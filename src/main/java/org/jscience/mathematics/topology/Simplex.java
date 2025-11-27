@@ -22,6 +22,7 @@
  */
 package org.jscience.mathematics.topology;
 
+import org.jscience.mathematics.number.Natural;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,8 +30,8 @@ import java.util.Set;
  * Represents a Simplex (a generalized triangle/tetrahedron).
  * <p>
  * Defined by a set of vertices. This implementation represents an Abstract
- * Simplex
- * where vertices are identified by integers.
+ * Simplex where vertices are identified by natural numbers (non-negative
+ * integers).
  * </p>
  * 
  * @author Silvere Martin-Michiellot
@@ -38,17 +39,33 @@ import java.util.Set;
  * @since 1.0
  */
 public class Simplex {
-    private final Set<Integer> vertices;
+    private final Set<Natural> vertices;
 
     /**
      * Creates a simplex from a list of vertex IDs.
      * 
-     * @param verts vertex IDs
+     * @param verts vertex IDs (non-negative)
      */
     public Simplex(int... verts) {
         this.vertices = new HashSet<>();
-        for (int v : verts)
+        for (int v : verts) {
+            if (v < 0) {
+                throw new IllegalArgumentException("Vertex indices must be non-negative: " + v);
+            }
+            vertices.add(Natural.of(v));
+        }
+    }
+
+    /**
+     * Creates a simplex from a list of Natural vertex IDs.
+     * 
+     * @param verts vertex IDs as Natural numbers
+     */
+    public Simplex(Natural... verts) {
+        this.vertices = new HashSet<>();
+        for (Natural v : verts) {
             vertices.add(v);
+        }
     }
 
     /**
@@ -56,7 +73,7 @@ public class Simplex {
      * 
      * @param verts set of vertex IDs
      */
-    public Simplex(Set<Integer> verts) {
+    public Simplex(Set<Natural> verts) {
         this.vertices = new HashSet<>(verts);
     }
 
@@ -78,8 +95,8 @@ public class Simplex {
      */
     public Set<Simplex> faces() {
         Set<Simplex> faces = new HashSet<>();
-        for (Integer v : vertices) {
-            Set<Integer> faceVerts = new HashSet<>(vertices);
+        for (Natural v : vertices) {
+            Set<Natural> faceVerts = new HashSet<>(vertices);
             faceVerts.remove(v);
             if (!faceVerts.isEmpty()) {
                 faces.add(new Simplex(faceVerts));
@@ -91,9 +108,9 @@ public class Simplex {
     /**
      * Returns the vertices of this simplex.
      * 
-     * @return unmodifiable view of vertices? Or copy?
+     * @return unmodifiable view of vertices
      */
-    public Set<Integer> getVertices() {
+    public Set<Natural> getVertices() {
         return java.util.Collections.unmodifiableSet(vertices);
     }
 
