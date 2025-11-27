@@ -1,4 +1,4 @@
-package org.jscience.mathematics.algebra;
+package org.jscience.mathematics.algebra.algebras;
 
 import org.jscience.mathematics.vector.Vector;
 

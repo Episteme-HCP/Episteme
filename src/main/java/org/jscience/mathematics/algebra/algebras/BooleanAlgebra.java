@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.mathematics.algebra;
+package org.jscience.mathematics.algebra.algebras;
 
 /**
  * Boolean algebra - a special algebraic structure for logic operations.
