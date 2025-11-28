@@ -66,7 +66,7 @@ public class HenonMap implements DiscreteMap<Point2D> {
      * @param b parameter b
      */
     public HenonMap(double a, double b) {
-        this(Real.valueOf(a), Real.valueOf(b));
+        this(Real.of(a), Real.of(b));
     }
 
     /**

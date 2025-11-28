@@ -196,4 +196,44 @@ final class IntegerInt extends Integer {
     public String toString() {
         return java.lang.Integer.toString(value);
     }
+
+    @Override
+    public int intValue() {
+        return value;
+    }
+
+    @Override
+    public float floatValue() {
+        return (float) value;
+    }
+
+    @Override
+    public double doubleValue() {
+        return (double) value;
+    }
+
+    @Override
+    public Integer inverse(Integer element) {
+        return element.negate();
+    }
+
+    @Override
+    public Integer operate(Integer left, Integer right) {
+        return left.add(right);
+    }
+
+    @Override
+    public String description() {
+        return "Integer (32-bit)";
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public boolean contains(Integer element) {
+        return element != null;
+    }
 }

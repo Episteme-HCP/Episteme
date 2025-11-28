@@ -26,8 +26,8 @@ package org.jscience.mathematics.vector;
 import java.util.ArrayList;
 import java.util.List;
 import org.jscience.mathematics.algebra.Field;
-import org.jscience.mathematics.context.ComputeContext;
 import org.jscience.mathematics.context.ComputeMode;
+import org.jscience.mathematics.context.MathContext;
 import org.jscience.mathematics.vector.backend.JavaLinearAlgebraProvider;
 import org.jscience.mathematics.vector.backend.LinearAlgebraProvider;
 
@@ -71,7 +71,7 @@ public class DenseMatrix<E> implements Matrix<E> {
     }
 
     private LinearAlgebraProvider<E> getProvider() {
-        ComputeMode mode = ComputeContext.getCurrent().getMode();
+        ComputeMode mode = MathContext.getCurrent().getComputeMode();
 
         if (mode == ComputeMode.CPU) {
             return new JavaLinearAlgebraProvider<>(field);
@@ -84,13 +84,13 @@ public class DenseMatrix<E> implements Matrix<E> {
             if (!canUseGpu) {
                 throw new UnsupportedOperationException("GPU mode currently only supports Real numbers");
             }
-            return new org.jscience.mathematics.provider.CudaLinearAlgebraProvider<>(field);
+            return new org.jscience.mathematics.vector.backend.CudaLinearAlgebraProvider<>(field);
         }
 
         // AUTO mode
         if (canUseGpu) {
             try {
-                return new org.jscience.mathematics.provider.CudaLinearAlgebraProvider<>(field);
+                return new org.jscience.mathematics.vector.backend.CudaLinearAlgebraProvider<>(field);
             } catch (UnsupportedOperationException e) {
                 // Fallback to CPU if CUDA not available
                 return new JavaLinearAlgebraProvider<>(field);

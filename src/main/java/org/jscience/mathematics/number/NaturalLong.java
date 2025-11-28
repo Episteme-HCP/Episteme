@@ -171,4 +171,54 @@ final class NaturalLong extends Natural {
     public String toString() {
         return String.valueOf(value);
     }
+
+    @Override
+    public int intValue() {
+        return (int) value;
+    }
+
+    @Override
+    public float floatValue() {
+        return (float) value;
+    }
+
+    @Override
+    public double doubleValue() {
+        return (double) value;
+    }
+
+    @Override
+    public Natural operate(Natural left, Natural right) {
+        return left.add(right);
+    }
+
+    @Override
+    public Natural multiply(Natural left, Natural right) {
+        return left.multiply(right);
+    }
+
+    @Override
+    public Natural one() {
+        return Natural.ONE;
+    }
+
+    @Override
+    public boolean isMultiplicationCommutative() {
+        return true;
+    }
+
+    @Override
+    public String description() {
+        return "Natural (64-bit)";
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public boolean contains(Natural element) {
+        return element != null;
+    }
 }

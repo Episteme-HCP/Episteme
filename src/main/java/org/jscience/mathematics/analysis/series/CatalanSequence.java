@@ -52,7 +52,7 @@ public class CatalanSequence implements IntegerSequence {
         // For now, we convert from BigInteger if needed
         int nInt = n.intValue();
         java.math.BigInteger bigResult = Combinatorics.catalan(nInt);
-        return Integer.valueOf(bigResult);
+        return Integer.of(bigResult);
     }
 
     @Override

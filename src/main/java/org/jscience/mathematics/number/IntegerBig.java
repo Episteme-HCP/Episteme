@@ -3,7 +3,7 @@
  * Copyright (c) 2025 Silvere Martin-Michiellot
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
+ * of this software and associated documentation files (the \"Software\"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -12,7 +12,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -96,6 +96,11 @@ final class IntegerBig extends Integer {
     }
 
     @Override
+    public int intValue() {
+        return value.intValue();
+    }
+
+    @Override
     public long longValue() {
         if (value.bitLength() > 63) {
             throw new ArithmeticException("Value too large for long");
@@ -104,8 +109,28 @@ final class IntegerBig extends Integer {
     }
 
     @Override
+    public float floatValue() {
+        return value.floatValue();
+    }
+
+    @Override
+    public double doubleValue() {
+        return value.doubleValue();
+    }
+
+    @Override
     public BigInteger bigIntegerValue() {
         return value;
+    }
+
+    @Override
+    public Integer operate(Integer left, Integer right) {
+        return left.add(right);
+    }
+
+    @Override
+    public Integer inverse(Integer element) {
+        return element.negate();
     }
 
     @Override
@@ -129,7 +154,38 @@ final class IntegerBig extends Integer {
     }
 
     @Override
+    public String description() {
+        return "Integer (Arbitrary Precision)";
+    }
+
+    @Override
     public String toString() {
         return value.toString();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    @Override
+    public boolean contains(Integer element) {
+        return element != null;
+    }
+
+    @Override
+    public Integer one() {
+        return Integer.ONE;
+    }
+
+    @Override
+    public Integer multiply(Integer left, Integer right) {
+        return left.multiply(right);
+    }
+
+    @Override
+    public boolean isMultiplicationCommutative() {
+        return true;
     }
 }

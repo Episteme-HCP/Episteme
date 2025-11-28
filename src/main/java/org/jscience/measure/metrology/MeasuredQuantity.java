@@ -183,7 +183,7 @@ public interface MeasuredQuantity<Q extends Quantity<Q>> {
      * @return the product with scaled uncertainty
      */
     default MeasuredQuantity<Q> multiply(double scalar) {
-        return multiply(Real.valueOf(scalar));
+        return multiply(Real.of(scalar));
     }
 
     /**
@@ -216,7 +216,7 @@ public interface MeasuredQuantity<Q extends Quantity<Q>> {
      * @return the quotient with scaled uncertainty
      */
     default MeasuredQuantity<Q> divide(double scalar) {
-        return divide(Real.valueOf(scalar));
+        return divide(Real.of(scalar));
     }
 
     /**

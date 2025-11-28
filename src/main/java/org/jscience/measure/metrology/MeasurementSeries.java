@@ -130,7 +130,7 @@ public class MeasurementSeries<Q extends Quantity<Q>> {
             sumSquaredDiff = sumSquaredDiff.add(diff.multiply(diff));
         }
 
-        Real variance = sumSquaredDiff.divide(Real.valueOf(measurements.size() - 1));
+        Real variance = sumSquaredDiff.divide(Real.of(measurements.size() - 1));
         Real stdDev = variance.sqrt();
 
         return mean.multiply(stdDev.divide(mean.getValue())); // Preserve units
@@ -146,7 +146,7 @@ public class MeasurementSeries<Q extends Quantity<Q>> {
      */
     public Quantity<Q> getStandardError() {
         Quantity<Q> stdDev = getStandardDeviation();
-        Real sqrtN = Real.valueOf(Math.sqrt(measurements.size()));
+        Real sqrtN = Real.of(Math.sqrt(measurements.size()));
         return stdDev.divide(sqrtN);
     }
 
@@ -204,7 +204,7 @@ public class MeasurementSeries<Q extends Quantity<Q>> {
                 for (Quantity<Q> m : measurements) {
                     Real diff = m.getValue().subtract(mean.getValue()).abs();
                     Real z = diff.divide(stdDev.getValue());
-                    if (z.compareTo(Real.valueOf(3.0)) > 0) {
+                    if (z.compareTo(Real.of(3.0)) > 0) {
                         outliers.add(m);
                     }
                 }

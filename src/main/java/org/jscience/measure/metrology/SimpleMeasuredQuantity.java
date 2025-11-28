@@ -70,8 +70,8 @@ final class SimpleMeasuredQuantity<Q extends Quantity<Q>> implements MeasuredQua
     public Real getRelativeUncertainty() {
         Real v = value.getValue();
         Real u = uncertainty.getValue();
-        if (v.abs().compareTo(Real.valueOf(1e-10)) < 0) {
-            return Real.valueOf(Double.POSITIVE_INFINITY); // Undefined
+        if (v.abs().compareTo(Real.of(1e-10)) < 0) {
+            return Real.of(Double.POSITIVE_INFINITY); // Undefined
         }
         return u.divide(v.abs());
     }
@@ -207,7 +207,7 @@ final class SimpleMeasuredQuantity<Q extends Quantity<Q>> implements MeasuredQua
     public boolean isConsistentWith(MeasuredQuantity<Q> other) {
         // Normalized difference should be < k (coverage factor)
         Real diff = getStandardizedDifference(other);
-        return diff.compareTo(Real.valueOf(getCoverageFactor())) < 0;
+        return diff.compareTo(Real.of(getCoverageFactor())) < 0;
     }
 
     @Override

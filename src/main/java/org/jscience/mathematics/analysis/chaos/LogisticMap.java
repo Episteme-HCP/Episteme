@@ -70,7 +70,7 @@ public class LogisticMap implements DiscreteMap<Double> {
      * @param r the growth rate parameter (typically [0, 4])
      */
     public LogisticMap(double r) {
-        this(Real.valueOf(r));
+        this(Real.of(r));
     }
 
     /**
@@ -83,18 +83,13 @@ public class LogisticMap implements DiscreteMap<Double> {
     }
 
     @Override
-    public Double evaluate(Double x) {
-        return iterate(x);
+    public Double apply(Double x) {
+        return iterate(Real.of(x)).doubleValue();
     }
 
-    /**
-     * Iterates the logistic map (double precision).
-     * 
-     * @param x current value
-     * @return next value: r * x * (1 - x)
-     */
-    public double iterate(double x) {
-        return iterate(Real.valueOf(x)).doubleValue();
+    @Override
+    public Double evaluate(Double x) {
+        return apply(x);
     }
 
     /**

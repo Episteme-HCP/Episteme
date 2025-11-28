@@ -185,7 +185,7 @@ class StandardUnit<Q extends Quantity<Q>> implements Unit<Q> {
 
         @Override
         public Real convert(Real value) {
-            return value.multiply(Real.valueOf(scale));
+            return value.multiply(Real.of(scale));
         }
 
         @Override
@@ -214,7 +214,7 @@ class StandardUnit<Q extends Quantity<Q>> implements Unit<Q> {
 
         @Override
         public Real derivative(Real value) {
-            return Real.valueOf(scale);
+            return Real.of(scale);
         }
 
         @Override

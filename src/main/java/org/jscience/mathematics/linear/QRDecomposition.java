@@ -1,0 +1,145 @@
+package org.jscience.mathematics.linear;
+
+import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.vector.Matrix;
+import org.jscience.mathematics.vector.DenseMatrix;
+import org.jscience.mathematics.vector.Vector;
+import org.jscience.mathematics.sets.Reals;
+import java.util.List;
+import java.util.ArrayList;
+
+/**
+ * QR Decomposition: A = QR where Q is orthogonal, R is upper triangular.
+ * <p>
+ * Uses Gram-Schmidt orthogonalization. Essential for least squares and
+ * eigenvalues.
+ * </p>
+ * 
+ * @author Silvere Martin-Michiellot
+ * @since 1.0
+ */
+public class QRDecomposition {
+
+    private final Matrix<Real> Q;
+    private final Matrix<Real> R;
+
+    private QRDecomposition(Matrix<Real> Q, Matrix<Real> R) {
+        this.Q = Q;
+        this.R = R;
+    }
+
+    /**
+     * Computes QR decomposition using Gram-Schmidt.
+     */
+    public static QRDecomposition decompose(Matrix<Real> matrix) {
+        int m = matrix.rows();
+        int n = matrix.cols();
+
+        Real[][] q = new Real[m][n];
+        Real[][] r = new Real[n][n];
+
+        // Gram-Schmidt orthogonalization
+        for (int j = 0; j < n; j++) {
+            // Get column j
+            Real[] v = new Real[m];
+            for (int i = 0; i < m; i++) {
+                v[i] = matrix.get(i, j);
+            }
+
+            // Subtract projections on previous columns
+            for (int k = 0; k < j; k++) {
+                r[k][j] = Real.ZERO;
+                for (int i = 0; i < m; i++) {
+                    r[k][j] = r[k][j].add(q[i][k].multiply(v[i]));
+                }
+                for (int i = 0; i < m; i++) {
+                    v[i] = v[i].subtract(r[k][j].multiply(q[i][k]));
+                }
+            }
+
+            // Compute norm
+            r[j][j] = Real.ZERO;
+            for (int i = 0; i < m; i++) {
+                r[j][j] = r[j][j].add(v[i].multiply(v[i]));
+            }
+            r[j][j] = r[j][j].sqrt();
+
+            // Normalize
+            if (r[j][j].compareTo(Real.of(1e-10)) > 0) {
+                for (int i = 0; i < m; i++) {
+                    q[i][j] = v[i].divide(r[j][j]);
+                }
+            } else {
+                for (int i = 0; i < m; i++) {
+                    q[i][j] = Real.ZERO;
+                }
+            }
+
+            // Fill rest of R row with zeros
+            for (int k = j + 1; k < n; k++) {
+                r[j][k] = Real.ZERO;
+            }
+        }
+
+        // Convert to matrices
+        List<List<Real>> qRows = new ArrayList<>();
+        List<List<Real>> rRows = new ArrayList<>();
+
+        for (int i = 0; i < m; i++) {
+            List<Real> row = new ArrayList<>();
+            for (int j = 0; j < n; j++) {
+                row.add(q[i][j]);
+            }
+            qRows.add(row);
+        }
+
+        for (int i = 0; i < n; i++) {
+            List<Real> row = new ArrayList<>();
+            for (int j = 0; j < n; j++) {
+                row.add(r[i][j]);
+            }
+            rRows.add(row);
+        }
+
+        Matrix<Real> Q = DenseMatrix.of(qRows, Reals.getInstance());
+        Matrix<Real> R = DenseMatrix.of(rRows, Reals.getInstance());
+
+        return new QRDecomposition(Q, R);
+    }
+
+    public Matrix<Real> getQ() {
+        return Q;
+    }
+
+    public Matrix<Real> getR() {
+        return R;
+    }
+
+    /**
+     * Solves least squares problem: min ||Ax - b||₂
+     */
+    public Real[] solveLeastSquares(Real[] b) {
+        int n = R.rows();
+
+        // Compute Q^T * b
+        Real[] qtb = new Real[n];
+        for (int i = 0; i < n; i++) {
+            qtb[i] = Real.ZERO;
+            for (int j = 0; j < b.length; j++) {
+                qtb[i] = qtb[i].add(Q.get(j, i).multiply(b[j]));
+            }
+        }
+
+        // Back substitution on R
+        Real[] x = new Real[n];
+        for (int i = n - 1; i >= 0; i--) {
+            Real sum = qtb[i];
+            for (int j = i + 1; j < n; j++) {
+                sum = sum.subtract(R.get(i, j).multiply(x[j]));
+            }
+            x[i] = sum.divide(R.get(i, i));
+        }
+
+        return x;
+    }
+}

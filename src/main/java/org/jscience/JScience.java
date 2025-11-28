@@ -1,6 +1,5 @@
 package org.jscience;
 
-import org.jscience.mathematics.context.ComputeContext;
 import org.jscience.mathematics.context.ComputeMode;
 import org.jscience.mathematics.context.MathContext;
 
@@ -37,8 +36,13 @@ public final class JScience {
      * 
      * @param mode the compute mode (CPU, GPU, AUTO)
      */
+    /**
+     * Sets the global computation mode for linear algebra operations.
+     * 
+     * @param mode the compute mode (CPU, GPU, AUTO)
+     */
     public static void setComputeMode(ComputeMode mode) {
-        ComputeContext.enter(mode);
+        MathContext.setCurrent(MathContext.getCurrent().withComputeMode(mode));
     }
 
     /**
@@ -47,28 +51,28 @@ public final class JScience {
      * @return the current compute mode
      */
     public static ComputeMode getComputeMode() {
-        return ComputeContext.getCurrent().getMode();
+        return MathContext.getCurrent().getComputeMode();
     }
 
     /**
      * Sets the library to use exact arithmetic (BigDecimal) where applicable.
      */
     public static void setExactPrecision() {
-        MathContext.setCurrent(MathContext.exact());
+        MathContext.setCurrent(MathContext.getCurrent().withRealPrecision(MathContext.RealPrecision.EXACT));
     }
 
     /**
      * Sets the library to use standard floating-point arithmetic (double).
      */
     public static void setStandardPrecision() {
-        MathContext.setCurrent(MathContext.normal());
+        MathContext.setCurrent(MathContext.getCurrent().withRealPrecision(MathContext.RealPrecision.NORMAL));
     }
 
     /**
      * Sets the library to use fast floating-point arithmetic (float).
      */
     public static void setFastPrecision() {
-        MathContext.setCurrent(MathContext.fast());
+        MathContext.setCurrent(MathContext.getCurrent().withRealPrecision(MathContext.RealPrecision.FAST));
     }
 
     /**

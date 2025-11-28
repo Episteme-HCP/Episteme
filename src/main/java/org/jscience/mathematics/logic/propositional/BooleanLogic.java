@@ -1,5 +1,7 @@
 package org.jscience.mathematics.logic.propositional;
 
+import org.jscience.mathematics.logic.Logic;
+
 /**
  * Classical two-valued Boolean logic.
  * 

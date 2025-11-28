@@ -62,7 +62,7 @@ public class PrimeSequence implements IntegerSequence {
             while (index >= cachedPrimes.size()) {
                 generateMorePrimes();
             }
-            return Integer.valueOf(cachedPrimes.get(index));
+            return Integer.of(cachedPrimes.get(index));
         }
     }
 
@@ -75,7 +75,7 @@ public class PrimeSequence implements IntegerSequence {
     public Integer get(int n) {
         if (n < 0)
             throw new IllegalArgumentException("n must be >= 0");
-        return get(Natural.valueOf(n));
+        return get(Natural.of(n));
     }
 
     private void generateMorePrimes() {

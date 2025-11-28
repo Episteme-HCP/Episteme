@@ -122,7 +122,6 @@ public class OEISClient {
             this.terms = terms;
         }
 
-        @Override
         public Integer get(Natural n) {
             int index = n.intValue();
             if (index >= terms.size()) {
@@ -132,17 +131,14 @@ public class OEISClient {
             return terms.get(index);
         }
 
-        @Override
         public String getOEISId() {
             return id;
         }
 
-        @Override
         public String getName() {
             return name;
         }
 
-        @Override
         public String getDomain() {
             return "ℕ (0 to " + (terms.size() - 1) + ")";
         }

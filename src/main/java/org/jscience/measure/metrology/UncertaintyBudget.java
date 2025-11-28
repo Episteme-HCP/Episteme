@@ -211,7 +211,7 @@ public class UncertaintyBudget<Q extends Quantity<Q>> {
             Real c = source.sensitivityCoefficient;
             Real effectiveU = u.multiply(c);
             Real contributionSquared = effectiveU.multiply(effectiveU);
-            Real percentage = contributionSquared.divide(combinedSquared).multiply(Real.valueOf(100));
+            Real percentage = contributionSquared.divide(combinedSquared).multiply(Real.of(100));
 
             contributions.put(source.name, percentage.doubleValue());
         }

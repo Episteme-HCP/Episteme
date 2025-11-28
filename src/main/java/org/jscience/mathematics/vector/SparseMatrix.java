@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.jscience.mathematics.algebra.Field;
-import org.jscience.mathematics.context.ComputeContext;
 import org.jscience.mathematics.context.ComputeMode;
 import org.jscience.mathematics.vector.backend.JavaLinearAlgebraProvider;
 import org.jscience.mathematics.vector.backend.LinearAlgebraProvider;

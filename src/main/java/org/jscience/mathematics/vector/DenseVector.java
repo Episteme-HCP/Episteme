@@ -26,7 +26,6 @@ package org.jscience.mathematics.vector;
 import java.util.ArrayList;
 import java.util.List;
 import org.jscience.mathematics.algebra.Field;
-import org.jscience.mathematics.context.ComputeContext;
 import org.jscience.mathematics.context.ComputeMode;
 import org.jscience.mathematics.vector.backend.JavaLinearAlgebraProvider;
 import org.jscience.mathematics.vector.backend.LinearAlgebraProvider;
@@ -61,7 +60,7 @@ public class DenseVector<E> implements Vector<E> {
     }
 
     private LinearAlgebraProvider<E> getProvider() {
-        ComputeMode mode = ComputeContext.getCurrent().getMode();
+        ComputeMode mode = MathContext.getCurrent().getComputeMode();
 
         if (mode == ComputeMode.CPU) {
             return new JavaLinearAlgebraProvider<>(field);

@@ -66,6 +66,16 @@ final class NaturalBig extends Natural {
     }
 
     @Override
+    public Natural operate(Natural left, Natural right) {
+        return left.add(right);
+    }
+
+    @Override
+    public Natural multiply(Natural left, Natural right) {
+        return left.multiply(right);
+    }
+
+    @Override
     public Natural divide(Natural other) {
         if (other.isZero()) {
             throw new ArithmeticException("Division by zero");
@@ -94,6 +104,16 @@ final class NaturalBig extends Natural {
     }
 
     @Override
+    public Natural one() {
+        return Natural.ONE;
+    }
+
+    @Override
+    public int intValue() {
+        return value.intValue();
+    }
+
+    @Override
     public long longValue() {
         if (value.bitLength() > 63) {
             throw new ArithmeticException("Value too large for long: " + value);
@@ -102,8 +122,38 @@ final class NaturalBig extends Natural {
     }
 
     @Override
+    public float floatValue() {
+        return value.floatValue();
+    }
+
+    @Override
+    public double doubleValue() {
+        return value.doubleValue();
+    }
+
+    @Override
+    public boolean isMultiplicationCommutative() {
+        return true;
+    }
+
+    @Override
     public BigInteger bigIntegerValue() {
         return value;
+    }
+
+    @Override
+    public String description() {
+        return "Natural (Arbitrary Precision)";
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public boolean contains(Natural element) {
+        return element != null;
     }
 
     @Override
