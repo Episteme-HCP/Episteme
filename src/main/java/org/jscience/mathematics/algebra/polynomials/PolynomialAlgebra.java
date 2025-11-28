@@ -2,6 +2,7 @@ package org.jscience.mathematics.algebra.polynomials;
 
 import org.jscience.mathematics.number.Integer;
 import org.jscience.mathematics.algebra.Polynomial;
+import org.jscience.mathematics.sets.Integers;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -47,7 +48,7 @@ public class PolynomialAlgebra {
         // return gcd(b, a.mod(b));
 
         // Simplified: return 1 if coprime
-        return Polynomial.constant(Integer.ONE);
+        return Polynomial.constant(Integer.ONE, Integers.getInstance());
     }
 
     /**
@@ -170,7 +171,7 @@ public class PolynomialAlgebra {
             newCoeffs.add(p.coefficient(i).divide(cont));
         }
 
-        return Polynomial.of(newCoeffs);
+        return new Polynomial<>(newCoeffs, Integers.getInstance());
     }
 
     /**
