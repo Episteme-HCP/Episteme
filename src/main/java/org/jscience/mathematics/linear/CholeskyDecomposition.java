@@ -1,3 +1,76 @@
+/**
+ * Cholesky decomposition: A = LL^T for symmetric positive definite matrices.
+ * <p>
+ * <b>What it does</b>: Decomposes A into lower triangular L such that A = LL^T.
+ * More efficient than LU for SPD matrices: O(n³/3) vs O(2n³/3).
+ * Numerically stable, preserves positive definiteness.
+ * </p>
+ * 
+ * <p><b>When to use</b>:</p>
+ * <ul>
+ *   <li>Solving Ax=b when A is symmetric positive definite</li>
+ *   <li>Computing matrix inverse for SPD matrices</li>
+ *   <li>Computing determinant efficiently</li>
+ *   <li>Least squares problems with normal equations</li>
+ * </ul>
+ * 
+ * <p><b>Prerequisites</b>:</p>
+ * <ul>
+ *   <li>Matrix must be square (n × n)</li>
+ *   <li>Matrix must be symmetric: A = A^T</li>
+ *   <li>Matrix must be positive definite: x^T A x > 0 for all x ≠ 0</li>
+ * </ul>
+ * 
+ * <p><b>Algorithm complexity</b>: O(n³/3) for decomposition, O(n²) for solving Ax=b</p>
+ * 
+ * <p><b>Alternatives</b>:</p>
+ * <ul>
+ *   <li>Use {@link LUDecomposition} for general square matrices</li>
+ *   <li>Use {@link SVD} for rank-deficient or ill-conditioned matrices</li>
+ *   <li>Use {@link org.jscience.mathematics.linear.sparse.ConjugateGradient} for large sparse SPD systems</li>
+ * </ul>
+ * 
+ * <p><b>Usage example</b>:</p>
+ * <pre>{@code
+ * // Create symmetric positive definite matrix
+ * Real[][] data = {
+ *     {Real.of(4), Real.of(2)},
+ *     {Real.of(2), Real.of(3)}
+ * };
+ * Matrix<Real> A = DenseMatrix.of(Arrays.asList(
+ *     Arrays.asList(data[0]),
+ *     Arrays.asList(data[1])
+ * ), Reals.getInstance());
+ * 
+ * // Decompose
+ * CholeskyDecomposition chol = CholeskyDecomposition.decompose(A);
+ * 
+ * // Solve Ax = b
+ * Real[] b = {Real.of(6), Real.of(5)};
+ * Real[] x = chol.solve(b);
+ * 
+ * // Compute determinant
+ * Real det = chol.determinant();
+ * }</pre>
+ * 
+ * <p><b>Performance notes</b>:</p>
+ * <ul>
+ *   <li>Fast for small to medium matrices (n < 1000)</li>
+ *   <li>For large sparse matrices, use iterative solvers instead</li>
+ *   <li>Numerically stable for well-conditioned matrices</li>
+ *   <li>May fail if matrix is not positive definite (throws IllegalArgumentException)</li>
+ * </ul>
+ * 
+ * <p><b>Implementation details</b>: Uses Cholesky-Banachiewicz algorithm.</p>
+ * 
+ * @see LUDecomposition
+ * @see QRDecomposition
+ * @see SVD
+ * @see org.jscience.mathematics.linear.sparse.ConjugateGradient
+ * 
+ * @author Silvere Martin-Michiellot
+ * @since 1.0
+ */
 package org.jscience.mathematics.linear;
 
 import org.jscience.mathematics.number.Real;
@@ -6,17 +79,8 @@ import org.jscience.mathematics.vector.DenseMatrix;
 import org.jscience.mathematics.sets.Reals;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
-/**
- * Cholesky decomposition: A = LL^T for symmetric positive definite matrices.
- * <p>
- * More efficient than LU for SPD matrices: O(n³/3) vs O(2n³/3).
- * Numerically stable, preserves positive definiteness.
- * </p>
- * 
- * @author Silvere Martin-Michiellot
- * @since 1.0
- */
 public class CholeskyDecomposition {
 
     private final Matrix<Real> L; // Lower triangular
@@ -28,12 +92,27 @@ public class CholeskyDecomposition {
     /**
      * Computes Cholesky decomposition A = LL^T.
      * <p>
-     * Algorithm: L[i][j] = (A[i][j] - Σ L[i][k]*L[j][k]) / L[j][j]
+     * <b>Algorithm steps</b>:
+     * <ol>
+     * <li>For each diagonal element: L[i][i] = sqrt(A[i][i] - Σ L[i][k]²)</li>
+     * <li>For each off-diagonal: L[i][j] = (A[i][j] - Σ L[i][k]*L[j][k]) /
+     * L[j][j]</li>
+     * </ol>
      * </p>
      * 
-     * @param matrix symmetric positive definite matrix
-     * @return Cholesky decomposition
-     * @throws IllegalArgumentException if matrix not SPD
+     * <p>
+     * <b>Invariants</b>:
+     * </p>
+     * <ul>
+     * <li>L is lower triangular (L[i][j] = 0 for j > i)</li>
+     * <li>A = LL^T exactly (within numerical precision)</li>
+     * <li>All diagonal elements of L are positive</li>
+     * </ul>
+     * 
+     * @param matrix symmetric positive definite matrix to decompose
+     * @return Cholesky decomposition containing L
+     * @throws IllegalArgumentException if matrix is not square
+     * @throws IllegalArgumentException if matrix is not positive definite
      */
     public static CholeskyDecomposition decompose(Matrix<Real> matrix) {
         int n = matrix.rows();
@@ -84,10 +163,16 @@ public class CholeskyDecomposition {
     /**
      * Solves Ax = b using Cholesky decomposition.
      * <p>
-     * Two-step process:
-     * 1. Solve Ly = b (forward substitution)
-     * 2. Solve L^T x = y (backward substitution)
+     * <b>Algorithm steps</b>:
+     * <ol>
+     * <li>Forward substitution: Solve Ly = b for y</li>
+     * <li>Backward substitution: Solve L^T x = y for x</li>
+     * </ol>
+     * Complexity: O(n²)
      * </p>
+     * 
+     * @param b right-hand side vector
+     * @return solution vector x such that Ax = b
      */
     public Real[] solve(Real[] b) {
         int n = b.length;
@@ -116,7 +201,12 @@ public class CholeskyDecomposition {
     }
 
     /**
-     * Computes determinant: det(A) = (∏ L[i][i])²
+     * Computes determinant efficiently: det(A) = (∏ L[i][i])²
+     * <p>
+     * Complexity: O(n)
+     * </p>
+     * 
+     * @return determinant of original matrix A
      */
     public Real determinant() {
         Real prod = Real.ONE;
@@ -128,6 +218,12 @@ public class CholeskyDecomposition {
 
     /**
      * Computes matrix inverse using Cholesky.
+     * <p>
+     * Solves AX = I by solving Ax_i = e_i for each column.
+     * Complexity: O(n³)
+     * </p>
+     * 
+     * @return inverse of original matrix A
      */
     public Matrix<Real> inverse() {
         int n = L.rows();
@@ -160,12 +256,19 @@ public class CholeskyDecomposition {
         return DenseMatrix.of(invT, Reals.getInstance());
     }
 
+    /**
+     * Returns the lower triangular matrix L.
+     * 
+     * @return L such that A = LL^T
+     */
     public Matrix<Real> getL() {
         return L;
     }
 
     /**
      * Returns L^T (upper triangular).
+     * 
+     * @return transpose of L
      */
     public Matrix<Real> getLT() {
         int n = L.rows();
