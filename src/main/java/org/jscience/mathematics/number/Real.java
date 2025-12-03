@@ -72,6 +72,12 @@ public abstract class Real extends Number implements Comparable<Real> {
     /** The real number 2 */
     public static final Real TWO = RealDouble.of(2.0);
 
+    /** Positive infinity */
+    public static final Real POSITIVE_INFINITY = RealDouble.of(Double.POSITIVE_INFINITY);
+
+    /** Negative infinity */
+    public static final Real NEGATIVE_INFINITY = RealDouble.of(Double.NEGATIVE_INFINITY);
+
     /**
      * Creates a real number from a double value.
      * Uses current MathContext to decide implementation.

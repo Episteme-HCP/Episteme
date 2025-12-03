@@ -22,6 +22,8 @@
  */
 package org.jscience.mathematics.logic;
 
+import org.jscience.mathematics.logic.propositional.Proposition;
+
 /**
  * Temporal logic for reasoning about time and sequence of events.
  * <p>
