@@ -158,7 +158,7 @@ public class TimeSeries {
      */
     public static class MAModel {
         private final Real[] coefficients;
-        private final Real mean;
+        private Real mean; // Changed from final to allow initialization in constructor
 
         public MAModel(Real[] data, int order) {
             // Compute mean

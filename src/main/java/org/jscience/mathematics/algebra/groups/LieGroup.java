@@ -24,6 +24,7 @@ package org.jscience.mathematics.algebra.groups;
 
 import org.jscience.mathematics.algebra.Group;
 import org.jscience.mathematics.vector.Matrix;
+import org.jscience.mathematics.vector.Vector;
 import org.jscience.mathematics.number.Complex;
 import org.jscience.mathematics.sets.Complexes;
 
