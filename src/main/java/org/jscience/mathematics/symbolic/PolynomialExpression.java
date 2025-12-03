@@ -257,7 +257,32 @@ public class PolynomialExpression<T extends Ring<T>> implements Expression<T> {
                         return monoStr;
                     return coeffStr + "*" + monoStr;
                 })
+                .collect(Collectors.joining(" +"));
+    }
+
+    @Override
+    public Expression<T> simplify() {
+        // Already simplified by removing zero coefficients in constructor
+        return this;
+    }
+
+    @Override
+    public String toLatex() {
+        if (terms.isEmpty())
+            return "0";
+
+        return terms.entrySet().stream()
+                .sorted((e1, e2) -> e2.getKey().compareTo(e1.getKey()))
+                .map(e -> {
+                    String coeffStr = e.getValue().toString();
+                    String monoStr = e.getKey().toString(); // Would use .toLatex() if Monomial had it
+
+                    if (monoStr.equals("1"))
+                        return coeffStr;
+                    if (e.getValue().equals(ring.one()))
+                        return monoStr;
+                    return coeffStr + monoStr;
+                })
                 .collect(Collectors.joining(" + "));
     }
 }
-
