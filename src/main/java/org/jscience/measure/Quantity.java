@@ -140,7 +140,7 @@ public interface Quantity<Q extends Quantity<Q>> {
      * @return a new quantity scaled by the given factor
      */
     default Quantity<Q> multiply(double scalar) {
-        return multiply(Real.valueOf(scalar));
+        return multiply(Real.of(scalar));
     }
 
     /**
@@ -171,7 +171,7 @@ public interface Quantity<Q extends Quantity<Q>> {
      * @return a new quantity divided by the given factor
      */
     default Quantity<Q> divide(double scalar) {
-        return divide(Real.valueOf(scalar));
+        return divide(Real.of(scalar));
     }
 
     /**
@@ -207,7 +207,7 @@ public interface Quantity<Q extends Quantity<Q>> {
      * @return true if the value is approximately zero
      */
     default boolean isZero() {
-        return getValue().abs().compareTo(Real.valueOf(1e-10)) < 0;
+        return getValue().abs().compareTo(Real.of(1e-10)) < 0;
     }
 
     /**

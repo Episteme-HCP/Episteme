@@ -1,4 +1,7 @@
-package org.jscience.mathematics.logic;
+package org.jscience.mathematics.logic.predicate;
+
+import org.jscience.mathematics.logic.Proposition;
+import org.jscience.mathematics.logic.Term;
 
 /**
  * Represents a quantifier in predicate logic.
