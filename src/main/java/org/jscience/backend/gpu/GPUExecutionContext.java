@@ -20,51 +20,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jscience.mathematics.backend;
+package org.jscience.backend.gpu;
 
-import org.jscience.mathematics.analysis.Function;
-import java.util.stream.DoubleStream;
+import org.jscience.backend.ExecutionContext;
+import org.jscience.backend.Operation;
+import org.jocl.cl_command_queue;
+import org.jocl.cl_context;
 
 /**
- * Standard CPU implementation of ComputeBackend.
- * <p>
- * Uses Java Streams for parallel execution on multi-core CPUs.
- * </p>
+ * GPU Execution Context.
  * 
  * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CPUBackend implements ComputeBackend {
+public class GPUExecutionContext implements ExecutionContext {
 
-    private final boolean parallel;
+    private final cl_context context;
+    private final cl_command_queue commandQueue;
 
-    public CPUBackend() {
-        this(true); // Default to parallel
-    }
-
-    public CPUBackend(boolean parallel) {
-        this.parallel = parallel;
-    }
-
-    @Override
-    public String getName() {
-        return parallel ? "Multi-core CPU" : "Single-core CPU";
+    public GPUExecutionContext(cl_context context, cl_command_queue commandQueue) {
+        this.context = context;
+        this.commandQueue = commandQueue;
     }
 
     @Override
-    public boolean isAvailable() {
-        return true;
+    public <T> T execute(Operation<T> operation) {
+        // TODO: Implement GPU execution logic (kernel compilation, data transfer, etc.)
+        // For now, fallback to CPU or throw
+        throw new UnsupportedOperationException("GPU execution not yet implemented for generic operations");
     }
 
     @Override
-    public double[] evaluate(Function<Double, Double> f, double[] inputs) {
-        DoubleStream stream = DoubleStream.of(inputs);
-
-        if (parallel) {
-            stream = stream.parallel();
-        }
-
-        return stream.map(x -> f.apply(x)).toArray();
+    public void close() {
+        // Cleanup if needed (context/queue are shared usually, but per-context
+        // resources should be freed)
     }
 }

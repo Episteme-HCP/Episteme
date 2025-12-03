@@ -130,7 +130,7 @@ public interface Function<D, C> extends Relation<D, C>, java.util.function.Funct
      * 
      * @param backend the compute backend
      */
-    default void setBackend(org.jscience.mathematics.backend.ComputeBackend backend) {
+    default void setBackend(org.jscience.backend.ComputeBackend backend) {
         // Default implementation does nothing (stateless functions)
     }
 
@@ -139,7 +139,7 @@ public interface Function<D, C> extends Relation<D, C>, java.util.function.Funct
      * 
      * @return the compute backend, or null if none is explicitly set or supported.
      */
-    default org.jscience.mathematics.backend.ComputeBackend getBackend() {
+    default org.jscience.backend.ComputeBackend getBackend() {
         return null;
     }
 

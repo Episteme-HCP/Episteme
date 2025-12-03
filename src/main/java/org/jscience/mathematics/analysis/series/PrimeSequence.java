@@ -23,7 +23,7 @@
 package org.jscience.mathematics.analysis.series;
 
 import org.jscience.mathematics.numbertheory.Primes;
-import org.jscience.mathematics.backend.ComputeBackend;
+import org.jscience.backend.ComputeBackend;
 import org.jscience.mathematics.number.Integer;
 import org.jscience.mathematics.number.Natural;
 import java.util.ArrayList;
@@ -80,7 +80,7 @@ public class PrimeSequence implements IntegerSequence {
 
     private void generateMorePrimes() {
         // If we have a GPU backend, use it to sieve the next block
-        if (backend != null && backend.getPlatform().equals("OpenCL")) {
+        if (backend != null && backend.getName().contains("GPU")) {
             generatePrimesGPU();
         } else {
             generatePrimesCPU();
