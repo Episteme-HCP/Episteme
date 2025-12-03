@@ -172,11 +172,11 @@ public class DelaunayTriangulation {
             // Find boundary polygon
             List<Point[]> polygon = new ArrayList<>();
             for (Triangle tri : badTriangles) {
-                Point[] edges = {
-                        new Point[] { tri.p1, tri.p2 },
-                        new Point[] { tri.p2, tri.p3 },
-                        new Point[] { tri.p3, tri.p1 }
-                };
+                // Create edges as 2D array
+                Point[][] edges = new Point[3][2];
+                edges[0] = new Point[] { tri.p1, tri.p2 };
+                edges[1] = new Point[] { tri.p2, tri.p3 };
+                edges[2] = new Point[] { tri.p3, tri.p1 };
 
                 for (Point[] edge : edges) {
                     boolean shared = false;

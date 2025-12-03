@@ -57,7 +57,7 @@ public class SquareSequence implements IntegerSequence {
 
     @Override
     public Integer get(Natural n) {
-        Integer nInt = Integer.valueOf(n.longValue());
+        Integer nInt = Integer.of(n.longValue());
         return nInt.multiply(nInt);
     }
 
