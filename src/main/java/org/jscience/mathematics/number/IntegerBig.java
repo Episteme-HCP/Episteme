@@ -169,7 +169,6 @@ final class IntegerBig extends Integer {
     }
 
     @Override
-    @Override
     public boolean contains(Integer element) {
         return element != null;
     }

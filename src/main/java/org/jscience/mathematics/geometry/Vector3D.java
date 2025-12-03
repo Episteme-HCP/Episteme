@@ -24,7 +24,6 @@ package org.jscience.mathematics.geometry;
 
 import org.jscience.mathematics.vector.DenseVector;
 import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.number.Reals;
 import java.util.Arrays;
 
 /**
@@ -52,7 +51,7 @@ public class Vector3D extends DenseVector<Real> {
      * @param z the z coordinate
      */
     public Vector3D(double x, double y, double z) {
-        super(Arrays.asList(Real.of(x), Real.of(y), Real.of(z)), Reals.getInstance());
+        super(Arrays.asList(Real.of(x), Real.of(y), Real.of(z)), null);
     }
 
     /**
@@ -63,7 +62,7 @@ public class Vector3D extends DenseVector<Real> {
      * @param z the z coordinate
      */
     public Vector3D(Real x, Real y, Real z) {
-        super(Arrays.asList(x, y, z), Reals.getInstance());
+        super(Arrays.asList(x, y, z), null);
     }
 
     public Real x() {

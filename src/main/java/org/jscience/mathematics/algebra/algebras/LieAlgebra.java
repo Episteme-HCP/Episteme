@@ -1,5 +1,6 @@
 package org.jscience.mathematics.algebra.algebras;
 
+import org.jscience.mathematics.algebra.Algebra;
 import org.jscience.mathematics.vector.Vector;
 
 /**

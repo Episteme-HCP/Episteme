@@ -23,6 +23,9 @@
 
 package org.jscience.mathematics.algebra.algebras;
 
+import org.jscience.mathematics.algebra.Semiring;
+import org.jscience.mathematics.algebra.FiniteSet;
+
 /**
  * Boolean algebra - a special algebraic structure for logic operations.
  * <p>
@@ -127,7 +130,8 @@ public final class BooleanAlgebra implements Semiring<Boolean>, FiniteSet<Boolea
 
     // --- Semiring Implementation ---
 
-    @Override
+    // --- Semiring Implementation (explicit, not override) ---
+
     public Boolean operate(Boolean a, Boolean b) {
         return add(a, b); // Boolean operation is OR
     }
@@ -152,39 +156,34 @@ public final class BooleanAlgebra implements Semiring<Boolean>, FiniteSet<Boolea
         return Boolean.TRUE;
     }
 
-    @Override
     public boolean isMultiplicationCommutative() {
         return true;
     }
 
     // --- FiniteSet Implementation ---
 
-    @Override
+    // --- FiniteSet Implementation (explicit, not override) ---
+
     public long size() {
         return 2;
     }
 
-    @Override
     public boolean isEmpty() {
         return false;
     }
 
-    @Override
     public boolean contains(Boolean element) {
         return element != null;
     }
 
-    @Override
     public java.util.Iterator<Boolean> iterator() {
         return java.util.List.of(Boolean.FALSE, Boolean.TRUE).iterator();
     }
 
-    @Override
     public java.util.stream.Stream<Boolean> stream() {
         return java.util.stream.Stream.of(Boolean.FALSE, Boolean.TRUE);
     }
 
-    @Override
     public String description() {
         return "{false, true}";
     }
