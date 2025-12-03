@@ -1,4 +1,4 @@
-package org.jscience.mathematics.logic;
+package org.jscience.mathematics.logic.multivalued;
 
 /**
  * Three-valued logic system (True, False, Unknown).

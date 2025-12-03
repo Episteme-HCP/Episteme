@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jscience.mathematics.logic;
+package org.jscience.mathematics.logic.modal;
 
 import org.jscience.mathematics.logic.propositional.Proposition;
 

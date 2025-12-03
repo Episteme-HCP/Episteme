@@ -23,7 +23,7 @@
 package org.jscience.mathematics.analysis;
 
 import org.jscience.mathematics.algebra.Ring;
-import org.jscience.mathematics.algebra.ring.PolynomialRing;
+import org.jscience.mathematics.algebra.rings.PolynomialRing;
 import java.util.Map;
 import java.util.HashMap;
 

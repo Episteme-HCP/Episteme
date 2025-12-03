@@ -1,4 +1,4 @@
-package org.jscience.mathematics.topology;
+package org.jscience.mathematics.topology.metrics;
 
 import org.jscience.mathematics.number.Real;
 import org.jscience.mathematics.vector.Vector;

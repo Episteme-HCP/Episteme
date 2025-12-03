@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jscience.mathematics.topology;
+package org.jscience.mathematics.topology.metrics;
 
 import org.jscience.mathematics.number.Real;
 import org.jscience.mathematics.vector.DenseMatrix;
