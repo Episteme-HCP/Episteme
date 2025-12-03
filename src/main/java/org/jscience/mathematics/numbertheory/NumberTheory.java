@@ -171,4 +171,15 @@ public class NumberTheory {
 
         return Natural.of(result);
     }
+
+    /**
+     * Probabilistic primality test using Miller-Rabin.
+     * 
+     * @param n         number to test
+     * @param certainty number of rounds (higher = more certain)
+     * @return true if probably prime
+     */
+    public static boolean isProbablePrime(Natural n, int certainty) {
+        return millerRabin(n.toBigInteger(), certainty);
+    }
 }

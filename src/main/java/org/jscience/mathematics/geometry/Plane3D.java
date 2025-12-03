@@ -87,4 +87,16 @@ public class Plane3D {
 
         return new Vector3D(px, py, pz);
     }
+
+    /**
+     * Returns a negated version of this plane (flips the normal).
+     * 
+     * @return the negated plane
+     */
+    public Plane3D negate() {
+        return new Plane3D(point, new Vector3D(
+                normal.x().negate(),
+                normal.y().negate(),
+                normal.z().negate()));
+    }
 }
