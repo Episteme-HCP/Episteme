@@ -113,7 +113,7 @@ public class NumberTheory {
             return new Integer[] { a, Integer.ONE, Integer.ZERO };
         }
 
-        Integer[] result = extendedGCD(b, a.mod(b));
+        Integer[] result = extendedGCD(b, Integer.of(a.toBigInteger().mod(b.toBigInteger())));
         Integer gcd = result[0];
         Integer x1 = result[1];
         Integer y1 = result[2];
@@ -143,7 +143,7 @@ public class NumberTheory {
             throw new ArithmeticException("Modular inverse does not exist");
         }
 
-        return Natural.of(x.mod(Integer.of(m.toBigInteger())).toBigInteger());
+        return Natural.of(x.toBigInteger().mod(m.toBigInteger()));
     }
 
     /**

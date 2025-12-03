@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.jscience.mathematics.algebra.Field;
 import org.jscience.mathematics.context.ComputeMode;
+import org.jscience.mathematics.context.MathContext;
 import org.jscience.mathematics.vector.backend.JavaLinearAlgebraProvider;
 import org.jscience.mathematics.vector.backend.LinearAlgebraProvider;
 
