@@ -1,7 +1,7 @@
 package org.jscience.mathematics.discrete.graph.flow;
 
 import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.discrete.graph.Graph;
+import org.jscience.mathematics.discrete.Graph;
 import java.util.*;
 
 /**

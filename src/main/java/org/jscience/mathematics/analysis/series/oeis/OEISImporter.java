@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jscience.mathematics.analysis.series.IntegerSequence;
 import org.jscience.mathematics.number.Integer;
 import org.jscience.mathematics.number.Natural;
 

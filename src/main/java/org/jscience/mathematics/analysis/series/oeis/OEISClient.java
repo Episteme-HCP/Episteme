@@ -29,6 +29,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jscience.mathematics.analysis.series.IntegerSequence;
 import org.jscience.mathematics.number.Integer;
 import org.jscience.mathematics.number.Natural;
 

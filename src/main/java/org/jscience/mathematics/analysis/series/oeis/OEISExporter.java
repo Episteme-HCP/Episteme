@@ -24,6 +24,7 @@ package org.jscience.mathematics.analysis.series.oeis;
 
 import java.io.PrintWriter;
 
+import org.jscience.mathematics.analysis.series.IntegerSequence;
 import org.jscience.mathematics.number.Integer;
 import org.jscience.mathematics.number.Natural;
 
