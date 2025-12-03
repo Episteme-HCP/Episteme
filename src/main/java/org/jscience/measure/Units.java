@@ -81,6 +81,21 @@ public final class Units {
      */
     public static final Unit<Time> SECOND = new StandardUnit<>("s", "second", Dimension.TIME);
 
+    /**
+     * The SI unit of temperature: kelvin (K).
+     */
+    public static final Unit<Temperature> KELVIN = new StandardUnit<>("K", "kelvin", Dimension.TEMPERATURE);
+
+    /**
+     * The SI unit of electric current: ampere (A).
+     */
+    public static final Unit<ElectricCurrent> AMPERE = new StandardUnit<>("A", "ampere", Dimension.ELECTRIC_CURRENT);
+
+    /**
+     * The SI unit of amount of substance: mole (mol).
+     */
+    public static final Unit<AmountOfSubstance> MOLE = new StandardUnit<>("mol", "mole", Dimension.AMOUNT_OF_SUBSTANCE);
+
     // ========== METRIC LENGTH UNITS ==========
 
     /** Kilometer: 1 km = 1000 m */
@@ -142,6 +157,63 @@ public final class Units {
      */
     @SuppressWarnings("unchecked")
     public static final Unit<Velocity> KILOMETER_PER_HOUR = (Unit<Velocity>) KILOMETER.divide(HOUR);
+
+    /**
+     * Meter per second squared: m/s² (acceleration).
+     */
+    @SuppressWarnings("unchecked")
+    public static final Unit<Acceleration> METERS_PER_SECOND_SQUARED = (Unit<Acceleration>) METER
+            .divide(SECOND.multiply(SECOND));
+
+    /**
+     * Joule: J (energy). 1 J = 1 kg⋅m²/s²
+     */
+    @SuppressWarnings("unchecked")
+    public static final Unit<Energy> JOULE = (Unit<Energy>) KILOGRAM.multiply(METER).multiply(METER)
+            .divide(SECOND.multiply(SECOND));
+
+    /**
+     * Watt: W (power). 1 W = 1 J/s
+     */
+    @SuppressWarnings("unchecked")
+    public static final Unit<Power> WATT = (Unit<Power>) JOULE.divide(SECOND);
+
+    /**
+     * Coulomb: C (electric charge). 1 C = 1 A⋅s
+     */
+    @SuppressWarnings("unchecked")
+    public static final Unit<ElectricCharge> COULOMB = (Unit<ElectricCharge>) AMPERE.multiply(SECOND);
+
+    /**
+     * Farad: F (capacitance). Simplified as C²⋅s²/(kg⋅m²)
+     */
+    @SuppressWarnings("unchecked")
+    public static final Unit<ElectricCapacitance> FARAD = (Unit<ElectricCapacitance>) COULOMB.multiply(COULOMB)
+            .multiply(SECOND).multiply(SECOND).divide(KILOGRAM.multiply(METER).multiply(METER));
+
+    /**
+     * Henry: H (inductance). 1 H = kg⋅m²/(s²⋅A²)
+     */
+    @SuppressWarnings("unchecked")
+    public static final Unit<Inductance> HENRY = (Unit<Inductance>) KILOGRAM.multiply(METER).multiply(METER)
+            .divide(SECOND.multiply(SECOND).multiply(AMPERE).multiply(AMPERE));
+
+    /**
+     * Dimensionless unit: 1 (for ratios).
+     */
+    public static final Unit<Dimensionless> ONE = new StandardUnit<>("1", "one", Dimension.DIMENSIONLESS);
+
+    /**
+     * Cubic meter: m³ (volume).
+     */
+    @SuppressWarnings("unchecked")
+    public static final Unit<Volume> CUBIC_METER = (Unit<Volume>) METER.pow(3);
+
+    /**
+     * Square meter: m² (area).
+     */
+    @SuppressWarnings("unchecked")
+    public static final Unit<Area> SQUARE_METER = (Unit<Area>) METER.pow(2);
 
     // ========== IMPERIAL/US CUSTOMARY UNITS ==========
 
