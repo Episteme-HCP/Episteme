@@ -104,7 +104,7 @@ public final class JScience {
      */
     public static boolean isGpuAvailable() {
         try {
-            return org.jscience.mathematics.provider.CudaLinearAlgebraProvider.isAvailable();
+            return org.jscience.mathematics.vector.backend.CudaLinearAlgebraProvider.isAvailable();
         } catch (Throwable t) {
             return false;
         }
