@@ -93,7 +93,7 @@ final class StandardQuantity<Q extends Quantity<Q>> implements Quantity<Q> {
 
     @Override
     public Quantity<Q> multiply(double scalar) {
-        return multiply(Real.valueOf(scalar));
+        return multiply(Real.of(scalar));
     }
 
     @Override
@@ -111,7 +111,7 @@ final class StandardQuantity<Q extends Quantity<Q>> implements Quantity<Q> {
 
     @Override
     public Quantity<Q> divide(double scalar) {
-        return divide(Real.valueOf(scalar));
+        return divide(Real.of(scalar));
     }
 
     @Override

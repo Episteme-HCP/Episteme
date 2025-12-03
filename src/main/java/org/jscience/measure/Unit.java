@@ -43,7 +43,7 @@ package org.jscience.measure;
  * 
  * // Unit conversions
  * UnitConverter toKm = meter.getConverterTo(Units.KILOMETER);
- * Real km = toKm.convert(Real.valueOf(1000)); // 1 km
+ * Real km = toKm.convert(Real.of(1000)); // 1 km
  * }</pre>
  * </p>
  * 

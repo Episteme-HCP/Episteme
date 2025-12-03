@@ -82,7 +82,7 @@ public final class Quantities {
      * @return the quantity
      */
     public static <Q extends Quantity<Q>> Quantity<Q> create(double value, Unit<Q> unit) {
-        return create(Real.valueOf(value), unit);
+        return create(Real.of(value), unit);
     }
 
     /**
@@ -94,7 +94,7 @@ public final class Quantities {
      * @return the quantity
      */
     public static <Q extends Quantity<Q>> Quantity<Q> create(long value, Unit<Q> unit) {
-        return create(Real.valueOf(value), unit);
+        return create(Real.of(value), unit);
     }
 
     /**
@@ -106,7 +106,7 @@ public final class Quantities {
      * @return the quantity
      */
     public static <Q extends Quantity<Q>> Quantity<Q> create(int value, Unit<Q> unit) {
-        return create(Real.valueOf(value), unit);
+        return create(Real.of(value), unit);
     }
 
     /**

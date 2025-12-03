@@ -37,11 +37,11 @@ import org.jscience.mathematics.number.Real;
  * <pre>{@code
  * // Simple linear conversion
  * UnitConverter toKm = LinearConverter.of(0.001);
- * Real km = toKm.convert(Real.valueOf(1000)); // 1 km
+ * Real km = toKm.convert(Real.of(1000)); // 1 km
  * 
  * // Temperature conversion (affine)
  * UnitConverter cToF = LinearConverter.of(1.8, 32); // °C to °F
- * Real fahrenheit = cToF.convert(Real.valueOf(0)); // 32°F
+ * Real fahrenheit = cToF.convert(Real.of(0)); // 32°F
  * 
  * // Chained conversions
  * UnitConverter mToFt = LinearConverter.of(3.28084);
@@ -74,7 +74,7 @@ public interface UnitConverter {
      * @return the converted value
      */
     default double convert(double value) {
-        return convert(Real.valueOf(value)).doubleValue();
+        return convert(Real.of(value)).doubleValue();
     }
 
     /**
