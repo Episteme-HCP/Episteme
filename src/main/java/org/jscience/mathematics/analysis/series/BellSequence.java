@@ -96,7 +96,7 @@ public class BellSequence implements IntegerSequence {
         // Initialize first few values
         cache.put(0, BigInteger.ONE);
         cache.put(1, BigInteger.ONE);
-        cache.put(2, BigInteger.of(2));
+        cache.put(2, BigInteger.valueOf(2));
     }
 
     @Override
@@ -178,8 +178,8 @@ public class BellSequence implements IntegerSequence {
 
         BigInteger result = BigInteger.ONE;
         for (int i = 0; i < k; i++) {
-            result = result.multiply(BigInteger.of(n - i));
-            result = result.divide(BigInteger.of(i + 1));
+            result = result.multiply(BigInteger.valueOf(n - i));
+            result = result.divide(BigInteger.valueOf(i + 1));
         }
         return result;
     }
