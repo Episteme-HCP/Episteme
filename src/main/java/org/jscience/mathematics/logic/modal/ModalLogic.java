@@ -22,6 +22,8 @@
  */
 package org.jscience.mathematics.logic;
 
+import org.jscience.mathematics.logic.propositional.Proposition;
+
 /**
  * Modal logic for reasoning about necessity and possibility.
  * <p>
