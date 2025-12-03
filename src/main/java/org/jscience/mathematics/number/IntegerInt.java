@@ -236,4 +236,9 @@ final class IntegerInt extends Integer {
     public boolean contains(Integer element) {
         return element != null;
     }
+
+    @Override
+    public boolean isMultiplicationCommutative() {
+        return true; // Integer multiplication is commutative
+    }
 }
