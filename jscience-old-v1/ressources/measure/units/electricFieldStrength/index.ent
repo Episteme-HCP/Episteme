@@ -1,0 +1,15 @@
+
+<!ENTITY microvoltPerMeter.xml SYSTEM "../electricFieldStrength/microvoltPerMeter.xml">
+<!ENTITY millivoltPerMeter.xml SYSTEM "../electricFieldStrength/millivoltPerMeter.xml">
+<!ENTITY nanovoltPerMeter.xml SYSTEM "../electricFieldStrength/nanovoltPerMeter.xml">
+<!ENTITY picovoltPerMeter.xml SYSTEM "../electricFieldStrength/picovoltPerMeter.xml">
+<!ENTITY voltPerMeter.xml SYSTEM "../electricFieldStrength/voltPerMeter.xml">
+
+<!ENTITY electricFieldStrength.elements	"
+&microvoltPerMeter.xml;
+&millivoltPerMeter.xml;
+&nanovoltPerMeter.xml;
+&picovoltPerMeter.xml;
+&voltPerMeter.xml;
+">
+

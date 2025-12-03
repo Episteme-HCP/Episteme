@@ -1,0 +1,117 @@
+java.util.Set proposed method addition getCommonClass()
+
+Set can contain many objects from different classes like carrots and tomatoes. However I would like a set of carrots to contain only carrots. I haven't found any way to do that. Testing the class of all elements to find the high level class that is the common ancestor of them all would solve the problem. So here is the following kind of code (untestable)
+
+//gets the class shared by all
+public Class getCommonClass() {
+
+Iterator iterator;
+Class tempClass;
+Class result;
+
+if (set.size()>1) {
+iterator = set.iterator();
+result = iterator.next().getClass();
+while (iterator.hasNext()) {
+tempClass = iterator.next().getClass();
+while (!(result instanceof tempClass)) {
+result = result.superclass();
+}
+}
+} else {
+if (set.size()==0) {
+result=null;
+} else {
+result=set.iterator().next().getClass();
+}
+}
+
+return result;
+
+}
+
+//true if all the elements are of the same class
+public boolean isAllSameClass() {
+
+boolean result;
+
+if (set.size()>1) {
+iterator = set.iterator();
+tempClass = iterator.next().getClass();
+result = true;
+while (iterator.hasNext() && result) {
+result = iterator.next().getClass().equals(tempClass);
+}
+} else {
+result=true;
+}
+}
+
+return result;
+}
+
+I cannot add this method to a subclass of Set since I will have to rebuild the whole collection package. But I nevertheless think this method might well be needed not only by me.
+
+
+Another set of useful methods to add to the Collection interface:
+
+//returns true if a collection c contains any of the elements in the x collection
+private boolean containsAny(Collection c, Collection x) {
+
+Iterator iterator;
+boolean found;
+
+iterator = x.iterator();
+found = false;
+while (iterator.hasNext() && !found) {
+found = c.contains(iterator.next());
+}
+
+return found;
+
+}
+
+//returns true if a collection c contains none of the elements in the x collection
+private boolean containsNone(Collection c, Collection x) {
+
+Iterator iterator;
+boolean found;
+
+iterator = x.iterator();
+found = true;
+while (iterator.hasNext() && found) {
+found = !c.contains(iterator.next());
+}
+
+return found;
+
+}
+
+And some methods for the Set interface:
+
+//returns a new Set based on the union of the Set argument and this
+private Set union(Set s) {
+
+Set set;
+
+set = new Set();
+set.addAll(this);
+set.addAll(s);
+
+return set;
+
+}
+
+//returns a new Set based on the intersection of the Set argument and this
+private Set intersection(Set s) {
+
+Set set;
+
+set = new Set();
+set.addAll(this);
+set.retainAll(s);
+
+return set;
+
+}
+ 

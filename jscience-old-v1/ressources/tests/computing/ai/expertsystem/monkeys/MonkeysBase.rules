@@ -1,0 +1,547 @@
+package jeops.examples.monkeys;
+
+import java.awt.Point;
+
+public ruleBase MonkeysBase implements Constants {
+
+
+// Rules for goal type == AT
+
+	rule atMonkey {
+	/* if the goal is that the monkey is at some place and the it is
+	 * somewhere else holding nothing, then the monkey goes there.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+		conditions
+			g.isActive();
+			g.getType() == AT;
+			g.getObject() == null;
+			m.isOn(FLOOR);
+			!m.isAt(g.getTo());
+			m.holdsNothing();
+		actions
+			m.goTo(g.getTo());
+			g.setSatisfied();
+			modified(m);
+			modified(g);
+	}
+
+	rule atMonkeyObject {
+	/* if the goal is that the monkey is at some place and the it is
+	 * somewhere else holding something, then the monkey goes there
+	 * bringing what is has.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+			PhysicalObject o;
+		conditions
+			g.isActive();
+			g.getType() == AT;
+			g.getObject() == null;
+			m.isOn(FLOOR);
+			!m.isAt(g.getTo());
+			m.isHolding(o);
+		actions
+			m.bring(o, g.getTo());
+			g.setSatisfied();
+			modified(m);
+			modified(g);
+			modified(o);
+	}
+
+	rule atMonkeyOn {
+	/* if the goal is that the monkey is at some place and the it is
+	 * somewhere else and not at the floor, then generate a subgoal
+	 * of being on the floor.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+		conditions
+			g.isActive();
+			g.getType() == AT;
+			g.getObject() == null;
+			!m.isOn(FLOOR);
+			!m.isAt(g.getTo());
+		actions
+			Goal g2 = new Goal(ON);
+			g2.setObject(FLOOR);
+			assert(g2);
+	}
+
+	rule atMonkeySatisfied {
+	/* if the goal is that the monkey is at some place and the it is
+	 * there, then satisfaction.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+		conditions
+			g.isActive();
+			g.getType() == AT;
+			g.getObject() == null;
+			m.isAt(g.getTo());
+		actions
+			System.out.println(m.getDescription() + " is already at " + g.getTo());
+			g.setSatisfied();
+			modified(g);
+	}
+
+	rule atObject {
+	/* if the goal is to bring an object to somewhere and the monkey
+	 * has the object and is on the floor somewhere else, then the
+	 * monkey brings the object to that place.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+			PhysicalObject o;
+		localdecl
+			Point p = g.getTo();
+		conditions
+			g.isActive();
+			g.getType() == AT;
+			o == g.getObject();
+			m.isOn(FLOOR);
+			!m.isAt(p);
+			m.isHolding(o);
+		actions
+			m.bring(o, p);
+			g.setSatisfied();
+			modified(m);
+			modified(g);
+			modified(o);
+	}
+
+	rule atObjectOnFloor {
+	/* if the goal is to bring an object to somewhere and the monkey
+	 * has the object but is not on the floor, then generate a goal
+	 * of being on the floor.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+			PhysicalObject o;
+		conditions
+			g.isActive();
+			g.getType() == AT;
+			o == g.getObject();
+			m.isAt(g.getTo());
+			m.isHolding(o);
+			!m.isOn(FLOOR);
+		actions
+			Goal g2 = new Goal(ON);
+			g2.setObject(FLOOR);
+			assert(g2);
+	}
+
+	rule atObjectOnHolds {
+	/* if the goal is to bring an object to somewhere and the object
+	 * is somewhere else and the monkey doesn't have the object, then
+	 * generate a goal of having the object.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+			PhysicalObject o;
+		conditions
+			g.isActive();
+			g.getType() == AT;
+			o == g.getObject();
+			o.getWeight() == LIGHT;
+			!o.isAt(g.getTo());
+			!m.isHolding(o);
+		actions
+			Goal g2 = new Goal(HOLD);
+			g2.setObject(o);
+			assert(g2);
+	}
+
+	rule atObjectSatisfied {
+	/* if the goal is that the monkey brings an object somewhere and
+	 * the object is already there, then satisfaction.
+	 */
+		declarations
+			Goal g;
+			PhysicalObject o;
+		conditions
+			g.isActive();
+			g.getType() == AT;
+			o == g.getObject();
+			o.getWeight() == LIGHT;
+			o.isAt(g.getTo());
+		actions
+			System.out.println("object " + o + " is already at " + g.getTo());
+			g.setSatisfied();
+			modified(g);
+	}
+
+
+// Rules for goal type == HOLD
+
+	rule holdNil {
+	/* if the goal is that the monkey doesn't have anything and it has
+	 * something, then leave it.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+		conditions
+			g.isActive();
+			g.getType() == HOLD;
+			g.getObject() == null;
+			m.holdsSomething();
+		actions
+			PhysicalObject objectHeld = m.getObjectHeld();
+			m.drop();
+			g.setSatisfied();
+			modified(g);
+			modified(m);
+			modified(objectHeld);
+	}
+
+	rule holdNilSatisfied {
+	/* if the goal is that the monkey doesn't have anything and it doesn't
+	 * have anything, then satisfaction.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+		conditions
+			g.isActive();
+			g.getType() == HOLD;
+			g.getObject() == null;
+			m.holdsNothing();
+		actions
+			g.setSatisfied();
+			System.out.println("monkey holds nothing.");
+			modified(g);
+	}
+
+	rule holdObjectCeiling {
+	/* if the goal is that the monkey has some object that is at the ceiling,
+	 * and the ladder is at the floor under the object, and the monkey is
+	 * on the ladder having nothing, then the monkey grabs the object.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+			PhysicalObject o;
+			Ladder l;
+		conditions
+			g.isActive();
+			g.getType() == HOLD;
+			o == g.getObject();
+			o.getWeight() == LIGHT;
+			o.isOn(CEILING);
+			l.isOn(FLOOR);
+			l.isAt(o.getAt());
+			m.isOn(l);
+			m.holdsNothing();
+		actions
+			m.take(o);
+			g.setSatisfied();
+			modified(g);
+			modified(m);
+			modified(o);
+	}
+
+	rule holdObjectCeilingAtObj {
+	/* if the goal is that the monkey has an object that is on the ceiling but
+	 * the ladder is not at the same place, then generate a goal of bringing
+	 * the ladder to the proper place.
+	 */
+		declarations
+			Goal g;
+			PhysicalObject o;
+			Ladder l;
+		conditions
+			g.isActive();
+			g.getType() == HOLD;
+			o == g.getObject();
+			o.getWeight() == LIGHT;
+			o.isOn(CEILING);
+			l.isOn(FLOOR);
+			!l.isAt(o.getAt());
+		actions
+			Goal g2 = new Goal(AT);
+			g2.setObject(l);
+			g2.setTo(o.getAt());
+			assert(g2);
+	}
+
+	rule holdObjectCeilingOn {
+	/* if the goal is that the monkey have an object that is on the ceiling
+	 * and the ladder is under the object at the floor and that the monkey
+	 * is not on the ladder, then generate a goal of being on the ladder.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+			PhysicalObject o;
+			Ladder l;
+		conditions
+			g.isActive();
+			g.getType() == HOLD;
+			o == g.getObject();
+			o.getWeight() == LIGHT;
+			o.isOn(CEILING);
+			l.isOn(FLOOR);
+			l.isAt(o.getAt());
+			!m.isOn(l);
+		actions
+			Goal g2 = new Goal(ON);
+			g2.setObject(l);
+			assert(g2);
+	}
+
+	rule holdObjectHolds {
+	/* if the goal is that the monkey have an object and the monkey is at
+	 * the same place holding something else, then generate a goal of not
+	 * having anything.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+			PhysicalObject o;
+		conditions
+			g.isActive();
+			g.getType() == HOLD;
+			o == g.getObject();
+			o.getWeight() == LIGHT;
+			m.isAt(o.getAt());
+			m.holdsSomething();
+			!m.isHolding(o);
+		actions
+			Goal g2 = new Goal(HOLD);
+			g2.setObject(null);
+			assert(g2);
+	}
+
+	rule holdObjectHoldsSatisfied {
+	/* if the goal is that the monkey have an object and it already
+	 * has it, then satisfaction.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+			PhysicalObject o;
+		conditions
+			g.isActive();
+			g.getType() == HOLD;
+			o == g.getObject();
+			o.getWeight() == LIGHT;
+			m.isAt(o.getAt());
+			m.isHolding(o);
+		actions
+			System.out.println(m.getDescription() + " already holds " + o);
+			g.setSatisfied();
+			modified(g);
+	}
+
+	rule holdObjectNotCeiling {
+	/* if the goal is that the monkey have an object which is not on the
+	 * ceiling and the monkey is at the same place at the floor not holding
+	 * anything, then take the object.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+			PhysicalObject o;
+		conditions
+			g.isActive();
+			g.getType() == HOLD;
+			o == g.getObject();
+			o.getWeight() == LIGHT;
+			!o.isOn(CEILING);
+			m.isOn(FLOOR);
+			m.holdsNothing();
+			m.isAt(o.getAt());
+		actions
+			m.take(o);
+			g.setSatisfied();
+			modified(g);
+			modified(m);
+			modified(o);
+	}
+
+	rule holdObjectNotCeilingAtMonkey {
+	/* if the goal is that the monkey have an object that is not on the
+	 * ceiling and the monkey is not at the same place, then generate a
+	 * goal of being at the same place.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+			PhysicalObject o;
+		conditions
+			g.isActive();
+			g.getType() == HOLD;
+			o == g.getObject();
+			o.getWeight() == LIGHT;
+			!o.isOn(CEILING);
+			!m.isAt(o.getAt());
+		actions
+			Goal g2 = new Goal(AT);
+			g2.setObject(null);
+			g2.setTo(o.getAt());
+			assert(g2);
+	}
+
+	rule holdObjectNotCeilingOn {
+	/* if the goal is that the monkey have an object that is not on the
+	 * ceiling and that the monket is at the same place but not on the
+	 * floor, then generate a goal of being on the floor.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+			PhysicalObject o;
+		conditions
+			g.isActive();
+			g.getType() == HOLD;
+			o == g.getObject();
+			o.getWeight() == LIGHT;
+			!o.isOn(CEILING);
+			!m.isOn(FLOOR);
+			m.isAt(o.getAt());
+		actions
+			Goal g2 = new Goal(ON);
+			g2.setObject(FLOOR);
+			assert(g2);
+	}
+
+// Rules for goal type == ON
+
+	rule onPhysicalObject {
+	/* if the goal is that the monkey be on some object, and the monkey
+	 * is at the same place holding nothing, but not on the object, then
+	 * the monkey climbs on the object.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+		localdecl
+			PhysicalObject o = g.getObject();
+		conditions
+			g.isActive();
+			g.getType() == ON;
+			o != null;
+			o != FLOOR;
+			o.isOn(FLOOR);
+			m.isAt(o.getAt());
+			m.holdsNothing();
+			!m.isOn(o);
+		actions
+			m.climbOn(o);
+			g.setSatisfied();
+			modified(g);
+			modified(m);
+	}
+
+	rule onPhysicalObjectAtMonkey {
+	/* if the goal is that the monkey be on some object, and the monkey
+	 * is somewhere else on the floor, then generate a goal of being at
+	 * the same place.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+		conditions
+			g.isActive();
+			g.getType() == ON;
+			g.getObject() != null;
+			g.getObject() != FLOOR;
+			g.getObject().isOn(FLOOR);
+			!m.isAt(g.getObject().getAt());
+		actions
+			Goal g2 = new Goal(AT);
+			g2.setObject(null);
+			g2.setTo(g.getObject().getAt());
+			assert(g2);
+	}
+
+	rule onPhysicalObjectHold {
+	/* if the goal is that the monket be on an object, and the monkey
+	 * is at the same place, having something, then generate a subgoal
+	 * of having nothing.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+		conditions
+			g.isActive();
+			g.getType() == ON;
+			g.getObject() != null;
+			g.getObject() != FLOOR;
+			g.getObject().isOn(FLOOR);
+			m.isAt(g.getObject().getAt());
+			m.holdsSomething();
+		actions
+			Goal g2 = new Goal(HOLD);
+			g2.setObject(null);
+			assert(g2);
+	}
+	
+	rule onPhysicalObjectSatisfied {
+	/* if the goal is that the monkey be on some object, and the
+	 * monkey is already there, then satisfaction
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+		conditions
+			g.isActive();
+			g.getType() == ON;
+			g.getObject() != null;
+			g.getObject() != FLOOR;
+			g.getObject().isOn(FLOOR);
+			m.isAt(g.getObject().getAt());
+			m.isOn(g.getObject());
+		actions
+			System.out.println(m.getDescription() + " already on " + g.getObject());
+			g.setSatisfied();
+			modified(g);
+	}
+
+	rule onFloor {
+	/* if the goal is that the monkey is on the floor, but it is not
+	 * there, then the monkey jumps to the floor.
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+		conditions
+			g.isActive();
+			g.getType() == ON;
+			g.getObject() == FLOOR;
+			!m.isOn(FLOOR);
+		actions
+			m.jumpOn(FLOOR);
+			g.setSatisfied();
+			modified(g);
+			modified(m);
+	}
+
+	rule onFloorSatisfied {
+	/* if the goal is that the monkey be on the floor, and it is there,
+	 * then satisfaction
+	 */
+		declarations
+			Goal g;
+			Monkey m;
+		conditions
+			g.isActive();
+			g.getType() == ON;
+			g.getObject() == FLOOR;
+			m.isOn(FLOOR);
+		actions
+			System.out.println(m.getDescription() + " already on floor");
+			g.setSatisfied();
+			modified(g);
+	}
+
+}

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>moon</type>
+        <name>despina</name>
+        <parent>neptune</parent>
+    </general>
+    <parameter>
+        <diameter>148</diameter>
+        <!-- km -->
+        <rotationperiod>0.335</rotationperiod>
+        <!-- day -->
+        <orbitperiod>0.335</orbitperiod>
+        <!-- day -->
+        <orbiteccentricity>0.0001</orbiteccentricity>
+        <orbitinclinationtoecliptic>0.065</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <distance>52526</distance>
+        <!-- km -->
+    </parameter>
+</celestialobject>

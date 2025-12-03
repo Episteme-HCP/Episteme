@@ -1,0 +1,180 @@
+---------------------------------------------------------------------
+VIRTUAL PLANTS
+==============
+
+University of applied sciences Biel
+
+hosted by Claude Schwab
+
+programmed by Rene Gressly
+
+March - July 1999
+
+---------------------------------------------------------------------
+
+MANUAL
+------
+
+Table of contents:
+
+1. System requirements
+2. Program installation
+3. Input files
+4. Meaning of the values:
+5. Signs and their meaning
+6. Run the application
+
+
+1. System requirements
+----------------------
+
+To run the VirtualPlants application you need a system with Java 1.2
+and Java3D 1.1.1 or higher installed and running. Refer to the Java
+installation manual for more help about installing Java and Java3D on
+your computer.
+If you want to create a structure containing many branches and leaves
+a powerful system is required. Since system power and processing speed
+change quickly I can not declare a specific system as ideal to see and,
+this is most important, move 3D plants on your pc. You need to find
+out yourself on how complex you want to make a structure to still be
+able to see it within a acceptable amount of time.
+Also memory is a matter, you need lots of for faster rendering and
+more detailed views.
+There is a useful note of the Java3D readme file concerning memory:
+
+Note: Some of the tests require a maximum memory pool larger
+than the default in Java.  To increase the maximum
+memory pool to 64 meg, add the following command line
+options to Java or appletviewer:
+
+java: -mx64m
+appletviewer: -J-mx64m
+
+
+2. Program installation
+-----------------------
+
+You need all the following files in the specified subdirectories to
+be able to run the VirtualPlants app. It doesn't matter in what
+directory you put the files, just the structure has to be maintained.
+
+VirtualPlants\source\VirtualPlants.class
+VirtualPlants\source\lsys\LSystem.class
+VirtualPlants\source\lsys\Turtle.class
+VirtualPlants\source\lsys\Rule.class
+VirtualPlants\source\lsys\Def.class
+VirtualPlants\source\shape\TruncatedCone.class
+VirtualPlants\source\shape\Quadrics.class
+VirtualPlants\source\shape\Primitive.class
+VirtualPlants\source\shape\GeomBuffer.class
+VirtualPlants\source\tools\Log.class
+
+
+3. Input files
+--------------
+
+The application doesn't know what to do if no path to the input file
+containing the needed values is specified. This input files are pure
+text files and look like following example:
+
+depth = 6
+angle = 22.5
+length = 0.5
+thickness = 0.2
+decrement = 0.007
+
+axiom = A
+
+rule = A -> [&FLA]/////'[&FLA]///////'[&FLA]
+rule = F -> !S/////F
+rule = S -> FL
+rule = L -> ['''^^{-f+f+f-|-f+f+f}]
+
+All keywords must stand at the beginning of a line, it does not
+mater in what order they are, but no sign not even a blank should
+stand befor them. Else the reader can not recognize the value. Then
+after every keyword such as 'depth or 'rule' an equal sign followed
+by the value define the system. The types for each value are as
+follows:
+
+depth, integer
+angle, float
+length, float
+thickness, float
+decrement, float
+axiom, char
+
+A rule has its own special type. A rule must contain a predecessor
+which is a character followed by an arrow '->' and the successor
+which is a string.
+
+4. Meaning of the values:
+-------------------------
+
+depth:        is the derivation depth and indicates how many times a
+system is parsed replacing the characters. This value
+should not be too high else your system will run out of
+memory.
+
+angle:        indicated the angle the turtle makes on each turn.
+
+length:        the length of a step the turtle makes.
+
+thickness:     thickness of the branches at the beginning.
+
+decrement:     value of how much the thickness decrements.
+
+axiom:        the starting system
+
+rule:        rule on how to replace the letters.
+
+
+5. Signs and their meaning
+--------------------------
+
+F    Draw line respectively branch
+f    Make a step without drawing
++    Turn left by angle d around Y axis
+-    Turn right by angle d around Y axis
+&    Pitch down by angle d around X axis
+^    Pitch up by angle d around X axis
+\    Roll left by angle d around Z axis
+/    Roll right by angle d axis
+|    Turn around by angle 180� using Y axis
+[    Store the turtle's actual position and orientation for later
+restore
+]    Restore the last stored position and orientation of the
+turtle
+{    Indicates that a leaf is being drawn
+}    Leaf is done
+!    The branch is becoming thinner
+
+
+6. Run the application
+----------------------
+
+To run the application open a shell, go to the directory where you
+placed the VirtualPlants.class file and start the app with the
+following syntax:
+
+VirtualPlants\source> java [-mx64m] VirtualPlants inputfile
+
+After that the program reads the input file (if it is found) and
+begins to create a scene for the system. This can take a while so
+be patient. If an error occurs an exception will be thrown and
+an error message will appear on your screen. If this happens
+you want to check if you didn't make any mistakes somewhere. Maybe
+the error message can help you detecting the error.
+
+
+7. Trouble shooting
+-------------------
+
+Check following points if you can't get the app work:
+
+1. Is your Java 1.2 installed and running properly?
+2. Did you install Java3D 1.1.1 classes and do they work?
+3. Are all needed files in the right directories?
+4. Did you specify the input file?
+5. Is the input file correct?
+6. Do you have enough memory?

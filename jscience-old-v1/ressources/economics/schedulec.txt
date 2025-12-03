@@ -1,0 +1,230 @@
+  Africa                 ALGERIA                            7210
+  Africa                 ANGOLA                             7620
+  Africa                 BENIN                              7610
+  Africa                 BOTSWANA                           7930
+  Africa                 BRITISH INDIAN OCEAN TERR.         7810
+  Africa                 BURKINA                            7600
+  Africa                 BURUNDI                            7670
+  Africa                 CAMEROON                           7420
+  Africa                 CAPE VERDE                         7643
+  Africa                 CENTRAL AFRICAN REPUBLIC           7540
+  Africa                 CHAD                               7560
+  Africa                 COMOROS                            7890
+  Africa                 CONGO                              7630
+  Africa                 DJIBOUTI                           7770
+  Africa                 EGYPT                              7290
+  Africa                 EQUATORIAL GUINEA                  7380
+  Africa                 ERITREA                            7741
+  Africa                 ETHIOPIA                           7740
+  Africa                 ETHIOPIA                           7749
+  Africa                 FR SOUTHERN-ANTARTIC LANDS         7905
+  Africa                 GABON                              7550
+  Africa                 GHANA                              7490
+  Africa                 GUINEA                             7460
+  Africa                 GUINEA-BISSAU                      7642
+  Africa                 IVORY COAST                        7480
+  Africa                 KENYA                              7790
+  Africa                 LESOTHO                            7990
+  Africa                 LIBERIA                            7650
+  Africa                 LIBYA                              7250
+  Africa                 MADAGASCAR                         7880
+  Africa                 MALAWI                             7970
+  Africa                 MALI                               7450
+  Africa                 MAURITANIA                         7410
+  Africa                 MAURITIUS                          7850
+  Africa                 MOROCCO                            7140
+  Africa                 MOZAMBIQUE                         7870
+  Africa                 NAMIBIA                            7920
+  Africa                 NIGER                              7510
+  Africa                 NIGERIA                            7530
+  Africa                 REPUBLIC OF SOUTH AFRICA           7910
+  Africa                 REUNION                            7904
+  Africa                 RWANDA                             7690
+  Africa                 SAO TOME AND PRINCIPE              7644
+  Africa                 SENEGAL                            7440
+  Africa                 SEYCHELLES                         7800
+  Africa                 SIERRA LEONE                       7470
+  Africa                 SOMALIA                            7700
+  Africa                 ST. HELENA                         7580
+  Africa                 SUDAN                              7320
+  Africa                 SWAZILAND                          7950
+  Africa                 TANZANIA                           7830
+  Africa                 THE GAMBIA                         7500
+  Africa                 TOGO                               7520
+  Africa                 TUNISIA                            7230
+  Africa                 UGANDA                             7780
+  Africa                 WESTERN SAHARA                     7370
+  Africa                 ZAIRE                              7660
+  Africa                 ZAMBIA                             7940
+  Africa                 ZIMBABWE                           7960
+  Asia                   AFGANISTAN                         5310
+  Asia                   BAHRAIN                            5250
+  Asia                   BANGLADESH                         5380
+  Asia                   BHUTAN                             5682
+  Asia                   BRUNEI                             5610
+  Asia                   BURMA                              5460
+  Asia                   CAMBODIA                           5550
+  Asia                   CHINA (MAINLAND)                   5700
+  Asia                   CHINA (TAIWAN)                     5830
+  Asia                   GAZA STRIP ADMNSTD BY ISRAEL       5082
+  Asia                   HONG KONG                          5820
+  Asia                   INDIA                              5330
+  Asia                   INDONESIA                          5600
+  Asia                   IRAN                               5070
+  Asia                   IRAQ                               5050
+  Asia                   ISRAEL                             5081
+  Asia                   JAPAN                              5880
+  Asia                   JORDAN                             5110
+  Asia                   KOREA, REPUBLIC OF                 5800
+  Asia                   KUWAIT                             5130
+  Asia                   LAOS                               5530
+  Asia                   LEBANON                            5040
+  Asia                   MACAO                              5660
+  Asia                   MALAYSIA                           5570
+  Asia                   MALDIVE ISLANDS                    5683
+  Asia                   MONGOLIA                           5740
+  Asia                   NEPAL                              5360
+  Asia                   NORTH KOREA                        5790
+  Asia                   OMAN                               5230
+  Asia                   PAKISTAN                           5350
+  Asia                   PHILIPPINES                        5650
+  Asia                   QATAR                              5180
+  Asia                   SAUDI ARABIA                       5170
+  Asia                   SINGAPORE                          5590
+  Asia                   SRI LANKA                          5420
+  Asia                   SYRIAN ARAB REPUBLIC               5020
+  Asia                   THAILAND                           5490
+  Asia                   UNITED ARAB EMIRATES               5200
+  Asia                   VIETNAM                            5520
+  Asia                   WEST BANK  ADMNSTD BY ISRAEL       5083
+  Asia                   YEMEN ARAB REPUBLIC                5210
+  Australia/Oceana       AUSTRALIA                          6021
+  Australia/Oceana       CHRISTMAS ISLAND                   6024
+  Australia/Oceana       COCOS ISLANDS                      6023
+  Australia/Oceana       COOK ISLANDS                       6142
+  Australia/Oceana       FEDRATED STATES OF MICRONESIA      6820
+  Australia/Oceana       FIJI                               6863
+  Australia/Oceana       FRENCH POLYNESIA                   6414
+  Australia/Oceana       HEARD AND MCDONALD ISLANDS         6029
+  Australia/Oceana       KIRIBATI                           6226
+  Australia/Oceana       MARSHALL ISLANDS                   6810
+  Australia/Oceana       NAURU                              6862
+  Australia/Oceana       NEW CALEDONIA                      6412
+  Australia/Oceana       NEW ZEALAND                        6141
+  Australia/Oceana       NIUE                               6144
+  Australia/Oceana       NORFOLK ISLAND                     6022
+  Australia/Oceana       PALAU                              6830
+  Australia/Oceana       PAPUA NEW GUINEA                   6040
+  Australia/Oceana       PITCAIRN ISLAND                    6225
+  Australia/Oceana       SOLOMON ISLANDS                    6223
+  Australia/Oceana       TOKELAU ISLANDS                    6143
+  Australia/Oceana       TONGA                              6864
+  Australia/Oceana       TUVALU ISLANDS                     6227
+  Australia/Oceana       VANUATU                            6224
+  Australia/Oceana       WALLIS AND FUTUNA                  6413
+  Australia/Oceana       WESTERN SAMOA                      6150
+  Europe                 ALBANIA                            4810
+  Europe                 ANDORRA                            4271
+  Europe                 ARMENIA                            4631
+  Europe                 AUSTRIA                            4330
+  Europe                 AZERBAIJAN                         4632
+  Europe                 BELARUS                            4622
+  Europe                 BELGIUM                            4231
+  Europe                 BOSNIA-HERCEGOVINA                 4793
+  Europe                 BULGARIA                           4870
+  Europe                 CROATIA                            4791
+  Europe                 CYPRUS                             4910
+  Europe                 DENMARK                            4099
+  Europe                 ESTONIA                            4470
+  Europe                 FAROE ISLAND                       4091
+  Europe                 FINLAND                            4050
+  Europe                 FRANCE                             4279
+  Europe                 GEORGIA                            4633
+  Europe                 GERMANY                            4280
+  Europe                 GIBRALTAR                          4720
+  Europe                 GREECE                             4840
+  Europe                 HUNGARY                            4370
+  Europe                 ICELAND                            4000
+  Europe                 IRELAND                            4190
+  Europe                 ITALY                              4759
+  Europe                 KAZAKHSTAN                         4634
+  Europe                 KYRGYZSTAN                         4635
+  Europe                 LATVIA                             4490
+  Europe                 LIECHTENSTEIN                      4411
+  Europe                 LITHUANIA                          4510
+  Europe                 LUXEMBOURG                         4239
+  Europe                 MACEDONIA                          4794
+  Europe                 MALTA AND GOZO                     4730
+  Europe                 MOLDOVA                            4641
+  Europe                 MONACO                             4272
+  Europe                 NETHERLANDS                        4210
+  Europe                 NORWAY                             4039
+  Europe                 POLAND                             4550
+  Europe                 PORTUGAL                           4710
+  Europe                 ROMANIA                            4850
+  Europe                 RUSSIA                             4621
+  Europe                 SAN MARINO                         4751
+  Europe                 SLOVAKIA                           4359
+  Europe                 SLOVENIA                           4792
+  Europe                 SPAIN                              4700
+  Europe                 SVALBARD, JAN MAYEN IS             4031
+  Europe                 SWEDEN                             4010
+  Europe                 SWITZERLAND                        4419
+  Europe                 TAJIKISTAN                         4642
+  Europe                 THE CZECH REPUBLIC                 4351
+  Europe                 TURKEY                             4890
+  Europe                 TURKMENISTAN                       4643
+  Europe                 UKRAINE                            4623
+  Europe                 UNITED KINGDOM                     4120
+  Europe                 UZBEKISTAN                         4644
+  Europe                 VATICAN CITY                       4752
+  Europe                 YUGOSLAVIA                         4790
+  Europe                 YUGOSLAVIA                         4799
+  North America          ANGUILLA                           2481
+  North America          ANTIGUA                            2484
+  North America          ARUBA                              2779
+  North America          BAHAMAS                            2360
+  North America          BARBADOS                           2720
+  North America          BELIZE                             2080
+  North America          BERMUDA                            2320
+  North America          BRITISH VIRGIN ISLANDS             2482
+  North America          CANADA                             1220
+  North America          CAYMAN ISLANDS                     2440
+  North America          COSTA RICA                         2230
+  North America          CUBA                               2390
+  North America          DOMINICA                           2486
+  North America          DOMINICAN REPUBLIC                 2470
+  North America          EL SALVADOR                        2110
+  North America          GREENLAND                          1010
+  North America          GRENADA                            2489
+  North America          GUADELOUPE                         2831
+  North America          GUATEMALA                          2050
+  North America          HAITI                              2450
+  North America          HONDURAS                           2150
+  North America          JAMAICA                            2410
+  North America          MARTINIQUE                         2839
+  North America          MEXICO                             2010
+  North America          MONTSERRAT                         2485
+  North America          NETHERLANDS ANTILLES               2771
+  North America          NICARAGUA                          2190
+  North America          PANAMA                             2250
+  North America          ST. KITTS-NEVIS                    2483
+  North America          ST. LUCIA                          2487
+  North America          ST. PIERRE AND MIQUELON            1610
+  North America          ST. VINCENT                        2488
+  North America          TRINIDAD AND TOBAGO                2740
+  North America          TURKS AND CAICOS ISLANDS           2430
+  South America          ARGENTINA                          3570
+  South America          BOLIVIA                            3350
+  South America          BRAZIL                             3510
+  South America          CHILE                              3370
+  South America          COLOMBIA                           3010
+  South America          ECUADOR                            3310
+  South America          FALKLAND ISLANDS                   3720
+  South America          FRENCH GUIANA                      3170
+  South America          GUYANA                             3120
+  South America          PARAGUAY                           3530
+  South America          PERU                               3330
+  South America          SURINAME                           3150
+  South America          URUGUAY                            3550
+  South America          VENEZUELA                          3070

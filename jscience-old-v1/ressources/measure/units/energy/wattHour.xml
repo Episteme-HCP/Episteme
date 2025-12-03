@@ -1,0 +1,4 @@
+<unit id="wattHour" name="watt hour" abbreviation="W h" unitType="energy" parentSI="joule" multiplierToSI="3600"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 watt hour = 3.6 kJ</description>
+</unit>

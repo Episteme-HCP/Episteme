@@ -1,0 +1,14 @@
+(Rich Franzen) digitally built this image around 1987 using the SMPTE RP-133 specification as a base. It was originally used as a test image by the DFR-8000 digital film recorder in the mid-to-late 1980s. Both the recorder and its manufacturer, DBA Systems, Inc. are long gone, although L-3 Communications is the company which bought the company which bought DBA. I was granted permission to use the image freely, and it has appeared on my site since 1998.
+
+It deviates from the RP-133 specification in three respects, all extensions in my opinion. First it contains another RP-133 compliant image within it (sort of as a joke since the main image is so big). Second, it contains a "square snake" encoding of a 4096-level greyscale (possible because the file is a 16-bit greyscale PNG file). Third, it contains some extra text not part of the 1983 SMPTE specification file. Admittedly these extensions mean the image is no longer fully compliant with the SMPTE specification.
+
+Updated to remove 2 bytes of trailing garbage at end of file.
+
+The formal name for the SMPTE specification in question is "SMPTE Medical Diagnostic Imaging Test Pattern".
+
+
+Licensing
+I, the copyright holder of this work, hereby publish it under the following license:
+
+ This file is licensed under the Creative Commons Attribution ShareAlike 2.5 License. In short: you are free to share and make derivative works of the file under the conditions that you appropriately attribute it, and that you distribute it only under a license identical to this one.  
+ 

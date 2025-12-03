@@ -1,0 +1,4 @@
+<unit id="megaelectronvolt" name="megaelectronvolt" abbreviation="MeV" unitType="energy" parentSI="joule"
+      multiplierToSI="1.60218E-13" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 MeV = 1000000 eV</description>
+</unit>

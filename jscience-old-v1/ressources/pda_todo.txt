@@ -1,0 +1,51 @@
+This is a separate to-do list for Paul Anderson, to keep Silvere (and others)
+informed about the areas I will be working...
+
+My main goal at present is to document, organize and verify the existing
+mathematics packages. The other todo.txt list has some good suggestions for
+additional functionality.
+
+First step is to update the existing documentation, that is, find out what is
+a) missing, b) outdated, and c) incomplete. I'll make a list of what I find and
+add it here.
+
+Second, I'd like to get the existing test packages working. Again, I'll make a
+list of what's working and what's not, and another list for what's missing.
+
+Third, as a result of steps one and two I should have a clear picture of what
+is in the mathematics packages. I'd like to create an overview document to
+make it easier for others to learn what is there. This should also help to
+identify gaps and overlaps in the packages. Then we can use that to give
+priority to changes and additions.
+
+PDA 11 Feb 2006
+
+Okay -- first look at current documentation:
+
+org.jscience.mathematics: Package description consists of a (good) list of
+Java math projects with hyperlinks. Need an overview, summarizing contents
+and stating goals and design decisions.
+
+org.jscience.mathematics.algebraic: Package description refers reader to
+Wikipedia. Need (as above) overview, summary and goals.
+
+org.jscience.mathematics.analysis. Package description is single line. Need
+overview, summary, goals.
+
+org.jscience.mathematics.axiomatic: Package description is single line. Classes
+within the package are essentially undocumented. Two text files containing
+rules(?) and definitions are included.
+
+org.jscience.mathematics.geometry: Package is well-documented. Unfortunately,
+documentation is in Japanese. I will attempt to add some English descriptions
+where intent is obvious.
+
+org.jscience.mathematics.statistics: Package is well documented other than
+top-level package description.
+
+org.jscience.mathematics.wavelets: Package description is missing. Lots of code
+here. I don't know anything about wavelets, so I will not attempt to document
+this package and subpackages at present.
+
+PDA 11 Feb 2006
+

@@ -1,0 +1,5 @@
+<unitType id="force" name="force">
+    <dimension name="mass" power="1" preserve="no"/>
+    <dimension name="length" power="1" preserve="no"/>
+    <dimension name="time" power="-2" preserve="no"/>
+</unitType>

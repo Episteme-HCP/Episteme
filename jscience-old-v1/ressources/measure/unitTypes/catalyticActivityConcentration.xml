@@ -1,0 +1,5 @@
+<unitType id="catalyticActivityConcentration" name="catalytic activity concentration">
+    <dimension name="time" power="-1" preserve="no"/>
+    <dimension name="amount" power="1" preserve="no"/>
+    <dimension name="length" power="-3" preserve="no"/>
+</unitType>

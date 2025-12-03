@@ -1,0 +1,87 @@
+// JTEM - Java Tools for Experimental Mathematics
+// Copyright (C) 2001 JTEM-Group
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+import org.jscience.swing.spinner.TimerControlPanel;
+
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+/**
+ * Simple example to demonstrate the functionality of the
+ * {@link TimerControlPanel} class.
+ * 
+ * @author marcel
+ */
+public class TimerControlPanelExample extends JPanel
+{
+  private class ForwardAction extends AbstractAction
+  {
+    public void actionPerformed(ActionEvent ev)
+    {
+      int i=Integer.parseInt(textField.getText());
+      i++;
+      textField.setText(String.valueOf(i));      
+    }
+  }
+  private class BackwardAction extends AbstractAction
+  {
+    public void actionPerformed(ActionEvent ev)
+    {
+      int i=Integer.parseInt(textField.getText());
+      i--;
+      textField.setText(String.valueOf(i));
+    }
+  }
+  private class ResetAction extends AbstractAction
+  {
+    public void actionPerformed(ActionEvent ev)
+    {
+      textField.setText("0");
+    }
+  }
+  private class RightClickOnForwardAction extends AbstractAction
+  {
+    public void actionPerformed(ActionEvent ev)
+    {
+      textField.setText("100");
+    }
+  }
+  private class RightClickOnBackwardAction extends AbstractAction
+  {
+    public void actionPerformed(ActionEvent ev)
+    {
+      textField.setText("-100");
+    }
+  }
+
+  JTextField textField=new JTextField("0");
+  TimerControlPanel timerPanel;
+
+  public TimerControlPanelExample()
+  {
+    super(new BorderLayout());
+    timerPanel=new TimerControlPanel(
+        new ForwardAction(), new BackwardAction(), new ResetAction(),
+        new RightClickOnForwardAction(), new RightClickOnBackwardAction());
+    add(textField, BorderLayout.NORTH);
+    add(timerPanel, BorderLayout.SOUTH);
+  }
+}

@@ -1,0 +1,3 @@
+<unitType id="time" name="time">
+    <dimension name="time" power="1" preserve="no"/>
+</unitType>

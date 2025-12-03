@@ -1,0 +1,868 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE>JScience Documentation</TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 1.9.95  (Win32)">
+	<META NAME="CREATED" CONTENT="20050901;21565150">
+	<META NAME="CHANGEDBY" CONTENT="Silvere Martin-Michiellot">
+	<META NAME="CHANGED" CONTENT="20050901;22310416">
+	<STYLE>
+	<!--
+		H1 { font-family: "Arial", "Helvetica", sans-serif }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<HR>
+<H1>JScience Documentation</H1>
+<HR>
+<P ALIGN=CENTER><IMG SRC="dukelogo.gif" NAME="graphics1" ALT="JScience Logo" ALIGN=BOTTOM WIDTH=260 HEIGHT=360 BORDER=0>
+</P>
+<P>Jscience is a general scientific library in Java.</P>
+<P>- Actually, your basic survival kit as a developer needing science
+-</P>
+<P><BR><BR>
+</P>
+<P><BR><BR>
+</P>
+<P><B>This file is not up to date. To see the latest revision of this document, please use readme.txt.</B></P>
+<P>This is the index.html file for JScience
+(http://www.jscience.org/) version 1.0 EXPERIMENTAL, as of September
+2005.</P>
+<P>Packages are NOT COMPILING, we are still working on. This is why
+this is called an experimental release.</P>
+<P>Expected first beta release in September or October 2005.</P>
+<P><BR><BR>
+</P>
+<P>See license.txt for appropriate usage.</P>
+<P><BR><BR>
+</P>
+<UL>
+	<LI><P>todo.txt gives a list of limitations and features we may work
+	on.</P>
+	<LI><P>sciences.xml and scientifichierarchy.xml give a definition of
+	science names.</P>
+	<LI><P>scientificmethod.txt describes the principles of the
+	scientific methodology.</P>
+	<LI><P>wsdl.html lists useful WSDL services to grab data from.</P>
+	<LI><P>scaleofsciences.pdf and scaleofsciences.odg are mostly here
+	for illustration to show how sciences are distributed of the size of
+	things.</P>
+	<LI><P>safetysigns.pdf as used in laboratories.</P>
+	<LI><P>packages.pdf and packages.odg give an overview of the
+	architecture of packages in Jscience.</P>
+	<LI><P>scienceslides.odt is a set of slides for a 20 minutes
+	presentation of JScience, good introduction, easy and fast to read.</P>
+</UL>
+<P><BR><BR>
+</P>
+<P>Please read the WARNINGS section (section 5 of this file).</P>
+<HR>
+<P><A HREF="#1 features">1. FEATURES</A></P>
+<P><A HREF="#2 installation">2. INSTALLATION FOR END USERS</A></P>
+<P><A HREF="#3 developer installation">3. INSTALLATION OR COMPILATION
+FOR DEVELOPERS</A></P>
+<P><A HREF="#4 required libraries">4. REQUIRED LIBRARIES</A></P>
+<P><A HREF="#5 warnings">5. WARNINGS</A></P>
+<P><A HREF="#6 contributions">6. CONTRIBUTIONS</A></P>
+<P><A HREF="#7 used pacakges">7. USED PACKAGES</A></P>
+<P><A HREF="#8 JScience share">8. JSCIENCE MARKET SHARE</A></P>
+<P><A HREF="#9 release history">9. RELEASE HISTORY</A></P>
+<P><A HREF="#10 selected readings">10. SELECTED READINGS OR SOURCES</A></P>
+<P><A HREF="#11 package links">11. PACKAGE SPECIFIC LINKS</A></P>
+<P><A HREF="#12 contact">12. CONTACT US</A></P>
+<HR>
+<P><BR><BR>
+</P>
+<P><A NAME="1 features"></A>1. FEATURES:</P>
+<P>This is a general scientific library in Java. Is is as complete in
+each area as it can be although we have made every effort to keep it
+simple and easy to use. This is therefore a kind of survival kit or a
+portable lab.</P>
+<P>Our coding standards are namely:</P>
+<UL>
+	<LI><P>Object Oriented: Objects/Interfaces are first class citizens
+	(no utility methods)</P>
+	<LI><P>Generic (no primitive types, interfaces instead)</P>
+	<LI><P>Simple (even for the profane)</P>
+	<LI><P>Useful Classes exist for a purpose</P>
+	<LI><P>Easy to use</P>
+	<LI><P>Standards oriented</P>
+	<LI><P>XML oriented</P>
+	<LI><P>Documented</P>
+</UL>
+<P>This is an API, not an application per se. Mostly, it is an API to
+develop some others API or some applications. We therefore expect a
+different target audience than the mainstream Internet user. In fact
+we target well defined sub groups:</P>
+<UL>
+	<LI><P>API builders to design APIs on top of this one</P>
+	<LI><P>Corporate developers looking for a wide spectrum free API</P>
+	<LI><P>Applet/Webstart developers that need to quick develop a
+	product</P>
+	<LI><P>Researchers and graduate students that want to test something
+	and (may be) don't require to build a full application</P>
+</UL>
+<P>JScience, and especially the numerical intensive packages (mostly
+mathematics), uses two models. The first one is the traditional way
+in which scientific libraries are designed, is optimized for speed
+and relies heavily on ints and doubles, while offering a strong
+logic. The other one provides an even better model closer to
+theoritical concepts generally acknowledge in science. It is based on
+ExactIntegers and ExactReal which both provide infinite precision
+support at the sacrifice of some speed. It comes along with unit
+systems and quantities. It is much less developed in the current
+release than the traditional model mostly for the reason that it
+makes this API bigger and more complex while probably required by
+less users. There are some bridges that help switch from one model
+from another so you shouldn't have much difficulties using any of the
+two. Classes normally behave the same way in both models and mostly
+only differ by their names.</P>
+<P>If you want to have an overview about how the packages are
+organized (object oriented and encapsulation), look at the
+org.jscience.sociology.Person class. Person extends
+HistoricalIndividual which itself extends Individual, itself
+basically a Set Of Organs, itself a Set of Tissues, itself a Set of
+Cells which contain DNA or RNA. These are big Molecules made up of
+Atoms moving as physical Particles. Many other classes are used in
+the same way.</P>
+<P>The library supports almost everything you should expect. It
+covers the following fields:</P>
+<UL>
+	<LI><P>Astronomy</P>
+	<LI><P>Bibliography</P>
+	<LI><P>Biology</P>
+	<LI><P>Chemistry</P>
+	<LI><P>Computing</P>
+	<LI><P>Earth</P>
+	<LI><P>Economics</P>
+	<LI><P>Geography</P>
+	<LI><P>History</P>
+	<LI><P>Law</P>
+	<LI><P>Linguistics</P>
+	<LI><P>Mathematics</P>
+	<LI><P>Medicine</P>
+	<LI><P>Measure (a general purpose measure scheme)</P>
+	<LI><P>Philosophy</P>
+	<LI><P>Physics</P>
+	<LI><P>Politics</P>
+	<LI><P>Psychology</P>
+	<LI><P>Society</P>
+</UL>
+<P>And several devices, media filters, utils and widgets.</P>
+<P>There are also some XML parsers, namely MathML, OpenMath, CML,
+SBML, gedcom, GML, HEML, TigerXML.</P>
+<P>Some limitations are to be mentioned, see todo.txt for a complete
+explanation.</P>
+<P>Finally there are many data files that are co bundled along with
+the classes. They are support information, NOT necessarily used by
+classes but brought to you so that you can have a handy reliable
+source of data.</P>
+<P>Although we have made many efforts to produce such a library there
+is still room for a lot of improvements. Please report any inaccuray,
+bug, feature request through the JScience website
+<A HREF="http://www.jscience.org/">http://www.jscience.org/</A>.</P>
+<P><BR><BR>
+</P>
+<P><A NAME="2 installation"></A>2. INSTALLATION FOR END USERS:</P>
+<P>Install Java (1.5 or later) from <A HREF="http://www.java.com/">http://www.java.com/</A>.
+All class files are Java VM 1.3 compatible (as far as we know)
+although this version is not supported. 
+</P>
+<P>See also the &quot;Required libraries&quot; section below.</P>
+<P>Put the JScience library in the &lt;jre&gt;/lib/ext directory of
+your java installation, removing all previous Jscience files.</P>
+<P>Or:</P>
+<P>Remove any previous version of JScience by simply deleting the
+org.jscience directory. 
+</P>
+<P>Unzip the current version of jscience.zip. 
+</P>
+<P>Make sure your CLASSPATH environment variable contains a path to
+jscience/classes/core.jar. 
+</P>
+<P>If required, also add any of the optional JAR files to your
+CLASSPATH. 
+</P>
+<P>Run any sample with the command line, as usual.</P>
+<P><BR><BR>
+</P>
+<P><A NAME="3 developer installation"></A>3. INSTALLATION OR
+COMPILATION FOR DEVELOPERS:</P>
+<P>To compile all the code:</P>
+<P>Install Java (1.5 or later) from <A HREF="http://www.java.com/">http://www.java.com/</A>.</P>
+<P>The text encoding for the compiler must be UTF-8 (mainly for some
+Measure package classes).</P>
+<P>See also the &quot;Required libraries&quot; section below.</P>
+<P>Compile with the command line, as usual or with Ant using the
+supplied build.xml in the org package.</P>
+<P><BR><BR>
+</P>
+<P><A NAME="4 required libraries"></A>4. REQUIRED LIBRARIES:</P>
+<P>To compile and/or run all the classes in this library you will
+also need:</P>
+<UL>
+	<LI><P>Java3D for the org.jscience.astronomy package. Java3D can be
+	found at <A HREF="http://java.sun.com/products/java-media/3D/">http://java.sun.com/products/java-media/3D/</A>.</P>
+	<LI><P>JavaComm for the control of the LX200 or NexStar telescope
+	(org.jscience.devices package). JavaComm can be found at
+	<A HREF="http://java.sun.com/products/javacomm/index.jsp">http://java.sun.com/products/javacomm/index.jsp</A>.</P>
+	<LI><P>MathML 2.0, 2nd edition implementation and dtd: the MathML
+	(partial) implementation that can be found on the Jscience website
+	is different from the standard implementation of the MathML dtd
+	(<A HREF="http://dev.w3.org/cvsweb/java/classes/org/w3c/dom/mathml/">http://dev.w3.org/cvsweb/java/classes/org/w3c/dom/mathml/</A>)
+	and corrects minor bugs. Please download the version from jscience
+	named MathML DOM. You will find the MathML dtd at
+	<A HREF="http://www.w3.org/TR/2003/REC-MathML2-20031021/">http://www.w3.org/TR/2003/REC-MathML2-20031021/
+	</A>Xerces XML parser found at <A HREF="http://xml.apache.org/xerces2-j/">http://xml.apache.org/xerces2-j/</A></P>
+	<LI><P>JUnit for org.jscience.test subpackage found at
+	<A HREF="http://www.junit.org/index.htm">http://www.junit.org/index.htm</A></P>
+	<LI><P>tools.jar (JDK doclet system) from the JDK lib directory must
+	be in the classpath to compile the Doclet subpackage</P>
+	<LI><P>OpenBQS client (BQS_ws.jar) for the Bibliography package
+	found at <A HREF="http://industry.ebi.ac.uk/openBQS/">http://industry.ebi.ac.uk/openBQS/</A></P>
+</UL>
+<P><BR><BR>
+</P>
+<P><A NAME="5 warnings"></A>5. WARNINGS:</P>
+<P>This is a scientific package. Futures release may NOT be
+compatible with the current code from the library. This means that
+code may NOT be upward compatible. One reason is that science changes
+from time to time and perhaps contradicts itself, wich means that we
+may have to rewrite the code because &quot;it is not scientific
+anymore&quot;. However, we will make every effort so that there is
+very few effort on your side to update your code to a new version.
+Our philosophy is to produce a new version to provide more features,
+more precision, more efficiency, less bugs.</P>
+<P>The library comes with several viewers that are currently designed
+by third parties and are merely co bundled and not fully integrated.
+You should consider these viewers as deprecated, although they are
+not marked as such.</P>
+<P>This includes: org.jscience.astronomy.ephemeris,
+org.jscience.astronomy.milkyway,
+org.jscience.astronomy.solarsystem.constellations (as well as the
+factories for Comets, Asteroids and Artificial Satellites),
+org.jscience.chemistry.viewer (and subpackages),
+org.jscience.earth.weather.cityforecast and
+org.jscience.earth.weather.metar.</P>
+<P>This is quite a large library. It is therefore full of errors,
+inconsistencies and inaccuracies. Yelling is not the solution.
+Please, fill a request for enhancement, a bug report or drop us a
+mail for every missing contribution, copyright infringement or the
+like. We are working hard to make this library as good as possible
+and will make every effort to provide a rapid answer.</P>
+<P><BR><BR>
+</P>
+<P><A NAME="6 contributions"></A>6. CONTRIBUTIONS:</P>
+<P>We have asked and received permission to use all the code and
+files we did not produce ourselves.</P>
+<P>Though, we still are waiting an answer from Prentice Hall for the
+org.jscience.media.audio.dsp package.</P>
+<P>Safety signs pdf files taken from
+<A HREF="http://www.urwpp.de/common/pdf/cd_l_safetysigns.pdf">http://www.urwpp.de/common/pdf/cd_l_safetysigns.pdf
+</A>or <A HREF="http://www.mr-clipart.com/products/safety/safetysigns-e.html">http://www.mr-clipart.com/products/safety/safetysigns-e.html</A>.
+Cards in org.jscience.swing.cards taken from Oxymoron cards
+(<A HREF="http://www.waste.org/~oxymoron/cards/">http://www.waste.org/~oxymoron/cards/</A>).
+Icons in org.jscience.awt.icons are from Sun Java Icons
+(<A HREF="http://java.sun.com/developer/techDocs/hi/repository/">http://java.sun.com/developer/techDocs/hi/repository/</A>).</P>
+<P>We also bundle many datafiles and physical measurements produced
+by many sources. Some of these files were converted to xml or
+reorganized by ourselves. You will normally find an accompanying
+document (Java, html or text file) describing the original
+location(s).</P>
+<P>The Duke logo, is based on the Java Duke, copyrighted by Sun
+Microsystems.</P>
+<P>Several people have contributed to this work. This list only
+includes active coders and known contributors of packages. Many
+people have also contributed and provided us with feature request,
+bug reports, etc. Big thanks to everyone. Send us a mail if you feel
+you have been forgotten (and you probably were).</P>
+<P>To name a few:</P>
+<UL>
+	<LI><P>Jean-Marie Dautelle &lt;jean-marie@dautelle.com&gt; (JADE,
+	Javolution, units packages)</P>
+	<LI><P>Greg Bush &lt;GBush@HealthMarket.com&gt; (mathematical
+	prover)</P>
+	<LI><P>Miguel Garvie &lt;miguelgarvie@yahoo.co.uk&gt; (distributed
+	computing)</P>
+	<LI><P>Levent Bayindir &lt;levent@ceng.metu.edu.tr&gt; (artificial
+	intelligence)</P>
+	<LI><P>Mark Hale &lt;m.hale@qmul.ac.uk&gt; (mathematics, physics,
+	chemistry)</P>
+	<LI><P>Kyle Siegrist &lt;siegrist@math.uah.edu&gt; (mathematics,
+	probability)</P>
+	<LI><P>Sergio A. de Carvalho Jr. &lt;sergioanibaljr@yahoo.com.br&gt;
+	(biology alignment)</P>
+	<LI><P>Edward A. Pier &lt;eap@milkyway.gsfc.nasa.gov&gt; (astronomy
+	FITS)</P>
+	<LI><P>Michel Van den Bergh &lt;vdbergh@luc.ac.be&gt; (network time)</P>
+	<LI><P>Jim Baer &lt;jimbaer1@earthlink.net&gt; (astronomy)</P>
+	<LI><P>Martin Senger &lt;senger@ebi.ac.uk&gt; (bibliography)</P>
+	<LI><P>Carsten Knudsen &lt;Carsten.Knudsen@fysik.dtu.dk&gt;
+	(mathematics)</P>
+	<LI><P>Peter Csapo &lt;peter@pcsapo.com&gt; (astronomy)</P>
+	<LI><P>David Caley &lt;dcaley@germane-software.com&gt; (astronomy)</P>
+	<LI><P>Luke Reeves &lt;luke@neuro-tech.net&gt; (economics)</P>
+	<LI><P>Michael H. Kay &lt;mhkay@iclway.co.uk&gt; (GedML)</P>
+	<LI><P>Serge Knystautas &lt;sergek@users.sourceforge.net&gt; (earth
+	sciences)</P>
+	<LI><P>Doug Gehringer &lt;Doug.Gehringer@sun.com&gt; (medicine)</P>
+	<LI><P>Paul Houle &lt;paul@honeylocust.com&gt; (random numbers)</P>
+	<LI><P>Silvere Martin-Michiellot &lt;silvere@digitalbiosphere.com&gt;
+	(soft sciences and biology, chemistry)</P>
+	<LI><P>Richard Cannings (Eigenvalue methods) 
+	</P>
+	<LI><P>Don Cross (Fourier transforms) 
+	</P>
+	<LI><P>Jaco van Kooten (Statistics and some special functions) 
+	</P>
+	<LI><P>Daniel Lemire (Wavelet package) 
+	</P>
+	<LI><P>Taber Smith (Matrix trace and norms) 
+	</P>
+	<LI><P>John Carr (awt/swing code and doc improvements) 
+	</P>
+	<LI><P>Rodrigo Almeida Gon?ves (LPSolve port) 
+	</P>
+	<LI><P>Benedikt Dietrich (Polynomials package) 
+	</P>
+	<LI><P>Alasdair King &lt;alasdairking@yahoo.co.uk&gt; (braille)</P>
+	<LI><P>&quot;This product includes software developed by Galdos
+	Systems Inc. (http://www.galdosinc.com).&quot; (GML4J)</P>
+	<LI><P>Adam Pease &lt;apease@users.sourceforge.net&gt; (linguistics)</P>
+	<LI><P>Mark E. Shoulson &lt;mark@kli.org&gt; (calendars)</P>
+	<LI><P>Joe Huwaldt &lt;jhuwaldt@mac.com&gt; (atmospheric systems)</P>
+</UL>
+<P>This is a opensource project, people just come in and join if they
+want to waste their time and feel like it.</P>
+<P>We don't even know each others but come excited by the common
+goals.</P>
+<P>You can offer a contribution in many ways:</P>
+<UL>
+	<LI><P>you have an idea and roadmap to rewrite one of the package in
+	a better way</P>
+	<LI><P>you have an idea to improve a package without breaking the
+	underlying model, offering new classes and methods</P>
+	<LI><P>you have designed a new subpackage you want to share</P>
+	<LI><P>you have improved existing documentation</P>
+	<LI><P>you have written some tests or sample code 
+	</P>
+	<LI><P>you want to submit a bug report</P>
+	<LI><P>you want to submit a request for enhancement</P>
+	<LI><P>you have some datafiles you would like us to bundle in</P>
+	<LI><P>you want to review or write some comments about JScience or
+	one of the packages</P>
+	<LI><P>you have written an application or an applet that uses
+	JScience and would like to let us know so that we can link to you</P>
+</UL>
+<P>Don't hesitate to contact us should you want to contribute in a
+way or another.</P>
+<P><BR><BR>
+</P>
+<P><A NAME="7 used pacakges"></A>7. USED PACKAGES:</P>
+<P>This software is based on the work from several authors which code
+we used to produce our own code. Normally, we merge every feature
+from every package (a notable exception is Biojava).</P>
+<P>We downloaded the code for (almost) each package on the 1st
+January 2005, so any later release should be more recent than the
+code we built JScience upon.</P>
+<P>Specifically:</P>
+<UL>
+	<LI><P>Janet 1.10 beta (partial inclusion) (Carsten Knudsen
+	&lt;Carsten.Knudsen@fysik.dtu.dk&gt;)</P>
+	<LI><P>JSci 0.93 (Mark Hale &lt;m.hale@qmul.ac.uk&gt;) (still being
+	developed)</P>
+	<LI><P>OpenBQS 1.0 (Martin Senger &lt;senger@ebi.ac.uk&gt;)</P>
+	<LI><P>Hipparcos 1.0 (koflaher@rssd.esa.int)</P>
+	<LI><P>CODES (Comet/asteroid Orbit Determination and Ephemeris
+	Software) 06/04 (Jim Baer &lt;jimbaer1@earthlink.net&gt;) (still
+	being developed)</P>
+	<LI><P>Tripos 1.0
+	(http://java.sun.com/products/java-media/3D/demos/index.html)</P>
+	<LI><P>Biojava 1.4pre1 (biojava-dev@biojava.org) (partial inclusion)
+	(still being developed)</P>
+	<LI><P>Neobio pre-alpha (Sergio A. de Carvalho Jr.
+	&lt;sergioanibaljr@yahoo.com.br&gt;)</P>
+	<LI><P>Peter Csapo 1.0 (Peter Csapo &lt;peter@pcsapo.com&gt;)</P>
+	<LI><P>David Caley 1.0 (David Caley &lt;dcaley@germane-software.com&gt;)</P>
+	<LI><P>JRUG JRL 1.0 (Levent Bayindir &lt;levent@ceng.metu.edu.tr&gt;)
+	(still being developed)</P>
+	<LI><P>Distrit 1.2 (Miguel Garvie &lt;miguelgarvie@yahoo.co.uk&gt;)</P>
+	<LI><P>JavaWeather 1.0 (Serge Knystautas
+	&lt;sergek@users.sourceforge.net&gt;)</P>
+	<LI><P>JADE 7.0.8 (Jean-Marie Dautelle &lt;jean-marie@dautelle.com&gt;)</P>
+	<LI><P>JFL 1.6.1 (Luke Reeves &lt;luke@neuro-tech.net&gt;)</P>
+	<LI><P>Riaca Openmath 2.0 (amc@win.tue.nl) (partial inclusion)
+	(still being developed)</P>
+	<LI><P>Swift FITS 1.3 (Edward A. Pier &lt;eap@milkyway.gsfc.nasa.gov&gt;)</P>
+	<LI><P>Prover 1.0 (Greg Bush &lt;GBush@HealthMarket.com&gt;)</P>
+	<LI><P>PSOL 1.0 (Kyle Siegrist &lt;siegrist@math.uah.edu&gt;)</P>
+	<LI><P>RngPack 1.1a (Paul Houle &lt;paul@honeylocust.com&gt;)</P>
+	<LI><P>Volrend 1.0 (Doug Gehringer &lt;Doug.Gehringer@sun.com&gt;)</P>
+	<LI><P>GedML 1.0 (Michael H. Kay &lt;mhkay@iclway.co.uk&gt;)</P>
+	<LI><P>NTP 1.0 (Michel Van den Bergh &lt;vdbergh@luc.ac.be&gt;)</P>
+	<LI><P>JIGCELL 5.0.3 (partial inclusion) (still being developed)</P>
+	<LI><P>JUMBO 4.3 (partial inclusion) (still being developed)</P>
+	<LI><P>BrailleTrans 1.0 (Alasdair King &lt;alasdairking@yahoo.co.uk&gt;)</P>
+	<LI><P>GML4J 1.0.3 beta (Aleksandar Milanovic
+	&lt;amilanovic@users.sourceforge.net&gt;)</P>
+	<LI><P>TigerAPI 1.8.2 (hajokeffer@users.sourceforge.net) (still
+	being developed)</P>
+	<LI><P>SEDRIS SRM 4.0 (se-mgmt@sedris.org) (still being developed)</P>
+	<LI><P>Sigmakee 1.1 (Adam Pease &lt;apease@users.sourceforge.net&gt;)</P>
+	<LI><P>Meson Calendar 1.0 applet (Mark E. Shoulson &lt;mark@kli.org&gt;)</P>
+	<LI><P>GPSLIB4J 0.0.2 (tkuebler@users.sourceforge.net) (based on
+	Henrik Aasted Sorensen's dk.itu.haas.GPS library)</P>
+	<LI><P>J3d.org CVS source tree (resources@j3d.org) (partial
+	inclusion) (still being developed)</P>
+	<LI><P>JDictClient 0.1.5 (bechynsk@users.sourceforge.net)</P>
+	<LI><P>Generation5 JDK 27/12/04 (generation5@users.sourceforge.net)
+	(still being developed)</P>
+	<LI><P>Geotools 2.0 (desruisseaux@users.sourceforge.net) (partial
+	inclusion) (still being developed)</P>
+	<LI><P>Itislib 1.0.0 (jones@nceas.ucsb.edu)</P>
+	<LI><P>Aerodynamics 20/11/04 (partial inclusion) (Joe Huwaldt
+	&lt;jhuwaldt@mac.com&gt;) 
+	</P>
+	<LI><P>1976 Standard Atmosphere Program 1.3.1 (partial inclusion)
+	(Joe Huwaldt &lt;jhuwaldt@mac.com&gt;) 
+	</P>
+	<LI><P>JGraphT 0.5.3 (still being developed)</P>
+	<LI><P>JHLabs image filters 01/01/05 (Jerry Huxtable
+	&lt;jerry@jhlabs.com&gt;)</P>
+	<LI><P>AudioStudio 1.1
+	(ftp://ftp.prenhall.com/pub/ptr/professional_computer_science.w-022/digital_audio/,
+	craigl@att.net)</P>
+	<LI><P>VirtualPlants 1.0 (rene@gressly.ch)</P>
+	<LI><P>Mantissa 5.8 (Luc Maisonobe &lt;luc@spaceroots.org&gt;)</P>
+	<LI><P>SelectionEngine alpha version</P>
+	<LI><P>Kaleido 1.0 (rl@math.technion.ac.il)</P>
+	<LI><P>Computational Geometry in C (Second Edition)
+	(orourke@cs.smith.edu)</P>
+</UL>
+<P><BR><BR>
+</P>
+<P><A NAME="8 JScience share"></A>8. JSCIENCE MARKET SHARE:</P>
+<P>After a couple of years browsing the Web for Java code, and after
+reviewing thousands of packages and applets, I have looked at about
+everything that exist in Java about science, robots and 3D. From this
+work I can make a few comments and draw a picture of the Java world.
+Also looking at the global community I can make a couple of comments
+about the share of the Java code in the scientific software market.</P>
+<P>First, it must be said that there is a lot of Java code as
+scientific projects, either as full libraries or short snippets. The
+opportunity applets offer for visual demonstrations is really a very
+important language design choice, but also Java appears to be
+interesting because it is a nice language to learn and test on which
+you are rapidly productive. This is appealing for scientists. But
+Java is also chosen for more mature projects: object oriented
+features, multi platform and ease of networking to a lesser extent
+are good reasons to go for a development. Finally, the plug and play
+concept of API makes code sharing very fruitful.</P>
+<P>As we find more and more Java projects, we move away from Fortran
+code which was widely accepted for high end scientific computation
+before. Actually, the only viable competitor to Java today is C (and
+C++). From my personal experience I would say there is about one
+third of projects in Java and the other two third in C (this does not
+take into account commercial products which are all designed in C).
+But Java code quality is often awesome and there is much less people
+spending there time in developing code that has been developed
+elsewhere. So, overall Java is probably on par or beats C. Also,
+there is virtually no C#, and I think this is really good for
+everyone.</P>
+<P>Java is not seen anymore as a slow system and computation
+intensive tasks are also programmed in Java. C, however, is largely
+favored for such tasks. Java has only one drawback, it is designed by
+a commercial company and not an international standard like C.
+Actually, I would even say that Java is in its golden age but will
+probably leave it once for all in a couple of years.</P>
+<P>Who is using scientific computation ?</P>
+<P>We have the following categories of scientific software products
+available:</P>
+<UL>
+	<LI><P>applet demos and hands on</P>
+	<LI><P>one time models for scientific publication</P>
+	<LI><P>university API and opensource community projects</P>
+	<LI><P>high end all language systems, mostly parallel, closed and
+	governmental</P>
+	<LI><P>windows all purpose mathematics applications</P>
+	<LI><P>stand alone commercial tailored solutions with proprietary
+	model</P>
+</UL>
+<P>Applets and one time models are usually designed in universities,
+by young enthusiasts (or sometimes Java addicts). They are normally
+short pieces of code that the author drops there without a chance for
+reuse or improvement. Sometimes the one and only algorithm is reused
+in bigger projects, in the same or a different language. This is
+either a university API or a governmental closed project.
+Universities prefer Java while government agencies prefer C because a
+good engineer is less expensive than a supercomputer. They also are
+dependent on tradition, power and habits. It is in this kind of
+projects that we find some Fortran code. As their projects are very
+big, there are always some spin off libraries developed that compete
+with stand alone API efforts made by universities. But comparison
+shows that Java products offer more features, are better maintained
+and supported by the whole free software community.</P>
+<P>Finally, there is a really different range of scientific product,
+namely industrial products. These are sold, offering proprietary
+models, source code is unavailable, API and extensions are rather
+poor. The user is therefore the &quot;final&quot; user. These
+products are side by side to the opensource Java API. Researchers
+routinely use both while people in the industry only use these close
+products. The reason is that researchers need to achieve some (one
+time) results whereas industrials are part of a work flow with
+furnishers and clients (ie: they are specialists that process data in
+a standard repeatable manner). Closed products are almost all written
+in C and have features that no API will ever compete with. They make
+few use of (possibly underlying) libraries but widgets. They come in
+two flavors: wide spectrum all purpose products like Mathematica,
+Mapple, Gauss and task specific for example crystallography software.
+The later class is often sold with a physical device used for data
+acquisition.</P>
+<P>So, what is JScience for ?</P>
+<P>JScience is a kind of Wikipedia for scientific software. It is
+less detailed than a book that would cover a specific area although,
+on the other hand it provides general guidelines and ideas about how
+things goes. Developers are welcomed to subclass the existing
+packages and provide some detailed implementation in an domain with
+the benefit of having some others developers doing the same in other
+domains. They also are guarantied of having standard code, tested and
+optimized algorithms for the well known scientific concepts taught at
+undergraduate level.</P>
+<P>This should bring in some more researchers and universities
+projects on a short time scale. This won't hurt much industrial C
+coded applications but may be push the market a bit towards more
+inter operability between their closed models.</P>
+<P>With computer evolving according to Moore law, scientific
+computation has a bright future. There is a need for a standard base
+of code no one can afford to develop anymore while testing more
+complex models.</P>
+<P><BR><BR>
+</P>
+<P><A NAME="9 release history"></A>9. RELEASE HISTORY:</P>
+<P>In November 2003, I (Silvere Martin-Michiellot) was looking for a
+general Newton kinematics model for the Digital Biosphere project (a
+3D realtime simulation of the earth for augmented reality,
+www.digitalbiosphere.org) when I found JSci (jsci.sourceforge.net) as
+a general purpose scientific API. Yet it provided only scientific
+support in mathematics, some physics and chemistry as well as some
+AWT and Swing components. I started to write new modules for JSci
+that could latter be used by Digital Biosphere rather than hacking
+them directly. As it turned out, Mark Hale, the JSci leader never
+accepted me fully as a developer of new packages which he always
+refused to commit to cvs. I wasn't so much bothered though, since I
+had my own projects and hoped to release my code elsewhere if needed.
+By April 2004 I had been working about 80 hours a week on this and
+contacted tens of people who had realtime datasources or scientific
+projects I could repackage. One of these was Jean-Marie Dautelle, the
+author of JADE, that had a very nice Units package and a concurrent
+Mathematics package. From April until August I kept working on the
+project but at a very low pace. By that time, Jean-Marie couldn't
+keep the name JADE for his project for silly copyright issues. I
+offered him to merge our works into a new project we named JScience.
+He managed to build up the website, register on dev.java.net and
+moved his original mature working code for release while I started
+working on the &quot;experimental release&quot;, a merger of JSci,
+JADE and my code along with more and more packages up to cover the
+scientific knowledge up to undergraduate degree in every area. Once
+again, from August 2004 to mid 2005, I worked on week ends and late
+nights (although at a reasonable rate of about 20 hours a week),
+tried out hundered of Java packages (actually almost every existing
+Java package), contacted hundreds of people to produce something that
+is about 2500 classes and 17 MB when zip-distributed with data files.
+This is neverthless the widest, most accurate and easiest scientific
+API ever. Many thanks to all countless contributors. Much remains to
+be done, actually there is work to improve every package for years.</P>
+<P>Actually, after a second thought, I dreamt of having such a
+general science package about 20 years ago. Although, by that time
+there was no Java, and in fact no object language at all (apart from
+some lab tools). I am therefore especially happy of participating in
+such a project... and sad at the same time that noone tried hard
+enough before.</P>
+<P><BR><BR>
+</P>
+<P><A NAME="10 selected readings"></A>10. SELECTED READINGS OR
+SOURCES:</P>
+<UL>
+	<LI><P>http://www.google.com/ (and http://scholar.google.com)</P>
+	<LI><P>http://www.wikipedia.org/</P>
+	<LI><P>http://hyperphysics.phy-astr.gsu.edu/hbase/hframe.html</P>
+	<LI><P>http://scienceworld.wolfram.com/</P>
+	<LI><P>http://planetmath.org/encyclopedia</P>
+	<LI><P>http://www.sciencesbookreview.com/</P>
+	<LI><P>http://phrontistery.50megs.com/</P>
+	<LI><P>http://www.cartage.org.lb/en/themes/Sciences/mainpage.htm</P>
+	<LI><P>http://www.bartleby.com/reference/</P>
+	<LI><P>http://i-cias.com/e.o/index.htm</P>
+</UL>
+<P>Richard Phillips Feynman, Lectures on Physics:
+http://www.amazon.com/exec/obidos/tg/detail/-/0201021153/002-2161498-8708867?v=glance</P>
+<P>Peter H. Raven, George B. Johnson, Biology:
+http://www.amazon.com/exec/obidos/ASIN/0073031208/qid=1077418580/sr=2-1/ref=sr_2_1/002-2161498-8708867</P>
+<P>Duward F. Shriver, P.W. Atkins, Inorganic Chemistry:
+http://www.amazon.co.uk/exec/obidos/ASIN/019850330X/ref=pd_bxgy_text_2_cp/026-9525467-3130854
+</P>
+<P>Atkins, Julio de Paula, Julio De Paula, Atkins' Physical
+Chemistry, 7th Ed.:
+http://www.amazon.co.uk/exec/obidos/ASIN/0198792859/ref=lm_lb_6/026-9525467-3130854</P>
+<P>David Harvey, Modern Analytic Chemistry:
+http://www.amazon.com/exec/obidos/tg/detail/-/0072375477/qid=1078529554//ref=sr_8_xs_ap_i1_xgl14/104-7144772-2507901?v=glance&amp;s=books&amp;n=507846</P>
+<P>You may also find free scientific articles here:</P>
+<UL>
+	<LI><P>International Network for the Availability of Scientific
+	Publications http://www.inasp.info/peri/free.html</P>
+	<LI><P>Free access litterature
+	http://www.scidev.net/ms/open_access/index.cfm?pageid=169</P>
+	<LI><P>HighWire http://highwire.stanford.edu/lists/largest.dtl</P>
+	<LI><P>lanl.arXiv.org e-Print archive mirror http://xxx.lanl.gov/</P>
+</UL>
+<P>Databases:</P>
+<UL>
+	<LI><P>NIST Scientific and Technical Databases - Index:
+	http://www.nist.gov/srd/</P>
+	<LI><P>Welcome to the NIST WebBook: http://webbook.nist.gov/</P>
+	<LI><P>Sciences Databases: http://www.lib.uchicago.edu/e/crerar/db/</P>
+</UL>
+<P><BR><BR>
+</P>
+<P><A NAME="11 package links"></A>11. PACKAGE SPECIFIC LINKS:</P>
+<P>Several links to third party Java libraries should help you to
+cover the areas not directly (or partly covered) by this library. If
+you really need a very exhaustive list of links, send an email to
+silvere@digitalbiosphere.com</P>
+<P>Caches packages:</P>
+<UL>
+	<LI><P>JSR 107: JCACHE - Java Temporary Caching API
+	http://jcp.org/en/jsr/detail?id=107</P>
+	<LI><P>FKache http://jcache.sourceforge.net/</P>
+	<LI><P>Commons Cache
+	http://jakarta.apache.org/commons/sandbox/cache/</P>
+	<LI><P>Java Caching System http://jakarta.apache.org/turbine/jcs/</P>
+	<LI><P>BioJava http://www.biojava.org/</P>
+</UL>
+<P>Frameworks for applications:</P>
+<UL>
+	<LI><P>Gandalf wizard framework
+	http://sourceforge.net/projects/gandalf/</P>
+	<LI><P>Java Wizard Framework http://sourceforge.net/projects/jwf/</P>
+	<LI><P>JPreference Framework
+	http://sourceforge.net/projects/jpreference/</P>
+	<LI><P>Manspace Java Framework Classes
+	http://sourceforge.net/projects/pulpitum/</P>
+	<LI><P>OPA http://sourceforge.net/projects/openprintassist/</P>
+</UL>
+<P>Resources for teachers:</P>
+<UL>
+	<LI><P>APIS QTIv2 Assessment Engine
+	http://sourceforge.net/projects/apis</P>
+	<LI><P>Online Learning And Training http://www.olat.org/</P>
+</UL>
+<P>Astronomy:</P>
+<UL>
+	<LI><P>Hipparcos and Tycho Catalogues
+	http://astro.estec.esa.nl/Hipparcos/catalog.html</P>
+	<LI><P>Tycho2 http://geocities.yahoo.com.br/astrobhbr/tycho2.htm</P>
+</UL>
+<P>Awt:</P>
+<UL>
+	<LI><P>See below, Swing.</P>
+</UL>
+<P>Bibliography:</P>
+<UL>
+	<LI><P>BQS http://industry.ebi.ac.uk/openBQS/</P>
+	<LI><P>Google API http://www.google.com/apis/index.html</P>
+</UL>
+<P>Biology:</P>
+<UL>
+	<LI><P>Biojava http://www.biojava.org/</P>
+	<LI><P>PAL: Phylogenetic Analysis Library
+	http://www.cebl.auckland.ac.nz/pal-project/</P>
+	<LI><P>Mesquite http://mesquiteproject.org/mesquite/mesquite.html</P>
+</UL>
+<P>Chemistry:</P>
+<UL>
+	<LI><P>CML, Jumbo http://www.xml-cml.org/jumbo3/ 
+	</P>
+	<LI><P>JMol http://jmol.sourceforge.net/</P>
+	<LI><P>Marvin http://www.chemaxon.com/marvin/</P>
+	<LI><P>CDK http://cdk.sourceforge.net/index.html</P>
+	<LI><P>JChemPaint http://jchempaint.sourceforge.net</P>
+	<LI><P>JEFF-3.0 http://www.nea.fr/html/dbdata/projects/nds_jef.htm</P>
+	<LI><P>JANIS http://www.nea.fr/janis/welcome.html</P>
+	<LI><P>Webreactions http://webreactions.net/index.html</P>
+	<LI><P>JCrystal http://jcrystal.com/index.html</P>
+</UL>
+<P>Computing:</P>
+<UL>
+	<LI><P>See corresponding directory (org.jscience.computing and
+	org.jscience.computing.ai) and</P>
+	<LI><P>JSR94 http://www.jcp.org/en/jsr/detail?id=94 (see
+	http://java-source.net/open-source/rule-engines)</P>
+	<LI><P>JSR73 http://www.jcp.org/en/jsr/detail?id=73</P>
+	<LI><P>JSR247 http://jcp.org/en/jsr/detail?id=247</P>
+	<LI><P>Antelmann library http://www.antelmann.com/developer/ (look
+	into the games package)</P>
+</UL>
+<P>Devices:</P>
+<UL>
+	<LI><P>http://www.raben.com/articles/TelescopeInterface/resources.html</P>
+</UL>
+<P>Earth:</P>
+<UL>
+	<LI><P>XMML https://www.seegrid.csiro.au/twiki/bin/view/Xmml/WebHome</P>
+</UL>
+<P>Economics:</P>
+<UL>
+	<LI><P>financial XML http://www.finxml.org/</P>
+	<LI><P>Jpos http://www.jpos.org/</P>
+	<LI><P>JDollars http://jdollars.sourceforge.net/</P>
+	<LI><P>Real-Time Data Feed API
+	http://www.modulusfe.com/api/default.asp</P>
+	<LI><P>Barcode generator http://sourceforge.net/projects/barbecue/</P>
+</UL>
+<P>Geography:</P>
+<UL>
+	<LI><P>Mondial database
+	http://dbis.informatik.uni-goettingen.de/Mondial/</P>
+	<LI><P>http://www.alphaworks.ibm.com/tech/snobase</P>
+	<LI><P>Geotools http://www.geotools.org/</P>
+</UL>
+<P>History:</P>
+<UL>
+	<LI><P>JODA Time http://joda-time.sourceforge.net/</P>
+	<LI><P>Time Package
+	http://www.dprism.com/products/time/features.html 
+	</P>
+</UL>
+<P>Law:</P>
+<UL>
+	<LI><P>-</P>
+</UL>
+<P>Linguistics:</P>
+<UL>
+	<LI><P>Chinese encoding converter
+	http://www.mandarintools.com/javaconverter.html</P>
+</UL>
+<P>Mathematics:</P>
+<UL>
+	<LI><P>Geometry
+	http://mathsrv.ku-eichstaett.de/MGF/homes/grothmann/java/zirkel/doc_en/</P>
+	<LI><P>JavaMath API - Welcome http://javamath.sourceforge.net/</P>
+	<LI><P>Qedeq http://www.qedeq.org/</P>
+	<LI><P>Orbital http://www.functologic.com/orbital/index.html</P>
+	<LI><P>Visual Numerics - Developers of IMSL and PV-WAVE
+	http://www.vni.com/products/imsl/jmsl.html</P>
+	<LI><P>Java Tools for Experimental Mathematics
+	http://www-sfb288.math.tu-berlin.de/~jtem/</P>
+	<LI><P>Vecmath https://vecmath.dev.java.net/</P>
+	<LI><P>Stochastic Simulation in Java
+	http://www.iro.umontreal.ca/~lecuyer/ssj/</P>
+	<LI><P>Javaview http://www.javaview.de/</P>
+</UL>
+<P>Measure:</P>
+<UL>
+	<LI><P>http://jcp.org/en/jsr/detail?id=275</P>
+</UL>
+<P>Media:</P>
+<UL>
+	<LI><P>See org.jscience.computing.ai (vision, image processing
+	links) and</P>
+	<LI><P>Java Advanced Imaging http://java.sun.com</P>
+	<LI><P>Java Media Framework http://java.sun.com</P>
+	<LI><P>Java3D http://java.sun.com</P>
+</UL>
+<P>Medicine:</P>
+<UL>
+	<LI><P>NeuroML http://www.neuroml.org/</P>
+	<LI><P>MorphML
+	http://germain.umemat.maine.edu/faculty/crook/MorphML.html</P>
+	<LI><P>CellML http://www.cellml.org/</P>
+	<LI><P>BrainML http://www.brainml.org/</P>
+	<LI><P>AnatML http://www.physiome.org.nz/anatml/</P>
+	<LI><P>NeatMed http://www.eeng.dcu.ie/%7Evsl/DICOM/</P>
+	<LI><P>SPLViz
+	http://splweb.bwh.harvard.edu:8000/pages/projects/vizualization/splviz/splviz.html</P>
+	<LI><P>Bio-medical Imaging in Java http://bij.isi.uu.nl/index.htm</P>
+</UL>
+<P>Ml:</P>
+<UL>
+	<LI><P>-</P>
+</UL>
+<P>Net:</P>
+<UL>
+	<LI><P>-</P>
+</UL>
+<P>Philosophy:</P>
+<UL>
+	<LI><P>-</P>
+</UL>
+<P>Physics:</P>
+<UL>
+	<LI><P>FreeHEP http://java.freehep.org/index.html</P>
+	<LI><P>ODE for Java https://odejava.dev.java.net/</P>
+	<LI><P>ODE for Java (another implementation)
+	http://sourceforge.net/projects/odeforjava/</P>
+</UL>
+<P>Politics:</P>
+<UL>
+	<LI><P>-</P>
+</UL>
+<P>Psychology:</P>
+<UL>
+	<LI><P>Modular Reasoning System
+	http://www.ksl.stanford.edu/software/JTP/</P>
+</UL>
+<P>Sociology:</P>
+<UL>
+	<LI><P>OASIS HumanMarkup
+	http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=humanmarkup</P>
+</UL>
+<P>Swing:</P>
+<UL>
+	<LI><P>General link resource
+	http://www.javadesktop.org/rollups/components/index.html</P>
+	<LI><P>Jun4Java
+	http://www.sra.co.jp/people/nisinaka/Jun4Java/index_en.html</P>
+	<LI><P>Batik http://xml.apache.org/batik/index.html</P>
+	<LI><P>JGraph http://www.jgraph.com/</P>
+	<LI><P>OpenJGraph http://openjgraph.sourceforge.net/</P>
+	<LI><P>YFiles http://www.yworks.com/en/products_yfiles_about.htm</P>
+	<LI><P>Visad http://www.ssec.wisc.edu/~billh/visad.html</P>
+	<LI><P>Scientific Graphics Toolkit
+	http://www.epic.noaa.gov/java/sgt/</P>
+	<LI><P>Many organizations provide charting packages (open source
+	only below):</P>
+	<LI><P>JFreeChart, JFreeReport http://www.jfree.org/</P>
+	<LI><P>JCharts http://jcharts.sourceforge.net/index.html</P>
+	<LI><P>UJAC http://ujac.sourceforge.net/index.html</P>
+	<LI><P>Askalon, GJCL
+	http://dps.uibk.ac.at/projects/askalon/visualization/</P>
+	<LI><P>PtPlot http://ptolemy.eecs.berkeley.edu/java/ptplot/</P>
+	<LI><P>Chart2D http://chart2d.sourceforge.net/</P>
+	<LI><P>JopenChart http://jopenchart.sourceforge.net/</P>
+	<LI><P>Thundergraph http://sourceforge.net/projects/thundergraph</P>
+	<LI><P>Jchart2d http://jchart2d.sourceforge.net/</P>
+	<LI><P>Java Charts, JVCL, LwVCL
+	http://www.zaval.org/products/index.html</P>
+	<LI><P>JRobin http://www.jrobin.org/</P>
+</UL>
+<P>Tests:</P>
+<UL>
+	<LI><P>JUnit http://www.junit.org/</P>
+</UL>
+<P>Util:</P>
+<UL>
+	<LI><P>Jakarta commons <A HREF="http://jakarta.apache.org/commons/">http://jakarta.apache.org/commons/</A></P>
+	<P></P>
+</UL>
+<P><A NAME="12 contact"></A>12. CONTACT US:</P>
+<P>Though we do not have any formal postal address, you can contact
+us using the website www.jscience.org, or jscience.dev.java.net. You
+can also join the mailing list or contact directly:</P>
+<P><A HREF="mailto: jean-marie@dautelle.com">&quot;Jean-Marie
+Dautelle&quot; &lt;jean-marie@dautelle.com&gt;</A></P>
+<P><A HREF="mailto:silvere@digitalbiosphere.com">&quot;Silvere
+Martin-Michiellot&quot; &lt;silvere@digitalbiosphere.com&gt;</A></P>
+</BODY>
+</HTML>

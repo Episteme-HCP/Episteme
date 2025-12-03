@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE web-app PUBLIC
+        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+
+    <filter>
+        <filter-name>xslFilter</filter-name>
+        <filter-class>mypackage.filters.FormXslFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>xslFilter</filter-name>
+        <url-pattern>/forms/*</url-pattern>
+    </filter-mapping>
+
+    <servlet>
+        <servlet-name>
+            applicationController
+        </servlet-name>
+        <servlet-class>
+            mypackage.control.ApplicationControllerServlet
+        </servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>
+            myforms
+        </servlet-name>
+        <servlet-class>
+            com.codepassion.form.control.FormControllerServlet
+        </servlet-class>
+        <init-param>
+            <param-name>
+                formDesigner
+            </param-name>
+            <param-value>
+                forms.xml
+            </param-value>
+        </init-param>
+        <init-param>
+            <param-name>
+                XMLReaderName
+            </param-name>
+            <param-value>
+                org.apache.xerces.parsers.SAXParser
+            </param-value>
+        </init-param>
+
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>myforms</servlet-name>
+        <url-pattern>/forms/*</url-pattern>
+    </servlet-mapping>
+
+</web-app>

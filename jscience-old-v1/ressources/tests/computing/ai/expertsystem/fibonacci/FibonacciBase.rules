@@ -1,0 +1,59 @@
+package jeops.examples.fibonacci;
+
+public ruleBase FibonacciBase {
+
+  rule GoDown {
+    // if n >= 2, create two sons for the object
+    declarations
+      Fibonacci f;
+    conditions
+      f.getValue() == -1;
+      f.getN() >= 2;
+      f.getSon1() == null;
+    actions
+      Fibonacci f1 = new Fibonacci(f.getN() - 1);
+      Fibonacci f2 = new Fibonacci(f.getN() - 2);
+      f.setSon1(f1);
+      f.setSon2(f2);
+      assert(f1);    // Let's tell our knowledge base
+      assert(f2);    //   that these two sons exist.
+      modified(f);
+  }
+
+  rule BaseCase {
+    // if n == 1 or n == 0, then the value is n.
+    declarations
+      Fibonacci f;
+    conditions
+      f.getN() <= 1;
+      f.getValue() == -1;
+    actions
+      f.setValue(f.getN());
+      modified(f);   // Yes, I modified f
+  }
+
+  rule GoUp {
+    // if both subproblems are solved, so let's solve this one
+    declarations
+      Fibonacci f, f1, f2;
+    localdecl
+      int valf = f.getValue();
+      int valf1 = f1.getValue();
+      int valf2 = f2.getValue();
+    conditions
+      f1 != null;
+      f2 != null;
+      f1 == f.getSon1();
+      f2 == f.getSon2();
+      valf == -1;
+      f.getN() >= 2;
+      valf1 != -1;
+      valf2 != -1;
+    actions
+      f.setValue(valf1 + valf2);
+      retract(f1);  // I don't need
+      retract(f2);  //   them anymore...
+      modified(f);
+  }
+
+}

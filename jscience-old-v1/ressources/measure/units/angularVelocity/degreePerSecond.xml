@@ -1,0 +1,3 @@
+<unit id="degreePerSecond" name="degree per second" abbreviation="deg/s" unitType="angularVelocity"
+      parentSI="radianPerSecond" multiplierToSI="1.74532925E-2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

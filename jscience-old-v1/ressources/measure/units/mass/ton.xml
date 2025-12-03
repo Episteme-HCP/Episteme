@@ -1,0 +1,4 @@
+<unit id="ton" name="ton" unitType="mass" parentSI="kilogram" multiplierToSI="907.200"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>standard US (short) ton = 2000 lbs</description>
+</unit>

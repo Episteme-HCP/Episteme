@@ -1,0 +1,3 @@
+<unit id="literPerHectare" name="liter per hectare" unitType="volumetricArea" parentSI="meterCubedPerMeterSquared"
+      multiplierToSI="1.0E-07" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

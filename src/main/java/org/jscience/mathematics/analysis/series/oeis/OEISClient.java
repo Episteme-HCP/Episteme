@@ -86,7 +86,7 @@ public class OEISClient {
                     for (String part : parts) {
                         if (!part.trim().isEmpty()) {
                             try {
-                                terms.add(Integer.valueOf(part.trim()));
+                                terms.add(Integer.of(part.trim()));
                             } catch (NumberFormatException e) {
                                 // Ignore non-integer parts
                             }

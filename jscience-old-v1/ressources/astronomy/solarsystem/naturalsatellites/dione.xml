@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>moon</type>
+        <name>dione</name>
+        <parent>saturn</parent>
+    </general>
+    <parameter>
+        <diameter>1120</diameter>
+        <!-- km -->
+        <rotationperiod>2.737</rotationperiod>
+        <!-- day -->
+        <orbitperiod>2.737</orbitperiod>
+        <!-- day -->
+        <orbiteccentricity>0.0021</orbiteccentricity>
+        <orbitinclinationtoecliptic>0.021</orbitinclinationtoecliptic>
+        <!-- � -->
+        <distance>377714</distance>
+        <!-- km -->
+        <mass>1.05e24</mass>
+        <!-- g -->
+        <density>1.44</density>
+        <!-- g/cm3 -->
+    </parameter>
+</celestialobject>

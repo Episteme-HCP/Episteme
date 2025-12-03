@@ -1,0 +1,7 @@
+
+<!ENTITY joulePerMeterCubed.xml SYSTEM "../energyDensity/joulePerMeterCubed.xml">
+
+<!ENTITY energyDensity.elements	"
+&joulePerMeterCubed.xml;
+">
+

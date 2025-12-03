@@ -1,0 +1,92 @@
+[
+    {
+        "name": "Sun",
+        "spectralType": "G2V",
+        "mass": 1.9885e30,
+        "temperature": 5778,
+        "luminosity": 3.828e26,
+        "radius": 6.96e8,
+        "distance": 0
+    },
+    {
+        "name": "Sirius A",
+        "spectralType": "A1V",
+        "mass": 2.063e30,
+        "temperature": 9940,
+        "luminosity": 1.0e27,
+        "radius": 1.71e9,
+        "distance": 8.6
+    },
+    {
+        "name": "Canopus",
+        "spectralType": "A9II",
+        "mass": 1.59e31,
+        "temperature": 7350,
+        "luminosity": 4.7e29,
+        "radius": 7.1e10,
+        "distance": 310
+    },
+    {
+        "name": "Arcturus",
+        "spectralType": "K1.5III",
+        "mass": 2.18e30,
+        "temperature": 4286,
+        "luminosity": 6.3e28,
+        "radius": 2.57e10,
+        "distance": 36.7
+    },
+    {
+        "name": "Vega",
+        "spectralType": "A0V",
+        "mass": 4.37e30,
+        "temperature": 9602,
+        "luminosity": 1.61e27,
+        "radius": 2.36e9,
+        "distance": 25.04
+    },
+    {
+        "name": "Capella",
+        "spectralType": "G5III",
+        "mass": 4.96e30,
+        "temperature": 4970,
+        "luminosity": 2.9e28,
+        "radius": 1.2e10,
+        "distance": 42.2
+    },
+    {
+        "name": "Rigel",
+        "spectralType": "B8Ia",
+        "mass": 4.37e31,
+        "temperature": 11000,
+        "luminosity": 4.6e31,
+        "radius": 7.8e10,
+        "distance": 860
+    },
+    {
+        "name": "Betelgeuse",
+        "spectralType": "M1-2Ia-Iab",
+        "mass": 3.98e31,
+        "temperature": 3500,
+        "luminosity": 5.5e31,
+        "radius": 9.0e11,
+        "distance": 548
+    },
+    {
+        "name": "Aldebaran",
+        "spectralType": "K5III",
+        "mass": 2.5e30,
+        "temperature": 3910,
+        "luminosity": 1.5e29,
+        "radius": 4.5e10,
+        "distance": 65.3
+    },
+    {
+        "name": "Spica",
+        "spectralType": "B1V",
+        "mass": 2.3e31,
+        "temperature": 22400,
+        "luminosity": 8.3e30,
+        "radius": 7.47e9,
+        "distance": 250
+    }
+]

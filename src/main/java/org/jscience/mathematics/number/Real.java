@@ -69,6 +69,9 @@ public abstract class Real extends Number implements Comparable<Real> {
     /** The real number NaN */
     public static final Real NaN = Constants.NaN;
 
+    /** The real number 2 */
+    public static final Real TWO = RealDouble.of(2.0);
+
     /**
      * Creates a real number from a double value.
      * Uses current MathContext to decide implementation.

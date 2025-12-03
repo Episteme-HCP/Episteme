@@ -83,7 +83,7 @@ public interface Sequence<T> extends Function<Natural, T> {
         if (n < 0) {
             throw new IllegalArgumentException("Sequence index must be non-negative: " + n);
         }
-        return get(Natural.valueOf(n));
+        return get(Natural.of(n));
     }
 
     /**
@@ -94,11 +94,6 @@ public interface Sequence<T> extends Function<Natural, T> {
      */
     @Override
     default T apply(Natural n) {
-        return get(n);
-    }
-
-    @Override
-    default T evaluate(Natural n) {
         return get(n);
     }
 

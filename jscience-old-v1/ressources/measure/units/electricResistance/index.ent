@@ -1,0 +1,21 @@
+
+<!ENTITY abohm.xml SYSTEM "../electricResistance/abohm.xml">
+<!ENTITY kiloohm.xml SYSTEM "../electricResistance/kiloohm.xml">
+<!ENTITY megaohm.xml SYSTEM "../electricResistance/megaohm.xml">
+<!ENTITY microohm.xml SYSTEM "../electricResistance/microohm.xml">
+<!ENTITY milliohm.xml SYSTEM "../electricResistance/milliohm.xml">
+<!ENTITY ohm.xml SYSTEM "../electricResistance/ohm.xml">
+<!ENTITY statohm.xml SYSTEM "../electricResistance/statohm.xml">
+<!ENTITY voltPerAmpere.xml SYSTEM "../electricResistance/voltPerAmpere.xml">
+
+<!ENTITY electricResistance.elements	"
+&abohm.xml;
+&kiloohm.xml;
+&megaohm.xml;
+&microohm.xml;
+&milliohm.xml;
+&ohm.xml;
+&statohm.xml;
+&voltPerAmpere.xml;
+">
+

@@ -1,0 +1,4 @@
+<unit id="teragram" name="teragram" abbreviation="Tg" unitType="mass" parentSI="kilogram" multiplierToSI="1.0E+9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>10^12 g.</description>
+</unit>

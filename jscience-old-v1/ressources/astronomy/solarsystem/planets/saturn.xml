@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE naturalsatellite SYSTEM "naturalsatellites.dtd">
+<natural-satellite>
+    <name>Saturn</name>
+    <mass>568.46</mass>
+    <volume>82713</volume>
+    <equatorial-radius>60268</equatorial-radius>
+    <polar-radius>54364</polar-radius>
+    <volumetric-mean-radius>58232</volumetric-mean-radius>
+    <ellipticity>0.09796</ellipticity>
+    <mean-density>687</mean-density>
+    <surface-gravity>10.44</surface-gravity>
+    <surface-acceleration>8.96</surface-acceleration>
+    <escape-velocity>35.5</escape-velocity>
+    <GM>37.931</GM>
+    <bond-albedo>0.342</bond-albedo>
+    <visual-geometric-albedo>0.47</visual-geometric-albedo>
+    <visual-magnitude>-8.88</visual-magnitude>
+    <solar-irradiance>14.90</solar-irradiance>
+    <black-body-temperature>81.1</black-body-temperature>
+    <moment-of-inertia>0.210</moment-of-inertia>
+    <J2>16298.0</J2>
+    <number-of-natural-satellites>31</number-of-natural-satellites>
+    <planetary-ring-system>Yes</planetary-ring-system>
+    <semi-major-axis>1433.53</semi-major-axis>
+    <sidereal-orbit-period>10759.22</sidereal-orbit-period>
+    <tropical-orbit-period>10746.94</tropical-orbit-period>
+    <perihelion>1352.55</perihelion>
+    <aphelion>1514.50</aphelion>
+    <synodic-period>378.09</synodic-period>
+    <mean-orbital-velocity>9.69</mean-orbital-velocity>
+    <maximum-orbital-velocity>10.18</maximum-orbital-velocity>
+    <minimum-orbital-velocity>9.09</minimum-orbital-velocity>
+    <orbit-inclination>2.485</orbit-inclination>
+    <orbit-eccentricity>0.0565</orbit-eccentricity>
+    <sidereal-rotation-period>10.656</sidereal-rotation-period>
+    <length-of-day>10.656</length-of-day>
+    <obliquity-to-orbit>26.73</obliquity-to-orbit>
+    <surface-pressure>1000</surface-pressure>
+    <average-temperature>134</average-temperature>
+    <atmospheric-composition>Molecular hydrogen (H2) - 96.3% (2.4%); Helium (He) - 3.25%
+        (2.4%)
+    </atmospheric-composition>
+</natural-satellite>

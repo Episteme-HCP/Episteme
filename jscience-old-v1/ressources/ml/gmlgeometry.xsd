@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink"
+            xmlns:gml="http://www.opengis.net/gml" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified" version="2.1.1">
+    <xsd:annotation>
+        <xsd:appinfo source="urn:x-opengis:specification:gml:schema-xsd:geometry:v2.1.1">2001-12</xsd:appinfo>
+        <xsd:documentation xml:lang="en">
+            GML Geometry schema. Copyright (c) 2001 OGC, All Rights Reserved.
+        </xsd:documentation>
+    </xsd:annotation>
+    <!-- bring in the XLink attributes -->
+    <xsd:import namespace="http://www.w3.org/1999/xlink"
+                schemaLocation="xlinks.xsd"/>
+    <!-- ==============================================================
+        global declarations
+   =================================================================== -->
+    <xsd:element name="_Geometry" type="gml:AbstractGeometryType" abstract="true"/>
+    <xsd:element name="_GeometryCollection" type="gml:GeometryCollectionType" abstract="true"
+                 substitutionGroup="gml:_Geometry"/>
+    <xsd:element name="geometryMember" type="gml:GeometryAssociationType"/>
+    <xsd:element name="pointMember" type="gml:PointMemberType" substitutionGroup="gml:geometryMember"/>
+    <xsd:element name="lineStringMember" type="gml:LineStringMemberType" substitutionGroup="gml:geometryMember"/>
+    <xsd:element name="polygonMember" type="gml:PolygonMemberType" substitutionGroup="gml:geometryMember"/>
+    <xsd:element name="outerBoundaryIs" type="gml:LinearRingMemberType"/>
+    <xsd:element name="innerBoundaryIs" type="gml:LinearRingMemberType"/>
+    <!-- primitive geometry elements -->
+    <xsd:element name="Point" type="gml:PointType" substitutionGroup="gml:_Geometry"/>
+    <xsd:element name="LineString" type="gml:LineStringType" substitutionGroup="gml:_Geometry"/>
+    <xsd:element name="LinearRing" type="gml:LinearRingType" substitutionGroup="gml:_Geometry"/>
+    <xsd:element name="Polygon" type="gml:PolygonType" substitutionGroup="gml:_Geometry"/>
+    <xsd:element name="Box" type="gml:BoxType"/>
+    <!-- aggregate geometry elements -->
+    <xsd:element name="MultiGeometry" type="gml:GeometryCollectionType" substitutionGroup="gml:_Geometry"/>
+    <xsd:element name="MultiPoint" type="gml:MultiPointType" substitutionGroup="gml:_Geometry"/>
+    <xsd:element name="MultiLineString" type="gml:MultiLineStringType" substitutionGroup="gml:_Geometry"/>
+    <xsd:element name="MultiPolygon" type="gml:MultiPolygonType" substitutionGroup="gml:_Geometry"/>
+    <!-- coordinate elements -->
+    <xsd:element name="coord" type="gml:CoordType"/>
+    <xsd:element name="coordinates" type="gml:CoordinatesType"/>
+    <!-- this attribute gives the location where an element is defined -->
+    <xsd:attribute name="remoteSchema" type="xsd:anyURI"/>
+    <!-- ==============================================================
+        abstract supertypes
+   =================================================================== -->
+    <xsd:complexType name="AbstractGeometryType" abstract="true">
+        <xsd:annotation>
+            <xsd:documentation>
+                All geometry elements are derived from this abstract supertype;
+                a geometry element may have an identifying attribute (gid).
+                It may be associated with a spatial reference system.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:restriction base="xsd:anyType">
+                <xsd:attribute name="gid" type="xsd:ID" use="optional"/>
+                <xsd:attribute name="srsName" type="xsd:anyURI" use="optional"/>
+            </xsd:restriction>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="AbstractGeometryCollectionBaseType" abstract="true">
+        <xsd:annotation>
+            <xsd:documentation>
+                This abstract base type for geometry collections just makes the
+                srsName attribute mandatory.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:restriction base="gml:AbstractGeometryType">
+                <xsd:attribute name="gid" type="xsd:ID" use="optional"/>
+                <xsd:attribute name="srsName" type="xsd:anyURI" use="required"/>
+            </xsd:restriction>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:attributeGroup name="AssociationAttributeGroup">
+        <xsd:annotation>
+            <xsd:documentation>
+                These attributes can be attached to any element, thus allowing it
+                to act as a pointer. The 'remoteSchema' attribute allows an element
+                that carries link attributes to indicate that the element is declared
+                in a remote schema rather than by the schema that constrains the
+                current document instance.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:attributeGroup ref="xlink:simpleLink"/>
+        <xsd:attribute ref="gml:remoteSchema" use="optional"/>
+    </xsd:attributeGroup>
+    <xsd:complexType name="GeometryAssociationType">
+        <xsd:annotation>
+            <xsd:documentation>
+                An instance of this type (e.g. a geometryMember) can either
+                enclose or point to a primitive geometry element. When serving
+                as a simple link that references a remote geometry instance,
+                the value of the gml:remoteSchema attribute can be used to
+                locate a schema fragment that constrains the target instance.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0">
+            <xsd:element ref="gml:_Geometry"/>
+        </xsd:sequence>
+        <xsd:attributeGroup ref="xlink:simpleLink"/>
+        <xsd:attribute ref="gml:remoteSchema" use="optional"/>
+    </xsd:complexType>
+    <xsd:complexType name="PointMemberType">
+        <xsd:annotation>
+            <xsd:documentation>Restricts the geometry member to being a Point instance.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:restriction base="gml:GeometryAssociationType">
+                <xsd:sequence minOccurs="0">
+                    <xsd:element ref="gml:Point"/>
+                </xsd:sequence>
+                <xsd:attributeGroup ref="xlink:simpleLink"/>
+                <xsd:attribute ref="gml:remoteSchema" use="optional"/>
+            </xsd:restriction>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="LineStringMemberType">
+        <xsd:annotation>
+            <xsd:documentation>Restricts the geometry member to being a LineString instance.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:restriction base="gml:GeometryAssociationType">
+                <xsd:sequence minOccurs="0">
+                    <xsd:element ref="gml:LineString"/>
+                </xsd:sequence>
+                <xsd:attributeGroup ref="xlink:simpleLink"/>
+                <xsd:attribute ref="gml:remoteSchema" use="optional"/>
+            </xsd:restriction>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="PolygonMemberType">
+        <xsd:annotation>
+            <xsd:documentation>Restricts the geometry member to being a Polygon instance.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:restriction base="gml:GeometryAssociationType">
+                <xsd:sequence minOccurs="0">
+                    <xsd:element ref="gml:Polygon"/>
+                </xsd:sequence>
+                <xsd:attributeGroup ref="xlink:simpleLink"/>
+                <xsd:attribute ref="gml:remoteSchema" use="optional"/>
+            </xsd:restriction>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="LinearRingMemberType">
+        <xsd:annotation>
+            <xsd:documentation>Restricts the outer or inner boundary of a polygon instance
+                to being a LinearRing.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:restriction base="gml:GeometryAssociationType">
+                <xsd:sequence minOccurs="0">
+                    <xsd:element ref="gml:LinearRing"/>
+                </xsd:sequence>
+                <xsd:attributeGroup ref="xlink:simpleLink"/>
+                <xsd:attribute ref="gml:remoteSchema" use="optional"/>
+            </xsd:restriction>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <!-- ==============================================================
+        primitive geometry types
+   =================================================================== -->
+    <xsd:complexType name="PointType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A Point is defined by a single coordinate tuple.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="gml:AbstractGeometryType">
+                <xsd:sequence>
+                    <xsd:choice>
+                        <xsd:element ref="gml:coord"/>
+                        <xsd:element ref="gml:coordinates"/>
+                    </xsd:choice>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="LineStringType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A LineString is defined by two or more coordinate tuples, with
+                linear interpolation between them.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="gml:AbstractGeometryType">
+                <xsd:sequence>
+                    <xsd:choice>
+                        <xsd:element ref="gml:coord" minOccurs="2" maxOccurs="unbounded"/>
+                        <xsd:element ref="gml:coordinates"/>
+                    </xsd:choice>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="LinearRingType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A LinearRing is defined by four or more coordinate tuples, with
+                linear interpolation between them; the first and last coordinates
+                must be coincident.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="gml:AbstractGeometryType">
+                <xsd:sequence>
+                    <xsd:choice>
+                        <xsd:element ref="gml:coord" minOccurs="4" maxOccurs="unbounded"/>
+                        <xsd:element ref="gml:coordinates"/>
+                    </xsd:choice>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="BoxType">
+        <xsd:annotation>
+            <xsd:documentation>
+                The Box structure defines an extent using a pair of coordinate tuples.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="gml:AbstractGeometryType">
+                <xsd:sequence>
+                    <xsd:choice>
+                        <xsd:element ref="gml:coord" minOccurs="2" maxOccurs="2"/>
+                        <xsd:element ref="gml:coordinates"/>
+                    </xsd:choice>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="PolygonType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A Polygon is defined by an outer boundary and zero or more inner
+                boundaries which are in turn defined by LinearRings.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="gml:AbstractGeometryType">
+                <xsd:sequence>
+                    <xsd:element ref="gml:outerBoundaryIs"/>
+                    <xsd:element ref="gml:innerBoundaryIs" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <!-- ==============================================================
+        aggregate geometry types
+   =================================================================== -->
+    <xsd:complexType name="GeometryCollectionType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A geometry collection must include one or more geometries, referenced
+                through geometryMember elements. User-defined geometry collections
+                that accept GML geometry classes as members must instantiate--or
+                derive from--this type.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="gml:AbstractGeometryCollectionBaseType">
+                <xsd:sequence>
+                    <xsd:element ref="gml:geometryMember" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="MultiPointType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A MultiPoint is defined by one or more Points, referenced through
+                pointMember elements.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:restriction base="gml:GeometryCollectionType">
+                <xsd:sequence>
+                    <xsd:element ref="gml:pointMember" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="gid" type="xsd:ID" use="optional"/>
+                <xsd:attribute name="srsName" type="xsd:anyURI" use="required"/>
+            </xsd:restriction>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="MultiLineStringType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A MultiLineString is defined by one or more LineStrings, referenced
+                through lineStringMember elements.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:restriction base="gml:GeometryCollectionType">
+                <xsd:sequence>
+                    <xsd:element ref="gml:lineStringMember" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="gid" type="xsd:ID" use="optional"/>
+                <xsd:attribute name="srsName" type="xsd:anyURI" use="required"/>
+            </xsd:restriction>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="MultiPolygonType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A MultiPolygon is defined by one or more Polygons, referenced through
+                polygonMember elements.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:restriction base="gml:GeometryCollectionType">
+                <xsd:sequence>
+                    <xsd:element ref="gml:polygonMember" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="gid" type="xsd:ID" use="optional"/>
+                <xsd:attribute name="srsName" type="xsd:anyURI" use="required"/>
+            </xsd:restriction>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <!-- ==============================================================
+        There are two ways to represent coordinates: (1) as a sequence
+        of <coord> elements that encapsulate tuples, or (2) using a
+        single <coordinates> string.
+   =================================================================== -->
+    <xsd:complexType name="CoordType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Represents a coordinate tuple in one, two, or three dimensions.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="X" type="xsd:decimal"/>
+            <xsd:element name="Y" type="xsd:decimal" minOccurs="0"/>
+            <xsd:element name="Z" type="xsd:decimal" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="CoordinatesType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Coordinates can be included in a single string, but there is no
+                facility for validating string content. The value of the 'cs' attribute
+                is the separator for coordinate values, and the value of the 'ts'
+                attribute gives the tuple separator (a single space by default); the
+                default values may be changed to reflect local usage.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="decimal" type="xsd:string" use="optional" default="."/>
+                <xsd:attribute name="cs" type="xsd:string" use="optional" default=","/>
+                <xsd:attribute name="ts" type="xsd:string" use="optional" default="&#x20;"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+</xsd:schema>

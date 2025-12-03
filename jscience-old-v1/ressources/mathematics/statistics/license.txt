@@ -1,0 +1,13 @@
+Copyright (C) 2001-2004  Kyle Siegrist, Dawn Duehring
+Department of Mathematical Sciences
+University of Alabama in Huntsville
+
+This program is part of Virtual Laboratories in Probability and Statistics,
+http://www.math.uah.edu/stat/.
+
+This program is licensed under a Creative Commons License. Basically, you are free to copy,
+distribute, and modify this program, and to make commercial use of the program.
+However you must give proper attribution.
+See http://creativecommons.org/licenses/by/2.0/ for more information.
+
+The author (Kyle Siegrist) gave us his authorization to republish his code under our license (GPL, LGPL).

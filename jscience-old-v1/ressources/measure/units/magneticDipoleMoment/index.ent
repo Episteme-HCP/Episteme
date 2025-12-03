@@ -1,0 +1,13 @@
+
+<!ENTITY ampereMeterSquared.xml SYSTEM "../magneticDipoleMoment/ampereMeterSquared.xml">
+<!ENTITY bohrMagneton.xml SYSTEM "../magneticDipoleMoment/bohrMagneton.xml">
+<!ENTITY emu.xml SYSTEM "../magneticDipoleMoment/emu.xml">
+<!ENTITY joulePerTesla.xml SYSTEM "../magneticDipoleMoment/joulePerTesla.xml">
+
+<!ENTITY magneticDipoleMoment.elements	"
+&ampereMeterSquared.xml;
+&bohrMagneton.xml;
+&emu.xml;
+&joulePerTesla.xml;
+">
+

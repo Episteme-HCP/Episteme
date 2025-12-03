@@ -1,0 +1,369 @@
+There are three classes of things on the "TODO" list:
+LIMITATIONS: The things that should be there but are not planned
+UPDATES: The things that are missing and on which we are working on
+HOPED: The things we hope to do, well, someday
+
+
+1. Limitations:
+
+Awt/Swing:
+Missing 3D charting package
+
+Chemistry:
+Missing sterochemistry methods
+
+Economics:
+No black-scholes model and the like
+
+Earth:
+No climate model (general circulation, etc)
+
+Physics:
+No relativity for particles kinematics
+No accoustics
+Very incomplete support for Maxwell equations in general
+
+There is also a general problem with the current viewers and datasets that are just cobundled but don't rely on parent packages.
+
+
+2. Updates (the list of features not yet implemented and on which we are working on):
+
+Look for the keywords "TODO" or "XXX" (as substring) by doing a find on the source text files. You will find methods with missing bodies. 
+
+All packages are 100% coded, and should compile (syntactic compilation done, but some are nevertheless untested or poorly tested) except:
+org.jscience.astronomy 90% (20 hours of work, many many things to do)
+org.jscience.chemistry 90% (20 hours of work, many things to do, viewers to work on, quantum chemistry integration)
+org.jscience.economics 98% (4 hours of work, Economy implementations)
+org.jscience.geography 98% (2 hours of work to use coordinates for Places, Boundary and Path and subclass geometry classes ; enhance HeightMap and Boundary)
+org.jscience.history.time 50% (4 hours of work to make a decent time computation system)
+org.jscience.physics 98% (6 hours of work, to change the algorithm of PhysicsBehavior and check the electricity subpackage)
+org.jscience.tests 50% (4 hours of work, many tests are broken)
+
+This is about 60 hours of work, but really a raw estimate. A more realistic estimation is about twice this figure and accounts for MORE TESTS.
+
+This DOES NOT count for the org.jscience.earth.geosphere earth geosphere Java3D system and org.jscience.biology.cycles biology cycles. These packages are supplement packages which should be part of a later release.
+
+Many packages are not working only due to interdependencies. We provide here a list of packages that currently compile (but can't be released until we finish chemistry):
+org.jscience.architecture
+org.jscience.arts
+org.jscience.awt
+org.jscience.bibliography
+org.jscience.biology (except cycles which is not part of the API)
+org.jscience.computing
+org.jscience.devices
+org.jscience.earth (except geosphere which is not part of the API)
+org.jscience.engineering
+org.jscience.geography
+org.jscience.help
+org.jscience.history (now broken because of new subpackage under developement)
+org.jscience.io
+org.jscience.law
+org.jscience.linguistics
+org.jscience.mathematics
+org.jscience.measure
+org.jscience.media
+org.jscience.medicine
+org.jscience.ml
+org.jscience.net
+org.jscience.philosophy
+org.jscience.physics (apart from org.jscience.physics.kinematics.PhysicsBehavior and electricity subpackage back under developement)
+org.jscience.politics
+org.jscience.psychology
+org.jscience.sociology
+org.jscience.sports
+org.jscience.swing
+org.jscience.text
+org.jscience.util
+
+Complete description of things underway follows:
+
+General:
+Review existing scientific sourceforge packages
+Review new XML formats for science
+
+Astronomy: 
+Fill many methods
+Basic ellipse, star background
+Scheduler, relativistic motions
+Ephemeresis for asteroids, artificial satellites
+Tidal strength (and tides prediction) or may be in org.jscience.earth package
+
+Biology:
+Have relations between individuals
+
+Chemistry:
+Fill many methods
+org.jscience.chemistry.gui: refactor and move some classes into org.jscience.mathematics package
+org.jscience.chemistry.quantum: refactor and move some classes into org.jscience.mathematics package
+Update periodic table:
+Isotops
+Ionic radius
+BondEnthalpy
+Electronic configuration 
+Ionization energies
+Electron binding energies
+ReductionPotentials
+Enthalpy Formation
+Delta G formation
+Entropy
+Specific Heat
+Enthalpy at 25 C
+
+Computing:
+More agents environments implementations
+
+Engineering:
+org.jscience.engineering.control.gui: refactor and move some classes into org.jscience.swing package
+
+Geography:
+Boundaries and paths better support (using org.jscience.mathematics.geometry)
+
+Mathematics:
+Still more methods in vectors, matrices to override support class methods (especially make a deep check on this one)
+Make Lie implement its interface.
+
+
+Measure:
+Update other packages to use these quantities with minimal performance penalty
+
+Philosophy:
+Refactor religion class
+
+Physics:
+Relativistic motions in kinematics
+Computation of Work in kinematics
+Unnecessary assignements in computation of Forces in kinematics
+org.jscience.physics.fluids.dynamics: refactor and move some classes into org.jscience.mathematics package
+org.jscience.physics.nuclear.kinematics: refactor and move some classes into org.jscience.mathematics package
+Rework out force, field and friction in kinematics
+Check Circuit applet behavior.
+
+Politics:
+Have relations between countries
+Change Nation to State or add class
+
+Psychology:
+Change Activity or add support to Individual class (from Biology package)
+
+Sociology:
+Check package
+
+Tests:
+Update tests as a whole
+
+Util:
+mark util.logging as deprecated
+
+We cobundle many datasources although the code doesn't use them. We should offer some classes to access this data instead of expecting some work from the user side.
+
+We are using access to distant data for global weather, hazards (tsunami, Volcanoes, fires, floods),  financial quotes, currency conversion, astronomical ephemeris, bibliography, molecules, chemical reactions, taxonomy. Part of this is realtime and should be using WSDL services while the rest is done using traditional database queries or webpage analysis. The aim is to provide a united way to do these queries.
+
+There is also a need for a general update of the viewers that rely on untrusted/third parties code:
+org.jscience.astronomy.ephemeris, org.jscience.astronomy.milkyway and org.jscience.astronomy.solarsystem
+org.jscience.chemistry.gui 
+org.jscience.computing.game
+org.jscience.earth.weather.cityforecast and org.jscience.earth.weather.metar
+org.jscience.medicine.volumetric
+org.jscience.linguistics.dict
+org.jscience.physics.nuclear.kinematics
+org.jscience.physics.waves.optics
+
+...and in the same line of sight to replace duplicate code for example duplicate Matrix classes (org.jscience.chemistry.gui) or similar cleanup (especially look into org.jscience.chemistry.quantum, org.jscience.physics.fluids.dynamics, org.jscience.physics.nuclear.kinematics and org.jscience.computing.ai.vision).
+
+Moreover, org.jscience.util.logging should be deprecated and the dependant code should use the logging system from Java 1.4.
+
+Viewers should also implement property change listeners and be transformed into beans.
+
+There are some empty packages reserved for future use: org.jscience.physics.waves.accoustics and org.jscience.philosophy.epistemology.
+
+Internationalization of error messages or everything in general (: "language packs") (this is meaningful as we are working on a scientific package).
+
+Move every class parameter (and string) to a resource bundle.
+
+Cross reviewing to enhance the code (for example change some fields to transcient, make more classes implement toString(), equals(), Serializable, Cloneable and in general provide more implementations, classes cross references, finner class/methods/fields modifiers and we should replace HashSet by Set and Vzctor by List when appropriate). Of course deeper modifications (new methods/classes) highly depend on suggestions.
+
+More samples, more documentation.
+
+We should also offer some UML diagrams for some very important classes like Particule/Atom/Molecule/Cell/Tissue/Organ/Individual/Group etc.
+
+May be we should move all the resources to a specific place, for example under org.jscience.resources.
+
+We have to update the contents of the files javascientificpackages.html, sourceforgescientificpackages.html and zips.
+
+We should also write a decent article about JScience on Wikipedia.
+
+The www.jscience.org website needs some more metatags as it is very difficult to find even with keywords such as "java science api". Similarily, we need a decent webpage for the jade.dev.java.net website.
+
+We should ask the commitee of Wikipedia if there is a way to partnership. Or perhaps a way of having a logo on our site saying "approved by wikipedia".
+
+We should work on (matrix) benchmarks (based on Scimark, Linpack) and compare results from our API with Jama and Colt
+
+We should sent every author that have participated in the project a mail to let them know about 1.0 release. We should also ask Mark Hale, Luc Maisonobe and Marc Conrad if they wish to join in the project.
+
+We should also write a scientific paper to explain the way JScience is built (object oriented with inheritance of science).
+
+
+3. Hoped:
+
+Next version should focus on:
+1. Testing and debugging
+2. Documentation
+3. XML internal data io support
+4. internationalization
+5. parametrization (merge with Jean Marie Dautelle)
+6. some packages changes depending on the requests
+7. especially change the model of space and time to provide complete units support (with minimal performance overhead)
+8. more separation of gui from the rest of the API
+9. more interfaces and modular oriented behavior
+
+Said in short the next milestone (version 2.0) should involve a tigher API with less overlapping between packages, loaders and gui should be more separated (MVC model enhanced), XML datafiles should be transparently loaded and saved as part of the API (datafeed), more subpackages should be merged in (for example in physics). Also, we have to think about something powerful for coordinates as we use different systems for geometry, geography and physics. All this is work but the real difficult part would be to go JSR.
+
+You will find below this line the all in one bundled ideas to enhance the library:
+
+org.jscience.astronomy 
+Coordinates converter using the coordinates systems in geography
+
+org.jscience.awt
+A general high quality Java3D or JOGL charting package for 3D graphs and surfaces
+
+org.jscience.biology
+Plants model (growth, stress)
+Biochemical networks, well maybe
+Cycles (Krebs, Calvin...)
+Hormons and neuromediators as molecules
+
+org.jscience.chemistry
+Something similar to http://www.poliplus.com/javaproducts.htm to display chemistry
+Offer some loaders
+Modify the XML of elements to add isotops and their abundance, ionic radius, source and valence, metallic bonding radius, covalent bonding radius, crystal Structure, energies (ionization, binding), heats.
+
+org.jscience.computing
+Computing science in general (Hoare logic, hardware circuitry maybe)
+A queuing system, like Stella
+http://www.jcp.org/en/jsr/detail?id=94 
+http://www.jcp.org/en/jsr/detail?id=73
+Artificial intelligence (bayesian networks, machine learning as a whole), see links in corresponding subdirectory
+Petri nets explicitly defined
+
+org.jscience.devices
+Some refactoring to better use other packages
+
+org.jscience.earth
+Hydrology models (flows, percolation)
+Climate models
+Water, rocks, co2 cycles
+water temperature and visibility model as a function of depth
+Geosphere (a 3D model of the earth (like Google Earth) using the computing.ai.agents and the geography.coordinates packages) and climatic events Java3D representation
+
+org.jscience.economics
+http://www.finxml.org/
+Black scholes model with differential equations
+Some basics tasks (methods, processes...), some sample tools, more abstract resources kinds (shares, bonds, livestock, etc).
+A system by which things are explicitly not sold but rent.
+
+org.jscience.mathematics
+Move the tolerance to computing approximation error management system into a top level package (org.jscience.measure or org.jscience.mathematics)
+There are some nice features in http://jscl-meditor.sourceforge.net/ that are hardly matched in our org.jscience.mathematics.analysis.expressions (especially vector operations and the integration with parent package)
+Something similar to http://www.poliplus.com/javaproducts.htm to display formulas
+Still more methods in vectors, matrices to override support class methods (especially make a deep check on this one)
+Mathematics benchmarking using modified code from Scimark and Linpack
+Add a couple of classes to the geometry package for convex hull computation on polyhedrons (or test if a point is in a polyhedron) reusing existing code
+Coordinates systems (polar, cyclindric, spheric) and geometry (triangle properties, hyperbolic geometry)
+RingHypermatrix, RingMatrix, RingVector: update all the files with the methods from AbstractDoubleMatrix and AbstractDoubleVector
+Null argument constructors should throw error (but it will slow down the package)
+Some methods should not throw an error when given empty argument (incorrect implementation of 0 length array)
+Provide a better implementation for the code from org.jscience.mathematics.algebraic.matrices.gui.MatrixEditorPanel and org.jscience.mathematics.algebraic.matrices.gui.VectorEditorPanel
+Return a hashCode for empty vectors and matrices and hypermatrices
+
+unplanned todo, good candidates for rapid implementation:
+A BooleanSparseMatrix, BooleanSparseVector class (and then refactor BooleanMatrixAlgebra class when BooleanSquareMatrix and BooleanDiagonalMatrix added)
+A ComplexSparse3DMatrix, a Complex3DMatrix, a DoubleSparse3Dmatrix, a Double3DMatrix, a IntegerSparse3DMatrix, a Integer3DMatrix, a BooleanSparse3Dmatrix, a Boolean3DMatrix, a RingSparse3Dmatrix, a Ring3DMatrix ?
+A RingSparseHypermatrix, RingSparseMatrix, RingSparseVector ?
+A RingMatrixAlgebra but this needs to refactor AbelianGroup.Member, Ring.Member to access the corresponding AbelianGroup or Ring to get the zero() and one() elements (this would also allow to add several methods to the RingVector, Ring Matrix and RingHypermatrix classes)
+Matrices based on long, not int ?
+Some BandedMatrix and TriangularMatrix classes implementations
+Should Field and Ring extend Set ?
+Should Algebra have a parent class ?
+
+unplanned todo, possible future features depending on request.:
+Use SingularMatrixException when solving matrices
+Ring matrix general multiplication
+Import some stuff from http://www-sfb288.math.tu-berlin.de/~jtem/riemann/api/index.html
+Look at the MathExpressionParser from http://www.matheclipse.org/me/
+A complex class based on float ?
+A rational class based on integer ?
+Change IntervalList (the domain of a function) when composing functions.
+Even more matrices kinds, like BandedMatrix...
+We could also provide a visual support for the geometry classes (like ZUL, JFigure, Cabri, Cinderella...)
+May be some iterators for Matrix classes ?
+
+org.jscience.measure
+A comprehensive and uniform system that takes numerical errors into account (so called tolerance, see getEpsilon() in org.jscience.mathematics.algebraic.numbers)
+Update other packages to use these quantities with minimal performance penalty
+Fuzzy quantities support based on Lofty Zadeh logic
+Concrete implementation of every Quantity
+Date class as a CompoundUnit and Dimensionless quantity wrapper for Java.util (useful for history)
+Position as a Dimensionless quantity (useful for geography)
+Angle as a CompoundUnit display format enhancers: provide methods asDegrees(), as Minutes(), asSeconds(), or bestDisplay()
+Support for percent computations, support for pH
+
+org.jscience.media
+More things like at http://jmusic.ci.qut.edu.au
+
+org.jscience.medicine
+More human anatomy, animal and plant parts
+
+org.jscience.physics
+PhysicsML (implementation/definition) see http://www.martinb.com/ for ideas
+Relativistic mechanics
+Waves (signal propagation, real strings, accoustics, hydrodynamics)
+Maxwell differential equations
+Nuclear desintegration
+Relativistic motions in kinematics
+Missing classes about strong and weak forces in kinematics
+Missing quantum particles, perhaps refactoring the whole as XML
+
+org.jscience.politics
+Several more competing implementations for the voting system (binary, ranked...)
+
+org.jscience.sociology
+General xml standard http://www.hr-xml.org/channels/projects_main.cfm#
+
+Perhaps we should think about an org.jscience.anthropology package (yet I have no idea about what it would contain that is not already there elsewhere).
+
+And
+move from dtd to xsd the XML schemas
+Update code with 1.5 features (especially generics and enums)
+Propose the package for a JSR or public domain for the parts we have the right to
+More documentation, testing and samples in every package (: for example in physics we should provide some examples Pendulum (and oscillations), SlidingMass, BalisticFire, BasicElectricCircuit, bouncing ball on the floor, flag in the wind)
+
+It would be nice to propose people to download a bundle of (decreasing order of importance):
+Bibliography http://www.ebi.ac.uk/~senger/openbqs/
+Bnj http://bnj.sourceforge.net/
+
+On the contrary, may be we should put aside the org.jscience.computing.graph (which although nice here is still developed as part of JGraphT, http://jgrapht.sourceforge.net/) packages aside.
+
+As part of the org.jscience.computing.game package, I was forced to include numerous support files into org.jscience.io, org.jscience.net and org.jscience.util (and org.jscience.util.logging, org.jscience.swing and org.jscience.util.license). Although these files may be useful for themselves they are nevertheless quite unrelated to a scientific package. Perhaps we should think about removing them all.
+
+We should also do some extra work on each release:
+run jalopy code beautifier and javadoc comments generator at http://jalopy.sourceforge.net/
+run optimization tools on raw code (like testing unused code from IDEAJ or running OptimizeIt, http://www.borland.fr/optimizeit/)
+run javac with -O parameter
+check there is no junk file
+check there is the complete set of files
+Jar package using maximum level or use pack200
+optimize the bytecode with http://www.nq4.de/webSite/JoGa/joga.html 
+obfuscate the bytecode with http://proguard.sourceforge.net/ (which further optimizes the code by reducing its size, although this will render library API access unusable)
+
+We may also want to rename the project to something like JLab, JResearch, etc.
+
+
+4. JSR "go to" status
+
+First we should send a mail to Sun to insist on the fact that science is poorly managed in Java and that we have done a huge amount of work to clear the path. Then we should urge them that there is potential with a JSR.
+
+Though I haven't much changes to suggest upon the whole API, XML parsers should be used in their corresponding packages (a lot of changes and work here), better coding style more consistent bewteen packages, a real MVC model with viewers really rewritten to use the underlying packages, a complete rewrite of bibliography using a real standard (that I am not aware of) (although this API is very useful, it really looks pittyful, IMVHO).
+
+Related: io standard formats should be considered, more devices drivers added. Viewers subpackages should not be part of the JSR API and be really rewritten to integrate really with the underlying API. As it is now done, the library should be delivered with public domain datafiles (periodic table...) and XML enhancements should be done in this area to provide better support by the API itself. Here is an example, imagine a timeline of world events for history: the whole sequence would be the following a data file is parsed by a specific XML parser and then passed to the history package and then viewed with corresponding swing timeline viewer. JSciencepackages.zip provides all these functionnalities but with a level less integration: users have to manually build bridges between packages.
+
+

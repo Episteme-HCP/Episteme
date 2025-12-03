@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="geneticprogramming examples" default="compile-all" basedir=".">
+
+    <property name="classpath" value="../../../../../../bin"/>
+
+    <target name="init">
+        <mkdir dir="SimpleGp1/build"/>
+        <mkdir dir="SimpleGp2/build"/>
+    </target>
+
+    <target name="compile-simplegp1" depends="init">
+        <javac classpath="${classpath}" destdir="SimpleGp1/build" srcdir="SimpleGp1/src"/>
+    </target>
+
+    <target name="compile-simplegp2" depends="init">
+        <javac classpath="${classpath}" destdir="SimpleGp2/build" srcdir="SimpleGp2/src"/>
+    </target>
+
+    <target name="compile-all">
+        <antcall target="compile-simplegp1"/>
+        <antcall target="compile-simplegp2"/>
+    </target>
+
+    <target name="run-simplegp1">
+        <java classname="SimpleGp1" classpath="${classpath};SimpleGp1/build"/>
+    </target>
+
+    <target name="run-simplegp2">
+        <java classname="SimpleGp2" classpath="${classpath};SimpleGp2/build"/>
+    </target>
+
+    <target name="clean-simplegp1">
+        <delete dir="SimpleGp1/build"/>
+    </target>
+
+    <target name="clean-simplegp2">
+        <delete dir="SimpleGp2/build"/>
+    </target>
+
+    <target name="clean-all">
+        <antcall target="clean-simplegp1"/>
+        <antcall target="clean-simplegp2"/>
+    </target>
+
+</project>

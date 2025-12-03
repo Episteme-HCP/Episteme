@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>moon</type>
+        <name>mimas</name>
+        <parent>saturn</parent>
+    </general>
+    <parameter>
+        <diameter>398</diameter>
+        <!-- km -->
+        <rotationperiod>0.943</rotationperiod>
+        <!-- day -->
+        <orbitperiod>0.943</orbitperiod>
+        <!-- day -->
+        <orbiteccentricity>0.0201</orbiteccentricity>
+        <orbitinclinationtoecliptic>1.585</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <distance>185727</distance>
+        <!-- km -->
+        <mass>3.75e22</mass>
+        <!-- g -->
+        <density>1.14</density>
+        <!-- g/cm3 -->
+    </parameter>
+</celestialobject>

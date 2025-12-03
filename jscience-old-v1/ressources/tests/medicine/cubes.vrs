@@ -1,0 +1,15 @@
+Java3D Volume Rendering Demo Attrs
+Description: null
+Data_File cubes64.vol
+Segy_Min_Alpha 80
+Segy_Max_Alpha 171
+Color_Mode Segy_Cmap
+Renderer Axis_Volume_2D_Textures
+Double_Buffer true
+Coord_Sys true
+VOI_Box true
+Perspective false
+Translation (0, 0, 0)
+Rotation (0.20246, -0.26919, -0.00599, 0.94155)
+Scale 1
+Vol_Ref_Pt (0.5, 0.5, 0.5)

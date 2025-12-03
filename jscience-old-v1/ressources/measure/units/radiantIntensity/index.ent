@@ -1,0 +1,7 @@
+
+<!ENTITY wattPerSteradian.xml SYSTEM "../radiantIntensity/wattPerSteradian.xml">
+
+<!ENTITY radiantIntensity.elements	"
+&wattPerSteradian.xml;
+">
+

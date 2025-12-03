@@ -1,0 +1,3 @@
+<unit id="radianPerSecondSquared" name="radian per second squared" abbreviation="rad/s^2" unitType="angularAcceleration"
+      parentSI="SELF" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

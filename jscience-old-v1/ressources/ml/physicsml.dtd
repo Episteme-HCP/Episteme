@@ -1,0 +1,29 @@
+<!-- entities -->
+
+<!-- the top level element -->
+<!ELEMENT particle(name, position, velocity, mass)>
+<!ELEMENT rigidbody(name, position, momentum, velocity, mass)>
+<!ELEMENT electricalcircuit(electricalelement+)>
+
+<!-- elements -->
+<!ELEMENT name         (#PCDATA)>
+<!ELEMENT position(x, y, z)     >
+<!ELEMENT velocity(vx, vy, vz)  >
+<!ELEMENT mass         (#PCDATA)>
+<!ELEMENT momentum(mx, my, mz)  >
+
+<!ELEMENT x            (#PCDATA)>
+<!ELEMENT y            (#PCDATA)>
+<!ELEMENT z            (#PCDATA)>
+<!ELEMENT vx           (#PCDATA)>
+<!ELEMENT vy           (#PCDATA)>
+<!ELEMENT vz           (#PCDATA)>
+<!ELEMENT mx           (#PCDATA)>
+<!ELEMENT my           (#PCDATA)>
+<!ELEMENT mz           (#PCDATA)>
+
+<!ELEMENT electricalelement(type, value, connector, connector, connector)  >
+<!ELEMENT type                (#PCDATA)>
+<!ELEMENT value               (#PCDATA)>
+<!ELEMENT connector           (#PCDATA)>
+

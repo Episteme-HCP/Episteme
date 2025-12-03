@@ -1,0 +1,29 @@
+
+<!ENTITY abtesla.xml SYSTEM "../magneticFluxDensity/abtesla.xml">
+<!ENTITY gamma.xml SYSTEM "../magneticFluxDensity/gamma.xml">
+<!ENTITY gauss.xml SYSTEM "../magneticFluxDensity/gauss.xml">
+<!ENTITY kilogauss.xml SYSTEM "../magneticFluxDensity/kilogauss.xml">
+<!ENTITY microtesla.xml SYSTEM "../magneticFluxDensity/microtesla.xml">
+<!ENTITY milligauss.xml SYSTEM "../magneticFluxDensity/milligauss.xml">
+<!ENTITY millitesla.xml SYSTEM "../magneticFluxDensity/millitesla.xml">
+<!ENTITY nanotesla.xml SYSTEM "../magneticFluxDensity/nanotesla.xml">
+<!ENTITY picotesla.xml SYSTEM "../magneticFluxDensity/picotesla.xml">
+<!ENTITY tesla.xml SYSTEM "../magneticFluxDensity/tesla.xml">
+<!ENTITY weberPerCentimeterSquared.xml SYSTEM "../magneticFluxDensity/weberPerCentimeterSquared.xml">
+<!ENTITY weberPerMeterSquared.xml SYSTEM "../magneticFluxDensity/weberPerMeterSquared.xml">
+
+<!ENTITY magneticFluxDensity.elements	"
+&abtesla.xml;
+&gamma.xml;
+&gauss.xml;
+&kilogauss.xml;
+&microtesla.xml;
+&milligauss.xml;
+&millitesla.xml;
+&nanotesla.xml;
+&picotesla.xml;
+&tesla.xml;
+&weberPerCentimeterSquared.xml;
+&weberPerMeterSquared.xml;
+">
+

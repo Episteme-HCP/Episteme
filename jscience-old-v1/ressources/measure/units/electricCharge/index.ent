@@ -1,0 +1,19 @@
+
+<!ENTITY abcoulomb.xml SYSTEM "../electricCharge/abcoulomb.xml">
+<!ENTITY ampereHour.xml SYSTEM "../electricCharge/ampereHour.xml">
+<!ENTITY ampereSecond.xml SYSTEM "../electricCharge/ampereSecond.xml">
+<!ENTITY coulomb.xml SYSTEM "../electricCharge/coulomb.xml">
+<!ENTITY franklin.xml SYSTEM "../electricCharge/franklin.xml">
+<!ENTITY milliampereHour.xml SYSTEM "../electricCharge/milliampereHour.xml">
+<!ENTITY statcoulomb.xml SYSTEM "../electricCharge/statcoulomb.xml">
+
+<!ENTITY electricCharge.elements	"
+&abcoulomb.xml;
+&ampereHour.xml;
+&ampereSecond.xml;
+&coulomb.xml;
+&franklin.xml;
+&milliampereHour.xml;
+&statcoulomb.xml;
+">
+

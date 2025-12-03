@@ -1,0 +1,57 @@
+#	Name:			BENZYL_ALCOHOL
+#	Creating user name:	jahl
+#	Creation time:		Fri May 27 03:38:30 1994
+
+#	Modifying user name:	jahl
+#	Modification time:	Mon May 30 04:36:29 1994
+
+@<TRIPOS>MOLECULE
+BENZYL_ALCOHOL
+   16    16     1     1     1
+SMALL
+GAST_HUCK
+
+
+@<TRIPOS>ATOM
+      1 O1_____     0.115009    2.333723   -1.649816 O.3       1 PHENYL     -0.382485 
+      2 C2_____     1.045625    1.608678   -0.827529 C.3       1 PHENYL      0.078151 
+      3 C           0.363389    0.412802   -0.148295 C.ar      1 PHENYL     -0.017764 
+      4 C           0.987851   -0.838805   -0.088281 C.ar      1 PHENYL     -0.058153 
+      5 C           0.345665   -1.918686    0.525098 C.ar      1 PHENYL     -0.068490 
+      6 C          -0.923944   -1.752408    1.085281 C.ar      1 PHENYL     -0.068723 
+      7 C          -1.549197   -0.503628    1.032909 C.ar      1 PHENYL     -0.068490 
+      8 C          -0.904881    0.575013    0.420124 C.ar      1 PHENYL     -0.058153 
+      9 H9_____    -0.254544    1.794620   -2.342805 H         1 PHENYL      0.212606 
+     10 H10____     1.408399    2.286032   -0.039328 H         1 PHENYL      0.072136 
+     11 H11____     1.910778    1.290685   -1.432903 H         1 PHENYL      0.072136 
+     12 H12____     1.974886   -0.980943   -0.516413 H         1 PHENYL      0.055733 
+     13 H13____     0.833234   -2.888041    0.566772 H         1 PHENYL      0.059934 
+     14 H14____    -1.423387   -2.591314    1.560357 H         1 PHENYL      0.055895 
+     15 H15____    -2.535135   -0.371395    1.468097 H         1 PHENYL      0.059934 
+     16 H16____    -1.393748    1.543665    0.386732 H         1 PHENYL      0.055733 
+@<TRIPOS>BOND
+     1    2    1 1    
+     2    3    4 ar   
+     3    3    8 ar   
+     4    8    7 ar   
+     5    7    6 ar   
+     6    6    5 ar   
+     7    5    4 ar   
+     8    3    2 1    
+     9    1    9 1    
+    10    2   10 1    
+    11    2   11 1    
+    12    4   12 1    
+    13    5   13 1    
+    14    6   14 1    
+    15    7   15 1    
+    16    8   16 1    
+@<TRIPOS>SUBSTRUCTURE
+     1 PHENYL      3 PERM              0 ****  ****    0 ROOT 
+@<TRIPOS>SET
+ATOM$CYAN       STATIC     ATOMS    COLORGROUP SYSTEM 
+16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+@<TRIPOS>NORMAL
+@<TRIPOS>FF_PBC
+FORCE_FIELD_SETUP_FEATURE Force Field Setup information
+v1.0  0 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 NONE 0 0 0 0 1 0 0 0 0 0 0 0 0

@@ -1,0 +1,4 @@
+<unit id="quart_USdry" name="US dry quart" abbreviation="qt" unitType="volume" parentSI="meterCubed"
+      multiplierToSI="1.101221E-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 US dry quart = 2 US dry pints</description>
+</unit>

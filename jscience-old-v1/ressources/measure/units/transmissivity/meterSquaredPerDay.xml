@@ -1,0 +1,5 @@
+<unit id="meterSquaredPerDay" name="meter squared per day" unitType="transmissivity" parentSI="meterSquaredPerSecond"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <unit ref="meter" power="2"/>
+    <unit ref="day" power="-1"/>
+</unit>

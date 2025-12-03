@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- This file is licensed under the GPL. Author: Nagy Elemer Karoly (eknagy@users.sourceforge.net) -->
+<!-- $Revision: 1.2 $ $Date: 2007-10-21 21:08:34 $ -->
+<!DOCTYPE JLESAcfg PUBLIC "" "JLESAcfg.dtd" >
+<JLESAcfg name="TestConfig 1" author="Nagy Elemér Károly" created="2005 March 15">
+    <Building HighestFloor="6" LowestFloor="-1" MaxNumberOfTicks="1000" TickBlocks="1"/>
+    <GUI Visible="true" AnimationSpeed="3"/>
+    <CA>
+        <Car StartingFloor="2" SpaceCapacity="12" WeightCapacity="450">
+            <LoadDependentKinematicModel>
+                <LoadSpeed BaseTime="20" DoorCloseTime="30" DoorOpenTime="20" FloorFligthTime="30" FromLoad="0"
+                           ToLoad="10"/>
+                <LoadSpeed BaseTime="30" DoorCloseTime="30" DoorOpenTime="20" FloorFligthTime="30" FromLoad="11"
+                           ToLoad="12"/>
+            </LoadDependentKinematicModel>
+        </Car>
+        <Car StartingFloor="0" SpaceCapacity="12" WeightCapacity="450">
+            <SimpleKinematicModel BaseTime="30" DoorCloseTime="30" DoorOpenTime="20" FloorFligthTime="30"/>
+            <!--
+               <LoadDependentKinematicModel>
+                   <LoadSpeed BaseTime="2" DoorCloseTime="3" DoorOpenTime="2" FloorFligthTime="5" FromLoad="0" ToLoad="0"/>
+                   <LoadSpeed BaseTime="4" DoorCloseTime="3" DoorOpenTime="2" FloorFligthTime="10" FromLoad="1" ToLoad="10"/>
+                   <LoadSpeed BaseTime="6" DoorCloseTime="3" DoorOpenTime="2" FloorFligthTime="11" FromLoad="11" ToLoad="12"/>
+               </LoadDependentKinematicModel>
+               -->
+        </Car>
+        <DynZoneCA VisibleGUI="true"/>
+        <!--
+          <SimplexCA/>
+          -->
+    </CA>
+    <PoissonPassengerGenerator RandomSeed="13">
+        <GammaLine Floor="0" Gamma="0.025"/>
+        <GammaLine Floor="-1" Gamma="0.005"/>
+    </PoissonPassengerGenerator>
+    <!--
+     <FileBasedPassengerGenerator InputFile="passengers.input"/>
+     -->
+    <LoggerPassengerProcessor GeneratedPassengersOutputFile="GeneratedPassengers3.log"
+                              PassengerTimesOutputFile="PassengerTimes.log" QueuLengthsOutputFile="QueuLengths.log"/>
+    <SimplePassengerProcessor OutputFile="output.csv"/>
+</JLESAcfg>

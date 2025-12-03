@@ -1,0 +1,5 @@
+<unitType id="surfaceChargeDensity" name="surface charge density">
+    <dimension name="length" power="-2" preserve="no"/>
+    <dimension name="current" power="1" preserve="no"/>
+    <dimension name="time" power="1" preserve="no"/>
+</unitType>

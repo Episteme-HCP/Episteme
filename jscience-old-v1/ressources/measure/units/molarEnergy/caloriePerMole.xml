@@ -1,0 +1,3 @@
+<unit id="caloriePerMole" name="calorie per mole" abbreviation="cal/mol" unitType="molarEnergy" parentSI="joulePerMole"
+      multiplierToSI="4.1868" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

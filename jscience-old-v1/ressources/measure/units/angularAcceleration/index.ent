@@ -1,0 +1,11 @@
+
+<!ENTITY radianPerSecondSquared.xml SYSTEM "../angularAcceleration/radianPerSecondSquared.xml">
+<!ENTITY revolutionPerMinuteSquared.xml SYSTEM "../angularAcceleration/revolutionPerMinuteSquared.xml">
+<!ENTITY revolutionPerSecondSquared.xml SYSTEM "../angularAcceleration/revolutionPerSecondSquared.xml">
+
+<!ENTITY angularAcceleration.elements	"
+&radianPerSecondSquared.xml;
+&revolutionPerMinuteSquared.xml;
+&revolutionPerSecondSquared.xml;
+">
+

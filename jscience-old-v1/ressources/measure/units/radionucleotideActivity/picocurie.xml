@@ -1,0 +1,4 @@
+<unit id="picocurie" name="picocurie" abbreviation="pCi" unitType="radionucleotideActivity" parentSI="becquerel"
+      multiplierToSI="0.037" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 pCi = 0.037 Bq</description>
+</unit>

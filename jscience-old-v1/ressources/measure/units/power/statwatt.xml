@@ -1,0 +1,4 @@
+<unit id="statwatt" name="statwatt" unitType="power" parentSI="watt" multiplierToSI="1.0E-7"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Part of the CGS electrostatic system</description>
+</unit>

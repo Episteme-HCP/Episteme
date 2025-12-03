@@ -1,0 +1,49 @@
+{
+    "metadata": {
+        "title": "ISO 3166 Countries",
+        "updated": "2025-11-28T16:10:00",
+        "ai_tags": [
+            "geography",
+            "standards",
+            "iso"
+        ]
+    },
+    "countries": [
+        {
+            "code": "AF",
+            "name": "Afghanistan",
+            "alpha3": "AFG",
+            "numeric": "004"
+        },
+        {
+            "code": "AL",
+            "name": "Albania",
+            "alpha3": "ALB",
+            "numeric": "008"
+        },
+        {
+            "code": "DZ",
+            "name": "Algeria",
+            "alpha3": "DZA",
+            "numeric": "012"
+        },
+        {
+            "code": "US",
+            "name": "United States",
+            "alpha3": "USA",
+            "numeric": "840"
+        },
+        {
+            "code": "FR",
+            "name": "France",
+            "alpha3": "FRA",
+            "numeric": "250"
+        },
+        {
+            "code": "JP",
+            "name": "Japan",
+            "alpha3": "JPN",
+            "numeric": "392"
+        }
+    ]
+}

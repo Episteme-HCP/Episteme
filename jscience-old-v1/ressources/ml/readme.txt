@@ -1,0 +1,1 @@
+Many schemas available at: http://schemas.liquid-technologies.com/

@@ -1,0 +1,4 @@
+<unit id="bohrMagneton" name="bohr magneton" abbreviation="mu_B" unitType="magneticDipoleMoment"
+      parentSI="joulesPerTesla" multiplierToSI="9.27401543E-24" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Magnetic dipole moment in atomic units</description>
+</unit>

@@ -1,0 +1,90 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ */
+package org.jscience.mathematics.logic;
+
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import org.jscience.mathematics.logic.multivalued.*;
+import org.jscience.mathematics.logic.modal.PossibleWorlds;
+import org.jscience.mathematics.logic.temporal.CTL;
+
+public class LogicTest {
+
+    @Test
+    public void testLukasiewiczLogic() {
+        LukasiewiczLogic logic = LukasiewiczLogic.getInstance();
+
+        assertEquals(1.0, logic.trueValue());
+        assertEquals(0.0, logic.falseValue());
+
+        // Test conjunction
+        assertEquals(0.5, logic.and(0.7, 0.8), 0.001);
+
+        // Test implication
+        assertEquals(1.0, logic.implies(0.5, 0.8), 0.001);
+    }
+
+    @Test
+    public void testGodelLogic() {
+        GodelLogic logic = GodelLogic.getInstance();
+
+        assertEquals(1.0, logic.trueValue());
+        assertEquals(0.0, logic.falseValue());
+
+        // Test conjunction (min)
+        assertEquals(0.5, logic.and(0.5, 0.8));
+
+        // Test disjunction (max)
+        assertEquals(0.8, logic.or(0.5, 0.8));
+    }
+
+    @Test
+    public void testIntuitionisticLogic() {
+        IntuitionisticLogic logic = IntuitionisticLogic.getInstance();
+
+        assertTrue(logic.and(true, true));
+        assertFalse(logic.and(true, false));
+        assertTrue(logic.or(true, false));
+    }
+
+    @Test
+    public void testParaconsistentLogic() {
+        ParaconsistentLogic logic = ParaconsistentLogic.getInstance();
+
+        assertEquals(ParaconsistentLogic.TruthValue.TRUE, logic.trueValue());
+        assertEquals(ParaconsistentLogic.TruthValue.BOTH,
+                logic.not(ParaconsistentLogic.TruthValue.BOTH));
+    }
+
+    @Test
+    public void testLinearLogic() {
+        LinearLogic.Proposition p = LinearLogic.linear("A");
+        assertTrue(p.canUse());
+        p.use();
+        assertFalse(p.canUse());
+    }
+
+    @Test
+    public void testPossibleWorlds() {
+        PossibleWorlds<String, String> pw = new PossibleWorlds<>();
+        pw.addWorld("w1");
+        pw.addWorld("w2");
+        pw.addAccessibility("w1", "w2");
+        pw.setValue("w2", "p", true);
+
+        assertTrue(pw.isPossible("w1", "p"));
+    }
+
+    @Test
+    public void testCTL() {
+        CTL<String, String> ctl = new CTL<>();
+        ctl.addState("s1");
+        ctl.addState("s2");
+        ctl.addTransition("s1", "s2");
+        ctl.label("s2", "p");
+
+        assertTrue(ctl.EF(s -> ctl.holds(s, "p")).contains("s1"));
+    }
+}

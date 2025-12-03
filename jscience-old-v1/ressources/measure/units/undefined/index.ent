@@ -1,0 +1,7 @@
+
+<!ENTITY undefined.xml SYSTEM "../undefined/undefined.xml">
+
+<!ENTITY undefined.elements	"
+&undefined.xml;
+">
+

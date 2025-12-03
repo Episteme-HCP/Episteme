@@ -1,0 +1,174 @@
+The cranial nerves (pairs): 
+Olfactory nerve (I) 
+Optic nerve (II) 
+Oculomotor nerve (III) 
+Trochlear nerve (IV) 
+Trigeminal nerve (V), subdivided into 
+Ophthalmic nerve (V1) 
+Maxillary nerve (V2) 
+Mandibular nerve (V3) 
+Abducens nerve (VI) 
+Facial nerve (VII) 
+Vestibulocochlear nerve (VIII), sometimes called the auditory nerve 
+Glossopharyngeal nerve (IX) 
+Vagus nerve (X) 
+Accessory nerve (XI), sometimes called the spinal accessory nerve 
+Hypoglossal nerve (XII) 
+
+The spinal nerves: 
+The posterior divisions 
+The anterior divisions 
+The thoracic nerves 
+The lumbosacral plexus 
+The sacral and coccygeal nerves 
+
+
+The sympathetic nerves: 
+The cephalic portion of the sympathetic system 
+The cervical portion of the sympathetic system 
+The thoracic portion of the sympathetic system 
+The abdominal portion of the sympathetic system 
+The pelvic portion of the sympathetic system 
+The great plexuses of the sympathetic system 
+
+
+Another list from http://www.aanem.org/practiceissues/recPolicy/listofNerves.cfm gives:
+
+Codes 95900 and 95903 involve the following nerves: 
+
+Upper Extremity/Cervical Plexus/Brachial Plexus Motor Nerves 
+Axillary motor nerve to the deltoid 
+Long thoracic motor nerve to the serratus anterior 
+Median nerve 
+Median motor nerve to the abductor pollicis brevis 
+Median motor nerve, anterior interosseou branch, to the flexor pollicis longus 
+Median motor nerve, anterior interosseous branch, to the pronator quadratus 
+Median motor nerve to the first lumbrical 
+Median motor nerve to the second lumbrical 
+Musculocutaneous motor nerve to the biceps brachii 
+Radial nerve 
+Radial motor nerve to the extensor carpi ulnaris 
+Radial motor nerve to the extensor digitorum communis 
+Radial motor nerve to the extensor indicis proprius 
+Radial motor nerve to the brachioradialis 
+Suprascapular nerve 
+Suprascapular motor nerve to the supraspinatus 
+Suprascapular motor nerve to the infraspinatus 
+Thoracodorsal motor nerve to the latissimus dorsi 
+Ulnar nerve 
+Ulnar motor nerve to the abductor digiti minimi 
+Ulnar motor nerve to the palmar interosseous 
+Ulnar motor nerve to the first dorsal interosseous 
+Ulnar motor nerve to the flexor carpi ulnaris 
+Other 
+Lower Extremity Motor Nerves 
+Femoral motor nerve to the quadriceps 
+Femoral motor nerve to vastus medialis 
+Femoral motor nerve to vastus lateralis 
+Femoral motor nerve to vastus intermedialis 
+Femoral motor nerve to rectus femoris. 
+Iloinguinal motor nerve 
+Peroneal nerve 
+Peroneal motor nerve to the extensor digitorum brevis 
+Peroneal motor nerve to the peroneus brevis 
+Peroneal motor nerve to the peroneus longus 
+Peroneal motor nerve to the tibialis anterior 
+Plantar motor nerve 
+Sciatic nerve 
+Tibial nerve 
+Tibial motor nerve, inferior calcaneal branch, to the abductor digiti minimi 
+Tibial motor nerve, medial plantar branch, to the abductor hallucis 
+Tibial motor nerve, lateral plantar branch, to the flexor digiti minimi brevis 
+Other 
+Cranial Nerves and Trunk 
+Cranial nerve VII (facial motor nerve) 
+Facial nerve to the frontalis 
+Facial nerve to the nasalis 
+Facial nerve to the orbicularis oculi 
+Facial nerve to the orbicularis oris 
+Cranial nerve XI (spinal accessory motor nerve) 
+Cranial nerve XII (hypoglossal motor nerve) 
+Intercostal motor nerve 
+Phrenic motor nerve to the diaphragm 
+Recurrent laryngeal nerve 
+Other 
+Nerve Roots 
+Cervical nerve root stimulation 
+Cervical level 5 (C5) 
+Cervical level 6 (C6) 
+Cervical level 7 (C7) 
+Cervical level 8 (C8) 
+Thoracic nerve root stimulation 
+Thoracic level 1 (T1) 
+Thoracic level 2 (T2) 
+Thoracic level 3 (T3) 
+Thoracic level 4 (T4) 
+Thoracic level 5 (T5) 
+Thoracic level 6 (T6) 
+Thoracic level 7 (T7) 
+Thoracic level 8 (T8) 
+Thoracic level 9 (T9) 
+Thoracic level 10 (T10) 
+Thoracic level 11 (T11) 
+Thoracic level 12 (T12) 
+Lumbar nerve root stimulation 
+Lumbar level 1 (L1) 
+Lumbar level 2 (L2) 
+Lumbar level 3 (L3) 
+Lumbar level 4 (L4) 
+Lumbar level 5 (L5) 
+Sacral nerve root stimulation 
+Sacral level 1 (S1) 
+Sacral level 2 (S2) 
+Sacral level 3 (S3) 
+Sacral level 4 (S4) 
+Code 95904 involves the following nerves: 
+
+Upper Extremity Sensory and Mixed Nerves 
+Lateral antebrachial cutaneous sensory nerve 
+Medial antebrachial cutaneous sensory nerve 
+Medial brachial cutaneous sensory nerve 
+Median nerve 
+Median sensory nerve to the 1st digit 
+Median sensory nerve to the 2nd digit 
+Median sensory nerve to the 3rd digit 
+Median sensory nerve to the 4th digit 
+Median palmar cutaneous sensory nerve 
+Median palmar mixed nerve 
+Posterior antebrachial cutaneous sensory nerve 
+Radial sensory nerve 
+Radial sensory nerve to the base of the thumb 
+Radial sensory nerve to digit 1 
+Ulnar nerve 
+Ulnar dorsal cutaneous sensory nerve 
+Ulnar sensory nerve to the 4th digit 
+Ulnar sensory nerve to the 5th digit 
+Ulnar palmar mixed nerve 
+Intercostal sensory nerve 
+Other 
+Lower Extremity Sensory and Mixed Nerves 
+Lateral femoral cutaneous sensory nerve 
+Medial calcaneal sensory nerve 
+Medial femoral cutaneous sensory nerve 
+Peroneal nerve 
+Deep peroneal sensory nerve 
+Superficial peroneal sensory nerve, medial dorsal cutaneous branch 
+Superficial peroneal sensory nerve, intermediate dorsal cutaneous branch 
+Posterior femoral cutaneous sensory nerve 
+Saphenous nerve 
+Saphenous sensory nerve (distal technique) 
+Saphenous sensory nerve (proximal technique) 
+Sural nerve 
+Sural sensory nerve, lateral dorsal cutaneous branch 
+Sural sensory nerve 
+Tibial sensory nerve (digital nerve to toe 1) 
+Tibial sensory nerve (medial plantar nerve) 
+Tibial sensory nerve (lateral plantar nerve) 
+Other 
+Head and Trunk Sensory Nerves 
+Dorsal nerve of the penis 
+Greater auricular nerve 
+Opthalmic branch of the trigeminal nerve 
+Pudendul sensory nerve 
+Suprascapular sensory nerves 
+Other 

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>planet</type>
+        <name>neptune</name>
+        <parent>sun</parent>
+    </general>
+    <parameter>
+        <diameter>49528.0</diameter>
+        <!-- km -->
+        <rotationperiod>0.67125</rotationperiod>
+        <!-- day -->
+        <orbitperiod>163.7232045</orbitperiod>
+        <!-- year -->
+        <meanorbitvelocity>5.4778</meanorbitvelocity>
+        <!-- km/s -->
+        <orbiteccentricity>0.00858587</orbiteccentricity>
+        <orbitinclinationtoecliptic>1.76917</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <inclinationofequatortoorbit>29.58</inclinationofequatortoorbit>
+        <!-- ° -->
+        <volume>44</volume>
+        <distance>30.06896348</distance>
+        <!-- AU -->
+        <mass>102.44e27</mass>
+        <!-- g -->
+        <density>1.76</density>
+        <!-- g/cm3 -->
+        <surfacegravity>11</surfacegravity>
+        <!-- m/s2 -->
+        <escapevelocity>23.71</escapevelocity>
+        <!-- km/s -->
+        <meantempatsolidsurface>48</meantempatsolidsurface>
+        <!-- Kelvin -->
+        <majoratmosphericconstitutents>H2,He,CH4</majoratmosphericconstitutents>
+    </parameter>
+</celestialobject>

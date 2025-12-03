@@ -1,0 +1,4 @@
+<unit id="coulombMeter" name="Coulomb meter" abbreviation="C m" unitType="electricDipoleMoment" parentSI="SELF"
+      multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>The SI unit of electric dipole moment</description>
+</unit>

@@ -1,0 +1,190 @@
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../../stylesheet.css">
+</head>
+
+<p>Back to the <a href="../../doc-files/tutorial.html">Antelmann.com
+    Java Framework Tutorial</a></p>
+<h1>Game Tutorial</h1>
+<p>The <a href="../package-summary.html">org.jscience.computing.game</a> package provides
+    extensive support for implementing strategy games (e.g. <a href="../chess/ChessGame.html">Chess</a>,
+    <a href="../checkers/CheckersGame.html">Checkers</a>, <a href="../gomoku/GomokuGame.html">Go-moku</a>,
+    <a href="../fourwins/FourWinsGame.html">FourConnects</a>, <a href="../muehle/MuehleGame.html">Nine
+    Men's Morris</a> or <a href="../reversi/ReversiGame.html">Othello</a>), puzzles
+    (e.g. <a href="../puzzle/TilePuzzle.html">TilePuzzle</a>) or in fact any type
+    of simulation (e.g. games involving luck, such as <a href="../card/BlackJack.html">BlackJack</a>
+    or other non-games not covered here). It is not really suitable for implementing
+    action games of any sort.&nbsp;</p>
+
+<h2>The structure of a game</h2>
+
+<p>Every game consists of the game representation itself (represented by the <a href="../GamePlay.html">GamePlay</a>
+    interface) - which embeds the rules of the game -&nbsp; and the actions that can
+    be applied to the game (represented by the <a href="../GameMove.html">GameMove</a>
+    interface) to alter its status to eventually win, loose or draw a game.</p>
+
+<h3>The <a href="../GamePlay.html">GamePlay</a> interface</h3>
+
+<p>The <a href="../GamePlay.html">GamePlay</a> interface defines all
+    functionality necessary to play a game (see the <a href="#Implementing a new game">chapter
+    below</a> on how to best provide your own implementation for this interface). A game always has a defined number of
+    player roles (<b>not</b> to be confused with <a href="../Player.html">Player</a>
+    objects covered later), which are represented by plain integers. For example,
+    the game of chess has 2 player roles, one for white and one for black. Other
+    games may have a varying number of player roles, such as BlackJack, which may be
+    played with multiple players against the bank (where the bank itself may or may
+    not be regarded as a separate player role; it could be regarded as just a part
+    of the rules). The method <a href="../GamePlay.html#numberOfPlayers()"><code>numberOfPlayers()</code></a>
+    will tell how many player roles exist in a given game.&nbsp;</p>
+
+<p>At any given point in a game, you can perform certain actions that will alter
+    the status of the game; these actions are represented by <a href="../GameMove.html">GameMove</a>
+    objects (see the next chapter for more details). The <a href="../GamePlay.html">GamePlay</a>
+    interfaces provides methods to retrieve all legal moves for a given game and to
+    determine whether a specific action (i.e. <a href="../GameMove.html">GameMove</a>)
+    is legal given the current game status.</p>
+
+<p>Given a legal move, you can then advance the game by applying that move with <a
+        href="../GamePlay.html#makeMove(org.jscience.computing.game.GameMove)"><code>makeMove(GameMove
+    move)</code></a>; there are also methods for undoing and redoing - allowing you
+    to move back&amp;forth within a game (provided that the implementation at hand
+    supports all this functionality; in a game of luck, for instance, - like <a
+        href="../card/BlackJack.html">BlackJack</a>
+    - you may choose to disable undo for obvious reasons).</p>
+
+<p>If no more moves are available in a given game, the game is over. Independent
+    from whether the game is over or not, you can check whether there are any
+    winners for the game by calling <a href="../GamePlay.html#getWinner()"><code>getWinner()</code></a>,
+    which returns an array of the game roles that have won the game (note that -
+    particular in games with more than two players - a game can go on even there are
+    already winners determined). To be able to rank among multiple players or rank
+    one player on how great the victory really was, you can also call the method <code><a
+        href="../GamePlay.html#getResult(int)">getResult(int
+    playerRole)</a></code>.</p>
+
+<p>An important feature of the <a href="../GamePlay.html">GamePlay</a> is the
+    ability to <code><a href="../GamePlay.html#spawnChild(org.jscience.computing.game.GameMove)">spawnChild(GameMove
+    move)</a></code>,
+    which allows game tree search algorithms to easily construct entire game trees
+    with separate <a href="../GamePlay.html">GamePlay</a> objects as nodes that
+    don't interfere with each other. This also allows game tree search with
+    backtracking for game implementations that do not support <code><a href="../GamePlay.html#undoLastMove()">undoLastMove()</a></code>.
+</p>
+
+<p>Other than that, the <a href="../GamePlay.html">GamePlay</a> also provides
+    everything else that is required to plug a game into the other functionality of
+    the org.jscience.computing.game package, such as GUIs with various options, AI
+    (artificial intelligence) players and network games.</p>
+
+<h3>The <a href="../GameMove.html">GameMove</a> interface</h3>
+
+<p>The <a href="../GameMove.html">GameMove</a> interface is fairly simple and
+    just defines the very basics that allow the concept of a move in a game to be
+    used with several different algorithms of other classes in the package (such as
+    game tree searches like best-first-search; see <a href="../GameUtilities.html">GameUtilities</a>
+    for examples for such algorithms). There is also a default implementation
+    available (see <a href="../MoveTemplate.html">MoveTemplate</a>), allowing you to
+    just focus on the game specific properties of a move by extending the <a
+        href="../MoveTemplate.html">MoveTemplate</a>.
+    The main feature of a <a href="../GameMove.html">GameMove</a> is that it is
+    always played by a specific game role (e.g. in a chess game, every move is
+    either made by white or by black), which is pretty much the case for any
+    conceivable game, puzzle or simulation.</p>
+
+<h2><a name="Implementing a new game">Implementing a new game</a></h2>
+<p>The easiest starting point for implementing a new game of your choice is to
+    extend the class <a href="../AbstractGame.html">AbstractGame</a>. It provides a
+    useful skeleton implementation of the methods defined&nbsp; in the <a href="../GamePlay.html">GamePlay</a>
+    interface that can be handled without domain knowledge of the game at hand. All
+    you will have to provide then is the actual domain knowledge (i.e. the rules of the
+    game along with an appropriate game representation) and you're all set.&nbsp;</p>
+<h3>Game implementation by example: Tick-Tack-Toe</h3>
+<p>The complete source code example of a Tick-Tack-Toe implementation is <a href="TickTackToe.java.txt">available
+    here</a> for your reference (note that the TickTackToe class embeds the GameMove
+    class used in the game as a nested class). The code is fairly well documented
+    (and the game itself is simple enough), so it should be straight forward to see
+    what's required to implement your own game. Also, carefully read the
+    documentation for the <a href="../AbstractGame.html">AbstractGame</a> class. You
+    can always take a look at other game implementation provided by several
+    sub-packages of org.jscience.computing.game.</p>
+
+<h3>Playing the TickTackToe ( - or any - ) game with <a href="../JGameFrame.html">JGameFrame</a></h3>
+<p>Once you've implemented just the game logic as described above, you can take
+    immediate advantage of the rich functionality provided by the org.jscience.computing.game
+    package and play the game with a GUI along with some initial AI Player opponent.
+    All you have to do is to start your game with a <a href="../JGameFrame.html">JGameFrame</a>
+    (which extends javax.swing.JFrame):</p>
+<blockquote>
+    <blockquote>
+        <p><code>new JGameFrame(new TickTackToe()).setVisible(true);</code></p>
+    </blockquote>
+</blockquote>
+<p>As you have not specified anything else at this point (like some intelligence
+    for the AI opponents or some GUI components that specify more sophisticated
+    visualization), <a href="../JGameFrame.html">JGameFrame</a> will use a bunch of
+    default classes that help to visualize the game (like <a href="../JDefaultGame.html">JDefaultGame</a>)
+    and provide some basic AI (like <a href="../RandomPlayer.html">RandomPayer</a>).
+    These defaults can in fact be applied to any game, but you can certainly do
+    better than that given some domain knowledge about the game at hand.</p>
+<h3>Adding artificial intelligence to your GamePlay</h3>
+<p>Once you have your game implemented in form of a <a href="../GamePlay.html">GamePlay</a>
+    class, you still have to tell the object explicitly what move is to be
+    performed to play the game 'properly' (at this point you can use your
+    implementation to play the game e.g. human against human, though - or just by
+    yourself if your game is more like an implementation of a puzzle). To automate
+    the <a href="../GamePlay.html">GamePlay</a>, you need to specify how a move is
+    to be selected, if all you want to do is just to make <i>some</i> move (an
+    example of such a concept was already mentioned above - the <a href="../RandomPlayer.html">RandomPayer</a>).</p>
+<p>You can do just that by implementing specialized AI <a href="../Player.html">Player</a>
+    objects (a convenient template for doing so is <a href="../TemplatePlayer.html">TemplatePlayer</a>,
+    which already provide several game tree search options for intelligently
+    selecting moves, so all you have to provide is a useful heuristic for the game)
+    that allow you to play against/with worthy opponents even if no other human is
+    available to play with you. The main focus for making the <a href="../Player.html">Player</a>
+    intelligent here is always to find that '<i>killer-heuristic</i>' for the game
+    at hand.</p>
+<p>Once you have a <a href="../Player.html">Player</a> implementation suitable
+    for your <a href="../GamePlay.html">GamePlay</a> implementation, you can merge
+    the <a href="../Player.html">Player</a> AI together with your <a href="../GamePlay.html">GamePlay</a>
+    object into an <a href="../AutoPlay.html">AutoPlay</a> object.</p>
+<p>The <a href="../AutoPlay.html">AutoPlay</a> interface provides the basis for
+    running automated simulations of a game with methods like <a href="../AutoPlay.html#autoMove()">autoMove()</a>.
+    The <a href="../AutoPlay.html">AutoPlay</a> interface also introduces concepts
+    that specify the desired <i>level</i> of intelligence to be used, such as in
+    fact a game level or a desired response time. In essence, the <a href="../AutoPlay.html">AutoPlay</a>
+    interface maps each game role (represented by a plain integer) to a <a href="../Player.html">Player</a>
+    object that assumes the specified game role. A single <a href="../Player.html">Player</a>
+    object could very well play more than just one game role, too (say you played a
+    card game and one player plays multiple hands). This is why all methods that
+    refer to the game roles of a <a href="../Player.html">Player</a> return an array
+    of integer rather than just one integer. In many games, you may ignore that
+    flexibility by just considering the first given role that a <a href="../Player.html">Player</a>
+    plays in an <a href="../AutoPlay.html">AutoPlay</a>.</p>
+<p>A reference implementation for the <a href="../AutoPlay.html">AutoPlay</a>
+    interface can be found in the class <a href="../GameDriver.html">GameDriver</a>,
+    which provides you will everything you need to run an automated simulation of
+    your <a href="../GamePlay.html">GamePlay</a> along with <a href="../Player.html">Player</a>
+    implementations.</p>
+<h3>Customizing game appearance</h3>
+<p>You can&nbsp; provide specialized visualizations (e.g. some nice graphics
+    representing the game within a JComponent that also may allow you to perform
+    moves by using drag&amp;drop with your mouse) through a GUI wrapper for
+    your game by implementing <a href="../JGamePlay.html">JGamePlay</a> (or you can
+    extend <a href="../JDefaultGame.html">JDefaultGame</a> for convenience).</p>
+<p>Once you have provided some useful implementations for <a href="../JGamePlay.html">JGamePlay</a>
+    and <a href="../Player.html">Player</a> for your game, you can then run a
+    specialized version of your <a href="../GamePlay.html">GamePlay</a>
+    by passing your <a href="../JGamePlay.html">JGamePlay</a> object to the <a href="../JGameFrame.html">JGameFrame</a>
+    constructor.</p>
+<p>Some game implementations included in the framework allow in fact for some
+    cool pre-programmed customizations, such as <a href="../chess/JChess.html">JChess</a>,
+    which includes a method to customize the appearance of individual chess figures.</p>
+<p>&nbsp;</p>
+<hr>
+<p><font size="2">(c) Holger Antelmann &lt;<a href="mailto:info@antelmann.com">info@antelmann.com</a>&gt;
+    - all rights reserved<br>
+</font><a href="http://www.antelmann.com/"><img border="0" src="../../doc-files/antelmannLogoSmall.gif" width="88"
+                                                height="31">
+</a></p>
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>

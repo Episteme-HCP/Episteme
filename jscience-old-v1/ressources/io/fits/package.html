@@ -1,0 +1,47 @@
+<html>
+<head><title>Package comments for org.jscience.io.fits</title></head>
+<body>
+
+A 100% Java interface to FITS data files. FITS is the standard file format for
+astronomy data. It is similar in spirit to TIFF in that it is highly extensible,
+and it stores metadata using keyword-value pairs. For more information on
+FITS, see <a href="http://heasarc.gsfc.nasa.gov/docs/heasarc/fits.html">
+    the HEASARC FITS web site</a>.
+<p>
+    The philosophy of this package is to represent FITS data in ways which are natural
+    to Java. So a FITS table implements the Java Swing TableModel interface.
+    Images fit into the old Java ImageProducer/ImageConsumer scheme, though there
+    are future plans to also represent them as a Raster and TableModel.
+
+<p>
+    The usual method for reading a FITS file is to first choose the proper
+    FitsFile subclass for your data source. If you have an uncompressed FITS file
+    on a local disk, then use {@link org.jscience.io.fits.RandomAccessFitsFile}. If you are reading
+    data over a network, or you need to pass it through a GZIPInputStream, then
+    use {@link org.jscience.io.fits.InputStreamFitsFile}. If you are creating a new file then
+    you can use the {@link org.jscience.io.fits.FitsFile} class.
+
+<p>
+    Next you use one of the FitsFile getHDU methods to obtain the
+    {@link org.jscience.io.fits.FitsHDU} you are
+    interested in. From the HDU you can get the {@link org.jscience.io.fits.FitsHeader} and
+    access the metadata stored there in {@link org.jscience.io.fits.FitsCard} objects.
+    You can also get the {@link org.jscience.io.fits.FitsData} in the HDU. Usually, you cast
+    this to a particular type: {@link org.jscience.io.fits.FitsBinTableData} or
+    {@link org.jscience.io.fits.FitsImageData}.
+
+<p>
+    For examples on how to use this package, see the source code for the 100% Java
+    FITS file browser in {@link org.jscience.io.fitsbrowser}.
+
+<p>
+    This package does not yet implement every facet of the FITS format and there are
+    many palns for improvements. If you have a request for an added feature, please
+    contact the author: Edward A. Pier pier@ssvs.gsfc.nasa.gov.
+
+    @author Edward A. Pier pier@ssvs.gsfc.nasa.gov
+    @version 1.0 2003-11-19
+
+
+</body>
+</html>

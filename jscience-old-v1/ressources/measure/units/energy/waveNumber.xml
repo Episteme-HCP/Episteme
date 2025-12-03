@@ -1,0 +1,4 @@
+<unit id="waveNumber" name="waveNumber" unitType="energy" multiplierToSI="1" parentSI="SELF"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Wavenumbers are reciprocals of wavelengths but are treated as units of energy</description>
+</unit>

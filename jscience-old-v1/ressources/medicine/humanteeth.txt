@@ -1,0 +1,33 @@
+Left Lower Central Incisor  
+Left Lower Lateral Incisor  
+Left Lower Canine  
+Left Lower First Premolar  
+Left Lower Second Premolar  
+Left Lower First Molar  
+Left Lower Second Molar  
+Left Lower Third Molar (Wisdom tooth)  
+Right Lower Central Incisor  
+Right Lower Lateral Incisor  
+Right Lower Canine  
+Right Lower First Premolar  
+Right Lower Second Premolar  
+Right Lower First Molar  
+Right Lower Second Molar  
+Right Lower Third Molar (Wisdom tooth)  
+Left Upper Lateral Incisor  
+Left Upper Central Incisor  
+Left Upper Canine  
+Left Upper First Premolar  
+Left Upper Second Premolar  
+Left Upper First Molar  
+Left Upper Second Molar  
+Left Upper Third Molar (Wisdom tooth)  
+Right Upper Lateral Incisor  
+Right Upper Central Incisor  
+Right Upper Canine  
+Right Upper First Premolar  
+Right Upper Second Premolar  
+Right Upper First Molar  
+Right Upper Second Molar  
+Right Upper Third Molar (Wisdom tooth)  
+ 

@@ -1,0 +1,9 @@
+
+<!ENTITY kilogramMeterPerSecond.xml SYSTEM "../momentum/kilogramMeterPerSecond.xml">
+<!ENTITY newtonSecond.xml SYSTEM "../momentum/newtonSecond.xml">
+
+<!ENTITY momentum.elements	"
+&kilogramMeterPerSecond.xml;
+&newtonSecond.xml;
+">
+

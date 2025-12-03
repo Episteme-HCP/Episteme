@@ -1,0 +1,4 @@
+<unit id="kilopond" name="kilopond" abbreviation="kp" unitType="force" parentSI="newton" multiplierToSI="9.80665"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Another name for kilogram of force</description>
+</unit>

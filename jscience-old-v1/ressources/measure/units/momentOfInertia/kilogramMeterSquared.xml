@@ -1,0 +1,4 @@
+<unit id="kilogramMeterSquared" name="kilogram meter squared" abbreviation="kgm^2" unitType="momentOfInertia"
+      parentSI="SELF" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>The SI unit of moment of inertia</description>
+</unit>

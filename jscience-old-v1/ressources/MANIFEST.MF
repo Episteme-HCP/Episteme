@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Specification-Version: 1.0
+Specification-Title: org.jscience, Java for science specification
+Implementation-Version: 1.0.0
+Implementation-Title: org.jscience, Java for science implementation
+Created-By: 1.5.0 (Sun Microsystems Inc.)
+Extension-Name: org.jscience
+Implementation-Vendor-Id: org.jscience
+Implementation-Vendor: jscience.org
+Specification-Vendor: jscience.org
+Main-Class: 

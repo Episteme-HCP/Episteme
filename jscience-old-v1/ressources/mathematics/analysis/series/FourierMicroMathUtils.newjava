@@ -1,0 +1,251 @@
+package org.jscience.mathematics;
+
+/**
+* The Fourier math library for J2ME.
+* This class cannot be subclassed or instantiated because all methods are static.
+* @planetmath FourierTransform
+* @version 0.8
+* @author Mark Hale
+*/
+public final class FourierMicroMathUtils {
+        private FourierMicroMathUtils() {}
+
+        /**
+        * Fourier transform.
+        * @return arrays containing positive frequencies in ascending order
+        * followed by negative frequencies in ascending order.
+        */
+        public static int[][] transform(final int data[][]) {
+                final int dataReal[]=data[0];
+                final int dataImag[]=data[1];
+                final int N=dataReal.length;
+                if(!isPowerOf2(N))
+                        throw new IllegalArgumentException("The number of samples must be a power of 2.");
+
+                final int arrayRe[]=new int[N];
+                final int arrayIm[]=new int[N];
+
+                final int numBits=numberOfBitsNeeded(N);
+// Simultaneous data copy and bit-reversal ordering into output
+                for(int i=0;i<N;i++) {
+                        final int j = reverseBits(i,numBits);
+                        arrayRe[j] = dataReal[i];
+                        arrayIm[j] = dataImag[i];
+                }
+// FFT
+                fft(arrayRe, arrayIm, 1);
+
+                return new int[][] {arrayRe, arrayIm};
+        }
+        /**
+        * Fourier transform.
+        * @return arrays containing positive frequencies in ascending order
+        * followed by negative frequencies in ascending order.
+        */
+        public static int[][] transform(final int data[]) {
+                final int N=data.length;
+                if(!isPowerOf2(N))
+                        throw new IllegalArgumentException("The number of samples must be a power of 2.");
+
+                final int arrayRe[]=new int[N];
+                final int arrayIm[]=new int[N];
+
+                final int numBits=numberOfBitsNeeded(N);
+// Simultaneous data copy and bit-reversal ordering into output
+                for(int i=0;i<N;i++) {
+                        final int j = reverseBits(i,numBits);
+                        arrayRe[j] = data[i];
+                }
+// FFT
+                fft(arrayRe, arrayIm, 1);
+
+                return new int[][] {arrayRe, arrayIm};
+        }
+        /**
+        * Inverse Fourier transform.
+        * @return arrays containing the positive time part of the signal
+        * followed by the negative time part.
+        */
+        public static int[][] inverseTransform(final int data[][]) {
+                final int dataReal[]=data[0];
+                final int dataImag[]=data[1];
+                final int N=dataReal.length;
+                if(!isPowerOf2(N))
+                        throw new IllegalArgumentException("Data length must be a power of 2.");
+
+                final int arrayRe[]=new int[N];
+                final int arrayIm[]=new int[N];
+
+                final int numBits=numberOfBitsNeeded(N);
+// Simultaneous data copy and bit-reversal ordering into output
+                for(int i=0;i<N;i++) {
+                        final int j = reverseBits(i,numBits);
+                        arrayRe[j] = dataReal[i];
+                        arrayIm[j] = dataImag[i];
+                }
+// inverse FFT
+                fft(arrayRe, arrayIm, -1);
+// Normalize
+                final int denom=N;
+                for(int i=0;i<N;i++) {
+                        arrayRe[i] /= denom;
+                        arrayIm[i] /= denom;
+                }
+                return new int[][] {arrayRe, arrayIm};
+        }
+        /**
+        * Inverse Fourier transform.
+        * @return arrays containing the positive time part of the signal
+        * followed by the negative time part.
+        */
+        public static int[][] inverseTransform(final int data[]) {
+                final int N=data.length;
+                if(!isPowerOf2(N))
+                        throw new IllegalArgumentException("Data length must be a power of 2.");
+
+                final int arrayRe[]=new int[N];
+                final int arrayIm[]=new int[N];
+
+                final int numBits=numberOfBitsNeeded(N);
+// Simultaneous data copy and bit-reversal ordering into output
+                for(int i=0;i<N;i++) {
+                        final int j = reverseBits(i,numBits);
+                        arrayRe[j] = data[i];
+                }
+// inverse FFT
+                fft(arrayRe, arrayIm, -1);
+// Normalize
+                final int denom=N;
+                for(int i=0;i<N;i++) {
+                        arrayRe[i] /= denom;
+                        arrayIm[i] /= denom;
+                }
+                return new int[][] {arrayRe, arrayIm};
+        }
+        /**
+        * Common FFT code.
+        * @param sign 1 for transform, -1 for inverse transform.
+        */
+        private static void fft(int arrayRe[], int arrayIm[], final int sign) {
+                final int N = arrayRe.length;
+                int blockEnd=1;
+                for(int blockSize=2; blockSize<=N; blockSize<<=1) {
+                        final short halfDeltaAngle = (short) (sign*PI/blockSize);
+                        int alpha = sin(halfDeltaAngle);
+                        alpha = 2*((alpha*alpha)/AMPLITUDE);
+                        final int beta = sin((short) (2*halfDeltaAngle));
+                        for(int i=0; i<N; i+=blockSize) {
+                                int angleRe=1<<16;
+                                int angleIm=0;
+                                for(int j=i,n=0; n<blockEnd; j++,n++) {
+                                        final int k=j+blockEnd;
+                                        // tmp = angle*array[k]
+                                        final int tmpRe = (int) ((((long)angleRe)*((long)arrayRe[k])-((long)angleIm)*((long)arrayIm[k])) >> 16);
+                                        final int tmpIm = (int) ((((long)angleRe)*((long)arrayIm[k])+((long)angleIm)*((long)arrayRe[k])) >> 16);
+                                        arrayRe[k] = arrayRe[j]-tmpRe;
+                                        arrayIm[k] = arrayIm[j]-tmpIm;
+                                        arrayRe[j] += tmpRe;
+                                        arrayIm[j] += tmpIm;
+                                        // angle = angle - (a-bi)*angle
+                                        angleRe -= (((long)alpha)*((long)angleRe) + ((long)beta)*((long)angleIm))/AMPLITUDE;
+                                        angleIm -= (((long)alpha)*((long)angleIm) - ((long)beta)*((long)angleRe))/AMPLITUDE;
+                                }
+                        }
+                        blockEnd=blockSize;
+                }
+        }
+        private static final short AMPLITUDE = 32767;
+        private static final short PI = 16384;
+        private static short sin(short theta) {
+                final int n = (((theta & 0xFFFF) + 0x2000) & 0xFFFF) >>> 14;
+                theta -= n*0x4000;
+                switch(n) {
+                        case 0 : return _sin(theta);
+                        case 1 : return _cos(theta);
+                        case 2 : return (short) -_sin(theta);
+                        case 3 : return (short) -_cos(theta);
+                        default : throw new RuntimeException("Illegal case: "+n);
+                }
+        }
+        private static short cos(short theta) {
+                return sin((short) (theta+0x4000));
+        }
+        private static final int S1 = 0x6487;
+        private static final int S3 = 0x2951;
+        private static final int S5 = 0x04F6;
+        private static short _sin(short theta) {
+                final int z = (((int)theta)*((int)theta)) >> 12;
+                int prod = (z*S5) >> 16;
+                int sum = S3-prod;
+                prod = (z*sum) >> 16;
+                sum = S1-prod;
+                return (short) ((theta*sum) >> 13);
+        }
+        private static final int C0 = 0x7FFF;
+        private static final int C2 = 0x4EEA;
+        private static final int C4 = 0x0FC4;
+        private static short _cos(short theta) {
+                final int z = (((int)theta)*((int)theta)) >> 12;
+                int prod = (z*C4) >> 16;
+                int sum = C2-prod;
+                prod = (z*sum) >> 15;
+                return (short) (C0-prod);
+        }
+        /**
+        * Returns true if x is a power of 2.
+        * @author Don Cross
+        */
+        private static boolean isPowerOf2(final int x) {
+                final int BITS_PER_WORD=32;
+                for(int i=1,y=2; i<BITS_PER_WORD; i++,y<<=1) {
+                        if(x==y)
+                                return true;
+                }
+                return false;
+        }
+        /**
+        * Number of bits needed.
+        * @author Don Cross
+        */
+        private static int numberOfBitsNeeded(final int pwrOf2) {
+                if(pwrOf2<2)
+                        throw new IllegalArgumentException();
+                for(int i=0;;i++) {
+                        if((pwrOf2&(1<<i))>0)
+                                return i;
+                }
+        }
+        /**
+        * Reverse bits.
+        * @author Don Cross
+        */
+        private static int reverseBits(int index,final int numBits) {
+                int i,rev;
+                for(i=rev=0;i<numBits;i++) {
+                        rev=(rev<<1)|(index&1);
+                        index>>=1;
+                }
+                return rev;
+        }
+
+        /**
+        * Sorts the output from the Fourier transfom methods into
+        * ascending frequency/time order.
+        */
+        public static int[][] sort(final int output[][]) {
+                final int outputReal[]=output[0];
+                final int outputImag[]=output[1];
+                final int N=outputReal.length;
+                final int arrayRe[]=new int[N];
+                final int arrayIm[]=new int[N];
+                final int Nby2=N/2;
+                for(int i=0;i<Nby2;i++) {
+                        arrayRe[Nby2+i] = outputReal[i];
+                        arrayIm[Nby2+i] = outputImag[i];
+                        arrayRe[i] = outputReal[Nby2+i];
+                        arrayIm[i] = outputImag[Nby2+i];
+                }
+                return new int[][] {arrayRe, arrayIm};
+        }
+}
+

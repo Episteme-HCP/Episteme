@@ -1,0 +1,4 @@
+<unit id="chainSquared" name="chain squared" abbreviation="ch^2" unitType="area" parentSI="meterSquared"
+      multiplierToSI="405.69" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>square chain</description>
+</unit>

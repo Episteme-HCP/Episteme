@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE web-app
+        PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN"
+        "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd">
+
+
+<!-- 
+To use Form Prosessing API 2.0 with your application, you must
+include the following code into your deployment descriptor.
+
+There are minimum three tasks accomplished here :
+
+  1 - giving a name to com.codepassion.form.control.FormControllerServlet.
+  2 - supplying the full class name of your XML Reader (responsable for reading
+      forms.xml file).
+      You do this through servlet's "XMLReaderName" init parameter.
+  3 - Mapping FormControllerServlet to "/forms/*" url pattern.
+      Having done that, the URL to any of your forms will look like :
+      http://your_host:port/your_context/forms/your_form_name
+      Note that "your_form_name" represents the name of a particular form.
+      Form names are entered in forms.xml, through "form" element's "name" attribute.
+      
+  If you are using Apache's Xerces2 parser, there is nothing to change in this file
+  (beside adding you own stuff), otherwise you will have to edit XMLReader
+  class name according to the one you are using.
+  
+  If you wish to call forms.xml file with another name, you will have to
+  insert the new name through FormControllerServlet's init parameter
+  called "formDesigner" :
+        <init-param>
+            <param-name>
+                formDesigner
+            </param-name>
+            <param-value>
+                newName.xml
+            </param-value>
+        </init-param>
+-->
+
+
+<web-app>
+
+    <servlet>
+        <servlet-name>
+            applicationController
+        </servlet-name>
+        <servlet-class>
+            mypackage.control.ApplicationControllerServlet
+        </servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>
+            myforms
+        </servlet-name>
+        <servlet-class>
+            com.codepassion.form.control.FormControllerServlet
+        </servlet-class>
+        <init-param>
+            <param-name>
+                XMLReaderName
+            </param-name>
+            <param-value>
+                org.apache.xerces.parsers.SAXParser
+            </param-value>
+        </init-param>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>myforms</servlet-name>
+        <url-pattern>/forms/*</url-pattern>
+    </servlet-mapping>
+
+</web-app>

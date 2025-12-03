@@ -1,0 +1,170 @@
+ISBN format details:
+an ISBN is formally broken into 4 parts, and these four parts are supposed to appear separated with hyphens or spaces. In reality, you often see ISBN's with the dashes/spaces stripped
+the four parts are:
+group/country identifier
+publisher identifier
+number assigned to a specific title in one format (formally called the title identifier)
+a check digit
+parts 1, 2 and 3 are variable-length and digits only.
+the check digit is a digit or X (which represents 10). The convention is for the x to be capitalized, but you can't count on it.
+you can use our java code or the xslt from xfront to calculate the check digit
+As noted, 3 hyphens (or spaces; hyphens are recommended) should separate the four parts of the ISBN. Since the last hyphen precedes the check digit, it always goes between the 9th and 10th characters.
+The group/country identifiers for each "country" are: 0/1 English - (UK, US, Australia, NZ, Canada,South Africa, Zimbabwe) [Ireland, Puerto Rico, Swaziland]
+2 French (France, Belgium, Canada, Switzerland)[and Luxembourg]
+3 German (Germany, Austria, Switzerland)
+4 Japan
+5 USSR [Now identified as Russian Federation, including these countries, many of which also have other codes: Azerbaijan, Tajikistan, Turkmenistan, Uzbekistan, Armenia (9930), Belarus (985), Estonia (9985), Georgia (99928), Kazakhstan (9965), Kyrgyzstan (9967), Latvia (9984), Lithuania (9986), Moldova (9975), Ukraine (966)]
+7 China
+80 Czechoslovakia [Czech Republic and Slovakia]
+81 India (see also 93)
+82 Norway
+83 Poland
+84 Spain
+85 Brazil
+86 Yugoslavia [Yugoslavia and Bosnia and Herzegovina (9958), Croatia (953), Macedonia (9989),Slovenia (961)]
+87 Denmark
+88 Italian (Italy, Switzerland)
+89 South Korea
+90 Dutch/Flemish
+91 Sweden
+92 International (UNESCO)
+93 India (see also 81)
+950 Argentina
+951 Finland
+952 Finland
+953 Croatia
+954 Bulgaria
+955 Sri Lanka
+956 Chile
+957 Taiwan [see also 986]
+958 Colombia
+959 Cuba
+960 Greece
+961 Slovenia
+962 Hong Kong
+963 Hungary
+964 Iran
+965 Israel
+966 Ukraine
+967 Malaysia (see also 983)
+968 Mexico (see also 970)
+969 Pakistan
+970 Mexico (see also 968)
+971 Philippines
+972 Portugal
+973 Romania
+974 Thailand
+975 Turkey
+976 Caribbean: AG,BS,BB,BZ,DM,GD,GY,JM,MS,KN,LC,VC,TT
+977 Egypt
+978 Nigeria
+979 Indonesia
+980 Venezuela
+981 Singapore (see also 9971)
+982 Pacific: CK,FJ,KI,NR,NU,SB,TK,TO,TV,VU,WS
+983 Malaysia (see also 967)
+984 Bangladesh
+985 Belarus
+986 Taiwan [see also 957; new]
+987 Argentina
+9952 Azerbaijan
+9953 Lebanon
+9954 Morocco (see also 9981))
+9955 Lithuania (See also 9986)
+9956 Cameroon
+9957 Jordan
+9958 Bosnia and Herzegovina
+9959 Libya
+9960 Saudi Arabia
+9961 Algeria
+9962 Panama
+9963 Cyprus
+9964 Ghana
+9965 Kazakhstan
+9966 Kenya
+9967 Kyrgyzstan
+9968 Costa Rica (see also 9977)
+9970 Uganda
+9971 Singapore (see also 981)
+9972 Syria
+9973 Tunisia
+9974 Uruguay
+9975 Moldova
+9976 Tanzania (see also 9987)
+9977 Costa Rica (see also 9968)
+9978 Ecuador
+9979 Iceland
+9980 Papua New Guinea
+9981 Morocco [see also 9954]
+9982 Zambia
+9983 Gambia
+9984 Latvia
+9985 Estonia
+9986 Lithuania [see also 9955]
+9987 Tanzania (see also 9976)
+9988 Ghana
+9989 Macedonia
+99901 Bahrain
+99903 Mauritius
+99904 Netherlands Antilles [Aruba, Neth. Antilles]
+99908 Malawi
+99909 Malta [see also 99932]
+99910 Sierra Leone
+99911 Lesotho
+99912 Botswana
+99913 Andorra (see also 99920)
+99914 Suriname
+99915 Maldives
+99916 Namibia
+99917 Brunei [Brunei Darussalam]
+99918 Faroe Islands
+99919 Benin
+99920 Andorra (see also 99913)
+99921 Qatar
+99922 Guatemala
+99923 El Salvador
+99924 Nicaragua
+99925 Paraguay
+99926 Honduras
+99927 Albania
+99928 Georgia
+99929 Mongolia
+99930 Armenia
+99931 Seychelles
+99932 Malta (see also 99909)
+99933 Nepal
+99935 Dominican Republic
+99936 Bhutan
+99937 Macau
+
+
+Position of the first digit (or space) -- if the first digit is 0-7, the first separator goes between the 1st and 2nd characters. If it's an 8, it goes between the 2nd and 3rd characters.
+
+If the first two characters are 90-93 the separator goes between the 2nd and 3rd characters. If it's 95, it goes between the 3rd and 4th characters (that is, if the first three characters are 950-959). If the first two characters are 94, it's an invalid ISBN.
+
+Blocks of ISBNs are assigned to publishers in groups of 10, 100, 1000, 10,000, 100,000 or 1,000,000. These carve up the possible ISBNs in an interesting fashion.
+For instance, for the largest publishers you could make this calculation -- going from the back, one character for the check digit, 6 for one million titles, and in English-speaking countries, 0 or 1 for the group/country identifier. That leaves 2 digits for the publisher code.
+
+So you might imagine that there are 100 possible publisher codes that could be assigned one million title codes. However, only the first 20 (00-19) have been reserved for such large publishers.
+
+Thus if the first three characters are 015, you know that in fact the first two hyphens should appear as 0-15- ... There are no smaller publishers whose publisher code begins with a 1, and no largest ones that begin with a 2 or greater.
+
+Thus in English we know that: Country  Publisher ID  If number ranges are between:  Insert hyphen after the:  Block Size
+0 00.......19 00-19 3rd digit 1,000,000
+0 200......699 20-69 4th digit 100,000
+0 7000.....8499 70-84 5th digit 10,000
+0 85000....89999 85-89 6th digit 1,000
+0 900000...949999 90-94 7th digit 100
+0 9500000..9999999 95-99 8th digit 10
+1 55000....86979 5500-8697 6th digit 1,000
+1 869800...998999 8698-9989 7th digit 100
+1 9990000..9999999 9990-9999 8th digit 10
+
+
+That is, for English-speaking countries, we know where the middle hyphen goes because we can tell how long the publisher identifier is by its makeup. The second hyphen goes between the 3rd and 4th characters if the ISBN begins 000-019; between the 4th and 5th characters if it begins 020-069 [which is to say, begins 0200-0699]; and so on.
+
+
+CueCat Scripts   Book Search   ISBN directory   ISBN.java
+
+
+� 2003, Openly Informatics, Inc. 

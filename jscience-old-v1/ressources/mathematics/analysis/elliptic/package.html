@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>// JTEM - Java Tools for Experimental Mathematics
+// Copyright (C) 2001 JEM-Group
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</head>
+
+<body bgcolor="white">The <code>ellipticFunctions</code> package provides a 
+library for elliptic functions.
+<p>
+Some of the most famous mathematicions of the 18<sup>th</sup>-century,
+like Abel, Gauss, Jacobi, or Weierstrass, contributed to this subject
+and opend a complete new field in mathematics.
+</p>
+<p>
+We compute all elliptic functions in terms of Jacobi's theta functions,
+which are implemented as static functions in {@link ellipticFunctions.Elliptic}.
+</p>
+<p>
+{@link ellipticFunctions.Jacobi} is devoted to the Jacobi's elliptic functions: 
+<code>sn</code>, <code>cn</code>, and <code>dn</code>. It also includes utillity 
+functions to compute back and forth between the different descriptions of the
+modulus.
+</p>
+<p>
+An implementation for the different elliptic functions of Weierstrass, will
+be added soon.
+</p>
+<p>
+All the functions have a convient and an numerical efficient front-end.
+Compare for example {@link #Jacobi.sn(Complex,Complex)} and 
+{@link #Jacobi.sn(Complex,Complex,Complex[],Complex)}.
+</p>
+Markus Schmies, Berlin, Dec. 2003
+
+@auther Markus Schmies
+@version 0.5
+</body>
+</html>

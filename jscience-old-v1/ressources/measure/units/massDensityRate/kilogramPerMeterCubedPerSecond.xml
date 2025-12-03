@@ -1,0 +1,4 @@
+<unit id="kilogramPerMeterCubedPerSecond" name="kilogram per meter cubed per second" abbreviation="kg/m^3 s"
+      unitType="massDensityRate" parentSI="SELF" multiplierToSI="1"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

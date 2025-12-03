@@ -1,0 +1,44 @@
+{
+    "Copper": {
+        "density": "8960 kg/m^3",
+        "specific_heat": "385 J/(kg*K)",
+        "thermal_conductivity": "401 W/(m*K)",
+        "electrical_conductivity": "5.96e7 S/m",
+        "youngs_modulus": "117 GPa"
+    },
+    "Aluminum": {
+        "density": "2700 kg/m^3",
+        "specific_heat": "897 J/(kg*K)",
+        "thermal_conductivity": "237 W/(m*K)",
+        "electrical_conductivity": "3.77e7 S/m",
+        "youngs_modulus": "69 GPa"
+    },
+    "Iron": {
+        "density": "7874 kg/m^3",
+        "specific_heat": "449 J/(kg*K)",
+        "thermal_conductivity": "80.2 W/(m*K)",
+        "electrical_conductivity": "1.0e7 S/m",
+        "youngs_modulus": "211 GPa"
+    },
+    "Silicon": {
+        "density": "2329 kg/m^3",
+        "specific_heat": "700 J/(kg*K)",
+        "thermal_conductivity": "148 W/(m*K)",
+        "electrical_conductivity": "1.56e-3 S/m",
+        "youngs_modulus": "130 GPa"
+    },
+    "Water": {
+        "density": "1000 kg/m^3",
+        "specific_heat": "4181 J/(kg*K)",
+        "thermal_conductivity": "0.606 W/(m*K)",
+        "electrical_conductivity": "5.5e-6 S/m",
+        "youngs_modulus": "0 Pa"
+    },
+    "Air": {
+        "density": "1.225 kg/m^3",
+        "specific_heat": "1005 J/(kg*K)",
+        "thermal_conductivity": "0.024 W/(m*K)",
+        "electrical_conductivity": "0 S/m",
+        "youngs_modulus": "0 Pa"
+    }
+}

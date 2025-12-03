@@ -1,0 +1,4 @@
+<unit id="horsepowerHour" name="horsepower hour" abbreviation="hp hr" unitType="energy" parentSI="joule"
+      multiplierToSI="2684519.64" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>US horsepower hours</description>
+</unit>

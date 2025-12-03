@@ -1,0 +1,5 @@
+<unitType id="electricCharge" name="electric charge">
+    <alternative type="synonym">electric flux</alternative>
+    <dimension name="current" power="1" preserve="no"/>
+    <dimension name="time" power="1" preserve="no"/>
+</unitType>

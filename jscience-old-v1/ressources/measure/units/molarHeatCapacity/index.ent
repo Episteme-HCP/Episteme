@@ -1,0 +1,9 @@
+
+<!ENTITY caloriePerMolePerKelvin.xml SYSTEM "../molarHeatCapacity/caloriePerMolePerKelvin.xml">
+<!ENTITY joulePerMolePerKelvin.xml SYSTEM "../molarHeatCapacity/joulePerMolePerKelvin.xml">
+
+<!ENTITY molarHeatCapacity.elements	"
+&caloriePerMolePerKelvin.xml;
+&joulePerMolePerKelvin.xml;
+">
+

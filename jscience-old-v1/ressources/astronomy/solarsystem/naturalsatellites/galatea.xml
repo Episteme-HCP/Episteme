@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>moon</type>
+        <name>galatea</name>
+        <parent>neptune</parent>
+    </general>
+    <parameter>
+        <diameter>158</diameter>
+        <!-- km -->
+        <rotationperiod>0.429</rotationperiod>
+        <!-- day -->
+        <orbitperiod>0.429</orbitperiod>
+        <!-- day -->
+        <orbiteccentricity>0.0001</orbiteccentricity>
+        <orbitinclinationtoecliptic>0.054</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <distance>61953</distance>
+        <!-- km -->
+    </parameter>
+</celestialobject>

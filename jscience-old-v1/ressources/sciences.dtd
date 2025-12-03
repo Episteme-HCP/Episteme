@@ -1,0 +1,9 @@
+<!-- entities -->
+
+<!-- the top level element -->
+<!ELEMENT science (name, description)>
+
+<!-- elements -->
+<!ELEMENT name                            (#PCDATA)>
+<!ELEMENT description                     (#PCDATA)>
+

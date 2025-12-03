@@ -1,0 +1,4 @@
+<unit id="dalton" name="dalton" abbreviation="Da" unitType="mass" parentSI="kilogram" multiplierToSI="1.6605402E-27"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 Da = 1 amu</description>
+</unit>

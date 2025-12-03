@@ -1,0 +1,4 @@
+<unitType id="specificVolume" name="specific volume">
+    <dimension name="mass" power="-1" preserve="no"/>
+    <dimension name="length" power="3" preserve="no"/>
+</unitType>

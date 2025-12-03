@@ -55,7 +55,7 @@ public class OEISExporter {
         for (int i = 0; i < count; i++) {
             if (i > 0)
                 writer.print(",");
-            Integer val = sequence.get(Natural.valueOf(i));
+            Integer val = sequence.get(Natural.of(i));
             writer.print(val);
         }
         writer.println();
@@ -74,7 +74,7 @@ public class OEISExporter {
             writer.print(i); // Or 1-based? OEIS usually 1-based for b-files but depends on offset.
             // We'll use 0-based index for now or sequence domain.
             writer.print(" ");
-            writer.println(sequence.get(Natural.valueOf(i)));
+            writer.println(sequence.get(Natural.of(i)));
         }
     }
 }

@@ -1,0 +1,94 @@
+<!-- elements in XSD schema; required for tools that validate against a DTD  -->
+<!ELEMENT schema (attributeGroup*, element*, (simpleType | complexType))*>
+
+<!ELEMENT attributeGroup (attribute | attributeGroup)*>
+<!ATTLIST attributeGroup
+name    CDATA   #IMPLIED
+id      CDATA   #IMPLIED
+ref     CDATA   #IMPLIED
+>
+    
+<!ELEMENT element (annotation*, (complexType)*)>
+<!ATTLIST element
+name    CDATA   #IMPLIED
+id      CDATA   #IMPLIED
+ref     CDATA   #IMPLIED
+>
+
+<!ELEMENT attribute (annotation*, simpleType*)>
+<!ATTLIST attribute
+name    CDATA   #REQUIRED
+id      CDATA   #IMPLIED
+type    CDATA   #IMPLIED
+href    CDATA   #IMPLIED
+use     CDATA   #IMPLIED
+default CDATA   #IMPLIED
+>
+
+<!ELEMENT annotation (documentation)>
+
+<!ELEMENT documentation (div*)>
+
+<!ELEMENT div ANY>
+<!ATTLIST div
+class   CDATA   #IMPLIED
+href    CDATA   #IMPLIED
+>
+
+<!ELEMENT a ANY>
+<!ATTLIST a
+class   CDATA   #IMPLIED
+href    CDATA   #IMPLIED
+>
+
+<!ELEMENT p ANY>
+<!ELEMENT pre ANY>
+<!ELEMENT tt (#PCDATA)>
+<!ELEMENT b (#PCDATA)>
+<!ELEMENT ul ANY>
+<!ELEMENT li ANY>
+
+<!ELEMENT complexType ((sequence|simpleContent|choice)*,
+     (attributeGroup|attribute)*)>
+<!ATTLIST complexType
+mixed   CDATA   #IMPLIED
+>
+
+<!ELEMENT simpleContent (extension)>
+
+<!ELEMENT simpleType (restriction | union)*>
+
+<!ELEMENT restriction ANY>
+<!ATTLIST restriction
+base    CDATA   #IMPLIED
+>
+
+<!ELEMENT enumeration ANY>
+<!ATTLIST enumeration
+value   CDATA   #IMPLIED
+>
+
+<!ELEMENT extension (attributeGroup | attribute)*>
+<!ATTLIST extension
+base    CDATA   #IMPLIED
+>
+
+<!ELEMENT union (simpleType)*>
+
+<!ELEMENT sequence (sequence | choice | element | any)*>
+<!ATTLIST sequence
+minOccurs CDATA   #IMPLIED
+maxOccurs CDATA   #IMPLIED
+>
+
+<!ELEMENT choice (sequence | choice | element | any)*>
+<!ATTLIST choice
+minOccurs CDATA   #IMPLIED
+maxOccurs CDATA   #IMPLIED
+>
+
+<!ELEMENT any EMPTY>
+<!ATTLIST any
+processContents CDATA   #IMPLIED
+>
+

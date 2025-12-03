@@ -196,6 +196,15 @@ public abstract class Natural extends Number implements Semiring<Natural>, Compa
      */
     public abstract BigInteger bigIntegerValue();
 
+    /**
+     * Alias for {@link #bigIntegerValue()} for compatibility.
+     * 
+     * @return the BigInteger value (never null)
+     */
+    public BigInteger toBigInteger() {
+        return bigIntegerValue();
+    }
+
     // --- Standard methods ---
 
     @Override

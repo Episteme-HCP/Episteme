@@ -1,0 +1,4 @@
+<unit id="kilohertz" name="kilohertz" abbreviation="kHz" unitType="frequency" parentSI="hertz" multiplierToSI="1000"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>kilohertz</description>
+</unit>

@@ -1,0 +1,3 @@
+<unit id="nanomole" name="nanomole" abbreviation="nmol" unitType="amount" parentSI="mole" multiplierToSI="1.0E-09"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

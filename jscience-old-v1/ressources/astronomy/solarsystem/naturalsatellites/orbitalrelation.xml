@@ -1,0 +1,94 @@
+<star objectname="sun">
+
+    <planet objectname="mercury"/>
+
+    <planet objectname="venus"/>
+
+    <planet objectname="earth">
+        <moon objectname="moon"/>
+    </planet>
+
+    <planet objectname="mars">
+        <moon objectname="phobos"/>
+        <moon objectname="deimos"/>
+    </planet>
+
+    <planet objectname="jupiter">
+        <moon objectname="metis"/>
+        <moon objectname="adrastea"/>
+        <moon objectname="amalthea"/>
+        <moon objectname="thebe"/>
+        <moon objectname="io"/>
+        <moon objectname="europa"/>
+        <moon objectname="ganymede"/>
+        <moon objectname="callisto"/>
+        <moon objectname="leda"/>
+        <moon objectname="himalia"/>
+        <moon objectname="lysithea"/>
+        <moon objectname="elara"/>
+        <moon objectname="ananke"/>
+        <moon objectname="carme"/>
+        <moon objectname="pasiphae"/>
+        <moon objectname="sinope"/>
+    </planet>
+
+    <planet objectname="saturn">
+        <moon objectname="pan"/>
+        <moon objectname="atlas"/>
+        <moon objectname="prometheus"/>
+        <moon objectname="pandora"/>
+        <moon objectname="epimetheus"/>
+        <moon objectname="janus"/>
+        <moon objectname="mimas"/>
+        <moon objectname="enceladus"/>
+        <moon objectname="tethys"/>
+        <moon objectname="telesto"/>
+        <moon objectname="calypso"/>
+        <moon objectname="dione"/>
+        <moon objectname="helene"/>
+        <moon objectname="rhea"/>
+        <moon objectname="titan"/>
+        <moon objectname="hyperion"/>
+        <moon objectname="iapetus"/>
+        <moon objectname="phoebe"/>
+    </planet>
+
+    <planet objectname="uranus">
+        <moon objectname="cordelia"/>
+        <moon objectname="ophelia"/>
+        <moon objectname="bianca"/>
+        <moon objectname="cressida"/>
+        <moon objectname="desdemona"/>
+        <moon objectname="juliet"/>
+        <moon objectname="portia"/>
+        <moon objectname="rosalind"/>
+        <moon objectname="belinda"/>
+        <moon objectname="puck"/>
+        <moon objectname="miranda"/>
+        <moon objectname="ariel"/>
+        <moon objectname="umbriel"/>
+        <moon objectname="titania"/>
+        <moon objectname="oberon"/>
+        <moon objectname="caliban"/>
+        <moon objectname="setebos"/>
+        <moon objectname="sycorax"/>
+        <moon objectname="stephano"/>
+        <moon objectname="prospero"/>
+    </planet>
+
+    <planet objectname="neptune">
+        <moon objectname="naiad"/>
+        <moon objectname="thalassa"/>
+        <moon objectname="despina"/>
+        <moon objectname="galatea"/>
+        <moon objectname="larissa"/>
+        <moon objectname="proteus"/>
+        <moon objectname="triton"/>
+        <moon objectname="nereid"/>
+    </planet>
+
+    <planet objectname="pluto">
+        <moon objectname="charon"/>
+    </planet>
+
+</star>

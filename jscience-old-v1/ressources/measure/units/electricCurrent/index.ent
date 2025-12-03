@@ -1,0 +1,21 @@
+
+<!ENTITY abampere.xml SYSTEM "../electricCurrent/abampere.xml">
+<!ENTITY ampere.xml SYSTEM "../electricCurrent/ampere.xml">
+<!ENTITY biot.xml SYSTEM "../electricCurrent/biot.xml">
+<!ENTITY kiloampere.xml SYSTEM "../electricCurrent/kiloampere.xml">
+<!ENTITY megampere.xml SYSTEM "../electricCurrent/megampere.xml">
+<!ENTITY microampere.xml SYSTEM "../electricCurrent/microampere.xml">
+<!ENTITY milliampere.xml SYSTEM "../electricCurrent/milliampere.xml">
+<!ENTITY statampere.xml SYSTEM "../electricCurrent/statampere.xml">
+
+<!ENTITY electricCurrent.elements	"
+&abampere.xml;
+&ampere.xml;
+&biot.xml;
+&kiloampere.xml;
+&megampere.xml;
+&microampere.xml;
+&milliampere.xml;
+&statampere.xml;
+">
+

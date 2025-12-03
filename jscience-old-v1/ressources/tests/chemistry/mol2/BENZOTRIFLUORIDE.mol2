@@ -1,0 +1,55 @@
+#	Name:			BENZOTRIFLUORIDE
+#	Creating user name:	jahl
+#	Creation time:		Thu May 26 08:24:35 1994
+
+#	Modifying user name:	jahl
+#	Modification time:	Mon May 30 04:36:14 1994
+
+@<TRIPOS>MOLECULE
+BENZOTRIFLUORIDE
+   15    15     1     1     1
+SMALL
+GAST_HUCK
+
+
+@<TRIPOS>ATOM
+      1 F1_____     0.047891    1.229331   -2.689702 F         1 PHENYL     -0.219930 
+      2 C2_____     0.530287    1.587786   -1.469787 C.3       1 PHENYL      0.377066 
+      3 F3_____    -0.060506    2.750461   -1.084495 F         1 PHENYL     -0.219930 
+      4 F4_____     1.872701    1.786018   -1.567238 F         1 PHENYL     -0.219930 
+      5 C           0.187714    0.491921   -0.453766 C.ar      1 PHENYL      0.048172 
+      6 C          -1.155439    0.159706   -0.246345 C.ar      1 PHENYL     -0.031482 
+      7 C          -1.505425   -0.834128    0.672467 C.ar      1 PHENYL     -0.032140 
+      8 C          -0.509681   -1.502477    1.390390 C.ar      1 PHENYL     -0.033965 
+      9 C           0.833897   -1.174730    1.186970 C.ar      1 PHENYL     -0.032140 
+     10 C           1.181788   -0.180318    0.267450 C.ar      1 PHENYL     -0.031482 
+     11 H11____    -1.931169    0.677342   -0.802771 H         1 PHENYL      0.085283 
+     12 H12____    -2.550181   -1.086572    0.828245 H         1 PHENYL      0.069813 
+     13 H13____    -0.779420   -2.274790    2.104755 H         1 PHENYL      0.085570 
+     14 H14____     1.608460   -1.693534    1.744285 H         1 PHENYL      0.069813 
+     15 H15____     2.229082    0.063985    0.119541 H         1 PHENYL      0.085283 
+@<TRIPOS>BOND
+     1    2    1 1    
+     2    2    3 1    
+     3    2    4 1    
+     4    5    6 ar   
+     5    5   10 ar   
+     6   10    9 ar   
+     7    9    8 ar   
+     8    8    7 ar   
+     9    7    6 ar   
+    10    5    2 1    
+    11    6   11 1    
+    12    7   12 1    
+    13    8   13 1    
+    14    9   14 1    
+    15   10   15 1    
+@<TRIPOS>SUBSTRUCTURE
+     1 PHENYL      5 PERM              0 ****  ****    0 ROOT 
+@<TRIPOS>SET
+ATOM$CYAN       STATIC     ATOMS    COLORGROUP SYSTEM 
+15 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+@<TRIPOS>NORMAL
+@<TRIPOS>FF_PBC
+FORCE_FIELD_SETUP_FEATURE Force Field Setup information
+v1.0  0 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 NONE 0 0 0 0 1 0 0 0 0 0 0 0 0

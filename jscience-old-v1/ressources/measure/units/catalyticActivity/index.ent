@@ -1,0 +1,7 @@
+
+<!ENTITY katal.xml SYSTEM "../catalyticActivity/katal.xml">
+
+<!ENTITY catalyticActivity.elements	"
+&katal.xml;
+">
+

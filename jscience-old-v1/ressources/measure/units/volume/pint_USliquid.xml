@@ -1,0 +1,4 @@
+<unit id="pint_USliquid" name="US liquid pint" abbreviation="pt" unitType="volume" parentSI="meterCubed"
+      multiplierToSI="4.73176E-4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 US liquid pint = 1/2 US liquid quart</description>
+</unit>

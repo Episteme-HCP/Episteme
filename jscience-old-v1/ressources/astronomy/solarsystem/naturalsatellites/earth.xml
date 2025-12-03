@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>planet</type>
+        <name>earth</name>
+        <parent>sun</parent>
+    </general>
+    <parameter>
+        <diameter>12756.28</diameter>
+        <!-- km -->
+        <rotationperiod>0.99726968</rotationperiod>
+        <!-- day -->
+        <orbitperiod>0.99997862</orbitperiod>
+        <!-- year -->
+        <meanorbitvelocity>29.7859</meanorbitvelocity>
+        <!-- km/s -->
+        <orbiteccentricity>0.01671022</orbiteccentricity>
+        <orbitinclinationtoecliptic>0.00005</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <inclinationofequatortoorbit>23.45</inclinationofequatortoorbit>
+        <!-- ° -->
+        <volume>1</volume>
+        <distance>1.00000011</distance>
+        <!-- AU -->
+        <mass>5.9742e27</mass>
+        <!-- g -->
+        <density>5.515</density>
+        <!-- g/cm3 -->
+        <surfacegravity>9.81</surfacegravity>
+        <!-- m/s2 -->
+        <escapevelocity>11.18</escapevelocity>
+        <!-- km/s -->
+        <meantempatsolidsurface>288</meantempatsolidsurface>
+        <!-- Kelvin - 288 - 293K -->
+        <majoratmosphericconstitutents>N2,O2,Ar</majoratmosphericconstitutents>
+    </parameter>
+</celestialobject>

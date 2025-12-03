@@ -1,0 +1,11 @@
+
+<!ENTITY centistokes.xml SYSTEM "../kinematicViscosity/centistokes.xml">
+<!ENTITY meterSquaredPerSecond.xml SYSTEM "../kinematicViscosity/meterSquaredPerSecond.xml">
+<!ENTITY stokes.xml SYSTEM "../kinematicViscosity/stokes.xml">
+
+<!ENTITY kinematicViscosity.elements	"
+&centistokes.xml;
+&meterSquaredPerSecond.xml;
+&stokes.xml;
+">
+

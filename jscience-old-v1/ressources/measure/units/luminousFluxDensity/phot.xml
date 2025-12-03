@@ -1,0 +1,3 @@
+<unit id="phot" name="phot" abbreviation="ph" unitType="luminousFluxDensity" parentSI="lux" multiplierToSI="1.0E+4"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

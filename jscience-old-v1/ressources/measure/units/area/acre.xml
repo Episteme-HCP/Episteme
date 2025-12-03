@@ -1,0 +1,4 @@
+<unit id="acre" name="acre" abbreviation="ac" unitType="area" parentSI="meterSquared" multiplierToSI="4046.8564"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 acre = 4046.8564 square meters or 1 hectare = 2.47 acres</description>
+</unit>

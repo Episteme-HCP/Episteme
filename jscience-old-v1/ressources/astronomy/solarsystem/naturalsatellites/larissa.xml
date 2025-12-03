@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>moon</type>
+        <name>larissa</name>
+        <parent>neptune</parent>
+    </general>
+    <parameter>
+        <diameter>192</diameter>
+        <!-- km -->
+        <rotationperiod>0.555</rotationperiod>
+        <!-- day -->
+        <orbitperiod>0.555</orbitperiod>
+        <!-- day -->
+        <orbiteccentricity>0.0014</orbiteccentricity>
+        <orbitinclinationtoecliptic>0.201</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <distance>73548</distance>
+        <!-- km -->
+    </parameter>
+</celestialobject>

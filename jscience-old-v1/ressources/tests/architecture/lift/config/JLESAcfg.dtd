@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- This file is licensed under GPL. Created by Nagy Elemér Károly at 2005. Version 0.3.1 -->
+<!-- $Revision: 1.1 $ $Date: 2006-09-07 22:00:54 $ -->
+
+<!ELEMENT JLESAcfg (Building, GUI?, CA+,(FileBasedPassengerGenerator|PoissonPassengerGenerator|SimplePassengerProcessor|LoggerPassengerProcessor)*)>
+<!ATTLIST JLESAcfg
+	name		CDATA #REQUIRED 
+	author		CDATA #REQUIRED
+	created		CDATA #REQUIRED>
+
+	<!ELEMENT Building EMPTY>
+	<!ATTLIST Building 
+		MaxNumberOfTicks	CDATA "1000"
+		TickBlocks			CDATA "0"
+		HighestFloor			CDATA "-2"
+		LowestFloor			CDATA "5">
+
+	<!ELEMENT GUI EMPTY>
+	<!ATTLIST GUI 
+		Visible			CDATA "true"
+		AnimationSpeed	CDATA "5">
+
+	<!ELEMENT CA (Car+, (DynZoneCA|TrivialCA|ManualCA|SimplexCA|OtherCA)) >
+	<!ATTLIST CA>
+
+		<!ELEMENT DynZoneCA EMPTY>
+		<!ATTLIST DynZoneCA 
+			VisibleGUI		CDATA "true">
+
+		<!ELEMENT TrivialCA EMPTY>
+		<!ATTLIST TrivialCA>
+
+		<!ELEMENT ManualCA EMPTY>
+		<!ATTLIST ManualCA
+			VisibleGUI		CDATA "true"
+			GUILocation		CDATA "0,600">
+
+		<!ELEMENT SimplexCA EMPTY>
+		<!ATTLIST SimplexCA>
+
+		<!ELEMENT OtherCA EMPTY>
+		<!ATTLIST OtherCA 
+			Name			CDATA #REQUIRED
+			OptionsString	CDATA #REQUIRED>
+	
+		<!ELEMENT Car (SimpleKinematicModel|LoadDependentKinematicModel|OtherKinematicModel)>
+		<!ATTLIST Car 
+			StartingFloor		CDATA #REQUIRED
+			WeightCapacity 	CDATA #REQUIRED
+			SpaceCapacity	CDATA #REQUIRED
+			>
+		
+			<!ELEMENT SimpleKinematicModel EMPTY>
+			<!ATTLIST SimpleKinematicModel 
+				BaseTime		CDATA #REQUIRED
+				FloorFligthTime	CDATA #REQUIRED
+				DoorOpenTime	CDATA #REQUIRED
+				DoorCloseTime	CDATA #REQUIRED>
+
+			<!ELEMENT LoadDependentKinematicModel (LoadSpeed)+>
+			<!ATTLIST SimpleKinematicModel>
+				
+				<!ELEMENT LoadSpeed EMPTY>
+				<!ATTLIST LoadSpeed
+					FromLoad		CDATA #REQUIRED
+					ToLoad			CDATA #REQUIRED
+					BaseTime		CDATA #REQUIRED
+					FloorFligthTime	CDATA #REQUIRED
+					DoorOpenTime	CDATA #REQUIRED
+					DoorCloseTime	CDATA #REQUIRED>
+			
+			<!ELEMENT OtherKinematicModel EMPTY>
+			<!ATTLIST OtherKinematicModel 
+				Name			CDATA #REQUIRED
+				OptionsString	CDATA #REQUIRED>
+
+	<!ELEMENT		FileBasedPassengerGenerator EMPTY>
+	<!ATTLIST		FileBasedPassengerGenerator
+		InputFile		CDATA	"passengers.input">
+	
+	<!ELEMENT 		PoissonPassengerGenerator (GammaLine)+>
+	<!ATTLIST		PoissonPassengerGenerator
+		RandomSeed	CDATA	"random">
+
+		<!ELEMENT		GammaLine EMPTY>
+		<!ATTLIST		GammaLine
+			Floor		CDATA	#REQUIRED
+			Gamma		CDATA	#REQUIRED>
+
+	<!ELEMENT 		SimplePassengerProcessor EMPTY>
+	<!ATTLIST 		SimplePassengerProcessor
+		OutputFile	CDATA	"output.csv">
+
+	<!ELEMENT 		LoggerPassengerProcessor EMPTY>
+	<!ATTLIST 		LoggerPassengerProcessor
+		QueuLengthsOutputFile			CDATA	"QueuLengths.log"
+		PassengerTimesOutputFile			CDATA	"PassengerTimes"
+		GeneratedPassengersOutputFile	CDATA	"GeneratedPassengers">
+

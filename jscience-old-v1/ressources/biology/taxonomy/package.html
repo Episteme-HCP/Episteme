@@ -1,0 +1,71 @@
+Databases we support (these are meant to be the most inclusives databases):
+
+http://www.ebi.ac.uk/taxy/
+http://www.cbif.gc.ca/pls/itisca/ (ITIS*ca database of taxonomic nomenclature)
+
+
+About the Itis database:
+This interface includes the ability to search the
+<a href="http://www.cbif.gc.ca/pls/itisca/">ITIS*ca database</a>
+for a string match to a taxon name, which
+returns the ITIS Taxonomic Serial Number (TSN) for that taxon.  One can
+then use the TSN to query ITIS*ca and find the scientific name,
+rank, author, synonym taxa, parent taxa, and children taxa
+(e.g., species within a genus), among other information. The "Itis" class
+is the main entry point for programmers to utilize the interface. All
+communication with the ITIS*ca database is accomplished using HTTP
+requests and XML formatted responses.
+See ITIS*ca for details on
+the ITIS database.
+
+
+Database where to get phylogenetics information from:
+
+http://www.ebi.ac.uk/taxy/
+http://www.sp2000.org/
+http://www.ucmp.berkeley.edu/help/taxaform.html
+http://www.treebase.org/treebase/
+http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=taxonomy
+http://www.itis.usda.gov/index.html  linked to Species2000
+http://member.biodiversity.org.uk/globalsearcher/  linked to Species2000
+http://tolweb.org/tree/phylogeny.html
+http://sn2000.taxonomy.nl/
+
+
+Technical Details of tree of life xml file:
+
+The structure of the tree is contained in a single XML element, the
+<TREE> element. The
+    <TREE> element contains a single element,
+        <NODES>, which contains zero or more
+            <NODE> elements. This pattern repeats itself out to the tips of the current tree structure of the ToL
+                Project. Note that the current tree structure is by no means complete, but in some branches it does
+                reach out to the actual leaves of the tree (this is denoted by a special LEAF attribute on NODE
+                elements).
+
+
+                NODE Attributes Summary
+                HASPAGE 1 - the node has a page on the Tree of Life Web Project
+                0 - it doesn't
+
+                ID The unique identifier for that node on the Tree of Life Web Project
+                EXTINCT 0 - node is not extinct
+                2 - node is extinct
+
+                CONFIDENCE Confidence of placement in the tree structure:
+                0 - confident
+                1 - incertae sedis putative position
+                2 - incertae sedis position unspecified
+
+                PHYLESIS 0 - monophyletic
+                1 - monophyly uncertain
+                2 - not monophyletic
+
+                CHILDCOUNT the number of children in the Tree of Life Web Project for a given node
+                LEAF 1 - the node represents a leaf in the Tree of Life
+                0 - the node does not represent a leaf
+
+
+                NODE Elements Summary
+                NAME The official name for the node in the Tree of Life Web Project
+                NODES Children nodes for this node

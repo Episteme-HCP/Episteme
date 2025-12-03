@@ -23,7 +23,7 @@
 package org.jscience.mathematics.analysis.series;
 
 import org.jscience.mathematics.numbertheory.Primes;
-import org.jscience.mathematics.analysis.acceleration.ComputeBackend;
+import org.jscience.mathematics.backend.ComputeBackend;
 import org.jscience.mathematics.number.Integer;
 import org.jscience.mathematics.number.Natural;
 import java.util.ArrayList;

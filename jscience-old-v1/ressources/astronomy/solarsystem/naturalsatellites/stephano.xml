@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>moon</type>
+        <name>stephano</name>
+        <parent>uranus</parent>
+    </general>
+    <parameter>
+        <diameter>30</diameter>
+        <!-- km -->
+        <rotationperiod>674</rotationperiod>
+        <!-- day -->
+        <orbitperiod>674</orbitperiod>
+        <!-- day -->
+        <orbiteccentricity>0.24</orbiteccentricity>
+        <orbitinclinationtoecliptic>143</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <distance>7947700</distance>
+        <!-- km -->
+    </parameter>
+</celestialobject>

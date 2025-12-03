@@ -1,0 +1,51 @@
+A good source for images and data:
+http://www.ngdc.noaa.gov/mgg/image/2minrelief.html
+
+A good site for features is:
+http://earth-info.nga.mil/gns/html/
+
+You may also want to look into org.jscience.politics for the Mondial database.
+
+
+org.jscience.geography.coordinates is based on SEDRIS Java SDK4.0 found at http://www.sedris.org/
+
+
+For users familiar with geoTransform:
+
+Anything you can do with Geotransform 1.5 is defined and ready to use in org.jscience.geography.coordinates.
+
+Here's the obvious mappings:
+Gcc_Coord_3D : Coord3D_Celestiocentric
+Gdc_Coord_3D : Coord3D_Celestiodetic
+Mercator_Coord_3D : Coord3D_Mercator
+Utm_Coord_3D : Coord3D_Transverse_Mercator
+
+Here's a questionable mapping:
+Lambert_Coord_3D : Coord3D_LambertConformalConic
+
+Here's a mapping that's not so obvious:
+OSGB_Coord_3D : Coord3D_Transverse_Mercator (with ORM_OSGB_1936, and one of
+the HSR_OSGBs)
+
+Ellipsoids are encapsulated as "Object Reference Models" (ORMs) and are
+given meaningful names instead of AA_Ellipsoid, etc.
+
+Datums are encapsulated as HSRs (transforms from the Source to the
+Reference frame).  These are also given meaningful names.
+
+"Standard" SRFs are created with BaseSRF.createStandardSRF(CODE).
+Things like UTM (with all the Zones) are organized into "SRF Sets" and
+specific zones are instantiated with BaseSRF.createSRFSetMember(SET_CODE,
+member,...)  Members 1-60 correspond to the 60 northern hemisphere zones,
+61-120 correspond to the 60 southern hemisphere zones.
+
+The coordinate conversion model has changed: the user is no longer
+responsible for explicitly instantiating the appropriate conversion object.
+Each coordinate's SRF is responsible for figuring out a conversion chain to
+itself from whatever the source is.
+
+Per using the docs, there's only one thing that Geotransform does
+which the org.jscience.geography.coordinates package does not do:
+the package is not optimized for conversions of
+entire coordinate arrays.
+

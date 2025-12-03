@@ -1,0 +1,528 @@
+<discovery>
+    <date>
+        1590
+    </date>
+    <subject>
+        Microscope
+    </subject>
+    <discoverers>
+        Janssen
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1609
+    </date>
+    <subject>
+        Kinematics
+    </subject>
+    <discoverers>
+        Galileo
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1609-1619
+    </date>
+    <subject>
+        Laws of planetary motions
+    </subject>
+    <discoverers>
+        Kepler
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1614
+    </date>
+    <subject>
+        Logarithms
+    </subject>
+    <discoverers>
+        Napier
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1618
+    </date>
+    <subject>
+        Circulation of the blood
+    </subject>
+    <discoverers>
+        Harvey
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1637
+    </date>
+    <subject>
+        Analytical geometry
+    </subject>
+    <discoverers>
+        Descartes
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1642
+    </date>
+    <subject>
+        Adding machine
+    </subject>
+    <discoverers>
+        Pascal
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1643
+    </date>
+    <subject>
+        Mercury barometer
+    </subject>
+    <discoverers>
+        Torricelli
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1657
+    </date>
+    <subject>
+        Pendulum clock
+    </subject>
+    <discoverers>
+        Huygens
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1662
+    </date>
+    <subject>
+        Physical properties of gases
+    </subject>
+    <discoverers>
+        Boyle
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1663
+    </date>
+    <subject>
+        Air pump
+    </subject>
+    <discoverers>
+        Guericke
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1665-1672
+    </date>
+    <subject>
+        Differential and integral calculus
+    </subject>
+    <discoverers>
+        Newton, Leibniz
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1666
+    </date>
+    <subject>
+        Law of gravitation
+    </subject>
+    <discoverers>
+        Newton
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1673
+    </date>
+    <subject>
+        Calculating machine
+    </subject>
+    <discoverers>
+        Leibniz
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1690
+    </date>
+    <subject>
+        Wave theory of light
+    </subject>
+    <discoverers>
+        Huygens
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1700
+    </date>
+    <subject>
+        Theory of probability
+    </subject>
+    <discoverers>
+        Bernoulli
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1718
+    </date>
+    <subject>
+        Mercury thermometer
+    </subject>
+    <discoverers>
+        Fahrenheit
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1769
+    </date>
+    <subject>
+        Steam engine
+    </subject>
+    <discoverers>
+        Watt
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1780
+    </date>
+    <subject>
+        Law of combustion
+    </subject>
+    <discoverers>
+        Lavoisier
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1783
+    </date>
+    <subject>
+        Hot-air ballon
+    </subject>
+    <discoverers>
+        Montgolfier
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1790
+    </date>
+    <subject>
+        Contact electricity
+    </subject>
+    <discoverers>
+        Galvani
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1807
+    </date>
+    <subject>
+        Steam ship
+    </subject>
+    <discoverers>
+        Fulton
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1831
+    </date>
+    <subject>
+        Law of electrical induction
+    </subject>
+    <discoverers>
+        Faraday
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1837
+    </date>
+    <subject>
+        Telegraph
+    </subject>
+    <discoverers>
+        Morse
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1839
+    </date>
+    <subject>
+        Photography
+    </subject>
+    <discoverers>
+        Daguerre
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1861-1876
+    </date>
+    <subject>
+        Telephone
+    </subject>
+    <discoverers>
+        Reis, Bell
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1867
+    </date>
+    <subject>
+        Dynamite
+    </subject>
+    <discoverers>
+        Nobel
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1869
+    </date>
+    <subject>
+        Periodic system of elements
+    </subject>
+    <discoverers>
+        Mendeleyev
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1876
+    </date>
+    <subject>
+        4-cycle gas engine
+    </subject>
+    <discoverers>
+        Otto
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1877
+    </date>
+    <subject>
+        Phonograph
+    </subject>
+    <discoverers>
+        Edison
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1879
+    </date>
+    <subject>
+        Electrical light bulb
+    </subject>
+    <discoverers>
+        Edison
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1879
+    </date>
+    <subject>
+        Electric locomotive
+    </subject>
+    <discoverers>
+        Siemens
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1885
+    </date>
+    <subject>
+        Motor car
+    </subject>
+    <discoverers>
+        Daimler/Benz
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1888
+    </date>
+    <subject>
+        Electromagnetic waves
+    </subject>
+    <discoverers>
+        Hertz
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1895
+    </date>
+    <subject>
+        Cinematograph
+    </subject>
+    <discoverers>
+        Lumiere
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1895
+    </date>
+    <subject>
+        X-rays
+    </subject>
+    <discoverers>
+        Roentgen
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1897
+    </date>
+    <subject>
+        Wireless
+    </subject>
+    <discoverers>
+        Marconi
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1898
+    </date>
+    <subject>
+        Radium
+    </subject>
+    <discoverers>
+        Marie Curie
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1900
+    </date>
+    <subject>
+        Quantum theory
+    </subject>
+    <discoverers>
+        Planck
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1903
+    </date>
+    <subject>
+        Motorized aeroplane
+    </subject>
+    <discoverers>
+        Wright Brothers
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1905
+    </date>
+    <subject>
+        Theory of relativity
+    </subject>
+    <discoverers>
+        Einstein
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1903
+    </date>
+    <subject>
+        Radioactivity
+    </subject>
+    <discoverers>
+        Rutherford
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1913
+    </date>
+    <subject>
+        Atomic structure
+    </subject>
+    <discoverers>
+        Bohr
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1916
+    </date>
+    <subject>
+        Wireless telegraphy
+    </subject>
+    <discoverers>
+        Marconi
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1928
+    </date>
+    <subject>
+        Penicillin
+    </subject>
+    <discoverers>
+        Fleming
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1925
+    </date>
+    <subject>
+        Quantum mechanics
+    </subject>
+    <discoverers>
+        Heisenberg/Born
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1932
+    </date>
+    <subject>
+        Neutrons, Positrons
+    </subject>
+    <discoverers>
+        Chadwick, Anderson
+    </discoverers>
+</discovery>
+<discovery>
+    <date>
+        1938
+    </date>
+    <subject>
+        Nuclear fission
+    </subject>
+    <discoverers>
+        Hahn/Strassmann
+    </discoverers>
+</discovery>

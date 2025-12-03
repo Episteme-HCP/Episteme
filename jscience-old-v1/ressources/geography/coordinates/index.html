@@ -1,0 +1,136 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <title>1.&nbsp;Quickstart to coordinate systems in JScience</title>
+    <link rel="stylesheet" href="html.css" type="text/css">
+    <meta name="generator" content="DocBook XSL Stylesheets V1.62.0">
+    <link rel="home" href="index.html" title="1.&nbsp;Quickstart to coordinate systems in JScience">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader">
+    <table width="100%" summary="Navigation header">
+        <tr>
+            <th colspan="3" align="center">1.&nbsp;Quickstart to coordinate systems in JScience</th>
+        </tr>
+    </table>
+    <hr>
+</div>
+<div class="section" lang="en">
+<div class="titlepage">
+    <div>
+        <div><h2 class="title" style="clear: both"><a name="Quickstart"></a>1.&nbsp;Quickstart to coordinate systems
+            in JScience</h2></div>
+    </div>
+    <div></div>
+    <hr>
+</div>
+<p>I presume you are reading this document because you have some task before you which requires the use of
+    coordinates. Whether you are setting up a simulation, trying to track satellites, or recording the location of
+    tree plots, your real job is to accomplish the task at hand. Your job is not to invent, yet again, some means of
+    keeping track of position.</p>
+
+<p>This document exists to help you find what you need quickly. It is not a complete description of the underlying
+    model. Hopefully, reading it will not prevent you from learning what you need to know in order to obtain
+    accurate results. In places, it will strongly suggest that you take it upon yourself to learn more before
+    proceeding. The effort you invest learning how coordinates work may very well pay off when you're debugging.</p>
+
+<div class="section" lang="en">
+    <div class="titlepage">
+        <div>
+            <div><h3 class="title"><a name="srm"></a>1.1.&nbsp;Introduction to the Spatial Referencing Model</h3>
+            </div>
+        </div>
+        <div></div>
+    </div>
+    <p>JScience incorporates the <a href="http://www.sedris.org" target="_top"> SEDRIS Spatial Reference Model
+        (SRM)</a>, a very powerful model which can do nearly anything one would like to do with coordinates. It
+        automatically keeps track of the <span class="emphasis"><em>type</em></span> of coordinate and any extra
+        data (parameterizations) which should accompany the coordinate. This enables the SRM to automatically
+        perform conversions when you request it (or at least inform you when it does not know of a conversion).</p>
+
+    <p>However, no system can produce accurate results if it is furnished incorrect or incomplete data. Every effort
+        has been made within JScience to make common tasks easy to perform and easy to identify. But there comes a
+        point where the only way to make things easier is for someone who does <span
+            class="emphasis"><em>not</em></span> have your data to make decisions they <span
+            class="emphasis"><em>cannot</em></span>
+        enforce about your data. This will almost certainly lead to a situation where the SRM is provided inaccurate
+        information, which will yield incorrect results.</p>
+
+    <p>The <a href="http://www.sedris.org" target="_top">SEDRIS</a> website contains a lot of information pertaining
+        to the SRM which this Quickstart document cannot replace. The website is the place to go when you want to
+        make sure that you are choosing the correct coordinate system for the problem you are trying to solve. It is
+        the place to go to learn how to use the package org.jscience.mathematics.coordinates. Finally, it is the
+        place to go if you need to use the SRM directly.</p>
+
+    <p>JScience <span class="emphasis"><em>uses</em></span> the SRM for all coordinate-related data, but <span
+            class="emphasis"><em>permits</em></span> three levels of interaction with it, which you are encouraged
+        to pursue in order:</p>
+
+    <div class="orderedlist">
+        <ol type="1">
+            <li><p>High level interaction for common tasks, which includes:</p>
+
+                <div class="orderedlist">
+                    <ol type="a">
+                        <li><p>Entry and processing of geolocation data (GPS and map coordinates).</p></li>
+                        <li><p>Named access to quantities like Ellipsoids and Datum(s)</p></li>
+                        <li><p>Construction of arbitrary 2D and 3D coordinate systems.</p></li>
+                    </ol>
+                </div>
+            </li>
+            <li><p>A parallel API to that found in the SEDRIS release. This API wraps the classes in the SEDRIS API
+                with classes having identical names. These wrapper classes, which live in the package
+                org.jscience.mathematics.coordinates, utilize the Units facility of JScience. Latitudes and
+                longitudes have the type Angle, eastings and northings have the type Length, and other quantities
+                are manipulated using the appropriate subclass of Quantity. </p></li>
+            <li><p>The SEDRIS SRM API itself, in the SRM package. All of the JScience wrapper classes are based on a
+                version of the SRM released from SEDRIS, which is included as a jarfile in the JScience release.
+                Therefore, if you already have code which uses the SRM directly, it will work with JScience.
+                Additionally, if you require some functionality not provided by the JScience wrapper packages you
+                can access that functionality directly. </p></li>
+        </ol>
+    </div>
+</div>
+<div class="section" lang="en">
+    <div class="titlepage">
+        <div>
+            <div><h3 class="title"><a name="geographic"></a>1.2.&nbsp;Geographic Coordinates</h3></div>
+        </div>
+        <div></div>
+    </div>
+    <p>Specifying the position of an object on or near the Earth is a very tricky thing. The bulk of this trickiness
+        has its origin in the cartography departments of universities, oil companies, and government entities
+        responsible for making maps. You will very shortly find (if you don't already know), that cartographers
+        exist in nearly every country. Each cartographer is concerned pretty much exclusively with making maps of
+        his or her local area which look nice. Cartographers are not ashamed to "tweak" a coordinate system in order
+        to afford their clients some miniscule (and probably undetectable to the untrained eye) benefit over the
+        existing system.</p>
+
+    <p>So what does this have to do with you? You have inherited this mess. Suppose, for instance, that you have a
+        pair of coordinates in latitude/longitude. You know these coordinates are perfectly accurate, with no error
+        whatsoever. Unfortunately, you have no other information, but this should be all you have to know,
+        right?</p>
+
+    <p>WRONG! With this information, you know what planet you're on, you know what hemisphere you're in, you know
+        what continent you're on, and perhaps the nation, state, and city you occupy. But you don't need a GPS for
+        that (usually). These perfect coordinates are missing half of the information required to get you back to
+        the burger stand they represent.</p>
+
+    <p>Hold on to your hats, because this is the heinously evil part: One pair of latitude and longitude numbers can
+        refer to different places! By this, I don't mean that by plugging in different values to latitude and
+        longitude one can eventually refer to all locations one would possibly ever want to go. No. One set of
+        numbers, say the numbers you write down off of your GPS when visiting your favorite burger joint, could also
+        refer to the naughty nighty store two blocks away. This has only one of two outcomes when your wife checks
+        up on you with her GPS, which for some reason has different settings: 1] She becomes excited (until you show
+        up with a burger and no nighty); or 2] she becomes irate (wondering who you're buying nighties for). Either
+        way you're in the doghouse because <span class="emphasis"><em>you forgot to write down all the position
+        information</em></span>.</p>
+
+    <p>The moral of this story is: make sure your coordinates are complete or be prepared to sleep in the
+        doghouse.</p></div>
+</div>
+<div class="navfooter">
+    <hr>
+</div>
+</body>
+</html>

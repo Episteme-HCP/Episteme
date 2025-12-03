@@ -1,0 +1,48 @@
+package jeops.examples.factorial;
+
+/**
+ * Rule base used to solve the factorial problem with JEOPS.
+ *
+ * @author Carlos Figueira Filho (<a href="mailto:csff@di.ufpe.br">csff@di.ufpe.br</a>)
+ */
+public ruleBase FactBase {
+
+	rule goDown {
+		declarations
+			Fact f;
+		conditions
+			!f.isOk();
+			f.getN() > 1;
+			f.getSubProblem() == null;
+		actions
+			Fact sub = new Fact(f.getN() - 1);
+			f.setSubProblem(sub);
+			assert(sub);
+			modified(f);
+	}
+
+	rule goUp {
+		declarations
+			Fact f, sub;
+		conditions
+			!f.isOk();
+			sub == f.getSubProblem();
+			sub != null;
+			sub.isOk();
+		actions
+			f.setResult(f.getN() * sub.getResult());
+			modified(f);
+	}
+
+	rule baseCase {
+		declarations
+			Fact f;
+		conditions
+			!f.isOk();
+			f.getN() <= 1;
+		actions
+			f.setResult(1);
+			modified(f);
+	}
+
+}

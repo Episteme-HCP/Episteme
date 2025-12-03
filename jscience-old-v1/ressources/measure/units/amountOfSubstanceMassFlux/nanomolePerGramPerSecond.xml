@@ -1,0 +1,7 @@
+<unit id="nanomolePerGramPerSecond" name="nanomole per gram per second" abbreviation="nmol/g s"
+      unitType="amountOfSubstanceMassFlux" parentSI="molePerKilogramPerSecond"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <unit ref="nanomole" power="1"/>
+    <unit ref="gram" power="-1"/>
+    <unit ref="second" power="-1"/>
+</unit>

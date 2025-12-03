@@ -1,0 +1,37 @@
+<html>
+
+<body>
+
+<p>This package contains packages to support game implementations.</p>
+
+<p>See also the <a href="doc-files/tutorial.html" target="_top">tutorial</a> available for
+    this package.</p>
+
+<p>The package provides a general framework for implementing different games
+    (or in fact any type of simulation) with minimal effort, since all generic concepts (game players with game tree
+    search capabilities - including intelligent pruning, game boards with
+    positions, undoing and redoing moves, GUI capabilities, etc.) are already
+    pre-implemented; the framework is kept so generic that it actually qualifies as
+    a general automated problem solver.
+    Sub-packages contain reference implementations of real games. The package is
+    very flexible and easily extendable, so it should be usable for just about any
+    effort to program game related functionality.</p>
+
+<p>Algorithms available for analyzing game trees or to support better AI for
+    Player implementations include MinMax, AlphaBeta, breadth-first-search,
+    depth-first-search and best-first-search.</p>
+
+<p>This package also includes classes that allow to play games with multiple
+    users remotely over the Internet - with other human players, remote AI Player
+    objects or a mix of the two. An included multi-threaded GameServer is based on
+    the functionality provided by the org.jscience.computing.game.net package of this framework.</p>
+
+<p>The game logic is kept separate from the way the visualization is
+    implemented. By convention,&nbsp; all classes that contain GUI elements (from
+    either java.awt or javax.swing) begin with a 'J', all other classes contain only
+    game logic and can be used in any context. This convention is also kept in the
+    sub-packages. </p>
+
+</body>
+
+</html>
