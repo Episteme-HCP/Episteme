@@ -45,6 +45,24 @@ public final class Complex {
         return imaginary;
     }
 
+    /**
+     * Returns the real part as a double.
+     * 
+     * @return the real part
+     */
+    public double real() {
+        return real.doubleValue();
+    }
+
+    /**
+     * Returns the imaginary part as a double.
+     * 
+     * @return the imaginary part
+     */
+    public double imaginary() {
+        return imaginary.doubleValue();
+    }
+
     // --- Operations ---
 
     public Complex operate(Complex a, Complex b) {

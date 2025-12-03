@@ -115,6 +115,17 @@ public class DiscreteFourierTransform implements Transform<Vector<Complex>, Vect
         return y;
     }
 
+    /**
+     * Static convenience method for FFT.
+     * 
+     * @param data the input data
+     * @return the transformed data
+     */
+    public static Complex[] transform(Complex[] data) {
+        DiscreteFourierTransform dft = new DiscreteFourierTransform();
+        return dft.fft(data, false);
+    }
+
     @Override
     public Transform<Vector<Complex>, Vector<Complex>> inverse() {
         return new DiscreteFourierTransform(!inverse);

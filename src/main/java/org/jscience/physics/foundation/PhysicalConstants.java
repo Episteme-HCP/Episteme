@@ -63,7 +63,7 @@ public final class PhysicalConstants {
 
         // Gravitational constant
         public static final Quantity<?> GRAVITATIONAL_CONSTANT = Quantities.create(6.67430e-11,
-                        Units.CUBIC_METER.divide(Units.KILOGRAM).divide(Units.SECOND.pow(2)));
+                        (Unit<?>) Units.CUBIC_METER.divide(Units.KILOGRAM).divide(Units.SECOND.pow(2)));
 
         // Standard acceleration of gravity
         public static final Quantity<Acceleration> STANDARD_GRAVITY = Quantities.create(9.80665,
@@ -96,19 +96,18 @@ public final class PhysicalConstants {
 
         // Gas constant
         public static final Quantity<?> GAS_CONSTANT = Quantities.create(8.314462618,
-                        Units.JOULE.divide(Units.MOLE.multiply(Units.KELVIN)));
+                        (Unit<?>) Units.JOULE.divide(Units.MOLE.multiply(Units.KELVIN)));
 
         // Faraday constant
         public static final Quantity<?> FARADAY_CONSTANT = Quantities.create(96485.33212,
-                        Units.COULOMB.divide(Units.MOLE));
+                        (Unit<?>) Units.COULOMB.divide(Units.MOLE));
 
         // Stefan-Boltzmann constant
         public static final Quantity<?> STEFAN_BOLTZMANN = Quantities.create(5.670374419e-8,
-                        Units.WATT.divide(Units.SQUARE_METER.multiply(Units.KELVIN.pow(4))));
+                        (Unit<?>) Units.WATT.divide(Units.SQUARE_METER.multiply(Units.KELVIN.pow(4))));
 
         // Aliases for compatibility
         public static final Quantity<Action> REDUCED_PLANCK = HBAR;
         public static final Quantity<ElectricPermittivity> ELECTRIC_CONSTANT = EPSILON_0;
         public static final Quantity<Dimensionless> FINE_STRUCTURE = FINE_STRUCTURE_CONSTANT;
 }
-

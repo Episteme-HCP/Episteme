@@ -61,17 +61,17 @@ public class JavaSparseLinearAlgebraProvider<E> extends JavaLinearAlgebraProvide
      * Only processes non-zero elements.
      */
     private SparseMatrix<E> addSparse(SparseMatrix<E> a, SparseMatrix<E> b) {
-        if (a.rows() != b.rows() || a.columns() != b.columns()) {
+        if (a.rows() != b.rows() || a.cols() != b.cols()) {
             throw new IllegalArgumentException(
-                    "Matrix dimensions must match: " + a.rows() + "x" + a.columns() +
-                            " vs " + b.rows() + "x" + b.columns());
+                    "Matrix dimensions must match: " + a.rows() + "x" + a.cols() +
+                            " vs " + b.rows() + "x" + b.cols());
         }
 
-        SparseMatrix<E> result = new SparseMatrix<>(a.rows(), a.columns(), field);
+        SparseMatrix<E> result = new SparseMatrix<>(a.rows(), a.cols(), field);
 
         // Add all non-zero elements from matrix a
         for (int i = 0; i < a.rows(); i++) {
-            for (int j = 0; j < a.columns(); j++) {
+            for (int j = 0; j < a.cols(); j++) {
                 E valueA = a.get(i, j);
                 if (!isZero(valueA)) {
                     result.set(i, j, valueA);
@@ -81,7 +81,7 @@ public class JavaSparseLinearAlgebraProvider<E> extends JavaLinearAlgebraProvide
 
         // Add non-zero elements from matrix b
         for (int i = 0; i < b.rows(); i++) {
-            for (int j = 0; j < b.columns(); j++) {
+            for (int j = 0; j < b.cols(); j++) {
                 E valueB = b.get(i, j);
                 if (!isZero(valueB)) {
                     E current = result.get(i, j);
@@ -113,22 +113,22 @@ public class JavaSparseLinearAlgebraProvider<E> extends JavaLinearAlgebraProvide
      * Uses row-column dot product, skipping zero elements.
      */
     private SparseMatrix<E> multiplySparse(SparseMatrix<E> a, SparseMatrix<E> b) {
-        if (a.columns() != b.rows()) {
+        if (a.cols() != b.rows()) {
             throw new IllegalArgumentException(
                     "Matrix dimensions incompatible for multiplication: " +
-                            a.rows() + "x" + a.columns() + " * " + b.rows() + "x" + b.columns());
+                            a.rows() + "x" + a.cols() + " * " + b.rows() + "x" + b.cols());
         }
 
-        SparseMatrix<E> result = new SparseMatrix<>(a.rows(), b.columns(), field);
+        SparseMatrix<E> result = new SparseMatrix<>(a.rows(), b.cols(), field);
 
         // For each row of a
         for (int i = 0; i < a.rows(); i++) {
             // For each column of b
-            for (int j = 0; j < b.columns(); j++) {
+            for (int j = 0; j < b.cols(); j++) {
                 E sum = field.zero();
 
                 // Compute dot product of row i of a with column j of b
-                for (int k = 0; k < a.columns(); k++) {
+                for (int k = 0; k < a.cols(); k++) {
                     E aValue = a.get(i, k);
                     E bValue = b.get(k, j);
 
@@ -149,9 +149,6 @@ public class JavaSparseLinearAlgebraProvider<E> extends JavaLinearAlgebraProvide
         return result;
     }
 
-    /**
-     * Helper method to check if a value is zero.
-     */
     private boolean isZero(E value) {
         return value.equals(field.zero());
     }

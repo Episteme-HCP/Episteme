@@ -23,7 +23,7 @@ import org.jscience.mathematics.vector.Vector;
  */
 public class JavaLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
-    private final Field<E> field;
+    protected final Field<E> field;
 
     public JavaLinearAlgebraProvider(Field<E> field) {
         this.field = field;
