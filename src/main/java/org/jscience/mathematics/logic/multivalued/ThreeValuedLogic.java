@@ -1,5 +1,7 @@
 package org.jscience.mathematics.logic.multivalued;
 
+import org.jscience.mathematics.logic.Logic;
+
 /**
  * Three-valued logic system (True, False, Unknown).
  * <p>

@@ -22,6 +22,8 @@
  */
 package org.jscience.mathematics.logic.temporal;
 
+import org.jscience.mathematics.logic.Logic;
+
 import org.jscience.mathematics.logic.propositional.Proposition;
 
 /**

@@ -22,6 +22,8 @@
  */
 package org.jscience.mathematics.topology.metrics;
 
+import org.jscience.mathematics.topology.Metric;
+
 import org.jscience.mathematics.number.Real;
 import org.jscience.mathematics.vector.DenseMatrix;
 import org.jscience.mathematics.vector.DenseVector;
@@ -193,3 +195,4 @@ public class MahalanobisMetric implements Metric<Vector<Real>> {
         return "MahalanobisMetric(dimension=" + dimension + ")";
     }
 }
+

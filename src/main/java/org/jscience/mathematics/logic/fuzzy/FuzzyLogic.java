@@ -1,5 +1,6 @@
 package org.jscience.mathematics.logic.fuzzy;
 
+import org.jscience.mathematics.logic.Logic;
 import org.jscience.mathematics.number.Real;
 
 /**
