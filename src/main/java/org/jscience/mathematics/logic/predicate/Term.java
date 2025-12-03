@@ -1,4 +1,4 @@
-package org.jscience.mathematics.logic;
+package org.jscience.mathematics.logic.predicate;
 
 /**
  * Represents a term in predicate logic.
