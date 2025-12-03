@@ -103,7 +103,7 @@ public class RSAAlgorithm {
         BigInteger phi = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
 
         // Choose e such that 1 < e < φ(n) and gcd(e, φ(n)) = 1
-        BigInteger e = BigInteger.of(65537); // Common choice (2^16 + 1)
+        BigInteger e = BigInteger.valueOf(65537); // Common choice (2^16 + 1)
 
         // Ensure gcd(e, phi) = 1
         while (phi.gcd(e).compareTo(BigInteger.ONE) > 0 && e.compareTo(phi) < 0) {
@@ -148,5 +148,3 @@ public class RSAAlgorithm {
         return verified.equals(message);
     }
 }
-
-

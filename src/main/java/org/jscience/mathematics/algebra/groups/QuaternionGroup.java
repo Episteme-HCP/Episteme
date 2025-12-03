@@ -1,4 +1,4 @@
-package org.jscience.mathematics.algebra.group;
+package org.jscience.mathematics.algebra.groups;
 
 import org.jscience.mathematics.algebra.Group;
 import org.jscience.mathematics.number.Quaternion;

@@ -1,4 +1,4 @@
-package org.jscience.mathematics.algebra.space;
+package org.jscience.mathematics.algebra.spaces;
 
 /**
  * Represents a Hilbert Space.

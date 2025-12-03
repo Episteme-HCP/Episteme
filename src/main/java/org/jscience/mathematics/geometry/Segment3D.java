@@ -36,7 +36,11 @@ public class Segment3D {
     }
 
     public Real length() {
-        return start.distance(end);
+        // Manual distance calculation: sqrt((x2-x1)^2 + (y2-y1)^2 + (z2-z1)^2)
+        double dx = end.getX() - start.getX();
+        double dy = end.getY() - start.getY();
+        double dz = end.getZ() - start.getZ();
+        return Real.of(Math.sqrt(dx * dx + dy * dy + dz * dz));
     }
 
     /**
@@ -158,4 +162,3 @@ public class Segment3D {
         return new Segment3D(newStart, newEnd);
     }
 }
-

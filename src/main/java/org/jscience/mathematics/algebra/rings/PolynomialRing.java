@@ -1,4 +1,4 @@
-package org.jscience.mathematics.algebra.ring;
+package org.jscience.mathematics.algebra.rings;
 
 import java.util.ArrayList;
 import java.util.Collections;

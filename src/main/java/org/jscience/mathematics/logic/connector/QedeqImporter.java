@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jscience.mathematics.logic.bridge;
+package org.jscience.mathematics.logic.connector;
 
 import java.io.IOException;
 import java.io.Reader;

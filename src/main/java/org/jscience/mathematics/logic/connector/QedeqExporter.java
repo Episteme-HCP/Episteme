@@ -1,4 +1,4 @@
-package org.jscience.mathematics.logic.bridge;
+package org.jscience.mathematics.logic.connector;
 
 import java.io.IOException;
 import java.io.Writer;
