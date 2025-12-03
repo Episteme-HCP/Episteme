@@ -173,6 +173,22 @@ public interface Unit<Q extends Quantity<Q>> {
     Unit<?> pow(int exponent);
 
     /**
+     * Casts this unit to a specific quantity type.
+     * <p>
+     * This is primarily used for type safety when creating derived units.
+     * For example, casting J/K to Entropy type.
+     * </p>
+     * 
+     * @param <R>  the target quantity type
+     * @param type the target quantity class
+     * @return this unit cast to the target type
+     */
+    @SuppressWarnings("unchecked")
+    default <R extends Quantity<R>> Unit<R> asType(Class<R> type) {
+        return (Unit<R>) this;
+    }
+
+    /**
      * Returns the inverse of this unit.
      * <p>
      * For example, the inverse of Time is Frequency (1/s = Hz).
