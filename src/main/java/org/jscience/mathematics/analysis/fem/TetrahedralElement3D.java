@@ -79,7 +79,7 @@ public class TetrahedralElement3D implements Element {
             @Override
             public Vector<Real> gradient(Vector<Real> coords) {
                 return new DenseVector<>(Arrays.asList(Real.ONE.negate(), Real.ONE.negate(), Real.ONE.negate()),
-                        Real.ZERO);
+                        Reals.getInstance());
             }
         });
 
@@ -92,7 +92,7 @@ public class TetrahedralElement3D implements Element {
 
             @Override
             public Vector<Real> gradient(Vector<Real> coords) {
-                return new DenseVector<>(Arrays.asList(Real.ONE, Real.ZERO, Real.ZERO), Real.ZERO);
+                return new DenseVector<>(Arrays.asList(Real.ONE, Real.ZERO, Real.ZERO), Reals.getInstance());
             }
         });
 
@@ -105,7 +105,7 @@ public class TetrahedralElement3D implements Element {
 
             @Override
             public Vector<Real> gradient(Vector<Real> coords) {
-                return new DenseVector<>(Arrays.asList(Real.ZERO, Real.ONE, Real.ZERO), Real.ZERO);
+                return new DenseVector<>(Arrays.asList(Real.ZERO, Real.ONE, Real.ZERO), Reals.getInstance());
             }
         });
 
@@ -118,7 +118,7 @@ public class TetrahedralElement3D implements Element {
 
             @Override
             public Vector<Real> gradient(Vector<Real> coords) {
-                return new DenseVector<>(Arrays.asList(Real.ZERO, Real.ZERO, Real.ONE), Real.ZERO);
+                return new DenseVector<>(Arrays.asList(Real.ZERO, Real.ZERO, Real.ONE), Reals.getInstance());
             }
         });
 
@@ -180,4 +180,3 @@ public class TetrahedralElement3D implements Element {
         return points;
     }
 }
-
