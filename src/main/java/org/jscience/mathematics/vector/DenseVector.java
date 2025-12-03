@@ -73,13 +73,13 @@ public class DenseVector<E> implements Vector<E> {
             if (!canUseGpu) {
                 throw new UnsupportedOperationException("GPU mode currently only supports Real numbers");
             }
-            return new org.jscience.mathematics.provider.CudaLinearAlgebraProvider<>(field);
+            return new org.jscience.mathematics.backend.CudaLinearAlgebraProvider<>(field);
         }
 
         // AUTO mode
         if (canUseGpu) {
             try {
-                return new org.jscience.mathematics.provider.CudaLinearAlgebraProvider<>(field);
+                return new org.jscience.mathematics.backend.CudaLinearAlgebraProvider<>(field);
             } catch (UnsupportedOperationException e) {
                 // Fallback to CPU if CUDA not available
                 return new JavaLinearAlgebraProvider<>(field);
