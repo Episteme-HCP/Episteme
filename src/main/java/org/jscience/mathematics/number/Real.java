@@ -317,5 +317,19 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
     public int characteristic() {
         return 0; // Real numbers have characteristic 0 (infinite field)
     }
-}
 
+    // --- Field Interface Implementation ---
+    @Override public Real operate(Real left, Real right) { return left.add(right); }
+    @Override public Real add(Real left, Real right) { return left.add(right); }
+    @Override public Real zero() { return ZERO; }
+    @Override public Real subtract(Real left, Real right) { return left.subtract(right); }
+    @Override public Real negate(Real element) { return element.negate(); }
+    @Override public Real one() { return ONE; }
+    @Override public Real multiply(Real left, Real right) { return left.multiply(right); }
+    @Override public boolean isMultiplicationCommutative() { return true; }
+    @Override public Real inverse(Real element) { return element.inverse(); }
+    @Override public boolean contains(Real element) { return element != null; }
+    @Override public String description() { return 'Real Numbers (\u211d)'; }
+    @Override public boolean isEmpty() { return false; }
+
+}
