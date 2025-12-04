@@ -64,7 +64,7 @@ public class FactorialSequence implements IntegerSequence {
 
         Integer result = Integer.ONE;
         for (int i = 2; i <= nInt; i++) {
-            result = result.multiply(Integer.valueOf(i));
+            result = result.multiply(Integer.of(i));
         }
 
         return result;

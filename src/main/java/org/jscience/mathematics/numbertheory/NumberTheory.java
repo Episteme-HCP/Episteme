@@ -143,7 +143,7 @@ public class NumberTheory {
             throw new ArithmeticException("Modular inverse does not exist");
         }
 
-        return Natural.of(x.toBigInteger().mod(m.toBigInteger()));
+        return Natural.of(x.bigIntegerValue().mod(m.bigIntegerValue()));
     }
 
     /**

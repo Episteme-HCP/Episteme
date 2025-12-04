@@ -182,4 +182,15 @@ final class StandardQuantity<Q extends Quantity<Q>> implements Quantity<Q> {
         // Hash based on value in base unit
         return value.hashCode() * 31 + unit.hashCode();
     }
+
+    @Override
+    public boolean equals(Quantity<Q> other, Real tolerance) {
+        try {
+            Quantity<Q> converted = other.to(unit);
+            Real diff = value.subtract(converted.getValue()).abs();
+            return diff.compareTo(tolerance) <= 0;
+        } catch (Exception e) {
+            return false; // Incompatible units
+        }
+    }
 }
