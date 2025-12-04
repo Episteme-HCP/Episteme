@@ -241,4 +241,14 @@ final class IntegerInt extends Integer {
     public boolean isMultiplicationCommutative() {
         return true; // Integer multiplication is commutative
     }
+
+    @Override
+    public Integer one() {
+        return IntegerInt.of(1);
+    }
+
+    @Override
+    public Integer multiply(Integer left, Integer right) {
+        return left.multiply(right);
+    }
 }

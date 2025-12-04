@@ -113,7 +113,7 @@ public class NumberTheory {
             return new Integer[] { a, Integer.ONE, Integer.ZERO };
         }
 
-        Integer[] result = extendedGCD(b, Integer.of(a.toBigInteger().mod(b.toBigInteger())));
+        Integer[] result = extendedGCD(b, Integer.of(a.bigIntegerValue().mod(b.bigIntegerValue())));
         Integer gcd = result[0];
         Integer x1 = result[1];
         Integer y1 = result[2];
