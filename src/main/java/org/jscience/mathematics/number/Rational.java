@@ -1,5 +1,7 @@
 package org.jscience.mathematics.number;
 
+import org.jscience.mathematics.algebra.Field;
+
 /**
  * Represents a rational number (ℚ), defined as the quotient of two integers.
  * <p>
@@ -12,7 +14,7 @@ package org.jscience.mathematics.number;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public final class Rational extends Number implements Comparable<Rational> {
+public final class Rational extends Number implements Comparable<Rational>, Field<Rational> {
 
     private final Integer numerator;
     private final Integer denominator;

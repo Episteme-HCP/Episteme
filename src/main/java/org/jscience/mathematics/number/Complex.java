@@ -1,5 +1,7 @@
 package org.jscience.mathematics.number;
 
+import org.jscience.mathematics.algebra.Field;
+
 /**
  * Represents a complex number (ℂ), defined as a + bi where a, b are Real
  * numbers.
@@ -11,7 +13,7 @@ package org.jscience.mathematics.number;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public final class Complex {
+public final class Complex implements Field<Complex> {
 
     private final Real real;
     private final Real imaginary;

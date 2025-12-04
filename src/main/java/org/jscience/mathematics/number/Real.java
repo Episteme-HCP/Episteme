@@ -24,6 +24,7 @@ package org.jscience.mathematics.number;
 
 import java.math.BigDecimal;
 import org.jscience.mathematics.context.MathContext;
+import org.jscience.mathematics.algebra.Field;
 
 /**
  * Abstract base class for real numbers (ℝ).
@@ -52,7 +53,7 @@ import org.jscience.mathematics.context.MathContext;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public abstract class Real extends Number implements Comparable<Real> {
+public abstract class Real extends Number implements Comparable<Real>, Field<Real> {
 
     private static final class Constants {
         private static final Real ZERO = RealDouble.of(0.0);
