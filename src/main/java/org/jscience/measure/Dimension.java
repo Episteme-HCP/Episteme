@@ -69,7 +69,15 @@ public interface Dimension {
     /**
      * Dimensionless (no dimension) - all exponents are zero.
      */
+    /**
+     * Dimensionless (no dimension) - all exponents are zero.
+     */
     Dimension NONE = of(0, 0, 0, 0, 0, 0, 0);
+
+    /**
+     * Dimensionless (alias for NONE).
+     */
+    Dimension DIMENSIONLESS = NONE;
 
     /**
      * Length dimension [L].

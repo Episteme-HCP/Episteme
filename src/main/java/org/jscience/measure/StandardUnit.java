@@ -38,7 +38,7 @@ import org.jscience.mathematics.number.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-class StandardUnit<Q extends Quantity<Q>> implements Unit<Q> {
+public class StandardUnit<Q extends Quantity<Q>> implements Unit<Q> {
 
     private final String symbol;
     private final String name;

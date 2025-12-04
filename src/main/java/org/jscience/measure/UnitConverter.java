@@ -97,7 +97,19 @@ public interface UnitConverter {
      * @param other the converter to apply after this one
      * @return the concatenated converter
      */
-    UnitConverter concatenate(UnitConverter other);
+    /**
+     * Returns a converter that first applies this converter, then the other.
+     * <p>
+     * For example, if this converts meters to feet and {@code other} converts
+     * feet to miles, the result converts meters to miles.
+     * </p>
+     * 
+     * @param other the converter to apply after this one
+     * @return the concatenated converter
+     */
+    default UnitConverter concatenate(UnitConverter other) {
+        return new org.jscience.measure.converters.CompositeConverter(this, other);
+    }
 
     /**
      * Checks if this converter is an identity converter (no conversion).

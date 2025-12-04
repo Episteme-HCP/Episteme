@@ -137,7 +137,7 @@ final class StandardQuantity<Q extends Quantity<Q>> implements Quantity<Q> {
     public Quantity<?> pow(int exponent) {
         Real newValue = value.pow(exponent);
         Unit<?> newUnit = unit.pow(exponent);
-        return new StandardQuantity(newValue, newUnit);
+        return new StandardQuantity<>(newValue, newUnit);
     }
 
     @Override
@@ -145,7 +145,7 @@ final class StandardQuantity<Q extends Quantity<Q>> implements Quantity<Q> {
     public Quantity<?> sqrt() {
         Real newValue = value.sqrt();
         Unit<?> newUnit = unit.sqrt();
-        return new StandardQuantity(newValue, newUnit);
+        return new StandardQuantity<>(newValue, newUnit);
     }
 
     @Override

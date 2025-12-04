@@ -143,11 +143,10 @@ public interface Unit<Q extends Quantity<Q>> {
      * For example, multiplying Length by Length gives Area.
      * </p>
      * 
-     * @param <R>   the other quantity type
      * @param other the unit to multiply with
      * @return the product unit
      */
-    <R extends Quantity<R>> Unit<?> multiply(Unit<R> other);
+    Unit<?> multiply(Unit<?> other);
 
     /**
      * Returns the quotient of this unit by another unit.
@@ -155,11 +154,10 @@ public interface Unit<Q extends Quantity<Q>> {
      * For example, dividing Length by Time gives Velocity.
      * </p>
      * 
-     * @param <R>   the other quantity type
      * @param other the unit to divide by
      * @return the quotient unit
      */
-    <R extends Quantity<R>> Unit<?> divide(Unit<R> other);
+    Unit<?> divide(Unit<?> other);
 
     /**
      * Returns this unit raised to the specified power.

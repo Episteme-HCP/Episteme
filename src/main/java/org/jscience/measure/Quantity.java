@@ -227,4 +227,19 @@ public interface Quantity<Q extends Quantity<Q>> {
      * @return true if quantities are equal within tolerance
      */
     boolean equals(Quantity<Q> other, Real tolerance);
+
+    /**
+     * Returns this quantity raised to the specified exponent.
+     *
+     * @param exponent the exponent
+     * @return this quantity raised to the exponent
+     */
+    Quantity<?> pow(int exponent);
+
+    /**
+     * Returns the square root of this quantity.
+     *
+     * @return the square root of this quantity
+     */
+    Quantity<?> sqrt();
 }
