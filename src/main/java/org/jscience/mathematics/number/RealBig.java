@@ -186,5 +186,11 @@ final class RealBigDecimal extends Real {
     public String toString() {
         return value.toString();
     }
+
+    @Override
+    public int characteristic() {
+        return 0; // Real numbers have characteristic 0 (infinite field)
+    }
 }
+
 

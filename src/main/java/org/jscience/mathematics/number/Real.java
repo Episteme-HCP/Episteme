@@ -312,4 +312,10 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
     public long longValue() {
         return (long) doubleValue();
     }
+
+    @Override
+    public int characteristic() {
+        return 0; // Real numbers have characteristic 0 (infinite field)
+    }
 }
+

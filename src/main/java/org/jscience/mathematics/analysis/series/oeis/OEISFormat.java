@@ -66,7 +66,7 @@ public class OEISFormat {
             List<Integer> terms = new ArrayList<>();
             for (String part : data.split(",")) {
                 try {
-                    terms.add(Integer.of(part.trim()));
+                    terms.add(Integer.of(Long.parseLong(part.trim())));
                 } catch (NumberFormatException e) {
                     // Ignore malformed numbers
                 }

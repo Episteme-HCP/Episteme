@@ -147,4 +147,10 @@ final class RealDouble extends Real {
     public String toString() {
         return Double.toString(value);
     }
+
+    @Override
+    public int characteristic() {
+        return 0; // Real numbers have characteristic 0 (infinite field)
+    }
 }
+

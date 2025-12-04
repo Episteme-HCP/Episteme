@@ -147,4 +147,10 @@ final class RealFloat extends Real {
     public String toString() {
         return Float.toString(value);
     }
+
+    @Override
+    public int characteristic() {
+        return 0; // Real numbers have characteristic 0 (infinite field)
+    }
 }
+
