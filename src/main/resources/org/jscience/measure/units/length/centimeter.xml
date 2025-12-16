@@ -1,4 +1,0 @@
-<unit id="centimeter" name="centimeter" abbreviation="cm" unitType="length" parentSI="meter" multiplierToSI="1.0E-2"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>0.01 meters</description>
-</unit>

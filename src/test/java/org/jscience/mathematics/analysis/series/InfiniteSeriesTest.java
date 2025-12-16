@@ -23,7 +23,7 @@
 package org.jscience.mathematics.analysis.series;
 
 import org.junit.jupiter.api.Test;
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -97,4 +97,3 @@ public class InfiniteSeriesTest {
         assertThat(sinPi2.doubleValue()).isCloseTo(1.0, within(0.0001));
     }
 }
-

@@ -1,3 +1,0 @@
-<unit id="joulePerKilogram" name="joule per kilogram" abbreviation="J/kg" unitType="absorbedDose" parentSI="gray"
-      multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

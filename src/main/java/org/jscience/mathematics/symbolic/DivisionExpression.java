@@ -23,7 +23,7 @@
 package org.jscience.mathematics.symbolic;
 
 import java.util.Map;
-import org.jscience.mathematics.algebra.Ring;
+import org.jscience.mathematics.structures.rings.Ring;
 
 /**
  * Represents a division of two expressions.
@@ -120,9 +120,9 @@ public class DivisionExpression<T extends Ring<T>> implements Expression<T> {
         T den = denominator.evaluate(assignments);
 
         // For Real, we can use divide
-        if (num instanceof org.jscience.mathematics.number.Real) {
-            org.jscience.mathematics.number.Real realNum = (org.jscience.mathematics.number.Real) num;
-            org.jscience.mathematics.number.Real realDen = (org.jscience.mathematics.number.Real) den;
+        if (num instanceof org.jscience.mathematics.numbers.real.Real) {
+            org.jscience.mathematics.numbers.real.Real realNum = (org.jscience.mathematics.numbers.real.Real) num;
+            org.jscience.mathematics.numbers.real.Real realDen = (org.jscience.mathematics.numbers.real.Real) den;
             @SuppressWarnings("unchecked")
             T result = (T) realNum.divide(realDen);
             return result;

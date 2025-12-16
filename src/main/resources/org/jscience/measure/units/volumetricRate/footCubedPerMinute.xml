@@ -1,4 +1,0 @@
-<unit id="footCubedPerMinute" name="foot cubed per minute" abbreviation="ft^3/min" unitType="volumetricRate"
-      parentSI="meterCubedPerSecond" multiplierToSI="4.719474432E-4"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

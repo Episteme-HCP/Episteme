@@ -23,7 +23,7 @@
 package org.jscience.mathematics.analysis.series;
 
 import org.jscience.mathematics.analysis.Function;
-import org.jscience.mathematics.number.Natural;
+import org.jscience.mathematics.numbers.integers.Natural;
 
 /**
  * A mathematical sequence a(n) for n ≥ 0.

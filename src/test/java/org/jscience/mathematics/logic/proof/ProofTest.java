@@ -25,7 +25,6 @@ package org.jscience.mathematics.logic.proof;
 import org.jscience.mathematics.logic.predicate.Formula;
 import org.junit.jupiter.api.Test;
 import java.util.Arrays;
-import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 

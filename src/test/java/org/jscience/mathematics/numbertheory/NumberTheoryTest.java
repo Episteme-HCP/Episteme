@@ -39,32 +39,32 @@ public class NumberTheoryTest {
     @Test
     public void testBailliePSW() {
         // Known primes
-        assertTrue(NumberTheory.isBailliePSW(BigInteger.of(2)));
-        assertTrue(NumberTheory.isBailliePSW(BigInteger.of(3)));
-        assertTrue(NumberTheory.isBailliePSW(BigInteger.of(17)));
+        assertTrue(NumberTheory.isBailliePSW(BigInteger.valueOf(2)));
+        assertTrue(NumberTheory.isBailliePSW(BigInteger.valueOf(3)));
+        assertTrue(NumberTheory.isBailliePSW(BigInteger.valueOf(17)));
         assertTrue(NumberTheory.isBailliePSW(new BigInteger("104729"))); // 10,000th prime
         assertTrue(NumberTheory.isBailliePSW(new BigInteger("179424673"))); // Large prime
 
         // Known composites
-        assertFalse(NumberTheory.isBailliePSW(BigInteger.of(4)));
-        assertFalse(NumberTheory.isBailliePSW(BigInteger.of(15)));
-        assertFalse(NumberTheory.isBailliePSW(BigInteger.of(100)));
+        assertFalse(NumberTheory.isBailliePSW(BigInteger.valueOf(4)));
+        assertFalse(NumberTheory.isBailliePSW(BigInteger.valueOf(15)));
+        assertFalse(NumberTheory.isBailliePSW(BigInteger.valueOf(100)));
         assertFalse(NumberTheory.isBailliePSW(new BigInteger("104728")));
 
         // Carmichael numbers (pass Fermat, fail Miller-Rabin/Baillie-PSW)
-        assertFalse(NumberTheory.isBailliePSW(BigInteger.of(561)));
-        assertFalse(NumberTheory.isBailliePSW(BigInteger.of(1105)));
-        assertFalse(NumberTheory.isBailliePSW(BigInteger.of(1729)));
+        assertFalse(NumberTheory.isBailliePSW(BigInteger.valueOf(561)));
+        assertFalse(NumberTheory.isBailliePSW(BigInteger.valueOf(1105)));
+        assertFalse(NumberTheory.isBailliePSW(BigInteger.valueOf(1729)));
     }
 
     @Test
     public void testAKS() {
         // AKS is slow, so we test with smaller numbers
-        assertTrue(NumberTheory.isAKS(BigInteger.of(17)));
-        assertTrue(NumberTheory.isAKS(BigInteger.of(101)));
+        assertTrue(NumberTheory.isAKS(BigInteger.valueOf(17)));
+        assertTrue(NumberTheory.isAKS(BigInteger.valueOf(101)));
 
-        assertFalse(NumberTheory.isAKS(BigInteger.of(15)));
-        assertFalse(NumberTheory.isAKS(BigInteger.of(100)));
+        assertFalse(NumberTheory.isAKS(BigInteger.valueOf(15)));
+        assertFalse(NumberTheory.isAKS(BigInteger.valueOf(100)));
     }
 
     @Test

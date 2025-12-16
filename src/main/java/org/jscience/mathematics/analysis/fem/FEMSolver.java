@@ -24,14 +24,12 @@ package org.jscience.mathematics.analysis.fem;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.DenseMatrix;
-import org.jscience.mathematics.vector.DenseVector;
-import org.jscience.mathematics.vector.Matrix;
-import org.jscience.mathematics.vector.Vector;
-import org.jscience.mathematics.sets.Reals;
-
-import org.jscience.mathematics.function.Function;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.mathematics.linearalgebra.Matrix;
+import org.jscience.mathematics.linearalgebra.Vector;
+import org.jscience.mathematics.analysis.Function;
 
 /**
  * A simple Finite Element Method solver.
@@ -125,8 +123,8 @@ public class FEMSolver {
         // This is a very simplified BC application
         applyBoundaryConditions(kRows, fData, mesh);
 
-        Matrix<Real> K = new DenseMatrix<>(kRows, Reals.getInstance());
-        Vector<Real> F = new DenseVector<>(fData, Reals.getInstance());
+        Matrix<Real> K = new DenseMatrix<>(kRows, Real.ZERO);
+        Vector<Real> F = new DenseVector<>(fData, Real.ZERO);
 
         // Solve Ku = F
         return K.inverse().multiply(F);
@@ -184,7 +182,7 @@ public class FEMSolver {
         for (int i = 0; i < v.dimension(); i++) {
             data.add(v.get(i).multiply(s));
         }
-        return new DenseVector<>(data, Reals.getInstance());
+        return new DenseVector<>(data, Real.ZERO);
     }
 
     // Helper for vector addition
@@ -193,7 +191,7 @@ public class FEMSolver {
         for (int i = 0; i < a.dimension(); i++) {
             data.add(a.get(i).add(b.get(i)));
         }
-        return new DenseVector<>(data, Reals.getInstance());
+        return new DenseVector<>(data, Real.ZERO);
     }
 
     /**

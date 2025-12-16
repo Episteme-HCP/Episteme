@@ -22,9 +22,10 @@
  */
 package org.jscience.mathematics.analysis.integration;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.Vector;
-import org.jscience.mathematics.vector.DenseVector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;

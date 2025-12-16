@@ -1,3 +1,0 @@
-<unit id="kilogramPerMeterSquaredPerSecond" name="kilogram per meter squared per second" abbreviation="kg/m^2 s"
-      unitType="arealMassFlux" parentSI="SELF" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

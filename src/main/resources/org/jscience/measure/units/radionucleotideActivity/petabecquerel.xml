@@ -1,4 +1,0 @@
-<unit id="petabecquerel" name="petabecquerel" abbreviation="PBq" unitType="radionucleotideActivity" parentSI="becquerel"
-      multiplierToSI="1.0E+15" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 PBq = 10^15 Bq</description>
-</unit>

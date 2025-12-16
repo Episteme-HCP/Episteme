@@ -121,6 +121,7 @@ public class PushdownAutomaton<S, A, G> {
         return explore(initialState, input, 0, stack);
     }
 
+    @SuppressWarnings("unchecked")
     private boolean explore(S currentState, List<A> input, int inputIndex, Stack<G> stack) {
         // Check if accepted: input consumed and (in accepting state OR stack empty
         // depending on acceptance criteria)
@@ -177,4 +178,3 @@ public class PushdownAutomaton<S, A, G> {
         return false;
     }
 }
-

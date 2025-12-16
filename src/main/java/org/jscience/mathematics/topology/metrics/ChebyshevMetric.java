@@ -2,8 +2,8 @@ package org.jscience.mathematics.topology.metrics;
 
 import org.jscience.mathematics.topology.Metric;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.Vector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
 
 /**
  * Chebyshev metric (L∞ norm, maximum metric).
@@ -41,4 +41,3 @@ public class ChebyshevMetric implements Metric<Vector<Real>> {
         return maxDiff;
     }
 }
-

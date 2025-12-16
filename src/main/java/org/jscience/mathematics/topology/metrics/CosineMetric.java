@@ -2,8 +2,8 @@ package org.jscience.mathematics.topology.metrics;
 
 import org.jscience.mathematics.topology.Metric;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.Vector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
 
 /**
  * Cosine distance metric.
@@ -57,4 +57,3 @@ public class CosineMetric implements Metric<Vector<Real>> {
         return Real.ONE.subtract(distance(a, b));
     }
 }
-

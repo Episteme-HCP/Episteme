@@ -1,4 +1,0 @@
-<unit id="megabecquerel" name="megabecquerel" abbreviation="MBq" unitType="radionucleotideActivity" parentSI="becquerel"
-      multiplierToSI="1.0E+6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 MBq = 1000000 Bq</description>
-</unit>

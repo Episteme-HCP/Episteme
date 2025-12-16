@@ -1,4 +1,0 @@
-<unitType id="specificEnergy" name="specific energy">
-    <dimension name="length" power="2" preserve="no"/>
-    <dimension name="time" power="-2" preserve="no"/>
-</unitType>

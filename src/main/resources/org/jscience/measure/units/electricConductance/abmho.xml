@@ -1,4 +1,0 @@
-<unit id="abmho" name="abmho" unitType="electricConductance" parentSI="siemens" multiplierToSI="1.0E+9"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>Part of the CGS absolute electromagnetic system</description>
-</unit>

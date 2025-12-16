@@ -1,7 +1,7 @@
 package org.jscience.mathematics.analysis.rootfinding;
 
 import org.jscience.mathematics.analysis.Function;
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Root finding algorithms for solving f(x) = 0.
@@ -167,7 +167,8 @@ public class RootFinding {
         Real fc = fa;
         boolean mflag = true;
         Real s = b;
-        Real d = c;
+        @SuppressWarnings("unused")
+        Real d = c; // State variable for Brent's method
 
         int maxIter = 100;
         for (int iter = 0; iter < maxIter; iter++) {

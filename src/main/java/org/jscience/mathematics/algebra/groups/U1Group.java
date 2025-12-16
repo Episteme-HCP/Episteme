@@ -1,8 +1,7 @@
 package org.jscience.mathematics.algebra.groups;
 
-import org.jscience.mathematics.algebra.Group;
-import org.jscience.mathematics.number.Complex;
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.structures.groups.Group;
+import org.jscience.mathematics.numbers.complex.Complex;
 
 /**
  * Represents the Unitary Group U(1).

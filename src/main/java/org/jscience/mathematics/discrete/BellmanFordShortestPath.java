@@ -33,7 +33,7 @@ public class BellmanFordShortestPath<V, W> {
     /**
      * Creates an instance for Real weights.
      */
-    public static <V> BellmanFordShortestPath<V, org.jscience.mathematics.number.Real> ofReal() {
+    public static <V> BellmanFordShortestPath<V, org.jscience.mathematics.numbers.real.Real> ofReal() {
         return new BellmanFordShortestPath<>(GraphWeightAdapter.REAL);
     }
 
@@ -52,7 +52,7 @@ public class BellmanFordShortestPath<V, W> {
 
         // Initialize distances
         for (V vertex : vertices) {
-            distances.put(vertex, weightAdapter.zero());
+            distances.put(vertex, null);
         }
         distances.put(source, weightAdapter.zero());
 

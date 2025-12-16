@@ -22,7 +22,7 @@
  */
 package org.jscience.mathematics.statistics.distributions;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.statistics.ContinuousDistribution;
 
 public class BetaDistribution extends ContinuousDistribution {

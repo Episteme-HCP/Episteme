@@ -1,4 +1,0 @@
-<unit id="franklin" name="franklin" abbreviation="Fr" unitType="electricCharge" parentSI="coulomb"
-      multiplierToSI="3.3356E-10" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>CGS unit for charge</description>
-</unit>

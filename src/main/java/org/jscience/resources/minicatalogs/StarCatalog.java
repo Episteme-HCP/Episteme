@@ -22,7 +22,7 @@
  */
 package org.jscience.resources.minicatalogs;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.quantity.*;

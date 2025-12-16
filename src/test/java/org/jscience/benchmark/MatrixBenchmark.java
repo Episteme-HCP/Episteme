@@ -22,9 +22,9 @@
  */
 package org.jscience.benchmark;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.DenseMatrix;
-import org.jscience.mathematics.vector.Matrix;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Matrix;
+import org.jscience.mathematics.linearalgebra.matrices.DenseMatrix;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,8 @@ import java.util.Random;
 public class MatrixBenchmark {
 
     private static final int SIZE_SMALL = 100;
-    private static final int SIZE_MEDIUM = 500;
+    @SuppressWarnings("unused")
+    private static final int SIZE_MEDIUM = 500; // Reserved for benchmark expansion
     // Large might be too slow for a quick test, let's stick to medium for now or
     // keep it smallish.
 

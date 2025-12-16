@@ -6,7 +6,6 @@ import javafx.scene.control.TableColumn;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.jscience.mathematics.vector.Vector;
 
 import java.util.ArrayList;
 import java.util.List;

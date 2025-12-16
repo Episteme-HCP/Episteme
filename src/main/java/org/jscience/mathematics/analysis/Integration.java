@@ -1,7 +1,7 @@
 package org.jscience.mathematics.analysis;
 
 import org.jscience.mathematics.analysis.integration.Integrator;
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Provides numerical integration capabilities.

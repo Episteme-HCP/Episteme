@@ -1,9 +1,7 @@
 package org.jscience.mathematics.analysis;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.Vector;
-
-import org.jscience.mathematics.function.Function;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
 
 /**
  * Represents a vector field: F: ℝⁿ → ℝⁿ

@@ -23,8 +23,8 @@
 package org.jscience.mathematics.symbolic;
 
 import java.util.Map;
-import org.jscience.mathematics.algebra.Ring;
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.structures.rings.Ring;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a transcendental function as a symbolic expression.
@@ -157,6 +157,9 @@ public class FunctionExpression<T extends Ring<T>> implements Expression<T> {
     public String toLatex() {
         if (type == FunctionType.POW) {
             return argument.toLatex() + "^{" + exponent.toLatex() + "}";
+        }
+        if (type == FunctionType.SQRT) {
+            return "\\sqrt{" + argument.toLatex() + "}";
         }
         return "\\" + type.name().toLowerCase() + "(" + argument.toLatex() + ")";
     }

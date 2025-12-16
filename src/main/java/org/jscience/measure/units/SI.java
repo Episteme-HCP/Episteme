@@ -28,20 +28,24 @@ import org.jscience.measure.quantity.*;
 /**
  * International System of Units (SI) - Complete Implementation.
  */
+@SuppressWarnings("unchecked")
 public final class SI {
         private SI() {
         }
 
         // ========== BASE UNITS ==========
-        public static final Unit<Length> METRE = new StandardUnit<>("m", "meter", Dimension.LENGTH);
-        public static final Unit<Mass> KILOGRAM = new StandardUnit<>("kg", "kilogram", Dimension.MASS);
-        public static final Unit<Time> SECOND = new StandardUnit<>("s", "second", Dimension.TIME);
-        public static final Unit<ElectricCurrent> AMPERE = new StandardUnit<>("A", "ampere",
+        // ========== BASE UNITS ==========
+        public static final Unit<Length> METRE = new StandardUnit<Length>("m", "meter",
+                        org.jscience.measure.Dimension.LENGTH);
+        public static final Unit<Mass> KILOGRAM = new StandardUnit<Mass>("kg", "kilogram", Dimension.MASS);
+        public static final Unit<Time> SECOND = new StandardUnit<Time>("s", "second", Dimension.TIME);
+        public static final Unit<ElectricCurrent> AMPERE = new StandardUnit<ElectricCurrent>("A", "ampere",
                         Dimension.ELECTRIC_CURRENT);
-        public static final Unit<Temperature> KELVIN = new StandardUnit<>("K", "kelvin", Dimension.TEMPERATURE);
-        public static final Unit<AmountOfSubstance> MOLE = new StandardUnit<>("mol", "mole",
+        public static final Unit<Temperature> KELVIN = new StandardUnit<Temperature>("K", "kelvin",
+                        Dimension.TEMPERATURE);
+        public static final Unit<AmountOfSubstance> MOLE = new StandardUnit<AmountOfSubstance>("mol", "mole",
                         Dimension.AMOUNT_OF_SUBSTANCE);
-        public static final Unit<LuminousIntensity> CANDELA = new StandardUnit<>("cd", "candela",
+        public static final Unit<LuminousIntensity> CANDELA = new StandardUnit<LuminousIntensity>("cd", "candela",
                         Dimension.LUMINOUS_INTENSITY);
 
         // ========== DERIVED UNITS ==========
@@ -58,5 +62,3 @@ public final class SI {
         public static final Unit<MagneticFluxDensity> TESLA = (Unit<MagneticFluxDensity>) WEBER.divide(METRE.pow(2));
         public static final Unit<Inductance> HENRY = (Unit<Inductance>) WEBER.divide(AMPERE);
 }
-
-

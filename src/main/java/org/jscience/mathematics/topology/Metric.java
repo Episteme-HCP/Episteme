@@ -1,6 +1,6 @@
 package org.jscience.mathematics.topology;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a metric (distance function).

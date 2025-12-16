@@ -16,22 +16,19 @@
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
 package org.jscience.mathematics.analysis;
 
-import org.jscience.mathematics.algebra.Ring;
-import org.jscience.mathematics.algebra.rings.PolynomialRing;
 import java.util.Map;
 import java.util.HashMap;
+import org.jscience.mathematics.structures.rings.Ring;
+import org.jscience.mathematics.structures.rings.Field;
+import org.jscience.mathematics.algebra.rings.PolynomialRing;
 
 /**
  * Represents a polynomial function P(x) over a Ring R.
- * <p>
- * P(x) = a_n * x^n + ... + a_1 * x + a_0
- * </p>
  * 
  * @param <R> the type of the ring elements (coefficients and variable)
  * 
@@ -87,12 +84,12 @@ public class PolynomialFunction<R> implements DifferentiableFunction<R, R>, Inte
 
     @Override
     public Function<R, R> integrate() {
-        if (!(ring.getCoefficientRing() instanceof org.jscience.mathematics.algebra.Field)) {
+        if (!(ring.getCoefficientRing() instanceof Field)) {
             throw new UnsupportedOperationException("Integration requires a Field (division support). Current ring: "
                     + ring.getCoefficientRing().getClass().getSimpleName());
         }
 
-        org.jscience.mathematics.algebra.Field<R> field = (org.jscience.mathematics.algebra.Field<R>) ring
+        Field<R> field = (Field<R>) ring
                 .getCoefficientRing();
 
         Map<Integer, R> coeffs = polynomial.getCoefficients();

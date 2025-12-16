@@ -1,0 +1,60 @@
+{
+    "name": "Solar System",
+    "stars": [
+        {
+            "name": "Sun",
+            "mass": 1.989e30,
+            "radius": 6.9634e8,
+            "luminosity": 3.828e26,
+            "temperature": 5778,
+            "texture": "textures/sun.jpg",
+            "planets": [
+                {
+                    "name": "Earth",
+                    "mass": 5.972e24,
+                    "radius": 6.371e6,
+                    "habitable": true,
+                    "texture": "textures/earth.jpg",
+                    "orbit": {
+                        "a": 1.496e11,
+                        "e": 0.0167,
+                        "i": 0.0,
+                        "Omega": 0.0,
+                        "omega": 102.9,
+                        "M": 0.0
+                    },
+                    "moons": [
+                        {
+                            "name": "Moon",
+                            "mass": 7.342e22,
+                            "radius": 1.737e6,
+                            "texture": "textures/moon.jpg",
+                            "orbit": {
+                                "a": 3.844e8,
+                                "e": 0.0549,
+                                "i": 5.145,
+                                "Omega": 125.08,
+                                "omega": 318.15,
+                                "M": 135.27
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Jupiter",
+                    "mass": 1.898e27,
+                    "radius": 6.9911e7,
+                    "texture": "textures/jupiter.jpg",
+                    "orbit": {
+                        "a": 7.785e11,
+                        "e": 0.0489,
+                        "i": 1.305,
+                        "Omega": 100.556,
+                        "omega": 274.3,
+                        "M": 18.72
+                    }
+                }
+            ]
+        }
+    ]
+}

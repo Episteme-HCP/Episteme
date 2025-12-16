@@ -30,8 +30,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jscience.mathematics.analysis.series.IntegerSequence;
-import org.jscience.mathematics.number.Integer;
-import org.jscience.mathematics.number.Natural;
+import org.jscience.mathematics.numbers.integers.Integer;
+import org.jscience.mathematics.numbers.integers.Natural;
 
 /**
  * Importer for local OEIS data files.

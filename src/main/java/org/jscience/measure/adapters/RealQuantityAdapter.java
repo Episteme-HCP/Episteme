@@ -3,7 +3,7 @@ package org.jscience.measure.adapters;
 import javax.measure.Quantity;
 import javax.measure.Unit;
 import tech.units.indriya.quantity.Quantities;
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Adapters between JScience Real numbers and JSR-385 Quantities.

@@ -22,7 +22,6 @@
  */
 package org.jscience.mathematics.cryptography;
 
-import org.jscience.mathematics.number.Integer;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 

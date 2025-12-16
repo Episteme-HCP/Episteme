@@ -1,4 +1,0 @@
-<unit id="kilobecquerel" name="kilobecquerel" abbreviation="kBq" unitType="radionucleotideActivity" parentSI="becquerel"
-      multiplierToSI="1000" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 kBq = 1000 Bq</description>
-</unit>

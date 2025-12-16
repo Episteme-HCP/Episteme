@@ -25,9 +25,6 @@ package org.jscience.resources.properties;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import org.jscience.measure.Quantity;
-import org.jscience.measure.Quantities;
-import org.jscience.mathematics.number.Real;
 
 /**
  * A container for properties, accessed via type-safe {@link PropertyKey}s.
@@ -66,8 +63,8 @@ public class PropertySet {
         // Type conversion logic
         if (!key.getType().isInstance(value)) {
             // Convert Number -> Real
-            if (key.getType().equals(org.jscience.mathematics.number.Real.class) && value instanceof Number) {
-                return key.getType().cast(org.jscience.mathematics.number.Real.of(((Number) value).doubleValue()));
+            if (key.getType().equals(org.jscience.mathematics.numbers.real.Real.class) && value instanceof Number) {
+                return key.getType().cast(org.jscience.mathematics.numbers.real.Real.of(((Number) value).doubleValue()));
             }
             // Convert String -> Quantity
             if (org.jscience.measure.Quantity.class.isAssignableFrom(key.getType()) && value instanceof String) {
@@ -99,5 +96,3 @@ public class PropertySet {
         return properties.containsKey(key.getName());
     }
 }
-
-

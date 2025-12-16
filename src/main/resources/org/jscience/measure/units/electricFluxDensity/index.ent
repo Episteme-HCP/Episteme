@@ -1,7 +1,0 @@
-
-<!ENTITY coulombPerMeterSquared.xml SYSTEM "../electricFluxDensity/coulombPerMeterSquared.xml">
-
-<!ENTITY electricFluxDensity.elements	"
-&coulombPerMeterSquared.xml;
-">
-

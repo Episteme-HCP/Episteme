@@ -23,8 +23,8 @@
 package org.jscience.mathematics.analysis.series;
 
 import org.jscience.mathematics.discrete.Combinatorics;
-import org.jscience.mathematics.number.Integer;
-import org.jscience.mathematics.number.Natural;
+import org.jscience.mathematics.numbers.integers.Integer;
+import org.jscience.mathematics.numbers.integers.Natural;
 
 /**
  * Catalan numbers: C(0)=1, C(n) = (2n)! / ((n+1)! * n!).

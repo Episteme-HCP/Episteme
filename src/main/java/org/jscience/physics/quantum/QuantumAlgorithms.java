@@ -1,0 +1,177 @@
+package org.jscience.physics.quantum;
+
+import org.jscience.mathematics.numbers.complex.Complex;
+import org.jscience.mathematics.linearalgebra.matrices.DenseMatrix;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+/**
+ * Quantum algorithms (Grover's search, Shor's period finding).
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI
+ * @since 5.0
+ */
+public class QuantumAlgorithms {
+
+    /**
+     * Creates a Grover oracle for a specific marked state.
+     * Oracle flips the sign of the marked state: O|x⟩ = -|x⟩ if x = marked, else
+     * |x⟩
+     * 
+     * @param numQubits   Number of qubits
+     * @param markedState Index of the state to search for
+     * @return Oracle gate
+     */
+    public static QuantumGate groverOracle(int numQubits, int markedState) {
+        int dim = 1 << numQubits; // 2^n
+        Complex[][] data = new Complex[dim][dim];
+
+        // Initialize as identity
+        for (int i = 0; i < dim; i++) {
+            for (int j = 0; j < dim; j++) {
+                data[i][j] = (i == j) ? Complex.ONE : Complex.ZERO;
+            }
+        }
+
+        // Flip sign of marked state
+        data[markedState][markedState] = Complex.ONE.negate();
+
+        return createGate(data);
+    }
+
+    /**
+     * Creates the Grover diffusion operator.
+     * D = 2|s⟩⟨s| - I where |s⟩ is the uniform superposition.
+     * 
+     * @param numQubits Number of qubits
+     * @return Diffusion gate
+     */
+    public static QuantumGate groverDiffusion(int numQubits) {
+        int dim = 1 << numQubits;
+        Complex[][] data = new Complex[dim][dim];
+
+        // 2/N - δ_ij
+        Complex twoOverN = Complex.of(2.0 / dim);
+
+        for (int i = 0; i < dim; i++) {
+            for (int j = 0; j < dim; j++) {
+                if (i == j) {
+                    data[i][j] = twoOverN.subtract(Complex.ONE);
+                } else {
+                    data[i][j] = twoOverN;
+                }
+            }
+        }
+
+        return createGate(data);
+    }
+
+    /**
+     * Optimal number of Grover iterations.
+     * r ≈ (π/4) * sqrt(N)
+     * 
+     * @param numQubits Number of qubits (N = 2^n)
+     * @return Optimal iteration count
+     */
+    public static int optimalGroverIterations(int numQubits) {
+        int N = 1 << numQubits;
+        return (int) Math.round(Math.PI / 4.0 * Math.sqrt(N));
+    }
+
+    /**
+     * Runs Grover's search algorithm.
+     * 
+     * @param numQubits   Number of qubits
+     * @param markedState State to search for
+     * @return Final quantum state (should have high amplitude at markedState)
+     */
+    public static BraKet groverSearch(int numQubits, int markedState) {
+        int dim = 1 << numQubits;
+
+        // Start in uniform superposition |s⟩ = H^⊗n |0⟩^⊗n
+        Complex amp = Complex.of(1.0 / Math.sqrt(dim));
+        Complex[] state = new Complex[dim];
+        for (int i = 0; i < dim; i++) {
+            state[i] = amp;
+        }
+        BraKet psi = new BraKet(state);
+
+        // Create oracle and diffusion
+        QuantumGate oracle = groverOracle(numQubits, markedState);
+        QuantumGate diffusion = groverDiffusion(numQubits);
+
+        // Apply Grover iterations
+        int iterations = optimalGroverIterations(numQubits);
+        for (int i = 0; i < iterations; i++) {
+            psi = oracle.apply(psi);
+            psi = diffusion.apply(psi);
+        }
+
+        return psi;
+    }
+
+    /**
+     * Quantum Fourier Transform gate for n qubits.
+     * QFT|j⟩ = (1/sqrt(N)) Σ_k exp(2πijk/N)|k⟩
+     * 
+     * @param numQubits Number of qubits
+     * @return QFT gate
+     */
+    public static QuantumGate qft(int numQubits) {
+        int N = 1 << numQubits;
+        Complex[][] data = new Complex[N][N];
+
+        Complex omega = Complex.of(Math.cos(2 * Math.PI / N), Math.sin(2 * Math.PI / N));
+        Complex scale = Complex.of(1.0 / Math.sqrt(N));
+
+        for (int j = 0; j < N; j++) {
+            for (int k = 0; k < N; k++) {
+                // ω^(jk)
+                int exponent = (j * k) % N;
+                Complex entry = complexPow(omega, exponent).multiply(scale);
+                data[j][k] = entry;
+            }
+        }
+
+        return createGate(data);
+    }
+
+    /**
+     * Inverse QFT.
+     */
+    public static QuantumGate inverseQft(int numQubits) {
+        int N = 1 << numQubits;
+        Complex[][] data = new Complex[N][N];
+
+        Complex omega = Complex.of(Math.cos(-2 * Math.PI / N), Math.sin(-2 * Math.PI / N));
+        Complex scale = Complex.of(1.0 / Math.sqrt(N));
+
+        for (int j = 0; j < N; j++) {
+            for (int k = 0; k < N; k++) {
+                int exponent = (j * k) % N;
+                Complex entry = complexPow(omega, exponent).multiply(scale);
+                data[j][k] = entry;
+            }
+        }
+
+        return createGate(data);
+    }
+
+    private static Complex complexPow(Complex base, int exp) {
+        Complex result = Complex.ONE;
+        for (int i = 0; i < exp; i++) {
+            result = result.multiply(base);
+        }
+        return result;
+    }
+
+    private static QuantumGate createGate(Complex[][] data) {
+        List<List<Complex>> rowsList = new ArrayList<>();
+        for (Complex[] row : data) {
+            rowsList.add(Arrays.asList(row));
+        }
+        return new QuantumGate(new DenseMatrix<>(rowsList, Complex.ZERO));
+    }
+}

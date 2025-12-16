@@ -22,10 +22,10 @@
  */
 package org.jscience.mathematics.algebra.groups;
 
-import org.jscience.mathematics.algebra.Group;
-import org.jscience.mathematics.vector.Matrix;
-import org.jscience.mathematics.number.Complex;
-import org.jscience.mathematics.vector.DenseMatrix;
+import org.jscience.mathematics.structures.groups.Group;
+import org.jscience.mathematics.linearalgebra.Matrix;
+import org.jscience.mathematics.numbers.complex.Complex;
+import org.jscience.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.mathematics.sets.Complexes;
 import java.util.*;
 

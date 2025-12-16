@@ -1,4 +1,0 @@
-<unit id="kilosecond" name="kilosecond" abbreviation="ksec" unitType="time" parentSI="second" multiplierToSI="1000"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1000 seconds</description>
-</unit>

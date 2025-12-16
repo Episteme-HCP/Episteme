@@ -22,9 +22,9 @@
  */
 package org.jscience.mathematics.geometry.curves;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.DenseVector;
-import org.jscience.mathematics.vector.Vector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.sets.Reals;
 
 import java.util.ArrayList;
@@ -229,49 +229,18 @@ public class BSpline {
     }
 
     public Vector<Real> tangent(Real t) {
-        // Numerical derivative
-        Real epsilon = Real.of(1e-6);
-        Vector<Real> p1 = evaluate(t);
-        Vector<Real> p2 = evaluate(t.add(epsilon));
-
-        List<Real> tangent = new ArrayList<>();
-        for (int i = 0; i < dimension; i++) {
-            Real derivative = p2.get(i).subtract(p1.get(i)).divide(epsilon);
-            tangent.add(derivative);
+        // Simple numerical differentiation for now
+        double dt = 1e-6;
+        Real t1 = t;
+        Real t2 = t.add(Real.of(dt));
+        if (t2.compareTo(Real.ONE) > 0) {
+            t2 = t;
+            t1 = t.subtract(Real.of(dt));
         }
 
-        return new DenseVector<>(tangent, Reals.getInstance());
-    }
+        Vector<Real> p1 = evaluate(t1);
+        Vector<Real> p2 = evaluate(t2);
 
-    /**
-     * Returns the control points.
-     * 
-     * @return the control points
-     */
-    public List<Vector<Real>> getControlPoints() {
-        return new ArrayList<>(controlPoints);
-    }
-
-    /**
-     * Returns the knot vector.
-     * 
-     * @return the knot vector
-     */
-    public List<Real> getKnotVector() {
-        return new ArrayList<>(knotVector);
-    }
-
-    /**
-     * Returns the degree.
-     * 
-     * @return the degree
-     */
-    public int getDegree() {
-        return degree;
-    }
-
-    @Override
-    public String toString() {
-        return "BSpline(points=" + controlPoints.size() + ", degree=" + degree + ")";
+        return p2.subtract(p1).multiply(Real.of(1.0 / dt));
     }
 }

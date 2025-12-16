@@ -1,6 +1,6 @@
 package org.jscience.measure.converters;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.UnitConverter;
 
 /**

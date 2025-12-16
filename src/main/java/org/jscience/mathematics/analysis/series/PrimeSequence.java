@@ -22,10 +22,9 @@
  */
 package org.jscience.mathematics.analysis.series;
 
-import org.jscience.mathematics.numbertheory.Primes;
-import org.jscience.backend.ComputeBackend;
-import org.jscience.mathematics.number.Integer;
-import org.jscience.mathematics.number.Natural;
+import org.jscience.technical.backend.ComputeBackend;
+import org.jscience.mathematics.numbers.integers.Integer;
+import org.jscience.mathematics.numbers.integers.Natural;
 import java.util.ArrayList;
 import java.util.List;
 

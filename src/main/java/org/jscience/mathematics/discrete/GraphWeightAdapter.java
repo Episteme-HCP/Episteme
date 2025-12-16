@@ -22,7 +22,7 @@
  */
 package org.jscience.mathematics.discrete;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import java.util.Comparator;
 
 /**
@@ -70,7 +70,7 @@ public interface GraphWeightAdapter<W> extends Comparator<W> {
     // --- Standard Implementations ---
 
     /**
-     * Adapter for {@link org.jscience.mathematics.number.Real}.
+     * Adapter for {@link org.jscience.mathematics.numbers.real.Real}.
      */
     GraphWeightAdapter<Real> REAL = new GraphWeightAdapter<Real>() {
         @Override

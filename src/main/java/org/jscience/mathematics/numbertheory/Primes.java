@@ -127,7 +127,7 @@ public class Primes {
         // Trial division by small primes
         BigInteger two = BigInteger.TWO;
         while (n.mod(two).equals(BigInteger.ZERO)) {
-            factors.merge(two, 1, Integer::sum);
+            factors.merge(two, 1, (a, b) -> a + b);
             n = n.divide(two);
         }
 
@@ -137,7 +137,7 @@ public class Primes {
 
         while (divisor.compareTo(limit) <= 0) {
             while (n.mod(divisor).equals(BigInteger.ZERO)) {
-                factors.merge(divisor, 1, Integer::sum);
+                factors.merge(divisor, 1, (a, b) -> a + b);
                 n = n.divide(divisor);
             }
             divisor = divisor.add(BigInteger.TWO);

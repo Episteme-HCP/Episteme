@@ -1,8 +1,6 @@
 package org.jscience.mathematics.analysis;
 
-import org.jscience.mathematics.number.Real;
-
-import org.jscience.mathematics.function.Function;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a scalar field: f: ℝⁿ → ℝ

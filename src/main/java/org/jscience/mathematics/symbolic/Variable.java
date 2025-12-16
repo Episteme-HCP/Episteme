@@ -24,7 +24,7 @@ package org.jscience.mathematics.symbolic;
 
 import java.util.Map;
 import java.util.Objects;
-import org.jscience.mathematics.algebra.Ring;
+import org.jscience.mathematics.structures.rings.Ring;
 
 /**
  * Represents a symbolic variable (e.g., "x", "y", "theta").

@@ -22,10 +22,9 @@
  */
 package org.jscience.mathematics.analysis.series;
 
-import org.jscience.mathematics.number.Integer;
-import org.jscience.mathematics.number.Natural;
+import org.jscience.mathematics.numbers.integers.Integer;
+import org.jscience.mathematics.numbers.integers.Natural;
 import org.jscience.mathematics.numbertheory.NumberTheory;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -312,4 +311,3 @@ public class PrimePiSequence implements IntegerSequence {
         return "PrimePiSequence(A000720): 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, ...";
     }
 }
-

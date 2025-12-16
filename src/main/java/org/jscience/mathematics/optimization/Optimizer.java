@@ -1,7 +1,7 @@
 package org.jscience.mathematics.optimization;
 
 import org.jscience.mathematics.analysis.Function;
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Optimization algorithms for finding minima/maxima.
@@ -246,5 +246,241 @@ public class Optimizer {
                 best = i;
         }
         return initialSimplex[best];
+    }
+
+    /**
+     * Linear programming solver using Simplex method.
+     * <p>
+     * Maximizes c·x subject to Ax ≤ b, x ≥ 0.
+     * </p>
+     * 
+     * @param c objective coefficients
+     * @param A constraint matrix
+     * @param b constraint bounds
+     * @return optimal solution vector
+     */
+    public static Real[] linearProgramming(Real[] c, Real[][] A, Real[] b) {
+        int n = c.length; // Number of variables
+        int m = A.length; // Number of constraints
+
+        // Create tableau with slack variables
+        // [A | I | b]
+        // [-c | 0 | 0]
+        Real[][] tableau = new Real[m + 1][n + m + 1];
+
+        // Fill constraints with slack
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                tableau[i][j] = A[i][j];
+            }
+            for (int j = 0; j < m; j++) {
+                tableau[i][n + j] = (i == j) ? Real.ONE : Real.ZERO;
+            }
+            tableau[i][n + m] = b[i];
+        }
+
+        // Objective row (negated for maximization)
+        for (int j = 0; j < n; j++) {
+            tableau[m][j] = c[j].negate();
+        }
+        for (int j = n; j <= n + m; j++) {
+            tableau[m][j] = Real.ZERO;
+        }
+
+        // Simplex iterations
+        int maxIterations = 1000;
+        for (int iter = 0; iter < maxIterations; iter++) {
+            // Find pivot column (most negative in objective row)
+            int pivotCol = -1;
+            Real minVal = Real.ZERO;
+            for (int j = 0; j < n + m; j++) {
+                if (tableau[m][j].compareTo(minVal) < 0) {
+                    minVal = tableau[m][j];
+                    pivotCol = j;
+                }
+            }
+            if (pivotCol == -1)
+                break; // Optimal
+
+            // Find pivot row (minimum ratio test)
+            int pivotRow = -1;
+            Real minRatio = Real.of(Double.MAX_VALUE);
+            for (int i = 0; i < m; i++) {
+                if (tableau[i][pivotCol].compareTo(Real.ZERO) > 0) {
+                    Real ratio = tableau[i][n + m].divide(tableau[i][pivotCol]);
+                    if (ratio.compareTo(minRatio) < 0) {
+                        minRatio = ratio;
+                        pivotRow = i;
+                    }
+                }
+            }
+            if (pivotRow == -1) {
+                throw new IllegalStateException("Unbounded solution");
+            }
+
+            // Pivot operation
+            Real pivot = tableau[pivotRow][pivotCol];
+            for (int j = 0; j <= n + m; j++) {
+                tableau[pivotRow][j] = tableau[pivotRow][j].divide(pivot);
+            }
+            for (int i = 0; i <= m; i++) {
+                if (i != pivotRow) {
+                    Real factor = tableau[i][pivotCol];
+                    for (int j = 0; j <= n + m; j++) {
+                        tableau[i][j] = tableau[i][j].subtract(factor.multiply(tableau[pivotRow][j]));
+                    }
+                }
+            }
+        }
+
+        // Extract solution
+        Real[] result = new Real[n];
+        for (int j = 0; j < n; j++) {
+            result[j] = Real.ZERO;
+            for (int i = 0; i < m; i++) {
+                if (Math.abs(tableau[i][j].doubleValue() - 1.0) < 1e-10) {
+                    boolean isBasic = true;
+                    for (int k = 0; k < m; k++) {
+                        if (k != i && Math.abs(tableau[k][j].doubleValue()) > 1e-10) {
+                            isBasic = false;
+                            break;
+                        }
+                    }
+                    if (isBasic) {
+                        result[j] = tableau[i][n + m];
+                        break;
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Nelder-Mead Simplex algorithm for multidimensional optimization.
+     * <p>
+     * Derivative-free method. Good for noisy functions.
+     * </p>
+     * 
+     * @param f              objective function (Real[] -> Real)
+     * @param initialSimplex initial simplex vertices (n+1 vertices for n
+     *                       dimensions)
+     * @param tolerance      convergence tolerance
+     * @param maxIterations  maximum iterations
+     * @return optimal point
+     */
+    public static Real[] nelderMead(java.util.function.Function<Real[], Real> f,
+            Real[][] initialSimplex,
+            Real tolerance,
+            int maxIterations) {
+        int n = initialSimplex[0].length; // Dimensions
+        int nVerts = initialSimplex.length; // n+1 vertices
+
+        Real[][] simplex = new Real[nVerts][];
+        Real[] values = new Real[nVerts];
+
+        // Copy simplex and evaluate
+        for (int i = 0; i < nVerts; i++) {
+            simplex[i] = initialSimplex[i].clone();
+            values[i] = f.apply(simplex[i]);
+        }
+
+        Real alpha = Real.ONE; // Reflection
+        Real gamma = Real.TWO; // Expansion
+        Real rho = Real.of(0.5); // Contraction
+        Real sigma = Real.of(0.5); // Shrink
+
+        for (int iter = 0; iter < maxIterations; iter++) {
+            // Sort vertices by function value
+            for (int i = 0; i < nVerts - 1; i++) {
+                for (int j = i + 1; j < nVerts; j++) {
+                    if (values[j].compareTo(values[i]) < 0) {
+                        Real[] tempV = simplex[i];
+                        simplex[i] = simplex[j];
+                        simplex[j] = tempV;
+                        Real tempF = values[i];
+                        values[i] = values[j];
+                        values[j] = tempF;
+                    }
+                }
+            }
+
+            // Check convergence
+            Real range = values[nVerts - 1].subtract(values[0]).abs();
+            if (range.compareTo(tolerance) < 0) {
+                return simplex[0];
+            }
+
+            // Compute centroid (excluding worst)
+            Real[] centroid = new Real[n];
+            for (int j = 0; j < n; j++) {
+                centroid[j] = Real.ZERO;
+                for (int i = 0; i < nVerts - 1; i++) {
+                    centroid[j] = centroid[j].add(simplex[i][j]);
+                }
+                centroid[j] = centroid[j].divide(Real.of(nVerts - 1));
+            }
+
+            // Reflection
+            Real[] reflected = new Real[n];
+            for (int j = 0; j < n; j++) {
+                reflected[j] = centroid[j].add(alpha.multiply(centroid[j].subtract(simplex[nVerts - 1][j])));
+            }
+            Real reflectedVal = f.apply(reflected);
+
+            if (reflectedVal.compareTo(values[0]) >= 0 && reflectedVal.compareTo(values[nVerts - 2]) < 0) {
+                simplex[nVerts - 1] = reflected;
+                values[nVerts - 1] = reflectedVal;
+                continue;
+            }
+
+            if (reflectedVal.compareTo(values[0]) < 0) {
+                // Expansion
+                Real[] expanded = new Real[n];
+                for (int j = 0; j < n; j++) {
+                    expanded[j] = centroid[j].add(gamma.multiply(reflected[j].subtract(centroid[j])));
+                }
+                Real expandedVal = f.apply(expanded);
+
+                if (expandedVal.compareTo(reflectedVal) < 0) {
+                    simplex[nVerts - 1] = expanded;
+                    values[nVerts - 1] = expandedVal;
+                } else {
+                    simplex[nVerts - 1] = reflected;
+                    values[nVerts - 1] = reflectedVal;
+                }
+                continue;
+            }
+
+            // Contraction
+            Real[] contracted = new Real[n];
+            for (int j = 0; j < n; j++) {
+                contracted[j] = centroid[j].add(rho.multiply(simplex[nVerts - 1][j].subtract(centroid[j])));
+            }
+            Real contractedVal = f.apply(contracted);
+
+            if (contractedVal.compareTo(values[nVerts - 1]) < 0) {
+                simplex[nVerts - 1] = contracted;
+                values[nVerts - 1] = contractedVal;
+                continue;
+            }
+
+            // Shrink
+            for (int i = 1; i < nVerts; i++) {
+                for (int j = 0; j < n; j++) {
+                    simplex[i][j] = simplex[0][j].add(sigma.multiply(simplex[i][j].subtract(simplex[0][j])));
+                }
+                values[i] = f.apply(simplex[i]);
+            }
+        }
+
+        // Return best
+        int best = 0;
+        for (int i = 1; i < nVerts; i++) {
+            if (values[i].compareTo(values[best]) < 0)
+                best = i;
+        }
+        return simplex[best];
     }
 }

@@ -23,9 +23,9 @@
 package org.jscience.benchmark;
 
 import org.jscience.mathematics.analysis.transform.FastFourierTransform;
-import org.jscience.mathematics.number.Complex;
-import org.jscience.mathematics.vector.DenseVector;
-import org.jscience.mathematics.vector.Vector;
+import org.jscience.mathematics.numbers.complex.Complex;
+import org.jscience.mathematics.linearalgebra.Vector;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.mathematics.sets.Complexes;
 
 import java.util.Random;

@@ -22,7 +22,7 @@
  */
 package org.jscience.mathematics.statistics;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Abstract base class for discrete probability distributions.

@@ -1,162 +1,145 @@
 package org.jscience.mathematics.analysis.integration;
 
-import org.jscience.mathematics.analysis.Function;
-import org.jscience.mathematics.number.Real;
+import java.util.function.DoubleUnaryOperator;
 
 /**
- * Numerical integration methods for computing definite integrals.
- * <p>
- * Implements Trapezoidal Rule and Simpson's Rule for approximating ∫f(x)dx.
- * </p>
+ * Numerical integration methods.
  * 
  * @author Silvere Martin-Michiellot
- * @since 1.0
+ * @author Gemini AI
+ * @since 5.0
  */
 public class NumericalIntegration {
 
     /**
-     * Trapezoidal rule: ∫[a,b] f(x)dx ≈ h/2 * (f(a) + 2Σf(xi) + f(b))
-     * <p>
-     * Error: O(h²) where h = (b-a)/n
-     * </p>
-     * 
-     * @param f the function to integrate
-     * @param a lower bound
-     * @param b upper bound
-     * @param n number of subintervals (must be > 0)
-     * @return approximate integral value
+     * Trapezoidal rule.
      */
-    public static Real trapezoidal(Function<Real, Real> f, Real a, Real b, int n) {
-        if (n <= 0) {
-            throw new IllegalArgumentException("n must be positive");
+    public static double trapezoidal(DoubleUnaryOperator f, double a, double b, int n) {
+        double h = (b - a) / n;
+        double sum = 0.5 * (f.applyAsDouble(a) + f.applyAsDouble(b));
+        for (int i = 1; i < n; i++) {
+            sum += f.applyAsDouble(a + i * h);
         }
-        if (a.compareTo(b) >= 0) {
-            throw new IllegalArgumentException("a must be < b");
-        }
+        return sum * h;
+    }
 
-        Real h = b.subtract(a).divide(Real.of(n));
-        Real sum = f.evaluate(a).add(f.evaluate(b)).divide(Real.of(2));
+    /**
+     * Simpson's rule.
+     */
+    public static double simpson(DoubleUnaryOperator f, double a, double b, int n) {
+        if (n % 2 != 0)
+            n++; // Must be even
+        double h = (b - a) / n;
+        double sum = f.applyAsDouble(a) + f.applyAsDouble(b);
 
         for (int i = 1; i < n; i++) {
-            Real xi = a.add(h.multiply(Real.of(i)));
-            sum = sum.add(f.evaluate(xi));
+            double x = a + i * h;
+            sum += (i % 2 == 0 ? 2 : 4) * f.applyAsDouble(x);
         }
-
-        return h.multiply(sum);
+        return sum * h / 3;
     }
 
     /**
-     * Simpson's rule: ∫[a,b] f(x)dx ≈ h/3 * (f(a) + 4Σf(x_odd) + 2Σf(x_even) +
-     * f(b))
-     * <p>
-     * Error: O(h⁴) - more accurate than trapezoidal
-     * Requires n to be even.
-     * </p>
-     * 
-     * @param f the function to integrate
-     * @param a lower bound
-     * @param b upper bound
-     * @param n number of subintervals (must be even and > 0)
-     * @return approximate integral value
+     * Romberg integration (Richardson extrapolation of trapezoidal).
      */
-    public static Real simpsons(Function<Real, Real> f, Real a, Real b, int n) {
-        if (n <= 0 || n % 2 != 0) {
-            throw new IllegalArgumentException("n must be positive and even");
-        }
-        if (a.compareTo(b) >= 0) {
-            throw new IllegalArgumentException("a must be < b");
+    public static double romberg(DoubleUnaryOperator f, double a, double b, int maxLevel) {
+        double[][] r = new double[maxLevel][maxLevel];
+
+        r[0][0] = 0.5 * (b - a) * (f.applyAsDouble(a) + f.applyAsDouble(b));
+
+        for (int i = 1; i < maxLevel; i++) {
+            int n = 1 << i; // 2^i
+            double h = (b - a) / n;
+
+            // Trapezoidal with 2^i intervals
+            double sum = 0;
+            for (int k = 1; k <= n / 2; k++) {
+                sum += f.applyAsDouble(a + (2 * k - 1) * h);
+            }
+            r[i][0] = 0.5 * r[i - 1][0] + h * sum;
+
+            // Richardson extrapolation
+            for (int j = 1; j <= i; j++) {
+                double pow4j = Math.pow(4, j);
+                r[i][j] = (pow4j * r[i][j - 1] - r[i - 1][j - 1]) / (pow4j - 1);
+            }
         }
 
-        Real h = b.subtract(a).divide(Real.of(n));
-        Real sum = f.evaluate(a).add(f.evaluate(b));
-
-        // Odd indices: coefficient 4
-        for (int i = 1; i < n; i += 2) {
-            Real xi = a.add(h.multiply(Real.of(i)));
-            sum = sum.add(f.evaluate(xi).multiply(Real.of(4)));
-        }
-
-        // Even indices: coefficient 2
-        for (int i = 2; i < n; i += 2) {
-            Real xi = a.add(h.multiply(Real.of(i)));
-            sum = sum.add(f.evaluate(xi).multiply(Real.of(2)));
-        }
-
-        return h.divide(Real.of(3)).multiply(sum);
+        return r[maxLevel - 1][maxLevel - 1];
     }
 
     /**
-     * Adaptive Simpson's rule with error tolerance.
-     * <p>
-     * Recursively subdivides intervals until error estimate < tolerance.
-     * </p>
-     * 
-     * @param f         the function to integrate
-     * @param a         lower bound
-     * @param b         upper bound
-     * @param tolerance error tolerance
-     * @return approximate integral value
+     * Gaussian quadrature (Gauss-Legendre, 5 points).
      */
-    public static Real adaptiveSimpsons(Function<Real, Real> f, Real a, Real b, Real tolerance) {
-        Real c = a.add(b).divide(Real.of(2));
-        Real h = b.subtract(a);
-        Real fa = f.evaluate(a);
-        Real fb = f.evaluate(b);
-        Real fc = f.evaluate(c);
+    public static double gaussLegendre(DoubleUnaryOperator f, double a, double b) {
+        // 5-point Gauss-Legendre nodes and weights on [-1, 1]
+        double[] nodes = {
+                -0.9061798459386640, -0.5384693101056831, 0.0,
+                0.5384693101056831, 0.9061798459386640
+        };
+        double[] weights = {
+                0.2369268850561891, 0.4786286704993665, 0.5688888888888889,
+                0.4786286704993665, 0.2369268850561891
+        };
 
-        Real S = h.divide(Real.of(6)).multiply(fa.add(fc.multiply(Real.of(4))).add(fb));
+        // Transform to [a, b]
+        double mid = (a + b) / 2;
+        double half = (b - a) / 2;
 
-        return adaptiveSimpsonsRecursive(f, a, b, tolerance, S, fa, fb, fc, 0);
-    }
-
-    private static Real adaptiveSimpsonsRecursive(Function<Real, Real> f, Real a, Real b,
-            Real tolerance, Real S, Real fa, Real fb, Real fc, int depth) {
-        if (depth > 20) {
-            return S; // Max recursion depth
+        double sum = 0;
+        for (int i = 0; i < 5; i++) {
+            double x = mid + half * nodes[i];
+            sum += weights[i] * f.applyAsDouble(x);
         }
-
-        Real c = a.add(b).divide(Real.of(2));
-        Real h = b.subtract(a);
-        Real d = a.add(c).divide(Real.of(2));
-        Real e = c.add(b).divide(Real.of(2));
-        Real fd = f.evaluate(d);
-        Real fe = f.evaluate(e);
-
-        Real Sleft = h.divide(Real.of(12)).multiply(fa.add(fd.multiply(Real.of(4))).add(fc));
-        Real Sright = h.divide(Real.of(12)).multiply(fc.add(fe.multiply(Real.of(4))).add(fb));
-        Real S2 = Sleft.add(Sright);
-
-        Real error = S2.subtract(S).abs().divide(Real.of(15));
-
-        if (error.compareTo(tolerance) < 0) {
-            return S2.add(error);
-        } else {
-            Real halfTolerance = tolerance.divide(Real.of(2));
-            Real left = adaptiveSimpsonsRecursive(f, a, c, halfTolerance, Sleft, fa, fc, fd, depth + 1);
-            Real right = adaptiveSimpsonsRecursive(f, c, b, halfTolerance, Sright, fc, fb, fe, depth + 1);
-            return left.add(right);
-        }
+        return sum * half;
     }
 
     /**
-     * Midpoint rule: ∫[a,b] f(x)dx ≈ h * Σf(midpoints)
-     * <p>
-     * Simple but effective for smooth functions.
-     * </p>
+     * Adaptive Simpson's rule with error control.
      */
-    public static Real midpoint(Function<Real, Real> f, Real a, Real b, int n) {
-        if (n <= 0) {
-            throw new IllegalArgumentException("n must be positive");
+    public static double adaptiveSimpson(DoubleUnaryOperator f, double a, double b,
+            double tol, int maxDepth) {
+        double c = (a + b) / 2;
+        double fa = f.applyAsDouble(a);
+        double fb = f.applyAsDouble(b);
+        double fc = f.applyAsDouble(c);
+        double s = (b - a) / 6 * (fa + 4 * fc + fb);
+        return adaptiveSimpsonHelper(f, a, b, fa, fb, fc, s, tol, maxDepth);
+    }
+
+    private static double adaptiveSimpsonHelper(DoubleUnaryOperator f, double a, double b,
+            double fa, double fb, double fc, double prevS,
+            double tol, int depth) {
+        double c = (a + b) / 2;
+        double d = (a + c) / 2;
+        double e = (c + b) / 2;
+        double fd = f.applyAsDouble(d);
+        double fe = f.applyAsDouble(e);
+
+        double h = b - a;
+        double left = h / 12 * (fa + 4 * fd + fc);
+        double right = h / 12 * (fc + 4 * fe + fb);
+        double s = left + right;
+
+        if (depth <= 0 || Math.abs(s - prevS) <= 15 * tol) {
+            return s + (s - prevS) / 15;
         }
 
-        Real h = b.subtract(a).divide(Real.of(n));
-        Real sum = Real.ZERO;
+        return adaptiveSimpsonHelper(f, a, c, fa, fc, fd, left, tol / 2, depth - 1)
+                + adaptiveSimpsonHelper(f, c, b, fc, fb, fe, right, tol / 2, depth - 1);
+    }
 
-        for (int i = 0; i < n; i++) {
-            Real midpoint = a.add(h.multiply(Real.of(i + 0.5)));
-            sum = sum.add(f.evaluate(midpoint));
+    /**
+     * Integrate tabulated data using trapezoidal rule.
+     */
+    public static double integrateData(double[] x, double[] y) {
+        if (x.length != y.length || x.length < 2) {
+            throw new IllegalArgumentException("Arrays must have same length >= 2");
         }
-
-        return h.multiply(sum);
+        double sum = 0;
+        for (int i = 1; i < x.length; i++) {
+            sum += 0.5 * (y[i] + y[i - 1]) * (x[i] - x[i - 1]);
+        }
+        return sum;
     }
 }

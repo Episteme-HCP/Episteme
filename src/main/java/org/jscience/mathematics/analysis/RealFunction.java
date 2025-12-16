@@ -1,6 +1,6 @@
 package org.jscience.mathematics.analysis;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a real-valued function of a real variable (R -> R).
@@ -39,7 +39,8 @@ public interface RealFunction extends DifferentiableFunction<Real, Real>, Integr
      */
     @Override
     default RealFunction integrate() {
-        throw new UnsupportedOperationException("Symbolic integration not supported by default");
+        // Return numerical antiderivative F(x) = ∫[0,x] f(t) dt
+        return x -> integrate(Real.ZERO, x);
     }
 
     /**

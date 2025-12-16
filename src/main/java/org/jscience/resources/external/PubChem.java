@@ -95,7 +95,9 @@ public class PubChem {
      * Placeholder for future mapping to Chemistry domain objects.
      */
     public static <T> T map(String json, Class<T> target) {
-        throw new UnsupportedOperationException("Domain class " + target.getSimpleName() + " not yet designed.");
+        System.err.println(
+                "WARNING: Domain mapping for " + target.getSimpleName() + " is not yet implemented. Returning null.");
+        return null;
     }
 
     /**
@@ -144,4 +146,3 @@ public class PubChem {
     private PubChem() {
     }
 }
-

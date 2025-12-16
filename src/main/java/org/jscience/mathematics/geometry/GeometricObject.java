@@ -20,10 +20,12 @@ public interface GeometricObject<T> {
      * Returns the intrinsic dimension of this geometric object.
      * <p>
      * Examples:
-     * - Point: 0
-     * - Line: 1
-     * - Plane: 2
-     * - Volume: 3
+     * <ul>
+     * <li>Point: 0</li>
+     * <li>Line/Segment: 1</li>
+     * <li>Plane/Surface: 2</li>
+     * <li>Volume: 3</li>
+     * </ul>
      * </p>
      * 
      * @return the dimension
@@ -41,25 +43,9 @@ public interface GeometricObject<T> {
     int ambientDimension();
 
     /**
-     * Checks if a point lies on or within this geometric object.
-     * <p>
-     * The exact meaning depends on the object type:
-     * - Point: equality check
-     * - Line: point is on the line
-     * - Plane: point is on the plane
-     * - Volume: point is inside the volume
-     * </p>
-     * 
-     * @param point the point to test
-     * @return true if the point is contained in this object
-     */
-    boolean contains(T point);
-
-    /**
      * Returns a human-readable description of this geometric object.
      * 
      * @return description string
      */
     String description();
 }
-

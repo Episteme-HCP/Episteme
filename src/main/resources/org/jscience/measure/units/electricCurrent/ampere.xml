@@ -1,4 +1,0 @@
-<unit id="ampere" name="ampere" abbreviation="A" unitType="electricCurrent" parentSI="SELF" multiplierToSI="1"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>SI unit of electrical current</description>
-</unit>

@@ -2,13 +2,8 @@ package org.jscience.ui.matrix;
 
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
-import org.jscience.mathematics.vector.Matrix;
+import org.jscience.mathematics.linearalgebra.Matrix;
 
-/**
- * A JavaFX control for visualizing and editing matrices.
- * 
- * @param <E> the type of matrix elements
- */
 public class MatrixViewer<E> extends Control {
 
     private final Matrix<E> matrix;

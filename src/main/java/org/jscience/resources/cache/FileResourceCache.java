@@ -110,9 +110,7 @@ public class FileResourceCache implements ResourceCache {
             }
             return sb.toString();
         } catch (Exception e) {
-            return String.of(key.hashCode());
+            return String.valueOf(key.hashCode());
         }
     }
 }
-
-

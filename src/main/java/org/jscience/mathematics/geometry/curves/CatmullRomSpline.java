@@ -22,9 +22,9 @@
  */
 package org.jscience.mathematics.geometry.curves;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.DenseVector;
-import org.jscience.mathematics.vector.Vector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.sets.Reals;
 
 import java.util.ArrayList;
@@ -120,7 +120,8 @@ public class CatmullRomSpline {
 
         // Catmull-Rom basis functions
         Real half = Real.of(0.5);
-        Real oneMinus = Real.ONE.subtract(tension);
+        @SuppressWarnings("unused")
+        Real oneMinus = Real.ONE.subtract(tension); // Reserved for cardinal spline variant
 
         List<Real> result = new ArrayList<>();
         for (int i = 0; i < dimension; i++) {

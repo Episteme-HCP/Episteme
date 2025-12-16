@@ -2,10 +2,9 @@ package org.jscience.mathematics.algebra.algebras;
 
 import java.util.Collections;
 import java.util.Map;
-import org.jscience.mathematics.algebra.Ring;
-import org.jscience.mathematics.algebra.VectorSpace;
+import org.jscience.mathematics.structures.rings.Ring;
 import java.util.TreeMap;
-import org.jscience.mathematics.algebra.Field;
+import org.jscience.mathematics.structures.rings.Field;
 
 /**
  * Represents a Clifford Algebra (Geometric Algebra) over a field.
@@ -25,7 +24,8 @@ public class CliffordAlgebra<E> implements Ring<CliffordAlgebra.Multivector<E>> 
 
     private final Field<E> scalarField;
     private final int dimension;
-    private final E[] metric; // Diagonal metric for simplicity (e.g., 1, 1, 1 or 1, -1, -1, -1)
+    @SuppressWarnings("unused")
+    private final E[] metric; // Reserved for full orthogonal basis product implementation
 
     public CliffordAlgebra(Field<E> scalarField, int dimension, E[] metric) {
         this.scalarField = scalarField;
@@ -143,21 +143,66 @@ public class CliffordAlgebra<E> implements Ring<CliffordAlgebra.Multivector<E>> 
                     E coeff1 = term1.getValue();
                     E coeff2 = term2.getValue();
 
-                    // Compute geometric product of basis blades e_A * e_B
-                    // Result is +/- e_{A XOR B}
+                    // Geometric Product: e_A * e_B
+                    // 1. Calculate sign from reordering (Grassmann product part for orthogonal
+                    // basis)
+                    // 2. Handle metric contraction (e_i * e_i = m_iis)
+
                     int resultBlade = blade1 ^ blade2;
 
-                    // Determine sign based on swaps and metric
-                    // This is complex; simplified placeholder logic:
-                    // 1. Count swaps to reorder (canonical reordering sign)
-                    // 2. Handle metric contraction (squaring basis vectors)
+                    // Count swaps to reach canonical order
+                    // Standard algorithm:
+                    // For each vector in A, how many vectors in B does it anticommute with?
+                    // Because they are orthogonal, e_i e_j = -e_j e_i (i != j)
+                    // Number of active bits in A > active bits in B?
+                    // Optimized:
+                    int swaps = 0;
+                    // Count number of pairs (i, j) with i in A, j in B, i > j (swaps needed to move
+                    // B indices to right)
+                    // Actually, we want to computing canonical form of e_A e_B.
 
-                    // For now, assuming Euclidean metric and simplified sign logic (just XOR)
-                    // TODO: Implement full orthogonal basis product logic
+                    // Correct approach for orthogonal basis:
+                    // e_A e_B = (-1)^s e_{A^B} * (contraction_factor)
+                    // s = number of bits in (A & B) + swaps?
+                    // No.
+
+                    // Let's use `Integer.bitCount(blade1 & (blade2 >> 1))` logic or similar for
+                    // swaps?
+                    // Standard formula for commutative swaps: bitCount(a & (b<<1)) etc? No.
+
+                    // Counting swaps:
+                    // For each bit set in blade2 (start from LSB), count how many bits set in
+                    // blade1 are HIGHER than it.
+                    // Those are the ones it jumped over.
+                    // Wait, e_1 e_2. 1 in A, 2 in B. 1 < 2. No swap.
+                    // e_2 e_1. 2 in A, 1 in B. 2 > 1. One swap. -e_1 e_2.
+
+                    int b = blade2;
+                    while (b != 0) {
+                        int j = Integer.numberOfTrailingZeros(b); // current bit in B
+                        // Count bits in A that are > j
+                        int maskHigh = ~((1 << (j + 1)) - 1);
+                        swaps += Integer.bitCount(blade1 & maskHigh);
+                        b &= ~(1 << j);
+                    }
 
                     E productCoeff = algebra.scalarField.multiply(coeff1, coeff2);
-                    // Apply sign (placeholder)
-                    // if (swaps is odd) productCoeff = negate(productCoeff)
+
+                    // Handle sign from swaps
+                    if ((swaps & 1) != 0) {
+                        productCoeff = algebra.scalarField.negate(productCoeff);
+                    }
+
+                    // Handle Metric: any shared bit i means we had e_i * e_i
+                    // e_i * e_i = Q(e_i)
+                    int shared = blade1 & blade2;
+                    int s = shared;
+                    while (s != 0) {
+                        int index = Integer.numberOfTrailingZeros(s);
+                        // Multiply by metric[index]
+                        productCoeff = algebra.scalarField.multiply(productCoeff, algebra.metric[index]);
+                        s &= ~(1 << index);
+                    }
 
                     result.merge(resultBlade, productCoeff, algebra.scalarField::add);
                 }

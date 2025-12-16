@@ -1,7 +1,7 @@
 package org.jscience.mathematics.geometry;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.Vector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
 
 /**
  * Represents a line segment in 3D space.
@@ -11,7 +11,7 @@ import org.jscience.mathematics.vector.Vector;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public class Segment3D {
+public class Segment3D implements GeometricObject<Point3D> {
 
     private final Vector3D start;
     private final Vector3D end;
@@ -90,6 +90,28 @@ public class Segment3D {
 
         Real t = dot.divide(lenSq);
         return t.doubleValue() >= -tolerance && t.doubleValue() <= 1.0 + tolerance;
+    }
+
+    // GeometricObject implementation
+    @Override
+    public int dimension() {
+        return 1; // A segment is 1-dimensional
+    }
+
+    @Override
+    public int ambientDimension() {
+        return 3; // Lives in 3D space
+    }
+
+    public boolean containsPoint(Point3D p) {
+        // Convert Point3D to Vector3D
+        Vector3D v = new Vector3D(p.getX(), p.getY(), p.getZ());
+        return contains(v, 1e-12);
+    }
+
+    @Override
+    public String description() {
+        return "Segment3D from " + start + " to " + end;
     }
 
     /**

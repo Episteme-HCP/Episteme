@@ -22,7 +22,6 @@
  */
 package org.jscience.mathematics.discrete;
 
-import org.jscience.mathematics.discrete.Combinatorics;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -40,10 +39,10 @@ public class CombinatoricsTest {
     @Test
     public void testBinomialBasic() {
         // C(5, 2) = 10
-        assertEquals(BigInteger.of(10), Combinatorics.binomial(5, 2));
+        assertEquals(BigInteger.valueOf(10), Combinatorics.binomial(5, 2));
 
         // C(10, 3) = 120
-        assertEquals(BigInteger.of(120), Combinatorics.binomial(10, 3));
+        assertEquals(BigInteger.valueOf(120), Combinatorics.binomial(10, 3));
 
         // C(n, 0) = 1
         assertEquals(BigInteger.ONE, Combinatorics.binomial(5, 0));
@@ -63,9 +62,9 @@ public class CombinatoricsTest {
         assertArrayEquals(
                 new BigInteger[] {
                         BigInteger.ONE,
-                        BigInteger.of(4),
-                        BigInteger.of(6),
-                        BigInteger.of(4),
+                        BigInteger.valueOf(4),
+                        BigInteger.valueOf(6),
+                        BigInteger.valueOf(4),
                         BigInteger.ONE
                 },
                 triangle[4]);
@@ -74,10 +73,10 @@ public class CombinatoricsTest {
     @Test
     public void testMultinomial() {
         // Multinomial(6; 2,2,2) = 6! / (2! * 2! * 2!) = 90
-        assertEquals(BigInteger.of(90), Combinatorics.multinomial(6, 2, 2, 2));
+        assertEquals(BigInteger.valueOf(90), Combinatorics.multinomial(6, 2, 2, 2));
 
         // Multinomial(10; 3,3,4) = 10! / (3! * 3! * 4!) = 4200
-        assertEquals(BigInteger.of(4200), Combinatorics.multinomial(10, 3, 3, 4));
+        assertEquals(BigInteger.valueOf(4200), Combinatorics.multinomial(10, 3, 3, 4));
     }
 
     @Test
@@ -96,13 +95,13 @@ public class CombinatoricsTest {
         assertEquals(BigInteger.ONE, Combinatorics.centralBinomial(0));
 
         // C(2, 1) = 2
-        assertEquals(BigInteger.of(2), Combinatorics.centralBinomial(1));
+        assertEquals(BigInteger.valueOf(2), Combinatorics.centralBinomial(1));
 
         // C(4, 2) = 6
-        assertEquals(BigInteger.of(6), Combinatorics.centralBinomial(2));
+        assertEquals(BigInteger.valueOf(6), Combinatorics.centralBinomial(2));
 
         // C(6, 3) = 20
-        assertEquals(BigInteger.of(20), Combinatorics.centralBinomial(3));
+        assertEquals(BigInteger.valueOf(20), Combinatorics.centralBinomial(3));
     }
 
     @Test
@@ -126,17 +125,17 @@ public class CombinatoricsTest {
     @Test
     public void testFactorial() {
         assertEquals(BigInteger.ONE, Combinatorics.factorial(0));
-        assertEquals(BigInteger.of(120), Combinatorics.factorial(5));
-        assertEquals(BigInteger.of(3628800), Combinatorics.factorial(10));
+        assertEquals(BigInteger.valueOf(120), Combinatorics.factorial(5));
+        assertEquals(BigInteger.valueOf(3628800), Combinatorics.factorial(10));
     }
 
     @Test
     public void testPermutations() {
         // P(5, 3) = 60
-        assertEquals(BigInteger.of(60), Combinatorics.permutations(5, 3));
+        assertEquals(BigInteger.valueOf(60), Combinatorics.permutations(5, 3));
 
         // P(10, 2) = 90
-        assertEquals(BigInteger.of(90), Combinatorics.permutations(10, 2));
+        assertEquals(BigInteger.valueOf(90), Combinatorics.permutations(10, 2));
     }
 
     @Test
@@ -144,8 +143,8 @@ public class CombinatoricsTest {
         // Catalan numbers: 1, 1, 2, 5, 14, 42, ...
         assertEquals(BigInteger.ONE, Combinatorics.catalan(0));
         assertEquals(BigInteger.ONE, Combinatorics.catalan(1));
-        assertEquals(BigInteger.of(2), Combinatorics.catalan(2));
-        assertEquals(BigInteger.of(5), Combinatorics.catalan(3));
-        assertEquals(BigInteger.of(14), Combinatorics.catalan(4));
+        assertEquals(BigInteger.valueOf(2), Combinatorics.catalan(2));
+        assertEquals(BigInteger.valueOf(5), Combinatorics.catalan(3));
+        assertEquals(BigInteger.valueOf(14), Combinatorics.catalan(4));
     }
 }

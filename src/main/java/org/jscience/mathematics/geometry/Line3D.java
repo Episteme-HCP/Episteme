@@ -1,6 +1,6 @@
 package org.jscience.mathematics.geometry;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a line in 3D Euclidean space.
@@ -12,7 +12,7 @@ import org.jscience.mathematics.number.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Line3D {
+public class Line3D implements GeometricObject<Point3D> {
 
     private final Vector3D point;
     private final Vector3D direction;
@@ -78,5 +78,134 @@ public class Line3D {
      */
     public boolean contains(Vector3D p, double tolerance) {
         return distance(p).doubleValue() < tolerance;
+    }
+
+    // GeometricObject implementation
+    @Override
+    public int dimension() {
+        return 1; // A line is 1-dimensional
+    }
+
+    @Override
+    public int ambientDimension() {
+        return 3; // Lives in 3D space
+    }
+
+    public boolean containsPoint(Point3D p) {
+        // Convert Point3D to Vector3D for distance check
+        Vector3D v = new Vector3D(p.getX(), p.getY(), p.getZ());
+        return distance(v).doubleValue() < 1e-12;
+    }
+
+    @Override
+    public String description() {
+        return "Line3D through " + point + " in direction " + direction;
+    }
+
+    /**
+     * Computes the intersection point with another line.
+     * 
+     * @param other the other line
+     * @return the intersection point, or null if lines are parallel or skew
+     */
+    public Vector3D intersection(Line3D other) {
+        // Use the closest points approach
+        // If the distance between closest points is ~0, they intersect
+
+        Vector3D p1 = this.point;
+        Vector3D d1 = this.direction;
+        Vector3D p2 = other.point;
+        Vector3D d2 = other.direction;
+
+        // w0 = p1 - p2
+        Vector3D w0 = new Vector3D(
+                p1.x().subtract(p2.x()),
+                p1.y().subtract(p2.y()),
+                p1.z().subtract(p2.z()));
+
+        Real a = dot(d1, d1); // always > 0
+        Real b = dot(d1, d2);
+        Real c = dot(d2, d2); // always > 0
+        Real d = dot(d1, w0);
+        Real e = dot(d2, w0);
+
+        Real denom = a.multiply(c).subtract(b.multiply(b));
+
+        // Check if parallel (denom ~= 0)
+        if (Math.abs(denom.doubleValue()) < 1e-12) {
+            return null; // Lines are parallel
+        }
+
+        Real sc = b.multiply(e).subtract(c.multiply(d)).divide(denom);
+        Real tc = a.multiply(e).subtract(b.multiply(d)).divide(denom);
+
+        // Points on each line
+        Vector3D point1 = new Vector3D(
+                p1.x().add(sc.multiply(d1.x())),
+                p1.y().add(sc.multiply(d1.y())),
+                p1.z().add(sc.multiply(d1.z())));
+
+        Vector3D point2 = new Vector3D(
+                p2.x().add(tc.multiply(d2.x())),
+                p2.y().add(tc.multiply(d2.y())),
+                p2.z().add(tc.multiply(d2.z())));
+
+        // Check if they're actually the same point (intersection)
+        double dist = new Vector3D(
+                point1.x().subtract(point2.x()),
+                point1.y().subtract(point2.y()),
+                point1.z().subtract(point2.z())).norm().doubleValue();
+
+        if (dist < 1e-10) {
+            return point1;
+        }
+
+        return null; // Skew lines
+    }
+
+    /**
+     * Computes the closest point on this line to another line.
+     * 
+     * @param other the other line
+     * @return the closest point on this line to the other line
+     */
+    public Vector3D closestPoint(Line3D other) {
+        Vector3D p1 = this.point;
+        Vector3D d1 = this.direction;
+        Vector3D p2 = other.point;
+        Vector3D d2 = other.direction;
+
+        // w0 = p1 - p2
+        Vector3D w0 = new Vector3D(
+                p1.x().subtract(p2.x()),
+                p1.y().subtract(p2.y()),
+                p1.z().subtract(p2.z()));
+
+        Real a = dot(d1, d1);
+        Real b = dot(d1, d2);
+        Real c = dot(d2, d2);
+        Real d = dot(d1, w0);
+        Real e = dot(d2, w0);
+
+        Real denom = a.multiply(c).subtract(b.multiply(b));
+
+        Real sc;
+        if (Math.abs(denom.doubleValue()) < 1e-12) {
+            // Lines are parallel, any point on this line works, use projection
+            sc = Real.ZERO;
+        } else {
+            sc = b.multiply(e).subtract(c.multiply(d)).divide(denom);
+        }
+
+        return new Vector3D(
+                p1.x().add(sc.multiply(d1.x())),
+                p1.y().add(sc.multiply(d1.y())),
+                p1.z().add(sc.multiply(d1.z())));
+    }
+
+    private static Real dot(Vector3D a, Vector3D b) {
+        return a.x().multiply(b.x())
+                .add(a.y().multiply(b.y()))
+                .add(a.z().multiply(b.z()));
     }
 }

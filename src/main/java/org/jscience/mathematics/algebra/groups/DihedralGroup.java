@@ -1,7 +1,6 @@
 package org.jscience.mathematics.algebra.groups;
 
-import org.jscience.mathematics.algebra.Group;
-import org.jscience.mathematics.number.Integer;
+import org.jscience.mathematics.structures.groups.Group;
 
 /**
  * Represents a Dihedral Group D_n of order 2n.

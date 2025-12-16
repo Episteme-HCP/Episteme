@@ -98,5 +98,75 @@
         "period": 7,
         "block": "f",
         "category": "Actinide"
+    },
+    {
+        "symbol": "Cl",
+        "name": "Chlorine",
+        "atomicNumber": 17,
+        "atomicMass": 35.45,
+        "group": 17,
+        "period": 3,
+        "block": "p",
+        "category": "Halogen"
+    },
+    {
+        "symbol": "Na",
+        "name": "Sodium",
+        "atomicNumber": 11,
+        "atomicMass": 22.99,
+        "group": 1,
+        "period": 3,
+        "block": "s",
+        "category": "Alkali Metal"
+    },
+    {
+        "symbol": "Mg",
+        "name": "Magnesium",
+        "atomicNumber": 12,
+        "atomicMass": 24.305,
+        "group": 2,
+        "period": 3,
+        "block": "s",
+        "category": "Alkaline Earth Metal"
+    },
+    {
+        "symbol": "Si",
+        "name": "Silicon",
+        "atomicNumber": 14,
+        "atomicMass": 28.085,
+        "group": 14,
+        "period": 3,
+        "block": "p",
+        "category": "Metalloid"
+    },
+    {
+        "symbol": "S",
+        "name": "Sulfur",
+        "atomicNumber": 16,
+        "atomicMass": 32.06,
+        "group": 16,
+        "period": 3,
+        "block": "p",
+        "category": "Nonmetal"
+    },
+    {
+        "symbol": "K",
+        "name": "Potassium",
+        "atomicNumber": 19,
+        "atomicMass": 39.098,
+        "group": 1,
+        "period": 4,
+        "block": "s",
+        "category": "Alkali Metal"
+    },
+    {
+        "symbol": "Ca",
+        "name": "Calcium",
+        "atomicNumber": 20,
+        "atomicMass": 40.078,
+        "group": 2,
+        "period": 4,
+        "block": "s",
+        "category": "Alkaline Earth Metal"
     }
 ]

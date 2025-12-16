@@ -22,7 +22,7 @@
  */
 package org.jscience.mathematics.statistics.distributions;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.statistics.DiscreteDistribution;
 
 public class PoissonDistribution extends DiscreteDistribution {

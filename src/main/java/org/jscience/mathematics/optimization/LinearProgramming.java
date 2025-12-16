@@ -1,6 +1,6 @@
 package org.jscience.mathematics.optimization;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Linear programming using Simplex algorithm.

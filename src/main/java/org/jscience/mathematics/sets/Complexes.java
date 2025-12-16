@@ -1,8 +1,8 @@
 package org.jscience.mathematics.sets;
 
-import org.jscience.mathematics.algebra.Field;
-import org.jscience.mathematics.algebra.InfiniteSet;
-import org.jscience.mathematics.number.Complex;
+import org.jscience.mathematics.structures.rings.Field;
+import org.jscience.mathematics.structures.sets.InfiniteSet;
+import org.jscience.mathematics.numbers.complex.Complex;
 
 /**
  * The structure of complex numbers (ℂ).

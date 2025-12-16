@@ -1,3 +1,0 @@
-<unit id="kilogramPerMole" name="kilogram per mole" abbreviation="kg/mol" unitType="molarMass" parentSI="SELF"
-      multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

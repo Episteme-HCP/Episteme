@@ -24,7 +24,7 @@ package org.jscience.mathematics.analysis.integration;
 
 import org.jscience.mathematics.analysis.Function;
 import org.jscience.mathematics.analysis.polynomials.Polynomials;
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Gauss-Legendre Quadrature.

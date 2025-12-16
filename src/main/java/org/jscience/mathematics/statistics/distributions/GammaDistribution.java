@@ -22,11 +22,11 @@
  */
 package org.jscience.mathematics.statistics.distributions;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.statistics.ContinuousDistribution;
 
 public class GammaDistribution extends ContinuousDistribution {
-    private final Real shape, rate, scale;
+    private final Real shape, rate;
 
     public GammaDistribution(Real shape, Real rate) {
         if (shape.compareTo(Real.ZERO) <= 0 || rate.compareTo(Real.ZERO) <= 0) {
@@ -34,7 +34,7 @@ public class GammaDistribution extends ContinuousDistribution {
         }
         this.shape = shape;
         this.rate = rate;
-        this.scale = Real.ONE.divide(rate);
+
     }
 
     private double lgamma(double x) {
@@ -68,5 +68,3 @@ public class GammaDistribution extends ContinuousDistribution {
         return String.format("Gamma(α=%.4f, β=%.4f)", shape.doubleValue(), rate.doubleValue());
     }
 }
-
-

@@ -22,7 +22,7 @@
  */
 package org.jscience.mathematics.analysis.chaos;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * The Gingerbread Man Map - a chaotic discrete dynamical system.

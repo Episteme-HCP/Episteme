@@ -1,5 +1,0 @@
-<unit id="mileSquared" name="mile squared" unitType="area" parentSI="meterSquared"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 mile squared</description>
-    <unit ref="mile" power="2"/>
-</unit>

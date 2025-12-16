@@ -2,6 +2,7 @@ package org.jscience;
 
 import org.jscience.mathematics.context.ComputeMode;
 import org.jscience.mathematics.context.MathContext;
+import org.jscience.ComputeContext;
 
 /**
  * The central entry point and configuration dashboard for the JScience library.
@@ -17,8 +18,13 @@ import org.jscience.mathematics.context.MathContext;
  * // Configure for high-performance GPU computing
  * JScience.setComputeMode(ComputeMode.GPU);
  * 
- * // Configure for exact arithmetic
- * JScience.setExactPrecision();
+ * // Configure floating-point precision
+ * JScience.setFloatPrecision(); // 32-bit float - faster
+ * JScience.setDoublePrecision(); // 64-bit double - more precise
+ * 
+ * // Configure integer precision
+ * JScience.setIntPrecision(); // 32-bit int - faster on most GPUs
+ * JScience.setLongPrecision(); // 64-bit long - larger range
  * }</pre>
  * 
  * @author Silvere Martin-Michiellot
@@ -31,11 +37,8 @@ public final class JScience {
         // Prevent instantiation
     }
 
-    /**
-     * Sets the global computation mode for linear algebra operations.
-     * 
-     * @param mode the compute mode (CPU, GPU, AUTO)
-     */
+    // ================= COMPUTE MODE =================
+
     /**
      * Sets the global computation mode for linear algebra operations.
      * 
@@ -43,6 +46,22 @@ public final class JScience {
      */
     public static void setComputeMode(ComputeMode mode) {
         MathContext.setCurrent(MathContext.getCurrent().withComputeMode(mode));
+        // Also update ComputeContext backend
+        switch (mode) {
+            case GPU:
+                ComputeContext.current().setBackend(ComputeContext.Backend.OPENCL_GPU);
+                break;
+            case CPU:
+                ComputeContext.current().setBackend(ComputeContext.Backend.JAVA_CPU);
+                break;
+            case AUTO:
+                if (isGpuAvailable()) {
+                    ComputeContext.current().setBackend(ComputeContext.Backend.OPENCL_GPU);
+                } else {
+                    ComputeContext.current().setBackend(ComputeContext.Backend.JAVA_CPU);
+                }
+                break;
+        }
     }
 
     /**
@@ -53,6 +72,8 @@ public final class JScience {
     public static ComputeMode getComputeMode() {
         return MathContext.getCurrent().getComputeMode();
     }
+
+    // ================= FLOATING-POINT PRECISION =================
 
     /**
      * Sets the library to use exact arithmetic (BigDecimal) where applicable.
@@ -66,6 +87,7 @@ public final class JScience {
      */
     public static void setStandardPrecision() {
         MathContext.setCurrent(MathContext.getCurrent().withRealPrecision(MathContext.RealPrecision.NORMAL));
+        ComputeContext.current().setFloatPrecision(ComputeContext.FloatPrecision.DOUBLE);
     }
 
     /**
@@ -73,29 +95,108 @@ public final class JScience {
      */
     public static void setFastPrecision() {
         MathContext.setCurrent(MathContext.getCurrent().withRealPrecision(MathContext.RealPrecision.FAST));
+        ComputeContext.current().setFloatPrecision(ComputeContext.FloatPrecision.FLOAT);
     }
 
     /**
+     * Sets 32-bit float precision for GPU/numerical operations.
+     * <p>
+     * Faster on most GPUs but lower precision (~7 decimal digits).
+     * </p>
+     */
+    public static void setFloatPrecision() {
+        ComputeContext.current().setFloatPrecision(ComputeContext.FloatPrecision.FLOAT);
+    }
+
+    /**
+     * Sets 64-bit double precision for GPU/numerical operations.
+     * <p>
+     * Higher precision (~15 decimal digits) but slower on many GPUs.
+     * </p>
+     */
+    public static void setDoublePrecision() {
+        ComputeContext.current().setFloatPrecision(ComputeContext.FloatPrecision.DOUBLE);
+    }
+
+    /**
+     * Returns the current floating-point precision mode.
+     */
+    public static ComputeContext.FloatPrecision getFloatPrecisionMode() {
+        return ComputeContext.current().getFloatPrecision();
+    }
+
+    // ================= INTEGER PRECISION =================
+
+    /**
+     * Sets 32-bit int precision for GPU/numerical integer operations.
+     * <p>
+     * Faster on most GPUs (especially consumer GPUs), smaller memory footprint,
+     * but limited to range ±2.1 billion.
+     * </p>
+     */
+    public static void setIntPrecision() {
+        ComputeContext.current().setIntPrecision(ComputeContext.IntPrecision.INT);
+    }
+
+    /**
+     * Sets 64-bit long precision for GPU/numerical integer operations.
+     * <p>
+     * Larger range (±9.2 × 10^18) but slower on some GPUs,
+     * as many consumer GPUs have weak int64 support.
+     * </p>
+     */
+    public static void setLongPrecision() {
+        ComputeContext.current().setIntPrecision(ComputeContext.IntPrecision.LONG);
+    }
+
+    /**
+     * Returns the current integer precision mode.
+     */
+    public static ComputeContext.IntPrecision getIntPrecisionMode() {
+        return ComputeContext.current().getIntPrecision();
+    }
+
+    // ================= CONVENIENCE CONFIGURATIONS =================
+
+    /**
      * Configures the library for maximum performance.
-     * Sets ComputeMode to AUTO (or GPU if available) and precision to FAST or
-     * NORMAL.
+     * <p>
+     * Sets ComputeMode to AUTO (GPU if available), float precision to FLOAT,
+     * and integer precision to INT.
+     * </p>
      */
     public static void configureForPerformance() {
         setComputeMode(ComputeMode.AUTO);
-        setStandardPrecision();
+        setFloatPrecision();
+        setIntPrecision();
     }
 
     /**
      * Configures the library for maximum precision.
-     * Sets ComputeMode to CPU (usually required for arbitrary precision) and
-     * precision to EXACT.
+     * <p>
+     * Sets ComputeMode to CPU (usually required for arbitrary precision),
+     * precision to EXACT, and integer precision to LONG.
+     * </p>
      */
     public static void configureForPrecision() {
         setComputeMode(ComputeMode.CPU);
         setExactPrecision();
+        setLongPrecision();
     }
 
-    // --- Introspection & Logging ---
+    /**
+     * Configures the library for balanced performance/precision.
+     * <p>
+     * Uses GPU if available with double precision for floats and long for integers.
+     * </p>
+     */
+    public static void configureBalanced() {
+        setComputeMode(ComputeMode.AUTO);
+        setDoublePrecision();
+        setLongPrecision();
+    }
+
+    // ================= INTROSPECTION & REPORTING =================
 
     /**
      * Checks if GPU acceleration is available on the current system.
@@ -104,10 +205,32 @@ public final class JScience {
      */
     public static boolean isGpuAvailable() {
         try {
-            return org.jscience.mathematics.vector.backend.CudaLinearAlgebraProvider.isAvailable();
+            // Check both CUDA and OpenCL backends
+            boolean cuda = new org.jscience.technical.backend.cuda.CudaBackend().isAvailable();
+            boolean opencl = new org.jscience.technical.backend.opencl.OpenCLBackend().isAvailable();
+            return cuda || opencl;
         } catch (Throwable t) {
             return false;
         }
+    }
+
+    /**
+     * Returns a collection of available compute backend names.
+     * 
+     * @return collection of backend names (e.g., "Java CPU", "CUDA-JCublas")
+     */
+    public static java.util.Collection<String> getAvailableBackends() {
+        return org.jscience.technical.backend.BackendManager.getAvailableBackendNames();
+    }
+
+    /**
+     * Returns the global compute context for advanced configuration.
+     * <p>
+     * Use this to register custom providers, check available backends, etc.
+     * </p>
+     */
+    public static ComputeContext getComputeContext() {
+        return ComputeContext.current();
     }
 
     /**
@@ -120,9 +243,13 @@ public final class JScience {
         sb.append("JScience Configuration Report\n");
         sb.append("=============================\n");
         sb.append("Compute Mode: ").append(getComputeMode()).append("\n");
+        sb.append("Backend: ").append(ComputeContext.current().getBackend()).append("\n");
+        sb.append("Float Precision: ").append(getFloatPrecisionMode()).append("\n");
+        sb.append("Integer Precision: ").append(getIntPrecisionMode()).append("\n");
         sb.append("Real Precision: ").append(MathContext.getCurrent().getRealPrecision()).append("\n");
         sb.append("GPU Available: ").append(isGpuAvailable() ? "Yes" : "No (or not loaded)").append("\n");
-        // Add more details as needed
+        sb.append("Available Backends: ").append(getAvailableBackends()).append("\n");
+        sb.append("Registered Providers: ").append(ComputeContext.current().toString()).append("\n");
         return sb.toString();
     }
 
@@ -141,6 +268,20 @@ public final class JScience {
             } catch (IllegalArgumentException e) {
                 System.err.println("Invalid compute mode: " + modeProp);
             }
+        }
+
+        String floatProp = System.getProperty("org.jscience.float.precision");
+        if ("float".equalsIgnoreCase(floatProp)) {
+            setFloatPrecision();
+        } else if ("double".equalsIgnoreCase(floatProp)) {
+            setDoublePrecision();
+        }
+
+        String intProp = System.getProperty("org.jscience.int.precision");
+        if ("int".equalsIgnoreCase(intProp)) {
+            setIntPrecision();
+        } else if ("long".equalsIgnoreCase(intProp)) {
+            setLongPrecision();
         }
 
         System.out.println(getConfigurationReport());

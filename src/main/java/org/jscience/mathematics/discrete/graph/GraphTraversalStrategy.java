@@ -22,7 +22,7 @@
  */
 package org.jscience.mathematics.discrete.graph;
 
-import org.jscience.backend.ComputeBackend;
+import org.jscience.technical.backend.ComputeBackend;
 import org.jscience.mathematics.discrete.Graph;
 
 /**

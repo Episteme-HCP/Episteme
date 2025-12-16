@@ -22,7 +22,7 @@
  */
 package org.jscience.mathematics.util;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import java.util.stream.Stream;
 import java.util.stream.DoubleStream;
 
@@ -76,6 +76,7 @@ public class StreamConverters {
      * @param stream the input Stream of Double objects
      * @return Stream of Real values
      */
+    @SuppressWarnings("null")
     public static Stream<Real> fromDoubleObjects(Stream<Double> stream) {
         if (stream == null)
             return null;
@@ -94,5 +95,3 @@ public class StreamConverters {
         return stream.map(Real::doubleValue);
     }
 }
-
-

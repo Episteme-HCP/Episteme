@@ -1,4 +1,0 @@
-<unitType id="amountOfSubstanceConcentration" name="amount-of-substance concentration">
-    <dimension name="amount" power="1" preserve="no"/>
-    <dimension name="length" power="-3" preserve="no"/>
-</unitType>

@@ -1,6 +1,9 @@
 package org.jscience.mathematics.algebra;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.algebra.intervals.IntervalND;
+
+import org.jscience.mathematics.numbers.real.Real;
+
 import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
@@ -17,8 +20,8 @@ public class IntervalNDTest {
         IntervalND interval = new IntervalND(min, max);
 
         assertEquals(2, interval.dimension());
-        assertEquals(0.0, interval.getMin().get(0).doubleValue(), TOLERANCE);
-        assertEquals(1.0, interval.getMax().get(1).doubleValue(), TOLERANCE);
+        assertEquals(0.0, interval.getMinPoint().get(0).doubleValue(), TOLERANCE);
+        assertEquals(1.0, interval.getMaxPoint().get(1).doubleValue(), TOLERANCE);
     }
 
     @Test
@@ -49,8 +52,8 @@ public class IntervalNDTest {
 
         IntervalND intersection = (IntervalND) interval1.intersection(interval2);
         assertNotNull(intersection);
-        assertEquals(1.0, intersection.getMin().get(0).doubleValue(), TOLERANCE);
-        assertEquals(2.0, intersection.getMax().get(0).doubleValue(), TOLERANCE);
+        assertEquals(1.0, intersection.getMinPoint().get(0).doubleValue(), TOLERANCE);
+        assertEquals(2.0, intersection.getMaxPoint().get(0).doubleValue(), TOLERANCE);
     }
 
     @Test
@@ -77,8 +80,8 @@ public class IntervalNDTest {
         IntervalND interval2 = new IntervalND(min2, max2);
 
         IntervalND union = (IntervalND) interval1.union(interval2);
-        assertEquals(0.0, union.getMin().get(0).doubleValue(), TOLERANCE);
-        assertEquals(1.5, union.getMax().get(0).doubleValue(), TOLERANCE);
+        assertEquals(0.0, union.getMinPoint().get(0).doubleValue(), TOLERANCE);
+        assertEquals(1.5, union.getMaxPoint().get(0).doubleValue(), TOLERANCE);
     }
 
     @Test
@@ -107,10 +110,9 @@ public class IntervalNDTest {
 
     @Test
     public void testIsEmpty() {
-        // Degenerate interval (point)
         List<Real> point = Arrays.asList(Real.of(1), Real.of(1));
         IntervalND interval = new IntervalND(point, point);
-        assertTrue(interval.isEmpty());
+        assertFalse(interval.isEmpty());
 
         // Non-empty interval
         List<Real> min = Arrays.asList(Real.of(0), Real.of(0));

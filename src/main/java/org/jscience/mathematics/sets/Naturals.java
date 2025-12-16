@@ -23,9 +23,9 @@
 
 package org.jscience.mathematics.sets;
 
-import org.jscience.mathematics.algebra.Semiring;
-import org.jscience.mathematics.algebra.InfiniteSet;
-import org.jscience.mathematics.number.Natural;
+import org.jscience.mathematics.structures.rings.Semiring;
+import org.jscience.mathematics.structures.sets.InfiniteSet;
+import org.jscience.mathematics.numbers.integers.Natural;
 import java.util.stream.Stream;
 
 /**

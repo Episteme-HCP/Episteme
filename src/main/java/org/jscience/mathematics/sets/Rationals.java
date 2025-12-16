@@ -1,8 +1,8 @@
 package org.jscience.mathematics.sets;
 
-import org.jscience.mathematics.algebra.Field;
-import org.jscience.mathematics.algebra.InfiniteSet;
-import org.jscience.mathematics.number.Rational;
+import org.jscience.mathematics.structures.rings.Field;
+import org.jscience.mathematics.structures.sets.InfiniteSet;
+import org.jscience.mathematics.numbers.rationals.Rational;
 
 /**
  * The structure of rational numbers (ℚ).

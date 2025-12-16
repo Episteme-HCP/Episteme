@@ -22,7 +22,7 @@
  */
 package org.jscience.mathematics.geometry;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a region in 3D space using a Binary Space Partitioning (BSP) tree.

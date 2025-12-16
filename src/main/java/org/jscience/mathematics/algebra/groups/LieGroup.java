@@ -22,11 +22,10 @@
  */
 package org.jscience.mathematics.algebra.groups;
 
-import org.jscience.mathematics.algebra.Group;
-import org.jscience.mathematics.vector.Matrix;
-import org.jscience.mathematics.vector.Vector;
-import org.jscience.mathematics.number.Complex;
-import org.jscience.mathematics.sets.Complexes;
+import org.jscience.mathematics.structures.groups.Group;
+import org.jscience.mathematics.linearalgebra.Matrix;
+import org.jscience.mathematics.linearalgebra.Vector;
+import org.jscience.mathematics.numbers.complex.Complex;
 
 /**
  * A Lie group is a group that is also a differentiable manifold.
@@ -79,7 +78,7 @@ public class LieGroup implements Group<Matrix<Complex>> {
      * @param v the vector of coefficients (must match dimension)
      * @return the group element (Matrix)
      */
-    public Matrix<Complex> getElement(Vector<org.jscience.mathematics.number.Real> v) {
+    public Matrix<Complex> getElement(Vector<org.jscience.mathematics.numbers.real.Real> v) {
         if (v.dimension() != dimension()) {
             throw new IllegalArgumentException("Vector dimension must match group dimension");
         }
@@ -135,8 +134,7 @@ public class LieGroup implements Group<Matrix<Complex>> {
             }
             rows.add(row);
         }
-        return org.jscience.mathematics.vector.DenseMatrix.of(rows,
-                org.jscience.mathematics.sets.Complexes.getInstance());
+        return new org.jscience.mathematics.linearalgebra.matrices.DenseMatrix<>(rows, Complex.ZERO);
     }
 
     @Override

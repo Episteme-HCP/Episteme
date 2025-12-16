@@ -1,6 +1,6 @@
 package org.jscience.mathematics.statistics.anova;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import java.util.List;
 
 /**

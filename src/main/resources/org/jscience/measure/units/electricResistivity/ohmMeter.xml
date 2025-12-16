@@ -1,4 +1,0 @@
-<unit id="ohmMeter" name="ohmMeter" unitType="electricResistivity" parentSI="SELF" multiplierToSI="1"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>ohm meter</description>
-</unit>

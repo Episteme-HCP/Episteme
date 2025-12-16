@@ -3,7 +3,6 @@ package org.jscience.mathematics.logic.proof;
 import org.junit.jupiter.api.Test;
 import org.jscience.mathematics.logic.predicate.Formula;
 import java.util.Arrays;
-import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class FormalProofTest {
@@ -18,9 +17,13 @@ public class FormalProofTest {
         // +: Addition
 
         // Axioms (Peano Arithmetic subset)
+        @SuppressWarnings("unused")
         Formula def1 = new Formula("1 = S(0)");
+        @SuppressWarnings("unused")
         Formula def2 = new Formula("2 = S(S(0))");
+        @SuppressWarnings("unused")
         Formula add0 = new Formula("forall x, x + 0 = x");
+        @SuppressWarnings("unused")
         Formula addS = new Formula("forall x y, x + S(y) = S(x + y)");
 
         Proof proof = new Proof();

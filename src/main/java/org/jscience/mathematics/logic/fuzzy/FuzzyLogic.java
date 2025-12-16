@@ -1,7 +1,7 @@
 package org.jscience.mathematics.logic.fuzzy;
 
 import org.jscience.mathematics.logic.Logic;
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Fuzzy Logic system where truth values are Real numbers in [0, 1].

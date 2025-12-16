@@ -22,8 +22,8 @@
  */
 package org.jscience.mathematics.symbolic;
 
-import org.jscience.mathematics.algebra.Ring;
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.structures.rings.Ring;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Provides LegacyExpression simplification using algebraic rules.
@@ -124,8 +124,11 @@ public class Simplifier {
             Expression<T> right = simplifyArithmetic(prod.getRight());
 
             // x * 0 = 0
-            if (isZero(left) || isZero(right)) {
-                return left instanceof ConstantExpression ? left : right;
+            if (isZero(left)) {
+                return left;
+            }
+            if (isZero(right)) {
+                return right;
             }
 
             // x * 1 = x

@@ -1,6 +1,6 @@
 package org.jscience.mathematics.algebra.categories;
 
-import org.jscience.mathematics.algebra.Category;
+import org.jscience.mathematics.structures.categories.Category;
 
 /**
  * Represents a Preorder as a Category.

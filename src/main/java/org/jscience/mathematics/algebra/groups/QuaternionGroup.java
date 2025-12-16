@@ -1,7 +1,7 @@
 package org.jscience.mathematics.algebra.groups;
 
-import org.jscience.mathematics.algebra.Group;
-import org.jscience.mathematics.number.Quaternion;
+import org.jscience.mathematics.structures.groups.Group;
+import org.jscience.mathematics.numbers.complex.Quaternion;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Arrays;

@@ -1,7 +1,7 @@
 package org.jscience.mathematics.algebra.polynomials;
 
-import org.jscience.mathematics.number.Integer;
-import org.jscience.mathematics.algebra.Polynomial;
+import org.jscience.mathematics.numbers.integers.Integer;
+import org.jscience.mathematics.analysis.functions.Polynomial;
 import org.jscience.mathematics.sets.Integers;
 import java.util.List;
 import java.util.ArrayList;

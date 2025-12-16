@@ -12,7 +12,7 @@
  * <li><b>Dimensional Analysis</b> - Compile-time checking of dimensional
  * consistency</li>
  * <li><b>Arbitrary Precision</b> - Uses
- * {@link org.jscience.mathematics.number.Real} for values</li>
+ * {@link org.jscience.mathematics.numbers.real.Real} for values</li>
  * </ul>
  * 
  * <h2>Core Concepts</h2>
@@ -72,7 +72,7 @@
  * <h2>Comparison with JSR-385</h2>
  * <p>
  * This package is inspired by JSR-385 (Units of Measurement API) but uses
- * JScience's {@link org.jscience.mathematics.number.Real} for arbitrary
+ * JScience's {@link org.jscience.mathematics.numbers.real.Real} for arbitrary
  * precision instead of primitive doubles. API compatibility is maintained
  * where possible for familiarity.
  * </p>

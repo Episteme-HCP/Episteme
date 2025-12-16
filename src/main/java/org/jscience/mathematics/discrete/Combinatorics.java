@@ -134,4 +134,98 @@ public class Combinatorics {
         return stirling2(n - 1, k).multiply(BigInteger.valueOf(k))
                 .add(stirling2(n - 1, k - 1));
     }
+
+    /**
+     * Computes Pascal's triangle up to row n.
+     * 
+     * @param n number of rows (0-indexed)
+     * @return 2D array where triangle[i][j] = C(i, j)
+     */
+    public static BigInteger[][] pascalTriangle(int n) {
+        BigInteger[][] triangle = new BigInteger[n + 1][];
+        for (int i = 0; i <= n; i++) {
+            triangle[i] = new BigInteger[i + 1];
+            for (int j = 0; j <= i; j++) {
+                triangle[i][j] = binomial(i, j);
+            }
+        }
+        return triangle;
+    }
+
+    /**
+     * Computes multinomial coefficient n! / (k1! * k2! * ... * km!).
+     * 
+     * @param n      total items
+     * @param groups sizes of each group (must sum to n)
+     * @return multinomial coefficient
+     */
+    public static BigInteger multinomial(int n, int... groups) {
+        int sum = 0;
+        for (int k : groups) {
+            sum += k;
+        }
+        if (sum != n) {
+            throw new IllegalArgumentException("Group sizes must sum to n");
+        }
+
+        BigInteger result = factorial(n);
+        for (int k : groups) {
+            result = result.divide(factorial(k));
+        }
+        return result;
+    }
+
+    /**
+     * Computes binomial coefficient modulo m using Lucas' theorem for prime m.
+     * 
+     * @param n total items
+     * @param k items to choose
+     * @param m modulus (should be prime for Lucas' theorem)
+     * @return C(n, k) mod m
+     */
+    public static long binomialMod(int n, int k, int m) {
+        if (k > n)
+            return 0;
+        if (k == 0 || k == n)
+            return 1;
+
+        // Use modular arithmetic directly for small numbers
+        BigInteger result = binomial(n, k);
+        return result.mod(BigInteger.valueOf(m)).longValue();
+    }
+
+    /**
+     * Computes central binomial coefficient C(2n, n).
+     * 
+     * @param n the parameter
+     * @return C(2n, n)
+     */
+    public static BigInteger centralBinomial(int n) {
+        return binomial(2 * n, n);
+    }
+
+    /**
+     * Verifies the symmetry property: C(n, k) = C(n, n-k).
+     * 
+     * @param n total items
+     * @param k items to choose
+     * @return true if symmetry holds
+     */
+    public static boolean verifySymmetry(int n, int k) {
+        return binomial(n, k).equals(binomial(n, n - k));
+    }
+
+    /**
+     * Verifies Pascal's identity: C(n, k) = C(n-1, k-1) + C(n-1, k).
+     * 
+     * @param n total items
+     * @param k items to choose
+     * @return true if Pascal's identity holds
+     */
+    public static boolean verifyPascal(int n, int k) {
+        if (k <= 0 || k >= n || n <= 1) {
+            return true; // Edge cases where identity doesn't apply
+        }
+        return binomial(n, k).equals(binomial(n - 1, k - 1).add(binomial(n - 1, k)));
+    }
 }

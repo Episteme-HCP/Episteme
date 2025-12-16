@@ -5,9 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.jscience.mathematics.analysis.ScalarField;
 import org.jscience.mathematics.analysis.VectorField;
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.Vector;
-import org.jscience.mathematics.vector.DenseVector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
+
 import org.jscience.mathematics.geometry.PointND;
 
 import java.util.Arrays;
@@ -54,6 +55,7 @@ public class VectorCalculusTest {
         VectorField<PointND> field = p -> {
             Real x = p.get(0);
             Real y = p.get(1);
+            @SuppressWarnings("unused")
             Real z = p.get(2);
             return new DenseVector<>(Arrays.asList(y.negate(), x, Real.ZERO),
                     org.jscience.mathematics.sets.Reals.getInstance());

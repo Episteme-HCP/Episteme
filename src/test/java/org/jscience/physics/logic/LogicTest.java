@@ -22,6 +22,8 @@
  */
 package org.jscience.physics.logic;
 
+import org.jscience.computing.logic.*;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

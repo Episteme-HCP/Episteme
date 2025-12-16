@@ -1,3 +1,0 @@
-<unit id="inchOfMercury" name="inch of mercury" abbreviation="inHg" unitType="pressure" parentSI="pascal"
-      multiplierToSI="3386.3788" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

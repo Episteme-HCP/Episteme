@@ -22,7 +22,8 @@
  */
 package org.jscience.mathematics.analysis.series;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.sequences.InfiniteSequence;
 import java.util.function.Function;
 
 /**
@@ -54,7 +55,7 @@ import java.util.function.Function;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public class PowerSeries implements InfiniteSeries<Real> {
+public class PowerSeries implements InfiniteSeries<Real>, InfiniteSequence<Real> {
 
     private final Function<Integer, Real> coefficients;
     private final Real x; // Point of evaluation
@@ -127,10 +128,23 @@ public class PowerSeries implements InfiniteSeries<Real> {
         if (!isConvergent()) {
             throw new ArithmeticException("Series diverges for |x| >= R");
         }
-        // For practical purposes, compute a large partial sum
-        // (true limit requires infinite terms)
-        // TODO: Implement convergence check or dynamic term count based on precision
-        return partialSum(100); // Good approximation for most series
+        // Sum terms until convergence or max iterations
+        Real sum = Real.ZERO;
+        double epsilon = 1e-12;
+        int maxIter = 1000;
+
+        for (int k = 0; k < maxIter; k++) {
+            Real term = term(k);
+            sum = sum.add(term);
+
+            // Check convergence
+            if (Math.abs(term.doubleValue()) < epsilon) {
+                return sum;
+            }
+        }
+
+        // If not converged, return best effort (or could throw warning)
+        return sum;
     }
 
     /**
@@ -216,10 +230,143 @@ public class PowerSeries implements InfiniteSeries<Real> {
         }, Real.ZERO, Real.POSITIVE_INFINITY);
     }
 
+    /**
+     * Creates the natural logarithm series: ln(1+x) = Σ (-1)^(n-1) * x^n / n for n
+     * >= 1
+     * 
+     * @return logarithm power series (centered at 0 for ln(1+x))
+     */
+    public static PowerSeries logarithm() {
+        return new PowerSeries(n -> {
+            if (n == 0)
+                return Real.ZERO;
+            Real val = Real.ONE.divide(Real.of(n));
+            if ((n - 1) % 2 == 1) {
+                val = val.negate();
+            }
+            return val;
+        }, Real.ZERO, Real.ONE);
+    }
+
+    /**
+     * Creates the arctangent series: atan(x) = Σ (-1)^n * x^(2n+1) / (2n+1)
+     * 
+     * @return arctangent power series
+     */
+    public static PowerSeries inverseTangent() {
+        return new PowerSeries(n -> {
+            if (n % 2 == 0)
+                return Real.ZERO;
+            int k = (n - 1) / 2;
+            Real val = Real.ONE.divide(Real.of(n));
+            if (k % 2 == 1) {
+                val = val.negate();
+            }
+            return val;
+        }, Real.ZERO, Real.ONE);
+    }
+
+    /**
+     * Creates the hyperbolic sine series: sinh(x) = Σ x^(2n+1)/(2n+1)!
+     * 
+     * @return hyperbolic sine power series
+     */
+    public static PowerSeries hyperbolicSine() {
+        return new PowerSeries(n -> {
+            if (n % 2 == 0)
+                return Real.ZERO;
+            long factorial = 1;
+            for (int i = 1; i <= n; i++) {
+                factorial *= i;
+            }
+            return Real.ONE.divide(Real.of(factorial));
+        }, Real.ZERO, Real.POSITIVE_INFINITY);
+    }
+
+    /**
+     * Creates the hyperbolic cosine series: cosh(x) = Σ x^(2n)/(2n)!
+     * 
+     * @return hyperbolic cosine power series
+     */
+    public static PowerSeries hyperbolicCosine() {
+        return new PowerSeries(n -> {
+            if (n % 2 == 1)
+                return Real.ZERO;
+            long factorial = 1;
+            for (int i = 1; i <= n; i++) {
+                factorial *= i;
+            }
+            return Real.ONE.divide(Real.of(factorial));
+        }, Real.ZERO, Real.POSITIVE_INFINITY);
+    }
+
+    @Override
+    public Real get(int index) {
+        return partialSum(index);
+    }
+
+    /**
+     * Generates a Taylor series expansion for a differentiable function.
+     * f(x) = f(a) + f'(a)(x-a) + f''(a)(x-a)^2/2! + ...
+     * 
+     * @param f      the differentiable function
+     * @param center the center point 'a'
+     * @param order  the maximum order of derivative to use (or -1 for infinite if
+     *               possible, but here we need a limit for practical generation if
+     *               not symbolic)
+     *               Actually, PowerSeries takes a function n -> coefficient.
+     *               If we can compute n-th derivative, we can create the series.
+     * @return the Taylor series
+     */
+    public static PowerSeries taylor(org.jscience.mathematics.analysis.DifferentiableFunction<Real, Real> f,
+            Real center) {
+        return taylor(f, center, 20); // Default to 20 terms
+    }
+
+    /**
+     * Generates a Taylor series expansion with memoized derivatives.
+     * <p>
+     * This overload pre-computes derivatives up to the specified order for
+     * better performance when evaluating multiple terms.
+     * </p>
+     * f(x) = f(a) + f'(a)(x-a) + f''(a)(x-a)^2/2! + ...
+     * 
+     * @param f        the differentiable function
+     * @param center   the center point 'a'
+     * @param maxOrder the maximum order of derivative to compute
+     * @return the Taylor series
+     */
+    public static PowerSeries taylor(org.jscience.mathematics.analysis.DifferentiableFunction<Real, Real> f,
+            Real center, int maxOrder) {
+        // Pre-compute and cache all derivatives up to maxOrder
+        final Real[] cachedDerivativeValues = new Real[maxOrder + 1];
+        final long[] cachedFactorials = new long[maxOrder + 1];
+
+        org.jscience.mathematics.analysis.DifferentiableFunction<Real, Real> currentDerivative = f;
+        cachedFactorials[0] = 1;
+
+        for (int n = 0; n <= maxOrder; n++) {
+            cachedDerivativeValues[n] = currentDerivative.evaluate(center);
+            if (n > 0) {
+                cachedFactorials[n] = cachedFactorials[n - 1] * n;
+            }
+            if (n < maxOrder) {
+                currentDerivative = (org.jscience.mathematics.analysis.DifferentiableFunction<Real, Real>) currentDerivative
+                        .differentiate();
+            }
+        }
+
+        return new PowerSeries(n -> {
+            if (n > maxOrder) {
+                return Real.ZERO; // Beyond computed order
+            }
+            return cachedDerivativeValues[n].divide(Real.of(cachedFactorials[n]));
+        }, center, Real.POSITIVE_INFINITY);
+    }
+
     @Override
     public String toString() {
         return String.format("PowerSeries(x=%s, R=%s, %s)",
                 x, radiusOfConvergence, isConvergent() ? "convergent" : "divergent");
     }
 }
-

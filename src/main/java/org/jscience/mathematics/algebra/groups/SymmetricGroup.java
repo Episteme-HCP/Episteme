@@ -1,6 +1,6 @@
 package org.jscience.mathematics.algebra.groups;
 
-import org.jscience.mathematics.algebra.Group;
+import org.jscience.mathematics.structures.groups.Group;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 

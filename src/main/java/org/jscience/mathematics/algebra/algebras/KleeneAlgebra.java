@@ -1,6 +1,6 @@
 package org.jscience.mathematics.algebra.algebras;
 
-import org.jscience.mathematics.algebra.Semiring;
+import org.jscience.mathematics.structures.rings.Semiring;
 
 /**
  * A Kleene Algebra is an idempotent semiring with a closure operator (Kleene

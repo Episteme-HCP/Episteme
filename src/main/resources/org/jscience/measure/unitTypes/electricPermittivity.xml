@@ -1,6 +1,0 @@
-<unitType id="electricPermittivity" name="electricPermittivity">
-    <dimension name="mass" power="-1" preserve="no"/>
-    <dimension name="length" power="-3" preserve="no"/>
-    <dimension name="time" power="4" preserve="no"/>
-    <dimension name="current" power="2" preserve="no"/>
-</unitType>

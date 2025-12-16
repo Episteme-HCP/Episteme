@@ -1,6 +1,6 @@
 package org.jscience.mathematics.algebra.spaces;
 
-import org.jscience.mathematics.algebra.Module;
+import org.jscience.mathematics.structures.spaces.Module;
 
 /**
  * Represents a Banach Space.

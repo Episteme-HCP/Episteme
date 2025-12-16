@@ -1,7 +1,7 @@
 package org.jscience.mathematics.geometry;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.Vector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
 
 /**
  * Represents an N-dimensional line.
@@ -84,8 +84,7 @@ public class LineND implements GeometricObject<PointND> {
         return point.translate(direction.multiply(t));
     }
 
-    @Override
-    public boolean contains(PointND p) {
+    public boolean containsPoint(PointND p) {
         if (p.ambientDimension() != this.ambientDimension()) {
             return false;
         }
@@ -166,7 +165,7 @@ public class LineND implements GeometricObject<PointND> {
 
         if (isParallelTo(other)) {
             // Parallel lines: check if they're the same line
-            if (this.contains(other.point)) {
+            if (this.containsPoint(other.point)) {
                 return other.point; // Same line, any point works
             }
             return null; // Parallel but distinct
@@ -210,7 +209,7 @@ public class LineND implements GeometricObject<PointND> {
 
         // Two lines are equal if they contain the same points
         // Check if other.point is on this line and directions are parallel
-        return this.contains(other.point) && this.isParallelTo(other);
+        return this.containsPoint(other.point) && this.isParallelTo(other);
     }
 
     @Override
@@ -219,4 +218,3 @@ public class LineND implements GeometricObject<PointND> {
         return direction.hashCode();
     }
 }
-

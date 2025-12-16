@@ -22,7 +22,7 @@
  */
 package org.jscience.mathematics.analysis.chaos;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * The Logistic Map: x_{n+1} = r * x_n * (1 - x_n).

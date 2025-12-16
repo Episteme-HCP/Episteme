@@ -47,6 +47,11 @@ public class UndirectedGraph<V> implements Graph<V> {
     }
 
     @Override
+    public int vertexCount() {
+        return adjacencyList.size();
+    }
+
+    @Override
     public Set<Edge<V>> edges() {
         Set<Edge<V>> edges = new HashSet<>();
         Set<V> visited = new HashSet<>();

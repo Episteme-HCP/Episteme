@@ -22,7 +22,7 @@
  */
 package org.jscience.mathematics.analysis.chaos;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import java.util.ArrayList;
 import java.util.List;
 

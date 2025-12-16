@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Units;
-import org.jscience.physics.matter.Material;
+import org.jscience.physics.classical.matter.Material;
 import org.jscience.measure.quantity.MassDensity;
 
 public class PropertySystemTest {
@@ -44,6 +44,7 @@ public class PropertySystemTest {
     }
 
     @Test
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void testUnitParsing() {
         PropertySet props = new PropertySet();
         props.set(Material.DENSITY, (Quantity) org.jscience.measure.Quantities.parse("2700 kg/m^3"));
@@ -73,4 +74,3 @@ public class PropertySystemTest {
         assertEquals(1000.0, density.getValue().doubleValue(), 0.001);
     }
 }
-

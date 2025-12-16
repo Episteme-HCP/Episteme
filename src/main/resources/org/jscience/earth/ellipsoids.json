@@ -1,0 +1,26 @@
+[
+  {
+    "name": "WGS84",
+    "code": "EPSG:7030",
+    "semiMajorAxis": 6378137.0,
+    "inverseFlattening": 298.257223563
+  },
+  {
+    "name": "GRS80",
+    "code": "EPSG:7019",
+    "semiMajorAxis": 6378137.0,
+    "inverseFlattening": 298.257222101
+  },
+  {
+    "name": "Airy 1830",
+    "code": "EPSG:7001",
+    "semiMajorAxis": 6377563.396,
+    "inverseFlattening": 299.3249646
+  },
+  {
+    "name": "Clarke 1866",
+    "code": "EPSG:7008",
+    "semiMajorAxis": 6378206.4,
+    "inverseFlattening": 294.9786982
+  }
+]

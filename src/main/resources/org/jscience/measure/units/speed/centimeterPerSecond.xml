@@ -1,3 +1,0 @@
-<unit id="centimeterPerSecond" name="centimeter per second" abbreviation="cm/s" unitType="speed"
-      parentSI="meterPerSecond" multiplierToSI="0.01" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

@@ -1,4 +1,0 @@
-<unit id="kilogramMeterPerSecondSquared" name="kilogram meter per second squared" abbreviation="kgm/s^2"
-      unitType="force" parentSI="newton" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 kgm/s^2 = 1 N</description>
-</unit>

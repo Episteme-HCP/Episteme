@@ -1,0 +1,435 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -----------------------< org.jscience:jscience >------------------------
+[INFO] Building JScience 1.0.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-cli) @ jscience ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 59 source files with javac [debug release 21] to target\test-classes
+[INFO] -------------------------------------------------------------
+[WARNING] COMPILATION WARNING : 
+[INFO] -------------------------------------------------------------
+[WARNING] using incubating module(s): jdk.incubator.vector
+[INFO] 1 warning
+[INFO] -------------------------------------------------------------
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/resources/properties/PropertySystemTest.java:[27,28] cannot find symbol
+  symbol:   class Quantity
+  location: package org.jscience.measure
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/resources/properties/PropertySystemTest.java:[28,28] cannot find symbol
+  symbol:   class Units
+  location: package org.jscience.measure
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/resources/properties/PropertySystemTest.java:[29,45] package org.jscience.physics.classical.matter does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/resources/properties/PropertySystemTest.java:[30,37] package org.jscience.measure.quantity does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/tensor/TensorTest.java:[26,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/tensor/TensorTest.java:[27,54] cannot find symbol
+  symbol:   class Tensor
+  location: package org.jscience.mathematics.linearalgebra.tensors
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/tensor/TensorTest.java:[28,54] cannot find symbol
+  symbol:   class DenseTensor
+  location: package org.jscience.mathematics.linearalgebra.tensors
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/tensor/TensorTest.java:[29,54] cannot find symbol
+  symbol:   class TensorFactory
+  location: package org.jscience.mathematics.linearalgebra.tensors
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/numbers/RealMathTest.java:[4,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/linearalgebra/tensors/TensorTest.java:[6,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/linearalgebra/tensors/TensorBenchmark.java:[25,63] cannot find symbol
+  symbol:   class CPUDenseTensorProvider
+  location: package org.jscience.mathematics.linearalgebra.tensors.backends
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/linearalgebra/tensors/TensorBenchmark.java:[26,63] cannot find symbol
+  symbol:   class CPUSIMDVectorTensorProvider
+  location: package org.jscience.mathematics.linearalgebra.tensors.backends
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/linearalgebra/tensors/TensorBenchmark.java:[27,63] cannot find symbol
+  symbol:   class TensorProvider
+  location: package org.jscience.mathematics.linearalgebra.tensors.backends
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/linearalgebra/tensors/TensorBenchmark.java:[28,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/linearalgebra/tensors/TensorBenchmark.java:[93,13] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.mathematics.linearalgebra.tensors.TensorBenchmark
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/algebra/PolynomialTest.java:[27,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/algebra/PolynomialTest.java:[28,37] package org.jscience.mathematics.sets does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/algebra/PolynomialTest.java:[29,51] package org.jscience.mathematics.analysis.functions does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/analysis/integration/LebesgueIntegrationTest.java:[25,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/analysis/integration/LebesgueIntegrationTest.java:[26,54] package org.jscience.mathematics.linearalgebra.vectors does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/analysis/integration/LebesgueIntegrationTest.java:[27,54] package org.jscience.mathematics.linearalgebra.vectors does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[3,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[5,41] cannot find symbol
+  symbol:   class Expression
+  location: package org.jscience.mathematics.symbolic
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[6,41] cannot find symbol
+  symbol:   class Variable
+  location: package org.jscience.mathematics.symbolic
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[7,41] cannot find symbol
+  symbol:   class PolynomialExpression
+  location: package org.jscience.mathematics.symbolic
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[46,19] cannot find symbol
+  symbol:   class Variable
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[46,28] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[47,19] cannot find symbol
+  symbol:   class Expression
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[47,30] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[48,19] cannot find symbol
+  symbol:   class Expression
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[48,30] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[49,19] cannot find symbol
+  symbol:   class Expression
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[49,30] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[50,19] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[51,19] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[59,39] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[59,52] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[98,12] cannot find symbol
+  symbol:   class Variable
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[98,21] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[107,12] cannot find symbol
+  symbol:   class Expression
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[107,23] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[116,12] cannot find symbol
+  symbol:   class Expression
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[116,23] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[125,12] cannot find symbol
+  symbol:   class Expression
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[125,23] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[135,35] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[135,12] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[147,36] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[147,12] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[159,42] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[159,12] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[192,12] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[196,12] cannot find symbol
+  symbol:   class Real
+  location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/analysis/special/SpecialFunctionsTest.java:[25,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/physics/electricity/simulation/CircuitTest.java:[11,72] package org.jscience.physics.classical.waves.electromagnetism.components does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/physics/electricity/simulation/CircuitTest.java:[12,72] package org.jscience.physics.classical.waves.electromagnetism.components does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/physics/electricity/simulation/CircuitTest.java:[13,72] package org.jscience.physics.classical.waves.electromagnetism.components does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/physics/electricity/simulation/CircuitTest.java:[14,70] package org.jscience.physics.classical.waves.electromagnetism.circuits does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/analysis/fem/FEMTest.java:[28,41] cannot find symbol
+  symbol:   class Function
+  location: package org.jscience.mathematics.analysis
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/analysis/fem/FEMTest.java:[29,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/analysis/fem/FEMTest.java:[30,54] package org.jscience.mathematics.linearalgebra.vectors does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/analysis/fem/FEMTest.java:[31,46] cannot find symbol
+  symbol:   class Vector
+  location: package org.jscience.mathematics.linearalgebra
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[6,38] package org.jscience.physics.astronomy does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[7,38] package org.jscience.physics.astronomy does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[8,30] cannot find symbol
+  symbol:   class PeriodicTable
+  location: package org.jscience.chemistry
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[9,30] cannot find symbol
+  symbol:   class Element
+  location: package org.jscience.chemistry
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[10,48] package org.jscience.physics.classical.mechanics does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[11,37] package org.jscience.biology.genetics does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[12,37] package org.jscience.biology.genetics does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[13,38] package org.jscience.earth.coordinates does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[14,38] package org.jscience.earth.coordinates does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[15,47] package org.jscience.computing.ai.neuralnetwork does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[16,47] package org.jscience.computing.ai.neuralnetwork does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[18,28] cannot find symbol
+  symbol:   class Quantity
+  location: package org.jscience.measure
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[19,28] cannot find symbol
+  symbol:   class Quantities
+  location: package org.jscience.measure
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[20,28] cannot find symbol
+  symbol:   class Units
+  location: package org.jscience.measure
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[21,37] package org.jscience.measure.quantity does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[22,37] package org.jscience.measure.quantity does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[23,37] package org.jscience.measure.quantity does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[24,37] package org.jscience.measure.quantity does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[25,37] package org.jscience.measure.quantity does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[26,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[27,46] cannot find symbol
+  symbol:   class Vector
+  location: package org.jscience.mathematics.linearalgebra
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[28,54] package org.jscience.mathematics.linearalgebra.vectors does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[29,54] package org.jscience.mathematics.linearalgebra.vectors does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/ConsciousnessFieldTest.java:[3,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/logic/proof/FormalProofTest.java:[4,48] package org.jscience.mathematics.logic.predicate does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/physics/optics/AdvancedOpticsTest.java:[5,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/physics/optics/AdvancedOpticsTest.java:[6,44] package org.jscience.physics.classical.waves.optics does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/discrete/DiscreteTest.java:[25,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/statistics/StatisticsTest.java:[5,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/statistics/StatisticsTest.java:[7,57] package org.jscience.mathematics.statistics.distributions does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/statistics/StatisticsTest.java:[8,57] package org.jscience.mathematics.statistics.distributions does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/discrete/DijkstraTest.java:[3,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/chemistry/ChemicalModelTest.java:[12,41] cannot find symbol
+  symbol:   class Vector3D
+  location: package org.jscience.mathematics.geometry
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/chemistry/ChemicalModelTest.java:[13,40] package org.jscience.resources.chemistry does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/chemistry/ChemicalModelTest.java:[15,46] cannot find symbol
+  symbol:   class Vector
+  location: package org.jscience.mathematics.linearalgebra
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/chemistry/ChemicalModelTest.java:[16,54] package org.jscience.mathematics.linearalgebra.vectors does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/chemistry/ChemicalModelTest.java:[17,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/chemistry/ChemicalModelTest.java:[18,37] package org.jscience.mathematics.sets does not exist
+[INFO] 100 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  27.721 s
+[INFO] Finished at: 2025-12-16T13:19:25+01:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:testCompile (default-cli) on project jscience: Compilation failure: Compilation failure: 
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/resources/properties/PropertySystemTest.java:[27,28] cannot find symbol
+[ERROR]   symbol:   class Quantity
+[ERROR]   location: package org.jscience.measure
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/resources/properties/PropertySystemTest.java:[28,28] cannot find symbol
+[ERROR]   symbol:   class Units
+[ERROR]   location: package org.jscience.measure
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/resources/properties/PropertySystemTest.java:[29,45] package org.jscience.physics.classical.matter does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/resources/properties/PropertySystemTest.java:[30,37] package org.jscience.measure.quantity does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/tensor/TensorTest.java:[26,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/tensor/TensorTest.java:[27,54] cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: package org.jscience.mathematics.linearalgebra.tensors
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/tensor/TensorTest.java:[28,54] cannot find symbol
+[ERROR]   symbol:   class DenseTensor
+[ERROR]   location: package org.jscience.mathematics.linearalgebra.tensors
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/tensor/TensorTest.java:[29,54] cannot find symbol
+[ERROR]   symbol:   class TensorFactory
+[ERROR]   location: package org.jscience.mathematics.linearalgebra.tensors
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/numbers/RealMathTest.java:[4,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/linearalgebra/tensors/TensorTest.java:[6,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/linearalgebra/tensors/TensorBenchmark.java:[25,63] cannot find symbol
+[ERROR]   symbol:   class CPUDenseTensorProvider
+[ERROR]   location: package org.jscience.mathematics.linearalgebra.tensors.backends
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/linearalgebra/tensors/TensorBenchmark.java:[26,63] cannot find symbol
+[ERROR]   symbol:   class CPUSIMDVectorTensorProvider
+[ERROR]   location: package org.jscience.mathematics.linearalgebra.tensors.backends
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/linearalgebra/tensors/TensorBenchmark.java:[27,63] cannot find symbol
+[ERROR]   symbol:   class TensorProvider
+[ERROR]   location: package org.jscience.mathematics.linearalgebra.tensors.backends
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/linearalgebra/tensors/TensorBenchmark.java:[28,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/linearalgebra/tensors/TensorBenchmark.java:[93,13] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.mathematics.linearalgebra.tensors.TensorBenchmark
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/algebra/PolynomialTest.java:[27,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/algebra/PolynomialTest.java:[28,37] package org.jscience.mathematics.sets does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/algebra/PolynomialTest.java:[29,51] package org.jscience.mathematics.analysis.functions does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/analysis/integration/LebesgueIntegrationTest.java:[25,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/analysis/integration/LebesgueIntegrationTest.java:[26,54] package org.jscience.mathematics.linearalgebra.vectors does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/analysis/integration/LebesgueIntegrationTest.java:[27,54] package org.jscience.mathematics.linearalgebra.vectors does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[3,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[5,41] cannot find symbol
+[ERROR]   symbol:   class Expression
+[ERROR]   location: package org.jscience.mathematics.symbolic
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[6,41] cannot find symbol
+[ERROR]   symbol:   class Variable
+[ERROR]   location: package org.jscience.mathematics.symbolic
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[7,41] cannot find symbol
+[ERROR]   symbol:   class PolynomialExpression
+[ERROR]   location: package org.jscience.mathematics.symbolic
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[46,19] cannot find symbol
+[ERROR]   symbol:   class Variable
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[46,28] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[47,19] cannot find symbol
+[ERROR]   symbol:   class Expression
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[47,30] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[48,19] cannot find symbol
+[ERROR]   symbol:   class Expression
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[48,30] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[49,19] cannot find symbol
+[ERROR]   symbol:   class Expression
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[49,30] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[50,19] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[51,19] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[59,39] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[59,52] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[98,12] cannot find symbol
+[ERROR]   symbol:   class Variable
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[98,21] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[107,12] cannot find symbol
+[ERROR]   symbol:   class Expression
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[107,23] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[116,12] cannot find symbol
+[ERROR]   symbol:   class Expression
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[116,23] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[125,12] cannot find symbol
+[ERROR]   symbol:   class Expression
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[125,23] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[135,35] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[135,12] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[147,36] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[147,12] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[159,42] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[159,12] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[192,12] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/SymbolicConsciousnessField.java:[196,12] cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class org.jscience.demo.conciousness.SymbolicConsciousnessField
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/analysis/special/SpecialFunctionsTest.java:[25,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/physics/electricity/simulation/CircuitTest.java:[11,72] package org.jscience.physics.classical.waves.electromagnetism.components does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/physics/electricity/simulation/CircuitTest.java:[12,72] package org.jscience.physics.classical.waves.electromagnetism.components does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/physics/electricity/simulation/CircuitTest.java:[13,72] package org.jscience.physics.classical.waves.electromagnetism.components does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/physics/electricity/simulation/CircuitTest.java:[14,70] package org.jscience.physics.classical.waves.electromagnetism.circuits does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/analysis/fem/FEMTest.java:[28,41] cannot find symbol
+[ERROR]   symbol:   class Function
+[ERROR]   location: package org.jscience.mathematics.analysis
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/analysis/fem/FEMTest.java:[29,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/analysis/fem/FEMTest.java:[30,54] package org.jscience.mathematics.linearalgebra.vectors does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/analysis/fem/FEMTest.java:[31,46] cannot find symbol
+[ERROR]   symbol:   class Vector
+[ERROR]   location: package org.jscience.mathematics.linearalgebra
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[6,38] package org.jscience.physics.astronomy does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[7,38] package org.jscience.physics.astronomy does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[8,30] cannot find symbol
+[ERROR]   symbol:   class PeriodicTable
+[ERROR]   location: package org.jscience.chemistry
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[9,30] cannot find symbol
+[ERROR]   symbol:   class Element
+[ERROR]   location: package org.jscience.chemistry
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[10,48] package org.jscience.physics.classical.mechanics does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[11,37] package org.jscience.biology.genetics does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[12,37] package org.jscience.biology.genetics does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[13,38] package org.jscience.earth.coordinates does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[14,38] package org.jscience.earth.coordinates does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[15,47] package org.jscience.computing.ai.neuralnetwork does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[16,47] package org.jscience.computing.ai.neuralnetwork does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[18,28] cannot find symbol
+[ERROR]   symbol:   class Quantity
+[ERROR]   location: package org.jscience.measure
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[19,28] cannot find symbol
+[ERROR]   symbol:   class Quantities
+[ERROR]   location: package org.jscience.measure
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[20,28] cannot find symbol
+[ERROR]   symbol:   class Units
+[ERROR]   location: package org.jscience.measure
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[21,37] package org.jscience.measure.quantity does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[22,37] package org.jscience.measure.quantity does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[23,37] package org.jscience.measure.quantity does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[24,37] package org.jscience.measure.quantity does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[25,37] package org.jscience.measure.quantity does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[26,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[27,46] cannot find symbol
+[ERROR]   symbol:   class Vector
+[ERROR]   location: package org.jscience.mathematics.linearalgebra
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[28,54] package org.jscience.mathematics.linearalgebra.vectors does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/ScienceVerificationTest.java:[29,54] package org.jscience.mathematics.linearalgebra.vectors does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/demo/conciousness/ConsciousnessFieldTest.java:[3,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/logic/proof/FormalProofTest.java:[4,48] package org.jscience.mathematics.logic.predicate does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/physics/optics/AdvancedOpticsTest.java:[5,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/physics/optics/AdvancedOpticsTest.java:[6,44] package org.jscience.physics.classical.waves.optics does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/discrete/DiscreteTest.java:[25,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/statistics/StatisticsTest.java:[5,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/statistics/StatisticsTest.java:[7,57] package org.jscience.mathematics.statistics.distributions does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/statistics/StatisticsTest.java:[8,57] package org.jscience.mathematics.statistics.distributions does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/mathematics/discrete/DijkstraTest.java:[3,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/chemistry/ChemicalModelTest.java:[12,41] cannot find symbol
+[ERROR]   symbol:   class Vector3D
+[ERROR]   location: package org.jscience.mathematics.geometry
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/chemistry/ChemicalModelTest.java:[13,40] package org.jscience.resources.chemistry does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/chemistry/ChemicalModelTest.java:[15,46] cannot find symbol
+[ERROR]   symbol:   class Vector
+[ERROR]   location: package org.jscience.mathematics.linearalgebra
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/chemistry/ChemicalModelTest.java:[16,54] package org.jscience.mathematics.linearalgebra.vectors does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/chemistry/ChemicalModelTest.java:[17,45] package org.jscience.mathematics.numbers.real does not exist
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/src/test/java/org/jscience/chemistry/ChemicalModelTest.java:[18,37] package org.jscience.mathematics.sets does not exist
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

@@ -1,8 +1,7 @@
 package org.jscience.mathematics.analysis.interpolation;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Polynomial interpolation methods.

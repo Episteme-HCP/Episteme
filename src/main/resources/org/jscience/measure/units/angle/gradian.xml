@@ -1,4 +1,0 @@
-<unit id="gradian" name="gradian" abbreviation="grad" unitType="angle" parentSI="radian"
-      multiplierToSI="1.57079632679E-2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>A unit of angular measure in which the angle of an entire circle is 400 gradians</description>
-</unit>

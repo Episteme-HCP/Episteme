@@ -1,7 +1,6 @@
 package org.jscience.mathematics.algebra.algebras;
 
 import org.jscience.mathematics.algebra.Algebra;
-import org.jscience.mathematics.vector.Vector;
 
 /**
  * Represents a Lie Algebra.
@@ -21,7 +20,7 @@ import org.jscience.mathematics.vector.Vector;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface LieAlgebra<E extends Vector<S>, S> extends Algebra<E, S> {
+public interface LieAlgebra<E, S> extends Algebra<E, S> {
 
     /**
      * Returns the Lie bracket [a, b].

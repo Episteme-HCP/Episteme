@@ -23,7 +23,7 @@
 package org.jscience.mathematics.symbolic;
 
 import java.util.Map;
-import org.jscience.mathematics.algebra.Ring;
+import org.jscience.mathematics.structures.rings.Ring;
 
 /**
  * Generic interface for symbolic mathematical expressions.

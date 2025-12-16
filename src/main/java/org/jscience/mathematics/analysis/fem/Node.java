@@ -22,8 +22,8 @@
  */
 package org.jscience.mathematics.analysis.fem;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.Vector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
 
 /**
  * Represents a node in the finite element mesh.
@@ -94,4 +94,3 @@ public class Node {
         return "Node[" + id + "] " + coordinates;
     }
 }
-

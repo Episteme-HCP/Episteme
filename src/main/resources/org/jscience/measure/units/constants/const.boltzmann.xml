@@ -1,3 +1,0 @@
-<unit id="const.boltzmann" name="Boltzmann constant" abbreviation="k" unitType="entropy" parentSI="joulePerKelvin"
-      multiplierToSI="1.380658E-23" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

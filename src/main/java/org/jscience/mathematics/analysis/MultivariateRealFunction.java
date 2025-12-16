@@ -22,8 +22,8 @@
  */
 package org.jscience.mathematics.analysis;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.Vector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
 
 /**
  * Represents a real-valued function of multiple real variables (R^n -> R).
@@ -59,9 +59,13 @@ public interface MultivariateRealFunction extends Function<Vector<Real>, Real> {
      * @return the gradient vector
      */
     default Vector<Real> gradient(Vector<Real> point) {
-        // Default to numerical gradient approximation
-        // TODO: Implement numerical gradient (e.g. central difference)
-        throw new UnsupportedOperationException("Numerical gradient not yet implemented");
+        int n = point.dimension();
+        java.util.List<Real> grad = new java.util.ArrayList<>(n);
+        for (int i = 0; i < n; i++) {
+            grad.add(partialDerivative(point, i));
+        }
+        return org.jscience.mathematics.linearalgebra.vectors.DenseVector.of(grad,
+                org.jscience.mathematics.sets.Reals.getInstance());
     }
 
     /**
@@ -73,9 +77,32 @@ public interface MultivariateRealFunction extends Function<Vector<Real>, Real> {
      * @return the partial derivative ∂f/∂xi
      */
     default Real partialDerivative(Vector<Real> point, int variableIndex) {
-        // Default to numerical differentiation
-        // TODO: Implement numerical partial derivative
-        throw new UnsupportedOperationException("Numerical partial derivative not yet implemented");
+        // Central difference approximation: (f(x+h) - f(x-h)) / 2h
+        double h = 1e-8;
+        Real hReal = Real.of(h);
+
+        // Create x+h vector
+        java.util.List<Real> plusHCoords = new java.util.ArrayList<>();
+        for (int i = 0; i < point.dimension(); i++) {
+            plusHCoords.add(point.get(i));
+        }
+        plusHCoords.set(variableIndex, plusHCoords.get(variableIndex).add(hReal));
+        Vector<Real> pointPlusH = org.jscience.mathematics.linearalgebra.vectors.DenseVector.of(plusHCoords,
+                org.jscience.mathematics.sets.Reals.getInstance());
+
+        // Create x-h vector
+        java.util.List<Real> minusHCoords = new java.util.ArrayList<>();
+        for (int i = 0; i < point.dimension(); i++) {
+            minusHCoords.add(point.get(i));
+        }
+        minusHCoords.set(variableIndex, minusHCoords.get(variableIndex).subtract(hReal));
+        Vector<Real> pointMinusH = org.jscience.mathematics.linearalgebra.vectors.DenseVector.of(minusHCoords,
+                org.jscience.mathematics.sets.Reals.getInstance());
+
+        Real fPlus = evaluate(pointPlusH);
+        Real fMinus = evaluate(pointMinusH);
+
+        return fPlus.subtract(fMinus).divide(hReal.multiply(Real.of(2.0)));
     }
 
     @Override
@@ -88,4 +115,3 @@ public interface MultivariateRealFunction extends Function<Vector<Real>, Real> {
         return "R";
     }
 }
-

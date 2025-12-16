@@ -22,8 +22,8 @@
  */
 package org.jscience.physics.quantum;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.physics.foundation.PhysicalConstants;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.physics.PhysicalConstants;
 
 /**
  * Nuclear physics - decay, fission, fusion, binding energy.
@@ -186,4 +186,3 @@ public class NuclearPhysics {
         return density1.multiply(density2).multiply(Real.of(sigmaV));
     }
 }
-

@@ -1,4 +1,0 @@
-<unit id="kilometerSquared" name="kilometer squared" abbreviation="km^2" unitType="area" parentSI="meterSquared"
-      multiplierToSI="1.0E+6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>square kilometers</description>
-</unit>

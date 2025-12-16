@@ -1,29 +1,8 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
 package org.jscience.mathematics.geometry;
 
-import org.jscience.mathematics.vector.DenseVector;
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.sets.Reals;
 import java.util.Arrays;
 
 /**
@@ -36,7 +15,10 @@ import java.util.Arrays;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Vector3D extends DenseVector<Real> {
+public class Vector3D extends DenseVector<Real> implements
+        org.jscience.mathematics.topology.MetricSpace<org.jscience.mathematics.linearalgebra.Vector<Real>> {
+
+    private static final Reals REALS = Reals.getInstance();
 
     public static final Vector3D ZERO = new Vector3D(0, 0, 0);
     public static final Vector3D X_AXIS = new Vector3D(1, 0, 0);
@@ -51,7 +33,7 @@ public class Vector3D extends DenseVector<Real> {
      * @param z the z coordinate
      */
     public Vector3D(double x, double y, double z) {
-        super(Arrays.asList(Real.of(x), Real.of(y), Real.of(z)), null);
+        super(Arrays.asList(Real.of(x), Real.of(y), Real.of(z)), REALS);
     }
 
     /**
@@ -62,7 +44,7 @@ public class Vector3D extends DenseVector<Real> {
      * @param z the z coordinate
      */
     public Vector3D(Real x, Real y, Real z) {
-        super(Arrays.asList(x, y, z), null);
+        super(Arrays.asList(x, y, z), REALS);
     }
 
     public Real x() {
@@ -82,12 +64,6 @@ public class Vector3D extends DenseVector<Real> {
      * Overridden to return Vector3D type.
      */
     public Vector3D cross(Vector3D other) {
-        // We can optimize this to avoid list creation overhead of super.cross()
-        // if performance becomes critical, but for now delegating is fine
-        // provided we cast or wrap the result.
-        // Super returns Vector<E>, which is likely a DenseVector.
-        // We need to construct a new Vector3D from it.
-
         Real x1 = this.x();
         Real y1 = this.y();
         Real z1 = this.z();
@@ -112,5 +88,73 @@ public class Vector3D extends DenseVector<Real> {
 
     public double getZ() {
         return z().doubleValue();
+    }
+
+    public Vector3D normalize() {
+        Real n = this.normValue();
+        if (n.equals(Real.ZERO)) {
+            return new Vector3D(0, 0, 0);
+        }
+        return this.divide(n);
+    }
+
+    public Real normValue() {
+        return x().multiply(x()).add(y().multiply(y())).add(z().multiply(z())).sqrt();
+    }
+
+    public Vector3D multiply(Real scalar) {
+        return new Vector3D(x().multiply(scalar), y().multiply(scalar), z().multiply(scalar));
+    }
+
+    public Vector3D divide(Real scalar) {
+        return new Vector3D(x().divide(scalar), y().divide(scalar), z().divide(scalar));
+    }
+
+    public Vector3D negate() {
+        return new Vector3D(x().negate(), y().negate(), z().negate());
+    }
+
+    @Override
+    public Real distance(org.jscience.mathematics.linearalgebra.Vector<Real> a,
+            org.jscience.mathematics.linearalgebra.Vector<Real> b) {
+        return a.subtract(b).norm();
+    }
+
+    // MetricSpace / Set methods
+    @Override
+    public boolean containsPoint(org.jscience.mathematics.linearalgebra.Vector<Real> p) {
+        return this.equals(p);
+    }
+
+    @Override
+    public boolean contains(org.jscience.mathematics.linearalgebra.Vector<Real> p) {
+        return containsPoint(p);
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public boolean isOpen() {
+        return false;
+    }
+
+    @Override
+    public boolean isClosed() {
+        return true;
+    }
+
+    public Real dot(Vector3D other) {
+        return x().multiply(other.x()).add(y().multiply(other.y())).add(z().multiply(other.z()));
+    }
+
+    public Vector3D subtract(Vector3D other) {
+        return new Vector3D(x().subtract(other.x()), y().subtract(other.y()), z().subtract(other.z()));
+    }
+
+    public Vector3D add(Vector3D other) {
+        return new Vector3D(x().add(other.x()), y().add(other.y()), z().add(other.z()));
     }
 }

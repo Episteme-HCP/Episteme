@@ -1,7 +1,7 @@
 package org.jscience.mathematics.discrete.graph.flow;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.discrete.Graph;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.discrete.WeightedGraph;
 import java.util.*;
 
 /**
@@ -19,19 +19,32 @@ public class MaxFlow {
     /**
      * Computes maximum flow using Ford-Fulkerson with DFS.
      * 
-     * @param graph  flow network
+     * @param <V>    the type of vertices
+     * @param graph  flow network (must be a WeightedGraph with Real weights)
      * @param source source vertex
      * @param sink   sink vertex
      * @return maximum flow value
      */
-    public static Real fordFulkerson(Graph<Real> graph, int source, int sink) {
-        int n = graph.vertexCount();
+    public static <V> Real fordFulkerson(WeightedGraph<V, Real> graph, V source, V sink) {
+        List<V> vertices = new ArrayList<>(graph.vertices());
+        Map<V, Integer> vertexToIndex = new HashMap<>();
+        for (int i = 0; i < vertices.size(); i++) {
+            vertexToIndex.put(vertices.get(i), i);
+        }
+
+        if (!vertexToIndex.containsKey(source) || !vertexToIndex.containsKey(sink)) {
+            throw new IllegalArgumentException("Source or sink not in graph");
+        }
+
+        int s = vertexToIndex.get(source);
+        int t = vertexToIndex.get(sink);
+        int n = vertices.size();
 
         // Residual capacity graph
         Real[][] residual = new Real[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                Real weight = graph.getWeight(i, j);
+                Real weight = graph.getWeight(vertices.get(i), vertices.get(j));
                 residual[i][j] = (weight != null) ? weight : Real.ZERO;
             }
         }
@@ -40,10 +53,10 @@ public class MaxFlow {
         int[] parent = new int[n];
 
         // While there exists augmenting path
-        while (hasAugmentingPath(residual, source, sink, parent)) {
+        while (hasAugmentingPath(residual, s, t, parent)) {
             // Find minimum capacity along path
             Real pathFlow = Real.of(Double.MAX_VALUE);
-            for (int v = sink; v != source; v = parent[v]) {
+            for (int v = t; v != s; v = parent[v]) {
                 int u = parent[v];
                 if (residual[u][v].compareTo(pathFlow) < 0) {
                     pathFlow = residual[u][v];
@@ -51,7 +64,7 @@ public class MaxFlow {
             }
 
             // Update residual capacities
-            for (int v = sink; v != source; v = parent[v]) {
+            for (int v = t; v != s; v = parent[v]) {
                 int u = parent[v];
                 residual[u][v] = residual[u][v].subtract(pathFlow);
                 residual[v][u] = residual[v][u].add(pathFlow);
@@ -101,13 +114,25 @@ public class MaxFlow {
      * Guaranteed to terminate for irrational capacities.
      * </p>
      */
-    public static Real edmondsKarp(Graph<Real> graph, int source, int sink) {
-        int n = graph.vertexCount();
+    public static <V> Real edmondsKarp(WeightedGraph<V, Real> graph, V source, V sink) {
+        List<V> vertices = new ArrayList<>(graph.vertices());
+        Map<V, Integer> vertexToIndex = new HashMap<>();
+        for (int i = 0; i < vertices.size(); i++) {
+            vertexToIndex.put(vertices.get(i), i);
+        }
+
+        if (!vertexToIndex.containsKey(source) || !vertexToIndex.containsKey(sink)) {
+            throw new IllegalArgumentException("Source or sink not in graph");
+        }
+
+        int s = vertexToIndex.get(source);
+        int t = vertexToIndex.get(sink);
+        int n = vertices.size();
 
         Real[][] residual = new Real[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                Real weight = graph.getWeight(i, j);
+                Real weight = graph.getWeight(vertices.get(i), vertices.get(j));
                 residual[i][j] = (weight != null) ? weight : Real.ZERO;
             }
         }
@@ -115,18 +140,18 @@ public class MaxFlow {
         Real maxFlow = Real.ZERO;
         int[] parent = new int[n];
 
-        while (bfs(residual, source, sink, parent)) {
+        while (bfs(residual, s, t, parent)) {
             // Find minimum capacity
             Real pathFlow = Real.of(Double.MAX_VALUE);
-            for (int v = sink; v != source; v = parent[v]) {
+            for (int v = t; v != s; v = parent[v]) {
                 int u = parent[v];
                 if (residual[u][v].compareTo(pathFlow) < 0) {
                     pathFlow = residual[u][v];
                 }
             }
 
-            // Update residual graph
-            for (int v = sink; v != source; v = parent[v]) {
+            // Update residual capacities
+            for (int v = t; v != s; v = parent[v]) {
                 int u = parent[v];
                 residual[u][v] = residual[u][v].subtract(pathFlow);
                 residual[v][u] = residual[v][u].add(pathFlow);
@@ -146,19 +171,20 @@ public class MaxFlow {
         Queue<Integer> queue = new LinkedList<>();
         queue.add(source);
         visited[source] = true;
+        parent[source] = -1;
 
         while (!queue.isEmpty()) {
             int u = queue.poll();
 
             for (int v = 0; v < n; v++) {
                 if (!visited[v] && residual[u][v].compareTo(Real.ZERO) > 0) {
-                    visited[v] = true;
-                    parent[v] = u;
-                    queue.add(v);
-
                     if (v == sink) {
+                        parent[v] = u;
                         return true;
                     }
+                    queue.add(v);
+                    parent[v] = u;
+                    visited[v] = true;
                 }
             }
         }

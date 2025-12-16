@@ -25,8 +25,8 @@ package org.jscience.mathematics.analysis.series.oeis;
 import java.io.PrintWriter;
 
 import org.jscience.mathematics.analysis.series.IntegerSequence;
-import org.jscience.mathematics.number.Integer;
-import org.jscience.mathematics.number.Natural;
+import org.jscience.mathematics.numbers.integers.Integer;
+import org.jscience.mathematics.numbers.integers.Natural;
 
 /**
  * Exporter for sequences to OEIS formats.

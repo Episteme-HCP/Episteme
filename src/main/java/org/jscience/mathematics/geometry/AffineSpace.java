@@ -1,6 +1,6 @@
 package org.jscience.mathematics.geometry;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents an affine space.
@@ -90,6 +90,7 @@ public interface AffineSpace<V> {
 
         // Add weighted differences
         for (int i = 1; i < points.length; i++) {
+            @SuppressWarnings("unused")
             V diff = difference(points[i], points[0]);
             // Scale diff by weight[i] and add to result
             // This requires vector scaling - implementation depends on V type
@@ -98,4 +99,3 @@ public interface AffineSpace<V> {
         return result;
     }
 }
-

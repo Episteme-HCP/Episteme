@@ -1,4 +1,0 @@
-<unit id="line" name="line" abbreviation="li" unitType="magneticFlux" parentSI="weber" multiplierToSI="1.0E-8"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>A former name for the maxwell</description>
-</unit>

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.jscience.mathematics.algebra.Ring;
+import org.jscience.mathematics.structures.rings.Ring;
 import java.util.TreeMap;
 
 /**
@@ -139,23 +139,8 @@ public class PolynomialRing<E> implements Ring<PolynomialRing.Polynomial<E>> {
 
         public E evaluate(E x) {
             E result = ring.coefficientRing.zero();
-            E xPow = ring.coefficientRing.one();
 
             // Evaluate sum(a_i * x^i)
-            // Optimization: Horner's method would be better but requires ordering.
-            // Since we have a TreeMap, we can iterate.
-            // But Horner's works best high-to-low.
-
-            E currentVal = ring.coefficientRing.zero();
-            // Iterate high degree to low for Horner's
-            List<Integer> degrees = new ArrayList<>(coefficients.keySet());
-            Collections.reverse(degrees);
-
-            if (degrees.isEmpty())
-                return result;
-
-            int currentDeg = degrees.get(0);
-
             // Naive implementation for general rings (can be optimized)
             for (Map.Entry<Integer, E> entry : coefficients.entrySet()) {
                 E term = entry.getValue();

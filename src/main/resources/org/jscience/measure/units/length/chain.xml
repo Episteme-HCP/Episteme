@@ -1,4 +1,0 @@
-<unit id="chain" name="chain" abbreviation="ch" unitType="length" parentSI="meter" multiplierToSI="20.1168"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 chain = 1/10 furlong</description>
-</unit>

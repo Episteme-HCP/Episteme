@@ -22,8 +22,8 @@
  */
 package org.jscience.distributed;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.number.Complex;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.numbers.complex.Complex;
 import org.jscience.mathematics.analysis.transform.DiscreteFourierTransform;
 
 import java.io.Serializable;

@@ -1,3 +1,0 @@
-<unit id="poise" name="poise" abbreviation="P" unitType="dynamicViscosity" parentSI="pascalSecond" multiplierToSI="0.1"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

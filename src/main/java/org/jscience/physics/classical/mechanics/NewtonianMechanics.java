@@ -20,9 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jscience.physics.mechanics;
+package org.jscience.physics.classical.mechanics;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.quantity.*;
 
@@ -68,5 +68,3 @@ public class NewtonianMechanics {
         return mass.multiply(g).multiply(height).asType(Energy.class);
     }
 }
-
-

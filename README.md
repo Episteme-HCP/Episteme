@@ -9,6 +9,7 @@ Mathematics → Physics → Chemistry → Biology → Human Sciences
 ## Vision
 
 JScience Reimagined creates an integrated API where:
+
 - A **biologist** extends biology classes and automatically gets chemistry, physics, and mathematics
 - A **chemist** works with molecules and automatically gets quantum mechanics and statistical analysis
 - All sciences respect their natural hierarchy and interdependencies
@@ -33,6 +34,8 @@ Statistics stats = dna.computeAlignmentStats();   // Mathematics layer
 - ✅ **JSR-385 Integration**: Full units of measurement support
 - ✅ **Modern Java 21**: Records, pattern matching, value types (when available)
 - ✅ **GPU Support**: CUDA backends for intensive computations
+- ✅ **Data Processing**: Import/Export support for JSON (Chemistry, etc.)
+- ✅ **Benchmarking**: Built-in JMH benchmarks and Graph generation
 - ✅ **Complete Documentation**: Javadoc, architecture guides, examples
 - ✅ **Internationalization**: EN, FR, ES, DE
 
@@ -59,18 +62,20 @@ Matrix<CudaFloat> gpu = Matrix.create(data, new CudaScalar());
 
 ## Project Status
 
-**Phase 1: Mathematical Foundation** (In Progress)
-- Algebraic structures (Set, Magma, Ring, Field, etc.)
-- Generic scalar type system
-- JSR-385 units integration
+**Phase 1-13: Core, Cleanup & Benchmarks** (Completed)
 
-See [task.md](task.md) for detailed progress.
+- Algebraic structures & Linear Algebra (Dense/Sparse/GPU)
+- Physics (Astronomy, Mechanics) & Chemistry (Periodic Table)
+- Comprehensive Cleanup & Benchmarking Suite
+
+See [roadmap.md](roadmap.md) and [task.md](task.md) for detailed progress.
 
 ## Architecture
 
 See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for complete design.
 
 **Core Principles:**
+
 1. **Performance First**: Primitives by default, objects when needed
 2. **Scientific Accuracy**: Respect mathematical and physical concepts
 3. **Ease of Use**: Domain scientists shouldn't need to know lower layers
@@ -105,6 +110,7 @@ MIT License - see [LICENSE](LICENSE) file.
 We welcome contributions! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 Areas we need help:
+
 - Physics layer implementation
 - Chemistry domain expertise
 - Biology algorithms

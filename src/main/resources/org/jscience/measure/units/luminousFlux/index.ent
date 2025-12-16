@@ -1,9 +1,0 @@
-
-<!ENTITY candelaSteradian.xml SYSTEM "../luminousFlux/candelaSteradian.xml">
-<!ENTITY lumen.xml SYSTEM "../luminousFlux/lumen.xml">
-
-<!ENTITY luminousFlux.elements	"
-&candelaSteradian.xml;
-&lumen.xml;
-">
-

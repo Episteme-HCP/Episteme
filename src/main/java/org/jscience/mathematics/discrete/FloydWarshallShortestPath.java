@@ -27,7 +27,7 @@ public class FloydWarshallShortestPath<V, W> {
         return new FloydWarshallShortestPath<>(GraphWeightAdapter.DOUBLE);
     }
 
-    public static <V> FloydWarshallShortestPath<V, org.jscience.mathematics.number.Real> ofReal() {
+    public static <V> FloydWarshallShortestPath<V, org.jscience.mathematics.numbers.real.Real> ofReal() {
         return new FloydWarshallShortestPath<>(GraphWeightAdapter.REAL);
     }
 
@@ -50,6 +50,7 @@ public class FloydWarshallShortestPath<V, W> {
         }
 
         // Initialize distance matrix
+        @SuppressWarnings("unchecked")
         W[][] dist = (W[][]) new Object[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {

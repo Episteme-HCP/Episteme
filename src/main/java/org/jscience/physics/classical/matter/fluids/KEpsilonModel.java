@@ -1,0 +1,194 @@
+package org.jscience.physics.classical.matter.fluids;
+
+/**
+ * k-epsilon turbulence model for RANS simulations.
+ * 
+ * Standard k-ε model equations:
+ * Dk/Dt = P_k - ε + ∇·((ν + ν_t/σ_k)∇k)
+ * Dε/Dt = C_ε1 * ε/k * P_k - C_ε2 * ε²/k + ∇·((ν + ν_t/σ_ε)∇ε)
+ * 
+ * where ν_t = C_μ * k²/ε (turbulent viscosity)
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI
+ * @since 5.0
+ */
+public class KEpsilonModel {
+
+    // Standard k-ε model constants
+    public static final double C_MU = 0.09;
+    public static final double C_EPS1 = 1.44;
+    public static final double C_EPS2 = 1.92;
+    public static final double SIGMA_K = 1.0;
+    public static final double SIGMA_EPS = 1.3;
+
+    private final int width;
+    private final int height;
+    private final double nu; // Molecular viscosity
+
+    // Turbulence fields
+    private double[][] k; // Turbulent kinetic energy
+    private double[][] epsilon; // Dissipation rate
+    private double[][] nuT; // Turbulent viscosity
+
+    // Velocity gradients (should be provided by main solver)
+    private double[][] dudx, dudy, dvdx, dvdy;
+
+    public KEpsilonModel(int width, int height, double molecularViscosity) {
+        this.width = width;
+        this.height = height;
+        this.nu = molecularViscosity;
+
+        k = new double[width][height];
+        epsilon = new double[width][height];
+        nuT = new double[width][height];
+
+        dudx = new double[width][height];
+        dudy = new double[width][height];
+        dvdx = new double[width][height];
+        dvdy = new double[width][height];
+
+        // Initialize with small values to avoid division by zero
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                k[x][y] = 1e-6;
+                epsilon[x][y] = 1e-8;
+            }
+        }
+    }
+
+    /**
+     * Sets inlet turbulence conditions.
+     * 
+     * @param inletK       Inlet turbulent kinetic energy
+     * @param inletEpsilon Inlet dissipation rate
+     */
+    public void setInletConditions(double inletK, double inletEpsilon) {
+        for (int y = 0; y < height; y++) {
+            k[0][y] = inletK;
+            epsilon[0][y] = inletEpsilon;
+        }
+    }
+
+    /**
+     * Estimates inlet k and ε from turbulence intensity and length scale.
+     * k = 1.5 * (U * I)²
+     * ε = C_μ^(3/4) * k^(3/2) / L
+     */
+    public static double[] estimateInletConditions(double velocity, double turbulenceIntensity,
+            double lengthScale) {
+        double kIn = 1.5 * Math.pow(velocity * turbulenceIntensity, 2);
+        double epsIn = Math.pow(C_MU, 0.75) * Math.pow(kIn, 1.5) / lengthScale;
+        return new double[] { kIn, epsIn };
+    }
+
+    /**
+     * Updates velocity gradients (call before each step).
+     */
+    public void setVelocityGradients(double[][] dudx, double[][] dudy,
+            double[][] dvdx, double[][] dvdy) {
+        this.dudx = dudx;
+        this.dudy = dudy;
+        this.dvdx = dvdx;
+        this.dvdy = dvdy;
+    }
+
+    /**
+     * Performs one time step of k-ε model.
+     * 
+     * @param dt Time step
+     */
+    public void step(double dt) {
+        // Compute turbulent viscosity
+        computeTurbulentViscosity();
+
+        // Compute production term
+        double[][] Pk = computeProduction();
+
+        // Update k and ε (explicit Euler, simplified)
+        for (int x = 1; x < width - 1; x++) {
+            for (int y = 1; y < height - 1; y++) {
+                double localK = k[x][y];
+                double localEps = epsilon[x][y];
+
+                // Ensure numerical stability
+                if (localK < 1e-10)
+                    localK = 1e-10;
+                if (localEps < 1e-12)
+                    localEps = 1e-12;
+
+                // k equation: dk/dt = P_k - ε
+                double dkdt = Pk[x][y] - localEps;
+
+                // ε equation: dε/dt = C_ε1 * ε/k * P_k - C_ε2 * ε²/k
+                double depsdt = C_EPS1 * localEps / localK * Pk[x][y]
+                        - C_EPS2 * localEps * localEps / localK;
+
+                // Update
+                k[x][y] = Math.max(1e-10, localK + dt * dkdt);
+                epsilon[x][y] = Math.max(1e-12, localEps + dt * depsdt);
+            }
+        }
+
+        // Recompute turbulent viscosity
+        computeTurbulentViscosity();
+    }
+
+    private void computeTurbulentViscosity() {
+        // ν_t = C_μ * k²/ε
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                double localK = Math.max(k[x][y], 1e-10);
+                double localEps = Math.max(epsilon[x][y], 1e-12);
+                nuT[x][y] = C_MU * localK * localK / localEps;
+            }
+        }
+    }
+
+    private double[][] computeProduction() {
+        // P_k = ν_t * S² where S² = 2*S_ij*S_ij
+        double[][] Pk = new double[width][height];
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                // Strain rate tensor components
+                double s11 = dudx[x][y];
+                double s22 = dvdy[x][y];
+                double s12 = 0.5 * (dudy[x][y] + dvdx[x][y]);
+
+                // S² = 2*(s11² + s22² + 2*s12²)
+                double s2 = 2.0 * (s11 * s11 + s22 * s22 + 2 * s12 * s12);
+
+                Pk[x][y] = nuT[x][y] * s2;
+            }
+        }
+
+        return Pk;
+    }
+
+    /**
+     * Returns effective viscosity (molecular + turbulent).
+     */
+    public double[][] getEffectiveViscosity() {
+        double[][] nuEff = new double[width][height];
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                nuEff[x][y] = nu + nuT[x][y];
+            }
+        }
+        return nuEff;
+    }
+
+    // Accessors
+    public double[][] getK() {
+        return k;
+    }
+
+    public double[][] getEpsilon() {
+        return epsilon;
+    }
+
+    public double[][] getTurbulentViscosity() {
+        return nuT;
+    }
+}

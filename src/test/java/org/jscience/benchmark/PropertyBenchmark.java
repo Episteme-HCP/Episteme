@@ -23,9 +23,7 @@
 package org.jscience.benchmark;
 
 import org.jscience.measure.Quantity;
-import org.jscience.physics.matter.Material;
-import org.jscience.resources.properties.PropertyKey;
-import org.jscience.resources.properties.PropertySet;
+import org.jscience.physics.classical.matter.Material;
 
 import java.util.HashMap;
 import java.util.Map;

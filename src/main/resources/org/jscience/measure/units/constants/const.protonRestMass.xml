@@ -1,4 +1,0 @@
-<unit id="const.protonRestMass" name="proton rest mass" abbreviation="m_p" unitType="mass" parentSI="kilogram"
-      multiplierToSI="1.6726E-24" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>Mass of a proton</description>
-</unit>

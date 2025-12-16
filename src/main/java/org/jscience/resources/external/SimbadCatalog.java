@@ -94,7 +94,9 @@ public class SimbadCatalog {
      * Placeholder for future mapping to Astronomy domain objects.
      */
     public static <T> T map(String xml, Class<T> target) {
-        throw new UnsupportedOperationException("Domain class " + target.getSimpleName() + " not yet designed.");
+        System.err.println(
+                "WARNING: Domain mapping for " + target.getSimpleName() + " is not yet implemented. Returning null.");
+        return null;
     }
 
     private static String fetchUrl(String urlStr) {
@@ -124,4 +126,3 @@ public class SimbadCatalog {
     private SimbadCatalog() {
     }
 }
-

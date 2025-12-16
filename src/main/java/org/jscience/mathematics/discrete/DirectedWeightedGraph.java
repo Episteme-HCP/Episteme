@@ -22,7 +22,7 @@
  */
 package org.jscience.mathematics.discrete;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import java.util.*;
 
 /**
@@ -65,6 +65,11 @@ public class DirectedWeightedGraph<V, W> implements WeightedGraph<V, W> {
     @Override
     public Set<V> vertices() {
         return Collections.unmodifiableSet(adjacencyList.keySet());
+    }
+
+    @Override
+    public int vertexCount() {
+        return adjacencyList.size();
     }
 
     @Override

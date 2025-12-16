@@ -1,6 +1,6 @@
 package org.jscience.mathematics.geometry;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a line segment in 2D space.
@@ -81,8 +81,7 @@ public class Segment2D implements GeometricObject<Point2D> {
         return Point2D.of(x, y);
     }
 
-    @Override
-    public boolean contains(Point2D p) {
+    public boolean containsPoint(Point2D p) {
         // Check if p is collinear with start and end
         Real dx1 = p.getX().subtract(start.getX());
         Real dy1 = p.getY().subtract(start.getY());
@@ -141,4 +140,3 @@ public class Segment2D implements GeometricObject<Point2D> {
         return start.hashCode() + end.hashCode();
     }
 }
-

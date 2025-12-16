@@ -1,8 +1,8 @@
 package org.jscience.mathematics.geometry;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.Vector;
-import org.jscience.mathematics.vector.DenseVector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,7 +18,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public class PointND implements GeometricObject<PointND> {
+public class PointND implements GeometricObject<PointND>, org.jscience.mathematics.topology.MetricSpace<PointND> {
 
     private final Vector<Real> coordinates;
 
@@ -97,9 +97,13 @@ public class PointND implements GeometricObject<PointND> {
         return coordinates;
     }
 
+    public boolean containsPoint(PointND point) {
+        return this.equals(point);
+    }
+
     @Override
     public boolean contains(PointND point) {
-        return this.equals(point);
+        return containsPoint(point);
     }
 
     /**
@@ -108,6 +112,27 @@ public class PointND implements GeometricObject<PointND> {
      * @param other the other point
      * @return the distance
      */
+    // MetricSpace implementation
+    @Override
+    public Real distance(PointND a, PointND b) {
+        return a.distanceTo(b);
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public boolean isOpen() {
+        return false;
+    }
+
+    @Override
+    public boolean isClosed() {
+        return true;
+    }
+
     public Real distanceTo(PointND other) {
         if (other.ambientDimension() != this.ambientDimension()) {
             throw new IllegalArgumentException("Points must have same dimension");
@@ -196,4 +221,3 @@ public class PointND implements GeometricObject<PointND> {
         return coordinates.hashCode();
     }
 }
-

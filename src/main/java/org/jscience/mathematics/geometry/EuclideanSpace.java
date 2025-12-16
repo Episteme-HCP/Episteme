@@ -1,6 +1,6 @@
 package org.jscience.mathematics.geometry;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.topology.Metric;
 
 /**

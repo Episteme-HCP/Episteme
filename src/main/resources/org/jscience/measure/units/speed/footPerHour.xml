@@ -1,5 +1,0 @@
-<unit id="footPerHour" name="foot per hour" unitType="speed" parentSI="meterPerSecond"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <unit ref="foot" power="1"/>
-    <unit ref="hour" power="-1"/>
-</unit>

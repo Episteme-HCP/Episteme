@@ -24,8 +24,8 @@ package org.jscience.mathematics.symbolic;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.jscience.mathematics.algebra.Ring;
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.structures.rings.Ring;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a power series Σ aₙxⁿ.
@@ -175,7 +175,7 @@ public class Series<T extends Ring<T>> {
      * @param order the number of terms
      * @return the Taylor series
      */
-    public static Series<Real> taylor(org.jscience.mathematics.function.DifferentiableFunction<Real, Real> f, Real a,
+    public static Series<Real> taylor(org.jscience.mathematics.analysis.DifferentiableFunction<Real, Real> f, Real a,
             int order) {
         List<Real> coeffs = new ArrayList<>();
         Real factorial = Real.ONE;
@@ -191,7 +191,7 @@ public class Series<T extends Ring<T>> {
         // differentiation!
 
         // Let's use a simplified approach: assume f can be differentiated repeatedly.
-        org.jscience.mathematics.function.Function<Real, Real> currentDeriv = f;
+        org.jscience.mathematics.analysis.Function<Real, Real> currentDeriv = f;
 
         for (int n = 0; n < order; n++) {
             if (n > 0) {
@@ -201,17 +201,17 @@ public class Series<T extends Ring<T>> {
             Real derivativeAtA;
             if (n == 0) {
                 derivativeAtA = f.evaluate(a);
-            } else if (currentDeriv instanceof org.jscience.mathematics.function.DifferentiableFunction) {
+            } else if (currentDeriv instanceof org.jscience.mathematics.analysis.DifferentiableFunction) {
                 // This cast is tricky if the derivative isn't also DifferentiableFunction
                 // In a real symbolic system, we'd use the LegacyExpression tree.
                 // Here we'll just support 0th and 1st order for generic DifferentiableFunction
                 // unless we cast.
                 try {
-                    derivativeAtA = ((org.jscience.mathematics.function.DifferentiableFunction<Real, Real>) currentDeriv)
-                            .derivative(a);
+                    derivativeAtA = ((org.jscience.mathematics.analysis.DifferentiableFunction<Real, Real>) currentDeriv)
+                            .differentiate().evaluate(a);
                     // Prepare next derivative
-                    currentDeriv = ((org.jscience.mathematics.function.DifferentiableFunction<Real, Real>) currentDeriv)
-                            .getDerivative();
+                    currentDeriv = ((org.jscience.mathematics.analysis.DifferentiableFunction<Real, Real>) currentDeriv)
+                            .differentiate();
                 } catch (Exception e) {
                     // Fallback or stop
                     break;

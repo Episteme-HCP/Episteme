@@ -50,6 +50,8 @@ public class SparkDistributedContext implements DistributedContext {
     // Spark configuration
     // private final SparkConf sparkConf;
     // private final JavaSparkContext sparkContext;
+    private final java.util.concurrent.ExecutorService executor;
+    private final int parallelism;
 
     /**
      * Creates a Spark distributed context.
@@ -57,91 +59,47 @@ public class SparkDistributedContext implements DistributedContext {
      * @param sparkConf Spark configuration
      */
     public SparkDistributedContext(Object sparkConf) {
-        // TODO: Initialize Spark context
+        // Placeholder for Spark context initialization.
+        // In a real implementation, this would initialize JavaSparkContext.
         // this.sparkConf = sparkConf;
         // this.sparkContext = new JavaSparkContext(sparkConf);
 
-        throw new UnsupportedOperationException(
-                "SparkDistributedContext requires Apache Spark dependency. " +
-                        "Add to pom.xml:\n" +
-                        "<dependency>\n" +
-                        "  <groupId>org.apache.spark</groupId>\n" +
-                        "  <artifactId>spark-core_2.12</artifactId>\n" +
-                        "  <version>3.5.0</version>\n" +
-                        "</dependency>");
+        System.err
+                .println("WARNING: Apache Spark not found. SparkDistributedContext running in local simulation mode.");
+        this.parallelism = Runtime.getRuntime().availableProcessors();
+        this.executor = java.util.concurrent.Executors.newFixedThreadPool(parallelism);
     }
 
     @Override
     public <T extends Serializable> Future<T> submit(Callable<T> task) {
-        // TODO: Capture MathContext
-        // org.jscience.mathematics.context.MathContext ctx =
-        // org.jscience.mathematics.context.MathContext.getCurrent();
-
-        // TODO: Wrap task with context propagation
-        // Callable<T> wrappedTask = wrapWithMathContext(task, ctx);
-
-        // TODO: Submit to Spark as a single-task job
-        // JavaRDD<Callable<T>> rdd =
-        // sparkContext.parallelize(Collections.singletonList(wrappedTask));
-        // JavaRDD<T> results = rdd.map(c -> c.call());
-        // return new SparkFuture<>(results);
-
-        throw new UnsupportedOperationException("Not yet implemented");
+        // Simulation mode
+        return executor.submit(task);
     }
 
     @Override
     public <T extends Serializable> List<Future<T>> invokeAll(List<Callable<T>> tasks) {
-        // TODO: Capture MathContext
-        // org.jscience.mathematics.context.MathContext ctx =
-        // org.jscience.mathematics.context.MathContext.getCurrent();
-
-        // TODO: Wrap all tasks
-        // List<Callable<T>> wrappedTasks = tasks.stream()
-        // .map(t -> wrapWithMathContext(t, ctx))
-        // .collect(Collectors.toList());
-
-        // TODO: Distribute across Spark cluster
-        // JavaRDD<Callable<T>> rdd = sparkContext.parallelize(wrappedTasks);
-        // JavaRDD<T> results = rdd.map(c -> c.call());
-        // List<T> collected = results.collect();
-        // return
-        // collected.stream().map(CompletableFuture::completedFuture).collect(Collectors.toList());
-
-        throw new UnsupportedOperationException("Not yet implemented");
+        try {
+            return executor.invokeAll(tasks);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while waiting for tasks", e);
+        }
     }
 
     @Override
     public int getParallelism() {
-        // TODO: Return Spark cluster parallelism
-        // return sparkContext.defaultParallelism();
-        return Runtime.getRuntime().availableProcessors(); // Placeholder
+        // In simulation mode, returns local parallelism.
+        // For Spark, this would return sparkContext.defaultParallelism().
+        return parallelism;
     }
 
     @Override
     public void shutdown() {
-        // TODO: Stop Spark context
-        // sparkContext.stop();
-
-        throw new UnsupportedOperationException("Not yet implemented");
+        executor.shutdown();
     }
 
     /**
      * Wraps a task with MathContext propagation for Spark workers.
      */
-    private static <T extends Serializable> Callable<T> wrapWithMathContext(
-            Callable<T> task,
-            org.jscience.mathematics.context.MathContext capturedContext) {
 
-        return () -> {
-            org.jscience.mathematics.context.MathContext oldContext = org.jscience.mathematics.context.MathContext
-                    .getCurrent();
-
-            try {
-                org.jscience.mathematics.context.MathContext.setCurrent(capturedContext);
-                return task.call();
-            } finally {
-                org.jscience.mathematics.context.MathContext.setCurrent(oldContext);
-            }
-        };
-    }
 }

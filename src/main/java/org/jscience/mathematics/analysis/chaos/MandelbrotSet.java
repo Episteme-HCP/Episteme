@@ -22,7 +22,7 @@
  */
 package org.jscience.mathematics.analysis.chaos;
 
-import org.jscience.mathematics.number.Complex;
+import org.jscience.mathematics.numbers.complex.Complex;
 
 /**
  * The Mandelbrot Set as a proper mathematical set.
@@ -44,7 +44,7 @@ import org.jscience.mathematics.number.Complex;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class MandelbrotSet implements org.jscience.mathematics.algebra.Set<Complex> {
+public class MandelbrotSet implements org.jscience.mathematics.structures.sets.Set<Complex> {
 
     private final int maxIterations;
     private static final double ESCAPE_RADIUS_SQ = 4.0;

@@ -1,4 +1,0 @@
-<unit id="gigahertz" name="gigahertz" abbreviation="GHz" unitType="frequency" parentSI="hertz" multiplierToSI="1.0E+9"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 GHz = 10^9 Hz</description>
-</unit>

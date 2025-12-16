@@ -1,7 +1,0 @@
-
-<!ENTITY amperePerMeterSquared.xml SYSTEM "../currentDensity/amperePerMeterSquared.xml">
-
-<!ENTITY currentDensity.elements	"
-&amperePerMeterSquared.xml;
-">
-

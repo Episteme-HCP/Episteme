@@ -1,3 +1,0 @@
-<unit id="picovoltPerMeter" name="picovolt per meter" abbreviation="pV/m" unitType="electricFieldStrength"
-      parentSI="voltPerMeter" multiplierToSI="1.0E-12" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

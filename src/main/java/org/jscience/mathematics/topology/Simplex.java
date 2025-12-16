@@ -22,7 +22,7 @@
  */
 package org.jscience.mathematics.topology;
 
-import org.jscience.mathematics.number.Natural;
+import org.jscience.mathematics.numbers.integers.Natural;
 import java.util.HashSet;
 import java.util.Set;
 

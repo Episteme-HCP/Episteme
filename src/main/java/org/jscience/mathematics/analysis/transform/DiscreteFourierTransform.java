@@ -23,10 +23,10 @@
 package org.jscience.mathematics.analysis.transform;
 
 import org.jscience.mathematics.analysis.VectorFunction;
-import org.jscience.mathematics.number.Complex;
-import org.jscience.mathematics.vector.Vector;
-import org.jscience.mathematics.vector.Matrix;
-import org.jscience.mathematics.vector.DenseVector; // Assuming this exists or will be found
+import org.jscience.mathematics.numbers.complex.Complex;
+import org.jscience.mathematics.linearalgebra.Vector;
+import org.jscience.mathematics.linearalgebra.Matrix;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector; // Assuming this exists or will be found
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,8 +133,22 @@ public class DiscreteFourierTransform implements Transform<Vector<Complex>, Vect
 
     @Override
     public Matrix<Complex> jacobian(Vector<Complex> point) {
-        // TODO: Return DFT matrix
-        throw new UnsupportedOperationException("Jacobian (DFT Matrix) generation pending");
+        int n = point.dimension();
+        List<List<Complex>> rows = new ArrayList<>();
+
+        double angleBase = (inverse ? 2 : -2) * Math.PI / n;
+
+        for (int j = 0; j < n; j++) {
+            List<Complex> row = new ArrayList<>();
+            for (int k = 0; k < n; k++) {
+                double angle = angleBase * j * k;
+                row.add(Complex.of(Math.cos(angle), Math.sin(angle)));
+            }
+            rows.add(row);
+        }
+
+        return org.jscience.mathematics.linearalgebra.matrices.DenseMatrix.of(rows,
+                org.jscience.mathematics.sets.Complexes.getInstance());
     }
 
     @Override

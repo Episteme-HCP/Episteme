@@ -1,4 +1,0 @@
-<unit id="const.electronRestMass" name="electron rest mass" abbreviation="m_e" unitType="mass" parentSI="kilogram"
-      multiplierToSI="9.10939E-31" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>Mass in atomic units</description>
-</unit>

@@ -1,0 +1,162 @@
+[
+    {
+        "name": "Glycine",
+        "three": "Gly",
+        "one": "G",
+        "mass": 75.07,
+        "pI": 6.0,
+        "type": "nonpolar"
+    },
+    {
+        "name": "Alanine",
+        "three": "Ala",
+        "one": "A",
+        "mass": 89.09,
+        "pI": 6.0,
+        "type": "nonpolar"
+    },
+    {
+        "name": "Valine",
+        "three": "Val",
+        "one": "V",
+        "mass": 117.15,
+        "pI": 6.0,
+        "type": "nonpolar"
+    },
+    {
+        "name": "Leucine",
+        "three": "Leu",
+        "one": "L",
+        "mass": 131.17,
+        "pI": 6.0,
+        "type": "nonpolar"
+    },
+    {
+        "name": "Isoleucine",
+        "three": "Ile",
+        "one": "I",
+        "mass": 131.2,
+        "pI": 6.0,
+        "type": "nonpolar"
+    },
+    {
+        "name": "Proline",
+        "three": "Pro",
+        "one": "P",
+        "mass": 115.13,
+        "pI": 6.3,
+        "type": "nonpolar"
+    },
+    {
+        "name": "Methionine",
+        "three": "Met",
+        "one": "M",
+        "mass": 149.21,
+        "pI": 5.7,
+        "type": "nonpolar"
+    },
+    {
+        "name": "Phenylalanine",
+        "three": "Phe",
+        "one": "F",
+        "mass": 165.19,
+        "pI": 5.5,
+        "type": "aromatic"
+    },
+    {
+        "name": "Tyrosine",
+        "three": "Tyr",
+        "one": "Y",
+        "mass": 181.19,
+        "pI": 5.7,
+        "type": "aromatic"
+    },
+    {
+        "name": "Tryptophan",
+        "three": "Trp",
+        "one": "W",
+        "mass": 204.23,
+        "pI": 5.9,
+        "type": "aromatic"
+    },
+    {
+        "name": "Serine",
+        "three": "Ser",
+        "one": "S",
+        "mass": 105.09,
+        "pI": 5.7,
+        "type": "polar"
+    },
+    {
+        "name": "Threonine",
+        "three": "Thr",
+        "one": "T",
+        "mass": 119.12,
+        "pI": 5.6,
+        "type": "polar"
+    },
+    {
+        "name": "Cysteine",
+        "three": "Cys",
+        "one": "C",
+        "mass": 121.16,
+        "pI": 5.1,
+        "type": "polar"
+    },
+    {
+        "name": "Asparagine",
+        "three": "Asn",
+        "one": "N",
+        "mass": 132.12,
+        "pI": 5.4,
+        "type": "polar"
+    },
+    {
+        "name": "Glutamine",
+        "three": "Gln",
+        "one": "Q",
+        "mass": 146.15,
+        "pI": 5.7,
+        "type": "polar"
+    },
+    {
+        "name": "Lysine",
+        "three": "Lys",
+        "one": "K",
+        "mass": 146.19,
+        "pI": 9.7,
+        "type": "basic"
+    },
+    {
+        "name": "Arginine",
+        "three": "Arg",
+        "one": "R",
+        "mass": 174.20,
+        "pI": 10.8,
+        "type": "basic"
+    },
+    {
+        "name": "Histidine",
+        "three": "His",
+        "one": "H",
+        "mass": 155.16,
+        "pI": 7.6,
+        "type": "basic"
+    },
+    {
+        "name": "Aspartate",
+        "three": "Asp",
+        "one": "D",
+        "mass": 133.10,
+        "pI": 2.8,
+        "type": "acidic"
+    },
+    {
+        "name": "Glutamate",
+        "three": "Glu",
+        "one": "E",
+        "mass": 147.13,
+        "pI": 3.2,
+        "type": "acidic"
+    }
+]

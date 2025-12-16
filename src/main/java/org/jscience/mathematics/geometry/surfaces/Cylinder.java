@@ -2,9 +2,9 @@ package org.jscience.mathematics.geometry.surfaces;
 
 import org.jscience.mathematics.geometry.ParametricSurface;
 import org.jscience.mathematics.geometry.PointND;
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.Vector;
-import org.jscience.mathematics.vector.DenseVector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 
 import java.util.Arrays;
 
@@ -73,7 +73,8 @@ public class Cylinder implements ParametricSurface {
     @Override
     public Vector<Real> partialV(Real u, Real v, Real h) {
         // ∂S/∂z = (0, 0, h)
-        return new DenseVector<>(Arrays.asList(Real.ZERO, Real.ZERO, height), org.jscience.mathematics.sets.Reals.getInstance());
+        return new DenseVector<>(Arrays.asList(Real.ZERO, Real.ZERO, height),
+                org.jscience.mathematics.sets.Reals.getInstance());
     }
 
     @Override

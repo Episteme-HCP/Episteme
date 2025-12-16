@@ -26,7 +26,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.jscience.mathematics.algebra.Ring;
+import org.jscience.mathematics.structures.rings.Ring;
+import org.jscience.mathematics.structures.rings.Field;
 
 /**
  * Represents a multivariate polynomial expression.
@@ -143,16 +144,15 @@ public class PolynomialExpression<T extends Ring<T>> implements Expression<T> {
                 newTerms.merge(newMono, newCoeff, ring::add);
             }
         }
-
         return new PolynomialExpression<>(newTerms, ring);
     }
 
     @Override
     public Expression<T> integrate(Variable<T> variable) {
-        if (!(ring instanceof org.jscience.mathematics.algebra.Field)) {
+        if (!(ring instanceof Field)) {
             throw new UnsupportedOperationException("Integration requires coefficients to be a Field");
         }
-        org.jscience.mathematics.algebra.Field<T> field = (org.jscience.mathematics.algebra.Field<T>) ring;
+        Field<T> field = (Field<T>) ring;
 
         Map<Monomial<T>, T> newTerms = new HashMap<>();
 

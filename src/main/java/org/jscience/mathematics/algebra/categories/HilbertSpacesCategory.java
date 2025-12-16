@@ -1,8 +1,8 @@
 package org.jscience.mathematics.algebra.categories;
 
-import org.jscience.mathematics.algebra.Category;
+import org.jscience.mathematics.structures.categories.Category;
 import org.jscience.mathematics.algebra.spaces.HilbertSpace;
-import org.jscience.mathematics.vector.Matrix;
+import org.jscience.mathematics.linearalgebra.Matrix;
 
 /**
  * Represents the Category of Hilbert Spaces (Hilb).
@@ -28,6 +28,7 @@ public class HilbertSpacesCategory implements Category<HilbertSpace<?, ?>, Matri
     }
 
     @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public Matrix<?> compose(Matrix<?> f, Matrix<?> g) {
         // Matrix multiplication corresponds to composition of linear maps
         // Need to cast to compatible types, assuming type safety is handled at higher
@@ -57,7 +58,8 @@ public class HilbertSpacesCategory implements Category<HilbertSpace<?, ?>, Matri
     }
 
     @Override
-    public org.jscience.mathematics.algebra.Set<Matrix<?>> hom(HilbertSpace<?, ?> source, HilbertSpace<?, ?> target) {
+    public org.jscience.mathematics.structures.sets.Set<Matrix<?>> hom(HilbertSpace<?, ?> source,
+            HilbertSpace<?, ?> target) {
         // Returns the set of all bounded linear operators (matrices) between source and
         // target
         // Ideally returns a VectorSpace of matrices

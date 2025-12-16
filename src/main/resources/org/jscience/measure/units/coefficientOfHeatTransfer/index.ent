@@ -1,7 +1,0 @@
-
-<!ENTITY wattPerMeterSquaredPerKelvin.xml SYSTEM "../coefficientOfHeatTransfer/wattPerMeterSquaredPerKelvin.xml">
-
-<!ENTITY coefficientOfHeatTransfer.elements	"
-&wattPerMeterSquaredPerKelvin.xml;
-">
-

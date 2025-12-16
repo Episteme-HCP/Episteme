@@ -1,4 +1,0 @@
-<unit id="caloriePerMolePerKelvin" name="calorie per mole per Kelvin" abbreviation="cal/mol K"
-      unitType="molarHeatCapacity" parentSI="joulePerMolePerKelvin" multiplierToSI="4.184"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

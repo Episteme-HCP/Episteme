@@ -22,7 +22,7 @@
  */
 package org.jscience.mathematics.statistics.distributions;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.statistics.ContinuousDistribution;
 
 /**
@@ -32,7 +32,6 @@ import org.jscience.mathematics.statistics.ContinuousDistribution;
 public class LogNormalDistribution extends ContinuousDistribution {
     private final Real mu;
     private final Real sigma;
-    private static final Real SQRT_2PI = Real.of(Math.sqrt(2 * Math.PI));
 
     public LogNormalDistribution(Real mu, Real sigma) {
         if (sigma.compareTo(Real.ZERO) <= 0) {
@@ -77,5 +76,3 @@ public class LogNormalDistribution extends ContinuousDistribution {
         return String.format("LogNormal(μ=%.4f, σ=%.4f)", mu.doubleValue(), sigma.doubleValue());
     }
 }
-
-

@@ -23,9 +23,9 @@
 
 package org.jscience.mathematics.sets;
 
-import org.jscience.mathematics.algebra.Ring;
-import org.jscience.mathematics.algebra.InfiniteSet;
-import org.jscience.mathematics.number.Integer;
+import org.jscience.mathematics.structures.rings.Ring;
+import org.jscience.mathematics.structures.sets.InfiniteSet;
+import org.jscience.mathematics.numbers.integers.Integer;
 
 /**
  * The structure of integers (ℤ = {..., -2, -1, 0, 1, 2, ...}).

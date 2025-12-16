@@ -1,6 +1,6 @@
 package org.jscience.mathematics.discrete.graph.matching;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Hungarian Algorithm (Kuhn-Munkres) for optimal bipartite matching.

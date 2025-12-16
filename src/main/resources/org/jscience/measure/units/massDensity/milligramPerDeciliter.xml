@@ -1,3 +1,0 @@
-<unit id="milligramPerDeciliter" name="milligram per deciliter" abbreviation="mg/dl" unitType="massDensity"
-      parentSI="kilogramPerMeterCubed" multiplierToSI="0.01" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

@@ -22,7 +22,6 @@
  */
 package org.jscience.measure.metrology;
 
-import org.jscience.mathematics.number.Real;
 import org.jscience.measure.Quantity;
 
 /**

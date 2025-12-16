@@ -22,8 +22,8 @@
  */
 package org.jscience.mathematics.analysis.series;
 
-import org.jscience.mathematics.number.Integer;
-import org.jscience.mathematics.number.Natural;
+import org.jscience.mathematics.numbers.integers.Integer;
+import org.jscience.mathematics.numbers.integers.Natural;
 import java.math.BigInteger;
 
 /**

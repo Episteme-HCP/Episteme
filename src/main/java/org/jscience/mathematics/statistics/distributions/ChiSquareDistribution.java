@@ -22,7 +22,7 @@
  */
 package org.jscience.mathematics.statistics.distributions;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 public class ChiSquareDistribution extends GammaDistribution {
     private final int degreesOfFreedom;

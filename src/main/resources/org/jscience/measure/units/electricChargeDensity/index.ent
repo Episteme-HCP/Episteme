@@ -1,7 +1,0 @@
-
-<!ENTITY coulombPerMeterCubed.xml SYSTEM "../electricChargeDensity/coulombPerMeterCubed.xml">
-
-<!ENTITY electricChargeDensity.elements	"
-&coulombPerMeterCubed.xml;
-">
-

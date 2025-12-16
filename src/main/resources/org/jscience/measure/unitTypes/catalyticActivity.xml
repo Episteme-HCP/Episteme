@@ -1,4 +1,0 @@
-<unitType id="catalyticActivity" name="catalytic activity">
-    <dimension name="time" power="-1" preserve="no"/>
-    <dimension name="amount" power="1" preserve="no"/>
-</unitType>

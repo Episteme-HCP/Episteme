@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jscience.mathematics.analysis.series.IntegerSequence;
-import org.jscience.mathematics.number.Integer;
-import org.jscience.mathematics.number.Natural;
+import org.jscience.mathematics.numbers.integers.Integer;
+import org.jscience.mathematics.numbers.integers.Natural;
 
 /**
  * Client for the Online Encyclopedia of Integer Sequences (OEIS).
@@ -60,7 +60,8 @@ public class OEISClient {
         }
 
         try {
-            URL url = new URL(String.format(SEARCH_URL, oeisId));
+            java.net.URI uri = java.net.URI.create(String.format(SEARCH_URL, oeisId));
+            URL url = uri.toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("User-Agent", "JScience/1.0");
@@ -87,7 +88,7 @@ public class OEISClient {
                     for (String part : parts) {
                         if (!part.trim().isEmpty()) {
                             try {
-                                terms.add(Integer.of(part.trim()));
+                                terms.add(Integer.of(Long.parseLong(part.trim())));
                             } catch (NumberFormatException e) {
                                 // Ignore non-integer parts
                             }

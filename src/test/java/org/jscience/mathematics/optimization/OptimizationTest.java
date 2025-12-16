@@ -22,7 +22,8 @@
  */
 package org.jscience.mathematics.optimization;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
+
 import org.jscience.mathematics.analysis.Function;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

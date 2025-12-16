@@ -1,4 +1,0 @@
-<unit id="nanosecond" name="nanosecond" abbreviation="nsec" unitType="time" parentSI="second" multiplierToSI="1.0E-9"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1/1000000 of a second</description>
-</unit>

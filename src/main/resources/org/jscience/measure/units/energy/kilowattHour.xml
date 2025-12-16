@@ -1,4 +1,0 @@
-<unit id="kilowattHour" name="kilowatt hour" abbreviation="kW h" unitType="energy" parentSI="joule"
-      multiplierToSI="3.6E+6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 kilowatt hour = 3.6 MJ</description>
-</unit>

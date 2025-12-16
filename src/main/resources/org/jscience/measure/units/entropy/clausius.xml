@@ -1,4 +1,0 @@
-<unit id="clausius" name="clausius" unitType="entropy" parentSI="joulePerKelvin" multiplierToSI="4.1868E+3"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 clausius = 1 kcal/K</description>
-</unit>

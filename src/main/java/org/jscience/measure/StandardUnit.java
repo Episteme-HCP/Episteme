@@ -22,7 +22,7 @@
  */
 package org.jscience.measure;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Standard implementation of {@link Unit}.
@@ -49,7 +49,7 @@ public class StandardUnit<Q extends Quantity<Q>> implements Unit<Q> {
     /**
      * Creates a base unit (defines the dimension).
      */
-    StandardUnit(String symbol, String name, Dimension dimension) {
+    public StandardUnit(String symbol, String name, Dimension dimension) {
         this.symbol = symbol;
         this.name = name;
         this.dimension = dimension;
@@ -100,7 +100,8 @@ public class StandardUnit<Q extends Quantity<Q>> implements Unit<Q> {
 
     @Override
     public Unit<Q> multiply(double factor) {
-        LinearConverter converter = new LinearConverter(factor);
+        org.jscience.measure.converters.MultiplyConverter converter = new org.jscience.measure.converters.MultiplyConverter(
+                Real.of(factor));
         UnitConverter combined = this.toSystemUnit.concatenate(converter);
 
         String newSymbol = factor + "×" + symbol;
@@ -108,42 +109,59 @@ public class StandardUnit<Q extends Quantity<Q>> implements Unit<Q> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <R extends Quantity<R>> Unit<?> multiply(Unit<R> other) {
-        Dimension newDim = dimension.multiply(other.getDimension());
-        String newSymbol = symbol + "⋅" + other.getSymbol();
-        String newName = name + " " + other.getName();
-
-        // Converter composition for product units
-        return new StandardUnit(newSymbol, newName, newDim, UnitConverter.identity());
+    public Unit<Q> divide(double divisor) {
+        return multiply(1.0 / divisor);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <R extends Quantity<R>> Unit<?> divide(Unit<R> other) {
+    public Unit<?> multiply(Unit<?> other) {
+        Dimension newDim = dimension.multiply(other.getDimension());
+        String newSymbol = symbol + "\u22c5" + other.getSymbol();
+        String newName = name + " " + ((StandardUnit<?>) other).getName();
+
+        return new StandardUnit<>(newSymbol, newName, newDim, UnitConverter.identity());
+    }
+
+    @Override
+    public Unit<?> divide(Unit<?> other) {
         Dimension newDim = dimension.divide(other.getDimension());
         String newSymbol = symbol + "/" + other.getSymbol();
-        String newName = name + " per " + other.getName();
+        String newName = name + " per " + ((StandardUnit<?>) other).getName();
 
-        return new StandardUnit(newSymbol, newName, newDim, UnitConverter.identity());
+        return new StandardUnit<>(newSymbol, newName, newDim, UnitConverter.identity());
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
+    /**
+     * Returns a unit equal to this unit shifted by the specified offset.
+     * <p>
+     * For example, {@code KELVIN.add(273.15)} gives Celsius.
+     * </p>
+     * 
+     * @param offset the offset to add
+     * @return the shifted unit
+     */
+    public Unit<Q> add(double offset) {
+        org.jscience.measure.converters.AddConverter converter = new org.jscience.measure.converters.AddConverter(
+                Real.of(offset));
+        UnitConverter combined = this.toSystemUnit.concatenate(converter);
+
+        String sign = offset >= 0 ? "+" : "";
+        String newSymbol = symbol + sign + offset;
+        return new StandardUnit<>(newSymbol, name, dimension, combined);
+    }
+
     public Unit<?> pow(int exponent) {
         Dimension newDim = dimension.pow(exponent);
         String newSymbol = symbol + (exponent == 2 ? "²" : exponent == 3 ? "³" : "^" + exponent);
 
-        return new StandardUnit(newSymbol, name, newDim, UnitConverter.identity());
+        return new StandardUnit<>(newSymbol, name, newDim, UnitConverter.identity());
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
     public Unit<?> sqrt() {
         Dimension newDim = dimension.sqrt();
         String newSymbol = "√" + symbol;
 
-        return new StandardUnit(newSymbol, name, newDim, UnitConverter.identity());
+        return new StandardUnit<>(newSymbol, name, newDim, UnitConverter.identity());
     }
 
     @Override
@@ -171,56 +189,6 @@ public class StandardUnit<Q extends Quantity<Q>> implements Unit<Q> {
     @Override
     public int hashCode() {
         return 31 * symbol.hashCode() + dimension.hashCode();
-    }
-
-    /**
-     * Simple linear converter: y = x × scale
-     */
-    private static class LinearConverter implements UnitConverter {
-        private final double scale;
-
-        LinearConverter(double scale) {
-            this.scale = scale;
-        }
-
-        @Override
-        public Real convert(Real value) {
-            return value.multiply(Real.of(scale));
-        }
-
-        @Override
-        public UnitConverter inverse() {
-            return new LinearConverter(1.0 / scale);
-        }
-
-        @Override
-        public UnitConverter concatenate(UnitConverter other) {
-            if (other instanceof LinearConverter) {
-                double newScale = scale * ((LinearConverter) other).scale;
-                return new LinearConverter(newScale);
-            }
-            return new CompoundConverter(this, other);
-        }
-
-        @Override
-        public boolean isIdentity() {
-            return Math.abs(scale - 1.0) < 1e-10;
-        }
-
-        @Override
-        public boolean isLinear() {
-            return true;
-        }
-
-        @Override
-        public Real derivative(Real value) {
-            return Real.of(scale);
-        }
-
-        @Override
-        public String toString() {
-            return "×" + scale;
-        }
     }
 
     /**

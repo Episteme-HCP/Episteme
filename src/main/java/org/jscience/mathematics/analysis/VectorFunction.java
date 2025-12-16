@@ -22,9 +22,9 @@
  */
 package org.jscience.mathematics.analysis;
 
-import org.jscience.mathematics.algebra.Field;
-import org.jscience.mathematics.vector.Matrix;
-import org.jscience.mathematics.vector.Vector;
+import org.jscience.mathematics.structures.rings.Field;
+import org.jscience.mathematics.linearalgebra.Matrix;
+import org.jscience.mathematics.linearalgebra.Vector;
 
 /**
  * Represents a function from a vector space to another (F^n -> F^m).

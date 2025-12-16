@@ -23,8 +23,8 @@
 
 package org.jscience.mathematics.algebra.algebras;
 
-import org.jscience.mathematics.algebra.Semiring;
-import org.jscience.mathematics.algebra.FiniteSet;
+import org.jscience.mathematics.structures.rings.Semiring;
+import org.jscience.mathematics.structures.sets.FiniteSet;
 
 /**
  * Boolean algebra - a special algebraic structure for logic operations.

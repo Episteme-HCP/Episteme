@@ -28,7 +28,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.util.Optional;
 
 /**
  * Connector to USGS Earthquake Hazards Program API.
@@ -85,7 +84,9 @@ public class UsgsEarthquakes {
      * Placeholder for future mapping to Geology domain objects.
      */
     public static <T> T map(String json, Class<T> target) {
-        throw new UnsupportedOperationException("Domain class " + target.getSimpleName() + " not yet designed.");
+        System.err.println(
+                "WARNING: Domain mapping for " + target.getSimpleName() + " is not yet implemented. Returning null.");
+        return null;
     }
 
     private static String fetchUrl(String urlStr) {
@@ -115,4 +116,3 @@ public class UsgsEarthquakes {
     private UsgsEarthquakes() {
     }
 }
-

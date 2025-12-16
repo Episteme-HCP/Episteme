@@ -22,7 +22,7 @@
  */
 package org.jscience.measure;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * A physical quantity combining a numerical value with a unit of measurement.
@@ -200,6 +200,22 @@ public interface Quantity<Q extends Quantity<Q>> {
      * @return a new quantity with negated value
      */
     Quantity<Q> negate();
+
+    /**
+     * Casts this quantity to the specified type.
+     * <p>
+     * This is an unchecked cast that allows reinterpreting the quantity type.
+     * Use with caution - the caller must ensure dimensional consistency.
+     * </p>
+     * 
+     * @param <R>  the target quantity type
+     * @param type the target quantity class
+     * @return this quantity cast to the specified type
+     */
+    @SuppressWarnings("unchecked")
+    default <R extends Quantity<R>> Quantity<R> asType(Class<R> type) {
+        return (Quantity<R>) this;
+    }
 
     /**
      * Checks if this quantity is zero within tolerance.

@@ -2,7 +2,6 @@ package org.jscience.mathematics.logic.predicate;
 
 import java.util.List;
 import org.jscience.mathematics.logic.propositional.Proposition;
-import org.jscience.mathematics.logic.predicate.Term;
 
 /**
  * Represents a predicate (relation) in predicate logic.

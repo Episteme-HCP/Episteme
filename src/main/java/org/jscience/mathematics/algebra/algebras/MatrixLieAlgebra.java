@@ -22,8 +22,8 @@
  */
 package org.jscience.mathematics.algebra.algebras;
 
-import org.jscience.mathematics.vector.Matrix;
-import org.jscience.mathematics.algebra.Field;
+import org.jscience.mathematics.linearalgebra.Matrix;
+import org.jscience.mathematics.structures.rings.Field;
 
 /**
  * A concrete Lie Algebra where elements are square matrices and the bracket
@@ -45,12 +45,16 @@ public class MatrixLieAlgebra<E> implements LieAlgebra<Matrix<E>, E> {
         this.n = n;
     }
 
-    @Override
+    /**
+     * Returns the dimension of the Lie algebra (n^2 for n×n matrices).
+     */
     public int dimension() {
         return n * n; // Dimension of n x n matrices is n^2
     }
 
-    @Override
+    /**
+     * Returns the scalar field.
+     */
     public Field<E> getScalarField() {
         return field;
     }
@@ -90,7 +94,7 @@ public class MatrixLieAlgebra<E> implements LieAlgebra<Matrix<E>, E> {
             }
             rows.add(row);
         }
-        return org.jscience.mathematics.vector.DenseMatrix.of(rows, field);
+        return org.jscience.mathematics.linearalgebra.matrices.DenseMatrix.of(rows, field);
     }
 
     @Override
@@ -129,7 +133,29 @@ public class MatrixLieAlgebra<E> implements LieAlgebra<Matrix<E>, E> {
             }
             rows.add(row);
         }
-        return org.jscience.mathematics.vector.DenseMatrix.of(rows, field);
+        return org.jscience.mathematics.linearalgebra.matrices.DenseMatrix.of(rows, field);
+    }
+
+    @Override
+    public boolean isMultiplicationCommutative() {
+        return false; // Lie brackets are anti-commutative, not commutative
+    }
+
+    @Override
+    public Matrix<E> one() {
+        // Lie Algebras don't necessarily have a multiplicative identity for the bracket
+        // operation.
+        // However, the Semiring interface requires it.
+        // Often, we might return the identity matrix if we consider the underlying
+        // associative algebra,
+        // but for the Lie bracket [A, I] = A*I - I*A = A - A = 0.
+        // So I is not the identity for the bracket.
+        // There is usually NO identity for the Lie bracket (except in trivial cases).
+        // We might throw UnsupportedOperationException or return null if allowed.
+        // But to satisfy the interface, let's throw for now or return a dummy if
+        // strictly required by compiler but not used.
+        // Given the error "must implement... one()", we must provide it.
+        throw new UnsupportedOperationException(
+                "Lie Algebras do not have a multiplicative identity for the bracket operation");
     }
 }
-

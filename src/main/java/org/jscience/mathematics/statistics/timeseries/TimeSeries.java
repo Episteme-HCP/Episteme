@@ -1,8 +1,6 @@
 package org.jscience.mathematics.statistics.timeseries;
 
-import org.jscience.mathematics.number.Real;
-import java.util.List;
-import java.util.ArrayList;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Time series analysis and forecasting.

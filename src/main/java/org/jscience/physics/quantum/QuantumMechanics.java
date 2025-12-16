@@ -22,8 +22,16 @@
  */
 package org.jscience.physics.quantum;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.physics.foundation.PhysicalConstants;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.physics.PhysicalConstants;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Energy;
+import org.jscience.measure.quantity.Frequency;
+import org.jscience.measure.quantity.Length;
+import org.jscience.measure.quantity.Mass;
+import org.jscience.measure.quantity.Velocity;
 
 /**
  * Quantum mechanics equations and principles.
@@ -106,5 +114,40 @@ public class QuantumMechanics {
 
         return numerator.divide(denominator);
     }
-}
 
+    /**
+     * Calculates the energy of a photon given its frequency.
+     * E = h * f
+     * 
+     * @param f frequency
+     * @return Energy
+     */
+    public static Quantity<Energy> photonEnergy(Quantity<Frequency> f) {
+        double h = PhysicalConstants.PLANCK_CONSTANT.getValue().doubleValue(); // Joule seconds
+        double fVal = f.to(Units.HERTZ).getValue().doubleValue();
+
+        return Quantities.create(h * fVal, Units.JOULE);
+    }
+
+    /**
+     * Calculates de Broglie wavelength using Quantities.
+     * lambda = h / p = h / (m * v)
+     * 
+     * @param m mass
+     * @param v velocity
+     * @return Wavelength (Length)
+     */
+    public static Quantity<Length> deBroglieWavelength(Quantity<Mass> m, Quantity<Velocity> v) {
+        double h = PhysicalConstants.PLANCK_CONSTANT.getValue().doubleValue();
+        double mVal = m.to(Units.KILOGRAM).getValue().doubleValue();
+        double vVal = v.to(Units.METER_PER_SECOND).getValue().doubleValue();
+
+        // p = m * v
+        double p = mVal * vVal;
+
+        if (p == 0)
+            throw new ArithmeticException("Momentum cannot be zero (wavelength undefined)");
+
+        return Quantities.create(h / p, Units.METER);
+    }
+}

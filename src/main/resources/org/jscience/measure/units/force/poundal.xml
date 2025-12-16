@@ -1,4 +1,0 @@
-<unit id="poundal" name="poundal" abbreviation="pdl" unitType="force" parentSI="newton" multiplierToSI="0.138255"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 poundal = 1 pound of mass * 1 ft/s^2</description>
-</unit>

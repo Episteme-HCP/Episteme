@@ -1,15 +1,15 @@
 package org.jscience.mathematics.ml;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.linear.SVD;
-import org.jscience.mathematics.vector.Matrix;
-import org.jscience.mathematics.vector.DenseMatrix;
-import org.jscience.mathematics.sets.Reals;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import org.jscience.mathematics.linearalgebra.matrices.solvers.SVDDecomposition;
+import org.jscience.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.jscience.mathematics.linearalgebra.Matrix;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.sets.Reals;
 
 /**
- * Principal Component Analysis (PCA) - Dimensionality reduction.
+ * Principal Component Analysis (PCA).
  * <p>
  * Finds principal components (directions of max variance) using SVD.
  * Used for: feature reduction, visualization, noise reduction.
@@ -57,7 +57,7 @@ public class PCA {
 
         // 2. Compute SVD of centered data
         Matrix<Real> X = createMatrix(centered);
-        SVD svd = SVD.decompose(X);
+        SVDDecomposition svd = SVDDecomposition.decompose(X);
 
         // 3. Principal components are right singular vectors (V)
         Matrix<Real> V = svd.getV();

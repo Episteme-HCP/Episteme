@@ -1,4 +1,0 @@
-<unitType id="exposureRate" name="exposure rate">
-    <dimension name="mass" power="-1" preserve="no"/>
-    <dimension name="current" power="1" preserve="no"/>
-</unitType>

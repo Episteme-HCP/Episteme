@@ -22,7 +22,7 @@
  */
 package org.jscience.measure;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Factory for creating {@link Quantity} instances.
@@ -135,15 +135,62 @@ public final class Quantities {
             double value = Double.parseDouble(parts[0]);
             String unitSymbol = parts[1];
 
-            // Verify unit matches
-            if (!expectedUnit.getSymbol().equals(unitSymbol)) {
-                // TODO: Could support parsing different units and converting
+            // Verify unit matches or convert
+            Unit<?> parsedUnit = Units.parseUnit(unitSymbol);
+            if (!parsedUnit.isCompatible(expectedUnit)) {
                 throw new IllegalArgumentException(
-                        "Unit mismatch: expected " + expectedUnit.getSymbol() +
+                        "Unit mismatch: expected compatible with " + expectedUnit.getSymbol() +
                                 ", got " + unitSymbol);
             }
 
-            return create(value, expectedUnit);
+            // Create with parsed unit and convert
+            // We need to cast safely because we checked compatibility
+            @SuppressWarnings("unchecked")
+            Unit<Q> castUnit = (Unit<Q>) parsedUnit;
+            Quantity<Q> quantity = create(value, castUnit);
+            return quantity.to(expectedUnit);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid number format: " + parts[0], e);
+        }
+    }
+
+    /**
+     * Parses a quantity from a string representation without specifying unit type.
+     * <p>
+     * Expected format: "value unit" (e.g., "100 m", "10.5 kg", "50 km/h")
+     * </p>
+     * <p>
+     * This overload returns Quantity<?> since the unit type is not known at compile
+     * time.
+     * </p>
+     * 
+     * @param text the string to parse
+     * @return the parsed quantity with unknown type
+     * @throws IllegalArgumentException if parsing fails
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static Quantity<?> parse(String text) {
+        if (text == null || text.isEmpty()) {
+            throw new IllegalArgumentException("Cannot parse null or empty string");
+        }
+
+        String[] parts = text.trim().split("\\s+", 2);
+        if (parts.length < 1) {
+            throw new IllegalArgumentException("Invalid quantity format: " + text);
+        }
+
+        try {
+            double value = Double.parseDouble(parts[0]);
+            if (parts.length == 1) {
+                // Just a number, return as dimensionless
+                return create(value, Units.ONE);
+            }
+            String unitSymbol = parts[1];
+
+            // Try to find the unit - for now, just return with a basic unit
+            // A full implementation would look up units by symbol
+            Unit<?> unit = Units.parseUnit(unitSymbol);
+            return new StandardQuantity(Real.of(value), unit);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid number format: " + parts[0], e);
         }

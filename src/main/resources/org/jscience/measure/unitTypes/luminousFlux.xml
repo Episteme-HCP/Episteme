@@ -1,4 +1,0 @@
-<unitType id="luminousFlux" name="luminous flux">
-    <dimension name="luminousIntensity" power="1" preserve="no"/>
-    <dimension name="angle" power="2" preserve="no"/>
-</unitType>

@@ -1,4 +1,0 @@
-<unit id="quart_imperial" name="imperial quart" abbreviation="qt" unitType="volume" parentSI="meterCubed"
-      multiplierToSI="1.1365225E-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 imperial quart = 1/4 imperial gallon</description>
-</unit>

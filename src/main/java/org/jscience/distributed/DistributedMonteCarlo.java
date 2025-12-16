@@ -22,11 +22,10 @@
  */
 package org.jscience.distributed;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 import java.io.Serializable;
 import java.util.Random;
-import java.util.concurrent.*;
 
 /**
  * Distributed Monte Carlo simulations.
@@ -143,4 +142,3 @@ public class DistributedMonteCarlo implements Serializable {
         }
     }
 }
-

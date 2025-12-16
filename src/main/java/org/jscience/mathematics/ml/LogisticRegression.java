@@ -1,6 +1,6 @@
 package org.jscience.mathematics.ml;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Logistic Regression - binary classification using sigmoid function.
@@ -73,8 +73,9 @@ public class LogisticRegression {
 
             // Optional: compute loss for monitoring
             if (iter % 100 == 0) {
+                @SuppressWarnings("unused")
                 Real loss = computeLoss(X, y);
-                // Could log loss here
+                // Loss computed for monitoring purposes (can be logged if needed)
             }
         }
     }

@@ -1,8 +1,8 @@
 package org.jscience.mathematics.random;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.number.Integer;
-import org.jscience.mathematics.number.Natural;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.numbers.integers.Integer;
+import org.jscience.mathematics.numbers.integers.Natural;
 import java.util.Random;
 
 /**
@@ -58,8 +58,8 @@ public class RandomGenerator {
     /**
      * Returns random boolean.
      */
-    public org.jscience.mathematics.number.Boolean nextBoolean() {
-        return org.jscience.mathematics.number.Boolean.of(random.nextBoolean());
+    public boolean nextBoolean() {
+        return random.nextBoolean();
     }
 
     /**

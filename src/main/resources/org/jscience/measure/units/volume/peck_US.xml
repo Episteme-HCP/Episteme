@@ -1,4 +1,0 @@
-<unit id="peck_US" name="US peck" abbreviation="pk" unitType="volume" parentSI="meterCubed" multiplierToSI="8.8098E-3"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 US peck = 8 US dry quarts</description>
-</unit>

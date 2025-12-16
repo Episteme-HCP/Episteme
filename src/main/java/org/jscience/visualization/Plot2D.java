@@ -1,104 +1,65 @@
 package org.jscience.visualization;
 
-import org.jscience.mathematics.analysis.Function;
-import org.jscience.mathematics.number.Real;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.stage.Stage;
 import java.util.List;
-import java.util.ArrayList;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * 2D plotting interface for JScience.
- * <p>
- * Backend-agnostic API. Supports XChart, JavaFX, JFreeChart backends.
- * </p>
+ * Utility for 2D data plotting.
  * 
  * @author Silvere Martin-Michiellot
- * @since 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 2.0
  */
-public interface Plot2D {
+public class Plot2D extends Application {
+
+    private static String title = "Plot";
+    private static List<Real> xData;
+    private static List<Real> yData;
 
     /**
-     * Adds function to plot: y = f(x)
+     * showing plot.
+     * Note: This blocks until window is closed.
+     * In a real application, this should be launched in a separate thread or part
+     * of the main UI.
      */
-    Plot2D addFunction(Function<Real, Real> function, Real xMin, Real xMax, String label);
-
-    /**
-     * Adds discrete data points.
-     */
-    Plot2D addData(List<Real> xData, List<Real> yData, String label);
-
-    /**
-     * Sets plot title.
-     */
-    Plot2D setTitle(String title);
-
-    /**
-     * Sets axis labels.
-     */
-    Plot2D setAxisLabels(String xLabel, String yLabel);
-
-    /**
-     * Sets grid visibility.
-     */
-    Plot2D setGrid(boolean enabled);
-
-    /**
-     * Sets legend visibility.
-     */
-    Plot2D setLegend(boolean enabled);
-
-    /**
-     * Sets axis ranges.
-     */
-    Plot2D setXRange(Real min, Real max);
-
-    Plot2D setYRange(Real min, Real max);
-
-    /**
-     * Displays plot in window.
-     */
-    void show();
-
-    /**
-     * Saves plot to file (PNG, PDF, SVG supported).
-     */
-    void save(String filename, PlotFormat format);
-
-    /**
-     * Returns underlying backend implementation.
-     */
-    PlottingBackend getBackend();
-
-    /**
-     * Series style options.
-     */
-    public static class SeriesStyle {
-        public enum Type {
-            LINE, SCATTER, BAR, AREA
-        }
-
-        public enum MarkerStyle {
-            CIRCLE, SQUARE, DIAMOND, NONE
-        }
-
-        public Type type = Type.LINE;
-        public MarkerStyle marker = MarkerStyle.NONE;
-        public int lineWidth = 2;
-        public String color = null; // null = auto
-
-        public static SeriesStyle line() {
-            return new SeriesStyle();
-        }
-
-        public static SeriesStyle scatter() {
-            SeriesStyle style = new SeriesStyle();
-            style.type = Type.SCATTER;
-            style.marker = MarkerStyle.CIRCLE;
-            return style;
-        }
+    public static void show(String plotTitle, List<Real> x, List<Real> y) {
+        title = plotTitle;
+        xData = x;
+        yData = y;
+        launch(); // Launches JavaFX application
     }
 
-    /**
-     * Adds styled series.
-     */
-    Plot2D addSeries(List<Real> xData, List<Real> yData, String label, SeriesStyle style);
+    @Override
+    public void start(Stage stage) {
+        stage.setTitle(title);
+
+        final NumberAxis xAxis = new NumberAxis();
+        final NumberAxis yAxis = new NumberAxis();
+        xAxis.setLabel("X");
+        yAxis.setLabel("Y");
+
+        final LineChart<Number, Number> lineChart = new LineChart<>(xAxis, yAxis);
+        lineChart.setTitle(title);
+
+        XYChart.Series<Number, Number> series = new XYChart.Series<>();
+        series.setName("Data");
+
+        if (xData != null && yData != null && xData.size() == yData.size()) {
+            for (int i = 0; i < xData.size(); i++) {
+                series.getData().add(new XYChart.Data<>(xData.get(i).doubleValue(), yData.get(i).doubleValue()));
+            }
+        }
+
+        lineChart.getData().add(series);
+
+        Scene scene = new Scene(lineChart, 800, 600);
+        stage.setScene(scene);
+        stage.show();
+    }
 }

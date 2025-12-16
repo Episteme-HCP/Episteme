@@ -25,7 +25,7 @@ package org.jscience.measure.metrology;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
 
 /**
@@ -134,13 +134,10 @@ public class UncertaintyBudget<Q extends Quantity<Q>> {
             throw new IllegalStateException("No uncertainty sources defined");
         }
 
+        Quantity<Q> firstUncertainty = sources.values().iterator().next().uncertainty;
         Real sumSquares = Real.ZERO;
-        Quantity<Q> firstUncertainty = null;
 
         for (UncertaintySource<Q> source : sources.values()) {
-            if (firstUncertainty == null) {
-                firstUncertainty = source.uncertainty;
-            }
 
             // u_i effective = c_i × u_i
             Real u = source.uncertainty.getValue();

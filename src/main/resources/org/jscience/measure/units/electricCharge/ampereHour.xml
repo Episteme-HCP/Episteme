@@ -1,4 +1,0 @@
-<unit id="ampereHour" name="ampere hour" abbreviation="Amp hr" unitType="electricCharge" parentSI="coulomb"
-      multiplierToSI="3600" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>Used to state capacity of a battery</description>
-</unit>

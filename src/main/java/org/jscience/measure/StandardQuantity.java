@@ -22,7 +22,7 @@
  */
 package org.jscience.measure;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Standard implementation of {@link Quantity}.
@@ -96,12 +96,10 @@ final class StandardQuantity<Q extends Quantity<Q>> implements Quantity<Q> {
         return multiply(Real.of(scalar));
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
     public <R extends Quantity<R>> Quantity<?> multiply(Quantity<R> other) {
         Real newValue = value.multiply(other.getValue());
         Unit<?> newUnit = unit.multiply(other.getUnit());
-        return new StandardQuantity(newValue, newUnit);
+        return new StandardQuantity<>(newValue, newUnit);
     }
 
     @Override
@@ -114,12 +112,10 @@ final class StandardQuantity<Q extends Quantity<Q>> implements Quantity<Q> {
         return divide(Real.of(scalar));
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
     public <R extends Quantity<R>> Quantity<?> divide(Quantity<R> other) {
         Real newValue = value.divide(other.getValue());
         Unit<?> newUnit = unit.divide(other.getUnit());
-        return new StandardQuantity(newValue, newUnit);
+        return new StandardQuantity<>(newValue, newUnit);
     }
 
     @Override
@@ -132,16 +128,12 @@ final class StandardQuantity<Q extends Quantity<Q>> implements Quantity<Q> {
         return new StandardQuantity<>(value.abs(), unit);
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
     public Quantity<?> pow(int exponent) {
         Real newValue = value.pow(exponent);
         Unit<?> newUnit = unit.pow(exponent);
         return new StandardQuantity<>(newValue, newUnit);
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
     public Quantity<?> sqrt() {
         Real newValue = value.sqrt();
         Unit<?> newUnit = unit.sqrt();

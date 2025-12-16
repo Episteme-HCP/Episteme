@@ -24,11 +24,11 @@ package org.jscience.mathematics.analysis.fem;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.DenseMatrix;
-import org.jscience.mathematics.vector.DenseVector;
-import org.jscience.mathematics.vector.Matrix;
-import org.jscience.mathematics.vector.Vector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.mathematics.linearalgebra.Matrix;
+import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.sets.Reals;
 
 /**
@@ -138,4 +138,3 @@ public class LinearElement1D implements Element {
         return quadraturePoints;
     }
 }
-

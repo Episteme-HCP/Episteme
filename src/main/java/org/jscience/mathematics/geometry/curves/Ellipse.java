@@ -2,9 +2,9 @@ package org.jscience.mathematics.geometry.curves;
 
 import org.jscience.mathematics.geometry.ParametricCurve;
 import org.jscience.mathematics.geometry.PointND;
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.Vector;
-import org.jscience.mathematics.vector.DenseVector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 
 import java.util.Arrays;
 

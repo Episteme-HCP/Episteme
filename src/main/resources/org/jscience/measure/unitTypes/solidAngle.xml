@@ -1,3 +1,0 @@
-<unitType id="solidAngle" name="solid angle">
-    <dimension name="angle" power="2" preserve="no"/>
-</unitType>

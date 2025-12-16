@@ -23,7 +23,6 @@
 package org.jscience.mathematics.logic.proof;
 
 import org.jscience.mathematics.logic.predicate.Formula;
-import org.jscience.mathematics.logic.propositional.Proposition;
 import java.util.List;
 
 /**

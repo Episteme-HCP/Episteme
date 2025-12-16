@@ -22,7 +22,7 @@
  */
 package org.jscience.measure;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Converts values between compatible units of measurement.
@@ -141,11 +141,11 @@ public interface UnitConverter {
     Real derivative(Real value);
 
     /**
-     * Returns the identity converter (no conversion).
+     * Returns the identity converter.
      * 
      * @return the identity converter
      */
     static UnitConverter identity() {
-        return IdentityConverter.INSTANCE;
+        return org.jscience.measure.converters.IdentityConverter.INSTANCE;
     }
 }

@@ -1,7 +1,0 @@
-
-<!ENTITY joulePerKilogram.xml SYSTEM "../specificEnergy/joulePerKilogram.xml">
-
-<!ENTITY specificEnergy.elements	"
-&joulePerKilogram.xml;
-">
-

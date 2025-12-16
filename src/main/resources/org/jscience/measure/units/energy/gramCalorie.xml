@@ -1,4 +1,0 @@
-<unit id="gramCalorie" name="gram-calorie" unitType="energy" parentSI="joule" multiplierToSI="4.1868"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 gram-calorie = 1 calorie</description>
-</unit>

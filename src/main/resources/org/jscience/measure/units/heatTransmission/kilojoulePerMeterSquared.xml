@@ -1,3 +1,0 @@
-<unit id="kilojoulePerMeterSquared" name="kilojoule per meter squared" abbreviation="kJ/m^2" unitType="heatTransmission"
-      parentSI="joulePerMeterSquared" multiplierToSI="1.0E+3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

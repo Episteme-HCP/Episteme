@@ -1,4 +1,0 @@
-<unit id="hour" name="hour" abbreviation="hr" unitType="time" parentSI="second" multiplierToSI="3600"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>3600 seconds</description>
-</unit>

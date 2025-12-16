@@ -1,6 +1,6 @@
 package org.jscience.mathematics.geometry;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a region in 3D space using a Binary Space Partitioning (BSP) tree.
@@ -32,11 +32,6 @@ public class RegionBSPTree {
             this.isInside = isInside;
         }
 
-        Node(Plane3D cut, Node plus, Node minus) {
-            this.cut = cut;
-            this.plus = plus;
-            this.minus = minus;
-        }
     }
 
     /**

@@ -1,7 +1,7 @@
 package org.jscience.mathematics.algebra.groups;
 
-import org.jscience.mathematics.algebra.Group;
-import org.jscience.mathematics.number.Integer;
+import org.jscience.mathematics.structures.groups.Group;
+import org.jscience.mathematics.numbers.integers.Integer;
 
 /**
  * Represents a Cyclic Group of order n (Z_n).

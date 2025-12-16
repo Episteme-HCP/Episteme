@@ -1,7 +1,0 @@
-
-<!ENTITY joulePerKelvin.xml SYSTEM "../heatCapacity/joulePerKelvin.xml">
-
-<!ENTITY heatCapacity.elements	"
-&joulePerKelvin.xml;
-">
-

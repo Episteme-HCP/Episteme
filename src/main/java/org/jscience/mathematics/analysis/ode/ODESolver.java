@@ -1,7 +1,7 @@
 package org.jscience.mathematics.analysis.ode;
 
 import org.jscience.mathematics.analysis.Function;
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Ordinary Differential Equation (ODE) solvers.

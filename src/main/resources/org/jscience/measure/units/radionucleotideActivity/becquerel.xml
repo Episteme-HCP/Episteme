@@ -1,4 +1,0 @@
-<unit id="becquerel" name="becquerel" abbreviation="Bq" unitType="radionucleotideActivity" parentSI="SELF"
-      multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>becquerel</description>
-</unit>

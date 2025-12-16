@@ -1,3 +1,0 @@
-<unit id="poundPerFootSquared" name="Pound per foot squared" abbreviation="lbf/ft^2" unitType="pressure"
-      parentSI="pascal" multiplierToSI="47.880" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

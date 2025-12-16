@@ -22,8 +22,8 @@
  */
 package org.jscience.mathematics.analysis.series;
 
-import org.jscience.mathematics.number.Integer;
-import org.jscience.mathematics.number.Natural;
+import org.jscience.mathematics.numbers.integers.Integer;
+import org.jscience.mathematics.numbers.integers.Natural;
 
 /**
  * Fibonacci sequence: F(0) = 0, F(1) = 1, F(n) = F(n-1) + F(n-2).

@@ -1,6 +1,6 @@
 package org.jscience.mathematics.statistics;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import java.util.List;
 
 /**
@@ -176,5 +176,65 @@ public class StatisticalTests {
      */
     public static Real standardDeviation(List<Real> data) {
         return variance(data).sqrt();
+    }
+
+    /**
+     * One-Way Analysis of Variance (ANOVA).
+     * Returns the F-statistic.
+     * 
+     * @param groups list of sample groups
+     * @return F-statistic
+     */
+    public static Real oneWayAnova(List<List<Real>> groups) {
+        if (groups.size() < 2) {
+            throw new IllegalArgumentException("ANOVA requires at least two groups");
+        }
+
+        int k = groups.size();
+        int nTotal = 0;
+        Real grandSum = Real.ZERO;
+
+        // Calculate Grand Mean
+        for (List<Real> group : groups) {
+            nTotal += group.size();
+            for (Real val : group) {
+                grandSum = grandSum.add(val);
+            }
+        }
+        Real grandMean = grandSum.divide(Real.of(nTotal));
+
+        Real ssb = Real.ZERO;
+        Real ssw = Real.ZERO;
+
+        for (List<Real> group : groups) {
+            int ni = group.size();
+            Real groupSum = Real.ZERO;
+            for (Real val : group) {
+                groupSum = groupSum.add(val);
+            }
+            Real groupMean = groupSum.divide(Real.of(ni));
+
+            // Sum of Squares Between: Σ ni * (mean_i - grandMean)^2
+            Real diffBetween = groupMean.subtract(grandMean);
+            ssb = ssb.add(Real.of(ni).multiply(diffBetween.multiply(diffBetween)));
+
+            // Sum of Squares Within: Σ Σ (val_ij - mean_i)^2
+            for (Real val : group) {
+                Real diffWithin = val.subtract(groupMean);
+                ssw = ssw.add(diffWithin.multiply(diffWithin));
+            }
+        }
+
+        int dfBetween = k - 1;
+        int dfWithin = nTotal - k;
+
+        if (dfWithin <= 0) {
+            throw new IllegalArgumentException("Not enough degrees of freedom for Within usage");
+        }
+
+        Real msb = ssb.divide(Real.of(dfBetween));
+        Real msw = ssw.divide(Real.of(dfWithin));
+
+        return msb.divide(msw);
     }
 }

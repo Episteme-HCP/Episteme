@@ -3,7 +3,6 @@ package org.jscience.mathematics.topology;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Arrays;
 
 /**
  * Represents a Simplicial Complex.

@@ -24,7 +24,6 @@ package org.jscience.resources.properties;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jscience.mathematics.number.Real;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,23 +55,31 @@ public class PropertiesLoader {
             return cache.get(cacheKey);
         }
 
-        try (InputStream is = PropertiesLoader.class.getResourceAsStream(resourcePath)) {
-            if (is == null) {
+        try {
+            InputStream isTemp = PropertiesLoader.class.getResourceAsStream(resourcePath);
+            if (isTemp == null && resourcePath.startsWith("/")) {
+                // Try context class loader with relative path
+                isTemp = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourcePath.substring(1));
+            }
+
+            if (isTemp == null) {
                 throw new IllegalArgumentException("Resource not found: " + resourcePath);
             }
 
-            JsonNode root = mapper.readTree(is);
-            JsonNode itemNode = root.get(itemName);
+            try (InputStream is = isTemp) {
+                JsonNode root = mapper.readTree(is);
+                JsonNode itemNode = root.get(itemName);
 
-            if (itemNode == null) {
-                throw new IllegalArgumentException("Item '" + itemName + "' not found in " + resourcePath);
+                if (itemNode == null) {
+                    throw new IllegalArgumentException("Item '" + itemName + "' not found in " + resourcePath);
+                }
+
+                PropertySet propertySet = new PropertySet();
+                parseProperties(itemNode, propertySet);
+
+                cache.put(cacheKey, propertySet);
+                return propertySet;
             }
-
-            PropertySet propertySet = new PropertySet();
-            parseProperties(itemNode, propertySet);
-
-            cache.put(cacheKey, propertySet);
-            return propertySet;
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to load properties from " + resourcePath, e);
@@ -103,7 +110,9 @@ public class PropertiesLoader {
                 Object inferred = org.jscience.util.TypeInference.infer(text);
                 // We need to handle the generic type safety warning here, or just cast
                 // PropertyKey expects a class.
-                set.set(PropertyKey.of(keyName, (Class<Object>) inferred.getClass()), inferred);
+                @SuppressWarnings("unchecked")
+                Class<Object> inferredClass = (Class<Object>) inferred.getClass();
+                set.set(PropertyKey.of(keyName, inferredClass), inferred);
             } else if (valueNode.isBoolean()) {
                 set.set(PropertyKey.of(keyName, Boolean.class), valueNode.asBoolean());
             } else {

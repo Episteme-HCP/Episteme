@@ -22,10 +22,6 @@
  */
 package org.jscience.benchmark;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
 /**
  * Simple utility for running benchmarks and reporting results.
  * 

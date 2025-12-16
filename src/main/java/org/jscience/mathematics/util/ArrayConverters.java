@@ -22,13 +22,12 @@
  */
 package org.jscience.mathematics.util;
 
-import org.jscience.mathematics.vector.Matrix;
-import org.jscience.mathematics.vector.DenseMatrix;
-import org.jscience.mathematics.vector.Vector;
-import org.jscience.mathematics.vector.DenseVector;
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.linearalgebra.Matrix;
+import org.jscience.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.jscience.mathematics.linearalgebra.Vector;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.sets.Reals;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,8 +93,6 @@ public class ArrayConverters {
     public static Matrix<Real> toMatrix(double[][] arr) {
         if (arr == null)
             return null;
-        int rows = arr.length;
-        int cols = arr[0].length;
 
         List<List<Real>> rowsList = new ArrayList<>();
         for (double[] row : arr) {
@@ -166,5 +163,3 @@ public class ArrayConverters {
         return result;
     }
 }
-
-

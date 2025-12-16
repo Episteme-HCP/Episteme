@@ -51,223 +51,431 @@ import org.jscience.measure.quantity.*;
  */
 public final class Units {
 
-    private Units() {
-        // Utility class
-    }
+        private Units() {
+                // Utility class
+        }
 
-    // ========== SI BASE UNITS ==========
+        // ========== SI BASE UNITS ==========
 
-    /**
-     * The SI unit of length: meter (m).
-     * <p>
-     * Defined by the distance light travels in vacuum in 1/299,792,458 second.
-     * </p>
-     */
-    public static final Unit<Length> METER = new StandardUnit<>("m", "meter", Dimension.LENGTH);
+        /**
+         * The SI unit of length: meter (m).
+         * <p>
+         * Defined by the distance light travels in vacuum in 1/299,792,458 second.
+         * </p>
+         */
+        public static final Unit<Length> METER = new StandardUnit<>("m", "meter", Dimension.LENGTH);
 
-    /**
-     * The SI unit of mass: kilogram (kg).
-     * <p>
-     * Defined by the Planck constant h = 6.62607015×10⁻³⁴ kg⋅m²⋅s⁻¹.
-     * </p>
-     */
-    public static final Unit<Mass> KILOGRAM = new StandardUnit<>("kg", "kilogram", Dimension.MASS);
+        /**
+         * The SI unit of mass: kilogram (kg).
+         * <p>
+         * Defined by the Planck constant h = 6.62607015×10⁻³⁴ kg⋅m²⋅s⁻¹.
+         * </p>
+         */
+        public static final Unit<Mass> KILOGRAM = new StandardUnit<>("kg", "kilogram", Dimension.MASS);
 
-    /**
-     * The SI unit of time: second (s).
-     * <p>
-     * Defined by the cesium-133 hyperfine transition frequency.
-     * </p>
-     */
-    public static final Unit<Time> SECOND = new StandardUnit<>("s", "second", Dimension.TIME);
+        /**
+         * The SI unit of time: second (s).
+         * <p>
+         * Defined by the cesium-133 hyperfine transition frequency.
+         * </p>
+         */
+        public static final Unit<Time> SECOND = new StandardUnit<>("s", "second", Dimension.TIME);
 
-    /**
-     * The SI unit of temperature: kelvin (K).
-     */
-    public static final Unit<Temperature> KELVIN = new StandardUnit<>("K", "kelvin", Dimension.TEMPERATURE);
+        /**
+         * The SI unit of temperature: kelvin (K).
+         */
+        public static final Unit<Temperature> KELVIN = new StandardUnit<>("K", "kelvin", Dimension.TEMPERATURE);
 
-    /**
-     * The SI unit of electric current: ampere (A).
-     */
-    public static final Unit<ElectricCurrent> AMPERE = new StandardUnit<>("A", "ampere", Dimension.ELECTRIC_CURRENT);
+        /**
+         * Celsius: °C = K - 273.15
+         * Since add(offset) means Value(Base) = Value(Derived) + Offset usually?
+         * Let's test assumption: If 0 C = 273.15 K.
+         * If Val(K) = Val(C) + 273.15. then add(273.15).
+         * Previous code had -273.15 which implies Val(K) = Val(C) - 273.15.
+         */
+        public static final Unit<Temperature> CELSIUS = ((StandardUnit<Temperature>) KELVIN).add(273.15);
 
-    /**
-     * The SI unit of amount of substance: mole (mol).
-     */
-    public static final Unit<AmountOfSubstance> MOLE = new StandardUnit<>("mol", "mole", Dimension.AMOUNT_OF_SUBSTANCE);
+        /**
+         * Fahrenheit: 0 F = 255.37 K (relative offset) + 255.37 step?
+         * Correct conversion chain K <-> F:
+         * Val(K) = (Val(F) + 459.67) * 5/9
+         * Val(K) = Val(F) * 5/9 + 255.372222...
+         * This corresponds to Mult(5/9) -> Add(255.372...).
+         */
+        public static final Unit<Temperature> FAHRENHEIT = ((StandardUnit<Temperature>) ((StandardUnit<Temperature>) KELVIN)
+                        .multiply(5.0 / 9.0)).add(255.37222222222222);
 
-    // ========== METRIC LENGTH UNITS ==========
+        /**
+         * The SI unit of electric current: ampere (A).
+         */
+        public static final Unit<ElectricCurrent> AMPERE = new StandardUnit<>("A", "ampere",
+                        Dimension.ELECTRIC_CURRENT);
 
-    /** Kilometer: 1 km = 1000 m */
-    public static final Unit<Length> KILOMETER = METER.multiply(1000);
+        /**
+         * The SI unit of amount of substance: mole (mol).
+         */
+        public static final Unit<AmountOfSubstance> MOLE = new StandardUnit<>("mol", "mole",
+                        Dimension.AMOUNT_OF_SUBSTANCE);
 
-    /** Centimeter: 1 cm = 0.01 m */
-    public static final Unit<Length> CENTIMETER = METER.divide(100);
+        /**
+         * The SI unit of luminous intensity: candela (cd).
+         */
+        public static final Unit<LuminousIntensity> CANDELA = new StandardUnit<>("cd", "candela",
+                        Dimension.LUMINOUS_INTENSITY);
 
-    /** Millimeter: 1 mm = 0.001 m */
-    public static final Unit<Length> MILLIMETER = METER.divide(1000);
+        // ========== SUPPLEMENTARY SI UNITS (DIMENSIONLESS) ==========
 
-    /** Micrometer: 1 μm = 10⁻⁶ m */
-    public static final Unit<Length> MICROMETER = METER.divide(1_000_000);
+        /**
+         * Radian: rad (plane angle).
+         */
+        public static final Unit<Dimensionless> RADIAN = new StandardUnit<>("rad", "radian", Dimension.DIMENSIONLESS);
 
-    /** Nanometer: 1 nm = 10⁻⁹ m */
-    public static final Unit<Length> NANOMETER = METER.divide(1_000_000_000);
+        /**
+         * Steradian: sr (solid angle).
+         */
+        public static final Unit<Dimensionless> STERADIAN = new StandardUnit<>("sr", "steradian",
+                        Dimension.DIMENSIONLESS);
 
-    // ========== METRIC MASS UNITS ==========
+        // ========== METRIC LENGTH UNITS ==========
 
-    /** Gram: 1 g = 0.001 kg */
-    public static final Unit<Mass> GRAM = KILOGRAM.divide(1000);
+        /** Kilometer: 1 km = 1000 m */
+        public static final Unit<Length> KILOMETER = METER.multiply(1000);
 
-    /** Milligram: 1 mg = 10⁻⁶ kg */
-    public static final Unit<Mass> MILLIGRAM = GRAM.divide(1000);
+        /** Centimeter: 1 cm = 0.01 m */
+        public static final Unit<Length> CENTIMETER = METER.divide(100);
 
-    /** Tonne (metric ton): 1 t = 1000 kg */
-    public static final Unit<Mass> TONNE = KILOGRAM.multiply(1000);
+        /** Millimeter: 1 mm = 0.001 m */
+        public static final Unit<Length> MILLIMETER = METER.divide(1000);
 
-    // ========== TIME UNITS ==========
+        /** Micrometer: 1 μm = 10⁻⁶ m */
+        public static final Unit<Length> MICROMETER = METER.divide(1_000_000);
 
-    /** Minute: 1 min = 60 s */
-    public static final Unit<Time> MINUTE = SECOND.multiply(60);
+        /** Nanometer: 1 nm = 10⁻⁹ m */
+        public static final Unit<Length> NANOMETER = METER.divide(1_000_000_000);
 
-    /** Hour: 1 h = 3600 s */
-    public static final Unit<Time> HOUR = SECOND.multiply(3600);
+        // ========== METRIC MASS UNITS ==========
 
-    /** Day: 1 d = 86400 s */
-    public static final Unit<Time> DAY = SECOND.multiply(86400);
+        /** Gram: 1 g = 0.001 kg */
+        public static final Unit<Mass> GRAM = KILOGRAM.divide(1000);
 
-    /** Millisecond: 1 ms = 0.001 s */
-    public static final Unit<Time> MILLISECOND = SECOND.divide(1000);
+        /** Milligram: 1 mg = 10⁻⁶ kg */
+        public static final Unit<Mass> MILLIGRAM = GRAM.divide(1000);
 
-    /** Microsecond: 1 μs = 10⁻⁶ s */
-    public static final Unit<Time> MICROSECOND = SECOND.divide(1_000_000);
+        /** Tonne (metric ton): 1 t = 1000 kg */
+        public static final Unit<Mass> TONNE = KILOGRAM.multiply(1000);
 
-    /** Nanosecond: 1 ns = 10⁻⁹ s */
-    public static final Unit<Time> NANOSECOND = SECOND.divide(1_000_000_000);
+        // ========== TIME UNITS ==========
 
-    // ========== DERIVED SI UNITS ==========
+        /** Minute: 1 min = 60 s */
+        public static final Unit<Time> MINUTE = SECOND.multiply(60);
 
-    /**
-     * Meter per second: m/s (velocity).
-     */
-    @SuppressWarnings("unchecked")
-    public static final Unit<Velocity> METER_PER_SECOND = (Unit<Velocity>) METER.divide(SECOND);
+        /** Hour: 1 h = 3600 s */
+        public static final Unit<Time> HOUR = SECOND.multiply(3600);
 
-    /**
-     * Kilometer per hour: km/h (velocity).
-     */
-    @SuppressWarnings("unchecked")
-    public static final Unit<Velocity> KILOMETER_PER_HOUR = (Unit<Velocity>) KILOMETER.divide(HOUR);
+        /** Day: 1 d = 86400 s */
+        public static final Unit<Time> DAY = SECOND.multiply(86400);
 
-    /**
-     * Meter per second squared: m/s² (acceleration).
-     */
-    @SuppressWarnings("unchecked")
-    public static final Unit<Acceleration> METERS_PER_SECOND_SQUARED = (Unit<Acceleration>) METER
-            .divide(SECOND.multiply(SECOND));
+        /** Millisecond: 1 ms = 0.001 s */
+        public static final Unit<Time> MILLISECOND = SECOND.divide(1000);
 
-    /**
-     * Joule: J (energy). 1 J = 1 kg⋅m²/s²
-     */
-    @SuppressWarnings("unchecked")
-    public static final Unit<Energy> JOULE = (Unit<Energy>) KILOGRAM.multiply(METER).multiply(METER)
-            .divide(SECOND.multiply(SECOND));
+        /** Microsecond: 1 μs = 10⁻⁶ s */
+        public static final Unit<Time> MICROSECOND = SECOND.divide(1_000_000);
 
-    /**
-     * Watt: W (power). 1 W = 1 J/s
-     */
-    @SuppressWarnings("unchecked")
-    public static final Unit<Power> WATT = (Unit<Power>) JOULE.divide(SECOND);
+        /** Nanosecond: 1 ns = 10⁻⁹ s */
+        public static final Unit<Time> NANOSECOND = SECOND.divide(1_000_000_000);
 
-    /**
-     * Coulomb: C (electric charge). 1 C = 1 A⋅s
-     */
-    @SuppressWarnings("unchecked")
-    public static final Unit<ElectricCharge> COULOMB = (Unit<ElectricCharge>) AMPERE.multiply(SECOND);
+        // ========== DERIVED SI UNITS ==========
 
-    /**
-     * Farad: F (capacitance). Simplified as C²⋅s²/(kg⋅m²)
-     */
-    @SuppressWarnings("unchecked")
-    public static final Unit<ElectricCapacitance> FARAD = (Unit<ElectricCapacitance>) COULOMB.multiply(COULOMB)
-            .multiply(SECOND).multiply(SECOND).divide(KILOGRAM.multiply(METER).multiply(METER));
+        /**
+         * Dimensionless unit: 1 (for ratios).
+         */
+        public static final Unit<Dimensionless> ONE = new StandardUnit<>("1", "one", Dimension.DIMENSIONLESS);
 
-    /**
-     * Henry: H (inductance). 1 H = kg⋅m²/(s²⋅A²)
-     */
-    @SuppressWarnings("unchecked")
-    public static final Unit<Inductance> HENRY = (Unit<Inductance>) KILOGRAM.multiply(METER).multiply(METER)
-            .divide(SECOND.multiply(SECOND).multiply(AMPERE).multiply(AMPERE));
+        /**
+         * Square meter: m² (area).
+         */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Area> SQUARE_METER = (Unit<Area>) METER.pow(2);
 
-    /**
-     * Dimensionless unit: 1 (for ratios).
-     */
-    public static final Unit<Dimensionless> ONE = new StandardUnit<>("1", "one", Dimension.DIMENSIONLESS);
+        /**
+         * Cubic meter: m³ (volume).
+         */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Volume> CUBIC_METER = (Unit<Volume>) METER.pow(3);
 
-    /**
-     * Cubic meter: m³ (volume).
-     */
-    @SuppressWarnings("unchecked")
-    public static final Unit<Volume> CUBIC_METER = (Unit<Volume>) METER.pow(3);
+        /**
+         * Kilogram per cubic meter: kg/m³ (density).
+         */
+        @SuppressWarnings("unchecked")
+        public static final Unit<MassDensity> KILOGRAM_PER_CUBIC_METER = (Unit<MassDensity>) KILOGRAM
+                        .divide(CUBIC_METER);
 
-    /**
-     * Square meter: m² (area).
-     */
-    @SuppressWarnings("unchecked")
-    public static final Unit<Area> SQUARE_METER = (Unit<Area>) METER.pow(2);
+        /**
+         * Meter per second: m/s (velocity).
+         */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Velocity> METER_PER_SECOND = (Unit<Velocity>) METER.divide(SECOND);
 
-    // ========== IMPERIAL/US CUSTOMARY UNITS ==========
+        /**
+         * Kilometer per hour: km/h (velocity).
+         */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Velocity> KILOMETER_PER_HOUR = (Unit<Velocity>) KILOMETER.divide(HOUR);
 
-    /** Inch: 1 in = 0.0254 m (exactly) */
-    @SuppressWarnings("unchecked")
-    public static final Unit<Length> INCH = (Unit<Length>) METER.multiply(0.0254);
+        /**
+         * Meter per second squared: m/s² (acceleration).
+         */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Acceleration> METERS_PER_SECOND_SQUARED = (Unit<Acceleration>) METER
+                        .divide(SECOND.multiply(SECOND));
 
-    /** Foot: 1 ft = 0.3048 m (exactly) */
-    @SuppressWarnings("unchecked")
-    public static final Unit<Length> FOOT = (Unit<Length>) METER.multiply(0.3048);
+        /**
+         * Joule: J (energy). 1 J = 1 kg⋅m²/s²
+         */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Energy> JOULE = (Unit<Energy>) KILOGRAM.multiply(METER).multiply(METER)
+                        .divide(SECOND.multiply(SECOND));
 
-    /** Yard: 1 yd = 0.9144 m */
-    @SuppressWarnings("unchecked")
-    public static final Unit<Length> YARD = (Unit<Length>) METER.multiply(0.9144);
+        /**
+         * Watt: W (power). 1 W = 1 J/s
+         */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Power> WATT = (Unit<Power>) JOULE.divide(SECOND);
 
-    /** Mile: 1 mi = 1609.344 m */
-    @SuppressWarnings("unchecked")
-    public static final Unit<Length> MILE = (Unit<Length>) METER.multiply(1609.344);
+        /**
+         * Newton: N (force). 1 N = 1 kg⋅m/s²
+         */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Force> NEWTON = (Unit<Force>) KILOGRAM.multiply(METER)
+                        .divide(SECOND.multiply(SECOND));
 
-    /** Pound (mass): 1 lb = 0.45359237 kg (exactly) */
-    @SuppressWarnings("unchecked")
-    public static final Unit<Mass> POUND = (Unit<Mass>) KILOGRAM.multiply(0.45359237);
+        /**
+         * Pascal: Pa (pressure). 1 Pa = 1 N/m² = 1 kg/(m⋅s²)
+         */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Pressure> PASCAL = (Unit<Pressure>) NEWTON.divide(SQUARE_METER);
 
-    /** Ounce: 1 oz = 0.028349523125 kg */
-    @SuppressWarnings("unchecked")
-    public static final Unit<Mass> OUNCE = (Unit<Mass>) KILOGRAM.multiply(0.028349523125);
+        /**
+         * Hertz: Hz (frequency). 1 Hz = 1/s
+         */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Frequency> HERTZ = (Unit<Frequency>) ONE.divide(SECOND);
 
-    /** Miles per hour: mph */
-    @SuppressWarnings("unchecked")
-    public static final Unit<Velocity> MILE_PER_HOUR = (Unit<Velocity>) MILE.divide(HOUR);
+        /**
+         * Volt: V (electric potential). 1 V = 1 W/A = 1 J/(A⋅s)
+         */
+        @SuppressWarnings("unchecked")
+        public static final Unit<ElectricPotential> VOLT = (Unit<ElectricPotential>) WATT.divide(AMPERE);
 
-    // ========== COMMON ALIASES ==========
+        /**
+         * Coulomb: C (electric charge). 1 C = 1 A⋅s
+         */
+        @SuppressWarnings("unchecked")
+        public static final Unit<ElectricCharge> COULOMB = (Unit<ElectricCharge>) AMPERE.multiply(SECOND);
 
-    /** Alias for METER */
-    public static final Unit<Length> M = METER;
+        /**
+         * Farad: F (capacitance). Simplified as C²⋅s²/(kg⋅m²)
+         */
+        @SuppressWarnings("unchecked")
+        public static final Unit<ElectricCapacitance> FARAD = (Unit<ElectricCapacitance>) COULOMB.multiply(COULOMB)
+                        .multiply(SECOND).multiply(SECOND).divide(KILOGRAM.multiply(METER).multiply(METER));
 
-    /** Alias for KILOMETER */
-    public static final Unit<Length> KM = KILOMETER;
+        /**
+         * Henry: H (inductance). 1 H = kg⋅m²/(s²⋅A²)
+         */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Inductance> HENRY = (Unit<Inductance>) KILOGRAM.multiply(METER).multiply(METER)
+                        .divide(SECOND.multiply(SECOND).multiply(AMPERE).multiply(AMPERE));
 
-    /** Alias for KILOGRAM */
-    public static final Unit<Mass> KG = KILOGRAM;
+        // ========== IMPERIAL/US CUSTOMARY UNITS ==========
 
-    /** Alias for GRAM */
-    public static final Unit<Mass> G = GRAM;
+        /** Inch: 1 in = 0.0254 m (exactly) */
+        public static final Unit<Length> INCH = (Unit<Length>) METER.multiply(0.0254);
 
-    /** Alias for SECOND */
-    public static final Unit<Time> S = SECOND;
+        /** Foot: 1 ft = 0.3048 m (exactly) */
+        public static final Unit<Length> FOOT = (Unit<Length>) METER.multiply(0.3048);
 
-    /** Alias for METER_PER_SECOND */
-    public static final Unit<Velocity> MPS = METER_PER_SECOND;
+        /** Yard: 1 yd = 0.9144 m */
+        public static final Unit<Length> YARD = (Unit<Length>) METER.multiply(0.9144);
 
-    /** Alias for KILOMETER_PER_HOUR */
-    public static final Unit<Velocity> KPH = KILOMETER_PER_HOUR;
+        /** Mile: 1 mi = 1609.344 m */
+        public static final Unit<Length> MILE = (Unit<Length>) METER.multiply(1609.344);
 
-    /** Alias for MILE_PER_HOUR */
-    public static final Unit<Velocity> MPH = MILE_PER_HOUR;
+        /** Pound (mass): 1 lb = 0.45359237 kg (exactly) */
+        public static final Unit<Mass> POUND = (Unit<Mass>) KILOGRAM.multiply(0.45359237);
+
+        /** Ounce: 1 oz = 0.028349523125 kg */
+        public static final Unit<Mass> OUNCE = (Unit<Mass>) KILOGRAM.multiply(0.028349523125);
+
+        /** Miles per hour: mph */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Velocity> MILE_PER_HOUR = (Unit<Velocity>) MILE.divide(HOUR);
+
+        // ========== NON-SI UNITS ==========
+
+        /** Litre: 1 L = 0.001 m³ */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Volume> LITRE = (Unit<Volume>) CUBIC_METER.divide(1000);
+
+        /** US Liquid Gallon: 1 gal = 3.785411784 L */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Volume> GALLON_LIQUID_US = (Unit<Volume>) LITRE.multiply(3.785411784);
+
+        /** Atmosphere: 1 atm = 101325 Pa */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Pressure> ATMOSPHERE = (Unit<Pressure>) PASCAL.multiply(101325);
+
+        /** Bar: 1 bar = 100000 Pa */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Pressure> BAR = (Unit<Pressure>) PASCAL.multiply(100000);
+
+        /** Pound per square inch: 1 psi ≈ 6894.76 Pa */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Pressure> POUND_PER_SQUARE_INCH = (Unit<Pressure>) PASCAL.multiply(6894.75729);
+
+        /** Millimeter of mercury: 1 mmHg ≈ 133.322 Pa */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Pressure> MILLIMETRE_OF_MERCURY = (Unit<Pressure>) PASCAL.multiply(133.322387415);
+
+        /** Calorie (thermochemical): 1 cal = 4.184 J */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Energy> CALORIE = (Unit<Energy>) JOULE.multiply(4.184);
+
+        /** Electronvolt: 1 eV ≈ 1.602×10⁻¹⁹ J */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Energy> ELECTRON_VOLT = (Unit<Energy>) JOULE.multiply(1.602176634e-19);
+
+        /** Degree: 1° = π/180 rad */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Angle> DEGREE_ANGLE = (Unit<Angle>) ((Unit<?>) RADIAN).multiply(Math.PI / 180.0);
+
+        /** Minute (angle): 1' = 1°/60 */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Angle> MINUTE_ANGLE = (Unit<Angle>) DEGREE_ANGLE.divide(60);
+
+        /** Second (angle): 1" = 1'/60 */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Angle> SECOND_ANGLE = (Unit<Angle>) MINUTE_ANGLE.divide(60);
+
+        /** Julian Year: 1 yr = 365.25 d */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Time> YEAR = (Unit<Time>) DAY.multiply(365.25);
+
+        /** Knot: 1 kn = 1852 m/h */
+        @SuppressWarnings("unchecked")
+        public static final Unit<Velocity> KNOT = (Unit<Velocity>) METER.multiply(1852).divide(HOUR);
+
+        // ========== COMMON ALIASES ==========
+
+        /** Alias for METER */
+        public static final Unit<Length> M = METER;
+
+        /** Alias for KILOMETER */
+        public static final Unit<Length> KM = KILOMETER;
+
+        /** Alias for KILOGRAM */
+        public static final Unit<Mass> KG = KILOGRAM;
+
+        /** Alias for GRAM */
+        public static final Unit<Mass> G = GRAM;
+
+        /** Alias for SECOND */
+        public static final Unit<Time> S = SECOND;
+
+        /** Alias for METER_PER_SECOND */
+        public static final Unit<Velocity> MPS = METER_PER_SECOND;
+
+        /** Alias for KILOMETER_PER_HOUR */
+        public static final Unit<Velocity> KPH = KILOMETER_PER_HOUR;
+
+        /** Alias for MILE_PER_HOUR */
+        public static final Unit<Velocity> MPH = MILE_PER_HOUR;
+
+        /** Legacy Alias for METER_PER_SECOND */
+        public static final Unit<Velocity> METERS_PER_SECOND = METER_PER_SECOND;
+
+        /** Legacy Alias for KILOMETER_PER_HOUR (British spelling) */
+        public static final Unit<Velocity> KILOMETRES_PER_HOUR = KILOMETER_PER_HOUR;
+
+        /** Legacy Alias for MILE_PER_HOUR */
+        public static final Unit<Velocity> MILES_PER_HOUR = MILE_PER_HOUR;
+
+        // ========== UNIT PARSING ==========
+
+        private static final java.util.Map<String, Unit<?>> UNIT_BY_SYMBOL = new java.util.HashMap<>();
+
+        static {
+                // Base units
+                UNIT_BY_SYMBOL.put("m", METER);
+                UNIT_BY_SYMBOL.put("kg", KILOGRAM);
+                UNIT_BY_SYMBOL.put("s", SECOND);
+                UNIT_BY_SYMBOL.put("A", AMPERE);
+                UNIT_BY_SYMBOL.put("K", KELVIN);
+                UNIT_BY_SYMBOL.put("mol", MOLE);
+                UNIT_BY_SYMBOL.put("cd", CANDELA);
+                UNIT_BY_SYMBOL.put("rad", RADIAN);
+                UNIT_BY_SYMBOL.put("sr", STERADIAN);
+
+                // Derived units
+                UNIT_BY_SYMBOL.put("km", KILOMETER);
+                UNIT_BY_SYMBOL.put("cm", CENTIMETER);
+                UNIT_BY_SYMBOL.put("mm", MILLIMETER);
+                UNIT_BY_SYMBOL.put("g", GRAM);
+                UNIT_BY_SYMBOL.put("N", NEWTON);
+                UNIT_BY_SYMBOL.put("J", JOULE);
+                UNIT_BY_SYMBOL.put("W", WATT);
+                UNIT_BY_SYMBOL.put("Pa", PASCAL);
+                UNIT_BY_SYMBOL.put("V", VOLT);
+                UNIT_BY_SYMBOL.put("C", COULOMB);
+                UNIT_BY_SYMBOL.put("F", FARAD);
+                UNIT_BY_SYMBOL.put("H", HENRY);
+                UNIT_BY_SYMBOL.put("Hz", HERTZ);
+                UNIT_BY_SYMBOL.put("m/s", METER_PER_SECOND);
+                UNIT_BY_SYMBOL.put("km/h", KILOMETER_PER_HOUR);
+                UNIT_BY_SYMBOL.put("m/s²", METERS_PER_SECOND_SQUARED);
+                UNIT_BY_SYMBOL.put("m²", SQUARE_METER);
+                UNIT_BY_SYMBOL.put("m³", CUBIC_METER);
+                UNIT_BY_SYMBOL.put("kg/m³", KILOGRAM_PER_CUBIC_METER);
+                UNIT_BY_SYMBOL.put("kg/m^3", KILOGRAM_PER_CUBIC_METER);
+                UNIT_BY_SYMBOL.put("m^2", SQUARE_METER);
+                UNIT_BY_SYMBOL.put("m^3", CUBIC_METER);
+                UNIT_BY_SYMBOL.put("m/s^2", METERS_PER_SECOND_SQUARED);
+
+                // Additional
+                UNIT_BY_SYMBOL.put("L", LITRE);
+                UNIT_BY_SYMBOL.put("gal", GALLON_LIQUID_US);
+                UNIT_BY_SYMBOL.put("atm", ATMOSPHERE);
+                UNIT_BY_SYMBOL.put("bar", BAR);
+                UNIT_BY_SYMBOL.put("psi", POUND_PER_SQUARE_INCH);
+                UNIT_BY_SYMBOL.put("mmHg", MILLIMETRE_OF_MERCURY);
+                UNIT_BY_SYMBOL.put("cal", CALORIE);
+                UNIT_BY_SYMBOL.put("eV", ELECTRON_VOLT);
+                UNIT_BY_SYMBOL.put("deg", DEGREE_ANGLE);
+                UNIT_BY_SYMBOL.put("deg", DEGREE_ANGLE);
+                UNIT_BY_SYMBOL.put("arcmin", MINUTE_ANGLE);
+                UNIT_BY_SYMBOL.put("arcsec", SECOND_ANGLE);
+                UNIT_BY_SYMBOL.put("deg", DEGREE_ANGLE);
+                UNIT_BY_SYMBOL.put("arcmin", MINUTE_ANGLE);
+                UNIT_BY_SYMBOL.put("arcsec", SECOND_ANGLE);
+                UNIT_BY_SYMBOL.put("yr", YEAR);
+                UNIT_BY_SYMBOL.put("kn", KNOT);
+
+                UNIT_BY_SYMBOL.put("°C", CELSIUS);
+                UNIT_BY_SYMBOL.put("°F", FAHRENHEIT);
+        }
+
+        /**
+         * Parses a unit from its symbol.
+         * 
+         * @param symbol the unit symbol (e.g., "m", "kg", "m/s")
+         * @return the unit corresponding to the symbol
+         * @throws IllegalArgumentException if the symbol is not recognized
+         */
+        public static Unit<?> parseUnit(String symbol) {
+                Unit<?> unit = UNIT_BY_SYMBOL.get(symbol);
+                if (unit == null) {
+                        throw new IllegalArgumentException("Unknown unit symbol: " + symbol);
+                }
+                return unit;
+        }
 }

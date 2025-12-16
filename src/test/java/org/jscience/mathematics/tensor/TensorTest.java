@@ -23,7 +23,10 @@
 package org.jscience.mathematics.tensor;
 
 import org.junit.jupiter.api.Test;
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.tensors.Tensor;
+import org.jscience.mathematics.linearalgebra.tensors.DenseTensor;
+import org.jscience.mathematics.linearalgebra.tensors.TensorFactory;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -110,5 +113,62 @@ public class TensorTest {
         assertThat(tensor.get(0, 0).doubleValue()).isEqualTo(1.0);
         assertThat(tensor.get(1, 1).doubleValue()).isEqualTo(1.0);
     }
-}
 
+    @Test
+    void denseTensor_broadcast() {
+        Real[] data = { Real.of(1), Real.of(2) }; // Shape [1, 2]
+        Tensor<Real> tensor = new DenseTensor<>(data, 1, 2);
+
+        // Broadcast to [2, 2]
+        Tensor<Real> broadcasted = tensor.broadcast(2, 2);
+
+        assertThat(broadcasted.shape()).containsExactly(2, 2);
+        assertThat(broadcasted.get(0, 0).doubleValue()).isEqualTo(1.0);
+        assertThat(broadcasted.get(1, 0).doubleValue()).isEqualTo(1.0); // Repeated row
+        assertThat(broadcasted.get(0, 1).doubleValue()).isEqualTo(2.0);
+        assertThat(broadcasted.get(1, 1).doubleValue()).isEqualTo(2.0); // Repeated row
+    }
+
+    @Test
+    void denseTensor_slice() {
+        Real[] data = {
+                Real.of(1), Real.of(2), Real.of(3),
+                Real.of(4), Real.of(5), Real.of(6)
+        }; // Shape [2, 3]
+        Tensor<Real> tensor = new DenseTensor<>(data, 2, 3);
+
+        // Slice: row 1, cols 0-1 (size 1, 2)
+        // starts: [1, 0], sizes: [1, 2] -> gets {4, 5}
+        Tensor<Real> sliced = tensor.slice(new int[] { 1, 0 }, new int[] { 1, 2 });
+
+        assertThat(sliced.shape()).containsExactly(1, 2);
+        assertThat(sliced.get(0, 0).doubleValue()).isEqualTo(4.0);
+        assertThat(sliced.get(0, 1).doubleValue()).isEqualTo(5.0);
+    }
+
+    @Test
+    void sparseTensor_usage() {
+        // Need explicit access to SparseTensor or factory
+        // Assuming SparseTensor constructor is public
+        // Shape [2, 2], zero = 0.0
+        org.jscience.mathematics.linearalgebra.tensors.SparseTensor<Real> sparse = new org.jscience.mathematics.linearalgebra.tensors.SparseTensor<>(
+                new int[] { 2, 2 }, Real.ZERO);
+
+        sparse.set(Real.of(5.0), 0, 0);
+        sparse.set(Real.of(3.0), 1, 1);
+
+        assertThat(sparse.get(0, 0).doubleValue()).isEqualTo(5.0);
+        assertThat(sparse.get(0, 1).doubleValue()).isEqualTo(0.0); // default
+
+        // Broadcast: [2, 2] -> [2, 2, 2] (add dim on left?) No, must match rank or add
+        // left.
+        // Let's broadcast [2, 2] -> [1, 2, 2]??
+        // No, broadcast usually does:
+        // [1, 2] -> [2, 2]
+        // Let's try slice first
+
+        Tensor<Real> sliced = sparse.slice(new int[] { 0, 0 }, new int[] { 1, 1 });
+        assertThat(sliced.shape()).containsExactly(1, 1);
+        assertThat(sliced.get(0, 0).doubleValue()).isEqualTo(5.0);
+    }
+}

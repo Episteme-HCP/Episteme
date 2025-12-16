@@ -1,8 +1,5 @@
 package org.jscience.mathematics.cryptography;
 
-import org.jscience.mathematics.number.Natural;
-import org.jscience.mathematics.number.Integer;
-import org.jscience.mathematics.numbertheory.NumberTheory;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 

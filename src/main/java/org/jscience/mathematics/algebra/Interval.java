@@ -1,271 +1,180 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.jscience.mathematics.algebra;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.topology.TopologicalSpace;
-
 /**
- * Represents a 1D interval over real numbers.
+ * Interface for N-dimensional intervals over ordered sets.
  * <p>
- * Supports open, closed, and semi-open intervals:
- * - [a,b] closed
- * - (a,b) open
- * - [a,b) or (a,b] semi-open
+ * An interval represents a contiguous hyper-rectangular region in an ordered
+ * space.
+ * This is the base interface for intervals, requiring only that elements be
+ * comparable.
+ * More specialized intervals (over Rings, Fields) extend this interface with
+ * additional
+ * capabilities.
  * </p>
+ * <p>
+ * Supports various endpoint configurations:
+ * <ul>
+ * <li>[a,b] - closed (includes endpoints)</li>
+ * <li>(a,b) - open (excludes endpoints)</li>
+ * <li>[a,b) or (a,b] - half-open</li>
+ * </ul>
+ * </p>
+ * 
+ * @param <T> the type of values in the interval, must be Comparable
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
+ * 
+ * @see OrderedSetIntervalND
+ * @see RingIntervalND
+ * @see FieldIntervalND
  */
-public class Interval implements Set<Real>, TopologicalSpace<Real> {
-
-    private final Real min;
-    private final Real max;
-    private final boolean closedLeft;
-    private final boolean closedRight;
+public interface Interval<T extends Comparable<T>> {
 
     /**
-     * Creates a new interval with specified endpoint types.
+     * Returns the number of dimensions of this interval.
      * 
-     * @param min         the minimum value
-     * @param max         the maximum value
-     * @param closedLeft  true for [, false for (
-     * @param closedRight true for ], false for )
+     * @return the dimensionality (1 for 1D intervals, N for ND)
      */
-    public Interval(Real min, Real max, boolean closedLeft, boolean closedRight) {
-        if (min.compareTo(max) > 0) {
-            this.min = max;
-            this.max = min;
-            this.closedLeft = closedRight;
-            this.closedRight = closedLeft;
-        } else {
-            this.min = min;
-            this.max = max;
-            this.closedLeft = closedLeft;
-            this.closedRight = closedRight;
+    int getDimension();
+
+    /**
+     * Returns the lower bound in the specified dimension.
+     * 
+     * @param dimension the dimension index (0-based)
+     * @return the minimum value in that dimension
+     * @throws IndexOutOfBoundsException if dimension is out of range
+     */
+    T getMin(int dimension);
+
+    /**
+     * Returns the upper bound in the specified dimension.
+     * 
+     * @param dimension the dimension index (0-based)
+     * @return the maximum value in that dimension
+     * @throws IndexOutOfBoundsException if dimension is out of range
+     */
+    T getMax(int dimension);
+
+    /**
+     * Returns whether the lower endpoint is closed in the specified dimension.
+     * 
+     * @param dimension the dimension index (0-based)
+     * @return true if the interval includes its minimum value in that dimension
+     */
+    boolean isClosedLeft(int dimension);
+
+    /**
+     * Returns whether the upper endpoint is closed in the specified dimension.
+     * 
+     * @param dimension the dimension index (0-based)
+     * @return true if the interval includes its maximum value in that dimension
+     */
+    boolean isClosedRight(int dimension);
+
+    /**
+     * Checks if a point is contained in this interval.
+     * 
+     * @param point array of coordinates (must match dimensionality)
+     * @return true if the point is within the interval bounds
+     * @throws IllegalArgumentException if point dimensionality doesn't match
+     */
+    boolean contains(T[] point);
+
+    /**
+     * Checks if this interval contains another interval entirely.
+     * 
+     * @param other the interval to check
+     * @return true if other is a subset of this interval
+     */
+    boolean contains(Interval<T> other);
+
+    /**
+     * Checks if this interval overlaps with another.
+     * 
+     * @param other the interval to check
+     * @return true if the intervals share at least one point
+     */
+    boolean overlaps(Interval<T> other);
+
+    /**
+     * Returns the intersection of this interval with another.
+     * 
+     * @param other the interval to intersect with
+     * @return the intersection interval, or null if empty
+     */
+    Interval<T> intersection(Interval<T> other);
+
+    /**
+     * Returns the smallest interval containing both this and another interval.
+     * 
+     * @param other the interval to union with
+     * @return the bounding interval
+     */
+    Interval<T> boundingInterval(Interval<T> other);
+
+    /**
+     * Returns whether this interval is empty.
+     * 
+     * @return true if the interval contains no elements
+     */
+    boolean isEmpty();
+
+    /**
+     * Returns whether this interval is open in all dimensions.
+     * 
+     * @return true if all endpoints are open
+     */
+    default boolean isOpen() {
+        for (int i = 0; i < getDimension(); i++) {
+            if (isClosedLeft(i) || isClosedRight(i)) {
+                return false;
+            }
         }
+        return true;
     }
 
     /**
-     * Creates a closed interval [min, max].
+     * Returns whether this interval is closed in all dimensions.
      * 
-     * @param min the minimum value
-     * @param max the maximum value
+     * @return true if all endpoints are closed
      */
-    public Interval(Real min, Real max) {
-        this(min, max, true, true);
+    default boolean isClosed() {
+        for (int i = 0; i < getDimension(); i++) {
+            if (!isClosedLeft(i) || !isClosedRight(i)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
-     * Creates a closed interval from doubles.
+     * Returns the standard mathematical notation for this interval.
      * 
-     * @param min the minimum value
-     * @param max the maximum value
+     * @return interval notation string (e.g., "[0,1] × (2,3]")
      */
-    public Interval(double min, double max) {
-        this(Real.of(min), Real.of(max), true, true);
-    }
-
-    public Real getMin() {
-        return min;
-    }
-
-    public Real getMax() {
-        return max;
-    }
-
-    public boolean isClosedLeft() {
-        return closedLeft;
-    }
-
-    public boolean isClosedRight() {
-        return closedRight;
-    }
-
-    @Override
-    public boolean contains(Real value) {
-        int cmpMin = value.compareTo(min);
-        int cmpMax = max.compareTo(value);
-
-        boolean aboveMin = closedLeft ? (cmpMin >= 0) : (cmpMin > 0);
-        boolean belowMax = closedRight ? (cmpMax >= 0) : (cmpMax > 0);
-
-        return aboveMin && belowMax;
-    }
-
-    public boolean contains(Interval other) {
-        boolean containsMin = contains(other.min) ||
-                (min.equals(other.min) && (closedLeft || !other.closedLeft));
-
-        boolean containsMax = contains(other.max) ||
-                (max.equals(other.max) && (closedRight || !other.closedRight));
-
-        return containsMin && containsMax;
-    }
-
-    @Override
-    public Set<Real> intersection(Set<Real> other) {
-        if (!(other instanceof Interval)) {
-            throw new IllegalArgumentException("Can only intersect with another Interval");
-        }
-        Interval otherInterval = (Interval) other;
-
-        Real newMin;
-        boolean newClosedLeft;
-        int cmpMin = this.min.compareTo(otherInterval.min);
-        if (cmpMin > 0) {
-            newMin = this.min;
-            newClosedLeft = this.closedLeft;
-        } else if (cmpMin < 0) {
-            newMin = otherInterval.min;
-            newClosedLeft = otherInterval.closedLeft;
-        } else {
-            newMin = this.min;
-            newClosedLeft = this.closedLeft && otherInterval.closedLeft;
-        }
-
-        Real newMax;
-        boolean newClosedRight;
-        int cmpMax = this.max.compareTo(otherInterval.max);
-        if (cmpMax < 0) {
-            newMax = this.max;
-            newClosedRight = this.closedRight;
-        } else if (cmpMax > 0) {
-            newMax = otherInterval.max;
-            newClosedRight = otherInterval.closedRight;
-        } else {
-            newMax = this.max;
-            newClosedRight = this.closedRight && otherInterval.closedRight;
-        }
-
-        int cmpMinMax = newMin.compareTo(newMax);
-        if (cmpMinMax > 0) {
-            return null;
-        }
-        if (cmpMinMax == 0 && !(newClosedLeft && newClosedRight)) {
-            return null;
-        }
-
-        return new Interval(newMin, newMax, newClosedLeft, newClosedRight);
-    }
-
-    @Override
-    public Set<Real> union(Set<Real> other) {
-        if (!(other instanceof Interval)) {
-            throw new IllegalArgumentException("Can only union with another Interval");
-        }
-        Interval otherInterval = (Interval) other;
-
-        Real newMin;
-        boolean newClosedLeft;
-        int cmpMin = this.min.compareTo(otherInterval.min);
-        if (cmpMin < 0) {
-            newMin = this.min;
-            newClosedLeft = this.closedLeft;
-        } else if (cmpMin > 0) {
-            newMin = otherInterval.min;
-            newClosedLeft = otherInterval.closedLeft;
-        } else {
-            newMin = this.min;
-            newClosedLeft = this.closedLeft || otherInterval.closedLeft;
-        }
-
-        Real newMax;
-        boolean newClosedRight;
-        int cmpMax = this.max.compareTo(otherInterval.max);
-        if (cmpMax > 0) {
-            newMax = this.max;
-            newClosedRight = this.closedRight;
-        } else if (cmpMax < 0) {
-            newMax = otherInterval.max;
-            newClosedRight = otherInterval.closedRight;
-        } else {
-            newMax = this.max;
-            newClosedRight = this.closedRight || otherInterval.closedRight;
-        }
-
-        return new Interval(newMin, newMax, newClosedLeft, newClosedRight);
-    }
-
-    public Real length() {
-        return max.subtract(min);
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return min.equals(max) && !(closedLeft && closedRight);
-    }
-
-    @Override
-    public String description() {
-        return toString();
-    }
-
-    @Override
-    public Set<Real> difference(Set<Real> other) {
-        if (!(other instanceof Interval)) {
-            throw new IllegalArgumentException("Can only compute difference with another Interval");
-        }
-        if (!overlaps(other)) {
-            return this;
-        }
-        return null;
-    }
-
-    @Override
-    public boolean isSubsetOf(Set<Real> other) {
-        if (!(other instanceof Interval)) {
-            return false;
-        }
-        return ((Interval) other).contains(this);
-    }
-
-    @Override
-    public boolean overlaps(Set<Real> other) {
-        if (!(other instanceof Interval)) {
-            return false;
-        }
-        return intersection(other) != null;
-    }
-
-    @Override
-    public boolean isOpen() {
-        return !closedLeft && !closedRight;
-    }
-
-    @Override
-    public boolean isClosed() {
-        return closedLeft && closedRight;
-    }
-
-    public boolean isClopen() {
-        return isOpen() && isClosed();
-    }
-
-    @Override
-    public String toString() {
-        String left = closedLeft ? "[" : "(";
-        String right = closedRight ? "]" : ")";
-        return left + min + ", " + max + right;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (!(obj instanceof Interval))
-            return false;
-        Interval other = (Interval) obj;
-        return min.equals(other.min) && max.equals(other.max) &&
-                closedLeft == other.closedLeft && closedRight == other.closedRight;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = min.hashCode();
-        result = 31 * result + max.hashCode();
-        result = 31 * result + (closedLeft ? 1 : 0);
-        result = 31 * result + (closedRight ? 1 : 0);
-        return result;
-    }
+    String notation();
 }
-

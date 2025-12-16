@@ -1,7 +1,7 @@
 package org.jscience.mathematics.analysis.integration;
 
 import org.jscience.mathematics.analysis.RealFunction;
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Trapezoidal rule integration.

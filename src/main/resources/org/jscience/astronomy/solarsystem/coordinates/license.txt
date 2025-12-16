@@ -1,3 +1,0 @@
-This package is in public domain.
-
-It comes from SkyView made by NASA.

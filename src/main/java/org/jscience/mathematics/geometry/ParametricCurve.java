@@ -1,10 +1,9 @@
 package org.jscience.mathematics.geometry;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.geometry.PointND;
-import org.jscience.mathematics.vector.Vector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
 
-import org.jscience.mathematics.function.VectorFunction;
+import org.jscience.mathematics.analysis.DifferentiableFunction;
 
 /**
  * Represents a parametric curve in N-dimensional space.
@@ -24,14 +23,27 @@ import org.jscience.mathematics.function.VectorFunction;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public interface ParametricCurve extends VectorFunction<Real, Real> {
+public interface ParametricCurve extends DifferentiableFunction<Real, Vector<Real>> {
+
+    @Override
+    default org.jscience.mathematics.analysis.Function<Real, Vector<Real>> differentiate() {
+        return new org.jscience.mathematics.analysis.Function<Real, Vector<Real>>() {
+            @Override
+            public Vector<Real> evaluate(Real t) {
+                // Return tangent approximation with small h
+                // Ideally this would be an exact derivative if known
+                return tangent(t, org.jscience.mathematics.numbers.real.Real.of(1.0e-5));
+            }
+        };
+    }
 
     @Override
     default Vector<Real> evaluate(Real t) {
         return at(t).toVector();
     }
 
-    @Override
+    // @Override removed as ParametricCurve does not extend VectorFunction (which
+    // enforces Vector input)
     default int getOutputDimension() {
         return dimension();
     }

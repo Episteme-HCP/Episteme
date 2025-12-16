@@ -23,10 +23,9 @@
 
 package org.jscience.mathematics.sets;
 
-import org.jscience.mathematics.algebra.Field;
-import org.jscience.mathematics.algebra.InfiniteSet;
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.number.Natural;
+import org.jscience.mathematics.structures.rings.Field;
+import org.jscience.mathematics.structures.sets.InfiniteSet;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * The structure of real numbers (ℝ).
@@ -59,7 +58,7 @@ import org.jscience.mathematics.number.Natural;
 public final class Reals implements Field<Real>, InfiniteSet<Real> {
 
     /** Singleton instance */
-    private static final Reals INSTANCE = new Reals();
+    public static final Reals INSTANCE = new Reals();
 
     /**
      * Returns the singleton instance.

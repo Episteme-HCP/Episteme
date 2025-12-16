@@ -1,3 +1,0 @@
-<unit id="kiloampere" name="kiloampere" abbreviation="kA" unitType="electricCurrent" parentSI="ampere"
-      multiplierToSI="1000" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

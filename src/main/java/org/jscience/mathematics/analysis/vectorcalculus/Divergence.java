@@ -2,8 +2,8 @@ package org.jscience.mathematics.analysis.vectorcalculus;
 
 import org.jscience.mathematics.analysis.ScalarField;
 import org.jscience.mathematics.analysis.VectorField;
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.Vector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.geometry.PointND;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,4 +99,3 @@ public class Divergence {
         return new PointND(newCoords);
     }
 }
-

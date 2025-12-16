@@ -1,7 +1,7 @@
 package org.jscience.mathematics.discrete;
 
 import java.util.*;
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Implementation of Prim's algorithm for finding the Minimum Spanning Tree.

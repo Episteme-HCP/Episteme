@@ -1,3 +1,0 @@
-<unit id="kilogramMeterPerSecond" name="kilogram meter per second" abbreviation="kgm/s" unitType="momentum"
-      parentSI="SELF" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

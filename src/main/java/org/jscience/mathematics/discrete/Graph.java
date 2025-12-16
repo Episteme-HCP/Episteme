@@ -94,30 +94,29 @@ public interface Graph<V> {
     boolean isDirected();
 
     /**
-     * Traverses the graph using the specified strategy.
-     * <p>
-     * This method provides a flexible way to traverse the graph using
-     * any traversal algorithm implementation.
-     * </p>
-     * 
-     * @param start    the starting vertex
-     * @param strategy the traversal strategy to use
-     * @param visitor  the visitor to call for each vertex
-     */
-    default void traverse(V start,
-            org.jscience.mathematics.discrete.graph.GraphTraversalStrategy<V> strategy,
-            org.jscience.mathematics.discrete.graph.VertexVisitor<V> visitor) {
-        strategy.traverse(this, start, visitor);
-    }
-
-    /**
      * Performs depth-first search (DFS) traversal.
      * 
      * @param start   the starting vertex
      * @param visitor the visitor to call for each vertex
      */
     default void dfs(V start, org.jscience.mathematics.discrete.graph.VertexVisitor<V> visitor) {
-        traverse(start, new org.jscience.mathematics.discrete.graph.DFSTraversal<>(), visitor);
+        java.util.Set<V> visited = new java.util.HashSet<>();
+        java.util.Deque<java.util.Map.Entry<V, Integer>> stack = new java.util.ArrayDeque<>();
+        stack.push(new java.util.AbstractMap.SimpleEntry<>(start, 0));
+        while (!stack.isEmpty()) {
+            java.util.Map.Entry<V, Integer> entry = stack.pop();
+            V current = entry.getKey();
+            int depth = entry.getValue();
+            if (!visited.contains(current)) {
+                visited.add(current);
+                visitor.visit(current, depth);
+                for (V neighbor : neighbors(current)) {
+                    if (!visited.contains(neighbor)) {
+                        stack.push(new java.util.AbstractMap.SimpleEntry<>(neighbor, depth + 1));
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -127,8 +126,32 @@ public interface Graph<V> {
      * @param visitor the visitor to call for each vertex
      */
     default void bfs(V start, org.jscience.mathematics.discrete.graph.VertexVisitor<V> visitor) {
-        traverse(start, new org.jscience.mathematics.discrete.graph.BFSTraversal<>(), visitor);
+        java.util.Set<V> visited = new java.util.HashSet<>();
+        java.util.Queue<V> queue = new java.util.LinkedList<>();
+        java.util.Map<V, Integer> depths = new java.util.HashMap<>();
+        queue.add(start);
+        visited.add(start);
+        depths.put(start, 0);
+        while (!queue.isEmpty()) {
+            V current = queue.poll();
+            int currentDepth = depths.get(current);
+            visitor.visit(current, currentDepth);
+            for (V neighbor : neighbors(current)) {
+                if (!visited.contains(neighbor)) {
+                    visited.add(neighbor);
+                    depths.put(neighbor, currentDepth + 1);
+                    queue.add(neighbor);
+                }
+            }
+        }
     }
+
+    /**
+     * Returns the number of vertices in the graph.
+     * 
+     * @return the number of vertices
+     */
+    int vertexCount();
 
     /**
      * Represents an edge in a graph.

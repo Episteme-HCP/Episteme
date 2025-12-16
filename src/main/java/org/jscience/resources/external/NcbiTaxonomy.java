@@ -26,7 +26,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 
 /**
  * Connector to the National Center for Biotechnology Information (NCBI)
@@ -79,7 +78,8 @@ public class NcbiTaxonomy {
 
     private static String fetchUrl(String urlStr) {
         try {
-            URL url = new URL(urlStr);
+            java.net.URI uri = java.net.URI.create(urlStr);
+            URL url = uri.toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
 
@@ -104,4 +104,3 @@ public class NcbiTaxonomy {
     private NcbiTaxonomy() {
     } // Utility class
 }
-

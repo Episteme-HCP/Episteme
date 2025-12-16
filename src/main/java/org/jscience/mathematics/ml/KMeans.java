@@ -1,8 +1,6 @@
 package org.jscience.mathematics.ml;
 
-import org.jscience.mathematics.number.Real;
-import java.util.List;
-import java.util.ArrayList;
+import org.jscience.mathematics.numbers.real.Real;
 import java.util.Random;
 
 /**
@@ -36,7 +34,6 @@ public class KMeans {
      */
     public int[] fit(Real[][] data) {
         int n = data.length;
-        int d = data[0].length;
 
         // Initialize centroids randomly (k-means++)
         initializeCentroidsKMeansPlusPlus(data);
@@ -70,7 +67,6 @@ public class KMeans {
      */
     private void initializeCentroidsKMeansPlusPlus(Real[][] data) {
         int n = data.length;
-        int d = data[0].length;
 
         // First centroid: random point
         int firstIdx = random.nextInt(n);

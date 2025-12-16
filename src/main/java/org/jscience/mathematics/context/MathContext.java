@@ -75,10 +75,11 @@ public final class MathContext {
         LAZY
     }
 
-    // Thread-local current context
-    private static final ThreadLocal<MathContext> CURRENT = ThreadLocal.withInitial(MathContext::getDefault);
+    // Thread-local storage is now handled by ComputeContext
+    // private static final ThreadLocal<MathContext> CURRENT ...
 
-    // Default context
+    // Default context logic is now implicit or handled by ComputeContext defaults
+    // But we keep a static default for API compatibility if needed
     private static MathContext DEFAULT = new MathContext(
             RealPrecision.NORMAL,
             OverflowMode.SAFE);
@@ -118,24 +119,30 @@ public final class MathContext {
     }
 
     /**
-     * Returns the current thread-local context.
+     * Returns the current thread-local context (view of ComputeContext).
      */
     public static MathContext getCurrent() {
-        return CURRENT.get();
+        org.jscience.ComputeContext cc = org.jscience.ComputeContext
+                .current();
+        return new MathContext(cc.getRealPrecision(), cc.getOverflowMode(), cc.getComputeMode());
     }
 
     /**
-     * Sets the current thread-local context.
+     * Sets the current thread-local context (updates ComputeContext).
      */
     public static void setCurrent(MathContext context) {
-        CURRENT.set(context);
+        org.jscience.ComputeContext cc = org.jscience.ComputeContext
+                .current();
+        cc.setRealPrecision(context.getRealPrecision());
+        cc.setOverflowMode(context.getOverflowMode());
+        cc.setComputeMode(context.getComputeMode());
     }
 
     /**
      * Resets thread-local context to default.
      */
     public static void reset() {
-        CURRENT.remove();
+        org.jscience.ComputeContext.reset();
     }
 
     /**

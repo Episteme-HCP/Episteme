@@ -1,6 +1,6 @@
 package org.jscience.mathematics.geometry;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents an N-dimensional line segment.
@@ -99,15 +99,14 @@ public class SegmentND implements GeometricObject<PointND> {
         return LineND.through(start, end);
     }
 
-    @Override
-    public boolean contains(PointND p) {
+    public boolean containsPoint(PointND p) {
         if (p.ambientDimension() != this.ambientDimension()) {
             return false;
         }
 
         // Check if p is on the line
         LineND line = toLine();
-        if (!line.contains(p)) {
+        if (!line.containsPoint(p)) {
             return false;
         }
 
@@ -137,7 +136,7 @@ public class SegmentND implements GeometricObject<PointND> {
         PointND projected = line.closestPoint(p);
 
         // Check if projection is within segment bounds
-        if (contains(projected)) {
+        if (containsPoint(projected)) {
             return projected;
         }
 
@@ -179,7 +178,7 @@ public class SegmentND implements GeometricObject<PointND> {
             return false;
         }
 
-        return this.contains(intersection) && other.contains(intersection);
+        return this.containsPoint(intersection) && other.containsPoint(intersection);
     }
 
     @Override
@@ -209,4 +208,3 @@ public class SegmentND implements GeometricObject<PointND> {
         return start.hashCode() + end.hashCode();
     }
 }
-

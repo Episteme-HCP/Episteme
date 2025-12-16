@@ -1,3 +1,0 @@
-<unit id="milliampereHour" name="milliampere hour" abbreviation="mA h" unitType="electricCharge" parentSI="coulomb"
-      multiplierToSI="3.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

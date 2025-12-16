@@ -22,7 +22,7 @@
  */
 package org.jscience.mathematics.util;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -54,6 +54,7 @@ public class CollectionConverters {
      * @param list the input List of Double objects
      * @return List of Real values
      */
+    @SuppressWarnings("null")
     public static List<Real> toReal(List<Double> list) {
         if (list == null)
             return null;
@@ -106,5 +107,3 @@ public class CollectionConverters {
         return result;
     }
 }
-
-

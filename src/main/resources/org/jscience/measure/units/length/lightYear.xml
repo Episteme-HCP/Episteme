@@ -1,4 +1,0 @@
-<unit id="lightYear" name="light year" unitType="length" parentSI="meter" multiplierToSI="9.460528405E+15"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>The distance travelled by light in a vacuum in one year.</description>
-</unit>

@@ -1,4 +1,0 @@
-<unit id="amperePerVolt" name="ampere per volt" abbreviation="A/V" unitType="electricConductance" parentSI="siemens"
-      multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 A/V = 1 S</description>
-</unit>

@@ -22,10 +22,10 @@
  */
 package org.jscience.physics.classical.thermodynamics;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.quantity.*;
-import org.jscience.physics.foundation.PhysicalConstants;
+import org.jscience.physics.PhysicalConstants;
 
 /**
  * Thermodynamics equations and models.
@@ -90,5 +90,44 @@ public class Thermodynamics {
 
         return term1.add(term2);
     }
-}
+    // --- Methods merged from IdealGas2 ---
 
+    /**
+     * Ideal gas law: PV = nRT (Double precision)
+     */
+    public static double idealGasLaw(double P, double V, double n, double T) {
+        double R = PhysicalConstants.GAS_CONSTANT.getValue().doubleValue();
+        if (P == 0)
+            return n * R * T / V;
+        if (V == 0)
+            return n * R * T / P;
+        if (n == 0)
+            return P * V / (R * T);
+        if (T == 0)
+            return P * V / (n * R);
+        return n * R * T / V;
+    }
+
+    /**
+     * Otto cycle efficiency.
+     */
+    public static double ottoEfficiency(double compressionRatio, double gamma) {
+        return 1.0 - 1.0 / Math.pow(compressionRatio, gamma - 1.0);
+    }
+
+    /**
+     * Diesel cycle efficiency.
+     */
+    public static double dieselEfficiency(double compressionRatio, double cutoffRatio, double gamma) {
+        double term1 = 1.0 / Math.pow(compressionRatio, gamma - 1);
+        double term2 = (Math.pow(cutoffRatio, gamma) - 1) / (gamma * (cutoffRatio - 1));
+        return 1 - term1 * term2;
+    }
+
+    /**
+     * Carnot efficiency (double).
+     */
+    public static double carnotEfficiency(double Thot, double Tcold) {
+        return 1.0 - Tcold / Thot;
+    }
+}

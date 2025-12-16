@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jscience.mathematics.number.Integer;
+import org.jscience.mathematics.numbers.integers.Integer;
 
 /**
  * Utilities for parsing OEIS internal format (stripped.gz, names.gz, etc.).

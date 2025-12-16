@@ -22,9 +22,9 @@
  */
 package org.jscience.mathematics.algebra.polynomials;
 
-import org.jscience.mathematics.algebra.Polynomial;
-import org.jscience.mathematics.algebra.Ring;
-import org.jscience.mathematics.number.Integer;
+import org.jscience.mathematics.analysis.functions.Polynomial;
+import org.jscience.mathematics.structures.rings.Ring;
+import org.jscience.mathematics.numbers.integers.Integer;
 import org.jscience.mathematics.sets.Integers;
 
 /**

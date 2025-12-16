@@ -20,10 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jscience.physics.waves;
+package org.jscience.physics.classical.waves;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.number.Complex;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * General wave mechanics - traveling waves, standing waves, interference.
@@ -121,5 +120,3 @@ public class Waves {
                 .multiply(amplitude).multiply(amplitude);
     }
 }
-
-

@@ -1,4 +1,0 @@
-<unit id="bohr" name="bohr radius" abbreviation="a_0" unitType="length" parentSI="meter" multiplierToSI="5.29177249E-11"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>Length in atomic units</description>
-</unit>

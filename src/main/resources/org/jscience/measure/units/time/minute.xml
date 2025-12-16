@@ -1,4 +1,0 @@
-<unit id="minute" name="minute" abbreviation="min" unitType="time" parentSI="second" multiplierToSI="60"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>60 seconds</description>
-</unit>

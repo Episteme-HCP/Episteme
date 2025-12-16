@@ -23,7 +23,7 @@
 package org.jscience.mathematics.analysis.chaos;
 
 import org.jscience.mathematics.geometry.Point2D;
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * The Hénon Map:

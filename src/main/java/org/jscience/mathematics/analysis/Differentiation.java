@@ -1,6 +1,6 @@
 package org.jscience.mathematics.analysis;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Provides numerical and symbolic differentiation capabilities.

@@ -1,3 +1,0 @@
-<unit id="kilogramPerMeter" name="kilogram per meter" abbreviation="kg/m" unitType="massPerUnitLength" parentSI="SELF"
-      multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

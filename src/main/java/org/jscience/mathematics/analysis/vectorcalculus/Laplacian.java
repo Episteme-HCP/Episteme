@@ -1,7 +1,7 @@
 package org.jscience.mathematics.analysis.vectorcalculus;
 
 import org.jscience.mathematics.analysis.ScalarField;
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.geometry.PointND;
 import java.util.ArrayList;
 import java.util.List;
@@ -97,7 +97,7 @@ public class Laplacian {
      * @param h     the step size
      * @return the vector Laplacian
      */
-    public static org.jscience.mathematics.vector.Vector<Real> computeVector(
+    public static org.jscience.mathematics.linearalgebra.Vector<Real> computeVector(
             org.jscience.mathematics.analysis.VectorField<PointND> field,
             PointND point,
             Real h) {
@@ -114,7 +114,7 @@ public class Laplacian {
             laplacianComponents.add(compute(componentField, point, h));
         }
 
-        return new org.jscience.mathematics.vector.DenseVector<>(
+        return new org.jscience.mathematics.linearalgebra.vectors.DenseVector<>(
                 laplacianComponents,
                 org.jscience.mathematics.sets.Reals.getInstance());
     }
@@ -137,4 +137,3 @@ public class Laplacian {
         return new PointND(newCoords);
     }
 }
-

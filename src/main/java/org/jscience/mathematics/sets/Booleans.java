@@ -23,9 +23,9 @@
 
 package org.jscience.mathematics.sets;
 
-import org.jscience.mathematics.algebra.Semiring;
-import org.jscience.mathematics.algebra.FiniteSet;
-import org.jscience.mathematics.number.Boolean;
+import org.jscience.mathematics.structures.rings.Semiring;
+import org.jscience.mathematics.structures.sets.FiniteSet;
+import org.jscience.mathematics.numbers.integers.Boolean;
 
 /**
  * The structure of Boolean values (𝔹 = {0, 1}).

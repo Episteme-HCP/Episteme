@@ -1,6 +1,7 @@
 package org.jscience.demo.conciousness;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
+
 import org.jscience.mathematics.symbolic.Expression;
 import org.jscience.mathematics.symbolic.Variable;
 import org.jscience.mathematics.symbolic.PolynomialExpression;
@@ -12,6 +13,14 @@ import java.util.HashMap;
  * <p>
  * Provides symbolic expressions for the potential function and its derivatives,
  * enabling symbolic manipulation, differentiation, and simplification.
+ * </p>
+ * <p>
+ * <strong>Reference:</strong>
+ * Strømme, M. (2025). "Universal consciousness as foundational field: A
+ * theoretical
+ * bridge between quantum physics and non-dual philosophy." AIP Advances,
+ * 15(11).
+ * DOI: <a href="https://doi.org/10.1063/5.0290984">10.1063/5.0290984</a>
  * </p>
  * <p>
  * The field potential is:

@@ -22,7 +22,7 @@
  */
 package org.jscience.mathematics.analysis.series;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Harmonic series: Σ 1/n, n=1..∞

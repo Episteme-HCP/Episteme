@@ -22,7 +22,7 @@
  */
 package org.jscience.measure.metrology;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Unit;
 
@@ -122,7 +122,7 @@ final class SimpleMeasuredQuantity<Q extends Quantity<Q>> implements MeasuredQua
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public <R extends Quantity<R>> MeasuredQuantity<?> multiply(MeasuredQuantity<R> other) {
         // z = x × y
         // σ_z/z = √((σ_x/x)² + (σ_y/y)²)
@@ -148,7 +148,7 @@ final class SimpleMeasuredQuantity<Q extends Quantity<Q>> implements MeasuredQua
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public <R extends Quantity<R>> MeasuredQuantity<?> divide(MeasuredQuantity<R> other) {
         // Same relative uncertainty propagation as multiplication
         Quantity<?> newValue = value.divide(other.getValue());

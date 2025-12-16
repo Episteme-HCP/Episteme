@@ -22,6 +22,8 @@
  */
 package org.jscience.mathematics.algebra;
 
+import org.jscience.mathematics.structures.spaces.Module;
+
 /**
  * A non-associative algebra over a field (or ring).
  * <p>
@@ -54,4 +56,3 @@ public interface NonAssociativeAlgebra<E, S> extends Module<E, S> {
      */
     E multiply(E a, E b);
 }
-

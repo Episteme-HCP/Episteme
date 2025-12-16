@@ -1,5 +1,0 @@
-<unit id="gramPerYear" name="gram per year" unitType="massFlux" parentSI="kilogramPerSecond"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <unit ref="gram" power="1"/>
-    <unit ref="year" power="-1"/>
-</unit>

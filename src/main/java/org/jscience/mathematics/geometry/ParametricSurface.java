@@ -1,10 +1,9 @@
 package org.jscience.mathematics.geometry;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.geometry.PointND;
-import org.jscience.mathematics.vector.Vector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
 
-import org.jscience.mathematics.function.VectorFunction;
+import org.jscience.mathematics.analysis.DifferentiableFunction;
 
 /**
  * Represents a parametric surface in 3D space.
@@ -24,7 +23,13 @@ import org.jscience.mathematics.function.VectorFunction;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public interface ParametricSurface extends VectorFunction<Vector<Real>, Real> {
+public interface ParametricSurface extends DifferentiableFunction<Vector<Real>, Vector<Real>> {
+
+    @Override
+    default org.jscience.mathematics.analysis.Function<Vector<Real>, Vector<Real>> differentiate() {
+        throw new UnsupportedOperationException(
+                "Surface derivative (Jacobian) requires dual vector output. Use partialU/partialV.");
+    }
 
     @Override
     default Vector<Real> evaluate(Vector<Real> uv) {
@@ -34,7 +39,7 @@ public interface ParametricSurface extends VectorFunction<Vector<Real>, Real> {
         return at(uv.get(0), uv.get(1)).toVector();
     }
 
-    @Override
+    // @Override removed
     default int getOutputDimension() {
         return 3; // Surfaces are typically in 3D
     }
@@ -200,7 +205,8 @@ public interface ParametricSurface extends VectorFunction<Vector<Real>, Real> {
         // This is a simplified implementation
         // Full implementation requires second fundamental form
 
-        Vector<Real> n = normal(u, v, h);
+        @SuppressWarnings("unused")
+        Vector<Real> n = normal(u, v, h); // Kept for future full implementation
 
         // Approximate using finite differences
         Vector<Real> nPlusU = normal(u.add(h), v, h);

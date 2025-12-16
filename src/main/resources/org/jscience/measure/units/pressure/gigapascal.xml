@@ -1,3 +1,0 @@
-<unit id="gigapascal" name="Gigapascal" abbreviation="GPa" unitType="pressure" parentSI="pascal"
-      multiplierToSI="1.0E+09" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

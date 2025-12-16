@@ -22,8 +22,8 @@
  */
 package org.jscience.mathematics.analysis.fem;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.Vector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
 
 /**
  * Interface for finite element shape functions.
@@ -60,4 +60,3 @@ public interface ShapeFunction {
      */
     Vector<Real> gradient(Vector<Real> localCoords);
 }
-

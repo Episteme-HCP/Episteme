@@ -26,9 +26,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.jscience.mathematics.analysis.Function;
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.DenseVector;
-import org.jscience.mathematics.vector.Vector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.mathematics.linearalgebra.Vector;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -59,6 +60,7 @@ public class FEMTest {
         }
 
         // Source term
+        @SuppressWarnings("unused")
         Function<Vector<Real>, Real> sourceTerm = v -> {
             Real x = v.get(0);
             double val = Math.PI * Math.PI * Math.sin(Math.PI * x.doubleValue());
@@ -100,7 +102,9 @@ public class FEMTest {
         // Exact solution: u(x,y,z) = sin(pi*x)*sin(pi*y)*sin(pi*z)
         // f(x,y,z) = 3*pi^2 * sin(pi*x)*sin(pi*y)*sin(pi*z)
 
+        @SuppressWarnings("unused")
         int nElements = 2; // Very coarse mesh for testing
+        @SuppressWarnings("unused")
         Mesh mesh = new Mesh();
 
         // Create nodes

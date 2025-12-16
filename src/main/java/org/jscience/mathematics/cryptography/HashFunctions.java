@@ -1,6 +1,5 @@
 package org.jscience.mathematics.cryptography;
 
-import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.nio.charset.StandardCharsets;
@@ -57,19 +56,6 @@ public class HashFunctions {
     public static String sha512(String text) {
         byte[] hash = sha512(text.getBytes(StandardCharsets.UTF_8));
         return bytesToHex(hash);
-    }
-
-    /**
-     * MD5 hash (deprecated for security, but useful for checksums).
-     */
-    @Deprecated
-    public static byte[] md5(byte[] data) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("MD5");
-            return digest.digest(data);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("MD5 not available", e);
-        }
     }
 
     /**

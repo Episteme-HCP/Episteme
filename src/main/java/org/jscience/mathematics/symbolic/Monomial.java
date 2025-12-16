@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.jscience.mathematics.algebra.Ring;
+import org.jscience.mathematics.structures.rings.Ring;
 
 /**
  * Represents a monomial, which is a product of variables raised to non-negative
@@ -74,7 +74,7 @@ public class Monomial<T extends Ring<T>> implements Comparable<Monomial<T>> {
      */
     public Monomial<T> multiply(Monomial<T> other) {
         Map<Variable<T>, Integer> newPowers = new HashMap<>(this.powers);
-        other.powers.forEach((v, exp) -> newPowers.merge(v, exp, Integer::sum));
+        other.powers.forEach((v, exp) -> newPowers.merge(v, exp, (a, b) -> a + b));
         return new Monomial<>(newPowers);
     }
 
@@ -132,4 +132,3 @@ public class Monomial<T extends Ring<T>> implements Comparable<Monomial<T>> {
         return this.toString().compareTo(o.toString());
     }
 }
-

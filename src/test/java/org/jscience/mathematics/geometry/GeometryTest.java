@@ -2,8 +2,6 @@ package org.jscience.mathematics.geometry;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.algebra.Interval;
 
 public class GeometryTest {
 
@@ -80,7 +78,9 @@ public class GeometryTest {
         assertNull(l1.intersection(l3));
 
         // Closest points
+        @SuppressWarnings("unused")
         Vector3D c1 = l1.closestPoint(l3);
+        @SuppressWarnings("unused")
         Vector3D c3 = l3.closestPoint(l1);
 
         // Closest point on L1 to L3 should be (0,0,0) if we consider projection?

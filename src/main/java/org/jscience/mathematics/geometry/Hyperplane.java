@@ -1,7 +1,7 @@
 package org.jscience.mathematics.geometry;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.Vector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
 
 /**
  * Represents an N-dimensional hyperplane.
@@ -97,8 +97,7 @@ public class Hyperplane implements GeometricObject<PointND> {
         return normal;
     }
 
-    @Override
-    public boolean contains(PointND p) {
+    public boolean containsPoint(PointND p) {
         if (p.ambientDimension() != this.ambientDimension()) {
             return false;
         }
@@ -202,7 +201,7 @@ public class Hyperplane implements GeometricObject<PointND> {
         Real dotDirNormal = line.getDirection().dot(normal);
         if (Math.abs(dotDirNormal.doubleValue()) < 1e-10) {
             // Line is parallel
-            if (this.contains(line.getPoint())) {
+            if (this.containsPoint(line.getPoint())) {
                 return line.getPoint(); // Line lies in hyperplane
             }
             return null; // Line is parallel but not in hyperplane
@@ -237,7 +236,7 @@ public class Hyperplane implements GeometricObject<PointND> {
         Hyperplane other = (Hyperplane) obj;
 
         // Two hyperplanes are equal if they contain the same points
-        return this.contains(other.point) && this.isParallelTo(other);
+        return this.containsPoint(other.point) && this.isParallelTo(other);
     }
 
     @Override
@@ -245,4 +244,3 @@ public class Hyperplane implements GeometricObject<PointND> {
         return normal.hashCode();
     }
 }
-

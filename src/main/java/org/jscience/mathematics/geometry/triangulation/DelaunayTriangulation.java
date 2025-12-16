@@ -1,6 +1,7 @@
 package org.jscience.mathematics.geometry.triangulation;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.geometry.Point2D;
+import org.jscience.mathematics.numbers.real.Real;
 import java.util.*;
 
 /**
@@ -16,84 +17,48 @@ import java.util.*;
 public class DelaunayTriangulation {
 
     /**
-     * Point in 2D space.
-     */
-    public static class Point {
-        public final Real x, y;
-
-        public Point(Real x, Real y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public Real distanceTo(Point other) {
-            Real dx = x.subtract(other.x);
-            Real dy = y.subtract(other.y);
-            return dx.multiply(dx).add(dy.multiply(dy)).sqrt();
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (!(obj instanceof Point))
-                return false;
-            Point p = (Point) obj;
-            return x.equals(p.x) && y.equals(p.y);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(x, y);
-        }
-    }
-
-    /**
      * Triangle defined by three points.
      */
     public static class Triangle {
-        public final Point p1, p2, p3;
-        private Point circumcenter;
-        private Real circumradius;
+        public final Point2D p1, p2, p3;
+        public final Point2D circumcenter;
+        public final Real circumradius;
 
-        public Triangle(Point p1, Point p2, Point p3) {
+        public Triangle(Point2D p1, Point2D p2, Point2D p3) {
             this.p1 = p1;
             this.p2 = p2;
             this.p3 = p3;
-            computeCircumcircle();
-        }
-
-        private void computeCircumcircle() {
-            // Circumcenter formula
+            // Compute circumcircle immediately
             Real d = Real.of(2).multiply(
-                    p1.x.multiply(p2.y.subtract(p3.y))
-                            .add(p2.x.multiply(p3.y.subtract(p1.y)))
-                            .add(p3.x.multiply(p1.y.subtract(p2.y))));
+                    p1.getX().multiply(p2.getY().subtract(p3.getY()))
+                            .add(p2.getX().multiply(p3.getY().subtract(p1.getY())))
+                            .add(p3.getX().multiply(p1.getY().subtract(p2.getY()))));
 
             if (d.abs().compareTo(Real.of(1e-10)) < 0) {
                 // Degenerate triangle
-                circumcenter = p1;
-                circumradius = Real.ZERO;
-                return;
+                this.circumcenter = p1;
+                this.circumradius = Real.ZERO;
+            } else {
+                Real p1sq = p1.getX().multiply(p1.getX()).add(p1.getY().multiply(p1.getY()));
+                Real p2sq = p2.getX().multiply(p2.getX()).add(p2.getY().multiply(p2.getY()));
+                Real p3sq = p3.getX().multiply(p3.getX()).add(p3.getY().multiply(p3.getY()));
+
+                Real ux = p1sq.multiply(p2.getY().subtract(p3.getY()))
+                        .add(p2sq.multiply(p3.getY().subtract(p1.getY())))
+                        .add(p3sq.multiply(p1.getY().subtract(p2.getY())))
+                        .divide(d);
+
+                Real uy = p1sq.multiply(p3.getX().subtract(p2.getX()))
+                        .add(p2sq.multiply(p1.getX().subtract(p3.getX())))
+                        .add(p3sq.multiply(p2.getX().subtract(p1.getX())))
+                        .divide(d);
+
+                this.circumcenter = Point2D.of(ux, uy);
+                this.circumradius = this.circumcenter.distanceTo(p1);
             }
-
-            Real p1sq = p1.x.multiply(p1.x).add(p1.y.multiply(p1.y));
-            Real p2sq = p2.x.multiply(p2.x).add(p2.y.multiply(p2.y));
-            Real p3sq = p3.x.multiply(p3.x).add(p3.y.multiply(p3.y));
-
-            Real ux = p1sq.multiply(p2.y.subtract(p3.y))
-                    .add(p2sq.multiply(p3.y.subtract(p1.y)))
-                    .add(p3sq.multiply(p1.y.subtract(p2.y)))
-                    .divide(d);
-
-            Real uy = p1sq.multiply(p3.x.subtract(p2.x))
-                    .add(p2sq.multiply(p1.x.subtract(p3.x)))
-                    .add(p3sq.multiply(p2.x.subtract(p1.x)))
-                    .divide(d);
-
-            circumcenter = new Point(ux, uy);
-            circumradius = circumcenter.distanceTo(p1);
         }
 
-        public boolean containsInCircumcircle(Point p) {
+        public boolean containsInCircumcircle(Point2D p) {
             return circumcenter.distanceTo(p).compareTo(circumradius) < 0;
         }
 
@@ -108,7 +73,7 @@ public class DelaunayTriangulation {
             return shared == 2;
         }
 
-        public boolean contains(Point p) {
+        public boolean contains(Point2D p) {
             return p.equals(p1) || p.equals(p2) || p.equals(p3);
         }
     }
@@ -122,24 +87,24 @@ public class DelaunayTriangulation {
      * @param points input points
      * @return list of triangles forming triangulation
      */
-    public static List<Triangle> triangulate(List<Point> points) {
+    public static List<Triangle> triangulate(List<Point2D> points) {
         if (points.size() < 3) {
             throw new IllegalArgumentException("Need at least 3 points");
         }
 
         // Find bounding box
-        Real minX = points.get(0).x, maxX = minX;
-        Real minY = points.get(0).y, maxY = minY;
+        Real minX = points.get(0).getX(), maxX = minX;
+        Real minY = points.get(0).getY(), maxY = minY;
 
-        for (Point p : points) {
-            if (p.x.compareTo(minX) < 0)
-                minX = p.x;
-            if (p.x.compareTo(maxX) > 0)
-                maxX = p.x;
-            if (p.y.compareTo(minY) < 0)
-                minY = p.y;
-            if (p.y.compareTo(maxY) > 0)
-                maxY = p.y;
+        for (Point2D p : points) {
+            if (p.getX().compareTo(minX) < 0)
+                minX = p.getX();
+            if (p.getX().compareTo(maxX) > 0)
+                maxX = p.getX();
+            if (p.getY().compareTo(minY) < 0)
+                minY = p.getY();
+            if (p.getY().compareTo(maxY) > 0)
+                maxY = p.getY();
         }
 
         // Create super-triangle containing all points
@@ -149,17 +114,17 @@ public class DelaunayTriangulation {
         Real midX = minX.add(maxX).divide(Real.of(2));
         Real midY = minY.add(maxY).divide(Real.of(2));
 
-        Point p1 = new Point(midX.subtract(dmax.multiply(Real.of(20))),
+        Point2D p1 = Point2D.of(midX.subtract(dmax.multiply(Real.of(20))),
                 midY.subtract(dmax));
-        Point p2 = new Point(midX, midY.add(dmax.multiply(Real.of(20))));
-        Point p3 = new Point(midX.add(dmax.multiply(Real.of(20))),
+        Point2D p2 = Point2D.of(midX, midY.add(dmax.multiply(Real.of(20))));
+        Point2D p3 = Point2D.of(midX.add(dmax.multiply(Real.of(20))),
                 midY.subtract(dmax));
 
         List<Triangle> triangles = new ArrayList<>();
         triangles.add(new Triangle(p1, p2, p3));
 
         // Bowyer-Watson algorithm
-        for (Point point : points) {
+        for (Point2D point : points) {
             List<Triangle> badTriangles = new ArrayList<>();
 
             // Find triangles whose circumcircle contains point
@@ -170,15 +135,15 @@ public class DelaunayTriangulation {
             }
 
             // Find boundary polygon
-            List<Point[]> polygon = new ArrayList<>();
+            List<Point2D[]> polygon = new ArrayList<>();
             for (Triangle tri : badTriangles) {
                 // Create edges as 2D array
-                Point[][] edges = new Point[3][2];
-                edges[0] = new Point[] { tri.p1, tri.p2 };
-                edges[1] = new Point[] { tri.p2, tri.p3 };
-                edges[2] = new Point[] { tri.p3, tri.p1 };
+                Point2D[][] edges = new Point2D[3][2];
+                edges[0] = new Point2D[] { tri.p1, tri.p2 };
+                edges[1] = new Point2D[] { tri.p2, tri.p3 };
+                edges[2] = new Point2D[] { tri.p3, tri.p1 };
 
-                for (Point[] edge : edges) {
+                for (Point2D[] edge : edges) {
                     boolean shared = false;
                     for (Triangle other : badTriangles) {
                         if (other == tri)
@@ -198,7 +163,7 @@ public class DelaunayTriangulation {
             triangles.removeAll(badTriangles);
 
             // Add new triangles from point to polygon edges
-            for (Point[] edge : polygon) {
+            for (Point2D[] edge : polygon) {
                 triangles.add(new Triangle(edge[0], edge[1], point));
             }
         }
@@ -213,10 +178,10 @@ public class DelaunayTriangulation {
      * Voronoi cell (region closest to a point).
      */
     public static class VoronoiCell {
-        public final Point site;
-        public final List<Point> vertices;
+        public final Point2D site;
+        public final List<Point2D> vertices;
 
-        public VoronoiCell(Point site, List<Point> vertices) {
+        public VoronoiCell(Point2D site, List<Point2D> vertices) {
             this.site = site;
             this.vertices = vertices;
         }
@@ -228,24 +193,24 @@ public class DelaunayTriangulation {
      * Voronoi vertices = circumcenters of Delaunay triangles.
      * </p>
      */
-    public static List<VoronoiCell> voronoiDiagram(List<Point> points) {
+    public static List<VoronoiCell> voronoiDiagram(List<Point2D> points) {
         List<Triangle> triangles = triangulate(points);
-        Map<Point, List<Point>> voronoiMap = new HashMap<>();
+        Map<Point2D, List<Point2D>> voronoiMap = new HashMap<>();
 
-        for (Point p : points) {
+        for (Point2D p : points) {
             voronoiMap.put(p, new ArrayList<>());
         }
 
         // Circumcenters form Voronoi vertices
         for (Triangle tri : triangles) {
-            Point center = tri.circumcenter;
+            Point2D center = tri.circumcenter;
             voronoiMap.get(tri.p1).add(center);
             voronoiMap.get(tri.p2).add(center);
             voronoiMap.get(tri.p3).add(center);
         }
 
         List<VoronoiCell> cells = new ArrayList<>();
-        for (Map.Entry<Point, List<Point>> entry : voronoiMap.entrySet()) {
+        for (Map.Entry<Point2D, List<Point2D>> entry : voronoiMap.entrySet()) {
             cells.add(new VoronoiCell(entry.getKey(), entry.getValue()));
         }
 

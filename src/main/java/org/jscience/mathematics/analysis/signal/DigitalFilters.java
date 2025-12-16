@@ -1,6 +1,6 @@
 package org.jscience.mathematics.analysis.signal;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Digital signal filters: Butterworth, FIR, IIR.

@@ -28,7 +28,7 @@ public class KruskalMinimumSpanningTree<V, W> implements MinimumSpanningTree<V, 
         return new KruskalMinimumSpanningTree<>(GraphWeightAdapter.DOUBLE);
     }
 
-    public static <V> KruskalMinimumSpanningTree<V, org.jscience.mathematics.number.Real> ofReal() {
+    public static <V> KruskalMinimumSpanningTree<V, org.jscience.mathematics.numbers.real.Real> ofReal() {
         return new KruskalMinimumSpanningTree<>(GraphWeightAdapter.REAL);
     }
 

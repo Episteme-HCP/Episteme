@@ -22,8 +22,8 @@
  */
 package org.jscience.mathematics.analysis.series;
 
-import org.jscience.mathematics.number.Integer;
-import org.jscience.mathematics.number.Natural;
+import org.jscience.mathematics.numbers.integers.Integer;
+import org.jscience.mathematics.numbers.integers.Natural;
 
 /**
  * A sequence of integers (ℤ).
@@ -34,7 +34,7 @@ import org.jscience.mathematics.number.Natural;
  * <p>
  * <b>Migration from BigInteger:</b><br>
  * Previous versions used {@code java.math.BigInteger}. This version uses
- * {@code org.jscience.mathematics.number.Integer} for consistency with
+ * {@code org.jscience.mathematics.numbers.integers.Integer} for consistency with
  * the JScience type system.
  * </p>
  * 

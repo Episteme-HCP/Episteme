@@ -2,11 +2,7 @@ package org.jscience.mathematics.geometry.curves;
 
 import org.jscience.mathematics.geometry.ParametricCurve;
 import org.jscience.mathematics.geometry.PointND;
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.Vector;
-import org.jscience.mathematics.vector.DenseVector;
-
-import java.util.Arrays;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a 3D helix (spiral) curve.
@@ -52,6 +48,19 @@ public class Helix implements ParametricCurve {
         this.pitch = pitch;
     }
 
+    /**
+     * Creates a helix with the given 3D center, radius, and pitch.
+     * 
+     * @param center the center point
+     * @param radius the radius of the helix
+     * @param pitch  the pitch (height per radian)
+     */
+    public Helix(org.jscience.mathematics.geometry.Point3D center, Real radius, Real pitch) {
+        this.radius = radius;
+        this.pitch = pitch;
+        this.center = org.jscience.mathematics.geometry.PointND.of(center.getX(), center.getY(), center.getZ());
+    }
+
     @Override
     public PointND at(Real t) {
         Real x = center.get(0).add(radius.multiply(Real.of(Math.cos(t.doubleValue()))));
@@ -66,12 +75,12 @@ public class Helix implements ParametricCurve {
     }
 
     @Override
-    public Vector<Real> tangent(Real t, Real h) {
+    public org.jscience.mathematics.geometry.Vector3D tangent(Real t, Real h) {
         // Analytical tangent: C'(t) = (-r·sin(t), r·cos(t), h)
         Real dx = radius.multiply(Real.of(Math.sin(t.doubleValue()))).negate();
         Real dy = radius.multiply(Real.of(Math.cos(t.doubleValue())));
         Real dz = pitch;
-        return new DenseVector<>(Arrays.asList(dx, dy, dz), org.jscience.mathematics.sets.Reals.getInstance());
+        return new org.jscience.mathematics.geometry.Vector3D(dx, dy, dz);
     }
 
     @Override

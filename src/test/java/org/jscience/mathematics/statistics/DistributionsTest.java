@@ -22,7 +22,8 @@
  */
 package org.jscience.mathematics.statistics;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
+
 import org.jscience.mathematics.statistics.distributions.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,7 +36,8 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class DistributionsTest {
 
-    private static final Real TOLERANCE = Real.of(1e-6);
+    @SuppressWarnings("unused")
+    private static final Real TOLERANCE = Real.of(1e-6); // Reserved for future assertions
 
     @Test
     public void testNormalDistribution() {
@@ -119,4 +121,3 @@ public class DistributionsTest {
         assertEquals(10.0, chiSq.variance().doubleValue(), 1e-10);
     }
 }
-

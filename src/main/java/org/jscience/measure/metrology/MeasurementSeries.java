@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
 
 /**
@@ -211,8 +211,24 @@ public class MeasurementSeries<Q extends Quantity<Q>> {
                 break;
 
             case IQR:
-                // Interquartile range method (simplified)
-                // TODO: Full IQR implementation
+                // Interquartile range method
+                List<Quantity<Q>> sorted = new ArrayList<>(measurements);
+                sorted.sort((q1, q2) -> q1.getValue().compareTo(q2.getValue()));
+
+                int n = sorted.size();
+                double q1Val = sorted.get(n / 4).getValue().doubleValue();
+                double q3Val = sorted.get((n * 3) / 4).getValue().doubleValue();
+                double iqr = q3Val - q1Val;
+
+                double lowerBound = q1Val - 1.5 * iqr;
+                double upperBound = q3Val + 1.5 * iqr;
+
+                for (Quantity<Q> m : measurements) {
+                    double val = m.getValue().doubleValue();
+                    if (val < lowerBound || val > upperBound) {
+                        outliers.add(m);
+                    }
+                }
                 break;
         }
 

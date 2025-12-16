@@ -23,6 +23,9 @@
 
 package org.jscience.mathematics.algebra;
 
+import org.jscience.mathematics.structures.spaces.Module;
+import org.jscience.mathematics.structures.rings.Ring;
+
 /**
  * An algebra over a field is a vector space equipped with a bilinear product.
  * 

@@ -22,11 +22,10 @@
  */
 package org.jscience.physics;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.physics.foundation.*;
-import org.jscience.physics.mechanics.*;
+import org.jscience.mathematics.numbers.real.Real;
+
 import org.jscience.physics.classical.thermodynamics.Thermodynamics;
-import org.jscience.physics.foundation.PhysicalConstants;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import org.jscience.measure.Quantity;
@@ -34,7 +33,6 @@ import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.units.SI;
 import org.jscience.measure.quantity.Pressure;
-import org.jscience.measure.quantity.Volume;
 
 /**
  * Test suite for physics packages.
@@ -63,7 +61,9 @@ public class PhysicsTest {
     @Test
     public void testNewtonianMechanics() {
         // F = ma test
+        @SuppressWarnings("unused")
         Real mass = Real.of(10.0); // 10 kg
+        @SuppressWarnings("unused")
         Real accel = Real.of(9.8); // 9.8 m/s²
 
         // Expected: F = 10 * 9.8 = 98 N (simplified, needs Quantity)
@@ -159,12 +159,12 @@ public class PhysicsTest {
         // gamma = 1 / sqrt(1 - 0.6^2) = 1 / sqrt(0.64) = 1 / 0.8 = 1.25
         Real c = PhysicalConstants.SPEED_OF_LIGHT.getValue();
         Real v = c.multiply(Real.of(0.6));
-        Real gamma = org.jscience.physics.fields.relativity.Relativity.lorentzFactor(v);
+        Real gamma = org.jscience.physics.relativity.Relativity.lorentzFactor(v);
         assertEquals(1.25, gamma.doubleValue(), TOLERANCE);
 
         // Time dilation
         Real t0 = Real.of(10.0);
-        Real t = org.jscience.physics.fields.relativity.Relativity.timeDilation(t0, v);
+        Real t = org.jscience.physics.relativity.Relativity.timeDilation(t0, v);
         assertEquals(12.5, t.doubleValue(), TOLERANCE);
     }
 

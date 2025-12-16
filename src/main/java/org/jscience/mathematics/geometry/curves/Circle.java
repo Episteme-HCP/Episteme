@@ -1,10 +1,10 @@
 package org.jscience.mathematics.geometry.curves;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.geometry.PointND;
 import org.jscience.mathematics.geometry.ParametricCurve;
-import org.jscience.mathematics.vector.Vector;
-import org.jscience.mathematics.vector.DenseVector;
+import org.jscience.mathematics.linearalgebra.Vector;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 import java.util.Arrays;
 
 /**
@@ -94,12 +94,13 @@ public class Circle implements ParametricCurve {
     }
 
     @Override
-    public Vector<Real> tangent(Real t, Real h) {
+    public org.jscience.mathematics.geometry.VectorND tangent(Real t, Real h) {
         // Analytical derivative: C'(t) = radius*(-sin(t)*u + cos(t)*v)
         Real cosT = Real.of(Math.cos(t.doubleValue()));
         Real sinT = Real.of(Math.sin(t.doubleValue()));
 
-        return u.multiply(sinT.negate()).add(v.multiply(cosT)).multiply(radius);
+        Vector<Real> tan = u.multiply(sinT.negate()).add(v.multiply(cosT)).multiply(radius);
+        return new org.jscience.mathematics.geometry.VectorND(tan);
     }
 
     @Override
@@ -153,4 +154,3 @@ public class Circle implements ParametricCurve {
         return "Circle(center=" + center + ", radius=" + radius + ")";
     }
 }
-

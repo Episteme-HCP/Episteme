@@ -1,4 +1,0 @@
-<unit id="abwatt" name="abwatt" unitType="power" parentSI="watt" multiplierToSI="1.0E-7"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>Part of the CGS absolute electromagnetic system. 1 abwatt = 0.1 microwatt</description>
-</unit>

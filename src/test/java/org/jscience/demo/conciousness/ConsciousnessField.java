@@ -1,6 +1,6 @@
 package org.jscience.demo.conciousness;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Model for Universal Consciousness as a Foundational Field.
@@ -8,6 +8,14 @@ import org.jscience.mathematics.number.Real;
  * Based on the theoretical framework proposing consciousness as a fundamental
  * field
  * exhibiting symmetry breaking dynamics.
+ * </p>
+ * <p>
+ * <strong>Reference:</strong>
+ * Strømme, M. (2025). "Universal consciousness as foundational field: A
+ * theoretical
+ * bridge between quantum physics and non-dual philosophy." AIP Advances,
+ * 15(11).
+ * DOI: <a href="https://doi.org/10.1063/5.0290984">10.1063/5.0290984</a>
  * </p>
  * <p>
  * The field potential is described by:

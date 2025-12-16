@@ -22,7 +22,7 @@
  */
 package org.jscience.mathematics.geometry;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * A 2D vector in Euclidean space.
@@ -31,18 +31,22 @@ import org.jscience.mathematics.number.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public final class Vector2D {
+public final class Vector2D extends org.jscience.mathematics.linearalgebra.vectors.DenseVector<Real>
+        implements GeometricObject<Point2D>,
+        org.jscience.mathematics.topology.MetricSpace<org.jscience.mathematics.linearalgebra.Vector<Real>> {
 
-    private final Real x;
-    private final Real y;
+    private static final org.jscience.mathematics.sets.Reals REALS = org.jscience.mathematics.sets.Reals.getInstance();
 
-    private Vector2D(Real x, Real y) {
-        this.x = x;
-        this.y = y;
+    public Vector2D(double x, double y) {
+        super(java.util.Arrays.asList(Real.of(x), Real.of(y)), REALS);
+    }
+
+    public Vector2D(Real x, Real y) {
+        super(java.util.Arrays.asList(x, y), REALS);
     }
 
     public static Vector2D of(double x, double y) {
-        return new Vector2D(Real.of(x), Real.of(y));
+        return new Vector2D(x, y);
     }
 
     public static Vector2D of(Real x, Real y) {
@@ -50,40 +54,104 @@ public final class Vector2D {
     }
 
     public Real getX() {
-        return x;
+        return get(0);
     }
 
     public Real getY() {
-        return y;
+        return get(1);
     }
 
+    // Overrides for performance and covariance
     public Vector2D add(Vector2D other) {
-        return new Vector2D(x.add(other.x), y.add(other.y));
+        return new Vector2D(getX().add(other.getX()), getY().add(other.getY()));
     }
 
     public Vector2D subtract(Vector2D other) {
-        return new Vector2D(x.subtract(other.x), y.subtract(other.y));
+        return new Vector2D(getX().subtract(other.getX()), getY().subtract(other.getY()));
     }
 
-    public Vector2D scale(Real scalar) {
-        return new Vector2D(x.multiply(scalar), y.multiply(scalar));
+    public Vector2D multiply(Real scalar) {
+        return new Vector2D(getX().multiply(scalar), getY().multiply(scalar));
     }
 
-    public Real dot(Vector2D other) {
-        return x.multiply(other.x).add(y.multiply(other.y));
-    }
-
-    public Real magnitude() {
-        return x.multiply(x).add(y.multiply(y)).sqrt();
+    public Vector2D negate() {
+        return new Vector2D(getX().negate(), getY().negate());
     }
 
     public Vector2D normalize() {
-        Real mag = magnitude();
-        return new Vector2D(x.divide(mag), y.divide(mag));
+        Real n = this.norm();
+        if (n.equals(Real.ZERO))
+            return new Vector2D(0, 0);
+        return this.multiply(n.inverse());
+    }
+
+    public Real dot(Vector2D other) {
+        return getX().multiply(other.getX()).add(getY().multiply(other.getY()));
+    }
+
+    // Explicit scale method if needed
+    public Vector2D scale(Real scalar) {
+        return multiply(scalar);
+    }
+
+    // MetricSpace implementation
+    @Override
+    public Real distance(org.jscience.mathematics.linearalgebra.Vector<Real> a,
+            org.jscience.mathematics.linearalgebra.Vector<Real> b) {
+        return a.subtract(b).norm();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public boolean isOpen() {
+        return false;
+    }
+
+    @Override
+    public boolean isClosed() {
+        return true;
     }
 
     @Override
     public String toString() {
-        return "<" + x + ", " + y + ">";
+        return "<" + getX() + ", " + getY() + ">";
+    }
+
+    // GeometricObject
+    @Override
+    public int dimension() {
+        return 0; // As a point
+    }
+
+    @Override
+    public int ambientDimension() {
+        return 2;
+    }
+
+    /**
+     * Checks if a point lies at the same position as this vector (interpreted as
+     * position vector).
+     */
+    public boolean containsPoint(Point2D p) {
+        return getX().equals(p.getX()) && getY().equals(p.getY());
+    }
+
+    @Override
+    public boolean containsPoint(org.jscience.mathematics.linearalgebra.Vector<Real> p) {
+        return this.equals(p);
+    }
+
+    @Override
+    public boolean contains(org.jscience.mathematics.linearalgebra.Vector<Real> p) {
+        return containsPoint(p);
+    }
+
+    @Override
+    public String description() {
+        return "Vector2D" + toString();
     }
 }

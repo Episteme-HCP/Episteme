@@ -1,4 +1,0 @@
-<unit id="hectometer" name="hectometer" abbreviation="hm" unitType="length" parentSI="meter" multiplierToSI="100"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>100 meters</description>
-</unit>

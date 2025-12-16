@@ -1,6 +1,6 @@
 package org.jscience.mathematics.geometry.curves;
 
-import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.geometry.PointND;
 import org.jscience.mathematics.geometry.ParametricCurve;
 import java.util.ArrayList;
@@ -85,7 +85,6 @@ public class BezierCurve implements ParametricCurve {
 
         // Linear interpolation between consecutive points
         List<PointND> newPoints = new ArrayList<>(points.size() - 1);
-        Real oneMinusT = Real.ONE.subtract(t);
 
         for (int i = 0; i < points.size() - 1; i++) {
             PointND p0 = points.get(i);
@@ -197,4 +196,3 @@ public class BezierCurve implements ParametricCurve {
         return "BezierCurve(degree=" + degree + ", points=" + controlPoints.size() + ")";
     }
 }
-
