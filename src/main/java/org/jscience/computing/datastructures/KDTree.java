@@ -1,10 +1,5 @@
 package org.jscience.computing.datastructures;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 /**
  * A K-Dimensional Tree for efficient spatial searching.
  * 
@@ -49,6 +44,7 @@ public class KDTree<T> {
 
     private class Node {
         double[] point;
+        @SuppressWarnings("unused")
         T value;
         Node left, right;
 

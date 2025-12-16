@@ -1,8 +1,5 @@
 package org.jscience.chemistry;
 
-import org.jscience.chemistry.Atom;
-import org.jscience.chemistry.Bond;
-import org.jscience.chemistry.Molecule;
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.measure.Units;
 import org.jscience.mathematics.numbers.real.Real;

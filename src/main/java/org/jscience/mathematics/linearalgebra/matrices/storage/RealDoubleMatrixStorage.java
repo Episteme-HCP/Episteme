@@ -1,7 +1,5 @@
 package org.jscience.mathematics.linearalgebra.matrices.storage;
 
-import org.jscience.mathematics.numbers.real.Real;
-
 /**
  * Optimized storage for double-precision real matrices.
  * Provides direct access to primitive doubles to avoid boxing overhead.

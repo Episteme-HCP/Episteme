@@ -3,9 +3,8 @@ package org.jscience.mathematics.linearalgebra.vectors;
 import org.jscience.ComputeContext;
 import org.jscience.mathematics.linearalgebra.vectors.storage.SparseVectorStorage;
 import org.jscience.mathematics.structures.rings.Field;
-import org.jscience.mathematics.linearalgebra.Vector;
+
 import java.util.List;
-import java.util.Map;
 
 /**
  * A sparse vector implementation.

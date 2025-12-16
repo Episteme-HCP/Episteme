@@ -18,7 +18,6 @@ import javafx.scene.image.Image;
 import org.jscience.physics.astronomy.CelestialBody;
 import org.jscience.physics.astronomy.StarSystem;
 import org.jscience.physics.astronomy.SolarSystemLoader;
-import org.jscience.mathematics.numbers.real.Real;
 
 import java.util.HashMap;
 import java.util.Map;

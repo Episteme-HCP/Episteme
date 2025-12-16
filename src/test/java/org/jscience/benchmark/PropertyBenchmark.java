@@ -51,7 +51,7 @@ public class PropertyBenchmark {
         Map<String, Object> map = new HashMap<>();
         map.put("density", "8960 kg/m^3");
 
-        BenchmarkRunner.run("HashMap<String, Object> Lookup", 1000, 10000, () -> {
+        SimpleBenchmarkRunner.run("HashMap<String, Object> Lookup", 1000, 10000, () -> {
             Object val = map.get("density");
             if (val == null)
                 throw new RuntimeException("Lookup failed");
@@ -63,7 +63,7 @@ public class PropertyBenchmark {
         // Pre-load to avoid I/O during benchmark
         copper.getDensity();
 
-        BenchmarkRunner.run("Material.get(PropertyKey) Lookup", 1000, 10000, () -> {
+        SimpleBenchmarkRunner.run("Material.get(PropertyKey) Lookup", 1000, 10000, () -> {
             Quantity<?> q = copper.getDensity();
             if (q == null)
                 throw new RuntimeException("Lookup failed");

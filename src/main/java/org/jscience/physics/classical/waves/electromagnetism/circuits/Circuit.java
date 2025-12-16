@@ -16,7 +16,6 @@ import org.jscience.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.mathematics.linearalgebra.backends.LinearAlgebraProvider;
-import org.jscience.mathematics.linearalgebra.backends.LinearAlgebraProvider;
 
 /**
  * A headless circuit simulator using Modified Nodal Analysis (MNA).

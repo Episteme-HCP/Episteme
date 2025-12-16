@@ -2,7 +2,7 @@ package org.jscience.physics.astronomy;
 
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.physics.PhysicalConstants;
+
 import org.jscience.physics.classical.mechanics.Particle;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.quantity.Mass;
@@ -100,7 +100,7 @@ public class CelestialBody extends Particle {
      */
     public Quantity<Acceleration> getSurfaceGravity() {
         // g = GM/r^2
-        double G = org.jscience.physics.PhysicalConstants.G.doubleValue();
+
         // Check PhysicalConstants.G type. It was Real or Quantity?
         // Viewed before: it uses Quantity.
 

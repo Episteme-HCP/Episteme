@@ -56,7 +56,7 @@ public class BarnesHutSimulation {
         Real maxX = minX, maxY = minY, maxZ = minZ;
 
         for (Particle p : particles) {
-            Real m = Real.of(p.getMass().getValue().doubleValue());
+
             Real x = p.getX();
             Real y = p.getY();
             Real z = p.getZ();
@@ -114,7 +114,6 @@ public class BarnesHutSimulation {
             Real r3 = r2.multiply(r);
             Real factor = G.multiply(node.mass).divide(r3);
 
-            Vector<Real> acc = p.getAcceleration();
             // acc += factor * d
             // But Vector is likely immutable or we need helper.
             // Let's create vector from d

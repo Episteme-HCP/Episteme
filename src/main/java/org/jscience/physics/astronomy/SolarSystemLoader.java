@@ -12,9 +12,8 @@ import org.jscience.measure.quantity.*;
 import org.jscience.physics.PhysicalConstants;
 
 import java.io.InputStream;
-import java.util.ArrayList;
+
 import java.util.Collections;
-import java.util.List;
 
 /**
  * Loads StarSystems from JSON configuration.

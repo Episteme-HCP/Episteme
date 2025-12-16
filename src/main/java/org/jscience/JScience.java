@@ -2,7 +2,6 @@ package org.jscience;
 
 import org.jscience.mathematics.context.ComputeMode;
 import org.jscience.mathematics.context.MathContext;
-import org.jscience.ComputeContext;
 
 /**
  * The central entry point and configuration dashboard for the JScience library.

@@ -25,7 +25,7 @@ package org.jscience.mathematics.linearalgebra;
 
 import org.jscience.mathematics.structures.spaces.Module;
 import org.jscience.mathematics.structures.rings.Field;
-import org.jscience.mathematics.linearalgebra.Matrix;
+
 import org.jscience.mathematics.linearalgebra.tensors.Tensor;
 import org.jscience.mathematics.linearalgebra.tensors.TensorFactory;
 

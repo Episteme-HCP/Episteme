@@ -22,8 +22,6 @@
  */
 package org.jscience.mathematics.linearalgebra.tensors;
 
-import org.jscience.mathematics.structures.rings.Field;
-
 /**
  * Represents a multidimensional array (tensor).
  * <p>

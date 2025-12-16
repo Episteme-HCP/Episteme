@@ -1,7 +1,7 @@
 package org.jscience.mathematics.linearalgebra.tensors.backends;
 
 import org.jscience.mathematics.linearalgebra.tensors.Tensor;
-import org.jscience.mathematics.structures.rings.Field;
+
 import org.jscience.technical.backend.ExecutionContext;
 
 public class ND4JSparseTensorProvider implements TensorProvider {

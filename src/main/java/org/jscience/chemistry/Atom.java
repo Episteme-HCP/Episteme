@@ -2,7 +2,6 @@ package org.jscience.chemistry;
 
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Quantity;
-import org.jscience.measure.Unit;
 import org.jscience.measure.quantity.*;
 import org.jscience.measure.Units;
 

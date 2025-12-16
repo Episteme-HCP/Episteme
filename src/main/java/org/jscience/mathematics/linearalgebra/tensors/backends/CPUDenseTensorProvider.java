@@ -24,7 +24,6 @@ package org.jscience.mathematics.linearalgebra.tensors.backends;
 
 import org.jscience.mathematics.linearalgebra.tensors.Tensor;
 import org.jscience.mathematics.linearalgebra.tensors.DenseTensor;
-import org.jscience.mathematics.structures.rings.Field;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.technical.backend.ExecutionContext;
 
@@ -72,7 +71,7 @@ public class CPUDenseTensorProvider implements TensorProvider {
                 }
             } else {
                 // Try default constructor generic fallback
-                T instance = elementType.getDeclaredConstructor().newInstance();
+
                 // Check if it has zero method via reflection?
                 // For now, only Ring supported or types with explicit support.
             }

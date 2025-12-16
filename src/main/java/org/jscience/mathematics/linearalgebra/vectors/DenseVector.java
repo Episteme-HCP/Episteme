@@ -3,9 +3,9 @@ package org.jscience.mathematics.linearalgebra.vectors;
 import org.jscience.ComputeContext;
 import org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
 import org.jscience.mathematics.structures.rings.Field;
-import org.jscience.mathematics.linearalgebra.Vector;
+
 import java.util.List;
-import java.util.Arrays;
+
 import java.util.ArrayList;
 
 /**

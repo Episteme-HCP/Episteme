@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 public class BenchmarkTest {
 
     @Test
-    public void runBenchmarks() {
+    public void runBenchmarks() throws Exception {
         // Invoke the main method of BenchmarkRunner
         BenchmarkRunner.main(new String[] {});
     }

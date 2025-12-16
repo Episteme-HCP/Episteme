@@ -2,7 +2,6 @@ package org.jscience.mathematics.linearalgebra.tensors.backends;
 
 import org.jscience.mathematics.linearalgebra.tensors.Tensor;
 import org.jscience.mathematics.linearalgebra.tensors.SparseTensor;
-import org.jscience.mathematics.structures.rings.Field;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.technical.backend.ExecutionContext;
 

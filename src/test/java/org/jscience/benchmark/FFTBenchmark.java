@@ -54,7 +54,7 @@ public class FFTBenchmark {
     private static void benchmarkBasicFFT(int size) {
         Complex[] input = createRandomData(size);
 
-        BenchmarkRunner.run("Basic Recursive FFT (" + size + " points)", () -> {
+        SimpleBenchmarkRunner.run("Basic Recursive FFT (" + size + " points)", () -> {
             basicFFT(input);
         });
     }
@@ -63,7 +63,7 @@ public class FFTBenchmark {
         Complex[] input = createRandomData(size);
         Vector<Complex> vector = new DenseVector<>(java.util.Arrays.asList(input), Complexes.getInstance());
 
-        BenchmarkRunner.run("JScience FFT (" + size + " points)", () -> {
+        SimpleBenchmarkRunner.run("JScience FFT (" + size + " points)", () -> {
             FastFourierTransform.transform(vector);
         });
     }

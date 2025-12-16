@@ -1,7 +1,6 @@
 package org.jscience.mathematics.linearalgebra.vectors;
 
 import org.jscience.ComputeContext;
-import org.jscience.mathematics.linearalgebra.backends.CPUDenseLinearAlgebraProvider;
 import org.jscience.mathematics.linearalgebra.backends.LinearAlgebraProvider;
 import org.jscience.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.jscience.mathematics.linearalgebra.Matrix;
@@ -9,11 +8,8 @@ import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
 import org.jscience.mathematics.linearalgebra.vectors.storage.VectorStorage;
 import org.jscience.mathematics.linearalgebra.tensors.Tensor;
-import org.jscience.mathematics.linearalgebra.tensors.TensorFactory;
 import org.jscience.mathematics.structures.rings.Field;
 import org.jscience.mathematics.structures.rings.Ring;
-
-import java.util.Arrays;
 
 /**
  * A generic vector implementation using abstract storage and provider

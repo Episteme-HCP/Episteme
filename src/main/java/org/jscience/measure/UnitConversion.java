@@ -1,15 +1,6 @@
 package org.jscience.measure;
 
-import org.jscience.measure.quantity.Length;
-import org.jscience.measure.quantity.Temperature;
-import org.jscience.measure.quantity.Mass;
-import org.jscience.measure.quantity.Volume;
-import org.jscience.measure.quantity.Pressure;
-import org.jscience.measure.quantity.Energy;
-import org.jscience.measure.quantity.Velocity;
-import org.jscience.measure.quantity.Frequency;
 import org.jscience.measure.quantity.Angle;
-import org.jscience.measure.quantity.Time;
 
 /**
  * Unit conversion utilities.

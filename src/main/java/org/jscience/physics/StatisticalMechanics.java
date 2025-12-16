@@ -23,7 +23,6 @@
 package org.jscience.physics;
 
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.physics.PhysicalConstants;
 
 /**
  * Statistical mechanics - bridge between microscopic and macroscopic physics.

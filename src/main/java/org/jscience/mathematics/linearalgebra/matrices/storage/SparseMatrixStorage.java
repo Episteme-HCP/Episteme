@@ -3,7 +3,6 @@ package org.jscience.mathematics.linearalgebra.matrices.storage;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Sparse matrix storage using a Map.

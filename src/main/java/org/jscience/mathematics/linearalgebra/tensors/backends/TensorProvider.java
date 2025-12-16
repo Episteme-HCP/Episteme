@@ -23,7 +23,6 @@
 package org.jscience.mathematics.linearalgebra.tensors.backends;
 
 import org.jscience.mathematics.linearalgebra.tensors.Tensor;
-import org.jscience.mathematics.structures.rings.Field;
 
 import org.jscience.technical.backend.ComputeBackend;
 

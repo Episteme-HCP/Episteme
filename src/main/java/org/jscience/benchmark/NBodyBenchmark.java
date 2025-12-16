@@ -1,14 +1,11 @@
 package org.jscience.benchmark;
 
 import org.openjdk.jmh.annotations.*;
-import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.sets.Reals;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.physics.astronomy.CelestialBody;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
-import org.jscience.measure.quantity.Mass;
-import org.jscience.measure.quantity.Length;
 import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 
 import java.util.ArrayList;
@@ -62,15 +59,12 @@ public class NBodyBenchmark {
         // N-Body naive force calculation step O(N^2)
         // This is a simplified simulation step for benchmarking math ops
         for (CelestialBody b1 : bodies) {
-            Vector<Real> totalForce = DenseVector.zeros(3, Reals.getInstance());
             for (CelestialBody b2 : bodies) {
                 if (b1 == b2)
                     continue;
                 // F = G * m1 * m2 / r^2
                 // Simply access positions to simulate memory load
-                Vector<Real> r = b2.getPosition().subtract(b1.getPosition());
-                // Real distSq = r.norm().pow(2); // Depending on norm imp
-                // totalForce = totalForce.add(r);
+                b2.getPosition().subtract(b1.getPosition());
             }
         }
     }

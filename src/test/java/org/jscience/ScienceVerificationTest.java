@@ -40,7 +40,6 @@ public class ScienceVerificationTest {
     @Test
     public void testPhysicsKinematics() {
         System.out.println("Verifying Physics...");
-        Real mass = Real.of(10.0);
 
         List<Real> vData = new ArrayList<>();
         vData.add(Real.of(3.0));

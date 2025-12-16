@@ -25,7 +25,7 @@ package org.jscience.mathematics.linearalgebra;
 
 import org.jscience.mathematics.structures.spaces.Module;
 import org.jscience.mathematics.structures.rings.Ring;
-import org.jscience.mathematics.linearalgebra.Vector;
+
 import org.jscience.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 
 /**

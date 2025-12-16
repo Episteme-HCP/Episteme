@@ -179,7 +179,8 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         E dotProduct = dot(a, a);
         if (field instanceof org.jscience.mathematics.sets.Reals) {
             org.jscience.mathematics.numbers.real.Real r = (org.jscience.mathematics.numbers.real.Real) dotProduct;
-            return (E) org.jscience.mathematics.numbers.real.Real.of(Math.sqrt(r.doubleValue()));
+            double val = r.doubleValue();
+            return (E) org.jscience.mathematics.numbers.real.Real.of(Math.sqrt(val));
         }
         throw new UnsupportedOperationException("Norm not supported for field: " + field.getClass().getSimpleName());
     }

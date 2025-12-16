@@ -3,7 +3,7 @@ package org.jscience.physics.thermodynamics;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
-import org.jscience.measure.Unit;
+
 import org.jscience.measure.quantity.Energy;
 import org.jscience.measure.quantity.Mass;
 import org.jscience.measure.quantity.Temperature;

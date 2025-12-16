@@ -28,7 +28,7 @@ package org.jscience.benchmark;
  * @author Silvere Martin-Michiellot
  * @since 2.0
  */
-public class BenchmarkRunner {
+public class SimpleBenchmarkRunner {
 
     public static void run(String name, Runnable benchmark) {
         run(name, 10, 100, benchmark);
@@ -64,7 +64,7 @@ public class BenchmarkRunner {
         System.out.println("=== JScience Comparative Benchmarks ===");
 
         // Matrix Benchmarks
-        MatrixBenchmark.run();
+        SimpleMatrixBenchmark.run();
 
         // FFT Benchmarks
         FFTBenchmark.run();

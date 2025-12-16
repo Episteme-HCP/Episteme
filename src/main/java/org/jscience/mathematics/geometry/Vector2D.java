@@ -122,10 +122,6 @@ public final class Vector2D extends org.jscience.mathematics.linearalgebra.vecto
     }
 
     // GeometricObject
-    @Override
-    public int dimension() {
-        return 0; // As a point
-    }
 
     @Override
     public int ambientDimension() {

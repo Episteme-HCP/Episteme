@@ -1,6 +1,5 @@
 package org.jscience.physics;
 
-import org.jscience.physics.PhysicalConstants;
 import org.jscience.mathematics.numbers.real.Real;
 import java.util.Map;
 import java.util.HashMap;

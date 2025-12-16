@@ -7,7 +7,7 @@ import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.mathematics.sets.Complexes;
 import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.List;
 
 /**

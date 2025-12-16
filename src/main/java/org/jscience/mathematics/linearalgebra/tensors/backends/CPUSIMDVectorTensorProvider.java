@@ -27,7 +27,6 @@ import jdk.incubator.vector.VectorSpecies;
 import org.jscience.mathematics.linearalgebra.tensors.DenseTensor;
 import org.jscience.mathematics.linearalgebra.tensors.Tensor;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.mathematics.structures.rings.Field;
 
 import java.util.Arrays;
 

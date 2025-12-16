@@ -4,7 +4,6 @@ import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.vectors.storage.*;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.sets.Reals;
-import org.jscience.mathematics.structures.rings.Field;
 
 /**
  * An optimized Vector implementation for Real numbers.

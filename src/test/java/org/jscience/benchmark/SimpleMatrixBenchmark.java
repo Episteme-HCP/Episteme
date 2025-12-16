@@ -41,7 +41,7 @@ import java.util.Random;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public class MatrixBenchmark {
+public class SimpleMatrixBenchmark {
 
     private static final int SIZE_SMALL = 100;
     @SuppressWarnings("unused")
@@ -63,7 +63,7 @@ public class MatrixBenchmark {
         double[][] A = createRandomArray(size);
         double[][] B = createRandomArray(size);
 
-        BenchmarkRunner.run("Raw double[][] Multiplication (" + size + "x" + size + ")", () -> {
+        SimpleBenchmarkRunner.run("Raw double[][] Multiplication (" + size + "x" + size + ")", () -> {
             multiplyRaw(A, B);
         });
     }
@@ -72,7 +72,7 @@ public class MatrixBenchmark {
         Matrix<Real> A = createRandomMatrix(size);
         Matrix<Real> B = createRandomMatrix(size);
 
-        BenchmarkRunner.run("JScience DenseMatrix Multiplication (" + size + "x" + size + ")", () -> {
+        SimpleBenchmarkRunner.run("JScience DenseMatrix Multiplication (" + size + "x" + size + ")", () -> {
             A.multiply(B);
         });
     }

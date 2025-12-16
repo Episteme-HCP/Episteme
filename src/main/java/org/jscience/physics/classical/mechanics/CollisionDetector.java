@@ -2,7 +2,6 @@ package org.jscience.physics.classical.mechanics;
 
 import org.jscience.mathematics.geometry.Point3D;
 import org.jscience.mathematics.geometry.Vector3D;
-import org.jscience.mathematics.linearalgebra.Vector;
 
 /**
  * Detects collisions between RigidBodies using Separation Axis Theorem (SAT).

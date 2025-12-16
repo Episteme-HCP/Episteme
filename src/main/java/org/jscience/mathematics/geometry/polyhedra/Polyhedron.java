@@ -4,7 +4,7 @@ import org.jscience.mathematics.geometry.Point3D;
 import org.jscience.mathematics.numbers.real.Real;
 
 import org.jscience.mathematics.linearalgebra.Vector;
-import org.jscience.mathematics.geometry.Vector3D;
+
 import org.jscience.physics.classical.mechanics.CollisionShape;
 
 import java.util.*;

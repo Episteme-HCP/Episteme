@@ -104,7 +104,7 @@ public class RigidBody {
     // Placeholder helper
     private DenseMatrix<Real> invertInertia(DenseMatrix<Real> I) {
         int n = I.rows();
-        int m = I.cols();
+
         // Assuming square
 
         // Solve I * X = Identity to find Inverse

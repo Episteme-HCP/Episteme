@@ -154,7 +154,6 @@ public class JavaFXPlot3D implements Plot3D {
         Platform.runLater(() -> {
             for (int i = 0; i < segments; i++) {
                 double t1 = tStart + i * dt;
-                double t2 = tStart + (i + 1) * dt;
 
                 double x1 = xFunc.evaluate(Real.of(t1)).doubleValue();
                 double y1 = yFunc.evaluate(Real.of(t1)).doubleValue();

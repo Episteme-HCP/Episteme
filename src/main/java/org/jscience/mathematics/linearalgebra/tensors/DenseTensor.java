@@ -22,7 +22,6 @@
  */
 package org.jscience.mathematics.linearalgebra.tensors;
 
-import org.jscience.mathematics.structures.rings.Field;
 import org.jscience.mathematics.structures.rings.Ring;
 import java.util.Arrays;
 

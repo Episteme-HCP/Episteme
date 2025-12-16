@@ -4,7 +4,6 @@ import org.jscience.measure.Quantity;
 import org.jscience.measure.quantity.Mass;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
-import org.jscience.mathematics.numbers.real.Real;
 import java.util.List;
 import java.util.ArrayList;
 

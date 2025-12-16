@@ -3,7 +3,6 @@ package org.jscience.chemistry;
 import java.util.Stack;
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.chemistry.PeriodicTable;
 
 /**
  * Parser for SMILES (Simplified Molecular Input Line Entry System) strings.
