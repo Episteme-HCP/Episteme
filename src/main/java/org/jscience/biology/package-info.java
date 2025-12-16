@@ -1,5 +1,3 @@
-package org.jscience;
-
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
@@ -23,23 +21,17 @@ package org.jscience;
  * THE SOFTWARE.
  */
 
-public final class JScienceVersion {
-    public static final String VERSION;
-
-    static {
-        String v = "Unknown";
-        try (java.io.InputStream is = JScienceVersion.class.getResourceAsStream("version.properties")) {
-            if (is != null) {
-                java.util.Properties p = new java.util.Properties();
-                p.load(is);
-                v = p.getProperty("version", "Unknown");
-            }
-        } catch (Exception e) {
-            // Ignore
-        }
-        VERSION = v;
-    }
-
-    private JScienceVersion() {
-    }
-}
+/**
+ * Provides support for biological sciences and bioinformatics.
+ * <p>
+ * Key features include:
+ * <ul>
+ * <li>Genetics (DNA/RNA sequences, Alignment)</li>
+ * <li>Cell Biology (Metabolism, Organelles)</li>
+ * <li>Evolutionary Biology (Phylogenetics, Population Genetics)</li>
+ * <li>Neuroscience (Neuron models)</li>
+ * <li>Structural Biology (PDB parsing)</li>
+ * </ul>
+ * </p>
+ */
+package org.jscience.biology;

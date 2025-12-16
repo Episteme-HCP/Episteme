@@ -1,5 +1,3 @@
-package org.jscience;
-
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
@@ -23,23 +21,15 @@ package org.jscience;
  * THE SOFTWARE.
  */
 
-public final class JScienceVersion {
-    public static final String VERSION;
-
-    static {
-        String v = "Unknown";
-        try (java.io.InputStream is = JScienceVersion.class.getResourceAsStream("version.properties")) {
-            if (is != null) {
-                java.util.Properties p = new java.util.Properties();
-                p.load(is);
-                v = p.getProperty("version", "Unknown");
-            }
-        } catch (Exception e) {
-            // Ignore
-        }
-        VERSION = v;
-    }
-
-    private JScienceVersion() {
-    }
-}
+/**
+ * Provides user interface components and visualization tools.
+ * <p>
+ * Built on JavaFX, this package offers:
+ * <ul>
+ * <li>2D and 3D Plotting</li>
+ * <li>Domain-specific viewers (Astronomy star maps, Molecule viewers)</li>
+ * <li>Interactive editor components</li>
+ * </ul>
+ * </p>
+ */
+package org.jscience.ui;

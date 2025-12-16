@@ -1,5 +1,3 @@
-package org.jscience;
-
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
@@ -23,23 +21,17 @@ package org.jscience;
  * THE SOFTWARE.
  */
 
-public final class JScienceVersion {
-    public static final String VERSION;
-
-    static {
-        String v = "Unknown";
-        try (java.io.InputStream is = JScienceVersion.class.getResourceAsStream("version.properties")) {
-            if (is != null) {
-                java.util.Properties p = new java.util.Properties();
-                p.load(is);
-                v = p.getProperty("version", "Unknown");
-            }
-        } catch (Exception e) {
-            // Ignore
-        }
-        VERSION = v;
-    }
-
-    private JScienceVersion() {
-    }
-}
+/**
+ * Provides classes for physical modeling and simulation.
+ * <p>
+ * This package covers:
+ * <ul>
+ * <li>Classical Mechanics (Kinematics, Dynamics, N-Body)</li>
+ * <li>Quantum Mechanics (Process descriptions, Circuits)</li>
+ * <li>Astronomy and Astrophysics</li>
+ * <li>Thermodynamics and Statistical Mechanics</li>
+ * <li>Electromagnetism</li>
+ * </ul>
+ * </p>
+ */
+package org.jscience.physics;

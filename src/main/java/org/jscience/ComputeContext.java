@@ -140,11 +140,6 @@ public class ComputeContext {
     }
 
     /**
-     * @deprecated Use {@link #current()} instead. Maintained for backward
-     *             compatibility during refactor.
-     */
-
-    /**
      * Gets the current floating-point precision mode.
      */
     public FloatPrecision getFloatPrecision() {
@@ -345,14 +340,6 @@ public class ComputeContext {
     }
 
     /**
-     * Gets the default dense matrix provider for the current backend.
-     * 
-     * @deprecated Use
-     *             {@link #getLinearAlgebraProvider(org.jscience.mathematics.structures.rings.Field)}
-     *             instead.
-     */
-
-    /**
      * Gets the appropriate tensor provider for the current backend.
      */
     public TensorProvider getTensorProvider() {
@@ -378,14 +365,6 @@ public class ComputeContext {
         // Default
         return new CPUDenseTensorProvider();
     }
-
-    /**
-     * Gets the default sparse matrix provider for the current backend.
-     * 
-     * @deprecated Use
-     *             {@link #getLinearAlgebraProvider(org.jscience.mathematics.structures.rings.Field)}
-     *             instead.
-     */
 
     /**
      * Convenience method to check if using float precision.

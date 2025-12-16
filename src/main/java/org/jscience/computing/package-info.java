@@ -1,5 +1,3 @@
-package org.jscience;
-
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
@@ -23,23 +21,15 @@ package org.jscience;
  * THE SOFTWARE.
  */
 
-public final class JScienceVersion {
-    public static final String VERSION;
-
-    static {
-        String v = "Unknown";
-        try (java.io.InputStream is = JScienceVersion.class.getResourceAsStream("version.properties")) {
-            if (is != null) {
-                java.util.Properties p = new java.util.Properties();
-                p.load(is);
-                v = p.getProperty("version", "Unknown");
-            }
-        } catch (Exception e) {
-            // Ignore
-        }
-        VERSION = v;
-    }
-
-    private JScienceVersion() {
-    }
-}
+/**
+ * Provides computational intelligence and algorithm support.
+ * <p>
+ * This field encompasses:
+ * <ul>
+ * <li>Artificial Intelligence (Neural Networks, ML)</li>
+ * <li>Datastructures (KD-Trees, Graphs)</li>
+ * <li>Distributed Computing (Grid, Cloud interactions)</li>
+ * </ul>
+ * </p>
+ */
+package org.jscience.computing;

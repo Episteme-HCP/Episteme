@@ -1,5 +1,3 @@
-package org.jscience;
-
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
@@ -23,23 +21,12 @@ package org.jscience;
  * THE SOFTWARE.
  */
 
-public final class JScienceVersion {
-    public static final String VERSION;
-
-    static {
-        String v = "Unknown";
-        try (java.io.InputStream is = JScienceVersion.class.getResourceAsStream("version.properties")) {
-            if (is != null) {
-                java.util.Properties p = new java.util.Properties();
-                p.load(is);
-                v = p.getProperty("version", "Unknown");
-            }
-        } catch (Exception e) {
-            // Ignore
-        }
-        VERSION = v;
-    }
-
-    private JScienceVersion() {
-    }
-}
+/**
+ * The root package for the JScience library, containing core classes and
+ * configuration.
+ * <p>
+ * This package provides the main entry point {@link org.jscience.JScience} and
+ * context management via {@link org.jscience.ComputeContext}.
+ * </p>
+ */
+package org.jscience;
