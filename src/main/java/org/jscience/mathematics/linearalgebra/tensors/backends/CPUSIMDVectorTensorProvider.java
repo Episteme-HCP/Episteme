@@ -47,7 +47,9 @@ public class CPUSIMDVectorTensorProvider implements TensorProvider {
     @Override
     public <T> Tensor<T> zeros(Class<T> elementType, int... shape) {
         if (Real.class.isAssignableFrom(elementType)) {
-            return (Tensor<T>) new RealVectorTensor(shape);
+            @SuppressWarnings("unchecked")
+            Tensor<T> t = (Tensor<T>) new RealVectorTensor(shape);
+            return t;
         }
         return new DenseTensor<>(createArray(elementType, computeSize(shape)), shape);
     }
@@ -57,7 +59,9 @@ public class CPUSIMDVectorTensorProvider implements TensorProvider {
         if (Real.class.isAssignableFrom(elementType)) {
             RealVectorTensor tensor = new RealVectorTensor(shape);
             Arrays.fill(tensor.primitiveData, 1.0);
-            return (Tensor<T>) tensor;
+            @SuppressWarnings("unchecked")
+            Tensor<T> t = (Tensor<T>) tensor;
+            return t;
         }
         // Fallback for non-Real
         int size = computeSize(shape);
@@ -74,7 +78,9 @@ public class CPUSIMDVectorTensorProvider implements TensorProvider {
             for (int i = 0; i < data.length; i++) {
                 prim[i] = ((Real) data[i]).doubleValue();
             }
-            return (Tensor<T>) new RealVectorTensor(prim, shape);
+            @SuppressWarnings("unchecked")
+            Tensor<T> t = (Tensor<T>) new RealVectorTensor(prim, shape);
+            return t;
         }
         return new DenseTensor<>(data, shape);
     }

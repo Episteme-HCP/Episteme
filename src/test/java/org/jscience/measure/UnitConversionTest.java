@@ -3,6 +3,7 @@ package org.jscience.measure;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.quantity.Temperature;
 
 /**
  * Tests for Units and UnitConversion.
@@ -42,18 +43,20 @@ public class UnitConversionTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testAffineUnitBehavior() {
         // Test manual affine unit creation
-        Unit<?> kelvin = Units.KELVIN;
-        Unit<?> celsius = ((StandardUnit<?>) kelvin).add(-273.15);
+        Unit<Temperature> kelvin = Units.KELVIN;
+        @SuppressWarnings("unchecked")
+        Unit<Temperature> celsius = (Unit<Temperature>) ((StandardUnit<Temperature>) kelvin).add(-273.15);
 
         Real kVal = Real.of(273.15);
         // 273.15 K -> 0 C
-        Real cVal = kelvin.getConverterTo((Unit) celsius).convert(kVal);
+        Real cVal = kelvin.getConverterTo(celsius).convert(kVal);
         Assertions.assertEquals(0.0, cVal.doubleValue(), DELTA);
 
         // 0 C -> 273.15 K
-        Real kVal2 = celsius.getConverterTo((Unit) kelvin).convert(Real.ZERO);
+        Real kVal2 = celsius.getConverterTo(kelvin).convert(Real.ZERO);
         Assertions.assertEquals(273.15, kVal2.doubleValue(), DELTA);
     }
 }

@@ -146,14 +146,16 @@ public class DenseTensor<T> implements Tensor<T> {
     @SuppressWarnings("unchecked")
     public T get(int... indices) {
         int idx = flatIndex(indices);
-        return ((T[]) data)[idx];
+        T val = ((T[]) data)[idx];
+        return val;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void set(T value, int... indices) {
         int idx = flatIndex(indices);
-        ((T[]) data)[idx] = value;
+        T[] arr = ((T[]) data);
+        arr[idx] = value;
     }
 
     @Override
@@ -265,7 +267,8 @@ public class DenseTensor<T> implements Tensor<T> {
 
         // Check if contiguous
         if (isContiguous()) {
-            return new DenseTensor<>((T[]) data, newShape); // Creates new canonical strides
+            Tensor<T> res = new DenseTensor<>((T[]) data, newShape); // Creates new canonical strides
+            return res;
         } else {
             return copy().reshape(newShape);
         }
@@ -421,7 +424,8 @@ public class DenseTensor<T> implements Tensor<T> {
         } else {
             T result = ((T[]) data)[0];
             for (int i = 1; i < size; i++) {
-                result = ((Ring<T>) result).add(result, ((T[]) data)[i]);
+                T val = ((T[]) data)[i];
+                result = ((Ring<T>) result).add(result, val);
             }
             return result;
         }
@@ -495,7 +499,9 @@ public class DenseTensor<T> implements Tensor<T> {
                     // Use functional style: a.add(a, b) because T extends Field<T>
                     @SuppressWarnings("unchecked")
                     T addend = (T) dataArray[i];
-                    result[resultIdx] = ((Ring<T>) result[resultIdx]).add(result[resultIdx], addend);
+                    @SuppressWarnings("unchecked")
+                    Ring<T> accum = (Ring<T>) result[resultIdx];
+                    result[resultIdx] = accum.add(result[resultIdx], addend);
                 }
             }
         }

@@ -116,7 +116,9 @@ public final class VectorFactory {
             for (int i = 0; i < dim; i++) {
                 dData[i] = ((org.jscience.mathematics.numbers.real.Real) data.get(i)).doubleValue();
             }
-            return (VectorStorage<E>) new HeapRealDoubleVectorStorage(dData);
+            @SuppressWarnings("unchecked")
+            VectorStorage<E> res = (VectorStorage<E>) new HeapRealDoubleVectorStorage(dData);
+            return res;
         }
 
         // Generic Dense Storage

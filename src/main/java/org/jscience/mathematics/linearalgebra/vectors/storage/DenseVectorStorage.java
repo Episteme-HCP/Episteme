@@ -20,7 +20,9 @@ public class DenseVectorStorage<E> implements VectorStorage<E> {
         // Object[] and cast on get.
         // However, GenericVector usually knows the class.
         // For simplicity in this refactor, we'll use Object[] internally and cast.
-        this.data = (E[]) new Object[dimension];
+        @SuppressWarnings("unchecked")
+        E[] arr = (E[]) new Object[dimension];
+        this.data = arr;
     }
 
     public DenseVectorStorage(E[] data) {
@@ -30,7 +32,9 @@ public class DenseVectorStorage<E> implements VectorStorage<E> {
 
     public DenseVectorStorage(java.util.List<E> data) {
         this.dimension = data.size();
-        this.data = (E[]) data.toArray();
+        @SuppressWarnings("unchecked")
+        E[] arr = (E[]) data.toArray();
+        this.data = arr;
     }
 
     @Override

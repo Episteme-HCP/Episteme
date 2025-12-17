@@ -229,7 +229,6 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
     /**
      * Builds a SparseMatrix in CSR format from row maps.
      */
-    @SuppressWarnings("unchecked")
     private SparseMatrix<E> buildCSRFromMaps(List<TreeMap<Integer, E>> rowMaps, int rows, int cols) {
         // Create storage
         E zero = field.zero();

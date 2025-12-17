@@ -34,7 +34,8 @@ public class CPUSparseTensorProvider implements TensorProvider {
                     throw new IllegalArgumentException("Cannot determine zero for type " + elementType);
                 }
             }
-            return new SparseTensor<>(shape, zero);
+            T z = zero;
+            return new SparseTensor<>(shape, z);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create zero for " + elementType, e);
         }
@@ -59,19 +60,25 @@ public class CPUSparseTensorProvider implements TensorProvider {
     public <T> Tensor<T> create(T[] data, int... shape) {
         // Create from array. Check for zeros.
         // Need zero value.
-        if (data.length == 0)
-            return zeros((Class<T>) data.getClass().getComponentType(), shape);
+        if (data.length == 0) {
+            Class<T> type = (Class<T>) data.getClass().getComponentType();
+            return zeros(type, shape);
+        }
 
         T zero;
         // Determine zero from data[0]?
         if (data[0] instanceof org.jscience.mathematics.structures.rings.Ring) {
-            zero = (T) ((org.jscience.mathematics.structures.rings.Ring) data[0]).zero();
+            @SuppressWarnings("rawtypes")
+            org.jscience.mathematics.structures.rings.Ring r = (org.jscience.mathematics.structures.rings.Ring) data[0];
+            T z = (T) r.zero();
+            zero = z;
         } else if (data[0] instanceof Real) {
             zero = (T) Real.ZERO;
         } else {
             // Fallback
             try {
-                zero = (T) data[0].getClass().getMethod("zero").invoke(data[0]);
+                T z = (T) data[0].getClass().getMethod("zero").invoke(data[0]);
+                zero = z;
             } catch (Exception e) {
                 // Assuming null? No.
                 throw new IllegalArgumentException("Cannot determine zero from data element");

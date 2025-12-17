@@ -45,6 +45,7 @@ public final class LinearAlgebraRegistry {
      */
     public static synchronized void reload() {
         MATRIX_PROVIDERS.clear();
+        @SuppressWarnings("rawtypes")
         ServiceLoader<LinearAlgebraProvider> matrixLoader = ServiceLoader.load(LinearAlgebraProvider.class);
         StreamSupport.stream(matrixLoader.spliterator(), false).forEach(MATRIX_PROVIDERS::add);
 

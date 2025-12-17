@@ -6,6 +6,9 @@ import org.jscience.mathematics.sets.Reals;
 import org.jscience.mathematics.numbers.real.Real;
 import java.util.concurrent.TimeUnit;
 import java.util.Random;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.ejml.simple.SimpleMatrix;
 
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
@@ -21,6 +24,14 @@ public class MatrixBenchmark {
     private Matrix<Real> A;
     private Matrix<Real> B;
 
+    // Commons Math
+    private RealMatrix cmA;
+    private RealMatrix cmB;
+
+    // EJML
+    private SimpleMatrix ejmlA;
+    private SimpleMatrix ejmlB;
+
     @Setup(Level.Trial)
     public void setup() {
         double[][] dataA = generateRandomData(size);
@@ -28,6 +39,14 @@ public class MatrixBenchmark {
 
         A = new org.jscience.mathematics.linearalgebra.matrices.DenseMatrix<>(toReal(dataA), Reals.getInstance());
         B = new org.jscience.mathematics.linearalgebra.matrices.DenseMatrix<>(toReal(dataB), Reals.getInstance());
+
+        // Commons Math Setup
+        cmA = new Array2DRowRealMatrix(dataA);
+        cmB = new Array2DRowRealMatrix(dataB);
+
+        // EJML Setup
+        ejmlA = new SimpleMatrix(dataA);
+        ejmlB = new SimpleMatrix(dataB);
     }
 
     private Real[][] toReal(double[][] data) {
@@ -42,8 +61,18 @@ public class MatrixBenchmark {
     }
 
     @Benchmark
-    public Matrix<Real> multiply() {
+    public Matrix<Real> multiplyJScience() {
         return A.multiply(B);
+    }
+
+    @Benchmark
+    public RealMatrix multiplyCommonsMath() {
+        return cmA.multiply(cmB);
+    }
+
+    @Benchmark
+    public SimpleMatrix multiplyEJML() {
+        return ejmlA.mult(ejmlB);
     }
 
     private double[][] generateRandomData(int n) {

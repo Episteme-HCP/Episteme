@@ -78,6 +78,7 @@ public class SymmetricMatrixStorage<E> implements MatrixStorage<E> {
 
     @Override
     public MatrixStorage<E> clone() {
+        @SuppressWarnings("unchecked")
         E[] copy = (E[]) new Object[upperTriangle.length];
         System.arraycopy(upperTriangle, 0, copy, 0, upperTriangle.length);
 

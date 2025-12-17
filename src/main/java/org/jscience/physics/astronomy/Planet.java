@@ -5,6 +5,10 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.quantity.Mass;
 import org.jscience.measure.quantity.Length;
+import org.jscience.measure.quantity.Temperature;
+import org.jscience.measure.quantity.Pressure;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Represents a Planet.
@@ -16,7 +20,12 @@ import org.jscience.measure.quantity.Length;
 public class Planet extends CelestialBody {
 
     private boolean habitable;
-    private String atmosphereSummary;
+    private boolean habitable;
+    private String atmosphereSummary; // Deprecated/Legacy
+
+    private Quantity<Temperature> surfaceTemperature;
+    private Quantity<Pressure> surfacePressure;
+    private Map<String, Double> atmosphereComposition = new HashMap<>();
 
     public Planet(String name, Quantity<Mass> mass, Quantity<Length> radius, Vector<Real> position,
             Vector<Real> velocity) {
@@ -37,6 +46,30 @@ public class Planet extends CelestialBody {
 
     public void setAtmosphereSummary(String atmosphereSummary) {
         this.atmosphereSummary = atmosphereSummary;
+    }
+
+    public Quantity<Temperature> getSurfaceTemperature() {
+        return surfaceTemperature;
+    }
+
+    public void setSurfaceTemperature(Quantity<Temperature> surfaceTemperature) {
+        this.surfaceTemperature = surfaceTemperature;
+    }
+
+    public Quantity<Pressure> getSurfacePressure() {
+        return surfacePressure;
+    }
+
+    public void setSurfacePressure(Quantity<Pressure> surfacePressure) {
+        this.surfacePressure = surfacePressure;
+    }
+
+    public Map<String, Double> getAtmosphereComposition() {
+        return atmosphereComposition;
+    }
+
+    public void setAtmosphereComposition(Map<String, Double> atmosphereComposition) {
+        this.atmosphereComposition = atmosphereComposition;
     }
 
     @Override

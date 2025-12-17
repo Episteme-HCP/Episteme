@@ -278,7 +278,9 @@ public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvide
 
             executeMatrixMultiply(ptrA, ptrB, ptrC, m, n, k);
 
-            return (Matrix<E>) resultC;
+            @SuppressWarnings("unchecked")
+            Matrix<E> res = (Matrix<E>) resultC;
+            return res;
         } catch (
 
         Exception e) {

@@ -186,6 +186,7 @@ public final class MatrixFactory {
             case DIAGONAL:
                 if (rows != cols)
                     throw new IllegalArgumentException("Diagonal matrices must be square");
+                @SuppressWarnings("unchecked")
                 E[] diag = (E[]) new Object[rows];
                 for (int i = 0; i < rows; i++)
                     diag[i] = data[i][i];
@@ -395,7 +396,9 @@ public final class MatrixFactory {
             for (int i = 0; i < rows; i++) {
                 System.arraycopy(dData[i], 0, flat, i * cols, cols);
             }
-            return (MatrixStorage<E>) new HeapRealDoubleMatrixStorage(flat, rows, cols);
+            @SuppressWarnings("unchecked")
+            MatrixStorage<E> res = (MatrixStorage<E>) new HeapRealDoubleMatrixStorage(flat, rows, cols);
+            return res;
         }
 
         // Generic Dense
@@ -427,7 +430,9 @@ public final class MatrixFactory {
             for (int i = 0; i < rows; i++) {
                 System.arraycopy(dData[i], 0, flat, i * cols, cols);
             }
-            return (MatrixStorage<E>) new HeapRealDoubleMatrixStorage(flat, rows, cols);
+            @SuppressWarnings("unchecked")
+            MatrixStorage<E> res = (MatrixStorage<E>) new HeapRealDoubleMatrixStorage(flat, rows, cols);
+            return res;
         }
 
         DenseMatrixStorage<E> storage = new DenseMatrixStorage<E>(rows, cols, field.zero());

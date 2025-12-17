@@ -29,13 +29,16 @@ public class BenchmarkRunner {
 
         for (RunResult result : results) {
             String benchmarkName = result.getPrimaryResult().getLabel();
-            double score = result.getPrimaryResult().getScore(); // Average Latency
+            // Expected format: "multiplyJScience", "multiplyCommonsMath", etc.
+            double score = result.getPrimaryResult().getScore(); // Average Latency in ms for Matrix, us for NBody?
 
-            System.out.println("Result: " + benchmarkName + " = " + score + " ms");
+            System.out.println("Result: " + benchmarkName + " = " + score);
 
             if (benchmarkName.contains("MatrixBenchmark")) {
                 String param = result.getParams().getParam("size");
-                matrixResults.put("Size=" + param, score);
+                String method = result.getParams().getBenchmark().replace("org.jscience.benchmark.MatrixBenchmark.",
+                        "");
+                matrixResults.put(method + " (Size=" + param + ")", score);
             } else if (benchmarkName.contains("NBodyBenchmark")) {
                 String param = result.getParams().getParam("bodiesCount");
                 nbodyResults.put("N=" + param, score);

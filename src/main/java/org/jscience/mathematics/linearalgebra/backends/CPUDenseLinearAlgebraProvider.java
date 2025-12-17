@@ -132,6 +132,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             // E is generic.
             // We can convert List to Array if we cast.
 
+            @SuppressWarnings("unchecked")
             E[] arr = (E[]) result.toArray(); // Safe if result contains E
             return new GenericVector<>(
                     new org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr), this, field);

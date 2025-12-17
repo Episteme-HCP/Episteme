@@ -1,0 +1,3 @@
+@echo off
+echo Running JScience Benchmarks with Comparisons...
+call mvn exec:java -Dexec.mainClass="org.jscience.benchmark.BenchmarkRunner" -Dexec.classpathScope=test

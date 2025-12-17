@@ -58,12 +58,12 @@ public class GenericMatrix<E> implements Matrix<E> {
      * Creates a matrix from a 2D array, automatically selecting storage and
      * provider.
      */
-    public static <T> GenericMatrix<T> of(T[][] data, Field<T> field) {
+    public static <E> GenericMatrix<E> of(E[][] data, Field<E> field) {
         int rows = data.length;
         int cols = rows > 0 ? data[0].length : 0;
 
         // Smart Selection Logic
-        MatrixStorage<T> storage;
+        MatrixStorage<E> storage;
         if (isSparse(data, field)) {
             storage = new SparseMatrixStorage<>(rows, cols, field.zero());
             for (int i = 0; i < rows; i++) {
@@ -75,7 +75,7 @@ public class GenericMatrix<E> implements Matrix<E> {
             }
         } else {
             // Default to Dense
-            storage = new DenseMatrixStorage<T>(rows, cols, field.zero());
+            storage = new DenseMatrixStorage<E>(rows, cols, field.zero());
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
                     storage.set(i, j, data[i][j]);
@@ -84,7 +84,7 @@ public class GenericMatrix<E> implements Matrix<E> {
         }
 
         // Provider Selection (could be enhanced with system properties)
-        LinearAlgebraProvider<T> provider = ComputeContext.current().getDenseLinearAlgebraProvider(field);
+        LinearAlgebraProvider<E> provider = ComputeContext.current().getDenseLinearAlgebraProvider(field);
 
         return new GenericMatrix<>(storage, provider, field);
     }
@@ -255,8 +255,9 @@ public class GenericMatrix<E> implements Matrix<E> {
     @Override
     public Matrix<E> one() {
         // Identity
-        GenericMatrix<E> m = of((E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), rows(), cols()),
-                field);
+        @SuppressWarnings("unchecked")
+        E[][] data = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), rows(), cols());
+        GenericMatrix<E> m = of(data, field);
         // Implementation detail: create storage directly.
         return m; // simplified
     }

@@ -52,8 +52,10 @@ public class GenericVector<E> implements Vector<E> {
 
     public Matrix<E> toMatrix() {
         // Convert vector to Column Matrix (n x 1)
+        @SuppressWarnings("unchecked")
         E[][] matrixData = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), storage.dimension(), 1);
         for (int i = 0; i < storage.dimension(); i++) {
+            @SuppressWarnings("unchecked")
             E[] row = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), 1);
             row[0] = storage.get(i);
             matrixData[i] = row;

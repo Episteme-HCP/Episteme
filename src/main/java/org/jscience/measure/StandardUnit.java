@@ -191,55 +191,6 @@ public class StandardUnit<Q extends Quantity<Q>> implements Unit<Q> {
         return 31 * symbol.hashCode() + dimension.hashCode();
     }
 
-    /**
-     * Compound converter: applies two converters in sequence.
-     */
-    private static class CompoundConverter implements UnitConverter {
-        private final UnitConverter first;
-        private final UnitConverter second;
+    // Unused CompoundConverter removed
 
-        CompoundConverter(UnitConverter first, UnitConverter second) {
-            this.first = first;
-            this.second = second;
-        }
-
-        @Override
-        public Real convert(Real value) {
-            return second.convert(first.convert(value));
-        }
-
-        @Override
-        public UnitConverter inverse() {
-            return new CompoundConverter(second.inverse(), first.inverse());
-        }
-
-        @Override
-        public UnitConverter concatenate(UnitConverter other) {
-            return new CompoundConverter(this, other);
-        }
-
-        @Override
-        public boolean isIdentity() {
-            return first.isIdentity() && second.isIdentity();
-        }
-
-        @Override
-        public boolean isLinear() {
-            return first.isLinear() && second.isLinear();
-        }
-
-        @Override
-        public Real derivative(Real value) {
-            // Chain rule: (f ∘ g)' = f'(g(x)) × g'(x)
-            Real intermediateValue = first.convert(value);
-            Real firstDeriv = first.derivative(value);
-            Real secondDeriv = second.derivative(intermediateValue);
-            return firstDeriv.multiply(secondDeriv);
-        }
-
-        @Override
-        public String toString() {
-            return first + " then " + second;
-        }
-    }
 }

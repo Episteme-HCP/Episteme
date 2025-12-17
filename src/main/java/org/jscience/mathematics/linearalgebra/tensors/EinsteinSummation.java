@@ -31,7 +31,6 @@ public class EinsteinSummation {
      * @return the resulting tensor
      * @param <T> the field element type
      */
-    @SuppressWarnings("unchecked")
     @SafeVarargs
     public static <T> Tensor<T> einsum(String equation, Tensor<T>... operands) {
         String[] parts = equation.replaceAll("\\s+", "").split("->");
@@ -197,7 +196,8 @@ public class EinsteinSummation {
                 if (product == null) {
                     product = val;
                 } else {
-                    product = ((org.jscience.mathematics.structures.rings.Ring<T>) product).multiply(product, val);
+                    T p = ((org.jscience.mathematics.structures.rings.Ring<T>) product).multiply(product, val);
+                    product = p;
                 }
             }
 
@@ -207,8 +207,9 @@ public class EinsteinSummation {
                 outIdx += counters[outVarIndices[k]] * outputStrides[k];
             }
 
-            resultData[outIdx] = ((org.jscience.mathematics.structures.rings.Ring<T>) resultData[outIdx])
+            T resVal = ((org.jscience.mathematics.structures.rings.Ring<T>) resultData[outIdx])
                     .add(resultData[outIdx], product);
+            resultData[outIdx] = resVal;
 
             // 3. Increment counters
             if (allVars.isEmpty()) {

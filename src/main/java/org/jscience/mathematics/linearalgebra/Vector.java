@@ -161,7 +161,6 @@ public interface Vector<E> extends Module<Vector<E>, E> {
      * @return the corresponding column matrix
      * @throws UnsupportedOperationException if the scalar ring is not a Field
      */
-    @SuppressWarnings("unchecked")
     default Matrix<E> toMatrix() {
         if (getScalarRing() instanceof Field) {
             Field<E> field = (Field<E>) getScalarRing();

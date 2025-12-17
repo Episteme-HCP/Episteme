@@ -140,6 +140,19 @@
             <scope>provided</scope>
         </dependency>
 
+
+        <!-- Benchmark Comparison Libraries -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ejml</groupId>
+            <artifactId>ejml-all</artifactId>
+            <version>0.43</version>
+        </dependency>
+
         <!-- JFreeChart for Benchmark Graphs -->
         <dependency>
             <groupId>org.jfree</groupId>
@@ -251,6 +264,30 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+                <excludes>
+                    <exclude>**/*.jpg</exclude>
+                    <exclude>**/*.png</exclude>
+                    <exclude>**/*.tif</exclude>
+                    <exclude>**/*.tiff</exclude>
+                    <exclude>**/*.obj</exclude>
+                    <exclude>**/*.gltf</exclude>
+                    <exclude>**/*.glb</exclude>
+                    <exclude>**/*.bin</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>**/*.jpg</include>
+                    <include>**/*.png</include>
+                    <include>**/*.tif</include>
+                    <include>**/*.tiff</include>
+                    <include>**/*.obj</include>
+                    <include>**/*.gltf</include>
+                    <include>**/*.glb</include>
+                    <include>**/*.bin</include>
+                </includes>
             </resource>
         </resources>
         <plugins>

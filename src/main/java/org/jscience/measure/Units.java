@@ -314,35 +314,27 @@ public final class Units {
         // ========== NON-SI UNITS ==========
 
         /** Litre: 1 L = 0.001 m³ */
-        @SuppressWarnings("unchecked")
         public static final Unit<Volume> LITRE = (Unit<Volume>) CUBIC_METER.divide(1000);
 
         /** US Liquid Gallon: 1 gal = 3.785411784 L */
-        @SuppressWarnings("unchecked")
         public static final Unit<Volume> GALLON_LIQUID_US = (Unit<Volume>) LITRE.multiply(3.785411784);
 
         /** Atmosphere: 1 atm = 101325 Pa */
-        @SuppressWarnings("unchecked")
         public static final Unit<Pressure> ATMOSPHERE = (Unit<Pressure>) PASCAL.multiply(101325);
 
         /** Bar: 1 bar = 100000 Pa */
-        @SuppressWarnings("unchecked")
         public static final Unit<Pressure> BAR = (Unit<Pressure>) PASCAL.multiply(100000);
 
         /** Pound per square inch: 1 psi ≈ 6894.76 Pa */
-        @SuppressWarnings("unchecked")
         public static final Unit<Pressure> POUND_PER_SQUARE_INCH = (Unit<Pressure>) PASCAL.multiply(6894.75729);
 
         /** Millimeter of mercury: 1 mmHg ≈ 133.322 Pa */
-        @SuppressWarnings("unchecked")
         public static final Unit<Pressure> MILLIMETRE_OF_MERCURY = (Unit<Pressure>) PASCAL.multiply(133.322387415);
 
         /** Calorie (thermochemical): 1 cal = 4.184 J */
-        @SuppressWarnings("unchecked")
         public static final Unit<Energy> CALORIE = (Unit<Energy>) JOULE.multiply(4.184);
 
         /** Electronvolt: 1 eV ≈ 1.602×10⁻¹⁹ J */
-        @SuppressWarnings("unchecked")
         public static final Unit<Energy> ELECTRON_VOLT = (Unit<Energy>) JOULE.multiply(1.602176634e-19);
 
         /** Degree: 1° = π/180 rad */
@@ -350,15 +342,12 @@ public final class Units {
         public static final Unit<Angle> DEGREE_ANGLE = (Unit<Angle>) ((Unit<?>) RADIAN).multiply(Math.PI / 180.0);
 
         /** Minute (angle): 1' = 1°/60 */
-        @SuppressWarnings("unchecked")
         public static final Unit<Angle> MINUTE_ANGLE = (Unit<Angle>) DEGREE_ANGLE.divide(60);
 
         /** Second (angle): 1" = 1'/60 */
-        @SuppressWarnings("unchecked")
         public static final Unit<Angle> SECOND_ANGLE = (Unit<Angle>) MINUTE_ANGLE.divide(60);
 
         /** Julian Year: 1 yr = 365.25 d */
-        @SuppressWarnings("unchecked")
         public static final Unit<Time> YEAR = (Unit<Time>) DAY.multiply(365.25);
 
         /** Knot: 1 kn = 1852 m/h */

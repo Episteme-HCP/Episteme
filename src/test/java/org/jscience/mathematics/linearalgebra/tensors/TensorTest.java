@@ -13,6 +13,7 @@ public class TensorTest {
     private static final double DELTA = 1e-9;
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testEinsteinSummationDotProduct() {
         // Vector dot product: i,i->
         Real[] d1 = { Real.of(1), Real.of(2), Real.of(3) };
@@ -27,6 +28,7 @@ public class TensorTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testEinsteinSummationMatrixMult() {
         // Matrix multiplication: ij,jk->ik
         // A = [[1, 2], [3, 4]]
@@ -49,6 +51,7 @@ public class TensorTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testEinsteinSummationTranspose() {
         // Transpose: ij->ji
         Real[] data = { Real.of(1), Real.of(2), Real.of(3), Real.of(4) };

@@ -109,11 +109,19 @@ public class SparseTensor<T> implements Tensor<T> {
 
             if (o.data.size() >= 1000) {
                 o.data.entrySet().stream().parallel().forEach(entry -> {
-                    resultData.merge(entry.getKey(), entry.getValue(), (v1, v2) -> ((Ring<T>) v1).add(v1, v2));
+                    resultData.merge(entry.getKey(), entry.getValue(), (v1, v2) -> {
+                        @SuppressWarnings("unchecked")
+                        Ring<T> r = (Ring<T>) v1;
+                        return r.add(v1, v2);
+                    });
                 });
             } else {
                 for (Map.Entry<Integer, T> entry : o.data.entrySet()) {
-                    resultData.merge(entry.getKey(), entry.getValue(), (v1, v2) -> ((Ring<T>) v1).add(v1, v2));
+                    resultData.merge(entry.getKey(), entry.getValue(), (v1, v2) -> {
+                        @SuppressWarnings("unchecked")
+                        Ring<T> r = (Ring<T>) v1;
+                        return r.add(v1, v2);
+                    });
                 }
             }
 
@@ -137,6 +145,7 @@ public class SparseTensor<T> implements Tensor<T> {
                 int idx = entry.getKey();
                 T val = entry.getValue();
                 T current = result.data.getOrDefault(idx, zero);
+                @SuppressWarnings("unchecked")
                 T newVal = ((Ring<T>) current).subtract(current, val);
                 if (newVal.equals(zero)) {
                     result.data.remove(idx);
@@ -171,6 +180,7 @@ public class SparseTensor<T> implements Tensor<T> {
 
             T val = entry.getValue();
             T otherVal = other.get(indices);
+            @SuppressWarnings("unchecked")
             T prod = ((Ring<T>) val).multiply(val, otherVal);
             if (!prod.equals(zero)) {
                 resultData.put(idx, prod);
@@ -192,6 +202,7 @@ public class SparseTensor<T> implements Tensor<T> {
             stream = stream.parallel();
 
         stream.forEach(entry -> {
+            @SuppressWarnings("unchecked")
             T newVal = ((Ring<T>) entry.getValue()).multiply(entry.getValue(), scalar);
             if (!newVal.equals(zero)) {
                 resultData.put(entry.getKey(), newVal);
@@ -364,7 +375,9 @@ public class SparseTensor<T> implements Tensor<T> {
         // sum of non-zeros.
         // Zeros don't contribute to sum.
         for (T val : data.values()) {
-            s = ((Ring<T>) s).add(s, val);
+            @SuppressWarnings("unchecked")
+            T nextS = ((Ring<T>) s).add(s, val);
+            s = nextS;
         }
         return s;
     }

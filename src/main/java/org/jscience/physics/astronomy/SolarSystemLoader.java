@@ -9,6 +9,8 @@ import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.*;
+import java.util.Iterator;
+import java.util.Map;
 import org.jscience.physics.PhysicalConstants;
 
 import java.io.InputStream;
@@ -124,6 +126,23 @@ public class SolarSystemLoader {
             planet.setTexturePath(node.get("texture").asText());
         if (node.has("habitable"))
             planet.setHabitable(node.get("habitable").asBoolean());
+
+        if (node.has("surface_temperature"))
+            planet.setSurfaceTemperature(Quantities.create(node.get("surface_temperature").asDouble(), Units.KELVIN));
+
+        if (node.has("surface_pressure"))
+            planet.setSurfacePressure(Quantities.create(node.get("surface_pressure").asDouble(), Units.PASCAL));
+
+        if (node.has("atmosphere")) {
+            JsonNode atmNode = node.get("atmosphere");
+            if (atmNode.isObject()) {
+                Iterator<Map.Entry<String, JsonNode>> fields = atmNode.fields();
+                while (fields.hasNext()) {
+                    Map.Entry<String, JsonNode> field = fields.next();
+                    planet.getAtmosphereComposition().put(field.getKey(), field.getValue().asDouble());
+                }
+            }
+        }
 
         return planet;
     }
