@@ -221,6 +221,11 @@
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
         <!-- ND4J (Tensor Operations) -->
         <dependency>
             <groupId>org.nd4j</groupId>

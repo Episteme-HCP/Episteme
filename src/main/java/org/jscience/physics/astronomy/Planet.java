@@ -20,7 +20,7 @@ import java.util.HashMap;
 public class Planet extends CelestialBody {
 
     private boolean habitable;
-    private boolean habitable;
+
     private String atmosphereSummary; // Deprecated/Legacy
 
     private Quantity<Temperature> surfaceTemperature;

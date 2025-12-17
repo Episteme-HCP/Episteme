@@ -43,11 +43,11 @@ public class UnitConversionTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
+
     public void testAffineUnitBehavior() {
         // Test manual affine unit creation
         Unit<Temperature> kelvin = Units.KELVIN;
-        @SuppressWarnings("unchecked")
+
         Unit<Temperature> celsius = (Unit<Temperature>) ((StandardUnit<Temperature>) kelvin).add(-273.15);
 
         Real kVal = Real.of(273.15);

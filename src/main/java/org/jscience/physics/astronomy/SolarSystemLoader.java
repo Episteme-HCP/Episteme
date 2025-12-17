@@ -100,8 +100,7 @@ public class SolarSystemLoader {
         // In reality, barycenter...
         Star star = new Star(name, mass, radius, zeroVector(), zeroVector());
 
-        if (node.has("texture"))
-            star.setTexturePath(node.get("texture").asText());
+        parseTextures(node, star);
         if (node.has("luminosity"))
             star.setLuminosity(Quantities.create(node.get("luminosity").asDouble(), Units.WATT));
         if (node.has("temperature"))
@@ -122,8 +121,28 @@ public class SolarSystemLoader {
         org.jscience.mathematics.linearalgebra.Vector<Real> vel = (org.jscience.mathematics.linearalgebra.Vector<Real>) state[1];
 
         Planet planet = new Planet(name, mass, radius, pos, vel);
-        if (node.has("texture"))
-            planet.setTexturePath(node.get("texture").asText());
+        parseTextures(node, planet);
+
+        if (node.has("rings")) {
+            JsonNode ringsNode = node.get("rings");
+            RingSystem rings = new RingSystem(name + " Rings",
+                    Quantities.create(1e10, Units.KILOGRAM), // Arbitrary small mass
+                    radius, // Base radius
+                    pos, vel);
+
+            if (ringsNode.has("inner"))
+                rings.setInnerRadius(Quantities.create(ringsNode.get("inner").asDouble(), Units.METER));
+            if (ringsNode.has("outer"))
+                rings.setOuterRadius(Quantities.create(ringsNode.get("outer").asDouble(), Units.METER));
+
+            parseTextures(ringsNode, rings);
+
+            planet.addChild(rings);
+            // Add rings to system bodies? Maybe not necessary if viewer handles planet
+            // children.
+            // But strict particle simulation might need it if we simul collisions.
+            // For now, let's assume RingSystem is attached to Planet visually.
+        }
         if (node.has("habitable"))
             planet.setHabitable(node.get("habitable").asBoolean());
 
@@ -159,13 +178,26 @@ public class SolarSystemLoader {
         org.jscience.mathematics.linearalgebra.Vector<Real> vel = (org.jscience.mathematics.linearalgebra.Vector<Real>) state[1];
 
         CelestialBody body = new CelestialBody(name, mass, radius, pos, vel);
-        if (node.has("texture"))
-            body.setTexturePath(node.get("texture").asText());
         return body;
     }
 
     private static org.jscience.mathematics.linearalgebra.Vector<Real> zeroVector() {
         return DenseVector.of(Collections.nCopies(3, Real.ZERO), Reals.getInstance());
+    }
+
+    private static void parseTextures(JsonNode node, CelestialBody body) {
+        if (node.has("texture")) {
+            JsonNode texNode = node.get("texture");
+            if (texNode.isObject()) {
+                Iterator<Map.Entry<String, JsonNode>> fields = texNode.fields();
+                while (fields.hasNext()) {
+                    Map.Entry<String, JsonNode> field = fields.next();
+                    body.setTexture(field.getKey(), field.getValue().asText());
+                }
+            } else {
+                body.setTexturePath(texNode.asText());
+            }
+        }
     }
 
     private static Object[] getInitialState(JsonNode node, Quantity<Mass> parentMass) {
@@ -179,7 +211,6 @@ public class SolarSystemLoader {
             double M = Math.toRadians(orbit.get("M").asDouble()); // Mean anomaly (deg -> rad)
 
             // Standard gravitational parameter mu = G * M
-            // G is N*m^2/kg^2. M is kg. Result is N*m^2/kg = m^3/s^2.
             double muVal = PhysicalConstants.G.doubleValue()
                     * parentMass.to(Units.KILOGRAM).getValue().doubleValue();
 

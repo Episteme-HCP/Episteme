@@ -24,7 +24,8 @@ public class CelestialBody extends Particle {
     private String name;
     private Quantity<Length> radius;
     private Quantity<Time> rotationPeriod;
-    private String texturePath; // Path to texture resource
+
+    private java.util.Map<String, String> texturePaths = new java.util.HashMap<>();
     private CelestialBody parent; // Primary body (e.g. Sun for Earth, Earth for Moon)
     private java.util.List<CelestialBody> children = new java.util.ArrayList<>();
 
@@ -69,11 +70,23 @@ public class CelestialBody extends Particle {
     }
 
     public String getTexturePath() {
-        return texturePath;
+        return texturePaths.get("diffuse");
     }
 
     public void setTexturePath(String texturePath) {
-        this.texturePath = texturePath;
+        this.texturePaths.put("diffuse", texturePath);
+    }
+
+    public String getTexture(String type) {
+        return texturePaths.get(type);
+    }
+
+    public void setTexture(String type, String path) {
+        this.texturePaths.put(type, path);
+    }
+
+    public java.util.Map<String, String> getTextures() {
+        return texturePaths;
     }
 
     public CelestialBody getParent() {
