@@ -26,8 +26,8 @@ public class PeriodicTable {
 
     private static void loadElements() {
         try {
-            // Load from root of classpath (src/main/resources/elements.json)
-            for (Element e : PeriodicTableLoader.load("/elements.json")) {
+            // Load from org/jscience/chemistry/elements.json
+            for (Element e : PeriodicTableLoader.load("/org/jscience/chemistry/elements.json")) {
                 registerElement(e);
             }
         } catch (Exception e) {

@@ -25,9 +25,9 @@ public class ChemistryDataLoader {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     public static void loadElements() {
-        try (InputStream is = ChemistryDataLoader.class.getResourceAsStream("/data/chemistry/elements.json")) {
+        try (InputStream is = ChemistryDataLoader.class.getResourceAsStream("/org/jscience/chemistry/elements.json")) {
             if (is == null) {
-                LOGGER.warning("elements.json not found in /data/chemistry/");
+                LOGGER.warning("elements.json not found in /org/jscience/chemistry/");
                 return;
             }
 
