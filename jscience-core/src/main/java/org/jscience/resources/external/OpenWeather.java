@@ -23,12 +23,6 @@
 package org.jscience.resources.external;
 
 import org.jscience.resources.cache.ResourceCache;
-import org.jscience.measure.Quantity;
-import org.jscience.measure.Quantities;
-import org.jscience.measure.Units;
-import org.jscience.measure.quantity.Temperature;
-import org.jscience.measure.quantity.Pressure;
-import org.jscience.measure.quantity.Velocity;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

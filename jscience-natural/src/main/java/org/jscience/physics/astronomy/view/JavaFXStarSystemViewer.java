@@ -219,10 +219,7 @@ public class JavaFXStarSystemViewer implements StarSystemViewer {
     }
 
     private void createRingVisual(RingSystem rings, Sphere parentSphere) {
-        double inner = rings.getInnerRadius().to(Units.METER).getValue().doubleValue() * scaleFactor * planetScale;
         double outer = rings.getOuterRadius().to(Units.METER).getValue().doubleValue() * scaleFactor * planetScale;
-        // double r = (inner + outer) / 2.0;
-        // double thickness = outer - inner;
 
         // Cylinder as ring? (Flattened)
         Cylinder ring = new Cylinder(outer, 0.1);
