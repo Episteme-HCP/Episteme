@@ -2,7 +2,7 @@
 // source: linear_algebra_service.proto
 
 // Protobuf Java Version: 3.25.1
-package org.jscience.computing.remote.grpc;
+package org.jscience.distributed.grpc;
 
 /**
  * Protobuf type {@code org.jscience.computing.remote.MatrixRequest}
@@ -28,20 +28,20 @@ private static final long serialVersionUID = 0L;
 
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return org.jscience.computing.remote.grpc.LinearAlgebraServiceProto.internal_static_org_jscience_computing_remote_MatrixRequest_descriptor;
+    return org.jscience.distributed.grpc.LinearAlgebraServiceProto.internal_static_org_jscience_computing_remote_MatrixRequest_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return org.jscience.computing.remote.grpc.LinearAlgebraServiceProto.internal_static_org_jscience_computing_remote_MatrixRequest_fieldAccessorTable
+    return org.jscience.distributed.grpc.LinearAlgebraServiceProto.internal_static_org_jscience_computing_remote_MatrixRequest_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            org.jscience.computing.remote.grpc.MatrixRequest.class, org.jscience.computing.remote.grpc.MatrixRequest.Builder.class);
+            org.jscience.distributed.grpc.MatrixRequest.class, org.jscience.distributed.grpc.MatrixRequest.Builder.class);
   }
 
   private int bitField0_;
   public static final int MATRIX_A_FIELD_NUMBER = 1;
-  private org.jscience.computing.remote.grpc.MatrixData matrixA_;
+  private org.jscience.distributed.grpc.MatrixData matrixA_;
   /**
    * <code>.org.jscience.computing.remote.MatrixData matrix_a = 1;</code>
    * @return Whether the matrixA field is set.
@@ -55,19 +55,19 @@ private static final long serialVersionUID = 0L;
    * @return The matrixA.
    */
   @java.lang.Override
-  public org.jscience.computing.remote.grpc.MatrixData getMatrixA() {
-    return matrixA_ == null ? org.jscience.computing.remote.grpc.MatrixData.getDefaultInstance() : matrixA_;
+  public org.jscience.distributed.grpc.MatrixData getMatrixA() {
+    return matrixA_ == null ? org.jscience.distributed.grpc.MatrixData.getDefaultInstance() : matrixA_;
   }
   /**
    * <code>.org.jscience.computing.remote.MatrixData matrix_a = 1;</code>
    */
   @java.lang.Override
-  public org.jscience.computing.remote.grpc.MatrixDataOrBuilder getMatrixAOrBuilder() {
-    return matrixA_ == null ? org.jscience.computing.remote.grpc.MatrixData.getDefaultInstance() : matrixA_;
+  public org.jscience.distributed.grpc.MatrixDataOrBuilder getMatrixAOrBuilder() {
+    return matrixA_ == null ? org.jscience.distributed.grpc.MatrixData.getDefaultInstance() : matrixA_;
   }
 
   public static final int MATRIX_B_FIELD_NUMBER = 2;
-  private org.jscience.computing.remote.grpc.MatrixData matrixB_;
+  private org.jscience.distributed.grpc.MatrixData matrixB_;
   /**
    * <code>.org.jscience.computing.remote.MatrixData matrix_b = 2;</code>
    * @return Whether the matrixB field is set.
@@ -81,15 +81,15 @@ private static final long serialVersionUID = 0L;
    * @return The matrixB.
    */
   @java.lang.Override
-  public org.jscience.computing.remote.grpc.MatrixData getMatrixB() {
-    return matrixB_ == null ? org.jscience.computing.remote.grpc.MatrixData.getDefaultInstance() : matrixB_;
+  public org.jscience.distributed.grpc.MatrixData getMatrixB() {
+    return matrixB_ == null ? org.jscience.distributed.grpc.MatrixData.getDefaultInstance() : matrixB_;
   }
   /**
    * <code>.org.jscience.computing.remote.MatrixData matrix_b = 2;</code>
    */
   @java.lang.Override
-  public org.jscience.computing.remote.grpc.MatrixDataOrBuilder getMatrixBOrBuilder() {
-    return matrixB_ == null ? org.jscience.computing.remote.grpc.MatrixData.getDefaultInstance() : matrixB_;
+  public org.jscience.distributed.grpc.MatrixDataOrBuilder getMatrixBOrBuilder() {
+    return matrixB_ == null ? org.jscience.distributed.grpc.MatrixData.getDefaultInstance() : matrixB_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -139,10 +139,10 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof org.jscience.computing.remote.grpc.MatrixRequest)) {
+    if (!(obj instanceof org.jscience.distributed.grpc.MatrixRequest)) {
       return super.equals(obj);
     }
-    org.jscience.computing.remote.grpc.MatrixRequest other = (org.jscience.computing.remote.grpc.MatrixRequest) obj;
+    org.jscience.distributed.grpc.MatrixRequest other = (org.jscience.distributed.grpc.MatrixRequest) obj;
 
     if (hasMatrixA() != other.hasMatrixA()) return false;
     if (hasMatrixA()) {
@@ -178,44 +178,44 @@ private static final long serialVersionUID = 0L;
     return hash;
   }
 
-  public static org.jscience.computing.remote.grpc.MatrixRequest parseFrom(
+  public static org.jscience.distributed.grpc.MatrixRequest parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static org.jscience.computing.remote.grpc.MatrixRequest parseFrom(
+  public static org.jscience.distributed.grpc.MatrixRequest parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static org.jscience.computing.remote.grpc.MatrixRequest parseFrom(
+  public static org.jscience.distributed.grpc.MatrixRequest parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static org.jscience.computing.remote.grpc.MatrixRequest parseFrom(
+  public static org.jscience.distributed.grpc.MatrixRequest parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static org.jscience.computing.remote.grpc.MatrixRequest parseFrom(byte[] data)
+  public static org.jscience.distributed.grpc.MatrixRequest parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static org.jscience.computing.remote.grpc.MatrixRequest parseFrom(
+  public static org.jscience.distributed.grpc.MatrixRequest parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static org.jscience.computing.remote.grpc.MatrixRequest parseFrom(java.io.InputStream input)
+  public static org.jscience.distributed.grpc.MatrixRequest parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static org.jscience.computing.remote.grpc.MatrixRequest parseFrom(
+  public static org.jscience.distributed.grpc.MatrixRequest parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -223,26 +223,26 @@ private static final long serialVersionUID = 0L;
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
-  public static org.jscience.computing.remote.grpc.MatrixRequest parseDelimitedFrom(java.io.InputStream input)
+  public static org.jscience.distributed.grpc.MatrixRequest parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input);
   }
 
-  public static org.jscience.computing.remote.grpc.MatrixRequest parseDelimitedFrom(
+  public static org.jscience.distributed.grpc.MatrixRequest parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static org.jscience.computing.remote.grpc.MatrixRequest parseFrom(
+  public static org.jscience.distributed.grpc.MatrixRequest parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static org.jscience.computing.remote.grpc.MatrixRequest parseFrom(
+  public static org.jscience.distributed.grpc.MatrixRequest parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -255,7 +255,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(org.jscience.computing.remote.grpc.MatrixRequest prototype) {
+  public static Builder newBuilder(org.jscience.distributed.grpc.MatrixRequest prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   @java.lang.Override
@@ -276,21 +276,21 @@ private static final long serialVersionUID = 0L;
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
       // @@protoc_insertion_point(builder_implements:org.jscience.computing.remote.MatrixRequest)
-      org.jscience.computing.remote.grpc.MatrixRequestOrBuilder {
+      org.jscience.distributed.grpc.MatrixRequestOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return org.jscience.computing.remote.grpc.LinearAlgebraServiceProto.internal_static_org_jscience_computing_remote_MatrixRequest_descriptor;
+      return org.jscience.distributed.grpc.LinearAlgebraServiceProto.internal_static_org_jscience_computing_remote_MatrixRequest_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return org.jscience.computing.remote.grpc.LinearAlgebraServiceProto.internal_static_org_jscience_computing_remote_MatrixRequest_fieldAccessorTable
+      return org.jscience.distributed.grpc.LinearAlgebraServiceProto.internal_static_org_jscience_computing_remote_MatrixRequest_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              org.jscience.computing.remote.grpc.MatrixRequest.class, org.jscience.computing.remote.grpc.MatrixRequest.Builder.class);
+              org.jscience.distributed.grpc.MatrixRequest.class, org.jscience.distributed.grpc.MatrixRequest.Builder.class);
     }
 
-    // Construct using org.jscience.computing.remote.grpc.MatrixRequest.newBuilder()
+    // Construct using org.jscience.distributed.grpc.MatrixRequest.newBuilder()
     private Builder() {
       maybeForceBuilderInitialization();
     }
@@ -327,17 +327,17 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return org.jscience.computing.remote.grpc.LinearAlgebraServiceProto.internal_static_org_jscience_computing_remote_MatrixRequest_descriptor;
+      return org.jscience.distributed.grpc.LinearAlgebraServiceProto.internal_static_org_jscience_computing_remote_MatrixRequest_descriptor;
     }
 
     @java.lang.Override
-    public org.jscience.computing.remote.grpc.MatrixRequest getDefaultInstanceForType() {
-      return org.jscience.computing.remote.grpc.MatrixRequest.getDefaultInstance();
+    public org.jscience.distributed.grpc.MatrixRequest getDefaultInstanceForType() {
+      return org.jscience.distributed.grpc.MatrixRequest.getDefaultInstance();
     }
 
     @java.lang.Override
-    public org.jscience.computing.remote.grpc.MatrixRequest build() {
-      org.jscience.computing.remote.grpc.MatrixRequest result = buildPartial();
+    public org.jscience.distributed.grpc.MatrixRequest build() {
+      org.jscience.distributed.grpc.MatrixRequest result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
@@ -345,14 +345,14 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public org.jscience.computing.remote.grpc.MatrixRequest buildPartial() {
-      org.jscience.computing.remote.grpc.MatrixRequest result = new org.jscience.computing.remote.grpc.MatrixRequest(this);
+    public org.jscience.distributed.grpc.MatrixRequest buildPartial() {
+      org.jscience.distributed.grpc.MatrixRequest result = new org.jscience.distributed.grpc.MatrixRequest(this);
       if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
     }
 
-    private void buildPartial0(org.jscience.computing.remote.grpc.MatrixRequest result) {
+    private void buildPartial0(org.jscience.distributed.grpc.MatrixRequest result) {
       int from_bitField0_ = bitField0_;
       int to_bitField0_ = 0;
       if (((from_bitField0_ & 0x00000001) != 0)) {
@@ -404,16 +404,16 @@ private static final long serialVersionUID = 0L;
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof org.jscience.computing.remote.grpc.MatrixRequest) {
-        return mergeFrom((org.jscience.computing.remote.grpc.MatrixRequest)other);
+      if (other instanceof org.jscience.distributed.grpc.MatrixRequest) {
+        return mergeFrom((org.jscience.distributed.grpc.MatrixRequest)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(org.jscience.computing.remote.grpc.MatrixRequest other) {
-      if (other == org.jscience.computing.remote.grpc.MatrixRequest.getDefaultInstance()) return this;
+    public Builder mergeFrom(org.jscience.distributed.grpc.MatrixRequest other) {
+      if (other == org.jscience.distributed.grpc.MatrixRequest.getDefaultInstance()) return this;
       if (other.hasMatrixA()) {
         mergeMatrixA(other.getMatrixA());
       }
@@ -477,9 +477,9 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private org.jscience.computing.remote.grpc.MatrixData matrixA_;
+    private org.jscience.distributed.grpc.MatrixData matrixA_;
     private com.google.protobuf.SingleFieldBuilderV3<
-        org.jscience.computing.remote.grpc.MatrixData, org.jscience.computing.remote.grpc.MatrixData.Builder, org.jscience.computing.remote.grpc.MatrixDataOrBuilder> matrixABuilder_;
+        org.jscience.distributed.grpc.MatrixData, org.jscience.distributed.grpc.MatrixData.Builder, org.jscience.distributed.grpc.MatrixDataOrBuilder> matrixABuilder_;
     /**
      * <code>.org.jscience.computing.remote.MatrixData matrix_a = 1;</code>
      * @return Whether the matrixA field is set.
@@ -491,9 +491,9 @@ private static final long serialVersionUID = 0L;
      * <code>.org.jscience.computing.remote.MatrixData matrix_a = 1;</code>
      * @return The matrixA.
      */
-    public org.jscience.computing.remote.grpc.MatrixData getMatrixA() {
+    public org.jscience.distributed.grpc.MatrixData getMatrixA() {
       if (matrixABuilder_ == null) {
-        return matrixA_ == null ? org.jscience.computing.remote.grpc.MatrixData.getDefaultInstance() : matrixA_;
+        return matrixA_ == null ? org.jscience.distributed.grpc.MatrixData.getDefaultInstance() : matrixA_;
       } else {
         return matrixABuilder_.getMessage();
       }
@@ -501,7 +501,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>.org.jscience.computing.remote.MatrixData matrix_a = 1;</code>
      */
-    public Builder setMatrixA(org.jscience.computing.remote.grpc.MatrixData value) {
+    public Builder setMatrixA(org.jscience.distributed.grpc.MatrixData value) {
       if (matrixABuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -518,7 +518,7 @@ private static final long serialVersionUID = 0L;
      * <code>.org.jscience.computing.remote.MatrixData matrix_a = 1;</code>
      */
     public Builder setMatrixA(
-        org.jscience.computing.remote.grpc.MatrixData.Builder builderForValue) {
+        org.jscience.distributed.grpc.MatrixData.Builder builderForValue) {
       if (matrixABuilder_ == null) {
         matrixA_ = builderForValue.build();
       } else {
@@ -531,11 +531,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>.org.jscience.computing.remote.MatrixData matrix_a = 1;</code>
      */
-    public Builder mergeMatrixA(org.jscience.computing.remote.grpc.MatrixData value) {
+    public Builder mergeMatrixA(org.jscience.distributed.grpc.MatrixData value) {
       if (matrixABuilder_ == null) {
         if (((bitField0_ & 0x00000001) != 0) &&
           matrixA_ != null &&
-          matrixA_ != org.jscience.computing.remote.grpc.MatrixData.getDefaultInstance()) {
+          matrixA_ != org.jscience.distributed.grpc.MatrixData.getDefaultInstance()) {
           getMatrixABuilder().mergeFrom(value);
         } else {
           matrixA_ = value;
@@ -565,7 +565,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>.org.jscience.computing.remote.MatrixData matrix_a = 1;</code>
      */
-    public org.jscience.computing.remote.grpc.MatrixData.Builder getMatrixABuilder() {
+    public org.jscience.distributed.grpc.MatrixData.Builder getMatrixABuilder() {
       bitField0_ |= 0x00000001;
       onChanged();
       return getMatrixAFieldBuilder().getBuilder();
@@ -573,23 +573,23 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>.org.jscience.computing.remote.MatrixData matrix_a = 1;</code>
      */
-    public org.jscience.computing.remote.grpc.MatrixDataOrBuilder getMatrixAOrBuilder() {
+    public org.jscience.distributed.grpc.MatrixDataOrBuilder getMatrixAOrBuilder() {
       if (matrixABuilder_ != null) {
         return matrixABuilder_.getMessageOrBuilder();
       } else {
         return matrixA_ == null ?
-            org.jscience.computing.remote.grpc.MatrixData.getDefaultInstance() : matrixA_;
+            org.jscience.distributed.grpc.MatrixData.getDefaultInstance() : matrixA_;
       }
     }
     /**
      * <code>.org.jscience.computing.remote.MatrixData matrix_a = 1;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        org.jscience.computing.remote.grpc.MatrixData, org.jscience.computing.remote.grpc.MatrixData.Builder, org.jscience.computing.remote.grpc.MatrixDataOrBuilder> 
+        org.jscience.distributed.grpc.MatrixData, org.jscience.distributed.grpc.MatrixData.Builder, org.jscience.distributed.grpc.MatrixDataOrBuilder> 
         getMatrixAFieldBuilder() {
       if (matrixABuilder_ == null) {
         matrixABuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            org.jscience.computing.remote.grpc.MatrixData, org.jscience.computing.remote.grpc.MatrixData.Builder, org.jscience.computing.remote.grpc.MatrixDataOrBuilder>(
+            org.jscience.distributed.grpc.MatrixData, org.jscience.distributed.grpc.MatrixData.Builder, org.jscience.distributed.grpc.MatrixDataOrBuilder>(
                 getMatrixA(),
                 getParentForChildren(),
                 isClean());
@@ -598,9 +598,9 @@ private static final long serialVersionUID = 0L;
       return matrixABuilder_;
     }
 
-    private org.jscience.computing.remote.grpc.MatrixData matrixB_;
+    private org.jscience.distributed.grpc.MatrixData matrixB_;
     private com.google.protobuf.SingleFieldBuilderV3<
-        org.jscience.computing.remote.grpc.MatrixData, org.jscience.computing.remote.grpc.MatrixData.Builder, org.jscience.computing.remote.grpc.MatrixDataOrBuilder> matrixBBuilder_;
+        org.jscience.distributed.grpc.MatrixData, org.jscience.distributed.grpc.MatrixData.Builder, org.jscience.distributed.grpc.MatrixDataOrBuilder> matrixBBuilder_;
     /**
      * <code>.org.jscience.computing.remote.MatrixData matrix_b = 2;</code>
      * @return Whether the matrixB field is set.
@@ -612,9 +612,9 @@ private static final long serialVersionUID = 0L;
      * <code>.org.jscience.computing.remote.MatrixData matrix_b = 2;</code>
      * @return The matrixB.
      */
-    public org.jscience.computing.remote.grpc.MatrixData getMatrixB() {
+    public org.jscience.distributed.grpc.MatrixData getMatrixB() {
       if (matrixBBuilder_ == null) {
-        return matrixB_ == null ? org.jscience.computing.remote.grpc.MatrixData.getDefaultInstance() : matrixB_;
+        return matrixB_ == null ? org.jscience.distributed.grpc.MatrixData.getDefaultInstance() : matrixB_;
       } else {
         return matrixBBuilder_.getMessage();
       }
@@ -622,7 +622,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>.org.jscience.computing.remote.MatrixData matrix_b = 2;</code>
      */
-    public Builder setMatrixB(org.jscience.computing.remote.grpc.MatrixData value) {
+    public Builder setMatrixB(org.jscience.distributed.grpc.MatrixData value) {
       if (matrixBBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -639,7 +639,7 @@ private static final long serialVersionUID = 0L;
      * <code>.org.jscience.computing.remote.MatrixData matrix_b = 2;</code>
      */
     public Builder setMatrixB(
-        org.jscience.computing.remote.grpc.MatrixData.Builder builderForValue) {
+        org.jscience.distributed.grpc.MatrixData.Builder builderForValue) {
       if (matrixBBuilder_ == null) {
         matrixB_ = builderForValue.build();
       } else {
@@ -652,11 +652,11 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>.org.jscience.computing.remote.MatrixData matrix_b = 2;</code>
      */
-    public Builder mergeMatrixB(org.jscience.computing.remote.grpc.MatrixData value) {
+    public Builder mergeMatrixB(org.jscience.distributed.grpc.MatrixData value) {
       if (matrixBBuilder_ == null) {
         if (((bitField0_ & 0x00000002) != 0) &&
           matrixB_ != null &&
-          matrixB_ != org.jscience.computing.remote.grpc.MatrixData.getDefaultInstance()) {
+          matrixB_ != org.jscience.distributed.grpc.MatrixData.getDefaultInstance()) {
           getMatrixBBuilder().mergeFrom(value);
         } else {
           matrixB_ = value;
@@ -686,7 +686,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>.org.jscience.computing.remote.MatrixData matrix_b = 2;</code>
      */
-    public org.jscience.computing.remote.grpc.MatrixData.Builder getMatrixBBuilder() {
+    public org.jscience.distributed.grpc.MatrixData.Builder getMatrixBBuilder() {
       bitField0_ |= 0x00000002;
       onChanged();
       return getMatrixBFieldBuilder().getBuilder();
@@ -694,23 +694,23 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>.org.jscience.computing.remote.MatrixData matrix_b = 2;</code>
      */
-    public org.jscience.computing.remote.grpc.MatrixDataOrBuilder getMatrixBOrBuilder() {
+    public org.jscience.distributed.grpc.MatrixDataOrBuilder getMatrixBOrBuilder() {
       if (matrixBBuilder_ != null) {
         return matrixBBuilder_.getMessageOrBuilder();
       } else {
         return matrixB_ == null ?
-            org.jscience.computing.remote.grpc.MatrixData.getDefaultInstance() : matrixB_;
+            org.jscience.distributed.grpc.MatrixData.getDefaultInstance() : matrixB_;
       }
     }
     /**
      * <code>.org.jscience.computing.remote.MatrixData matrix_b = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        org.jscience.computing.remote.grpc.MatrixData, org.jscience.computing.remote.grpc.MatrixData.Builder, org.jscience.computing.remote.grpc.MatrixDataOrBuilder> 
+        org.jscience.distributed.grpc.MatrixData, org.jscience.distributed.grpc.MatrixData.Builder, org.jscience.distributed.grpc.MatrixDataOrBuilder> 
         getMatrixBFieldBuilder() {
       if (matrixBBuilder_ == null) {
         matrixBBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            org.jscience.computing.remote.grpc.MatrixData, org.jscience.computing.remote.grpc.MatrixData.Builder, org.jscience.computing.remote.grpc.MatrixDataOrBuilder>(
+            org.jscience.distributed.grpc.MatrixData, org.jscience.distributed.grpc.MatrixData.Builder, org.jscience.distributed.grpc.MatrixDataOrBuilder>(
                 getMatrixB(),
                 getParentForChildren(),
                 isClean());
@@ -735,12 +735,12 @@ private static final long serialVersionUID = 0L;
   }
 
   // @@protoc_insertion_point(class_scope:org.jscience.computing.remote.MatrixRequest)
-  private static final org.jscience.computing.remote.grpc.MatrixRequest DEFAULT_INSTANCE;
+  private static final org.jscience.distributed.grpc.MatrixRequest DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new org.jscience.computing.remote.grpc.MatrixRequest();
+    DEFAULT_INSTANCE = new org.jscience.distributed.grpc.MatrixRequest();
   }
 
-  public static org.jscience.computing.remote.grpc.MatrixRequest getDefaultInstance() {
+  public static org.jscience.distributed.grpc.MatrixRequest getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
@@ -776,7 +776,7 @@ private static final long serialVersionUID = 0L;
   }
 
   @java.lang.Override
-  public org.jscience.computing.remote.grpc.MatrixRequest getDefaultInstanceForType() {
+  public org.jscience.distributed.grpc.MatrixRequest getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 

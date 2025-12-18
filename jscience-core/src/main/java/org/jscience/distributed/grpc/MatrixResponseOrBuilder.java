@@ -2,7 +2,7 @@
 // source: linear_algebra_service.proto
 
 // Protobuf Java Version: 3.25.1
-package org.jscience.computing.remote.grpc;
+package org.jscience.distributed.grpc;
 
 public interface MatrixResponseOrBuilder extends
     // @@protoc_insertion_point(interface_extends:org.jscience.computing.remote.MatrixResponse)
@@ -17,9 +17,9 @@ public interface MatrixResponseOrBuilder extends
    * <code>.org.jscience.computing.remote.MatrixData result = 1;</code>
    * @return The result.
    */
-  org.jscience.computing.remote.grpc.MatrixData getResult();
+  org.jscience.distributed.grpc.MatrixData getResult();
   /**
    * <code>.org.jscience.computing.remote.MatrixData result = 1;</code>
    */
-  org.jscience.computing.remote.grpc.MatrixDataOrBuilder getResultOrBuilder();
+  org.jscience.distributed.grpc.MatrixDataOrBuilder getResultOrBuilder();
 }

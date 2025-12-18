@@ -2,10 +2,10 @@ package org.jscience.mathematics.linearalgebra.backends;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import org.jscience.computing.remote.grpc.MatrixRequest;
-import org.jscience.computing.remote.grpc.MatrixResponse;
-import org.jscience.computing.remote.grpc.MatrixServiceGrpc;
-import org.jscience.computing.remote.grpc.MatrixData;
+import org.jscience.distributed.grpc.MatrixRequest;
+import org.jscience.distributed.grpc.MatrixResponse;
+import org.jscience.distributed.grpc.MatrixServiceGrpc;
+import org.jscience.distributed.grpc.MatrixData;
 
 import org.jscience.mathematics.linearalgebra.Matrix;
 import org.jscience.mathematics.linearalgebra.Vector;

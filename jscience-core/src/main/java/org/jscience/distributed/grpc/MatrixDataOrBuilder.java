@@ -2,7 +2,7 @@
 // source: linear_algebra_service.proto
 
 // Protobuf Java Version: 3.25.1
-package org.jscience.computing.remote.grpc;
+package org.jscience.distributed.grpc;
 
 public interface MatrixDataOrBuilder extends
     // @@protoc_insertion_point(interface_extends:org.jscience.computing.remote.MatrixData)

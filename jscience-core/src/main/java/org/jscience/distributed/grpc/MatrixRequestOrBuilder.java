@@ -2,7 +2,7 @@
 // source: linear_algebra_service.proto
 
 // Protobuf Java Version: 3.25.1
-package org.jscience.computing.remote.grpc;
+package org.jscience.distributed.grpc;
 
 public interface MatrixRequestOrBuilder extends
     // @@protoc_insertion_point(interface_extends:org.jscience.computing.remote.MatrixRequest)
@@ -17,11 +17,11 @@ public interface MatrixRequestOrBuilder extends
    * <code>.org.jscience.computing.remote.MatrixData matrix_a = 1;</code>
    * @return The matrixA.
    */
-  org.jscience.computing.remote.grpc.MatrixData getMatrixA();
+  org.jscience.distributed.grpc.MatrixData getMatrixA();
   /**
    * <code>.org.jscience.computing.remote.MatrixData matrix_a = 1;</code>
    */
-  org.jscience.computing.remote.grpc.MatrixDataOrBuilder getMatrixAOrBuilder();
+  org.jscience.distributed.grpc.MatrixDataOrBuilder getMatrixAOrBuilder();
 
   /**
    * <code>.org.jscience.computing.remote.MatrixData matrix_b = 2;</code>
@@ -32,9 +32,9 @@ public interface MatrixRequestOrBuilder extends
    * <code>.org.jscience.computing.remote.MatrixData matrix_b = 2;</code>
    * @return The matrixB.
    */
-  org.jscience.computing.remote.grpc.MatrixData getMatrixB();
+  org.jscience.distributed.grpc.MatrixData getMatrixB();
   /**
    * <code>.org.jscience.computing.remote.MatrixData matrix_b = 2;</code>
    */
-  org.jscience.computing.remote.grpc.MatrixDataOrBuilder getMatrixBOrBuilder();
+  org.jscience.distributed.grpc.MatrixDataOrBuilder getMatrixBOrBuilder();
 }

@@ -1,4 +1,4 @@
-package org.jscience.computing.remote.grpc;
+package org.jscience.distributed.grpc;
 
 import static io.grpc.MethodDescriptor.generateFullMethodName;
 
@@ -15,29 +15,29 @@ public final class MatrixServiceGrpc {
   public static final java.lang.String SERVICE_NAME = "org.jscience.computing.remote.MatrixService";
 
   // Static method descriptors that strictly reflect the proto.
-  private static volatile io.grpc.MethodDescriptor<org.jscience.computing.remote.grpc.MatrixRequest,
-      org.jscience.computing.remote.grpc.MatrixResponse> getMatrixMultiplyMethod;
+  private static volatile io.grpc.MethodDescriptor<org.jscience.distributed.grpc.MatrixRequest,
+      org.jscience.distributed.grpc.MatrixResponse> getMatrixMultiplyMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "MatrixMultiply",
-      requestType = org.jscience.computing.remote.grpc.MatrixRequest.class,
-      responseType = org.jscience.computing.remote.grpc.MatrixResponse.class,
+      requestType = org.jscience.distributed.grpc.MatrixRequest.class,
+      responseType = org.jscience.distributed.grpc.MatrixResponse.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
-  public static io.grpc.MethodDescriptor<org.jscience.computing.remote.grpc.MatrixRequest,
-      org.jscience.computing.remote.grpc.MatrixResponse> getMatrixMultiplyMethod() {
-    io.grpc.MethodDescriptor<org.jscience.computing.remote.grpc.MatrixRequest, org.jscience.computing.remote.grpc.MatrixResponse> getMatrixMultiplyMethod;
+  public static io.grpc.MethodDescriptor<org.jscience.distributed.grpc.MatrixRequest,
+      org.jscience.distributed.grpc.MatrixResponse> getMatrixMultiplyMethod() {
+    io.grpc.MethodDescriptor<org.jscience.distributed.grpc.MatrixRequest, org.jscience.distributed.grpc.MatrixResponse> getMatrixMultiplyMethod;
     if ((getMatrixMultiplyMethod = MatrixServiceGrpc.getMatrixMultiplyMethod) == null) {
       synchronized (MatrixServiceGrpc.class) {
         if ((getMatrixMultiplyMethod = MatrixServiceGrpc.getMatrixMultiplyMethod) == null) {
           MatrixServiceGrpc.getMatrixMultiplyMethod = getMatrixMultiplyMethod =
-              io.grpc.MethodDescriptor.<org.jscience.computing.remote.grpc.MatrixRequest, org.jscience.computing.remote.grpc.MatrixResponse>newBuilder()
+              io.grpc.MethodDescriptor.<org.jscience.distributed.grpc.MatrixRequest, org.jscience.distributed.grpc.MatrixResponse>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(SERVICE_NAME, "MatrixMultiply"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  org.jscience.computing.remote.grpc.MatrixRequest.getDefaultInstance()))
+                  org.jscience.distributed.grpc.MatrixRequest.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  org.jscience.computing.remote.grpc.MatrixResponse.getDefaultInstance()))
+                  org.jscience.distributed.grpc.MatrixResponse.getDefaultInstance()))
               .setSchemaDescriptor(new MatrixServiceMethodDescriptorSupplier("MatrixMultiply"))
               .build();
         }
@@ -96,8 +96,8 @@ public final class MatrixServiceGrpc {
 
     /**
      */
-    default void matrixMultiply(org.jscience.computing.remote.grpc.MatrixRequest request,
-        io.grpc.stub.StreamObserver<org.jscience.computing.remote.grpc.MatrixResponse> responseObserver) {
+    default void matrixMultiply(org.jscience.distributed.grpc.MatrixRequest request,
+        io.grpc.stub.StreamObserver<org.jscience.distributed.grpc.MatrixResponse> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getMatrixMultiplyMethod(), responseObserver);
     }
   }
@@ -131,8 +131,8 @@ public final class MatrixServiceGrpc {
 
     /**
      */
-    public void matrixMultiply(org.jscience.computing.remote.grpc.MatrixRequest request,
-        io.grpc.stub.StreamObserver<org.jscience.computing.remote.grpc.MatrixResponse> responseObserver) {
+    public void matrixMultiply(org.jscience.distributed.grpc.MatrixRequest request,
+        io.grpc.stub.StreamObserver<org.jscience.distributed.grpc.MatrixResponse> responseObserver) {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getMatrixMultiplyMethod(), getCallOptions()), request, responseObserver);
     }
@@ -156,7 +156,7 @@ public final class MatrixServiceGrpc {
 
     /**
      */
-    public org.jscience.computing.remote.grpc.MatrixResponse matrixMultiply(org.jscience.computing.remote.grpc.MatrixRequest request) {
+    public org.jscience.distributed.grpc.MatrixResponse matrixMultiply(org.jscience.distributed.grpc.MatrixRequest request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getMatrixMultiplyMethod(), getCallOptions(), request);
     }
@@ -180,8 +180,8 @@ public final class MatrixServiceGrpc {
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<org.jscience.computing.remote.grpc.MatrixResponse> matrixMultiply(
-        org.jscience.computing.remote.grpc.MatrixRequest request) {
+    public com.google.common.util.concurrent.ListenableFuture<org.jscience.distributed.grpc.MatrixResponse> matrixMultiply(
+        org.jscience.distributed.grpc.MatrixRequest request) {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getMatrixMultiplyMethod(), getCallOptions()), request);
     }
@@ -207,8 +207,8 @@ public final class MatrixServiceGrpc {
     public void invoke(Req request, io.grpc.stub.StreamObserver<Resp> responseObserver) {
       switch (methodId) {
         case METHODID_MATRIX_MULTIPLY:
-          serviceImpl.matrixMultiply((org.jscience.computing.remote.grpc.MatrixRequest) request,
-              (io.grpc.stub.StreamObserver<org.jscience.computing.remote.grpc.MatrixResponse>) responseObserver);
+          serviceImpl.matrixMultiply((org.jscience.distributed.grpc.MatrixRequest) request,
+              (io.grpc.stub.StreamObserver<org.jscience.distributed.grpc.MatrixResponse>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -232,8 +232,8 @@ public final class MatrixServiceGrpc {
           getMatrixMultiplyMethod(),
           io.grpc.stub.ServerCalls.asyncUnaryCall(
             new MethodHandlers<
-              org.jscience.computing.remote.grpc.MatrixRequest,
-              org.jscience.computing.remote.grpc.MatrixResponse>(
+              org.jscience.distributed.grpc.MatrixRequest,
+              org.jscience.distributed.grpc.MatrixResponse>(
                 service, METHODID_MATRIX_MULTIPLY)))
         .build();
   }
@@ -244,7 +244,7 @@ public final class MatrixServiceGrpc {
 
     @java.lang.Override
     public com.google.protobuf.Descriptors.FileDescriptor getFileDescriptor() {
-      return org.jscience.computing.remote.grpc.LinearAlgebraServiceProto.getDescriptor();
+      return org.jscience.distributed.grpc.LinearAlgebraServiceProto.getDescriptor();
     }
 
     @java.lang.Override
