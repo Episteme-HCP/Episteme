@@ -51,13 +51,13 @@ public class IdealGas implements ThermodynamicState {
     public IdealGas(Real moles, Real temperatureK, Real volumeM3) {
         this(moles.doubleValue(),
                 Quantities.create(temperatureK.doubleValue(), Units.KELVIN),
-                Quantities.create(volumeM3.doubleValue(), Units.CUBIC_METRE));
+                Quantities.create(volumeM3.doubleValue(), Units.CUBIC_METER));
     }
 
     private void calculatePressure() {
         // P = nRT / V
         double T = temperature.getValue(Units.KELVIN).doubleValue();
-        double V = volume.getValue(Units.CUBIC_METRE).doubleValue();
+        double V = volume.getValue(Units.CUBIC_METER).doubleValue();
         double P = amountOfSubstance * R * T / V;
         this.pressure = Quantities.create(P, Units.PASCAL);
     }
@@ -67,7 +67,7 @@ public class IdealGas implements ThermodynamicState {
         double T = temperature.getValue(Units.KELVIN).doubleValue();
         double P = pressure.getValue(Units.PASCAL).doubleValue();
         double V = amountOfSubstance * R * T / P;
-        this.volume = Quantities.create(V, Units.CUBIC_METRE);
+        this.volume = Quantities.create(V, Units.CUBIC_METER);
     }
 
     // --- State Accessors ---
@@ -98,7 +98,7 @@ public class IdealGas implements ThermodynamicState {
     @Override
     public Quantity<Energy> getEntropy() {
         // S = nR ln(V) (simplified relative entropy)
-        double V = volume.getValue(Units.CUBIC_METRE).doubleValue();
+        double V = volume.getValue(Units.CUBIC_METER).doubleValue();
         double S = amountOfSubstance * R * Math.log(V);
         return Quantities.create(S, Units.JOULE); // J/K approximated as Joule
     }
@@ -108,7 +108,7 @@ public class IdealGas implements ThermodynamicState {
         // H = U + PV
         double U = getInternalEnergy().getValue(Units.JOULE).doubleValue();
         double P = pressure.getValue(Units.PASCAL).doubleValue();
-        double V = volume.getValue(Units.CUBIC_METRE).doubleValue();
+        double V = volume.getValue(Units.CUBIC_METER).doubleValue();
         double H = U + P * V;
         return Quantities.create(H, Units.JOULE);
     }
