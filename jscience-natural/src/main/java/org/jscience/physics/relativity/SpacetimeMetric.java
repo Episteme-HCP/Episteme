@@ -43,20 +43,10 @@ public interface SpacetimeMetric extends MetricSpace<Vector4D> {
      * @return the Christoffel symbols tensor
      */
     default Tensor<Real> getChristoffelSymbols(Vector4D point) {
-        // Finite difference approximation for derivatives of Metric Tensor
-        // Gamma^L_mn = 0.5 * g^Lr * (d_m g_nr + d_n g_mr - d_r g_mn)
-
-        double epsilon = 1e-6;
-        Tensor<Real> g = getMetricTensor(point);
-        // Inverse metric g^uv is needed.
-        // Assuming Tensor class has inverse() or linear solver.
-        // If not, we throw exception but a more specific one.
-
-        // Check if Tensor supports inverse
-        // For this generic Stub fix, we return a zero tensor if not implemented, to
-        // just 'fix' the crash?
-        // No, user wants correct implementation.
-
+        // Christoffel symbols: Gamma^L_mn = 0.5 * g^Lr * (d_m g_nr + d_n g_mr - d_r
+        // g_mn)
+        // Requires: metric tensor inverse and partial derivatives via finite
+        // differences
         throw new UnsupportedOperationException(
                 "Symbolic/Finite-diff calculation requires Tensor inversion and partial derivatives - Pending implementation of Tensor Analysis module");
     }
