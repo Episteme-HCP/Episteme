@@ -23,101 +23,53 @@
 package org.jscience.mathematics.statistics;
 
 import org.jscience.mathematics.numbers.real.Real;
-
-import org.jscience.mathematics.statistics.distributions.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Test suite for statistical distributions.
- * 
- * @author Silvere Martin-Michiellot
- * @since 2.0
- */
 public class DistributionsTest {
 
-    @SuppressWarnings("unused")
-    private static final Real TOLERANCE = Real.of(1e-6); // Reserved for future assertions
-
     @Test
-    public void testNormalDistribution() {
-        NormalDistribution normal = new NormalDistribution(Real.ZERO, Real.ONE);
+    public void testNormalPdf() {
+        Real x = Real.of(0.0);
+        Real mean = Real.of(0.0);
+        Real stdDev = Real.of(1.0);
 
-        // Test mean
-        assertEquals(0.0, normal.mean().doubleValue(), 1e-10);
-
-        // Test variance
-        assertEquals(1.0, normal.variance().doubleValue(), 1e-10);
-
-        // Test density at mean (should be 1/sqrt(2π))
-        Real densityAtMean = normal.density(Real.ZERO);
-        double expected = 1.0 / Math.sqrt(2 * Math.PI);
-        assertEquals(expected, densityAtMean.doubleValue(), 1e-6);
+        // 1/sqrt(2pi) approx 0.39894
+        Real pdf = Distributions.normalPdf(x, mean, stdDev);
+        assertEquals(0.39894228, pdf.doubleValue(), 1e-6);
     }
 
     @Test
-    public void testBinomialDistribution() {
-        BinomialDistribution binomial = new BinomialDistribution(10, Real.of(0.5));
+    public void testStandardNormalCdf() {
+        // CDF(0) should be 0.5
+        assertEquals(0.5, Distributions.standardNormalCdf(Real.ZERO).doubleValue(), 1e-9);
 
-        // Test mean: n*p = 10*0.5 = 5
-        assertEquals(5.0, binomial.mean().doubleValue(), 1e-10);
-
-        // Test variance: n*p*(1-p) = 10*0.5*0.5 = 2.5
-        assertEquals(2.5, binomial.variance().doubleValue(), 1e-10);
+        // CDF(1.96) approx 0.975
+        assertEquals(0.975, Distributions.standardNormalCdf(Real.of(1.96)).doubleValue(), 1e-3);
     }
 
     @Test
-    public void testExponentialDistribution() {
-        ExponentialDistribution exp = new ExponentialDistribution(Real.TWO);
-
-        // Test mean: 1/λ = 1/2 = 0.5
-        assertEquals(0.5, exp.mean().doubleValue(), 1e-10);
-
-        // Test variance: 1/λ² = 1/4 = 0.25
-        assertEquals(0.25, exp.variance().doubleValue(), 1e-10);
+    public void testPoissonPmf() {
+        Real lambda = Real.of(3.0);
+        // P(X=2) = 3^2 * e^-3 / 2! = 9 * 0.049787 / 2 = 0.22404
+        assertEquals(0.2240418, Distributions.poissonPmf(2, lambda).doubleValue(), 1e-5);
     }
 
     @Test
-    public void testPoissonDistribution() {
-        PoissonDistribution poisson = new PoissonDistribution(Real.of(3.0));
-
-        // Test mean: λ = 3
-        assertEquals(3.0, poisson.mean().doubleValue(), 1e-10);
-
-        // Test variance: λ = 3
-        assertEquals(3.0, poisson.variance().doubleValue(), 1e-10);
+    public void testExponentialCdf() {
+        Real lambda = Real.of(0.5);
+        Real x = Real.of(2.0);
+        // F(2) = 1 - e^(-0.5 * 2) = 1 - e^-1 = 1 - 0.367879 = 0.63212
+        assertEquals(0.63212056, Distributions.exponentialCdf(x, lambda).doubleValue(), 1e-5);
     }
 
     @Test
-    public void testUniformDistribution() {
-        UniformDistribution uniform = new UniformDistribution(Real.ZERO, Real.ONE);
-
-        // Test mean: (a+b)/2 = 0.5
-        assertEquals(0.5, uniform.mean().doubleValue(), 1e-10);
-
-        // Test variance: (b-a)²/12 = 1/12
-        assertEquals(1.0 / 12.0, uniform.variance().doubleValue(), 1e-10);
-    }
-
-    @Test
-    public void testGammaDistribution() {
-        GammaDistribution gamma = new GammaDistribution(Real.TWO, Real.TWO);
-
-        // Test mean: α/β = 2/2 = 1
-        assertEquals(1.0, gamma.mean().doubleValue(), 1e-10);
-
-        // Test variance: α/β² = 2/4 = 0.5
-        assertEquals(0.5, gamma.variance().doubleValue(), 1e-10);
-    }
-
-    @Test
-    public void testChiSquareDistribution() {
-        ChiSquareDistribution chiSq = new ChiSquareDistribution(5);
-
-        // Test mean: k = 5
-        assertEquals(5.0, chiSq.mean().doubleValue(), 1e-10);
-
-        // Test variance: 2k = 10
-        assertEquals(10.0, chiSq.variance().doubleValue(), 1e-10);
+    public void testBinomialCoefficient() {
+        // C(5, 2) = 10
+        assertEquals(10.0, Distributions.binomialCoefficient(5, 2).doubleValue(), 1e-9);
+        // C(10, 0) = 1
+        assertEquals(1.0, Distributions.binomialCoefficient(10, 0).doubleValue(), 1e-9);
+        // C(10, 10) = 1
+        assertEquals(1.0, Distributions.binomialCoefficient(10, 10).doubleValue(), 1e-9);
     }
 }
