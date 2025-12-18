@@ -1,13 +1,27 @@
 package org.jscience.biology.ecology;
 
 /**
- * Population dynamics models.
+ * Population dynamics models for ecology.
+ * <p>
+ * Provides:
+ * <ul>
+ * <li>Exponential growth</li>
+ * <li>Logistic growth (Verhulst equation)</li>
+ * <li>Lotka-Volterra predator-prey model</li>
+ * <li>Competition models</li>
+ * </ul>
+ * </p>
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI
- * @since 5.0
+ * @since 2.0
  */
 public class PopulationDynamics {
+
+    private PopulationDynamics() {
+    }
+
+    // === Exponential Growth ===
 
     /**
      * Exponential growth model (Malthusian).
@@ -23,8 +37,25 @@ public class PopulationDynamics {
     }
 
     /**
+     * Exponential growth rate calculation.
+     * r = ln(Nt/N0) / t
+     */
+    public static double calculateGrowthRate(double n0, double nt, double time) {
+        return Math.log(nt / n0) / time;
+    }
+
+    /**
+     * Doubling time for exponential growth.
+     * td = ln(2) / r
+     */
+    public static double doublingTime(double growthRate) {
+        return Math.log(2) / growthRate;
+    }
+
+    // === Logistic Growth ===
+
+    /**
      * Logistic growth model.
-     * dP/dt = rP(1 - P/K)
      * P(t) = K / (1 + ((K - P0)/P0) * e^(-rt))
      * 
      * @param p0 Initial population
@@ -36,6 +67,24 @@ public class PopulationDynamics {
     public static double logisticGrowth(double p0, double r, double K, double t) {
         return K / (1 + ((K - p0) / p0) * Math.exp(-r * t));
     }
+
+    /**
+     * Logistic growth rate at population N.
+     * dN/dt = rN(1 - N/K)
+     */
+    public static double logisticGrowthRate(double n, double k, double r) {
+        return r * n * (1 - n / k);
+    }
+
+    /**
+     * Inflection point of logistic curve (maximum growth rate).
+     * Occurs at N = K/2
+     */
+    public static double inflectionPoint(double k) {
+        return k / 2;
+    }
+
+    // === Lotka-Volterra Predator-Prey ===
 
     /**
      * Solving Lotka-Volterra predator-prey equations using Euler method.
@@ -78,5 +127,51 @@ public class PopulationDynamics {
         }
 
         return result;
+    }
+
+    /**
+     * Lotka-Volterra equilibrium - prey population.
+     * N* = gamma/delta
+     */
+    public static double preyEquilibrium(double gamma, double delta) {
+        return gamma / delta;
+    }
+
+    /**
+     * Lotka-Volterra equilibrium - predator population.
+     * P* = alpha/beta
+     */
+    public static double predatorEquilibrium(double alpha, double beta) {
+        return alpha / beta;
+    }
+
+    // === Competition ===
+
+    /**
+     * Competitive exclusion - Lotka-Volterra competition.
+     * dN1/dt = r1*N1 * (K1 - N1 - alpha12*N2) / K1
+     * 
+     * @param n1      species 1 population
+     * @param n2      species 2 population
+     * @param r1      growth rate of species 1
+     * @param k1      carrying capacity of species 1
+     * @param alpha12 competition coefficient (effect of N2 on N1)
+     * @return growth rate of species 1
+     */
+    public static double competitionGrowthRate(double n1, double n2, double r1, double k1, double alpha12) {
+        return r1 * n1 * (k1 - n1 - alpha12 * n2) / k1;
+    }
+
+    /**
+     * Allee effect - reduced growth at low density.
+     * dN/dt = rN(N/A - 1)(1 - N/K)
+     * 
+     * @param n population
+     * @param r growth rate
+     * @param a Allee threshold
+     * @param k carrying capacity
+     */
+    public static double alleeEffectGrowthRate(double n, double r, double a, double k) {
+        return r * n * (n / a - 1) * (1 - n / k);
     }
 }
