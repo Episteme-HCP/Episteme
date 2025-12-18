@@ -83,7 +83,7 @@
 
 ### Biology
 
-- [ ] PopulationDynamics - Logistic growth, Lotka-Volterra
+- [x] PopulationDynamics - Logistic growth, Lotka-Volterra
 - [ ] GeneticAlgorithm - Evolution simulation
 - [ ] SequenceAlignment - Needleman-Wunsch, BLAST-like
 - [ ] PhylogeneticTree - Distance matrix, UPGMA
@@ -92,14 +92,14 @@
 ### Earth Science
 
 - [ ] PlateMotion - GPS velocity vectors
-- [ ] SeismicWaveTravel - P/S wave arrival times
+- [x] SeismicWaveTravel - P/S wave arrival times, Magnitude, Energy
 - [ ] AtmosphericPressure - Barometric formula
 - [ ] TidalPrediction - Harmonic analysis
 - [ ] GeodeticDistance - Vincenty/Haversine formulas
 
 ### Engineering
 
-- [ ] CircuitSolver - Ohm's law, Kirchhoff's rules
+- [x] CircuitSolver - Ohm's law, Kirchhoff's rules, Impedance
 - [ ] BeamDeflection - Euler-Bernoulli beam theory
 - [ ] HeatTransfer - Conduction, convection, radiation
 - [ ] FluidFlow - Bernoulli, Reynolds number
@@ -107,7 +107,7 @@
 
 ### Medicine
 
-- [ ] Pharmacokinetics - ADME models, half-life
+- [x] Pharmacokinetics - ADME models, half-life, dosing
 - [ ] BMI/BSA calculators with Quantity
 - [ ] ECG analysis basics
 - [ ] DoseCalculator - Weight-based dosing
