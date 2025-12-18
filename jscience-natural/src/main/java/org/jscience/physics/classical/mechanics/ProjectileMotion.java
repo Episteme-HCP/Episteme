@@ -22,13 +22,11 @@
  */
 package org.jscience.physics.classical.mechanics;
 
-import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Length;
 import org.jscience.measure.quantity.Time;
-import org.jscience.measure.quantity.Velocity;
 
 /**
  * Projectile motion calculator with air resistance options.
