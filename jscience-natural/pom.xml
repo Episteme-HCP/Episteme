@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.jscience</groupId>
+        <artifactId>jscience-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>jscience-natural</artifactId>
+    <packaging>jar</packaging>
+
+    <name>JScience Natural</name>
+    <description>JScience Natural Sciences - Physics, Chemistry, Biology, Earth, Medicine, Computing</description>
+
+    <dependencies>
+        <!-- Core module -->
+        <dependency>
+            <groupId>org.jscience</groupId>
+            <artifactId>jscience-core</artifactId>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>**/*.jpg</exclude>
+                    <exclude>**/*.png</exclude>
+                    <exclude>**/*.tif</exclude>
+                    <exclude>**/*.tiff</exclude>
+                    <exclude>**/*.obj</exclude>
+                    <exclude>**/*.gltf</exclude>
+                    <exclude>**/*.glb</exclude>
+                    <exclude>**/*.bin</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>**/*.jpg</include>
+                    <include>**/*.png</include>
+                    <include>**/*.tif</include>
+                    <include>**/*.tiff</include>
+                    <include>**/*.obj</include>
+                    <include>**/*.gltf</include>
+                    <include>**/*.glb</include>
+                    <include>**/*.bin</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
