@@ -18,6 +18,7 @@ public class NeuralNetwork {
     private double[][] biases;
     private double learningRate;
     private final Random random;
+    private ActivationFunction activationFunction = ActivationFunction.SIGMOID;
 
     /**
      * Creates an MLP with specified layer sizes.
@@ -83,7 +84,7 @@ public class NeuralNetwork {
                 for (int k = 0; k < layerSizes[layer]; k++) {
                     sum += weights[layer][j][k] * neurons[layer][k];
                 }
-                neurons[layer + 1][j] = sigmoid(sum);
+                neurons[layer + 1][j] = activationFunction.apply(sum);
             }
         }
 
@@ -114,7 +115,7 @@ public class NeuralNetwork {
         for (int j = 0; j < layerSizes[numLayers - 1]; j++) {
             double error = target[j] - output[j];
             mse += error * error;
-            deltas[numLayers - 1][j] = error * sigmoidDerivative(output[j]);
+            deltas[numLayers - 1][j] = error * activationFunction.derivative(output[j]);
         }
         mse /= target.length;
 
@@ -125,7 +126,7 @@ public class NeuralNetwork {
                 for (int k = 0; k < layerSizes[layer + 1]; k++) {
                     error += deltas[layer + 1][k] * weights[layer][k][j];
                 }
-                deltas[layer][j] = error * sigmoidDerivative(neurons[layer][j]);
+                deltas[layer][j] = error * activationFunction.derivative(neurons[layer][j]);
             }
         }
 
@@ -162,16 +163,24 @@ public class NeuralNetwork {
         return mse;
     }
 
-    private double sigmoid(double x) {
+    public static double sigmoid(double x) {
         return 1.0 / (1.0 + Math.exp(-x));
     }
 
-    private double sigmoidDerivative(double y) {
+    public static double sigmoidDerivative(double y) {
         return y * (1.0 - y);
     }
 
     public void setLearningRate(double rate) {
         this.learningRate = rate;
+    }
+
+    public void setActivationFunction(ActivationFunction activation) {
+        this.activationFunction = activation;
+    }
+
+    public ActivationFunction getActivationFunction() {
+        return activationFunction;
     }
 
     public int[] getLayerSizes() {

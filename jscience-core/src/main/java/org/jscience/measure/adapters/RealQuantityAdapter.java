@@ -1,8 +1,8 @@
 package org.jscience.measure.adapters;
 
-import javax.measure.Quantity;
-import javax.measure.Unit;
-import tech.units.indriya.quantity.Quantities;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Unit;
+import org.jscience.measure.Quantities;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
@@ -32,7 +32,7 @@ public final class RealQuantityAdapter {
      * @return the equivalent Quantity
      */
     public static <Q extends Quantity<Q>> Quantity<Q> toQuantity(Real value, Unit<Q> unit) {
-        return Quantities.getQuantity(value.doubleValue(), unit);
+        return Quantities.create(value.doubleValue(), unit);
     }
 
     /**

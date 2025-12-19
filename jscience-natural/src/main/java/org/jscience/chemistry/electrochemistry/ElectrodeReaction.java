@@ -32,6 +32,12 @@ public class ElectrodeReaction {
      * E = E° - (RT/nF) * ln(Q)
      */
     public double calculatePotential(double temperature, int n, double reactionQuotientQ) {
-        return NernstEquation.cellPotential(standardPotential, n, reactionQuotientQ, temperature);
+        org.jscience.measure.Quantity<org.jscience.measure.quantity.ElectricPotential> e0 = org.jscience.measure.Quantities
+                .create(standardPotential, org.jscience.measure.Units.VOLT);
+        org.jscience.measure.Quantity<org.jscience.measure.quantity.Temperature> t = org.jscience.measure.Quantities
+                .create(temperature, org.jscience.measure.Units.KELVIN);
+
+        return NernstEquation.calculatePotential(e0, t, n, reactionQuotientQ)
+                .to(org.jscience.measure.Units.VOLT).getValue().doubleValue();
     }
 }

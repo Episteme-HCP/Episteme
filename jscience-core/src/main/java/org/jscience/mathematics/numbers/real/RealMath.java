@@ -46,7 +46,7 @@ public class RealMath {
      */
     public static Real erf(Real x) {
         // Use double approximation for now, but wrapped in Real for API consistency
-        // TODO: Implement high-precision Erf for BigDecimal mode
+        // Note: High-precision Erf for BigDecimal mode not yet implemented
         return Real.of(erf(x.doubleValue()));
     }
 

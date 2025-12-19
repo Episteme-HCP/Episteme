@@ -48,7 +48,7 @@ public class UnitConversionTest {
         // Test manual affine unit creation
         Unit<Temperature> kelvin = Units.KELVIN;
 
-        Unit<Temperature> celsius = (Unit<Temperature>) ((StandardUnit<Temperature>) kelvin).add(-273.15);
+        Unit<Temperature> celsius = (Unit<Temperature>) ((StandardUnit<Temperature>) kelvin).add(273.15);
 
         Real kVal = Real.of(273.15);
         // 273.15 K -> 0 C

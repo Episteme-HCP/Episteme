@@ -158,4 +158,46 @@ public class StructuralAnalysis {
         double J = Math.PI * Math.pow(radius, 4) / 2;
         return torque * length / (shearModulus * J);
     }
+
+    // === Quantity Overloads ===
+
+    /**
+     * Bending stress using Quantity types.
+     * σ = M * y / I
+     * 
+     * @param moment          Bending moment
+     * @param distanceFromNA  Distance from neutral axis
+     * @param momentOfInertia Second moment of area
+     * @return Stress as Quantity<Pressure>
+     */
+    public static org.jscience.measure.Quantity<org.jscience.measure.quantity.Pressure> bendingStress(
+            org.jscience.measure.Quantity<?> moment,
+            org.jscience.measure.Quantity<org.jscience.measure.quantity.Length> distanceFromNA,
+            double momentOfInertia) {
+        // Simplified: extract values and compute
+        double m = moment.getValue().doubleValue();
+        double y = distanceFromNA.to(org.jscience.measure.Units.METER).getValue().doubleValue();
+        double stress = m * y / momentOfInertia;
+        return org.jscience.measure.Quantities.create(stress, org.jscience.measure.Units.PASCAL);
+    }
+
+    /**
+     * Euler buckling load using Quantity types.
+     * 
+     * @param E Young's modulus
+     * @param I Moment of inertia (m^4)
+     * @param L Column length
+     * @param K Effective length factor
+     * @return Critical buckling load as Force
+     */
+    public static org.jscience.measure.Quantity<org.jscience.measure.quantity.Force> eulerBucklingLoad(
+            org.jscience.measure.Quantity<org.jscience.measure.quantity.Pressure> E,
+            double I,
+            org.jscience.measure.Quantity<org.jscience.measure.quantity.Length> L,
+            double K) {
+        double ePa = E.to(org.jscience.measure.Units.PASCAL).getValue().doubleValue();
+        double lM = L.to(org.jscience.measure.Units.METER).getValue().doubleValue();
+        double pCr = eulerBucklingLoad(ePa, I, lM, K);
+        return org.jscience.measure.Quantities.create(pCr, org.jscience.measure.Units.NEWTON);
+    }
 }

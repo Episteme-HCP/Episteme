@@ -183,6 +183,10 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             double val = r.doubleValue();
             return (E) org.jscience.mathematics.numbers.real.Real.of(Math.sqrt(val));
         }
+        if (dotProduct instanceof org.jscience.mathematics.numbers.real.RealDouble) {
+            org.jscience.mathematics.numbers.real.RealDouble rd = (org.jscience.mathematics.numbers.real.RealDouble) dotProduct;
+            return (E) org.jscience.mathematics.numbers.real.RealDouble.of(Math.sqrt(rd.doubleValue()));
+        }
         throw new UnsupportedOperationException("Norm not supported for field: " + field.getClass().getSimpleName());
     }
 
@@ -537,10 +541,27 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
 
         for (int col = 0; col < n; col++) {
             int pivotRow = col;
-            for (int i = col + 1; i < n; i++) {
-                if (!field.zero().equals(aug.get(i).get(col))) {
-                    pivotRow = i;
-                    break;
+            if (field instanceof org.jscience.mathematics.sets.Reals) {
+                // Partial Pivoting for Reals (Numerical Stability)
+                double maxVal = Math
+                        .abs(((org.jscience.mathematics.numbers.real.Real) aug.get(col).get(col)).doubleValue());
+                for (int i = col + 1; i < n; i++) {
+                    double val = Math
+                            .abs(((org.jscience.mathematics.numbers.real.Real) aug.get(i).get(col)).doubleValue());
+                    if (val > maxVal) {
+                        maxVal = val;
+                        pivotRow = i;
+                    }
+                }
+            } else {
+                // Fallback for generic fields: Swap if current is zero
+                if (field.zero().equals(aug.get(col).get(col))) {
+                    for (int i = col + 1; i < n; i++) {
+                        if (!field.zero().equals(aug.get(i).get(col))) {
+                            pivotRow = i;
+                            break;
+                        }
+                    }
                 }
             }
             if (pivotRow != col) {
@@ -565,11 +586,13 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 }
             }
         }
+
         List<E> res = new ArrayList<>();
         for (int i = 0; i < n; i++)
             res.add(aug.get(i).get(n));
         @SuppressWarnings("unchecked")
-        E[] resArray = (E[]) res.toArray();
+        E[] resArray = (E[]) res
+                .toArray();
         return new GenericVector<>(
                 new org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(resArray), this, field);
     }

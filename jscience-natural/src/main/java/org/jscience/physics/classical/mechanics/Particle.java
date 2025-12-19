@@ -9,9 +9,11 @@ import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Mass;
 import org.jscience.measure.quantity.Energy;
-
-import java.util.ArrayList;
+import org.jscience.measure.quantity.Length;
+import org.jscience.measure.quantity.Velocity;
+import org.jscience.measure.quantity.Acceleration;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * A particle in N-body simulation using Generic Linear Algebra.
@@ -170,5 +172,38 @@ public class Particle {
     @Override
     public String toString() {
         return String.format("Particle(m=%s, pos=%s)", mass, position);
+    }
+
+    // --- Quantity Convenience Methods ---
+
+    public Particle(Quantity<Length> x, Quantity<Length> y, Quantity<Length> z, Quantity<Mass> mass) {
+        this.mass = mass;
+        this.position = createVector(
+                x.to(Units.METER).getValue().doubleValue(),
+                y.to(Units.METER).getValue().doubleValue(),
+                z.to(Units.METER).getValue().doubleValue());
+        this.velocity = createVector(0, 0, 0);
+        this.acceleration = createVector(0, 0, 0);
+    }
+
+    public void setPosition(Quantity<Length> x, Quantity<Length> y, Quantity<Length> z) {
+        this.position = createVector(
+                x.to(Units.METER).getValue().doubleValue(),
+                y.to(Units.METER).getValue().doubleValue(),
+                z.to(Units.METER).getValue().doubleValue());
+    }
+
+    public void setVelocity(Quantity<Velocity> x, Quantity<Velocity> y, Quantity<Velocity> z) {
+        this.velocity = createVector(
+                x.to(Units.METERS_PER_SECOND).getValue().doubleValue(),
+                y.to(Units.METERS_PER_SECOND).getValue().doubleValue(),
+                z.to(Units.METERS_PER_SECOND).getValue().doubleValue());
+    }
+
+    public void setAcceleration(Quantity<Acceleration> x, Quantity<Acceleration> y, Quantity<Acceleration> z) {
+        this.acceleration = createVector(
+                x.to(Units.METERS_PER_SECOND_SQUARED).getValue().doubleValue(),
+                y.to(Units.METERS_PER_SECOND_SQUARED).getValue().doubleValue(),
+                z.to(Units.METERS_PER_SECOND_SQUARED).getValue().doubleValue());
     }
 }

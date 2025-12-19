@@ -196,4 +196,37 @@ public class SignalProcessing {
         }
         return noisy;
     }
+
+    /**
+     * Magnitude spectrum from DFT output.
+     */
+    public static double[] magnitudeSpectrum(double[] real, double[] imag) {
+        double[] magnitude = new double[real.length];
+        for (int i = 0; i < real.length; i++) {
+            magnitude[i] = Math.sqrt(real[i] * real[i] + imag[i] * imag[i]);
+        }
+        return magnitude;
+    }
+
+    /**
+     * Simple low-pass filter response check.
+     */
+    public static boolean lowPassFilter(double frequency, double cutoff) {
+        return frequency <= cutoff;
+    }
+
+    /**
+     * Peak-to-peak amplitude.
+     */
+    public static double peakToPeak(double[] signal) {
+        double min = Double.MAX_VALUE;
+        double max = Double.MIN_VALUE;
+        for (double v : signal) {
+            if (v < min)
+                min = v;
+            if (v > max)
+                max = v;
+        }
+        return max - min;
+    }
 }

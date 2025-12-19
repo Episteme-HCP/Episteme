@@ -30,7 +30,7 @@ public class ChemicalReaction {
     private Quantity<Energy> activationEnergy; // Ea
     private Quantity<Frequency> preExponentialFactor; // A (Arrhenius) - simplified unit inverse time
 
-    private ChemicalReaction(Map<String, Integer> reactants, Map<String, Integer> products, String equation) {
+    protected ChemicalReaction(Map<String, Integer> reactants, Map<String, Integer> products, String equation) {
         this.reactants = reactants;
         this.products = products;
         this.equation = equation;

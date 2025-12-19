@@ -202,7 +202,6 @@ public abstract class CircuitElement {
      */
     public void setNodeVoltage(int n, double voltage) {
         volts[n] = voltage;
-        calculateCurrent();
     }
 
     /**

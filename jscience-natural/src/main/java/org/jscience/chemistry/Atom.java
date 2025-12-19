@@ -29,9 +29,6 @@ public class Atom extends Particle {
         this.element = element;
         this.formalCharge = Quantities.create(0, Units.COULOMB);
         this.isotope = null;
-        // force initialized to zero vector of same dimension
-        // Since we don't know dimension easily from ZERO, we assume 3D or derive map
-        // For now, we assume 3D for Atoms usually
         this.force = position.multiply(Real.ZERO);
     }
 
@@ -43,22 +40,11 @@ public class Atom extends Particle {
         this.force = position.multiply(Real.ZERO);
     }
 
-    private static Real calculateMass(Element element, Isotope isotope) {
+    private static Quantity<Mass> calculateMass(Element element, Isotope isotope) {
         if (isotope != null) {
-            // Assuming Isotope has getMass() returning Quantity<Mass> or similar
-            try {
-                // If Isotope is updated to use Quantity:
-                // return
-                // Real.of(isotope.getMass().to(Units.KILOGRAM).getValue().doubleValue());
-
-                // Fallback for now if Isotope not updated:
-                return Real.of(isotope.getMass().getValue().doubleValue() * 1.66053906660e-27);
-            } catch (Exception e) {
-                return Real.ZERO;
-            }
+            return isotope.getMass();
         }
-        // element.getAtomicMass() now returns Quantity<Mass>
-        return Real.of(element.getAtomicMass().to(Units.KILOGRAM).getValue().doubleValue());
+        return element.getAtomicMass();
     }
 
     // --- Properties ---

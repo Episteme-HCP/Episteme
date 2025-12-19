@@ -1,10 +1,10 @@
 package org.jscience.chemistry.electrochemistry;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.ElectricCharge;
-import javax.measure.quantity.Mass;
-import tech.units.indriya.quantity.Quantities;
-import tech.units.indriya.unit.Units;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.quantity.ElectricCharge;
+import org.jscience.measure.quantity.Mass;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
 
 /**
  * Faraday's laws of electrolysis.
@@ -52,6 +52,6 @@ public class FaradayLaws {
         double q = charge.to(Units.COULOMB).getValue().doubleValue();
         double m = calculateMassDeposited(q, molarMassGramPerMol, valence);
         // m is in grams
-        return Quantities.getQuantity(m / 1000.0, Units.KILOGRAM);
+        return Quantities.create(m / 1000.0, Units.KILOGRAM);
     }
 }

@@ -1,5 +1,12 @@
 package org.jscience.biology.ecology;
 
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Dimensionless;
+import org.jscience.measure.quantity.Frequency;
+import org.jscience.measure.quantity.Time;
+
 /**
  * Population dynamics models for ecology.
  * <p>
@@ -19,6 +26,36 @@ package org.jscience.biology.ecology;
 public class PopulationDynamics {
 
     private PopulationDynamics() {
+    }
+
+    // === Quantity Overloads ===
+
+    /**
+     * Exponential growth model using Quantities.
+     * P(t) = P0 * e^(rt)
+     */
+    public static Quantity<Dimensionless> exponentialGrowth(Quantity<Dimensionless> p0, Quantity<Frequency> r,
+            Quantity<Time> t) {
+        double p0Val = p0.to(Units.ONE).getValue().doubleValue();
+        double rVal = r.to(Units.HERTZ).getValue().doubleValue(); // 1/s
+        double tVal = t.to(Units.SECOND).getValue().doubleValue(); // s
+        double result = exponentialGrowth(p0Val, rVal, tVal);
+        return Quantities.create(result, Units.ONE);
+    }
+
+    /**
+     * Logistic growth model using Quantities.
+     * P(t) = K / (1 + ((K - P0)/P0) * e^(-rt))
+     */
+    public static Quantity<Dimensionless> logisticGrowth(Quantity<Dimensionless> p0, Quantity<Frequency> r,
+            Quantity<Dimensionless> K, Quantity<Time> t) {
+        double p0Val = p0.to(Units.ONE).getValue().doubleValue();
+        double rVal = r.to(Units.HERTZ).getValue().doubleValue();
+        double kVal = K.to(Units.ONE).getValue().doubleValue();
+        double tVal = t.to(Units.SECOND).getValue().doubleValue();
+
+        double result = logisticGrowth(p0Val, rVal, kVal, tVal);
+        return Quantities.create(result, Units.ONE);
     }
 
     // === Exponential Growth ===

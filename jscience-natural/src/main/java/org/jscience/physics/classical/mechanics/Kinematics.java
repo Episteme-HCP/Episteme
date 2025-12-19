@@ -30,6 +30,11 @@ import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Mass;
 import org.jscience.measure.quantity.Energy;
+import org.jscience.measure.quantity.Length;
+import org.jscience.measure.quantity.Velocity;
+import org.jscience.measure.quantity.Acceleration;
+import org.jscience.measure.quantity.Time;
+import org.jscience.measure.quantity.Angle;
 
 /**
  * Classical kinematics - motion without considering forces.
@@ -197,5 +202,63 @@ public class Kinematics {
         // Use DenseVector via VectorFactory if possible, or just list
         return org.jscience.mathematics.linearalgebra.vectors.VectorFactory.<Real>create(
                 java.util.Arrays.asList(cx, cy, cz), Real.ZERO);
+    }
+
+    // --- Quantity Convenience Overloads ---
+
+    public static Quantity<Length> position(Quantity<Length> initialPos, Quantity<Velocity> initialVel,
+            Quantity<Acceleration> accel, Quantity<Time> time) {
+        Real x0 = Real.of(initialPos.to(Units.METER).getValue().doubleValue());
+        Real v0 = Real.of(initialVel.to(Units.METERS_PER_SECOND).getValue().doubleValue());
+        Real a = Real.of(accel.to(Units.METERS_PER_SECOND_SQUARED).getValue().doubleValue());
+        Real t = Real.of(time.to(Units.SECOND).getValue().doubleValue());
+
+        Real result = positionConstantAccel(x0, v0, a, t);
+        return Quantities.create(result.doubleValue(), Units.METER);
+    }
+
+    public static Quantity<Velocity> velocity(Quantity<Velocity> initialVel, Quantity<Acceleration> accel,
+            Quantity<Time> time) {
+        Real v0 = Real.of(initialVel.to(Units.METERS_PER_SECOND).getValue().doubleValue());
+        Real a = Real.of(accel.to(Units.METERS_PER_SECOND_SQUARED).getValue().doubleValue());
+        Real t = Real.of(time.to(Units.SECOND).getValue().doubleValue());
+
+        Real result = velocityConstantAccel(v0, a, t);
+        return Quantities.create(result.doubleValue(), Units.METERS_PER_SECOND);
+    }
+
+    public static Quantity<Energy> kineticEnergy(Quantity<Mass> mass, Quantity<Velocity> velocity) {
+        Real m = Real.of(mass.to(Units.KILOGRAM).getValue().doubleValue());
+        Real v = Real.of(velocity.to(Units.METERS_PER_SECOND).getValue().doubleValue());
+
+        // KE = 1/2 m v^2
+        Real ke = Real.of(0.5).multiply(m).multiply(v).multiply(v);
+        return Quantities.create(ke.doubleValue(), Units.JOULE);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Quantity<Length> projectileRange(Quantity<Velocity> initialSpeed, Quantity<Angle> launchAngle,
+            Quantity<Acceleration> g) {
+        Real v = Real.of(initialSpeed.to(Units.METERS_PER_SECOND).getValue().doubleValue());
+        Real theta = Real
+                .of(launchAngle.to((org.jscience.measure.Unit<Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
+                        .getValue().doubleValue());
+        Real grav = Real.of(g.to(Units.METERS_PER_SECOND_SQUARED).getValue().doubleValue());
+
+        Real range = projectileRange(v, theta, grav);
+        return Quantities.create(range.doubleValue(), Units.METER);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Quantity<Length> projectileMaxHeight(Quantity<Velocity> initialSpeed, Quantity<Angle> launchAngle,
+            Quantity<Acceleration> g) {
+        Real v = Real.of(initialSpeed.to(Units.METERS_PER_SECOND).getValue().doubleValue());
+        Real theta = Real
+                .of(launchAngle.to((org.jscience.measure.Unit<Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
+                        .getValue().doubleValue());
+        Real grav = Real.of(g.to(Units.METERS_PER_SECOND_SQUARED).getValue().doubleValue());
+
+        Real h = projectileMaxHeight(v, theta, grav);
+        return Quantities.create(h.doubleValue(), Units.METER);
     }
 }

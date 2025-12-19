@@ -17,6 +17,7 @@
         <module>jscience-core</module>
         <module>jscience-natural</module>
         <module>jscience-social</module>
+        <module>jscience-benchmarks</module>
     </modules>
 
     <licenses>
@@ -168,6 +169,18 @@
                 <artifactId>ejml-all</artifactId>
                 <version>0.43</version>
             </dependency>
+            <!-- Colt (scientific computing) -->
+            <dependency>
+                <groupId>colt</groupId>
+                <artifactId>colt</artifactId>
+                <version>1.2.0</version>
+            </dependency>
+            <!-- JBlas (native BLAS) -->
+            <dependency>
+                <groupId>org.jblas</groupId>
+                <artifactId>jblas</artifactId>
+                <version>1.2.5</version>
+            </dependency>
 
             <!-- JFreeChart for Benchmark Graphs -->
             <dependency>
@@ -308,10 +321,21 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>3.6.3</version>
                     <configuration>
-                        <show>private</show>
+                        <show>protected</show>
                         <nohelp>true</nohelp>
                         <failOnError>false</failOnError>
                         <doclint>none</doclint>
+                        <!-- Frame-based layout for alphabetical navigation -->
+                        <notree>false</notree>
+                        <noindex>false</noindex>
+                        <splitindex>true</splitindex>
+                        <author>true</author>
+                        <version>true</version>
+                        <use>true</use>
+                        <windowtitle>JScience API Documentation</windowtitle>
+                        <doctitle>JScience - Scientific Computing for Java</doctitle>
+                        <header>&lt;b&gt;JScience ${project.version}&lt;/b&gt;</header>
+                        <footer>&lt;i&gt;Copyright © 2024 JScience Team&lt;/i&gt;</footer>
                         <additionalOptions>
                             <additionalOption>--add-modules</additionalOption>
                             <additionalOption>jdk.incubator.vector</additionalOption>

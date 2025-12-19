@@ -23,8 +23,7 @@
 package org.jscience.physics.nuclear;
 
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.measure.Quantity;
-import org.jscience.measure.quantity.Time;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -1,8 +1,8 @@
 package org.jscience.measure.units;
 
-import javax.measure.Unit;
-import javax.measure.quantity.*;
-import tech.units.indriya.unit.Units;
+import org.jscience.measure.Unit;
+import org.jscience.measure.quantity.*;
+import org.jscience.measure.Units;
 
 /**
  * JScience-specific units for scientific domains.
@@ -27,19 +27,19 @@ public final class JScienceUnits {
      * Light year - distance light travels in one Julian year.
      * Approximately 9.461 × 10^15 meters.
      */
-    public static final Unit<Length> LIGHT_YEAR = Units.METRE.multiply(9.4607304725808e15);
+    public static final Unit<Length> LIGHT_YEAR = Units.METER.multiply(9.4607304725808e15);
 
     /**
      * Parsec - parallax of one arcsecond.
      * Approximately 3.086 × 10^16 meters or 3.26 light-years.
      */
-    public static final Unit<Length> PARSEC = Units.METRE.multiply(3.0856775814913673e16);
+    public static final Unit<Length> PARSEC = Units.METER.multiply(3.0856775814913673e16);
 
     /**
      * Astronomical Unit - mean Earth-Sun distance.
      * Exactly 149,597,870,700 meters (IAU 2012 definition).
      */
-    public static final Unit<Length> ASTRONOMICAL_UNIT = Units.METRE.multiply(149597870700.0);
+    public static final Unit<Length> ASTRONOMICAL_UNIT = Units.METER.multiply(149597870700.0);
 
     // ========== Atomic Physics Units ==========
 
@@ -47,12 +47,12 @@ public final class JScienceUnits {
      * Bohr radius - characteristic radius of hydrogen atom ground state.
      * Approximately 5.292 × 10^-11 meters.
      */
-    public static final Unit<Length> BOHR = Units.METRE.multiply(5.29177210903e-11);
+    public static final Unit<Length> BOHR = Units.METER.multiply(5.29177210903e-11);
 
     /**
      * Angstrom - 10^-10 meters, commonly used for atomic-scale measurements.
      */
-    public static final Unit<Length> ANGSTROM = Units.METRE.multiply(1e-10);
+    public static final Unit<Length> ANGSTROM = Units.METER.multiply(1e-10);
 
     /**
      * Electron volt - energy gained by electron through 1V potential.

@@ -25,18 +25,20 @@ package org.jscience.medicine.pharmacology;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Frequency;
+import org.jscience.measure.quantity.Mass;
 import org.jscience.measure.quantity.Time;
+import org.jscience.measure.quantity.Volume;
 
 /**
  * Pharmacokinetics calculations for drug concentration modeling.
  * <p>
- * Provides one-compartment model calculations including:
+ * Provides one-compartment model calculations using type-safe Quantities:
  * <ul>
  * <li>First-order elimination</li>
  * <li>Half-life calculations</li>
  * <li>Steady-state concentrations</li>
- * <li>Loading dose calculations</li>
- * <li>Clearance and volume of distribution</li>
+ * <li>Loading/Maintenance dose calculations</li>
  * </ul>
  * </p>
  * 
@@ -46,18 +48,20 @@ import org.jscience.measure.quantity.Time;
  */
 public class Pharmacokinetics {
 
-    private final double ke; // Elimination rate constant (1/h)
-    private final double vd; // Volume of distribution (L)
+    private final Quantity<Frequency> ke; // Elimination rate constant
+    private final Quantity<Volume> vd; // Volume of distribution
     private final double bioavailability; // Fraction absorbed (0-1)
 
     /**
      * Creates pharmacokinetic model.
      * 
-     * @param eliminationRateConstant ke in 1/hour
-     * @param volumeOfDistribution    Vd in liters
+     * @param eliminationRateConstant ke (e.g., 0.1/h)
+     * @param volumeOfDistribution    Vd (e.g., 10 L)
      * @param bioavailability         F (0-1, typically 1 for IV)
      */
-    public Pharmacokinetics(double eliminationRateConstant, double volumeOfDistribution, double bioavailability) {
+    public Pharmacokinetics(Quantity<Frequency> eliminationRateConstant,
+            Quantity<Volume> volumeOfDistribution,
+            double bioavailability) {
         this.ke = eliminationRateConstant;
         this.vd = volumeOfDistribution;
         this.bioavailability = bioavailability;
@@ -66,9 +70,13 @@ public class Pharmacokinetics {
     /**
      * Creates model from half-life and volume.
      */
-    public static Pharmacokinetics fromHalfLife(double halfLifeHours, double volumeL, double bioavailability) {
-        double ke = Math.log(2) / halfLifeHours;
-        return new Pharmacokinetics(ke, volumeL, bioavailability);
+    public static Pharmacokinetics fromHalfLife(Quantity<Time> halfLife, Quantity<Volume> volume,
+            double bioavailability) {
+        // ke = ln(2) / t½
+        // Calculate value in 1/s (Hertz) then create Quantity
+        double keVal = Math.log(2) / halfLife.to(Units.SECOND).getValue().doubleValue();
+        Quantity<Frequency> ke = Quantities.create(keVal, Units.HERTZ);
+        return new Pharmacokinetics(ke, volume, bioavailability);
     }
 
     /**
@@ -76,138 +84,101 @@ public class Pharmacokinetics {
      * t½ = ln(2) / ke
      */
     public Quantity<Time> getHalfLife() {
-        double hours = Math.log(2) / ke;
-        return Quantities.create(hours * 3600, Units.SECOND);
+        double keVal = ke.to(Units.HERTZ).getValue().doubleValue();
+        return Quantities.create(Math.log(2) / keVal, Units.SECOND);
     }
 
     /**
      * Clearance.
      * CL = ke * Vd
-     * 
-     * @return clearance in L/h
+     * Returns Volume/Time (e.g. L/h) - Generic Quantity as no specific
+     * Dimension/Type for flow rate in standard set yet?
+     * Actually VolumetricFlowRate exists in some extensions, but generic Quantity
+     * is safe.
      */
-    public double getClearance() {
-        return ke * vd;
+    public Quantity<?> getClearance() {
+        return vd.multiply(ke);
     }
 
     /**
      * Plasma concentration after single IV bolus dose.
      * C(t) = (D / Vd) * e^(-ke*t)
-     * 
-     * @param doseAmount dose in mg
-     * @param timeHours  time since dose in hours
-     * @return concentration in mg/L
      */
-    public double concentrationAfterBolus(double doseAmount, double timeHours) {
-        double c0 = doseAmount / vd;
-        return c0 * Math.exp(-ke * timeHours);
+    public Quantity<?> concentrationAfterBolus(Quantity<Mass> dose, Quantity<Time> time) {
+        Quantity<?> c0 = dose.divide(vd); // Concentration
+        double exponent = -getDimensionlessExponent(ke, time);
+        return c0.multiply(Math.exp(exponent));
     }
 
     /**
      * Plasma concentration after oral dose.
-     * Includes absorption phase with ka.
      * C(t) = (F*D*ka / Vd*(ka-ke)) * (e^(-ke*t) - e^(-ka*t))
-     * 
-     * @param doseAmount     dose in mg
-     * @param timeHours      time since dose
-     * @param absorptionRate ka in 1/h
-     * @return concentration in mg/L
      */
-    public double concentrationAfterOral(double doseAmount, double timeHours, double absorptionRate) {
-        double ka = absorptionRate;
-        double factor = (bioavailability * doseAmount * ka) / (vd * (ka - ke));
-        return factor * (Math.exp(-ke * timeHours) - Math.exp(-ka * timeHours));
+    public Quantity<?> concentrationAfterOral(Quantity<Mass> dose, Quantity<Time> time,
+            Quantity<Frequency> absorptionRate) {
+        Quantity<Frequency> ka = absorptionRate;
+        // factor = (F * D * ka) / (Vd * (ka - ke))
+        // Dimensions: (1 * M * T^-1) / (L^3 * T^-1) = M/L^3 = Concentration
+
+        Quantity<?> numerator = dose.multiply(ka).multiply(bioavailability);
+        Quantity<?> denominator = vd.multiply(ka.subtract(ke));
+
+        Quantity<?> factor = numerator.divide(denominator);
+
+        double keT = getDimensionlessExponent(ke, time);
+        double kaT = getDimensionlessExponent(ka, time);
+
+        return factor.multiply(Math.exp(-keT) - Math.exp(-kaT));
     }
 
     /**
      * Time to peak concentration after oral dose.
      * tmax = ln(ka/ke) / (ka - ke)
      */
-    public double timeToPeak(double absorptionRate) {
-        double ka = absorptionRate;
-        return Math.log(ka / ke) / (ka - ke);
+    public Quantity<Time> timeToPeak(Quantity<Frequency> absorptionRate) {
+        Quantity<Frequency> ka = absorptionRate;
+        double kaVal = ka.to(Units.HERTZ).getValue().doubleValue();
+        double keVal = ke.to(Units.HERTZ).getValue().doubleValue();
+
+        if (Math.abs(kaVal - keVal) < 1e-15)
+            return Quantities.create(0, Units.SECOND); // Undefined if equal
+
+        double tMaxSeconds = Math.log(kaVal / keVal) / (kaVal - keVal);
+        return Quantities.create(tMaxSeconds, Units.SECOND);
     }
 
     /**
      * Steady-state average concentration with repeated dosing.
-     * Css,avg = (F*D) / (CL * τ)
-     * 
-     * @param doseAmount          dose per administration
-     * @param dosingIntervalHours τ (tau) - time between doses
-     * @return average steady-state concentration
+     * Css,avg = (F*D) / (Math.abs(CL) * τ)
+     * CL * tau -> Volume
+     * Dose / Volume -> Concentration
      */
-    public double steadyStateAverage(double doseAmount, double dosingIntervalHours) {
-        return (bioavailability * doseAmount) / (getClearance() * dosingIntervalHours);
+    public Quantity<?> steadyStateAverage(Quantity<Mass> dose, Quantity<Time> dosingInterval) {
+        Quantity<?> clearance = getClearance(); // L/s
+        Quantity<?> volCleared = clearance.multiply(dosingInterval); // L
+        return dose.multiply(bioavailability).divide(volCleared);
     }
 
     /**
-     * Steady-state peak concentration.
-     * Css,max = (F*D/Vd) / (1 - e^(-ke*τ))
-     */
-    public double steadyStatePeak(double doseAmount, double dosingIntervalHours) {
-        double numerator = bioavailability * doseAmount / vd;
-        double denominator = 1 - Math.exp(-ke * dosingIntervalHours);
-        return numerator / denominator;
-    }
-
-    /**
-     * Steady-state trough concentration.
-     * Css,min = Css,max * e^(-ke*τ)
-     */
-    public double steadyStateTrough(double doseAmount, double dosingIntervalHours) {
-        return steadyStatePeak(doseAmount, dosingIntervalHours) * Math.exp(-ke * dosingIntervalHours);
-    }
-
-    /**
-     * Loading dose to achieve target concentration immediately.
+     * Loading dose to achieve target concentration.
      * LD = Css * Vd / F
-     * 
-     * @param targetConcentration desired concentration (mg/L)
-     * @return loading dose in mg
+     * Css (Mass/Vol) * Vol -> Mass.
      */
-    public double loadingDose(double targetConcentration) {
-        return targetConcentration * vd / bioavailability;
+    public Quantity<Mass> loadingDose(Quantity<?> targetConcentration) {
+        // Check dimensions strictly? Or assume targetConcentration is M/L^3
+        return targetConcentration.multiply(vd).divide(bioavailability).asType(Mass.class);
     }
 
-    /**
-     * Maintenance dose to maintain steady state.
-     * MD = Css * CL * τ / F
-     */
-    public double maintenanceDose(double targetConcentration, double dosingIntervalHours) {
-        return targetConcentration * getClearance() * dosingIntervalHours / bioavailability;
+    // Helper
+    private double getDimensionlessExponent(Quantity<Frequency> rate, Quantity<Time> time) {
+        return rate.to(Units.HERTZ).getValue().doubleValue() * time.to(Units.SECOND).getValue().doubleValue();
     }
 
-    /**
-     * Time to reach fraction of steady state.
-     * t = -ln(1-f) / ke
-     * 
-     * @param fraction fraction of steady state (e.g., 0.9 for 90%)
-     * @return time in hours
-     */
-    public double timeToSteadyStateFraction(double fraction) {
-        return -Math.log(1 - fraction) / ke;
-    }
-
-    /**
-     * Number of half-lives to reach steady state (≈ 4-5).
-     */
-    public double halfLivesToSteadyState() {
-        return 4.32; // ~97% of steady state
-    }
-
-    /**
-     * Drug accumulation factor.
-     * R = 1 / (1 - e^(-ke*τ))
-     */
-    public double accumulationFactor(double dosingIntervalHours) {
-        return 1.0 / (1 - Math.exp(-ke * dosingIntervalHours));
-    }
-
-    public double getKe() {
+    public Quantity<Frequency> getKe() {
         return ke;
     }
 
-    public double getVd() {
+    public Quantity<Volume> getVd() {
         return vd;
     }
 
@@ -217,7 +188,6 @@ public class Pharmacokinetics {
 
     @Override
     public String toString() {
-        return String.format("Pharmacokinetics{ke=%.4f/h, Vd=%.1fL, F=%.2f, t½=%.1fh, CL=%.2fL/h}",
-                ke, vd, bioavailability, Math.log(2) / ke, getClearance());
+        return String.format("Pharmacokinetics{ke=%s, Vd=%s, F=%.2f}", ke, vd, bioavailability);
     }
 }

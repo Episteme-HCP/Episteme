@@ -184,7 +184,9 @@ public class CircuitTest {
 
         // Simulate for 0.1s (1 Tau)
         for (int i = 0; i < 100; i++) {
-            circuit.step();
+            if (!circuit.step()) {
+                fail("Step failed at iteration " + i + ": " + circuit.getStopMessage());
+            }
         }
 
         double expectedVoltage = 10.0 * (1.0 - Math.exp(-1.0)); // ~6.32V

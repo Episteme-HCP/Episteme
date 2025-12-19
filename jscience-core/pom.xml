@@ -56,15 +56,8 @@
             <artifactId>jmh-generator-annprocess</artifactId>
         </dependency>
 
-        <!-- Benchmark Comparison Libraries -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.ejml</groupId>
-            <artifactId>ejml-all</artifactId>
-        </dependency>
+
+
 
         <!-- JFreeChart for Benchmark Graphs -->
         <dependency>
@@ -156,6 +149,12 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- Web Server (Javalin) -->
+        <dependency>
+            <groupId>io.javalin</groupId>
+            <artifactId>javalin</artifactId>
         </dependency>
     </dependencies>
 

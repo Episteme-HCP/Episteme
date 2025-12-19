@@ -5,7 +5,7 @@ import org.jscience.mathematics.linearalgebra.matrices.storage.DenseMatrixStorag
 import org.jscience.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 import org.jscience.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage;
 import org.jscience.ComputeContext;
-import org.jscience.mathematics.linearalgebra.vectors.GenericVector;
+
 import org.jscience.mathematics.linearalgebra.Matrix;
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.structures.rings.Field;
@@ -230,11 +230,8 @@ public class GenericMatrix<E> implements Matrix<E> {
 
     @Override
     public Vector<E> multiply(Vector<E> vector) {
-        if (vector instanceof GenericVector) {
-            // return provider.multiply(this, (GenericVector<E>) vector);
-            // Provider needs to support Mat-Vec
-        }
-        throw new UnsupportedOperationException("Mat-Vec not fully wired");
+        // Delegate to provider which handles GenericVector natively or via interface
+        return provider.multiply(this, vector);
     }
 
     @Override

@@ -52,9 +52,9 @@ public class LebesgueIntegrationTest {
         // Integrate f(x, y) = x + y over [0, 1] x [0, 1]
         // Exact integral = 1
 
-        Vector<Real> lower = DenseVector.of(Arrays.asList(Real.ZERO, Real.ZERO),
+        Vector<Real> lower = new DenseVector<>(Arrays.asList(Real.ZERO, Real.ZERO),
                 org.jscience.mathematics.sets.Reals.getInstance());
-        Vector<Real> upper = DenseVector.of(Arrays.asList(Real.ONE, Real.ONE),
+        Vector<Real> upper = new DenseVector<>(Arrays.asList(Real.ONE, Real.ONE),
                 org.jscience.mathematics.sets.Reals.getInstance());
 
         Real result = LebesgueIntegration.monteCarlo(

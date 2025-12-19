@@ -7,34 +7,35 @@ package org.jscience.distributed.grpc;
 /**
  * Protobuf type {@code org.jscience.computing.remote.MatrixData}
  */
+@SuppressWarnings("all")
 public final class MatrixData extends
     com.google.protobuf.GeneratedMessageV3 implements
     // @@protoc_insertion_point(message_implements:org.jscience.computing.remote.MatrixData)
     MatrixDataOrBuilder {
-private static final long serialVersionUID = 0L;
+  private static final long serialVersionUID = 0L;
+
   // Use MatrixData.newBuilder() to construct.
   private MatrixData(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
     super(builder);
   }
+
   private MatrixData() {
     data_ = emptyDoubleList();
   }
 
   @java.lang.Override
-  @SuppressWarnings({"unused"})
+  @SuppressWarnings({ "unused" })
   protected java.lang.Object newInstance(
       UnusedPrivateParameter unused) {
     return new MatrixData();
   }
 
-  public static final com.google.protobuf.Descriptors.Descriptor
-      getDescriptor() {
+  public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
     return org.jscience.distributed.grpc.LinearAlgebraServiceProto.internal_static_org_jscience_computing_remote_MatrixData_descriptor;
   }
 
   @java.lang.Override
-  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internalGetFieldAccessorTable() {
+  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable internalGetFieldAccessorTable() {
     return org.jscience.distributed.grpc.LinearAlgebraServiceProto.internal_static_org_jscience_computing_remote_MatrixData_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             org.jscience.distributed.grpc.MatrixData.class, org.jscience.distributed.grpc.MatrixData.Builder.class);
@@ -42,8 +43,10 @@ private static final long serialVersionUID = 0L;
 
   public static final int ROWS_FIELD_NUMBER = 1;
   private int rows_ = 0;
+
   /**
    * <code>int32 rows = 1;</code>
+   * 
    * @return The rows.
    */
   @java.lang.Override
@@ -53,8 +56,10 @@ private static final long serialVersionUID = 0L;
 
   public static final int COLS_FIELD_NUMBER = 2;
   private int cols_ = 0;
+
   /**
    * <code>int32 cols = 2;</code>
+   * 
    * @return The cols.
    */
   @java.lang.Override
@@ -64,52 +69,60 @@ private static final long serialVersionUID = 0L;
 
   public static final int DATA_FIELD_NUMBER = 3;
   @SuppressWarnings("serial")
-  private com.google.protobuf.Internal.DoubleList data_ =
-      emptyDoubleList();
+  private com.google.protobuf.Internal.DoubleList data_ = emptyDoubleList();
+
   /**
    * <pre>
    * Row-major order
    * </pre>
    *
    * <code>repeated double data = 3;</code>
+   * 
    * @return A list containing the data.
    */
   @java.lang.Override
-  public java.util.List<java.lang.Double>
-      getDataList() {
+  public java.util.List<java.lang.Double> getDataList() {
     return data_;
   }
+
   /**
    * <pre>
    * Row-major order
    * </pre>
    *
    * <code>repeated double data = 3;</code>
+   * 
    * @return The count of data.
    */
   public int getDataCount() {
     return data_.size();
   }
+
   /**
    * <pre>
    * Row-major order
    * </pre>
    *
    * <code>repeated double data = 3;</code>
+   * 
    * @param index The index of the element to return.
    * @return The data at the given index.
    */
   public double getData(int index) {
     return data_.getDouble(index);
   }
+
   private int dataMemoizedSerializedSize = -1;
 
   private byte memoizedIsInitialized = -1;
+
   @java.lang.Override
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized == 1)
+      return true;
+    if (isInitialized == 0)
+      return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -117,7 +130,7 @@ private static final long serialVersionUID = 0L;
 
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
-                      throws java.io.IOException {
+      throws java.io.IOException {
     getSerializedSize();
     if (rows_ != 0) {
       output.writeInt32(1, rows_);
@@ -138,16 +151,17 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public int getSerializedSize() {
     int size = memoizedSize;
-    if (size != -1) return size;
+    if (size != -1)
+      return size;
 
     size = 0;
     if (rows_ != 0) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(1, rows_);
+          .computeInt32Size(1, rows_);
     }
     if (cols_ != 0) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(2, cols_);
+          .computeInt32Size(2, cols_);
     }
     {
       int dataSize = 0;
@@ -168,20 +182,22 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public boolean equals(final java.lang.Object obj) {
     if (obj == this) {
-     return true;
+      return true;
     }
     if (!(obj instanceof org.jscience.distributed.grpc.MatrixData)) {
       return super.equals(obj);
     }
     org.jscience.distributed.grpc.MatrixData other = (org.jscience.distributed.grpc.MatrixData) obj;
 
-    if (getRows()
-        != other.getRows()) return false;
-    if (getCols()
-        != other.getCols()) return false;
+    if (getRows() != other.getRows())
+      return false;
+    if (getCols() != other.getCols())
+      return false;
     if (!getDataList()
-        .equals(other.getDataList())) return false;
-    if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+        .equals(other.getDataList()))
+      return false;
+    if (!getUnknownFields().equals(other.getUnknownFields()))
+      return false;
     return true;
   }
 
@@ -210,38 +226,45 @@ private static final long serialVersionUID = 0L;
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
+
   public static org.jscience.distributed.grpc.MatrixData parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
+
   public static org.jscience.distributed.grpc.MatrixData parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
+
   public static org.jscience.distributed.grpc.MatrixData parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
+
   public static org.jscience.distributed.grpc.MatrixData parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
+
   public static org.jscience.distributed.grpc.MatrixData parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
+
   public static org.jscience.distributed.grpc.MatrixData parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
+
   public static org.jscience.distributed.grpc.MatrixData parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -263,12 +286,14 @@ private static final long serialVersionUID = 0L;
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
+
   public static org.jscience.distributed.grpc.MatrixData parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
+
   public static org.jscience.distributed.grpc.MatrixData parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -278,17 +303,23 @@ private static final long serialVersionUID = 0L;
   }
 
   @java.lang.Override
-  public Builder newBuilderForType() { return newBuilder(); }
+  public Builder newBuilderForType() {
+    return newBuilder();
+  }
+
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
+
   public static Builder newBuilder(org.jscience.distributed.grpc.MatrixData prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
+
   @java.lang.Override
   public Builder toBuilder() {
     return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
+        ? new Builder()
+        : new Builder().mergeFrom(this);
   }
 
   @java.lang.Override
@@ -297,6 +328,7 @@ private static final long serialVersionUID = 0L;
     Builder builder = new Builder(parent);
     return builder;
   }
+
   /**
    * Protobuf type {@code org.jscience.computing.remote.MatrixData}
    */
@@ -304,14 +336,12 @@ private static final long serialVersionUID = 0L;
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
       // @@protoc_insertion_point(builder_implements:org.jscience.computing.remote.MatrixData)
       org.jscience.distributed.grpc.MatrixDataOrBuilder {
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
+    public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
       return org.jscience.distributed.grpc.LinearAlgebraServiceProto.internal_static_org_jscience_computing_remote_MatrixData_descriptor;
     }
 
     @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-        internalGetFieldAccessorTable() {
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable internalGetFieldAccessorTable() {
       return org.jscience.distributed.grpc.LinearAlgebraServiceProto.internal_static_org_jscience_computing_remote_MatrixData_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.jscience.distributed.grpc.MatrixData.class, org.jscience.distributed.grpc.MatrixData.Builder.class);
@@ -327,6 +357,7 @@ private static final long serialVersionUID = 0L;
       super(parent);
 
     }
+
     @java.lang.Override
     public Builder clear() {
       super.clear();
@@ -338,8 +369,7 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Descriptors.Descriptor
-        getDescriptorForType() {
+    public com.google.protobuf.Descriptors.Descriptor getDescriptorForType() {
       return org.jscience.distributed.grpc.LinearAlgebraServiceProto.internal_static_org_jscience_computing_remote_MatrixData_descriptor;
     }
 
@@ -360,7 +390,9 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public org.jscience.distributed.grpc.MatrixData buildPartial() {
       org.jscience.distributed.grpc.MatrixData result = new org.jscience.distributed.grpc.MatrixData(this);
-      if (bitField0_ != 0) { buildPartial0(result); }
+      if (bitField0_ != 0) {
+        buildPartial0(result);
+      }
       onBuilt();
       return result;
     }
@@ -383,38 +415,44 @@ private static final long serialVersionUID = 0L;
     public Builder clone() {
       return super.clone();
     }
+
     @java.lang.Override
     public Builder setField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
       return super.setField(field, value);
     }
+
     @java.lang.Override
     public Builder clearField(
         com.google.protobuf.Descriptors.FieldDescriptor field) {
       return super.clearField(field);
     }
+
     @java.lang.Override
     public Builder clearOneof(
         com.google.protobuf.Descriptors.OneofDescriptor oneof) {
       return super.clearOneof(oneof);
     }
+
     @java.lang.Override
     public Builder setRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         int index, java.lang.Object value) {
       return super.setRepeatedField(field, index, value);
     }
+
     @java.lang.Override
     public Builder addRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
       return super.addRepeatedField(field, value);
     }
+
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof org.jscience.distributed.grpc.MatrixData) {
-        return mergeFrom((org.jscience.distributed.grpc.MatrixData)other);
+        return mergeFrom((org.jscience.distributed.grpc.MatrixData) other);
       } else {
         super.mergeFrom(other);
         return this;
@@ -422,7 +460,8 @@ private static final long serialVersionUID = 0L;
     }
 
     public Builder mergeFrom(org.jscience.distributed.grpc.MatrixData other) {
-      if (other == org.jscience.distributed.grpc.MatrixData.getDefaultInstance()) return this;
+      if (other == org.jscience.distributed.grpc.MatrixData.getDefaultInstance())
+        return this;
       if (other.getRows() != 0) {
         setRows(other.getRows());
       }
@@ -508,19 +547,24 @@ private static final long serialVersionUID = 0L;
       } // finally
       return this;
     }
+
     private int bitField0_;
 
-    private int rows_ ;
+    private int rows_;
+
     /**
      * <code>int32 rows = 1;</code>
+     * 
      * @return The rows.
      */
     @java.lang.Override
     public int getRows() {
       return rows_;
     }
+
     /**
      * <code>int32 rows = 1;</code>
+     * 
      * @param value The rows to set.
      * @return This builder for chaining.
      */
@@ -531,8 +575,10 @@ private static final long serialVersionUID = 0L;
       onChanged();
       return this;
     }
+
     /**
      * <code>int32 rows = 1;</code>
+     * 
      * @return This builder for chaining.
      */
     public Builder clearRows() {
@@ -542,17 +588,21 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private int cols_ ;
+    private int cols_;
+
     /**
      * <code>int32 cols = 2;</code>
+     * 
      * @return The cols.
      */
     @java.lang.Override
     public int getCols() {
       return cols_;
     }
+
     /**
      * <code>int32 cols = 2;</code>
+     * 
      * @param value The cols to set.
      * @return This builder for chaining.
      */
@@ -563,8 +613,10 @@ private static final long serialVersionUID = 0L;
       onChanged();
       return this;
     }
+
     /**
      * <code>int32 cols = 2;</code>
+     * 
      * @return This builder for chaining.
      */
     public Builder clearCols() {
@@ -575,60 +627,69 @@ private static final long serialVersionUID = 0L;
     }
 
     private com.google.protobuf.Internal.DoubleList data_ = emptyDoubleList();
+
     private void ensureDataIsMutable() {
       if (!data_.isModifiable()) {
         data_ = makeMutableCopy(data_);
       }
       bitField0_ |= 0x00000004;
     }
+
     private void ensureDataIsMutable(int capacity) {
       if (!data_.isModifiable()) {
         data_ = makeMutableCopy(data_, capacity);
       }
       bitField0_ |= 0x00000004;
     }
+
     /**
      * <pre>
      * Row-major order
      * </pre>
      *
      * <code>repeated double data = 3;</code>
+     * 
      * @return A list containing the data.
      */
-    public java.util.List<java.lang.Double>
-        getDataList() {
+    public java.util.List<java.lang.Double> getDataList() {
       data_.makeImmutable();
       return data_;
     }
+
     /**
      * <pre>
      * Row-major order
      * </pre>
      *
      * <code>repeated double data = 3;</code>
+     * 
      * @return The count of data.
      */
     public int getDataCount() {
       return data_.size();
     }
+
     /**
      * <pre>
      * Row-major order
      * </pre>
      *
      * <code>repeated double data = 3;</code>
+     * 
      * @param index The index of the element to return.
      * @return The data at the given index.
      */
     public double getData(int index) {
       return data_.getDouble(index);
     }
+
     /**
      * <pre>
      * Row-major order
      * </pre>
      *
      * <code>repeated double data = 3;</code>
+     * 
      * @param index The index to set the value at.
      * @param value The data to set.
      * @return This builder for chaining.
@@ -642,12 +703,14 @@ private static final long serialVersionUID = 0L;
       onChanged();
       return this;
     }
+
     /**
      * <pre>
      * Row-major order
      * </pre>
      *
      * <code>repeated double data = 3;</code>
+     * 
      * @param value The data to add.
      * @return This builder for chaining.
      */
@@ -659,12 +722,14 @@ private static final long serialVersionUID = 0L;
       onChanged();
       return this;
     }
+
     /**
      * <pre>
      * Row-major order
      * </pre>
      *
      * <code>repeated double data = 3;</code>
+     * 
      * @param values The data to add.
      * @return This builder for chaining.
      */
@@ -677,12 +742,14 @@ private static final long serialVersionUID = 0L;
       onChanged();
       return this;
     }
+
     /**
      * <pre>
      * Row-major order
      * </pre>
      *
      * <code>repeated double data = 3;</code>
+     * 
      * @return This builder for chaining.
      */
     public Builder clearData() {
@@ -691,6 +758,7 @@ private static final long serialVersionUID = 0L;
       onChanged();
       return this;
     }
+
     @java.lang.Override
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -702,7 +770,6 @@ private static final long serialVersionUID = 0L;
         final com.google.protobuf.UnknownFieldSet unknownFields) {
       return super.mergeUnknownFields(unknownFields);
     }
-
 
     // @@protoc_insertion_point(builder_scope:org.jscience.computing.remote.MatrixData)
   }
@@ -717,8 +784,7 @@ private static final long serialVersionUID = 0L;
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<MatrixData>
-      PARSER = new com.google.protobuf.AbstractParser<MatrixData>() {
+  private static final com.google.protobuf.Parser<MatrixData> PARSER = new com.google.protobuf.AbstractParser<MatrixData>() {
     @java.lang.Override
     public MatrixData parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
@@ -754,4 +820,3 @@ private static final long serialVersionUID = 0L;
   }
 
 }
-

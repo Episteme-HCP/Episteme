@@ -22,6 +22,18 @@
  */
 package org.jscience.engineering.electrical;
 
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.ElectricPotential;
+import org.jscience.measure.quantity.ElectricCurrent;
+import org.jscience.measure.quantity.ElectricResistance;
+import org.jscience.measure.quantity.Power;
+import org.jscience.measure.quantity.ElectricCapacitance;
+import org.jscience.measure.quantity.Inductance;
+import org.jscience.measure.quantity.Time;
+import org.jscience.measure.quantity.Frequency;
+
 /**
  * Basic DC circuit calculations using Ohm's law and Kirchhoff's rules.
  * <p>
@@ -42,6 +54,38 @@ package org.jscience.engineering.electrical;
 public class CircuitAnalysis {
 
     private CircuitAnalysis() {
+    }
+
+    // === Quantity Overloads ===
+
+    public static Quantity<ElectricPotential> voltage(Quantity<ElectricCurrent> i, Quantity<ElectricResistance> r) {
+        return Quantities.create(voltage(i.to(Units.AMPERE).getValue().doubleValue(),
+                r.to(Units.OHM).getValue().doubleValue()), Units.VOLT);
+    }
+
+    public static Quantity<ElectricCurrent> current(Quantity<ElectricPotential> v, Quantity<ElectricResistance> r) {
+        return Quantities.create(current(v.to(Units.VOLT).getValue().doubleValue(),
+                r.to(Units.OHM).getValue().doubleValue()), Units.AMPERE);
+    }
+
+    public static Quantity<ElectricResistance> resistance(Quantity<ElectricPotential> v, Quantity<ElectricCurrent> i) {
+        return Quantities.create(resistance(v.to(Units.VOLT).getValue().doubleValue(),
+                i.to(Units.AMPERE).getValue().doubleValue()), Units.OHM);
+    }
+
+    public static Quantity<Power> power(Quantity<ElectricPotential> v, Quantity<ElectricCurrent> i) {
+        return Quantities.create(power(v.to(Units.VOLT).getValue().doubleValue(),
+                i.to(Units.AMPERE).getValue().doubleValue()), Units.WATT);
+    }
+
+    public static Quantity<Time> rcTimeConstant(Quantity<ElectricResistance> r, Quantity<ElectricCapacitance> c) {
+        return Quantities.create(rcTimeConstant(r.to(Units.OHM).getValue().doubleValue(),
+                c.to(Units.FARAD).getValue().doubleValue()), Units.SECOND);
+    }
+
+    public static Quantity<Frequency> resonantFrequency(Quantity<Inductance> l, Quantity<ElectricCapacitance> c) {
+        return Quantities.create(resonantFrequency(l.to(Units.HENRY).getValue().doubleValue(),
+                c.to(Units.FARAD).getValue().doubleValue()), Units.HERTZ);
     }
 
     // === Ohm's Law ===

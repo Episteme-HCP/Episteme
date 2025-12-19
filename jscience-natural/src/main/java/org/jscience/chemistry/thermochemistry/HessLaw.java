@@ -1,0 +1,64 @@
+package org.jscience.chemistry.thermochemistry;
+
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Energy;
+
+import java.util.Map;
+
+/**
+ * Thermochemistry calculations using Hess's Law.
+ * <p>
+ * Based on: G.H. Hess, "Thermochemische Untersuchungen", Annalen der Physik
+ * und Chemie, Vol. 50, pp. 385-404, 1840.
+ * </p>
+ * <p>
+ * Hess's Law states that the total enthalpy change of a reaction is
+ * independent of the pathway taken (path independence of state functions).
+ * </p>
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI
+ * @since 5.0
+ */
+public class HessLaw {
+
+    private HessLaw() {
+    }
+
+    /**
+     * Calculates the enthalpy of reaction using Hess's Law.
+     * ΔH_rxn = Σ(ΔHf products) - Σ(ΔHf reactants)
+     * 
+     * @param productEnthalpies  Map of product formula to (coefficient, ΔHf in
+     *                           kJ/mol)
+     * @param reactantEnthalpies Map of reactant formula to (coefficient, ΔHf in
+     *                           kJ/mol)
+     * @return Enthalpy of reaction in kJ/mol
+     */
+    public static Quantity<Energy> calculateEnthalpyOfReaction(
+            Map<String, double[]> productEnthalpies,
+            Map<String, double[]> reactantEnthalpies) {
+
+        double sumProducts = 0;
+        for (double[] coeffAndEnthalpy : productEnthalpies.values()) {
+            sumProducts += coeffAndEnthalpy[0] * coeffAndEnthalpy[1];
+        }
+
+        double sumReactants = 0;
+        for (double[] coeffAndEnthalpy : reactantEnthalpies.values()) {
+            sumReactants += coeffAndEnthalpy[0] * coeffAndEnthalpy[1];
+        }
+
+        double deltaH = sumProducts - sumReactants;
+        return Quantities.create(deltaH * 1000, Units.JOULE); // kJ -> J
+    }
+
+    /**
+     * Determines if reaction is exothermic or endothermic.
+     */
+    public static boolean isExothermic(Quantity<Energy> enthalpyOfReaction) {
+        return enthalpyOfReaction.to(Units.JOULE).getValue().doubleValue() < 0;
+    }
+}

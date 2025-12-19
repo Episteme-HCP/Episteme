@@ -9,7 +9,7 @@ import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Mass;
 import org.jscience.measure.quantity.AmountOfSubstance;
 
-import org.jscience.resources.chemistry.ChemistryDataLoader;
+import org.jscience.chemistry.loaders.ChemistryDataLoader;
 
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.vectors.DenseVector;

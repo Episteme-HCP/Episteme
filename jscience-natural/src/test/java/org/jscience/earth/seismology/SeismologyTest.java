@@ -24,9 +24,7 @@ package org.jscience.earth.seismology;
 
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
-import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Energy;
-import org.jscience.measure.quantity.Length;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

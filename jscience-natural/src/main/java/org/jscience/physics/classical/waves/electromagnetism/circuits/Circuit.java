@@ -266,6 +266,22 @@ public class Circuit {
             vscount += ce.getVoltageSourceCount();
         }
 
+        // DEBUG: Print Topology
+        System.out.println("--- Circuit Topology ---");
+        for (int i = 0; i < nodes.size(); i++) {
+            CircuitNode cn = nodes.get(i);
+            System.out.println("Node " + i + ": (" + cn.x + "," + cn.y + ") Internal=" + cn.internal + " Links="
+                    + cn.links.size());
+        }
+        for (CircuitElement ce : elements) {
+            System.out.print(ce.getClass().getSimpleName() + ": Nodes=[");
+            for (int j = 0; j < ce.getPostCount(); j++) {
+                System.out.print(ce.getNode(j) + (j < ce.getPostCount() - 1 ? "," : ""));
+            }
+            System.out.println("]");
+        }
+        System.out.println("------------------------");
+
         // Allocate voltage sources array
         voltageSources = new CircuitElement[vscount];
         vscount = 0;
@@ -403,6 +419,11 @@ public class Circuit {
                         voltageSources[ji].setCurrent(ji, res);
                     }
                 }
+            }
+
+            // Calculate current for all elements after voltages are updated
+            for (CircuitElement ce : elements) {
+                ce.calculateCurrent();
             }
 
             if (!circuitNonLinear) {
@@ -564,9 +585,16 @@ public class Circuit {
 
         // 2. Convert double[] b -> Vector<Real>
         List<Real> bList = new ArrayList<>(circuitMatrixSize);
+        System.out.println("--- Solver Input ---");
+        System.out.println("Size: " + circuitMatrixSize);
         for (int i = 0; i < circuitMatrixSize; i++) {
             bList.add(Real.of(circuitRightSide[i]));
+            System.out.print("Row " + i + " [ ");
+            for (int k = 0; k < circuitMatrixSize; k++)
+                System.out.print(circuitMatrix[i][k] + " ");
+            System.out.println("] = " + circuitRightSide[i]);
         }
+        System.out.println("--------------------");
         Vector<Real> b = new DenseVector<>(bList, org.jscience.mathematics.sets.Reals.getInstance());
 
         // 3. Solve using Provider

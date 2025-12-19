@@ -36,6 +36,8 @@ public class Inductor extends CircuitElement implements CircuitComponent {
     private final Real inductance;
     private Real currentPrev;
     private double compResistance; // Companion model resistance
+    private double voltageLast;
+    private double currentLast;
 
     public Inductor(double inductanceHenries) {
         super();
@@ -52,9 +54,9 @@ public class Inductor extends CircuitElement implements CircuitComponent {
     @Override
     public Real getCurrent(Real voltage, Real dt) {
         Real dI = voltage.divide(inductance).multiply(dt);
-        Real current = currentPrev.add(dI);
-        currentPrev = current;
-        return current;
+        Real c = currentPrev.add(dI);
+        currentPrev = c;
+        return c;
     }
 
     public Real getInductance() {
@@ -65,6 +67,14 @@ public class Inductor extends CircuitElement implements CircuitComponent {
     public void reset() {
         super.reset();
         currentPrev = Real.ZERO;
+        voltageLast = 0;
+        currentLast = 0;
+    }
+
+    @Override
+    public void startIteration() {
+        voltageLast = getVoltageDiff();
+        currentLast = current;
     }
 
     @Override
@@ -75,22 +85,27 @@ public class Inductor extends CircuitElement implements CircuitComponent {
             double dt = circuit.getTimeStep();
             compResistance = 2 * inductance.doubleValue() / dt;
             circuit.stampResistor(nodes[0], nodes[1], compResistance);
-            circuit.stampCurrentSource(nodes[0], nodes[1], current);
+            // Initial source stamp (J = i_n + v_n/R)
+            // At t=0, i=0, v=0 -> J=0.
         }
     }
 
     @Override
     public void doStep() {
         if (circuit != null) {
-            // double dt = circuit.getTimeStep();
-            double i = current + getVoltageDiff() / compResistance;
-            circuit.stampCurrentSource(nodes[0], nodes[1], i);
+            // J = i_n + v_n / R_eq
+            double curSourceValue = currentLast + voltageLast / compResistance;
+            circuit.stampCurrentSource(nodes[0], nodes[1], curSourceValue);
         }
     }
 
     @Override
     public void calculateCurrent() {
-        current = getVoltageDiff() / compResistance + current;
+        // i_{n+1} = v_{n+1}/R_eq + J
+        double vDiff = getVoltageDiff();
+        double j = currentLast + voltageLast / compResistance;
+        current = vDiff / compResistance + j;
+        // System.out.println("IND: V=" + vDiff + " I_new=" + current);
     }
 
     @Override

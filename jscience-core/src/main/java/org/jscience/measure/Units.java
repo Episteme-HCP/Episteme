@@ -287,6 +287,12 @@ public final class Units {
         public static final Unit<Inductance> HENRY = (Unit<Inductance>) KILOGRAM.multiply(METER).multiply(METER)
                         .divide(SECOND.multiply(SECOND).multiply(AMPERE).multiply(AMPERE));
 
+        /**
+         * Ohm: Ω (electric resistance). 1 Ω = 1 V/A
+         */
+        @SuppressWarnings("unchecked")
+        public static final Unit<ElectricResistance> OHM = (Unit<ElectricResistance>) VOLT.divide(AMPERE);
+
         // ========== IMPERIAL/US CUSTOMARY UNITS ==========
 
         /** Inch: 1 in = 0.0254 m (exactly) */
@@ -429,6 +435,9 @@ public final class Units {
                 UNIT_BY_SYMBOL.put("m^2", SQUARE_METER);
                 UNIT_BY_SYMBOL.put("m^3", CUBIC_METER);
                 UNIT_BY_SYMBOL.put("m/s^2", METERS_PER_SECOND_SQUARED);
+
+                UNIT_BY_SYMBOL.put("Ohm", OHM);
+                UNIT_BY_SYMBOL.put("Ω", OHM);
 
                 // Additional
                 UNIT_BY_SYMBOL.put("L", LITRE);

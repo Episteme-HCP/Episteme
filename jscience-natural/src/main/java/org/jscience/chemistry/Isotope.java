@@ -1,9 +1,10 @@
 package org.jscience.chemistry;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
-import tech.units.indriya.quantity.Quantities;
-import tech.units.indriya.unit.Units;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.quantity.Mass;
+import org.jscience.measure.quantity.Time;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
 
 /**
  * Represents a specific isotope of an element.
@@ -18,14 +19,14 @@ public class Isotope {
     private final int neutronCount;
     private final double massAMU; // Atomic Mass Units
     private final boolean radioactive;
-    private final Double halfLifeSeconds; // null if stable
+    private final Quantity<Time> halfLife; // null if stable
 
-    public Isotope(Element element, int neutronCount, double massAMU, boolean radioactive, Double halfLifeSeconds) {
+    public Isotope(Element element, int neutronCount, double massAMU, boolean radioactive, Quantity<Time> halfLife) {
         this.element = element;
         this.neutronCount = neutronCount;
         this.massAMU = massAMU;
         this.radioactive = radioactive;
-        this.halfLifeSeconds = halfLifeSeconds;
+        this.halfLife = halfLife;
     }
 
     public Element getElement() {
@@ -46,15 +47,15 @@ public class Isotope {
 
     public Quantity<Mass> getMass() {
         // 1 u = 1.66053906660e-27 kg
-        return Quantities.getQuantity(massAMU * 1.66053906660e-27, Units.KILOGRAM);
+        return Quantities.create(massAMU * 1.66053906660e-27, Units.KILOGRAM);
     }
 
     public boolean isStable() {
         return !radioactive;
     }
 
-    public Double getHalfLife() {
-        return halfLifeSeconds;
+    public Quantity<Time> getHalfLife() {
+        return halfLife;
     }
 
     @Override

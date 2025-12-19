@@ -32,7 +32,7 @@ public class MatrixFactoryTest {
         data.add(Arrays.asList(one, one));
 
         // Use explicit storage because size < 100 defaults to DENSE in AUTO mode
-        Matrix<Real> m = MatrixFactory.create(data, Reals.getInstance(), MatrixFactory.Storage.TRIANGULAR);
+        Matrix<Real> m = MatrixFactory.<Real>create(data, Reals.getInstance(), MatrixFactory.Storage.TRIANGULAR);
 
         assertTrue(m instanceof GenericMatrix, "Should be GenericMatrix");
         GenericMatrix<Real> gm = (GenericMatrix<Real>) m;
@@ -57,7 +57,7 @@ public class MatrixFactoryTest {
         data.add(Arrays.asList(zero, one, one));
 
         // Use explicit storage because size < 100 defaults to DENSE in AUTO mode
-        Matrix<Real> m = MatrixFactory.create(data, Reals.getInstance(), MatrixFactory.Storage.TRIDIAGONAL);
+        Matrix<Real> m = MatrixFactory.<Real>create(data, Reals.getInstance(), MatrixFactory.Storage.TRIDIAGONAL);
 
         GenericMatrix<Real> gm = (GenericMatrix<Real>) m;
         assertTrue(gm.getStorage() instanceof TridiagonalMatrixStorage, "Should be TridiagonalMatrixStorage");
@@ -89,7 +89,7 @@ public class MatrixFactoryTest {
         data.add(Arrays.asList(Real.ONE, Real.ZERO));
         data.add(Arrays.asList(Real.ONE, Real.ONE));
         // Use explicit storage to ensure TriangularStorage context
-        Matrix<Real> tri = MatrixFactory.create(data, Reals.getInstance(), MatrixFactory.Storage.TRIANGULAR);
+        Matrix<Real> tri = MatrixFactory.<Real>create(data, Reals.getInstance(), MatrixFactory.Storage.TRIANGULAR);
 
         // Multiply Triangular * Triangular
         // Logic in CPUDenseLinearAlgebraProvider.multiply(Matrix, Matrix)

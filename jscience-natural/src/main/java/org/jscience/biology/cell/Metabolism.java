@@ -1,9 +1,9 @@
 package org.jscience.biology.cell;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Energy;
-import tech.units.indriya.quantity.Quantities;
-import tech.units.indriya.unit.Units;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.quantity.Energy;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
 
 /**
  * Cellular metabolism models.
@@ -26,7 +26,7 @@ public class Metabolism {
      */
     public static Quantity<Energy> atpHydrolysisEnergy(double moles) {
         double energyKj = Math.abs(ATP_HYDROLYSIS_G) * moles;
-        return Quantities.getQuantity(energyKj * 1000, Units.JOULE);
+        return Quantities.create(energyKj * 1000, Units.JOULE);
     }
 
     /**
