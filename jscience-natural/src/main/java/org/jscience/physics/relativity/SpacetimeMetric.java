@@ -50,7 +50,6 @@ public interface SpacetimeMetric extends MetricSpace<Vector4D> {
      * should override with analytic expressions.
      * </p>
      */
-    @SuppressWarnings("unchecked")
     default Tensor<Real> getChristoffelSymbols(Vector4D point) {
         // Christoffel symbols of the second kind: Gamma^k_ij
         // gamma^k_ij = 0.5 * g^kl * (d_i g_jl + d_j g_il - d_l g_ij)

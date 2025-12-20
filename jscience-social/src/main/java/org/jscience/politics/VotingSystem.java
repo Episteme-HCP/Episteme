@@ -1,7 +1,6 @@
 package org.jscience.politics;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Algorithms for determining election winners.

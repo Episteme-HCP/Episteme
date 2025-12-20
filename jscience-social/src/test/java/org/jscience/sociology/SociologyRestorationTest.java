@@ -3,7 +3,6 @@ package org.jscience.sociology;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.jscience.geography.Place;
 import java.time.LocalDate;
 
 public class SociologyRestorationTest {

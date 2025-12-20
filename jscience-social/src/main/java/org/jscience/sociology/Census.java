@@ -1,6 +1,5 @@
 package org.jscience.sociology;
 
-import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -9,11 +8,9 @@ import java.util.*;
 public class Census {
 
     private final List<Person> population;
-    private final LocalDate censusDate;
 
     public Census(List<Person> population) {
         this.population = new ArrayList<>(population);
-        this.censusDate = LocalDate.now();
     }
 
     public int getTotalPopulation() {

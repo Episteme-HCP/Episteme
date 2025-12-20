@@ -3,23 +3,12 @@ package org.jscience.physics.classical.mechanics;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.jscience.measure.Quantity;
-import org.jscience.measure.quantity.Length;
-import org.jscience.measure.quantity.Mass;
-import org.jscience.measure.quantity.Velocity;
-import org.jscience.measure.quantity.Acceleration;
-
-import org.jscience.measure.Quantities;
-import org.jscience.measure.Units;
-
 import org.jscience.mathematics.numbers.real.Real;
 
 public class ParticleTest {
 
         @Test
         public void testParticleCreation() {
-                Quantity<Length> len = Quantities.create(10.0, Units.METER);
-                Quantity<Mass> mass = Quantities.create(1.0, Units.KILOGRAM);
 
                 // Particle now expects doubles in constructor as per previous refactor or I
                 // should update it to take Quantities?

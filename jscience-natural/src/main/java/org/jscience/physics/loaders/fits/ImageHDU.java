@@ -28,7 +28,6 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.ByteOrder;
 import org.jscience.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.mathematics.linearalgebra.matrices.RealDoubleMatrix;
-import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Header Data Unit representing an Image (N-dimensional array).
@@ -87,12 +86,10 @@ public class ImageHDU extends HDU {
         buffer.order(ByteOrder.BIG_ENDIAN);
 
         // Read fully
-        int read = 0;
         while (buffer.hasRemaining()) {
             int r = channel.read(buffer);
             if (r < 0)
                 throw new IOException("Unexpected EOF in ImageHDU data");
-            read += r;
         }
         buffer.flip();
 

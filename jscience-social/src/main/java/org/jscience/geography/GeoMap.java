@@ -10,7 +10,6 @@ import java.util.Set;
 public class GeoMap {
 
     private String name;
-    private double scale; // e.g. 1:50000 ? Or meters per pixel? Legacy used simple double.
     private double width; // in meters
     private double height; // in meters
     private Coordinate topLeftCoordinate;

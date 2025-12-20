@@ -255,7 +255,6 @@ public class PhylogeneticTree {
 
         while (active.size() > 2) {
             int r = active.size();
-            Real rReal = Real.of(r);
             Real factor = Real.of(r - 2);
 
             // Calculate row sums
@@ -290,12 +289,11 @@ public class PhylogeneticTree {
             // Calculate branch lengths
             Real dij = D[minI][minJ];
             // 0.5 * dij + (S[minI] - S[minJ]) / (2 * (r - 2))
-
             Real term1 = dij.divide(Real.TWO);
             Real term2 = S[minI].subtract(S[minJ]).divide(Real.TWO.multiply(factor));
 
             Real branchI = term1.add(term2);
-            Real branchJ = dij.subtract(branchI);
+            dij.subtract(branchI);
 
             // Create new node
             Node newNode = new Node("(" + nodes.get(minI).name + "," + nodes.get(minJ).name + ")",

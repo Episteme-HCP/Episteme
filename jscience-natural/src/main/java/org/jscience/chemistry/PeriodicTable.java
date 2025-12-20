@@ -5,13 +5,10 @@ import org.jscience.measure.Units;
 
 import org.jscience.measure.quantity.MassDensity;
 import org.jscience.measure.quantity.Mass;
-import org.jscience.measure.quantity.SpecificHeatCapacity;
-import org.jscience.measure.quantity.ThermalConductivity;
+import org.jscience.measure.quantity.Temperature;
 
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Unit;
-import org.jscience.measure.quantity.Length;
-import org.jscience.measure.quantity.Temperature;
 import org.jscience.util.SimpleJson;
 
 import java.io.InputStream;

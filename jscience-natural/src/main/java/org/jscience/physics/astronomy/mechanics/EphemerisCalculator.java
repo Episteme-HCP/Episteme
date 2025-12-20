@@ -199,10 +199,6 @@ public class EphemerisCalculator {
             public String name;
             public double a;
             public double e;
-            public double i;
-            public double omega;
-            public double Omega;
-            public double L0;
             public double n;
         }
     }
@@ -214,43 +210,84 @@ public class EphemerisCalculator {
      * @param jd     Julian Date
      * @return [longitude (deg), latitude (deg), distance (AU)]
      */
-    public static double[] heliocentricPosition(Planet planet, JulianDate jd) {
-
+    /**
+     * Calculates heliocentric position vector (in J2000 ecliptic frame).
+     * 
+     * @param planet Planet to calculate
+     * @param jd     Julian Date
+     * @return Vector<Real> [x, y, z] in AU
+     */
+    public static org.jscience.mathematics.linearalgebra.Vector<Real> heliocentricPositionVector(Planet planet,
+            JulianDate jd) {
         double d = jd.getValue() - JulianDate.J2000;
 
-        // Unpack values to primitive doubles for calculation
-        double L0 = planet.L0.to(org.jscience.measure.Units.DEGREE_ANGLE).getValue().doubleValue();
-        double n = planet.nVal.doubleValue(); // Already deg/day
+        // Extract elements using Real directly for OrbitalElements
+
+        double i = planet.i.to(org.jscience.measure.Units.DEGREE_ANGLE).getValue().doubleValue();
+        double Omega = planet.Omega.to(org.jscience.measure.Units.DEGREE_ANGLE).getValue().doubleValue();
         double omega = planet.omega.to(org.jscience.measure.Units.DEGREE_ANGLE).getValue().doubleValue();
-        double e = planet.e.doubleValue();
-        double a = planet.a.to(org.jscience.measure.Units.METER).getValue().doubleValue()
-                / PhysicalConstants.AU.doubleValue();
+        // L = Mean Longitude
+        double L0 = planet.L0.to(org.jscience.measure.Units.DEGREE_ANGLE).getValue().doubleValue();
+        double n = planet.nVal.doubleValue();
 
-        // Mean anomaly
-        double M = normalizeAngle(L0 + n * d - omega);
-        double Mr = Math.toRadians(M);
+        double currentL = normalizeAngle(L0 + n * d);
 
-        // Solve Kepler equation (simple iteration)
-        double E = Mr;
-        for (int iter = 0; iter < 10; iter++) {
-            E = Mr + e * Math.sin(E);
-        }
+        // M = L - varpi (approx) or M = L - (Omega + omega) if L is mean longitude
+        // Note: definitions vary. Assuming L is mean longitude.
+        // varpi = Omega + omega
+        double varpi = Omega + omega;
+        double M = normalizeAngle(currentL - varpi);
 
-        // True anomaly
-        double nu = 2 * Math.atan(Math.sqrt((1 + e) / (1 - e))
-                * Math.tan(E / 2));
+        // Standard Gravitational Parameter for Sun in AU^3/day^2 ?
+        // Or we use OrbitalElements which works in SI usually?
+        // OrbitalElements uses Real. If we pass SI units, we get SI output.
+        // Let's stick to SI for internal calculation in OrbitalElements, then convert
+        // to AU if needed.
 
-        // Distance
-        double r = a * (1 - e * Math.cos(E));
+        double muSI = 1.32712440018e20; // m^3/s^2 (Standard parameter for Sun)
+        // Adjust inputs to SI (Radians for angles)
 
-        // Heliocentric ecliptic longitude
-        double lon = Math.toDegrees(nu) + omega;
-        lon = normalizeAngle(lon);
+        Real aReal = planet.a.to(org.jscience.measure.Units.METER).getValue();
+        Real eReal = planet.e;
+        Real iReal = Real.of(Math.toRadians(i));
+        Real OmegaReal = Real.of(Math.toRadians(Omega));
+        Real omegaReal = Real.of(Math.toRadians(omega));
+        Real MReal = Real.of(Math.toRadians(M));
+        Real muReal = Real.of(muSI);
 
-        // Latitude (simplified - should include node and inclination)
-        double lat = 0; // Approximate for low-precision
+        org.jscience.physics.astronomy.OrbitalElements elem = new org.jscience.physics.astronomy.OrbitalElements(aReal,
+                eReal, iReal, OmegaReal, omegaReal, MReal, muReal);
 
-        return new double[] { lon, lat, r };
+        Object[] state = elem.toStateVector();
+        @SuppressWarnings("unchecked")
+        org.jscience.mathematics.linearalgebra.Vector<Real> posSI = (org.jscience.mathematics.linearalgebra.Vector<Real>) state[0];
+
+        // Convert Position from meters to AU for the return
+        double xAU = posSI.get(0).doubleValue() / PhysicalConstants.AU.doubleValue();
+        double yAU = posSI.get(1).doubleValue() / PhysicalConstants.AU.doubleValue();
+        double zAU = posSI.get(2).doubleValue() / PhysicalConstants.AU.doubleValue();
+
+        return org.jscience.mathematics.linearalgebra.vectors.DenseVector.of(
+                java.util.Arrays.asList(Real.of(xAU), Real.of(yAU), Real.of(zAU)),
+                org.jscience.mathematics.sets.Reals.getInstance());
+    }
+
+    /**
+     * Legacy support wrapper.
+     */
+    public static double[] heliocentricPosition(Planet planet, JulianDate jd) {
+        org.jscience.mathematics.linearalgebra.Vector<Real> vec = heliocentricPositionVector(planet, jd);
+        double x = vec.get(0).doubleValue();
+        double y = vec.get(1).doubleValue();
+        double z = vec.get(2).doubleValue();
+
+        // Convert back to simple spherical for compatibility?
+        // Or just return cartesian if usages allow?
+        // Original returned [lon, lat, r].
+        double r = Math.sqrt(x * x + y * y + z * z);
+        double lon = Math.toDegrees(Math.atan2(y, x));
+        double lat = Math.toDegrees(Math.asin(z / r));
+        return new double[] { normalizeAngle(lon), lat, r };
     }
 
     /**

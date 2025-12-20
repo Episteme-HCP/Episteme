@@ -5,8 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.jscience.geography.Place;
 import org.jscience.sociology.Person;
-import org.jscience.economics.Currency; // Correct import
-import javax.measure.Quantity;
+
 import java.time.LocalDate;
 
 public class EconomicsRestorationTest {

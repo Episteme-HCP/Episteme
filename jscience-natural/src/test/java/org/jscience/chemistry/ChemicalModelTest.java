@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
-import org.jscience.measure.quantity.Mass;
+
 import org.jscience.measure.quantity.AmountOfSubstance;
 
 import org.jscience.chemistry.loaders.ChemistryDataLoader;

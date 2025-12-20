@@ -1,8 +1,7 @@
 package org.jscience.ui.chemistry;
 
 import javafx.application.Application;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -12,12 +11,12 @@ import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
+
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Cylinder;
-import javafx.scene.shape.DrawMode;
+
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
@@ -160,7 +159,6 @@ public class MoleculeViewerDemo extends Application {
     }
 
     private void renderGraph(MolecularGraph graph) {
-        PhongMaterial bondMaterial = new PhongMaterial(Color.LIGHTGRAY);
 
         for (Atom atom : graph.getAtoms()) {
             Sphere sphere = new Sphere(getAtomRadius(atom));

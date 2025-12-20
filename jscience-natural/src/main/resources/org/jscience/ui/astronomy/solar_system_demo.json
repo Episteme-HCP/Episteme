@@ -1,0 +1,149 @@
+{
+    "name": "Solar System",
+    "stars": [
+        {
+            "name": "Sun",
+            "mass": 1.989e30,
+            "radius": 6.9634e8,
+            "texture": "/org/jscience/physics/astronomy/2k_sun.jpg",
+            "luminosity": 3.828e26,
+            "temperature": 5778,
+            "planets": [
+                {
+                    "name": "MERCURY",
+                    "mass": 3.3011e23,
+                    "radius": 2.4397e6,
+                    "texture": "/org/jscience/physics/astronomy/2k_mercury.jpg",
+                    "orbit": {
+                        "a": 5.7909e10,
+                        "e": 0.2056,
+                        "i": 7.00,
+                        "omega": 77.46,
+                        "Omega": 48.33,
+                        "M": 174.79
+                    }
+                },
+                {
+                    "name": "VENUS",
+                    "mass": 4.8675e24,
+                    "radius": 6.0518e6,
+                    "texture": "/org/jscience/physics/astronomy/2k_venus_surface.jpg",
+                    "orbit": {
+                        "a": 1.0821e11,
+                        "e": 0.0068,
+                        "i": 3.39,
+                        "omega": 131.53,
+                        "Omega": 76.68,
+                        "M": 50.45
+                    }
+                },
+                {
+                    "name": "EARTH",
+                    "mass": 5.972e24,
+                    "radius": 6.371e6,
+                    "texture": "/org/jscience/physics/astronomy/2k_earth_daymap.jpg",
+                    "habitable": true,
+                    "orbit": {
+                        "a": 1.496e11,
+                        "e": 0.0167,
+                        "i": 0.00,
+                        "omega": 102.94,
+                        "Omega": -11.26,
+                        "M": 357.51
+                    },
+                    "moons": [
+                        {
+                            "name": "MOON",
+                            "mass": 7.342e22,
+                            "radius": 1.7371e6,
+                            "texture": "/org/jscience/physics/astronomy/2k_moon.jpg",
+                            "orbit": {
+                                "a": 3.844e8,
+                                "e": 0.0549,
+                                "i": 5.145,
+                                "omega": 318.15,
+                                "Omega": 125.08,
+                                "M": 135.27
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "MARS",
+                    "mass": 6.4171e23,
+                    "radius": 3.3895e6,
+                    "texture": "/org/jscience/physics/astronomy/2k_mars.jpg",
+                    "orbit": {
+                        "a": 2.2792e11,
+                        "e": 0.0934,
+                        "i": 1.85,
+                        "omega": 336.04,
+                        "Omega": 49.56,
+                        "M": 19.38
+                    }
+                },
+                {
+                    "name": "JUPITER",
+                    "mass": 1.8982e27,
+                    "radius": 6.9911e7,
+                    "texture": "/org/jscience/physics/astronomy/2k_jupiter.jpg",
+                    "orbit": {
+                        "a": 7.7857e11,
+                        "e": 0.0484,
+                        "i": 1.30,
+                        "omega": 14.75,
+                        "Omega": 100.46,
+                        "M": 19.67
+                    }
+                },
+                {
+                    "name": "SATURN",
+                    "mass": 5.6834e26,
+                    "radius": 5.8232e7,
+                    "texture": "/org/jscience/physics/astronomy/2k_saturn.jpg",
+                    "orbit": {
+                        "a": 1.4335e12,
+                        "e": 0.0542,
+                        "i": 2.49,
+                        "omega": 92.43,
+                        "Omega": 113.72,
+                        "M": 317.02
+                    },
+                    "rings": {
+                        "inner": 7.45e7,
+                        "outer": 1.4022e8,
+                        "texture": "/org/jscience/physics/astronomy/2k_saturn_ring_alpha.png"
+                    }
+                },
+                {
+                    "name": "URANUS",
+                    "mass": 8.6810e25,
+                    "radius": 2.5362e7,
+                    "texture": "/org/jscience/physics/astronomy/2k_uranus.jpg",
+                    "orbit": {
+                        "a": 2.8725e12,
+                        "e": 0.0472,
+                        "i": 0.77,
+                        "omega": 170.96,
+                        "Omega": 74.00,
+                        "M": 142.23
+                    }
+                },
+                {
+                    "name": "NEPTUNE",
+                    "mass": 1.0241e26,
+                    "radius": 2.4622e7,
+                    "texture": "/org/jscience/physics/astronomy/2k_neptune.jpg",
+                    "orbit": {
+                        "a": 4.4951e12,
+                        "e": 0.0086,
+                        "i": 1.77,
+                        "omega": 44.97,
+                        "Omega": 131.78,
+                        "M": 27.67
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,7 +1,6 @@
 package org.jscience.earth.geophysics;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;

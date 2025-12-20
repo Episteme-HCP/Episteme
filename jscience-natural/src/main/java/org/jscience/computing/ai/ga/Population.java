@@ -6,8 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.jscience.computing.ai.ga.Chromosome;
-
 /**
  * Represents a generation of chromosomes.
  * 

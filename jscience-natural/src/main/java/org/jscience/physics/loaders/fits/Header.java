@@ -95,12 +95,10 @@ public class Header {
 
         while (!endFound) {
             buffer.clear();
-            int read = 0;
             while (buffer.hasRemaining()) {
                 int r = channel.read(buffer);
                 if (r < 0)
                     throw new IOException("Unexpected EOF in FITS header");
-                read += r;
             }
             buffer.flip();
 

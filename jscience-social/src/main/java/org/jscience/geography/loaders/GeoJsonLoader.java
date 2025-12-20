@@ -86,7 +86,6 @@ public class GeoJsonLoader {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     private static class Feature {
-        public String type;
         public Geometry geometry;
         public java.util.Map<String, Object> properties;
     }

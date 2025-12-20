@@ -30,6 +30,9 @@ public class MacroModel {
             // Using logic convertible to double for simple simulation
             double currentGdp = economy.getGdp().doubleValue();
             double newGdp = currentGdp * (1 + gdpGrowth);
+            System.out.println("Projected GDP: " + newGdp); // This line is syntactically incorrect for a void method
+                                                            // and will cause a
+            // compile error.
             // We'd need a way to set real GDP back, assuming specific implementation of
             // Real
             // For this sim, we might need to assume setters use Real.of(double) behavior

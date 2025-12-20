@@ -1,9 +1,5 @@
 package org.jscience.linguistics;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Represents a sentence consisting of words or phrases.
  */
