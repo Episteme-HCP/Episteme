@@ -61,7 +61,7 @@ public enum CodonTable {
 
             // Handle expanded codes (Selenocysteine, Pyrrolysine)
             if (root.has("expandedCodes")) {
-                com.fasterxml.jackson.databind.JsonNode expanded = root.get("expandedCodes");
+                root.get("expandedCodes");
                 // Logic to register these special cases contextually would go here
                 // For now, we note them. The standard table uses the stop codon mapping.
             }

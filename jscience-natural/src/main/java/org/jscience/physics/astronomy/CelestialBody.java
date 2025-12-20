@@ -12,7 +12,6 @@ import org.jscience.measure.quantity.Mass;
 import org.jscience.measure.quantity.Time;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
-import org.jscience.measure.Unit;
 
 /**
  * Represents a celestial body (Star, Planet, Moon, etc.).

@@ -26,7 +26,7 @@ public class ChemistryDataLoader {
     private static final Logger LOGGER = Logger.getLogger(ChemistryDataLoader.class.getName());
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private static final java.util.Map<String, org.jscience.chemistry.Molecule> MOLECULE_CACHE = new java.util.HashMap<>();
+    private static final java.util.Map<String, MoleculeData> MOLECULE_DATA_CACHE = new java.util.HashMap<>();
 
     public static void loadElements() {
         System.out.println("DEBUG: ChemistryDataLoader.loadElements() called.");
@@ -118,50 +118,19 @@ public class ChemistryDataLoader {
             }
             MoleculeListWrapper wrapper = MAPPER.readValue(is, MoleculeListWrapper.class);
             for (MoleculeData md : wrapper.molecules) {
-                org.jscience.chemistry.Molecule mol = new org.jscience.chemistry.Molecule(md.name);
-                List<org.jscience.chemistry.Atom> createdAtoms = new java.util.ArrayList<>();
-
+                // Verify atoms exist before caching
+                boolean valid = true;
                 for (AtomData ad : md.atoms) {
-                    Element el = PeriodicTable.bySymbol(ad.symbol);
-                    if (el == null) {
+                    if (PeriodicTable.bySymbol(ad.symbol) == null) {
                         LOGGER.warning("Unknown element symbol in molecule " + md.name + ": " + ad.symbol);
-                        continue;
-                    }
-                    // Coordinate conversion done here or in constructor?
-                    // We need Vector<Real>.
-                    org.jscience.mathematics.linearalgebra.vectors.DenseVector<org.jscience.mathematics.numbers.real.Real> pos = org.jscience.mathematics.linearalgebra.vectors.DenseVector
-                            .of(
-                                    java.util.Arrays.asList(
-                                            org.jscience.mathematics.numbers.real.Real.of(ad.x),
-                                            org.jscience.mathematics.numbers.real.Real.of(ad.y),
-                                            org.jscience.mathematics.numbers.real.Real.of(ad.z)),
-                                    org.jscience.mathematics.sets.Reals.getInstance());
-
-                    org.jscience.chemistry.Atom atom = new org.jscience.chemistry.Atom(el, pos);
-                    mol.addAtom(atom);
-                    createdAtoms.add(atom);
-                }
-
-                for (BondData bd : md.bonds) {
-                    // 0-based indices matching creation order
-                    if (bd.from >= 0 && bd.from < createdAtoms.size() &&
-                            bd.to >= 0 && bd.to < createdAtoms.size()) {
-
-                        org.jscience.chemistry.Bond.BondOrder order = org.jscience.chemistry.Bond.BondOrder.SINGLE;
-                        try {
-                            order = org.jscience.chemistry.Bond.BondOrder.valueOf(bd.order.toUpperCase());
-                        } catch (Exception ignore) {
-                        }
-
-                        mol.addBond(new org.jscience.chemistry.Bond(
-                                createdAtoms.get(bd.from),
-                                createdAtoms.get(bd.to),
-                                order));
+                        valid = false;
+                        break;
                     }
                 }
-
-                MOLECULE_CACHE.put(md.name, mol);
-                LOGGER.info("Registered molecule: " + md.name);
+                if (valid) {
+                    MOLECULE_DATA_CACHE.put(md.name, md);
+                    LOGGER.info("Registered molecule data: " + md.name);
+                }
             }
         } catch (Exception e) {
             System.out.println("DEBUG: Exception loading molecules: " + e);
@@ -170,20 +139,54 @@ public class ChemistryDataLoader {
     }
 
     /**
-     * Gets a new instance (clone-like) of a loaded molecule.
-     * Note: Currently returns the cached instance which IS mutable.
-     * TODO: Implement deep clone if simulation modifies structure.
+     * Gets a new instance (deep clone) of a loaded molecule.
+     * Reconstructs the molecule from cached data to ensure thread safety and
+     * mutability.
      */
     public static org.jscience.chemistry.Molecule getMolecule(String name) {
-        // Return a fresh build if possible, or assume caller will not mutate structure
-        // irreversibly
-        // For now return cached. (Ideally we should parse again or clone)
-        // Since Atom positions are mutable in MolecularDynamics, we MUST clone.
-        // Simplest clone: Reload from JSON or serialize/deserialize logic.
-        // Or just re-instantiate from cache data (if we stored data DTOs).
-        // Let's keep access to DTOs or just re-run creation logic?
-        // Optimization: Store MoleculeData in cache and build on demand.
-        return MOLECULE_CACHE.get(name); // WARNING: Shared instance for now.
+        MoleculeData md = MOLECULE_DATA_CACHE.get(name);
+        if (md == null)
+            return null;
+        return createMoleculeFromData(md);
+    }
+
+    private static org.jscience.chemistry.Molecule createMoleculeFromData(MoleculeData md) {
+        org.jscience.chemistry.Molecule mol = new org.jscience.chemistry.Molecule(md.name);
+        List<org.jscience.chemistry.Atom> createdAtoms = new java.util.ArrayList<>();
+
+        for (AtomData ad : md.atoms) {
+            Element el = PeriodicTable.bySymbol(ad.symbol);
+            // Coordinate conversion
+            org.jscience.mathematics.linearalgebra.vectors.DenseVector<org.jscience.mathematics.numbers.real.Real> pos = org.jscience.mathematics.linearalgebra.vectors.DenseVector
+                    .of(
+                            java.util.Arrays.asList(
+                                    org.jscience.mathematics.numbers.real.Real.of(ad.x),
+                                    org.jscience.mathematics.numbers.real.Real.of(ad.y),
+                                    org.jscience.mathematics.numbers.real.Real.of(ad.z)),
+                            org.jscience.mathematics.sets.Reals.getInstance());
+
+            org.jscience.chemistry.Atom atom = new org.jscience.chemistry.Atom(el, pos);
+            mol.addAtom(atom);
+            createdAtoms.add(atom);
+        }
+
+        for (BondData bd : md.bonds) {
+            if (bd.from >= 0 && bd.from < createdAtoms.size() &&
+                    bd.to >= 0 && bd.to < createdAtoms.size()) {
+
+                org.jscience.chemistry.Bond.BondOrder order = org.jscience.chemistry.Bond.BondOrder.SINGLE;
+                try {
+                    order = org.jscience.chemistry.Bond.BondOrder.valueOf(bd.order.toUpperCase());
+                } catch (Exception ignore) {
+                }
+
+                mol.addBond(new org.jscience.chemistry.Bond(
+                        createdAtoms.get(bd.from),
+                        createdAtoms.get(bd.to),
+                        order));
+            }
+        }
+        return mol;
     }
 
     // DTO for JSON mapping

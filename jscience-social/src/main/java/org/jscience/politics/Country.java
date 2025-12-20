@@ -13,19 +13,23 @@ package org.jscience.politics;
  */
 public class Country {
 
-    private final String name;
-    private final String alpha2; // ISO 3166-1 alpha-2
-    private final String alpha3; // ISO 3166-1 alpha-3
-    private final int numericCode; // ISO 3166-1 numeric
-    private final String capital;
-    private final String continent;
-    private final long population;
-    private final double areaSqKm;
+    private String name;
+    private String alpha2; // ISO 3166-1 alpha-2
+    private String alpha3; // ISO 3166-1 alpha-3
+    private int numericCode; // ISO 3166-1 numeric
+    private String capital;
+    private String continent;
+    private long population;
+    private double areaSqKm;
+
+    public Country(String name, String alpha2) {
+        this.name = name;
+        this.alpha2 = alpha2;
+    }
 
     public Country(String name, String alpha2, String alpha3, int numericCode,
             String capital, String continent, long population, double areaSqKm) {
-        this.name = name;
-        this.alpha2 = alpha2;
+        this(name, alpha2);
         this.alpha3 = alpha3;
         this.numericCode = numericCode;
         this.capital = capital;
@@ -64,6 +68,38 @@ public class Country {
 
     public double getAreaSqKm() {
         return areaSqKm;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAlpha2(String alpha2) {
+        this.alpha2 = alpha2;
+    }
+
+    public void setAlpha3(String alpha3) {
+        this.alpha3 = alpha3;
+    }
+
+    public void setNumericCode(int numericCode) {
+        this.numericCode = numericCode;
+    }
+
+    public void setCapital(String capital) {
+        this.capital = capital;
+    }
+
+    public void setContinent(String continent) {
+        this.continent = continent;
+    }
+
+    public void setPopulation(long population) {
+        this.population = population;
+    }
+
+    public void setAreaSqKm(double areaSqKm) {
+        this.areaSqKm = areaSqKm;
     }
 
     public double getPopulationDensity() {

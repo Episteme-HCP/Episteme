@@ -5,7 +5,6 @@
 package org.jscience.economics;
 
 import org.jscience.mathematics.numbers.real.Real;
-import java.util.*;
 
 /**
  * Represents an economic system/economy.

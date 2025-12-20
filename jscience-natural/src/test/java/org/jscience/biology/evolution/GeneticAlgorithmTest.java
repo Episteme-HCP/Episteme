@@ -1,5 +1,9 @@
 package org.jscience.biology.evolution;
 
+import org.jscience.computing.ai.ga.Chromosome;
+import org.jscience.computing.ai.ga.GeneticAlgorithm;
+import org.jscience.computing.ai.ga.Population;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

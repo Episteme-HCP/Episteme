@@ -5,7 +5,6 @@
 package org.jscience.sports;
 
 import java.time.LocalDateTime;
-import java.util.*;
 
 /**
  * Represents a sports match/game.

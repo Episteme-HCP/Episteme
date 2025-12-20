@@ -3,7 +3,6 @@ package org.jscience.biology.structure;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Optional;
 
 import org.jscience.chemistry.Atom;
 import org.jscience.chemistry.Element;

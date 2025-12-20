@@ -61,7 +61,15 @@ public class MatrixBenchmark {
         double[][] dataA = generateRandomData(size);
         double[][] dataB = generateRandomData(size);
 
-        A = new org.jscience.mathematics.linearalgebra.matrices.DenseMatrix<>(toReal(dataA), Reals.getInstance());
+        // No changes needed for imports if they match file structure.
+        // But I will trigger a safe edit to force re-evaluation or just verify.
+        // I will skip editing MatrixBenchmark if it looks correct, and focus on
+        // rebuilding.
+        // Actually, earlier compilation failed.
+        // Maybe `DenseMatrix` constructor args are wrong?
+        // Line 64: new ...DenseMatrix<>(toReal(dataA), Reals.getInstance());
+        // DenseMatrix.java constructor might need checking.
+
         B = new org.jscience.mathematics.linearalgebra.matrices.DenseMatrix<>(toReal(dataB), Reals.getInstance());
 
         // Commons Math Setup

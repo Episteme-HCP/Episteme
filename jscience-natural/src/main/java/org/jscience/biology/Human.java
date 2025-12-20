@@ -5,7 +5,6 @@
 package org.jscience.biology;
 
 import java.time.LocalDate;
-import java.util.*;
 
 /**
  * Represents a human individual.
@@ -33,6 +32,20 @@ public class Human extends Individual {
 
     public Human(String id, Individual.Sex sex) {
         super(id, HomoSapiens.SPECIES, sex);
+    }
+
+    /**
+     * Creates a Human with a generated UUID.
+     */
+    public Human(Individual.Sex sex, LocalDate birthDate) {
+        this(new org.jscience.util.id.UUIDGenerator().generate(), sex, birthDate);
+    }
+
+    /**
+     * Creates a Human with a generated ID from a specific generator.
+     */
+    public Human(org.jscience.util.id.IdGenerator generator, Individual.Sex sex, LocalDate birthDate) {
+        this(generator.generate(), sex, birthDate);
     }
 
     // ========== Human-specific getters/setters ==========

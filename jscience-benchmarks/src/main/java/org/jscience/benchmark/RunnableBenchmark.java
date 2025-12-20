@@ -1,7 +1,5 @@
 package org.jscience.benchmark;
 
-import java.util.Map;
-
 /**
  * Standard interface for all JScience benchmarks.
  * <p>

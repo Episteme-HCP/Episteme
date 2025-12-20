@@ -8,7 +8,7 @@ import java.io.*;
 import java.util.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.core.type.*;
-import org.jscience.resources.MiniCatalog;
+import org.jscience.io.MiniCatalog;
 
 /**
  * Catalog of vitamins with nutritional information.
@@ -34,6 +34,7 @@ public class VitaminCatalog implements MiniCatalog<VitaminCatalog.Vitamin> {
         loadFromJSON();
     }
 
+    @SuppressWarnings("unchecked")
     private void loadFromJSON() {
         try {
             InputStream is = getClass().getResourceAsStream("/org/jscience/biology/vitamins.json");

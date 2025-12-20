@@ -4,8 +4,6 @@
  */
 package org.jscience.economics;
 
-import org.jscience.mathematics.numbers.real.Real;
-
 /**
  * Represents a currency with ISO 4217 code.
  *

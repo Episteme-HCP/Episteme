@@ -4,6 +4,8 @@
  */
 package org.jscience.sociology;
 
+import org.jscience.economics.Money;
+import org.jscience.geography.Place;
 import java.util.*;
 
 /**
@@ -25,6 +27,11 @@ public class Person {
     private final java.time.LocalDate birthDate;
     private final String nationality;
     private final List<String> roles;
+    private final List<Role> structuralRoles;
+
+    // V1 Features
+    private Money wealth;
+    private Place location;
 
     public Person(String id, String name, Gender gender, java.time.LocalDate birthDate,
             String nationality) {
@@ -33,7 +40,11 @@ public class Person {
         this.gender = gender;
         this.birthDate = birthDate;
         this.nationality = nationality;
+
         this.roles = new ArrayList<>();
+        this.structuralRoles = new ArrayList<>();
+        // Default initial state
+        this.wealth = Money.usd(0);
     }
 
     public String getId() {
@@ -60,9 +71,49 @@ public class Person {
         return Collections.unmodifiableList(roles);
     }
 
+    public Money getWealth() {
+        return wealth;
+    }
+
+    public void earn(Money amount) {
+        if (this.wealth.getCurrency().equals(amount.getCurrency())) {
+            this.wealth = this.wealth.add(amount);
+        }
+    }
+
+    public void spend(Money amount) {
+        if (this.wealth.getCurrency().equals(amount.getCurrency())) {
+            this.wealth = this.wealth.subtract(amount);
+        }
+    }
+
+    public Place getLocation() {
+        return location;
+    }
+
+    public void move(Place newLocation) {
+        if (this.location != null) {
+            this.location.removeInhabitant(this);
+        }
+        this.location = newLocation;
+        if (this.location != null) {
+            this.location.addInhabitant(this);
+        }
+    }
+
     public Person addRole(String role) {
         roles.add(role);
         return this;
+    }
+
+    public void addRole(Role role) {
+        if (!structuralRoles.contains(role)) {
+            structuralRoles.add(role);
+        }
+    }
+
+    public List<Role> getStructuralRoles() {
+        return Collections.unmodifiableList(structuralRoles);
     }
 
     public int getAge() {

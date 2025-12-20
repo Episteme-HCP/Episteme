@@ -1,11 +1,16 @@
 package org.jscience.chemistry.electrochemistry;
 
+import org.jscience.util.SimpleJson;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Standard Electrode Potentials (E°) at 25°C.
  * Relative to Standard Hydrogen Electrode (SHE).
+ * Loads data from potentials.json.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI
@@ -16,30 +21,36 @@ public class StandardPotentials {
     private static final Map<String, Double> POTENTIALS = new HashMap<>();
 
     static {
-        // Halogens
-        POTENTIALS.put("F2 + 2e- -> 2F-", 2.87);
-        POTENTIALS.put("Cl2 + 2e- -> 2Cl-", 1.36);
-        POTENTIALS.put("Br2 + 2e- -> 2Br-", 1.07);
-        POTENTIALS.put("I2 + 2e- -> 2I-", 0.54);
+        loadPotentials();
+    }
 
-        // Metals
-        POTENTIALS.put("Ag+ + e- -> Ag", 0.80);
-        POTENTIALS.put("Cu2+ + 2e- -> Cu", 0.34);
-        POTENTIALS.put("Pb2+ + 2e- -> Pb", -0.13);
-        POTENTIALS.put("Sn2+ + 2e- -> Sn", -0.14);
-        POTENTIALS.put("Ni2+ + 2e- -> Ni", -0.25);
-        POTENTIALS.put("Fe2+ + 2e- -> Fe", -0.44);
-        POTENTIALS.put("Zn2+ + 2e- -> Zn", -0.76);
-        POTENTIALS.put("Al3+ + 3e- -> Al", -1.66);
-        POTENTIALS.put("Mg2+ + 2e- -> Mg", -2.37);
-        POTENTIALS.put("Na+ + e- -> Na", -2.71);
-        POTENTIALS.put("Ca2+ + 2e- -> Ca", -2.87);
-        POTENTIALS.put("K+ + e- -> K", -2.93);
-        POTENTIALS.put("Li+ + e- -> Li", -3.04);
+    @SuppressWarnings("unchecked")
+    private static void loadPotentials() {
+        try (InputStream is = StandardPotentials.class.getResourceAsStream("potentials.json")) {
+            if (is == null) {
+                System.err.println("StandardPotentials: Resource not found: potentials.json");
+                return;
+            }
 
-        // Others
-        POTENTIALS.put("2H+ + 2e- -> H2", 0.00); // SHE
-        POTENTIALS.put("O2 + 4H+ + 4e- -> 2H2O", 1.23);
+            String jsonText = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            Object result = SimpleJson.parse(jsonText);
+
+            if (result instanceof Map) {
+                Map<String, Object> root = (Map<String, Object>) result;
+                List<Object> list = (List<Object>) root.get("potentials");
+
+                if (list != null) {
+                    for (Object item : list) {
+                        Map<String, Object> entry = (Map<String, Object>) item;
+                        String reaction = (String) entry.get("reaction");
+                        Double e0 = ((Number) entry.get("E0")).doubleValue();
+                        POTENTIALS.put(reaction, e0);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

@@ -5,7 +5,6 @@
 package org.jscience.politics;
 
 import java.time.LocalDate;
-import java.util.*;
 
 /**
  * Represents a political party.

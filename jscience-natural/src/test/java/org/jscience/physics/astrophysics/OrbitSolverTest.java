@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Quantity;
+import org.jscience.physics.astronomy.mechanics.OrbitSolver;
+import org.jscience.physics.astronomy.mechanics.KeplerParams;
+import org.jscience.physics.astronomy.mechanics.OrbitalState;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Angle;
 import org.jscience.measure.quantity.Mass;

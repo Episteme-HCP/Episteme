@@ -144,8 +144,7 @@ public class PhysicsTest {
         Quantity<Pressure> pressure = Thermodynamics.idealGasPressure(
                 Quantities.create(1.0, Units.MOLE),
                 Quantities.create(273.15, Units.KELVIN),
-                Quantities.create(0.0224,
-                        (org.jscience.measure.Unit<Volume>) (org.jscience.measure.Unit<?>) Units.METER.pow(3)));
+                Quantities.create(0.0224, Units.METER.pow(3).asType(Volume.class)));
 
         // Expected: P ≈ 101325 Pa (1 atm)
         // PV = nRT -> P = nRT/V = 1 * 8.314 * 273.15 / 0.0224 ≈ 101383 Pa

@@ -1,7 +1,5 @@
 package org.jscience.biology.structure;
 
-import java.util.Stack;
-
 /**
  * RNA Secondary Structure Prediction using Nussinov Algorithm.
  * Maximizes base pairs.

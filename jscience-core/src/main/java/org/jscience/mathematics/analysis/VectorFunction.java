@@ -74,7 +74,7 @@ public interface VectorFunction<F extends Field<F>> extends DifferentiableFuncti
         F twoH = (F) org.jscience.mathematics.numbers.real.Real.of(2 * hVal);
 
         // Get Field from Vector's scalar ring
-        @SuppressWarnings("unchecked")
+
         Field<F> field = (Field<F>) point.getScalarRing();
 
         java.util.List<java.util.List<F>> columns = new java.util.ArrayList<>();
@@ -123,7 +123,6 @@ public interface VectorFunction<F extends Field<F>> extends DifferentiableFuncti
             rows.add(rowData);
         }
 
-        @SuppressWarnings("unchecked")
         Field<F> resultField = (Field<F>) point.getScalarRing();
         return org.jscience.mathematics.linearalgebra.matrices.MatrixFactory.create(rows, resultField);
     }

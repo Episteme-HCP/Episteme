@@ -1,84 +1,1351 @@
 {
     "elements": [
         {
+            "atomicNumber": 1,
             "symbol": "H",
             "name": "Hydrogen",
-            "atomicNumber": 1,
             "atomicMass": 1.008,
-            "group": 1,
-            "period": 1,
-            "category": "diatomic nonmetal",
-            "density": 0.08988,
+            "category": "nonmetal",
+            "density": 0.00008988,
             "melt": 14.01,
-            "boil": 20.28,
-            "discovered_by": "Henry Cavendish",
-            "special_characteristics": "Lightest element"
+            "boil": 20.28
         },
         {
+            "atomicNumber": 2,
             "symbol": "He",
             "name": "Helium",
-            "atomicNumber": 2,
             "atomicMass": 4.0026,
-            "group": 18,
-            "period": 1,
             "category": "noble gas",
-            "density": 0.1786,
+            "density": 0.0001786,
             "melt": 0.95,
-            "boil": 4.22,
-            "discovered_by": "Pierre Janssen",
-            "special_characteristics": "Second lightest, noble gas"
+            "boil": 4.22
         },
         {
+            "atomicNumber": 3,
             "symbol": "Li",
             "name": "Lithium",
-            "atomicNumber": 3,
             "atomicMass": 6.94,
-            "group": 1,
-            "period": 2,
             "category": "alkali metal",
             "density": 0.534,
             "melt": 453.69,
-            "boil": 1603,
-            "discovered_by": "Johan August Arfwedson"
+            "boil": 1615
         },
         {
+            "atomicNumber": 4,
+            "symbol": "Be",
+            "name": "Beryllium",
+            "atomicMass": 9.0122,
+            "category": "alkaline earth metal",
+            "density": 1.85,
+            "melt": 1560,
+            "boil": 2743
+        },
+        {
+            "atomicNumber": 5,
+            "symbol": "B",
+            "name": "Boron",
+            "atomicMass": 10.81,
+            "category": "metalloid",
+            "density": 2.34,
+            "melt": 2349,
+            "boil": 4200
+        },
+        {
+            "atomicNumber": 6,
             "symbol": "C",
             "name": "Carbon",
-            "atomicNumber": 6,
             "atomicMass": 12.011,
-            "group": 14,
-            "period": 2,
-            "category": "polyatomic nonmetal",
+            "category": "nonmetal",
             "density": 2.267,
-            "melt": 3915,
-            "boil": 4300,
-            "discovered_by": "Ancient Egypt"
+            "melt": 3800,
+            "boil": 4300
         },
         {
+            "atomicNumber": 7,
             "symbol": "N",
             "name": "Nitrogen",
-            "atomicNumber": 7,
             "atomicMass": 14.007,
-            "group": 15,
-            "period": 2,
-            "category": "diatomic nonmetal",
-            "density": 1.2506,
+            "category": "nonmetal",
+            "density": 0.0012506,
             "melt": 63.15,
-            "boil": 77.36,
-            "discovered_by": "Daniel Rutherford"
+            "boil": 77.36
         },
         {
+            "atomicNumber": 8,
             "symbol": "O",
             "name": "Oxygen",
-            "atomicNumber": 8,
             "atomicMass": 15.999,
-            "group": 16,
-            "period": 2,
-            "category": "diatomic nonmetal",
-            "density": 1.429,
+            "category": "nonmetal",
+            "density": 0.001429,
             "melt": 54.36,
-            "boil": 90.20,
-            "discovered_by": "Carl Wilhelm Scheele"
+            "boil": 90.20
+        },
+        {
+            "atomicNumber": 9,
+            "symbol": "F",
+            "name": "Fluorine",
+            "atomicMass": 18.998,
+            "category": "halogen",
+            "density": 0.001696,
+            "melt": 53.53,
+            "boil": 85.03
+        },
+        {
+            "atomicNumber": 10,
+            "symbol": "Ne",
+            "name": "Neon",
+            "atomicMass": 20.180,
+            "category": "noble gas",
+            "density": 0.0009002,
+            "melt": 24.56,
+            "boil": 27.07
+        },
+        {
+            "atomicNumber": 11,
+            "symbol": "Na",
+            "name": "Sodium",
+            "atomicMass": 22.990,
+            "category": "alkali metal",
+            "density": 0.968,
+            "melt": 370.87,
+            "boil": 1156
+        },
+        {
+            "atomicNumber": 12,
+            "symbol": "Mg",
+            "name": "Magnesium",
+            "atomicMass": 24.305,
+            "category": "alkaline earth metal",
+            "density": 1.738,
+            "melt": 923,
+            "boil": 1363
+        },
+        {
+            "atomicNumber": 13,
+            "symbol": "Al",
+            "name": "Aluminium",
+            "atomicMass": 26.982,
+            "category": "post-transition metal",
+            "density": 2.70,
+            "melt": 933.47,
+            "boil": 2792
+        },
+        {
+            "atomicNumber": 14,
+            "symbol": "Si",
+            "name": "Silicon",
+            "atomicMass": 28.085,
+            "category": "metalloid",
+            "density": 2.329,
+            "melt": 1687,
+            "boil": 3538
+        },
+        {
+            "atomicNumber": 15,
+            "symbol": "P",
+            "name": "Phosphorus",
+            "atomicMass": 30.974,
+            "category": "nonmetal",
+            "density": 1.823,
+            "melt": 317.30,
+            "boil": 550
+        },
+        {
+            "atomicNumber": 16,
+            "symbol": "S",
+            "name": "Sulfur",
+            "atomicMass": 32.06,
+            "category": "nonmetal",
+            "density": 2.07,
+            "melt": 388.36,
+            "boil": 717.8
+        },
+        {
+            "atomicNumber": 17,
+            "symbol": "Cl",
+            "name": "Chlorine",
+            "atomicMass": 35.45,
+            "category": "halogen",
+            "density": 0.0032,
+            "melt": 171.6,
+            "boil": 239.11
+        },
+        {
+            "atomicNumber": 18,
+            "symbol": "Ar",
+            "name": "Argon",
+            "atomicMass": 39.948,
+            "category": "noble gas",
+            "density": 0.001784,
+            "melt": 83.80,
+            "boil": 87.30
+        },
+        {
+            "atomicNumber": 19,
+            "symbol": "K",
+            "name": "Potassium",
+            "atomicMass": 39.098,
+            "category": "alkali metal",
+            "density": 0.89,
+            "melt": 336.53,
+            "boil": 1032
+        },
+        {
+            "atomicNumber": 20,
+            "symbol": "Ca",
+            "name": "Calcium",
+            "atomicMass": 40.078,
+            "category": "alkaline earth metal",
+            "density": 1.55,
+            "melt": 1115,
+            "boil": 1757
+        },
+        {
+            "atomicNumber": 21,
+            "symbol": "Sc",
+            "name": "Scandium",
+            "atomicMass": 44.956,
+            "category": "transition metal",
+            "density": 2.985,
+            "melt": 1814,
+            "boil": 3109
+        },
+        {
+            "atomicNumber": 22,
+            "symbol": "Ti",
+            "name": "Titanium",
+            "atomicMass": 47.867,
+            "category": "transition metal",
+            "density": 4.506,
+            "melt": 1941,
+            "boil": 3560
+        },
+        {
+            "atomicNumber": 23,
+            "symbol": "V",
+            "name": "Vanadium",
+            "atomicMass": 50.942,
+            "category": "transition metal",
+            "density": 6.11,
+            "melt": 2183,
+            "boil": 3680
+        },
+        {
+            "atomicNumber": 24,
+            "symbol": "Cr",
+            "name": "Chromium",
+            "atomicMass": 51.996,
+            "category": "transition metal",
+            "density": 7.19,
+            "melt": 2180,
+            "boil": 2944
+        },
+        {
+            "atomicNumber": 25,
+            "symbol": "Mn",
+            "name": "Manganese",
+            "atomicMass": 54.938,
+            "category": "transition metal",
+            "density": 7.21,
+            "melt": 1519,
+            "boil": 2334
+        },
+        {
+            "atomicNumber": 26,
+            "symbol": "Fe",
+            "name": "Iron",
+            "atomicMass": 55.845,
+            "category": "transition metal",
+            "density": 7.874,
+            "melt": 1811,
+            "boil": 3134
+        },
+        {
+            "atomicNumber": 27,
+            "symbol": "Co",
+            "name": "Cobalt",
+            "atomicMass": 58.933,
+            "category": "transition metal",
+            "density": 8.90,
+            "melt": 1768,
+            "boil": 3200
+        },
+        {
+            "atomicNumber": 28,
+            "symbol": "Ni",
+            "name": "Nickel",
+            "atomicMass": 58.693,
+            "category": "transition metal",
+            "density": 8.908,
+            "melt": 1728,
+            "boil": 3186
+        },
+        {
+            "atomicNumber": 29,
+            "symbol": "Cu",
+            "name": "Copper",
+            "atomicMass": 63.546,
+            "category": "transition metal",
+            "density": 8.96,
+            "melt": 1357.77,
+            "boil": 2835
+        },
+        {
+            "atomicNumber": 30,
+            "symbol": "Zn",
+            "name": "Zinc",
+            "atomicMass": 65.38,
+            "category": "transition metal",
+            "density": 7.14,
+            "melt": 692.68,
+            "boil": 1180
+        },
+        {
+            "atomicNumber": 31,
+            "symbol": "Ga",
+            "name": "Gallium",
+            "atomicMass": 69.723,
+            "category": "post-transition metal",
+            "density": 5.91,
+            "melt": 302.91,
+            "boil": 2477
+        },
+        {
+            "atomicNumber": 32,
+            "symbol": "Ge",
+            "name": "Germanium",
+            "atomicMass": 72.630,
+            "category": "metalloid",
+            "density": 5.323,
+            "melt": 1211.40,
+            "boil": 3106
+        },
+        {
+            "atomicNumber": 33,
+            "symbol": "As",
+            "name": "Arsenic",
+            "atomicMass": 74.922,
+            "category": "metalloid",
+            "density": 5.727,
+            "melt": 1090,
+            "boil": 887
+        },
+        {
+            "atomicNumber": 34,
+            "symbol": "Se",
+            "name": "Selenium",
+            "atomicMass": 78.971,
+            "category": "nonmetal",
+            "density": 4.81,
+            "melt": 494,
+            "boil": 958
+        },
+        {
+            "atomicNumber": 35,
+            "symbol": "Br",
+            "name": "Bromine",
+            "atomicMass": 79.904,
+            "category": "halogen",
+            "density": 3.1028,
+            "melt": 265.8,
+            "boil": 332
+        },
+        {
+            "atomicNumber": 36,
+            "symbol": "Kr",
+            "name": "Krypton",
+            "atomicMass": 83.798,
+            "category": "noble gas",
+            "density": 0.003749,
+            "melt": 115.79,
+            "boil": 119.93
+        },
+        {
+            "atomicNumber": 37,
+            "symbol": "Rb",
+            "name": "Rubidium",
+            "atomicMass": 85.468,
+            "category": "alkali metal",
+            "density": 1.532,
+            "melt": 312.46,
+            "boil": 961
+        },
+        {
+            "atomicNumber": 38,
+            "symbol": "Sr",
+            "name": "Strontium",
+            "atomicMass": 87.62,
+            "category": "alkaline earth metal",
+            "density": 2.64,
+            "melt": 1050,
+            "boil": 1655
+        },
+        {
+            "atomicNumber": 39,
+            "symbol": "Y",
+            "name": "Yttrium",
+            "atomicMass": 88.906,
+            "category": "transition metal",
+            "density": 4.472,
+            "melt": 1799,
+            "boil": 3609
+        },
+        {
+            "atomicNumber": 40,
+            "symbol": "Zr",
+            "name": "Zirconium",
+            "atomicMass": 91.224,
+            "category": "transition metal",
+            "density": 6.52,
+            "melt": 2128,
+            "boil": 4682
+        },
+        {
+            "atomicNumber": 41,
+            "symbol": "Nb",
+            "name": "Niobium",
+            "atomicMass": 92.906,
+            "category": "transition metal",
+            "density": 8.57,
+            "melt": 2750,
+            "boil": 5017
+        },
+        {
+            "atomicNumber": 42,
+            "symbol": "Mo",
+            "name": "Molybdenum",
+            "atomicMass": 95.95,
+            "category": "transition metal",
+            "density": 10.28,
+            "melt": 2896,
+            "boil": 4912
+        },
+        {
+            "atomicNumber": 43,
+            "symbol": "Tc",
+            "name": "Technetium",
+            "atomicMass": 98,
+            "category": "transition metal",
+            "density": 11,
+            "melt": 2430,
+            "boil": 4538
+        },
+        {
+            "atomicNumber": 44,
+            "symbol": "Ru",
+            "name": "Ruthenium",
+            "atomicMass": 101.07,
+            "category": "transition metal",
+            "density": 12.45,
+            "melt": 2607,
+            "boil": 4423
+        },
+        {
+            "atomicNumber": 45,
+            "symbol": "Rh",
+            "name": "Rhodium",
+            "atomicMass": 102.91,
+            "category": "transition metal",
+            "density": 12.41,
+            "melt": 2237,
+            "boil": 3968
+        },
+        {
+            "atomicNumber": 46,
+            "symbol": "Pd",
+            "name": "Palladium",
+            "atomicMass": 106.42,
+            "category": "transition metal",
+            "density": 12.023,
+            "melt": 1828.05,
+            "boil": 3236
+        },
+        {
+            "atomicNumber": 47,
+            "symbol": "Ag",
+            "name": "Silver",
+            "atomicMass": 107.87,
+            "category": "transition metal",
+            "density": 10.49,
+            "melt": 1234.93,
+            "boil": 2435
+        },
+        {
+            "atomicNumber": 48,
+            "symbol": "Cd",
+            "name": "Cadmium",
+            "atomicMass": 112.41,
+            "category": "transition metal",
+            "density": 8.65,
+            "melt": 594.22,
+            "boil": 1040
+        },
+        {
+            "atomicNumber": 49,
+            "symbol": "In",
+            "name": "Indium",
+            "atomicMass": 114.82,
+            "category": "post-transition metal",
+            "density": 7.31,
+            "melt": 429.75,
+            "boil": 2345
+        },
+        {
+            "atomicNumber": 50,
+            "symbol": "Sn",
+            "name": "Tin",
+            "atomicMass": 118.71,
+            "category": "post-transition metal",
+            "density": 7.265,
+            "melt": 505.08,
+            "boil": 2875
+        },
+        {
+            "atomicNumber": 51,
+            "symbol": "Sb",
+            "name": "Antimony",
+            "atomicMass": 121.76,
+            "category": "metalloid",
+            "density": 6.697,
+            "melt": 903.78,
+            "boil": 1860
+        },
+        {
+            "atomicNumber": 52,
+            "symbol": "Te",
+            "name": "Tellurium",
+            "atomicMass": 127.60,
+            "category": "metalloid",
+            "density": 6.24,
+            "melt": 722.66,
+            "boil": 1261
+        },
+        {
+            "atomicNumber": 53,
+            "symbol": "I",
+            "name": "Iodine",
+            "atomicMass": 126.90,
+            "category": "halogen",
+            "density": 4.933,
+            "melt": 386.85,
+            "boil": 457.4
+        },
+        {
+            "atomicNumber": 54,
+            "symbol": "Xe",
+            "name": "Xenon",
+            "atomicMass": 131.29,
+            "category": "noble gas",
+            "density": 0.005894,
+            "melt": 161.4,
+            "boil": 165.03
+        },
+        {
+            "atomicNumber": 55,
+            "symbol": "Cs",
+            "name": "Cesium",
+            "atomicMass": 132.91,
+            "category": "alkali metal",
+            "density": 1.93,
+            "melt": 301.59,
+            "boil": 944
+        },
+        {
+            "atomicNumber": 56,
+            "symbol": "Ba",
+            "name": "Barium",
+            "atomicMass": 137.33,
+            "category": "alkaline earth metal",
+            "density": 3.51,
+            "melt": 1000,
+            "boil": 2170
+        },
+        {
+            "atomicNumber": 57,
+            "symbol": "La",
+            "name": "Lanthanum",
+            "atomicMass": 138.91,
+            "category": "lanthanide",
+            "density": 6.162,
+            "melt": 1193,
+            "boil": 3737
+        },
+        {
+            "atomicNumber": 58,
+            "symbol": "Ce",
+            "name": "Cerium",
+            "atomicMass": 140.12,
+            "category": "lanthanide",
+            "density": 6.770,
+            "melt": 1068,
+            "boil": 3716
+        },
+        {
+            "atomicNumber": 59,
+            "symbol": "Pr",
+            "name": "Praseodymium",
+            "atomicMass": 140.91,
+            "category": "lanthanide",
+            "density": 6.77,
+            "melt": 1208,
+            "boil": 3793
+        },
+        {
+            "atomicNumber": 60,
+            "symbol": "Nd",
+            "name": "Neodymium",
+            "atomicMass": 144.24,
+            "category": "lanthanide",
+            "density": 7.01,
+            "melt": 1297,
+            "boil": 3347
+        },
+        {
+            "atomicNumber": 61,
+            "symbol": "Pm",
+            "name": "Promethium",
+            "atomicMass": 145,
+            "category": "lanthanide",
+            "density": 7.26,
+            "melt": 1315,
+            "boil": 3273
+        },
+        {
+            "atomicNumber": 62,
+            "symbol": "Sm",
+            "name": "Samarium",
+            "atomicMass": 150.36,
+            "category": "lanthanide",
+            "density": 7.52,
+            "melt": 1345,
+            "boil": 2067
+        },
+        {
+            "atomicNumber": 63,
+            "symbol": "Eu",
+            "name": "Europium",
+            "atomicMass": 151.96,
+            "category": "lanthanide",
+            "density": 5.244,
+            "melt": 1099,
+            "boil": 1802
+        },
+        {
+            "atomicNumber": 64,
+            "symbol": "Gd",
+            "name": "Gadolinium",
+            "atomicMass": 157.25,
+            "category": "lanthanide",
+            "density": 7.90,
+            "melt": 1585,
+            "boil": 3546
+        },
+        {
+            "atomicNumber": 65,
+            "symbol": "Tb",
+            "name": "Terbium",
+            "atomicMass": 158.93,
+            "category": "lanthanide",
+            "density": 8.23,
+            "melt": 1629,
+            "boil": 3503
+        },
+        {
+            "atomicNumber": 66,
+            "symbol": "Dy",
+            "name": "Dysprosium",
+            "atomicMass": 162.50,
+            "category": "lanthanide",
+            "density": 8.540,
+            "melt": 1680,
+            "boil": 2840
+        },
+        {
+            "atomicNumber": 67,
+            "symbol": "Ho",
+            "name": "Holmium",
+            "atomicMass": 164.93,
+            "category": "lanthanide",
+            "density": 8.79,
+            "melt": 1734,
+            "boil": 2993
+        },
+        {
+            "atomicNumber": 68,
+            "symbol": "Er",
+            "name": "Erbium",
+            "atomicMass": 167.26,
+            "category": "lanthanide",
+            "density": 9.066,
+            "melt": 1802,
+            "boil": 3141
+        },
+        {
+            "atomicNumber": 69,
+            "symbol": "Tm",
+            "name": "Thulium",
+            "atomicMass": 168.93,
+            "category": "lanthanide",
+            "density": 9.32,
+            "melt": 1818,
+            "boil": 2223
+        },
+        {
+            "atomicNumber": 70,
+            "symbol": "Yb",
+            "name": "Ytterbium",
+            "atomicMass": 173.05,
+            "category": "lanthanide",
+            "density": 6.90,
+            "melt": 1097,
+            "boil": 1469
+        },
+        {
+            "atomicNumber": 71,
+            "symbol": "Lu",
+            "name": "Lutetium",
+            "atomicMass": 174.97,
+            "category": "lanthanide",
+            "density": 9.841,
+            "melt": 1925,
+            "boil": 3675
+        },
+        {
+            "atomicNumber": 72,
+            "symbol": "Hf",
+            "name": "Hafnium",
+            "atomicMass": 178.49,
+            "category": "transition metal",
+            "density": 13.31,
+            "melt": 2506,
+            "boil": 4876
+        },
+        {
+            "atomicNumber": 73,
+            "symbol": "Ta",
+            "name": "Tantalum",
+            "atomicMass": 180.95,
+            "category": "transition metal",
+            "density": 16.69,
+            "melt": 3290,
+            "boil": 5731
+        },
+        {
+            "atomicNumber": 74,
+            "symbol": "W",
+            "name": "Tungsten",
+            "atomicMass": 183.84,
+            "category": "transition metal",
+            "density": 19.3,
+            "melt": 3695,
+            "boil": 5828
+        },
+        {
+            "atomicNumber": 75,
+            "symbol": "Re",
+            "name": "Rhenium",
+            "atomicMass": 186.21,
+            "category": "transition metal",
+            "density": 21.02,
+            "melt": 3459,
+            "boil": 5869
+        },
+        {
+            "atomicNumber": 76,
+            "symbol": "Os",
+            "name": "Osmium",
+            "atomicMass": 190.23,
+            "category": "transition metal",
+            "density": 22.59,
+            "melt": 3306,
+            "boil": 5285
+        },
+        {
+            "atomicNumber": 77,
+            "symbol": "Ir",
+            "name": "Iridium",
+            "atomicMass": 192.22,
+            "category": "transition metal",
+            "density": 22.56,
+            "melt": 2719,
+            "boil": 4701
+        },
+        {
+            "atomicNumber": 78,
+            "symbol": "Pt",
+            "name": "Platinum",
+            "atomicMass": 195.08,
+            "category": "transition metal",
+            "density": 21.45,
+            "melt": 2041.4,
+            "boil": 4098
+        },
+        {
+            "atomicNumber": 79,
+            "symbol": "Au",
+            "name": "Gold",
+            "atomicMass": 196.97,
+            "category": "transition metal",
+            "density": 19.32,
+            "melt": 1337.33,
+            "boil": 3129
+        },
+        {
+            "atomicNumber": 80,
+            "symbol": "Hg",
+            "name": "Mercury",
+            "atomicMass": 200.59,
+            "category": "transition metal",
+            "density": 13.534,
+            "melt": 234.32,
+            "boil": 629.88
+        },
+        {
+            "atomicNumber": 81,
+            "symbol": "Tl",
+            "name": "Thallium",
+            "atomicMass": 204.38,
+            "category": "post-transition metal",
+            "density": 11.85,
+            "melt": 577,
+            "boil": 1746
+        },
+        {
+            "atomicNumber": 82,
+            "symbol": "Pb",
+            "name": "Lead",
+            "atomicMass": 207.2,
+            "category": "post-transition metal",
+            "density": 11.34,
+            "melt": 600.61,
+            "boil": 2022
+        },
+        {
+            "atomicNumber": 83,
+            "symbol": "Bi",
+            "name": "Bismuth",
+            "atomicMass": 208.98,
+            "category": "post-transition metal",
+            "density": 9.78,
+            "melt": 544.7,
+            "boil": 1837
+        },
+        {
+            "atomicNumber": 84,
+            "symbol": "Po",
+            "name": "Polonium",
+            "atomicMass": 209,
+            "category": "metalloid",
+            "density": 9.196,
+            "melt": 527,
+            "boil": 1235
+        },
+        {
+            "atomicNumber": 85,
+            "symbol": "At",
+            "name": "Astatine",
+            "atomicMass": 210,
+            "category": "halogen",
+            "density": 7,
+            "melt": 575,
+            "boil": 610
+        },
+        {
+            "atomicNumber": 86,
+            "symbol": "Rn",
+            "name": "Radon",
+            "atomicMass": 222,
+            "category": "noble gas",
+            "density": 0.00973,
+            "melt": 202,
+            "boil": 211.3
+        },
+        {
+            "atomicNumber": 87,
+            "symbol": "Fr",
+            "name": "Francium",
+            "atomicMass": 223,
+            "category": "alkali metal",
+            "density": 1.87,
+            "melt": 300,
+            "boil": 950
+        },
+        {
+            "atomicNumber": 88,
+            "symbol": "Ra",
+            "name": "Radium",
+            "atomicMass": 226,
+            "category": "alkaline earth metal",
+            "density": 5.5,
+            "melt": 973,
+            "boil": 2010
+        },
+        {
+            "atomicNumber": 89,
+            "symbol": "Ac",
+            "name": "Actinium",
+            "atomicMass": 227,
+            "category": "actinide",
+            "density": 10.07,
+            "melt": 1323,
+            "boil": 3471
+        },
+        {
+            "atomicNumber": 90,
+            "symbol": "Th",
+            "name": "Thorium",
+            "atomicMass": 232.04,
+            "category": "actinide",
+            "density": 11.72,
+            "melt": 2115,
+            "boil": 5061
+        },
+        {
+            "atomicNumber": 91,
+            "symbol": "Pa",
+            "name": "Protactinium",
+            "atomicMass": 231.04,
+            "category": "actinide",
+            "density": 15.37,
+            "melt": 1841,
+            "boil": 4300
+        },
+        {
+            "atomicNumber": 92,
+            "symbol": "U",
+            "name": "Uranium",
+            "atomicMass": 238.03,
+            "category": "actinide",
+            "density": 19.1,
+            "melt": 1405.3,
+            "boil": 4404
+        },
+        {
+            "atomicNumber": 93,
+            "symbol": "Np",
+            "name": "Neptunium",
+            "atomicMass": 237,
+            "category": "actinide",
+            "density": 20.45,
+            "melt": 917,
+            "boil": 4273
+        },
+        {
+            "atomicNumber": 94,
+            "symbol": "Pu",
+            "name": "Plutonium",
+            "atomicMass": 244,
+            "category": "actinide",
+            "density": 19.85,
+            "melt": 912.5,
+            "boil": 3501
+        },
+        {
+            "atomicNumber": 95,
+            "symbol": "Am",
+            "name": "Americium",
+            "atomicMass": 243,
+            "category": "actinide",
+            "density": 13.67,
+            "melt": 1449,
+            "boil": 2880
+        },
+        {
+            "atomicNumber": 96,
+            "symbol": "Cm",
+            "name": "Curium",
+            "atomicMass": 247,
+            "category": "actinide",
+            "density": 13.51,
+            "melt": 1613,
+            "boil": 3383
+        },
+        {
+            "atomicNumber": 97,
+            "symbol": "Bk",
+            "name": "Berkelium",
+            "atomicMass": 247,
+            "category": "actinide",
+            "density": 14.78,
+            "melt": 1259,
+            "boil": 2900
+        },
+        {
+            "atomicNumber": 98,
+            "symbol": "Cf",
+            "name": "Californium",
+            "atomicMass": 251,
+            "category": "actinide",
+            "density": 15.1,
+            "melt": 1173,
+            "boil": 1743
+        },
+        {
+            "atomicNumber": 99,
+            "symbol": "Es",
+            "name": "Einsteinium",
+            "atomicMass": 252,
+            "category": "actinide",
+            "density": 8.84,
+            "melt": 1133,
+            "boil": 1269
+        },
+        {
+            "atomicNumber": 100,
+            "symbol": "Fm",
+            "name": "Fermium",
+            "atomicMass": 257,
+            "category": "actinide",
+            "density": 0,
+            "melt": 1800,
+            "boil": 0
+        },
+        {
+            "atomicNumber": 101,
+            "symbol": "Md",
+            "name": "Mendelevium",
+            "atomicMass": 258,
+            "category": "actinide",
+            "density": 0,
+            "melt": 1100,
+            "boil": 0
+        },
+        {
+            "atomicNumber": 102,
+            "symbol": "No",
+            "name": "Nobelium",
+            "atomicMass": 259,
+            "category": "actinide",
+            "density": 0,
+            "melt": 1100,
+            "boil": 0
+        },
+        {
+            "atomicNumber": 103,
+            "symbol": "Lr",
+            "name": "Lawrencium",
+            "atomicMass": 262,
+            "category": "actinide",
+            "density": 0,
+            "melt": 1900,
+            "boil": 0
+        },
+        {
+            "atomicNumber": 104,
+            "symbol": "Rf",
+            "name": "Rutherfordium",
+            "atomicMass": 267,
+            "category": "transition metal",
+            "density": 0,
+            "melt": 0,
+            "boil": 0
+        },
+        {
+            "atomicNumber": 105,
+            "symbol": "Db",
+            "name": "Dubnium",
+            "atomicMass": 270,
+            "category": "transition metal",
+            "density": 0,
+            "melt": 0,
+            "boil": 0
+        },
+        {
+            "atomicNumber": 106,
+            "symbol": "Sg",
+            "name": "Seaborgium",
+            "atomicMass": 271,
+            "category": "transition metal",
+            "density": 0,
+            "melt": 0,
+            "boil": 0
+        },
+        {
+            "atomicNumber": 107,
+            "symbol": "Bh",
+            "name": "Bohrium",
+            "atomicMass": 270,
+            "category": "transition metal",
+            "density": 0,
+            "melt": 0,
+            "boil": 0
+        },
+        {
+            "atomicNumber": 108,
+            "symbol": "Hs",
+            "name": "Hassium",
+            "atomicMass": 277,
+            "category": "transition metal",
+            "density": 0,
+            "melt": 0,
+            "boil": 0
+        },
+        {
+            "atomicNumber": 109,
+            "symbol": "Mt",
+            "name": "Meitnerium",
+            "atomicMass": 276,
+            "category": "unknown",
+            "density": 0,
+            "melt": 0,
+            "boil": 0
+        },
+        {
+            "atomicNumber": 110,
+            "symbol": "Ds",
+            "name": "Darmstadtium",
+            "atomicMass": 281,
+            "category": "unknown",
+            "density": 0,
+            "melt": 0,
+            "boil": 0
+        },
+        {
+            "atomicNumber": 111,
+            "symbol": "Rg",
+            "name": "Roentgenium",
+            "atomicMass": 280,
+            "category": "unknown",
+            "density": 0,
+            "melt": 0,
+            "boil": 0
+        },
+        {
+            "atomicNumber": 112,
+            "symbol": "Cn",
+            "name": "Copernicium",
+            "atomicMass": 285,
+            "category": "unknown",
+            "density": 0,
+            "melt": 0,
+            "boil": 0
+        },
+        {
+            "atomicNumber": 113,
+            "symbol": "Nh",
+            "name": "Nihonium",
+            "atomicMass": 284,
+            "category": "unknown",
+            "density": 0,
+            "melt": 0,
+            "boil": 0
+        },
+        {
+            "atomicNumber": 114,
+            "symbol": "Fl",
+            "name": "Flerovium",
+            "atomicMass": 289,
+            "category": "unknown",
+            "density": 0,
+            "melt": 0,
+            "boil": 0
+        },
+        {
+            "atomicNumber": 115,
+            "symbol": "Mc",
+            "name": "Moscovium",
+            "atomicMass": 288,
+            "category": "unknown",
+            "density": 0,
+            "melt": 0,
+            "boil": 0
+        },
+        {
+            "atomicNumber": 116,
+            "symbol": "Lv",
+            "name": "Livermorium",
+            "atomicMass": 293,
+            "category": "unknown",
+            "density": 0,
+            "melt": 0,
+            "boil": 0
+        },
+        {
+            "atomicNumber": 117,
+            "symbol": "Ts",
+            "name": "Tennessine",
+            "atomicMass": 294,
+            "category": "unknown",
+            "density": 0,
+            "melt": 0,
+            "boil": 0
+        },
+        {
+            "atomicNumber": 118,
+            "symbol": "Og",
+            "name": "Oganesson",
+            "atomicMass": 294,
+            "category": "unknown",
+            "density": 0,
+            "melt": 0,
+            "boil": 0
+        },
+        {
+            "name": "Rutherfordium",
+            "symbol": "Rf",
+            "atomicNumber": 104,
+            "atomicMass": 267,
+            "category": "transition metal",
+            "density": 23.2,
+            "melt": 2400,
+            "boil": 5800,
+            "phase": "Solid",
+            "x": 4,
+            "y": 7
+        },
+        {
+            "name": "Dubnium",
+            "symbol": "Db",
+            "atomicNumber": 105,
+            "atomicMass": 268,
+            "category": "transition metal",
+            "density": 29.3,
+            "phase": "Solid",
+            "x": 5,
+            "y": 7
+        },
+        {
+            "name": "Seaborgium",
+            "symbol": "Sg",
+            "atomicNumber": 106,
+            "atomicMass": 271,
+            "category": "transition metal",
+            "density": 35.0,
+            "phase": "Solid",
+            "x": 6,
+            "y": 7
+        },
+        {
+            "name": "Bohrium",
+            "symbol": "Bh",
+            "atomicNumber": 107,
+            "atomicMass": 272,
+            "category": "transition metal",
+            "density": 37.1,
+            "phase": "Solid",
+            "x": 7,
+            "y": 7
+        },
+        {
+            "name": "Hassium",
+            "symbol": "Hs",
+            "atomicNumber": 108,
+            "atomicMass": 270,
+            "category": "transition metal",
+            "density": 40.7,
+            "phase": "Solid",
+            "x": 8,
+            "y": 7
+        },
+        {
+            "name": "Meitnerium",
+            "symbol": "Mt",
+            "atomicNumber": 109,
+            "atomicMass": 276,
+            "category": "unknown, probably transition metal",
+            "density": 37.4,
+            "phase": "Solid",
+            "x": 9,
+            "y": 7
+        },
+        {
+            "name": "Darmstadtium",
+            "symbol": "Ds",
+            "atomicNumber": 110,
+            "atomicMass": 281,
+            "category": "unknown, probably transition metal",
+            "density": 34.8,
+            "phase": "Solid",
+            "x": 10,
+            "y": 7
+        },
+        {
+            "name": "Roentgenium",
+            "symbol": "Rg",
+            "atomicNumber": 111,
+            "atomicMass": 280,
+            "category": "unknown, probably transition metal",
+            "density": 28.7,
+            "phase": "Solid",
+            "x": 11,
+            "y": 7
+        },
+        {
+            "name": "Copernicium",
+            "symbol": "Cn",
+            "atomicNumber": 112,
+            "atomicMass": 285,
+            "category": "transition metal",
+            "density": 23.7,
+            "phase": "Liquid",
+            "x": 12,
+            "y": 7
+        },
+        {
+            "name": "Nihonium",
+            "symbol": "Nh",
+            "atomicNumber": 113,
+            "atomicMass": 284,
+            "category": "unknown, probably post-transition metal",
+            "density": 16.0,
+            "phase": "Solid",
+            "x": 13,
+            "y": 7
+        },
+        {
+            "name": "Flerovium",
+            "symbol": "Fl",
+            "atomicNumber": 114,
+            "atomicMass": 289,
+            "category": "post-transition metal",
+            "density": 14.0,
+            "phase": "Solid",
+            "x": 14,
+            "y": 7
+        },
+        {
+            "name": "Moscovium",
+            "symbol": "Mc",
+            "atomicNumber": 115,
+            "atomicMass": 288,
+            "category": "unknown, probably post-transition metal",
+            "density": 13.5,
+            "phase": "Solid",
+            "x": 15,
+            "y": 7
+        },
+        {
+            "name": "Livermorium",
+            "symbol": "Lv",
+            "atomicNumber": 116,
+            "atomicMass": 293,
+            "category": "unknown, probably post-transition metal",
+            "density": 12.9,
+            "phase": "Solid",
+            "x": 16,
+            "y": 7
+        },
+        {
+            "name": "Tennessine",
+            "symbol": "Ts",
+            "atomicNumber": 117,
+            "atomicMass": 294,
+            "category": "unknown, probably metalloid",
+            "density": 7.2,
+            "phase": "Solid",
+            "x": 17,
+            "y": 7
+        },
+        {
+            "name": "Oganesson",
+            "symbol": "Og",
+            "atomicNumber": 118,
+            "atomicMass": 294,
+            "category": "unknown, probably noble gas",
+            "density": 5.0,
+            "phase": "Solid",
+            "x": 18,
+            "y": 7
         }
     ]
 }

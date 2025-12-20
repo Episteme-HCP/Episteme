@@ -28,9 +28,9 @@ import org.jscience.measure.quantity.MassDensity;
 import org.jscience.measure.quantity.Pressure;
 import org.jscience.measure.quantity.ThermalConductivity;
 
-import org.jscience.resources.properties.PropertiesLoader;
-import org.jscience.resources.properties.PropertyKey;
-import org.jscience.resources.properties.PropertySet;
+import org.jscience.io.properties.PropertiesLoader;
+import org.jscience.io.properties.PropertyKey;
+import org.jscience.io.properties.PropertySet;
 
 /**
  * Represents a physical material with standard properties.

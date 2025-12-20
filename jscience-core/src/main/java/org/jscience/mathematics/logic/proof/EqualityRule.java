@@ -45,7 +45,7 @@ public class EqualityRule implements InferenceRule {
             String p2 = premises.get(1).getExpression().trim();
 
             String eq = null;
-            String p = null;
+            String p = "";
 
             if (p1.contains("=") && !p2.contains("=")) {
                 eq = p1;

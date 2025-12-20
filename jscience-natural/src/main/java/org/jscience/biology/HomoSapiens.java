@@ -4,7 +4,6 @@
  */
 package org.jscience.biology;
 
-import java.time.LocalDate;
 import org.jscience.biology.taxonomy.Species;
 
 /**

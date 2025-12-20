@@ -27,7 +27,7 @@ import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.quantity.*;
 import org.jscience.measure.units.SI;
-import org.jscience.resources.MiniCatalog;
+import org.jscience.io.MiniCatalog;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;

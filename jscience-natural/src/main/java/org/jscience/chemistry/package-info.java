@@ -8,7 +8,7 @@
  * <li>{@link org.jscience.chemistry.Element} - Properties including mass,
  * electronegativity</li>
  * <li>JSON Data Loading via
- * {@link org.jscience.resources.chemistry.ChemistryDataLoader}</li>
+ * {@link org.jscience.io.chemistry.ChemistryDataLoader}</li>
  * </ul>
  * </p>
  * 

@@ -4,7 +4,6 @@
  */
 package org.jscience.arts.theater;
 
-import java.time.LocalDate;
 import java.util.*;
 
 /**

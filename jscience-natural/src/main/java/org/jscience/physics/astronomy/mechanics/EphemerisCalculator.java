@@ -68,17 +68,24 @@ public class EphemerisCalculator {
         // Let's use Real for 'n' to minimize complexity in the calculation formula
         // which relies on day diffs.
         public Real nVal;
+        public List<Moon> moons = new ArrayList<>();
 
         public Planet() {
         }
 
-        // Setter for JSON mapping (Jackson uses setters or public fields)
-        // We might need a helper class or custom deserializer if we change types but
-        // JSON remains doubles.
-        // Actually, we can keep public double fields for JSON loading and auto-convert
-        // in a post-construct or use setters.
-        // Let's use setters to intercept.
+        // ... (existing setters) ...
 
+        public static class Moon {
+            public String name;
+            public Quantity<Length> a;
+            public Real e;
+            public Quantity<Angle> i;
+            public Quantity<Frequency> n; // or Real for deg/day
+            public Real nVal;
+            // Add other parameters as needed for basic moon orbit
+        }
+
+        // Setter for JSON mapping (Jackson uses setters or public fields)
         public void setName(String name) {
             this.name = name;
         }
@@ -147,6 +154,18 @@ public class EphemerisCalculator {
                     p.L0 = Quantities.create(dto.L0, org.jscience.measure.Units.DEGREE_ANGLE);
                     p.nVal = Real.of(dto.n);
 
+                    if (dto.moons != null) {
+                        for (PlanetDTO.MoonDTO mDto : dto.moons) {
+                            Moon m = new Moon();
+                            m.name = mDto.name;
+                            m.a = Quantities.create(mDto.a * PhysicalConstants.AU.doubleValue(),
+                                    org.jscience.measure.Units.METER);
+                            m.e = Real.of(mDto.e);
+                            m.nVal = Real.of(mDto.n);
+                            p.moons.add(m);
+                        }
+                    }
+
                     REGISTRY.add(p);
                     BY_NAME.put(p.name, p);
                 }
@@ -174,6 +193,18 @@ public class EphemerisCalculator {
         public double Omega;
         public double L0;
         public double n;
+        public List<MoonDTO> moons;
+
+        public static class MoonDTO {
+            public String name;
+            public double a;
+            public double e;
+            public double i;
+            public double omega;
+            public double Omega;
+            public double L0;
+            public double n;
+        }
     }
 
     /**

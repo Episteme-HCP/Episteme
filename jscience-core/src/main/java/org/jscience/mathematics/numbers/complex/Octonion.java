@@ -197,7 +197,7 @@ public class Octonion implements Field<Octonion> {
         Real ac3 = a0.multiply(c3).add(a1.multiply(c2)).subtract(a2.multiply(c1)).add(a3.multiply(c0));
 
         // db* (d * conjugate(b))
-        Real minus = Real.ONE.negate();
+
         Real nb1 = b1.negate();
         Real nb2 = b2.negate();
         Real nb3 = b3.negate();

@@ -50,6 +50,7 @@ public interface SpacetimeMetric extends MetricSpace<Vector4D> {
      * should override with analytic expressions.
      * </p>
      */
+    @SuppressWarnings("unchecked")
     default Tensor<Real> getChristoffelSymbols(Vector4D point) {
         // Christoffel symbols of the second kind: Gamma^k_ij
         // gamma^k_ij = 0.5 * g^kl * (d_i g_jl + d_j g_il - d_l g_ij)
@@ -97,7 +98,6 @@ public interface SpacetimeMetric extends MetricSpace<Vector4D> {
         Real h = Real.of(hVal);
         Real twoH = Real.of(2 * hVal);
 
-        Tensor<Real>[][] dG = new Tensor[dim][dim]; // dG[k] is partial derivative tensor wrt x^k? No.
         // We need a structure to hold d_k g_ij. Rank 3: [k, i, j]
         // Let's store as Tensor<Real> [dim] where array index is k, tensor is g_ij. No.
         // Let's conceptually compute it on fly or store in a [4][4][4] array?

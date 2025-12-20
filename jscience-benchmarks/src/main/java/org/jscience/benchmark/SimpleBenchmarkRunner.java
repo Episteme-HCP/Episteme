@@ -68,7 +68,7 @@ public class SimpleBenchmarkRunner {
         // Need to instantiate and run MatrixBenchmark wrapper if available, or just
         // skip for now.
         // Assuming MatrixBenchmark is the one we just fixed.
-        MatrixBenchmark mb = new MatrixBenchmark();
+        // MatrixBenchmark mb = new MatrixBenchmark();
         // But MatrixBenchmark isn't a Runnable? It implements RunnableBenchmark.
         // We need a runner that can run RunnableBenchmark methods annotated with
         // @Benchmark.

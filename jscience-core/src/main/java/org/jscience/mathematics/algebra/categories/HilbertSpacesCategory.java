@@ -80,7 +80,7 @@ public class HilbertSpacesCategory implements Category<HilbertSpace<?, ?>, Matri
      * @param v2    second vector
      * @return the scalar inner product
      */
-    @SuppressWarnings("unchecked")
+
     public <V, S> S innerProduct(HilbertSpace<V, S> space, V v1, V v2) {
         // Delegate to the space's internal inner product definition
         // Assuming HilbertSpace has such a method, otherwise this is a placeholder

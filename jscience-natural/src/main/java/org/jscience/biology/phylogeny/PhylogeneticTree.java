@@ -4,6 +4,8 @@ import java.util.*;
 
 import org.jscience.mathematics.discrete.Tree;
 import org.jscience.mathematics.discrete.RootedTree;
+import org.jscience.biology.taxonomy.Species;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Phylogenetic tree construction and representation.
@@ -30,35 +32,49 @@ public class PhylogeneticTree {
      */
     public static class Node {
         public final String name;
-        public final double height; // Height from leaves (for UPGMA)
-        public final double branchLength; // Branch length to parent
+        public final Species species; // Linked Species object (optional)
+        public final Real height; // Height from leaves (for UPGMA)
+        public final Real branchLength; // Branch length to parent
         public final Node left;
         public final Node right;
 
-        /** Leaf node constructor */
+        /** Leaf node constructor from Name */
         public Node(String name) {
             this.name = name;
-            this.height = 0;
-            this.branchLength = 0;
+            this.species = null;
+            this.height = Real.ZERO;
+            this.branchLength = Real.ZERO;
+            this.left = null;
+            this.right = null;
+        }
+
+        /** Leaf node constructor from Species */
+        public Node(Species species) {
+            this.name = species.getScientificName();
+            this.species = species;
+            this.height = Real.ZERO;
+            this.branchLength = Real.ZERO;
             this.left = null;
             this.right = null;
         }
 
         /** Internal node constructor for UPGMA */
-        public Node(Node left, Node right, double height) {
+        public Node(Node left, Node right, Real height) {
             this.name = ".";
+            this.species = null;
             this.left = left;
             this.right = right;
             this.height = height;
-            this.branchLength = 0;
+            this.branchLength = Real.ZERO;
         }
 
         /** Internal node constructor with branch length */
-        public Node(String name, Node left, Node right, double branchLength) {
+        public Node(String name, Node left, Node right, Real branchLength) {
             this.name = name;
+            this.species = null;
             this.left = left;
             this.right = right;
-            this.height = 0;
+            this.height = Real.ZERO;
             this.branchLength = branchLength;
         }
 
@@ -77,54 +93,61 @@ public class PhylogeneticTree {
             }
             String leftStr = left.toNewick();
             String rightStr = right.toNewick();
-            double leftBranch = height - left.height;
-            double rightBranch = height - right.height;
-            return String.format("(%s:%.4f,%s:%.4f)", leftStr, leftBranch, rightStr, rightBranch);
+            Real leftBranch = height.subtract(left.height);
+            Real rightBranch = height.subtract(right.height);
+            return String.format("(%s:%.4f,%s:%.4f)", leftStr, leftBranch.doubleValue(), rightStr,
+                    rightBranch.doubleValue());
         }
     }
 
     // ========== Tree Construction Algorithms ==========
 
+    public static Node buildUPGMA(Real[][] distanceMatrix, List<Species> speciesList) {
+        List<Node> nodes = new ArrayList<>();
+        for (Species s : speciesList) {
+            nodes.add(new Node(s));
+        }
+        return runUPGMA(distanceMatrix, nodes);
+    }
+
     /**
-     * Builds a phylogenetic tree using UPGMA algorithm.
-     * <p>
-     * UPGMA assumes a molecular clock (constant evolutionary rate).
-     * </p>
-     *
-     * @param distanceMatrix pairwise distance matrix
-     * @param labels         species/sequence labels
-     * @return root node of the constructed tree
+     * Builds a phylogenetic tree using UPGMA algorithm (String labels).
      */
-    public static Node buildUPGMA(double[][] distanceMatrix, List<String> labels) {
-        int n = labels.size();
+    public static Node buildUPGMAFromLabels(Real[][] distanceMatrix, List<String> labels) {
+        List<Node> nodes = new ArrayList<>();
+        for (String label : labels) {
+            nodes.add(new Node(label));
+        }
+        return runUPGMA(distanceMatrix, nodes);
+    }
+
+    private static Node runUPGMA(Real[][] distanceMatrix, List<Node> inputNodes) {
+        int n = inputNodes.size();
 
         // Dynamic list of distances
-        List<List<Double>> dists = new ArrayList<>();
+        List<List<Real>> dists = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            List<Double> row = new ArrayList<>();
-            for (double val : distanceMatrix[i])
+            List<Real> row = new ArrayList<>();
+            for (Real val : distanceMatrix[i])
                 row.add(val);
             dists.add(row);
         }
 
-        List<Node> nodes = new ArrayList<>();
+        List<Node> nodes = new ArrayList<>(inputNodes);
         List<Integer> sizes = new ArrayList<>();
-
-        for (String label : labels) {
-            nodes.add(new Node(label));
+        for (int i = 0; i < n; i++)
             sizes.add(1);
-        }
 
         while (nodes.size() > 1) {
             // Find minimum distance
-            double min = Double.MAX_VALUE;
+            Real min = Real.POSITIVE_INFINITY;
             int minI = -1, minJ = -1;
 
             int sz = nodes.size();
             for (int i = 0; i < sz; i++) {
                 for (int j = i + 1; j < sz; j++) {
-                    double d = dists.get(i).get(j);
-                    if (d < min) {
+                    Real d = dists.get(i).get(j);
+                    if (d.compareTo(min) < 0) {
                         min = d;
                         minI = i;
                         minJ = j;
@@ -138,17 +161,23 @@ public class PhylogeneticTree {
             int sizeI = sizes.get(minI);
             int sizeJ = sizes.get(minJ);
 
-            Node parent = new Node(ni, nj, min / 2.0);
+            Node parent = new Node(ni, nj, min.divide(Real.TWO));
 
             // Calculate new distances using UPGMA formula
-            List<Double> newRow = new ArrayList<>();
+            List<Real> newRow = new ArrayList<>();
             for (int k = 0; k < sz; k++) {
                 if (k == minI || k == minJ) {
-                    newRow.add(0.0);
+                    newRow.add(Real.ZERO);
                 } else {
-                    double dik = dists.get(minI).get(k);
-                    double djk = dists.get(minJ).get(k);
-                    double dnew = (dik * sizeI + djk * sizeJ) / (sizeI + sizeJ);
+                    Real dik = dists.get(minI).get(k);
+                    Real djk = dists.get(minJ).get(k);
+
+                    // (dik * sizeI + djk * sizeJ) / (sizeI + sizeJ)
+                    Real sumI = dik.multiply(Real.of(sizeI));
+                    Real sumJ = djk.multiply(Real.of(sizeJ));
+                    Real totalSize = Real.of(sizeI + sizeJ);
+
+                    Real dnew = sumI.add(sumJ).divide(totalSize);
                     newRow.add(dnew);
                 }
             }
@@ -164,18 +193,18 @@ public class PhylogeneticTree {
 
             dists.remove(remove1);
             dists.remove(remove2);
-            for (List<Double> row : dists) {
+            for (List<Real> row : dists) {
                 row.remove(remove1);
                 row.remove(remove2);
             }
 
-            List<Double> cleanNewRow = new ArrayList<>();
+            List<Real> cleanNewRow = new ArrayList<>();
             for (int k = 0; k < sz; k++) {
                 if (k != minI && k != minJ) {
                     cleanNewRow.add(newRow.get(k));
                 }
             }
-            cleanNewRow.add(0.0);
+            cleanNewRow.add(Real.ZERO);
 
             nodes.add(parent);
             sizes.add(sizeI + sizeJ);
@@ -190,60 +219,67 @@ public class PhylogeneticTree {
         return nodes.get(0);
     }
 
+    public static Node buildNeighborJoining(Real[][] distanceMatrix, List<Species> speciesList) {
+        List<Node> nodes = new ArrayList<>();
+        for (Species s : speciesList)
+            nodes.add(new Node(s));
+        return runNeighborJoining(distanceMatrix, nodes);
+    }
+
     /**
-     * Builds a phylogenetic tree using Neighbor-Joining algorithm.
-     * <p>
-     * Neighbor-Joining does not assume a molecular clock and produces
-     * unrooted trees with more accurate branch lengths.
-     * </p>
-     *
-     * @param distanceMatrix pairwise distance matrix
-     * @param labels         species/sequence labels
-     * @return root node of the constructed tree
+     * Builds a phylogenetic tree using Neighbor-Joining algorithm (String labels).
      */
-    public static Node buildNeighborJoining(double[][] distanceMatrix, List<String> labels) {
-        int n = labels.size();
+    public static Node buildNeighborJoiningFromLabels(Real[][] distanceMatrix, List<String> labels) {
+        List<Node> nodes = new ArrayList<>();
+        for (String label : labels)
+            nodes.add(new Node(label));
+        return runNeighborJoining(distanceMatrix, nodes);
+    }
+
+    private static Node runNeighborJoining(Real[][] distanceMatrix, List<Node> inputNodes) {
+        int n = inputNodes.size();
         if (n < 2) {
-            return n == 1 ? new Node(labels.get(0)) : null;
+            return n == 1 ? inputNodes.get(0) : null;
         }
 
         // Copy distance matrix
-        double[][] D = new double[n][n];
+        Real[][] D = new Real[n][n];
         for (int i = 0; i < n; i++) {
             D[i] = Arrays.copyOf(distanceMatrix[i], n);
         }
 
-        List<Node> nodes = new ArrayList<>();
-        for (String label : labels) {
-            nodes.add(new Node(label));
-        }
-
+        List<Node> nodes = new ArrayList<>(inputNodes);
         List<Integer> active = new ArrayList<>();
         for (int i = 0; i < n; i++)
             active.add(i);
 
         while (active.size() > 2) {
             int r = active.size();
+            Real rReal = Real.of(r);
+            Real factor = Real.of(r - 2);
 
             // Calculate row sums
-            double[] S = new double[n];
+            Real[] S = new Real[n];
             for (int i : active) {
-                double sum = 0;
+                Real sum = Real.ZERO;
                 for (int j : active) {
-                    sum += D[i][j];
+                    sum = sum.add(D[i][j]);
                 }
                 S[i] = sum;
             }
 
             // Find minimum Q(i,j)
-            double minQ = Double.MAX_VALUE;
+            Real minQ = Real.POSITIVE_INFINITY;
             int minI = -1, minJ = -1;
+
             for (int ii = 0; ii < r; ii++) {
                 for (int jj = ii + 1; jj < r; jj++) {
                     int i = active.get(ii);
                     int j = active.get(jj);
-                    double q = (r - 2) * D[i][j] - S[i] - S[j];
-                    if (q < minQ) {
+                    // (r - 2) * D[i][j] - S[i] - S[j]
+                    Real q = factor.multiply(D[i][j]).subtract(S[i]).subtract(S[j]);
+
+                    if (q.compareTo(minQ) < 0) {
                         minQ = q;
                         minI = i;
                         minJ = j;
@@ -252,20 +288,25 @@ public class PhylogeneticTree {
             }
 
             // Calculate branch lengths
-            double dij = D[minI][minJ];
-            double branchI = 0.5 * dij + (S[minI] - S[minJ]) / (2 * (r - 2));
-            double branchJ = dij - branchI;
+            Real dij = D[minI][minJ];
+            // 0.5 * dij + (S[minI] - S[minJ]) / (2 * (r - 2))
+
+            Real term1 = dij.divide(Real.TWO);
+            Real term2 = S[minI].subtract(S[minJ]).divide(Real.TWO.multiply(factor));
+
+            Real branchI = term1.add(term2);
+            Real branchJ = dij.subtract(branchI);
 
             // Create new node
             Node newNode = new Node("(" + nodes.get(minI).name + "," + nodes.get(minJ).name + ")",
-                    nodes.get(minI), nodes.get(minJ), 0);
+                    nodes.get(minI), nodes.get(minJ), Real.ZERO);
 
             // Update distance matrix
             int newIdx = nodes.size();
             nodes.add(newNode);
 
             // Extend D matrix
-            double[][] newD = new double[newIdx + 1][newIdx + 1];
+            Real[][] newD = new Real[newIdx + 1][newIdx + 1];
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
                     newD[i][j] = D[i][j];
@@ -275,12 +316,13 @@ public class PhylogeneticTree {
             // Calculate distances to new node
             for (int k : active) {
                 if (k != minI && k != minJ) {
-                    double dnew = 0.5 * (D[minI][k] + D[minJ][k] - dij);
+                    // 0.5 * (D[minI][k] + D[minJ][k] - dij)
+                    Real dnew = D[minI][k].add(D[minJ][k]).subtract(dij).divide(Real.TWO);
                     newD[newIdx][k] = dnew;
                     newD[k][newIdx] = dnew;
                 }
             }
-            newD[newIdx][newIdx] = 0;
+            newD[newIdx][newIdx] = Real.ZERO;
 
             D = newD;
             n = newIdx + 1;
@@ -295,8 +337,8 @@ public class PhylogeneticTree {
         if (active.size() == 2) {
             int i = active.get(0);
             int j = active.get(1);
-            double d = D[i][j];
-            return new Node(nodes.get(i), nodes.get(j), d / 2);
+            Real d = D[i][j];
+            return new Node(nodes.get(i), nodes.get(j), d.divide(Real.TWO));
         }
 
         return nodes.get(active.get(0));
@@ -371,7 +413,7 @@ public class PhylogeneticTree {
         Node left = parseNewickRecursive(leftStr.split(":")[0]);
         Node right = parseNewickRecursive(rightStr.split(":")[0]);
 
-        return new Node(left, right, 0);
+        return new Node(left, right, Real.ZERO);
     }
 
     /**

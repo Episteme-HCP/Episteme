@@ -8,22 +8,12 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import org.jscience.chemistry.Molecule;
-import org.jscience.chemistry.Atom;
-import org.jscience.chemistry.Bond;
-import org.jscience.chemistry.Bond.BondOrder;
-import org.jscience.chemistry.Element;
-import org.jscience.chemistry.PeriodicTable;
 import org.jscience.chemistry.loaders.ChemistryDataLoader;
 import org.jscience.physics.astronomy.SolarSystemLoader;
 import org.jscience.physics.astronomy.StarSystem;
 import org.jscience.ui.chemistry.MolecularViewer;
 import org.jscience.ui.chemistry.PeriodicTableViewer;
 import org.jscience.ui.physics.astronomy.StarSystemViewer;
-import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
-import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.mathematics.sets.Reals;
-
-import java.util.Arrays;
 
 /**
  * Unified JScience Demo Application.

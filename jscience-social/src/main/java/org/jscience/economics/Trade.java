@@ -4,7 +4,6 @@
  */
 package org.jscience.economics;
 
-import org.jscience.mathematics.numbers.real.Real;
 import java.time.LocalDate;
 
 /**

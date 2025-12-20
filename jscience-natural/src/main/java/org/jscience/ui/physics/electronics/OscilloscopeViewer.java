@@ -9,7 +9,6 @@ import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Interactive viewer for the Oscilloscope.

@@ -141,16 +141,6 @@ public class CollisionDetector {
         return a.getX() * b.getX() + a.getY() * b.getY() + a.getZ() * b.getZ();
     }
 
-    private Vector3D tripleProduct(Vector3D a, Vector3D b, Vector3D c) {
-        // (a x b) x c = b(a.c) - a(b.c)
-        double ac = dotProduct(a, c);
-        double bc = dotProduct(b, c);
-        return new Vector3D(
-                b.getX() * ac - a.getX() * bc,
-                b.getY() * ac - a.getY() * bc,
-                b.getZ() * ac - a.getZ() * bc);
-    }
-
     // Support function in Minkowski Difference
     public Point3D support(RigidBody b1, RigidBody b2, Vector3D direction) {
         Point3D p1 = getSupport(b1, direction);

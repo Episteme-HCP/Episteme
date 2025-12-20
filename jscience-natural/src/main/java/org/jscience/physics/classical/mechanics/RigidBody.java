@@ -1,7 +1,5 @@
 package org.jscience.physics.classical.mechanics;
 
-import org.jscience.physics.classical.mechanics.Kinematics;
-
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 

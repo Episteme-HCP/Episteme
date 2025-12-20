@@ -29,6 +29,16 @@ public class SpacetimeMetricTest {
                 g.set(one, 3, 3); // z
                 return g;
             }
+
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
+
+            @Override
+            public boolean contains(Vector4D element) {
+                return true;
+            }
         };
 
         // Point at x=2, others 0

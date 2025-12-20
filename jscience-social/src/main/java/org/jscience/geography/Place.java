@@ -4,6 +4,12 @@
  */
 package org.jscience.geography;
 
+import org.jscience.economics.Market;
+import org.jscience.sociology.Person;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Collections;
+
 /**
  * Represents a named geographic place.
  *
@@ -16,7 +22,8 @@ public class Place {
     public enum Type {
         CITY, TOWN, VILLAGE, NEIGHBORHOOD, LANDMARK,
         PARK, MOUNTAIN, RIVER, LAKE, OCEAN, ISLAND,
-        BUILDING, MONUMENT, AIRPORT, STATION
+        BUILDING, MONUMENT, AIRPORT, STATION,
+        COUNTRY, REGION, STATE, CONTINENT
     }
 
     private final String name;
@@ -25,11 +32,16 @@ public class Place {
     private String description;
     private String region;
     private String country;
-    private long population;
+
+    // V1 Features
+    private final List<Person> inhabitants;
+    private final List<Market> markets;
 
     public Place(String name, Type type) {
         this.name = name;
         this.type = type;
+        this.inhabitants = new ArrayList<>();
+        this.markets = new ArrayList<>();
     }
 
     public Place(String name, Type type, Coordinate location) {
@@ -63,7 +75,29 @@ public class Place {
     }
 
     public long getPopulation() {
-        return population;
+        return inhabitants.size();
+    }
+
+    public List<Person> getInhabitants() {
+        return Collections.unmodifiableList(inhabitants);
+    }
+
+    public void addInhabitant(Person p) {
+        if (!inhabitants.contains(p)) {
+            inhabitants.add(p);
+        }
+    }
+
+    public void removeInhabitant(Person p) {
+        inhabitants.remove(p);
+    }
+
+    public List<Market> getMarkets() {
+        return Collections.unmodifiableList(markets);
+    }
+
+    public void addMarket(Market m) {
+        markets.add(m);
     }
 
     // Setters
@@ -83,8 +117,12 @@ public class Place {
         this.country = country;
     }
 
+    // Explicit population setting deprecated in favor of list tracking,
+    // but kept for compatibility if needed (logic override)
     public void setPopulation(long population) {
-        this.population = population;
+        // No-op or throw exception? For now ignoring as it's derived.
+        // Or we could have an "estimated" population field separate from actual tracked
+        // entities.
     }
 
     /**

@@ -1,155 +1,79 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
- */
 package org.jscience.economics;
 
-import java.time.LocalDate;
-import java.util.*;
-import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.sociology.Person;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Represents a worker/employee in an economic system.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 2.0
+ * Represents a person working in an organization.
  */
-public class Worker {
+public class Worker implements Serializable {
 
-    public enum EmploymentType {
-        FULL_TIME, PART_TIME, CONTRACT, TEMPORARY, INTERN, FREELANCE
-    }
+    private final Person person;
+    private Organization organization;
 
-    public enum Skill {
-        UNSKILLED, SEMI_SKILLED, SKILLED, PROFESSIONAL, EXECUTIVE
-    }
-
-    private final String id;
-    private final String name;
-    private EmploymentType employmentType;
-    private Skill skillLevel;
-    private String occupation;
-    private String employer;
-    private LocalDate hireDate;
+    private String jobTitle;
     private Money salary;
-    private int hoursPerWeek;
-    private final List<String> skills = new ArrayList<>();
 
-    public Worker(String id, String name) {
-        this.id = id;
-        this.name = name;
-        this.employmentType = EmploymentType.FULL_TIME;
-        this.skillLevel = Skill.UNSKILLED;
-        this.hoursPerWeek = 40;
+    private Set<Worker> chiefs;
+    private Set<Worker> subalterns;
+
+    public Worker(Person person, Organization organization, String jobTitle, Money salary) {
+        this.person = person;
+        this.organization = organization;
+        this.jobTitle = jobTitle;
+        this.salary = salary;
+
+        this.chiefs = new HashSet<>();
+        this.subalterns = new HashSet<>();
     }
 
-    // Getters
-    public String getId() {
-        return id;
+    public Person getPerson() {
+        return person;
     }
 
-    public String getName() {
-        return name;
+    public Organization getOrganization() {
+        return organization;
     }
 
-    public EmploymentType getEmploymentType() {
-        return employmentType;
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 
-    public Skill getSkillLevel() {
-        return skillLevel;
+    public String getJobTitle() {
+        return jobTitle;
     }
 
-    public String getOccupation() {
-        return occupation;
-    }
-
-    public String getEmployer() {
-        return employer;
-    }
-
-    public LocalDate getHireDate() {
-        return hireDate;
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
     }
 
     public Money getSalary() {
         return salary;
     }
 
-    public int getHoursPerWeek() {
-        return hoursPerWeek;
-    }
-
-    public List<String> getSkills() {
-        return Collections.unmodifiableList(skills);
-    }
-
-    // Setters
-    public void setEmploymentType(EmploymentType type) {
-        this.employmentType = type;
-    }
-
-    public void setSkillLevel(Skill level) {
-        this.skillLevel = level;
-    }
-
-    public void setOccupation(String occupation) {
-        this.occupation = occupation;
-    }
-
-    public void setEmployer(String employer) {
-        this.employer = employer;
-    }
-
-    public void setHireDate(LocalDate hireDate) {
-        this.hireDate = hireDate;
-    }
-
     public void setSalary(Money salary) {
         this.salary = salary;
     }
 
-    public void setHoursPerWeek(int hours) {
-        this.hoursPerWeek = hours;
+    public Set<Worker> getChiefs() {
+        return chiefs;
     }
 
-    public void addSkill(String skill) {
-        if (!skills.contains(skill)) {
-            skills.add(skill);
+    public Set<Worker> getSubalterns() {
+        return subalterns;
+    }
+
+    public void addSubaltern(Worker worker) {
+        if (worker != this) {
+            this.subalterns.add(worker);
+            worker.getChiefs().add(this);
         }
     }
 
-    /**
-     * Calculates years of experience at current employer.
-     */
-    public int getYearsOfExperience() {
-        if (hireDate == null)
-            return 0;
-        return java.time.Period.between(hireDate, LocalDate.now()).getYears();
-    }
-
-    /**
-     * Calculates hourly rate from annual salary.
-     */
-    public Money getHourlyRate() {
-        if (salary == null || hoursPerWeek == 0)
-            return null;
-        double annualHours = hoursPerWeek * 52;
-        Real hourlyAmount = salary.getAmount().divide(Real.of(annualHours));
-        return new Money(hourlyAmount, salary.getCurrency());
-    }
-
-    /**
-     * Checks if worker is considered full-time.
-     */
-    public boolean isFullTime() {
-        return hoursPerWeek >= 35;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Worker[%s] %s - %s at %s (%s)",
-                id, name, occupation, employer, employmentType);
+    public void removeSubaltern(Worker worker) {
+        this.subalterns.remove(worker);
+        worker.getChiefs().remove(this);
     }
 }
