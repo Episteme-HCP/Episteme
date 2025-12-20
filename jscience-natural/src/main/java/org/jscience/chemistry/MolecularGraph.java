@@ -2,17 +2,25 @@ package org.jscience.chemistry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import org.jscience.mathematics.discrete.Graph;
 
 /**
  * Represents a molecule as a graph of atoms and bonds.
+ * <p>
+ * Implements {@link Graph} to allow graph-theoretic algorithms (DFS, BFS, etc.)
+ * to be applied directly to molecular structures.
+ * </p>
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public class MolecularGraph {
+public class MolecularGraph implements Graph<Atom> {
 
     private final List<Atom> atoms;
     private final List<Bond> bonds;
@@ -96,6 +104,76 @@ public class MolecularGraph {
     public String toString() {
         return getFormula() + " (" + atoms.size() + " atoms, " + bonds.size() + " bonds)";
     }
+
+    // --- Graph<Atom> Interface Implementation ---
+
+    @Override
+    public Set<Atom> vertices() {
+        return new HashSet<>(atoms);
+    }
+
+    @Override
+    public Set<Graph.Edge<Atom>> edges() {
+        Set<Graph.Edge<Atom>> edgeSet = new HashSet<>();
+        for (Bond b : bonds) {
+            edgeSet.add(new Graph.Edge<Atom>() {
+                @Override
+                public Atom source() {
+                    return b.source;
+                }
+
+                @Override
+                public Atom target() {
+                    return b.target;
+                }
+            });
+        }
+        return edgeSet;
+    }
+
+    @Override
+    public boolean addVertex(Atom vertex) {
+        if (atoms.contains(vertex))
+            return false;
+        atoms.add(vertex);
+        return true;
+    }
+
+    @Override
+    public boolean addEdge(Atom source, Atom target) {
+        // Default to SINGLE bond when using Graph interface
+        addBond(source, target, BondType.SINGLE);
+        return true;
+    }
+
+    @Override
+    public Set<Atom> neighbors(Atom vertex) {
+        Set<Atom> neighborSet = new HashSet<>();
+        for (Bond b : bonds) {
+            if (b.source.equals(vertex))
+                neighborSet.add(b.target);
+            if (b.target.equals(vertex))
+                neighborSet.add(b.source);
+        }
+        return neighborSet;
+    }
+
+    @Override
+    public int degree(Atom vertex) {
+        return neighbors(vertex).size();
+    }
+
+    @Override
+    public boolean isDirected() {
+        return false; // Molecular bonds are undirected
+    }
+
+    @Override
+    public int vertexCount() {
+        return atoms.size();
+    }
+
+    // --- Inner Classes ---
 
     public static class Bond {
         public final Atom source;

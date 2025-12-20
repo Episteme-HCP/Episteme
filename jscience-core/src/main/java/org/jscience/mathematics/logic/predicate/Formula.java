@@ -46,6 +46,23 @@ public class Formula {
         return expression;
     }
 
-    // Placeholder for parsing and evaluation logic
+    /**
+     * Checks if the formula is syntactically valid (parentheses balance).
+     * 
+     * @return true if valid
+     */
+    public boolean isValid() {
+        if (expression == null || expression.isEmpty())
+            return false;
+        int balance = 0;
+        for (char c : expression.toCharArray()) {
+            if (c == '(')
+                balance++;
+            else if (c == ')')
+                balance--;
+            if (balance < 0)
+                return false;
+        }
+        return balance == 0;
+    }
 }
-

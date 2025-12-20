@@ -5,6 +5,7 @@ import org.jscience.measure.quantity.Temperature;
 import org.jscience.measure.quantity.Pressure;
 import org.jscience.measure.quantity.Volume;
 import org.jscience.measure.quantity.Energy;
+import org.jscience.measure.quantity.Entropy;
 
 /**
  * Interface representing the thermodynamic state of a system.
@@ -49,9 +50,9 @@ public interface ThermodynamicState {
     /**
      * Returns the entropy of this state.
      * 
-     * @return entropy (J/K) - uses Energy type as placeholder for entropy
+     * @return entropy (J/K)
      */
-    Quantity<Energy> getEntropy();
+    Quantity<Entropy> getEntropy();
 
     /**
      * Internal energy ($U$).

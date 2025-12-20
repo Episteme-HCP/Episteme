@@ -208,14 +208,20 @@ public class GenericMatrix<E> implements Matrix<E> {
 
     @Override
     public Vector<E> getRow(int row) {
-        // Return GenericVector
-        // Implementation needed
-        return null; // Placeholder
+        java.util.List<E> rowData = new java.util.ArrayList<>(cols());
+        for (int j = 0; j < cols(); j++) {
+            rowData.add(get(row, j));
+        }
+        return new org.jscience.mathematics.linearalgebra.vectors.GenericVector<>(rowData, field);
     }
 
     @Override
     public Vector<E> getColumn(int col) {
-        return null; // Placeholder
+        java.util.List<E> colData = new java.util.ArrayList<>(rows());
+        for (int i = 0; i < rows(); i++) {
+            colData.add(get(i, col));
+        }
+        return new org.jscience.mathematics.linearalgebra.vectors.GenericVector<>(colData, field);
     }
 
     @Override

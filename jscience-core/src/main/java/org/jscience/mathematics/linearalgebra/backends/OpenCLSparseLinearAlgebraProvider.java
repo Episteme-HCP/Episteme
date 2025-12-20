@@ -19,6 +19,10 @@ public class OpenCLSparseLinearAlgebraProvider<E> implements LinearAlgebraProvid
 
     public OpenCLSparseLinearAlgebraProvider(Field<E> field) {
         this.cpuProvider = new CPUSparseLinearAlgebraProvider<>(field);
+        if (isAvailable()) {
+            java.util.logging.Logger.getLogger(getClass().getName()).info(
+                    "OpenCLSparseLinearAlgebraProvider initialized (Warning: Sparse GPU ops delegated to CPU in this version)");
+        }
     }
 
     @Override

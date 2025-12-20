@@ -48,7 +48,11 @@ public class OEISExporter {
     public static void exportStripped(IntegerSequence sequence, int count, PrintWriter writer) {
         String id = sequence.getOEISId();
         if (id == null)
-            id = "A000000"; // Placeholder
+            throw new IllegalArgumentException(
+                    "Sequence defined with no OEIS ID cannot be exported to stripped format.");
+
+        if (!isValidOEISId(id))
+            throw new IllegalArgumentException("Invalid OEIS ID: " + id);
 
         writer.print(id);
         writer.print(" ,");
@@ -60,6 +64,18 @@ public class OEISExporter {
             writer.print(val);
         }
         writer.println();
+    }
+
+    /**
+     * Validates an OEIS ID format (A followed by 6 digits).
+     * 
+     * @param id the ID to validate
+     * @return true if valid, false otherwise
+     */
+    public static boolean isValidOEISId(String id) {
+        if (id == null)
+            return false;
+        return id.matches("^A\\d{6}$");
     }
 
     /**

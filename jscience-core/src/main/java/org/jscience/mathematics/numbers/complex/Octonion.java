@@ -2,6 +2,7 @@ package org.jscience.mathematics.numbers.complex;
 
 import java.util.Objects;
 import org.jscience.mathematics.structures.rings.Field;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents an octonion number (8-dimensional hypercomplex number).
@@ -16,19 +17,21 @@ import org.jscience.mathematics.structures.rings.Field;
 public class Octonion implements Field<Octonion> {
 
     /** The zero octonion. */
-    public static final Octonion ZERO = new Octonion(0, 0, 0, 0, 0, 0, 0, 0);
+    public static final Octonion ZERO = new Octonion(Real.ZERO, Real.ZERO, Real.ZERO, Real.ZERO, Real.ZERO, Real.ZERO,
+            Real.ZERO, Real.ZERO);
 
     /** The unit (1,0,0,0,0,0,0,0). */
-    public static final Octonion ONE = new Octonion(1, 0, 0, 0, 0, 0, 0, 0);
+    public static final Octonion ONE = new Octonion(Real.ONE, Real.ZERO, Real.ZERO, Real.ZERO, Real.ZERO, Real.ZERO,
+            Real.ZERO, Real.ZERO);
 
-    private final double e0, e1, e2, e3, e4, e5, e6, e7;
+    private final Real e0, e1, e2, e3, e4, e5, e6, e7;
 
     /**
      * Creates an octonion from 8 real components.
      * o = e0 + e1*i + e2*j + e3*k + e4*l + e5*il + e6*jl + e7*kl
      */
-    public Octonion(double e0, double e1, double e2, double e3,
-            double e4, double e5, double e6, double e7) {
+    public Octonion(Real e0, Real e1, Real e2, Real e3,
+            Real e4, Real e5, Real e6, Real e7) {
         this.e0 = e0;
         this.e1 = e1;
         this.e2 = e2;
@@ -39,86 +42,96 @@ public class Octonion implements Field<Octonion> {
         this.e7 = e7;
     }
 
+    public Octonion(double e0, double e1, double e2, double e3,
+            double e4, double e5, double e6, double e7) {
+        this(Real.of(e0), Real.of(e1), Real.of(e2), Real.of(e3),
+                Real.of(e4), Real.of(e5), Real.of(e6), Real.of(e7));
+    }
+
     /**
      * Creates an octonion from a quaternion (last 4 components = 0).
      */
     public static Octonion fromQuaternion(Quaternion q) {
-        return new Octonion(q.getReal(), q.getI(), q.getJ(), q.getK(), 0, 0, 0, 0);
+        return new Octonion(q.getReal(), q.getI(), q.getJ(), q.getK(), Real.ZERO, Real.ZERO, Real.ZERO, Real.ZERO);
     }
 
     /**
      * Creates an octonion from a complex number (last 6 components = 0).
      */
     public static Octonion fromComplex(Complex c) {
-        return new Octonion(c.real(), c.imaginary(), 0, 0, 0, 0, 0, 0);
+        return new Octonion(Real.of(c.real()), Real.of(c.imaginary()), Real.ZERO, Real.ZERO, Real.ZERO, Real.ZERO,
+                Real.ZERO, Real.ZERO);
     }
 
     // Getters
-    public double getE0() {
+    public Real getE0() {
         return e0;
     }
 
-    public double getE1() {
+    public Real getE1() {
         return e1;
     }
 
-    public double getE2() {
+    public Real getE2() {
         return e2;
     }
 
-    public double getE3() {
+    public Real getE3() {
         return e3;
     }
 
-    public double getE4() {
+    public Real getE4() {
         return e4;
     }
 
-    public double getE5() {
+    public Real getE5() {
         return e5;
     }
 
-    public double getE6() {
+    public Real getE6() {
         return e6;
     }
 
-    public double getE7() {
+    public Real getE7() {
         return e7;
     }
 
     /**
      * Returns the real part (e0).
      */
-    public double real() {
+    public Real real() {
         return e0;
     }
 
     /**
      * Returns the norm (magnitude) of this octonion.
      */
-    public double norm() {
-        return Math.sqrt(normSquared());
+    public Real norm() {
+        return normSquared().sqrt();
     }
 
     /**
      * Returns the squared norm.
      */
-    public double normSquared() {
-        return e0 * e0 + e1 * e1 + e2 * e2 + e3 * e3 + e4 * e4 + e5 * e5 + e6 * e6 + e7 * e7;
+    public Real normSquared() {
+        return e0.multiply(e0).add(e1.multiply(e1)).add(e2.multiply(e2)).add(e3.multiply(e3))
+                .add(e4.multiply(e4)).add(e5.multiply(e5)).add(e6.multiply(e6)).add(e7.multiply(e7));
     }
 
     /**
      * Returns the conjugate of this octonion.
      */
     public Octonion conjugate() {
-        return new Octonion(e0, -e1, -e2, -e3, -e4, -e5, -e6, -e7);
+        return new Octonion(e0, e1.negate(), e2.negate(), e3.negate(),
+                e4.negate(), e5.negate(), e6.negate(), e7.negate());
     }
 
     /**
      * Returns the negation of this octonion.
      */
     public Octonion negate() {
-        return new Octonion(-e0, -e1, -e2, -e3, -e4, -e5, -e6, -e7);
+        return new Octonion(e0.negate(), e1.negate(), e2.negate(), e3.negate(),
+                e4.negate(), e5.negate(), e6.negate(), e7.negate());
     }
 
     /**
@@ -126,8 +139,8 @@ public class Octonion implements Field<Octonion> {
      */
     public Octonion plus(Octonion o) {
         return new Octonion(
-                e0 + o.e0, e1 + o.e1, e2 + o.e2, e3 + o.e3,
-                e4 + o.e4, e5 + o.e5, e6 + o.e6, e7 + o.e7);
+                e0.add(o.e0), e1.add(o.e1), e2.add(o.e2), e3.add(o.e3),
+                e4.add(o.e4), e5.add(o.e5), e6.add(o.e6), e7.add(o.e7));
     }
 
     /**
@@ -135,22 +148,31 @@ public class Octonion implements Field<Octonion> {
      */
     public Octonion minus(Octonion o) {
         return new Octonion(
-                e0 - o.e0, e1 - o.e1, e2 - o.e2, e3 - o.e3,
-                e4 - o.e4, e5 - o.e5, e6 - o.e6, e7 - o.e7);
+                e0.subtract(o.e0), e1.subtract(o.e1), e2.subtract(o.e2), e3.subtract(o.e3),
+                e4.subtract(o.e4), e5.subtract(o.e5), e6.subtract(o.e6), e7.subtract(o.e7));
     }
 
     /**
      * Multiplies this octonion by a scalar.
      */
     public Octonion times(double s) {
-        return new Octonion(e0 * s, e1 * s, e2 * s, e3 * s, e4 * s, e5 * s, e6 * s, e7 * s);
+        Real sr = Real.of(s);
+        return new Octonion(e0.multiply(sr), e1.multiply(sr), e2.multiply(sr), e3.multiply(sr),
+                e4.multiply(sr), e5.multiply(sr), e6.multiply(sr), e7.multiply(sr));
     }
 
     /**
      * Divides this octonion by a scalar.
      */
     public Octonion divides(double s) {
-        return new Octonion(e0 / s, e1 / s, e2 / s, e3 / s, e4 / s, e5 / s, e6 / s, e7 / s);
+        Real sr = Real.of(s);
+        return new Octonion(e0.divide(sr), e1.divide(sr), e2.divide(sr), e3.divide(sr),
+                e4.divide(sr), e5.divide(sr), e6.divide(sr), e7.divide(sr));
+    }
+
+    public Octonion divides(Real sr) {
+        return new Octonion(e0.divide(sr), e1.divide(sr), e2.divide(sr), e3.divide(sr),
+                e4.divide(sr), e5.divide(sr), e6.divide(sr), e7.divide(sr));
     }
 
     /**
@@ -161,48 +183,57 @@ public class Octonion implements Field<Octonion> {
         // Using Cayley-Dickson construction: (a,b)*(c,d) = (ac - d*b*, a*d + cb)
         // where a,b,c,d are quaternions and * denotes conjugation
 
-        double a0 = e0, a1 = e1, a2 = e2, a3 = e3;
-        double b0 = e4, b1 = e5, b2 = e6, b3 = e7;
-        double c0 = o.e0, c1 = o.e1, c2 = o.e2, c3 = o.e3;
-        double d0 = o.e4, d1 = o.e5, d2 = o.e6, d3 = o.e7;
+        Real a0 = e0, a1 = e1, a2 = e2, a3 = e3;
+        Real b0 = e4, b1 = e5, b2 = e6, b3 = e7;
+        Real c0 = o.e0, c1 = o.e1, c2 = o.e2, c3 = o.e3;
+        Real d0 = o.e4, d1 = o.e5, d2 = o.e6, d3 = o.e7;
 
-        // Quaternion multiplication for ac
-        double ac0 = a0 * c0 - a1 * c1 - a2 * c2 - a3 * c3;
-        double ac1 = a0 * c1 + a1 * c0 + a2 * c3 - a3 * c2;
-        double ac2 = a0 * c2 - a1 * c3 + a2 * c0 + a3 * c1;
-        double ac3 = a0 * c3 + a1 * c2 - a2 * c1 + a3 * c0;
+        // Quaternion multiplication logic applied to Real components
+        // Helper lambda or method would be cleaner, but inline for now.
+        // ac
+        Real ac0 = a0.multiply(c0).subtract(a1.multiply(c1)).subtract(a2.multiply(c2)).subtract(a3.multiply(c3));
+        Real ac1 = a0.multiply(c1).add(a1.multiply(c0)).add(a2.multiply(c3)).subtract(a3.multiply(c2));
+        Real ac2 = a0.multiply(c2).subtract(a1.multiply(c3)).add(a2.multiply(c0)).add(a3.multiply(c1));
+        Real ac3 = a0.multiply(c3).add(a1.multiply(c2)).subtract(a2.multiply(c1)).add(a3.multiply(c0));
 
-        // d* = conjugate of d as quaternion: (d0, -d1, -d2, -d3)
-        // d* * b* where b* = (b0, -b1, -b2, -b3)
-        double db0 = d0 * b0 - (-d1) * (-b1) - (-d2) * (-b2) - (-d3) * (-b3);
-        double db1 = d0 * (-b1) + (-d1) * b0 + (-d2) * (-b3) - (-d3) * (-b2);
-        double db2 = d0 * (-b2) - (-d1) * (-b3) + (-d2) * b0 + (-d3) * (-b1);
-        double db3 = d0 * (-b3) + (-d1) * (-b2) - (-d2) * (-b1) + (-d3) * b0;
+        // db* (d * conjugate(b))
+        Real minus = Real.ONE.negate();
+        Real nb1 = b1.negate();
+        Real nb2 = b2.negate();
+        Real nb3 = b3.negate();
+
+        Real db0 = d0.multiply(b0).subtract(d1.multiply(nb1)).subtract(d2.multiply(nb2)).subtract(d3.multiply(nb3));
+        Real db1 = d0.multiply(nb1).add(d1.multiply(b0)).add(d2.multiply(nb3)).subtract(d3.multiply(nb2));
+        Real db2 = d0.multiply(nb2).subtract(d1.multiply(nb3)).add(d2.multiply(b0)).add(d3.multiply(nb1));
+        Real db3 = d0.multiply(nb3).add(d1.multiply(nb2)).subtract(d2.multiply(nb1)).add(d3.multiply(b0));
 
         // First quaternion result: ac - d*b*
-        double r0 = ac0 - db0;
-        double r1 = ac1 - db1;
-        double r2 = ac2 - db2;
-        double r3 = ac3 - db3;
+        Real r0 = ac0.subtract(db0);
+        Real r1 = ac1.subtract(db1);
+        Real r2 = ac2.subtract(db2);
+        Real r3 = ac3.subtract(db3);
 
-        // a* = conjugate of a: (a0, -a1, -a2, -a3)
-        // a* * d
-        double ad0 = a0 * d0 - (-a1) * d1 - (-a2) * d2 - (-a3) * d3;
-        double ad1 = a0 * d1 + (-a1) * d0 + (-a2) * d3 - (-a3) * d2;
-        double ad2 = a0 * d2 - (-a1) * d3 + (-a2) * d0 + (-a3) * d1;
-        double ad3 = a0 * d3 + (-a1) * d2 - (-a2) * d1 + (-a3) * d0;
+        // a*d (conjugate(a) * d)
+        Real na1 = a1.negate();
+        Real na2 = a2.negate();
+        Real na3 = a3.negate();
 
-        // c * b
-        double cb0 = c0 * b0 - c1 * b1 - c2 * b2 - c3 * b3;
-        double cb1 = c0 * b1 + c1 * b0 + c2 * b3 - c3 * b2;
-        double cb2 = c0 * b2 - c1 * b3 + c2 * b0 + c3 * b1;
-        double cb3 = c0 * b3 + c1 * b2 - c2 * b1 + c3 * b0;
+        Real ad0 = a0.multiply(d0).subtract(na1.multiply(d1)).subtract(na2.multiply(d2)).subtract(na3.multiply(d3));
+        Real ad1 = a0.multiply(d1).add(na1.multiply(d0)).add(na2.multiply(d3)).subtract(na3.multiply(d2));
+        Real ad2 = a0.multiply(d2).subtract(na1.multiply(d3)).add(na2.multiply(d0)).add(na3.multiply(d1));
+        Real ad3 = a0.multiply(d3).add(na1.multiply(d2)).subtract(na2.multiply(d1)).add(na3.multiply(d0));
+
+        // cb
+        Real cb0 = c0.multiply(b0).subtract(c1.multiply(b1)).subtract(c2.multiply(b2)).subtract(c3.multiply(b3));
+        Real cb1 = c0.multiply(b1).add(c1.multiply(b0)).add(c2.multiply(b3)).subtract(c3.multiply(b2));
+        Real cb2 = c0.multiply(b2).subtract(c1.multiply(b3)).add(c2.multiply(b0)).add(c3.multiply(b1));
+        Real cb3 = c0.multiply(b3).add(c1.multiply(b2)).subtract(c2.multiply(b1)).add(c3.multiply(b0));
 
         // Second quaternion result: a*d + cb
-        double r4 = ad0 + cb0;
-        double r5 = ad1 + cb1;
-        double r6 = ad2 + cb2;
-        double r7 = ad3 + cb3;
+        Real r4 = ad0.add(cb0);
+        Real r5 = ad1.add(cb1);
+        Real r6 = ad2.add(cb2);
+        Real r7 = ad3.add(cb3);
 
         return new Octonion(r0, r1, r2, r3, r4, r5, r6, r7);
     }
@@ -211,8 +242,8 @@ public class Octonion implements Field<Octonion> {
      * Returns the multiplicative inverse of this octonion.
      */
     public Octonion inverse() {
-        double n2 = normSquared();
-        if (n2 < 1e-30) {
+        Real n2 = normSquared();
+        if (n2.isZero()) {
             throw new ArithmeticException("Cannot invert zero or near-zero octonion");
         }
         return conjugate().divides(n2);
@@ -232,11 +263,8 @@ public class Octonion implements Field<Octonion> {
         if (!(obj instanceof Octonion))
             return false;
         Octonion o = (Octonion) obj;
-        double tol = 1e-10;
-        return Math.abs(e0 - o.e0) < tol && Math.abs(e1 - o.e1) < tol &&
-                Math.abs(e2 - o.e2) < tol && Math.abs(e3 - o.e3) < tol &&
-                Math.abs(e4 - o.e4) < tol && Math.abs(e5 - o.e5) < tol &&
-                Math.abs(e6 - o.e6) < tol && Math.abs(e7 - o.e7) < tol;
+        return e0.equals(o.e0) && e1.equals(o.e1) && e2.equals(o.e2) && e3.equals(o.e3) &&
+                e4.equals(o.e4) && e5.equals(o.e5) && e6.equals(o.e6) && e7.equals(o.e7);
     }
 
     @Override
@@ -246,7 +274,7 @@ public class Octonion implements Field<Octonion> {
 
     @Override
     public String toString() {
-        return String.format("(%.4f + %.4fi + %.4fj + %.4fk + %.4fl + %.4fil + %.4fjl + %.4fkl)",
+        return String.format("(%s + %si + %sj + %sk + %sl + %sil + %sjl + %skl)",
                 e0, e1, e2, e3, e4, e5, e6, e7);
     }
 

@@ -1,0 +1,118 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ */
+package org.jscience.arts.theater;
+
+import java.time.LocalDate;
+import java.util.*;
+
+/**
+ * Represents a theatrical performance or play.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 2.0
+ */
+public class Play {
+
+    public enum Genre {
+        TRAGEDY, COMEDY, DRAMA, MUSICAL, OPERA, BALLET,
+        FARCE, MELODRAMA, PANTOMIME, EXPERIMENTAL
+    }
+
+    private final String title;
+    private String playwright;
+    private Genre genre;
+    private int acts;
+    private int durationMinutes;
+    private int yearWritten;
+    private final List<String> characters = new ArrayList<>();
+
+    public Play(String title) {
+        this.title = title;
+    }
+
+    public Play(String title, String playwright, Genre genre) {
+        this(title);
+        this.playwright = playwright;
+        this.genre = genre;
+    }
+
+    // Getters
+    public String getTitle() {
+        return title;
+    }
+
+    public String getPlaywright() {
+        return playwright;
+    }
+
+    public Genre getGenre() {
+        return genre;
+    }
+
+    public int getActs() {
+        return acts;
+    }
+
+    public int getDurationMinutes() {
+        return durationMinutes;
+    }
+
+    public int getYearWritten() {
+        return yearWritten;
+    }
+
+    public List<String> getCharacters() {
+        return Collections.unmodifiableList(characters);
+    }
+
+    // Setters
+    public void setPlaywright(String playwright) {
+        this.playwright = playwright;
+    }
+
+    public void setGenre(Genre genre) {
+        this.genre = genre;
+    }
+
+    public void setActs(int acts) {
+        this.acts = acts;
+    }
+
+    public void setDurationMinutes(int duration) {
+        this.durationMinutes = duration;
+    }
+
+    public void setYearWritten(int year) {
+        this.yearWritten = year;
+    }
+
+    public void addCharacter(String character) {
+        characters.add(character);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("\"%s\" by %s (%s, %d)", title, playwright, genre, yearWritten);
+    }
+
+    // Famous plays
+    public static Play hamlet() {
+        Play p = new Play("Hamlet", "William Shakespeare", Genre.TRAGEDY);
+        p.setYearWritten(1600);
+        p.setActs(5);
+        p.addCharacter("Hamlet");
+        p.addCharacter("Claudius");
+        p.addCharacter("Ophelia");
+        return p;
+    }
+
+    public static Play romeoAndJuliet() {
+        Play p = new Play("Romeo and Juliet", "William Shakespeare", Genre.TRAGEDY);
+        p.setYearWritten(1597);
+        p.setActs(5);
+        return p;
+    }
+}

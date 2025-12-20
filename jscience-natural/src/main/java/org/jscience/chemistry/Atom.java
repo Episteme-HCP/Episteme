@@ -1,13 +1,15 @@
 package org.jscience.chemistry;
 
-import org.jscience.measure.Quantities;
-import org.jscience.measure.Quantity;
-import org.jscience.measure.quantity.*;
-import org.jscience.measure.Units;
-
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.physics.classical.mechanics.Particle;
+
+import org.jscience.measure.Quantity;
+import org.jscience.measure.quantity.ElectricCharge;
+import org.jscience.measure.quantity.Length;
+import org.jscience.measure.quantity.Mass;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
 
 /**
  * An atom in a molecular structure.
@@ -20,12 +22,12 @@ import org.jscience.physics.classical.mechanics.Particle;
 public class Atom extends Particle {
 
     private final Element element;
-    private Isotope isotope; // Optional, specific isotope
+    private Isotope isotope;
     private Quantity<ElectricCharge> formalCharge;
-    private Vector<Real> force; // Kept here as Particle doesn't explicitly store force, only acceleration
+    private Vector<Real> force;
 
     public Atom(Element element, Vector<Real> position) {
-        super(position, position.multiply(Real.ZERO), calculateMass(element, null)); // Velocity zero initially
+        super(position, position.multiply(Real.ZERO), calculateMass(element, null));
         this.element = element;
         this.formalCharge = Quantities.create(0, Units.COULOMB);
         this.isotope = null;
@@ -83,9 +85,6 @@ public class Atom extends Particle {
             throw new IllegalArgumentException("Isotope element mismatch");
         }
         this.isotope = isotope;
-        // Should update mass in Particle? Particle mass is usually final or needs
-        // setter.
-        // Particle doesn't have setMass in my impl. Limitation.
     }
 
     public Isotope getIsotope() {
@@ -97,7 +96,7 @@ public class Atom extends Particle {
      */
     public Quantity<Length> distanceTo(Atom other) {
         Real dist = this.distanceTo((Particle) other);
-        return Quantities.create(dist, Units.METER);
+        return Quantities.create(dist.doubleValue(), Units.METER);
     }
 
     @Override

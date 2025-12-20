@@ -2,6 +2,7 @@ package org.jscience.physics.astronomy;
 
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.numbers.real.Real;
+
 import org.jscience.measure.Quantity;
 import org.jscience.measure.quantity.Mass;
 import org.jscience.measure.quantity.Length;
@@ -10,6 +11,7 @@ import org.jscience.measure.quantity.Power;
 
 /**
  * Represents a Star.
+ * Modernized to JScience.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI

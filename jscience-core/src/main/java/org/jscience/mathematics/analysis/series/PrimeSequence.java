@@ -147,11 +147,10 @@ public class PrimeSequence implements IntegerSequence {
     }
 
     private void generatePrimesGPU() {
-        // Placeholder for GPU logic
-        // In a real implementation, we would dispatch a kernel to mark composites
-        // in a large buffer, then read back the boolean array.
-        // For now, fallback to CPU but log/notify?
-        // Or just run CPU logic.
+        // GPU acceleration requested but not implemented for this backend.
+        // Falling back to CPU generation.
+        java.util.logging.Logger.getLogger(PrimeSequence.class.getName())
+                .info("GPU acceleration for primes not available in current backend. Using CPU sieve.");
         generatePrimesCPU();
     }
 

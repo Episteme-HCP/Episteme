@@ -41,13 +41,92 @@ import org.jscience.mathematics.linearalgebra.Vector;
 public interface VectorFunction<F extends Field<F>> extends DifferentiableFunction<Vector<F>, Vector<F>> {
 
     /**
+     * Returns the dimension of the output vector.
+     * 
+     * @return m where f: F^n -> F^m
+     */
+    int outputDimension();
+
+    /**
      * Calculates the Jacobian matrix at the given point.
      * J_ij = d(f_i)/d(x_j)
+     * 
+     * Default implementation uses central difference approximation if F is Real.
      * 
      * @param point the point at which to evaluate the Jacobian
      * @return the Jacobian matrix (m x n)
      */
-    Matrix<F> jacobian(Vector<F> point);
+    default Matrix<F> jacobian(Vector<F> point) {
+        F val = point.get(0);
+        if (!(val instanceof org.jscience.mathematics.numbers.real.Real)) {
+            throw new UnsupportedOperationException("Automatic Jacobian only supported for Real fields");
+        }
+
+        int n = point.dimension();
+        Vector<F> f0 = evaluate(point);
+        int m = f0.dimension();
+
+        // Use central difference: f(x+h) - f(x-h) / 2h
+        double hVal = 1e-8;
+        @SuppressWarnings("unchecked")
+        F h = (F) org.jscience.mathematics.numbers.real.Real.of(hVal);
+        @SuppressWarnings("unchecked")
+        F twoH = (F) org.jscience.mathematics.numbers.real.Real.of(2 * hVal);
+
+        // Get Field from Vector's scalar ring
+        @SuppressWarnings("unchecked")
+        Field<F> field = (Field<F>) point.getScalarRing();
+
+        java.util.List<java.util.List<F>> columns = new java.util.ArrayList<>();
+
+        for (int j = 0; j < n; j++) {
+            // Create x+h and x-h
+            java.util.List<F> plusCoords = new java.util.ArrayList<>();
+            java.util.List<F> minusCoords = new java.util.ArrayList<>();
+            for (int k = 0; k < n; k++) {
+                F coord = point.get(k);
+                if (k == j) {
+                    // Use Field operations: field.add(a, b), field.subtract(a, b)
+                    plusCoords.add(field.add(coord, h));
+                    minusCoords.add(field.subtract(coord, h));
+                } else {
+                    plusCoords.add(coord);
+                    minusCoords.add(coord);
+                }
+            }
+
+            Vector<F> pPlus = org.jscience.mathematics.linearalgebra.vectors.VectorFactory.create(plusCoords, field);
+            Vector<F> pMinus = org.jscience.mathematics.linearalgebra.vectors.VectorFactory.create(minusCoords, field);
+
+            Vector<F> fPlus = evaluate(pPlus);
+            Vector<F> fMinus = evaluate(pMinus);
+
+            // Column j = (fPlus - fMinus) / 2h
+            F invTwoH = field.inverse(twoH);
+            Vector<F> diff = fPlus.subtract(fMinus).multiply(invTwoH);
+
+            // Add to columns list
+            java.util.List<F> colData = new java.util.ArrayList<>();
+            for (int i = 0; i < m; i++) {
+                colData.add(diff.get(i));
+            }
+            columns.add(colData);
+        }
+
+        // Transpose to rows for MatrixFactory (create takes row-major List<List>)
+        java.util.List<java.util.List<F>> rows = new java.util.ArrayList<>();
+        for (int i = 0; i < m; i++) {
+            java.util.List<F> rowData = new java.util.ArrayList<>();
+            for (int j = 0; j < n; j++) {
+                rowData.add(columns.get(j).get(i));
+            }
+            rows.add(rowData);
+        }
+
+        @SuppressWarnings("unchecked")
+        Field<F> resultField = (Field<F>) point.getScalarRing();
+        return org.jscience.mathematics.linearalgebra.matrices.MatrixFactory.create(rows, resultField);
+    }
 
     /**
      * Returns the derivative of this function, which is the linear map

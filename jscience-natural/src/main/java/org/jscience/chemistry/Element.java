@@ -1,15 +1,17 @@
 package org.jscience.chemistry;
 
 import org.jscience.measure.Quantity;
+import org.jscience.measure.quantity.Dimensionless;
 import org.jscience.measure.quantity.Length;
 import org.jscience.measure.quantity.Mass;
 import org.jscience.measure.quantity.Temperature;
+import org.jscience.measure.quantity.MassDensity;
+import org.jscience.measure.quantity.SpecificHeatCapacity;
+import org.jscience.measure.quantity.ThermalConductivity;
 
 /**
- * Chemical element from the periodic table.
- * <p>
- * Immutable representation of an element with all key properties.
- * </p>
+ * A chemical element.
+ * Modernized to use JScience V5 Quantity system.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI
@@ -17,135 +19,168 @@ import org.jscience.measure.quantity.Temperature;
  */
 public class Element {
 
-    private final int atomicNumber; // Z
-    private final String symbol; // e.g., "H", "He"
-    private final String name; // e.g., "Hydrogen"
-    private final Quantity<Mass> atomicMass;
-    private final int group; // 1-18 (0 for lanthanides/actinides)
-    private final int period; // 1-7
-    private final ElementCategory category;
-    private final double electronegativity; // Pauling scale (0 if unknown)
-    private final Quantity<Length> atomicRadius; // Optional
-    private final Quantity<Temperature> meltingPoint; // Optional
-    private final Quantity<Temperature> boilingPoint; // Optional
-
     public enum ElementCategory {
-        ALKALI_METAL,
-        ALKALINE_EARTH_METAL,
-        TRANSITION_METAL,
-        POST_TRANSITION_METAL,
-        METALLOID,
-        NONMETAL, // Generic for diatomic/polyatomic if not specific
-        DIATOMIC_NONMETAL,
-        POLYATOMIC_NONMETAL,
-        HALOGEN,
-        NOBLE_GAS,
-        LANTHANIDE,
-        ACTINIDE,
-        UNKNOWN
+        ALKALI_METAL, ALKALINE_EARTH_METAL, TRANSITION_METAL, POST_TRANSITION_METAL, CHEMICALLY_UNKNOWN, METALLOID,
+        NONMETAL, HALOGEN, NOBLE_GAS, LANTHANIDE, ACTINIDE, UNKNOWN
     }
 
-    public Element(int atomicNumber, String symbol, String name, Quantity<Mass> atomicMass,
-            int group, int period, ElementCategory category, double electronegativity,
-            Quantity<Temperature> meltingPoint, Quantity<Temperature> boilingPoint) {
-        this.atomicNumber = atomicNumber;
-        this.symbol = symbol;
+    private String name;
+    private String symbol;
+    private int atomicNumber;
+    private int massNumber;
+    private Quantity<Mass> atomicMass;
+    private int group;
+    private int period;
+    private ElementCategory category;
+    private double electronegativity;
+
+    // Properties
+    private Quantity<Length> covalentRadius;
+    private Quantity<Length> atomicRadius;
+    private Quantity<Temperature> meltingPoint;
+    private Quantity<Temperature> boilingPoint;
+    private Quantity<MassDensity> density;
+    private Quantity<SpecificHeatCapacity> specificHeat;
+    private Quantity<ThermalConductivity> thermalConductivity;
+    private Quantity<Dimensionless> ionizationEnergy;
+
+    public Element(String name, String symbol) {
         this.name = name;
-        this.atomicMass = atomicMass;
-        this.group = group;
-        this.period = period;
-        this.category = category;
-        this.electronegativity = electronegativity;
-        this.atomicRadius = null; // Default to null if not provided
-        this.meltingPoint = meltingPoint;
-        this.boilingPoint = boilingPoint;
+        this.symbol = symbol;
     }
 
-    // --- Properties ---
+    // --- Getters and Setters ---
 
-    public int getAtomicNumber() {
-        return atomicNumber;
+    public String getName() {
+        return name;
     }
 
     public String getSymbol() {
         return symbol;
     }
 
-    public String getName() {
-        return name;
+    public int getAtomicNumber() {
+        return atomicNumber;
+    }
+
+    public void setAtomicNumber(int atomicNumber) {
+        this.atomicNumber = atomicNumber;
+    }
+
+    public int getMassNumber() {
+        return massNumber;
+    }
+
+    public void setMassNumber(int massNumber) {
+        this.massNumber = massNumber;
     }
 
     public Quantity<Mass> getAtomicMass() {
         return atomicMass;
     }
 
+    public void setAtomicMass(Quantity<Mass> atomicMass) {
+        this.atomicMass = atomicMass;
+    }
+
     public int getGroup() {
         return group;
+    }
+
+    public void setGroup(int group) {
+        this.group = group;
     }
 
     public int getPeriod() {
         return period;
     }
 
+    public void setPeriod(int period) {
+        this.period = period;
+    }
+
     public ElementCategory getCategory() {
         return category;
+    }
+
+    public void setCategory(ElementCategory category) {
+        this.category = category;
     }
 
     public double getElectronegativity() {
         return electronegativity;
     }
 
+    public void setElectronegativity(double electronegativity) {
+        this.electronegativity = electronegativity;
+    }
+
+    public Quantity<Length> getCovalentRadius() {
+        return covalentRadius;
+    }
+
+    public void setCovalentRadius(Quantity<Length> covalentRadius) {
+        this.covalentRadius = covalentRadius;
+    }
+
     public Quantity<Length> getAtomicRadius() {
         return atomicRadius;
+    }
+
+    public void setAtomicRadius(Quantity<Length> atomicRadius) {
+        this.atomicRadius = atomicRadius;
     }
 
     public Quantity<Temperature> getMeltingPoint() {
         return meltingPoint;
     }
 
+    public void setMeltingPoint(Quantity<Temperature> meltingPoint) {
+        this.meltingPoint = meltingPoint;
+    }
+
     public Quantity<Temperature> getBoilingPoint() {
         return boilingPoint;
     }
 
-    /**
-     * Number of valence electrons (simplified for main group elements).
-     */
-    public int getValenceElectrons() {
-        if (group >= 1 && group <= 2)
-            return group;
-        if (group >= 13 && group <= 18)
-            return group - 10;
-        return -1; // Transition metals are complex
+    public void setBoilingPoint(Quantity<Temperature> boilingPoint) {
+        this.boilingPoint = boilingPoint;
     }
 
-    /**
-     * Is this a metal?
-     */
-    public boolean isMetal() {
-        return category == ElementCategory.ALKALI_METAL ||
-                category == ElementCategory.ALKALINE_EARTH_METAL ||
-                category == ElementCategory.TRANSITION_METAL ||
-                category == ElementCategory.POST_TRANSITION_METAL ||
-                category == ElementCategory.LANTHANIDE ||
-                category == ElementCategory.ACTINIDE;
+    public Quantity<MassDensity> getDensity() {
+        return density;
+    }
+
+    public void setDensity(Quantity<MassDensity> density) {
+        this.density = density;
+    }
+
+    public Quantity<SpecificHeatCapacity> getSpecificHeat() {
+        return specificHeat;
+    }
+
+    public void setSpecificHeat(Quantity<SpecificHeatCapacity> specificHeat) {
+        this.specificHeat = specificHeat;
+    }
+
+    public Quantity<ThermalConductivity> getThermalConductivity() {
+        return thermalConductivity;
+    }
+
+    public void setThermalConductivity(Quantity<ThermalConductivity> thermalConductivity) {
+        this.thermalConductivity = thermalConductivity;
+    }
+
+    public Quantity<Dimensionless> getIonizationEnergy() {
+        return ionizationEnergy;
+    }
+
+    public void setIonizationEnergy(Quantity<Dimensionless> ionizationEnergy) {
+        this.ionizationEnergy = ionizationEnergy;
     }
 
     @Override
     public String toString() {
-        return String.format("%s (%s, Z=%d, A=%s)", name, symbol, atomicNumber, atomicMass);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof Element))
-            return false;
-        return atomicNumber == ((Element) o).atomicNumber;
-    }
-
-    @Override
-    public int hashCode() {
-        return atomicNumber;
+        return symbol;
     }
 }

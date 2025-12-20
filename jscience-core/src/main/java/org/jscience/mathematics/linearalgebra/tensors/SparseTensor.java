@@ -384,8 +384,40 @@ public class SparseTensor<T> implements Tensor<T> {
 
     @Override
     public Tensor<T> sum(int axis) {
-        // ... similar logic ...
-        return null; // Placeholder
+        if (axis < 0 || axis >= rank()) {
+            throw new IllegalArgumentException("Invalid axis: " + axis);
+        }
+
+        // Result shape: remove the summed axis
+        int[] newShape = new int[rank() - 1];
+        int idx = 0;
+        for (int i = 0; i < rank(); i++) {
+            if (i != axis) {
+                newShape[idx++] = shape[i];
+            }
+        }
+
+        SparseTensor<T> result = new SparseTensor<>(newShape.length > 0 ? newShape : new int[] { 1 }, zero);
+
+        for (Map.Entry<Integer, T> entry : data.entrySet()) {
+            int[] oldIndices = indicesFromFlat(entry.getKey());
+
+            // Build new indices by removing the axis
+            int[] newIndices = new int[newShape.length > 0 ? newShape.length : 1];
+            idx = 0;
+            for (int i = 0; i < rank(); i++) {
+                if (i != axis) {
+                    newIndices[idx++] = oldIndices[i];
+                }
+            }
+
+            T current = result.get(newIndices);
+            @SuppressWarnings("unchecked")
+            T sum = ((Ring<T>) current).add(current, entry.getValue());
+            result.set(sum, newIndices);
+        }
+
+        return result;
     }
 
     @Override
@@ -395,8 +427,36 @@ public class SparseTensor<T> implements Tensor<T> {
 
     @Override
     public Object toArray() {
-        // Convert to dense array
-        return null; // Placeholder
+        // Convert to dense multi-dimensional array
+        // For simplicity, return a flat array for rank > 2
+        if (rank() == 1) {
+            @SuppressWarnings("unchecked")
+            T[] arr = (T[]) java.lang.reflect.Array.newInstance(zero.getClass(), shape[0]);
+            java.util.Arrays.fill(arr, zero);
+            for (Map.Entry<Integer, T> e : data.entrySet()) {
+                arr[e.getKey()] = e.getValue();
+            }
+            return arr;
+        } else if (rank() == 2) {
+            @SuppressWarnings("unchecked")
+            T[][] arr = (T[][]) java.lang.reflect.Array.newInstance(zero.getClass(), shape[0], shape[1]);
+            for (int i = 0; i < shape[0]; i++) {
+                java.util.Arrays.fill(arr[i], zero);
+            }
+            for (Map.Entry<Integer, T> e : data.entrySet()) {
+                int[] idx = indicesFromFlat(e.getKey());
+                arr[idx[0]][idx[1]] = e.getValue();
+            }
+            return arr;
+        }
+        // For higher ranks, return flat array with elements
+        @SuppressWarnings("unchecked")
+        T[] arr = (T[]) java.lang.reflect.Array.newInstance(zero.getClass(), size);
+        java.util.Arrays.fill(arr, zero);
+        for (Map.Entry<Integer, T> e : data.entrySet()) {
+            arr[e.getKey()] = e.getValue();
+        }
+        return arr;
     }
 
     public T getZero() {

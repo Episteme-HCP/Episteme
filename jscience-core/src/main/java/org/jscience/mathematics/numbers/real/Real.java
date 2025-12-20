@@ -60,6 +60,8 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
         private static final Real ZERO = RealDouble.create(0.0);
         private static final Real ONE = RealDouble.create(1.0);
         private static final Real NaN = RealDouble.create(Double.NaN);
+        private static final Real PI = RealDouble.create(Math.PI);
+        private static final Real E = RealDouble.create(Math.E);
     }
 
     /** The real number 0 */
@@ -70,6 +72,12 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
 
     /** The real number NaN */
     public static final Real NaN = Constants.NaN;
+
+    /** The real number PI */
+    public static final Real PI = Constants.PI;
+
+    /** The real number E */
+    public static final Real E = Constants.E;
 
     /** The real number 2 */
     public static final Real TWO = RealDouble.create(2.0);

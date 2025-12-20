@@ -1,5 +1,7 @@
 package org.jscience.physics.classical.mechanics;
 
+import org.jscience.physics.classical.mechanics.Kinematics;
+
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 
@@ -80,26 +82,33 @@ public class RigidBody {
     public static Vector<Real> rotate(Vector<Real> v, Quaternion q) {
         // q * v
         // v as pure quaternion (0, x, y, z)
-        double vx = v.get(0).doubleValue();
-        double vy = v.get(1).doubleValue();
-        double vz = v.get(2).doubleValue();
+        Real vx = v.get(0);
+        Real vy = v.get(1);
+        Real vz = v.get(2);
 
-        double qw = q.getReal();
-        double qx = q.getI();
-        double qy = q.getJ();
-        double qz = q.getK();
+        Real qw = q.getReal();
+        Real qx = q.getI();
+        Real qy = q.getJ();
+        Real qz = q.getK();
 
         // t = 2 * cross(q_xyz, v)
-        double tx = 2 * (qy * vz - qz * vy);
-        double ty = 2 * (qz * vx - qx * vz);
-        double tz = 2 * (qx * vy - qy * vx);
+        // t_x = 2 * (qy*vz - qz*vy)
+        Real two = Real.TWO;
+        Real tx = two.multiply(qy.multiply(vz).subtract(qz.multiply(vy)));
+        Real ty = two.multiply(qz.multiply(vx).subtract(qx.multiply(vz)));
+        Real tz = two.multiply(qx.multiply(vy).subtract(qy.multiply(vx)));
 
         // v' = v + q_w * t + cross(q_xyz, t)
-        double resX = vx + qw * tx + (qy * tz - qz * ty);
-        double resY = vy + qw * ty + (qz * tx - qx * tz);
-        double resZ = vz + qw * tz + (qx * ty - qy * tx);
+        // cross(q_xyz, t)_x = qy*tz - qz*ty
+        Real crossX = qy.multiply(tz).subtract(qz.multiply(ty));
+        Real crossY = qz.multiply(tx).subtract(qx.multiply(tz));
+        Real crossZ = qx.multiply(ty).subtract(qy.multiply(tx));
 
-        return DenseVector.of(Arrays.asList(Real.of(resX), Real.of(resY), Real.of(resZ)), Reals.getInstance());
+        Real resX = vx.add(qw.multiply(tx)).add(crossX);
+        Real resY = vy.add(qw.multiply(ty)).add(crossY);
+        Real resZ = vz.add(qw.multiply(tz)).add(crossZ);
+
+        return DenseVector.of(Arrays.asList(resX, resY, resZ), Reals.getInstance());
     }
 
     // Placeholder helper
@@ -133,10 +142,23 @@ public class RigidBody {
         return new DenseMatrix<>(rows, Reals.getInstance());
     }
 
+    // Helper for matrix-vector multiplication: M * v
+    private Vector<Real> multiplyMatrixVector(DenseMatrix<Real> mat, Vector<Real> vec) {
+        int n = mat.rows();
+        Real[] result = new Real[n];
+        for (int i = 0; i < n; i++) {
+            result[i] = Real.ZERO;
+            for (int j = 0; j < vec.dimension(); j++) {
+                result[i] = result[i].add(mat.get(i, j).multiply(vec.get(j)));
+            }
+        }
+        return DenseVector.of(Arrays.asList(result), Reals.getInstance());
+    }
+
     public void integrate(Real dt) {
         if (mass.isZero())
             return; // Static body
-        double dts = dt.doubleValue();
+        // Real dts = dt;
 
         // 1. Integrate linear velocity
         // v += (F / m) * dt
@@ -155,27 +177,28 @@ public class RigidBody {
         // matrix operations not yet setup)
         // Real logic: angularVelocity += inverseInertiaWorld * torque * dt
 
-        Vector<Real> angularAccel = torque; // Placeholder for I^-1 * T
+        // Angular acceleration: α = I^-1 * T (simplified Euler equation)
+        Vector<Real> angularAccel = multiplyMatrixVector(inverseInertiaTensor, torque);
         angularVelocity = angularVelocity.add(angularAccel.multiply(dt));
         angularVelocity = angularVelocity.multiply(angularDamping);
 
         // 4. Integrate orientation
         // dq/dt = 0.5 * w * q
-        double wx = angularVelocity.get(0).doubleValue();
-        double wy = angularVelocity.get(1).doubleValue();
-        double wz = angularVelocity.get(2).doubleValue();
+        Real wx = angularVelocity.get(0);
+        Real wy = angularVelocity.get(1);
+        Real wz = angularVelocity.get(2);
 
-        Quaternion wq = new Quaternion(0, wx, wy, wz);
-        Quaternion dq = wq.multiply(orientation).multiply(0.5 * dts);
+        Quaternion wq = new Quaternion(Real.ZERO, wx, wy, wz);
+        Quaternion dq = wq.multiply(orientation).multiply(dt.multiply(Real.of(0.5)));
 
         orientation = orientation.add(dq);
 
         // Normalize orientation
-        double normSq = orientation.normSquared();
-        if (Math.abs(normSq - 1.0) > 1e-6) {
-            double invNorm = 1.0 / Math.sqrt(normSq);
-            orientation = orientation.multiply(invNorm);
-        }
+        Real normSq = orientation.normSquared();
+        // if (Math.abs(normSq - 1.0) > 1e-6)
+        // Real.ONE.subtract(normSq).abs().compareTo ...
+        // Simplify: always normalize to avoid drift
+        orientation = orientation.multiply(normSq.sqrt().inverse());
 
         // Clear accumulators
         force = createZeroVector();

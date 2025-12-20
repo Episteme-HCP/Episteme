@@ -1,10 +1,7 @@
 package org.jscience.earth.geophysics;
 
 import org.jscience.measure.Quantities;
-import org.jscience.measure.Quantity;
 import org.jscience.measure.Units;
-import org.jscience.measure.quantity.Angle;
-import org.jscience.measure.quantity.Time;
 
 /**
  * Calculates tectonic plate motions.
@@ -22,7 +19,8 @@ public class PlateMotionCalculator {
          * @return New PlateVector with updated position (velocity assumed constant)
          */
         @SuppressWarnings("unchecked")
-        public static PlateVector predictPosition(PlateVector start, Quantity<Time> duration) {
+        public static PlateVector predictPosition(PlateVector start,
+                        org.jscience.measure.Quantity<org.jscience.measure.quantity.Time> duration) {
 
                 // 1. Calculate displacement in meters
                 // 1. Calculate displacement in meters (dtYears was unused)
@@ -48,24 +46,26 @@ public class PlateMotionCalculator {
                 double bearing = Math.atan2(eastDistMeters, northDistMeters); // 0 is North, PI/2 is East
 
                 // 2. Use Vincenty 'destination' to find new Lat/Lon
+                // Cast to raw Unit to bypass generics hell if explicit FQN doesn't match
+                // Unit<Angle> vs Unit<?>
                 double latRad = start.getLatitude()
-                                .to((org.jscience.measure.Unit<Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
+                                .to((org.jscience.measure.Unit<org.jscience.measure.quantity.Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
                                 .getValue()
                                 .doubleValue();
                 double lonRad = start.getLongitude()
-                                .to((org.jscience.measure.Unit<Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
+                                .to((org.jscience.measure.Unit<org.jscience.measure.quantity.Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
                                 .getValue()
                                 .doubleValue();
 
                 double[] newPosRad = VincentyUtils.destination(latRad, lonRad, bearing, totalDist);
 
-                Quantity<Angle> newLat = Quantities
+                org.jscience.measure.Quantity<org.jscience.measure.quantity.Angle> newLat = Quantities
                                 .create(newPosRad[0],
-                                                (org.jscience.measure.Unit<Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
+                                                (org.jscience.measure.Unit<org.jscience.measure.quantity.Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
                                 .to(Units.DEGREE_ANGLE);
-                Quantity<Angle> newLon = Quantities
+                org.jscience.measure.Quantity<org.jscience.measure.quantity.Angle> newLon = Quantities
                                 .create(newPosRad[1],
-                                                (org.jscience.measure.Unit<Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
+                                                (org.jscience.measure.Unit<org.jscience.measure.quantity.Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
                                 .to(Units.DEGREE_ANGLE);
 
                 return new PlateVector(start.getSiteId(), newLat, newLon, start.getNorthVelocity(),

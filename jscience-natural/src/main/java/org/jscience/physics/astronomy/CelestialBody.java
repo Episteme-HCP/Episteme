@@ -4,16 +4,20 @@ import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.numbers.real.Real;
 
 import org.jscience.physics.classical.mechanics.Particle;
+
 import org.jscience.measure.Quantity;
-import org.jscience.measure.quantity.Mass;
-import org.jscience.measure.quantity.Length;
-import org.jscience.measure.quantity.Time;
 import org.jscience.measure.quantity.Acceleration;
+import org.jscience.measure.quantity.Length;
+import org.jscience.measure.quantity.Mass;
+import org.jscience.measure.quantity.Time;
+import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
+import org.jscience.measure.Unit;
 
 /**
  * Represents a celestial body (Star, Planet, Moon, etc.).
  * Extends Particle for kinematic simulation.
+ * Modernized to JScience.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI
@@ -26,18 +30,9 @@ public class CelestialBody extends Particle {
     private Quantity<Time> rotationPeriod;
 
     private java.util.Map<String, String> texturePaths = new java.util.HashMap<>();
-    private CelestialBody parent; // Primary body (e.g. Sun for Earth, Earth for Moon)
+    private CelestialBody parent;
     private java.util.List<CelestialBody> children = new java.util.ArrayList<>();
 
-    /**
-     * Creates a new CelestialBody.
-     * 
-     * @param name     Name of the body
-     * @param mass     Mass in kg
-     * @param radius   Mean radius in meters
-     * @param position Initial position vector
-     * @param velocity Initial velocity vector
-     */
     public CelestialBody(String name, Quantity<Mass> mass, Quantity<Length> radius, Vector<Real> position,
             Vector<Real> velocity) {
         super(position, velocity, mass);
@@ -112,18 +107,17 @@ public class CelestialBody extends Particle {
      * Surface gravity: g = GM/r²
      */
     public Quantity<Acceleration> getSurfaceGravity() {
-        // g = GM/r^2
-
-        // Check PhysicalConstants.G type. It was Real or Quantity?
-        // Viewed before: it uses Quantity.
-
-        // Let's rely on Quantity math if possible or extract double
         double m = getMass().to(Units.KILOGRAM).getValue().doubleValue();
         double r = radius.to(Units.METER).getValue().doubleValue();
-        // PhysicalConstants.G is likely N*m^2/kg^2
-        // For now, let's extract G value manually if getting G symbol is hard
+
+        // G = 6.67430e-11 N*m^2/kg^2
         double gVal = 6.67430e-11 * m / (r * r);
-        return org.jscience.measure.Quantities.create(gVal, Units.METERS_PER_SECOND_SQUARED);
+        // acceleration unit m/s^2 can be derived or constructed
+        return Quantities.create(gVal, Units.METER.divide(Units.SECOND.pow(2)).asType(Acceleration.class));
+    }
+
+    public Quantity<Acceleration> getSurfaceGravitySafe() {
+        return getSurfaceGravity();
     }
 
     @Override

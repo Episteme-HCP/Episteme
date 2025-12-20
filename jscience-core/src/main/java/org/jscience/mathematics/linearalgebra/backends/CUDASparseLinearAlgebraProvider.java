@@ -16,6 +16,10 @@ public class CUDASparseLinearAlgebraProvider<E> implements LinearAlgebraProvider
     public CUDASparseLinearAlgebraProvider(Field<E> field) {
         // this.field = field; // Unused
         this.cpuProvider = new CPUSparseLinearAlgebraProvider<>(field);
+        if (checkAvailability()) {
+            java.util.logging.Logger.getLogger(getClass().getName()).info(
+                    "CUDASparseLinearAlgebraProvider initialized (Warning: Sparse GPU ops delegated to CPU in this version)");
+        }
     }
 
     // Check if JCusparse is available? Usually assuming if JCuda matches.

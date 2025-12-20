@@ -1,0 +1,255 @@
+[
+    {
+        "id": "A",
+        "name": "Vitamin A",
+        "aliases": [
+            "Retinol"
+        ],
+        "solubility": "fat",
+        "rdaAdult": 900,
+        "rdaUnit": "μg",
+        "sources": [
+            "liver",
+            "carrots",
+            "sweet potato"
+        ],
+        "functions": [
+            "vision",
+            "immune function",
+            "skin health"
+        ]
+    },
+    {
+        "id": "D",
+        "name": "Vitamin D",
+        "aliases": [
+            "Calciferol"
+        ],
+        "solubility": "fat",
+        "rdaAdult": 15,
+        "rdaUnit": "μg",
+        "sources": [
+            "sunlight",
+            "fatty fish",
+            "fortified milk"
+        ],
+        "functions": [
+            "calcium absorption",
+            "bone health",
+            "immune function"
+        ]
+    },
+    {
+        "id": "E",
+        "name": "Vitamin E",
+        "aliases": [
+            "Tocopherol"
+        ],
+        "solubility": "fat",
+        "rdaAdult": 15,
+        "rdaUnit": "mg",
+        "sources": [
+            "nuts",
+            "seeds",
+            "vegetable oils"
+        ],
+        "functions": [
+            "antioxidant",
+            "immune function"
+        ]
+    },
+    {
+        "id": "K",
+        "name": "Vitamin K",
+        "aliases": [
+            "Phylloquinone",
+            "Menaquinone"
+        ],
+        "solubility": "fat",
+        "rdaAdult": 120,
+        "rdaUnit": "μg",
+        "sources": [
+            "leafy greens",
+            "broccoli"
+        ],
+        "functions": [
+            "blood clotting",
+            "bone metabolism"
+        ]
+    },
+    {
+        "id": "C",
+        "name": "Vitamin C",
+        "aliases": [
+            "Ascorbic acid"
+        ],
+        "solubility": "water",
+        "rdaAdult": 90,
+        "rdaUnit": "mg",
+        "sources": [
+            "citrus fruits",
+            "peppers",
+            "strawberries"
+        ],
+        "functions": [
+            "antioxidant",
+            "collagen synthesis",
+            "immune function"
+        ]
+    },
+    {
+        "id": "B1",
+        "name": "Vitamin B1",
+        "aliases": [
+            "Thiamine"
+        ],
+        "solubility": "water",
+        "rdaAdult": 1.2,
+        "rdaUnit": "mg",
+        "sources": [
+            "whole grains",
+            "pork",
+            "legumes"
+        ],
+        "functions": [
+            "energy metabolism",
+            "nerve function"
+        ]
+    },
+    {
+        "id": "B2",
+        "name": "Vitamin B2",
+        "aliases": [
+            "Riboflavin"
+        ],
+        "solubility": "water",
+        "rdaAdult": 1.3,
+        "rdaUnit": "mg",
+        "sources": [
+            "dairy",
+            "eggs",
+            "lean meats"
+        ],
+        "functions": [
+            "energy metabolism",
+            "cell function"
+        ]
+    },
+    {
+        "id": "B3",
+        "name": "Vitamin B3",
+        "aliases": [
+            "Niacin"
+        ],
+        "solubility": "water",
+        "rdaAdult": 16,
+        "rdaUnit": "mg",
+        "sources": [
+            "meat",
+            "fish",
+            "peanuts"
+        ],
+        "functions": [
+            "energy metabolism",
+            "DNA repair"
+        ]
+    },
+    {
+        "id": "B5",
+        "name": "Vitamin B5",
+        "aliases": [
+            "Pantothenic acid"
+        ],
+        "solubility": "water",
+        "rdaAdult": 5,
+        "rdaUnit": "mg",
+        "sources": [
+            "meat",
+            "vegetables",
+            "whole grains"
+        ],
+        "functions": [
+            "coenzyme A synthesis",
+            "fatty acid metabolism"
+        ]
+    },
+    {
+        "id": "B6",
+        "name": "Vitamin B6",
+        "aliases": [
+            "Pyridoxine"
+        ],
+        "solubility": "water",
+        "rdaAdult": 1.7,
+        "rdaUnit": "mg",
+        "sources": [
+            "poultry",
+            "fish",
+            "potatoes"
+        ],
+        "functions": [
+            "protein metabolism",
+            "neurotransmitter synthesis"
+        ]
+    },
+    {
+        "id": "B7",
+        "name": "Vitamin B7",
+        "aliases": [
+            "Biotin",
+            "Vitamin H"
+        ],
+        "solubility": "water",
+        "rdaAdult": 30,
+        "rdaUnit": "μg",
+        "sources": [
+            "eggs",
+            "nuts",
+            "soybeans"
+        ],
+        "functions": [
+            "fatty acid synthesis",
+            "gluconeogenesis"
+        ]
+    },
+    {
+        "id": "B9",
+        "name": "Vitamin B9",
+        "aliases": [
+            "Folate",
+            "Folic acid"
+        ],
+        "solubility": "water",
+        "rdaAdult": 400,
+        "rdaUnit": "μg",
+        "sources": [
+            "leafy greens",
+            "legumes",
+            "fortified grains"
+        ],
+        "functions": [
+            "DNA synthesis",
+            "cell division",
+            "neural tube development"
+        ]
+    },
+    {
+        "id": "B12",
+        "name": "Vitamin B12",
+        "aliases": [
+            "Cobalamin"
+        ],
+        "solubility": "water",
+        "rdaAdult": 2.4,
+        "rdaUnit": "μg",
+        "sources": [
+            "meat",
+            "fish",
+            "dairy"
+        ],
+        "functions": [
+            "red blood cell formation",
+            "neurological function"
+        ]
+    }
+]

@@ -6,6 +6,7 @@ import java.util.List;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.physics.PhysicalConstants;
+
 import org.jscience.measure.Units;
 
 /**
@@ -13,6 +14,7 @@ import org.jscience.measure.Units;
  * <p>
  * Use {@link BarnesHutSimulation} for O(n log n) with many particles.
  * </p>
+ * Modernized to JScience.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI
@@ -75,8 +77,10 @@ public class NBodySimulation {
                 // a_i += G * m_j * r_vec / r^3
                 Real factor = G.divide(r3);
 
-                Vector<Real> accPartI = rVec.multiply(factor.multiply(pj.getMass().to(Units.KILOGRAM).getValue()));
-                Vector<Real> accPartJ = rVec.multiply(factor.multiply(pi.getMass().to(Units.KILOGRAM).getValue()));
+                Vector<Real> accPartI = rVec
+                        .multiply(factor.multiply(Real.of(pj.getMass().to(Units.KILOGRAM).getValue().doubleValue())));
+                Vector<Real> accPartJ = rVec
+                        .multiply(factor.multiply(Real.of(pi.getMass().to(Units.KILOGRAM).getValue().doubleValue())));
 
                 pi.setAcceleration(pi.getAcceleration().add(accPartI));
                 pj.setAcceleration(pj.getAcceleration().subtract(accPartJ));
@@ -85,16 +89,6 @@ public class NBodySimulation {
     }
 
     public void step(Real dt) {
-        // Kick-Drift-Kick or simple Euler? Original was:
-        // v += 0.5 * a * dt
-        // x += v * dt ?? No, x update was separate.
-        // Original:
-        // v += 0.5 * a * dt
-        // updatePosition(dt) -> x += v * dt
-        // computeForces()
-        // v += 0.5 * a * dt
-        // This is Velocity Verlet.
-
         for (Particle p : particles) {
             Vector<Real> a = p.getAcceleration();
             Vector<Real> v = p.getVelocity();
@@ -122,7 +116,7 @@ public class NBodySimulation {
     public Real kineticEnergy() {
         Real ke = Real.ZERO;
         for (Particle p : particles)
-            ke = ke.add(p.kineticEnergy().to(Units.JOULE).getValue());
+            ke = ke.add(Real.of(p.kineticEnergy().to(Units.JOULE).getValue().doubleValue()));
         return ke;
     }
 
@@ -135,8 +129,8 @@ public class NBodySimulation {
                 Particle pj = particles.get(j);
                 Real r = pi.distanceTo(pj);
                 if (r.compareTo(softening) > 0)
-                    pe = pe.subtract(G.multiply(pi.getMass().to(Units.KILOGRAM).getValue())
-                            .multiply(pj.getMass().to(Units.KILOGRAM).getValue()).divide(r));
+                    pe = pe.subtract(G.multiply(Real.of(pi.getMass().to(Units.KILOGRAM).getValue().doubleValue()))
+                            .multiply(Real.of(pj.getMass().to(Units.KILOGRAM).getValue().doubleValue())).divide(r));
             }
         }
         return pe;

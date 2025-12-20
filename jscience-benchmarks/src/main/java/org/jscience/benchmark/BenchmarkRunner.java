@@ -2,6 +2,7 @@ package org.jscience.benchmark;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 import java.io.File;
 import org.jfree.chart.ChartFactory;
@@ -14,11 +15,11 @@ import org.jfree.data.category.DefaultCategoryDataset;
  */
 public class BenchmarkRunner {
 
-    private final List<Benchmark> benchmarks = new ArrayList<>();
+    private final List<RunnableBenchmark> benchmarks = new ArrayList<>();
     private final List<BenchmarkResult> results = new ArrayList<>();
 
     public void discover() {
-        ServiceLoader<Benchmark> loader = ServiceLoader.load(Benchmark.class);
+        ServiceLoader<RunnableBenchmark> loader = ServiceLoader.load(RunnableBenchmark.class);
         loader.forEach(benchmarks::add);
         System.out.println("Discovered " + benchmarks.size() + " benchmarks.");
     }
@@ -29,7 +30,7 @@ public class BenchmarkRunner {
                 "Mem (MB)");
         System.out.println("-".repeat(90));
 
-        for (Benchmark b : benchmarks) {
+        for (RunnableBenchmark b : benchmarks) {
             try {
                 b.setup();
 

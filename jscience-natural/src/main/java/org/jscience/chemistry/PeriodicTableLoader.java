@@ -87,6 +87,16 @@ public class PeriodicTableLoader {
             boil = Quantities.create(node.get("boil").asDouble(), Units.KELVIN);
         }
 
-        return new Element(atomicNumber, symbol, name, atomicMass, group, period, category, electro, melt, boil);
+        Element e = new Element(name, symbol);
+        e.setAtomicNumber(atomicNumber);
+        e.setAtomicMass(atomicMass);
+        e.setGroup(group);
+        e.setPeriod(period);
+        e.setCategory(category);
+        e.setElectronegativity(electro);
+        e.setMeltingPoint(melt);
+        e.setBoilingPoint(boil);
+
+        return e;
     }
 }

@@ -14,10 +14,10 @@ import org.jscience.computing.ai.neuralnetwork.Layer;
 import org.jscience.computing.ai.neuralnetwork.ActivationFunction;
 
 import org.jscience.measure.Quantity;
-import org.jscience.measure.Quantities;
-import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Mass;
 import org.jscience.measure.quantity.Energy;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
 
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.linearalgebra.Vector;
@@ -31,7 +31,7 @@ public class ScienceVerificationTest {
     @Test
     public void testChemistryPeriodicTable() {
         System.out.println("Verifying Chemistry...");
-        Element carbon = PeriodicTable.bySymbol("C").get();
+        Element carbon = PeriodicTable.bySymbol("C");
         assertNotNull(carbon, "Carbon should be found");
         assertEquals(6, carbon.getAtomicNumber());
         System.out.println("Carbon mass: " + carbon.getAtomicMass());
@@ -72,7 +72,9 @@ public class ScienceVerificationTest {
         GeodeticCoordinate coord = new GeodeticCoordinate(0, 0, 0); // Equator, Prime Meridian, Sea Level
         Vector<Real> ecef = coord.toECEF();
 
-        double a = ReferenceEllipsoid.WGS84.getSemiMajorAxis().to(Units.METER).getValue().doubleValue();
+        // Legacy bridge: reference ellipsoid uses legacy units.
+        double a = ReferenceEllipsoid.WGS84.getSemiMajorAxis()
+                .to(org.jscience.measure.Units.METER).getValue().doubleValue();
 
         // At (0,0,0), x should be 'a', y=0, z=0
         assertEquals(a, ecef.get(0).doubleValue(), 1.0);

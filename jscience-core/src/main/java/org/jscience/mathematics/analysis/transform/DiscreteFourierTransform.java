@@ -54,6 +54,17 @@ public class DiscreteFourierTransform implements Transform<Vector<Complex>, Vect
         this(false);
     }
 
+    /**
+     * Returns the output dimension. For DFT, output dimension equals input.
+     * This is only known at evaluation time, so we return -1 to indicate dynamic.
+     */
+    @Override
+    public int outputDimension() {
+        // DFT output dimension equals input dimension
+        // Return -1 to indicate it's dynamic (determined by input)
+        return -1;
+    }
+
     @Override
     public Vector<Complex> evaluate(Vector<Complex> input) {
         int n = input.dimension();

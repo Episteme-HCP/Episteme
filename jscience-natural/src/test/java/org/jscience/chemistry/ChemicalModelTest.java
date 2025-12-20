@@ -26,31 +26,40 @@ public class ChemicalModelTest {
     @Test
     public void testAtomProperties() {
         // Test Hydrogen from PeriodicTable (static load)
-        Atom h = new Atom(PeriodicTable.bySymbol("H").get(), zero());
-        assertEquals("H", h.getElement().getSymbol());
+        Element h = PeriodicTable.bySymbol("H");
+        assertNotNull(h, "Hydrogen should be found");
+        assertEquals("H", h.getSymbol());
         // Mass > 0 kg
-        assertTrue(h.getMass().to(Units.KILOGRAM).getValue().doubleValue() > 0.0);
+        assertTrue(h.getAtomicMass().to(Units.KILOGRAM).getValue().doubleValue() > 0.0);
 
         // Test custom position
         // h.setPosition(new Vector3D(1.0, 0.0, 0.0)); // Vector3D is gone? Use
         // Vector<Real>
         Vector<Real> pos = DenseVector.of(List.of(Real.ONE, Real.ZERO, Real.ZERO), Reals.getInstance());
-        h.setPosition(pos);
-        assertEquals(1.0, h.getPosition().get(0).doubleValue(), 0.001);
+        Atom atom = new Atom(h, zero());
+        atom.setPosition(pos);
+        assertEquals(1.0, atom.getPosition().get(0).doubleValue(), 0.001);
     }
 
     @Test
     public void testMoleculeWeight() {
         // Manual Water creation (factory methods removed)
         Molecule water = new Molecule("Water");
-        Atom o = new Atom(PeriodicTable.bySymbol("O").get(), zero());
-        Atom h1 = new Atom(PeriodicTable.bySymbol("H").get(), zero());
-        Atom h2 = new Atom(PeriodicTable.bySymbol("H").get(), zero());
-        water.addAtom(o);
-        water.addAtom(h1);
-        water.addAtom(h2);
+        Element o = PeriodicTable.bySymbol("O");
+        Element h = PeriodicTable.bySymbol("H");
 
-        Quantity<Mass> mw = water.getMolecularWeight();
+        assertNotNull(o, "Oxygen should be found");
+        assertNotNull(h, "Hydrogen should be found");
+
+        Atom atomO = new Atom(o, zero());
+        Atom atomH1 = new Atom(h, zero());
+        Atom atomH2 = new Atom(h, zero());
+
+        water.addAtom(atomO);
+        water.addAtom(atomH1);
+        water.addAtom(atomH2);
+
+        var mw = water.getMolecularWeight();
         // O(15.999) + 2*H(1.008) = 18.015 u. Convert to kg approx 2.99e-26
         assertTrue(mw.to(Units.KILOGRAM).getValue().doubleValue() > 2.9e-26);
     }
@@ -62,7 +71,7 @@ public class ChemicalModelTest {
         assertTrue(reaction.isBalanced());
 
         Quantity<AmountOfSubstance> h2Moles = Quantities.create(2.0, Units.MOLE);
-        Quantity<AmountOfSubstance> waterMoles = reaction.stoichiometry("H2", h2Moles, "H2O");
+        var waterMoles = reaction.stoichiometry("H2", h2Moles, "H2O");
 
         // 2 mol H2 produces 2 mol H2O
         assertEquals(2.0, waterMoles.to(Units.MOLE).getValue().doubleValue(), 0.001);

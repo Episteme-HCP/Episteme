@@ -1,0 +1,73 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ */
+package org.jscience.philosophy;
+
+/**
+ * Represents a philosophical concept or idea.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 2.0
+ */
+public class Concept {
+
+    public enum Branch {
+        METAPHYSICS, EPISTEMOLOGY, ETHICS, AESTHETICS, LOGIC,
+        POLITICAL, PHILOSOPHY_OF_MIND, PHILOSOPHY_OF_SCIENCE
+    }
+
+    public enum Tradition {
+        WESTERN, EASTERN, ANALYTIC, CONTINENTAL, PRAGMATIST,
+        EXISTENTIALIST, PHENOMENOLOGICAL
+    }
+
+    private final String name;
+    private final String description;
+    private final Branch branch;
+    private final Tradition tradition;
+    private final String originatingPhilosopher;
+
+    public Concept(String name, String description, Branch branch,
+            Tradition tradition, String originatingPhilosopher) {
+        this.name = name;
+        this.description = description;
+        this.branch = branch;
+        this.tradition = tradition;
+        this.originatingPhilosopher = originatingPhilosopher;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Branch getBranch() {
+        return branch;
+    }
+
+    public Tradition getTradition() {
+        return tradition;
+    }
+
+    public String getOriginatingPhilosopher() {
+        return originatingPhilosopher;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s (%s, %s) - %s", name, branch, tradition, originatingPhilosopher);
+    }
+
+    // Notable concepts
+    public static final Concept CATEGORICAL_IMPERATIVE = new Concept("Categorical Imperative",
+            "Act only according to maxims you could will to be universal law",
+            Branch.ETHICS, Tradition.WESTERN, "Immanuel Kant");
+    public static final Concept COGITO = new Concept("Cogito Ergo Sum",
+            "I think, therefore I am",
+            Branch.EPISTEMOLOGY, Tradition.WESTERN, "René Descartes");
+}

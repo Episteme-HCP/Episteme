@@ -38,13 +38,36 @@ public class EqualityRule implements InferenceRule {
             }
         }
 
-        // Substitution: P(a), a = b |- P(b)
-        // This requires parsing P(x) which is hard with strings.
-        // Let's just support the specific case needed for 1+1=2
-        // 1+1 = S(0)+S(0)
-        // S(0)+S(0) = S(S(0)+0)
-        // ...
+        if (premises.size() == 2) {
+            // Check substitution P(a), a=b |- P(b)
+            // Order might be mixed.
+            String p1 = premises.get(0).getExpression().trim();
+            String p2 = premises.get(1).getExpression().trim();
 
-        return true; // Placeholder for manual verification in test
+            String eq = null;
+            String p = null;
+
+            if (p1.contains("=") && !p2.contains("=")) {
+                eq = p1;
+                p = p2;
+            } else if (p2.contains("=") && !p1.contains("=")) {
+                eq = p2;
+                p = p1;
+            }
+
+            if (eq != null) {
+                String[] parts = eq.split("=");
+                if (parts.length == 2) {
+                    String a = parts[0].trim();
+                    String b = parts[1].trim();
+
+                    // Check if P(b) is result of replacing a with b in P
+                    String expected = p.replace(a, b);
+                    return conclStr.equals(expected);
+                }
+            }
+        }
+
+        return false; // Safest default
     }
 }

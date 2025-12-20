@@ -39,31 +39,53 @@ public class HilbertSpacesCategory implements Category<HilbertSpace<?, ?>, Matri
 
     @Override
     public Matrix<?> identity(HilbertSpace<?, ?> object) {
-        // Return identity matrix of appropriate dimension
-        // This requires HilbertSpace to expose dimension and field
-        // Placeholder
-        throw new UnsupportedOperationException("Identity matrix generation requires dimension info");
+        // Requires dimensionality and basis information to construct identity matrix
+        throw new UnsupportedOperationException(
+                "Identity matrix generation requires discrete basis information not available in generic HilbertSpace interface.");
     }
 
     @Override
     public HilbertSpace<?, ?> domain(Matrix<?> morphism) {
-        // In a real implementation, Matrix would carry domain info
+        // In this simplified model, we don't track domain in the raw Matrix
         return null;
     }
 
     @Override
     public HilbertSpace<?, ?> codomain(Matrix<?> morphism) {
-        // In a real implementation, Matrix would carry codomain info
         return null;
     }
 
     @Override
     public org.jscience.mathematics.structures.sets.Set<Matrix<?>> hom(HilbertSpace<?, ?> source,
             HilbertSpace<?, ?> target) {
-        // Returns the set of all bounded linear operators (matrices) between source and
-        // target
-        // Ideally returns a VectorSpace of matrices
-        // Placeholder: returning null or a dummy implementation
-        return null;
+        throw new UnsupportedOperationException(
+                "Representation of full Hom-set as a discrete Set is not supported for infinite or unspecified dimensional spaces.");
+    }
+
+    /**
+     * Checks if the space is complete (Hilbert space requirement).
+     * 
+     * @param space the space to check
+     * @return true (always for Hilbert Spaces definition)
+     */
+    public boolean isComplete(HilbertSpace<?, ?> space) {
+        return true;
+    }
+
+    /**
+     * Computes the inner product between two vectors in a given Hilbert Space.
+     * 
+     * @param space the context space
+     * @param v1    first vector
+     * @param v2    second vector
+     * @return the scalar inner product
+     */
+    @SuppressWarnings("unchecked")
+    public <V, S> S innerProduct(HilbertSpace<V, S> space, V v1, V v2) {
+        // Delegate to the space's internal inner product definition
+        // Assuming HilbertSpace has such a method, otherwise this is a placeholder
+        // return space.innerProduct(v1, v2);
+        throw new UnsupportedOperationException(
+                "Inner product delegation not yet implemented in HilbertSpace interface");
     }
 }

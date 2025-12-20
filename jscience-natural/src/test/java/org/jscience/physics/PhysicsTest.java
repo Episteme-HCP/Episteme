@@ -31,8 +31,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
-import org.jscience.measure.units.SI;
 import org.jscience.measure.quantity.Pressure;
+
+import org.jscience.measure.quantity.Volume;
 
 /**
  * Test suite for physics packages.
@@ -141,9 +142,10 @@ public class PhysicsTest {
         // Ideal gas law simplified test
         // 1 mole, 273.15 K, 22.4 L = 0.0224 m^3
         Quantity<Pressure> pressure = Thermodynamics.idealGasPressure(
-                Quantities.create(1.0, SI.MOLE),
-                Quantities.create(273.15, SI.KELVIN),
-                Quantities.create(0.0224, Units.CUBIC_METER));
+                Quantities.create(1.0, Units.MOLE),
+                Quantities.create(273.15, Units.KELVIN),
+                Quantities.create(0.0224,
+                        (org.jscience.measure.Unit<Volume>) (org.jscience.measure.Unit<?>) Units.METER.pow(3)));
 
         // Expected: P ≈ 101325 Pa (1 atm)
         // PV = nRT -> P = nRT/V = 1 * 8.314 * 273.15 / 0.0224 ≈ 101383 Pa

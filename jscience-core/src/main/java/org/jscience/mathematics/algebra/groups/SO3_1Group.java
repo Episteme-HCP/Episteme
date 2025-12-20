@@ -73,8 +73,7 @@ public class SO3_1Group implements Group<Matrix<Real>> {
 
     @Override
     public Matrix<Real> inverse(Matrix<Real> element) {
-        // Placeholder
-        throw new UnsupportedOperationException("Matrix inversion not yet fully exposed in generic interface");
+        return element.inverse();
     }
 
     @Override

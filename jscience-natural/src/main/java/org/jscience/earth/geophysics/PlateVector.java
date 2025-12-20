@@ -1,25 +1,24 @@
 package org.jscience.earth.geophysics;
 
-import org.jscience.measure.Quantity;
-import org.jscience.measure.quantity.Angle;
-import org.jscience.measure.quantity.Velocity;
-
 /**
  * Represents a point on a tectonic plate with its associated velocity vector.
  */
 public class PlateVector {
 
     private final String siteId;
-    private final Quantity<Angle> latitude;
-    private final Quantity<Angle> longitude;
+    private final org.jscience.measure.Quantity<org.jscience.measure.quantity.Angle> latitude;
+    private final org.jscience.measure.Quantity<org.jscience.measure.quantity.Angle> longitude;
 
     // Velocity components
-    private final Quantity<Velocity> northVelocity; // mm/yr usually
-    private final Quantity<Velocity> eastVelocity; // mm/yr usually
+    private final org.jscience.measure.Quantity<org.jscience.measure.quantity.Velocity> northVelocity; // mm/yr usually
+    private final org.jscience.measure.Quantity<org.jscience.measure.quantity.Velocity> eastVelocity; // mm/yr usually
     // Up component usually ignored for 2D plate motion but could be added
 
-    public PlateVector(String siteId, Quantity<Angle> latitude, Quantity<Angle> longitude,
-            Quantity<Velocity> northVelocity, Quantity<Velocity> eastVelocity) {
+    public PlateVector(String siteId,
+            org.jscience.measure.Quantity<org.jscience.measure.quantity.Angle> latitude,
+            org.jscience.measure.Quantity<org.jscience.measure.quantity.Angle> longitude,
+            org.jscience.measure.Quantity<org.jscience.measure.quantity.Velocity> northVelocity,
+            org.jscience.measure.Quantity<org.jscience.measure.quantity.Velocity> eastVelocity) {
         this.siteId = siteId;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -31,19 +30,19 @@ public class PlateVector {
         return siteId;
     }
 
-    public Quantity<Angle> getLatitude() {
+    public org.jscience.measure.Quantity<org.jscience.measure.quantity.Angle> getLatitude() {
         return latitude;
     }
 
-    public Quantity<Angle> getLongitude() {
+    public org.jscience.measure.Quantity<org.jscience.measure.quantity.Angle> getLongitude() {
         return longitude;
     }
 
-    public Quantity<Velocity> getNorthVelocity() {
+    public org.jscience.measure.Quantity<org.jscience.measure.quantity.Velocity> getNorthVelocity() {
         return northVelocity;
     }
 
-    public Quantity<Velocity> getEastVelocity() {
+    public org.jscience.measure.Quantity<org.jscience.measure.quantity.Velocity> getEastVelocity() {
         return eastVelocity;
     }
 

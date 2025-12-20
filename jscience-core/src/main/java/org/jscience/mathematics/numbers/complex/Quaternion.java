@@ -1,6 +1,7 @@
 package org.jscience.mathematics.numbers.complex;
 
 import org.jscience.mathematics.structures.rings.Field;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a Quaternion number (H).
@@ -15,93 +16,110 @@ import org.jscience.mathematics.structures.rings.Field;
  */
 public final class Quaternion implements Field<Quaternion> {
 
-    private final double a, b, c, d;
+    private final Real a, b, c, d;
 
-    public static final Quaternion ZERO = new Quaternion(0, 0, 0, 0);
-    public static final Quaternion ONE = new Quaternion(1, 0, 0, 0);
-    public static final Quaternion I = new Quaternion(0, 1, 0, 0);
-    public static final Quaternion J = new Quaternion(0, 0, 1, 0);
-    public static final Quaternion K = new Quaternion(0, 0, 0, 1);
+    public static final Quaternion ZERO = new Quaternion(Real.ZERO, Real.ZERO, Real.ZERO, Real.ZERO);
+    public static final Quaternion ONE = new Quaternion(Real.ONE, Real.ZERO, Real.ZERO, Real.ZERO);
+    public static final Quaternion I = new Quaternion(Real.ZERO, Real.ONE, Real.ZERO, Real.ZERO);
+    public static final Quaternion J = new Quaternion(Real.ZERO, Real.ZERO, Real.ONE, Real.ZERO);
+    public static final Quaternion K = new Quaternion(Real.ZERO, Real.ZERO, Real.ZERO, Real.ONE);
 
-    public Quaternion(double a, double b, double c, double d) {
+    public Quaternion(Real a, Real b, Real c, Real d) {
         this.a = a;
         this.b = b;
         this.c = c;
         this.d = d;
     }
 
+    public Quaternion(double a, double b, double c, double d) {
+        this(Real.of(a), Real.of(b), Real.of(c), Real.of(d));
+    }
+
+    public static Quaternion of(Real a, Real b, Real c, Real d) {
+        return new Quaternion(a, b, c, d);
+    }
+
     public static Quaternion of(double a, double b, double c, double d) {
         return new Quaternion(a, b, c, d);
+    }
+
+    public static Quaternion of(Real real) {
+        return new Quaternion(real, Real.ZERO, Real.ZERO, Real.ZERO);
     }
 
     public static Quaternion of(double real) {
         return new Quaternion(real, 0, 0, 0);
     }
 
-    public double getReal() {
+    public Real getReal() {
         return a;
     }
 
-    public double getI() {
+    public Real getI() {
         return b;
     }
 
-    public double getJ() {
+    public Real getJ() {
         return c;
     }
 
-    public double getK() {
+    public Real getK() {
         return d;
     }
 
     public Quaternion add(Quaternion other) {
-        return new Quaternion(a + other.a, b + other.b, c + other.c, d + other.d);
+        return new Quaternion(a.add(other.a), b.add(other.b), c.add(other.c), d.add(other.d));
     }
 
     public Quaternion subtract(Quaternion other) {
-        return new Quaternion(a - other.a, b - other.b, c - other.c, d - other.d);
+        return new Quaternion(a.subtract(other.a), b.subtract(other.b), c.subtract(other.c), d.subtract(other.d));
     }
 
     public Quaternion multiply(Quaternion other) {
         // Hamilton product
-        double newA = a * other.a - b * other.b - c * other.c - d * other.d;
-        double newB = a * other.b + b * other.a + c * other.d - d * other.c;
-        double newC = a * other.c - b * other.d + c * other.a + d * other.b;
-        double newD = a * other.d + b * other.c - c * other.b + d * other.a;
+        Real newA = a.multiply(other.a).subtract(b.multiply(other.b)).subtract(c.multiply(other.c))
+                .subtract(d.multiply(other.d));
+        Real newB = a.multiply(other.b).add(b.multiply(other.a)).add(c.multiply(other.d)).subtract(d.multiply(other.c));
+        Real newC = a.multiply(other.c).subtract(b.multiply(other.d)).add(c.multiply(other.a)).add(d.multiply(other.b));
+        Real newD = a.multiply(other.d).add(b.multiply(other.c)).subtract(c.multiply(other.b)).add(d.multiply(other.a));
         return new Quaternion(newA, newB, newC, newD);
     }
 
+    public Quaternion multiply(Real scalar) {
+        return new Quaternion(a.multiply(scalar), b.multiply(scalar), c.multiply(scalar), d.multiply(scalar));
+    }
+
     public Quaternion multiply(double scalar) {
-        return new Quaternion(a * scalar, b * scalar, c * scalar, d * scalar);
+        return multiply(Real.of(scalar));
     }
 
     public Quaternion conjugate() {
-        return new Quaternion(a, -b, -c, -d);
+        return new Quaternion(a, b.negate(), c.negate(), d.negate());
     }
 
-    public double normSquared() {
-        return a * a + b * b + c * c + d * d;
+    public Real normSquared() {
+        return a.multiply(a).add(b.multiply(b)).add(c.multiply(c)).add(d.multiply(d));
     }
 
-    public double norm() {
-        return Math.sqrt(normSquared());
+    public Real norm() {
+        return normSquared().sqrt();
     }
 
     public Quaternion inverse() {
-        double n2 = normSquared();
-        if (n2 == 0.0)
+        Real n2 = normSquared();
+        if (n2.isZero())
             throw new ArithmeticException("Cannot invert zero quaternion");
         Quaternion conj = conjugate();
-        return new Quaternion(conj.a / n2, conj.b / n2, conj.c / n2, conj.d / n2);
+        return new Quaternion(conj.a.divide(n2), conj.b.divide(n2), conj.c.divide(n2), conj.d.divide(n2));
     }
 
     public Quaternion negate() {
-        return new Quaternion(-a, -b, -c, -d);
+        return new Quaternion(a.negate(), b.negate(), c.negate(), d.negate());
     }
 
     @Override
     public String toString() {
-        return String.format("%.2f + %.2fi + %.2fj + %.2fk", a, b, c, d);
+        return String.format("%s + %si + %sj + %sk", a, b, c, d);
     }
 
     @Override
@@ -111,8 +129,7 @@ public final class Quaternion implements Field<Quaternion> {
         if (!(obj instanceof Quaternion))
             return false;
         Quaternion q = (Quaternion) obj;
-        return Double.compare(a, q.a) == 0 && Double.compare(b, q.b) == 0 &&
-                Double.compare(c, q.c) == 0 && Double.compare(d, q.d) == 0;
+        return a.equals(q.a) && b.equals(q.b) && c.equals(q.c) && d.equals(q.d);
     }
 
     @Override

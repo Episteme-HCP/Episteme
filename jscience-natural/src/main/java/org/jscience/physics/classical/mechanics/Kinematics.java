@@ -1,46 +1,21 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
 package org.jscience.physics.classical.mechanics;
 
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.geometry.Vector2D;
 import org.jscience.mathematics.linearalgebra.Vector;
+
 import org.jscience.measure.Quantity;
+import org.jscience.measure.quantity.*;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
-import org.jscience.measure.quantity.Mass;
-import org.jscience.measure.quantity.Energy;
-import org.jscience.measure.quantity.Length;
-import org.jscience.measure.quantity.Velocity;
-import org.jscience.measure.quantity.Acceleration;
-import org.jscience.measure.quantity.Time;
-import org.jscience.measure.quantity.Angle;
 
 /**
  * Classical kinematics - motion without considering forces.
+ * Modernized to JScience.
  * 
  * @author Silvere Martin-Michiellot
- * @since 2.0
+ * @author Gemini AI
+ * @since 5.0
  */
 public class Kinematics {
 
@@ -60,8 +35,6 @@ public class Kinematics {
     public static Real kineticEnergy(Real mass, Vector<Real> velocity) {
         // KE = 0.5 * m * |v|^2
         Real v2 = velocity.norm().pow(2);
-        // Note: norm() returns Euclidian norm. Square it.
-        // Or if Vector has dot product: velocity.dot(velocity)
         return Real.of(0.5).multiply(mass).multiply(v2);
     }
 
@@ -122,23 +95,13 @@ public class Kinematics {
 
     public static Vector<Real> centripetalAcceleration(Vector<Real> velocity, Real radius, Vector<Real> position,
             Vector<Real> center) {
-        // Direction towards center: center - position
         Vector<Real> rVec = center.subtract(position);
-
-        // Ensure radius matches distance? Or trust parameter?
-        // Let's rely on direction vector normalization.
-        // a_c = (v^2 / radius) * normalized(rVec)
-
         Real vSq = velocity.norm().pow(2);
         Real mag = vSq.divide(radius);
-
-        // Normalize direction
         Real dist = rVec.norm();
         if (dist.equals(Real.ZERO))
-            return velocity.multiply(Real.ZERO); // Singularity
-
+            return velocity.multiply(Real.ZERO);
         Vector<Real> dir = rVec.multiply(dist.inverse());
-
         return dir.multiply(mag);
     }
 
@@ -173,13 +136,6 @@ public class Kinematics {
         return velocityChange.multiply(time.inverse());
     }
 
-    /**
-     * Computes the cross product of two 3D vectors.
-     * 
-     * @param a Vector A
-     * @param b Vector B
-     * @return a x b
-     */
     public static Vector<Real> crossProduct(Vector<Real> a, Vector<Real> b) {
         if (a.dimension() != 3 || b.dimension() != 3)
             throw new IllegalArgumentException("Cross product requires 3D vectors");
@@ -192,14 +148,10 @@ public class Kinematics {
         Real by = b.get(1);
         Real bz = b.get(2);
 
-        // cx = ay*bz - az*by
         Real cx = ay.multiply(bz).subtract(az.multiply(by));
-        // cy = az*bx - ax*bz
         Real cy = az.multiply(bx).subtract(ax.multiply(bz));
-        // cz = ax*by - ay*bx
         Real cz = ax.multiply(by).subtract(ay.multiply(bx));
 
-        // Use DenseVector via VectorFactory if possible, or just list
         return org.jscience.mathematics.linearalgebra.vectors.VectorFactory.<Real>create(
                 java.util.Arrays.asList(cx, cy, cz), Real.ZERO);
     }
@@ -209,7 +161,7 @@ public class Kinematics {
     public static Quantity<Length> position(Quantity<Length> initialPos, Quantity<Velocity> initialVel,
             Quantity<Acceleration> accel, Quantity<Time> time) {
         Real x0 = Real.of(initialPos.to(Units.METER).getValue().doubleValue());
-        Real v0 = Real.of(initialVel.to(Units.METERS_PER_SECOND).getValue().doubleValue());
+        Real v0 = Real.of(initialVel.to(Units.METER_PER_SECOND).getValue().doubleValue());
         Real a = Real.of(accel.to(Units.METERS_PER_SECOND_SQUARED).getValue().doubleValue());
         Real t = Real.of(time.to(Units.SECOND).getValue().doubleValue());
 
@@ -219,19 +171,18 @@ public class Kinematics {
 
     public static Quantity<Velocity> velocity(Quantity<Velocity> initialVel, Quantity<Acceleration> accel,
             Quantity<Time> time) {
-        Real v0 = Real.of(initialVel.to(Units.METERS_PER_SECOND).getValue().doubleValue());
+        Real v0 = Real.of(initialVel.to(Units.METER_PER_SECOND).getValue().doubleValue());
         Real a = Real.of(accel.to(Units.METERS_PER_SECOND_SQUARED).getValue().doubleValue());
         Real t = Real.of(time.to(Units.SECOND).getValue().doubleValue());
 
         Real result = velocityConstantAccel(v0, a, t);
-        return Quantities.create(result.doubleValue(), Units.METERS_PER_SECOND);
+        return Quantities.create(result.doubleValue(), Units.METER_PER_SECOND);
     }
 
     public static Quantity<Energy> kineticEnergy(Quantity<Mass> mass, Quantity<Velocity> velocity) {
         Real m = Real.of(mass.to(Units.KILOGRAM).getValue().doubleValue());
-        Real v = Real.of(velocity.to(Units.METERS_PER_SECOND).getValue().doubleValue());
+        Real v = Real.of(velocity.to(Units.METER_PER_SECOND).getValue().doubleValue());
 
-        // KE = 1/2 m v^2
         Real ke = Real.of(0.5).multiply(m).multiply(v).multiply(v);
         return Quantities.create(ke.doubleValue(), Units.JOULE);
     }
@@ -239,26 +190,13 @@ public class Kinematics {
     @SuppressWarnings("unchecked")
     public static Quantity<Length> projectileRange(Quantity<Velocity> initialSpeed, Quantity<Angle> launchAngle,
             Quantity<Acceleration> g) {
-        Real v = Real.of(initialSpeed.to(Units.METERS_PER_SECOND).getValue().doubleValue());
+        Real v = Real.of(initialSpeed.to(Units.METER_PER_SECOND).getValue().doubleValue());
         Real theta = Real
                 .of(launchAngle.to((org.jscience.measure.Unit<Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
                         .getValue().doubleValue());
         Real grav = Real.of(g.to(Units.METERS_PER_SECOND_SQUARED).getValue().doubleValue());
 
-        Real range = projectileRange(v, theta, grav);
-        return Quantities.create(range.doubleValue(), Units.METER);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static Quantity<Length> projectileMaxHeight(Quantity<Velocity> initialSpeed, Quantity<Angle> launchAngle,
-            Quantity<Acceleration> g) {
-        Real v = Real.of(initialSpeed.to(Units.METERS_PER_SECOND).getValue().doubleValue());
-        Real theta = Real
-                .of(launchAngle.to((org.jscience.measure.Unit<Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
-                        .getValue().doubleValue());
-        Real grav = Real.of(g.to(Units.METERS_PER_SECOND_SQUARED).getValue().doubleValue());
-
-        Real h = projectileMaxHeight(v, theta, grav);
-        return Quantities.create(h.doubleValue(), Units.METER);
+        Real result = projectileRange(v, theta, grav);
+        return Quantities.create(result.doubleValue(), Units.METER);
     }
 }

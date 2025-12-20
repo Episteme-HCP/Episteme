@@ -150,7 +150,7 @@ public class Polymer {
         org.jscience.chemistry.Molecule mol = new org.jscience.chemistry.Molecule(name + "_DP" + dp);
 
         // Simple heuristic: Linear chain of Carbon atoms along X-axis
-        org.jscience.chemistry.Element carbon = org.jscience.chemistry.PeriodicTable.CARBON;
+        org.jscience.chemistry.Element carbon = org.jscience.chemistry.PeriodicTable.getElement("Carbon");
 
         org.jscience.chemistry.Atom prev = null;
         for (int i = 0; i < dp; i++) {

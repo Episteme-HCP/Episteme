@@ -55,7 +55,10 @@ public class SmilesParser {
 
                 // Look up Element (assuming Element enum exists and follows standard naming)
                 // Look up Element using PeriodicTable
-                Element element = PeriodicTable.bySymbol(symbol.toUpperCase()).orElse(PeriodicTable.CARBON);
+                Element element = PeriodicTable.bySymbol(symbol.toUpperCase());
+                if (element == null) {
+                    element = PeriodicTable.getElement("Carbon");
+                }
 
                 // Initial position (generic, ForceDirectedLayout will fix this later)
                 // Use fully qualified names to ensure correctness if imports are missing

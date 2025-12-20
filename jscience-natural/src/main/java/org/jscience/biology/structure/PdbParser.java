@@ -85,8 +85,10 @@ public class PdbParser {
                     }
 
                     // Lookup Element
-                    Optional<Element> elemOpt = PeriodicTable.bySymbol(elementSymbol);
-                    Element element = elemOpt.orElse(PeriodicTable.CARBON); // Fallback to Carbon? Or Unknown.
+                    Element element = PeriodicTable.bySymbol(elementSymbol);
+                    if (element == null) {
+                        element = PeriodicTable.getElement("Carbon"); // Fallback
+                    }
 
                     // Create Atom
                     // Note: Coordinates in PDB are Angstroms (1e-10 m).

@@ -96,11 +96,15 @@ public class IdealGas implements ThermodynamicState {
     }
 
     @Override
-    public Quantity<Energy> getEntropy() {
+    public Quantity<org.jscience.measure.quantity.Entropy> getEntropy() {
         // S = nR ln(V) (simplified relative entropy)
         double V = volume.getValue(Units.CUBIC_METER).doubleValue();
         double S = amountOfSubstance * R * Math.log(V);
-        return Quantities.create(S, Units.JOULE); // J/K approximated as Joule
+        // Units.JOULE_PER_KELVIN is not defined, deriving it
+        @SuppressWarnings("unchecked")
+        org.jscience.measure.Unit<org.jscience.measure.quantity.Entropy> entropyUnit = (org.jscience.measure.Unit<org.jscience.measure.quantity.Entropy>) Units.JOULE
+                .divide(Units.KELVIN);
+        return Quantities.create(S, entropyUnit);
     }
 
     @Override

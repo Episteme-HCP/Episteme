@@ -1,28 +1,91 @@
 package org.jscience.physics.geophysics;
 
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.quantity.Length;
+import org.jscience.measure.quantity.Pressure;
+import org.jscience.measure.quantity.Temperature;
+
+import java.io.Serializable;
+
 /**
- * Atmospheric physics calculations.
+ * Atmospheric physics calculations and data model.
+ * <p>
+ * Provides atmospheric property calculations (pressure, temperature, density)
+ * and serves as a data model for planetary atmospheres.
+ * </p>
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI
  * @since 5.0
  */
-public class Atmosphere {
+public class Atmosphere implements Serializable {
 
+    // --- Constants using Real ---
     /** Standard sea level pressure (Pa) */
-    public static final double P0 = 101325;
+    public static final Real P0 = Real.of(101325);
 
     /** Standard sea level temperature (K) */
-    public static final double T0 = 288.15;
+    public static final Real T0 = Real.of(288.15);
 
     /** Temperature lapse rate (K/m) in troposphere */
-    public static final double LAPSE_RATE = 0.0065;
+    public static final Real LAPSE_RATE = Real.of(0.0065);
 
     /** Gas constant for dry air (J/(kg·K)) */
-    public static final double R_AIR = 287.05;
+    public static final Real R_AIR = Real.of(287.05);
 
     /** Gravitational acceleration (m/s²) */
-    public static final double G = 9.80665;
+    public static final Real G = Real.of(9.80665);
+
+    // --- Data Model Fields (from earth/Atmosphere) ---
+    private Quantity<Length> height;
+    private String composition;
+    private Quantity<Pressure> pressureValue;
+    private Quantity<Temperature> averageTemperature;
+
+    // --- Constructors ---
+    public Atmosphere() {
+    }
+
+    public Atmosphere(Quantity<Length> height, String composition) {
+        this.height = height;
+        this.composition = composition;
+    }
+
+    // --- Data Model Accessors ---
+    public Quantity<Length> getHeight() {
+        return height;
+    }
+
+    public void setHeight(Quantity<Length> height) {
+        this.height = height;
+    }
+
+    public String getComposition() {
+        return composition;
+    }
+
+    public void setComposition(String composition) {
+        this.composition = composition;
+    }
+
+    public Quantity<Pressure> getPressureValue() {
+        return pressureValue;
+    }
+
+    public void setPressureValue(Quantity<Pressure> pressureValue) {
+        this.pressureValue = pressureValue;
+    }
+
+    public Quantity<Temperature> getAverageTemperature() {
+        return averageTemperature;
+    }
+
+    public void setAverageTemperature(Quantity<Temperature> averageTemperature) {
+        this.averageTemperature = averageTemperature;
+    }
+
+    // --- Static Calculation Methods (using Real) ---
 
     /**
      * Barometric formula: pressure vs altitude.
@@ -31,101 +94,115 @@ public class Atmosphere {
      * @param altitude Height above sea level (m)
      * @return Pressure (Pa)
      */
-    public static double pressure(double altitude) {
-        if (altitude < 0)
-            altitude = 0;
-        if (altitude > 11000) {
-            // Above troposphere - isothermal approximation
-            double P11 = pressure(11000);
-            double T11 = temperature(11000);
-            return P11 * Math.exp(-G * (altitude - 11000) / (R_AIR * T11));
+    public static Real pressure(Real altitude) {
+        if (altitude.doubleValue() < 0) {
+            altitude = Real.ZERO;
         }
-        double exponent = G / (R_AIR * LAPSE_RATE);
-        return P0 * Math.pow(1 - LAPSE_RATE * altitude / T0, exponent);
+        if (altitude.doubleValue() > 11000) {
+            // Above troposphere - isothermal approximation
+            Real P11 = pressure(Real.of(11000));
+            Real T11 = temperature(Real.of(11000));
+            Real expo = G.negate().multiply(altitude.subtract(Real.of(11000))).divide(R_AIR.multiply(T11));
+            return P11.multiply(expo.exp());
+        }
+        Real exponent = G.divide(R_AIR.multiply(LAPSE_RATE));
+        Real base = Real.ONE.subtract(LAPSE_RATE.multiply(altitude).divide(T0));
+        return P0.multiply(base.pow(exponent.doubleValue()));
     }
 
     /**
      * Temperature vs altitude (troposphere).
      */
-    public static double temperature(double altitude) {
-        if (altitude > 11000)
-            return 216.65; // Tropopause
-        return T0 - LAPSE_RATE * altitude;
+    public static Real temperature(Real altitude) {
+        if (altitude.doubleValue() > 11000) {
+            return Real.of(216.65); // Tropopause
+        }
+        return T0.subtract(LAPSE_RATE.multiply(altitude));
     }
 
     /**
      * Air density from temperature and pressure.
      * ρ = P / (R * T)
      */
-    public static double density(double pressure, double temperature) {
-        return pressure / (R_AIR * temperature);
+    public static Real density(Real pressure, Real temperature) {
+        return pressure.divide(R_AIR.multiply(temperature));
     }
 
     /**
      * Density at altitude.
      */
-    public static double densityAtAltitude(double altitude) {
+    public static Real densityAtAltitude(Real altitude) {
         return density(pressure(altitude), temperature(altitude));
     }
 
     /**
      * Scale height: H = RT/g
      */
-    public static double scaleHeight(double temperature) {
-        return R_AIR * temperature / G;
+    public static Real scaleHeight(Real temperature) {
+        return R_AIR.multiply(temperature).divide(G);
     }
 
     /**
      * Speed of sound in air.
      * c = sqrt(γ * R * T) where γ = 1.4 for diatomic gas
      */
-    public static double speedOfSound(double temperature) {
-        return Math.sqrt(1.4 * R_AIR * temperature);
+    public static Real speedOfSound(Real temperature) {
+        return Real.of(1.4).multiply(R_AIR).multiply(temperature).sqrt();
     }
 
     /**
      * Relative humidity from dew point and temperature.
      * RH ≈ 100 * exp(17.625 * Td / (243.04 + Td)) / exp(17.625 * T / (243.04 + T))
      */
-    public static double relativeHumidity(double tempCelsius, double dewPointCelsius) {
-        double es = saturationVaporPressure(tempCelsius);
-        double e = saturationVaporPressure(dewPointCelsius);
-        return 100 * e / es;
+    public static Real relativeHumidity(Real tempCelsius, Real dewPointCelsius) {
+        Real es = saturationVaporPressure(tempCelsius);
+        Real e = saturationVaporPressure(dewPointCelsius);
+        return Real.of(100).multiply(e).divide(es);
     }
 
     /**
      * Saturation vapor pressure (Magnus formula).
      * e_s = 6.112 * exp(17.67 * T / (T + 243.5)) in hPa
      */
-    public static double saturationVaporPressure(double tempCelsius) {
-        return 6.112 * Math.exp(17.67 * tempCelsius / (tempCelsius + 243.5));
+    public static Real saturationVaporPressure(Real tempCelsius) {
+        Real exponent = Real.of(17.67).multiply(tempCelsius).divide(tempCelsius.add(Real.of(243.5)));
+        return Real.of(6.112).multiply(exponent.exp());
     }
 
     /**
      * Heat index (feels-like temperature).
      */
-    public static double heatIndex(double tempCelsius, double humidity) {
-        double T = tempCelsius * 9.0 / 5.0 + 32; // Convert to Fahrenheit
-        double RH = humidity;
+    public static Real heatIndex(Real tempCelsius, Real humidity) {
+        Real T = tempCelsius.multiply(Real.of(9.0 / 5.0)).add(Real.of(32)); // Fahrenheit
+        Real RH = humidity;
 
-        double HI = -42.379 + 2.04901523 * T + 10.14333127 * RH
-                - 0.22475541 * T * RH - 0.00683783 * T * T
-                - 0.05481717 * RH * RH + 0.00122874 * T * T * RH
-                + 0.00085282 * T * RH * RH - 0.00000199 * T * T * RH * RH;
+        Real HI = Real.of(-42.379)
+                .add(Real.of(2.04901523).multiply(T))
+                .add(Real.of(10.14333127).multiply(RH))
+                .subtract(Real.of(0.22475541).multiply(T).multiply(RH))
+                .subtract(Real.of(0.00683783).multiply(T.pow(2)))
+                .subtract(Real.of(0.05481717).multiply(RH.pow(2)))
+                .add(Real.of(0.00122874).multiply(T.pow(2)).multiply(RH))
+                .add(Real.of(0.00085282).multiply(T).multiply(RH.pow(2)))
+                .subtract(Real.of(0.00000199).multiply(T.pow(2)).multiply(RH.pow(2)));
 
-        return (HI - 32) * 5.0 / 9.0; // Convert back to Celsius
+        return HI.subtract(Real.of(32)).multiply(Real.of(5.0 / 9.0)); // Back to Celsius
     }
 
     /**
      * Wind chill (Fahrenheit formula converted to Celsius).
      */
-    public static double windChill(double tempCelsius, double windSpeedKmh) {
-        if (tempCelsius > 10 || windSpeedKmh < 4.8)
+    public static Real windChill(Real tempCelsius, Real windSpeedKmh) {
+        if (tempCelsius.doubleValue() > 10 || windSpeedKmh.doubleValue() < 4.8) {
             return tempCelsius;
+        }
 
-        double T = tempCelsius;
-        double V = Math.pow(windSpeedKmh, 0.16);
+        Real T = tempCelsius;
+        Real V = Real.of(Math.pow(windSpeedKmh.doubleValue(), 0.16));
 
-        return 13.12 + 0.6215 * T - 11.37 * V + 0.3965 * T * V;
+        return Real.of(13.12)
+                .add(Real.of(0.6215).multiply(T))
+                .subtract(Real.of(11.37).multiply(V))
+                .add(Real.of(0.3965).multiply(T).multiply(V));
     }
 }

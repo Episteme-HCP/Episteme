@@ -2,16 +2,19 @@ package org.jscience.physics.astronomy;
 
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.numbers.real.Real;
+
 import org.jscience.measure.Quantity;
 import org.jscience.measure.quantity.Mass;
 import org.jscience.measure.quantity.Length;
 import org.jscience.measure.quantity.Temperature;
 import org.jscience.measure.quantity.Pressure;
+
 import java.util.Map;
 import java.util.HashMap;
 
 /**
  * Represents a Planet.
+ * Modernized to JScience.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI

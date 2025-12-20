@@ -18,27 +18,41 @@ public class SignalProcessing {
      * @param cutoff     Cutoff frequency (normalized 0-1)
      * @param sampleRate Sampling rate
      */
-    public static double[] lowPassFilter(double[] signal, double cutoff, double sampleRate) {
+    public static org.jscience.mathematics.numbers.real.Real[] lowPassFilter(
+            org.jscience.mathematics.numbers.real.Real[] signal, org.jscience.mathematics.numbers.real.Real cutoff,
+            org.jscience.mathematics.numbers.real.Real sampleRate) {
         int n = nextPowerOf2(signal.length);
-        double[] padded = new double[n];
+        org.jscience.mathematics.numbers.real.Real[] padded = new org.jscience.mathematics.numbers.real.Real[n];
+        org.jscience.mathematics.numbers.real.Real zero = org.jscience.mathematics.numbers.real.Real.ZERO;
+
+        // Fill padded with zero default first effectively (arrays null init, wait Real
+        // array is nulls)
+        for (int i = 0; i < n; i++)
+            padded[i] = zero;
         System.arraycopy(signal, 0, padded, 0, signal.length);
 
-        double[][] spectrum = FFT.fftReal(padded);
-        double[] real = spectrum[0];
-        double[] imag = spectrum[1];
+        org.jscience.mathematics.numbers.real.Real[][] spectrum = FFT.fftReal(padded);
+        org.jscience.mathematics.numbers.real.Real[] real = spectrum[0];
+        org.jscience.mathematics.numbers.real.Real[] imag = spectrum[1];
 
-        double nyquist = sampleRate / 2;
-        int cutoffBin = (int) (cutoff / nyquist * (n / 2));
+        // double nyquist = sampleRate / 2;
+        org.jscience.mathematics.numbers.real.Real nyquist = sampleRate
+                .divide(org.jscience.mathematics.numbers.real.Real.of(2));
+
+        // int cutoffBin = (int) (cutoff / nyquist * (n / 2));
+        double cVal = cutoff.divide(nyquist).multiply(org.jscience.mathematics.numbers.real.Real.of(n / 2))
+                .doubleValue();
+        int cutoffBin = (int) cVal;
 
         // Zero out frequencies above cutoff
         for (int i = cutoffBin + 1; i < n - cutoffBin; i++) {
-            real[i] = 0;
-            imag[i] = 0;
+            real[i] = zero;
+            imag[i] = zero;
         }
 
         FFT.ifft(real, imag);
 
-        double[] result = new double[signal.length];
+        org.jscience.mathematics.numbers.real.Real[] result = new org.jscience.mathematics.numbers.real.Real[signal.length];
         System.arraycopy(real, 0, result, 0, signal.length);
         return result;
     }
@@ -46,31 +60,40 @@ public class SignalProcessing {
     /**
      * High-pass filter using FFT.
      */
-    public static double[] highPassFilter(double[] signal, double cutoff, double sampleRate) {
+    public static org.jscience.mathematics.numbers.real.Real[] highPassFilter(
+            org.jscience.mathematics.numbers.real.Real[] signal, org.jscience.mathematics.numbers.real.Real cutoff,
+            org.jscience.mathematics.numbers.real.Real sampleRate) {
         int n = nextPowerOf2(signal.length);
-        double[] padded = new double[n];
+        org.jscience.mathematics.numbers.real.Real[] padded = new org.jscience.mathematics.numbers.real.Real[n];
+        org.jscience.mathematics.numbers.real.Real zero = org.jscience.mathematics.numbers.real.Real.ZERO;
+        for (int i = 0; i < n; i++)
+            padded[i] = zero;
         System.arraycopy(signal, 0, padded, 0, signal.length);
 
-        double[][] spectrum = FFT.fftReal(padded);
-        double[] real = spectrum[0];
-        double[] imag = spectrum[1];
+        org.jscience.mathematics.numbers.real.Real[][] spectrum = FFT.fftReal(padded);
+        org.jscience.mathematics.numbers.real.Real[] real = spectrum[0];
+        org.jscience.mathematics.numbers.real.Real[] imag = spectrum[1];
 
-        double nyquist = sampleRate / 2;
-        int cutoffBin = (int) (cutoff / nyquist * (n / 2));
+        // double nyquist = sampleRate / 2;
+        org.jscience.mathematics.numbers.real.Real nyquist = sampleRate
+                .divide(org.jscience.mathematics.numbers.real.Real.of(2));
+        double cVal = cutoff.divide(nyquist).multiply(org.jscience.mathematics.numbers.real.Real.of(n / 2))
+                .doubleValue();
+        int cutoffBin = (int) cVal;
 
         // Zero out frequencies below cutoff
         for (int i = 0; i <= cutoffBin; i++) {
-            real[i] = 0;
-            imag[i] = 0;
+            real[i] = zero;
+            imag[i] = zero;
             if (i > 0 && n - i < n) {
-                real[n - i] = 0;
-                imag[n - i] = 0;
+                real[n - i] = zero;
+                imag[n - i] = zero;
             }
         }
 
         FFT.ifft(real, imag);
 
-        double[] result = new double[signal.length];
+        org.jscience.mathematics.numbers.real.Real[] result = new org.jscience.mathematics.numbers.real.Real[signal.length];
         System.arraycopy(real, 0, result, 0, signal.length);
         return result;
     }
@@ -78,18 +101,19 @@ public class SignalProcessing {
     /**
      * Moving average filter.
      */
-    public static double[] movingAverage(double[] signal, int windowSize) {
+    public static org.jscience.mathematics.numbers.real.Real[] movingAverage(
+            org.jscience.mathematics.numbers.real.Real[] signal, int windowSize) {
         int n = signal.length;
-        double[] result = new double[n];
-        double sum = 0;
+        org.jscience.mathematics.numbers.real.Real[] result = new org.jscience.mathematics.numbers.real.Real[n];
+        org.jscience.mathematics.numbers.real.Real sum = org.jscience.mathematics.numbers.real.Real.ZERO;
 
         for (int i = 0; i < n; i++) {
-            sum += signal[i];
+            sum = sum.add(signal[i]);
             if (i >= windowSize) {
-                sum -= signal[i - windowSize];
+                sum = sum.subtract(signal[i - windowSize]);
             }
             int count = Math.min(i + 1, windowSize);
-            result[i] = sum / count;
+            result[i] = sum.divide(org.jscience.mathematics.numbers.real.Real.of(count));
         }
         return result;
     }
@@ -97,12 +121,12 @@ public class SignalProcessing {
     /**
      * Compute RMS (Root Mean Square) value.
      */
-    public static double rms(double[] signal) {
-        double sum = 0;
-        for (double v : signal) {
-            sum += v * v;
+    public static org.jscience.mathematics.numbers.real.Real rms(org.jscience.mathematics.numbers.real.Real[] signal) {
+        org.jscience.mathematics.numbers.real.Real sum = org.jscience.mathematics.numbers.real.Real.ZERO;
+        for (org.jscience.mathematics.numbers.real.Real v : signal) {
+            sum = sum.add(v.multiply(v));
         }
-        return Math.sqrt(sum / signal.length);
+        return sum.divide(org.jscience.mathematics.numbers.real.Real.of(signal.length)).sqrt();
     }
 
     /**
@@ -112,12 +136,26 @@ public class SignalProcessing {
      * @param threshold Minimum peak amplitude
      * @return Indices of peaks
      */
-    public static int[] findPeaks(double[] signal, double threshold) {
+    public static int[] findPeaks(org.jscience.mathematics.numbers.real.Real[] signal,
+            org.jscience.mathematics.numbers.real.Real threshold) {
         java.util.List<Integer> peaks = new java.util.ArrayList<>();
         for (int i = 1; i < signal.length - 1; i++) {
-            if (signal[i] > threshold
-                    && signal[i] > signal[i - 1]
-                    && signal[i] > signal[i + 1]) {
+            // signal[i] > threshold && signal[i] > signal[i-1] && signal[i] > signal[i+1]
+            // Real doesn't implement compareTo directly in generic sense usually, check
+            // Comparable
+            // But checking .doubleValue() is easiest for inequality if conversion is safe
+            // Assuming Real implements Comparable<Real> or use compareTo
+
+            // Actually Real implements FieldElement?
+            // Let's use compareTo if available, otherwise subtract and check sign?
+            // Real likely extends Number or Comparable.
+            // Checking outline: Real extends Number, implements FieldElement<Real>,
+            // Comparable<Real> usually.
+            // If not, use doubleValue() for inequalities to be safe/quick.
+
+            if (signal[i].doubleValue() > threshold.doubleValue()
+                    && signal[i].doubleValue() > signal[i - 1].doubleValue()
+                    && signal[i].doubleValue() > signal[i + 1].doubleValue()) {
                 peaks.add(i);
             }
         }
@@ -127,22 +165,26 @@ public class SignalProcessing {
     /**
      * Zero-crossing rate.
      */
-    public static double zeroCrossingRate(double[] signal) {
+    public static org.jscience.mathematics.numbers.real.Real zeroCrossingRate(
+            org.jscience.mathematics.numbers.real.Real[] signal) {
         int crossings = 0;
         for (int i = 1; i < signal.length; i++) {
-            if (signal[i] * signal[i - 1] < 0) {
+            // if (signal[i] * signal[i - 1] < 0)
+            if (signal[i].multiply(signal[i - 1]).doubleValue() < 0) {
                 crossings++;
             }
         }
-        return (double) crossings / (signal.length - 1);
+        return org.jscience.mathematics.numbers.real.Real.of(crossings)
+                .divide(org.jscience.mathematics.numbers.real.Real.of(signal.length - 1));
     }
 
     /**
      * Downsample signal by factor.
      */
-    public static double[] downsample(double[] signal, int factor) {
+    public static org.jscience.mathematics.numbers.real.Real[] downsample(
+            org.jscience.mathematics.numbers.real.Real[] signal, int factor) {
         int n = (signal.length + factor - 1) / factor;
-        double[] result = new double[n];
+        org.jscience.mathematics.numbers.real.Real[] result = new org.jscience.mathematics.numbers.real.Real[n];
         for (int i = 0; i < n; i++) {
             result[i] = signal[i * factor];
         }
@@ -152,8 +194,14 @@ public class SignalProcessing {
     /**
      * Upsample signal by factor (zero-insertion).
      */
-    public static double[] upsample(double[] signal, int factor) {
-        double[] result = new double[signal.length * factor];
+    public static org.jscience.mathematics.numbers.real.Real[] upsample(
+            org.jscience.mathematics.numbers.real.Real[] signal, int factor) {
+        org.jscience.mathematics.numbers.real.Real[] result = new org.jscience.mathematics.numbers.real.Real[signal.length
+                * factor];
+        org.jscience.mathematics.numbers.real.Real zero = org.jscience.mathematics.numbers.real.Real.ZERO;
+        for (int i = 0; i < result.length; i++)
+            result[i] = zero;
+
         for (int i = 0; i < signal.length; i++) {
             result[i * factor] = signal[i];
         }
@@ -163,10 +211,18 @@ public class SignalProcessing {
     /**
      * Generate sine wave.
      */
-    public static double[] sineWave(double frequency, double sampleRate, int samples) {
-        double[] wave = new double[samples];
+    public static org.jscience.mathematics.numbers.real.Real[] sineWave(
+            org.jscience.mathematics.numbers.real.Real frequency, org.jscience.mathematics.numbers.real.Real sampleRate,
+            int samples) {
+        org.jscience.mathematics.numbers.real.Real[] wave = new org.jscience.mathematics.numbers.real.Real[samples];
+        org.jscience.mathematics.numbers.real.Real twoPi = org.jscience.mathematics.numbers.real.Real.PI
+                .multiply(org.jscience.mathematics.numbers.real.Real.of(2));
+
         for (int i = 0; i < samples; i++) {
-            wave[i] = Math.sin(2 * Math.PI * frequency * i / sampleRate);
+            // wave[i] = Math.sin(2 * Math.PI * frequency * i / sampleRate);
+            org.jscience.mathematics.numbers.real.Real t = org.jscience.mathematics.numbers.real.Real.of(i)
+                    .divide(sampleRate);
+            wave[i] = twoPi.multiply(frequency).multiply(t).sin();
         }
         return wave;
     }
@@ -174,11 +230,11 @@ public class SignalProcessing {
     /**
      * Generate white noise.
      */
-    public static double[] whiteNoise(int samples) {
-        double[] noise = new double[samples];
+    public static org.jscience.mathematics.numbers.real.Real[] whiteNoise(int samples) {
+        org.jscience.mathematics.numbers.real.Real[] noise = new org.jscience.mathematics.numbers.real.Real[samples];
         java.util.Random rand = new java.util.Random();
         for (int i = 0; i < samples; i++) {
-            noise[i] = rand.nextGaussian();
+            noise[i] = org.jscience.mathematics.numbers.real.Real.of(rand.nextGaussian());
         }
         return noise;
     }
@@ -186,15 +242,160 @@ public class SignalProcessing {
     /**
      * Add two signals.
      */
-    public static double[] add(double[] a, double[] b) {
+    public static org.jscience.mathematics.numbers.real.Real[] add(org.jscience.mathematics.numbers.real.Real[] a,
+            org.jscience.mathematics.numbers.real.Real[] b) {
         int n = Math.max(a.length, b.length);
-        double[] result = new double[n];
+        org.jscience.mathematics.numbers.real.Real[] result = new org.jscience.mathematics.numbers.real.Real[n];
+        org.jscience.mathematics.numbers.real.Real zero = org.jscience.mathematics.numbers.real.Real.ZERO;
+
         for (int i = 0; i < n; i++) {
-            double va = i < a.length ? a[i] : 0;
-            double vb = i < b.length ? b[i] : 0;
-            result[i] = va + vb;
+            org.jscience.mathematics.numbers.real.Real va = i < a.length ? a[i] : zero;
+            org.jscience.mathematics.numbers.real.Real vb = i < b.length ? b[i] : zero;
+            result[i] = va.add(vb);
         }
         return result;
+    }
+
+    /**
+     * Fast Fourier Transform of real-valued signal.
+     */
+    public static org.jscience.mathematics.numbers.real.Real[][] fft(
+            org.jscience.mathematics.numbers.real.Real[] signal) {
+        return FFT.fftReal(signal);
+    }
+
+    /**
+     * Inverse FFT.
+     */
+    public static org.jscience.mathematics.numbers.real.Real[] ifft(org.jscience.mathematics.numbers.real.Real[] real,
+            org.jscience.mathematics.numbers.real.Real[] imag) {
+        org.jscience.mathematics.numbers.real.Real[] r = real.clone();
+        org.jscience.mathematics.numbers.real.Real[] i = imag.clone();
+        FFT.ifft(r, i);
+        return r;
+    }
+
+    /**
+     * Power spectrum from FFT result.
+     */
+    public static org.jscience.mathematics.numbers.real.Real[] powerSpectrum(
+            org.jscience.mathematics.numbers.real.Real[] real, org.jscience.mathematics.numbers.real.Real[] imag) {
+        org.jscience.mathematics.numbers.real.Real[] power = new org.jscience.mathematics.numbers.real.Real[real.length];
+        for (int k = 0; k < real.length; k++) {
+            power[k] = real[k].multiply(real[k]).add(imag[k].multiply(imag[k]));
+        }
+        return power;
+    }
+
+    /**
+     * Power spectral density using FFT.
+     */
+    public static org.jscience.mathematics.numbers.real.Real[] powerSpectralDensity(
+            org.jscience.mathematics.numbers.real.Real[] signal) {
+        return FFT.powerSpectrum(signal);
+    }
+
+    /**
+     * Exponential moving average.
+     */
+    public static org.jscience.mathematics.numbers.real.Real[] exponentialMovingAverage(
+            org.jscience.mathematics.numbers.real.Real[] signal, org.jscience.mathematics.numbers.real.Real alpha) {
+        org.jscience.mathematics.numbers.real.Real[] filtered = new org.jscience.mathematics.numbers.real.Real[signal.length];
+        filtered[0] = signal[0];
+        org.jscience.mathematics.numbers.real.Real oneMinusAlpha = org.jscience.mathematics.numbers.real.Real.ONE
+                .subtract(alpha);
+
+        for (int i = 1; i < signal.length; i++) {
+            filtered[i] = alpha.multiply(signal[i]).add(oneMinusAlpha.multiply(filtered[i - 1]));
+        }
+        return filtered;
+    }
+
+    /**
+     * Convolution of two signals.
+     */
+    public static org.jscience.mathematics.numbers.real.Real[] convolve(
+            org.jscience.mathematics.numbers.real.Real[] signal, org.jscience.mathematics.numbers.real.Real[] kernel) {
+        int outLen = signal.length + kernel.length - 1;
+        org.jscience.mathematics.numbers.real.Real[] result = new org.jscience.mathematics.numbers.real.Real[outLen];
+        org.jscience.mathematics.numbers.real.Real zero = org.jscience.mathematics.numbers.real.Real.ZERO;
+        for (int k = 0; k < outLen; k++)
+            result[k] = zero;
+
+        for (int i = 0; i < signal.length; i++) {
+            for (int j = 0; j < kernel.length; j++) {
+                result[i + j] = result[i + j].add(signal[i].multiply(kernel[j]));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Cross-correlation of two signals.
+     */
+    public static org.jscience.mathematics.numbers.real.Real[] crossCorrelation(
+            org.jscience.mathematics.numbers.real.Real[] x, org.jscience.mathematics.numbers.real.Real[] y) {
+        int N = x.length;
+        int M = y.length;
+        org.jscience.mathematics.numbers.real.Real[] result = new org.jscience.mathematics.numbers.real.Real[N + M - 1];
+        org.jscience.mathematics.numbers.real.Real zero = org.jscience.mathematics.numbers.real.Real.ZERO;
+        for (int k = 0; k < result.length; k++)
+            result[k] = zero;
+
+        for (int lag = -(M - 1); lag < N; lag++) {
+            int idx = lag + M - 1;
+            for (int i = 0; i < N; i++) {
+                int j = i - lag;
+                if (j >= 0 && j < M) {
+                    result[idx] = result[idx].add(x[i].multiply(y[j]));
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Magnitude spectrum from DFT output.
+     */
+    public static org.jscience.mathematics.numbers.real.Real[] magnitudeSpectrum(
+            org.jscience.mathematics.numbers.real.Real[] real, org.jscience.mathematics.numbers.real.Real[] imag) {
+        org.jscience.mathematics.numbers.real.Real[] magnitude = new org.jscience.mathematics.numbers.real.Real[real.length];
+        for (int i = 0; i < real.length; i++) {
+            magnitude[i] = real[i].multiply(real[i]).add(imag[i].multiply(imag[i])).sqrt();
+        }
+        return magnitude;
+    }
+
+    /**
+     * Peak-to-peak amplitude.
+     */
+    public static org.jscience.mathematics.numbers.real.Real peakToPeak(
+            org.jscience.mathematics.numbers.real.Real[] signal) {
+        double min = Double.MAX_VALUE;
+        double max = -Double.MAX_VALUE;
+
+        for (org.jscience.mathematics.numbers.real.Real vReal : signal) {
+            double v = vReal.doubleValue();
+            if (v < min)
+                min = v;
+            if (v > max)
+                max = v;
+        }
+        return org.jscience.mathematics.numbers.real.Real.of(max - min);
+    }
+
+    /**
+     * Adds white noise to a signal.
+     */
+    public static org.jscience.mathematics.numbers.real.Real[] addNoise(
+            org.jscience.mathematics.numbers.real.Real[] signal, org.jscience.mathematics.numbers.real.Real amplitude) {
+        java.util.Random rand = new java.util.Random();
+        org.jscience.mathematics.numbers.real.Real[] noisy = new org.jscience.mathematics.numbers.real.Real[signal.length];
+        for (int i = 0; i < signal.length; i++) {
+            double r = 2 * rand.nextDouble() - 1;
+            noisy[i] = signal[i].add(amplitude.multiply(org.jscience.mathematics.numbers.real.Real.of(r)));
+        }
+        return noisy;
     }
 
     private static int nextPowerOf2(int n) {

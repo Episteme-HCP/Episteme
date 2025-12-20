@@ -4,6 +4,7 @@ import org.jscience.measure.Quantity;
 import org.jscience.measure.quantity.Mass;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
+
 import java.util.List;
 import java.util.ArrayList;
 
@@ -124,7 +125,7 @@ public class Molecule {
      */
     public Quantity<Mass> getMolecularWeight() {
         double totalMassKg = atoms.stream()
-                .mapToDouble(a -> a.getMass().to(Units.KILOGRAM).getValue().doubleValue())
+                .mapToDouble(a -> a.getElement().getAtomicMass().to(Units.KILOGRAM).getValue().doubleValue())
                 .sum();
         return Quantities.create(totalMassKg, Units.KILOGRAM);
     }

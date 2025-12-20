@@ -80,10 +80,25 @@ public class RegionBSPTree {
      * @param other the other region
      * @return a new region representing the union
      */
+    /**
+     * Computes the union of this region and another.
+     * 
+     * @param other the other region
+     * @return a new region representing the union
+     */
     public RegionBSPTree union(RegionBSPTree other) {
+        // Trivial optimizations
+        if (this.root.cut == null && this.root.isInside)
+            return this;
+        if (other.root.cut == null && other.root.isInside)
+            return other;
+        if (this.root.cut == null && !this.root.isInside)
+            return other;
+        if (other.root.cut == null && !other.root.isInside)
+            return this;
+
         // Full CSG implementation requires merging trees
-        // This is a placeholder for the structure
-        throw new UnsupportedOperationException("CSG Union not yet implemented");
+        throw new UnsupportedOperationException("CSG Union for complex shapes not yet implemented");
     }
 
     /**
@@ -93,7 +108,16 @@ public class RegionBSPTree {
      * @return a new region representing the intersection
      */
     public RegionBSPTree intersection(RegionBSPTree other) {
-        throw new UnsupportedOperationException("CSG Intersection not yet implemented");
+        if (this.root.cut == null && this.root.isInside)
+            return other;
+        if (other.root.cut == null && other.root.isInside)
+            return this;
+        if (this.root.cut == null && !this.root.isInside)
+            return this;
+        if (other.root.cut == null && !other.root.isInside)
+            return other;
+
+        throw new UnsupportedOperationException("CSG Intersection for complex shapes not yet implemented");
     }
 
     /**
@@ -103,6 +127,11 @@ public class RegionBSPTree {
      * @return a new region representing the difference
      */
     public RegionBSPTree difference(RegionBSPTree other) {
-        throw new UnsupportedOperationException("CSG Difference not yet implemented");
+        if (other.root.cut == null && !other.root.isInside)
+            return this; // A - Empty = A
+        if (other.root.cut == null && other.root.isInside)
+            return new RegionBSPTree(false); // A - Full = Empty
+
+        throw new UnsupportedOperationException("CSG Difference for complex shapes not yet implemented");
     }
 }

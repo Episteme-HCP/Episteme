@@ -30,36 +30,45 @@ public enum CodonTable {
         try {
             com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
             java.io.InputStream is = CodonTable.class
-                    .getResourceAsStream("/org/jscience/biology/genetics/codon_table.json");
+                    .getResourceAsStream("/org/jscience/biology/codons.json");
             if (is == null) {
-                java.util.logging.Logger.getLogger("CodonTable").severe("codon_table.json not found!");
+                java.util.logging.Logger.getLogger("CodonTable").severe("codons.json not found!");
                 return;
             }
             com.fasterxml.jackson.databind.JsonNode root = mapper.readTree(is);
+            com.fasterxml.jackson.databind.JsonNode codonsNode = root.get("codons");
 
-            java.util.Iterator<Map.Entry<String, com.fasterxml.jackson.databind.JsonNode>> fields = root.fields();
+            java.util.Iterator<Map.Entry<String, com.fasterxml.jackson.databind.JsonNode>> fields = codonsNode.fields();
             while (fields.hasNext()) {
                 Map.Entry<String, com.fasterxml.jackson.databind.JsonNode> entry = fields.next();
                 String codon = entry.getKey();
-                String aaOneLetter = entry.getValue().asText();
+                com.fasterxml.jackson.databind.JsonNode data = entry.getValue();
 
-                if (aaOneLetter.equals("*")) {
+                if (data.has("stop") && data.get("stop").asBoolean()) {
                     register(codon, null);
                 } else {
-                    AminoAcid aa = AminoAcid.fromCode(aaOneLetter.charAt(0));
+                    String aaCode = data.get("aminoAcid").asText();
+                    AminoAcid aa = AminoAcid.fromCode(aaCode.charAt(0));
                     if (aa != null) {
                         register(codon, aa);
                     } else {
                         // Warning: Amino Acid not found?
                         java.util.logging.Logger.getLogger("CodonTable")
-                                .warning("Amino Acid not found for code: " + aaOneLetter);
+                                .warning("Amino Acid not found for code: " + aaCode);
                     }
                 }
             }
+
+            // Handle expanded codes (Selenocysteine, Pyrrolysine)
+            if (root.has("expandedCodes")) {
+                com.fasterxml.jackson.databind.JsonNode expanded = root.get("expandedCodes");
+                // Logic to register these special cases contextually would go here
+                // For now, we note them. The standard table uses the stop codon mapping.
+            }
+
             is.close();
         } catch (Exception e) {
             e.printStackTrace();
-            // Fallback to minimal if needed?
         }
     }
 

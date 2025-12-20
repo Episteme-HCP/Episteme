@@ -61,17 +61,25 @@ public class FiniteSetsCategory implements Category<java.util.Set<?>, Function<O
 
     @Override
     public java.util.Set<?> domain(Function<Object, Object> morphism) {
-        return null; // Placeholder
+        // Standard functions in Java don't carry domain information
+        // Domain must be tracked externally or use a custom MorphismWithDomain class
+        throw new UnsupportedOperationException(
+                "Java Function does not carry domain information. Use typed morphisms.");
     }
 
     @Override
     public java.util.Set<?> codomain(Function<Object, Object> morphism) {
-        return null; // Placeholder
+        // Standard functions in Java don't carry codomain information
+        throw new UnsupportedOperationException(
+                "Java Function does not carry codomain information. Use typed morphisms.");
     }
 
     @Override
     public Set<Function<Object, Object>> hom(java.util.Set<?> source,
             java.util.Set<?> target) {
-        return null; // Placeholder
+        // Generating hom-set for finite sets is exponential in size
+        // and impractical for general use. Would need specialized FiniteSet class.
+        throw new UnsupportedOperationException(
+                "Generating hom-set for finite sets requires specialized FiniteSet type.");
     }
 }

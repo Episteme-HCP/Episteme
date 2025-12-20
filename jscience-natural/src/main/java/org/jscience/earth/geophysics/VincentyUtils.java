@@ -1,8 +1,6 @@
 package org.jscience.earth.geophysics;
 
-import org.jscience.measure.Quantity;
 import org.jscience.measure.Units;
-import org.jscience.measure.quantity.Angle;
 
 /**
  * High-precision geodesy calculations on the WGS-84 ellipsoid using Vincenty's
@@ -40,18 +38,24 @@ public class VincentyUtils {
          * @return Distance in meters
          */
         @SuppressWarnings("unchecked")
-        public static double distance(Quantity<Angle> lat1, Quantity<Angle> lon1,
-                        Quantity<Angle> lat2, Quantity<Angle> lon2) {
+        public static double distance(org.jscience.measure.Quantity<org.jscience.measure.quantity.Angle> lat1,
+                        org.jscience.measure.Quantity<org.jscience.measure.quantity.Angle> lon1,
+                        org.jscience.measure.Quantity<org.jscience.measure.quantity.Angle> lat2,
+                        org.jscience.measure.Quantity<org.jscience.measure.quantity.Angle> lon2) {
 
-                double phi1 = lat1.to((org.jscience.measure.Unit<Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
+                double phi1 = lat1.to(
+                                (org.jscience.measure.Unit<org.jscience.measure.quantity.Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
                                 .getValue()
                                 .doubleValue();
-                double lambda1 = lon1.to((org.jscience.measure.Unit<Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
+                double lambda1 = lon1.to(
+                                (org.jscience.measure.Unit<org.jscience.measure.quantity.Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
                                 .getValue().doubleValue();
-                double phi2 = lat2.to((org.jscience.measure.Unit<Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
+                double phi2 = lat2.to(
+                                (org.jscience.measure.Unit<org.jscience.measure.quantity.Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
                                 .getValue()
                                 .doubleValue();
-                double lambda2 = lon2.to((org.jscience.measure.Unit<Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
+                double lambda2 = lon2.to(
+                                (org.jscience.measure.Unit<org.jscience.measure.quantity.Angle>) (org.jscience.measure.Unit<?>) Units.RADIAN)
                                 .getValue().doubleValue();
 
                 double L = lambda2 - lambda1;
