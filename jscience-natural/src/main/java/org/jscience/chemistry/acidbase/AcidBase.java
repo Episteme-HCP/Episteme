@@ -17,10 +17,12 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.chemistry.acidbase;
+
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * pH calculations for aqueous solutions.
@@ -35,165 +37,134 @@ package org.jscience.chemistry.acidbase;
  * </p>
  * 
  * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 2.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class AcidBase {
 
     /** Standard temperature for Kw (25°C) */
-    public static final double STANDARD_TEMP_K = 298.15;
+    public static final Real STANDARD_TEMP_K = Real.of(298.15);
 
     /** Water ionization constant at 25°C */
-    public static final double KW_25C = 1.0e-14;
+    public static final Real KW_25C = Real.of(1.0e-14);
+
+    private static final Real FOURTEEN = Real.of(14.0);
+    private static final Real R_GAS = Real.of(8.314);
+    private static final Real DELTA_H = Real.of(55800);
 
     private AcidBase() {
     }
 
     /**
      * Calculates pH from hydrogen ion concentration.
-     * 
-     * @param hConcentration [H+] in mol/L
-     * @return pH value
      */
-    public static double pH(double hConcentration) {
-        if (hConcentration <= 0)
+    public static Real pH(Real hConcentration) {
+        if (hConcentration.compareTo(Real.ZERO) <= 0)
             throw new IllegalArgumentException("[H+] must be positive");
-        return -Math.log10(hConcentration);
+        return hConcentration.log10().negate();
     }
 
     /**
      * Calculates pOH from hydroxide ion concentration.
-     * 
-     * @param ohConcentration [OH-] in mol/L
-     * @return pOH value
      */
-    public static double pOH(double ohConcentration) {
-        if (ohConcentration <= 0)
+    public static Real pOH(Real ohConcentration) {
+        if (ohConcentration.compareTo(Real.ZERO) <= 0)
             throw new IllegalArgumentException("[OH-] must be positive");
-        return -Math.log10(ohConcentration);
+        return ohConcentration.log10().negate();
     }
 
     /**
      * Calculates [H+] from pH.
-     * 
-     * @param pH pH value
-     * @return hydrogen ion concentration (mol/L)
      */
-    public static double hConcentration(double pH) {
-        return Math.pow(10, -pH);
+    public static Real hConcentration(Real pH) {
+        return Real.of(10).pow(pH.negate());
     }
 
     /**
      * Calculates [OH-] from pOH.
-     * 
-     * @param pOH pOH value
-     * @return hydroxide ion concentration (mol/L)
      */
-    public static double ohConcentration(double pOH) {
-        return Math.pow(10, -pOH);
+    public static Real ohConcentration(Real pOH) {
+        return Real.of(10).pow(pOH.negate());
     }
 
     /**
      * Converts pH to pOH at 25°C.
      * (pH + pOH = 14 at 25°C)
      */
-    public static double pHtopOH(double pH) {
-        return 14.0 - pH;
+    public static Real pHtopOH(Real pH) {
+        return FOURTEEN.subtract(pH);
     }
 
     /**
      * Henderson-Hasselbalch equation for buffer pH.
      * pH = pKa + log([A-]/[HA])
-     * 
-     * @param pKa               acid dissociation constant
-     * @param conjugateBaseConc [A-] concentration
-     * @param acidConc          [HA] concentration
-     * @return buffer pH
      */
-    public static double hendersonHasselbalch(double pKa, double conjugateBaseConc, double acidConc) {
-        if (conjugateBaseConc <= 0 || acidConc <= 0) {
+    public static Real hendersonHasselbalch(Real pKa, Real conjugateBaseConc, Real acidConc) {
+        if (conjugateBaseConc.compareTo(Real.ZERO) <= 0 || acidConc.compareTo(Real.ZERO) <= 0) {
             throw new IllegalArgumentException("Concentrations must be positive");
         }
-        return pKa + Math.log10(conjugateBaseConc / acidConc);
+        return pKa.add(conjugateBaseConc.divide(acidConc).log10());
     }
 
     /**
      * Calculates pH of a weak acid solution.
      * Uses simplified Ka expression: Ka = x²/(Ca - x)
-     * 
-     * @param Ka                acid dissociation constant
-     * @param acidConcentration initial acid concentration (mol/L)
-     * @return pH
      */
-    public static double weakAcidpH(double Ka, double acidConcentration) {
+    public static Real weakAcidpH(Real Ka, Real acidConcentration) {
         // Solve x² + Ka*x - Ka*Ca = 0
-        double a = 1;
-        double b = Ka;
-        double c = -Ka * acidConcentration;
-        double x = (-b + Math.sqrt(b * b - 4 * a * c)) / (2 * a);
+        Real a = Real.ONE;
+        Real b = Ka;
+        Real c = Ka.negate().multiply(acidConcentration);
+        Real discriminant = b.multiply(b).subtract(Real.of(4).multiply(a).multiply(c));
+        Real x = b.negate().add(discriminant.sqrt()).divide(Real.TWO.multiply(a));
         return pH(x);
     }
 
     /**
      * Calculates pH of a weak base solution.
-     * 
-     * @param Kb                base dissociation constant
-     * @param baseConcentration initial base concentration (mol/L)
-     * @return pH
      */
-    public static double weakBasepH(double Kb, double baseConcentration) {
-        // Calculate pOH first
-        double a = 1;
-        double b = Kb;
-        double c = -Kb * baseConcentration;
-        double x = (-b + Math.sqrt(b * b - 4 * a * c)) / (2 * a);
-        double pOH = pOH(x);
-        return 14.0 - pOH;
+    public static Real weakBasepH(Real Kb, Real baseConcentration) {
+        Real a = Real.ONE;
+        Real b = Kb;
+        Real c = Kb.negate().multiply(baseConcentration);
+        Real discriminant = b.multiply(b).subtract(Real.of(4).multiply(a).multiply(c));
+        Real x = b.negate().add(discriminant.sqrt()).divide(Real.TWO.multiply(a));
+        Real pOHVal = pOH(x);
+        return FOURTEEN.subtract(pOHVal);
     }
 
     /**
      * Buffer capacity (Van Slyke equation approximation).
      * β = 2.303 * C * Ka * [H+] / (Ka + [H+])²
-     * 
-     * @param totalBufferConc total buffer concentration
-     * @param Ka              acid dissociation constant
-     * @param pH              current pH
-     * @return buffer capacity (mol/L per pH unit)
      */
-    public static double bufferCapacity(double totalBufferConc, double Ka, double pH) {
-        double h = hConcentration(pH);
-        double term = Ka * h / Math.pow(Ka + h, 2);
-        return 2.303 * totalBufferConc * term;
+    public static Real bufferCapacity(Real totalBufferConc, Real Ka, Real pH) {
+        Real h = hConcentration(pH);
+        Real term = Ka.multiply(h).divide(Ka.add(h).pow(2));
+        return Real.of(2.303).multiply(totalBufferConc).multiply(term);
     }
 
     /**
      * Temperature-corrected Kw.
-     * Kw increases with temperature.
-     * 
-     * @param temperatureK temperature in Kelvin
-     * @return Kw at given temperature (approximate)
      */
-    public static double kwAtTemperature(double temperatureK) {
-        // Approximate using Van 't Hoff: dln(Kw)/d(1/T) ≈ -ΔH/R
-        // ΔH ≈ 55.8 kJ/mol for water ionization
-        double deltaH = 55800; // J/mol
-        double R = 8.314; // J/(mol*K)
-        double lnKw25 = Math.log(KW_25C);
-        double lnKw = lnKw25 - (deltaH / R) * (1 / temperatureK - 1 / STANDARD_TEMP_K);
-        return Math.exp(lnKw);
+    public static Real kwAtTemperature(Real temperatureK) {
+        Real lnKw25 = KW_25C.log();
+        Real invDeltaT = Real.ONE.divide(temperatureK).subtract(Real.ONE.divide(STANDARD_TEMP_K));
+        Real lnKw = lnKw25.subtract(DELTA_H.divide(R_GAS).multiply(invDeltaT));
+        return lnKw.exp();
     }
 
     /**
      * Classifies solution by pH.
      */
-    public static String classify(double pH) {
-        if (pH < 3)
+    public static String classify(Real pH) {
+        double pHVal = pH.doubleValue();
+        if (pHVal < 3)
             return "Strongly Acidic";
-        if (pH < 6)
+        if (pHVal < 6)
             return "Weakly Acidic";
-        if (pH < 8)
+        if (pHVal < 8)
             return "Neutral";
-        if (pH < 11)
+        if (pHVal < 11)
             return "Weakly Basic";
         return "Strongly Basic";
     }

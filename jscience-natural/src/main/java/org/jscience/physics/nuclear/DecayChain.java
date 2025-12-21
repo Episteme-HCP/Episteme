@@ -1,16 +1,42 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.physics.nuclear;
 
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.mathematics.sets.Reals;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Solves decay chain problems using Bateman equations.
  * For chain: N₁ → N₂ → N₃ → ... → Stable
+ * * @author Silvere Martin-Michiellot
  * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 5.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class DecayChain {
 
@@ -23,10 +49,11 @@ public class DecayChain {
 
         public Nuclide(String name, Real halfLife) {
             this.name = name;
-            if (halfLife == null || halfLife.isZero() || halfLife.doubleValue() == Double.POSITIVE_INFINITY) {
+            // Stable if halfLife is null, zero, or infinite (treat as stable)
+            if (halfLife == null || halfLife.isZero()) {
                 this.decayConstant = Real.ZERO; // Stable
             } else {
-                this.decayConstant = Real.of(Math.log(2)).divide(halfLife);
+                this.decayConstant = Real.LN2.divide(halfLife);
             }
         }
 
@@ -35,8 +62,11 @@ public class DecayChain {
         }
     }
 
+    /** Threshold for degenerate case detection */
+    private static final Real DEGENERACY_THRESHOLD = Real.of(1e-30);
+
     private final List<Nuclide> chain;
-    private final Real[] initialAmounts;
+    private final Vector<Real> initialAmounts;
 
     /**
      * Creates a decay chain.
@@ -44,9 +74,9 @@ public class DecayChain {
      * @param nuclides       Ordered list of nuclides in the chain
      * @param initialAmounts Initial number of atoms for each nuclide
      */
-    public DecayChain(List<Nuclide> nuclides, Real[] initialAmounts) {
+    public DecayChain(List<Nuclide> nuclides, Vector<Real> initialAmounts) {
         this.chain = new ArrayList<>(nuclides);
-        this.initialAmounts = initialAmounts.clone();
+        this.initialAmounts = initialAmounts;
     }
 
     /**
@@ -64,12 +94,12 @@ public class DecayChain {
         if (nuclideIndex == 0) {
             // Simple exponential decay for parent
             Real lambda = chain.get(0).decayConstant;
-            return initialAmounts[0].multiply(lambda.negate().multiply(time).exp());
+            return initialAmounts.get(0).multiply(lambda.negate().multiply(time).exp());
         }
 
         // General Bateman solution for i-th nuclide (0-indexed)
         Real sum = Real.ZERO;
-        Real N0 = initialAmounts[0];
+        Real N0 = initialAmounts.get(0);
 
         // Product of decay constants for nuclides 1 to i
         Real lambdaProduct = Real.ONE;
@@ -89,9 +119,9 @@ public class DecayChain {
                 if (k != j) {
                     Real lambdaK = chain.get(k).decayConstant;
                     Real diff = lambdaK.subtract(lambdaJ);
-                    if (diff.abs().doubleValue() < 1e-30) {
+                    if (diff.abs().compareTo(DEGENERACY_THRESHOLD) < 0) {
                         // Handle degenerate case (equal decay constants)
-                        diff = Real.of(1e-30);
+                        diff = DEGENERACY_THRESHOLD;
                     }
                     denom = denom.multiply(diff);
                 }
@@ -122,7 +152,7 @@ public class DecayChain {
         List<Nuclide> nuclides = new ArrayList<>();
         nuclides.add(new Nuclide(parent, parentHalfLife));
         nuclides.add(new Nuclide(daughter, daughterHalfLife));
-        return new DecayChain(nuclides, new Real[] { initialParent, Real.ZERO });
+        return new DecayChain(nuclides, DenseVector.of(Arrays.asList(initialParent, Real.ZERO), Reals.getInstance()));
     }
 
     /**
@@ -142,13 +172,13 @@ public class DecayChain {
         nuclides.add(new Nuclide("Rn-222", Real.of(3.8235 * 24 * 3600))); // 3.8 days
         nuclides.add(new Nuclide("Pb-206", null)); // Stable
 
-        Real[] initial = new Real[nuclides.size()];
-        initial[0] = initialU238;
-        for (int i = 1; i < initial.length; i++) {
-            initial[i] = Real.ZERO;
+        List<Real> initial = new ArrayList<>();
+        initial.add(initialU238);
+        for (int i = 1; i < nuclides.size(); i++) {
+            initial.add(Real.ZERO);
         }
 
-        return new DecayChain(nuclides, initial);
+        return new DecayChain(nuclides, DenseVector.of(initial, Reals.getInstance()));
     }
 
     public List<Nuclide> getChain() {

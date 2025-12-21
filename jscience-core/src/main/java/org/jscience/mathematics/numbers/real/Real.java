@@ -50,7 +50,8 @@ import org.jscience.mathematics.structures.rings.FieldElement;
  * }
  * </pre>
  * 
- * @author Silvere Martin-Michiellot
+ * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -82,11 +83,23 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
     /** The real number 2 */
     public static final Real TWO = RealDouble.create(2.0);
 
+    /** 2π - commonly used in angular calculations */
+    public static final Real TWO_PI = RealDouble.create(2.0 * Math.PI);
+
+    /** π/2 - quarter turn in radians */
+    public static final Real HALF_PI = RealDouble.create(Math.PI / 2.0);
+
     /** Positive infinity */
     public static final Real POSITIVE_INFINITY = RealDouble.create(Double.POSITIVE_INFINITY);
 
     /** Negative infinity */
     public static final Real NEGATIVE_INFINITY = RealDouble.create(Double.NEGATIVE_INFINITY);
+
+    /** Natural logarithm of 2 */
+    public static final Real LN2 = RealDouble.create(Math.log(2.0));
+
+    /** Natural logarithm of 10 */
+    public static final Real LN10 = RealDouble.create(Math.log(10.0));
 
     /**
      * Creates a real number from a double value.
@@ -495,6 +508,29 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
      */
     public Real max(Real other) {
         return this.compareTo(other) >= 0 ? this : other;
+    }
+
+    /**
+     * Returns the remainder of this number divided by another.
+     * 
+     * @param other the divisor
+     * @return this % other
+     */
+    public Real remainder(Real other) {
+        return Real.of(this.doubleValue() % other.doubleValue());
+    }
+
+    /**
+     * Returns the modulo of this number (always non-negative).
+     * 
+     * @param other the divisor
+     * @return ((this % other) + other) % other
+     */
+    public Real mod(Real other) {
+        double result = this.doubleValue() % other.doubleValue();
+        if (result < 0)
+            result += other.doubleValue();
+        return Real.of(result);
     }
 
     @Override

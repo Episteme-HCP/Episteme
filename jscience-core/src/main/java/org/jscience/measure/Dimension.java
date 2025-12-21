@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.measure;
 
@@ -56,13 +56,9 @@ package org.jscience.measure;
  * assert force.equals(Dimension.of(1, 1, -2, 0, 0, 0, 0));
  * }</pre>
  * </p>
- * 
- * @author Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 2.0
- * 
- * @see Unit
- * @see Quantity
+ * @since 1.0
  */
 public interface Dimension {
 

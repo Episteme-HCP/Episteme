@@ -1,89 +1,97 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.earth.oceanography;
+
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Tidal prediction using harmonic analysis.
+ * * @author Silvere Martin-Michiellot
+ * 
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class TidalPrediction {
 
     private TidalPrediction() {
     }
 
-    /**
-     * Harmonic constituent for tidal prediction.
-     */
     public static class TidalConstituent {
         public final String name;
-        public final double amplitude; // meters
-        public final double phase; // degrees
-        public final double speed; // degrees per hour
+        public final Real amplitude;
+        public final Real phase;
+        public final Real speed;
 
-        public TidalConstituent(String name, double amplitude, double phase, double speed) {
+        public TidalConstituent(String name, Real amplitude, Real phase, Real speed) {
             this.name = name;
             this.amplitude = amplitude;
             this.phase = phase;
             this.speed = speed;
         }
+
+        public TidalConstituent(String name, double amplitude, double phase, double speed) {
+            this(name, Real.of(amplitude), Real.of(phase), Real.of(speed));
+        }
     }
 
-    // Common tidal constituents (approximate speeds in degrees/hour)
-    public static final double M2_SPEED = 28.984104; // Principal lunar semidiurnal
-    public static final double S2_SPEED = 30.0; // Principal solar semidiurnal
-    public static final double N2_SPEED = 28.439730; // Larger lunar elliptic
-    public static final double K1_SPEED = 15.041069; // Lunar diurnal
-    public static final double O1_SPEED = 13.943035; // Lunar diurnal
-    public static final double M4_SPEED = 57.968208; // Shallow water overtide
+    public static final Real M2_SPEED = Real.of(28.984104);
+    public static final Real S2_SPEED = Real.of(30.0);
+    public static final Real N2_SPEED = Real.of(28.439730);
+    public static final Real K1_SPEED = Real.of(15.041069);
+    public static final Real O1_SPEED = Real.of(13.943035);
+    public static final Real M4_SPEED = Real.of(57.968208);
 
-    /**
-     * Predicts tide height at a given time using harmonic constituents.
-     * h(t) = h₀ + Σ Aᵢ cos(ωᵢt - φᵢ)
-     * 
-     * @param meanSeaLevel   h₀ (meters)
-     * @param constituents   Array of tidal constituents
-     * @param hoursFromEpoch Time since reference epoch
-     * @return Predicted tide height (meters)
-     */
-    public static double predictHeight(double meanSeaLevel, TidalConstituent[] constituents,
-            double hoursFromEpoch) {
-        double height = meanSeaLevel;
-
+    /** Predict height: h(t) = h₀ + Σ Aᵢ cos(ωᵢt - φᵢ) */
+    public static Real predictHeight(Real meanSeaLevel, TidalConstituent[] constituents, Real hoursFromEpoch) {
+        Real height = meanSeaLevel;
         for (TidalConstituent c : constituents) {
-            double angle = Math.toRadians(c.speed * hoursFromEpoch - c.phase);
-            height += c.amplitude * Math.cos(angle);
+            Real angle = c.speed.multiply(hoursFromEpoch).subtract(c.phase);
+            Real cosAngle = angle.toRadians().cos();
+            height = height.add(c.amplitude.multiply(cosAngle));
         }
-
         return height;
     }
 
-    /**
-     * Calculates tidal range (high - low) from constituents.
-     * Approximate as 2 * sum of amplitudes for max range.
-     */
-    public static double maxTidalRange(TidalConstituent[] constituents) {
-        double sumAmplitudes = 0;
+    /** Max tidal range: 2 * sum of amplitudes */
+    public static Real maxTidalRange(TidalConstituent[] constituents) {
+        Real sum = Real.ZERO;
         for (TidalConstituent c : constituents) {
-            sumAmplitudes += c.amplitude;
+            sum = sum.add(c.amplitude);
         }
-        return 2 * sumAmplitudes;
+        return Real.TWO.multiply(sum);
     }
 
-    /**
-     * Creates a simple M2+S2 tide model.
-     */
-    public static TidalConstituent[] simpleSemidiurnalModel(double m2Amp, double m2Phase,
-            double s2Amp, double s2Phase) {
+    /** Simple M2+S2 model */
+    public static TidalConstituent[] simpleSemidiurnalModel(Real m2Amp, Real m2Phase, Real s2Amp, Real s2Phase) {
         return new TidalConstituent[] {
                 new TidalConstituent("M2", m2Amp, m2Phase, M2_SPEED),
                 new TidalConstituent("S2", s2Amp, s2Phase, S2_SPEED)
         };
     }
 
-    /**
-     * Estimates time to next high tide (simple approximation).
-     */
-    public static double hoursToNextHighTide(double currentHoursFromEpoch) {
-        // M2 period is ~12.42 hours
-        // M2 period is ~12.42 hours
-        double phase = (currentHoursFromEpoch * M2_SPEED) % 360;
-        return (360 - phase) / M2_SPEED;
+    /** Hours to next high tide */
+    public static Real hoursToNextHighTide(Real currentHoursFromEpoch) {
+        Real phase = currentHoursFromEpoch.multiply(M2_SPEED).remainder(Real.of(360));
+        return Real.of(360).subtract(phase).divide(M2_SPEED);
     }
 }

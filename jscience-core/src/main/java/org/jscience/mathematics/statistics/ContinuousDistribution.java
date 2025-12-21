@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.mathematics.statistics;
 
@@ -29,10 +29,9 @@ import org.jscience.mathematics.numbers.real.Real;
  * <p>
  * Uses {@link Real} for all calculations.
  * </p>
- * 
- * @author Silvere Martin-Michiellot
+ * * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 2.0
+ * @since 1.0
  */
 public abstract class ContinuousDistribution implements ProbabilityDistribution {
 
@@ -104,4 +103,3 @@ public abstract class ContinuousDistribution implements ProbabilityDistribution 
         return quantile(Real.of(Math.random()));
     }
 }
-

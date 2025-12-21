@@ -1,30 +1,61 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.geography;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a 2D map of a geographical area.
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class GeoMap {
 
     private String name;
-    private double width; // in meters
-    private double height; // in meters
+    private Real width;
+    private Real height;
     private Coordinate topLeftCoordinate;
 
     private final Set<Place> places;
     private final Set<GeoPath> paths;
     private String description;
 
-    public GeoMap(String name, Coordinate topLeftCoordinate, double width, double height) {
+    public GeoMap(String name, Coordinate topLeftCoordinate, Real width, Real height) {
         this.name = name;
         this.topLeftCoordinate = topLeftCoordinate;
         this.width = width;
         this.height = height;
         this.places = new HashSet<>();
         this.paths = new HashSet<>();
+    }
+
+    public GeoMap(String name, Coordinate topLeftCoordinate, double width, double height) {
+        this(name, topLeftCoordinate, Real.of(width), Real.of(height));
     }
 
     public String getName() {
@@ -35,11 +66,11 @@ public class GeoMap {
         return topLeftCoordinate;
     }
 
-    public double getWidth() {
+    public Real getWidth() {
         return width;
     }
 
-    public double getHeight() {
+    public Real getHeight() {
         return height;
     }
 
@@ -71,23 +102,13 @@ public class GeoMap {
         this.description = description;
     }
 
-    /**
-     * Estimates bottom right coordinate based on width/height and simple
-     * projection.
-     * Assumes small area (flat earth approximation sufficient for simple bounding
-     * box).
-     */
     public Coordinate getBottomRightCoordinate() {
-        // Simple approximation: 1 degree lat ~= 111km
-        // 1 degree lon ~= 111km * cos(lat)
-
-        double latOffset = -(height / 111000.0); // Going down (South)
-        double lonOffset = width / (111000.0 * Math.cos(Math.toRadians(topLeftCoordinate.getLatitude()))); // Going
-                                                                                                           // right
-                                                                                                           // (East)
+        Real latOffset = height.negate().divide(Real.of(111000));
+        Real cosLat = topLeftCoordinate.getLatitude().toRadians().cos();
+        Real lonOffset = width.divide(Real.of(111000).multiply(cosLat));
 
         return new Coordinate(
-                topLeftCoordinate.getLatitude() + latOffset,
-                topLeftCoordinate.getLongitude() + lonOffset);
+                topLeftCoordinate.getLatitude().add(latOffset),
+                topLeftCoordinate.getLongitude().add(lonOffset));
     }
 }

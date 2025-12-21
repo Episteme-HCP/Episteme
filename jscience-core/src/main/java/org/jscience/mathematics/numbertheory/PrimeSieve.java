@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.mathematics.numbertheory;
 
@@ -28,10 +28,9 @@ import java.util.List;
 
 /**
  * High-performance prime number generation using a segmented sieve.
- * 
- * @author Silvere Martin-Michiellot
+ * * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 2.0
+ * @since 1.0
  */
 public class PrimeSieve {
 
@@ -117,4 +116,3 @@ public class PrimeSieve {
         return primes;
     }
 }
-

@@ -1,154 +1,173 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.physics.classical.matter.plasma;
+
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Plasma physics calculations.
  * 
  * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 5.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class PlasmaPhysics {
 
     /** Vacuum permittivity (F/m) */
-    public static final double EPSILON_0 = 8.854187817e-12;
+    public static final Real EPSILON_0 = Real.of(8.854187817e-12);
 
     /** Elementary charge (C) */
-    public static final double E = 1.602176634e-19;
+    public static final Real E = Real.of(1.602176634e-19);
 
     /** Electron mass (kg) */
-    public static final double M_E = 9.1093837015e-31;
+    public static final Real M_E = Real.of(9.1093837015e-31);
 
     /** Proton mass (kg) */
-    public static final double M_P = 1.67262192369e-27;
+    public static final Real M_P = Real.of(1.67262192369e-27);
 
     /** Boltzmann constant (J/K) */
-    public static final double K_B = 1.380649e-23;
+    public static final Real K_B = Real.of(1.380649e-23);
+
+    /** Permeability of free space */
+    private static final Real MU_0 = Real.of(4 * Math.PI * 1e-7);
 
     /**
      * Debye length: characteristic screening distance.
      * λ_D = √(ε₀ k_B T / n e²)
-     * 
-     * @param temperature Electron temperature (K)
-     * @param density     Electron density (m⁻³)
-     * @return Debye length (m)
      */
-    public static double debyeLength(double temperature, double density) {
-        return Math.sqrt(EPSILON_0 * K_B * temperature / (density * E * E));
+    public static Real debyeLength(Real temperature, Real density) {
+        return EPSILON_0.multiply(K_B).multiply(temperature)
+                .divide(density.multiply(E.pow(2))).sqrt();
     }
 
     /**
      * Plasma frequency: natural oscillation frequency.
      * ω_p = √(n e² / ε₀ m_e)
-     * 
-     * @param density Electron density (m⁻³)
-     * @return Angular plasma frequency (rad/s)
      */
-    public static double plasmaFrequency(double density) {
-        return Math.sqrt(density * E * E / (EPSILON_0 * M_E));
+    public static Real plasmaFrequency(Real density) {
+        return density.multiply(E.pow(2)).divide(EPSILON_0.multiply(M_E)).sqrt();
     }
 
     /**
      * Plasma frequency in Hz.
      */
-    public static double plasmaFrequencyHz(double density) {
-        return plasmaFrequency(density) / (2 * Math.PI);
+    public static Real plasmaFrequencyHz(Real density) {
+        return plasmaFrequency(density).divide(Real.TWO_PI);
     }
 
     /**
      * Electron cyclotron frequency (gyrofrequency).
      * ω_ce = eB / m_e
      */
-    public static double electronCyclotronFrequency(double magneticField) {
-        return E * magneticField / M_E;
+    public static Real electronCyclotronFrequency(Real magneticField) {
+        return E.multiply(magneticField).divide(M_E);
     }
 
     /**
      * Ion cyclotron frequency.
      * ω_ci = ZeB / m_i
      */
-    public static double ionCyclotronFrequency(double magneticField, double ionMass, int chargeNumber) {
-        return chargeNumber * E * magneticField / ionMass;
+    public static Real ionCyclotronFrequency(Real magneticField, Real ionMass, int chargeNumber) {
+        return Real.of(chargeNumber).multiply(E).multiply(magneticField).divide(ionMass);
     }
 
     /**
      * Larmor radius (gyroradius).
      * r_L = m v_perp / (eB)
      */
-    public static double larmorRadius(double velocity, double magneticField, double mass) {
-        return mass * velocity / (E * magneticField);
+    public static Real larmorRadius(Real velocity, Real magneticField, Real mass) {
+        return mass.multiply(velocity).divide(E.multiply(magneticField));
     }
 
     /**
      * Thermal velocity.
      * v_th = √(k_B T / m)
      */
-    public static double thermalVelocity(double temperature, double mass) {
-        return Math.sqrt(K_B * temperature / mass);
+    public static Real thermalVelocity(Real temperature, Real mass) {
+        return K_B.multiply(temperature).divide(mass).sqrt();
     }
 
     /**
      * Plasma parameter: number of particles in Debye sphere.
      * Λ = n λ_D³
-     * Plasma is ideal when Λ >> 1
      */
-    public static double plasmaParameter(double density, double debyeLength) {
-        return density * Math.pow(debyeLength, 3);
+    public static Real plasmaParameter(Real density, Real debyeLength) {
+        return density.multiply(debyeLength.pow(3));
     }
 
     /**
      * Coulomb logarithm (approximate).
      * ln(Λ) ≈ ln(12π n λ_D³)
      */
-    public static double coulombLogarithm(double density, double temperature) {
-        double lambdaD = debyeLength(temperature, density);
-        return Math.log(12 * Math.PI * plasmaParameter(density, lambdaD));
+    public static Real coulombLogarithm(Real density, Real temperature) {
+        Real lambdaD = debyeLength(temperature, density);
+        return Real.of(12).multiply(Real.PI).multiply(plasmaParameter(density, lambdaD)).log();
     }
 
     /**
      * Alfvén velocity.
      * v_A = B / √(μ₀ ρ)
      */
-    public static double alfvenVelocity(double magneticField, double massDensity) {
-        double mu0 = 4 * Math.PI * 1e-7;
-        return magneticField / Math.sqrt(mu0 * massDensity);
+    public static Real alfvenVelocity(Real magneticField, Real massDensity) {
+        return magneticField.divide(MU_0.multiply(massDensity).sqrt());
     }
 
     /**
      * Sound speed in plasma.
      * c_s = √(γ k_B T / m_i)
      */
-    public static double soundSpeed(double temperature, double ionMass, double gamma) {
-        return Math.sqrt(gamma * K_B * temperature / ionMass);
+    public static Real soundSpeed(Real temperature, Real ionMass, Real gamma) {
+        return gamma.multiply(K_B).multiply(temperature).divide(ionMass).sqrt();
     }
 
     /**
      * Beta: ratio of plasma pressure to magnetic pressure.
      * β = nkT / (B²/2μ₀)
      */
-    public static double beta(double density, double temperature, double magneticField) {
-        double mu0 = 4 * Math.PI * 1e-7;
-        double plasmaPressure = density * K_B * temperature;
-        double magneticPressure = magneticField * magneticField / (2 * mu0);
-        return plasmaPressure / magneticPressure;
+    public static Real beta(Real density, Real temperature, Real magneticField) {
+        Real plasmaPressure = density.multiply(K_B).multiply(temperature);
+        Real magneticPressure = magneticField.pow(2).divide(Real.TWO.multiply(MU_0));
+        return plasmaPressure.divide(magneticPressure);
     }
 
     /**
      * Spitzer resistivity.
-     * η = (π Z e² m_e^(1/2) ln(Λ)) / ((4πε₀)² (k_B T_e)^(3/2))
      */
-    public static double spitzerResistivity(double temperature, double coulombLog, int Z) {
-        double num = Math.PI * Z * E * E * Math.sqrt(M_E) * coulombLog;
-        double den = 16 * Math.PI * Math.PI * EPSILON_0 * EPSILON_0
-                * Math.pow(K_B * temperature, 1.5);
-        return num / den;
+    public static Real spitzerResistivity(Real temperature, Real coulombLog, int Z) {
+        Real num = Real.PI.multiply(Real.of(Z)).multiply(E.pow(2)).multiply(M_E.sqrt()).multiply(coulombLog);
+        Real den = Real.of(16).multiply(Real.PI.pow(2)).multiply(EPSILON_0.pow(2))
+                .multiply(K_B.multiply(temperature).pow(Real.of(1.5)));
+        return num.divide(den);
     }
 
     /**
      * Collision frequency (electron-ion).
      */
-    public static double collisionFrequency(double density, double temperature, double coulombLog) {
-        return density * E * E * E * E * coulombLog
-                / (6 * Math.pow(Math.PI, 1.5) * EPSILON_0 * EPSILON_0 * M_E * M_E
-                        * Math.pow(K_B * temperature / M_E, 1.5));
+    public static Real collisionFrequency(Real density, Real temperature, Real coulombLog) {
+        Real num = density.multiply(E.pow(4)).multiply(coulombLog);
+        Real den = Real.of(6).multiply(Real.PI.pow(Real.of(1.5)))
+                .multiply(EPSILON_0.pow(2)).multiply(M_E.pow(2))
+                .multiply(K_B.multiply(temperature).divide(M_E).pow(Real.of(1.5)));
+        return num.divide(den);
     }
 }

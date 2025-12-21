@@ -33,8 +33,7 @@ import java.util.*;
  * The group of all linear transformations of Minkowski space that preserve the
  * spacetime interval ds²=-c²dt²+dx²+dy²+dz².
  * Elements are represented as 4x4 matrices.
- * 
- * @author Silvere Martin-Michiellot
+ * * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

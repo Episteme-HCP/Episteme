@@ -1,153 +1,128 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.chemistry.computational;
+
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Molecular orbital calculations using Hückel theory.
+ * * @author Silvere Martin-Michiellot
  * 
- * Hückel MO theory is a simple LCAO method for conjugated π systems.
- * Secular equation: |H - ES| = 0
- * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 5.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class MolecularOrbitals {
 
-    /** Coulomb integral α (energy of electron in 2p orbital) */
-    private final double alpha;
+    private final Real alpha;
+    private final Real beta;
 
-    /** Resonance integral β (interaction between adjacent atoms) */
-    private final double beta;
-
-    public MolecularOrbitals(double alpha, double beta) {
+    public MolecularOrbitals(Real alpha, Real beta) {
         this.alpha = alpha;
         this.beta = beta;
     }
 
-    /**
-     * Default constructor with typical values (β < 0, α arbitrary).
-     */
+    public MolecularOrbitals(double alpha, double beta) {
+        this(Real.of(alpha), Real.of(beta));
+    }
+
     public MolecularOrbitals() {
-        this(-6.0, -2.5); // Typical values in eV
+        this(-6.0, -2.5);
     }
 
-    /**
-     * Calculates π-electron energies for a linear conjugated chain.
-     * E_k = α + 2β·cos(kπ/(n+1)) for k = 1, 2, ..., n
-     * 
-     * @param numAtoms Number of sp² carbon atoms
-     * @return Array of orbital energies (lowest first)
-     */
-    public double[] linearChainEnergies(int numAtoms) {
-        double[] energies = new double[numAtoms];
+    /** Linear chain energies: E_k = α + 2β·cos(kπ/(n+1)) */
+    public Real[] linearChainEnergies(int numAtoms) {
+        Real[] energies = new Real[numAtoms];
         for (int k = 1; k <= numAtoms; k++) {
-            energies[k - 1] = alpha + 2 * beta * Math.cos(k * Math.PI / (numAtoms + 1));
+            Real cosArg = Real.of(k).multiply(Real.PI).divide(Real.of(numAtoms + 1)).cos();
+            energies[k - 1] = alpha.add(Real.TWO.multiply(beta).multiply(cosArg));
         }
         return energies;
     }
 
-    /**
-     * Calculates π-electron energies for a cyclic conjugated system.
-     * E_k = α + 2β·cos(2πk/n) for k = 0, 1, ..., n-1
-     * 
-     * @param numAtoms Number of atoms in the ring
-     * @return Array of orbital energies
-     */
-    public double[] cyclicEnergies(int numAtoms) {
-        double[] energies = new double[numAtoms];
+    /** Cyclic energies: E_k = α + 2β·cos(2πk/n) */
+    public Real[] cyclicEnergies(int numAtoms) {
+        Real[] energies = new Real[numAtoms];
         for (int k = 0; k < numAtoms; k++) {
-            energies[k] = alpha + 2 * beta * Math.cos(2 * Math.PI * k / numAtoms);
+            Real cosArg = Real.TWO.multiply(Real.PI).multiply(Real.of(k)).divide(Real.of(numAtoms)).cos();
+            energies[k] = alpha.add(Real.TWO.multiply(beta).multiply(cosArg));
         }
-        // Sort by energy
-        java.util.Arrays.sort(energies);
+        java.util.Arrays.sort(energies, (a, b) -> a.compareTo(b));
         return energies;
     }
 
-    /**
-     * Calculates total π-electron energy for a system.
-     * 
-     * @param orbitalEnergies Orbital energies
-     * @param numElectrons    Number of π electrons
-     * @return Total π-electron energy
-     */
-    public double totalPiEnergy(double[] orbitalEnergies, int numElectrons) {
-        double total = 0;
+    /** Total π-electron energy */
+    public Real totalPiEnergy(Real[] orbitalEnergies, int numElectrons) {
+        Real total = Real.ZERO;
         int electrons = numElectrons;
-        for (double e : orbitalEnergies) {
+        for (Real e : orbitalEnergies) {
             if (electrons >= 2) {
-                total += 2 * e;
+                total = total.add(Real.TWO.multiply(e));
                 electrons -= 2;
             } else if (electrons == 1) {
-                total += e;
+                total = total.add(e);
                 electrons--;
-            } else {
+            } else
                 break;
-            }
         }
         return total;
     }
 
-    /**
-     * Calculates delocalization energy (resonance stabilization).
-     * DE = E_π(actual) - E_π(localized)
-     * 
-     * @param actualEnergy   Total π energy from Hückel
-     * @param numDoubleBonds Number of isolated double bonds in reference
-     * @return Delocalization energy
-     */
-    public double delocalizationEnergy(double actualEnergy, int numDoubleBonds) {
-        // Reference: isolated ethene has E = 2(α + β)
-        double localizedEnergy = numDoubleBonds * 2 * (alpha + beta);
-        return actualEnergy - localizedEnergy;
+    /** Delocalization energy */
+    public Real delocalizationEnergy(Real actualEnergy, int numDoubleBonds) {
+        Real localizedEnergy = Real.of(numDoubleBonds * 2).multiply(alpha.add(beta));
+        return actualEnergy.subtract(localizedEnergy);
     }
 
-    /**
-     * HOMO-LUMO gap (frontier orbital energy difference).
-     * 
-     * @param orbitalEnergies Sorted orbital energies
-     * @param numElectrons    Number of electrons
-     * @return HOMO-LUMO gap
-     */
-    public double homoLumoGap(double[] orbitalEnergies, int numElectrons) {
-        int homoIndex = (numElectrons + 1) / 2 - 1; // 0-indexed
+    /** HOMO-LUMO gap */
+    public Real homoLumoGap(Real[] orbitalEnergies, int numElectrons) {
+        int homoIndex = (numElectrons + 1) / 2 - 1;
         int lumoIndex = homoIndex + 1;
-        if (lumoIndex >= orbitalEnergies.length) {
-            return Double.NaN;
-        }
-        return orbitalEnergies[lumoIndex] - orbitalEnergies[homoIndex];
+        if (lumoIndex >= orbitalEnergies.length)
+            return Real.of(Double.NaN);
+        return orbitalEnergies[lumoIndex].subtract(orbitalEnergies[homoIndex]);
     }
 
-    /**
-     * Checks if a cyclic system satisfies Hückel's rule (aromatic).
-     * 4n+2 π electrons = aromatic
-     */
     public static boolean isAromatic(int numPiElectrons) {
         return (numPiElectrons - 2) % 4 == 0 && numPiElectrons >= 2;
     }
 
-    /**
-     * Checks if antiaromatic (4n π electrons).
-     */
     public static boolean isAntiaromatic(int numPiElectrons) {
         return numPiElectrons % 4 == 0 && numPiElectrons > 0;
     }
 
-    // --- Common molecules ---
-
-    /** Benzene: 6 carbon ring, 6 π electrons */
-    public double[] benzeneEnergies() {
+    public Real[] benzeneEnergies() {
         return cyclicEnergies(6);
     }
 
-    /** Butadiene: 4 carbon chain, 4 π electrons */
-    public double[] butadieneEnergies() {
+    public Real[] butadieneEnergies() {
         return linearChainEnergies(4);
     }
 
-    public double getAlpha() {
+    public Real getAlpha() {
         return alpha;
     }
 
-    public double getBeta() {
+    public Real getBeta() {
         return beta;
     }
 }

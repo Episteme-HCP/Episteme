@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.measure.quantity;
 
@@ -37,14 +37,9 @@ import org.jscience.measure.Quantity;
  * <li><b>Imperial</b>: pound, ounce, ton (short ton), stone</li>
  * <li><b>Atomic</b>: atomic mass unit (u or Da), electronvolt/c²</li>
  * </ul>
- * 
- * @author Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 2.0
- * 
- * @see org.jscience.measure.Units#KILOGRAM
- * @see org.jscience.measure.Units#GRAM
- * @see org.jscience.measure.Units#POUND
+ * @since 1.0
  */
 public interface Mass extends Quantity<Mass> {
 }

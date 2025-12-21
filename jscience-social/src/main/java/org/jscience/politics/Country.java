@@ -1,34 +1,55 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.politics;
 
+import org.jscience.mathematics.numbers.real.Real;
+
 /**
  * Represents a country/nation with standard codes.
- *
+ * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 2.0
+ * @since 1.0
  */
 public class Country {
 
     private String name;
-    private String alpha2; // ISO 3166-1 alpha-2
-    private String alpha3; // ISO 3166-1 alpha-3
-    private int numericCode; // ISO 3166-1 numeric
+    private String alpha2;
+    private String alpha3;
+    private int numericCode;
     private String capital;
     private String continent;
     private long population;
-    private double areaSqKm;
+    private Real areaSqKm;
 
     public Country(String name, String alpha2) {
         this.name = name;
         this.alpha2 = alpha2;
+        this.areaSqKm = Real.ZERO;
     }
 
     public Country(String name, String alpha2, String alpha3, int numericCode,
-            String capital, String continent, long population, double areaSqKm) {
+            String capital, String continent, long population, Real areaSqKm) {
         this(name, alpha2);
         this.alpha3 = alpha3;
         this.numericCode = numericCode;
@@ -36,6 +57,11 @@ public class Country {
         this.continent = continent;
         this.population = population;
         this.areaSqKm = areaSqKm;
+    }
+
+    public Country(String name, String alpha2, String alpha3, int numericCode,
+            String capital, String continent, long population, double areaSqKm) {
+        this(name, alpha2, alpha3, numericCode, capital, continent, population, Real.of(areaSqKm));
     }
 
     public String getName() {
@@ -66,7 +92,7 @@ public class Country {
         return population;
     }
 
-    public double getAreaSqKm() {
+    public Real getAreaSqKm() {
         return areaSqKm;
     }
 
@@ -98,12 +124,16 @@ public class Country {
         this.population = population;
     }
 
-    public void setAreaSqKm(double areaSqKm) {
+    public void setAreaSqKm(Real areaSqKm) {
         this.areaSqKm = areaSqKm;
     }
 
-    public double getPopulationDensity() {
-        return areaSqKm > 0 ? population / areaSqKm : 0;
+    public void setAreaSqKm(double areaSqKm) {
+        this.areaSqKm = Real.of(areaSqKm);
+    }
+
+    public Real getPopulationDensity() {
+        return areaSqKm.doubleValue() > 0 ? Real.of(population).divide(areaSqKm) : Real.ZERO;
     }
 
     @Override
@@ -113,19 +143,19 @@ public class Country {
 
     // Major countries
     public static final Country USA = new Country("United States", "US", "USA", 840,
-            "Washington D.C.", "North America", 331_000_000L, 9_833_520);
+            "Washington D.C.", "North America", 331_000_000L, 9_833_520.0);
     public static final Country CHINA = new Country("China", "CN", "CHN", 156,
-            "Beijing", "Asia", 1_412_000_000L, 9_596_960);
+            "Beijing", "Asia", 1_412_000_000L, 9_596_960.0);
     public static final Country INDIA = new Country("India", "IN", "IND", 356,
-            "New Delhi", "Asia", 1_380_000_000L, 3_287_263);
+            "New Delhi", "Asia", 1_380_000_000L, 3_287_263.0);
     public static final Country FRANCE = new Country("France", "FR", "FRA", 250,
-            "Paris", "Europe", 67_000_000L, 643_801);
+            "Paris", "Europe", 67_000_000L, 643_801.0);
     public static final Country GERMANY = new Country("Germany", "DE", "DEU", 276,
-            "Berlin", "Europe", 83_000_000L, 357_022);
+            "Berlin", "Europe", 83_000_000L, 357_022.0);
     public static final Country UK = new Country("United Kingdom", "GB", "GBR", 826,
-            "London", "Europe", 67_000_000L, 242_495);
+            "London", "Europe", 67_000_000L, 242_495.0);
     public static final Country JAPAN = new Country("Japan", "JP", "JPN", 392,
-            "Tokyo", "Asia", 126_000_000L, 377_975);
+            "Tokyo", "Asia", 126_000_000L, 377_975.0);
     public static final Country BRAZIL = new Country("Brazil", "BR", "BRA", 76,
-            "Brasília", "South America", 212_000_000L, 8_515_767);
+            "Brasília", "South America", 212_000_000L, 8_515_767.0);
 }

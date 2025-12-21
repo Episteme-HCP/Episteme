@@ -135,6 +135,23 @@
 - [x] DOI resolver and metadata fetcher
 - [x] Reference manager integration
 
+### UI/Demos
+
+- [x] JScienceDemoApp - Master demo launcher
+- [x] DemoProvider interface with ServiceLoader
+- [x] MatrixViewerDemo, PlottingDemo (jscience-natural)
+- [x] EconomicsDemo - GDP growth model
+- [x] GeneticsDemo - Genetic drift simulation
+- [x] StarSystemViewer, MolecularViewer
+- [x] L-System, Logic Gate, Oscilloscope viewers
+
+### Architecture Improvements
+
+- [x] Loader standardization (AbstractLoader base class)
+- [x] TTL caching support (24h default)
+- [x] Package alignment (electronics→engineering, matrix→mathematics)
+- [x] Consolidated Javadoc in `/javadoc`
+
 ---
 
 ## Known Issues / Technical Debt

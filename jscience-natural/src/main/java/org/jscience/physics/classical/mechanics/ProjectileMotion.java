@@ -17,16 +17,25 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.physics.classical.mechanics;
 
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
+import org.jscience.mathematics.linearalgebra.Matrix;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.jscience.mathematics.sets.Reals;
+import org.jscience.physics.PhysicalConstants;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Length;
 import org.jscience.measure.quantity.Time;
+
+import java.util.Arrays;
 
 /**
  * Projectile motion calculator with air resistance options.
@@ -39,155 +48,219 @@ import org.jscience.measure.quantity.Time;
  * <li>Trajectory points</li>
  * </ul>
  * </p>
- * 
+ * <p>
+ * Uses proper types: Vector for position/velocity, Matrix for trajectories,
+ * Quantity for physical quantities, Real for dimensionless values.
+ * </p>
+ *
  * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 2.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class ProjectileMotion {
 
-    /** Standard gravity (m/s²) */
-    public static final double G = 9.80665;
+    /** Standard gravity as Real */
+    private static final Real G = PhysicalConstants.g_n;
 
-    private final double initialSpeed; // m/s
-    private final double launchAngle; // radians
-    private final double launchHeight; // m
-    private final double gravity; // m/s²
+    /** Mathematical constants */
+    private static final Real HALF = Real.ONE.divide(Real.TWO);
+    private static final Real OPTIMAL_ANGLE = Real.of(45);
+
+    private final Real initialSpeed; // m/s
+    private final Real launchAngle; // radians
+    private final Real launchHeight; // m
+    private final Real gravity; // m/s²
 
     /**
      * Creates projectile with specified parameters.
-     * 
-     * @param initialSpeed       initial speed (m/s)
-     * @param launchAngleDegrees launch angle (degrees from horizontal)
-     * @param launchHeight       initial height (m)
+     *
+     * @param initialSpeed       initial velocity magnitude
+     * @param launchAngleDegrees launch angle in degrees
+     * @param launchHeight       initial height above ground
      */
-    public ProjectileMotion(double initialSpeed, double launchAngleDegrees, double launchHeight) {
+    public ProjectileMotion(Real initialSpeed, Real launchAngleDegrees, Real launchHeight) {
         this(initialSpeed, launchAngleDegrees, launchHeight, G);
     }
 
     /**
      * Creates projectile with custom gravity.
+     *
+     * @param initialSpeed       initial velocity magnitude
+     * @param launchAngleDegrees launch angle in degrees
+     * @param launchHeight       initial height above ground
+     * @param gravity            gravitational acceleration
      */
-    public ProjectileMotion(double initialSpeed, double launchAngleDegrees, double launchHeight, double gravity) {
+    public ProjectileMotion(Real initialSpeed, Real launchAngleDegrees, Real launchHeight, Real gravity) {
         this.initialSpeed = initialSpeed;
-        this.launchAngle = Math.toRadians(launchAngleDegrees);
+        this.launchAngle = launchAngleDegrees.toRadians();
         this.launchHeight = launchHeight;
         this.gravity = gravity;
     }
 
     /**
      * Calculates maximum height reached.
-     * 
-     * @return maximum height as Quantity
+     *
+     * @return maximum height as Length quantity
      */
     public Quantity<Length> getMaxHeight() {
-        double vY = initialSpeed * Math.sin(launchAngle);
-        double maxH = launchHeight + (vY * vY) / (2 * gravity);
+        Real vY = initialSpeed.multiply(launchAngle.sin());
+        Real maxH = launchHeight.add(vY.multiply(vY).divide(Real.TWO.multiply(gravity)));
         return Quantities.create(maxH, Units.METER);
     }
 
     /**
      * Calculates horizontal range (assuming flat ground at launch height).
-     * 
-     * @return range as Quantity
+     *
+     * @return horizontal range as Length quantity
      */
     public Quantity<Length> getRange() {
-        double vX = initialSpeed * Math.cos(launchAngle);
-        double vY = initialSpeed * Math.sin(launchAngle);
+        Real vX = initialSpeed.multiply(launchAngle.cos());
+        Real vY = initialSpeed.multiply(launchAngle.sin());
 
         // Time when y = 0: solve y = h + vY*t - 0.5*g*t² = 0
-        double discriminant = vY * vY + 2 * gravity * launchHeight;
-        double t = (vY + Math.sqrt(discriminant)) / gravity;
+        Real discriminant = vY.multiply(vY).add(Real.TWO.multiply(gravity).multiply(launchHeight));
+        Real t = vY.add(discriminant.sqrt()).divide(gravity);
 
-        double range = vX * t;
+        Real range = vX.multiply(t);
         return Quantities.create(range, Units.METER);
     }
 
     /**
      * Calculates time of flight until ground.
-     * 
-     * @return time of flight as Quantity
+     *
+     * @return time of flight as Time quantity
      */
     public Quantity<Time> getTimeOfFlight() {
-        double vY = initialSpeed * Math.sin(launchAngle);
-        double discriminant = vY * vY + 2 * gravity * launchHeight;
-        double t = (vY + Math.sqrt(discriminant)) / gravity;
+        Real vY = initialSpeed.multiply(launchAngle.sin());
+        Real discriminant = vY.multiply(vY).add(Real.TWO.multiply(gravity).multiply(launchHeight));
+        Real t = vY.add(discriminant.sqrt()).divide(gravity);
         return Quantities.create(t, Units.SECOND);
     }
 
     /**
-     * Returns position at time t.
-     * 
-     * @param t time in seconds
-     * @return [x, y] position array
+     * Returns time of flight as Real value.
+     *
+     * @return time of flight in seconds
      */
-    public double[] getPosition(double t) {
-        double vX = initialSpeed * Math.cos(launchAngle);
-        double vY = initialSpeed * Math.sin(launchAngle);
-
-        double x = vX * t;
-        double y = launchHeight + vY * t - 0.5 * gravity * t * t;
-
-        return new double[] { x, Math.max(0, y) };
+    public Real getTimeOfFlightReal() {
+        Real vY = initialSpeed.multiply(launchAngle.sin());
+        Real discriminant = vY.multiply(vY).add(Real.TWO.multiply(gravity).multiply(launchHeight));
+        return vY.add(discriminant.sqrt()).divide(gravity);
     }
 
     /**
-     * Returns velocity at time t.
-     * 
-     * @param t time in seconds
-     * @return [vx, vy] velocity array
+     * Returns position at time t as a 2D Vector.
+     *
+     * @param t time elapsed
+     * @return Vector with [x, y] position
      */
-    public double[] getVelocity(double t) {
-        double vX = initialSpeed * Math.cos(launchAngle);
-        double vY = initialSpeed * Math.sin(launchAngle) - gravity * t;
-        return new double[] { vX, vY };
+    public Vector<Real> getPosition(Real t) {
+        Real vX = initialSpeed.multiply(launchAngle.cos());
+        Real vY = initialSpeed.multiply(launchAngle.sin());
+
+        Real x = vX.multiply(t);
+        Real y = launchHeight.add(vY.multiply(t)).subtract(
+                HALF.multiply(gravity).multiply(t).multiply(t));
+
+        Real yClipped = y.compareTo(Real.ZERO) < 0 ? Real.ZERO : y;
+        return DenseVector.of(Arrays.asList(x, yClipped), Reals.getInstance());
     }
 
     /**
-     * Calculates optimal launch angle for maximum range.
-     * 
+     * Returns velocity at time t as a 2D Vector.
+     *
+     * @param t time elapsed
+     * @return Vector with [vx, vy] velocity
+     */
+    public Vector<Real> getVelocity(Real t) {
+        Real vX = initialSpeed.multiply(launchAngle.cos());
+        Real vY = initialSpeed.multiply(launchAngle.sin()).subtract(gravity.multiply(t));
+        return DenseVector.of(Arrays.asList(vX, vY), Reals.getInstance());
+    }
+
+    /**
+     * Calculates optimal launch angle for maximum range (45°).
+     *
      * @return optimal angle in degrees
      */
-    public static double optimalAngle() {
-        return 45.0;
+    public static Real optimalAngle() {
+        return OPTIMAL_ANGLE;
     }
 
     /**
      * Calculates optimal angle considering launch height above target.
-     * 
-     * @param launchHeight height above target
-     * @param range        desired range
+     *
+     * @param launchHeight height difference
+     * @param range        target range
      * @param initialSpeed projectile speed
      * @return optimal angle in degrees
      */
-    public static double optimalAngle(double launchHeight, double range, double initialSpeed) {
-        // For non-zero launch height, optimal angle < 45°
-        double v2 = initialSpeed * initialSpeed;
-        double term = v2 / (v2 + G * launchHeight);
-        return Math.toDegrees(Math.asin(Math.sqrt(term)) / 2);
+    public static Real optimalAngle(Real launchHeight, Real range, Real initialSpeed) {
+        Real v2 = initialSpeed.multiply(initialSpeed);
+        Real term = v2.divide(v2.add(G.multiply(launchHeight)));
+        return term.sqrt().asin().divide(Real.TWO).toDegrees();
     }
 
     /**
-     * Generates trajectory points.
-     * 
-     * @param numPoints number of points
-     * @return array of [x, y] points
+     * Generates trajectory points as a Matrix.
+     * <p>
+     * Each row represents a point: [x, y]
+     * </p>
+     *
+     * @param numPoints number of trajectory points
+     * @return Matrix with trajectory data (numPoints x 2)
      */
-    public double[][] getTrajectory(int numPoints) {
-        double tFlight = getTimeOfFlight().getValue(Units.SECOND).doubleValue();
-        double dt = tFlight / (numPoints - 1);
+    public Matrix<Real> getTrajectory(int numPoints) {
+        Real tFlight = getTimeOfFlightReal();
+        Real dt = tFlight.divide(Real.of(numPoints - 1));
 
-        double[][] trajectory = new double[numPoints][2];
+        Real[][] data = new Real[numPoints][2];
+
         for (int i = 0; i < numPoints; i++) {
-            trajectory[i] = getPosition(i * dt);
+            Vector<Real> pos = getPosition(Real.of(i).multiply(dt));
+            data[i][0] = pos.get(0);
+            data[i][1] = pos.get(1);
         }
-        return trajectory;
+
+        return DenseMatrix.of(data, Reals.getInstance());
+    }
+
+    /**
+     * Returns initial velocity components as a Vector.
+     *
+     * @return Vector with [vx0, vy0]
+     */
+    public Vector<Real> getInitialVelocity() {
+        Real vX = initialSpeed.multiply(launchAngle.cos());
+        Real vY = initialSpeed.multiply(launchAngle.sin());
+        return DenseVector.of(Arrays.asList(vX, vY), Reals.getInstance());
+    }
+
+    /**
+     * Returns the initial speed.
+     */
+    public Real getInitialSpeed() {
+        return initialSpeed;
+    }
+
+    /**
+     * Returns the launch angle in radians.
+     */
+    public Real getLaunchAngle() {
+        return launchAngle;
+    }
+
+    /**
+     * Returns the launch height.
+     */
+    public Real getLaunchHeight() {
+        return launchHeight;
     }
 
     @Override
     public String toString() {
-        return String.format("ProjectileMotion{v0=%.2f m/s, θ=%.1f°, h0=%.2f m, range=%.2f m}",
-                initialSpeed, Math.toDegrees(launchAngle), launchHeight,
-                getRange().getValue(Units.METER).doubleValue());
+        return String.format("ProjectileMotion{v0=%s m/s, θ=%s°, h0=%s m, range=%s}",
+                initialSpeed, launchAngle.toDegrees(), launchHeight,
+                getRange());
     }
 }

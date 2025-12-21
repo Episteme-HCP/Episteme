@@ -1,3 +1,25 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.physics.nuclear;
 
 import org.jscience.mathematics.numbers.real.Real;
@@ -17,10 +39,10 @@ import org.jscience.measure.quantity.Time;
  * <li>Common isotope presets</li>
  * </ul>
  * </p>
+ * * @author Silvere Martin-Michiellot
  * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 2.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class RadioactiveDecay {
 
@@ -49,7 +71,7 @@ public class RadioactiveDecay {
      * Decay constant: λ = ln(2) / t½
      */
     public Real getDecayConstant() {
-        return Real.of(2.0).log().divide(halfLife);
+        return Real.LN2.divide(halfLife);
     }
 
     /**
@@ -102,7 +124,7 @@ public class RadioactiveDecay {
         Real lambda = getDecayConstant();
         // t = -ln(f) / lambda
         Real seconds = fraction.log().negate().divide(lambda);
-        return Quantities.create(seconds.doubleValue(), Units.SECOND);
+        return Quantities.create(seconds, Units.SECOND);
     }
 
     // --- Dating Methods ---
@@ -116,7 +138,7 @@ public class RadioactiveDecay {
     public static Real carbonDate(Real ratioToModern) {
         // Half-life 5730 years
         Real halfLifeSeconds = Real.of(5730 * 365.25 * 24 * 3600);
-        Real lambda = Real.of(2.0).log().divide(halfLifeSeconds);
+        Real lambda = Real.LN2.divide(halfLifeSeconds);
         Real ageSeconds = ratioToModern.log().negate().divide(lambda);
         return ageSeconds.divide(Real.of(365.25 * 24 * 3600)); // Convert to years
     }
@@ -129,7 +151,7 @@ public class RadioactiveDecay {
         Real ratio = uraniumAtoms.divide(n0);
         // Half-life 4.468 billion years
         Real halfLifeSeconds = Real.of(4.468e9 * 365.25 * 24 * 3600);
-        Real lambda = Real.of(2.0).log().divide(halfLifeSeconds);
+        Real lambda = Real.LN2.divide(halfLifeSeconds);
         Real ageSeconds = ratio.log().negate().divide(lambda);
         return ageSeconds.divide(Real.of(365.25 * 24 * 3600));
     }
@@ -175,7 +197,7 @@ public class RadioactiveDecay {
     }
 
     public Quantity<Time> getHalfLifeQuantity() {
-        return Quantities.create(halfLife.doubleValue(), Units.SECOND);
+        return Quantities.create(halfLife, Units.SECOND);
     }
 
     @Override

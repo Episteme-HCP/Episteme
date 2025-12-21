@@ -30,8 +30,7 @@ import org.jscience.mathematics.numbers.integers.Natural;
  * <p>
  * OEIS A000217: Triangular numbers.
  * </p>
- * 
- * @author Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

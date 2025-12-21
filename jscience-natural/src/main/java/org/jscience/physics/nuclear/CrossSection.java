@@ -25,8 +25,8 @@ public class CrossSection {
      */
     public static Real geometric(int massNumber) {
         Real r0 = Real.of(1.2e-15); // fm in meters
-        Real radius = r0.multiply(Real.of(Math.pow(massNumber, 1.0 / 3.0)));
-        return Real.of(Math.PI).multiply(radius.pow(2));
+        Real radius = r0.multiply(Real.of(massNumber).cbrt());
+        return Real.PI.multiply(radius.pow(2));
     }
 
     /**

@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.physics;
 
@@ -30,9 +30,9 @@ import org.jscience.mathematics.numbers.real.Real;
  * Hamiltonian: H = Σpᵢq̇ᵢ - L
  * Hamilton's equations: q̇ = ∂H/∂p, ṗ = -∂H/∂q
  * </p>
- * 
- * @author Silvere Martin-Michiellot
- * @since 2.0
+ * * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class HamiltonianMechanics {
 

@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.io.cache;
 
@@ -32,15 +32,21 @@ import java.util.Optional;
  * <p>
  * Stores data in {@code ~/.jscience/cache/}.
  * Uses MD5 hash of keys for filenames to avoid filesystem issues.
+ * Supports TTL (time-to-live) for cached entries.
  * </p>
  * 
  * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class FileResourceCache implements ResourceCache {
 
     private static final FileResourceCache INSTANCE = new FileResourceCache();
     private final Path cacheDir;
+
+    /** Default TTL in milliseconds (24 hours). */
+    private static final long DEFAULT_TTL_MS = 24 * 60 * 60 * 1000;
+    private long ttlMs = DEFAULT_TTL_MS;
 
     private FileResourceCache() {
         String userHome = System.getProperty("user.home");
@@ -56,11 +62,26 @@ public class FileResourceCache implements ResourceCache {
         return INSTANCE;
     }
 
+    /**
+     * Sets the time-to-live for cached entries.
+     * 
+     * @param ttlMillis TTL in milliseconds
+     */
+    public void setTtl(long ttlMillis) {
+        this.ttlMs = ttlMillis;
+    }
+
     @Override
     public Optional<String> get(String key) {
         try {
             Path file = getFileForKey(key);
             if (Files.exists(file)) {
+                // Check TTL
+                long fileAge = System.currentTimeMillis() - Files.getLastModifiedTime(file).toMillis();
+                if (fileAge > ttlMs) {
+                    Files.delete(file); // Expired
+                    return Optional.empty();
+                }
                 return Optional.of(new String(Files.readAllBytes(file), "UTF-8"));
             }
         } catch (Exception e) {

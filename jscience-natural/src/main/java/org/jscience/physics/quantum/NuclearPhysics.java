@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.physics.quantum;
 
@@ -27,162 +27,86 @@ import org.jscience.physics.PhysicalConstants;
 
 /**
  * Nuclear physics - decay, fission, fusion, binding energy.
- * <p>
- * Based on latest nuclear data and modern computational methods.
- * </p>
  * 
  * @author Silvere Martin-Michiellot
- * @since 2.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class NuclearPhysics {
 
-    /**
-     * Radioactive decay: N(t) = N₀e^(-λt)
-     * Returns remaining atoms at time t
-     */
+    /** Radioactive decay: N(t) = N₀e^(-λt) */
     public static Real radioactiveDecay(Real initialAmount, Real decayConstant, Real time) {
-        return initialAmount.multiply(Real.of(Math.exp(-decayConstant.doubleValue() * time.doubleValue())));
+        return initialAmount.multiply(decayConstant.negate().multiply(time).exp());
     }
 
-    /**
-     * Half-life from decay constant: t₁/₂ = ln(2)/λ
-     */
+    /** Half-life: t₁/₂ = ln(2)/λ */
     public static Real halfLife(Real decayConstant) {
-        return Real.of(Math.log(2)).divide(decayConstant);
+        return Real.LN2.divide(decayConstant);
     }
 
-    /**
-     * Activity: A = λN = (ln(2)/t₁/₂)N
-     * Returns decay rate (Becquerels)
-     */
+    /** Activity: A = λN */
     public static Real activity(Real decayConstant, Real numAtoms) {
         return decayConstant.multiply(numAtoms);
     }
 
-    /**
-     * Mass-energy equivalence: E = mc²
-     */
+    /** Mass-energy: E = mc² */
     public static Real massEnergy(Real mass) {
-        Real c = PhysicalConstants.SPEED_OF_LIGHT.getValue();
-        return mass.multiply(c).multiply(c);
+        return mass.multiply(PhysicalConstants.c.pow(2));
     }
 
-    /**
-     * Binding energy per nucleon (semi-empirical mass formula - SEMF):
-     * BE/A ≈ aᵥ - aₛA^(-1/3) - aₒZ(Z-1)/A^(4/3) - aₐ(A-2Z)²/A² ± δ/A^(1/2)
-     * 
-     * Simplified version using Weizsäcker formula constants
-     */
+    /** Binding energy per nucleon (SEMF) */
     public static Real bindingEnergyPerNucleon(int A, int Z) {
-        // SEMF constants (MeV)
-        double av = 15.75; // Volume
-        double as = 17.8; // Surface
-        double ac = 0.711; // Coulomb
-        double aa = 23.7; // Asymmetry
-
+        double av = 15.75, as = 17.8, ac = 0.711, aa = 23.7;
         int N = A - Z;
         double A13 = Math.pow(A, 1.0 / 3.0);
-
-        double volume = av;
-        double surface = -as / A13;
-        double coulomb = -ac * Z * (Z - 1) / A13;
-        double asymmetry = -aa * (N - Z) * (N - Z) / A;
-
-        // Pairing term (simplified)
-        double pairing = 0;
+        double BE = av - as / A13 - ac * Z * (Z - 1) / A13 - aa * (N - Z) * (N - Z) / A;
         if (N % 2 == 0 && Z % 2 == 0)
-            pairing = 12.0 / Math.sqrt(A);
+            BE += 12.0 / Math.sqrt(A);
         else if (N % 2 == 1 && Z % 2 == 1)
-            pairing = -12.0 / Math.sqrt(A);
-
-        double bePerA = volume + surface + coulomb + asymmetry + pairing;
-        return Real.of(bePerA);
+            BE -= 12.0 / Math.sqrt(A);
+        return Real.of(BE);
     }
 
-    /**
-     * Q-value for nuclear reaction: Q = (Σm_reactants - Σm_products)c²
-     */
+    /** Q-value: Q = (Σm_reactants - Σm_products)c² */
     public static Real qValue(Real reactantMass, Real productMass) {
-        Real c = PhysicalConstants.SPEED_OF_LIGHT.getValue();
-        return reactantMass.subtract(productMass).multiply(c).multiply(c);
+        return reactantMass.subtract(productMass).multiply(PhysicalConstants.c.pow(2));
     }
 
-    /**
-     * Fusion power (Lawson criterion): nτT > critical value
-     * Returns triple product for fusion ignition assessment
-     */
+    /** Lawson triple product */
     public static Real lawsonTripleProduct(Real density, Real confinementTime, Real temperature) {
         return density.multiply(confinementTime).multiply(temperature);
     }
 
-    /**
-     * Fission energy release (U-235): ~200 MeV per fission
-     * Returns energy from N fissions
-     */
+    /** Fission energy (~200 MeV per fission) */
     public static Real fissionEnergy(Real numFissions) {
-        Real energyPerFission = Real.of(200e6 * 1.602176634e-19); // 200 MeV in Joules
+        Real energyPerFission = Real.of(200e6).multiply(PhysicalConstants.e);
         return energyPerFission.multiply(numFissions);
     }
 
-    /**
-     * Critical mass (simplified sphere): M_crit ∝ 1/(ρσ)
-     * Rough estimate for bare sphere
-     */
+    /** Critical mass factor (simplified) */
     public static Real criticalMassFactor(Real density, Real crossSection) {
-        // This is a simplified factor; real calculation requires neutron transport
         return Real.ONE.divide(density.multiply(crossSection));
     }
 
-    /**
-     * Exact Critical Mass (Diffusion Approximation for Bare Sphere).
-     * <p>
-     * M_c = (4/3) * pi * R_c^3 * rho
-     * R_c = pi / B_g
-     * B_g = sqrt((nu * Sigma_f - Sigma_a) / D)
-     * </p>
-     * 
-     * @param density        density (rho)
-     * @param nu             average neutrons per fission
-     * @param sigmaF         macroscopic fission cross-section
-     * @param sigmaA         macroscopic absorption cross-section
-     * @param diffusionCoeff diffusion coefficient (D)
-     * @return critical mass
-     */
+    /** Exact critical mass (diffusion approximation for bare sphere) */
     public static Real exactCriticalMass(Real density, Real nu, Real sigmaF, Real sigmaA, Real diffusionCoeff) {
-        // Calculate material buckling B_m^2 = (nu*Sigma_f - Sigma_a) / D
-        Real production = nu.multiply(sigmaF);
-        Real netProduction = production.subtract(sigmaA);
-
-        if (netProduction.doubleValue() <= 0) {
-            return Real.POSITIVE_INFINITY; // Subcritical material
-        }
-
-        Real bucklingSquared = netProduction.divide(diffusionCoeff);
-        Real buckling = Real.of(Math.sqrt(bucklingSquared.doubleValue()));
-
-        // Critical radius R_c = pi / B
-        Real criticalRadius = Real.of(Math.PI).divide(buckling);
-
-        // Critical mass M_c = 4/3 * pi * R_c^3 * rho
-        Real volume = Real.of(4.0 / 3.0 * Math.PI).multiply(criticalRadius.pow(3));
+        Real netProduction = nu.multiply(sigmaF).subtract(sigmaA);
+        if (netProduction.compareTo(Real.ZERO) <= 0)
+            return Real.POSITIVE_INFINITY;
+        Real buckling = netProduction.divide(diffusionCoeff).sqrt();
+        Real criticalRadius = Real.PI.divide(buckling);
+        Real volume = Real.of(4.0 / 3.0).multiply(Real.PI).multiply(criticalRadius.pow(3));
         return volume.multiply(density);
     }
 
-    /**
-     * Neutron multiplication factor: k = (neutrons produced)/(neutrons absorbed)
-     * k > 1: supercritical, k = 1: critical, k < 1: subcritical
-     */
+    /** Neutron multiplication factor */
     public static Real multiplicationFactor(Real produced, Real absorbed) {
         return produced.divide(absorbed);
     }
 
-    /**
-     * Deuterium-Tritium fusion cross-section peak at ~100 keV
-     * Returns approximate reaction rate (simplified)
-     */
+    /** D-T fusion reaction rate (simplified) */
     public static Real fusionReactionRate(Real density1, Real density2, Real temperature) {
-        // Simplified: σv ~ T² for D-T fusion in relevant range
-        double sigmaV = 1e-22 * Math.pow(temperature.doubleValue() / 1e7, 2); // m³/s
-        return density1.multiply(density2).multiply(Real.of(sigmaV));
+        Real sigmaV = Real.of(1e-22).multiply(temperature.divide(Real.of(1e7)).pow(2));
+        return density1.multiply(density2).multiply(sigmaV);
     }
 }

@@ -7,6 +7,7 @@ import org.jscience.measure.quantity.Pressure;
 import org.jscience.measure.quantity.Temperature;
 
 import java.io.Serializable;
+import org.jscience.physics.PhysicalConstants;
 
 /**
  * Atmospheric physics calculations and data model.
@@ -35,7 +36,7 @@ public class Atmosphere implements Serializable {
     public static final Real R_AIR = Real.of(287.05);
 
     /** Gravitational acceleration (m/s²) */
-    public static final Real G = Real.of(9.80665);
+    private static final Real G = PhysicalConstants.g_n;
 
     // --- Data Model Fields (from earth/Atmosphere) ---
     private Quantity<Length> height;
@@ -94,28 +95,33 @@ public class Atmosphere implements Serializable {
      * @param altitude Height above sea level (m)
      * @return Pressure (Pa)
      */
+    /** Troposphere boundary altitude (m) */
+    private static final Real TROPOPAUSE = Real.of(11000);
+    /** Tropopause temperature (K) */
+    private static final Real T_TROPOPAUSE = Real.of(216.65);
+
     public static Real pressure(Real altitude) {
-        if (altitude.doubleValue() < 0) {
+        if (altitude.compareTo(Real.ZERO) < 0) {
             altitude = Real.ZERO;
         }
-        if (altitude.doubleValue() > 11000) {
+        if (altitude.compareTo(TROPOPAUSE) > 0) {
             // Above troposphere - isothermal approximation
-            Real P11 = pressure(Real.of(11000));
-            Real T11 = temperature(Real.of(11000));
-            Real expo = G.negate().multiply(altitude.subtract(Real.of(11000))).divide(R_AIR.multiply(T11));
+            Real P11 = pressure(TROPOPAUSE);
+            Real T11 = temperature(TROPOPAUSE);
+            Real expo = G.negate().multiply(altitude.subtract(TROPOPAUSE)).divide(R_AIR.multiply(T11));
             return P11.multiply(expo.exp());
         }
         Real exponent = G.divide(R_AIR.multiply(LAPSE_RATE));
         Real base = Real.ONE.subtract(LAPSE_RATE.multiply(altitude).divide(T0));
-        return P0.multiply(base.pow(exponent.doubleValue()));
+        return P0.multiply(base.pow(exponent));
     }
 
     /**
      * Temperature vs altitude (troposphere).
      */
     public static Real temperature(Real altitude) {
-        if (altitude.doubleValue() > 11000) {
-            return Real.of(216.65); // Tropopause
+        if (altitude.compareTo(TROPOPAUSE) > 0) {
+            return T_TROPOPAUSE;
         }
         return T0.subtract(LAPSE_RATE.multiply(altitude));
     }
@@ -192,13 +198,19 @@ public class Atmosphere implements Serializable {
     /**
      * Wind chill (Fahrenheit formula converted to Celsius).
      */
+    /** Constants for wind chill calculation */
+    private static final Real WIND_CHILL_TEMP_LIMIT = Real.of(10);
+    private static final Real WIND_CHILL_SPEED_LIMIT = Real.of(4.8);
+    private static final Real WIND_CHILL_EXPONENT = Real.of(0.16);
+
     public static Real windChill(Real tempCelsius, Real windSpeedKmh) {
-        if (tempCelsius.doubleValue() > 10 || windSpeedKmh.doubleValue() < 4.8) {
+        if (tempCelsius.compareTo(WIND_CHILL_TEMP_LIMIT) > 0 ||
+                windSpeedKmh.compareTo(WIND_CHILL_SPEED_LIMIT) < 0) {
             return tempCelsius;
         }
 
         Real T = tempCelsius;
-        Real V = Real.of(Math.pow(windSpeedKmh.doubleValue(), 0.16));
+        Real V = windSpeedKmh.pow(WIND_CHILL_EXPONENT);
 
         return Real.of(13.12)
                 .add(Real.of(0.6215).multiply(T))

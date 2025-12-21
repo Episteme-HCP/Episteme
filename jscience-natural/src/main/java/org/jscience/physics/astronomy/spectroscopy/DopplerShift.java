@@ -1,122 +1,90 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.physics.astronomy.spectroscopy;
+
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Doppler shift and redshift calculations.
+ * * @author Silvere Martin-Michiellot
  * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 5.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class DopplerShift {
 
     /** Speed of light in km/s */
-    public static final double C_KM_S = 299792.458;
+    public static final Real C_KM_S = Real.of(299792.458);
+    /** Hubble constant (Planck 2018) */
+    public static final Real H0_PLANCK = Real.of(67.4);
+
+    // --- Spectral lines (Angstroms) ---
+    public static final Real H_ALPHA = Real.of(6562.8);
+    public static final Real H_BETA = Real.of(4861.3);
+    public static final Real CA_K = Real.of(3933.7);
+    public static final Real CA_H = Real.of(3968.5);
+    public static final Real NA_D1 = Real.of(5895.9);
+    public static final Real NA_D2 = Real.of(5889.9);
 
     private DopplerShift() {
-    } // Utility class
-
-    /**
-     * Calculates radial velocity from observed and rest wavelengths.
-     * v = c * (λ_obs - λ_rest) / λ_rest
-     * 
-     * @param observedWavelength Observed wavelength
-     * @param restWavelength     Rest (lab) wavelength
-     * @return Radial velocity in same units as c (default: km/s)
-     */
-    public static double radialVelocity(double observedWavelength, double restWavelength) {
-        return C_KM_S * (observedWavelength - restWavelength) / restWavelength;
     }
 
-    /**
-     * Calculates redshift z from wavelengths.
-     * z = (λ_obs - λ_rest) / λ_rest
-     * 
-     * @param observedWavelength Observed wavelength
-     * @param restWavelength     Rest wavelength
-     * @return Redshift z
-     */
-    public static double redshift(double observedWavelength, double restWavelength) {
-        return (observedWavelength - restWavelength) / restWavelength;
+    /** Radial velocity: v = c * (λ_obs - λ_rest) / λ_rest */
+    public static Real radialVelocity(Real observedWavelength, Real restWavelength) {
+        return C_KM_S.multiply(observedWavelength.subtract(restWavelength)).divide(restWavelength);
     }
 
-    /**
-     * Converts redshift to radial velocity.
-     * For z << 1: v ≈ c * z
-     * For relativistic: v = c * ((1+z)² - 1) / ((1+z)² + 1)
-     * 
-     * @param z                      Redshift
-     * @param relativisticCorrection Use relativistic formula if true
-     * @return Velocity in km/s
-     */
-    public static double redshiftToVelocity(double z, boolean relativisticCorrection) {
-        if (relativisticCorrection) {
-            double zp1 = 1 + z;
-            return C_KM_S * (zp1 * zp1 - 1) / (zp1 * zp1 + 1);
-        } else {
-            return C_KM_S * z;
+    /** Redshift: z = (λ_obs - λ_rest) / λ_rest */
+    public static Real redshift(Real observedWavelength, Real restWavelength) {
+        return observedWavelength.subtract(restWavelength).divide(restWavelength);
+    }
+
+    /** Redshift to velocity */
+    public static Real redshiftToVelocity(Real z, boolean relativistic) {
+        if (relativistic) {
+            Real zp1 = Real.ONE.add(z);
+            Real zp1Sq = zp1.pow(2);
+            return C_KM_S.multiply(zp1Sq.subtract(Real.ONE)).divide(zp1Sq.add(Real.ONE));
         }
+        return C_KM_S.multiply(z);
     }
 
-    /**
-     * Converts velocity to redshift.
-     * For v << c: z ≈ v/c
-     * For relativistic: z = sqrt((1+v/c)/(1-v/c)) - 1
-     * 
-     * @param velocityKmS            Velocity in km/s
-     * @param relativisticCorrection Use relativistic formula if true
-     * @return Redshift z
-     */
-    public static double velocityToRedshift(double velocityKmS, boolean relativisticCorrection) {
-        double beta = velocityKmS / C_KM_S;
-        if (relativisticCorrection) {
-            return Math.sqrt((1 + beta) / (1 - beta)) - 1;
-        } else {
-            return beta;
+    /** Velocity to redshift */
+    public static Real velocityToRedshift(Real velocityKmS, boolean relativistic) {
+        Real beta = velocityKmS.divide(C_KM_S);
+        if (relativistic) {
+            return Real.ONE.add(beta).divide(Real.ONE.subtract(beta)).sqrt().subtract(Real.ONE);
         }
+        return beta;
     }
 
-    /**
-     * Calculates observed wavelength from rest wavelength and velocity.
-     * λ_obs = λ_rest * (1 + v/c)
-     */
-    public static double observedWavelength(double restWavelength, double velocityKmS) {
-        return restWavelength * (1 + velocityKmS / C_KM_S);
+    /** Observed wavelength from rest wavelength and velocity */
+    public static Real observedWavelength(Real restWavelength, Real velocityKmS) {
+        return restWavelength.multiply(Real.ONE.add(velocityKmS.divide(C_KM_S)));
     }
 
-    /**
-     * Cosmological distance estimate using Hubble law.
-     * d = v / H0 = c * z / H0
-     * 
-     * @param z  Redshift
-     * @param H0 Hubble constant (km/s/Mpc), typically ~70
-     * @return Distance in Mpc
-     */
-    public static double hubbleDistance(double z, double H0) {
-        return C_KM_S * z / H0;
+    /** Hubble distance: d = c * z / H0 (Mpc) */
+    public static Real hubbleDistance(Real z, Real H0) {
+        return C_KM_S.multiply(z).divide(H0);
     }
-
-    /**
-     * Hubble constant in km/s/Mpc (Planck 2018 value).
-     */
-    public static final double H0_PLANCK = 67.4;
-
-    // --- Common spectral lines (wavelength in Angstroms) ---
-
-    /** Hydrogen alpha (Balmer series) */
-    public static final double H_ALPHA = 6562.8;
-
-    /** Hydrogen beta */
-    public static final double H_BETA = 4861.3;
-
-    /** Calcium K line */
-    public static final double CA_K = 3933.7;
-
-    /** Calcium H line */
-    public static final double CA_H = 3968.5;
-
-    /** Sodium D1 line */
-    public static final double NA_D1 = 5895.9;
-
-    /** Sodium D2 line */
-    public static final double NA_D2 = 5889.9;
 }

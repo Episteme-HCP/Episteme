@@ -1,168 +1,117 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.chemistry.computational;
+
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Molecular mechanics force field calculations.
+ * * @author Silvere Martin-Michiellot
  * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 5.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class ForceField {
 
     /**
-     * Lennard-Jones 12-6 potential for van der Waals interactions.
-     * V(r) = ε * [(σ/r)^12 - 2*(σ/r)^6]
-     * 
-     * @param r       Distance between atoms
-     * @param epsilon Well depth (energy at minimum)
-     * @param sigma   Distance at which V = 0
-     * @return Potential energy
+     * Lennard-Jones 12-6 potential. V(r) = ε * [(σ/r)^12 - 2*(σ/r)^6]
      */
-    public static double lennardJones(double r, double epsilon, double sigma) {
-        double ratio = sigma / r;
-        double r6 = Math.pow(ratio, 6);
-        double r12 = r6 * r6;
-        return epsilon * (r12 - 2 * r6);
+    public static Real lennardJones(Real r, Real epsilon, Real sigma) {
+        Real ratio = sigma.divide(r);
+        Real r6 = ratio.pow(6);
+        Real r12 = r6.pow(2);
+        return epsilon.multiply(r12.subtract(Real.TWO.multiply(r6)));
     }
 
-    /**
-     * Lennard-Jones force (negative derivative of potential).
-     * F(r) = 12ε/r * [(σ/r)^12 - (σ/r)^6]
-     */
-    public static double lennardJonesForce(double r, double epsilon, double sigma) {
-        double ratio = sigma / r;
-        double r6 = Math.pow(ratio, 6);
-        double r12 = r6 * r6;
-        return 12 * epsilon / r * (r12 - r6);
+    /** Lennard-Jones force. F(r) = 12ε/r * [(σ/r)^12 - (σ/r)^6] */
+    public static Real lennardJonesForce(Real r, Real epsilon, Real sigma) {
+        Real ratio = sigma.divide(r);
+        Real r6 = ratio.pow(6);
+        Real r12 = r6.pow(2);
+        return Real.of(12).multiply(epsilon).divide(r).multiply(r12.subtract(r6));
     }
 
-    /**
-     * Harmonic bond stretching potential.
-     * V(r) = 0.5 * k * (r - r0)²
-     * 
-     * @param r  Current bond length
-     * @param r0 Equilibrium bond length
-     * @param k  Force constant
-     * @return Potential energy
-     */
-    public static double bondStretch(double r, double r0, double k) {
-        double dr = r - r0;
-        return 0.5 * k * dr * dr;
+    /** Harmonic bond stretching: V(r) = 0.5 * k * (r - r0)² */
+    public static Real bondStretch(Real r, Real r0, Real k) {
+        Real dr = r.subtract(r0);
+        return Real.of(0.5).multiply(k).multiply(dr.pow(2));
     }
 
-    /**
-     * Harmonic angle bending potential.
-     * V(θ) = 0.5 * k * (θ - θ0)²
-     * 
-     * @param theta  Current angle (radians)
-     * @param theta0 Equilibrium angle (radians)
-     * @param k      Force constant
-     * @return Potential energy
-     */
-    public static double angleBend(double theta, double theta0, double k) {
-        double dTheta = theta - theta0;
-        return 0.5 * k * dTheta * dTheta;
+    /** Harmonic angle bending: V(θ) = 0.5 * k * (θ - θ0)² */
+    public static Real angleBend(Real theta, Real theta0, Real k) {
+        Real dTheta = theta.subtract(theta0);
+        return Real.of(0.5).multiply(k).multiply(dTheta.pow(2));
     }
 
-    /**
-     * Torsional (dihedral) potential.
-     * V(φ) = V_n/2 * [1 + cos(n*φ - γ)]
-     * 
-     * @param phi   Dihedral angle (radians)
-     * @param Vn    Barrier height
-     * @param n     Periodicity
-     * @param gamma Phase offset (radians)
-     * @return Potential energy
-     */
-    public static double torsion(double phi, double Vn, int n, double gamma) {
-        return Vn / 2.0 * (1 + Math.cos(n * phi - gamma));
+    /** Torsional potential: V(φ) = V_n/2 * [1 + cos(n*φ - γ)] */
+    public static Real torsion(Real phi, Real Vn, int n, Real gamma) {
+        Real cosArg = Real.of(n).multiply(phi).subtract(gamma).cos();
+        return Vn.divide(Real.TWO).multiply(Real.ONE.add(cosArg));
     }
 
-    /**
-     * Coulomb electrostatic interaction.
-     * V(r) = (q1 * q2) / (4πε0 * r)
-     * 
-     * @param q1 Charge 1 (in elementary charges)
-     * @param q2 Charge 2 (in elementary charges)
-     * @param r  Distance (Angstroms)
-     * @return Energy in kcal/mol (using dielectric constant = 1)
-     */
-    public static double coulomb(double q1, double q2, double r) {
-        // 332.06 converts to kcal/mol when charges in e and r in Angstroms
-        return 332.06 * q1 * q2 / r;
+    /** Coulomb interaction (kcal/mol when q in e, r in Å) */
+    public static Real coulomb(Real q1, Real q2, Real r) {
+        return Real.of(332.06).multiply(q1).multiply(q2).divide(r);
     }
 
-    /**
-     * Morse potential for bond stretching (more accurate than harmonic).
-     * V(r) = D_e * [1 - exp(-a*(r-r_e))]²
-     * 
-     * @param r  Current bond length
-     * @param re Equilibrium bond length
-     * @param De Dissociation energy
-     * @param a  Width parameter = sqrt(k_e / 2*D_e)
-     * @return Potential energy
-     */
-    public static double morse(double r, double re, double De, double a) {
-        double exp = Math.exp(-a * (r - re));
-        return De * Math.pow(1 - exp, 2);
+    /** Morse potential: V(r) = D_e * [1 - exp(-a*(r-r_e))]² */
+    public static Real morse(Real r, Real re, Real De, Real a) {
+        Real exp = a.negate().multiply(r.subtract(re)).exp();
+        return De.multiply(Real.ONE.subtract(exp).pow(2));
     }
 
     // --- Common parameters (Angstroms, kcal/mol) ---
-
-    /** LJ parameters for C-C interaction */
-    public static final double CC_EPSILON = 0.066;
-    public static final double CC_SIGMA = 3.4;
-
-    /** LJ parameters for O-O interaction */
-    public static final double OO_EPSILON = 0.152;
-    public static final double OO_SIGMA = 3.12;
-
-    /** C-C single bond equilibrium length (Å) */
-    public static final double CC_BOND_LENGTH = 1.54;
-
-    /** C=C double bond equilibrium length (Å) */
-    public static final double CC_DOUBLE_LENGTH = 1.34;
-
-    /** C-H bond equilibrium length (Å) */
-    public static final double CH_BOND_LENGTH = 1.09;
+    public static final Real CC_EPSILON = Real.of(0.066);
+    public static final Real CC_SIGMA = Real.of(3.4);
+    public static final Real OO_EPSILON = Real.of(0.152);
+    public static final Real OO_SIGMA = Real.of(3.12);
+    public static final Real CC_BOND_LENGTH = Real.of(1.54);
+    public static final Real CC_DOUBLE_LENGTH = Real.of(1.34);
+    public static final Real CH_BOND_LENGTH = Real.of(1.09);
 
     /**
      * Calculates total potential energy of a molecule.
-     * Includes Bond stretching and Non-bonded interactions (LJ only for now).
-     * 
-     * @param molecule The molecule
-     * @return Total potential energy in kcal/mol
      */
-    public static double calculatePotentialEnergy(org.jscience.chemistry.Molecule molecule) {
-        double totalEnergy = 0.0;
+    public static Real calculatePotentialEnergy(org.jscience.chemistry.Molecule molecule) {
+        Real totalEnergy = Real.ZERO;
 
-        // 1. Bond Stretching
         for (org.jscience.chemistry.Bond bond : molecule.getBonds()) {
-            double rMeter = bond.getLength().to(org.jscience.measure.Units.METER).getValue().doubleValue();
-            double rAngstrom = rMeter * 1e10;
+            Real rMeter = bond.getLength().to(org.jscience.measure.Units.METER).getValue();
+            Real rAngstrom = rMeter.multiply(Real.of(1e10));
 
-            // Heuristic parameter selection
-            double r0 = CC_BOND_LENGTH;
-            // Simple check for bond type could go here, for now assumes generic single bond
-            // length
+            Real r0 = CC_BOND_LENGTH;
             if (bond.getOrder() == org.jscience.chemistry.Bond.BondOrder.DOUBLE)
                 r0 = CC_DOUBLE_LENGTH;
 
-            // k usually ~300-500 kcal/mol/A^2
-            totalEnergy += bondStretch(rAngstrom, r0, 300.0);
+            totalEnergy = totalEnergy.add(bondStretch(rAngstrom, r0, Real.of(300.0)));
         }
 
-        // 2. Non-bonded (LJ)
-        // Naive N^2 loop
         java.util.List<org.jscience.chemistry.Atom> atoms = molecule.getAtoms();
         for (int i = 0; i < atoms.size(); i++) {
             for (int j = i + 1; j < atoms.size(); j++) {
                 org.jscience.chemistry.Atom a1 = atoms.get(i);
                 org.jscience.chemistry.Atom a2 = atoms.get(j);
 
-                // Exclude bonded atoms? (Bonded atoms usually excluded from non-bonded calc
-                // 1-2, 1-3)
-                // We check if a bond exists between them.
                 boolean bonded = false;
                 for (org.jscience.chemistry.Bond b : molecule.getBondsFor(a1)) {
                     if (b.getOtherAtom(a1) == a2) {
@@ -173,14 +122,13 @@ public class ForceField {
                 if (bonded)
                     continue;
 
-                double distMeter = a1.distanceTo(a2).to(org.jscience.measure.Units.METER).getValue().doubleValue();
-                double distAngstrom = distMeter * 1e10;
+                Real distMeter = a1.distanceTo(a2).to(org.jscience.measure.Units.METER).getValue();
+                Real distAngstrom = distMeter.multiply(Real.of(1e10));
 
-                if (distAngstrom < 0.1)
-                    distAngstrom = 0.1; // Clamp
+                if (distAngstrom.doubleValue() < 0.1)
+                    distAngstrom = Real.of(0.1);
 
-                // Use generic C-C parameters for everything for now
-                totalEnergy += lennardJones(distAngstrom, CC_EPSILON, CC_SIGMA);
+                totalEnergy = totalEnergy.add(lennardJones(distAngstrom, CC_EPSILON, CC_SIGMA));
             }
         }
 

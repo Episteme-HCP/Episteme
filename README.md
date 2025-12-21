@@ -68,6 +68,48 @@ Matrix<CudaFloat> gpu = Matrix.create(data, new CudaScalar());
 - Physics (Astronomy, Mechanics) & Chemistry (Periodic Table)
 - Comprehensive Cleanup & Benchmarking Suite
 
+## Module Structure
+
+```
+jscience/
+├── jscience-core/          # Mathematics, I/O, common utilities
+│   ├── mathematics/        # Linear algebra, calculus, statistics
+│   ├── measure/            # Quantities, units (JSR-385)
+│   ├── bibliography/       # Citation management, CrossRef
+│   └── ui/mathematics/     # Matrix viewers
+├── jscience-natural/       # Natural sciences
+│   ├── physics/            # Mechanics, thermodynamics, astronomy
+│   ├── chemistry/          # Molecules, reactions, biochemistry
+│   ├── biology/            # Genetics, evolution, ecology
+│   └── earth/              # Geology, meteorology, coordinates
+├── jscience-social/        # Social sciences
+│   ├── economics/          # Markets, currencies, models
+│   ├── geography/          # GIS, maps, demographics
+│   └── sociology/          # Networks, organizations
+└── jscience-benchmarks/    # JMH performance benchmarks
+```
+
+## Data Loaders
+
+External data sources with built-in caching (TTL: 24h):
+
+| Module | Loaders |
+|--------|---------|
+| Astronomy | `NasaExoplanets`, `SimbadLoader`, `SimbadCatalog` |
+| Biology | `GbifTaxonomy`, `GenBank`, `NcbiTaxonomy` |
+| Chemistry | `PubChem` |
+| Earth | `OpenWeather`, `UsgsEarthquakes` |
+| Economics | `WorldBank` |
+| Bibliography | `CrossRef` |
+
+## Demo Application
+
+Launch the master demo:
+
+```bash
+mvn exec:java -pl jscience-natural -Dexec.mainClass="org.jscience.ui.JScienceDemoApp"
+```
+
 See [roadmap.md](roadmap.md) and [task.md](task.md) for detailed progress.
 
 ## Architecture

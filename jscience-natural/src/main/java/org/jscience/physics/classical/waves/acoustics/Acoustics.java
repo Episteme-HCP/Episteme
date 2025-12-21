@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.physics.classical.waves.acoustics;
 
@@ -26,11 +26,17 @@ import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Acoustics equations - sound propagation, intensity, resonance.
+ * * @author Silvere Martin-Michiellot
  * 
- * @author Silvere Martin-Michiellot
- * @since 2.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class Acoustics {
+
+    /** Speed of sound in air at 20°C */
+    public static final Real C_AIR_20C = Real.of(343.0);
+    /** Speed of sound in water */
+    public static final Real C_WATER = Real.of(1480.0);
 
     /**
      * Speed of sound in air: v ≈ 331 + 0.6T (m/s, T in °C)
@@ -40,17 +46,33 @@ public class Acoustics {
     }
 
     /**
+     * Speed of sound in air (more accurate formula).
+     * v = 331.3 * sqrt(1 + T/273.15)
+     */
+    public static Real speedOfSoundInAirAccurate(Real tempCelsius) {
+        return Real.of(331.3).multiply(Real.ONE.add(tempCelsius.divide(Real.of(273.15))).sqrt());
+    }
+
+    /**
      * Sound intensity level (decibels): L = 10 log₁₀(I/I₀)
      * where I₀ = 10⁻¹² W/m² (threshold of hearing)
      */
     public static Real soundIntensityLevel(Real intensity) {
-        Real I0 = Real.of(1e-12); // W/m²
-        return Real.of(10 * Math.log10(intensity.divide(I0).doubleValue()));
+        Real I0 = Real.of(1e-12);
+        return Real.of(10).multiply(intensity.divide(I0).log10());
+    }
+
+    /**
+     * Pressure to decibels: L = 20 log₁₀(p/p₀)
+     * where p₀ = 2×10⁻⁵ Pa (reference pressure)
+     */
+    public static Real pressureToDecibels(Real pressure) {
+        Real p0 = Real.of(2e-5);
+        return Real.of(20).multiply(pressure.divide(p0).log10());
     }
 
     /**
      * Doppler effect: f' = f(v + v_observer)/(v - v_source)
-     * Positive velocities approach each other
      */
     public static Real dopplerFrequency(Real sourceFreq, Real soundSpeed,
             Real observerVelocity, Real sourceVelocity) {
@@ -60,15 +82,15 @@ public class Acoustics {
     }
 
     /**
-     * Resonance frequency of closed pipe: f_n = nv/(2L)
+     * Resonance frequency of closed pipe: f_n = (2n-1)v/(4L)
      */
     public static Real closedPipeResonance(int harmonicNumber, Real soundSpeed, Real length) {
-        return Real.of(harmonicNumber).multiply(soundSpeed).divide(Real.TWO.multiply(length));
+        return Real.of(2 * harmonicNumber - 1).multiply(soundSpeed)
+                .divide(Real.of(4).multiply(length));
     }
 
     /**
      * Resonance frequency of open pipe: f_n = nv/(2L)
-     * Same as closed but different harmonic series
      */
     public static Real openPipeResonance(int harmonicNumber, Real soundSpeed, Real length) {
         return Real.of(harmonicNumber).multiply(soundSpeed).divide(Real.TWO.multiply(length));
@@ -92,40 +114,28 @@ public class Acoustics {
      * Sound intensity from power: I = P/(4πr²)
      */
     public static Real soundIntensity(Real power, Real distance) {
-        Real area = Real.of(4 * Math.PI).multiply(distance).multiply(distance);
+        Real area = Real.of(4).multiply(Real.PI).multiply(distance.pow(2));
         return power.divide(area);
     }
 
-    // --- Methods merged from Acoustics2 ---
-
-    public static final double C_AIR_20C = 343.0;
-    public static final double C_WATER = 1480.0;
-
-    public static double speedOfSoundInAir(double tempCelsius) {
-        return 331.3 * Math.sqrt(1 + tempCelsius / 273.15);
+    /**
+     * MIDI note number to frequency.
+     * f = 440 * 2^((n-69)/12)
+     */
+    public static Real midiToFrequency(int midiNote) {
+        return Real.of(440).multiply(Real.of(2).pow(Real.of(midiNote - 69).divide(Real.of(12))));
     }
 
-    public static double pressureToDecibels(double pressure) {
-        return 20 * Math.log10(pressure / 2e-5);
-    }
-
-    public static double closedPipeFrequency(int harmonic, double length, double c) {
-        return (2 * harmonic - 1) * c / (4 * length);
-    }
-
-    public static double openPipeFrequency(int harmonic, double length, double c) {
-        return harmonic * c / (2 * length);
-    }
-
-    public static double beatFrequency(double f1, double f2) {
-        return Math.abs(f1 - f2);
-    }
-
-    public static double midiToFrequency(int midiNote) {
-        return 440.0 * Math.pow(2, (midiNote - 69) / 12.0);
-    }
-
-    public static int frequencyToMidi(double frequency) {
-        return (int) Math.round(69 + 12 * Math.log(frequency / 440.0) / Math.log(2));
+    /**
+     * Frequency to MIDI note number.
+     * n = 69 + 12 * log₂(f/440)
+     */
+    public static int frequencyToMidi(Real frequency) {
+        // n = 69 + 12 * log(f/440) / log(2)
+        Real ratio = frequency.divide(Real.of(440));
+        Real log2Ratio = ratio.log().divide(Real.LN2);
+        Real result = Real.of(69).add(Real.of(12).multiply(log2Ratio));
+        // Round to nearest integer
+        return (int) Math.round(result.doubleValue());
     }
 }

@@ -1,5 +1,28 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.physics.relativity;
 
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
@@ -10,11 +33,14 @@ import org.jscience.physics.PhysicalConstants;
 
 /**
  * Provides static methods for Relativistic Mechanics calculations.
+ * <p>
  * Supports helper methods for Lorentz factor, Relativistic Energy, etc.
- * 
+ * Uses Real arithmetic for all calculations.
+ * </p>
+ *
  * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 5.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class RelativisticMechanics {
 
@@ -23,68 +49,97 @@ public class RelativisticMechanics {
 
     /**
      * Calculates the Lorentz factor (gamma) given a velocity v.
-     * gamma = 1 / sqrt(1 - v^2/c^2)
-     * 
+     * gamma = 1 / sqrt(1 - v²/c²)
+     *
      * @param v velocity
-     * @return Lorentz factor (dimensionless)
+     * @return Lorentz factor as Real (dimensionless)
      */
-    public static double lorentzFactor(Quantity<Velocity> v) {
-        double vVal = v.to(Units.METER_PER_SECOND).getValue().doubleValue();
-        double c = PhysicalConstants.SPEED_OF_LIGHT.to(Units.METER_PER_SECOND).getValue().doubleValue();
+    public static Real lorentzFactor(Quantity<Velocity> v) {
+        Real vVal = v.to(Units.METER_PER_SECOND).getValue();
+        Real c = PhysicalConstants.SPEED_OF_LIGHT.to(Units.METER_PER_SECOND).getValue();
 
-        if (vVal >= c) {
+        if (vVal.compareTo(c) >= 0) {
             throw new IllegalArgumentException("Velocity cannot equal or exceed speed of light (c)");
         }
 
-        return 1.0 / Math.sqrt(1.0 - (vVal * vVal) / (c * c));
+        Real betaSq = vVal.multiply(vVal).divide(c.multiply(c));
+        return Real.ONE.divide(Real.ONE.subtract(betaSq).sqrt());
     }
 
     /**
      * Calculates Relativistic Mass.
      * m = gamma * rest_mass
-     * 
+     *
      * @param restMass rest mass
      * @param v        velocity
      * @return relativistic mass
      */
     public static Quantity<Mass> relativisticMass(Quantity<Mass> restMass, Quantity<Velocity> v) {
-        double gamma = lorentzFactor(v);
+        Real gamma = lorentzFactor(v);
         return restMass.multiply(gamma);
     }
 
     /**
      * Calculates Total Relativistic Energy.
-     * E = m * c^2 (where m is relativistic mass)
-     * Or E = gamma * m0 * c^2
-     * 
+     * E = gamma * m₀ * c²
+     *
      * @param restMass rest mass
      * @param v        velocity
      * @return Total Energy
      */
     public static Quantity<Energy> totalEnergy(Quantity<Mass> restMass, Quantity<Velocity> v) {
-        Quantity<Mass> mRel = relativisticMass(restMass, v);
-        double c = PhysicalConstants.SPEED_OF_LIGHT.to(Units.METER_PER_SECOND).getValue().doubleValue();
+        Real gamma = lorentzFactor(v);
+        Real m0 = restMass.to(Units.KILOGRAM).getValue();
+        Real c = PhysicalConstants.SPEED_OF_LIGHT.to(Units.METER_PER_SECOND).getValue();
+        Real cSquared = c.multiply(c);
 
-        // E = m * c^2
-        // kg * (m/s)^2 = J
-        double energyVal = mRel.to(Units.KILOGRAM).getValue().doubleValue() * c * c;
+        // E = gamma * m0 * c²
+        Real energyVal = gamma.multiply(m0).multiply(cSquared);
         return Quantities.create(energyVal, Units.JOULE);
     }
 
     /**
      * Calculates Kinetic Energy.
-     * KE = (gamma - 1) * m0 * c^2
-     * 
+     * KE = (gamma - 1) * m₀ * c²
+     *
      * @param restMass rest mass
      * @param v        velocity
      * @return Kinetic Energy
      */
     public static Quantity<Energy> kineticEnergy(Quantity<Mass> restMass, Quantity<Velocity> v) {
-        double gamma = lorentzFactor(v);
-        double c = PhysicalConstants.SPEED_OF_LIGHT.to(Units.METER_PER_SECOND).getValue().doubleValue();
-        double m0 = restMass.to(Units.KILOGRAM).getValue().doubleValue();
+        Real gamma = lorentzFactor(v);
+        Real m0 = restMass.to(Units.KILOGRAM).getValue();
+        Real c = PhysicalConstants.SPEED_OF_LIGHT.to(Units.METER_PER_SECOND).getValue();
+        Real cSquared = c.multiply(c);
 
-        double keVal = (gamma - 1.0) * m0 * c * c;
+        Real keVal = gamma.subtract(Real.ONE).multiply(m0).multiply(cSquared);
         return Quantities.create(keVal, Units.JOULE);
+    }
+
+    /**
+     * Rest energy: E₀ = m₀c²
+     *
+     * @param restMass rest mass
+     * @return rest energy
+     */
+    public static Quantity<Energy> restEnergy(Quantity<Mass> restMass) {
+        Real m0 = restMass.to(Units.KILOGRAM).getValue();
+        Real c = PhysicalConstants.SPEED_OF_LIGHT.to(Units.METER_PER_SECOND).getValue();
+        Real cSquared = c.multiply(c);
+        return Quantities.create(m0.multiply(cSquared), Units.JOULE);
+    }
+
+    /**
+     * Relativistic momentum: p = gamma * m₀ * v
+     *
+     * @param restMass rest mass
+     * @param v        velocity
+     * @return momentum (kg·m/s)
+     */
+    public static Real relativisticMomentum(Quantity<Mass> restMass, Quantity<Velocity> v) {
+        Real gamma = lorentzFactor(v);
+        Real m0 = restMass.to(Units.KILOGRAM).getValue();
+        Real vVal = v.to(Units.METER_PER_SECOND).getValue();
+        return gamma.multiply(m0).multiply(vVal);
     }
 }

@@ -1,16 +1,39 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.mathematics.linearalgebra.vectors;
 
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.vectors.storage.*;
 import org.jscience.mathematics.structures.rings.Field;
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * Factory for creating vectors with specific storage layouts.
  * 
  * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 5.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public final class VectorFactory {
 
@@ -28,16 +51,34 @@ public final class VectorFactory {
     }
 
     /**
+     * Creates a vector from varargs elements.
+     * Convenience method for Real vectors.
+     * 
+     * @param elementClass the class of elements (e.g., Real.class)
+     * @param elements     the elements of the vector
+     * @return a new Vector instance
+     */
+    @SuppressWarnings("unchecked")
+    @SafeVarargs
+    public static <E> Vector<E> of(Class<E> elementClass, E... elements) {
+        List<E> list = Arrays.asList(elements);
+        if (elementClass == org.jscience.mathematics.numbers.real.Real.class) {
+            return create(list, (Field<E>) org.jscience.mathematics.numbers.real.Real.ZERO);
+        }
+        throw new UnsupportedOperationException("of() only supports Real.class currently");
+    }
+
+    /**
      * Creates a vector with automatic storage selection (AUTO).
      */
     public static <E> Vector<E> create(List<E> data, Field<E> field) {
         return create(data, field, Storage.AUTO);
     }
 
+    /**
+     * Automatic storage selection based on density.
+     */
     public static <E> VectorStorage<E> createAutomaticStorage(List<E> data, Field<E> field) {
-        // Re-use logic or call existing create
-        // But create returns Vector, we need VectorStorage.
-        // Let's implement logic here properly.
         int dim = data.size();
         int nonZero = 0;
         E zero = field.zero();
@@ -60,14 +101,12 @@ public final class VectorFactory {
 
         switch (storageType) {
             case AUTO:
-                // Simple heuristic: check density
                 int nonZero = 0;
                 E zero = field.zero();
                 for (E val : data) {
                     if (!val.equals(zero))
                         nonZero++;
                 }
-                // If density < 0.2, use Sparse
                 if (dim > 0 && (double) nonZero / dim < 0.2) {
                     return create(data, field, Storage.SPARSE);
                 } else {
@@ -75,21 +114,9 @@ public final class VectorFactory {
                 }
 
             case DENSE:
-                // Check for RealDouble optimization
-                boolean isReal = (dim > 0 && data.get(0) instanceof org.jscience.mathematics.numbers.real.Real);
-
-                if (isReal) {
-                    // We will implement RealDoubleVector later in the parity steps.
-                    // For now, return DenseVector, but note that DenseVector is being updated to
-                    // support RealDoubleVectorStorage soon.
-                    // Actually, if we want full parity, we should support it here once available.
-                    // Leaving as standard DenseVector for now, consistent with current DenseVector
-                    // state.
-                }
                 return DenseVector.of(data, field);
 
             case SPARSE:
-                // SparseVector
                 SparseVector<E> sv = new SparseVector<>(dim, field);
                 E z = field.zero();
                 for (int i = 0; i < dim; i++) {
@@ -105,8 +132,6 @@ public final class VectorFactory {
         }
     }
 
-    // --- Helper methods for Constructors (Parity with MatrixFactory) ---
-
     public static <E> VectorStorage<E> createDenseStorage(List<E> data, Field<E> field) {
         int dim = data.size();
         boolean isReal = (dim > 0 && data.get(0) instanceof org.jscience.mathematics.numbers.real.Real);
@@ -121,7 +146,6 @@ public final class VectorFactory {
             return res;
         }
 
-        // Generic Dense Storage
         DenseVectorStorage<E> storage = new DenseVectorStorage<>(dim);
         for (int i = 0; i < dim; i++) {
             storage.set(i, data.get(i));

@@ -1,22 +1,47 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.physics.nuclear;
 
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Fission and fusion calculations.
+ * * @author Silvere Martin-Michiellot
  * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 5.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class FissionFusion {
 
     /** MeV to Joules conversion */
     private static final Real MEV_TO_JOULES = Real.of(1.602176634e-13);
 
+    /** Speed of light (m/s) */
+    private static final Real C = Real.of(299792458);
+
     /** Speed of light squared (m²/s²) */
     @SuppressWarnings("unused")
-    private static final Real C_SQUARED = Real.of(299792458.0 * 299792458.0);
+    private static final Real C_SQUARED = C.pow(2);
 
     // ==================== FISSION ====================
 
@@ -60,10 +85,13 @@ public class FissionFusion {
 
         // r_c ≈ π * L / sqrt(k - 1) where k = ν*σ_f/(σ_a)
         Real kEffMinusOne = nuMinusOne.multiply(Real.of(0.9)); // Simplified
-        Real criticalRadius = Real.of(Math.PI).multiply(diffusionLength)
+        Real criticalRadius = Real.PI.multiply(diffusionLength)
                 .divide(kEffMinusOne.sqrt());
 
-        Real volume = Real.of(4.0 / 3.0 * Math.PI).multiply(criticalRadius.pow(3));
+        /** 4/3 as Real */
+        Real fourThirds = Real.of(4).divide(Real.of(3));
+
+        Real volume = fourThirds.multiply(Real.PI).multiply(criticalRadius.pow(3));
         return density.multiply(volume);
     }
 

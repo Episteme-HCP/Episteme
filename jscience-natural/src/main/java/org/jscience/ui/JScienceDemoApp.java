@@ -1,172 +1,149 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.ui;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+
+import javafx.scene.control.TitledPane;
+
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import org.jscience.chemistry.Molecule;
-import org.jscience.chemistry.loaders.ChemistryDataLoader;
-import org.jscience.physics.astronomy.SolarSystemLoader;
-import org.jscience.physics.astronomy.StarSystem;
 import org.jscience.ui.chemistry.MolecularViewer;
 import org.jscience.ui.chemistry.PeriodicTableViewer;
 import org.jscience.ui.physics.astronomy.StarSystemViewer;
+import org.jscience.ui.physics.thermodynamics.ThermodynamicsViewer;
+import org.jscience.ui.mathematics.fractals.MandelbrotViewer;
+import org.jscience.ui.biology.lsystems.LSystemViewer;
+import org.jscience.ui.biology.phylogeny.PhylogeneticTreeViewer;
+import org.jscience.ui.mathematics.statistics.GaltonBoardViewer;
+import org.jscience.ui.physics.mechanics.MechanicsViewer;
+import org.jscience.ui.physics.fluids.FluidDynamicsViewer;
+import org.jscience.ui.engineering.components.ResistorColorCodeViewer;
+import org.jscience.ui.engineering.circuits.LogicGateSimulator;
+import org.jscience.ui.computing.GameOfLifeViewer;
+import org.jscience.ui.engineering.instruments.OscilloscopeViewer;
 
 /**
- * Unified JScience Demo Application.
- * <p>
- * Provides a tabbed interface to explore all JScience visualization panels.
- * Each panel demonstrates actual JScience functionality using real data.
- * </p>
+ * JScience Master Demo Launcher.
+ * Central hub to launch all scientific demos.
  * 
  * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 5.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class JScienceDemoApp extends Application {
 
-    @Override
-    public void start(Stage primaryStage) {
-        // Initialize chemistry data
-        ChemistryDataLoader.loadElements();
+        @Override
+        public void start(Stage primaryStage) {
+                VBox root = new VBox(20);
+                root.setPadding(new Insets(20));
+                root.setAlignment(Pos.TOP_CENTER);
 
-        TabPane tabPane = new TabPane();
-        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+                Label title = new Label("JScience Demonstration Suite");
+                title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
-        // Chemistry Tab
-        Tab chemistryTab = new Tab("Chemistry");
-        VBox chemistryPane = new VBox(15);
-        chemistryPane.setPadding(new Insets(15));
-        chemistryPane.getChildren().addAll(
-                new Label("Interactive Periodic Table"),
-                createLaunchButton("Periodic Table", this::launchPeriodicTable),
-                new Separator(),
-                new Label("Molecular Viewer - Water (H₂O)"),
-                createLaunchButton("Water Molecule", () -> launchMolecule(ChemistryDataLoader.getMolecule("Water"))),
-                new Separator(),
-                new Label("Molecular Viewer - Methane (CH₄)"),
-                createLaunchButton("Methane Molecule",
-                        () -> launchMolecule(ChemistryDataLoader.getMolecule("Methane"))));
-        chemistryTab.setContent(new ScrollPane(chemistryPane));
+                VBox content = new VBox(15);
+                content.getChildren().addAll(
+                                createSection("Astronomy",
+                                                createLauncher("Star System Viewer",
+                                                                () -> new StarSystemViewer().display(new Stage(),
+                                                                                null))),
+                                createSection("Chemistry",
+                                                createLauncher("Molecular Viewer",
+                                                                () -> MolecularViewer.show(new Stage())),
+                                                createLauncher("Periodic Table",
+                                                                () -> PeriodicTableViewer.show(new Stage()))),
+                                createSection("Physics",
+                                                createLauncher("Thermodynamics Viewer",
+                                                                () -> new ThermodynamicsViewer().start(new Stage())),
+                                                createLauncher("Mechanics (Mass-Spring)",
+                                                                () -> MechanicsViewer.show(new Stage())),
+                                                createLauncher("Fluid Dynamics",
+                                                                () -> FluidDynamicsViewer.show(new Stage())),
+                                                createLauncher("Oscilloscope",
+                                                                () -> OscilloscopeViewer.show(new Stage()))),
+                                createSection("Biology",
+                                                createLauncher("Phylogenetic Tree Viewer",
+                                                                () -> PhylogeneticTreeViewer.show(new Stage()))),
+                                createSection("Mathematics & Statistics",
+                                                createLauncher("Mandelbrot Fractal",
+                                                                () -> MandelbrotViewer.show(new Stage())),
+                                                createLauncher("L-Systems Viewer",
+                                                                () -> LSystemViewer.show(new Stage())),
+                                                createLauncher("Galton Board (Stats)",
+                                                                () -> GaltonBoardViewer.show(new Stage())),
+                                                createLauncher("Matrix Viewer",
+                                                                () -> MatrixViewerDemo.show(new Stage()))),
+                                createSection("Electronics & Circuits",
+                                                createLauncher("Logic Gate Simulator",
+                                                                () -> LogicGateSimulator.show(new Stage())),
+                                                createLauncher("Resistor Color Code",
+                                                                () -> ResistorColorCodeViewer.show(new Stage()))),
+                                createSection("Computing",
+                                                createLauncher("Game of Life",
+                                                                () -> GameOfLifeViewer.show(new Stage()))));
 
-        // Astronomy Tab
-        Tab astronomyTab = new Tab("Astronomy");
-        VBox astronomyPane = new VBox(15);
-        astronomyPane.setPadding(new Insets(15));
-        astronomyPane.getChildren().addAll(
-                new Label("Solar System - 3D Interactive View"),
-                createLaunchButton("Solar System", this::launchSolarSystem));
-        astronomyTab.setContent(astronomyPane);
+                // Discover additional demos
+                java.util.ServiceLoader<DemoProvider> loader = java.util.ServiceLoader.load(DemoProvider.class);
+                for (DemoProvider provider : loader) {
+                        content.getChildren().add(createSection(provider.getCategory(),
+                                        createLauncher(provider.getName(), () -> provider.show(new Stage()))));
+                }
 
-        // Thermodynamics Tab
-        Tab thermoTab = new Tab("Thermodynamics");
-        VBox thermoPane = new VBox(15);
-        thermoPane.setPadding(new Insets(15));
-        thermoPane.getChildren().addAll(
-                new Label("Thermodynamics Dashboard - Ideal Gas PV Diagram"),
-                createLaunchButton("Dashboard", this::launchThermodynamics));
-        thermoTab.setContent(thermoPane);
+                ScrollPane scroll = new ScrollPane(content);
+                scroll.setFitToWidth(true);
+                root.getChildren().addAll(title, scroll);
 
-        // Electronics Tab
-        Tab electronicsTab = new Tab("Electronics");
-        VBox electronicsPane = new VBox(15);
-        electronicsPane.setPadding(new Insets(15));
-        electronicsPane.getChildren().addAll(
-                new Label("Oscilloscope - Signal Generator"),
-                createLaunchButton("Oscilloscope", this::launchOscilloscope));
-        electronicsTab.setContent(electronicsPane);
-
-        tabPane.getTabs().addAll(chemistryTab, astronomyTab, thermoTab, electronicsTab);
-
-        BorderPane root = new BorderPane();
-        root.setCenter(tabPane);
-
-        Label footer = new Label("JScience Demo Application v5.0 - Using Real Scientific Data");
-        footer.setStyle("-fx-padding: 8px; -fx-background-color: #2d3436; -fx-text-fill: white;");
-        root.setBottom(footer);
-
-        Scene scene = new Scene(root, 600, 400);
-        primaryStage.setTitle("JScience Demo Application");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
-
-    private Button createLaunchButton(String text, Runnable action) {
-        Button btn = new Button("Launch " + text);
-        btn.setStyle("-fx-background-color: #0984e3; -fx-text-fill: white; -fx-padding: 8 16;");
-        btn.setOnAction(e -> action.run());
-        return btn;
-    }
-
-    private void launchPeriodicTable() {
-        try {
-            Stage stage = new Stage();
-            PeriodicTableViewer viewer = new PeriodicTableViewer();
-            viewer.start(stage);
-        } catch (Exception e) {
-            showError("Periodic Table", e);
+                Scene scene = new Scene(root, 600, 800);
+                primaryStage.setTitle("JScience Master Demo");
+                primaryStage.setScene(scene);
+                primaryStage.show();
         }
-    }
 
-    private void launchMolecule(Molecule mol) {
-        try {
-            Stage stage = new Stage();
-            MolecularViewer viewer = new MolecularViewer(mol);
-
-            BorderPane root = new BorderPane();
-            root.setCenter(viewer.getView3D(600, 400));
-
-            Scene scene = new Scene(root, 600, 400, true);
-            scene.setFill(javafx.scene.paint.Color.DARKGRAY);
-            stage.setTitle("Molecular Viewer: " + mol.getName());
-            stage.setScene(scene);
-            stage.show();
-        } catch (Exception e) {
-            showError("Molecular Viewer", e);
+        private TitledPane createSection(String title, javafx.scene.Node... nodes) {
+                VBox box = new VBox(10, nodes);
+                box.setPadding(new Insets(10));
+                TitledPane pane = new TitledPane(title, box);
+                pane.setCollapsible(true);
+                pane.setExpanded(true);
+                return pane;
         }
-    }
 
-    private void launchSolarSystem() {
-        try {
-            Stage stage = new Stage();
-            StarSystem system = SolarSystemLoader.load("/org/jscience/astronomy/solarsystem.json");
-            StarSystemViewer.show(stage, system);
-        } catch (Exception e) {
-            showError("Solar System", e);
+        private Button createLauncher(String name, Runnable action) {
+                Button btn = new Button(name);
+                btn.setMaxWidth(Double.MAX_VALUE);
+                btn.setOnAction(e -> action.run());
+                return btn;
         }
-    }
 
-    private void launchThermodynamics() {
-        try {
-            Stage stage = new Stage();
-            new org.jscience.ui.physics.thermodynamics.ThermodynamicsDashboard().start(stage);
-        } catch (Exception e) {
-            showError("Thermodynamics Dashboard", e);
+        public static void main(String[] args) {
+                launch(args);
         }
-    }
-
-    private void launchOscilloscope() {
-        try {
-            Stage stage = new Stage();
-            new org.jscience.ui.physics.electronics.OscilloscopeViewer().start(stage);
-        } catch (Exception e) {
-            showError("Oscilloscope", e);
-        }
-    }
-
-    private void showError(String component, Exception e) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText("Failed to launch " + component);
-        alert.setContentText(e.getMessage());
-        alert.showAndWait();
-        e.printStackTrace();
-    }
-
-    public static void main(String[] args) {
-        launch(args);
-    }
 }

@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.mathematics.analysis.fem;
 
@@ -36,13 +36,8 @@ import org.jscience.mathematics.analysis.Function;
  * <p>
  * Currently supports solving the Poisson equation: -div(grad u) = f.
  * </p>
- * 
- * @author Silvere Martin-Michiellot
+ * * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @see <a href=
- *      "https://www.amazon.com/Finite-Element-Method-Linear-Dynamic/dp/0486411818">Hughes,
- *      T.J.R. (2000). The Finite Element Method: Linear Static and Dynamic
- *      Finite Element Analysis. Dover Publications.</a>
  * @since 1.0
  */
 public class FEMSolver {

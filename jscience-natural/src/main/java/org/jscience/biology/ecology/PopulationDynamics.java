@@ -1,5 +1,28 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.biology.ecology;
 
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
@@ -20,15 +43,15 @@ import org.jscience.measure.quantity.Time;
  * </p>
  * 
  * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 2.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class PopulationDynamics {
 
     private PopulationDynamics() {
     }
 
-    // === Quantity Overloads ===
+    // === Exponential Growth ===
 
     /**
      * Exponential growth model using Quantities.
@@ -36,12 +59,38 @@ public class PopulationDynamics {
      */
     public static Quantity<Dimensionless> exponentialGrowth(Quantity<Dimensionless> p0, Quantity<Frequency> r,
             Quantity<Time> t) {
-        double p0Val = p0.to(Units.ONE).getValue().doubleValue();
-        double rVal = r.to(Units.HERTZ).getValue().doubleValue(); // 1/s
-        double tVal = t.to(Units.SECOND).getValue().doubleValue(); // s
-        double result = exponentialGrowth(p0Val, rVal, tVal);
-        return Quantities.create(result, Units.ONE);
+        Real p0Val = Real.of(p0.to(Units.ONE).getValue().doubleValue());
+        Real rVal = Real.of(r.to(Units.HERTZ).getValue().doubleValue());
+        Real tVal = Real.of(t.to(Units.SECOND).getValue().doubleValue());
+        Real result = exponentialGrowth(p0Val, rVal, tVal);
+        return Quantities.create(result.doubleValue(), Units.ONE);
     }
+
+    /**
+     * Exponential growth model (Malthusian).
+     * P(t) = P0 * e^(rt)
+     */
+    public static Real exponentialGrowth(Real p0, Real r, Real t) {
+        return p0.multiply(r.multiply(t).exp());
+    }
+
+    /**
+     * Exponential growth rate calculation.
+     * r = ln(Nt/N0) / t
+     */
+    public static Real calculateGrowthRate(Real n0, Real nt, Real time) {
+        return nt.divide(n0).log().divide(time);
+    }
+
+    /**
+     * Doubling time for exponential growth.
+     * td = ln(2) / r
+     */
+    public static Real doublingTime(Real growthRate) {
+        return Real.LN2.divide(growthRate);
+    }
+
+    // === Logistic Growth ===
 
     /**
      * Logistic growth model using Quantities.
@@ -49,76 +98,37 @@ public class PopulationDynamics {
      */
     public static Quantity<Dimensionless> logisticGrowth(Quantity<Dimensionless> p0, Quantity<Frequency> r,
             Quantity<Dimensionless> K, Quantity<Time> t) {
-        double p0Val = p0.to(Units.ONE).getValue().doubleValue();
-        double rVal = r.to(Units.HERTZ).getValue().doubleValue();
-        double kVal = K.to(Units.ONE).getValue().doubleValue();
-        double tVal = t.to(Units.SECOND).getValue().doubleValue();
-
-        double result = logisticGrowth(p0Val, rVal, kVal, tVal);
-        return Quantities.create(result, Units.ONE);
+        Real p0Val = Real.of(p0.to(Units.ONE).getValue().doubleValue());
+        Real rVal = Real.of(r.to(Units.HERTZ).getValue().doubleValue());
+        Real kVal = Real.of(K.to(Units.ONE).getValue().doubleValue());
+        Real tVal = Real.of(t.to(Units.SECOND).getValue().doubleValue());
+        Real result = logisticGrowth(p0Val, rVal, kVal, tVal);
+        return Quantities.create(result.doubleValue(), Units.ONE);
     }
-
-    // === Exponential Growth ===
-
-    /**
-     * Exponential growth model (Malthusian).
-     * P(t) = P0 * e^(rt)
-     * 
-     * @param p0 Initial population
-     * @param r  Growth rate
-     * @param t  Time
-     * @return Population at time t
-     */
-    public static double exponentialGrowth(double p0, double r, double t) {
-        return p0 * Math.exp(r * t);
-    }
-
-    /**
-     * Exponential growth rate calculation.
-     * r = ln(Nt/N0) / t
-     */
-    public static double calculateGrowthRate(double n0, double nt, double time) {
-        return Math.log(nt / n0) / time;
-    }
-
-    /**
-     * Doubling time for exponential growth.
-     * td = ln(2) / r
-     */
-    public static double doublingTime(double growthRate) {
-        return Math.log(2) / growthRate;
-    }
-
-    // === Logistic Growth ===
 
     /**
      * Logistic growth model.
      * P(t) = K / (1 + ((K - P0)/P0) * e^(-rt))
-     * 
-     * @param p0 Initial population
-     * @param r  Growth rate
-     * @param K  Carrying capacity
-     * @param t  Time
-     * @return Population at time t
      */
-    public static double logisticGrowth(double p0, double r, double K, double t) {
-        return K / (1 + ((K - p0) / p0) * Math.exp(-r * t));
+    public static Real logisticGrowth(Real p0, Real r, Real K, Real t) {
+        Real factor = K.subtract(p0).divide(p0).multiply(r.negate().multiply(t).exp());
+        return K.divide(Real.ONE.add(factor));
     }
 
     /**
      * Logistic growth rate at population N.
      * dN/dt = rN(1 - N/K)
      */
-    public static double logisticGrowthRate(double n, double k, double r) {
-        return r * n * (1 - n / k);
+    public static Real logisticGrowthRate(Real n, Real k, Real r) {
+        return r.multiply(n).multiply(Real.ONE.subtract(n.divide(k)));
     }
 
     /**
      * Inflection point of logistic curve (maximum growth rate).
      * Occurs at N = K/2
      */
-    public static double inflectionPoint(double k) {
-        return k / 2;
+    public static Real inflectionPoint(Real k) {
+        return k.divide(Real.TWO);
     }
 
     // === Lotka-Volterra Predator-Prey ===
@@ -136,31 +146,31 @@ public class PopulationDynamics {
      * @param gamma    Predator death rate
      * @param timeStep dt
      * @param steps    Number of steps to simulate
-     * @return [steps][2] array where [i][0] is prey, [i][1] is predator
+     * @return Real[][] where column 0 is prey, column 1 is predator (rows = steps)
      */
-    public static double[][] lotkaVolterra(double prey, double predator,
-            double alpha, double beta,
-            double delta, double gamma,
-            double timeStep, int steps) {
-        double[][] result = new double[steps][2];
-        double x = prey;
-        double y = predator;
+    public static Real[][] lotkaVolterra(Real prey, Real predator,
+            Real alpha, Real beta,
+            Real delta, Real gamma,
+            Real timeStep, int steps) {
+        Real[][] result = new Real[steps][2];
+        Real x = prey;
+        Real y = predator;
 
         for (int i = 0; i < steps; i++) {
             result[i][0] = x;
             result[i][1] = y;
 
-            double dx = (alpha * x - beta * x * y) * timeStep;
-            double dy = (delta * x * y - gamma * y) * timeStep;
+            Real dx = alpha.multiply(x).subtract(beta.multiply(x).multiply(y)).multiply(timeStep);
+            Real dy = delta.multiply(x).multiply(y).subtract(gamma.multiply(y)).multiply(timeStep);
 
-            x += dx;
-            y += dy;
+            x = x.add(dx);
+            y = y.add(dy);
 
             // Prevent negative populations
-            if (x < 0)
-                x = 0;
-            if (y < 0)
-                y = 0;
+            if (x.compareTo(Real.ZERO) < 0)
+                x = Real.ZERO;
+            if (y.compareTo(Real.ZERO) < 0)
+                y = Real.ZERO;
         }
 
         return result;
@@ -170,16 +180,16 @@ public class PopulationDynamics {
      * Lotka-Volterra equilibrium - prey population.
      * N* = gamma/delta
      */
-    public static double preyEquilibrium(double gamma, double delta) {
-        return gamma / delta;
+    public static Real preyEquilibrium(Real gamma, Real delta) {
+        return gamma.divide(delta);
     }
 
     /**
      * Lotka-Volterra equilibrium - predator population.
      * P* = alpha/beta
      */
-    public static double predatorEquilibrium(double alpha, double beta) {
-        return alpha / beta;
+    public static Real predatorEquilibrium(Real alpha, Real beta) {
+        return alpha.divide(beta);
     }
 
     // === Competition ===
@@ -187,28 +197,17 @@ public class PopulationDynamics {
     /**
      * Competitive exclusion - Lotka-Volterra competition.
      * dN1/dt = r1*N1 * (K1 - N1 - alpha12*N2) / K1
-     * 
-     * @param n1      species 1 population
-     * @param n2      species 2 population
-     * @param r1      growth rate of species 1
-     * @param k1      carrying capacity of species 1
-     * @param alpha12 competition coefficient (effect of N2 on N1)
-     * @return growth rate of species 1
      */
-    public static double competitionGrowthRate(double n1, double n2, double r1, double k1, double alpha12) {
-        return r1 * n1 * (k1 - n1 - alpha12 * n2) / k1;
+    public static Real competitionGrowthRate(Real n1, Real n2, Real r1, Real k1, Real alpha12) {
+        Real numerator = k1.subtract(n1).subtract(alpha12.multiply(n2));
+        return r1.multiply(n1).multiply(numerator).divide(k1);
     }
 
     /**
      * Allee effect - reduced growth at low density.
      * dN/dt = rN(N/A - 1)(1 - N/K)
-     * 
-     * @param n population
-     * @param r growth rate
-     * @param a Allee threshold
-     * @param k carrying capacity
      */
-    public static double alleeEffectGrowthRate(double n, double r, double a, double k) {
-        return r * n * (n / a - 1) * (1 - n / k);
+    public static Real alleeEffectGrowthRate(Real n, Real r, Real a, Real k) {
+        return r.multiply(n).multiply(n.divide(a).subtract(Real.ONE)).multiply(Real.ONE.subtract(n.divide(k)));
     }
 }

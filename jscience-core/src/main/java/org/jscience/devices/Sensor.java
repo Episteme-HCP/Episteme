@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.devices;
 
@@ -27,10 +27,9 @@ import java.io.IOException;
 /**
  * Represents a sensor device that produces data.
  *
- * @param <D> the type of data produced by the sensor
- * @author Silvere Martin-Michiellot
+ * @param <D> the type of data produced by the sensor * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 5.0
+ * @since 1.0
  */
 public interface Sensor<D> extends Device {
 

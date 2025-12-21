@@ -1,3 +1,25 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.mathematics.linearalgebra.matrices;
 
 import org.jscience.mathematics.linearalgebra.Matrix;
@@ -8,10 +30,10 @@ import java.util.ArrayList;
 
 /**
  * Factory for creating matrices with specific storage layouts.
+ * * @author Silvere Martin-Michiellot
  * 
- * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 5.0
+ * @since 1.0
  */
 public final class MatrixFactory {
 
@@ -49,6 +71,29 @@ public final class MatrixFactory {
         }
         DiagonalMatrixStorage<E> storage = new DiagonalMatrixStorage<>(diag, field);
         return new GenericMatrix<>(storage, getProvider(field), field);
+    }
+
+    /**
+     * Creates a zero-initialized dense matrix of the specified dimensions.
+     * Convenience method for Real matrices.
+     * 
+     * @param elementClass the class of elements (e.g., Real.class)
+     * @param rows         number of rows
+     * @param cols         number of columns
+     * @return a new mutable DenseMatrix instance
+     */
+    @SuppressWarnings("unchecked")
+    public static <E> DenseMatrix<E> dense(Class<E> elementClass, int rows, int cols) {
+        if (elementClass == org.jscience.mathematics.numbers.real.Real.class) {
+            org.jscience.mathematics.numbers.real.Real[][] data = new org.jscience.mathematics.numbers.real.Real[rows][cols];
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    data[i][j] = org.jscience.mathematics.numbers.real.Real.ZERO;
+                }
+            }
+            return (DenseMatrix<E>) DenseMatrix.of(data, org.jscience.mathematics.numbers.real.Real.ZERO);
+        }
+        throw new UnsupportedOperationException("dense() only supports Real.class currently");
     }
 
     /**

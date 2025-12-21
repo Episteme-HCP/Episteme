@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.mathematics.statistics.distributions;
 
@@ -30,10 +30,9 @@ import org.jscience.mathematics.statistics.ContinuousDistribution;
  * <p>
  * PDF: f(x) = (1/(σ√(2π))) exp(-(x-μ)²/(2σ²))
  * </p>
- * 
- * @author Silvere Martin-Michiellot
+ * * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 2.0
+ * @since 1.0
  */
 public class NormalDistribution extends ContinuousDistribution {
 
@@ -82,5 +81,3 @@ public class NormalDistribution extends ContinuousDistribution {
         return String.format("N(μ=%.4f, σ=%.4f)", mean.doubleValue(), stdDev.doubleValue());
     }
 }
-
-

@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.mathematics.statistics.distributions;
 
@@ -28,7 +28,10 @@ import org.jscience.mathematics.statistics.ContinuousDistribution;
 /**
  * Cauchy distribution (also called Lorentz distribution).
  * PDF: f(x) = 1/(πγ[1 + ((x-x₀)/γ)²])
- * Has no defined mean or variance.
+ * Has no defined mean or variance. * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ 
  */
 public class CauchyDistribution extends ContinuousDistribution {
     private final Real location; // x₀
@@ -73,5 +76,3 @@ public class CauchyDistribution extends ContinuousDistribution {
         return String.format("Cauchy(x₀=%.4f, γ=%.4f)", location.doubleValue(), scale.doubleValue());
     }
 }
-
-

@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.mathematics.analysis.series;
 
@@ -82,8 +82,7 @@ import java.math.BigInteger;
  * <li>Bell, E. T. (1934). "Exponential polynomials"</li>
  * <li>Comtet, L. (1974). "Advanced Combinatorics"</li>
  * </ul>
- * 
- * @author Silvere Martin-Michiellot
+ * * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -208,4 +207,3 @@ public class BellSequence implements IntegerSequence {
         return "BellSequence(A000110): 1, 1, 2, 5, 15, 52, 203, 877, 4140, ...";
     }
 }
-

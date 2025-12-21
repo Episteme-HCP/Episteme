@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.mathematics.analysis.chaos;
 
@@ -58,8 +58,7 @@ import java.util.List;
  * Punktmannigfaltigkeiten"</li>
  * <li>Mandelbrot, B. (1982). "The Fractal Geometry of Nature"</li>
  * </ul>
- * 
- * @author Silvere Martin-Michiellot
+ * * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -212,4 +211,3 @@ public class CantorDust {
         cantorSet1DRecursive(start.add(third.multiply(Real.of(2))), end, depth - 1, intervals);
     }
 }
-

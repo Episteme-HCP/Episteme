@@ -1,8 +1,8 @@
 # JScience Reimagined - Architecture
 
-**Version**: 1.0.0-SNAPSHOT  
-**Status**: Foundation Phase  
-**Date**: 2025-11-24
+**Version**: 2.0.0-SNAPSHOT  
+**Status**: Multi-Module Refactoring Complete  
+**Date**: 2025-12-21
 
 ---
 
@@ -21,7 +21,9 @@ Each layer automatically inherits capabilities from layers below, enabling domai
 ## Design Principles
 
 ### 1. **Scientific Hierarchy**
+
 Respect the natural dependencies between sciences:
+
 - Mathematics provides foundational structures
 - Physics builds on mathematical models
 - Chemistry uses physics (quantum + classical)
@@ -29,19 +31,23 @@ Respect the natural dependencies between sciences:
 - Human sciences incorporate biological and social models
 
 ### 2. **Flexible Precision**
+
 Support multiple numeric types without code changes:
+
 - `DoubleScalar` - Fast, default (15 digits)
 - `FloatScalar` - GPU-friendly (7 digits)  
 - `IntScalar` - Discrete mathematics (ℤ)
 - `ExactScalar` - Arbitrary precision (BigDecimal)
 
 ### 3. **Performance First**
+
 - Primitives by default (doubles, not objects)
 - Zero-cost abstractions (JIT eliminates generics overhead)
 - Dynamic backend selection (Java/BLAS/CUDA)
 - Memory pooling to minimize GC pressure
 
 ### 4. **Ease of Use**
+
 - Domain scientists work at their layer
 - Automatic access to lower layers
 - Type-safe generic algorithms
@@ -54,6 +60,7 @@ Support multiple numeric types without code changes:
 ### Layer 1: Mathematics (Current Implementation)
 
 **Algebraic Structures** (`org.jscience.mathematics.algebra`):
+
 ```
 Set (membership) 
   ↓ binary operation
@@ -69,6 +76,7 @@ Field
 ```
 
 **Scalar Types** (`org.jscience.mathematics.scalar`):
+
 - **ScalarType<T>**: Generic arithmetic interface
 - **DoubleScalar**: 64-bit floating point (ℝ approximation)
 - **FloatScalar**: 32-bit floating point (GPU-optimized)
@@ -76,6 +84,7 @@ Field
 - **ExactScalar**: Arbitrary precision (ℚ or ℝ)
 
 **Linear Algebra** (Planned):
+
 - Generic Matrix<T, S>
 - Dynamic optimization (sparse/dense/triangular)
 - Backend abstraction (Java/BLAS/CUDA)
@@ -83,21 +92,25 @@ Field
 ### Layer 2: Physics (Planned)
 
 **Classical Mechanics**:
+
 - Particle<T> (position, velocity, mass)
 - RigidBody<T> (orientation, angular momentum)
 - Force fields and potentials
 
 **Thermodynamics**:
+
 - Temperature, pressure, entropy
 - Ideal gas law
 - Heat transfer
 
 **Electromagnetism**:
+
 - Electric/magnetic fields
 - Maxwell's equations
 - Electromagnetic waves
 
 **Quantum Mechanics**:
+
 - Wave functions
 - Operators and observables
 - Time evolution
@@ -130,11 +143,13 @@ Field
 ### Philosophical Distinction
 
 **Discrete Types** (ℤ, ℕ - countable):
+
 - `IntScalar`: ℤ/2³²ℤ - Forms a ring with modular arithmetic
 - `LongScalar`: ℤ/2⁶⁴ℤ - Larger integer range
 - Use for: combinatorics, graph algorithms, discrete math
 
 **Continuous Types** (ℝ, ℂ - uncountable):
+
 - `DoubleScalar`: ℝ approximation - Forms a field (with rounding)
 - `FloatScalar`: ℝ approximation - GPU-friendly
 - `ExactScalar`: ℚ or ℝ - Configurable precision
@@ -190,6 +205,7 @@ Backend Interface
 ```
 
 Automatic selection based on:
+
 - Hardware availability
 - Problem size
 - Data type (float vs double)
@@ -212,16 +228,19 @@ Quantity<Time> time = distance.divide(speed).asType(Time.class);
 ## Testing Strategy
 
 ### Unit Tests
+
 - Every class has comprehensive tests
 - Property-based testing for algebraic laws
 - Edge cases (zero, negative, overflow)
 
 ### Integration Tests
+
 - Cross-layer integration (DNA → Chemistry → Physics)
 - Performance benchmarks
 - Precision validation (exact vs approximate)
 
 ### Current Coverage
+
 - ✅ DoubleScalar: 13/13 tests passing
 - ✅ Algebraic structures: Compile-time validation
 - 🔜 FloatScalar, IntScalar, ExactScalar tests
@@ -231,11 +250,13 @@ Quantity<Time> time = distance.divide(speed).asType(Time.class);
 ## Internationalization
 
 All user-facing strings in resource bundles:
+
 - Error messages
 - Mathematical terminology
 - Documentation
 
 Supported languages:
+
 - English (default)
 - Français
 - Español (planned)
@@ -246,6 +267,7 @@ Supported languages:
 ## Current Status (2025-11-24)
 
 ### ✅ Completed
+
 - Project structure (Maven + Git)
 - Algebraic hierarchy (Set → Field)
 - Scalar type system (4 implementations)
@@ -254,11 +276,13 @@ Supported languages:
 - i18n (EN, FR)
 
 ### 🚧 In Progress
+
 - Complex number types
 - Additional scalar tests
 - Architecture documentation
 
 ### 📋 Next Steps
+
 1. Complete scalar type suite (LongScalar)
 2. Complex<T> implementation
 3. Vector<T> and Matrix<T> interfaces
@@ -282,14 +306,17 @@ Supported languages:
 ## Dependencies
 
 **Required**:
+
 - Java 21+
 - Maven 3.8+
 
 **Optional**:
+
 - CUDA Toolkit 12.0+ (for GPU support)
 - BLAS/LAPACK (for native optimization)
 
 **External Libraries**:
+
 - JSR-385 (Units API)
 - SLF4J + Logback (logging)
 - JUnit 5 (testing)
@@ -312,9 +339,9 @@ Supported languages:
 - **Algebra**: Dummit & Foote, "Abstract Algebra"
 - **Linear Algebra**: Strang, "Linear Algebra and Its Applications"
 - **Numerical Methods**: Press et al., "Numerical Recipes"
-- **JSR-385**: https://github.com/unitsofmeasurement/unit-api
-- **Original JScience**: http://jscience.org/ (inspiration)
+- **JSR-385**: <https://github.com/unitsofmeasurement/unit-api>
+- **Original JScience**: <http://jscience.org/> (inspiration)
 
 ---
 
-*This architecture document will evolve as the project grows. Last updated: 2025-11-24*
+*This architecture document will evolve as the project grows. Last updated: 2025-12-21*

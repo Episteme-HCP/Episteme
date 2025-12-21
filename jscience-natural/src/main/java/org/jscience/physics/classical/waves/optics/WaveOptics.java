@@ -1,13 +1,35 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.physics.classical.waves.optics;
 
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Utilities for wave optics (diffraction, interference, polarization).
+ * * @author Silvere Martin-Michiellot
  * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 5.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class WaveOptics {
 
@@ -25,13 +47,12 @@ public class WaveOptics {
      * @return Intensity at angle θ
      */
     public static Real singleSlitIntensity(Real theta, Real slitWidth, Real wavelength, Real i0) {
-        if (theta.doubleValue() == 0.0)
+        if (theta.compareTo(Real.ZERO) == 0)
             return i0;
 
-        double PI = Math.PI;
-        Real beta = Real.of(PI).multiply(slitWidth).multiply(theta.sin()).divide(wavelength);
+        Real beta = Real.PI.multiply(slitWidth).multiply(theta.sin()).divide(wavelength);
 
-        if (beta.doubleValue() == 0.0)
+        if (beta.compareTo(Real.ZERO) == 0)
             return i0;
 
         Real sinc = beta.sin().divide(beta);
@@ -51,9 +72,8 @@ public class WaveOptics {
      * @return Intensity at angle θ
      */
     public static Real doubleSlitIntensity(Real theta, Real slitSeparation, Real wavelength, Real i0) {
-        double PI = Math.PI;
-        Real delta = Real.of(2.0 * PI).multiply(slitSeparation).multiply(theta.sin()).divide(wavelength);
-        Real term = delta.divide(Real.of(2.0)).cos();
+        Real delta = Real.TWO.multiply(Real.PI).multiply(slitSeparation).multiply(theta.sin()).divide(wavelength);
+        Real term = delta.divide(Real.TWO).cos();
         return i0.multiply(term.pow(2));
     }
 
@@ -84,18 +104,17 @@ public class WaveOptics {
      */
     public static Real diffractionGratingIntensity(Real theta, Real slitWidth, Real slitSeparation,
             Real wavelength, int numSlits, Real i0) {
-        double PI = Math.PI;
         Real sinTheta = theta.sin();
 
         // Single slit envelope
-        Real alpha = Real.of(PI).multiply(slitWidth).multiply(sinTheta).divide(wavelength);
+        Real alpha = Real.PI.multiply(slitWidth).multiply(sinTheta).divide(wavelength);
         Real singleSlitFactor = alpha.isZero() ? Real.ONE : alpha.sin().divide(alpha);
 
         // Grating interference
-        Real beta = Real.of(PI).multiply(slitSeparation).multiply(sinTheta).divide(wavelength);
-        Real betaHalf = beta.divide(Real.of(2.0));
+        Real beta = Real.PI.multiply(slitSeparation).multiply(sinTheta).divide(wavelength);
+        Real betaHalf = beta.divide(Real.TWO);
         Real betaHalfSin = betaHalf.sin();
-        Real nBetaHalf = beta.multiply(Real.of(numSlits)).divide(Real.of(2.0));
+        Real nBetaHalf = beta.multiply(Real.of(numSlits)).divide(Real.TWO);
 
         Real gratingFactor = betaHalfSin.isZero() ? Real.of(numSlits) : nBetaHalf.sin().divide(betaHalfSin);
 
@@ -113,18 +132,19 @@ public class WaveOptics {
      * @param i0         Central intensity
      * @return Intensity at angle theta
      */
-    public static Real airyDiskIntensity(Real theta, Real diameter, Real wavelength, Real i0) {
-        double PI = Math.PI;
-        Real x = Real.of(PI).multiply(diameter).multiply(theta.sin()).divide(wavelength);
+    /** Threshold for near-zero detection */
+    private static final Real EPSILON = Real.of(1e-10);
 
-        if (x.abs().doubleValue() < 1e-10) {
+    public static Real airyDiskIntensity(Real theta, Real diameter, Real wavelength, Real i0) {
+        Real x = Real.PI.multiply(diameter).multiply(theta.sin()).divide(wavelength);
+
+        if (x.abs().compareTo(EPSILON) < 0) {
             return i0; // Center of pattern
         }
 
-        // Bessel J1 approximation for small x: J1(x) ≈ x/2
-        // For larger x: use series or lookup
+        // Bessel J1 approximation
         Real j1Approx = besselJ1Approx(x);
-        Real airyFactor = j1Approx.multiply(Real.of(2.0)).divide(x);
+        Real airyFactor = j1Approx.multiply(Real.TWO).divide(x);
 
         return i0.multiply(airyFactor.pow(2));
     }

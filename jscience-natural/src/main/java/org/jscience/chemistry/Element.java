@@ -1,3 +1,25 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.chemistry;
 
 import org.jscience.measure.Quantity;
@@ -8,14 +30,15 @@ import org.jscience.measure.quantity.Temperature;
 import org.jscience.measure.quantity.MassDensity;
 import org.jscience.measure.quantity.SpecificHeatCapacity;
 import org.jscience.measure.quantity.ThermalConductivity;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * A chemical element.
  * Modernized to use JScience V5 Quantity system.
+ * * @author Silvere Martin-Michiellot
  * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 5.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class Element {
 
@@ -32,7 +55,7 @@ public class Element {
     private int group;
     private int period;
     private ElementCategory category;
-    private double electronegativity;
+    private Real electronegativity;
 
     // Properties
     private Quantity<Length> covalentRadius;
@@ -107,12 +130,18 @@ public class Element {
         this.category = category;
     }
 
-    public double getElectronegativity() {
+    public Real getElectronegativity() {
         return electronegativity;
     }
 
-    public void setElectronegativity(double electronegativity) {
+    public void setElectronegativity(Real electronegativity) {
         this.electronegativity = electronegativity;
+    }
+
+    // Legacy support for loading tools (optional but helpful if JSON loader uses
+    // double)
+    public void setElectronegativity(double val) {
+        this.electronegativity = Real.of(val);
     }
 
     public Quantity<Length> getCovalentRadius() {

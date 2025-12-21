@@ -1,118 +1,108 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.medicine.cardiology;
+
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Basic ECG (Electrocardiogram) analysis utilities.
+ * * @author Silvere Martin-Michiellot
+ * 
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class ECGAnalysis {
 
     private ECGAnalysis() {
     }
 
-    /**
-     * Calculates heart rate from R-R intervals.
-     * HR = 60 / RR_interval_seconds
-     * 
-     * @param rrIntervalMs R-R interval in milliseconds
-     * @return Heart rate in beats per minute
-     */
-    public static double heartRateFromRR(double rrIntervalMs) {
-        return 60000.0 / rrIntervalMs;
+    /** Heart rate from R-R interval: HR = 60000 / RR_ms */
+    public static Real heartRateFromRR(Real rrIntervalMs) {
+        return Real.of(60000).divide(rrIntervalMs);
     }
 
-    /**
-     * Calculates average heart rate from multiple R-peak timestamps.
-     */
-    public static double averageHeartRate(double[] rPeakTimesMs) {
+    /** Average heart rate from R-peak timestamps */
+    public static Real averageHeartRate(Real[] rPeakTimesMs) {
         if (rPeakTimesMs.length < 2)
-            return 0;
-
-        double totalInterval = rPeakTimesMs[rPeakTimesMs.length - 1] - rPeakTimesMs[0];
-        int numIntervals = rPeakTimesMs.length - 1;
-        double avgRR = totalInterval / numIntervals;
-
-        return 60000.0 / avgRR;
+            return Real.ZERO;
+        Real totalInterval = rPeakTimesMs[rPeakTimesMs.length - 1].subtract(rPeakTimesMs[0]);
+        Real avgRR = totalInterval.divide(Real.of(rPeakTimesMs.length - 1));
+        return Real.of(60000).divide(avgRR);
     }
 
-    /**
-     * Heart rate variability (SDNN) - standard deviation of NN intervals.
-     */
-    public static double hrvSDNN(double[] rrIntervalsMs) {
+    /** HRV SDNN - standard deviation of NN intervals */
+    public static Real hrvSDNN(Real[] rrIntervalsMs) {
         if (rrIntervalsMs.length < 2)
-            return 0;
+            return Real.ZERO;
+        Real mean = Real.ZERO;
+        for (Real rr : rrIntervalsMs)
+            mean = mean.add(rr);
+        mean = mean.divide(Real.of(rrIntervalsMs.length));
 
-        double mean = 0;
-        for (double rr : rrIntervalsMs)
-            mean += rr;
-        mean /= rrIntervalsMs.length;
-
-        double sumSq = 0;
-        for (double rr : rrIntervalsMs) {
-            sumSq += Math.pow(rr - mean, 2);
+        Real sumSq = Real.ZERO;
+        for (Real rr : rrIntervalsMs) {
+            sumSq = sumSq.add(rr.subtract(mean).pow(2));
         }
-
-        return Math.sqrt(sumSq / rrIntervalsMs.length);
+        return sumSq.divide(Real.of(rrIntervalsMs.length)).sqrt();
     }
 
-    /**
-     * RMSSD - root mean square of successive differences.
-     * Important HRV metric.
-     */
-    public static double hrvRMSSD(double[] rrIntervalsMs) {
+    /** RMSSD - root mean square of successive differences */
+    public static Real hrvRMSSD(Real[] rrIntervalsMs) {
         if (rrIntervalsMs.length < 2)
-            return 0;
-
-        double sumSqDiff = 0;
+            return Real.ZERO;
+        Real sumSqDiff = Real.ZERO;
         for (int i = 1; i < rrIntervalsMs.length; i++) {
-            double diff = rrIntervalsMs[i] - rrIntervalsMs[i - 1];
-            sumSqDiff += diff * diff;
+            Real diff = rrIntervalsMs[i].subtract(rrIntervalsMs[i - 1]);
+            sumSqDiff = sumSqDiff.add(diff.pow(2));
         }
-
-        return Math.sqrt(sumSqDiff / (rrIntervalsMs.length - 1));
+        return sumSqDiff.divide(Real.of(rrIntervalsMs.length - 1)).sqrt();
     }
 
-    /**
-     * QTc calculation (Bazett's formula).
-     * QTc = QT / sqrt(RR)
-     * 
-     * @param qtIntervalMs QT interval in ms
-     * @param rrIntervalMs RR interval in ms
-     * @return Corrected QT interval
-     */
-    public static double qtcBazett(double qtIntervalMs, double rrIntervalMs) {
-        return qtIntervalMs / Math.sqrt(rrIntervalMs / 1000);
+    /** QTc Bazett: QTc = QT / sqrt(RR/1000) */
+    public static Real qtcBazett(Real qtIntervalMs, Real rrIntervalMs) {
+        return qtIntervalMs.divide(rrIntervalMs.divide(Real.of(1000)).sqrt());
     }
 
-    /**
-     * QTc using Fridericia formula (better for fast/slow HR).
-     * QTc = QT / RR^(1/3)
-     */
-    public static double qtcFridericia(double qtIntervalMs, double rrIntervalMs) {
-        return qtIntervalMs / Math.cbrt(rrIntervalMs / 1000);
+    /** QTc Fridericia: QTc = QT / (RR/1000)^(1/3) */
+    public static Real qtcFridericia(Real qtIntervalMs, Real rrIntervalMs) {
+        return qtIntervalMs.divide(rrIntervalMs.divide(Real.of(1000)).cbrt());
     }
 
-    /**
-     * Checks if QTc is prolonged.
-     * Normal: <440ms male, <460ms female
-     */
-    public static boolean isQTcProlonged(double qtcMs, boolean isMale) {
-        return qtcMs > (isMale ? 440 : 460);
+    /** Checks if QTc is prolonged */
+    public static boolean isQTcProlonged(Real qtcMs, boolean isMale) {
+        return qtcMs.compareTo(Real.of(isMale ? 440 : 460)) > 0;
     }
 
-    /**
-     * Simple R-peak detection (threshold-based).
-     * Returns indices of detected R-peaks.
-     */
-    public static int[] detectRPeaks(double[] ecgSignal, double threshold) {
+    /** Simple R-peak detection (threshold-based) */
+    public static int[] detectRPeaks(Real[] ecgSignal, Real threshold) {
         java.util.List<Integer> peaks = new java.util.ArrayList<>();
-
         for (int i = 1; i < ecgSignal.length - 1; i++) {
-            if (ecgSignal[i] > threshold &&
-                    ecgSignal[i] > ecgSignal[i - 1] &&
-                    ecgSignal[i] > ecgSignal[i + 1]) {
+            if (ecgSignal[i].compareTo(threshold) > 0 &&
+                    ecgSignal[i].compareTo(ecgSignal[i - 1]) > 0 &&
+                    ecgSignal[i].compareTo(ecgSignal[i + 1]) > 0) {
                 peaks.add(i);
             }
         }
-
         return peaks.stream().mapToInt(Integer::intValue).toArray();
     }
 }

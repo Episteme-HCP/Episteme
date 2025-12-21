@@ -1,9 +1,32 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.social;
 
 import org.jscience.economics.*;
 import org.jscience.sociology.*;
 import org.jscience.geography.*;
 import org.jscience.linguistics.*;
+import org.jscience.mathematics.numbers.real.Real;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -46,12 +69,12 @@ public class AdvancedFeaturesTest {
         Coordinate paris = new Coordinate(48.8566, 2.3522);
         Coordinate london = new Coordinate(51.5074, -0.1278);
 
-        double distance = GISProfile.calculateDistance(paris, london);
+        Real distance = GISProfile.calculateDistance(paris, london);
         // Approx 344 km
-        assertEquals(343000, distance, 5000); // 5km tolerance
+        assertEquals(343000, distance.doubleValue(), 5000); // 5km tolerance
 
         GISProfile gp = new GISProfile(GISProfile.Projection.MERCATOR);
-        double[] proj = gp.project(paris);
+        Real[] proj = gp.project(paris);
         assertNotNull(proj);
         assertEquals(2, proj.length);
     }

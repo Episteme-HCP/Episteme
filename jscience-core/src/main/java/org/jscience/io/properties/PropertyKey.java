@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.io.properties;
 
@@ -28,8 +28,8 @@ import java.util.Objects;
  * A type-safe key for accessing properties in a {@link PropertySet}.
  * 
  * @param <T> The type of the property value.
- * 
- * @author Silvere Martin-Michiellot
+ * * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class PropertyKey<T> {
@@ -83,5 +83,3 @@ public class PropertyKey<T> {
         return new PropertyKey<>(name, type);
     }
 }
-
-

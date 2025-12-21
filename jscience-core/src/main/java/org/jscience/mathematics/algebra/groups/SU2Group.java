@@ -33,8 +33,7 @@ import java.util.*;
  * The group of 2x2 unitary matrices with determinant 1.
  * Isomorphic to the group of unit quaternions.
  * Important in quantum mechanics (spin 1/2).
- * 
- * @author Silvere Martin-Michiellot
+ * * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

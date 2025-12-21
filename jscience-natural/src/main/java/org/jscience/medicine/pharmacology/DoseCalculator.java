@@ -1,78 +1,78 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.medicine.pharmacology;
 
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Mass;
 
 /**
  * Weight-based medication dose calculator.
+ * * @author Silvere Martin-Michiellot
+ * 
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class DoseCalculator {
 
     private DoseCalculator() {
     }
 
-    /**
-     * Calculates dose based on weight.
-     * dose = dosePerKg * weight
-     * 
-     * @param dosePerKg Dose per kg (mg/kg)
-     * @param weight    Patient weight
-     * @return Total dose in mg
-     */
-    public static double weightBasedDose(double dosePerKg, Quantity<Mass> weight) {
-        double kg = weight.to(Units.KILOGRAM).getValue().doubleValue();
-        return dosePerKg * kg;
+    /** Weight-based dose: dose = dosePerKg * weight */
+    public static Real weightBasedDose(Real dosePerKg, Quantity<Mass> weight) {
+        Real kg = weight.to(Units.KILOGRAM).getValue();
+        return dosePerKg.multiply(kg);
     }
 
-    /**
-     * Calculates dose based on BSA.
-     * dose = dosePerM2 * BSA
-     * 
-     * @param dosePerM2 Dose per m² (mg/m²)
-     * @param bsa       Body surface area in m²
-     * @return Total dose in mg
-     */
-    public static double bsaBasedDose(double dosePerM2, double bsa) {
-        return dosePerM2 * bsa;
+    /** BSA-based dose: dose = dosePerM2 * BSA */
+    public static Real bsaBasedDose(Real dosePerM2, Real bsa) {
+        return dosePerM2.multiply(bsa);
     }
 
-    /**
-     * Calculates IV drip rate.
-     * rate = (dose_mg * volume_ml) / (concentration_mg_per_ml * time_hours)
-     * 
-     * @return ml/hour
-     */
-    public static double ivDripRate(double totalDoseMg, double concentrationMgPerMl, double infusionHours) {
-        double volumeNeeded = totalDoseMg / concentrationMgPerMl;
-        return volumeNeeded / infusionHours;
+    /** IV drip rate (ml/hour) */
+    public static Real ivDripRate(Real totalDoseMg, Real concentrationMgPerMl, Real infusionHours) {
+        Real volumeNeeded = totalDoseMg.divide(concentrationMgPerMl);
+        return volumeNeeded.divide(infusionHours);
     }
 
-    /**
-     * Pediatric dose using Clark's rule.
-     * Child dose = (weight_lbs / 150) * adult_dose
-     */
-    public static double clarksRule(double adultDoseMg, Quantity<Mass> childWeight) {
-        double lbs = childWeight.to(Units.KILOGRAM).getValue().doubleValue() * 2.205;
-        return (lbs / 150.0) * adultDoseMg;
+    /** Clark's rule: Child dose = (weight_lbs / 150) * adult_dose */
+    public static Real clarksRule(Real adultDoseMg, Quantity<Mass> childWeight) {
+        Real lbs = childWeight.to(Units.KILOGRAM).getValue().multiply(Real.of(2.205));
+        return lbs.divide(Real.of(150)).multiply(adultDoseMg);
     }
 
-    /**
-     * Pediatric dose using Young's rule.
-     * Child dose = (age / (age + 12)) * adult_dose
-     */
-    public static double youngsRule(double adultDoseMg, int ageYears) {
-        return (ageYears / (double) (ageYears + 12)) * adultDoseMg;
+    /** Young's rule: Child dose = (age / (age + 12)) * adult_dose */
+    public static Real youngsRule(Real adultDoseMg, int ageYears) {
+        return Real.of(ageYears).divide(Real.of(ageYears + 12)).multiply(adultDoseMg);
     }
 
-    /**
-     * Creatinine clearance (Cockcroft-Gault).
-     * CrCl = ((140 - age) * weight * [0.85 if female]) / (72 * serum_creatinine)
-     */
-    public static double creatinineClearance(int ageYears, Quantity<Mass> weight,
-            double serumCreatinineMgDl, boolean isFemale) {
-        double kg = weight.to(Units.KILOGRAM).getValue().doubleValue();
-        double result = ((140 - ageYears) * kg) / (72 * serumCreatinineMgDl);
-        return isFemale ? result * 0.85 : result;
+    /** Creatinine clearance (Cockcroft-Gault) */
+    public static Real creatinineClearance(int ageYears, Quantity<Mass> weight,
+            Real serumCreatinineMgDl, boolean isFemale) {
+        Real kg = weight.to(Units.KILOGRAM).getValue();
+        Real result = Real.of(140 - ageYears).multiply(kg)
+                .divide(Real.of(72).multiply(serumCreatinineMgDl));
+        return isFemale ? result.multiply(Real.of(0.85)) : result;
     }
 }

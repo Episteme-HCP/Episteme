@@ -1,11 +1,35 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.chemistry.biochemistry;
+
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Enzyme kinetics calculations (Michaelis-Menten).
  * 
  * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 5.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class EnzymeKinetics {
 
@@ -18,60 +42,62 @@ public class EnzymeKinetics {
      * @param Km   Michaelis constant
      * @return Reaction velocity
      */
-    public static double michaelismenten(double S, double Vmax, double Km) {
-        return (Vmax * S) / (Km + S);
+    public static Real michaelismenten(Real S, Real Vmax, Real Km) {
+        return Vmax.multiply(S).divide(Km.add(S));
     }
 
     /**
      * Lineweaver-Burk (double reciprocal) transformation.
      * 1/v = (Km/Vmax) · (1/[S]) + 1/Vmax
-     * Returns [slope, intercept].
+     * Returns array with [slope, intercept].
      */
-    public static double[] lineweaverBurkParams(double Vmax, double Km) {
-        double slope = Km / Vmax;
-        double intercept = 1.0 / Vmax;
-        return new double[] { slope, intercept };
+    public static Real[] lineweaverBurkParams(Real Vmax, Real Km) {
+        Real slope = Km.divide(Vmax);
+        Real intercept = Real.ONE.divide(Vmax);
+        return new Real[] { slope, intercept };
     }
 
     /**
      * Calculates Vmax and Km from Lineweaver-Burk plot slope and intercept.
+     * Returns array with [Vmax, Km].
      */
-    public static double[] vMaxKmFromLB(double slope, double intercept) {
-        double Vmax = 1.0 / intercept;
-        double Km = slope * Vmax;
-        return new double[] { Vmax, Km };
+    public static Real[] vMaxKmFromLB(Real slope, Real intercept) {
+        Real Vmax = Real.ONE.divide(intercept);
+        Real Km = slope.multiply(Vmax);
+        return new Real[] { Vmax, Km };
     }
 
     /**
      * Competitive inhibition: apparent Km increased.
      * Km_app = Km · (1 + [I]/Ki)
      */
-    public static double competitiveKm(double Km, double I, double Ki) {
-        return Km * (1 + I / Ki);
+    public static Real competitiveKm(Real Km, Real I, Real Ki) {
+        return Km.multiply(Real.ONE.add(I.divide(Ki)));
     }
 
     /**
      * Non-competitive inhibition: Vmax decreased.
      * Vmax_app = Vmax / (1 + [I]/Ki)
      */
-    public static double noncompetitiveVmax(double Vmax, double I, double Ki) {
-        return Vmax / (1 + I / Ki);
+    public static Real noncompetitiveVmax(Real Vmax, Real I, Real Ki) {
+        return Vmax.divide(Real.ONE.add(I.divide(Ki)));
     }
 
     /**
      * Uncompetitive inhibition: both Km and Vmax decreased.
+     * Returns array with [Vmax_app, Km_app].
      */
-    public static double[] uncompetitiveParams(double Vmax, double Km, double I, double Ki) {
-        double factor = 1 + I / Ki;
-        return new double[] { Vmax / factor, Km / factor };
+    public static Real[] uncompetitiveParams(Real Vmax, Real Km, Real I, Real Ki) {
+        Real factor = Real.ONE.add(I.divide(Ki));
+        return new Real[] { Vmax.divide(factor), Km.divide(factor) };
     }
 
     /**
      * Turnover number (kcat): reactions per enzyme per second.
      * kcat = Vmax / [E]_total
      */
-    public static double turnoverNumber(double Vmax, double enzymeConcentration) {
-        return Vmax / enzymeConcentration;
+    public static Real turnoverNumber(Real Vmax, Real enzymeConcentration) {
+        return Vmax.divide(enzymeConcentration);
     }
 
     /**
@@ -79,8 +105,8 @@ public class EnzymeKinetics {
      * η = kcat / Km
      * Higher is better (diffusion limit ~10⁸-10⁹ M⁻¹s⁻¹)
      */
-    public static double catalyticEfficiency(double kcat, double Km) {
-        return kcat / Km;
+    public static Real catalyticEfficiency(Real kcat, Real Km) {
+        return kcat.divide(Km);
     }
 
     /**
@@ -92,8 +118,8 @@ public class EnzymeKinetics {
      * @param n Hill coefficient (n>1: positive cooperativity)
      * @return Fractional saturation
      */
-    public static double hillEquation(double S, double K, double n) {
-        double Sn = Math.pow(S, n);
-        return Sn / (K + Sn);
+    public static Real hillEquation(Real S, Real K, Real n) {
+        Real Sn = S.pow(n);
+        return Sn.divide(K.add(Sn));
     }
 }

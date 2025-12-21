@@ -1,147 +1,150 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.physics.astronomy.astrophysics;
+
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Black hole physics calculations.
  * 
  * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 5.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class BlackHole {
 
     /** Gravitational constant (m³/(kg·s²)) */
-    public static final double G = 6.67430e-11;
+    public static final Real G = Real.of(6.67430e-11);
 
     /** Speed of light (m/s) */
-    public static final double C = 2.998e8;
+    public static final Real C = Real.of(2.998e8);
 
     /** Solar mass (kg) */
-    public static final double M_SUN = 1.989e30;
+    public static final Real M_SUN = Real.of(1.989e30);
+
+    /** Reduced Planck constant */
+    private static final Real HBAR = Real.of(1.054571817e-34);
+
+    /** Boltzmann constant */
+    private static final Real KB = Real.of(1.380649e-23);
 
     /**
      * Schwarzschild radius (event horizon for non-rotating black hole).
      * r_s = 2GM/c²
-     * 
-     * @param mass Black hole mass (kg)
-     * @return Schwarzschild radius (m)
      */
-    public static double schwarzschildRadius(double mass) {
-        return 2 * G * mass / (C * C);
+    public static Real schwarzschildRadius(Real mass) {
+        return Real.TWO.multiply(G).multiply(mass).divide(C.multiply(C));
     }
 
     /**
      * Schwarzschild radius in solar masses.
      * r_s ≈ 2.95 km per solar mass
      */
-    public static double schwarzschildRadiusSolarMass(double solarMasses) {
-        return 2953 * solarMasses; // meters
+    public static Real schwarzschildRadiusSolarMass(Real solarMasses) {
+        return Real.of(2953).multiply(solarMasses);
     }
 
     /**
      * Gravitational time dilation near Schwarzschild black hole.
-     * Δt_far = Δt_near / √(1 - r_s/r)
-     * 
-     * @param r  Distance from center (m)
-     * @param rs Schwarzschild radius (m)
-     * @return Time dilation factor (>1 means time runs slower)
      */
-    public static double timeDilation(double r, double rs) {
-        if (r <= rs)
-            return Double.POSITIVE_INFINITY;
-        return 1.0 / Math.sqrt(1 - rs / r);
+    public static Real timeDilation(Real r, Real rs) {
+        if (r.compareTo(rs) <= 0)
+            return Real.POSITIVE_INFINITY;
+        return Real.ONE.divide(Real.ONE.subtract(rs.divide(r)).sqrt());
     }
 
     /**
      * Gravitational redshift.
-     * z = 1/√(1 - r_s/r) - 1
      */
-    public static double gravitationalRedshift(double r, double rs) {
-        if (r <= rs)
-            return Double.POSITIVE_INFINITY;
-        return 1.0 / Math.sqrt(1 - rs / r) - 1;
+    public static Real gravitationalRedshift(Real r, Real rs) {
+        if (r.compareTo(rs) <= 0)
+            return Real.POSITIVE_INFINITY;
+        return Real.ONE.divide(Real.ONE.subtract(rs.divide(r)).sqrt()).subtract(Real.ONE);
     }
 
     /**
      * Innermost stable circular orbit (ISCO) for Schwarzschild.
-     * r_ISCO = 3 * r_s = 6GM/c²
      */
-    public static double iscoRadius(double mass) {
-        return 3 * schwarzschildRadius(mass);
+    public static Real iscoRadius(Real mass) {
+        return Real.of(3).multiply(schwarzschildRadius(mass));
     }
 
     /**
      * Photon sphere radius (light can orbit).
-     * r_photon = 1.5 * r_s
      */
-    public static double photonSphereRadius(double mass) {
-        return 1.5 * schwarzschildRadius(mass);
+    public static Real photonSphereRadius(Real mass) {
+        return Real.of(1.5).multiply(schwarzschildRadius(mass));
     }
 
     /**
      * Hawking temperature.
      * T = ℏc³ / (8πGMk_B)
-     * 
-     * @param mass Black hole mass (kg)
-     * @return Temperature (Kelvin)
      */
-    public static double hawkingTemperature(double mass) {
-        double hbar = 1.054571817e-34;
-        double kB = 1.380649e-23;
-        return hbar * C * C * C / (8 * Math.PI * G * mass * kB);
+    public static Real hawkingTemperature(Real mass) {
+        Real numerator = HBAR.multiply(C.pow(3));
+        Real denominator = Real.of(8 * Math.PI).multiply(G).multiply(mass).multiply(KB);
+        return numerator.divide(denominator);
     }
 
     /**
      * Bekenstein-Hawking entropy.
-     * S = (k_B * c³ * A) / (4 * G * ℏ)
-     * where A = 4π r_s²
      */
-    public static double entropy(double mass) {
-        double hbar = 1.054571817e-34;
-        double kB = 1.380649e-23;
-        double rs = schwarzschildRadius(mass);
-        double A = 4 * Math.PI * rs * rs;
-        return kB * C * C * C * A / (4 * G * hbar);
+    public static Real entropy(Real mass) {
+        Real rs = schwarzschildRadius(mass);
+        Real A = Real.of(4 * Math.PI).multiply(rs.pow(2));
+        return KB.multiply(C.pow(3)).multiply(A).divide(Real.of(4).multiply(G).multiply(HBAR));
     }
 
     /**
      * Kerr black hole outer horizon radius.
-     * r+ = GM/c² + √((GM/c²)² - a²)
-     * where a = J/(Mc) is spin parameter
-     * 
-     * @param mass Black hole mass (kg)
-     * @param J    Angular momentum (kg·m²/s)
      */
-    public static double kerrOuterHorizon(double mass, double J) {
-        double rs = schwarzschildRadius(mass);
-        double a = J / (mass * C); // Spin parameter
-        double rg = rs / 2; // GM/c²
-        return rg + Math.sqrt(rg * rg - a * a);
+    public static Real kerrOuterHorizon(Real mass, Real J) {
+        Real rs = schwarzschildRadius(mass);
+        Real a = J.divide(mass.multiply(C));
+        Real rg = rs.divide(Real.TWO);
+        return rg.add(rg.pow(2).subtract(a.pow(2)).sqrt());
     }
 
     /**
      * Kerr black hole ergosphere radius at equator.
-     * r_ergo = GM/c² + √((GM/c²)² - a²cos²θ)
-     * At equator (θ=π/2): r_ergo = 2GM/c² = r_s
      */
-    public static double kerrErgosphereEquator(double mass) {
+    public static Real kerrErgosphereEquator(Real mass) {
         return schwarzschildRadius(mass);
     }
 
     /**
      * Black hole luminosity from Hawking radiation.
-     * L = ℏc⁶ / (15360πG²M²)
      */
-    public static double hawkingLuminosity(double mass) {
-        double hbar = 1.054571817e-34;
-        return hbar * Math.pow(C, 6) / (15360 * Math.PI * G * G * mass * mass);
+    public static Real hawkingLuminosity(Real mass) {
+        return HBAR.multiply(C.pow(6)).divide(
+                Real.of(15360 * Math.PI).multiply(G.pow(2)).multiply(mass.pow(2)));
     }
 
     /**
      * Black hole evaporation time.
-     * t = 5120πG²M³ / (ℏc⁴)
      */
-    public static double evaporationTime(double mass) {
-        double hbar = 1.054571817e-34;
-        return 5120 * Math.PI * G * G * Math.pow(mass, 3) / (hbar * Math.pow(C, 4));
+    public static Real evaporationTime(Real mass) {
+        return Real.of(5120 * Math.PI).multiply(G.pow(2)).multiply(mass.pow(3))
+                .divide(HBAR.multiply(C.pow(4)));
     }
 }

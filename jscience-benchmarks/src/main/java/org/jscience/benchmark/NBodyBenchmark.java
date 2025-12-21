@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.benchmark;
 
@@ -50,11 +50,9 @@ import java.util.List;
  * <li>Real number precision</li>
  * </ul>
  * </p>
- * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 2.0
- * @see NBodyNaiveBenchmark for optimized primitive baseline
+ * * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class NBodyBenchmark implements RunnableBenchmark {
     /** Gravitational constant (m³/(kg·s²)) */

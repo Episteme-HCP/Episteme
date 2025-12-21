@@ -1,17 +1,36 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.arts;
 
 import java.util.*;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a film/movie.
- *
- * @author Silvere Martin-Michiellot
+ * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
- * @since 2.0
+ * @since 1.0
  */
 public class Film {
 
@@ -33,7 +52,7 @@ public class Film {
     private String studio;
     private final List<String> cast = new ArrayList<>();
     private long boxOffice;
-    private double imdbRating;
+    private Real imdbRating;
 
     public Film(String title) {
         this.title = title;
@@ -78,7 +97,7 @@ public class Film {
         return boxOffice;
     }
 
-    public double getImdbRating() {
+    public Real getImdbRating() {
         return imdbRating;
     }
 
@@ -115,7 +134,7 @@ public class Film {
         this.boxOffice = amount;
     }
 
-    public void setImdbRating(double rating) {
+    public void setImdbRating(Real rating) {
         this.imdbRating = rating;
     }
 
@@ -133,7 +152,7 @@ public class Film {
         Film f = new Film("Citizen Kane", "Orson Welles", 1941);
         f.setGenre(Genre.DRAMA);
         f.setDurationMinutes(119);
-        f.setImdbRating(8.3);
+        f.setImdbRating(Real.of(8.3));
         f.addCastMember("Orson Welles");
         return f;
     }
@@ -142,7 +161,7 @@ public class Film {
         Film f = new Film("2001: A Space Odyssey", "Stanley Kubrick", 1968);
         f.setGenre(Genre.SCIENCE_FICTION);
         f.setDurationMinutes(149);
-        f.setImdbRating(8.3);
+        f.setImdbRating(Real.of(8.3));
         return f;
     }
 }

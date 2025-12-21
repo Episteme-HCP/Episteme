@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.physics.classical.matter.fluids;
 
@@ -29,9 +29,10 @@ import org.jscience.mathematics.numbers.real.Real;
  * <p>
  * Implements classical and modern computational fluid dynamics equations.
  * </p>
+ * * @author Silvere Martin-Michiellot
  * 
- * @author Silvere Martin-Michiellot
- * @since 2.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class FluidMechanics {
 
@@ -80,7 +81,7 @@ public class FluidMechanics {
      */
     public static Real poiseuilleFlow(Real pressureDrop, Real radius, Real viscosity, Real length) {
         Real r4 = radius.multiply(radius).multiply(radius).multiply(radius);
-        Real numerator = Real.of(Math.PI).multiply(pressureDrop).multiply(r4);
+        Real numerator = Real.PI.multiply(pressureDrop).multiply(r4);
         Real denominator = Real.of(8).multiply(viscosity).multiply(length);
         return numerator.divide(denominator);
     }

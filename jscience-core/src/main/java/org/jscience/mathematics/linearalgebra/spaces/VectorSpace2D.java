@@ -34,8 +34,7 @@ import java.util.Arrays;
  * <p>
  * Optimized for 2D geometry and physics.
  * </p>
- * 
- * @author Silvere Martin-Michiellot
+ * * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

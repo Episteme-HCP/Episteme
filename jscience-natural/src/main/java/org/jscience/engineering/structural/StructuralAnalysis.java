@@ -1,203 +1,201 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.engineering.structural;
+
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Force;
+import org.jscience.measure.quantity.Length;
+import org.jscience.measure.quantity.Pressure;
 
 /**
  * Structural analysis calculations.
  * 
  * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 5.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class StructuralAnalysis {
 
     /**
      * Simply supported beam: maximum deflection at center.
      * δ_max = (5 * w * L⁴) / (384 * E * I)
-     * 
-     * @param w Distributed load (N/m)
-     * @param L Beam length (m)
-     * @param E Young's modulus (Pa)
-     * @param I Second moment of area (m⁴)
-     * @return Maximum deflection (m)
      */
-    public static double simpleBeamDeflectionUniform(double w, double L, double E, double I) {
-        return 5 * w * Math.pow(L, 4) / (384 * E * I);
+    public static Real simpleBeamDeflectionUniform(Real w, Real L, Real E, Real I) {
+        return Real.of(5).multiply(w).multiply(L.pow(4)).divide(Real.of(384).multiply(E).multiply(I));
     }
 
     /**
      * Simply supported beam: deflection under point load at center.
      * δ_max = (P * L³) / (48 * E * I)
      */
-    public static double simpleBeamDeflectionPoint(double P, double L, double E, double I) {
-        return P * Math.pow(L, 3) / (48 * E * I);
+    public static Real simpleBeamDeflectionPoint(Real P, Real L, Real E, Real I) {
+        return P.multiply(L.pow(3)).divide(Real.of(48).multiply(E).multiply(I));
     }
 
     /**
      * Cantilever beam: deflection at free end under uniform load.
      * δ_max = (w * L⁴) / (8 * E * I)
      */
-    public static double cantileverDeflectionUniform(double w, double L, double E, double I) {
-        return w * Math.pow(L, 4) / (8 * E * I);
+    public static Real cantileverDeflectionUniform(Real w, Real L, Real E, Real I) {
+        return w.multiply(L.pow(4)).divide(Real.of(8).multiply(E).multiply(I));
     }
 
     /**
      * Cantilever beam: deflection at free end under point load.
      * δ_max = (P * L³) / (3 * E * I)
      */
-    public static double cantileverDeflectionPoint(double P, double L, double E, double I) {
-        return P * Math.pow(L, 3) / (3 * E * I);
+    public static Real cantileverDeflectionPoint(Real P, Real L, Real E, Real I) {
+        return P.multiply(L.pow(3)).divide(Real.of(3).multiply(E).multiply(I));
     }
 
     /**
      * Maximum bending moment for simply supported beam with uniform load.
      * M_max = w * L² / 8
      */
-    public static double simpleBeamMomentUniform(double w, double L) {
-        return w * L * L / 8;
+    public static Real simpleBeamMomentUniform(Real w, Real L) {
+        return w.multiply(L.pow(2)).divide(Real.of(8));
     }
 
     /**
      * Maximum bending moment for cantilever with uniform load.
      * M_max = w * L² / 2
      */
-    public static double cantileverMomentUniform(double w, double L) {
-        return w * L * L / 2;
+    public static Real cantileverMomentUniform(Real w, Real L) {
+        return w.multiply(L.pow(2)).divide(Real.TWO);
     }
 
     /**
      * Bending stress.
      * σ = M * y / I
      */
-    public static double bendingStress(double moment, double distanceFromNA, double momentOfInertia) {
-        return moment * distanceFromNA / momentOfInertia;
+    public static Real bendingStress(Real moment, Real distanceFromNA, Real momentOfInertia) {
+        return moment.multiply(distanceFromNA).divide(momentOfInertia);
     }
 
     /**
      * Shear stress in beam.
      * τ = V * Q / (I * b)
      */
-    public static double shearStress(double shearForce, double firstMoment,
-            double momentOfInertia, double width) {
-        return shearForce * firstMoment / (momentOfInertia * width);
+    public static Real shearStress(Real shearForce, Real firstMoment, Real momentOfInertia, Real width) {
+        return shearForce.multiply(firstMoment).divide(momentOfInertia.multiply(width));
     }
 
     /**
      * Second moment of area for rectangle.
      * I = b * h³ / 12
      */
-    public static double rectangleMomentOfInertia(double width, double height) {
-        return width * Math.pow(height, 3) / 12;
+    public static Real rectangleMomentOfInertia(Real width, Real height) {
+        return width.multiply(height.pow(3)).divide(Real.of(12));
     }
 
     /**
      * Second moment of area for circle.
      * I = π * r⁴ / 4
      */
-    public static double circleMomentOfInertia(double radius) {
-        return Math.PI * Math.pow(radius, 4) / 4;
+    public static Real circleMomentOfInertia(Real radius) {
+        return Real.PI.multiply(radius.pow(4)).divide(Real.of(4));
     }
 
     /**
      * Section modulus.
      * S = I / y_max
      */
-    public static double sectionModulus(double momentOfInertia, double distanceToExtreme) {
-        return momentOfInertia / distanceToExtreme;
+    public static Real sectionModulus(Real momentOfInertia, Real distanceToExtreme) {
+        return momentOfInertia.divide(distanceToExtreme);
     }
 
     /**
      * Column buckling (Euler formula).
      * P_cr = π² * E * I / (K * L)²
-     * 
-     * @param E Young's modulus (Pa)
-     * @param I Moment of inertia (m⁴)
-     * @param L Column length (m)
-     * @param K Effective length factor (1.0 for pinned-pinned)
      */
-    public static double eulerBucklingLoad(double E, double I, double L, double K) {
-        return Math.PI * Math.PI * E * I / Math.pow(K * L, 2);
+    public static Real eulerBucklingLoad(Real E, Real I, Real L, Real K) {
+        return Real.PI.pow(2).multiply(E).multiply(I).divide(K.multiply(L).pow(2));
     }
 
     /**
      * Slenderness ratio.
-     * λ = K * L / r where r = √(I/A) is radius of gyration
+     * λ = K * L / r
      */
-    public static double slendernessRatio(double K, double L, double radiusOfGyration) {
-        return K * L / radiusOfGyration;
+    public static Real slendernessRatio(Real K, Real L, Real radiusOfGyration) {
+        return K.multiply(L).divide(radiusOfGyration);
     }
 
     /**
      * Radius of gyration.
      * r = √(I / A)
      */
-    public static double radiusOfGyration(double momentOfInertia, double area) {
-        return Math.sqrt(momentOfInertia / area);
+    public static Real radiusOfGyration(Real momentOfInertia, Real area) {
+        return momentOfInertia.divide(area).sqrt();
     }
 
     /**
      * Truss member force (method of joints - simplified).
-     * For equilibrium: ΣFx = 0, ΣFy = 0
      */
-    public static double trussMemberForce(double angle, double jointForce) {
-        return jointForce / Math.cos(Math.toRadians(angle));
+    public static Real trussMemberForce(Real angleDegrees, Real jointForce) {
+        return jointForce.divide(angleDegrees.toRadians().cos());
     }
 
     /**
      * Torsional shear stress in circular shaft.
      * τ = T * r / J where J = πr⁴/2
      */
-    public static double torsionalShearStress(double torque, double radius) {
-        double J = Math.PI * Math.pow(radius, 4) / 2;
-        return torque * radius / J;
+    public static Real torsionalShearStress(Real torque, Real radius) {
+        Real J = Real.PI.multiply(radius.pow(4)).divide(Real.TWO);
+        return torque.multiply(radius).divide(J);
     }
 
     /**
      * Angle of twist.
      * θ = T * L / (G * J)
      */
-    public static double angleOfTwist(double torque, double length, double shearModulus, double radius) {
-        double J = Math.PI * Math.pow(radius, 4) / 2;
-        return torque * length / (shearModulus * J);
+    public static Real angleOfTwist(Real torque, Real length, Real shearModulus, Real radius) {
+        Real J = Real.PI.multiply(radius.pow(4)).divide(Real.TWO);
+        return torque.multiply(length).divide(shearModulus.multiply(J));
     }
 
     // === Quantity Overloads ===
 
     /**
      * Bending stress using Quantity types.
-     * σ = M * y / I
-     * 
-     * @param moment          Bending moment
-     * @param distanceFromNA  Distance from neutral axis
-     * @param momentOfInertia Second moment of area
-     * @return Stress as Quantity<Pressure>
      */
-    public static org.jscience.measure.Quantity<org.jscience.measure.quantity.Pressure> bendingStress(
-            org.jscience.measure.Quantity<?> moment,
-            org.jscience.measure.Quantity<org.jscience.measure.quantity.Length> distanceFromNA,
-            double momentOfInertia) {
-        // Simplified: extract values and compute
+    public static Quantity<Pressure> bendingStressQ(Quantity<?> moment, Quantity<Length> distanceFromNA,
+            Real momentOfInertia) {
         double m = moment.getValue().doubleValue();
-        double y = distanceFromNA.to(org.jscience.measure.Units.METER).getValue().doubleValue();
-        double stress = m * y / momentOfInertia;
-        return org.jscience.measure.Quantities.create(stress, org.jscience.measure.Units.PASCAL);
+        double y = distanceFromNA.to(Units.METER).getValue().doubleValue();
+        double stress = m * y / momentOfInertia.doubleValue();
+        return Quantities.create(stress, Units.PASCAL);
     }
 
     /**
      * Euler buckling load using Quantity types.
-     * 
-     * @param E Young's modulus
-     * @param I Moment of inertia (m^4)
-     * @param L Column length
-     * @param K Effective length factor
-     * @return Critical buckling load as Force
      */
-    public static org.jscience.measure.Quantity<org.jscience.measure.quantity.Force> eulerBucklingLoad(
-            org.jscience.measure.Quantity<org.jscience.measure.quantity.Pressure> E,
-            double I,
-            org.jscience.measure.Quantity<org.jscience.measure.quantity.Length> L,
-            double K) {
-        double ePa = E.to(org.jscience.measure.Units.PASCAL).getValue().doubleValue();
-        double lM = L.to(org.jscience.measure.Units.METER).getValue().doubleValue();
-        double pCr = eulerBucklingLoad(ePa, I, lM, K);
-        return org.jscience.measure.Quantities.create(pCr, org.jscience.measure.Units.NEWTON);
+    public static Quantity<Force> eulerBucklingLoadQ(Quantity<Pressure> E, Real I, Quantity<Length> L, Real K) {
+        double ePa = E.to(Units.PASCAL).getValue().doubleValue();
+        double lM = L.to(Units.METER).getValue().doubleValue();
+        Real pCr = eulerBucklingLoad(Real.of(ePa), I, Real.of(lM), K);
+        return Quantities.create(pCr.doubleValue(), Units.NEWTON);
     }
 }

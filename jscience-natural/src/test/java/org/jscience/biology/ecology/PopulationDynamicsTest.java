@@ -1,3 +1,25 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.biology.ecology;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -8,6 +30,7 @@ import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Dimensionless;
 import org.jscience.measure.quantity.Frequency;
 import org.jscience.measure.quantity.Time;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Tests for PopulationDynamics.
@@ -16,13 +39,13 @@ public class PopulationDynamicsTest {
 
     @Test
     public void testExponentialGrowth() {
-        double p0 = 100;
-        double r = 0.1;
-        double t = 10;
+        Real p0 = Real.of(100);
+        Real r = Real.of(0.1);
+        Real t = Real.of(10);
         double expected = 100 * Math.exp(1); // e^1 ~ 2.718 -> 271.8
 
-        double result = PopulationDynamics.exponentialGrowth(p0, r, t);
-        assertEquals(expected, result, 1e-5);
+        Real result = PopulationDynamics.exponentialGrowth(p0, r, t);
+        assertEquals(expected, result.doubleValue(), 1e-5);
     }
 
     @Test
@@ -37,16 +60,16 @@ public class PopulationDynamicsTest {
 
     @Test
     public void testLogisticGrowth() {
-        double p0 = 10;
-        double K = 100;
-        double r = 0.5;
-        double t = 2;
+        Real p0 = Real.of(10);
+        Real K = Real.of(100);
+        Real r = Real.of(0.5);
+        Real t = Real.of(2);
 
-        double res = PopulationDynamics.logisticGrowth(p0, r, K, t);
+        Real res = PopulationDynamics.logisticGrowth(p0, r, K, t);
         // P(t) = 100 / (1 + (9)*e^-1) = 100 / (1 + 9*0.3678) = 100 / (1+3.31) =
         // 100/4.31 = 23.2
         double expected = 100.0 / (1.0 + ((100.0 - 10.0) / 10.0) * Math.exp(-0.5 * 2.0));
-        assertEquals(expected, res, 1e-5);
+        assertEquals(expected, res.doubleValue(), 1e-5);
     }
 
     @Test

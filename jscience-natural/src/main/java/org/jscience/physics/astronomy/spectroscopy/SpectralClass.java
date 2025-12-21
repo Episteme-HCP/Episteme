@@ -1,3 +1,25 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 package org.jscience.physics.astronomy.spectroscopy;
 
@@ -11,14 +33,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Temperature;
+
 /**
  * Stellar spectral classification.
  * Morgan-Keenan (MK) system.
  * Data loaded from spectral_classes.json.
+ * * @author Silvere Martin-Michiellot
  * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 5.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class SpectralClass {
 
@@ -42,11 +70,11 @@ public class SpectralClass {
     public static final SpectralClass Y = get("Y");
 
     private String symbol;
-    private double minTemp;
-    private double maxTemp;
+    private Quantity<Temperature> minTemp;
+    private Quantity<Temperature> maxTemp;
     private String color;
     private String features;
-    private double bvColorIndex; // Approximate B-V index upper bound
+    private Real bvColorIndex; // Approximate B-V index upper bound
 
     // Simple constructor for Jackson
     public SpectralClass() {
@@ -61,6 +89,7 @@ public class SpectralClass {
                 System.err.println("Could not find spectral_classes.json");
                 return;
             }
+            // Use DTO or just assume JSON maps to setters
             List<SpectralClass> classes = mapper.readValue(is, new TypeReference<List<SpectralClass>>() {
             });
             for (SpectralClass sc : classes) {
@@ -76,6 +105,13 @@ public class SpectralClass {
         return BY_SYMBOL.get(symbol);
     }
 
+    public static void register(SpectralClass spectralClass) {
+        if (spectralClass != null && spectralClass.getSymbol() != null) {
+            REGISTRY.add(spectralClass);
+            BY_SYMBOL.put(spectralClass.getSymbol(), spectralClass);
+        }
+    }
+
     public static List<SpectralClass> values() {
         return Collections.unmodifiableList(REGISTRY);
     }
@@ -88,19 +124,27 @@ public class SpectralClass {
         this.symbol = symbol;
     }
 
-    public double getMinTemp() {
+    public Quantity<Temperature> getMinTemp() {
         return minTemp;
     }
 
-    public void setMinTemp(double minTemp) {
+    public void setMinTemp(double val) {
+        this.minTemp = Quantities.create(val, Units.KELVIN);
+    }
+
+    public void setMinTemp(Quantity<Temperature> minTemp) {
         this.minTemp = minTemp;
     }
 
-    public double getMaxTemp() {
+    public Quantity<Temperature> getMaxTemp() {
         return maxTemp;
     }
 
-    public void setMaxTemp(double maxTemp) {
+    public void setMaxTemp(double val) {
+        this.maxTemp = Quantities.create(val, Units.KELVIN);
+    }
+
+    public void setMaxTemp(Quantity<Temperature> maxTemp) {
         this.maxTemp = maxTemp;
     }
 
@@ -120,11 +164,15 @@ public class SpectralClass {
         this.features = features;
     }
 
-    public double getBvColorIndex() {
+    public Real getBvColorIndex() {
         return bvColorIndex;
     }
 
-    public void setBvColorIndex(double bvColorIndex) {
+    public void setBvColorIndex(double val) {
+        this.bvColorIndex = Real.of(val);
+    }
+
+    public void setBvColorIndex(Real bvColorIndex) {
         this.bvColorIndex = bvColorIndex;
     }
 
@@ -132,14 +180,21 @@ public class SpectralClass {
      * Estimates spectral class from effective temperature.
      */
     public static SpectralClass fromTemperature(double temperature) {
+        return fromTemperature(Quantities.create(temperature, Units.KELVIN));
+    }
+
+    public static SpectralClass fromTemperature(Quantity<Temperature> temperature) {
         for (SpectralClass sc : REGISTRY) {
-            if (temperature >= sc.minTemp && temperature < sc.maxTemp) {
+            // Check if temperature is within range [min, max)
+            // minTemp <= temperature < maxTemp
+            // Note: Use compareTo for Quantities
+            if (temperature.compareTo(sc.minTemp) >= 0 && temperature.compareTo(sc.maxTemp) < 0) {
                 return sc;
             }
         }
         // Fallback logic
         if (!REGISTRY.isEmpty()) {
-            if (temperature >= REGISTRY.get(0).maxTemp)
+            if (temperature.compareTo(REGISTRY.get(0).maxTemp) >= 0)
                 return REGISTRY.get(0); // Hottest
             return REGISTRY.get(REGISTRY.size() - 1); // Coolest
         }
@@ -150,8 +205,12 @@ public class SpectralClass {
      * Estimates spectral class from B-V color index.
      */
     public static SpectralClass fromColorIndex(double bv) {
+        return fromColorIndex(Real.of(bv));
+    }
+
+    public static SpectralClass fromColorIndex(Real bv) {
         for (SpectralClass sc : REGISTRY) {
-            if (bv < sc.bvColorIndex) {
+            if (bv.compareTo(sc.bvColorIndex) < 0) {
                 return sc;
             }
         }

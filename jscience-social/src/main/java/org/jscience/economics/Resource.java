@@ -1,6 +1,29 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.economics;
 
 import org.jscience.geography.Place;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.sociology.Person;
 import javax.measure.Quantity;
 import java.io.Serializable;
@@ -15,6 +38,11 @@ import java.util.Set;
  * for another factory/consumer.
  *
  * Use Generic Q for the type of Quantity (Mass, Volume, Dimensionless, etc.)
+ * * @author Silvere Martin-Michiellot
+ * 
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ * 
  */
 public abstract class Resource<Q extends Quantity<Q>> implements Serializable {
 
@@ -33,14 +61,14 @@ public abstract class Resource<Q extends Quantity<Q>> implements Serializable {
     // Simplification for V1 Social: "Amount" is effectively "Quantity"
     // We will use a double magnitude and a String unit for display, or just
     // abstract it.
-    private double quantity;
+    private Real quantity;
 
     private Organization producer;
     private Set<Person> owners;
     private Place place;
     private Date productionDate;
 
-    public Resource(String name, String description, double quantity, Organization producer, Place place) {
+    public Resource(String name, String description, Real quantity, Organization producer, Place place) {
         this.name = name;
         this.description = description;
         this.quantity = quantity;
@@ -58,11 +86,11 @@ public abstract class Resource<Q extends Quantity<Q>> implements Serializable {
         return description;
     }
 
-    public double getQuantity() {
+    public Real getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(double quantity) {
+    public void setQuantity(Real quantity) {
         this.quantity = quantity;
     }
 

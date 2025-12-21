@@ -1,143 +1,113 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.physics.classical.thermodynamics;
+
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Thermodynamic property calculations.
+ * * @author Silvere Martin-Michiellot
  * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 5.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class ThermodynamicProperties {
 
     /** Gas constant R in J/(mol·K) */
-    public static final double R_J = 8.314462618;
-
+    public static final Real R_J = Real.of(8.314462618);
     /** Gas constant R in kJ/(mol·K) */
-    public static final double R_KJ = 0.008314462618;
-
+    public static final Real R_KJ = Real.of(0.008314462618);
     /** Gas constant R in cal/(mol·K) */
-    public static final double R_CAL = 1.98720425864;
+    public static final Real R_CAL = Real.of(1.98720425864);
 
     /**
-     * Calculates Gibbs free energy change.
-     * ΔG = ΔH - T·ΔS
+     * Calculates Gibbs free energy change. ΔG = ΔH - T·ΔS
      * 
      * @param deltaH Enthalpy change (kJ/mol)
      * @param deltaS Entropy change (J/mol·K)
      * @param T      Temperature (K)
      * @return ΔG in kJ/mol
      */
-    public static double gibbsEnergy(double deltaH, double deltaS, double T) {
-        return deltaH - T * deltaS / 1000.0; // Convert J to kJ
+    public static Real gibbsEnergy(Real deltaH, Real deltaS, Real T) {
+        return deltaH.subtract(T.multiply(deltaS).divide(Real.of(1000)));
+    }
+
+    /** Equilibrium constant from Gibbs energy. K = exp(-ΔG°/(R·T)) */
+    public static Real equilibriumConstant(Real deltaG, Real T) {
+        return deltaG.negate().divide(R_KJ.multiply(T)).exp();
+    }
+
+    /** Gibbs energy from equilibrium constant. ΔG° = -R·T·ln(K) */
+    public static Real gibbsFromK(Real K, Real T) {
+        return R_KJ.negate().multiply(T).multiply(K.log());
     }
 
     /**
-     * Calculates equilibrium constant from Gibbs energy.
-     * K = exp(-ΔG°/(R·T))
-     * 
-     * @param deltaG Standard Gibbs energy change (kJ/mol)
-     * @param T      Temperature (K)
-     * @return Equilibrium constant K
+     * Reaction quotient Q = [products]^ν / [reactants]^ν
      */
-    public static double equilibriumConstant(double deltaG, double T) {
-        return Math.exp(-deltaG / (R_KJ * T));
-    }
-
-    /**
-     * Calculates Gibbs energy from equilibrium constant.
-     * ΔG° = -R·T·ln(K)
-     */
-    public static double gibbsFromK(double K, double T) {
-        return -R_KJ * T * Math.log(K);
-    }
-
-    /**
-     * Reaction quotient Q calculation.
-     * Q = [products]^ν / [reactants]^ν
-     * 
-     * @param productConcentrations  Product concentrations
-     * @param productCoefficients    Stoichiometric coefficients (positive)
-     * @param reactantConcentrations Reactant concentrations
-     * @param reactantCoefficients   Stoichiometric coefficients (positive)
-     * @return Reaction quotient Q
-     */
-    public static double reactionQuotient(double[] productConcentrations, int[] productCoefficients,
-            double[] reactantConcentrations, int[] reactantCoefficients) {
-        double numerator = 1.0;
-        for (int i = 0; i < productConcentrations.length; i++) {
-            numerator *= Math.pow(productConcentrations[i], productCoefficients[i]);
+    public static Real reactionQuotient(Real[] productConc, int[] productCoeff,
+            Real[] reactantConc, int[] reactantCoeff) {
+        Real numerator = Real.ONE;
+        for (int i = 0; i < productConc.length; i++) {
+            numerator = numerator.multiply(productConc[i].pow(Real.of(productCoeff[i])));
         }
-
-        double denominator = 1.0;
-        for (int i = 0; i < reactantConcentrations.length; i++) {
-            denominator *= Math.pow(reactantConcentrations[i], reactantCoefficients[i]);
+        Real denominator = Real.ONE;
+        for (int i = 0; i < reactantConc.length; i++) {
+            denominator = denominator.multiply(reactantConc[i].pow(Real.of(reactantCoeff[i])));
         }
-
-        return numerator / denominator;
+        return numerator.divide(denominator);
     }
 
-    /**
-     * Determines reaction spontaneity.
-     * 
-     * @param deltaG Gibbs energy change
-     * @return true if spontaneous (ΔG < 0)
-     */
-    public static boolean isSpontaneous(double deltaG) {
-        return deltaG < 0;
+    /** Returns true if spontaneous (ΔG < 0) */
+    public static boolean isSpontaneous(Real deltaG) {
+        return deltaG.compareTo(Real.ZERO) < 0;
     }
 
-    /**
-     * Calculates temperature at which ΔG = 0 (equilibrium temperature).
-     * T_eq = ΔH / ΔS
-     * 
-     * @param deltaH Enthalpy change (kJ/mol)
-     * @param deltaS Entropy change (J/mol·K)
-     * @return Equilibrium temperature (K)
-     */
-    public static double equilibriumTemperature(double deltaH, double deltaS) {
-        return deltaH * 1000.0 / deltaS;
+    /** Equilibrium temperature T_eq = ΔH / ΔS */
+    public static Real equilibriumTemperature(Real deltaH, Real deltaS) {
+        return deltaH.multiply(Real.of(1000)).divide(deltaS);
     }
 
-    /**
-     * Van't Hoff equation: temperature dependence of K.
-     * ln(K2/K1) = -ΔH°/R * (1/T2 - 1/T1)
-     * 
-     * @param K1     Equilibrium constant at T1
-     * @param T1     Temperature 1 (K)
-     * @param T2     Temperature 2 (K)
-     * @param deltaH Standard enthalpy change (kJ/mol)
-     * @return K2 at temperature T2
-     */
-    public static double vantHoff(double K1, double T1, double T2, double deltaH) {
-        double exponent = (-deltaH / R_KJ) * (1.0 / T2 - 1.0 / T1);
-        return K1 * Math.exp(exponent);
+    /** Van't Hoff equation: K2 = K1 * exp(-ΔH/R * (1/T2 - 1/T1)) */
+    public static Real vantHoff(Real K1, Real T1, Real T2, Real deltaH) {
+        Real exponent = deltaH.negate().divide(R_KJ).multiply(T2.inverse().subtract(T1.inverse()));
+        return K1.multiply(exponent.exp());
     }
 
-    /**
-     * Heat capacity at constant pressure.
-     * q = n·Cp·ΔT
-     * 
-     * @param n      Amount (mol)
-     * @param Cp     Molar heat capacity (J/mol·K)
-     * @param deltaT Temperature change (K)
-     * @return Heat transferred (J)
-     */
-    public static double heatTransfer(double n, double Cp, double deltaT) {
-        return n * Cp * deltaT;
+    /** Heat transfer q = n·Cp·ΔT */
+    public static Real heatTransfer(Real n, Real Cp, Real deltaT) {
+        return n.multiply(Cp).multiply(deltaT);
     }
 
-    /**
-     * Standard enthalpy of reaction from formation enthalpies.
-     * ΔH°_rxn = Σ ΔH°_f(products) - Σ ΔH°_f(reactants)
-     */
-    public static double reactionEnthalpy(double[] productFormationEnthalpies, int[] productCoeff,
-            double[] reactantFormationEnthalpies, int[] reactantCoeff) {
-        double sum = 0;
-        for (int i = 0; i < productFormationEnthalpies.length; i++) {
-            sum += productCoeff[i] * productFormationEnthalpies[i];
+    /** Standard enthalpy of reaction from formation enthalpies */
+    public static Real reactionEnthalpy(Real[] productFormH, int[] productCoeff,
+            Real[] reactantFormH, int[] reactantCoeff) {
+        Real sum = Real.ZERO;
+        for (int i = 0; i < productFormH.length; i++) {
+            sum = sum.add(Real.of(productCoeff[i]).multiply(productFormH[i]));
         }
-        for (int i = 0; i < reactantFormationEnthalpies.length; i++) {
-            sum -= reactantCoeff[i] * reactantFormationEnthalpies[i];
+        for (int i = 0; i < reactantFormH.length; i++) {
+            sum = sum.subtract(Real.of(reactantCoeff[i]).multiply(reactantFormH[i]));
         }
         return sum;
     }

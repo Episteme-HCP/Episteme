@@ -1,0 +1,145 @@
+package org.jscience.ui.physics.mechanics;
+
+import javafx.animation.AnimationTimer;
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+
+/**
+ * Mechanics Viewer.
+ * Visualizes a Mass-Spring-Damper system.
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+public class MechanicsViewer extends Application {
+
+    private double mass = 5.0; // kg
+    private double k = 10.0; // N/m (Spring constant)
+    private double c = 0.5; // Ns/m (Damping)
+
+    private double position = 100; // Displacement from equilibrium (pixels)
+    private double velocity = 0;
+
+    private Canvas canvas;
+
+    @Override
+    public void start(Stage stage) {
+        BorderPane root = new BorderPane();
+        canvas = new Canvas(400, 600);
+        root.setCenter(canvas);
+
+        VBox controls = new VBox(10);
+        controls.setPadding(new Insets(10));
+
+        Slider kSlider = new Slider(1, 50, 10);
+        kSlider.valueProperty().addListener((o, old, v) -> k = v.doubleValue());
+
+        Slider mSlider = new Slider(1, 20, 5);
+        mSlider.valueProperty().addListener((o, old, v) -> mass = v.doubleValue());
+
+        Slider cSlider = new Slider(0, 5, 0.5);
+        cSlider.valueProperty().addListener((o, old, v) -> c = v.doubleValue());
+
+        controls.getChildren().addAll(
+                new Label("Spring Constant (k):"), kSlider,
+                new Label("Mass (m):"), mSlider,
+                new Label("Damping (c):"), cSlider,
+                new Label("Click and drag mass to disturb"));
+        root.setRight(controls);
+
+        canvas.setOnMouseDragged(e -> {
+            // Drag mass
+            position = e.getY() - 300; // 300 is equilibrium Y
+            velocity = 0;
+        });
+
+        new AnimationTimer() {
+            long last = 0;
+
+            @Override
+            public void handle(long now) {
+                if (last == 0) {
+                    last = now;
+                    return;
+                }
+                double dt = (now - last) / 1e9;
+                last = now;
+                update(dt);
+                draw();
+            }
+        }.start();
+
+        Scene scene = new Scene(root, 600, 600);
+        stage.setTitle("JScience Mechanics Demo");
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private void update(double dt) {
+        // F = -kx - cv
+        // a = F/m
+        double force = -k * position - c * velocity;
+        double a = force / mass;
+
+        velocity += a * dt * 50; // Scale time/physics for visual speed
+        position += velocity * dt * 50;
+    }
+
+    private void draw() {
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.setFill(Color.WHITESMOKE);
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        double centerX = canvas.getWidth() / 2;
+        double anchorY = 50;
+        double eqY = 300;
+        double massY = eqY + position;
+
+        // Draw Ceiling
+        gc.setLineWidth(4);
+        gc.setStroke(Color.BLACK);
+        gc.strokeLine(centerX - 50, anchorY, centerX + 50, anchorY);
+
+        // Draw Spring
+        gc.setLineWidth(2);
+        gc.setStroke(Color.BLACK);
+        int segments = 15;
+        double segHeight = (massY - anchorY) / segments;
+        double w = 20;
+        double px = centerX;
+        double py = anchorY;
+        for (int i = 0; i < segments; i++) {
+            double ny = py + segHeight;
+            double nx = centerX + ((i % 2 == 0) ? w : -w);
+            if (i == segments - 1)
+                nx = centerX;
+            gc.strokeLine(px, py, nx, ny);
+            px = nx;
+            py = ny;
+        }
+
+        // Draw Mass
+        gc.setFill(Color.RED);
+        gc.fillRect(centerX - 20, massY, 40, 40);
+        gc.setFill(Color.WHITE);
+        gc.fillText(String.format("%.1f kg", mass), centerX - 15, massY + 25);
+    }
+
+    public static void show(Stage stage) {
+        new MechanicsViewer().start(stage);
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}

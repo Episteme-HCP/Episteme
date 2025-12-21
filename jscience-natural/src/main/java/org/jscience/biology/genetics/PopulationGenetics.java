@@ -1,74 +1,69 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.biology.genetics;
+
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Population genetics models.
+ * * @author Silvere Martin-Michiellot
  * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 5.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class PopulationGenetics {
 
-    /**
-     * Hardy-Weinberg equilibrium: Genotype frequency.
-     * p + q = 1
-     * p² + 2pq + q² = 1
-     * 
-     * @param p Frequency of dominant allele (A)
-     * @return [p², 2pq, q²] representing AA, Aa, aa frequencies.
-     */
-    public static double[] hardyWeinbergFrequencies(double p) {
-        if (p < 0 || p > 1)
+    /** Hardy-Weinberg genotype frequencies: [p², 2pq, q²] */
+    public static Real[] hardyWeinbergFrequencies(Real p) {
+        if (p.compareTo(Real.ZERO) < 0 || p.compareTo(Real.ONE) > 0)
             throw new IllegalArgumentException("Allele frequency p must be between 0 and 1");
-        double q = 1.0 - p;
-        return new double[] { p * p, 2 * p * q, q * q };
+        Real q = Real.ONE.subtract(p);
+        return new Real[] { p.pow(2), Real.TWO.multiply(p).multiply(q), q.pow(2) };
     }
 
-    /**
-     * Estimates allele frequency p from genotype counts.
-     * p = (2*AA + Aa) / (2*N)
-     * 
-     * @param AA Count of homozygous dominant
-     * @param Aa Count of heterozygous
-     * @param aa Count of homozygous recessive
-     */
-    public static double estimateAlleleFrequency(int AA, int Aa, int aa) {
+    /** Estimate allele frequency: p = (2*AA + Aa) / (2*N) */
+    public static Real estimateAlleleFrequency(int AA, int Aa, int aa) {
         int N = AA + Aa + aa;
         if (N == 0)
-            return 0;
-        return (2.0 * AA + Aa) / (2.0 * N);
+            return Real.ZERO;
+        return Real.of(2.0 * AA + Aa).divide(Real.of(2.0 * N));
     }
 
-    /**
-     * Fixation index (F_ST) between two subpopulations.
-     * F_ST = (H_T - H_S) / H_T
-     * where H_T is total heterozygosity and H_S is average subpopulation
-     * heterozygosity.
-     */
-    public static double fixationIndex(double heterozygozityTotal, double heterozygozitySub) {
-        if (heterozygozityTotal == 0)
-            return 0;
-        return (heterozygozityTotal - heterozygozitySub) / heterozygozityTotal;
+    /** Fixation index: F_ST = (H_T - H_S) / H_T */
+    public static Real fixationIndex(Real heterozygosityTotal, Real heterozygositySub) {
+        if (heterozygosityTotal.isZero())
+            return Real.ZERO;
+        return heterozygosityTotal.subtract(heterozygositySub).divide(heterozygosityTotal);
     }
 
-    /**
-     * Genetic drift simulation (Wright-Fisher model).
-     * Simulates the change in allele count over generation.
-     * 
-     * @param initialCountAllelA Number of 'A' alleles in population (max 2N)
-     * @param populationSize     N (diploid individuals, so 2N gene copies)
-     * @return New count of 'A' alleles in next generation
-     */
-    public static int wrightFisherStep(int initialCountAllelA, int populationSize) {
+    /** Wright-Fisher step (genetic drift simulation) */
+    public static int wrightFisherStep(int initialCountAlleleA, int populationSize) {
         int totalGenes = 2 * populationSize;
-        double p = (double) initialCountAllelA / totalGenes;
-
-        // Next generation: binomial sampling B(2N, p)
+        double p = (double) initialCountAlleleA / totalGenes;
         int nextGenCount = 0;
         for (int i = 0; i < totalGenes; i++) {
-            if (Math.random() < p) {
+            if (Math.random() < p)
                 nextGenCount++;
-            }
         }
         return nextGenCount;
     }

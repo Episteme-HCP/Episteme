@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.io;
 
@@ -63,8 +63,8 @@ import java.util.*;
  * <li>Memory: ~70KB for full database</li>
  * </ul>
  * 
- * @see <a href="http://phrontistery.50megs.com">Phrontistery Word List</a>
- * @author Silvere Martin-Michiellot
+ * @see <a href="http://phrontistery.50megs.com">Phrontistery Word List</a> * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class SciencesDatabase {

@@ -32,8 +32,7 @@ import java.util.*;
 /**
  * The group of 3x3 unitary matrices with determinant 1.
  * Important in quantum chromodynamics (QCD).
- * 
- * @author Silvere Martin-Michiellot
+ * * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

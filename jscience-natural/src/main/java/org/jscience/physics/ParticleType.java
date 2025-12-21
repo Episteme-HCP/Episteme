@@ -1,3 +1,25 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.physics;
 
 import org.jscience.mathematics.numbers.real.Real;
@@ -6,10 +28,10 @@ import java.util.HashMap;
 
 /**
  * Standard Model particles and properties.
+ * * @author Silvere Martin-Michiellot
  * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 5.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class ParticleType {
 
@@ -116,6 +138,20 @@ public class ParticleType {
             is.close();
         } catch (Exception e) {
             throw new RuntimeException("Failed to load Standard Model particles", e);
+        }
+    }
+
+    /**
+     * Registers a new particle type manually.
+     * 
+     * @param particle the particle type to register
+     */
+    public static void registerParticle(ParticleType particle) {
+        if (particle != null && particle.getSymbol() != null) {
+            PARTICLES.put(particle.getSymbol(), particle);
+            if (particle.getName() != null) {
+                PARTICLES.put(particle.getName().toUpperCase(), particle);
+            }
         }
     }
 

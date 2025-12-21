@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.physics;
 
@@ -30,9 +30,10 @@ import org.jscience.mathematics.numbers.real.Real;
  * Based on Hamilton's principle of least action: δS = δ∫L dt = 0
  * Euler-Lagrange equation: d/dt(∂L/∂q̇) - ∂L/∂q = 0
  * </p>
+ * * @author Silvere Martin-Michiellot
  * 
- * @author Silvere Martin-Michiellot
- * @since 2.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class LagrangianMechanics {
 
@@ -91,7 +92,7 @@ public class LagrangianMechanics {
     public static Real lagrangianPendulum(Real mass, Real length, Real angularVel, Real angle, Real g) {
         Real kinetic = Real.of(0.5).multiply(mass).multiply(length).multiply(length)
                 .multiply(angularVel).multiply(angularVel);
-        Real potential = mass.multiply(g).multiply(length).multiply(Real.of(Math.cos(angle.doubleValue())));
+        Real potential = mass.multiply(g).multiply(length).multiply(angle.cos());
         return kinetic.add(potential); // +mgl cos(θ) since we measure from bottom
     }
 

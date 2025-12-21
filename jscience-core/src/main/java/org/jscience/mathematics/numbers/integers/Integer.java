@@ -51,8 +51,7 @@ import org.jscience.mathematics.structures.rings.RingElement;
  * Integer huge = Integer.of(new BigInteger("999999999999999999999")); // Uses BigInteger
  * }
  * </pre>
- * 
- * @author Silvere Martin-Michiellot
+ * * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

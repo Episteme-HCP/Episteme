@@ -1,6 +1,24 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.economics;
 
@@ -8,10 +26,10 @@ import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents an economic system/economy.
- *
+ * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 2.0
+ * @since 1.0
  */
 public class Economy {
 
@@ -31,9 +49,9 @@ public class Economy {
     private Currency primaryCurrency;
     private Real gdp; // Gross Domestic Product
     private Real gdpPerCapita;
-    private double inflationRate; // Annual percentage
-    private double unemploymentRate; // Percentage
-    private double giniCoefficient; // Income inequality (0-1)
+    private Real inflationRate; // Annual percentage
+    private Real unemploymentRate; // Percentage
+    private Real giniCoefficient; // Income inequality (0-1)
     private long population;
 
     public Economy(String name, Type type, Currency primaryCurrency) {
@@ -63,15 +81,15 @@ public class Economy {
         return gdpPerCapita;
     }
 
-    public double getInflationRate() {
+    public Real getInflationRate() {
         return inflationRate;
     }
 
-    public double getUnemploymentRate() {
+    public Real getUnemploymentRate() {
         return unemploymentRate;
     }
 
-    public double getGiniCoefficient() {
+    public Real getGiniCoefficient() {
         return giniCoefficient;
     }
 
@@ -92,15 +110,15 @@ public class Economy {
         this.gdpPerCapita = gdpPerCapita;
     }
 
-    public void setInflationRate(double rate) {
+    public void setInflationRate(Real rate) {
         this.inflationRate = rate;
     }
 
-    public void setUnemploymentRate(double rate) {
+    public void setUnemploymentRate(Real rate) {
         this.unemploymentRate = rate;
     }
 
-    public void setGiniCoefficient(double gini) {
+    public void setGiniCoefficient(Real gini) {
         this.giniCoefficient = gini;
     }
 
@@ -122,19 +140,23 @@ public class Economy {
      * Based on unemployment, inflation, and growth.
      */
     public String getHealthIndicator() {
-        if (unemploymentRate < 5 && inflationRate < 3)
+        double unemp = unemploymentRate != null ? unemploymentRate.doubleValue() : 0;
+        double infl = inflationRate != null ? inflationRate.doubleValue() : 0;
+
+        if (unemp < 5 && infl < 3)
             return "Strong";
-        if (unemploymentRate < 8 && inflationRate < 5)
+        if (unemp < 8 && infl < 5)
             return "Moderate";
-        if (unemploymentRate < 12 && inflationRate < 10)
+        if (unemp < 12 && infl < 10)
             return "Weak";
         return "Critical";
     }
 
     @Override
     public String toString() {
-        return String.format("Economy '%s' (%s): GDP=%s, Unemployment=%.1f%%",
-                name, type, gdp != null ? gdp.toString() : "N/A", unemploymentRate);
+        return String.format("Economy '%s' (%s): GDP=%s, Unemployment=%s",
+                name, type, gdp != null ? gdp.toString() : "N/A",
+                unemploymentRate != null ? unemploymentRate.toString() : "N/A");
     }
 
     // Notable economies
@@ -143,9 +165,9 @@ public class Economy {
         e.setGdp(Real.of(25_000_000_000_000.0)); // $25 trillion
         e.setPopulation(330_000_000);
         e.calculateGdpPerCapita();
-        e.setUnemploymentRate(3.7);
-        e.setInflationRate(3.2);
-        e.setGiniCoefficient(0.39);
+        e.setUnemploymentRate(Real.of(3.7));
+        e.setInflationRate(Real.of(3.2));
+        e.setGiniCoefficient(Real.of(0.39));
         return e;
     }
 
@@ -154,9 +176,9 @@ public class Economy {
         e.setGdp(Real.of(18_000_000_000_000.0)); // $18 trillion
         e.setPopulation(1_400_000_000);
         e.calculateGdpPerCapita();
-        e.setUnemploymentRate(5.3);
-        e.setInflationRate(0.2);
-        e.setGiniCoefficient(0.38);
+        e.setUnemploymentRate(Real.of(5.3));
+        e.setInflationRate(Real.of(0.2));
+        e.setGiniCoefficient(Real.of(0.38));
         return e;
     }
 }

@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.benchmark;
 
@@ -32,11 +32,9 @@ package org.jscience.benchmark;
  * Tests performance of direct N-body gravitational simulation
  * with O(N²) force calculations.
  * </p>
- * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 2.0
- * @see NBodySimulation for JScience API-based implementation
+ * * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class NBodyRegularBenchmark {
 

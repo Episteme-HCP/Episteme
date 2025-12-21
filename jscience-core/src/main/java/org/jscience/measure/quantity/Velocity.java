@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.measure.quantity;
 
@@ -38,13 +38,9 @@ import org.jscience.measure.Quantity;
  * <li><b>Imperial</b>: ft/s, mph (miles per hour), knots</li>
  * <li><b>Scientific</b>: c (speed of light)</li>
  * </ul>
- * 
- * @author Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 2.0
- * 
- * @see org.jscience.measure.Units#METER_PER_SECOND
- * @see org.jscience.measure.Units#KILOMETER_PER_HOUR
+ * @since 1.0
  */
 public interface Velocity extends Quantity<Velocity> {
 }

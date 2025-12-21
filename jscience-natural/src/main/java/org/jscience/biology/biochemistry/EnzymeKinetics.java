@@ -1,50 +1,61 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.biology.biochemistry;
+
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Michaelis-Menten enzyme kinetics.
+ * * @author Silvere Martin-Michiellot
+ * 
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class EnzymeKinetics {
 
     private EnzymeKinetics() {
     }
 
-    /**
-     * Calculates reaction velocity using Michaelis-Menten equation.
-     * V = Vmax * [S] / (Km + [S])
-     * 
-     * @param vMax                   Maximum velocity
-     * @param km                     Michaelis constant
-     * @param substrateConcentration [S]
-     * @return Reaction velocity
-     */
-    public static double velocity(double vMax, double km, double substrateConcentration) {
-        return vMax * substrateConcentration / (km + substrateConcentration);
+    /** Michaelis-Menten: V = Vmax * [S] / (Km + [S]) */
+    public static Real velocity(Real vMax, Real km, Real substrateConc) {
+        return vMax.multiply(substrateConc).divide(km.add(substrateConc));
     }
 
-    /**
-     * Lineweaver-Burk linearization (double reciprocal).
-     * 1/V = (Km/Vmax)(1/[S]) + 1/Vmax
-     * 
-     * @return double[2] = {slope, intercept}
-     */
-    public static double[] lineweaverBurkParams(double vMax, double km) {
-        double slope = km / vMax;
-        double intercept = 1.0 / vMax;
-        return new double[] { slope, intercept };
+    /** Lineweaver-Burk parameters: {slope, intercept} */
+    public static Real[] lineweaverBurkParams(Real vMax, Real km) {
+        Real slope = km.divide(vMax);
+        Real intercept = Real.ONE.divide(vMax);
+        return new Real[] { slope, intercept };
     }
 
-    /**
-     * Calculates Km from half-maximal velocity.
-     * At V = Vmax/2, [S] = Km
-     */
-    public static double findKm(double[] substrateConcs, double[] velocities, double vMax) {
-        double halfVmax = vMax / 2.0;
-        // Find [S] where V is closest to Vmax/2
+    /** Find Km from velocity data (half-maximal) */
+    public static Real findKm(Real[] substrateConcs, Real[] velocities, Real vMax) {
+        Real halfVmax = vMax.divide(Real.TWO);
         int bestIdx = 0;
-        double bestDiff = Double.MAX_VALUE;
+        Real bestDiff = Real.of(Double.MAX_VALUE);
         for (int i = 0; i < velocities.length; i++) {
-            double diff = Math.abs(velocities[i] - halfVmax);
-            if (diff < bestDiff) {
+            Real diff = velocities[i].subtract(halfVmax).abs();
+            if (diff.compareTo(bestDiff) < 0) {
                 bestDiff = diff;
                 bestIdx = i;
             }
@@ -52,13 +63,10 @@ public class EnzymeKinetics {
         return substrateConcs[bestIdx];
     }
 
-    /**
-     * Competitive inhibition.
-     * V = Vmax * [S] / (Km * (1 + [I]/Ki) + [S])
-     */
-    public static double velocityWithCompetitiveInhibitor(double vMax, double km,
-            double substrateConc, double inhibitorConc, double ki) {
-        double apparentKm = km * (1 + inhibitorConc / ki);
-        return vMax * substrateConc / (apparentKm + substrateConc);
+    /** Competitive inhibition: V = Vmax * [S] / (Km * (1 + [I]/Ki) + [S]) */
+    public static Real velocityWithCompetitiveInhibitor(Real vMax, Real km,
+            Real substrateConc, Real inhibitorConc, Real ki) {
+        Real apparentKm = km.multiply(Real.ONE.add(inhibitorConc.divide(ki)));
+        return vMax.multiply(substrateConc).divide(apparentKm.add(substrateConc));
     }
 }

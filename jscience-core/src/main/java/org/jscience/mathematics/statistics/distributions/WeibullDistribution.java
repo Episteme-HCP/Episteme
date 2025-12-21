@@ -17,8 +17,8 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package org.jscience.mathematics.statistics.distributions;
 
@@ -27,7 +27,10 @@ import org.jscience.mathematics.statistics.ContinuousDistribution;
 
 /**
  * Weibull distribution.
- * PDF: f(x) = (k/λ)(x/λ)^(k-1) * exp(-(x/λ)^k) for x ≥ 0
+ * PDF: f(x) = (k/λ)(x/λ)^(k-1) * exp(-(x/λ)^k) for x ≥ 0 * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ 
  */
 public class WeibullDistribution extends ContinuousDistribution {
     private final Real shape; // k
@@ -79,5 +82,3 @@ public class WeibullDistribution extends ContinuousDistribution {
         return String.format("Weibull(k=%.4f, λ=%.4f)", shape.doubleValue(), scale.doubleValue());
     }
 }
-
-

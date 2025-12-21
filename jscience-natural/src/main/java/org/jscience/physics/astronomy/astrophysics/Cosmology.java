@@ -1,155 +1,170 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.physics.astronomy.astrophysics;
+
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Cosmology calculations.
  * 
  * @author Silvere Martin-Michiellot
- * @author Gemini AI
- * @since 5.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class Cosmology {
 
     /** Speed of light (km/s) */
-    public static final double C_KM_S = 299792.458;
+    public static final Real C_KM_S = Real.of(299792.458);
 
     /** Hubble constant (km/s/Mpc) - Planck 2018 */
-    public static final double H0_PLANCK = 67.4;
+    public static final Real H0_PLANCK = Real.of(67.4);
 
     /** Critical density (kg/m³) for H0 = 67.4 */
-    public static final double RHO_CRIT = 8.5e-27;
+    public static final Real RHO_CRIT = Real.of(8.5e-27);
 
     /** Age of universe (seconds) */
-    public static final double AGE_UNIVERSE = 4.35e17;
+    public static final Real AGE_UNIVERSE = Real.of(4.35e17);
 
     /** Present density parameters (Planck 2018) */
-    public static final double OMEGA_M = 0.315; // Matter
-    public static final double OMEGA_LAMBDA = 0.685; // Dark energy
-    public static final double OMEGA_R = 9.2e-5; // Radiation
+    public static final Real OMEGA_M = Real.of(0.315);
+    public static final Real OMEGA_LAMBDA = Real.of(0.685);
+    public static final Real OMEGA_R = Real.of(9.2e-5);
 
     /**
      * Hubble's law: recession velocity.
      * v = H0 * d
-     * 
-     * @param distanceMpc Distance in megaparsecs
-     * @param H0          Hubble constant (km/s/Mpc)
-     * @return Recession velocity (km/s)
      */
-    public static double recessionVelocity(double distanceMpc, double H0) {
-        return H0 * distanceMpc;
+    public static Real recessionVelocity(Real distanceMpc, Real H0) {
+        return H0.multiply(distanceMpc);
     }
 
     /**
      * Hubble distance from redshift (low-z approximation).
      * d = cz / H0
      */
-    public static double hubbleDistance(double z, double H0) {
-        return C_KM_S * z / H0;
+    public static Real hubbleDistance(Real z, Real H0) {
+        return C_KM_S.multiply(z).divide(H0);
     }
 
     /**
      * Hubble time (age of universe if expansion were constant).
-     * t_H = 1/H0
      * 
-     * @param H0 Hubble constant (km/s/Mpc)
      * @return Hubble time in Gyr
      */
-    public static double hubbleTime(double H0) {
-        // Convert H0 to 1/seconds, then to Gyr
-        return 977.8 / H0; // Gyr
+    public static Real hubbleTime(Real H0) {
+        return Real.of(977.8).divide(H0);
     }
 
     /**
      * Cosmological redshift to scale factor.
      * a = 1/(1+z)
      */
-    public static double scaleFactor(double z) {
-        return 1.0 / (1 + z);
+    public static Real scaleFactor(Real z) {
+        return Real.ONE.divide(Real.ONE.add(z));
     }
 
     /**
      * Scale factor to redshift.
      * z = 1/a - 1
      */
-    public static double redshiftFromScaleFactor(double a) {
-        return 1.0 / a - 1;
+    public static Real redshiftFromScaleFactor(Real a) {
+        return Real.ONE.divide(a).subtract(Real.ONE);
     }
 
     /**
      * Lookback time (simplified, matter-dominated).
-     * t_lookback ≈ t_H * (1 - (1+z)^(-3/2))
      */
-    public static double lookbackTime(double z, double H0) {
-        double tH = hubbleTime(H0);
-        return tH * (1 - Math.pow(1 + z, -1.5));
+    public static Real lookbackTime(Real z, Real H0) {
+        Real tH = hubbleTime(H0);
+        return tH.multiply(Real.ONE.subtract(Real.ONE.add(z).pow(Real.of(-1.5))));
     }
 
     /**
      * Comoving distance (simplified integral for ΛCDM).
      */
-    public static double comovingDistance(double z, double H0, double omegaM, double omegaLambda) {
-        // Numerical integration of dc = c * dz / H(z)
+    public static Real comovingDistance(Real z, Real H0, Real omegaM, Real omegaLambda) {
         int steps = 1000;
-        double dz = z / steps;
-        double dc = 0;
+        Real dz = z.divide(Real.of(steps));
+        Real dc = Real.ZERO;
 
         for (int i = 0; i < steps; i++) {
-            double zi = (i + 0.5) * dz;
-            double Ez = Math.sqrt(omegaM * Math.pow(1 + zi, 3) + omegaLambda);
-            dc += dz / Ez;
+            Real zi = Real.of(i + 0.5).multiply(dz);
+            Real onePlusZ = Real.ONE.add(zi);
+            Real Ez = omegaM.multiply(onePlusZ.pow(3)).add(omegaLambda).sqrt();
+            dc = dc.add(dz.divide(Ez));
         }
 
-        return C_KM_S * dc / H0; // Mpc
+        return C_KM_S.multiply(dc).divide(H0);
     }
 
     /**
      * Luminosity distance.
      * d_L = (1+z) * d_c
      */
-    public static double luminosityDistance(double z, double comovingDistance) {
-        return (1 + z) * comovingDistance;
+    public static Real luminosityDistance(Real z, Real comovingDistance) {
+        return Real.ONE.add(z).multiply(comovingDistance);
     }
 
     /**
      * Angular diameter distance.
      * d_A = d_c / (1+z)
      */
-    public static double angularDiameterDistance(double z, double comovingDistance) {
-        return comovingDistance / (1 + z);
+    public static Real angularDiameterDistance(Real z, Real comovingDistance) {
+        return comovingDistance.divide(Real.ONE.add(z));
     }
 
     /**
      * Cosmic microwave background temperature at redshift z.
      * T(z) = T0 * (1+z)
      */
-    public static double cmbTemperature(double z) {
-        double T0 = 2.725; // Present CMB temperature (K)
-        return T0 * (1 + z);
+    public static Real cmbTemperature(Real z) {
+        Real T0 = Real.of(2.725);
+        return T0.multiply(Real.ONE.add(z));
     }
 
     /**
      * Dark energy equation of state parameter.
-     * For cosmological constant: w = -1
      */
-    public static double darkEnergyDensity(double z, double w) {
-        return Math.pow(1 + z, 3 * (1 + w));
+    public static Real darkEnergyDensity(Real z, Real w) {
+        return Real.ONE.add(z).pow(Real.of(3).multiply(Real.ONE.add(w)));
     }
 
     /**
      * Friedmann equation: H²/H0² = E²(z)
-     * E(z) = √(Ωm(1+z)³ + ΩΛ + Ωr(1+z)⁴)
      */
-    public static double friedmannE(double z, double omegaM, double omegaLambda, double omegaR) {
-        return Math.sqrt(omegaM * Math.pow(1 + z, 3)
-                + omegaLambda
-                + omegaR * Math.pow(1 + z, 4));
+    public static Real friedmannE(Real z, Real omegaM, Real omegaLambda, Real omegaR) {
+        Real onePlusZ = Real.ONE.add(z);
+        return omegaM.multiply(onePlusZ.pow(3))
+                .add(omegaLambda)
+                .add(omegaR.multiply(onePlusZ.pow(4)))
+                .sqrt();
     }
 
     /**
      * Deceleration parameter at present.
      * q0 = Ωm/2 - ΩΛ
-     * q0 < 0 means accelerating expansion
      */
-    public static double decelerationParameter(double omegaM, double omegaLambda) {
-        return omegaM / 2 - omegaLambda;
+    public static Real decelerationParameter(Real omegaM, Real omegaLambda) {
+        return omegaM.divide(Real.TWO).subtract(omegaLambda);
     }
 }
