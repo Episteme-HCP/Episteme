@@ -29,6 +29,7 @@ import java.util.*;
 /**
  * Represents a person with demographics and social attributes.
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

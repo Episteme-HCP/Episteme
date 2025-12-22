@@ -22,16 +22,18 @@
  */
 package org.jscience.economics;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Utility class for financial mathematics.
+ * <p>
  * Includes Net Present Value (NPV), Future Value (FV), and Amortization
- * calculations. * @author Silvere Martin-Michiellot
+ * calculations, strictly using {@link Real} for precision.
+ * </p>
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- 
  */
 public class FinancialMath {
 
@@ -44,15 +46,14 @@ public class FinancialMath {
      * FV = PV * (1 + r)^n
      *
      * @param presentValue The current value (PV).
-     * @param rate         The interest rate per period (r).
+     * @param rate         The interest rate per period (r) as a decimal (e.g. 0.05
+     *                     for 5%).
      * @param periods      The number of periods (n).
      * @return The future value.
      */
-    public static Money calculateFutureValue(Money presentValue, double rate, int periods) {
-        BigDecimal pv = BigDecimal.valueOf(presentValue.getAmount().doubleValue());
-        BigDecimal multiplier = BigDecimal.valueOf(1 + rate).pow(periods);
-        BigDecimal fv = pv.multiply(multiplier);
-        return new Money(fv.doubleValue(), presentValue.getCurrency());
+    public static Money calculateFutureValue(Money presentValue, Real rate, int periods) {
+        Real multiplier = Real.ONE.add(rate).pow(periods);
+        return presentValue.multiply(multiplier);
     }
 
     /**
@@ -63,21 +64,21 @@ public class FinancialMath {
      * @param cashFlows The series of cash flows (Money objects).
      * @return The Net Present Value.
      */
-    public static Money calculateNPV(double rate, Money... cashFlows) {
+    public static Money calculateNPV(Real rate, Money... cashFlows) {
         if (cashFlows.length == 0) {
-            return new Money(0.0, Currency.USD); // Default
+            return Money.usd(Real.ZERO); // Default
         }
 
         Currency currency = cashFlows[0].getCurrency();
-        BigDecimal npv = BigDecimal.ZERO;
+        Real npv = Real.ZERO;
 
         for (int t = 0; t < cashFlows.length; t++) {
-            BigDecimal cf = BigDecimal.valueOf(cashFlows[t].getAmount().doubleValue());
-            BigDecimal denominator = BigDecimal.valueOf(1 + rate).pow(t); // t=0 is initial investment usually
-            npv = npv.add(cf.divide(denominator, 4, RoundingMode.HALF_UP));
+            Real cf = cashFlows[t].getAmount();
+            Real denominator = Real.ONE.add(rate).pow(t); // t=0 is initial investment usually
+            npv = npv.add(cf.divide(denominator));
         }
 
-        return new Money(npv.doubleValue(), currency);
+        return new Money(npv, currency);
     }
 
     /**
@@ -89,23 +90,25 @@ public class FinancialMath {
      * @param years      The loan term in years.
      * @return The monthly payment.
      */
-    public static Money calculateMonthlyPayment(Money principal, double annualRate, int years) {
-        double monthlyRate = annualRate / 12.0;
+    public static Money calculateMonthlyPayment(Money principal, Real annualRate, int years) {
+        Real monthlyRate = annualRate.divide(Real.of(12));
         int months = years * 12;
 
-        BigDecimal p = BigDecimal.valueOf(principal.getAmount().doubleValue());
-        BigDecimal r = BigDecimal.valueOf(monthlyRate);
-        BigDecimal onePlusR = r.add(BigDecimal.ONE).pow(months);
+        Real p = principal.getAmount();
+        Real r = monthlyRate;
+        Real onePlusR = r.add(Real.ONE).pow(months);
 
-        BigDecimal numerator = p.multiply(r).multiply(onePlusR);
-        BigDecimal denominator = onePlusR.subtract(BigDecimal.ONE);
+        Real numerator = p.multiply(r).multiply(onePlusR);
+        Real denominator = onePlusR.subtract(Real.ONE);
 
-        if (denominator.compareTo(BigDecimal.ZERO) == 0) {
-            BigDecimal flat = p.divide(BigDecimal.valueOf(months), 2, RoundingMode.HALF_UP);
-            return new Money(flat.doubleValue(), principal.getCurrency());
+        if (denominator.equals(Real.ZERO)) {
+            // Should theoretically check almostEquals(Real.ZERO) if precision issues arise,
+            // but Real should handle exact zero for 0 rate.
+            // If rate is 0, payment is just P / months
+            return principal.divide(Real.of(months));
         }
 
-        BigDecimal monthlyPayment = numerator.divide(denominator, 2, RoundingMode.HALF_UP);
-        return new Money(monthlyPayment.doubleValue(), principal.getCurrency());
+        Real monthlyPayment = numerator.divide(denominator);
+        return new Money(monthlyPayment, principal.getCurrency());
     }
 }

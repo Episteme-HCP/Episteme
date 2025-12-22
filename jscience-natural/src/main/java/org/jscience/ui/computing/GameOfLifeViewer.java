@@ -1,85 +1,156 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ */
 package org.jscience.ui.computing;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
+
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.jscience.computing.automata.ConwayLife;
+import org.jscience.computing.ai.automata.ConwayLife;
 
 /**
  * Game of Life Viewer.
- * Visualizes Cellular Automata.
+ * Visualizes Cellular Automata with interactive controls.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @since 1.1
  */
 public class GameOfLifeViewer extends Application {
 
     private static final int CELL_SIZE = 5;
     private static final int WIDTH = 160;
-    private static final int HEIGHT = 120;
+    private static final int HEIGHT = 100;
 
     private ConwayLife life;
     private Canvas canvas;
-    private boolean paused = false;
+    private boolean paused = true;
+    private long lastUpdate = 0;
+    private long updateInterval = 50_000_000; // 50ms default
 
     @Override
     public void start(Stage stage) {
         life = new ConwayLife(WIDTH, HEIGHT);
-        // Random seed
-        for (int x = 0; x < WIDTH; x++) {
-            for (int y = 0; y < HEIGHT; y++) {
-                if (Math.random() < 0.2)
-                    life.setState(x, y, true);
-            }
-        }
-
+        // Canvas Area
+        BorderPane root = new BorderPane();
         canvas = new Canvas(WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE);
+
+        randomize();
         canvas.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.PRIMARY) {
-                int x = (int) (e.getX() / CELL_SIZE);
-                int y = (int) (e.getY() / CELL_SIZE);
+            int x = (int) (e.getX() / CELL_SIZE);
+            int y = (int) (e.getY() / CELL_SIZE);
+            if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
                 life.setState(x, y, !life.getState(x, y));
                 draw();
-            } else {
-                paused = !paused;
             }
         });
-
         canvas.setOnMouseDragged(e -> {
             int x = (int) (e.getX() / CELL_SIZE);
             int y = (int) (e.getY() / CELL_SIZE);
-            life.setState(x, y, true);
+            if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
+                life.setState(x, y, true);
+                draw();
+            }
+        });
+
+        // Wrap canvas in a pane to center it
+        VBox canvasContainer = new VBox(canvas);
+        canvasContainer.setPadding(new Insets(10));
+        canvasContainer.setStyle("-fx-background-color: #222; -fx-alignment: center;");
+        root.setCenter(canvasContainer);
+
+        // Controls Area
+        HBox controls = new HBox(10);
+        controls.setPadding(new Insets(10));
+        controls.setStyle("-fx-background-color: #333;");
+
+        Button btnPlay = new Button("Play");
+        Button btnStep = new Button("Step");
+        Button btnClear = new Button("Clear");
+        Button btnRandom = new Button("Randomize");
+
+        Slider speedSlider = new Slider(10, 500, 50); // ms delay
+        speedSlider.setShowTickLabels(false);
+        speedSlider.setShowTickMarks(false);
+        Label speedLabel = new Label("Speed");
+        speedLabel.setTextFill(Color.WHITE);
+
+        btnPlay.setOnAction(e -> {
+            paused = !paused;
+            btnPlay.setText(paused ? "Play" : "Pause");
+        });
+
+        btnStep.setOnAction(e -> {
+            paused = true;
+            btnPlay.setText("Play");
+            life.nextGeneration();
             draw();
         });
 
-        StackPane root = new StackPane(canvas);
+        btnClear.setOnAction(e -> {
+            paused = true;
+            btnPlay.setText("Play");
+            life = new ConwayLife(WIDTH, HEIGHT); // Reset
+            draw();
+        });
+
+        btnRandom.setOnAction(e -> randomize());
+
+        speedSlider.valueProperty().addListener((obs, old, val) -> {
+            updateInterval = (long) (val.doubleValue() * 1_000_000);
+        });
+        // Invert logical direction: Left (10ms) is fast, Right (500ms) is slow?
+        // Or Left (Slow) -> Right (Fast)?
+        // Slider 10..500. 10ms is fast.
+        // Let's invert UI: 100% Speed = 10ms. 0% = 500ms.
+        // Actually direct control of delay is fine for dev.
+
+        controls.getChildren().addAll(btnPlay, btnStep, btnClear, btnRandom, speedLabel, speedSlider);
+        root.setBottom(controls);
+
         Scene scene = new Scene(root);
 
         new AnimationTimer() {
-            long last = 0;
-
             @Override
             public void handle(long now) {
-                if (paused)
-                    return;
-                if (now - last > 50_000_000) { // 20 FPS
-                    life.nextGeneration();
-                    draw();
-                    last = now;
+                if (!paused) {
+                    if (now - lastUpdate > updateInterval) {
+                        life.nextGeneration();
+                        draw();
+                        lastUpdate = now;
+                    }
                 }
             }
         }.start();
 
-        stage.setTitle("JScience Game of Life");
+        stage.setTitle("JScience Game of Life - Enhanced");
         stage.setScene(scene);
         stage.show();
+        draw();
+    }
+
+    private void randomize() {
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                if (Math.random() < 0.2)
+                    life.setState(x, y, true);
+                else
+                    life.setState(x, y, false);
+            }
+        }
         draw();
     }
 

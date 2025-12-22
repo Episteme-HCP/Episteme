@@ -22,9 +22,13 @@
  */
 package org.jscience.economics;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Represents a currency with ISO 4217 code.
- * * @author Silvere Martin-Michiellot
+ * 
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -70,4 +74,23 @@ public class Currency {
     public static final Currency JPY = new Currency("JPY", "Japanese Yen", "¥", 0);
     public static final Currency CNY = new Currency("CNY", "Chinese Yuan", "¥", 2);
     public static final Currency CHF = new Currency("CHF", "Swiss Franc", "CHF", 2);
+
+    // Registry for flyweight pattern
+    private static final Map<String, Currency> CACHE = new HashMap<>();
+
+    static {
+        CACHE.put("USD", USD);
+        CACHE.put("EUR", EUR);
+        CACHE.put("GBP", GBP);
+        CACHE.put("JPY", JPY);
+        CACHE.put("CNY", CNY);
+        CACHE.put("CHF", CHF);
+    }
+
+    public static Currency of(String code) {
+        if (code == null)
+            return null;
+        String upper = code.toUpperCase();
+        return CACHE.computeIfAbsent(upper, c -> new Currency(c, c, c, 2));
+    }
 }

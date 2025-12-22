@@ -23,7 +23,6 @@
 package org.jscience.measure;
 
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.measure.quantity.Dimensionless;
 
 import java.time.Instant;
 import java.util.*;

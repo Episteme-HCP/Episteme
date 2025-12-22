@@ -46,22 +46,29 @@ public class GISProfile {
     /**
      * Projects a 3D coordinate (lat/lon) to a 2D map coordinate (x/y).
      * 
-     * @return Real array with [x, y] map coordinates
+     * @return Vector<Real> with [x, y] map coordinates
      */
-    public Real[] project(Coordinate coord) {
+    public org.jscience.mathematics.linearalgebra.Vector<Real> project(Coordinate coord) {
         Real lat = coord.getLatitude().toRadians();
         Real lon = coord.getLongitude().toRadians();
+
+        java.util.List<Real> coords = new java.util.ArrayList<>();
 
         switch (projection) {
             case MERCATOR:
                 Real x = lon;
                 Real y = Real.PI.divide(Real.of(4)).add(lat.divide(Real.TWO)).tan().log();
-                return new Real[] { x, y };
+                coords.add(x);
+                coords.add(y);
+                break;
             case EQUIRECTANGULAR:
-                return new Real[] { lon, lat };
+                coords.add(lon);
+                coords.add(lat);
+                break;
             default:
                 throw new UnsupportedOperationException("Projection not implemented");
         }
+        return org.jscience.mathematics.linearalgebra.vectors.DenseVector.of(coords, Real.ZERO);
     }
 
     /**

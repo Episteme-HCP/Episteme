@@ -42,6 +42,7 @@ import org.jscience.measure.quantity.*;
  * }</pre>
  * </p>
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -355,6 +356,9 @@ public final class Units {
         /** Knot: 1 kn = 1852 m/h */
         @SuppressWarnings("unchecked")
         public static final Unit<Velocity> KNOT = (Unit<Velocity>) METER.multiply(1852).divide(HOUR);
+
+        /** Light-year: 1 ly ≈ 9.461×10¹⁵ m */
+        public static final Unit<Length> LIGHT_YEAR = (Unit<Length>) METER.multiply(9.4607304725808e15);
 
         // ========== COMMON ALIASES ==========
 

@@ -92,8 +92,8 @@ public class Place {
         return country;
     }
 
-    public long getPopulation() {
-        return inhabitants.size();
+    public org.jscience.mathematics.numbers.real.Real getPopulation() {
+        return org.jscience.mathematics.numbers.real.Real.of(inhabitants.size());
     }
 
     public List<Person> getInhabitants() {
@@ -137,10 +137,10 @@ public class Place {
 
     // Explicit population setting deprecated in favor of list tracking,
     // but kept for compatibility if needed (logic override)
-    public void setPopulation(long population) {
-        // No-op or throw exception? For now ignoring as it's derived.
-        // Or we could have an "estimated" population field separate from actual tracked
-        // entities.
+    public void setPopulation(org.jscience.mathematics.numbers.real.Real population) {
+        // This is a manual override if we aren't tracking individuals
+        // Logic to clear inhabitants or set an estimated population field?
+        // For now, no-op or throw, as existing code does nothing.
     }
 
     /**

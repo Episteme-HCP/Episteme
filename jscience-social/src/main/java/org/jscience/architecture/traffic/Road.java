@@ -29,9 +29,10 @@ import java.util.List;
 
 /**
  * Represents a road for vehicles. * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- 
+ * 
  */
 public class Road extends GeoPath {
 

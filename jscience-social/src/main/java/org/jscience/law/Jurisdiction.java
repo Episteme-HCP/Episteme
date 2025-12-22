@@ -29,10 +29,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Represents a legal jurisdiction or area of authority. * @author Silvere Martin-Michiellot
+ * Represents a legal jurisdiction or area of authority. * @author Silvere
+ * Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- 
+ * 
  */
 public class Jurisdiction {
 

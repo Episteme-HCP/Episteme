@@ -59,7 +59,12 @@ public class EphemerisCalculator {
         private static final Map<String, Planet> BY_NAME = new HashMap<>();
 
         static {
-            loadData();
+            try {
+                loadData();
+            } catch (Throwable t) {
+                System.err.println("Failed to load Ephemeris data: " + t.getMessage());
+                t.printStackTrace();
+            }
         }
 
         public static final Planet MERCURY = get("MERCURY");
@@ -153,6 +158,8 @@ public class EphemerisCalculator {
         private static void loadData() {
             try {
                 ObjectMapper mapper = new ObjectMapper();
+                mapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                        false);
                 InputStream is = EphemerisCalculator.class
                         .getResourceAsStream("/org/jscience/physics/astronomy/ephemeris/planets.json");
                 if (is == null) {

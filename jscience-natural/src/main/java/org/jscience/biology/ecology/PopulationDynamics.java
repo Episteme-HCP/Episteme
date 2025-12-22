@@ -210,4 +210,68 @@ public class PopulationDynamics {
     public static Real alleeEffectGrowthRate(Real n, Real r, Real a, Real k) {
         return r.multiply(n).multiply(n.divide(a).subtract(Real.ONE)).multiply(Real.ONE.subtract(n.divide(k)));
     }
+    // === Epidemiology ===
+
+    /**
+     * SEIR Model (Susceptible, Exposed, Infectious, Recovered).
+     * 
+     * dS/dt = -beta * S * I / N
+     * dE/dt = beta * S * I / N - sigma * E
+     * dI/dt = sigma * E - gamma * I
+     * dR/dt = gamma * I
+     * 
+     * @param initialPop [S, E, I, R]
+     * @param beta       rate of spread
+     * @param sigma      rate of progression (1/incubation period)
+     * @param gamma      rate of recovery (1/infectious period)
+     * @param dt         time step
+     * @param steps      number of steps
+     * @return Real[steps][4] containing S, E, I, R for each step
+     */
+    public static Real[][] seirModel(Real[] initialPop, Real beta, Real sigma, Real gamma, Real dt, int steps) {
+        Real[][] result = new Real[steps][4];
+        Real S = initialPop[0];
+        Real E = initialPop[1];
+        Real I = initialPop[2];
+        Real R = initialPop[3];
+        Real N = S.add(E).add(I).add(R); // Total population assumed constant
+
+        for (int t = 0; t < steps; t++) {
+            result[t][0] = S;
+            result[t][1] = E;
+            result[t][2] = I;
+            result[t][3] = R;
+
+            // dS = -beta * S * I / N
+            Real dS = beta.multiply(S).multiply(I).divide(N).negate().multiply(dt);
+
+            // dE = beta * S * I / N - sigma * E
+            Real transmission = beta.multiply(S).multiply(I).divide(N);
+            Real progression = sigma.multiply(E);
+            Real dE = transmission.subtract(progression).multiply(dt);
+
+            // dI = sigma * E - gamma * I
+            Real recovery = gamma.multiply(I);
+            Real dI = progression.subtract(recovery).multiply(dt);
+
+            // dR = gamma * I
+            Real dR = recovery.multiply(dt);
+
+            S = S.add(dS);
+            E = E.add(dE);
+            I = I.add(dI);
+            R = R.add(dR);
+
+            // Safety clamp
+            if (S.doubleValue() < 0)
+                S = Real.ZERO;
+            if (E.doubleValue() < 0)
+                E = Real.ZERO;
+            if (I.doubleValue() < 0)
+                I = Real.ZERO;
+            if (R.doubleValue() < 0)
+                R = Real.ZERO;
+        }
+        return result;
+    }
 }

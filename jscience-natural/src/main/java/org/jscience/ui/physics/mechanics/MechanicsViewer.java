@@ -86,23 +86,53 @@ public class MechanicsViewer extends Application {
     }
 
     private void update(double dt) {
-        // F = -kx - cv
-        // a = F/m
+        // Stage 1: Spring Mass
         double force = -k * position - c * velocity;
         double a = force / mass;
-
-        velocity += a * dt * 50; // Scale time/physics for visual speed
+        velocity += a * dt * 50;
         position += velocity * dt * 50;
+
+        // Stage 2: Ball Trigger (if mass hits platform at Y=200 relative to eq)
+        if (position > 150 && !ballTriggered) {
+            ballTriggered = true;
+            // Impulse to ball
+            ballVx = 5;
+        }
+
+        // Stage 3: Ball Physics
+        if (ballTriggered) {
+            ballX += ballVx * dt * 50;
+            // Rolling friction?
+
+            // Check Domino Collision
+            if (ballX > 300 && !dominoFallen) {
+                dominoAngle += 5 * dt * 50; // Topple
+                if (dominoAngle > 90) {
+                    dominoFallen = true;
+                    dominoAngle = 90;
+                    // Reset? Or show msg
+                }
+            }
+        }
     }
+
+    // Goldberg State
+    private boolean ballTriggered = false;
+    private double ballX = 50;
+    private double ballY = 400; // Platform level
+    private double ballVx = 0;
+
+    private boolean dominoFallen = false;
+    private double dominoAngle = 0;
 
     private void draw() {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(Color.WHITESMOKE);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        double centerX = canvas.getWidth() / 2;
+        double centerX = 150; // Shifted left
         double anchorY = 50;
-        double eqY = 300;
+        double eqY = 250;
         double massY = eqY + position;
 
         // Draw Ceiling
@@ -133,6 +163,39 @@ public class MechanicsViewer extends Application {
         gc.fillRect(centerX - 20, massY, 40, 40);
         gc.setFill(Color.WHITE);
         gc.fillText(String.format("%.1f kg", mass), centerX - 15, massY + 25);
+
+        // Draw Platform for Ball
+        gc.setFill(Color.DARKGRAY);
+        gc.fillRect(20, ballY + 20, 350, 10);
+
+        // Draw Trigger Plate
+        gc.setFill(Color.ORANGE);
+        gc.fillRect(centerX - 30, ballY + 15, 60, 5); // Target for mass
+
+        // Draw Ball
+        gc.setFill(Color.BLUE);
+        gc.fillOval(ballX, ballY, 20, 20);
+
+        // Draw Domino
+        gc.setFill(Color.BLACK);
+        gc.save();
+        gc.translate(320, ballY + 20);
+        gc.rotate(dominoAngle);
+        gc.fillRect(0, -60, 10, 60);
+        gc.restore();
+
+        if (dominoFallen) {
+            gc.setFill(Color.GREEN);
+            gc.setFont(javafx.scene.text.Font.font(24));
+            gc.fillText("SUCCESS!", 350, 200);
+        }
+
+        // Reset Button Hint
+        if (dominoFallen) {
+            gc.setFill(Color.GRAY);
+            gc.setFont(javafx.scene.text.Font.font(12));
+            gc.fillText("Drag mass up to reset... (Manual reset not impl yet)", 350, 230);
+        }
     }
 
     public static void show(Stage stage) {

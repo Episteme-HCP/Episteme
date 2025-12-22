@@ -39,17 +39,32 @@ import java.util.logging.Logger;
 /**
  * Loads chemistry data (elements, molecules) from JSON.
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class ChemistryDataLoader {
 
     private static final Logger LOGGER = Logger.getLogger(ChemistryDataLoader.class.getName());
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static ObjectMapper MAPPER;
+
+    static {
+        try {
+            MAPPER = new ObjectMapper();
+        } catch (Throwable t) {
+            System.err.println("CRITICAL ERROR: Could not initialize Jackson ObjectMapper. Check dependencies!");
+            t.printStackTrace();
+            MAPPER = null;
+        }
+    }
 
     private static final java.util.Map<String, MoleculeData> MOLECULE_DATA_CACHE = new java.util.HashMap<>();
 
     public static void loadElements() {
+        if (MAPPER == null) {
+            System.err.println("ERROR: ChemistryDataLoader cannot function because ObjectMapper failed to initialize.");
+            return;
+        }
         System.out.println("DEBUG: ChemistryDataLoader.loadElements() called.");
         try (InputStream is = ChemistryDataLoader.class.getResourceAsStream("/org/jscience/chemistry/elements.json")) {
             if (is == null) {
@@ -131,6 +146,8 @@ public class ChemistryDataLoader {
     }
 
     public static void loadMolecules() {
+        if (MAPPER == null)
+            return;
         System.out.println("DEBUG: ChemistryDataLoader.loadMolecules() called.");
         try (InputStream is = ChemistryDataLoader.class.getResourceAsStream("/org/jscience/chemistry/molecules.json")) {
             if (is == null) {

@@ -1,0 +1,373 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ */
+package org.jscience.apps.framework;
+
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
+import java.io.File;
+import java.util.Locale;
+import java.util.prefs.Preferences;
+
+/**
+ * Abstract base class for all JScience Killer Apps.
+ * Provides standard application framework with menus, toolbars, status bar,
+ * preferences, and internationalization support.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+public abstract class KillerAppBase extends Application {
+
+    protected Stage primaryStage;
+    protected BorderPane rootPane;
+    protected MenuBar menuBar;
+    protected ToolBar toolBar;
+    protected HBox statusBar;
+    protected Label statusLabel;
+    protected ProgressBar progressBar;
+
+    protected I18nManager i18n = I18nManager.getInstance();
+    protected Preferences prefs;
+    protected File currentFile;
+    protected boolean isDirty = false;
+
+    private String currentTheme = "light";
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        this.primaryStage = stage;
+        this.prefs = Preferences.userNodeForPackage(getClass());
+
+        // Load saved preferences
+        loadPreferences();
+
+        // Build UI
+        rootPane = new BorderPane();
+
+        // Menu Bar
+        AppMenuFactory menuFactory = new AppMenuFactory(this);
+        menuBar = menuFactory.createMenuBar();
+        rootPane.setTop(new VBox(menuBar, createToolBar()));
+
+        // Main content (subclass provides this)
+        rootPane.setCenter(createMainContent());
+
+        // Status Bar
+        statusBar = createStatusBar();
+        rootPane.setBottom(statusBar);
+
+        // Scene
+        Scene scene = new Scene(rootPane, getDefaultWidth(), getDefaultHeight());
+        applyTheme(scene);
+
+        stage.setTitle(getAppTitle());
+        stage.setScene(scene);
+        stage.setOnCloseRequest(e -> {
+            e.consume();
+            onExit();
+        });
+        stage.show();
+
+        // Post-init
+        onAppReady();
+    }
+
+    // ===== Abstract methods - subclasses must implement =====
+
+    /** Returns the application title (localized). */
+    protected abstract String getAppTitle();
+
+    /** Creates the main content area of the application. */
+    protected abstract Region createMainContent();
+
+    /** Called when the application is fully initialized. */
+    protected void onAppReady() {}
+
+    /** Default window width. */
+    protected double getDefaultWidth() { return 1200; }
+
+    /** Default window height. */
+    protected double getDefaultHeight() { return 800; }
+
+    // ===== Toolbar =====
+
+    protected ToolBar createToolBar() {
+        toolBar = new ToolBar();
+
+        Button runBtn = new Button("▶ " + i18n.get("toolbar.run"));
+        runBtn.setOnAction(e -> onRun());
+
+        Button pauseBtn = new Button("⏸ " + i18n.get("toolbar.pause"));
+        pauseBtn.setOnAction(e -> onPause());
+
+        Button stopBtn = new Button("⏹ " + i18n.get("toolbar.stop"));
+        stopBtn.setOnAction(e -> onStop());
+
+        Button resetBtn = new Button("↺ " + i18n.get("toolbar.reset"));
+        resetBtn.setOnAction(e -> onReset());
+
+        toolBar.getItems().addAll(runBtn, pauseBtn, stopBtn, new Separator(), resetBtn);
+
+        // Subclasses can add more items
+        customizeToolBar(toolBar);
+
+        return toolBar;
+    }
+
+    /** Override to add custom toolbar items. */
+    protected void customizeToolBar(ToolBar toolBar) {}
+
+    // ===== Status Bar =====
+
+    protected HBox createStatusBar() {
+        HBox bar = new HBox(10);
+        bar.setPadding(new Insets(5, 10, 5, 10));
+        bar.setAlignment(Pos.CENTER_LEFT);
+        bar.setStyle("-fx-background-color: #e0e0e0;");
+
+        statusLabel = new Label(i18n.get("status.ready"));
+        progressBar = new ProgressBar(0);
+        progressBar.setPrefWidth(150);
+        progressBar.setVisible(false);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        bar.getChildren().addAll(statusLabel, spacer, progressBar);
+        return bar;
+    }
+
+    protected void setStatus(String message) {
+        statusLabel.setText(message);
+    }
+
+    protected void setProgress(double value) {
+        progressBar.setVisible(value > 0 && value < 1);
+        progressBar.setProgress(value);
+    }
+
+    // ===== Theme =====
+
+    protected void applyTheme(Scene scene) {
+        if ("dark".equals(currentTheme)) {
+            scene.getRoot().setStyle(
+                "-fx-base: #2b2b2b; " +
+                "-fx-background: #1e1e1e; " +
+                "-fx-control-inner-background: #3c3c3c; " +
+                "-fx-text-fill: #e0e0e0;"
+            );
+        } else {
+            scene.getRoot().setStyle("");
+        }
+    }
+
+    public void setTheme(String theme) {
+        this.currentTheme = theme;
+        if (primaryStage != null && primaryStage.getScene() != null) {
+            applyTheme(primaryStage.getScene());
+        }
+    }
+
+    // ===== File Operations =====
+
+    public void onNew() {
+        if (confirmUnsavedChanges()) {
+            currentFile = null;
+            isDirty = false;
+            doNew();
+        }
+    }
+
+    protected void doNew() {
+        // Subclasses override
+    }
+
+    public void onOpen() {
+        if (confirmUnsavedChanges()) {
+            FileChooser chooser = new FileChooser();
+            chooser.setTitle(i18n.get("menu.file.open"));
+            configureFileChooser(chooser);
+            File file = chooser.showOpenDialog(primaryStage);
+            if (file != null) {
+                currentFile = file;
+                doOpen(file);
+                isDirty = false;
+            }
+        }
+    }
+
+    protected void doOpen(File file) {
+        // Subclasses override
+    }
+
+    public void onSave() {
+        if (currentFile == null) {
+            onSaveAs();
+        } else {
+            doSave(currentFile);
+            isDirty = false;
+        }
+    }
+
+    public void onSaveAs() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle(i18n.get("menu.file.saveAs"));
+        configureFileChooser(chooser);
+        File file = chooser.showSaveDialog(primaryStage);
+        if (file != null) {
+            currentFile = file;
+            doSave(file);
+            isDirty = false;
+        }
+    }
+
+    protected void doSave(File file) {
+        // Subclasses override
+    }
+
+    protected void configureFileChooser(FileChooser chooser) {
+        // Subclasses can add extensions
+    }
+
+    public void onExport(String format) {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle(i18n.get("menu.file.export"));
+        switch (format) {
+            case "png" -> chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG Image", "*.png"));
+            case "csv" -> chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV File", "*.csv"));
+            case "pdf" -> chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Document", "*.pdf"));
+        }
+        File file = chooser.showSaveDialog(primaryStage);
+        if (file != null) {
+            doExport(file, format);
+        }
+    }
+
+    protected void doExport(File file, String format) {
+        // Subclasses override
+    }
+
+    public void onExit() {
+        if (confirmUnsavedChanges()) {
+            savePreferences();
+            primaryStage.close();
+        }
+    }
+
+    protected boolean confirmUnsavedChanges() {
+        if (!isDirty) return true;
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(i18n.get("dialog.confirm.unsaved"));
+        alert.setContentText(i18n.get("dialog.confirm.unsaved"));
+        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
+        var result = alert.showAndWait();
+        if (result.isPresent()) {
+            if (result.get() == ButtonType.YES) {
+                onSave();
+                return true;
+            } else if (result.get() == ButtonType.NO) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===== Edit Operations =====
+
+    public void onUndo() {}
+    public void onRedo() {}
+    public void onFind() {}
+    public void onReplace() {}
+
+    // ===== View Operations =====
+
+    public void onZoomIn() {}
+    public void onZoomOut() {}
+    public void onFitToWindow() {}
+    public void onFullScreen() {
+        primaryStage.setFullScreen(!primaryStage.isFullScreen());
+    }
+
+    // ===== Tools Operations =====
+
+    public void onRun() {}
+    public void onPause() {}
+    public void onStop() {}
+    public void onReset() {}
+    public void onShowParameters() {}
+    public void onShowConsole() {}
+
+    // ===== Preferences =====
+
+    public void onLanguageChanged(Locale locale) {
+        // Rebuild menus with new locale
+        Alert info = new Alert(Alert.AlertType.INFORMATION);
+        info.setContentText("Language changed. Restart application to apply.");
+        info.showAndWait();
+    }
+
+    public void onRestoreDefaults() {
+        try {
+            prefs.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onShowShortcuts() {}
+
+    protected void loadPreferences() {
+        String lang = prefs.get("language", Locale.getDefault().getLanguage());
+        i18n.setLocale(new Locale(lang));
+        currentTheme = prefs.get("theme", "light");
+    }
+
+    protected void savePreferences() {
+        prefs.put("language", i18n.getCurrentLocale().getLanguage());
+        prefs.put("theme", currentTheme);
+    }
+
+    // ===== Help =====
+
+    public void onShowDocumentation() {}
+    public void onShowTutorials() {}
+
+    public void onShowAbout() {
+        Alert about = new Alert(Alert.AlertType.INFORMATION);
+        about.setTitle(i18n.get("menu.help.about"));
+        about.setHeaderText(getAppTitle());
+        about.setContentText("JScience Killer Apps\nVersion " + i18n.get("app.version") +
+                "\n\n© 2025 Silvere Martin-Michiellot\nPowered by Gemini AI");
+        about.showAndWait();
+    }
+
+    // ===== Utility =====
+
+    protected void markDirty() {
+        isDirty = true;
+    }
+
+    protected void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    protected void showInfo(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+}

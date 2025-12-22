@@ -45,6 +45,9 @@ public class Region {
     private long population;
     private Coordinate center;
     private String capital;
+    // New Data Loader Fields
+    private String code; // ISO Code
+    private org.jscience.economics.Money gdp;
 
     public Region(String name, Type type) {
         this.name = name;
@@ -81,6 +84,14 @@ public class Region {
         return capital;
     }
 
+    public String getCode() {
+        return code;
+    }
+
+    public org.jscience.economics.Money getGdp() {
+        return gdp;
+    }
+
     // Setters
     public void setType(Type type) {
         this.type = type;
@@ -108,6 +119,14 @@ public class Region {
 
     public void setCapital(String capital) {
         this.capital = capital;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public void setGdp(org.jscience.economics.Money gdp) {
+        this.gdp = gdp;
     }
 
     /** Population density (people per sq km) */

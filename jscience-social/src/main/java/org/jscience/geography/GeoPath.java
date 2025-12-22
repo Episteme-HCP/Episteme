@@ -22,6 +22,8 @@
  */
 package org.jscience.geography;
 
+import org.jscience.geography.Coordinate;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

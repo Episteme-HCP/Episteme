@@ -36,14 +36,14 @@ public class AdvancedFeaturesTest {
 
     @Test
     public void testFinancialMath() {
-        Money principal = new Money(1000.0, Currency.USD);
-        Money fv = FinancialMath.calculateFutureValue(principal, 0.05, 10);
+        Money principal = Money.usd(1000.0);
+        Money fv = FinancialMath.calculateFutureValue(principal, Real.of(0.05), 10);
         // 1000 * (1.05)^10 = 1628.89
         assertEquals(1628.89, fv.getAmount().doubleValue(), 0.01);
 
-        Money loan = new Money(100000.0, Currency.USD);
+        Money loan = Money.usd(100000.0);
         // 30 years at 5%
-        Money monthly = FinancialMath.calculateMonthlyPayment(loan, 0.05, 30);
+        Money monthly = FinancialMath.calculateMonthlyPayment(loan, Real.of(0.05), 30);
         assertEquals(536.82, monthly.getAmount().doubleValue(), 0.01);
     }
 
@@ -74,9 +74,9 @@ public class AdvancedFeaturesTest {
         assertEquals(343000, distance.doubleValue(), 5000); // 5km tolerance
 
         GISProfile gp = new GISProfile(GISProfile.Projection.MERCATOR);
-        Real[] proj = gp.project(paris);
+        org.jscience.mathematics.linearalgebra.Vector<Real> proj = gp.project(paris);
         assertNotNull(proj);
-        assertEquals(2, proj.length);
+        assertEquals(2, proj.dimension());
     }
 
     @Test

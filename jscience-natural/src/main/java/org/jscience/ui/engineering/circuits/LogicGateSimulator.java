@@ -34,6 +34,7 @@ public class LogicGateSimulator extends Application {
 
         abstract void evaluate();
 
+        @SuppressWarnings("unused")
         boolean getOutput() {
             return output;
         }
@@ -41,7 +42,28 @@ public class LogicGateSimulator extends Application {
 
     private static class AndGate extends Gate {
         AndGate() {
-            getChildren().add(new Label("AND"));
+            // D-shape
+            javafx.scene.shape.Path shape = new javafx.scene.shape.Path();
+            shape.getElements().add(new javafx.scene.shape.MoveTo(0, 0));
+            shape.getElements().add(new javafx.scene.shape.LineTo(30, 0));
+            shape.getElements().add(new javafx.scene.shape.ArcTo(20, 20, 0, 30, 40, false, true));
+            shape.getElements().add(new javafx.scene.shape.LineTo(0, 40));
+            shape.getElements().add(new javafx.scene.shape.ClosePath());
+            shape.setFill(Color.LIGHTGRAY);
+            shape.setStroke(Color.BLACK);
+
+            getChildren().add(shape);
+
+            Label lbl = new Label("AND");
+            lbl.setLayoutX(10);
+            lbl.setLayoutY(12);
+            getChildren().add(lbl);
+
+            // Input/Output pins
+            Rectangle pinIn1 = new Rectangle(-10, 10, 10, 2);
+            Rectangle pinIn2 = new Rectangle(-10, 30, 10, 2);
+            Rectangle pinOut = new Rectangle(50, 20, 10, 2);
+            getChildren().addAll(pinIn1, pinIn2, pinOut);
         }
 
         @Override
@@ -54,12 +76,20 @@ public class LogicGateSimulator extends Application {
         boolean state = false;
 
         Switch() {
-            setPrefSize(30, 30);
-            Rectangle rect = new Rectangle(30, 30, Color.RED);
-            getChildren().add(rect);
+            setPrefSize(40, 40);
+            Rectangle base = new Rectangle(40, 40, Color.DARKGRAY);
+            base.setArcWidth(10);
+            base.setArcHeight(10);
+
+            javafx.scene.shape.Circle button = new javafx.scene.shape.Circle(20, 20, 15);
+            button.setFill(Color.RED);
+            button.setStroke(Color.BLACK);
+
+            getChildren().addAll(base, button);
+
             setOnMouseClicked(e -> {
                 state = !state;
-                rect.setFill(state ? Color.GREEN : Color.RED);
+                button.setFill(state ? Color.GREEN : Color.RED);
             });
         }
 

@@ -1,0 +1,79 @@
+/* Modern Dark Theme for JScience */
+.root {
+    -fx-base: #1e1e1e;
+    -fx-background: #1e1e1e;
+    -fx-control-inner-background: #252526;
+    -fx-control-inner-background-alt: #1e1e1e;
+    -fx-accent: #007acc;
+    -fx-focus-color: #007acc;
+    -fx-faint-focus-color: #007acc22;
+    -fx-text-base-color: #cccccc;
+    -fx-text-background-color: #cccccc;
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 14px;
+}
+
+.label {
+    -fx-text-fill: #cccccc;
+}
+
+.button {
+    -fx-background-color: #333333;
+    -fx-text-fill: white;
+    -fx-background-radius: 4;
+}
+
+.button:hover {
+    -fx-background-color: #444444;
+}
+
+.button:pressed {
+    -fx-background-color: #007acc;
+}
+
+.list-view {
+    -fx-background-color: #252526;
+    -fx-background-insets: 0;
+}
+
+.list-cell {
+    -fx-background-color: #252526;
+    -fx-text-fill: #cccccc;
+    -fx-padding: 8 12;
+}
+
+.list-cell:filled:selected, .list-cell:filled:selected:hover {
+    -fx-background-color: #37373d;
+    -fx-text-fill: white;
+    -fx-border-color: #007acc;
+    -fx-border-width: 0 0 0 3;
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: #2a2d2e;
+}
+
+.split-pane-divider {
+    -fx-background-color: #1e1e1e;
+    -fx-padding: 0 2;
+}
+
+/* ScrollBar */
+.scroll-bar {
+    -fx-background-color: transparent;
+}
+.scroll-bar .thumb {
+    -fx-background-color: #424242;
+    -fx-background-radius: 4;
+}
+.scroll-bar .thumb:hover {
+    -fx-background-color: #4f4f4f;
+}
+
+/* Headers */
+.header-label {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+    -fx-padding: 10;
+}

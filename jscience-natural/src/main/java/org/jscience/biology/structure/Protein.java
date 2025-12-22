@@ -32,6 +32,7 @@ import java.util.List;
 /**
  * Represents a protein structure composed of polypeptide chains.
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -39,14 +40,24 @@ public class Protein extends Molecule {
 
     private final String pdbId;
     private final List<Chain> chains = new ArrayList<>();
+    private String name;
 
     public Protein(String pdbId) {
         super(pdbId);
         this.pdbId = pdbId;
+        this.name = pdbId;
     }
 
     public String getPdbId() {
         return pdbId;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void addChain(Chain chain) {

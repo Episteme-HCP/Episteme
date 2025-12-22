@@ -18,6 +18,7 @@
         <module>jscience-natural</module>
         <module>jscience-social</module>
         <module>jscience-benchmarks</module>
+        <module>jscience-killer-apps</module>
     </modules>
 
     <licenses>

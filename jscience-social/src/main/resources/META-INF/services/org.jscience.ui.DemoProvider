@@ -1,2 +1,11 @@
-org.jscience.ui.SocialDemoProvider
-org.jscience.ui.EconomicsDemo
+org.jscience.ui.demos.EconomicsMarketDemo
+org.jscience.ui.demos.SociologyNetworkDemo
+org.jscience.ui.demos.GeographyGISDemo
+org.jscience.ui.demos.HistoryTimelineDemo
+org.jscience.ui.demos.LinguisticsWordFreqDemo
+org.jscience.ui.demos.PoliticsVotingDemo
+org.jscience.ui.demos.PsychologyReactionTest
+org.jscience.ui.demos.ArchitectureStabilityDemo
+org.jscience.ui.demos.SportsBallisticsDemo
+org.jscience.ui.demos.ArtsColorTheoryDemo
+org.jscience.ui.demos.EconomicsGDPDemo

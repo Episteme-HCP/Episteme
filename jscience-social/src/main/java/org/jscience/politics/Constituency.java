@@ -25,10 +25,12 @@ package org.jscience.politics;
 import org.jscience.geography.Place;
 
 /**
- * Represents an electoral district or constituency. * @author Silvere Martin-Michiellot
+ * Represents an electoral district or constituency. * @author Silvere
+ * Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- 
+ * 
  */
 public class Constituency {
 

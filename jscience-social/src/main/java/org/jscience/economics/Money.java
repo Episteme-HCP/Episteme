@@ -26,10 +26,15 @@ import org.jscience.mathematics.numbers.real.Real;
 import java.util.Objects;
 
 /**
- * Represents a monetary amount with currency. * @author Silvere Martin-Michiellot
+ * Represents a monetary amount with currency.
+ * <p>
+ * Uses {@link Real} for amounts to ensure arbitrary precision and avoid
+ * floating-point errors.
+ * </p>
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- 
  */
 public class Money {
     private final Real amount;
@@ -40,8 +45,8 @@ public class Money {
         this.currency = Objects.requireNonNull(currency);
     }
 
-    public Money(double amount, Currency currency) {
-        this(Real.of(amount), currency);
+    public Money(Real amount, String currencyCode) {
+        this(amount, Currency.of(currencyCode));
     }
 
     public Real getAmount() {
@@ -66,6 +71,10 @@ public class Money {
         return new Money(amount.multiply(factor), currency);
     }
 
+    public Money divide(Real divisor) {
+        return new Money(amount.divide(divisor), currency);
+    }
+
     private void requireSameCurrency(Money other) {
         if (!currency.getCode().equals(other.currency.getCode())) {
             throw new IllegalArgumentException("Currency mismatch");
@@ -74,14 +83,22 @@ public class Money {
 
     @Override
     public String toString() {
-        return String.format("%s%.2f", currency.getSymbol(), amount.doubleValue());
+        return String.format("%s%s", currency.getSymbol(), amount.toString());
     }
 
-    public static Money usd(double amount) {
+    public static Money usd(Real amount) {
         return new Money(amount, Currency.USD);
     }
 
-    public static Money eur(double amount) {
+    public static Money usd(double amount) {
+        return new Money(Real.of(amount), Currency.USD);
+    }
+
+    public static Money eur(Real amount) {
         return new Money(amount, Currency.EUR);
+    }
+
+    public static Money eur(double amount) {
+        return new Money(Real.of(amount), Currency.EUR);
     }
 }

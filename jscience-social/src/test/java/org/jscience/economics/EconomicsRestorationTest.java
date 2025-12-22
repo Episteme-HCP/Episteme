@@ -36,7 +36,7 @@ public class EconomicsRestorationTest {
     public void testFactoryAndWorkers() {
         // Setup
         Place london = new Place("London", Place.Type.CITY);
-        Money initialCapital = new Money(10000.0, Currency.USD);
+        Money initialCapital = Money.usd(10000.0);
         Factory widgetFactory = new Factory("Acme Widgets", london, initialCapital);
 
         Person alice = new Person("A001", "Alice", Person.Gender.FEMALE, LocalDate.of(1990, 5, 20), "USA");
@@ -44,7 +44,7 @@ public class EconomicsRestorationTest {
         // 8, 15), "UK");
 
         // Test Worker Assignment
-        Worker workerAlice = new Worker(alice, widgetFactory, "Manager", new Money(50000, Currency.USD));
+        Worker workerAlice = new Worker(alice, widgetFactory, "Manager", Money.usd(50000));
         widgetFactory.addWorker(workerAlice);
 
         assertEquals(1, widgetFactory.getWorkers().size());
@@ -54,7 +54,7 @@ public class EconomicsRestorationTest {
         widgetFactory.addProductionType("Widget");
         assertTrue(widgetFactory.canProduce("Widget"));
 
-        Money productionCost = new Money(100.0, Currency.USD);
+        Money productionCost = Money.usd(100.0);
         MaterialResource<?> widget = widgetFactory.produce("Widget", 10.0, productionCost);
 
         assertNotNull(widget);

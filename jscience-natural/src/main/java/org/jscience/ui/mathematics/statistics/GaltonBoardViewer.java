@@ -88,15 +88,18 @@ public class GaltonBoardViewer extends Application {
             int row = (int) ((b.y - START_Y) / PEG_SPACING);
             if (row >= 0 && row < ROWS) {
                 double pegY = START_Y + row * PEG_SPACING;
-                // Check collision roughly
-                if (Math.abs(b.y - pegY) < 5) {
+                // Velocity-aware collision check (Sweep approximation)
+                double threshold = Math.max(5, Math.abs(b.vy));
+                if (Math.abs(b.y - pegY) < threshold) {
 
-                    // Approximate columns
-                    // Actually simpler logic: just randomness at decision points
-                    // We simulate "bounce"
-                    if (rand.nextDouble() < 0.05) { // Chance to hit peg
+                    // Check X range relative to pegs for this row
+                    // (Simplified logic specific to this visual demo)
+
+                    if (rand.nextDouble() < 0.1) { // Hit chance
+                        // Bounce
                         b.vx = (rand.nextBoolean() ? 1 : -1) * (1 + rand.nextDouble());
-                        b.vy *= -0.5; // Damping
+                        b.vy *= -0.6; // Lossy bounce
+                        b.y = pegY - threshold - 1; // Eject slightly
                     }
                 }
             }

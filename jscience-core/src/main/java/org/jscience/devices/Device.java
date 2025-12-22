@@ -30,7 +30,8 @@ import java.io.IOException;
  * This interface provides the basic contract for device interaction, including
  * connection management and identification.
  * </p>
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -56,11 +57,20 @@ public interface Device extends AutoCloseable {
      * @return true if connected, false otherwise
      */
     boolean isConnected();
-    
+
     /**
      * Returns the device name or identifier.
      * 
      * @return the device name
      */
     String getName();
+
+    /**
+     * Returns the physical instrument metadata associated with this device.
+     * 
+     * @return the instrument metadata, or null if not applicable/simulated.
+     */
+    default org.jscience.measure.Instrument getInstrumentMetadata() {
+        return null;
+    }
 }

@@ -31,10 +31,12 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Represents an economic organization (e.g., Company, Factory). * @author Silvere Martin-Michiellot
+ * Represents an economic organization (e.g., Company, Factory). * @author
+ * Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- 
+ * 
  */
 public class Organization implements Serializable {
 
