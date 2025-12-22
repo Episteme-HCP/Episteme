@@ -1,7 +1,7 @@
 package org.jscience.biology.io;
 
 import org.jscience.biology.structure.Protein;
-import org.jscience.chemistry.biochemistry.AminoAcid;
+
 import org.jscience.chemistry.Atom;
 import org.jscience.chemistry.Element;
 import org.jscience.chemistry.PeriodicTable;
@@ -12,8 +12,6 @@ import org.jscience.mathematics.sets.Reals;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Loads protein structures from PDB format (Simplified).

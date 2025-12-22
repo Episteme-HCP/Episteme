@@ -34,6 +34,7 @@ import org.jscience.biology.taxonomy.Species;
  * modeling.
  * </p>
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -145,7 +146,7 @@ public class Population {
      */
     public List<Individual> getFounders() {
         return members.stream()
-                .filter(i -> i.getMother() == null && i.getFather() == null)
+                .filter(i -> i.getParents().isEmpty())
                 .toList();
     }
 

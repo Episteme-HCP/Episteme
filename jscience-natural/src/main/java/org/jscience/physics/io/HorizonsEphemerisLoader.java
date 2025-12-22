@@ -3,18 +3,15 @@ package org.jscience.physics.io;
 import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.sets.Reals;
-import org.jscience.physics.astronomy.OrbitalElements;
+
 import org.jscience.history.TimePoint;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Loads ephemerides from JPL Horizons system (Text format).

@@ -22,8 +22,6 @@
  */
 package org.jscience.geography;
 
-import org.jscience.geography.Coordinate;
-
 import java.util.*;
 import org.jscience.mathematics.numbers.real.Real;
 

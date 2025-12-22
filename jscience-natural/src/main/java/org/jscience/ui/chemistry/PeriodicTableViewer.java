@@ -49,8 +49,6 @@ import org.jscience.chemistry.Element;
 import org.jscience.chemistry.PeriodicTable;
 import org.jscience.chemistry.loaders.ChemistryDataLoader;
 
-import java.util.Random;
-
 /**
  * Interactive periodic table viewer using JavaFX.
  * <p>

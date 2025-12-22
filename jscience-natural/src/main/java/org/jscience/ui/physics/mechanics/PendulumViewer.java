@@ -20,9 +20,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import org.jscience.measure.Quantities;
-import org.jscience.measure.Units;
-import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.physics.PhysicalConstants;
 
 /**

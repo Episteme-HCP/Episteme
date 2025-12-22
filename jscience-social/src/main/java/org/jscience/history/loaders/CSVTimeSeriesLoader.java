@@ -1,4 +1,4 @@
-package org.jscience.social.io;
+package org.jscience.history.loaders;
 
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.history.TimePoint;

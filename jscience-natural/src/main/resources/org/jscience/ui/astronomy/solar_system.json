@@ -1,0 +1,14 @@
+{
+    "name": "Solar System",
+    "stars": [
+        {
+            "name": "Sun",
+            "mass": 1.989e30,
+            "radius": 6.9634e8,
+            "texture": "2k_sun.jpg",
+            "luminosity": 3.828e26,
+            "temperature": 5778,
+            "planets": []
+        }
+    ]
+}

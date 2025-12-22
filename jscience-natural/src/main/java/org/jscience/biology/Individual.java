@@ -130,32 +130,6 @@ public class Individual {
         return Collections.unmodifiableList(parents);
     }
 
-    /**
-     * @deprecated Use {@link #getParents()} instead for flexibility
-     */
-    @Deprecated
-    public Individual getMother() {
-        return parents.stream()
-                .filter(p -> p.getSex() == Sex.FEMALE)
-                .findFirst()
-                .orElse(null);
-    }
-
-    /**
-     * @deprecated Use {@link #getParents()} instead for flexibility
-     */
-    @Deprecated
-    public Individual getFather() {
-        return parents.stream()
-                .filter(p -> p.getSex() == Sex.MALE)
-                .findFirst()
-                .orElse(null);
-    }
-
-    public List<Individual> getOffspring() {
-        return Collections.unmodifiableList(offspring);
-    }
-
     // ========== Setters ==========
     public void setDeathDate(LocalDate deathDate) {
         this.deathDate = deathDate;
@@ -169,6 +143,10 @@ public class Individual {
         this.reproductionMode = mode;
     }
 
+    public List<Individual> getOffspring() {
+        return Collections.unmodifiableList(offspring);
+    }
+
     /**
      * Adds a parent to this individual.
      *
@@ -178,22 +156,6 @@ public class Individual {
         if (!parents.contains(parent)) {
             parents.add(parent);
         }
-    }
-
-    /**
-     * @deprecated Use {@link #addParent(Individual)} instead
-     */
-    @Deprecated
-    public void setMother(Individual mother) {
-        addParent(mother);
-    }
-
-    /**
-     * @deprecated Use {@link #addParent(Individual)} instead
-     */
-    @Deprecated
-    public void setFather(Individual father) {
-        addParent(father);
     }
 
     // ========== Lifecycle ==========
