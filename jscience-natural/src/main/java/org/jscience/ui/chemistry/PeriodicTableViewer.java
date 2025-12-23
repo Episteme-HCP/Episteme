@@ -132,7 +132,7 @@ public class PeriodicTableViewer extends Application {
         topBar.setStyle("-fx-background-color: #16213e; -fx-text-fill: white;");
         ((Label) topBar.getChildren().get(0)).setTextFill(Color.WHITE);
 
-        root.setTop(topBar);
+        root.setTop(null); // No top bar - zoom removed per request
         root.setCenter(scrollPane);
         root.setRight(detailPanel);
 
@@ -321,7 +321,50 @@ public class PeriodicTableViewer extends Application {
         }
         if (element.getAtomicMass() != null) {
             props.getChildren().add(createPropLabel("Atomic Mass",
-                    String.format("%.4f u", element.getAtomicMass().getValue().doubleValue())));
+                    String.format("%.4f u", element.getAtomicMass().getValue().doubleValue() / 1.66053906660e-27))); // Convert
+                                                                                                                     // back
+                                                                                                                     // to
+                                                                                                                     // u
+        }
+        if (element.getElectronegativity() != null) {
+            props.getChildren().add(createPropLabel("Electronegativity",
+                    String.format("%.2f", element.getElectronegativity().doubleValue())));
+        }
+        if (element.getStandardState() != null) {
+            props.getChildren().add(createPropLabel("Standard State", element.getStandardState()));
+        }
+        if (element.getElectronConfiguration() != null) {
+            props.getChildren().add(createPropLabel("Electron Config", element.getElectronConfiguration()));
+        }
+        if (element.getOxidationStates() != null) {
+            props.getChildren().add(createPropLabel("Oxidation States", element.getOxidationStates()));
+        }
+        if (element.getAtomicRadius() != null) {
+            props.getChildren().add(createPropLabel("Atomic Radius",
+                    String.format("%.0f pm", element.getAtomicRadius().getValue().doubleValue() * 1e12)));
+        }
+        if (element.getIonizationEnergy() != null) {
+            props.getChildren().add(createPropLabel("Ionization Energy",
+                    String.format("%.3f eV", element.getIonizationEnergy().getValue().doubleValue())));
+        }
+        if (element.getElectronAffinity() != null) {
+            props.getChildren().add(createPropLabel("Electron Affinity",
+                    String.format("%.3f eV", element.getElectronAffinity().getValue().doubleValue())));
+        }
+        if (element.getMeltingPoint() != null) {
+            props.getChildren().add(createPropLabel("Melting Point",
+                    String.format("%.2f K", element.getMeltingPoint().getValue().doubleValue())));
+        }
+        if (element.getBoilingPoint() != null) {
+            props.getChildren().add(createPropLabel("Boiling Point",
+                    String.format("%.2f K", element.getBoilingPoint().getValue().doubleValue())));
+        }
+        if (element.getDensity() != null) {
+            props.getChildren().add(createPropLabel("Density",
+                    String.format("%.3f g/cm³", element.getDensity().getValue().doubleValue())));
+        }
+        if (element.getYearDiscovered() > 0) {
+            props.getChildren().add(createPropLabel("Year Discovered", String.valueOf(element.getYearDiscovered())));
         }
 
         // 3D Atom Structure (Protons + Neutrons + Electrons)

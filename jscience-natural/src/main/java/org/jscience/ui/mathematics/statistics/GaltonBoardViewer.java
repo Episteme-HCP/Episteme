@@ -74,34 +74,67 @@ public class GaltonBoardViewer extends Application {
 
     private void update() {
         Iterator<Ball> it = balls.iterator();
+        double pegRadius = 4; // Visible peg radius
+        double ballRadius = 4;
+        double collisionDist = pegRadius + ballRadius;
+
         while (it.hasNext()) {
             Ball b = it.next();
             if (b.settled)
                 continue;
 
-            b.vy += 0.2; // Gravity
+            b.vy += 0.15; // Gravity (reduced for smoother motion)
             b.y += b.vy;
             b.x += b.vx;
 
-            // Interaction with pegs
-            // Pegs are at rows
-            int row = (int) ((b.y - START_Y) / PEG_SPACING);
-            if (row >= 0 && row < ROWS) {
-                double pegY = START_Y + row * PEG_SPACING;
-                // Velocity-aware collision check (Sweep approximation)
-                double threshold = Math.max(5, Math.abs(b.vy));
-                if (Math.abs(b.y - pegY) < threshold) {
+            // Apply friction to horizontal velocity
+            b.vx *= 0.99;
 
-                    // Check X range relative to pegs for this row
-                    // (Simplified logic specific to this visual demo)
+            // Collision with pegs - check all pegs
+            for (int r = 0; r < ROWS; r++) {
+                double pegY = START_Y + r * PEG_SPACING;
+                double rowStartX = WIDTH / 2 - r * PEG_SPACING / 2.0;
 
-                    if (rand.nextDouble() < 0.1) { // Hit chance
-                        // Bounce
-                        b.vx = (rand.nextBoolean() ? 1 : -1) * (1 + rand.nextDouble());
-                        b.vy *= -0.6; // Lossy bounce
-                        b.y = pegY - threshold - 1; // Eject slightly
+                for (int c = 0; c <= r; c++) {
+                    double pegX = rowStartX + c * PEG_SPACING;
+
+                    double dx = b.x - pegX;
+                    double dy = b.y - pegY;
+                    double dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < collisionDist && dist > 0) {
+                        // Collision! Push ball away from peg
+                        double overlap = collisionDist - dist;
+                        double nx = dx / dist; // Normal vector
+                        double ny = dy / dist;
+
+                        // Move ball out of peg
+                        b.x += nx * overlap;
+                        b.y += ny * overlap;
+
+                        // Reflect velocity with energy loss
+                        double dotProduct = b.vx * nx + b.vy * ny;
+                        b.vx -= 1.5 * dotProduct * nx; // Bounce reflection
+                        b.vy -= 1.5 * dotProduct * ny;
+
+                        // Add slight random deflection
+                        b.vx += (rand.nextDouble() - 0.5) * 0.5;
+
+                        // Energy loss
+                        b.vx *= 0.7;
+                        b.vy *= 0.7;
                     }
                 }
+            }
+
+            // Wall boundaries
+            if (b.x < 50) {
+                b.x = 50;
+                b.vx = Math.abs(b.vx) * 0.5;
+            }
+            if (b.x > WIDTH - 50) {
+                b.x = WIDTH - 50;
+                b.vx = -Math.abs(b.vx) * 0.5;
             }
 
             // Floor / Bins
@@ -113,8 +146,7 @@ public class GaltonBoardViewer extends Application {
                 if (bin >= 0 && bin <= ROWS) {
                     bins[bin]++;
                 }
-                it.remove(); // Remove simplified version, or keep to stack?
-                // Let's remove active ball and increment Histogram
+                it.remove();
             }
         }
     }

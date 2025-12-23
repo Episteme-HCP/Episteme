@@ -122,11 +122,15 @@ public class LSystemViewer extends Application {
             build();
         });
 
-        Slider iterSlider = new Slider(1, 6, 4);
+        Slider iterSlider = new Slider(1, 5, 4); // Max 5 to prevent slowness
         iterSlider.setShowTickLabels(true);
         iterSlider.setShowTickMarks(true);
-        iterSlider.valueProperty().addListener((o, old, v) -> {
-            iterations = v.intValue();
+        iterSlider.setMajorTickUnit(1);
+        iterSlider.setMinorTickCount(0);
+        iterSlider.setSnapToTicks(true);
+        // Only rebuild on mouse release, not on every drag
+        iterSlider.setOnMouseReleased(e -> {
+            iterations = (int) iterSlider.getValue();
             build();
         });
 

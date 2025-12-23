@@ -43,8 +43,13 @@ public class GalaxyViewer extends Application {
 
     // Collision State
     private boolean collisionMode = false;
-    private double g2x = 800, g2y = -500; // Galaxy 2 position
-    private double g2vx = -2, g2vy = 2; // Galaxy 2 velocity
+    private double g2x = 800, g2y = -500;
+    private double g2vx = -2, g2vy = 2;
+
+    // Simulation Time
+    private long simulationTime = 0;
+    private javafx.scene.control.Label timeLabel;
+    private javafx.scene.control.ComboBox<String> galaxyTypeCombo;
 
     @Override
     public void start(Stage stage) {
@@ -55,12 +60,42 @@ public class GalaxyViewer extends Application {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         root.getChildren().add(canvas);
 
-        // UI Controls
+        // UI Controls Panel
+        VBox controls = new VBox(10);
+        controls.setPadding(new javafx.geometry.Insets(10));
+        controls.setStyle("-fx-background-color: rgba(20,20,40,0.8); -fx-padding: 15;");
+        controls.setMaxWidth(200);
+        controls.setMaxHeight(300);
+        controls.setAlignment(javafx.geometry.Pos.TOP_LEFT);
+        StackPane.setAlignment(controls, javafx.geometry.Pos.TOP_LEFT);
+
+        javafx.scene.control.Label titleLbl = new javafx.scene.control.Label("Galaxy Simulation");
+        titleLbl.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8af;");
+
+        // Galaxy type selector
+        javafx.scene.control.Label typeLbl = new javafx.scene.control.Label("Galaxy Type:");
+        typeLbl.setStyle("-fx-text-fill: white;");
+        galaxyTypeCombo = new javafx.scene.control.ComboBox<>();
+        galaxyTypeCombo.getItems().addAll("Spiral (2 arms)", "Spiral (3 arms)", "Barred Spiral", "Elliptical");
+        galaxyTypeCombo.setValue("Spiral (2 arms)");
+        galaxyTypeCombo.setOnAction(e -> resetGalaxy());
+
         javafx.scene.control.Button btnCollision = new javafx.scene.control.Button("Trigger Collision");
+        btnCollision.setMaxWidth(Double.MAX_VALUE);
         btnCollision.setOnAction(e -> triggerCollision());
-        btnCollision.setTranslateY(20);
-        VBox controls = new VBox(btnCollision);
-        controls.setPickOnBounds(false);
+
+        javafx.scene.control.Button btnReset = new javafx.scene.control.Button("Reset");
+        btnReset.setMaxWidth(Double.MAX_VALUE);
+        btnReset.setOnAction(e -> resetGalaxy());
+
+        timeLabel = new javafx.scene.control.Label("Time: 0 Myr");
+        timeLabel.setStyle("-fx-text-fill: cyan; -fx-font-family: monospace;");
+
+        javafx.scene.control.Label infoLbl = new javafx.scene.control.Label("Controls:\n• Scroll: Zoom\n• Drag: Pan");
+        infoLbl.setStyle("-fx-text-fill: #888;");
+
+        controls.getChildren().addAll(titleLbl, new javafx.scene.control.Separator(), typeLbl, galaxyTypeCombo,
+                btnCollision, btnReset, new javafx.scene.control.Separator(), timeLabel, infoLbl);
         root.getChildren().add(controls);
 
         initGalaxy(stars, 0, 0, 0); // Main galaxy
@@ -68,6 +103,7 @@ public class GalaxyViewer extends Application {
         // Mouse Controls
         canvas.setOnScroll(e -> {
             zoom *= (e.getDeltaY() > 0) ? 1.1 : 0.9;
+            zoom = Math.max(0.1, Math.min(zoom, 5.0));
         });
         canvas.setOnMousePressed(e -> {
             dragStartX = e.getX() - panX;
@@ -83,6 +119,8 @@ public class GalaxyViewer extends Application {
             public void handle(long now) {
                 update();
                 render(gc, canvas.getWidth(), canvas.getHeight());
+                simulationTime++;
+                timeLabel.setText(String.format("Time: %d Myr", simulationTime / 10));
             }
         }.start();
 
@@ -90,6 +128,14 @@ public class GalaxyViewer extends Application {
         stage.setTitle("JScience Galaxy Viewer - Spiral Structure Simulation");
         stage.setScene(scene);
         stage.show();
+    }
+
+    private void resetGalaxy() {
+        stars.clear();
+        galaxy2.clear();
+        collisionMode = false;
+        simulationTime = 0;
+        initGalaxy(stars, 0, 0, 0);
     }
 
     private void triggerCollision() {

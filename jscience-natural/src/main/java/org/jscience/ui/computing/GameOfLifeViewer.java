@@ -110,13 +110,12 @@ public class GameOfLifeViewer extends Application {
         btnRandom.setOnAction(e -> randomize());
 
         speedSlider.valueProperty().addListener((obs, old, val) -> {
-            updateInterval = (long) (val.doubleValue() * 1_000_000);
+            // Invert: Left (10) = slow (500ms), Right (500) = fast (10ms)
+            double invertedDelay = 510 - val.doubleValue();
+            updateInterval = (long) (invertedDelay * 1_000_000);
         });
-        // Invert logical direction: Left (10ms) is fast, Right (500ms) is slow?
-        // Or Left (Slow) -> Right (Fast)?
-        // Slider 10..500. 10ms is fast.
-        // Let's invert UI: 100% Speed = 10ms. 0% = 500ms.
-        // Actually direct control of delay is fine for dev.
+        // Default position: start at slow end
+        speedSlider.setValue(50); // Middle-slow, actual delay = 460ms
 
         controls.getChildren().addAll(btnPlay, btnStep, btnClear, btnRandom, speedLabel, speedSlider);
         root.setBottom(controls);

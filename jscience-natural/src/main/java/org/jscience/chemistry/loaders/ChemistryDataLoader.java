@@ -131,6 +131,23 @@ public class ChemistryDataLoader {
                             Units.GRAM.divide(Units.CENTIMETER.pow(3)).asType(MassDensity.class)));
                 }
 
+                // New Properties
+                element.setStandardState(data.standardState);
+                element.setElectronConfiguration(data.electronConfig);
+                element.setOxidationStates(data.oxidationStates);
+                element.setYearDiscovered(data.yearDiscovered);
+
+                if (data.atomicRadius != null) {
+                    // Atomic radius in picometers. Convert pm to m: 1 pm = 1e-12 m
+                    element.setAtomicRadius(Quantities.create(data.atomicRadius * 1e-12, Units.METER));
+                }
+                if (data.ionization != null) {
+                    element.setIonizationEnergy(Quantities.create(data.ionization, Units.ELECTRON_VOLT));
+                }
+                if (data.affinity != null) {
+                    element.setElectronAffinity(Quantities.create(data.affinity, Units.ELECTRON_VOLT));
+                }
+
                 PeriodicTable.registerElement(element);
                 LOGGER.info("Registered element: " + data.symbol);
             }
@@ -241,6 +258,14 @@ public class ChemistryDataLoader {
         public Double melt;
         public Double boil;
         public Double density;
+        // New fields
+        public String standardState;
+        public String electronConfig;
+        public String oxidationStates;
+        public Double atomicRadius; // pm
+        public Double ionization; // eV
+        public Double affinity; // eV
+        public int yearDiscovered;
     }
 
     public static class ElementListWrapper {

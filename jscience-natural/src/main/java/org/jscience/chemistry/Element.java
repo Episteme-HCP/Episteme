@@ -23,13 +23,13 @@
 package org.jscience.chemistry;
 
 import org.jscience.measure.Quantity;
-import org.jscience.measure.quantity.Dimensionless;
 import org.jscience.measure.quantity.Length;
 import org.jscience.measure.quantity.Mass;
 import org.jscience.measure.quantity.Temperature;
 import org.jscience.measure.quantity.MassDensity;
 import org.jscience.measure.quantity.SpecificHeatCapacity;
 import org.jscience.measure.quantity.ThermalConductivity;
+import org.jscience.measure.quantity.Energy;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
@@ -65,7 +65,12 @@ public class Element {
     private Quantity<MassDensity> density;
     private Quantity<SpecificHeatCapacity> specificHeat;
     private Quantity<ThermalConductivity> thermalConductivity;
-    private Quantity<Dimensionless> ionizationEnergy;
+    private Quantity<Energy> ionizationEnergy;
+    private Quantity<Energy> electronAffinity;
+    private String standardState;
+    private String electronConfiguration; // e.g. [Ar]4s2
+    private String oxidationStates; // e.g. +4, +2
+    private int yearDiscovered;
 
     public Element(String name, String symbol) {
         this.name = name;
@@ -200,12 +205,52 @@ public class Element {
         this.thermalConductivity = thermalConductivity;
     }
 
-    public Quantity<Dimensionless> getIonizationEnergy() {
+    public Quantity<Energy> getIonizationEnergy() {
         return ionizationEnergy;
     }
 
-    public void setIonizationEnergy(Quantity<Dimensionless> ionizationEnergy) {
+    public void setIonizationEnergy(Quantity<Energy> ionizationEnergy) {
         this.ionizationEnergy = ionizationEnergy;
+    }
+
+    public Quantity<Energy> getElectronAffinity() {
+        return electronAffinity;
+    }
+
+    public void setElectronAffinity(Quantity<Energy> electronAffinity) {
+        this.electronAffinity = electronAffinity;
+    }
+
+    public String getStandardState() {
+        return standardState;
+    }
+
+    public void setStandardState(String standardState) {
+        this.standardState = standardState;
+    }
+
+    public String getElectronConfiguration() {
+        return electronConfiguration;
+    }
+
+    public void setElectronConfiguration(String electronConfiguration) {
+        this.electronConfiguration = electronConfiguration;
+    }
+
+    public String getOxidationStates() {
+        return oxidationStates;
+    }
+
+    public void setOxidationStates(String oxidationStates) {
+        this.oxidationStates = oxidationStates;
+    }
+
+    public int getYearDiscovered() {
+        return yearDiscovered;
+    }
+
+    public void setYearDiscovered(int yearDiscovered) {
+        this.yearDiscovered = yearDiscovered;
     }
 
     @Override

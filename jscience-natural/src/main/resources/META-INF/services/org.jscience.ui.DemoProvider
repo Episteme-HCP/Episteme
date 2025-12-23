@@ -16,3 +16,6 @@ org.jscience.ui.demos.FluidDynamicsDemo
 org.jscience.ui.demos.OscilloscopeDemo
 org.jscience.ui.demos.ResistorColorCodeDemo
 org.jscience.ui.demos.ThermodynamicsDemo
+org.jscience.ui.demos.HumanBodyDemo
+org.jscience.ui.demos.ChemicalReactionDemo
+

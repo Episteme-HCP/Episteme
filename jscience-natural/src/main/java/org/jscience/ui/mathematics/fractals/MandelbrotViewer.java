@@ -57,16 +57,22 @@ public class MandelbrotViewer extends Application {
 
         modeBtn.setOnAction(e -> {
             juliaMode = modeBtn.isSelected();
-            // Reset view for Julia
+            // Reset view based on mode
             if (juliaMode) {
                 minRe = -2.0;
                 maxRe = 2.0;
                 minIm = -1.5;
                 maxIm = 1.5;
             } else {
+                // Reset to Mandelbrot default and recalculate aspect
                 minRe = -2.0;
                 maxRe = 1.0;
-                // re-calc Im
+                double aspect = (double) HEIGHT / WIDTH;
+                double reWidth = maxRe - minRe;
+                double imHeight = reWidth * aspect;
+                double centerIm = 0.0; // Center at origin for Mandelbrot
+                minIm = centerIm - imHeight / 2;
+                maxIm = centerIm + imHeight / 2;
             }
             render();
         });

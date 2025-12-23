@@ -25,6 +25,7 @@ package org.jscience.ui.chemistry;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
@@ -33,6 +34,7 @@ import javafx.scene.SubScene;
 import javafx.scene.control.*;
 
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -73,6 +75,8 @@ public class MolecularViewer extends Application {
     private double mouseX, mouseY;
     private Label detailLabel = new Label("Select a molecule...");
     private CheckBox showBondsBox;
+    private CheckBox showOrbitalsBox;
+    private boolean showOrbitals = false;
 
     private static final Map<String, Color> CPK_COLORS = new HashMap<>();
     private static final Map<String, Double> VDW_RADII = new HashMap<>();
@@ -135,18 +139,44 @@ public class MolecularViewer extends Application {
         showBondsBox.setSelected(true);
         showBondsBox.setOnAction(e -> toggleBonds(showBondsBox.isSelected()));
 
+        showOrbitalsBox = new CheckBox("Show Orbitals");
+        showOrbitalsBox.setSelected(false);
+        showOrbitalsBox.setOnAction(e -> {
+            showOrbitals = showOrbitalsBox.isSelected();
+            // Reload current model to apply orbitals
+            loadModel(selector.getValue());
+        });
+
+        // Planar (2D) View Toggle
+        CheckBox planarViewBox = new CheckBox("Planar (2D) View");
+        planarViewBox.setSelected(false);
+        planarViewBox.setOnAction(e -> {
+            planarMode = planarViewBox.isSelected();
+            if (planarMode) {
+                root.setCenter(create2DView());
+            } else {
+                root.setCenter(subScene);
+            }
+            loadModel(selector.getValue());
+        });
+
         detailLabel.setWrapText(true);
         detailLabel.setStyle("-fx-font-family: 'Consolas', monospace; -fx-font-size: 11px;");
 
         Label header = new Label("Molecular Viewer");
         header.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
+        VBox legend = createLegend();
+
         controls.getChildren().addAll(header, new Separator(),
                 new Label("Load Model:"), selector,
-                showBondsBox,
+                showBondsBox, showOrbitalsBox, planarViewBox,
                 new Separator(),
                 new Label("Molecule Info:"),
-                detailLabel);
+                detailLabel,
+                new Separator(),
+                new Label("Legend:"),
+                legend);
         root.setRight(controls);
 
         loadModel("Benzene (Orbitals)");
@@ -155,6 +185,82 @@ public class MolecularViewer extends Application {
         primaryStage.setTitle("JScience Molecular Viewer");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    // Planar mode flag
+    private boolean planarMode = false;
+    private javafx.scene.canvas.Canvas planarCanvas;
+
+    private javafx.scene.Node create2DView() {
+        planarCanvas = new javafx.scene.canvas.Canvas(800, 600);
+        javafx.scene.layout.StackPane container = new javafx.scene.layout.StackPane(planarCanvas);
+        container.setStyle("-fx-background-color: white;");
+        return container;
+    }
+
+    private void drawPlanarMolecule(MolecularGraph graph) {
+        if (planarCanvas == null)
+            return;
+        javafx.scene.canvas.GraphicsContext gc = planarCanvas.getGraphicsContext2D();
+        gc.setFill(Color.WHITE);
+        gc.fillRect(0, 0, planarCanvas.getWidth(), planarCanvas.getHeight());
+
+        double cx = planarCanvas.getWidth() / 2;
+        double cy = planarCanvas.getHeight() / 2;
+        double scale = 40.0;
+
+        // Draw bonds first
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(2);
+        for (MolecularGraph.Bond bond : graph.getBonds()) {
+            Atom a1 = bond.source;
+            Atom a2 = bond.target;
+            double x1 = cx + a1.getPosition().get(0).doubleValue() * scale;
+            double y1 = cy - a1.getPosition().get(1).doubleValue() * scale;
+            double x2 = cx + a2.getPosition().get(0).doubleValue() * scale;
+            double y2 = cy - a2.getPosition().get(1).doubleValue() * scale;
+
+            int order = bond.type == MolecularGraph.BondType.SINGLE ? 1
+                    : bond.type == MolecularGraph.BondType.DOUBLE ? 2
+                            : bond.type == MolecularGraph.BondType.TRIPLE ? 3 : 1;
+            if (order == 1) {
+                gc.strokeLine(x1, y1, x2, y2);
+            } else if (order == 2) {
+                double dx = (y2 - y1) * 0.05;
+                double dy = (x2 - x1) * 0.05;
+                gc.strokeLine(x1 + dx, y1 - dy, x2 + dx, y2 - dy);
+                gc.strokeLine(x1 - dx, y1 + dy, x2 - dx, y2 + dy);
+            } else if (order == 3) {
+                double dx = (y2 - y1) * 0.07;
+                double dy = (x2 - x1) * 0.07;
+                gc.strokeLine(x1, y1, x2, y2);
+                gc.strokeLine(x1 + dx, y1 - dy, x2 + dx, y2 - dy);
+                gc.strokeLine(x1 - dx, y1 + dy, x2 - dx, y2 + dy);
+            }
+        }
+
+        // Draw atoms
+        for (Atom atom : graph.getAtoms()) {
+            double x = cx + atom.getPosition().get(0).doubleValue() * scale;
+            double y = cy - atom.getPosition().get(1).doubleValue() * scale;
+            String symbol = atom.getElement().getSymbol();
+
+            Color color = CPK_COLORS.getOrDefault(symbol, Color.GRAY);
+            double radius = 15;
+
+            gc.setFill(color);
+            gc.fillOval(x - radius, y - radius, radius * 2, radius * 2);
+            gc.setStroke(Color.BLACK);
+            gc.setLineWidth(1);
+            gc.strokeOval(x - radius, y - radius, radius * 2, radius * 2);
+
+            // Label
+            gc.setFill(color.getBrightness() > 0.5 ? Color.BLACK : Color.WHITE);
+            gc.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, 12));
+            gc.setTextAlign(javafx.scene.text.TextAlignment.CENTER);
+            gc.setTextBaseline(javafx.geometry.VPos.CENTER);
+            gc.fillText(symbol, x, y);
+        }
     }
 
     // Static show method for Master Demo
@@ -189,11 +295,12 @@ public class MolecularViewer extends Application {
         subScene.setOnMouseDragged(e -> {
             double dx = e.getSceneX() - mouseX;
             double dy = e.getSceneY() - mouseY;
-            if (e.isPrimaryButtonDown()) {
+            if (e.isSecondaryButtonDown()) { // Right Button -> Rotate
                 ry.setAngle(ry.getAngle() + dx * 0.2);
                 rx.setAngle(rx.getAngle() - dy * 0.2);
-            } else if (e.isSecondaryButtonDown()) {
-                t.setZ(t.getZ() + dy * 0.1);
+            } else if (e.isPrimaryButtonDown()) { // Left Button -> Translate (Pan)
+                t.setX(t.getX() + dx * 0.1);
+                t.setY(t.getY() + dy * 0.1);
             }
             mouseX = e.getSceneX();
             mouseY = e.getSceneY();
@@ -324,6 +431,58 @@ public class MolecularViewer extends Application {
         // Center the molecule
         // Simple average calc could go here, but for now we rely on model coords being
         // somewhat centered
+
+        if (showOrbitals) {
+            for (Atom atom : graph.getAtoms()) {
+                // Add atomic orbital visual (Simplified generic orbital for all atoms)
+                // Using VDW radius approximation as orbital shell
+                String symbol = atom.getElement().getSymbol();
+                createGenericOrbital(atom.getPosition(), symbol);
+            }
+        }
+    }
+
+    private void createGenericOrbital(Vector<Real> posVector, String symbol) {
+        // Generic transparent shell to represent orbital probability cloud
+        double posScale = 3.0;
+        javafx.geometry.Point3D pos = new javafx.geometry.Point3D(
+                posVector.get(0).doubleValue() * posScale,
+                posVector.get(1).doubleValue() * posScale,
+                posVector.get(2).doubleValue() * posScale);
+
+        double radius = VDW_RADII.getOrDefault(symbol, 1.5) * 0.5 * 1.5; // Slightly larger than atom
+        Sphere s = new Sphere(radius);
+        PhongMaterial mat = new PhongMaterial(CPK_COLORS.getOrDefault(symbol, Color.GRAY));
+        mat.setDiffuseColor(new Color(mat.getDiffuseColor().getRed(), mat.getDiffuseColor().getGreen(),
+                mat.getDiffuseColor().getBlue(), 0.3)); // Transparent
+        mat.setSpecularColor(Color.WHITE);
+
+        s.setMaterial(mat);
+        s.setTranslateX(pos.getX());
+        s.setTranslateY(pos.getY());
+        s.setTranslateZ(pos.getZ());
+        s.setMouseTransparent(true); // Don't block clicks on atom
+        moleculeGroup.getChildren().add(s);
+    }
+
+    private VBox createLegend() {
+        VBox box = new VBox(5);
+        box.setPadding(new Insets(5));
+        box.setStyle("-fx-background-color: white; -fx-border-color: #ccc;");
+
+        String[] elements = { "H", "C", "N", "O", "S", "P", "Halogen" };
+        for (String el : elements) {
+            HBox row = new HBox(5);
+            row.setAlignment(Pos.CENTER_LEFT);
+            javafx.scene.shape.Circle c = new javafx.scene.shape.Circle(6);
+            String lookup = el.equals("Halogen") ? "Cl" : el;
+            c.setFill(CPK_COLORS.getOrDefault(lookup, Color.GRAY));
+            Label l = new Label(el.equals("Halogen") ? "F, Cl, Br, I" : el);
+            l.setStyle("-fx-font-size: 10px;");
+            row.getChildren().addAll(c, l);
+            box.getChildren().add(row);
+        }
+        return box;
     }
 
     private void showAtomDetails(Atom atom) {

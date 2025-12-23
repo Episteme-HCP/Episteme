@@ -279,35 +279,58 @@ public class StarSystemViewer extends Application {
             double x = 0, y = 0, z = 0;
 
             if (body.getName().contains("Black Hole")) {
-                // Static center
-            } else if (body.getName().contains("Supergiant")) {
-                // Orbit logic for binary
-                double t = updateCounter * 0.01;
-                double dist = 100;
+                // Static center - black hole doesn't move
+                x = 0;
+                y = 0;
+                z = 0;
+            } else if (body.getName().contains("Supergiant") || body.getName().contains("Companion")) {
+                // Orbit around black hole
+                double t = updateCounter * 0.02;
+                double dist = 80;
                 x = Math.cos(t) * dist;
-                y = Math.sin(t) * dist;
+                z = Math.sin(t) * dist;
+            } else if (body.getName().equalsIgnoreCase("Sun")) {
+                // Sun at center
+                x = 0;
+                y = 0;
+                z = 0;
+            } else if (body.getName().equalsIgnoreCase("Earth")) {
+                // Earth orbits sun
+                double t = updateCounter * 0.01;
+                double dist = 150;
+                x = Math.cos(t) * dist;
+                z = Math.sin(t) * dist;
+            } else if (body.getName().equalsIgnoreCase("Mars")) {
+                // Mars orbits sun at different rate
+                double t = updateCounter * 0.006;
+                double dist = 230;
+                x = Math.cos(t) * dist;
+                z = Math.sin(t) * dist;
             } else {
-                // Existing ephemeris logic or static fallback
-                // Simplified for brevity in this overwrite, resuming original logic
-                // ...
-                if (body.getName().equalsIgnoreCase("Earth")) {
-                    x = 150;
-                } // Mock for non-ephemeris
+                // Default: try to get position from body
+                try {
+                    Vector<Real> pos = body.getPosition();
+                    x = pos.get(0).doubleValue() * scaleFactor;
+                    y = pos.get(1).doubleValue() * scaleFactor;
+                    z = pos.get(2).doubleValue() * scaleFactor;
+                } catch (Exception e) {
+                    // Fallback
+                }
             }
 
             node.setTranslateX(x);
-            node.setTranslateZ(y);
-            node.setTranslateY(-z);
+            node.setTranslateZ(z);
+            node.setTranslateY(-y);
 
-            // Trail logic
-            if (updateCounter % 5 == 0 && !body.getName().contains("Black Hole")) {
-                Sphere marker = new Sphere(0.5);
+            // Trail logic - show orbital paths
+            if (updateCounter % 10 == 0 && !body.getName().contains("Black Hole") && !body.getName().contains("Sun")) {
+                Sphere marker = new Sphere(0.3);
                 marker.setTranslateX(x);
-                marker.setTranslateY(-z);
-                marker.setTranslateZ(y);
-                marker.setMaterial(new PhongMaterial(Color.LIGHTGRAY));
+                marker.setTranslateY(-y);
+                marker.setTranslateZ(z);
+                marker.setMaterial(new PhongMaterial(Color.gray(0.5, 0.3)));
                 trailGroup.getChildren().add(marker);
-                if (trailGroup.getChildren().size() > 1000)
+                if (trailGroup.getChildren().size() > 500)
                     trailGroup.getChildren().remove(0);
             }
         }
