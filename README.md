@@ -2,6 +2,8 @@
 
 **A unified scientific computing framework where all sciences naturally build upon their mathematical foundations.**
 
+[![Javadoc](https://img.shields.io/badge/Javadoc-Reference-blue)](https://silveremartin-dev.github.io/JScience/)
+
 ```
 Mathematics → Physics → Chemistry → Biology → Human Sciences
 ```
@@ -125,6 +127,7 @@ See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for complete design.
 
 ## Documentation
 
+- 📚 **Online API Javadoc**: [https://silveremartin-dev.github.io/JScience/](https://silveremartin-dev.github.io/JScience/)
 - [Architecture Guide](docs/ARCHITECTURE.md)
 - [Mathematical Concepts](docs/MATH_CONCEPTS.md)
 - [API Reference](docs/API.md)
