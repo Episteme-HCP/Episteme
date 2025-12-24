@@ -17,7 +17,7 @@ public class EconomicsMarketDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return "Social Sciences";
+        return "Economics";
     }
 
     @Override

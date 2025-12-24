@@ -28,10 +28,12 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-
 import javafx.stage.Stage;
 
 import java.util.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * JScience Master Demo Launcher.
@@ -47,31 +49,45 @@ import java.util.*;
  */
 public class JScienceDemoApp extends Application {
 
+    private static final Logger logger = LoggerFactory.getLogger(JScienceDemoApp.class);
+
     @Override
     public void start(Stage primaryStage) {
         BorderPane root = new BorderPane();
 
-        // Load CSS
-        String css = getClass().getResource("theme.css").toExternalForm();
-        root.getStylesheets().add(css);
+        // Load CSS with null protection
+        var cssResource = getClass().getResource("theme.css");
+        if (cssResource != null) {
+            root.getStylesheets().add(cssResource.toExternalForm());
+        } else {
+            logger.warn("theme.css not found, using default styling");
+        }
 
         // Header
         VBox header = createHeader();
-        root.setTop(header);
+
+        // Menu Bar
+        MenuBar menuBar = createMenuBar();
+        VBox topContainer = new VBox(menuBar, header);
+        root.setTop(topContainer);
 
         // Discovery
         Map<String, List<DemoProvider>> demosByCategory = new TreeMap<>();
         List<DemoProvider> viewers = new ArrayList<>();
 
-        ServiceLoader<DemoProvider> loader = ServiceLoader.load(DemoProvider.class);
-        for (DemoProvider provider : loader) {
-            if (provider.isViewer()) {
-                viewers.add(provider);
-            } else {
-                demosByCategory
-                        .computeIfAbsent(provider.getCategory(), k -> new ArrayList<>())
-                        .add(provider);
+        try {
+            ServiceLoader<DemoProvider> loader = ServiceLoader.load(DemoProvider.class);
+            for (DemoProvider provider : loader) {
+                if (provider.isViewer()) {
+                    viewers.add(provider);
+                } else {
+                    demosByCategory
+                            .computeIfAbsent(provider.getCategory(), k -> new ArrayList<>())
+                            .add(provider);
+                }
             }
+        } catch (Exception e) {
+            logger.error("Error loading demos", e);
         }
 
         // Tabs
@@ -89,27 +105,57 @@ public class JScienceDemoApp extends Application {
         root.setCenter(tabs);
 
         Scene scene = new Scene(root, 1000, 750);
-        // Add CSS to scene as well just in case
-        scene.getStylesheets().add(css);
+        // Add CSS to scene as well
+        if (cssResource != null) {
+            scene.getStylesheets().add(cssResource.toExternalForm());
+        }
 
         primaryStage.setTitle("JScience Demonstration Suite");
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        // Run diagnostics at startup (internal check)
+        runDiagnostics();
+    }
+
+    private MenuBar createMenuBar() {
+        MenuBar menuBar = new MenuBar();
+        Menu toolsMenu = new Menu("Tools");
+        MenuItem diagnosticsItem = new MenuItem("Run Diagnostics");
+        diagnosticsItem.setOnAction(e -> runDiagnostics());
+        toolsMenu.getItems().add(diagnosticsItem);
+        menuBar.getMenus().add(toolsMenu);
+        return menuBar;
+    }
+
+    private void runDiagnostics() {
+        logger.info("Starting JScience Demo Diagnostics...");
+        logger.info("Java Version: {}", System.getProperty("java.version"));
+        logger.info("Classpath: {}", System.getProperty("java.class.path"));
+
+        try {
+            logger.info("--- Attempting to load DemoProviders ---");
+            ServiceLoader<DemoProvider> loader = ServiceLoader.load(DemoProvider.class);
+            int count = 0;
+            for (DemoProvider provider : loader) {
+                logger.info("Found provider: {} - {}", provider.getClass().getName(), provider.getName());
+                count++;
+            }
+            logger.info("Total providers found: {}", count);
+        } catch (Throwable t) {
+            logger.error("FAILED TO LOAD PROVIDERS", t);
+        }
     }
 
     private VBox createHeader() {
         VBox header = new VBox(5);
         header.setPadding(new Insets(20));
         header.setAlignment(Pos.CENTER);
-        header.getStyleClass().add("header-box"); // Defined in CSS if possible, else rely on styles below
-        // Fallback or explicit styling for header gradient handled in CSS .root if
-        // doable,
-        // but here we can keep the nice gradient programmatically if CSS is static
+        header.getStyleClass().add("header-box");
         header.setStyle("-fx-background-color: linear-gradient(to right, #1a2a6c, #b21f1f, #fdbb2d);");
 
         Label title = new Label("JScience Demonstration Suite");
         title.getStyleClass().add("header-label");
-        // Override for header specific text
         title.setStyle("-fx-font-size: 28px; -fx-text-fill: white; -fx-font-weight: bold;");
 
         Label subtitle = new Label("Interactive Scientific Visualizations & Simulations");
@@ -145,8 +191,6 @@ public class JScienceDemoApp extends Application {
         if (providers.isEmpty()) {
             content.getChildren().add(new Label("No generic viewers found."));
         } else {
-            // Just use the same list style but grouped in one "Tools" block or just flat
-            // Generic tools need good cards
             for (DemoProvider p : providers) {
                 content.getChildren().add(createCard(p));
             }

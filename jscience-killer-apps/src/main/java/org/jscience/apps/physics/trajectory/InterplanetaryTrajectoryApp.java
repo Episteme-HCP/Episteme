@@ -13,13 +13,13 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
-import javafx.scene.transform.Transform;
 
 import org.jscience.apps.framework.KillerAppBase;
 import org.jscience.physics.astronomy.SolarSystemLoader;
 import org.jscience.physics.astronomy.StarSystem;
 import org.jscience.physics.astronomy.CelestialBody;
 import org.jscience.physics.astronomy.Planet;
+import org.jscience.physics.loaders.HorizonsEphemerisLoader;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -50,9 +50,9 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
     private StarSystem solarSystem;
     private CelestialBody originBody;
     private CelestialBody targetBody;
-    
+
     // Simulation scale: Pixels per AU
-    private static final double SCALE = 100.0; 
+    private static final double SCALE = 100.0;
     // AU in meters
     private static final double AU = 1.496e11;
 
@@ -73,11 +73,11 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
         solarSystemCanvas = new Canvas(800, 600);
         solarSystemCanvas.widthProperty().bind(canvasPane.widthProperty());
         solarSystemCanvas.heightProperty().bind(canvasPane.heightProperty());
-        
+
         // Redraw when resized
         solarSystemCanvas.widthProperty().addListener(o -> drawSolarSystem());
         solarSystemCanvas.heightProperty().addListener(o -> drawSolarSystem());
-        
+
         canvasPane.getChildren().add(solarSystemCanvas);
         VBox.setVgrow(solarSystemCanvas, Priority.ALWAYS);
 
@@ -88,7 +88,7 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
 
         mainSplit.getItems().addAll(canvasPane, controls);
         mainSplit.setDividerPositions(0.7);
-        
+
         // Initial Draw
         drawSolarSystem();
 
@@ -98,15 +98,31 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
     private void loadData() {
         // Load our JSON resource
         solarSystem = SolarSystemLoader.load("org/jscience/astronomy/solarsystem.json");
+
+        // Load Real Mars Ephemeris
+        try (var is = getClass().getResourceAsStream("data/mars_horizons.txt")) {
+            if (is != null) {
+                List<HorizonsEphemerisLoader.EphemerisPoint> marsPoints = HorizonsEphemerisLoader.loadEphemeris(is);
+                System.out.println("Loaded " + marsPoints.size() + " real ephemeris points for Mars.");
+                // In a real app, we would inject these into the Planet object or a
+                // TrajectoryService
+                // For this demo, we can store them to overlay on the graph
+                // TODO: Store in a member variable if needed for visualization override
+            } else {
+                System.err.println("Mars ephemeris file not found.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private VBox createControls() {
         VBox panel = new VBox(15);
         panel.setPadding(new Insets(20));
-        panel.setStyle("-fx-background-color: #f4f4f4; -fx-border-color: #ddd; -fx-border-width: 0 0 0 1;");
+        panel.setStyle("-fx-background-color: #16213e; -fx-border-color: #333; -fx-border-width: 0 0 0 1;");
 
-        Label title = new Label("🚀 Mission Configuration");
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        Label title = new Label("🚀 " + i18n.get("trajectory.panel.config"));
+        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #00d9ff;");
 
         // Planet Selection
         List<String> planets = solarSystem.getBodies().stream()
@@ -128,13 +144,13 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
         // Dates
         launchDatePicker = new DatePicker(LocalDate.now());
         launchDatePicker.setOnAction(e -> drawSolarSystem());
-        
+
         flightDurationSpinner = new Spinner<>(30, 1000, 180, 10); // Min 30 days, Max 1000, Default 180
         flightDurationSpinner.setEditable(true);
         flightDurationSpinner.valueProperty().addListener((o, ov, nv) -> drawSolarSystem());
 
         // Calc Button
-        Button calcBtn = new Button("Calculate Trajectory");
+        Button calcBtn = new Button(i18n.get("trajectory.button.calculate"));
         calcBtn.setMaxWidth(Double.MAX_VALUE);
         calcBtn.getStyleClass().add("primary-button"); // If theme supports it
         calcBtn.setStyle("-fx-background-color: #007bff; -fx-text-fill: white; -fx-font-weight: bold;");
@@ -150,23 +166,23 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
         missionLog.setWrapText(true);
 
         panel.getChildren().addAll(
-            title,
-            new Label("Origin:"), originBox,
-            new Label("Target:"), targetBox,
-            new Separator(),
-            new Label("Launch Date:"), launchDatePicker,
-            new Label("Flight Duration (days):"), flightDurationSpinner,
-            new Separator(),
-            calcBtn,
-            deltaVLabel,
-            new Label("Mission Log:"), missionLog
-        );
+                title,
+                new Label(i18n.get("trajectory.label.origin") + ":"), originBox,
+                new Label(i18n.get("trajectory.label.target") + ":"), targetBox,
+                new Separator(),
+                new Label(i18n.get("trajectory.label.departure") + ":"), launchDatePicker,
+                new Label(i18n.get("trajectory.label.duration") + ":"), flightDurationSpinner,
+                new Separator(),
+                calcBtn,
+                deltaVLabel,
+                new Label(i18n.get("trajectory.label.log") + ":"), missionLog);
 
         return panel;
     }
 
     private void updateSelection() {
-        if (solarSystem == null) return;
+        if (solarSystem == null)
+            return;
         originBody = findBody(originBox.getValue());
         targetBody = findBody(targetBox.getValue());
         drawSolarSystem();
@@ -174,9 +190,9 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
 
     private CelestialBody findBody(String name) {
         return solarSystem.getBodies().stream()
-            .filter(b -> b.getName().equals(name))
-            .findFirst()
-            .orElse(null);
+                .filter(b -> b.getName().equals(name))
+                .findFirst()
+                .orElse(null);
     }
 
     private void drawSolarSystem() {
@@ -197,9 +213,9 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
 
         // Draw Planets
         // Assume planets are children of the first star (Sun)
-        CelestialBody sun = solarSystem.getStars().get(0); // Assuming 1 star system 
+        // CelestialBody sun = solarSystem.getStars().get(0); // Assuming 1 star system
         // Or iterate all bodies
-        
+
         LocalDate date = launchDatePicker.getValue();
         double centuriesSinceJ2000 = getCenturiesSinceJ2000(date);
 
@@ -209,7 +225,7 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
                 drawPlanet(gc, (Planet) body, centuriesSinceJ2000);
             }
         }
-        
+
         // Reset transform
         gc.setTransform(new Affine());
     }
@@ -217,18 +233,23 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
     private void drawPlanetOrbit(GraphicsContext gc, Planet p) {
         // Simplified circular orbit assuming 'a' is radius
         // To do generic ellipse, we need e, a, etc.
-        // Assuming SolarSystemLoader puts 'a' in orbit data, but we don't have direct access here 
+        // Assuming SolarSystemLoader puts 'a' in orbit data, but we don't have direct
+        // access here
         // without casting to internal impl or having standard fields.
         // SolarSystemLoader stores pos/vel in Quantity fields or Vectors.
-        // We will approximate 'a' from current position magnitude for visualization if stored element not available.
-        // Actually, SolarSystemLoader doesn't expose Elements directly on CelestialBody, just initial Pos/Vel.
-        // But for "Planet" it keeps reading from JSON. 
-        // Since we can't easily get 'a' from the generic Body class without deeper inspection, 
+        // We will approximate 'a' from current position magnitude for visualization if
+        // stored element not available.
+        // Actually, SolarSystemLoader doesn't expose Elements directly on
+        // CelestialBody, just initial Pos/Vel.
+        // But for "Planet" it keeps reading from JSON.
+        // Since we can't easily get 'a' from the generic Body class without deeper
+        // inspection,
         // and we parsed it into DenseVectors...
-        // Let's use the magnitude of the position vector at epoch as an approximation for 'a' for drawing circles.
-        
+        // Let's use the magnitude of the position vector at epoch as an approximation
+        // for 'a' for drawing circles.
+
         double r = p.getPosition().norm().doubleValue() / AU * SCALE;
-        
+
         gc.setStroke(Color.web("#333333"));
         gc.setLineWidth(1);
         gc.strokeOval(-r, -r, 2 * r, 2 * r);
@@ -237,62 +258,62 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
     private void drawPlanet(GraphicsContext gc, Planet p, double t) {
         // Calculate position (Simplified Mean Motion for visualization)
         // Mean Anomaly M = M0 + n * t
-        // We need orbital period or 'a'. 
+        // We need orbital period or 'a'.
         // Let's estimate 'a' = mag(pos)
-        double a_m = p.getPosition().norm().doubleValue(); 
+        double a_m = p.getPosition().norm().doubleValue();
         double a_au = a_m / AU;
-        
+
         // Period (Kepler 3rd): P^2 = a^3 (P in years, a in AU)
         double P = Math.sqrt(Math.pow(a_au, 3));
         double n = 2 * Math.PI / P; // rad/year
-        
+
         // Angle at time t (centuries). t is in centuries. P is in years.
         // angle = n * (t * 100) + initial_angle
         // Let's assume initial angle is atan2(y, x) of initial pos.
         double x0 = p.getPosition().get(0).doubleValue();
         double y0 = p.getPosition().get(1).doubleValue();
         double theta0 = Math.atan2(y0, x0);
-        
+
         double theta = theta0 + n * t * 100; // t in centuries
-        
+
         double r = a_au * SCALE;
         double x = r * Math.cos(theta);
         double y = r * Math.sin(theta);
-        
+
         gc.setFill(getColorForPlanet(p.getName()));
         double size = 8;
         if (p.getName().equals(originBox.getValue())) {
-             gc.setFill(Color.LIME);
-             size = 10;
+            gc.setFill(Color.LIME);
+            size = 10;
         } else if (p.getName().equals(targetBox.getValue())) {
-             gc.setFill(Color.RED);
-             size = 10;
+            gc.setFill(Color.RED);
+            size = 10;
         }
-        
-        gc.fillOval(x - size/2, y - size/2, size, size);
-        
+
+        gc.fillOval(x - size / 2, y - size / 2, size, size);
+
         gc.setFill(Color.WHITE);
         gc.fillText(p.getName(), x + 8, y + 4);
     }
-    
+
     private double[] calculatePosition(Planet p, LocalDate date) {
         double centuries = getCenturiesSinceJ2000(date);
-        
+
         // Same logic as drawPlanet but returning coords in meters
-        double a_m = p.getPosition().norm().doubleValue(); 
+        double a_m = p.getPosition().norm().doubleValue();
         double a_au = a_m / AU;
-        
+
         double P = Math.sqrt(Math.pow(a_au, 3));
-        double n = 2 * Math.PI / P; 
+        double n = 2 * Math.PI / P;
 
         double x0 = p.getPosition().get(0).doubleValue();
         double y0 = p.getPosition().get(1).doubleValue();
         double theta0 = Math.atan2(y0, x0);
-        
+
         double theta = theta0 + n * centuries * 100;
-        
+
         double r = a_m; // Circle
-        return new double[]{ r * Math.cos(theta), r * Math.sin(theta) };
+        return new double[] { r * Math.cos(theta), r * Math.sin(theta) };
     }
 
     private Color getColorForPlanet(String name) {
@@ -314,13 +335,15 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
     }
 
     private void calculateTrajectory() {
-        if (originBody == null || targetBody == null) return;
-        if (!(originBody instanceof Planet) || !(targetBody instanceof Planet)) return;
+        if (originBody == null || targetBody == null)
+            return;
+        if (!(originBody instanceof Planet) || !(targetBody instanceof Planet))
+            return;
 
         LocalDate d1 = launchDatePicker.getValue();
         int duration = flightDurationSpinner.getValue();
         LocalDate d2 = d1.plusDays(duration);
-        
+
         missionLog.appendText("--------------------------------\n");
         missionLog.appendText("Analyzing Transfer:\n");
         missionLog.appendText("Launcher: " + originBody.getName() + " -> " + targetBody.getName() + "\n");
@@ -329,65 +352,65 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
 
         double[] pos1 = calculatePosition((Planet) originBody, d1);
         double[] pos2 = calculatePosition((Planet) targetBody, d2);
-        
-        double r1 = Math.sqrt(pos1[0]*pos1[0] + pos1[1]*pos1[1]);
-        double r2 = Math.sqrt(pos2[0]*pos2[0] + pos2[1]*pos2[1]);
-        
+
+        double r1 = Math.sqrt(pos1[0] * pos1[0] + pos1[1] * pos1[1]);
+        double r2 = Math.sqrt(pos2[0] * pos2[0] + pos2[1] * pos2[1]);
+
         // Hohmann Transfer Delta-V
         double mu = 1.327e20; // Sun GM (m^3/s^2)
-        
+
         double v1 = Math.sqrt(mu / r1);
         double v2 = Math.sqrt(mu / r2);
-        
+
         // Transfer orbit energy
         double a_transfer = (r1 + r2) / 2.0;
-        double v_perigee = Math.sqrt(mu * (2/r1 - 1/a_transfer)); // Velocity at r1 on transfer orbit
-        double v_apogee = Math.sqrt(mu * (2/r2 - 1/a_transfer)); // Velocity at r2 on transfer orbit
-        
+        double v_perigee = Math.sqrt(mu * (2 / r1 - 1 / a_transfer)); // Velocity at r1 on transfer orbit
+        double v_apogee = Math.sqrt(mu * (2 / r2 - 1 / a_transfer)); // Velocity at r2 on transfer orbit
+
         double dv1 = Math.abs(v_perigee - v1);
         double dv2 = Math.abs(v2 - v_apogee);
         double totalDv = (dv1 + dv2) / 1000.0; // km/s
-        
+
         // Phase angle check (simplified)
         // Optimal alignment?
-        
+
         deltaVLabel.setText(String.format("Delta-V: %.2f km/s", totalDv));
-        
+
         missionLog.appendText(String.format("Hohmann Transfer Estimates:\n"));
-        missionLog.appendText(String.format("  Departure Delta-V: %.2f km/s\n", dv1/1000.0));
-        missionLog.appendText(String.format("  Arrival Delta-V:   %.2f km/s\n", dv2/1000.0));
+        missionLog.appendText(String.format("  Departure Delta-V: %.2f km/s\n", dv1 / 1000.0));
+        missionLog.appendText(String.format("  Arrival Delta-V:   %.2f km/s\n", dv2 / 1000.0));
         missionLog.appendText(String.format("  Total Basic dV:    %.2f km/s\n", totalDv));
-        
+
         // Visualizer Transfer Orbit
         GraphicsContext gc = solarSystemCanvas.getGraphicsContext2D();
         gc.save();
-        gc.translate(solarSystemCanvas.getWidth()/2, solarSystemCanvas.getHeight()/2);
-        
+        gc.translate(solarSystemCanvas.getWidth() / 2, solarSystemCanvas.getHeight() / 2);
+
         gc.setStroke(Color.LIMEGREEN);
         gc.setLineWidth(2);
         gc.setLineDashes(5);
-        
+
         // Draw ellipse from r1 to r2
         double a_t_au = a_transfer / AU;
         double r1_au = r1 / AU;
         double r2_au = r2 / AU;
-        
+
         // Center of transfer ellipse is at (r1+r2)/2 - r1 = (r2-r1)/2 from Sun?
-        // No, sun is at focus. 
+        // No, sun is at focus.
         // Perigee is r1. Apogee is r2.
         // Center offset X = -(r2-r1)/2 (if aligned on X axis)
-        double cx = -(r2_au - r1_au) * SCALE / 2.0; 
-        double cy = 0;
+        double cx = -(r2_au - r1_au) * SCALE / 2.0;
+        // double cy = 0;
         double rw = a_t_au * SCALE; // Semi-major
-        double rh = Math.sqrt(r1_au*r2_au) * SCALE; // Semi-minor approx for visual? Close enough
-        
-        // Rotate to match launch angle? 
+        double rh = Math.sqrt(r1_au * r2_au) * SCALE; // Semi-minor approx for visual? Close enough
+
+        // Rotate to match launch angle?
         // For visual demo, just draw a representative transfer arc
-        gc.strokeOval(cx - rw, -rh, 2*rw, 2*rh);
-        
+        gc.strokeOval(cx - rw, -rh, 2 * rw, 2 * rh);
+
         gc.restore();
     }
-    
+
     public static void main(String[] args) {
         launch(args);
     }

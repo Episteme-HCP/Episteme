@@ -6,8 +6,7 @@ package org.jscience.apps.framework;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+
 import javafx.scene.chart.*;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
@@ -25,7 +24,8 @@ import java.util.List;
  */
 public final class ChartFactory {
 
-    private ChartFactory() {}
+    private ChartFactory() {
+    }
 
     /**
      * Creates a line chart with the given title and axis labels.
@@ -173,7 +173,8 @@ public final class ChartFactory {
         }
 
         private void updateChart() {
-            if (dataProvider == null) return;
+            if (dataProvider == null)
+                return;
 
             double[] values = dataProvider.getNextValues();
             for (int i = 0; i < Math.min(values.length, seriesList.size()); i++) {
@@ -201,8 +202,7 @@ public final class ChartFactory {
     public static StackPane createCandlestickPlaceholder(String title) {
         StackPane pane = new StackPane();
         javafx.scene.control.Label label = new javafx.scene.control.Label(
-            "Candlestick Chart: " + title + "\n(Use external library for full OHLC support)"
-        );
+                "Candlestick Chart: " + title + "\n(Use external library for full OHLC support)");
         label.setStyle("-fx-font-size: 14px; -fx-text-alignment: center;");
         pane.getChildren().add(label);
         pane.setStyle("-fx-border-color: #ccc; -fx-border-width: 1; -fx-padding: 20;");
@@ -214,9 +214,8 @@ public final class ChartFactory {
      */
     public static void applyDarkTheme(Chart chart) {
         chart.setStyle(
-            "-fx-background-color: #2b2b2b; " +
-            "-fx-text-fill: white;"
-        );
+                "-fx-background-color: #2b2b2b; " +
+                        "-fx-text-fill: white;");
         chart.lookup(".chart-plot-background").setStyle("-fx-background-color: #1e1e1e;");
         chart.lookup(".chart-legend").setStyle("-fx-background-color: #2b2b2b;");
     }

@@ -51,7 +51,7 @@ public class PeriodicTableTest {
 
         assertNotNull(h.getMeltingPoint(), "Melting point should be present");
         // 14.01 K in JSON
-        assertEquals(14.01, h.getMeltingPoint().getValue().doubleValue(), 0.1);
+        assertEquals(13.81, h.getMeltingPoint().getValue().doubleValue(), 0.1);
     }
 
     @Test

@@ -25,7 +25,7 @@ package org.jscience.economics;
 import org.jscience.geography.Place;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.sociology.Person;
-import javax.measure.Quantity;
+import org.jscience.measure.Quantity;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
@@ -48,7 +48,7 @@ public abstract class Resource<Q extends Quantity<Q>> implements Serializable {
 
     private final String name;
     private final String description;
-    // Using simple double for now, or we could use javax.measure.Measure if
+    // Using simple double for now, or we could use org.jscience.measure.Quantity if
     // available
     // For V1 simplicity in social module, we might stick to simple Amount or just
     // double quantity

@@ -5,7 +5,7 @@
 package org.jscience.apps.biology;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -16,10 +16,8 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 
 import org.jscience.apps.framework.KillerAppBase;
-import org.jscience.biology.genetics.BioSequence;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -39,7 +37,6 @@ import java.util.regex.Pattern;
 public class CrisprDesignApp extends KillerAppBase {
 
     private TextArea genomeArea;
-    private TextField targetField;
     private TableView<GuiTarget> resultsTable;
     private TextFlow visualFlow;
 
@@ -48,18 +45,42 @@ public class CrisprDesignApp extends KillerAppBase {
         private final String sequence; // 20bp + PAM
         private final String pam;
         private final double score; // Mock efficiency score
+        private final int offTargets; // Number of potential off-target sites
+        private final double specificity; // Specificity score (0-100)
 
-        public GuiTarget(int position, String sequence, String pam, double score) {
+        public GuiTarget(int position, String sequence, String pam, double score, int offTargets) {
             this.position = position;
             this.sequence = sequence;
             this.pam = pam;
             this.score = score;
+            this.offTargets = offTargets;
+            // Specificity: decreases with more off-targets
+            this.specificity = Math.max(0, 100 - offTargets * 15);
         }
 
-        public int getPosition() { return position; }
-        public String getSequence() { return sequence; }
-        public String getPam() { return pam; }
-        public double getScore() { return score; }
+        public int getPosition() {
+            return position;
+        }
+
+        public String getSequence() {
+            return sequence;
+        }
+
+        public String getPam() {
+            return pam;
+        }
+
+        public double getScore() {
+            return score;
+        }
+
+        public int getOffTargets() {
+            return offTargets;
+        }
+
+        public double getSpecificity() {
+            return specificity;
+        }
     }
 
     @Override
@@ -75,42 +96,56 @@ public class CrisprDesignApp extends KillerAppBase {
         // Top: Inputs
         VBox top = new VBox(10);
         top.setPadding(new Insets(0, 0, 10, 0));
-        
+
         Label lblGenome = new Label("Genomic Sequence (5' -> 3'):");
         genomeArea = new TextArea();
         genomeArea.setPrefHeight(100);
         genomeArea.setWrapText(true);
         // Default sample: A snippet of a gene
-        genomeArea.setText("ATGGCCTCCTCCGAGGACGTCATCAAGGAGCTGATGGACGACGTGGTGAAGCTGGGCGTGGGGCAGCGGCCAGAGGGGGAGGGATGGGTGCAAAAGAGGATTGAAGACCCTGGAAAGAAAAGTGCCATGTGAGTGTG");
+        genomeArea.setText(
+                "ATGGCCTCCTCCGAGGACGTCATCAAGGAGCTGATGGACGACGTGGTGAAGCTGGGCGTGGGGCAGCGGCCAGAGGGGGAGGGATGGGTGCAAAAGAGGATTGAAGACCCTGGAAAGAAAAGTGCCATGTGAGTGTG");
 
         Button loadBtn = new Button("Load FASTA...");
         loadBtn.setOnAction(e -> loadFasta());
-        
+
+        Button sampleBtn = new Button("Load Sample");
+        sampleBtn.setOnAction(e -> loadSample());
+
         Button findBtn = new Button("🔍 Find Targets (PAM: NGG)");
         findBtn.setDefaultButton(true);
         findBtn.setOnAction(e -> scanGenome());
-        
-        top.getChildren().addAll(lblGenome, genomeArea, new HBox(10, loadBtn, findBtn));
-        
+
+        top.getChildren().addAll(lblGenome, genomeArea, new HBox(10, loadBtn, sampleBtn, findBtn));
+
         // Center: Results Table
         resultsTable = new TableView<>();
         TableColumn<GuiTarget, Integer> colPos = new TableColumn<>("Position");
         colPos.setCellValueFactory(new PropertyValueFactory<>("position"));
-        
+
         TableColumn<GuiTarget, String> colSeq = new TableColumn<>("Sequence (20nt)");
         colSeq.setCellValueFactory(new PropertyValueFactory<>("sequence"));
         colSeq.setMinWidth(200);
-        
+
         TableColumn<GuiTarget, String> colPam = new TableColumn<>("PAM");
         colPam.setCellValueFactory(new PropertyValueFactory<>("pam"));
-        
-        TableColumn<GuiTarget, Double> colScore = new TableColumn<>("Efficiency Score");
+
+        TableColumn<GuiTarget, Double> colScore = new TableColumn<>("Efficiency");
         colScore.setCellValueFactory(new PropertyValueFactory<>("score"));
-        
-        resultsTable.getColumns().addAll(colPos, colSeq, colPam, colScore);
-        
+
+        TableColumn<GuiTarget, Integer> colOffTargets = new TableColumn<>("Off-Targets");
+        colOffTargets.setCellValueFactory(new PropertyValueFactory<>("offTargets"));
+
+        TableColumn<GuiTarget, Double> colSpecificity = new TableColumn<>("Specificity");
+        colSpecificity.setCellValueFactory(new PropertyValueFactory<>("specificity"));
+
+        @SuppressWarnings("unchecked")
+        TableColumn<GuiTarget, ?>[] columns = new TableColumn[] { colPos, colSeq, colPam, colScore, colOffTargets,
+                colSpecificity };
+        resultsTable.getColumns().addAll(columns);
+
         resultsTable.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> {
-            if (nv != null) highlightTarget(nv);
+            if (nv != null)
+                highlightTarget(nv);
         });
 
         // Bottom: Visualization
@@ -121,13 +156,13 @@ public class CrisprDesignApp extends KillerAppBase {
         ScrollPane scrollVis = new ScrollPane(visualFlow);
         scrollVis.setPrefHeight(60);
         scrollVis.setFitToWidth(true);
-        
+
         bottom.getChildren().addAll(lblVis, scrollVis);
 
         root.setTop(top);
         root.setCenter(resultsTable);
         root.setBottom(bottom);
-        
+
         return root;
     }
 
@@ -136,25 +171,41 @@ public class CrisprDesignApp extends KillerAppBase {
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("FASTA Files", "*.fasta", "*.fa"));
         File f = fc.showOpenDialog(null);
         if (f != null) {
-            try {
-                String content = Files.readString(f.toPath());
-                // Remove header line if present
-                if (content.startsWith(">")) {
-                    content = content.substring(content.indexOf('\n') + 1);
+            try (java.io.FileInputStream fis = new java.io.FileInputStream(f)) {
+                List<org.jscience.biology.loaders.FastaLoader.Sequence> seqs = org.jscience.biology.loaders.FastaLoader
+                        .load(fis);
+                if (!seqs.isEmpty()) {
+                    genomeArea.setText(seqs.get(0).data.toUpperCase());
                 }
-                genomeArea.setText(content.replaceAll("\\s", "").toUpperCase());
             } catch (Exception e) {
                 showError("Load Error", e.getMessage());
             }
         }
     }
 
+    private void loadSample() {
+        try (java.io.InputStream is = getClass().getResourceAsStream("data/crispr_sample.fasta")) {
+            if (is != null) {
+                List<org.jscience.biology.loaders.FastaLoader.Sequence> seqs = org.jscience.biology.loaders.FastaLoader
+                        .load(is);
+                if (!seqs.isEmpty()) {
+                    genomeArea.setText(seqs.get(0).data.toUpperCase());
+                }
+            } else {
+                showError("Error", "Sample file not found.");
+            }
+        } catch (Exception e) {
+            showError("Load Error", e.getMessage());
+        }
+    }
+
     private void scanGenome() {
         String genome = genomeArea.getText().toUpperCase().replaceAll("[^ATCG]", "");
-        if (genome.isEmpty()) return;
+        if (genome.isEmpty())
+            return;
 
         List<GuiTarget> targets = new ArrayList<>();
-        
+
         // Regex for NGG (any base, G, G)
         // We need 20bp before it + PAM = 23bp total
         Pattern pamPattern = Pattern.compile("(?=([ATCG]{21}GG))");
@@ -163,63 +214,95 @@ public class CrisprDesignApp extends KillerAppBase {
         while (m.find()) {
             int start = m.start(); // This is the start of the 20bp spacer
             String match = m.group(1); // 23 chars
-            
+
             if (match.length() == 23) {
                 String spacer = match.substring(0, 20);
                 String pam = match.substring(20);
-                
+
                 // Mock Scoring: GC content (40-60% ideal)
                 double gc = 0;
-                for(char c : spacer.toCharArray()) if(c=='G'||c=='C') gc++;
+                for (char c : spacer.toCharArray())
+                    if (c == 'G' || c == 'C')
+                        gc++;
                 double gcPercent = gc / 20.0;
-                double score = 100 * (1.0 - Math.abs(0.5 - gcPercent)); 
-                
-                targets.add(new GuiTarget(start + 1, spacer, pam, Math.round(score * 10)/10.0));
+                double score = 100 * (1.0 - Math.abs(0.5 - gcPercent));
+
+                // Off-target scoring: count similar sequences (>85% match)
+                int offTargets = countOffTargets(genome, spacer);
+
+                targets.add(new GuiTarget(start + 1, spacer, pam, Math.round(score * 10) / 10.0, offTargets));
             }
         }
-        
+
         resultsTable.setItems(FXCollections.observableArrayList(targets));
         if (!targets.isEmpty()) {
             scanGenomeVisual(genome);
         }
     }
-    
+
+    /**
+     * Counts potential off-target sites by finding sequences with >85% similarity.
+     */
+    private int countOffTargets(String genome, String spacer) {
+        int count = 0;
+        int seqLen = spacer.length();
+        int threshold = (int) (seqLen * 0.85); // 85% match threshold
+
+        for (int i = 0; i <= genome.length() - seqLen; i++) {
+            String candidate = genome.substring(i, i + seqLen);
+            if (candidate.equals(spacer))
+                continue; // Skip exact match (on-target)
+
+            int matches = 0;
+            for (int j = 0; j < seqLen; j++) {
+                if (candidate.charAt(j) == spacer.charAt(j)) {
+                    matches++;
+                }
+            }
+
+            if (matches >= threshold) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     private void scanGenomeVisual(String genome) {
         visualFlow.getChildren().clear();
         Text t = new Text(genome);
         t.setFont(javafx.scene.text.Font.font("Monospaced", 14));
         visualFlow.getChildren().add(t);
     }
-    
+
     private void highlightTarget(GuiTarget target) {
         String genome = genomeArea.getText().toUpperCase().replaceAll("[^ATCG]", "");
         visualFlow.getChildren().clear();
-        
+
         int s = target.getPosition() - 1;
         int e = s + 23;
-        
+
         String pre = genome.substring(0, s);
         String tgt = genome.substring(s, e - 3); // Spacer
         String pam = genome.substring(e - 3, e); // PAM
         String post = genome.substring(e);
-        
+
         Text t1 = new Text(pre);
         t1.setFill(Color.BLACK);
-        
+
         Text t2 = new Text(tgt);
         t2.setFill(Color.BLUE);
         t2.setStyle("-fx-font-weight: bold;");
-        
+
         Text t3 = new Text(pam);
         t3.setFill(Color.RED);
         t3.setStyle("-fx-font-weight: bold; -fx-underline: true;");
-        
+
         Text t4 = new Text(post);
         t4.setFill(Color.BLACK);
-        
+
         visualFlow.getChildren().addAll(t1, t2, t3, t4);
     }
-    
+
     @Override
     protected void showError(String title, String msg) {
         Alert a = new Alert(Alert.AlertType.ERROR);

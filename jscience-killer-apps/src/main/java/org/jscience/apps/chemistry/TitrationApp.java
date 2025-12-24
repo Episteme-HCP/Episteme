@@ -10,18 +10,14 @@ import javafx.geometry.Orientation;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
+
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 import org.jscience.apps.framework.ChartFactory;
 import org.jscience.apps.framework.KillerAppBase;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Virtual Titration Lab.
@@ -42,20 +38,75 @@ public class TitrationApp extends KillerAppBase {
     private double concBase = 0.1; // M
     private double volumeBaseAdded = 0.0; // mL
     private double maxBuretteVol = 50.0; // mL
-    
+
     private boolean valveOpen = false;
     private double flowRate = 0.0; // mL per tick
-    
+    private AcidType selectedAcid = AcidType.HCL;
+
+    // Multi-protic acid types with pKa values
+    private enum AcidType {
+        HCL("HCl (Strong)", new double[] { -7.0 }), // Strong acid, effectively complete dissociation
+        H2SO4("H₂SO₄ (Sulfuric)", new double[] { -3.0, 1.99 }), // Diprotic
+        H3PO4("H₃PO₄ (Phosphoric)", new double[] { 2.15, 7.20, 12.35 }), // Triprotic
+        H2CO3("H₂CO₃ (Carbonic)", new double[] { 6.35, 10.33 }), // Diprotic
+        ACETIC("CH₃COOH (Acetic)", new double[] { 4.76 }); // Weak monoprotic
+
+        final String name;
+        final double[] pKa; // pKa values for each dissociation step
+
+        AcidType(String name, double[] pKa) {
+            this.name = name;
+            this.pKa = pKa;
+        }
+
+        public int getProtonCount() {
+            return pKa.length;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
     // UI
     private Canvas labCanvas;
     private XYChart.Series<Number, Number> phSeries;
     private Label phLabel;
     private Label volumeLabel;
     private Slider valveSlider;
+    private ComboBox<Indicator> indicatorSelector;
     private Color indicatorColor = Color.TRANSPARENT;
-    
+
+    // Indicators with their pH ranges and colors
+    private enum Indicator {
+        PHENOLPHTHALEIN("Phenolphthalein", 8.2, 10.0, Color.TRANSPARENT, Color.DEEPPINK),
+        METHYL_ORANGE("Methyl Orange", 3.1, 4.4, Color.RED, Color.YELLOW),
+        BROMOTHYMOL_BLUE("Bromothymol Blue", 6.0, 7.6, Color.YELLOW, Color.BLUE),
+        LITMUS("Litmus", 5.0, 8.0, Color.RED, Color.BLUE),
+        UNIVERSAL("Universal Indicator", 1.0, 14.0, Color.RED, Color.VIOLET);
+
+        final String name;
+        final double pHLow;
+        final double pHHigh;
+        final Color colorAcid;
+        final Color colorBase;
+
+        Indicator(String name, double pHLow, double pHHigh, Color colorAcid, Color colorBase) {
+            this.name = name;
+            this.pHLow = pHLow;
+            this.pHHigh = pHHigh;
+            this.colorAcid = colorAcid;
+            this.colorBase = colorBase;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
     // Constants
-    private static final double KW = 1.0e-14;
 
     @Override
     protected String getAppTitle() {
@@ -66,16 +117,16 @@ public class TitrationApp extends KillerAppBase {
     protected Region createMainContent() {
         SplitPane split = new SplitPane();
         split.setOrientation(Orientation.HORIZONTAL);
-        
+
         // Left: Lab Equipment Visualization
         VBox labPane = createLabPane();
-        
+
         // Right: Data & Controls
         VBox dataPane = createDataPane();
-        
+
         split.getItems().addAll(labPane, dataPane);
         split.setDividerPositions(0.4);
-        
+
         startSimulation();
         return split;
     }
@@ -84,10 +135,10 @@ public class TitrationApp extends KillerAppBase {
         VBox box = new VBox(10);
         box.setPadding(new Insets(10));
         box.setStyle("-fx-background-color: #ddd;");
-        
+
         labCanvas = new Canvas(300, 600);
         drawLab();
-        
+
         box.getChildren().add(labCanvas);
         VBox.setVgrow(labCanvas, Priority.ALWAYS);
         return box;
@@ -96,22 +147,24 @@ public class TitrationApp extends KillerAppBase {
     private VBox createDataPane() {
         VBox box = new VBox(15);
         box.setPadding(new Insets(15));
-        
+
         // Chart
-        LineChart<Number, Number> phChart = ChartFactory.createLineChart("Titration Curve", "Volume Base (mL)", "pH");
+        LineChart<Number, Number> phChart = ChartFactory.createLineChart(i18n.get("titration.panel.chart"),
+                i18n.get("titration.label.volume"), "pH");
         phSeries = new XYChart.Series<>();
         phSeries.setName("pH");
         phChart.getData().add(phSeries);
-        
+
         // Status
         GridPane grid = new GridPane();
-        grid.setHgap(10); grid.setVgap(10);
-        
+        grid.setHgap(10);
+        grid.setVgap(10);
+
         phLabel = new Label("pH: 1.00");
         phLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
-        
-        volumeLabel = new Label("Vol Added: 0.00 mL");
-        
+
+        volumeLabel = new Label(i18n.get("titration.label.volume") + ": 0.00");
+
         valveSlider = new Slider(0, 1.0, 0);
         valveSlider.setShowTickLabels(true);
         valveSlider.setShowTickMarks(true);
@@ -119,19 +172,39 @@ public class TitrationApp extends KillerAppBase {
             flowRate = nv.doubleValue() * 0.2; // Max 0.2 mL/frame
             valveOpen = flowRate > 0;
         });
-        
-        Button resetButton = new Button("Reset Experiment");
+
+        Button resetButton = new Button(i18n.get("toolbar.reset"));
         resetButton.setOnAction(e -> reset());
-        
+
+        // Acid type selector for multi-protic acids
+        ComboBox<AcidType> acidSelector = new ComboBox<>();
+        acidSelector.getItems().addAll(AcidType.values());
+        acidSelector.setValue(AcidType.HCL);
+        acidSelector.setMaxWidth(Double.MAX_VALUE);
+        acidSelector.setOnAction(e -> {
+            selectedAcid = acidSelector.getValue();
+            reset();
+        });
+
+        // Indicator selector
+        indicatorSelector = new ComboBox<>();
+        indicatorSelector.getItems().addAll(Indicator.values());
+        indicatorSelector.setValue(Indicator.PHENOLPHTHALEIN);
+        indicatorSelector.setMaxWidth(Double.MAX_VALUE);
+
         box.getChildren().addAll(
-            new Label("🧪 Titration Data"),
-            phChart,
-            phLabel, volumeLabel,
-            new Separator(),
-            new Label("🚰 Burette Valve Control"),
-            valveSlider,
-            resetButton
-        );
+                new Label("🧪 " + i18n.get("titration.panel.setup")),
+                new Label("⚗️ Acid Type:"),
+                acidSelector,
+                phChart,
+                phLabel, volumeLabel,
+                new Separator(),
+                new Label("🎨 Indicator:"),
+                indicatorSelector,
+                new Separator(),
+                new Label("🚰 " + i18n.get("titration.label.titrant")),
+                valveSlider,
+                resetButton);
         VBox.setVgrow(phChart, Priority.ALWAYS);
         return box;
     }
@@ -146,123 +219,175 @@ public class TitrationApp extends KillerAppBase {
         };
         timer.start();
     }
-    
+
     private void update() {
         if (valveOpen && volumeBaseAdded < maxBuretteVol) {
             volumeBaseAdded += flowRate;
-            if (volumeBaseAdded > maxBuretteVol) volumeBaseAdded = maxBuretteVol;
-            
+            if (volumeBaseAdded > maxBuretteVol)
+                volumeBaseAdded = maxBuretteVol;
+
             calculatePH();
         }
     }
-    
+
     private void calculatePH() {
-        // Strong Acid (HCl) + Strong Base (NaOH) approximation
-        // Moles Acid initial
-        double molesA = volumeAcid / 1000.0 * concAcid;
-        double molesB = volumeBaseAdded / 1000.0 * concBase;
+        // Multi-protic acid titration calculation
+        double molesAcidInitial = volumeAcid / 1000.0 * concAcid;
+        double molesBaseAdded = volumeBaseAdded / 1000.0 * concBase;
         double totalVolL = (volumeAcid + volumeBaseAdded) / 1000.0;
-        
+
+        int protonCount = selectedAcid.getProtonCount();
+        double[] pKa = selectedAcid.pKa;
+
         double ph;
-        if (molesA > molesB) {
-            // Excess Acid
-            double concH = (molesA - molesB) / totalVolL;
-            ph = -Math.log10(concH);
-        } else if (molesB > molesA) {
-            // Excess Base
-            double concOH = (molesB - molesA) / totalVolL;
-            double pOH = -Math.log10(concOH);
-            ph = 14.0 - pOH;
+
+        // Calculate equivalence point for multi-protic acids
+        // Each equivalence point occurs at n * molesAcidInitial moles of base
+        double molesPerProton = molesAcidInitial;
+        double equivalencePointTotal = molesAcidInitial * protonCount;
+
+        if (pKa[0] < 0) {
+            // Strong acid - complete dissociation
+            if (molesAcidInitial > molesBaseAdded) {
+                double concH = (molesAcidInitial - molesBaseAdded) / totalVolL;
+                ph = -Math.log10(Math.max(1e-14, concH));
+            } else if (molesBaseAdded > equivalencePointTotal) {
+                double concOH = (molesBaseAdded - equivalencePointTotal) / totalVolL;
+                double pOH = -Math.log10(Math.max(1e-14, concOH));
+                ph = 14.0 - pOH;
+            } else {
+                ph = 7.0;
+            }
         } else {
-            // Neutral
-            ph = 7.0;
+            // Weak/multi-protic acid - use Henderson-Hasselbalch
+            double molesRatio = molesBaseAdded / molesPerProton;
+
+            if (molesRatio < 0.01) {
+                // Before any significant titration - weak acid solution
+                ph = 0.5 * (pKa[0] - Math.log10(concAcid * 1000.0 / totalVolL / 1000.0));
+            } else if (molesRatio >= protonCount) {
+                // Past final equivalence point - excess base
+                double excessBase = molesBaseAdded - molesAcidInitial * protonCount;
+                double concOH = excessBase / totalVolL;
+                ph = 14.0 + Math.log10(Math.max(1e-14, concOH));
+            } else {
+                // Between start and final equivalence point
+                int step = (int) molesRatio; // Which dissociation step
+                double stepProgress = molesRatio - step; // Progress within step
+
+                if (step < protonCount) {
+                    double currentPKa = pKa[step];
+                    if (Math.abs(stepProgress - 0.5) < 0.01) {
+                        // At half-equivalence point: pH = pKa
+                        ph = currentPKa;
+                    } else if (stepProgress < 0.5) {
+                        // Before half-equivalence: more acid form
+                        double ratio = (0.5 - stepProgress) / (0.5 + stepProgress);
+                        ph = currentPKa - Math.log10(Math.max(0.01, ratio));
+                    } else {
+                        // After half-equivalence: more conjugate base form
+                        double ratio = (stepProgress - 0.5) / (1.5 - stepProgress);
+                        ph = currentPKa + Math.log10(Math.max(0.01, ratio));
+                    }
+                } else {
+                    ph = 7.0;
+                }
+            }
         }
-        
-        // Phenolphthalein Indicator: Colorless < 8.2, Pink > 8.2, Red/Purple > 10
-        if (ph < 8.2) {
-             indicatorColor = Color.web("#ffffff", 0.3); // Clear/Watery
-        } else if (ph < 10.0) {
-             // Gradient Pink
-             double intensity = (ph - 8.2) / (10.0 - 8.2);
-             indicatorColor = Color.HOTPINK.deriveColor(0, 1, 1, 0.3 + 0.5 * intensity);
+
+        // Clamp pH to reasonable range
+        ph = Math.max(0, Math.min(14, ph));
+
+        // Update indicator color based on selected indicator
+        Indicator ind = indicatorSelector != null ? indicatorSelector.getValue() : Indicator.PHENOLPHTHALEIN;
+        if (ind == null)
+            ind = Indicator.PHENOLPHTHALEIN;
+
+        if (ph <= ind.pHLow) {
+            indicatorColor = ind.colorAcid.deriveColor(0, 1, 1, 0.6);
+        } else if (ph >= ind.pHHigh) {
+            indicatorColor = ind.colorBase.deriveColor(0, 1, 1, 0.6);
         } else {
-             indicatorColor = Color.DEEPPINK.deriveColor(0, 1, 1, 0.8);
+            // Interpolate between acid and base colors
+            double t = (ph - ind.pHLow) / (ind.pHHigh - ind.pHLow);
+            indicatorColor = ind.colorAcid.interpolate(ind.colorBase, t).deriveColor(0, 1, 1, 0.6);
         }
-        
+
         // Update UI
         phLabel.setText(String.format("pH: %.2f", ph));
         volumeLabel.setText(String.format("Vol Added: %.2f mL", volumeBaseAdded));
-        
+
         // Chart sampling (don't flood chart)
-        if (phSeries.getData().isEmpty() || 
-            Math.abs(phSeries.getData().get(phSeries.getData().size()-1).getXValue().doubleValue() - volumeBaseAdded) > 0.5) {
+        if (phSeries.getData().isEmpty() ||
+                Math.abs(phSeries.getData().get(phSeries.getData().size() - 1).getXValue().doubleValue()
+                        - volumeBaseAdded) > 0.5) {
             phSeries.getData().add(new XYChart.Data<>(volumeBaseAdded, ph));
         }
     }
-    
+
     private void drawLab() {
         GraphicsContext gc = labCanvas.getGraphicsContext2D();
         double w = labCanvas.getWidth();
         double h = labCanvas.getHeight();
-        
+
         gc.clearRect(0, 0, w, h);
-        
-        double centerX = w/2;
-        
+
+        double centerX = w / 2;
+
         // Stand
         gc.setFill(Color.DARKGRAY);
         gc.fillRect(centerX - 60, h - 20, 120, 20); // Base
         gc.fillRect(centerX - 50, 50, 10, h - 70); // Rod
         gc.fillRect(centerX - 50, 100, 60, 5); // Clamp
-        
+
         // Burette
         double burX = centerX + 10;
         double burY = 50;
         double burW = 20;
         double burH = 300;
-        
+
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(1);
         gc.strokeRect(burX, burY, burW, burH);
-        
+
         // Liquid in Burette
         double liquidH = burH * ((maxBuretteVol - volumeBaseAdded) / maxBuretteVol);
         gc.setFill(Color.web("#ccf", 0.5));
         gc.fillRect(burX, burY + (burH - liquidH), burW, liquidH);
-        
+
         // Beaker
         double beakW = 80;
         double beakH = 100;
         double beakX = centerX - 20; // Under burette tip roughly
         double beakY = h - 130;
-        
+
         gc.setStroke(Color.BLACK);
-        gc.strokePolyline(new double[]{beakX, beakX, beakX+beakW, beakX+beakW}, 
-                          new double[]{beakY, beakY+beakH, beakY+beakH, beakY}, 4);
-                          
+        gc.strokePolyline(new double[] { beakX, beakX, beakX + beakW, beakX + beakW },
+                new double[] { beakY, beakY + beakH, beakY + beakH, beakY }, 4);
+
         // Liquid in Beaker
         // Volume simulates liquid height
         double baseLiquidHeight = 40; // Initial
-        double addedHeight = (volumeBaseAdded / volumeAcid) * 20; 
+        double addedHeight = (volumeBaseAdded / volumeAcid) * 20;
         double totalH = baseLiquidHeight + addedHeight;
-        
+
         gc.setFill(indicatorColor);
-        gc.fillRect(beakX+1, beakY+beakH - totalH, beakW-2, totalH);
-        
+        gc.fillRect(beakX + 1, beakY + beakH - totalH, beakW - 2, totalH);
+
         // Drops
         if (valveOpen) {
             gc.setFill(Color.AQUA);
             gc.fillOval(burX + 5, burY + burH + (System.currentTimeMillis() % 200 / 200.0) * 50, 6, 6);
         }
     }
-    
+
     private void reset() {
         volumeBaseAdded = 0;
         phSeries.getData().clear();
         calculatePH();
         valveSlider.setValue(0);
     }
-    
+
     public static void main(String[] args) {
         launch(args);
     }

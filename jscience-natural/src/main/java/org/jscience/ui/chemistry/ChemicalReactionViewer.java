@@ -9,7 +9,6 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.jscience.chemistry.ChemicalReactionParser;
 import org.jscience.chemistry.ChemicalReactionParser.Formula;
@@ -32,15 +31,15 @@ public class ChemicalReactionViewer extends Application {
     @Override
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #f5f5f5;");
+        root.setStyle("-fx-background-color: #1a1a2e;");
         root.setPadding(new Insets(15));
 
         // Header
         VBox header = new VBox(5);
         Label title = new Label("Chemical Reaction Parser");
-        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #00d9ff;");
         Label subtitle = new Label("Enter chemical equations to parse and analyze");
-        subtitle.setStyle("-fx-text-fill: #666;");
+        subtitle.setStyle("-fx-text-fill: #888;");
         header.getChildren().addAll(title, subtitle);
         root.setTop(header);
         BorderPane.setMargin(header, new Insets(0, 0, 15, 0));
@@ -48,10 +47,10 @@ public class ChemicalReactionViewer extends Application {
         // Input area
         VBox inputBox = new VBox(5);
         inputBox.setPadding(new Insets(10));
-        inputBox.setStyle("-fx-background-color: white; -fx-background-radius: 5;");
+        inputBox.setStyle("-fx-background-color: #16213e; -fx-background-radius: 5;");
 
         Label inputLabel = new Label("Reaction Equation:");
-        inputLabel.setStyle("-fx-font-weight: bold;");
+        inputLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #aaa;");
 
         inputArea = new TextArea();
         inputArea.setPromptText("Enter chemical equation, e.g.: 2H2 + O2 -> 2H2O");
@@ -75,10 +74,10 @@ public class ChemicalReactionViewer extends Application {
         // Output area
         VBox outputBox = new VBox(5);
         outputBox.setPadding(new Insets(10));
-        outputBox.setStyle("-fx-background-color: white; -fx-background-radius: 5;");
+        outputBox.setStyle("-fx-background-color: #16213e; -fx-background-radius: 5;");
 
         Label outputLabel = new Label("Analysis Results:");
-        outputLabel.setStyle("-fx-font-weight: bold;");
+        outputLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #aaa;");
 
         outputArea = new TextArea();
         outputArea.setEditable(false);
@@ -98,11 +97,11 @@ public class ChemicalReactionViewer extends Application {
         // Formula parser panel on right
         VBox formulaPanel = new VBox(10);
         formulaPanel.setPadding(new Insets(10));
-        formulaPanel.setStyle("-fx-background-color: #e8e8e8; -fx-background-radius: 5;");
+        formulaPanel.setStyle("-fx-background-color: #0f3460; -fx-background-radius: 5;");
         formulaPanel.setPrefWidth(250);
 
         Label formulaTitle = new Label("Quick Formula Parser");
-        formulaTitle.setStyle("-fx-font-weight: bold;");
+        formulaTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: #00d9ff;");
 
         TextField formulaInput = new TextField();
         formulaInput.setPromptText("e.g., Ca(OH)2");

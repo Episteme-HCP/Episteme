@@ -1,1 +1,5 @@
-org.jscience.benchmark.SimpleMatrixBenchmark
+org.jscience.benchmark.MatrixBenchmark
+org.jscience.benchmark.FFTBenchmark
+org.jscience.benchmark.NBodyBenchmark
+org.jscience.benchmark.NBodyRegularBenchmark
+org.jscience.benchmark.TensorBenchmark

@@ -39,7 +39,7 @@ public class GameOfLifeViewer extends Application {
     private Canvas canvas;
     private boolean paused = true;
     private long lastUpdate = 0;
-    private long updateInterval = 50_000_000; // 50ms default
+    private long updateInterval = 460_000_000; // 460ms default (matches slider value 50)
 
     @Override
     public void start(Stage stage) {
@@ -114,7 +114,7 @@ public class GameOfLifeViewer extends Application {
             double invertedDelay = 510 - val.doubleValue();
             updateInterval = (long) (invertedDelay * 1_000_000);
         });
-        // Default position: start at slow end
+        // Initialize slider to match default updateInterval (460ms -> slider value 50)
         speedSlider.setValue(50); // Middle-slow, actual delay = 460ms
 
         controls.getChildren().addAll(btnPlay, btnStep, btnClear, btnRandom, speedLabel, speedSlider);

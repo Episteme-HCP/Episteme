@@ -76,8 +76,13 @@ public class VirusLoader extends AbstractLoader<VirusSpecies> {
         return cache.get(identifier.toUpperCase());
     }
 
-    public List<VirusSpecies> loadAll() throws Exception {
-        ensureLoaded();
+    @Override
+    public List<VirusSpecies> loadAll() {
+        try {
+            ensureLoaded();
+        } catch (IOException e) {
+            return new ArrayList<>();
+        }
         return new ArrayList<>(cache.values());
     }
 

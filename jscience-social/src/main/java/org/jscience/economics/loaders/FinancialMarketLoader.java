@@ -44,7 +44,7 @@ public class FinancialMarketLoader {
         }
     }
 
-    public List<Candle> loadCSV(InputStream is, String currencyCode) throws IOException {
+    public static List<Candle> loadCSV(InputStream is, String currencyCode) throws IOException {
         List<Candle> candles = new ArrayList<>();
         if (is == null)
             return candles;

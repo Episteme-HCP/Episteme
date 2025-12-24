@@ -17,7 +17,7 @@ public class SportsBallisticsDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return "Social Sciences"; // Sports section
+        return "Sports"; // Sports section
     }
 
     @Override
@@ -58,7 +58,6 @@ public class SportsBallisticsDemo implements DemoProvider {
 
         new AnimationTimer() {
             Ball b = null;
-            long lastTime = 0;
 
             @Override
             public void handle(long now) {
@@ -82,7 +81,7 @@ public class SportsBallisticsDemo implements DemoProvider {
                     double fy = 9.81 * b.mass + dragForce * (b.vy / speed); // Gravity is down (+y)
 
                     double ax = fx / b.mass;
-                    double ay = 9.81; // Simplified gravity down
+                    double ay = fy / b.mass;
 
                     b.vx += ax * dt;
                     b.vy += ay * dt;

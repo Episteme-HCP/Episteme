@@ -11,7 +11,7 @@ import org.jscience.ui.geology.EarthquakeMapViewer;
 public class EarthquakeDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Geology";
+        return "Earth Sciences";
     }
 
     @Override

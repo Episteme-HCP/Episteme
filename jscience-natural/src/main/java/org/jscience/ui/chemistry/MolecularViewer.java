@@ -119,7 +119,7 @@ public class MolecularViewer extends Application {
         // UI
         VBox controls = new VBox(10);
         controls.setPadding(new Insets(10));
-        controls.setStyle("-fx-background-color: #eee; -fx-border-color: #ccc; -fx-border-width: 0 0 0 1;");
+        controls.setStyle("-fx-background-color: #16213e; -fx-border-color: #333; -fx-border-width: 0 0 0 1;");
 
         ComboBox<String> selector = new ComboBox<>();
         selector.setItems(FXCollections.observableArrayList(
@@ -196,71 +196,6 @@ public class MolecularViewer extends Application {
         javafx.scene.layout.StackPane container = new javafx.scene.layout.StackPane(planarCanvas);
         container.setStyle("-fx-background-color: white;");
         return container;
-    }
-
-    private void drawPlanarMolecule(MolecularGraph graph) {
-        if (planarCanvas == null)
-            return;
-        javafx.scene.canvas.GraphicsContext gc = planarCanvas.getGraphicsContext2D();
-        gc.setFill(Color.WHITE);
-        gc.fillRect(0, 0, planarCanvas.getWidth(), planarCanvas.getHeight());
-
-        double cx = planarCanvas.getWidth() / 2;
-        double cy = planarCanvas.getHeight() / 2;
-        double scale = 40.0;
-
-        // Draw bonds first
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(2);
-        for (MolecularGraph.Bond bond : graph.getBonds()) {
-            Atom a1 = bond.source;
-            Atom a2 = bond.target;
-            double x1 = cx + a1.getPosition().get(0).doubleValue() * scale;
-            double y1 = cy - a1.getPosition().get(1).doubleValue() * scale;
-            double x2 = cx + a2.getPosition().get(0).doubleValue() * scale;
-            double y2 = cy - a2.getPosition().get(1).doubleValue() * scale;
-
-            int order = bond.type == MolecularGraph.BondType.SINGLE ? 1
-                    : bond.type == MolecularGraph.BondType.DOUBLE ? 2
-                            : bond.type == MolecularGraph.BondType.TRIPLE ? 3 : 1;
-            if (order == 1) {
-                gc.strokeLine(x1, y1, x2, y2);
-            } else if (order == 2) {
-                double dx = (y2 - y1) * 0.05;
-                double dy = (x2 - x1) * 0.05;
-                gc.strokeLine(x1 + dx, y1 - dy, x2 + dx, y2 - dy);
-                gc.strokeLine(x1 - dx, y1 + dy, x2 - dx, y2 + dy);
-            } else if (order == 3) {
-                double dx = (y2 - y1) * 0.07;
-                double dy = (x2 - x1) * 0.07;
-                gc.strokeLine(x1, y1, x2, y2);
-                gc.strokeLine(x1 + dx, y1 - dy, x2 + dx, y2 - dy);
-                gc.strokeLine(x1 - dx, y1 + dy, x2 - dx, y2 + dy);
-            }
-        }
-
-        // Draw atoms
-        for (Atom atom : graph.getAtoms()) {
-            double x = cx + atom.getPosition().get(0).doubleValue() * scale;
-            double y = cy - atom.getPosition().get(1).doubleValue() * scale;
-            String symbol = atom.getElement().getSymbol();
-
-            Color color = CPK_COLORS.getOrDefault(symbol, Color.GRAY);
-            double radius = 15;
-
-            gc.setFill(color);
-            gc.fillOval(x - radius, y - radius, radius * 2, radius * 2);
-            gc.setStroke(Color.BLACK);
-            gc.setLineWidth(1);
-            gc.strokeOval(x - radius, y - radius, radius * 2, radius * 2);
-
-            // Label
-            gc.setFill(color.getBrightness() > 0.5 ? Color.BLACK : Color.WHITE);
-            gc.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, 12));
-            gc.setTextAlign(javafx.scene.text.TextAlignment.CENTER);
-            gc.setTextBaseline(javafx.geometry.VPos.CENTER);
-            gc.fillText(symbol, x, y);
-        }
     }
 
     // Static show method for Master Demo

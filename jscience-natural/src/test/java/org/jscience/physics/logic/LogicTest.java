@@ -121,3 +121,4 @@ public class LogicTest {
         assertTrue(kripke.getAccessibleWorlds("w1").contains("w2"));
     }
 }
+// Final touch for IDE re-indexing

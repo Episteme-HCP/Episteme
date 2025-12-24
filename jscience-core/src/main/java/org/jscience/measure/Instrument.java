@@ -1,8 +1,5 @@
 package org.jscience.measure;
 
-import org.jscience.geography.Coordinate;
-import org.jscience.util.Named; // Assuming Named exists or will be created/used
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,9 +16,7 @@ public abstract class Instrument {
     private final String manufacturer;
     private final String model;
 
-    // Location can be a precise coordinate or a descriptive name (lab room, etc.)
-    private Coordinate coordinate; // Precise location
-    private String locationDescription; // Fuzzy location (e.g. "Lab 3, Shelf B")
+    private String locationDescription; // Lab room, shelf, etc.
 
     private final List<Calibration> calibrationHistory = new ArrayList<>();
 
@@ -48,22 +43,6 @@ public abstract class Instrument {
         return model;
     }
 
-    public Coordinate getCoordinate() {
-        return coordinate;
-    }
-
-    public void setCoordinate(Coordinate coordinate) {
-        this.coordinate = coordinate;
-    }
-
-    public String getLocationDescription() {
-        return locationDescription;
-    }
-
-    public void setLocationDescription(String locationDescription) {
-        this.locationDescription = locationDescription;
-    }
-
     public List<Calibration> getCalibrationHistory() {
         return Collections.unmodifiableList(calibrationHistory);
     }
@@ -76,5 +55,13 @@ public abstract class Instrument {
         if (calibrationHistory.isEmpty())
             return null;
         return calibrationHistory.get(calibrationHistory.size() - 1);
+    }
+
+    public String getLocationDescription() {
+        return locationDescription;
+    }
+
+    public void setLocationDescription(String locationDescription) {
+        this.locationDescription = locationDescription;
     }
 }

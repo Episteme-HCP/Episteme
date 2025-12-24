@@ -44,7 +44,9 @@ import java.util.List;
  * TensorProvider nd4j = TensorFactory.getProvider("ND4J");
  * Tensor&lt;Real&gt; t2 = nd4j.zeros(Real.class, 100, 100);
  * </pre>
+ * 
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

@@ -15,7 +15,7 @@ public class PsychologyReactionTest implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return "Social Sciences";
+        return "Psychology";
     }
 
     @Override

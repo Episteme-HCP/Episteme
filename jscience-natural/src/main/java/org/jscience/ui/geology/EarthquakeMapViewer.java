@@ -7,7 +7,6 @@ package org.jscience.ui.geology;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -40,7 +39,6 @@ public class EarthquakeMapViewer extends Application {
     private final List<Earthquake> quakes = new ArrayList<>();
     private double offsetX = 0, offsetY = 0;
     private double zoom = 1.0;
-    private double mouseX, mouseY;
     private Label coordLabel;
     private Label infoLabel;
 
@@ -107,8 +105,8 @@ public class EarthquakeMapViewer extends Application {
 
         // Mouse controls
         canvas.setOnMouseMoved(e -> {
-            mouseX = e.getX();
-            mouseY = e.getY();
+            double mouseX = e.getX();
+            double mouseY = e.getY();
             double lon = xToLon(mouseX);
             double lat = yToLat(mouseY);
             coordLabel.setText(String.format("Lat: %.2f°, Lon: %.2f°", lat, lon));
@@ -296,9 +294,6 @@ public class EarthquakeMapViewer extends Application {
             this.depth = depth;
         }
 
-        Earthquake(double lat, double lon, double mag) {
-            this(lat, lon, mag, 10);
-        }
     }
 
     public static void show(Stage stage) {

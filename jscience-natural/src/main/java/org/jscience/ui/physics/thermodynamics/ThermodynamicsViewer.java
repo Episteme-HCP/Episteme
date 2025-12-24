@@ -78,9 +78,10 @@ public class ThermodynamicsViewer extends Application {
         });
 
         VBox controls = new VBox(10, new Label("Temperature (K)"), tempSlider, infoLabel);
-        controls.setStyle("-fx-padding: 10;");
+        controls.setStyle("-fx-padding: 10; -fx-background-color: #16213e;");
 
         BorderPane root = new BorderPane();
+        root.setStyle("-fx-background-color: #1a1a2e;");
         root.setCenter(pvChart);
         root.setBottom(controls);
 
@@ -109,5 +110,9 @@ public class ThermodynamicsViewer extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    public static void show(Stage stage) {
+        new ThermodynamicsViewer().start(stage);
     }
 }

@@ -23,7 +23,10 @@
 package org.jscience.geography;
 
 import java.util.*;
-import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Length;
 
 /**
  * Represents a geographic boundary/border.
@@ -42,14 +45,14 @@ public class Boundary {
     private final String name;
     private Type type;
     private final List<Coordinate> points = new ArrayList<>();
-    private Real lengthKm;
+    private double lengthMeters;
     private String entity1;
     private String entity2;
 
     public Boundary(String name, Type type) {
         this.name = name;
         this.type = type;
-        this.lengthKm = Real.ZERO;
+        this.lengthMeters = 0.0;
     }
 
     public String getName() {
@@ -60,8 +63,18 @@ public class Boundary {
         return type;
     }
 
-    public Real getLengthKm() {
-        return lengthKm;
+    /**
+     * Returns the length in kilometers.
+     */
+    public double getLengthKm() {
+        return lengthMeters / 1000.0;
+    }
+
+    /**
+     * Returns the length as a Length quantity.
+     */
+    public Quantity<Length> getLength() {
+        return Quantities.create(lengthMeters, Units.METER);
     }
 
     public String getEntity1() {
@@ -80,12 +93,12 @@ public class Boundary {
         this.type = type;
     }
 
-    public void setLengthKm(Real length) {
-        this.lengthKm = length;
+    public void setLengthKm(double lengthKm) {
+        this.lengthMeters = lengthKm * 1000.0;
     }
 
-    public void setLengthKm(double length) {
-        this.lengthKm = Real.of(length);
+    public void setLengthMeters(double lengthMeters) {
+        this.lengthMeters = lengthMeters;
     }
 
     public void setEntities(String entity1, String entity2) {
@@ -97,25 +110,31 @@ public class Boundary {
         points.add(coord);
     }
 
-    public Real calculateLength() {
+    /**
+     * Calculates the total length of the boundary from its points.
+     * 
+     * @return length as a Length quantity
+     */
+    public Quantity<Length> calculateLength() {
         if (points.size() < 2)
-            return Real.ZERO;
-        Real total = Real.ZERO;
+            return Quantities.create(0, Units.METER);
+        double total = 0.0;
         for (int i = 1; i < points.size(); i++) {
-            total = total.add(points.get(i - 1).distanceTo(points.get(i)));
+            total += points.get(i - 1).distanceTo(points.get(i))
+                    .to(Units.METER).getValue().doubleValue();
         }
-        return total;
+        return Quantities.create(total, Units.METER);
     }
 
     @Override
     public String toString() {
-        return String.format("Boundary '%s' (%s): %.1f km", name, type, lengthKm.doubleValue() / 1000.0);
+        return String.format("Boundary '%s' (%s): %.1f km", name, type, getLengthKm());
     }
 
     public static Boundary usCanadaBorder() {
         Boundary b = new Boundary("US-Canada Border", Type.NATIONAL);
         b.setEntities("United States", "Canada");
-        b.setLengthKm(8891000); // meters
+        b.setLengthKm(8891); // kilometers
         return b;
     }
 }

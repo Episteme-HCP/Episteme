@@ -123,7 +123,7 @@ public class ChemicalReactionParser {
                         count = Integer.parseInt(formula.substring(j, subEnd));
                     }
 
-                    elements.merge(symbol, count * multiplier, Integer::sum);
+                    elements.merge(symbol, count * multiplier, (a, b) -> a + b);
                     i = subEnd;
                 } else {
                     i++;
@@ -246,13 +246,13 @@ public class ChemicalReactionParser {
 
             for (Formula f : reactants) {
                 for (var e : f.getTotalElements().entrySet()) {
-                    leftCounts.merge(e.getKey(), e.getValue(), Integer::sum);
+                    leftCounts.merge(e.getKey(), e.getValue(), (a, b) -> a + b);
                 }
             }
 
             for (Formula f : products) {
                 for (var e : f.getTotalElements().entrySet()) {
-                    rightCounts.merge(e.getKey(), e.getValue(), Integer::sum);
+                    rightCounts.merge(e.getKey(), e.getValue(), (a, b) -> a + b);
                 }
             }
 
@@ -268,12 +268,12 @@ public class ChemicalReactionParser {
 
             for (Formula f : reactants) {
                 for (var e : f.getTotalElements().entrySet()) {
-                    left.merge(e.getKey(), e.getValue(), Integer::sum);
+                    left.merge(e.getKey(), e.getValue(), (a, b) -> a + b);
                 }
             }
             for (Formula f : products) {
                 for (var e : f.getTotalElements().entrySet()) {
-                    right.merge(e.getKey(), e.getValue(), Integer::sum);
+                    right.merge(e.getKey(), e.getValue(), (a, b) -> a + b);
                 }
             }
 

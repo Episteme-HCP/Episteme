@@ -35,7 +35,7 @@ public class PlottingViewer extends Application {
     @Override
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #f5f5f5;");
+        root.setStyle("-fx-background-color: #1a1a2e;");
 
         // Header
         Label header = new Label("JScience 2D Function Plotter");
@@ -43,18 +43,19 @@ public class PlottingViewer extends Application {
         HBox headerBox = new HBox(header);
         headerBox.setPadding(new Insets(10));
         headerBox.setAlignment(Pos.CENTER);
-        headerBox.setStyle("-fx-background-color: #2196F3;");
-        header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
+        headerBox.setStyle("-fx-background-color: #16213e;");
+        header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #00d9ff;");
         root.setTop(headerBox);
 
         // Left Panel - Controls
         VBox leftPanel = new VBox(10);
         leftPanel.setPadding(new Insets(10));
         leftPanel.setPrefWidth(250);
-        leftPanel.setStyle("-fx-background-color: #e0e0e0;");
+        leftPanel.setStyle("-fx-background-color: #16213e;");
 
         // Function selector
         Label funcLabel = new Label("Add Function:");
+        funcLabel.setStyle("-fx-text-fill: #aaa;");
         functionSelector = new ComboBox<>();
         functionSelector.getItems().addAll(
                 "sin(x)", "cos(x)", "tan(x)",
@@ -66,6 +67,7 @@ public class PlottingViewer extends Application {
 
         // Range inputs
         Label rangeLabel = new Label("X Range:");
+        rangeLabel.setStyle("-fx-text-fill: #aaa;");
         HBox rangeBox = new HBox(5);
         xMinField = new TextField("-10");
         xMinField.setPrefWidth(60);
@@ -88,7 +90,7 @@ public class PlottingViewer extends Application {
         // Active series list
         Label seriesLabel = new Label("Active Series:");
         seriesListBox = new VBox(5);
-        seriesListBox.setStyle("-fx-background-color: white; -fx-padding: 5;");
+        seriesListBox.setStyle("-fx-background-color: #0f3460; -fx-padding: 5;");
 
         // Clear all button
         Button clearBtn = new Button("Clear All");
@@ -125,7 +127,7 @@ public class PlottingViewer extends Application {
         centerBox.setPadding(new Insets(40));
 
         Label instructLabel = new Label("Add functions and click 'Generate Plot'");
-        instructLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #666;");
+        instructLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #aaa;");
 
         Label tipLabel = new Label(
                 "Tips:\n" +
@@ -133,7 +135,7 @@ public class PlottingViewer extends Application {
                         "• Adjust X range for different views\n" +
                         "• Toggle grid and legend options\n" +
                         "• Plot opens in new window");
-        tipLabel.setStyle("-fx-font-size: 12px;");
+        tipLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #888;");
 
         centerBox.getChildren().addAll(instructLabel, tipLabel);
         root.setCenter(centerBox);

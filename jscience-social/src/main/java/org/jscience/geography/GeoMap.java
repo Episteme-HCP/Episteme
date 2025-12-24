@@ -25,7 +25,6 @@ package org.jscience.geography;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a 2D map of a geographical area.
@@ -37,25 +36,29 @@ import org.jscience.mathematics.numbers.real.Real;
 public class GeoMap {
 
     private String name;
-    private Real width;
-    private Real height;
+    private double widthDegrees;
+    private double heightDegrees;
     private Coordinate topLeftCoordinate;
 
     private final Set<Place> places;
     private final Set<GeoPath> paths;
     private String description;
 
-    public GeoMap(String name, Coordinate topLeftCoordinate, Real width, Real height) {
+    /**
+     * Creates a map with the specified top-left coordinate and dimensions.
+     * 
+     * @param name              map name
+     * @param topLeftCoordinate top-left corner coordinate
+     * @param widthDegrees      width in degrees
+     * @param heightDegrees     height in degrees
+     */
+    public GeoMap(String name, Coordinate topLeftCoordinate, double widthDegrees, double heightDegrees) {
         this.name = name;
         this.topLeftCoordinate = topLeftCoordinate;
-        this.width = width;
-        this.height = height;
+        this.widthDegrees = widthDegrees;
+        this.heightDegrees = heightDegrees;
         this.places = new HashSet<>();
         this.paths = new HashSet<>();
-    }
-
-    public GeoMap(String name, Coordinate topLeftCoordinate, double width, double height) {
-        this(name, topLeftCoordinate, Real.of(width), Real.of(height));
     }
 
     public String getName() {
@@ -66,12 +69,12 @@ public class GeoMap {
         return topLeftCoordinate;
     }
 
-    public Real getWidth() {
-        return width;
+    public double getWidthDegrees() {
+        return widthDegrees;
     }
 
-    public Real getHeight() {
-        return height;
+    public double getHeightDegrees() {
+        return heightDegrees;
     }
 
     public Set<Place> getPlaces() {
@@ -102,13 +105,17 @@ public class GeoMap {
         this.description = description;
     }
 
+    /**
+     * Calculates the bottom-right coordinate of this map.
+     */
     public Coordinate getBottomRightCoordinate() {
-        Real latOffset = height.negate().divide(Real.of(111000));
-        Real cosLat = topLeftCoordinate.getLatitude().toRadians().cos();
-        Real lonOffset = width.divide(Real.of(111000).multiply(cosLat));
+        double topLat = topLeftCoordinate.getLatitudeDegrees();
+        double topLon = topLeftCoordinate.getLongitudeDegrees();
 
-        return new Coordinate(
-                topLeftCoordinate.getLatitude().add(latOffset),
-                topLeftCoordinate.getLongitude().add(lonOffset));
+        // Height goes down (south), width goes right (east)
+        double bottomLat = topLat - heightDegrees;
+        double rightLon = topLon + widthDegrees;
+
+        return new Coordinate(bottomLat, rightLon);
     }
 }

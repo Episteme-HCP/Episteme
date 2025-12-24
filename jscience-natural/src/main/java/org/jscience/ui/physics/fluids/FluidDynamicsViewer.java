@@ -3,13 +3,11 @@ package org.jscience.ui.physics.fluids;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -33,8 +31,7 @@ public class FluidDynamicsViewer extends Application {
     private static final int SCALE = 6;
     private static final int PARTICLE_COUNT = 500;
 
-    private double viscosity = 0.01;
-    private double diffusion = 0.001;
+    private double viscosity = 0.0001;
     private boolean showField = true;
     private boolean showParticles = true;
     private String colorScheme = "Blue";

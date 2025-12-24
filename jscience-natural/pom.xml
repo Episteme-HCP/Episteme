@@ -13,8 +13,9 @@
     <packaging>jar</packaging>
 
     <name>JScience Natural</name>
-    <description>JScience Natural Sciences - Physics, Chemistry, Biology, Earth, Medicine, Computing</description>
+    <description>JScience Natural Sciences Layer - Physics, Chemistry, Biology, Earth, Medicine, Computing</description>
 
+    <!-- Force IDE resync -->
     <dependencies>
         <!-- Core module -->
         <dependency>

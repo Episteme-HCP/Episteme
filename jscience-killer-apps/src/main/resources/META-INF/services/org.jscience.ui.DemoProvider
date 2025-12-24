@@ -1,2 +1,10 @@
-org.jscience.apps.physics.trajectory.InterplanetaryTrajectoryPlanner
-org.jscience.apps.biology.pandemic.PandemicForecaster
+org.jscience.apps.biology.CrisprDesignApp
+org.jscience.apps.biology.PandemicForecasterApp
+org.jscience.apps.chemistry.CrystalStructureApp
+org.jscience.apps.chemistry.TitrationApp
+org.jscience.apps.engineering.SmartGridApp
+org.jscience.apps.physics.QuantumCircuitApp
+org.jscience.apps.physics.relativity.RelativisticFlightApp
+org.jscience.apps.physics.trajectory.InterplanetaryTrajectoryApp
+org.jscience.apps.social.CivilizationApp
+org.jscience.apps.social.MarketCrashApp

@@ -15,7 +15,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+
 import javafx.util.Duration;
 
 import org.jscience.apps.framework.ChartFactory;
@@ -112,7 +112,10 @@ public class PandemicForecasterApp extends KillerAppBase {
         infSeriesI = ChartFactory.createSeries(i18n.get("pandemic.label.infectious"));
         recSeriesR = ChartFactory.createSeries(i18n.get("pandemic.label.recovered"));
 
-        seirChart.getData().addAll(susSeriesS, expSeriesE, infSeriesI, recSeriesR);
+        @SuppressWarnings("unchecked")
+        XYChart.Series<Number, Number>[] series = new XYChart.Series[] { susSeriesS, expSeriesE, infSeriesI,
+                recSeriesR };
+        seirChart.getData().addAll(series);
 
         // Style series
         susSeriesS.getNode();
@@ -156,7 +159,8 @@ public class PandemicForecasterApp extends KillerAppBase {
             @Override
             protected void updateItem(org.jscience.geography.Region item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty || item == null ? "" : item.getName() + " (Pop: " + formatNumber(item.getPopulation()) + ")");
+                setText(empty || item == null ? ""
+                        : item.getName() + " (Pop: " + formatNumber(item.getPopulation()) + ")");
             }
         });
         countrySelector.setButtonCell(countrySelector.getCellFactory().call(null));
@@ -208,16 +212,15 @@ public class PandemicForecasterApp extends KillerAppBase {
 
         // Assemble
         panel.getChildren().addAll(
-            countryLabel, countrySelector,
-            new Separator(),
-            paramLabel,
-            betaBox, sigmaBox, gammaBox,
-            new Separator(),
-            initialBox, daysBox,
-            r0Label,
-            new Separator(),
-            logLabel, eventLog
-        );
+                countryLabel, countrySelector,
+                new Separator(),
+                paramLabel,
+                betaBox, sigmaBox, gammaBox,
+                new Separator(),
+                initialBox, daysBox,
+                r0Label,
+                new Separator(),
+                logLabel, eventLog);
 
         return panel;
     }
@@ -259,7 +262,8 @@ public class PandemicForecasterApp extends KillerAppBase {
 
     @Override
     public void onRun() {
-        if (isRunning) return;
+        if (isRunning)
+            return;
 
         org.jscience.geography.Region country = countrySelector.getValue();
         if (country == null) {
@@ -281,10 +285,10 @@ public class PandemicForecasterApp extends KillerAppBase {
         Real dt = Real.of(1.0);
 
         Real[] initial = new Real[] {
-            Real.of(N - I0),  // S
-            Real.of(0),       // E
-            Real.of(I0),      // I
-            Real.of(0)        // R
+                Real.of(N - I0), // S
+                Real.of(0), // E
+                Real.of(I0), // I
+                Real.of(0) // R
         };
 
         log("Starting simulation: " + country.getName() + ", Pop=" + formatNumber(N) + ", β=" + betaSlider.getValue());
@@ -396,12 +400,11 @@ public class PandemicForecasterApp extends KillerAppBase {
                 pw.println("Day,Susceptible,Exposed,Infectious,Recovered");
                 for (int d = 0; d < currentDay; d++) {
                     pw.printf("%d,%.0f,%.0f,%.0f,%.0f%n",
-                        d,
-                        simulationResults[d][0].doubleValue(),
-                        simulationResults[d][1].doubleValue(),
-                        simulationResults[d][2].doubleValue(),
-                        simulationResults[d][3].doubleValue()
-                    );
+                            d,
+                            simulationResults[d][0].doubleValue(),
+                            simulationResults[d][1].doubleValue(),
+                            simulationResults[d][2].doubleValue(),
+                            simulationResults[d][3].doubleValue());
                 }
                 log("Exported to: " + file.getName());
                 showInfo("Export", "Data exported successfully to " + file.getName());
@@ -422,9 +425,12 @@ public class PandemicForecasterApp extends KillerAppBase {
     }
 
     private String formatNumber(long num) {
-        if (num >= 1_000_000_000) return String.format("%.1fB", num / 1e9);
-        if (num >= 1_000_000) return String.format("%.1fM", num / 1e6);
-        if (num >= 1_000) return String.format("%.1fK", num / 1e3);
+        if (num >= 1_000_000_000)
+            return String.format("%.1fB", num / 1e9);
+        if (num >= 1_000_000)
+            return String.format("%.1fM", num / 1e6);
+        if (num >= 1_000)
+            return String.format("%.1fK", num / 1e3);
         return String.valueOf(num);
     }
 

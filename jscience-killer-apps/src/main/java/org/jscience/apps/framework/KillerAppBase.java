@@ -91,13 +91,18 @@ public abstract class KillerAppBase extends Application {
     protected abstract Region createMainContent();
 
     /** Called when the application is fully initialized. */
-    protected void onAppReady() {}
+    protected void onAppReady() {
+    }
 
     /** Default window width. */
-    protected double getDefaultWidth() { return 1200; }
+    protected double getDefaultWidth() {
+        return 1200;
+    }
 
     /** Default window height. */
-    protected double getDefaultHeight() { return 800; }
+    protected double getDefaultHeight() {
+        return 800;
+    }
 
     // ===== Toolbar =====
 
@@ -125,7 +130,8 @@ public abstract class KillerAppBase extends Application {
     }
 
     /** Override to add custom toolbar items. */
-    protected void customizeToolBar(ToolBar toolBar) {}
+    protected void customizeToolBar(ToolBar toolBar) {
+    }
 
     // ===== Status Bar =====
 
@@ -161,11 +167,10 @@ public abstract class KillerAppBase extends Application {
     protected void applyTheme(Scene scene) {
         if ("dark".equals(currentTheme)) {
             scene.getRoot().setStyle(
-                "-fx-base: #2b2b2b; " +
-                "-fx-background: #1e1e1e; " +
-                "-fx-control-inner-background: #3c3c3c; " +
-                "-fx-text-fill: #e0e0e0;"
-            );
+                    "-fx-base: #2b2b2b; " +
+                            "-fx-background: #1e1e1e; " +
+                            "-fx-control-inner-background: #3c3c3c; " +
+                            "-fx-text-fill: #e0e0e0;");
         } else {
             scene.getRoot().setStyle("");
         }
@@ -265,7 +270,8 @@ public abstract class KillerAppBase extends Application {
     }
 
     protected boolean confirmUnsavedChanges() {
-        if (!isDirty) return true;
+        if (!isDirty)
+            return true;
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(i18n.get("dialog.confirm.unsaved"));
         alert.setContentText(i18n.get("dialog.confirm.unsaved"));
@@ -284,28 +290,52 @@ public abstract class KillerAppBase extends Application {
 
     // ===== Edit Operations =====
 
-    public void onUndo() {}
-    public void onRedo() {}
-    public void onFind() {}
-    public void onReplace() {}
+    public void onUndo() {
+    }
+
+    public void onRedo() {
+    }
+
+    public void onFind() {
+    }
+
+    public void onReplace() {
+    }
 
     // ===== View Operations =====
 
-    public void onZoomIn() {}
-    public void onZoomOut() {}
-    public void onFitToWindow() {}
+    public void onZoomIn() {
+    }
+
+    public void onZoomOut() {
+    }
+
+    public void onFitToWindow() {
+    }
+
     public void onFullScreen() {
         primaryStage.setFullScreen(!primaryStage.isFullScreen());
     }
 
     // ===== Tools Operations =====
 
-    public void onRun() {}
-    public void onPause() {}
-    public void onStop() {}
-    public void onReset() {}
-    public void onShowParameters() {}
-    public void onShowConsole() {}
+    public void onRun() {
+    }
+
+    public void onPause() {
+    }
+
+    public void onStop() {
+    }
+
+    public void onReset() {
+    }
+
+    public void onShowParameters() {
+    }
+
+    public void onShowConsole() {
+    }
 
     // ===== Preferences =====
 
@@ -324,11 +354,12 @@ public abstract class KillerAppBase extends Application {
         }
     }
 
-    public void onShowShortcuts() {}
+    public void onShowShortcuts() {
+    }
 
     protected void loadPreferences() {
         String lang = prefs.get("language", Locale.getDefault().getLanguage());
-        i18n.setLocale(new Locale(lang));
+        i18n.setLocale(Locale.of(lang));
         currentTheme = prefs.get("theme", "light");
     }
 
@@ -339,8 +370,11 @@ public abstract class KillerAppBase extends Application {
 
     // ===== Help =====
 
-    public void onShowDocumentation() {}
-    public void onShowTutorials() {}
+    public void onShowDocumentation() {
+    }
+
+    public void onShowTutorials() {
+    }
 
     public void onShowAbout() {
         Alert about = new Alert(Alert.AlertType.INFORMATION);

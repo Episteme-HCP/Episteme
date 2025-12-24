@@ -68,16 +68,16 @@ public class GeneticsViewer extends Application {
                 runBtn);
         controls.setPadding(new Insets(10));
         controls.setAlignment(Pos.CENTER_LEFT);
-        controls.setStyle("-fx-background-color: #f0f0f0;");
+        controls.setStyle("-fx-background-color: #16213e;");
 
         // Info Panel
         VBox infoPanel = new VBox(10);
         infoPanel.setPadding(new Insets(10));
-        infoPanel.setStyle("-fx-background-color: #e0e0e0;");
+        infoPanel.setStyle("-fx-background-color: #0f3460;");
         infoPanel.setPrefWidth(200);
 
         Label titleLabel = new Label("Genetic Drift Simulation");
-        titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #00d9ff;");
 
         Label explanationLabel = new Label(
                 "This demonstrates genetic drift - random changes in allele " +
@@ -88,10 +88,10 @@ public class GeneticsViewer extends Application {
                         "- Frequency can fixate at 0 or 1\n" +
                         "- Initial frequency affects trajectory");
         explanationLabel.setWrapText(true);
-        explanationLabel.setStyle("-fx-font-size: 11px;");
+        explanationLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #aaa;");
 
         statusLabel = new Label("Click 'Run Simulation' to start");
-        statusLabel.setStyle("-fx-font-style: italic;");
+        statusLabel.setStyle("-fx-font-style: italic; -fx-text-fill: #888;");
 
         infoPanel.getChildren().addAll(titleLabel, new Separator(), explanationLabel, new Separator(), statusLabel);
 
@@ -99,7 +99,7 @@ public class GeneticsViewer extends Application {
         root.setCenter(canvas);
         root.setBottom(controls);
         root.setRight(infoPanel);
-        root.setStyle("-fx-background-color: white;");
+        root.setStyle("-fx-background-color: #1a1a2e;");
 
         drawAxes();
 
@@ -133,27 +133,28 @@ public class GeneticsViewer extends Application {
 
     private void drawAxes() {
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setFill(Color.WHITE);
+        gc.setFill(Color.web("#1a1a2e"));
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         // Axes
-        gc.setStroke(Color.BLACK);
+        gc.setStroke(Color.LIGHTGRAY);
         gc.setLineWidth(1.5);
         gc.strokeLine(50, 350, 680, 350); // X axis
         gc.strokeLine(50, 50, 50, 350); // Y axis
 
         // Labels
-        gc.setFill(Color.BLACK);
+        gc.setFill(Color.LIGHTGRAY);
         gc.fillText("Generation", 350, 385);
         gc.fillText("Allele", 5, 180);
         gc.fillText("Frequency", 5, 195);
 
         // Y-axis ticks
-        gc.setStroke(Color.GRAY);
+        gc.setStroke(Color.web("#444"));
         gc.setLineWidth(0.5);
         for (double f = 0; f <= 1.0; f += 0.25) {
             double y = 350 - (f * 300);
             gc.strokeLine(45, y, 680, y);
+            gc.setFill(Color.LIGHTGRAY);
             gc.fillText(String.format("%.2f", f), 20, y + 4);
         }
 
@@ -167,7 +168,7 @@ public class GeneticsViewer extends Application {
 
     private void drawHistory() {
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setStroke(Color.BLUE);
+        gc.setStroke(Color.web("#00d9ff"));
         gc.setLineWidth(2);
         gc.beginPath();
         for (int i = 0; i < generations; i++) {

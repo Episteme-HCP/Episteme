@@ -20,7 +20,7 @@ public class PoliticsVotingDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return "Social Sciences";
+        return "Politics";
     }
 
     @Override

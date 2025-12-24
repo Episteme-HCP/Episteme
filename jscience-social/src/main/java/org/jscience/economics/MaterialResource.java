@@ -35,7 +35,7 @@ import java.util.UUID;
  * @since 1.0
  * 
  */
-public class MaterialResource<Q extends javax.measure.Quantity<Q>> extends Resource<Q> {
+public class MaterialResource<Q extends org.jscience.measure.Quantity<Q>> extends Resource<Q> {
 
     // Using UUID string for identification instead of legacy Identification class
     private final String identification;

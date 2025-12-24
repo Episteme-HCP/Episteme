@@ -20,7 +20,7 @@ public class LinguisticsWordFreqDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return "Social Sciences";
+        return "Linguistics";
     }
 
     @Override

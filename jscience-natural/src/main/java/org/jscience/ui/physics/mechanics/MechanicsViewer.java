@@ -35,11 +35,17 @@ public class MechanicsViewer extends Application {
     @Override
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
+        root.setStyle("-fx-background-color: #1a1a2e;");
         canvas = new Canvas(400, 600);
         root.setCenter(canvas);
 
         VBox controls = new VBox(10);
-        controls.setPadding(new Insets(10));
+        controls.setPadding(new Insets(15));
+        controls.setPrefWidth(200);
+        controls.setStyle("-fx-background-color: #16213e;");
+
+        Label title = new Label("⚙️ Mass-Spring-Damper");
+        title.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #00d9ff;");
 
         Slider kSlider = new Slider(1, 50, 10);
         kSlider.valueProperty().addListener((o, old, v) -> k = v.doubleValue());
@@ -50,11 +56,21 @@ public class MechanicsViewer extends Application {
         Slider cSlider = new Slider(0, 5, 0.5);
         cSlider.valueProperty().addListener((o, old, v) -> c = v.doubleValue());
 
+        Label kLabel = new Label("Spring Constant (k):");
+        kLabel.setStyle("-fx-text-fill: #888;");
+        Label mLabel = new Label("Mass (m):");
+        mLabel.setStyle("-fx-text-fill: #888;");
+        Label cLabel = new Label("Damping (c):");
+        cLabel.setStyle("-fx-text-fill: #888;");
+        Label hintLabel = new Label("Click and drag mass");
+        hintLabel.setStyle("-fx-text-fill: #666;");
+
         controls.getChildren().addAll(
-                new Label("Spring Constant (k):"), kSlider,
-                new Label("Mass (m):"), mSlider,
-                new Label("Damping (c):"), cSlider,
-                new Label("Click and drag mass to disturb"));
+                title, new javafx.scene.control.Separator(),
+                kLabel, kSlider,
+                mLabel, mSlider,
+                cLabel, cSlider,
+                hintLabel);
         root.setRight(controls);
 
         canvas.setOnMouseDragged(e -> {
@@ -127,7 +143,7 @@ public class MechanicsViewer extends Application {
 
     private void draw() {
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setFill(Color.WHITESMOKE);
+        gc.setFill(Color.web("#1a1a2e"));
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         double centerX = 150; // Shifted left
@@ -137,12 +153,12 @@ public class MechanicsViewer extends Application {
 
         // Draw Ceiling
         gc.setLineWidth(4);
-        gc.setStroke(Color.BLACK);
+        gc.setStroke(Color.LIGHTGRAY);
         gc.strokeLine(centerX - 50, anchorY, centerX + 50, anchorY);
 
         // Draw Spring
         gc.setLineWidth(2);
-        gc.setStroke(Color.BLACK);
+        gc.setStroke(Color.web("#aaa"));
         int segments = 15;
         double segHeight = (massY - anchorY) / segments;
         double w = 20;
@@ -165,7 +181,7 @@ public class MechanicsViewer extends Application {
         gc.fillText(String.format("%.1f kg", mass), centerX - 15, massY + 25);
 
         // Draw Platform for Ball
-        gc.setFill(Color.DARKGRAY);
+        gc.setFill(Color.web("#555"));
         gc.fillRect(20, ballY + 20, 350, 10);
 
         // Draw Trigger Plate
@@ -177,7 +193,7 @@ public class MechanicsViewer extends Application {
         gc.fillOval(ballX, ballY, 20, 20);
 
         // Draw Domino
-        gc.setFill(Color.BLACK);
+        gc.setFill(Color.web("#444"));
         gc.save();
         gc.translate(320, ballY + 20);
         gc.rotate(dominoAngle);

@@ -15,7 +15,7 @@ public class HistoryTimelineDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return "Social Sciences";
+        return "History";
     }
 
     @Override

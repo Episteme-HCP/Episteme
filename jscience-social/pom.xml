@@ -16,7 +16,11 @@
     <description>JScience Social - Social Sciences, Humanities, Engineering</description>
 
     <dependencies>
-        <!-- Natural Sciences module (includes core transitively) -->
+        <!-- Internal modules -->
+        <dependency>
+            <groupId>org.jscience</groupId>
+            <artifactId>jscience-core</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.jscience</groupId>
             <artifactId>jscience-natural</artifactId>

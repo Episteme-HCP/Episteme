@@ -69,9 +69,9 @@ public class AdvancedFeaturesTest {
         Coordinate paris = new Coordinate(48.8566, 2.3522);
         Coordinate london = new Coordinate(51.5074, -0.1278);
 
-        Real distance = GISProfile.calculateDistance(paris, london);
+        double distance = GISProfile.calculateDistanceMeters(paris, london);
         // Approx 344 km
-        assertEquals(343000, distance.doubleValue(), 5000); // 5km tolerance
+        assertEquals(343000, distance, 5000); // 5km tolerance
 
         GISProfile gp = new GISProfile(GISProfile.Projection.MERCATOR);
         org.jscience.mathematics.linearalgebra.Vector<Real> proj = gp.project(paris);

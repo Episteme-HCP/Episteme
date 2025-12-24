@@ -230,6 +230,6 @@ public class NasaExoplanets extends AbstractLoader<ExoplanetInfo> {
     }
 
     private NasaExoplanets() {
-        setBackupPath("/org/jscience/physics/astronomy/loaders/backup/");
+        // API-based loader, no backup path needed
     }
 }

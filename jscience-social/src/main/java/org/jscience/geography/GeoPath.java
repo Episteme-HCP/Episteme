@@ -25,10 +25,12 @@ package org.jscience.geography;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Length;
 
 /**
- * Represents a path or track consisting of a sequence of coordinates.
+ * Represents a sequence of geographic coordinates forming a path or route.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -36,46 +38,74 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public class GeoPath {
 
-    private final List<Coordinate> coordinates;
+    private final List<Coordinate> coordinates = new ArrayList<>();
+    private String name;
+
+    public GeoPath() {
+    }
 
     public GeoPath(List<Coordinate> coordinates) {
-        if (coordinates == null || coordinates.isEmpty()) {
-            throw new IllegalArgumentException("Path must have at least one coordinate");
-        }
-        this.coordinates = new ArrayList<>(coordinates);
+        this.coordinates.addAll(coordinates);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void addPoint(Coordinate coord) {
+        coordinates.add(coord);
     }
 
     public List<Coordinate> getCoordinates() {
         return Collections.unmodifiableList(coordinates);
     }
 
+    public int size() {
+        return coordinates.size();
+    }
+
     public Coordinate getStart() {
-        return coordinates.get(0);
+        return coordinates.isEmpty() ? null : coordinates.get(0);
     }
 
     public Coordinate getEnd() {
-        return coordinates.get(coordinates.size() - 1);
+        return coordinates.isEmpty() ? null : coordinates.get(coordinates.size() - 1);
     }
 
+    /**
+     * Checks if the path is closed (start and end are at the same location).
+     */
     public boolean isClosed() {
         if (coordinates.size() < 2)
             return false;
         Coordinate start = getStart();
         Coordinate end = getEnd();
-        Real latDiff = start.getLatitude().subtract(end.getLatitude()).abs();
-        Real lonDiff = start.getLongitude().subtract(end.getLongitude()).abs();
-        Real epsilon = Real.of(1e-9);
-        return latDiff.compareTo(epsilon) < 0 && lonDiff.compareTo(epsilon) < 0;
+        double latDiff = Math.abs(start.getLatitudeDegrees() - end.getLatitudeDegrees());
+        double lonDiff = Math.abs(start.getLongitudeDegrees() - end.getLongitudeDegrees());
+        return latDiff < 1e-9 && lonDiff < 1e-9;
     }
 
-    public Real getLength() {
-        Real length = Real.ZERO;
+    /**
+     * Calculates the total length of the path.
+     * 
+     * @return total length as a Length quantity
+     */
+    public Quantity<Length> getLength() {
+        double lengthMeters = 0.0;
         for (int i = 0; i < coordinates.size() - 1; i++) {
-            length = length.add(coordinates.get(i).distanceTo(coordinates.get(i + 1)));
+            lengthMeters += coordinates.get(i).distanceTo(coordinates.get(i + 1))
+                    .to(Units.METER).getValue().doubleValue();
         }
-        return length;
+        return org.jscience.measure.Quantities.create(lengthMeters, Units.METER);
     }
 
+    /**
+     * Returns a reversed copy of this path.
+     */
     public GeoPath reverse() {
         List<Coordinate> reversed = new ArrayList<>(coordinates);
         Collections.reverse(reversed);

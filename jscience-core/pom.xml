@@ -12,7 +12,7 @@
     <artifactId>jscience-core</artifactId>
     <packaging>jar</packaging>
 
-    <name>JScience Core</name>
+    <name>JScience Core Engine</name>
     <description>JScience Core - Mathematics, Measure, and Computing Infrastructure</description>
 
     <dependencies>

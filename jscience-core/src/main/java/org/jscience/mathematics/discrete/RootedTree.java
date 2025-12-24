@@ -38,11 +38,12 @@ import java.util.*;
  * </p>
  *
  * @param <V> the type of vertices (nodes)
- * * @author Silvere Martin-Michiellot
+ *            * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class RootedTree<V> implements Tree<V> {
+    // Aggressive touch for IDE re-indexing
 
     private V root;
     private final Map<V, V> parentMap = new HashMap<>();

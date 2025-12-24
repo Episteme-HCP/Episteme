@@ -32,10 +32,12 @@ import java.util.Properties;
  * Loads properties from 'jscience.properties' at the root of the classpath.
  * </p>
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class Configuration {
+    // Aggressive touch for IDE re-indexing
 
     private static final Properties properties = new Properties();
 
@@ -58,6 +60,7 @@ public class Configuration {
      * @return the property value, or null if not found
      */
     public static String get(String key) {
+        // Internal touch to trigger IDE re-indexing
         return properties.getProperty(key);
     }
 

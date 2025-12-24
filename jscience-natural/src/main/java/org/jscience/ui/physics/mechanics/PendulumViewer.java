@@ -38,22 +38,24 @@ public class PendulumViewer extends Application {
     @Override
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
+        root.setStyle("-fx-background-color: #1a1a2e;");
 
         // Canvas for simulation
         Canvas canvas = new Canvas(400, 400);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         // Chart for Phase Space
+        // Chart for Phase Space
         NumberAxis xAxis = new NumberAxis();
-        xAxis.setLabel("Angle (rad)");
+        xAxis.setLabel(org.jscience.natural.i18n.I18n.getInstance().get("pendulum.axis.angle"));
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("Angular Velocity (rad/s)");
+        yAxis.setLabel(org.jscience.natural.i18n.I18n.getInstance().get("pendulum.axis.velocity"));
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Phase Space");
+        chart.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("pendulum.title"));
         chart.setCreateSymbols(false);
         chart.setAnimated(false);
         chart.getData().add(phaseData);
-        phaseData.setName("Trajectory");
+        phaseData.setName(org.jscience.natural.i18n.I18n.getInstance().get("pendulum.series.trajectory"));
 
         // Controls
         VBox controls = new VBox(10);
@@ -152,7 +154,8 @@ public class PendulumViewer extends Application {
 
         double w = gc.getCanvas().getWidth();
         double h = gc.getCanvas().getHeight();
-        gc.clearRect(0, 0, w, h);
+        gc.setFill(Color.web("#1a1a2e"));
+        gc.fillRect(0, 0, w, h);
 
         double pivotX = w / 2;
         double pivotY = 50;
@@ -163,17 +166,16 @@ public class PendulumViewer extends Application {
         double bobX = pivotX + length * scale * java.lang.Math.sin(theta);
         double bobY = pivotY + length * scale * java.lang.Math.cos(theta);
 
-        // Draw Rod
-        gc.setStroke(Color.BLACK);
+        gc.setStroke(Color.web("#aaa"));
         gc.setLineWidth(2);
         gc.strokeLine(pivotX, pivotY, bobX, bobY);
 
         // Draw Bob
-        gc.setFill(Color.RED);
+        gc.setFill(Color.web("#ff6b6b"));
         gc.fillOval(bobX - 10, bobY - 10, 20, 20);
 
         // Draw Pivot
-        gc.setFill(Color.BLACK);
+        gc.setFill(Color.LIGHTGRAY);
         gc.fillOval(pivotX - 5, pivotY - 5, 10, 10);
     }
 

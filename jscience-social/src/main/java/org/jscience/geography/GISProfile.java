@@ -22,7 +22,14 @@
  */
 package org.jscience.geography;
 
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Length;
+import org.jscience.mathematics.linearalgebra.Vector;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.mathematics.numbers.real.Real;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Handles Geographic Information System (GIS) profiles and projections.
@@ -46,49 +53,44 @@ public class GISProfile {
     /**
      * Projects a 3D coordinate (lat/lon) to a 2D map coordinate (x/y).
      * 
-     * @return Vector<Real> with [x, y] map coordinates
+     * @return Vector with [x, y] map coordinates (in radians)
      */
-    public org.jscience.mathematics.linearalgebra.Vector<Real> project(Coordinate coord) {
-        Real lat = coord.getLatitude().toRadians();
-        Real lon = coord.getLongitude().toRadians();
+    public Vector<Real> project(Coordinate coord) {
+        double latRad = Math.toRadians(coord.getLatitudeDegrees());
+        double lonRad = Math.toRadians(coord.getLongitudeDegrees());
 
-        java.util.List<Real> coords = new java.util.ArrayList<>();
+        List<Real> coords = new ArrayList<>();
 
         switch (projection) {
             case MERCATOR:
-                Real x = lon;
-                Real y = Real.PI.divide(Real.of(4)).add(lat.divide(Real.TWO)).tan().log();
-                coords.add(x);
-                coords.add(y);
+                double x = lonRad;
+                double y = Math.log(Math.tan(Math.PI / 4 + latRad / 2));
+                coords.add(Real.of(x));
+                coords.add(Real.of(y));
                 break;
             case EQUIRECTANGULAR:
-                coords.add(lon);
-                coords.add(lat);
+                coords.add(Real.of(lonRad));
+                coords.add(Real.of(latRad));
                 break;
             default:
                 throw new UnsupportedOperationException("Projection not implemented");
         }
-        return org.jscience.mathematics.linearalgebra.vectors.DenseVector.of(coords, Real.ZERO);
+        return DenseVector.of(coords, Real.ZERO);
     }
 
     /**
-     * Calculates great-circle distance (Haversine) in meters.
+     * Calculates great-circle distance (Haversine) between two coordinates.
+     * 
+     * @return distance as a Length quantity
      */
-    public static Real calculateDistance(Coordinate c1, Coordinate c2) {
-        Real R = Real.of(6371000); // Earth radius in meters
-        Real lat1 = c1.getLatitude().toRadians();
-        Real lat2 = c2.getLatitude().toRadians();
-        Real dLat = c2.getLatitude().subtract(c1.getLatitude()).toRadians();
-        Real dLon = c2.getLongitude().subtract(c1.getLongitude()).toRadians();
+    public static Quantity<Length> calculateDistance(Coordinate c1, Coordinate c2) {
+        return c1.distanceTo(c2);
+    }
 
-        Real sinDLatHalf = dLat.divide(Real.TWO).sin();
-        Real sinDLonHalf = dLon.divide(Real.TWO).sin();
-
-        Real a = sinDLatHalf.pow(2).add(lat1.cos().multiply(lat2.cos()).multiply(sinDLonHalf.pow(2)));
-        Real sqrtA = a.sqrt();
-        Real sqrtOneMinusA = Real.ONE.subtract(a).sqrt();
-        Real c = Real.TWO.multiply(sqrtA.atan2(sqrtOneMinusA));
-
-        return R.multiply(c);
+    /**
+     * Calculates great-circle distance in meters.
+     */
+    public static double calculateDistanceMeters(Coordinate c1, Coordinate c2) {
+        return c1.distanceTo(c2).to(Units.METER).getValue().doubleValue();
     }
 }

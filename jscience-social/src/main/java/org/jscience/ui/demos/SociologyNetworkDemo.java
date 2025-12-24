@@ -17,7 +17,7 @@ public class SociologyNetworkDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return "Social Sciences";
+        return "Sociology";
     }
 
     @Override

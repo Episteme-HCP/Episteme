@@ -80,7 +80,9 @@ import org.jscience.mathematics.numbers.real.Real;
  * // Get recommendation
  * Strategy recommended = MatrixSolver.recommend(A);
  * </pre>
+ * 
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

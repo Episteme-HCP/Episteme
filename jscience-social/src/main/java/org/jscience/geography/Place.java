@@ -24,14 +24,18 @@ package org.jscience.geography;
 
 import org.jscience.economics.Market;
 import org.jscience.sociology.Person;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Length;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 
 /**
  * Represents a named geographic place.
- * * @author Silvere Martin-Michiellot
  * 
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -92,8 +96,8 @@ public class Place {
         return country;
     }
 
-    public org.jscience.mathematics.numbers.real.Real getPopulation() {
-        return org.jscience.mathematics.numbers.real.Real.of(inhabitants.size());
+    public int getPopulation() {
+        return inhabitants.size();
     }
 
     public List<Person> getInhabitants() {
@@ -135,24 +139,29 @@ public class Place {
         this.country = country;
     }
 
-    // Explicit population setting deprecated in favor of list tracking,
-    // but kept for compatibility if needed (logic override)
-    public void setPopulation(org.jscience.mathematics.numbers.real.Real population) {
-        // This is a manual override if we aren't tracking individuals
-        // Logic to clear inhabitants or set an estimated population field?
-        // For now, no-op or throw, as existing code does nothing.
-    }
-
     /**
      * Calculates distance to another place.
      * 
-     * @return distance as Real, or null if location unknown
+     * @return distance as Quantity<Length>, or null if location unknown
      */
-    public org.jscience.mathematics.numbers.real.Real distanceTo(Place other) {
+    public Quantity<Length> distanceTo(Place other) {
         if (location != null && other.location != null) {
             return location.distanceTo(other.location);
         }
         return null;
+    }
+
+    /**
+     * Calculates distance to another place in meters.
+     * 
+     * @return distance in meters, or -1 if location unknown
+     */
+    public double distanceToMeters(Place other) {
+        Quantity<Length> dist = distanceTo(other);
+        if (dist != null) {
+            return dist.to(Units.METER).getValue().doubleValue();
+        }
+        return -1;
     }
 
     @Override

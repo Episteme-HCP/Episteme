@@ -6,7 +6,7 @@ package org.jscience.apps.physics;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
+
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
@@ -36,11 +36,11 @@ public class QuantumCircuitApp extends KillerAppBase {
     // Circuit components
     private static final int MAX_QUBITS = 4;
     private static final int MAX_GATES = 12;
-    
+
     private List<List<String>> circuit; // [qubit][gate position]
     private double[] stateReal;
     private double[] stateImag;
-    
+
     // UI
     private Canvas circuitCanvas;
     private Canvas blochCanvas;
@@ -64,7 +64,7 @@ public class QuantumCircuitApp extends KillerAppBase {
 
         // Left: Circuit and visualization
         VBox leftPane = createCircuitPane();
-        
+
         // Right: Controls and state
         VBox rightPane = createControlPane();
         rightPane.setPrefWidth(350);
@@ -108,7 +108,7 @@ public class QuantumCircuitApp extends KillerAppBase {
 
         // Visualizations
         HBox visuals = new HBox(20);
-        
+
         // Bloch sphere
         VBox blochBox = new VBox(5);
         Label blochLabel = new Label("🎯 Bloch Sphere (Q0)");
@@ -147,29 +147,34 @@ public class QuantumCircuitApp extends KillerAppBase {
         qubitSelector.setPromptText("Qubit");
 
         gateSelector = new ComboBox<>();
-        gateSelector.getItems().addAll("H", "X", "Y", "Z", "S", "T", "CNOT");
+        gateSelector.getItems().addAll("H", "X", "Y", "Z", "S", "T", "CNOT", "SWAP", "CZ");
         gateSelector.setValue("H");
-        gateSelector.setPromptText("Gate");
+        gateSelector.setValue("H");
+        gateSelector.setPromptText(i18n.get("quantum.label.gate"));
 
-        Button addBtn = new Button("Add");
+        Button addBtn = new Button(i18n.get("quantum.button.add"));
         addBtn.setOnAction(e -> addGate());
 
-        gateRow.getChildren().addAll(new Label("Qubit:"), qubitSelector, new Label("Gate:"), gateSelector, addBtn);
+        gateRow.getChildren().addAll(new Label(i18n.get("quantum.label.qubit") + ":"), qubitSelector,
+                new Label(i18n.get("quantum.label.gate") + ":"), gateSelector, addBtn);
 
         // Quick gates
-        Label quickLabel = new Label("⚡ Quick Gates");
+        Label quickLabel = new Label("⚡ " + i18n.get("quantum.panel.quick"));
         quickLabel.setStyle("-fx-font-weight: bold;");
 
         HBox quickGates = new HBox(5);
-        for (String gate : new String[]{"H", "X", "Y", "Z"}) {
+        for (String gate : new String[] { "H", "X", "Y", "Z" }) {
             Button btn = new Button(gate);
             btn.setPrefWidth(40);
-            btn.setOnAction(e -> { gateSelector.setValue(gate); addGate(); });
+            btn.setOnAction(e -> {
+                gateSelector.setValue(gate);
+                addGate();
+            });
             quickGates.getChildren().add(btn);
         }
 
         // State vector display
-        Label stateLabel = new Label("📐 State Vector");
+        Label stateLabel = new Label("📐 " + i18n.get("quantum.panel.state"));
         stateLabel.setStyle("-fx-font-weight: bold;");
 
         stateVectorLabel = new Label("|ψ⟩ = |0000⟩");
@@ -181,18 +186,17 @@ public class QuantumCircuitApp extends KillerAppBase {
         stateScroll.setFitToWidth(true);
 
         // Log
-        Label logLabel = new Label("📋 Execution Log");
+        Label logLabel = new Label("📋 " + i18n.get("quantum.label.log"));
         logLabel.setStyle("-fx-font-weight: bold;");
         logView = new ListView<>();
         logView.setPrefHeight(150);
 
         pane.getChildren().addAll(
-            gateLabel, gateRow, quickLabel, quickGates,
-            new Separator(),
-            stateLabel, stateScroll,
-            new Separator(),
-            logLabel, logView
-        );
+                gateLabel, gateRow, quickLabel, quickGates,
+                new Separator(),
+                stateLabel, stateScroll,
+                new Separator(),
+                logLabel, logView);
 
         return pane;
     }
@@ -200,7 +204,7 @@ public class QuantumCircuitApp extends KillerAppBase {
     private void addGate() {
         int qubit = qubitSelector.getValue();
         String gate = gateSelector.getValue();
-        
+
         // Find first empty slot
         List<String> qubitGates = circuit.get(qubit);
         for (int i = 0; i < MAX_GATES; i++) {
@@ -220,7 +224,7 @@ public class QuantumCircuitApp extends KillerAppBase {
         double y = e.getY();
         int gateIdx = (int) ((x - 60) / 40);
         int qubitIdx = (int) ((y - 20) / 40);
-        
+
         if (gateIdx >= 0 && gateIdx < MAX_GATES && qubitIdx >= 0 && qubitIdx < MAX_QUBITS) {
             String current = circuit.get(qubitIdx).get(gateIdx);
             if (!"-".equals(current)) {
@@ -235,7 +239,7 @@ public class QuantumCircuitApp extends KillerAppBase {
         GraphicsContext gc = circuitCanvas.getGraphicsContext2D();
         double w = circuitCanvas.getWidth();
         double h = circuitCanvas.getHeight();
-        
+
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, w, h);
 
@@ -278,7 +282,8 @@ public class QuantumCircuitApp extends KillerAppBase {
             case "Y" -> Color.FORESTGREEN;
             case "Z" -> Color.PURPLE;
             case "S", "T" -> Color.ORANGE;
-            case "CNOT" -> Color.DARKSLATEGRAY;
+            case "CNOT", "CZ" -> Color.DARKSLATEGRAY;
+            case "SWAP" -> Color.TEAL;
             default -> Color.GRAY;
         };
     }
@@ -337,7 +342,7 @@ public class QuantumCircuitApp extends KillerAppBase {
     public void onRun() {
         log("Executing circuit...");
         resetState();
-        
+
         // Apply gates column by column
         for (int col = 0; col < MAX_GATES; col++) {
             for (int q = 0; q < MAX_QUBITS; q++) {
@@ -355,44 +360,132 @@ public class QuantumCircuitApp extends KillerAppBase {
     }
 
     private void applyGate(String gate, int qubit) {
-        // Simplified gate application (demonstration)
         log("Applied " + gate + " to Q" + qubit);
-        
+
         int dim = stateReal.length;
         int mask = 1 << (MAX_QUBITS - 1 - qubit);
 
-        if ("X".equals(gate)) {
-            // Bit flip
-            for (int i = 0; i < dim; i++) {
-                int j = i ^ mask;
-                if (i < j) {
-                    double tr = stateReal[i]; stateReal[i] = stateReal[j]; stateReal[j] = tr;
-                    double ti = stateImag[i]; stateImag[i] = stateImag[j]; stateImag[j] = ti;
+        switch (gate) {
+            case "X" -> {
+                // Bit flip (Pauli-X)
+                for (int i = 0; i < dim; i++) {
+                    int j = i ^ mask;
+                    if (i < j) {
+                        swapAmplitudes(i, j);
+                    }
                 }
             }
-        } else if ("H".equals(gate)) {
-            // Hadamard
-            double sqrt2 = Math.sqrt(2);
-            for (int i = 0; i < dim; i++) {
-                int j = i ^ mask;
-                if (i < j) {
-                    double ar = stateReal[i], ai = stateImag[i];
-                    double br = stateReal[j], bi = stateImag[j];
-                    stateReal[i] = (ar + br) / sqrt2;
-                    stateImag[i] = (ai + bi) / sqrt2;
-                    stateReal[j] = (ar - br) / sqrt2;
-                    stateImag[j] = (ai - bi) / sqrt2;
+            case "Y" -> {
+                // Pauli-Y: -i|0><1| + i|1><0|
+                for (int i = 0; i < dim; i++) {
+                    int j = i ^ mask;
+                    if (i < j) {
+                        double ar = stateReal[i], ai = stateImag[i];
+                        double br = stateReal[j], bi = stateImag[j];
+                        // Y|0> = i|1>, Y|1> = -i|0>
+                        stateReal[i] = bi;
+                        stateImag[i] = -br;
+                        stateReal[j] = -ai;
+                        stateImag[j] = ar;
+                    }
                 }
             }
-        } else if ("Z".equals(gate)) {
-            // Phase flip
-            for (int i = 0; i < dim; i++) {
-                if ((i & mask) != 0) {
-                    stateReal[i] = -stateReal[i];
-                    stateImag[i] = -stateImag[i];
+            case "H" -> {
+                // Hadamard
+                double sqrt2 = Math.sqrt(2);
+                for (int i = 0; i < dim; i++) {
+                    int j = i ^ mask;
+                    if (i < j) {
+                        double ar = stateReal[i], ai = stateImag[i];
+                        double br = stateReal[j], bi = stateImag[j];
+                        stateReal[i] = (ar + br) / sqrt2;
+                        stateImag[i] = (ai + bi) / sqrt2;
+                        stateReal[j] = (ar - br) / sqrt2;
+                        stateImag[j] = (ai - bi) / sqrt2;
+                    }
+                }
+            }
+            case "Z" -> {
+                // Phase flip (Pauli-Z)
+                for (int i = 0; i < dim; i++) {
+                    if ((i & mask) != 0) {
+                        stateReal[i] = -stateReal[i];
+                        stateImag[i] = -stateImag[i];
+                    }
+                }
+            }
+            case "S" -> {
+                // S gate (sqrt(Z)): |0> -> |0>, |1> -> i|1>
+                for (int i = 0; i < dim; i++) {
+                    if ((i & mask) != 0) {
+                        double r = stateReal[i], im = stateImag[i];
+                        stateReal[i] = -im;
+                        stateImag[i] = r;
+                    }
+                }
+            }
+            case "T" -> {
+                // T gate (pi/8 gate): |0> -> |0>, |1> -> e^(i*pi/4)|1>
+                double cos = Math.cos(Math.PI / 4);
+                double sin = Math.sin(Math.PI / 4);
+                for (int i = 0; i < dim; i++) {
+                    if ((i & mask) != 0) {
+                        double r = stateReal[i], im = stateImag[i];
+                        stateReal[i] = r * cos - im * sin;
+                        stateImag[i] = r * sin + im * cos;
+                    }
+                }
+            }
+            case "CNOT" -> {
+                // CNOT with control=qubit, target=qubit+1
+                if (qubit < MAX_QUBITS - 1) {
+                    int targetMask = 1 << (MAX_QUBITS - 2 - qubit);
+                    for (int i = 0; i < dim; i++) {
+                        if ((i & mask) != 0) { // Control is |1>
+                            int j = i ^ targetMask;
+                            if (i < j)
+                                swapAmplitudes(i, j);
+                        }
+                    }
+                }
+            }
+            case "CZ" -> {
+                // Controlled-Z with control=qubit, target=qubit+1
+                if (qubit < MAX_QUBITS - 1) {
+                    int targetMask = 1 << (MAX_QUBITS - 2 - qubit);
+                    for (int i = 0; i < dim; i++) {
+                        if ((i & mask) != 0 && (i & targetMask) != 0) {
+                            stateReal[i] = -stateReal[i];
+                            stateImag[i] = -stateImag[i];
+                        }
+                    }
+                }
+            }
+            case "SWAP" -> {
+                // SWAP qubit with qubit+1
+                if (qubit < MAX_QUBITS - 1) {
+                    int mask2 = 1 << (MAX_QUBITS - 2 - qubit);
+                    for (int i = 0; i < dim; i++) {
+                        boolean b1 = (i & mask) != 0;
+                        boolean b2 = (i & mask2) != 0;
+                        if (b1 != b2) {
+                            int j = i ^ mask ^ mask2;
+                            if (i < j)
+                                swapAmplitudes(i, j);
+                        }
+                    }
                 }
             }
         }
+    }
+
+    private void swapAmplitudes(int i, int j) {
+        double tr = stateReal[i];
+        double ti = stateImag[i];
+        stateReal[i] = stateReal[j];
+        stateImag[i] = stateImag[j];
+        stateReal[j] = tr;
+        stateImag[j] = ti;
     }
 
     private void updateStateDisplay() {
@@ -403,9 +496,10 @@ public class QuantumCircuitApp extends KillerAppBase {
             double r = stateReal[i], im = stateImag[i];
             double prob = r * r + im * im;
             if (prob > 0.001) {
-                if (!first) sb.append(" + ");
-                sb.append(String.format("%.3f|%s⟩", Math.sqrt(prob), 
-                    String.format("%" + MAX_QUBITS + "s", Integer.toBinaryString(i)).replace(' ', '0')));
+                if (!first)
+                    sb.append(" + ");
+                sb.append(String.format("%.3f|%s⟩", Math.sqrt(prob),
+                        String.format("%" + MAX_QUBITS + "s", Integer.toBinaryString(i)).replace(' ', '0')));
                 first = false;
             }
         }
@@ -425,7 +519,8 @@ public class QuantumCircuitApp extends KillerAppBase {
     private void log(String msg) {
         String ts = java.time.LocalTime.now().toString().substring(0, 8);
         logView.getItems().add(0, "[" + ts + "] " + msg);
-        if (logView.getItems().size() > 50) logView.getItems().remove(logView.getItems().size() - 1);
+        if (logView.getItems().size() > 50)
+            logView.getItems().remove(logView.getItems().size() - 1);
     }
 
     public static void main(String[] args) {

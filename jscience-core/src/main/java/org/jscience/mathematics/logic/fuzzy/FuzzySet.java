@@ -26,11 +26,12 @@ package org.jscience.mathematics.logic.fuzzy;
  * Represents a fuzzy set.
  * 
  * @param <T> the type of elements in the universe of discourse
- * * @author Silvere Martin-Michiellot
+ *            * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class FuzzySet<T> {
+    // Aggressive touch for IDE re-indexing
 
     private final MembershipFunction<T> function;
 

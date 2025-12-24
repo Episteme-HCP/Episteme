@@ -69,11 +69,11 @@ public final class I18nManager {
      */
     public static Locale[] getSupportedLocales() {
         return new Locale[] {
-            Locale.ENGLISH,
-            Locale.FRENCH,
-            Locale.GERMAN,
-            new Locale("es"), // Spanish
-            Locale.CHINESE
+                Locale.ENGLISH,
+                Locale.FRENCH,
+                Locale.GERMAN,
+                Locale.of("es"), // Spanish
+                Locale.CHINESE
         };
     }
 }

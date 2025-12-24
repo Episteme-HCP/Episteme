@@ -70,7 +70,9 @@ import org.jscience.mathematics.context.MathContext;
  * JScience.setIntPrecision(); // 32-bit int - faster on most GPUs
  * JScience.setLongPrecision(); // 64-bit long - larger range
  * }</pre>
+ * 
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

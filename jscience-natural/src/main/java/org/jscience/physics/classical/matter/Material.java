@@ -36,6 +36,7 @@ import org.jscience.io.properties.PropertySet;
  * Represents a physical material with standard properties.
  * Properties are loaded dynamically from JSON resources.
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -121,3 +122,4 @@ public class Material {
     public static final Material WATER = new Material("Water");
     public static final Material AIR = new Material("Air");
 }
+// IDE re-indexing touch

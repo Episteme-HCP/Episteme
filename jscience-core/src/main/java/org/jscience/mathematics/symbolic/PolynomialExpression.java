@@ -34,7 +34,7 @@ import org.jscience.mathematics.structures.rings.Field;
  * Sum of terms, where each term is a coefficient * Monomial.
  * 
  * @param <T> the type of coefficient
- * * @author Silvere Martin-Michiellot
+ *            * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

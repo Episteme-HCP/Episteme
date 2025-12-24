@@ -23,12 +23,15 @@
 package org.jscience.bibliography;
 
 /**
- * Represents a standardization body or publication (e.g., CODATA, IUPAC). * @author Silvere Martin-Michiellot
+ * Represents a standardization body or publication (e.g., CODATA, IUPAC).
+ * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- 
+ * 
  */
 public interface Standard {
+    // Aggressive touch for IDE re-indexing
     /**
      * Returns the name of the standard (e.g., "CODATA").
      */

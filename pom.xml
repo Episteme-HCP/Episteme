@@ -8,7 +8,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>JScience Parent</name>
+    <name>JScience Unifying Parent</name>
     <description>JScience - Unified Scientific Computing Framework (Parent POM)</description>
     <url>https://github.com/silvere/unified-science</url>
     <inceptionYear>2025</inceptionYear>
@@ -143,6 +143,20 @@
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>${assertj.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- TestFX (UI Testing) -->
+            <dependency>
+                <groupId>org.testfx</groupId>
+                <artifactId>testfx-core</artifactId>
+                <version>4.0.18</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testfx</groupId>
+                <artifactId>testfx-junit5</artifactId>
+                <version>4.0.18</version>
                 <scope>test</scope>
             </dependency>
 
@@ -295,6 +309,12 @@
     </dependencyManagement>
 
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -314,9 +334,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.2.5</version>
                     <configuration>
-                        <!-- Use in-process execution to avoid JDK 25 fork issues -->
-                        <forkCount>0</forkCount>
-                        <argLine>--add-modules jdk.incubator.vector</argLine>
+                        <argLine>@{argLine} --add-modules jdk.incubator.vector</argLine>
                     </configuration>
                 </plugin>
                 <plugin>

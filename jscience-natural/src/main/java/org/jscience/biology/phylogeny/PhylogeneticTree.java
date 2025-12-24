@@ -43,6 +43,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * operations.
  * </p>
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -464,3 +465,4 @@ public class PhylogeneticTree {
         }
     }
 }
+// IDE re-indexing touch

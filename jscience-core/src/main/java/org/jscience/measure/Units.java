@@ -172,6 +172,9 @@ public final class Units {
         /** Day: 1 d = 86400 s */
         public static final Unit<Time> DAY = SECOND.multiply(86400);
 
+        /** Week: 1 wk = 7 d */
+        public static final Unit<Time> WEEK = DAY.multiply(7);
+
         /** Millisecond: 1 ms = 0.001 s */
         public static final Unit<Time> MILLISECOND = SECOND.divide(1000);
 
@@ -233,11 +236,20 @@ public final class Units {
         public static final Unit<Energy> JOULE = (Unit<Energy>) KILOGRAM.multiply(METER).multiply(METER)
                         .divide(SECOND.multiply(SECOND));
 
+        /** Kilojoule: 1 kJ = 1000 J */
+        public static final Unit<Energy> KILOJOULE = JOULE.multiply(1000);
+
         /**
          * Watt: W (power). 1 W = 1 J/s
          */
         @SuppressWarnings("unchecked")
         public static final Unit<Power> WATT = (Unit<Power>) JOULE.divide(SECOND);
+
+        /** Watt-hour: W*h = 3600 J */
+        public static final Unit<Energy> WATT_HOUR = (Unit<Energy>) JOULE.multiply(3600);
+
+        /** Kilowatt-hour: kWh = 1000 Wh */
+        public static final Unit<Energy> KILOWATT_HOUR = (Unit<Energy>) WATT_HOUR.multiply(1000);
 
         /**
          * Newton: N (force). 1 N = 1 kg⋅m/s²
@@ -337,6 +349,9 @@ public final class Units {
         /** Calorie (thermochemical): 1 cal = 4.184 J */
         public static final Unit<Energy> CALORIE = (Unit<Energy>) JOULE.multiply(4.184);
 
+        /** Kilocalorie (food calorie): 1 kcal = 1000 cal */
+        public static final Unit<Energy> KILOCALORIE = (Unit<Energy>) CALORIE.multiply(1000);
+
         /** Electronvolt: 1 eV ≈ 1.602×10⁻¹⁹ J */
         public static final Unit<Energy> ELECTRON_VOLT = (Unit<Energy>) JOULE.multiply(1.602176634e-19);
 
@@ -359,6 +374,12 @@ public final class Units {
 
         /** Light-year: 1 ly ≈ 9.461×10¹⁵ m */
         public static final Unit<Length> LIGHT_YEAR = (Unit<Length>) METER.multiply(9.4607304725808e15);
+
+        /** Nautical Mile: 1852 m */
+        public static final Unit<Length> NAUTICAL_MILE = (Unit<Length>) METER.multiply(1852);
+
+        /** Mach: Speed of sound in air at 20°C ≈ 343.2 m/s */
+        public static final Unit<Velocity> MACH = (Unit<Velocity>) METER_PER_SECOND.multiply(343.2);
 
         // ========== COMMON ALIASES ==========
 

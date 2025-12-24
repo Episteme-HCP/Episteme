@@ -123,7 +123,7 @@ public class PhylogeneticTreeViewer extends Application {
         root.setCenter(canvas);
 
         Label infoPanel = new Label("Click Node for Details | Toggle View");
-        infoPanel.setStyle("-fx-padding: 10; -fx-background-color: #eee;");
+        infoPanel.setStyle("-fx-padding: 10; -fx-background-color: #16213e; -fx-text-fill: #aaa;");
 
         javafx.scene.control.Button toggleBtn = new javafx.scene.control.Button("Switch View (Linear/Radial)");
         toggleBtn.setOnAction(e -> {
@@ -185,11 +185,11 @@ public class PhylogeneticTreeViewer extends Application {
     private void drawTree(GraphicsContext gc, Node node) {
         // Clear background
         if (node == treeRoot) {
-            gc.setFill(Color.WHITE);
+            gc.setFill(Color.web("#1a1a2e"));
             gc.fillRect(0, 0, 900, 700);
         }
 
-        gc.setStroke(Color.BLACK);
+        gc.setStroke(Color.web("#666"));
         gc.setLineWidth(1);
 
         // Draw Links
@@ -216,7 +216,7 @@ public class PhylogeneticTreeViewer extends Application {
 
         // Draw Node Name (for non-leaves in linear, or selected in radial)
         if (!radialMode || node == selectedNode) {
-            gc.setFill(Color.BLACK);
+            gc.setFill(Color.LIGHTGRAY);
             gc.setTextAlign(TextAlignment.LEFT);
             gc.setTextBaseline(VPos.CENTER);
             gc.fillText(node.name, node.x + 10, node.y);
@@ -238,7 +238,7 @@ public class PhylogeneticTreeViewer extends Application {
     // Helper to draw heatmap cells
     private void drawLinearHeatmap(GraphicsContext gc, Node n, double startX, double y) {
         // Text Label
-        gc.setFill(Color.BLACK);
+        gc.setFill(Color.LIGHTGRAY);
         gc.setTextAlign(TextAlignment.LEFT);
         gc.setTextBaseline(VPos.CENTER);
         gc.fillText(n.name, startX + 65, y);

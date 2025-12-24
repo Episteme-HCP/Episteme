@@ -34,10 +34,12 @@ import java.util.Map;
 /**
  * Loads properties from JSON resources.
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class PropertiesLoader {
+    // Aggressive touch for IDE re-indexing
 
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final Map<String, PropertySet> cache = new HashMap<>();

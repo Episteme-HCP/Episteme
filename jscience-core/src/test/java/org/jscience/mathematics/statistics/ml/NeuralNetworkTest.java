@@ -28,10 +28,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class NeuralNetworkTest {
 
     @Test
-    public void testXorWithTanh() {
+    public void testXorWithSigmoid() {
         // XOR problem: Classic non-linear separability test
         NeuralNetwork nn = new NeuralNetwork(2, 4, 1);
-        nn.setActivationFunction(ActivationFunction.TANH);
+        nn.setActivationFunction(ActivationFunction.SIGMOID);
         nn.setLearningRate(0.5);
 
         double[][] inputs = {

@@ -1,12 +1,6 @@
 package org.jscience.ui.demos;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
@@ -21,7 +15,7 @@ public class ArchitectureStabilityDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return "Social Sciences";
+        return "Architecture";
     }
 
     @Override
@@ -50,7 +44,6 @@ public class ArchitectureStabilityDemo implements DemoProvider {
         // State
         class State {
             int blocks = 0;
-            double topX = 300;
             double comX = 300; // Center of Mass X
             boolean collapsed = false;
             java.util.List<Double> offsets = new java.util.ArrayList<>();

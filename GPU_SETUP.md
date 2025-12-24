@@ -12,7 +12,7 @@ JScience supports GPU acceleration via CUDA for linear algebra operations when a
 - JOCL library (included in dependencies)
 
 ### For CPU Mode (Always Available)
-- Java 11+ JDK
+- Java 21+ JDK
 - No additional requirements
 
 ## Quick Start
