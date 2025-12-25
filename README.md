@@ -3,6 +3,8 @@
 **A unified scientific computing framework where all sciences naturally build upon their mathematical foundations.**
 
 [![Javadoc](https://img.shields.io/badge/Javadoc-Reference-blue)](https://silveremartin-dev.github.io/JScience/)
+[![Demos](https://img.shields.io/badge/Demos-59-green)](README.md#demo-applications)
+[![I18n](https://img.shields.io/badge/Languages-EN%20|%20FR-orange)](README.md#internationalization)
 
 ```
 Mathematics → Physics → Chemistry → Biology → Human Sciences
@@ -39,7 +41,8 @@ Statistics stats = dna.computeAlignmentStats();   // Mathematics layer
 - ✅ **Data Processing**: Import/Export support for JSON (Chemistry, etc.)
 - ✅ **Benchmarking**: Built-in JMH benchmarks and Graph generation
 - ✅ **Complete Documentation**: Javadoc, architecture guides, examples
-- ✅ **Internationalization**: EN, FR, ES, DE
+- ✅ **Internationalization**: EN, FR (100% translated)
+- ✅ **59 Interactive Demos**: Physics, Chemistry, Biology, Social Sciences
 
 ## Quick Start
 
@@ -64,11 +67,12 @@ Matrix<CudaFloat> gpu = Matrix.create(data, new CudaScalar());
 
 ## Project Status
 
-**Phase 1-13: Core, Cleanup & Benchmarks** (Completed)
+**Phase 1-14: Core, Cleanup, Benchmarks & UI** (Completed)
 
 - Algebraic structures & Linear Algebra (Dense/Sparse/GPU)
 - Physics (Astronomy, Mechanics) & Chemistry (Periodic Table)
 - Comprehensive Cleanup & Benchmarking Suite
+- Full I18n support (EN/FR) with TestFX UI testing
 
 ## Module Structure
 
@@ -78,17 +82,42 @@ jscience/
 │   ├── mathematics/        # Linear algebra, calculus, statistics
 │   ├── measure/            # Quantities, units (JSR-385)
 │   ├── bibliography/       # Citation management, CrossRef
-│   └── ui/mathematics/     # Matrix viewers
-├── jscience-natural/       # Natural sciences
+│   └── ui/                 # Demo launcher, Matrix viewers
+├── jscience-natural/       # Natural sciences (34 demos)
 │   ├── physics/            # Mechanics, thermodynamics, astronomy
 │   ├── chemistry/          # Molecules, reactions, biochemistry
 │   ├── biology/            # Genetics, evolution, ecology
 │   └── earth/              # Geology, meteorology, coordinates
-├── jscience-social/        # Social sciences
+├── jscience-social/        # Social sciences (11 demos)
 │   ├── economics/          # Markets, currencies, models
 │   ├── geography/          # GIS, maps, demographics
 │   └── sociology/          # Networks, organizations
+├── jscience-killer-apps/   # Advanced applications (10 demos)
+│   ├── biology/            # CRISPR Design, Pandemic Forecaster
+│   ├── physics/            # Quantum Circuits, Relativity
+│   └── chemistry/          # Titration, Crystal Structure
 └── jscience-benchmarks/    # JMH performance benchmarks
+```
+
+## Demo Applications
+
+**59 interactive scientific demonstrations** across 4 modules:
+
+| Module | Demos | Examples |
+|--------|-------|----------|
+| jscience-core | 4 | Matrix Viewer, Function Plotter, 3D Surfaces |
+| jscience-natural | 34 | Mandelbrot, Game of Life, Stellar Sky, Pendulum |
+| jscience-social | 11 | GIS Maps, Voting Systems, GDP Models |
+| jscience-killer-apps | 10 | CRISPR, Quantum Circuits, Pandemic Forecaster |
+
+### Launch Demo Launcher
+
+```bash
+# From project root
+mvn exec:java -pl jscience-core -Dexec.mainClass="org.jscience.ui.JScienceDemoApp"
+
+# Or use batch script
+run_demos.bat
 ```
 
 ## Data Loaders
@@ -104,13 +133,36 @@ External data sources with built-in caching (TTL: 24h):
 | Economics | `WorldBank` |
 | Bibliography | `CrossRef` |
 
-## Demo Application
+## Testing
 
-Launch the master demo:
+### Unit Tests
 
 ```bash
-mvn exec:java -pl jscience-natural -Dexec.mainClass="org.jscience.ui.JScienceDemoApp"
+mvn test
 ```
+
+### UI Tests (TestFX)
+
+```bash
+# With display
+mvn test -pl jscience-core -Dtest=*UITest,*DemoAppTest
+
+# Headless mode (CI/CD)
+mvn test -Dtestfx.headless=true -Dprism.order=sw -Djava.awt.headless=true
+```
+
+## Internationalization
+
+Full support for English and French across all modules:
+
+| Module | EN | FR |
+|--------|----|----|
+| jscience-core | ✅ | ✅ |
+| jscience-natural | ✅ | ✅ |
+| jscience-social | ✅ | ✅ |
+| jscience-killer-apps | ✅ | ✅ |
+
+Switch language via `Preferences > Language` menu.
 
 See [roadmap.md](roadmap.md) and [task.md](task.md) for detailed progress.
 
