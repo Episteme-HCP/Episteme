@@ -16,7 +16,6 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 
 import org.jscience.apps.framework.KillerAppBase;
-import org.jscience.biology.loaders.FastaLoader;
 
 import java.io.File;
 import java.util.ArrayList;

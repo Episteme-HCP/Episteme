@@ -27,7 +27,6 @@ import org.jscience.natural.i18n.I18n;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -192,6 +191,9 @@ public class RigidBodyViewer extends Application {
 
     private void update() {
         Real dt = Real.of(0.2); // Slower time step for stability with Real types overhead
+        // Pre-computed gravity force (currently unused, applying directly to velocity
+        // for stability)
+        @SuppressWarnings("unused")
         Vector<Real> gravityForce = toVector(0, gravityVal, 0);
 
         for (VisualBody vb : bodies) {

@@ -20,7 +20,6 @@ import javafx.util.Duration;
 
 import org.jscience.apps.framework.ChartFactory;
 import org.jscience.apps.framework.KillerAppBase;
-import org.jscience.biology.ecology.Epidemiology;
 import org.jscience.biology.ecology.PopulationDynamics;
 import org.jscience.geography.loaders.WorldBankLoader;
 import org.jscience.mathematics.numbers.real.Real;

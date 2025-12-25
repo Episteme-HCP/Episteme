@@ -19,7 +19,6 @@
 package org.jscience.ui;
 
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
@@ -121,6 +120,7 @@ public class JScienceDemoAppTest {
         // Get theme menu and click items programmatically
         MenuBar menuBar = robot.lookup(".menu-bar").queryAs(MenuBar.class);
         Menu themeMenu = menuBar.getMenus().get(1);
+        assertNotNull(themeMenu, "Theme menu should exist");
 
         // Verify app stays visible throughout
         assertTrue(stage.isShowing(), "App should remain visible");
@@ -131,6 +131,7 @@ public class JScienceDemoAppTest {
         // Get language menu
         MenuBar menuBar = robot.lookup(".menu-bar").queryAs(MenuBar.class);
         Menu languageMenu = menuBar.getMenus().get(0);
+        assertNotNull(languageMenu, "Language menu should exist");
 
         // Verify app stays visible
         assertTrue(stage.isShowing(), "App should remain visible after language operations");

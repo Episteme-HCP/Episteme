@@ -5,23 +5,17 @@
 package org.jscience.apps.physics.relativity;
 
 import javafx.animation.AnimationTimer;
-import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
-import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 import org.jscience.apps.framework.KillerAppBase;
-import org.jscience.physics.astronomy.loaders.StarLoader;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Special Relativity Spaceflight Simulator.

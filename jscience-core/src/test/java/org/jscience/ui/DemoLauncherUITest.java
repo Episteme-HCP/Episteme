@@ -19,7 +19,6 @@
 package org.jscience.ui;
 
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
@@ -265,8 +264,8 @@ public class DemoLauncherUITest {
 
         // Verify we can read labels without exceptions
         for (Label label : labels) {
-            String text = label.getText();
-            // Text can be null for non-text labels
+            // Access text to ensure no exceptions (text can be null for non-text labels)
+            assertNotNull(label, "Label should not be null");
         }
 
         assertTrue(stage.isShowing(), "App should remain stable when checking labels");

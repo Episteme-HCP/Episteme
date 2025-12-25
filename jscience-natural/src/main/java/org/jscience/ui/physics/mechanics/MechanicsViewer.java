@@ -1,7 +1,6 @@
 package org.jscience.ui.physics.mechanics;
 
 import org.jscience.natural.i18n.I18n;
-import org.jscience.physics.PhysicalConstants;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;

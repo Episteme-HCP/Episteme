@@ -20,8 +20,6 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import org.jscience.apps.framework.KillerAppBase;
 import org.jscience.apps.framework.I18nManager;
-import org.jscience.chemistry.loaders.CIFLoader;
-import org.jscience.chemistry.crystallography.UnitCell;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -398,7 +396,9 @@ public class CrystalStructureApp extends KillerAppBase {
         infoLabel.setText("");
 
         List<AtomRecord> atoms = new ArrayList<>();
-        double a = 1.0; // lattice constant, normalized
+        // Base lattice constant (normalized), used for scaling
+        @SuppressWarnings("unused")
+        double latticeConstant = 1.0;
 
         if (type == LatticeType.SC) {
             // Simple Cubic
