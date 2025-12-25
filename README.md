@@ -4,7 +4,7 @@
 
 [![Javadoc](https://img.shields.io/badge/Javadoc-Reference-blue)](https://silveremartin-dev.github.io/JScience/)
 [![Demos](https://img.shields.io/badge/Demos-59-green)](README.md#demo-applications)
-[![I18n](https://img.shields.io/badge/Languages-EN%20|%20FR-orange)](README.md#internationalization)
+[![I18n](https://img.shields.io/badge/Languages-EN%20|%20FR%20|%20ES%20|%20DE-orange)](README.md#internationalization)
 
 ```
 Mathematics → Physics → Chemistry → Biology → Human Sciences
@@ -153,7 +153,7 @@ mvn test -Dtestfx.headless=true -Dprism.order=sw -Djava.awt.headless=true
 
 ## Internationalization
 
-Full support for English and French across all modules:
+Full support for English, French, Spanish, and German:
 
 | Module | EN | FR |
 |--------|----|----|
