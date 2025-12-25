@@ -20,12 +20,12 @@ public class ArchitectureStabilityDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Architecture: Structural Stability";
+        return org.jscience.social.i18n.I18n.getInstance().get("ArchitectureStability.title");
     }
 
     @Override
     public String getDescription() {
-        return "Visual demonstration of center of mass and stability in a tower.";
+        return org.jscience.social.i18n.I18n.getInstance().get("ArchitectureStability.desc");
     }
 
     @Override
@@ -36,9 +36,9 @@ public class ArchitectureStabilityDemo implements DemoProvider {
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        Button addBlockBtn = new Button("Add Block (Random Offset)");
-        Button resetBtn = new Button("Reset");
-        Label status = new Label("Stable");
+        Button addBlockBtn = new Button(org.jscience.social.i18n.I18n.getInstance().get("arch.stability.btn.add"));
+        Button resetBtn = new Button(org.jscience.social.i18n.I18n.getInstance().get("arch.stability.btn.reset"));
+        Label status = new Label(org.jscience.social.i18n.I18n.getInstance().get("arch.stability.label.stable"));
         status.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
 
         // State
@@ -90,12 +90,14 @@ public class ArchitectureStabilityDemo implements DemoProvider {
 
             // Text
             gc.setFill(Color.BLACK);
-            gc.fillText("Center of Mass: " + String.format("%.2f", s.comX), 10, 20);
+            gc.fillText(
+                    String.format(org.jscience.social.i18n.I18n.getInstance().get("arch.stability.label.com"), s.comX),
+                    10, 20);
 
             // Stability check (Simplified: if COM outside base [250, 350])
             if (s.comX < 250 || s.comX > 350) {
                 s.collapsed = true;
-                status.setText("COLLAPSED!");
+                status.setText(org.jscience.social.i18n.I18n.getInstance().get("arch.stability.label.collapsed"));
                 status.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
             }
         };
@@ -112,7 +114,7 @@ public class ArchitectureStabilityDemo implements DemoProvider {
             s.blocks = 0;
             s.offsets.clear();
             s.collapsed = false;
-            status.setText("Stable");
+            status.setText(org.jscience.social.i18n.I18n.getInstance().get("arch.stability.label.stable"));
             status.setStyle("-fx-text-fill: green;");
             draw.run();
         });

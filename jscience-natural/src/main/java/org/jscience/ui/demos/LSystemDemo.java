@@ -16,12 +16,12 @@ public class LSystemDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "L-Systems Viewer";
+        return org.jscience.natural.i18n.I18n.getInstance().get("LSystem.title");
     }
 
     @Override
     public String getDescription() {
-        return "Lindenmayer systems for generating fractal plants and biological structures.";
+        return org.jscience.natural.i18n.I18n.getInstance().get("LSystem.desc");
     }
 
     @Override

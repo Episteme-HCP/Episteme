@@ -20,6 +20,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import org.jscience.natural.i18n.I18n;
 import org.jscience.physics.PhysicalConstants;
 
 /**
@@ -38,24 +39,21 @@ public class PendulumViewer extends Application {
     @Override
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #1a1a2e;");
+        root.getStyleClass().add("root");
 
         // Canvas for simulation
         Canvas canvas = new Canvas(400, 400);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         // Chart for Phase Space
-        // Chart for Phase Space
-        NumberAxis xAxis = new NumberAxis();
-        xAxis.setLabel(org.jscience.natural.i18n.I18n.getInstance().get("pendulum.axis.angle"));
-        NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel(org.jscience.natural.i18n.I18n.getInstance().get("pendulum.axis.velocity"));
+        NumberAxis xAxis = new NumberAxis(I18n.getInstance().get("pendulum.axis.angle"), -Math.PI, Math.PI, 0.5);
+        NumberAxis yAxis = new NumberAxis(I18n.getInstance().get("pendulum.axis.velocity"), -5, 5, 1);
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("pendulum.title"));
+        chart.setTitle(I18n.getInstance().get("pendulum.title"));
         chart.setCreateSymbols(false);
         chart.setAnimated(false);
         chart.getData().add(phaseData);
-        phaseData.setName(org.jscience.natural.i18n.I18n.getInstance().get("pendulum.series.trajectory"));
+        phaseData.setName(I18n.getInstance().get("pendulum.series.trajectory"));
 
         // Controls
         VBox controls = new VBox(10);
@@ -97,6 +95,7 @@ public class PendulumViewer extends Application {
         }.start();
 
         Scene scene = new Scene(root, 900, 500);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle("JScience Pendulum Viewer");
         stage.setScene(scene);
         stage.show();

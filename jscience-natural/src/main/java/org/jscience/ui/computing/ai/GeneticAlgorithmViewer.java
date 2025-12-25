@@ -20,6 +20,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import org.jscience.natural.i18n.I18n;
 
 /**
  * Genetic Algorithm Visualization: Evolving Pathfinders.
@@ -74,40 +75,38 @@ public class GeneticAlgorithmViewer extends Application {
         sidebar.setPrefWidth(180);
         sidebar.setStyle("-fx-background-color: #16213e;");
 
-        Label title = new Label("🧬 Genetic Algorithm");
+        Label title = new Label(I18n.getInstance().get("geneticalgo.title"));
         title.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #00d9ff;");
 
-        Label genLabel = new Label("Generation: 1");
+        Label genLabel = new Label(I18n.getInstance().get("geneticalgo.generation") + " 1");
         genLabel.setStyle("-fx-text-fill: #aaa;");
 
-        Label fitLabel = new Label("Best Fitness: 0.00");
+        Label fitLabel = new Label(I18n.getInstance().get("geneticalgo.fitness") + " 0.00");
         fitLabel.setStyle("-fx-text-fill: #aaa;");
 
-        Label reachLabel = new Label("Reached: 0/50");
+        Label reachLabel = new Label(I18n.getInstance().get("geneticalgo.reached") + " 0/50");
         reachLabel.setStyle("-fx-text-fill: #aaa;");
 
         Separator sep1 = new Separator();
 
-        Label speedLabel = new Label("Speed: 1x");
+        Label speedLabel = new Label(I18n.getInstance().get("geneticalgo.speed") + " 1x");
         speedLabel.setStyle("-fx-text-fill: #888;");
         javafx.scene.control.Slider speedSlider = new javafx.scene.control.Slider(1, 5, 1);
         speedSlider.setShowTickLabels(true);
         speedSlider.setMajorTickUnit(1);
         speedSlider.valueProperty().addListener((o, ov, nv) -> {
             speed = nv.intValue();
-            speedLabel.setText("Speed: " + speed + "x");
+            speedLabel.setText(I18n.getInstance().get("geneticalgo.speed") + " " + speed + "x");
         });
 
         Separator sep2 = new Separator();
 
-        Button resetBtn = new Button("Restart");
+        Button resetBtn = new Button(I18n.getInstance().get("geneticalgo.restart"));
         resetBtn.setMaxWidth(Double.MAX_VALUE);
         resetBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
         resetBtn.setOnAction(e -> restart());
 
-        Label descLabel = new Label(
-                "Evolves pathfinders to\nreach target (red dot).\n\n" +
-                        "Blue = Active\nGreen = Reached\nGray = Crashed");
+        Label descLabel = new Label(I18n.getInstance().get("geneticalgo.desc"));
         descLabel.setStyle("-fx-text-fill: #666; -fx-font-size: 11px;");
         descLabel.setWrapText(true);
 
@@ -139,6 +138,7 @@ public class GeneticAlgorithmViewer extends Application {
         }.start();
 
         Scene scene = new Scene(root, 950, 600);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle("JScience - Genetic Algorithm Demo");
         stage.setScene(scene);
         stage.show();

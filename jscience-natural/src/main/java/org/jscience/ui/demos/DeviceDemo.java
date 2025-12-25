@@ -22,7 +22,11 @@
  */
 package org.jscience.ui.demos;
 
-import org.jscience.ui.devices.*;
+import org.jscience.natural.i18n.I18n;
+import org.jscience.ui.devices.OscilloscopeViewer;
+import org.jscience.ui.devices.PressureGaugeViewer;
+import org.jscience.ui.devices.TelescopeViewer;
+import org.jscience.ui.devices.ThermometerViewer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -44,30 +48,31 @@ import javafx.stage.Stage;
 public class DeviceDemo extends Application {
 
     @Override
+
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("JScience Device Demonstration");
+        primaryStage.setTitle(I18n.getInstance().get("device.title"));
 
         TabPane tabPane = new TabPane();
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         tabPane.setStyle("-fx-background-color: #1a1a2e;");
 
         // Thermometer Tab
-        Tab thermometerTab = new Tab("🌡️ Thermometer");
+        Tab thermometerTab = new Tab(I18n.getInstance().get("device.tab.thermometer"));
         thermometerTab.setContent(createThermometerPanel());
         tabPane.getTabs().add(thermometerTab);
 
         // Pressure Gauge Tab
-        Tab pressureTab = new Tab("⏲️ Pressure Gauge");
+        Tab pressureTab = new Tab(I18n.getInstance().get("device.tab.pressure"));
         pressureTab.setContent(createPressureGaugePanel());
         tabPane.getTabs().add(pressureTab);
 
         // Oscilloscope Tab
-        Tab scopeTab = new Tab("📊 Oscilloscope");
+        Tab scopeTab = new Tab(I18n.getInstance().get("device.tab.oscilloscope"));
         scopeTab.setContent(createOscilloscopePanel());
         tabPane.getTabs().add(scopeTab);
 
         // Telescope Tab
-        Tab telescopeTab = new Tab("🔭 Telescope");
+        Tab telescopeTab = new Tab(I18n.getInstance().get("device.tab.telescope"));
         telescopeTab.setContent(createTelescopePanel());
         tabPane.getTabs().add(telescopeTab);
 
@@ -90,7 +95,7 @@ public class DeviceDemo extends Application {
             controls.setPadding(new Insets(10));
             controls.setStyle("-fx-background-color: #16213e; -fx-background-radius: 8;");
 
-            Label infoLabel = new Label("Simulated thermometer with realistic temperature readings");
+            Label infoLabel = new Label(I18n.getInstance().get("device.thermometer.info"));
             infoLabel.setStyle("-fx-text-fill: white;");
 
             Slider tempSlider = new Slider(-20, 50, 20);
@@ -98,14 +103,14 @@ public class DeviceDemo extends Application {
             tempSlider.setShowTickMarks(true);
             tempSlider.setMajorTickUnit(10);
 
-            Label sliderLabel = new Label("Set Temperature (°C):");
+            Label sliderLabel = new Label(I18n.getInstance().get("device.thermometer.label"));
             sliderLabel.setStyle("-fx-text-fill: lightgray;");
 
             controls.getChildren().addAll(infoLabel, sliderLabel, tempSlider);
             panel.setBottom(controls);
 
         } catch (Exception e) {
-            panel.setCenter(new Label("Error loading thermometer: " + e.getMessage()));
+            panel.setCenter(new Label(I18n.getInstance().get("device.thermometer.error") + " " + e.getMessage()));
         }
 
         return panel;
@@ -125,7 +130,7 @@ public class DeviceDemo extends Application {
             controls.setPadding(new Insets(10));
             controls.setStyle("-fx-background-color: #16213e; -fx-background-radius: 8;");
 
-            Label infoLabel = new Label("Simulated pressure gauge with configurable range");
+            Label infoLabel = new Label(I18n.getInstance().get("device.pressure.info"));
             infoLabel.setStyle("-fx-text-fill: white;");
 
             Slider pressureSlider = new Slider(0, 10, 5);
@@ -133,14 +138,14 @@ public class DeviceDemo extends Application {
             pressureSlider.setShowTickMarks(true);
             pressureSlider.setMajorTickUnit(2);
 
-            Label sliderLabel = new Label("Set Pressure (bar):");
+            Label sliderLabel = new Label(I18n.getInstance().get("device.pressure.label"));
             sliderLabel.setStyle("-fx-text-fill: lightgray;");
 
             controls.getChildren().addAll(infoLabel, sliderLabel, pressureSlider);
             panel.setBottom(controls);
 
         } catch (Exception e) {
-            panel.setCenter(new Label("Error loading pressure gauge: " + e.getMessage()));
+            panel.setCenter(new Label(I18n.getInstance().get("device.pressure.error") + " " + e.getMessage()));
         }
 
         return panel;
@@ -160,7 +165,7 @@ public class DeviceDemo extends Application {
             controls.setPadding(new Insets(10));
             controls.setStyle("-fx-background-color: #16213e; -fx-background-radius: 8;");
 
-            Label infoLabel = new Label("Simulated oscilloscope displaying waveforms");
+            Label infoLabel = new Label(I18n.getInstance().get("device.oscilloscope.info"));
             infoLabel.setStyle("-fx-text-fill: white;");
 
             HBox waveformControls = new HBox(10);
@@ -170,10 +175,11 @@ public class DeviceDemo extends Application {
 
             Slider freqSlider = new Slider(1, 100, 10);
             freqSlider.setShowTickLabels(true);
-            Label freqLabel = new Label("Frequency (Hz):");
+            Label freqLabel = new Label(I18n.getInstance().get("device.oscilloscope.freq"));
             freqLabel.setStyle("-fx-text-fill: lightgray;");
 
-            waveformControls.getChildren().addAll(new Label("Waveform:"), waveformType, freqLabel, freqSlider);
+            waveformControls.getChildren().addAll(new Label(I18n.getInstance().get("device.oscilloscope.waveform")),
+                    waveformType, freqLabel, freqSlider);
             waveformControls.getChildren().filtered(n -> n instanceof Label)
                     .forEach(n -> ((Label) n).setStyle("-fx-text-fill: lightgray;"));
 
@@ -181,7 +187,7 @@ public class DeviceDemo extends Application {
             panel.setBottom(controls);
 
         } catch (Exception e) {
-            panel.setCenter(new Label("Error loading oscilloscope: " + e.getMessage()));
+            panel.setCenter(new Label(I18n.getInstance().get("device.oscilloscope.error") + " " + e.getMessage()));
         }
 
         return panel;
@@ -196,7 +202,7 @@ public class DeviceDemo extends Application {
             TelescopeViewer viewer = new TelescopeViewer();
             panel.setCenter(viewer);
         } catch (Exception e) {
-            Label errorLabel = new Label("Error loading telescope viewer: " + e.getMessage());
+            Label errorLabel = new Label(I18n.getInstance().get("device.telescope.error") + " " + e.getMessage());
             errorLabel.setStyle("-fx-text-fill: red;");
             panel.setCenter(errorLabel);
         }

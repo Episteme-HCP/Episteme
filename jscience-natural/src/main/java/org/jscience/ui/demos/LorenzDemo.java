@@ -16,12 +16,12 @@ public class LorenzDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Lorenz Chaos Attractor";
+        return org.jscience.natural.i18n.I18n.getInstance().get("Lorenz.title");
     }
 
     @Override
     public String getDescription() {
-        return "Visualizes deterministic chaos through the Lorenz system of differential equations.";
+        return org.jscience.natural.i18n.I18n.getInstance().get("Lorenz.desc");
     }
 
     @Override

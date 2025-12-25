@@ -68,6 +68,7 @@ public class SequenceAlignmentViewer extends Application {
         runAlignment();
 
         Scene scene = new Scene(root, 800, 600);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle("DNA Sequence Alignment");
         stage.setScene(scene);
         stage.show();

@@ -35,6 +35,8 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.jscience.ui.i18n.I18n;
+
 /**
  * JScience Master Demo Launcher.
  * <p>
@@ -50,9 +52,16 @@ import org.slf4j.LoggerFactory;
 public class JScienceDemoApp extends Application {
 
     private static final Logger logger = LoggerFactory.getLogger(JScienceDemoApp.class);
+    private Stage primaryStage;
 
     @Override
     public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+        buildUI();
+        primaryStage.show();
+    }
+
+    private void buildUI() {
         BorderPane root = new BorderPane();
 
         // Load CSS with null protection
@@ -73,36 +82,41 @@ public class JScienceDemoApp extends Application {
 
         // Discovery
         Map<String, List<DemoProvider>> demosByCategory = new TreeMap<>();
-        List<DemoProvider> viewers = new ArrayList<>();
 
         try {
             ServiceLoader<DemoProvider> loader = ServiceLoader.load(DemoProvider.class);
             for (DemoProvider provider : loader) {
-                if (provider.isViewer()) {
-                    viewers.add(provider);
-                } else {
+                if (!provider.isViewer()) {
                     demosByCategory
                             .computeIfAbsent(provider.getCategory(), k -> new ArrayList<>())
                             .add(provider);
                 }
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            System.err.println("CRITICAL DEMO LOAD ERROR:");
+            e.printStackTrace();
             logger.error("Error loading demos", e);
         }
 
-        // Tabs
-        TabPane tabs = new TabPane();
-        tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        // Single unified content - no tabs
+        VBox allContent = new VBox(15);
+        allContent.setPadding(new Insets(20));
+        allContent.getStyleClass().add("content-box");
 
-        Tab demosTab = new Tab("Demos");
-        demosTab.setContent(createCategoryContent(demosByCategory));
+        // Add demos by category
+        if (demosByCategory.isEmpty()) {
+            allContent.getChildren().add(new Label(I18n.getInstance().get("app.nodemos")));
+        } else {
+            // Demos sections
+            for (Map.Entry<String, List<DemoProvider>> entry : demosByCategory.entrySet()) {
+                TitledPane section = createSection(entry.getKey(), entry.getValue());
+                allContent.getChildren().add(section);
+            }
+        }
 
-        Tab viewersTab = new Tab("Viewers");
-        viewersTab.setContent(createSimpleListContent(viewers));
-
-        tabs.getTabs().addAll(demosTab, viewersTab);
-
-        root.setCenter(tabs);
+        ScrollPane scroll = new ScrollPane(allContent);
+        scroll.setFitToWidth(true);
+        root.setCenter(scroll);
 
         Scene scene = new Scene(root, 1000, 750);
         // Add CSS to scene as well
@@ -110,41 +124,62 @@ public class JScienceDemoApp extends Application {
             scene.getStylesheets().add(cssResource.toExternalForm());
         }
 
-        primaryStage.setTitle("JScience Demonstration Suite");
+        primaryStage.setTitle(I18n.getInstance().get("app.header.title"));
         primaryStage.setScene(scene);
-        primaryStage.show();
 
-        // Run diagnostics at startup (internal check)
-        runDiagnostics();
+        // Apply global theme preference
+        ThemeManager.getInstance().applyTheme(scene);
     }
 
     private MenuBar createMenuBar() {
         MenuBar menuBar = new MenuBar();
-        Menu toolsMenu = new Menu("Tools");
-        MenuItem diagnosticsItem = new MenuItem("Run Diagnostics");
-        diagnosticsItem.setOnAction(e -> runDiagnostics());
-        toolsMenu.getItems().add(diagnosticsItem);
-        menuBar.getMenus().add(toolsMenu);
+
+        // Language Menu
+        Menu languageMenu = new Menu(I18n.getInstance().get("app.menu.language"));
+        ToggleGroup langGroup = new ToggleGroup();
+
+        RadioMenuItem englishItem = new RadioMenuItem("English");
+        englishItem.setToggleGroup(langGroup);
+        englishItem.setSelected(Locale.getDefault().getLanguage().equals("en"));
+        englishItem.setOnAction(e -> setLocale(Locale.ENGLISH));
+
+        RadioMenuItem frenchItem = new RadioMenuItem("Français");
+        frenchItem.setToggleGroup(langGroup);
+        frenchItem.setSelected(Locale.getDefault().getLanguage().equals("fr"));
+        frenchItem.setOnAction(e -> setLocale(Locale.FRENCH));
+
+        languageMenu.getItems().addAll(englishItem, frenchItem);
+
+        // Theme Menu
+        Menu themeMenu = new Menu(I18n.getInstance().get("app.menu.theme"));
+        ToggleGroup themeGroup = new ToggleGroup();
+
+        RadioMenuItem darkItem = new RadioMenuItem(I18n.getInstance().get("app.menu.theme.dark"));
+        darkItem.setToggleGroup(themeGroup);
+        darkItem.setSelected(ThemeManager.getInstance().isDarkTheme());
+        darkItem.setOnAction(e -> {
+            ThemeManager.getInstance().setDarkTheme(true);
+            ThemeManager.getInstance().applyTheme(primaryStage.getScene());
+        });
+
+        RadioMenuItem lightItem = new RadioMenuItem(I18n.getInstance().get("app.menu.theme.light"));
+        lightItem.setToggleGroup(themeGroup);
+        lightItem.setSelected(!ThemeManager.getInstance().isDarkTheme());
+        lightItem.setOnAction(e -> {
+            ThemeManager.getInstance().setDarkTheme(false);
+            ThemeManager.getInstance().applyTheme(primaryStage.getScene());
+        });
+
+        themeMenu.getItems().addAll(darkItem, lightItem);
+
+        menuBar.getMenus().addAll(languageMenu, themeMenu);
         return menuBar;
     }
 
-    private void runDiagnostics() {
-        logger.info("Starting JScience Demo Diagnostics...");
-        logger.info("Java Version: {}", System.getProperty("java.version"));
-        logger.info("Classpath: {}", System.getProperty("java.class.path"));
-
-        try {
-            logger.info("--- Attempting to load DemoProviders ---");
-            ServiceLoader<DemoProvider> loader = ServiceLoader.load(DemoProvider.class);
-            int count = 0;
-            for (DemoProvider provider : loader) {
-                logger.info("Found provider: {} - {}", provider.getClass().getName(), provider.getName());
-                count++;
-            }
-            logger.info("Total providers found: {}", count);
-        } catch (Throwable t) {
-            logger.error("FAILED TO LOAD PROVIDERS", t);
-        }
+    private void setLocale(Locale locale) {
+        Locale.setDefault(locale);
+        I18n.getInstance().setLocale(locale);
+        buildUI();
     }
 
     private VBox createHeader() {
@@ -154,51 +189,15 @@ public class JScienceDemoApp extends Application {
         header.getStyleClass().add("header-box");
         header.setStyle("-fx-background-color: linear-gradient(to right, #1a2a6c, #b21f1f, #fdbb2d);");
 
-        Label title = new Label("JScience Demonstration Suite");
+        Label title = new Label(I18n.getInstance().get("app.header.title"));
         title.getStyleClass().add("header-label");
         title.setStyle("-fx-font-size: 28px; -fx-text-fill: white; -fx-font-weight: bold;");
 
-        Label subtitle = new Label("Interactive Scientific Visualizations & Simulations");
+        Label subtitle = new Label(I18n.getInstance().get("app.header.subtitle"));
         subtitle.setStyle("-fx-font-size: 14px; -fx-text-fill: #eeeeee;");
 
         header.getChildren().addAll(title, subtitle);
         return header;
-    }
-
-    private ScrollPane createCategoryContent(Map<String, List<DemoProvider>> demosByCategory) {
-        VBox content = new VBox(15);
-        content.setPadding(new Insets(20));
-        content.getStyleClass().add("content-box");
-
-        if (demosByCategory.isEmpty()) {
-            content.getChildren().add(new Label("No demos found."));
-        } else {
-            for (Map.Entry<String, List<DemoProvider>> entry : demosByCategory.entrySet()) {
-                TitledPane section = createSection(entry.getKey(), entry.getValue());
-                content.getChildren().add(section);
-            }
-        }
-
-        ScrollPane scroll = new ScrollPane(content);
-        scroll.setFitToWidth(true);
-        return scroll;
-    }
-
-    private ScrollPane createSimpleListContent(List<DemoProvider> providers) {
-        VBox content = new VBox(15);
-        content.setPadding(new Insets(20));
-
-        if (providers.isEmpty()) {
-            content.getChildren().add(new Label("No generic viewers found."));
-        } else {
-            for (DemoProvider p : providers) {
-                content.getChildren().add(createCard(p));
-            }
-        }
-
-        ScrollPane scroll = new ScrollPane(content);
-        scroll.setFitToWidth(true);
-        return scroll;
     }
 
     private TitledPane createSection(String category, List<DemoProvider> demos) {
@@ -223,7 +222,7 @@ public class JScienceDemoApp extends Application {
         row.setStyle(
                 "-fx-background-color: #333333; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 1); -fx-background-radius: 5;");
 
-        Button btn = new Button("LAUNCH");
+        Button btn = new Button(I18n.getInstance().get("app.button.launch"));
         btn.getStyleClass().add("launch-button");
         btn.setStyle("-fx-background-color: #007acc; -fx-text-fill: white; -fx-font-weight: bold; -fx-min-width: 80;");
 

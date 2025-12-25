@@ -98,6 +98,7 @@ public class ResistorColorCodeViewer extends Application {
         root.getChildren().addAll(resistorBody, resultLabel, controls);
 
         Scene scene = new Scene(root, 500, 300);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle("JScience Resistor Calculator");
         stage.setScene(scene);
         stage.show();

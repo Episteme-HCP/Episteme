@@ -12,7 +12,20 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public interface Centrifuge extends Device {
     enum RotorType {
-        FIXED_ANGLE, SWINGING_BUCKET, VERTICAL
+        FIXED_ANGLE("device.centrifuge.rotor.fixed"),
+        SWINGING_BUCKET("device.centrifuge.rotor.swinging"),
+        VERTICAL("device.centrifuge.rotor.vertical");
+
+        private final String i18nKey;
+
+        RotorType(String i18nKey) {
+            this.i18nKey = i18nKey;
+        }
+
+        @Override
+        public String toString() {
+            return org.jscience.natural.i18n.I18n.getInstance().get(i18nKey);
+        }
     }
 
     void start(Real rpm);

@@ -16,6 +16,7 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 
 import org.jscience.apps.framework.KillerAppBase;
+import org.jscience.biology.loaders.FastaLoader;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -97,7 +98,7 @@ public class CrisprDesignApp extends KillerAppBase {
         VBox top = new VBox(10);
         top.setPadding(new Insets(0, 0, 10, 0));
 
-        Label lblGenome = new Label("Genomic Sequence (5' -> 3'):");
+        Label lblGenome = new Label(i18n.get("crispr.label.genome"));
         genomeArea = new TextArea();
         genomeArea.setPrefHeight(100);
         genomeArea.setWrapText(true);
@@ -105,13 +106,13 @@ public class CrisprDesignApp extends KillerAppBase {
         genomeArea.setText(
                 "ATGGCCTCCTCCGAGGACGTCATCAAGGAGCTGATGGACGACGTGGTGAAGCTGGGCGTGGGGCAGCGGCCAGAGGGGGAGGGATGGGTGCAAAAGAGGATTGAAGACCCTGGAAAGAAAAGTGCCATGTGAGTGTG");
 
-        Button loadBtn = new Button("Load FASTA...");
+        Button loadBtn = new Button(i18n.get("crispr.button.load"));
         loadBtn.setOnAction(e -> loadFasta());
 
-        Button sampleBtn = new Button("Load Sample");
+        Button sampleBtn = new Button(i18n.get("crispr.button.sample"));
         sampleBtn.setOnAction(e -> loadSample());
 
-        Button findBtn = new Button("🔍 Find Targets (PAM: NGG)");
+        Button findBtn = new Button(i18n.get("crispr.button.find"));
         findBtn.setDefaultButton(true);
         findBtn.setOnAction(e -> scanGenome());
 
@@ -119,23 +120,23 @@ public class CrisprDesignApp extends KillerAppBase {
 
         // Center: Results Table
         resultsTable = new TableView<>();
-        TableColumn<GuiTarget, Integer> colPos = new TableColumn<>("Position");
+        TableColumn<GuiTarget, Integer> colPos = new TableColumn<>(i18n.get("crispr.table.pos"));
         colPos.setCellValueFactory(new PropertyValueFactory<>("position"));
 
-        TableColumn<GuiTarget, String> colSeq = new TableColumn<>("Sequence (20nt)");
+        TableColumn<GuiTarget, String> colSeq = new TableColumn<>(i18n.get("crispr.table.seq"));
         colSeq.setCellValueFactory(new PropertyValueFactory<>("sequence"));
         colSeq.setMinWidth(200);
 
-        TableColumn<GuiTarget, String> colPam = new TableColumn<>("PAM");
+        TableColumn<GuiTarget, String> colPam = new TableColumn<>(i18n.get("crispr.table.pam"));
         colPam.setCellValueFactory(new PropertyValueFactory<>("pam"));
 
-        TableColumn<GuiTarget, Double> colScore = new TableColumn<>("Efficiency");
+        TableColumn<GuiTarget, Double> colScore = new TableColumn<>(i18n.get("crispr.table.eff"));
         colScore.setCellValueFactory(new PropertyValueFactory<>("score"));
 
-        TableColumn<GuiTarget, Integer> colOffTargets = new TableColumn<>("Off-Targets");
+        TableColumn<GuiTarget, Integer> colOffTargets = new TableColumn<>(i18n.get("crispr.table.off"));
         colOffTargets.setCellValueFactory(new PropertyValueFactory<>("offTargets"));
 
-        TableColumn<GuiTarget, Double> colSpecificity = new TableColumn<>("Specificity");
+        TableColumn<GuiTarget, Double> colSpecificity = new TableColumn<>(i18n.get("crispr.table.spec"));
         colSpecificity.setCellValueFactory(new PropertyValueFactory<>("specificity"));
 
         @SuppressWarnings("unchecked")
@@ -151,7 +152,7 @@ public class CrisprDesignApp extends KillerAppBase {
         // Bottom: Visualization
         VBox bottom = new VBox(5);
         bottom.setPadding(new Insets(10, 0, 0, 0));
-        Label lblVis = new Label("Target Visualization:");
+        Label lblVis = new Label(i18n.get("crispr.label.visual"));
         visualFlow = new TextFlow();
         ScrollPane scrollVis = new ScrollPane(visualFlow);
         scrollVis.setPrefHeight(60);
@@ -178,7 +179,7 @@ public class CrisprDesignApp extends KillerAppBase {
                     genomeArea.setText(seqs.get(0).data.toUpperCase());
                 }
             } catch (Exception e) {
-                showError("Load Error", e.getMessage());
+                showError(i18n.get("crispr.error.load"), e.getMessage());
             }
         }
     }
@@ -192,10 +193,10 @@ public class CrisprDesignApp extends KillerAppBase {
                     genomeArea.setText(seqs.get(0).data.toUpperCase());
                 }
             } else {
-                showError("Error", "Sample file not found.");
+                showError(i18n.get("dialog.error.title"), i18n.get("crispr.error.sample"));
             }
         } catch (Exception e) {
-            showError("Load Error", e.getMessage());
+            showError(i18n.get("crispr.error.load"), e.getMessage());
         }
     }
 

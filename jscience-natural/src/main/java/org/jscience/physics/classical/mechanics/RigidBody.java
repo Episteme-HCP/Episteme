@@ -42,6 +42,7 @@ import java.util.List;
  * Integration is performed using symplectic Euler or RK4.
  * </p>
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -257,5 +258,17 @@ public class RigidBody {
 
     public DenseMatrix<Real> getInverseInertiaTensor() {
         return inverseInertiaTensor;
+    }
+
+    public void setPosition(Vector<Real> position) {
+        this.position = position;
+    }
+
+    public void setVelocity(Vector<Real> velocity) {
+        this.velocity = velocity;
+    }
+
+    public void setAngularVelocity(Vector<Real> angularVelocity) {
+        this.angularVelocity = angularVelocity;
     }
 }

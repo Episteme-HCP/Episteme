@@ -60,9 +60,6 @@ public class MarketCrashApp extends KillerAppBase {
 
     @Override
     protected Region createMainContent() {
-        // Generate sample data
-        generateSampleData();
-
         SplitPane mainSplit = new SplitPane();
         mainSplit.setOrientation(Orientation.HORIZONTAL);
 
@@ -76,6 +73,9 @@ public class MarketCrashApp extends KillerAppBase {
 
         mainSplit.getItems().addAll(chartArea, controlPanel);
         mainSplit.setDividerPositions(0.72);
+
+        // Generate sample data after UI is ready (so log works)
+        generateSampleData();
 
         return mainSplit;
     }
@@ -101,16 +101,16 @@ public class MarketCrashApp extends KillerAppBase {
         VBox.setVgrow(priceChart, Priority.ALWAYS);
 
         // RSI Chart
-        Label rsiTitle = new Label("📊 RSI Indicator");
+        Label rsiTitle = new Label("📊 " + i18n.get("market.indicator.rsi"));
         rsiTitle.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 
-        rsiChart = ChartFactory.createLineChart("", "Day", "RSI");
+        rsiChart = ChartFactory.createLineChart("", "Day", i18n.get("market.indicator.rsi"));
         rsiChart.setAnimated(false);
         rsiChart.setCreateSymbols(false);
         rsiChart.setPrefHeight(150);
         rsiChart.setLegendVisible(false);
 
-        rsiSeries = ChartFactory.createSeries("RSI");
+        rsiSeries = ChartFactory.createSeries(i18n.get("market.indicator.rsi"));
         rsiChart.getData().add(rsiSeries);
 
         area.getChildren().addAll(priceTitle, priceChart, rsiTitle, rsiChart);
@@ -123,41 +123,41 @@ public class MarketCrashApp extends KillerAppBase {
         panel.setStyle("-fx-background-color: #fafafa; -fx-border-color: #ddd; -fx-border-width: 0 0 0 1;");
 
         // Risk Assessment
-        Label riskTitle = new Label("🔔 Risk Assessment");
+        Label riskTitle = new Label(i18n.get("market.risk.title"));
         riskTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-        riskLabel = new Label("--");
+        riskLabel = new Label(i18n.get("market.risk.none"));
         riskLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-padding: 10;");
 
         HBox riskBox = new HBox(riskLabel);
         riskBox.setStyle("-fx-background-color: #e0e0e0; -fx-background-radius: 8; -fx-padding: 15;");
 
         // Current Stats
-        Label statsTitle = new Label("📉 Current Stats");
+        Label statsTitle = new Label(i18n.get("market.stats.title"));
         statsTitle.setStyle("-fx-font-weight: bold;");
 
-        currentPriceLabel = new Label("Price: --");
-        smaLabel = new Label("SMA-20: --");
-        rsiLabel = new Label("RSI-14: --");
+        currentPriceLabel = new Label(java.text.MessageFormat.format(i18n.get("market.label.price"), "--"));
+        smaLabel = new Label(java.text.MessageFormat.format(i18n.get("market.label.sma"), 20, "--"));
+        rsiLabel = new Label(java.text.MessageFormat.format(i18n.get("market.label.rsi"), 14, "--"));
 
         VBox statsBox = new VBox(5, currentPriceLabel, smaLabel, rsiLabel);
         statsBox.setStyle("-fx-background-color: #f5f5f5; -fx-padding: 10; -fx-background-radius: 5;");
 
         // Indicator Settings
-        Label settingsTitle = new Label("⚙️ Indicator Settings");
+        Label settingsTitle = new Label(i18n.get("market.settings.title"));
         settingsTitle.setStyle("-fx-font-weight: bold;");
 
-        VBox smaBox = createSliderBox("SMA Period:", 5, 50, 20);
+        VBox smaBox = createSliderBox(i18n.get("market.slider.sma"), 5, 50, 20);
         smaPeriodSlider = (Slider) smaBox.getChildren().get(1);
 
-        VBox rsiBox = createSliderBox("RSI Period:", 7, 21, 14);
+        VBox rsiBox = createSliderBox(i18n.get("market.slider.rsi"), 7, 21, 14);
         rsiPeriodSlider = (Slider) rsiBox.getChildren().get(1);
 
-        showSMA = new CheckBox("Show SMA");
+        showSMA = new CheckBox(i18n.get("market.check.sma"));
         showSMA.setSelected(true);
         showSMA.setOnAction(e -> smaSeries.getNode().setVisible(showSMA.isSelected()));
 
-        showBollinger = new CheckBox("Show Bollinger Bands");
+        showBollinger = new CheckBox(i18n.get("market.check.bb"));
         showBollinger.setSelected(true);
         showBollinger.setOnAction(e -> {
             upperBB.getNode().setVisible(showBollinger.isSelected());
@@ -165,7 +165,7 @@ public class MarketCrashApp extends KillerAppBase {
         });
 
         // Alert Log
-        Label alertTitle = new Label("📋 Alert Log");
+        Label alertTitle = new Label(i18n.get("market.log.title"));
         alertTitle.setStyle("-fx-font-weight: bold;");
 
         alertLog = new ListView<>();
@@ -199,7 +199,8 @@ public class MarketCrashApp extends KillerAppBase {
         try (var is = getClass().getResourceAsStream("data/SP500_Sample.csv")) {
             if (is != null) {
                 marketData = FinancialMarketLoader.loadCSV(is, "USD");
-                log("Loaded " + marketData.size() + " trading days of real market data (S&P 500)");
+                marketData = FinancialMarketLoader.loadCSV(is, "USD");
+                log(java.text.MessageFormat.format(i18n.get("market.log.loaded"), marketData.size()));
             } else {
                 log("Data file not found, creating dummy empty set.");
                 marketData = new ArrayList<>();
@@ -267,24 +268,29 @@ public class MarketCrashApp extends KillerAppBase {
             return;
 
         double close = marketData.get(currentIndex).close.getAmount().doubleValue();
-        currentPriceLabel.setText(String.format("Price: $%.2f", close));
+        currentPriceLabel.setText(java.text.MessageFormat.format(i18n.get("market.label.price"),
+                String.format("$%.2f", close)));
 
         List<Candle> subset = marketData.subList(0, currentIndex + 1);
 
         Real sma = TechnicalIndicators.sma(subset, (int) smaPeriodSlider.getValue());
         if (sma != null) {
-            smaLabel.setText(String.format("SMA-%d: $%.2f", (int) smaPeriodSlider.getValue(), sma.doubleValue()));
+            smaLabel.setText(java.text.MessageFormat.format(i18n.get("market.label.sma"),
+                    (int) smaPeriodSlider.getValue(), String.format("$%.2f", sma.doubleValue())));
         }
 
         Real rsi = TechnicalIndicators.rsi(subset, (int) rsiPeriodSlider.getValue());
         if (rsi != null) {
             double rsiVal = rsi.doubleValue();
-            rsiLabel.setText(String.format("RSI-%d: %.1f", (int) rsiPeriodSlider.getValue(), rsiVal));
+            rsiLabel.setText(java.text.MessageFormat.format(i18n.get("market.label.rsi"),
+                    (int) rsiPeriodSlider.getValue(), String.format("%.1f", rsiVal)));
 
             if (rsiVal < 30) {
-                log("⚠️ Day " + currentIndex + ": RSI oversold (" + String.format("%.1f", rsiVal) + ")");
+                log(java.text.MessageFormat.format(i18n.get("market.log.oversold"), currentIndex,
+                        String.format("%.1f", rsiVal)));
             } else if (rsiVal > 70) {
-                log("⚠️ Day " + currentIndex + ": RSI overbought (" + String.format("%.1f", rsiVal) + ")");
+                log(java.text.MessageFormat.format(i18n.get("market.log.overbought"), currentIndex,
+                        String.format("%.1f", rsiVal)));
             }
         }
 
@@ -324,17 +330,17 @@ public class MarketCrashApp extends KillerAppBase {
         String riskText;
         Color color;
         if (score >= 5) {
-            riskText = "🔴 EXTREME";
+            riskText = i18n.get("market.risk.extreme");
             color = Color.DARKRED;
-            log("🚨 Day " + currentIndex + ": EXTREME RISK DETECTED");
+            log(java.text.MessageFormat.format(i18n.get("market.log.extreme"), currentIndex));
         } else if (score >= 4) {
-            riskText = "🟠 HIGH";
+            riskText = i18n.get("market.risk.high");
             color = Color.DARKORANGE;
         } else if (score >= 2) {
-            riskText = "🟡 MODERATE";
+            riskText = i18n.get("market.risk.moderate");
             color = Color.GOLDENROD;
         } else {
-            riskText = "🟢 LOW";
+            riskText = i18n.get("market.risk.low");
             color = Color.DARKGREEN;
         }
 
@@ -347,7 +353,7 @@ public class MarketCrashApp extends KillerAppBase {
             animationTimeline.stop();
         setStatus(i18n.get("status.complete"));
         setProgress(0);
-        log("Analysis complete: " + currentIndex + " days processed");
+        log(java.text.MessageFormat.format(i18n.get("market.log.complete"), currentIndex));
     }
 
     @Override

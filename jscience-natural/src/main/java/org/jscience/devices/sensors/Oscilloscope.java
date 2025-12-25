@@ -12,7 +12,20 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public interface Oscilloscope extends Sensor<Real> {
     enum TriggerMode {
-        AUTO, NORMAL, SINGLE
+        AUTO("device.oscilloscope.trigger.auto"),
+        NORMAL("device.oscilloscope.trigger.normal"),
+        SINGLE("device.oscilloscope.trigger.single");
+
+        private final String i18nKey;
+
+        TriggerMode(String i18nKey) {
+            this.i18nKey = i18nKey;
+        }
+
+        @Override
+        public String toString() {
+            return org.jscience.natural.i18n.I18n.getInstance().get(i18nKey);
+        }
     }
 
     int getChannelCount();

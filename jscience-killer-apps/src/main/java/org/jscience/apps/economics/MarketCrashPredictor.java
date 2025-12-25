@@ -9,6 +9,7 @@ import org.jscience.economics.loaders.FinancialMarketLoader.Candle;
 import org.jscience.economics.Money;
 import org.jscience.history.TimePoint;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.apps.framework.I18nManager;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -28,20 +29,20 @@ import java.util.List;
 public class MarketCrashPredictor {
 
     public enum RiskLevel {
-        LOW("🟢 LOW RISK"),
-        MODERATE("🟡 MODERATE RISK"),
-        HIGH("🟠 HIGH RISK"),
-        EXTREME("🔴 EXTREME RISK - CRASH WARNING");
+        LOW("market.risk.low"),
+        MODERATE("market.risk.moderate"),
+        HIGH("market.risk.high"),
+        EXTREME("market.risk.extreme");
 
-        private final String label;
+        private final String key;
 
-        RiskLevel(String label) {
-            this.label = label;
+        RiskLevel(String key) {
+            this.key = key;
         }
 
         @Override
         public String toString() {
-            return label;
+            return I18nManager.getInstance().get(key);
         }
     }
 

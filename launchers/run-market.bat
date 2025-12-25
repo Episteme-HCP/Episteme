@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-set APP_CLASS=org.jscience.apps.social.MarketCrashApp
+set APP_CLASS=org.jscience.apps.economics.MarketCrashApp
 set LIB_DIR=lib
 set MODULE_PATH=..\jscience-killer-apps\target\classes;..\jscience-core\target\classes;..\jscience-natural\target\classes;..\jscience-social\target\classes
 

@@ -22,12 +22,12 @@ public class EconomicsMarketDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Economics: Market Equilibrium";
+        return org.jscience.social.i18n.I18n.getInstance().get("econ.market.title");
     }
 
     @Override
     public String getDescription() {
-        return "Interactive Supply and Demand graph visualization determining market equilibrium.";
+        return org.jscience.social.i18n.I18n.getInstance().get("econ.market.desc");
     }
 
     @Override
@@ -35,18 +35,20 @@ public class EconomicsMarketDemo implements DemoProvider {
         BorderPane root = new BorderPane();
 
         // Axes
-        NumberAxis xAxis = new NumberAxis("Quantity", 0, 100, 10);
-        NumberAxis yAxis = new NumberAxis("Price", 0, 100, 10);
+        NumberAxis xAxis = new NumberAxis(org.jscience.social.i18n.I18n.getInstance().get("econ.market.axis.quantity"),
+                0, 100, 10);
+        NumberAxis yAxis = new NumberAxis(org.jscience.social.i18n.I18n.getInstance().get("econ.market.axis.price"), 0,
+                100, 10);
 
         LineChart<Number, Number> lineChart = new LineChart<>(xAxis, yAxis);
-        lineChart.setTitle("Supply and Demand");
+        lineChart.setTitle(org.jscience.social.i18n.I18n.getInstance().get("econ.market.chart.title"));
         lineChart.setAnimated(false); // crucial for smooth slider updates
 
         XYChart.Series<Number, Number> supplySeries = new XYChart.Series<>();
-        supplySeries.setName("Supply");
+        supplySeries.setName(org.jscience.social.i18n.I18n.getInstance().get("econ.market.series.supply"));
 
         XYChart.Series<Number, Number> demandSeries = new XYChart.Series<>();
-        demandSeries.setName("Demand");
+        demandSeries.setName(org.jscience.social.i18n.I18n.getInstance().get("econ.market.series.demand"));
 
         lineChart.getData().add(supplySeries);
         lineChart.getData().add(demandSeries);
@@ -93,8 +95,10 @@ public class EconomicsMarketDemo implements DemoProvider {
         updateGraph.run(); // Init
 
         VBox controls = new VBox(10,
-                new Label("Shift Supply:"), supplyShift,
-                new Label("Shift Demand:"), demandShift);
+                new Label(org.jscience.social.i18n.I18n.getInstance().get("econ.market.label.shift_supply")),
+                supplyShift,
+                new Label(org.jscience.social.i18n.I18n.getInstance().get("econ.market.label.shift_demand")),
+                demandShift);
         controls.setStyle("-fx-padding: 10; -fx-background-color: #f0f0f0;");
 
         root.setCenter(lineChart);

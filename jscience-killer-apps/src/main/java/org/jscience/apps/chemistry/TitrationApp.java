@@ -10,7 +10,6 @@ import javafx.geometry.Orientation;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.chart.LineChart;
-
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -18,6 +17,8 @@ import javafx.scene.paint.Color;
 
 import org.jscience.apps.framework.ChartFactory;
 import org.jscience.apps.framework.KillerAppBase;
+import java.text.MessageFormat;
+import org.jscience.apps.framework.I18nManager;
 
 /**
  * Virtual Titration Lab.
@@ -45,17 +46,17 @@ public class TitrationApp extends KillerAppBase {
 
     // Multi-protic acid types with pKa values
     private enum AcidType {
-        HCL("HCl (Strong)", new double[] { -7.0 }), // Strong acid, effectively complete dissociation
-        H2SO4("H₂SO₄ (Sulfuric)", new double[] { -3.0, 1.99 }), // Diprotic
-        H3PO4("H₃PO₄ (Phosphoric)", new double[] { 2.15, 7.20, 12.35 }), // Triprotic
-        H2CO3("H₂CO₃ (Carbonic)", new double[] { 6.35, 10.33 }), // Diprotic
-        ACETIC("CH₃COOH (Acetic)", new double[] { 4.76 }); // Weak monoprotic
+        HCL("titration.acid.hcl", new double[] { -7.0 }), // Strong acid, effectively complete dissociation
+        H2SO4("titration.acid.h2so4", new double[] { -3.0, 1.99 }), // Diprotic
+        H3PO4("titration.acid.h3po4", new double[] { 2.15, 7.20, 12.35 }), // Triprotic
+        H2CO3("titration.acid.h2co3", new double[] { 6.35, 10.33 }), // Diprotic
+        ACETIC("titration.acid.acetic", new double[] { 4.76 }); // Weak monoprotic
 
-        final String name;
+        final String key;
         final double[] pKa; // pKa values for each dissociation step
 
-        AcidType(String name, double[] pKa) {
-            this.name = name;
+        AcidType(String key, double[] pKa) {
+            this.key = key;
             this.pKa = pKa;
         }
 
@@ -65,7 +66,7 @@ public class TitrationApp extends KillerAppBase {
 
         @Override
         public String toString() {
-            return name;
+            return I18nManager.getInstance().get(key);
         }
     }
 
@@ -80,20 +81,20 @@ public class TitrationApp extends KillerAppBase {
 
     // Indicators with their pH ranges and colors
     private enum Indicator {
-        PHENOLPHTHALEIN("Phenolphthalein", 8.2, 10.0, Color.TRANSPARENT, Color.DEEPPINK),
-        METHYL_ORANGE("Methyl Orange", 3.1, 4.4, Color.RED, Color.YELLOW),
-        BROMOTHYMOL_BLUE("Bromothymol Blue", 6.0, 7.6, Color.YELLOW, Color.BLUE),
-        LITMUS("Litmus", 5.0, 8.0, Color.RED, Color.BLUE),
-        UNIVERSAL("Universal Indicator", 1.0, 14.0, Color.RED, Color.VIOLET);
+        PHENOLPHTHALEIN("titration.ind.phen", 8.2, 10.0, Color.TRANSPARENT, Color.DEEPPINK),
+        METHYL_ORANGE("titration.ind.methyl", 3.1, 4.4, Color.RED, Color.YELLOW),
+        BROMOTHYMOL_BLUE("titration.ind.brom", 6.0, 7.6, Color.YELLOW, Color.BLUE),
+        LITMUS("titration.ind.litmus", 5.0, 8.0, Color.RED, Color.BLUE),
+        UNIVERSAL("titration.ind.univ", 1.0, 14.0, Color.RED, Color.VIOLET);
 
-        final String name;
+        final String key;
         final double pHLow;
         final double pHHigh;
         final Color colorAcid;
         final Color colorBase;
 
-        Indicator(String name, double pHLow, double pHHigh, Color colorAcid, Color colorBase) {
-            this.name = name;
+        Indicator(String key, double pHLow, double pHHigh, Color colorAcid, Color colorBase) {
+            this.key = key;
             this.pHLow = pHLow;
             this.pHHigh = pHHigh;
             this.colorAcid = colorAcid;
@@ -102,7 +103,7 @@ public class TitrationApp extends KillerAppBase {
 
         @Override
         public String toString() {
-            return name;
+            return I18nManager.getInstance().get(key);
         }
     }
 
@@ -160,10 +161,10 @@ public class TitrationApp extends KillerAppBase {
         grid.setHgap(10);
         grid.setVgap(10);
 
-        phLabel = new Label("pH: 1.00");
+        phLabel = new Label(MessageFormat.format(i18n.get("titration.label.ph"), "1.00"));
         phLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
-        volumeLabel = new Label(i18n.get("titration.label.volume") + ": 0.00");
+        volumeLabel = new Label(MessageFormat.format(i18n.get("titration.label.voladded"), "0.00"));
 
         valveSlider = new Slider(0, 1.0, 0);
         valveSlider.setShowTickLabels(true);
@@ -194,12 +195,12 @@ public class TitrationApp extends KillerAppBase {
 
         box.getChildren().addAll(
                 new Label("🧪 " + i18n.get("titration.panel.setup")),
-                new Label("⚗️ Acid Type:"),
+                new Label("⚗️ " + i18n.get("titration.label.acidtype")),
                 acidSelector,
                 phChart,
                 phLabel, volumeLabel,
                 new Separator(),
-                new Label("🎨 Indicator:"),
+                new Label("🎨 " + i18n.get("titration.label.indicator")),
                 indicatorSelector,
                 new Separator(),
                 new Label("🚰 " + i18n.get("titration.label.titrant")),
@@ -314,8 +315,9 @@ public class TitrationApp extends KillerAppBase {
         }
 
         // Update UI
-        phLabel.setText(String.format("pH: %.2f", ph));
-        volumeLabel.setText(String.format("Vol Added: %.2f mL", volumeBaseAdded));
+        phLabel.setText(MessageFormat.format(i18n.get("titration.label.ph"), String.format("%.2f", ph)));
+        volumeLabel.setText(
+                MessageFormat.format(i18n.get("titration.label.voladded"), String.format("%.2f", volumeBaseAdded)));
 
         // Chart sampling (don't flood chart)
         if (phSeries.getData().isEmpty() ||

@@ -35,11 +35,17 @@ public class GalaxyViewer extends Application {
     private final List<StarParticle> galaxy2 = new ArrayList<>();
     private final Random random = new Random();
 
+    private GalaxySimulator simulator;
+
     // View Parameters
     private double zoom = 1.0;
     private double panX = 0;
     private double panY = 0;
     private double dragStartX, dragStartY;
+
+    private javafx.scene.control.Label fpsLabel;
+    private long lastFrameTime = 0;
+    private int frameCount = 0;
 
     // Collision State
     private boolean collisionMode = false;
@@ -59,6 +65,9 @@ public class GalaxyViewer extends Application {
         Canvas canvas = new Canvas(1000, 800);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         root.getChildren().add(canvas);
+
+        // Init Simulator (Default Primitive)
+        simulator = new PrimitiveGalaxySimulator();
 
         // UI Controls Panel
         VBox controls = new VBox(10);
@@ -91,14 +100,42 @@ public class GalaxyViewer extends Application {
         timeLabel = new javafx.scene.control.Label("Time: 0 Myr");
         timeLabel.setStyle("-fx-text-fill: cyan; -fx-font-family: monospace;");
 
+        // FPS Label
+        fpsLabel = new javafx.scene.control.Label("FPS: --");
+        fpsLabel.setStyle("-fx-text-fill: yellow; -fx-font-family: monospace;");
+
+        // Simulator Switch
+        javafx.scene.control.ToggleButton simSwitch = new javafx.scene.control.ToggleButton("Mode: Primitive");
+        simSwitch.setMaxWidth(Double.MAX_VALUE);
+        simSwitch.setOnAction(e -> {
+            if (simSwitch.isSelected()) {
+                simulator = new ObjectGalaxySimulator();
+                simSwitch.setText("Mode: Scientific (Object)");
+            } else {
+                simulator = new PrimitiveGalaxySimulator();
+                simSwitch.setText("Mode: Primitive (double)");
+            }
+            // Re-init with current stars
+            simulator.init(stars);
+            // Sync G2 state if needed?
+            // Currently simple reset might be cleaner but let's try to preserve state?
+            // ObjectSim expects Init to create internal vectors.
+            // If we swap mid-sim, we should probably reset or sync.
+            // Let's reset for simplicity as user can just hit reset.
+            // Or just init, it will grab current positions.
+            simulator.setGalaxy2State(g2x, g2y, g2vx, g2vy);
+        });
+
         javafx.scene.control.Label infoLbl = new javafx.scene.control.Label("Controls:\n• Scroll: Zoom\n• Drag: Pan");
         infoLbl.setStyle("-fx-text-fill: #888;");
 
         controls.getChildren().addAll(titleLbl, new javafx.scene.control.Separator(), typeLbl, galaxyTypeCombo,
-                btnCollision, btnReset, new javafx.scene.control.Separator(), timeLabel, infoLbl);
+                btnCollision, btnReset, new javafx.scene.control.Separator(),
+                simSwitch, fpsLabel, timeLabel, infoLbl);
         root.getChildren().add(controls);
 
         initGalaxy(stars, 0, 0, 0); // Main galaxy
+        simulator.init(stars);
 
         // Mouse Controls
         canvas.setOnScroll(e -> {
@@ -117,6 +154,19 @@ public class GalaxyViewer extends Application {
         new AnimationTimer() {
             @Override
             public void handle(long now) {
+                // FPS Calc
+                long cur = System.nanoTime();
+                if (frameCount % 30 == 0 && lastFrameTime > 0) {
+                    double fps = 30.0 * 1e9 / (cur - lastFrameTime);
+                    fpsLabel.setText(String.format("FPS: %.1f", fps));
+                    lastFrameTime = cur;
+                } else if (lastFrameTime == 0) {
+                    lastFrameTime = cur;
+                }
+                if (frameCount % 30 == 0)
+                    lastFrameTime = cur;
+                frameCount++;
+
                 update();
                 render(gc, canvas.getWidth(), canvas.getHeight());
                 simulationTime++;
@@ -125,6 +175,7 @@ public class GalaxyViewer extends Application {
         }.start();
 
         Scene scene = new Scene(root, 1000, 800);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle("JScience Galaxy Viewer - Spiral Structure Simulation");
         stage.setScene(scene);
         stage.show();
@@ -136,6 +187,7 @@ public class GalaxyViewer extends Application {
         collisionMode = false;
         simulationTime = 0;
         initGalaxy(stars, 0, 0, 0);
+        simulator.init(stars);
     }
 
     private void triggerCollision() {
@@ -146,6 +198,9 @@ public class GalaxyViewer extends Application {
         g2y = -800;
         initGalaxy(galaxy2, g2x, g2y, 1);
         stars.addAll(galaxy2);
+        simulator.init(stars); // Re-init with new stars
+        simulator.setGalaxy2State(g2x, g2y, 1, -1); // approximate core velocity
+
     }
 
     private void initGalaxy(List<StarParticle> list, double cx, double cy, int type) {
@@ -193,55 +248,30 @@ public class GalaxyViewer extends Application {
     }
 
     private void update() {
-        if (collisionMode) {
-            // Move Galaxy Cores
-            double dx = g2x - 0;
-            double dy = g2y - 0;
-            double dist = Math.sqrt(dx * dx + dy * dy);
-            double force = 10000.0 / (dist * dist + 100); // Softened gravity
+        // Delegate to Simulator
+        simulator.setGalaxy2State(g2x, g2y, g2vx, g2vy); // Pass current view state if primitive?
+        // Actually, if we are in Object mode, the Simulator manages state.
+        // If we are in Primitive mode, the Simulator manages state.
+        // We really shouldn't manage state in View for G2 anymore if we outsource it.
+        // But `g2x` etc are fields here.
+        // Let's assume Simulator updates its own state, and we just call Update.
+        // BUT we need to render the Core (G2).
+        // We should add getters to Simulator (or Primitive implementation).
+        // Since interface doesn't enforce getters for G2, we might fail to sync.
+        // For Benchmark, preserving Logic in View for Primitive and logic in Sim for
+        // Object is tricky if they diverge.
 
-            // Integrate Cores (Simplified 2-body)
-            g2vx -= (force * dx / dist);
-            g2vy -= (force * dy / dist);
-            g2x += g2vx;
-            g2y += g2vy;
+        simulator.update(collisionMode, g2x, g2y);
 
-            // Perturb stars
-            for (StarParticle s : stars) {
-                // Gravity from Center A (0,0) - already implicitly in orbital v? No, we need
-                // explicit integration now.
-                // We switch to N-body with 2 attractors
-
-                // Attractor 1 (0,0)
-                double d1 = Math.sqrt(s.x * s.x + s.y * s.y);
-                double f1 = 500.0 / (d1 * d1 + 100);
-                s.vx -= (f1 * s.x / d1);
-                s.vy -= (f1 * s.y / d1);
-
-                // Attractor 2 (g2x, g2y)
-                double d2x = s.x - g2x;
-                double d2y = s.y - g2y;
-                double d2 = Math.sqrt(d2x * d2x + d2y * d2y);
-                double f2 = 300.0 / (d2 * d2 + 100);
-                s.vx -= (f2 * d2x / d2);
-                s.vy -= (f2 * d2y / d2);
-
-                s.x += s.vx;
-                s.y += s.vy;
-            }
-        } else {
-            // Static Rotation (Visual only)
-            for (StarParticle s : stars) {
-                // Rotate around 0,0
-                double x = s.x;
-                double y = s.y;
-                double r = Math.sqrt(x * x + y * y);
-                double ang = Math.atan2(y, x);
-                double v = (1.0 / (r / 200.0 + 0.1)) * 0.05; // Speed
-                ang += v;
-                s.x = Math.cos(ang) * r;
-                s.y = Math.sin(ang) * r;
-            }
+        // Update View state from Simulator (for G2 rendering if it moved)
+        if (simulator instanceof PrimitiveGalaxySimulator) {
+            PrimitiveGalaxySimulator prim = (PrimitiveGalaxySimulator) simulator;
+            g2x = prim.getG2X();
+            g2y = prim.getG2Y();
+        } else if (simulator instanceof ObjectGalaxySimulator) {
+            ObjectGalaxySimulator obj = (ObjectGalaxySimulator) simulator;
+            g2x = obj.getG2X();
+            g2y = obj.getG2Y();
         }
     }
 
@@ -270,7 +300,7 @@ public class GalaxyViewer extends Application {
         gc.fillText("Zoom: " + String.format("%.2f", zoom), 10, 60);
     }
 
-    private static class StarParticle {
+    public static class StarParticle {
         double x, y;
         double vx, vy;
         Color color;

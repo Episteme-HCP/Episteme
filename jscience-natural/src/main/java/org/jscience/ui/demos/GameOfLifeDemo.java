@@ -6,7 +6,7 @@ package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
-import org.jscience.ui.computing.GameOfLifeViewer;
+import org.jscience.ui.computing.ai.GameOfLifeViewer;
 
 public class GameOfLifeDemo implements DemoProvider {
     @Override
@@ -16,12 +16,12 @@ public class GameOfLifeDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Game of Life";
+        return org.jscience.natural.i18n.I18n.getInstance().get("life.title");
     }
 
     @Override
     public String getDescription() {
-        return "Conway's cellular automaton with pattern presets and zoom controls.";
+        return org.jscience.natural.i18n.I18n.getInstance().get("life.desc");
     }
 
     @Override

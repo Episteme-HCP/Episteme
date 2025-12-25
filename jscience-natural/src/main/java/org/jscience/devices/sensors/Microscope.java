@@ -12,7 +12,23 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public interface Microscope extends Device {
     enum Type {
-        OPTICAL, ELECTRON_SCANNING, ELECTRON_TRANSMISSION, CONFOCAL, FLUORESCENCE, ATOMIC_FORCE
+        OPTICAL("device.microscope.type.optical"),
+        ELECTRON_SCANNING("device.microscope.type.sem"),
+        ELECTRON_TRANSMISSION("device.microscope.type.tem"),
+        CONFOCAL("device.microscope.type.confocal"),
+        FLUORESCENCE("device.microscope.type.fluorescence"),
+        ATOMIC_FORCE("device.microscope.type.afm");
+
+        private final String i18nKey;
+
+        Type(String i18nKey) {
+            this.i18nKey = i18nKey;
+        }
+
+        @Override
+        public String toString() {
+            return org.jscience.natural.i18n.I18n.getInstance().get(i18nKey);
+        }
     }
 
     Type getType();

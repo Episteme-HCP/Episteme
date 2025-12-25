@@ -27,7 +27,24 @@ import java.util.List;
 public class CircuitSimulatorViewer extends Application {
 
     private enum ComponentType {
-        RESISTOR, CAPACITOR, INDUCTOR, BATTERY, WIRE, GROUND, METER
+        RESISTOR("circuit.component.resistor"),
+        CAPACITOR("circuit.component.capacitor"),
+        INDUCTOR("circuit.component.inductor"),
+        BATTERY("circuit.component.battery"),
+        WIRE("circuit.component.wire"),
+        GROUND("circuit.component.ground"),
+        METER("circuit.component.meter");
+
+        private final String i18nKey;
+
+        ComponentType(String i18nKey) {
+            this.i18nKey = i18nKey;
+        }
+
+        @Override
+        public String toString() {
+            return org.jscience.natural.i18n.I18n.getInstance().get(i18nKey);
+        }
     }
 
     private ComponentType selectedType = ComponentType.WIRE;
@@ -137,6 +154,7 @@ public class CircuitSimulatorViewer extends Application {
         root.setRight(sidebar);
 
         Scene scene = new Scene(root, 1200, 800);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle("JScience Circuit Designer");
         stage.setScene(scene);
         stage.show();

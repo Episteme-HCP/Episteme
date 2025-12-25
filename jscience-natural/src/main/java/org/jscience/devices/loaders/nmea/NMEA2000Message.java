@@ -16,7 +16,7 @@
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
  */
-package org.jscience.devices.signals.nmea;
+package org.jscience.devices.loaders.nmea;
 
 /**
  * NMEA 2000 (CAN-based marine protocol) message parser and representation.

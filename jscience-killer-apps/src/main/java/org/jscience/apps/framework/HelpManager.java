@@ -13,6 +13,8 @@ import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import org.jscience.ui.ThemeManager;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +47,7 @@ public class HelpManager {
     public void showHelp(String appName, String title, List<HelpSection> sections) {
         Stage helpStage = new Stage();
         helpStage.initModality(Modality.APPLICATION_MODAL);
-        helpStage.setTitle("Help - " + appName);
+        helpStage.setTitle(I18nManager.getInstance().get("help.title") + " - " + appName);
 
         VBox content = new VBox(15);
         content.setPadding(new Insets(20));
@@ -62,7 +64,7 @@ public class HelpManager {
         }
 
         // Close button
-        Button closeBtn = new Button("Close");
+        Button closeBtn = new Button(I18nManager.getInstance().get("action.close"));
         closeBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8 20;");
         closeBtn.setOnAction(e -> helpStage.close());
 
@@ -75,6 +77,7 @@ public class HelpManager {
         scrollPane.setStyle("-fx-background-color: white;");
 
         Scene scene = new Scene(scrollPane, 600, 500);
+        ThemeManager.getInstance().applyTheme(scene);
         helpStage.setScene(scene);
         helpStage.show();
     }
@@ -111,7 +114,7 @@ public class HelpManager {
 
         // Add tip if provided
         if (section.tip != null) {
-            Label tipLabel = new Label("💡 Tip: " + section.tip);
+            Label tipLabel = new Label(I18nManager.getInstance().get("help.tip") + " " + section.tip);
             tipLabel.setWrapText(true);
             tipLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #27ae60; -fx-font-style: italic;");
             box.getChildren().add(tipLabel);
@@ -125,7 +128,7 @@ public class HelpManager {
      */
     public void showQuickHelp(String title, String content) {
         List<HelpSection> sections = new ArrayList<>();
-        sections.add(new HelpSection("Overview", content));
+        sections.add(new HelpSection(I18nManager.getInstance().get("help.overview"), content));
         showHelp("JScience", title, sections);
     }
 

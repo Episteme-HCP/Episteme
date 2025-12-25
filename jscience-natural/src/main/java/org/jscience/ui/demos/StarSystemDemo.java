@@ -16,12 +16,12 @@ public class StarSystemDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Star System Viewer";
+        return org.jscience.natural.i18n.I18n.getInstance().get("starsystem.title");
     }
 
     @Override
     public String getDescription() {
-        return "3D solar system visualization with ephemeris-based planet positions.";
+        return org.jscience.natural.i18n.I18n.getInstance().get("starsystem.desc");
     }
 
     @Override

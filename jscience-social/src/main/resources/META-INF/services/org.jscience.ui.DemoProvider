@@ -9,3 +9,4 @@ org.jscience.ui.demos.PoliticsVotingDemo
 org.jscience.ui.demos.PsychologyReactionTest
 org.jscience.ui.demos.SociologyNetworkDemo
 org.jscience.ui.demos.SportsBallisticsDemo
+org.jscience.apps.economics.KurzweilDemo

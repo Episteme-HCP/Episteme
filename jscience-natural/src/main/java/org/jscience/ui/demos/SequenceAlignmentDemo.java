@@ -16,12 +16,12 @@ public class SequenceAlignmentDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "DNA Sequence Alignment";
+        return org.jscience.natural.i18n.I18n.getInstance().get("SequenceAlignment.title");
     }
 
     @Override
     public String getDescription() {
-        return "Visualization of the Needleman-Wunsch algorithm for global sequence alignment of DNA or RNA strings.";
+        return org.jscience.natural.i18n.I18n.getInstance().get("SequenceAlignment.desc");
     }
 
     @Override

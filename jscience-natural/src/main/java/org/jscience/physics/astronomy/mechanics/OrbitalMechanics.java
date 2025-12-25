@@ -36,6 +36,7 @@ import org.jscience.measure.quantity.Velocity;
  * All methods use type-safe Quantity measurements.
  * </p>
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -194,5 +195,124 @@ public class OrbitalMechanics {
     public static Quantity<Time> synodicPeriod(double period1, double period2) {
         double synodic = Math.abs(1.0 / period1 - 1.0 / period2);
         return Quantities.create(1.0 / synodic, Units.SECOND);
+    }
+
+    // ========== Lambert Problem Solver ==========
+
+    /**
+     * Result of Lambert's problem solution.
+     */
+    public static class LambertResult {
+        public final double[] v1;
+        public final double[] v2;
+        public final boolean converged;
+
+        public LambertResult(double[] v1, double[] v2, boolean converged) {
+            this.v1 = v1;
+            this.v2 = v2;
+            this.converged = converged;
+        }
+    }
+
+    /**
+     * Solves Lambert's problem using Universal Variables method.
+     *
+     * @param r1       Position vector 1 [x, y, z] in meters
+     * @param r2       Position vector 2 [x, y, z] in meters
+     * @param dt       Time of flight in seconds
+     * @param mu       Gravitational parameter (m³/s²)
+     * @param prograde true for prograde (short way)
+     * @return LambertResult containing v1, v2 and convergence status
+     */
+    public static LambertResult solveLambert(double[] r1, double[] r2, double dt, double mu, boolean prograde) {
+        final int MAX_ITER = 50;
+        final double TOL = 1e-10;
+
+        double magR1 = lambertNorm(r1);
+        double magR2 = lambertNorm(r2);
+
+        double[] crossR1R2 = lambertCross(r1, r2);
+        double cosDTheta = lambertDot(r1, r2) / (magR1 * magR2);
+        cosDTheta = Math.max(-1, Math.min(1, cosDTheta));
+
+        double dTheta;
+        if (prograde) {
+            dTheta = (crossR1R2[2] >= 0) ? Math.acos(cosDTheta) : 2 * Math.PI - Math.acos(cosDTheta);
+        } else {
+            dTheta = (crossR1R2[2] < 0) ? Math.acos(cosDTheta) : 2 * Math.PI - Math.acos(cosDTheta);
+        }
+
+        double A = Math.sin(dTheta) * Math.sqrt(magR1 * magR2 / (1 - Math.cos(dTheta)));
+        double z = 0.0;
+
+        for (int iter = 0; iter < MAX_ITER; iter++) {
+            double C = stumpffC(z);
+            double S = stumpffS(z);
+            double y = magR1 + magR2 + A * (z * S - 1) / Math.sqrt(C);
+
+            if (y < 0) {
+                z = z / 2;
+                continue;
+            }
+
+            double x = Math.sqrt(y / C);
+            double tof = (x * x * x * S + A * Math.sqrt(y)) / Math.sqrt(mu);
+            double error = tof - dt;
+
+            if (Math.abs(error) < TOL) {
+                double f = 1 - y / magR1;
+                double gDot = 1 - y / magR2;
+                double g = A * Math.sqrt(y / mu);
+
+                double[] v1 = { (r2[0] - f * r1[0]) / g, (r2[1] - f * r1[1]) / g, (r2[2] - f * r1[2]) / g };
+                double[] v2 = { (gDot * r2[0] - r1[0]) / g, (gDot * r2[1] - r1[1]) / g, (gDot * r2[2] - r1[2]) / g };
+                return new LambertResult(v1, v2, true);
+            }
+
+            double dtof_dz = (x * x * x * (stumpffDC(z) - 3 * S * stumpffDS(z) / (2 * C)) / (2 * C)
+                    + (A / 8) * (3 * S * Math.sqrt(y) / C + A / Math.sqrt(y))) / Math.sqrt(mu);
+            z = z - error / dtof_dz;
+        }
+        return new LambertResult(new double[3], new double[3], false);
+    }
+
+    private static double stumpffC(double z) {
+        if (z > 1e-6)
+            return (1 - Math.cos(Math.sqrt(z))) / z;
+        if (z < -1e-6)
+            return (Math.cosh(Math.sqrt(-z)) - 1) / (-z);
+        return 0.5 - z / 24;
+    }
+
+    private static double stumpffS(double z) {
+        if (z > 1e-6) {
+            double sq = Math.sqrt(z);
+            return (sq - Math.sin(sq)) / (sq * sq * sq);
+        }
+        if (z < -1e-6) {
+            double sq = Math.sqrt(-z);
+            return (Math.sinh(sq) - sq) / (sq * sq * sq);
+        }
+        return 1.0 / 6 - z / 120;
+    }
+
+    private static double stumpffDC(double z) {
+        return (1 / (2 * z)) * (1 - z * stumpffS(z) - 2 * stumpffC(z));
+    }
+
+    private static double stumpffDS(double z) {
+        return (1 / (2 * z)) * (stumpffC(z) - 3 * stumpffS(z));
+    }
+
+    private static double lambertNorm(double[] v) {
+        return Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    }
+
+    private static double lambertDot(double[] a, double[] b) {
+        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    }
+
+    private static double[] lambertCross(double[] a, double[] b) {
+        return new double[] { a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0] };
     }
 }

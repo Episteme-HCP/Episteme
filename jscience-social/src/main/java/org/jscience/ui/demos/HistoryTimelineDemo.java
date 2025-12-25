@@ -20,12 +20,12 @@ public class HistoryTimelineDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "History: Interactive Timeline";
+        return org.jscience.social.i18n.I18n.getInstance().get("hist.timeline.title");
     }
 
     @Override
     public String getDescription() {
-        return "Horizontal scrollable timeline visualizing historical eras and events.";
+        return org.jscience.social.i18n.I18n.getInstance().get("hist.timeline.desc");
     }
 
     @Override

@@ -20,12 +20,12 @@ public class GeographyGISDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Geography: GIS Map Layers";
+        return org.jscience.social.i18n.I18n.getInstance().get("geo.gis.title");
     }
 
     @Override
     public String getDescription() {
-        return "Geographic Information System demo showing layered map data (Terrain, Roads, Population).";
+        return org.jscience.social.i18n.I18n.getInstance().get("geo.gis.desc");
     }
 
     @Override
@@ -34,11 +34,11 @@ public class GeographyGISDemo implements DemoProvider {
         Canvas canvas = new Canvas(800, 600);
         root.setCenter(canvas);
 
-        CheckBox terrainChk = new CheckBox("Terrain (Green/Blue)");
+        CheckBox terrainChk = new CheckBox(org.jscience.social.i18n.I18n.getInstance().get("geo.gis.check.terrain"));
         terrainChk.setSelected(true);
-        CheckBox roadsChk = new CheckBox("Roads (Gray)");
+        CheckBox roadsChk = new CheckBox(org.jscience.social.i18n.I18n.getInstance().get("geo.gis.check.roads"));
         roadsChk.setSelected(true);
-        CheckBox popChk = new CheckBox("Population Density (Red Heatmap)");
+        CheckBox popChk = new CheckBox(org.jscience.social.i18n.I18n.getInstance().get("geo.gis.check.pop"));
         popChk.setSelected(false);
 
         Runnable draw = () -> renderMap(canvas.getGraphicsContext2D(), 800, 600,
@@ -48,7 +48,8 @@ public class GeographyGISDemo implements DemoProvider {
         roadsChk.setOnAction(e -> draw.run());
         popChk.setOnAction(e -> draw.run());
 
-        VBox controls = new VBox(10, new Label("Layers:"), terrainChk, roadsChk, popChk);
+        VBox controls = new VBox(10, new Label(org.jscience.social.i18n.I18n.getInstance().get("geo.gis.label.layers")),
+                terrainChk, roadsChk, popChk);
         controls.setStyle("-fx-padding: 10; -fx-background-color: #eee;");
         root.setRight(controls);
 

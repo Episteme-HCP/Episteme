@@ -17,42 +17,56 @@ import javafx.scene.control.Slider;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.mathematics.linearalgebra.Vector;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.jscience.mathematics.sets.Reals;
+import org.jscience.physics.classical.mechanics.RigidBody;
+import org.jscience.natural.i18n.I18n;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 /**
  * 2D Rigid Body Physics Engine Demo.
+ * Demonstrates integration with
+ * org.jscience.physics.classical.mechanics.RigidBody.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  */
 public class RigidBodyViewer extends Application {
 
-    private static class Body {
-        double x, y, vx, vy, radius, mass, bounciness = 0.8;
+    // Extension to hold visual data not in the core physics body
+    private static class VisualBody {
+        RigidBody physicsBody;
+        double radius;
         Color color;
+        double bounciness = 0.8;
 
-        Body(double x, double y, double r, Color c) {
-            this.x = x;
-            this.y = y;
+        VisualBody(RigidBody rb, double r, Color c) {
+            this.physicsBody = rb;
             this.radius = r;
             this.color = c;
-            this.mass = r * r;
         }
     }
 
-    private List<Body> bodies = new ArrayList<>();
-    private double gravity = 0.5;
-    private double bounciness = 0.8;
+    private List<VisualBody> bodies = new ArrayList<>();
+    private double gravityVal = 0.5;
+    private double bouncinessVal = 0.8;
     private Canvas canvas;
     private Label countLabel;
 
     @Override
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #1a1a2e;");
+        root.setId("root"); // CSS hook
+        root.setStyle("-fx-background-color: #1a1a2e;"); // Fallback
+
         canvas = new Canvas(800, 600);
         root.setCenter(canvas);
 
@@ -61,52 +75,52 @@ public class RigidBodyViewer extends Application {
         sidebar.setPrefWidth(180);
         sidebar.setStyle("-fx-background-color: #16213e;");
 
-        Label title = new Label("⚾ Rigid Body Physics");
+        Label title = new Label(I18n.getInstance().get("rigid.title"));
         title.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #00d9ff;");
 
-        countLabel = new Label("Bodies: 0");
+        countLabel = new Label(I18n.getInstance().get("rigid.bodies"));
         countLabel.setStyle("-fx-text-fill: #aaa;");
 
         Separator sep1 = new Separator();
 
-        Label gravLabel = new Label("Gravity: 0.5");
+        Label gravLabel = new Label(I18n.getInstance().get("rigid.gravity"));
         gravLabel.setStyle("-fx-text-fill: #888;");
         Slider gravSlider = new Slider(0, 2, 0.5);
         gravSlider.setShowTickLabels(true);
         gravSlider.valueProperty().addListener((o, ov, nv) -> {
-            gravity = nv.doubleValue();
-            gravLabel.setText(String.format("Gravity: %.1f", gravity));
+            gravityVal = nv.doubleValue();
+            gravLabel.setText(String.format(I18n.getInstance().get("rigid.gravity") + ": %.1f", gravityVal));
         });
 
-        Label bounceLabel = new Label("Bounciness: 0.8");
+        Label bounceLabel = new Label(I18n.getInstance().get("rigid.bounciness"));
         bounceLabel.setStyle("-fx-text-fill: #888;");
         Slider bounceSlider = new Slider(0.1, 1.0, 0.8);
         bounceSlider.setShowTickLabels(true);
         bounceSlider.valueProperty().addListener((o, ov, nv) -> {
-            bounciness = nv.doubleValue();
-            bounceLabel.setText(String.format("Bounciness: %.1f", bounciness));
+            bouncinessVal = nv.doubleValue();
+            bounceLabel.setText(String.format(I18n.getInstance().get("rigid.bounciness") + ": %.1f", bouncinessVal));
         });
 
         Separator sep2 = new Separator();
 
-        Button addBtn = new Button("Add Ball");
+        Button addBtn = new Button(I18n.getInstance().get("rigid.add"));
         addBtn.setMaxWidth(Double.MAX_VALUE);
         addBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
         addBtn.setOnAction(e -> addBody());
 
-        Button add5Btn = new Button("Add 5 Balls");
+        Button add5Btn = new Button(I18n.getInstance().get("rigid.add5"));
         add5Btn.setMaxWidth(Double.MAX_VALUE);
         add5Btn.setOnAction(e -> {
             for (int i = 0; i < 5; i++)
                 addBody();
         });
 
-        Button clearBtn = new Button("Clear All");
+        Button clearBtn = new Button(I18n.getInstance().get("rigid.clear"));
         clearBtn.setMaxWidth(Double.MAX_VALUE);
         clearBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
         clearBtn.setOnAction(e -> {
             bodies.clear();
-            countLabel.setText("Bodies: 0");
+            countLabel.setText(I18n.getInstance().get("rigid.bodies"));
         });
 
         sidebar.getChildren().addAll(title, countLabel, sep1,
@@ -123,7 +137,15 @@ public class RigidBodyViewer extends Application {
         }.start();
 
         Scene scene = new Scene(root, 950, 600);
-        stage.setTitle("JScience - Rigid Body Engine");
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
+
+        // Load CSS if available
+        java.net.URL css = getClass().getResource("/org/jscience/ui/theme.css");
+        if (css != null) {
+            scene.getStylesheets().add(css.toExternalForm());
+        }
+
+        stage.setTitle(I18n.getInstance().get("rigid.window"));
         stage.setScene(scene);
         stage.show();
     }
@@ -131,76 +153,156 @@ public class RigidBodyViewer extends Application {
     private void addBody() {
         Random r = new Random();
         double radius = 10 + r.nextDouble() * 20;
-        Body b = new Body(100 + r.nextDouble() * 600, 50, radius,
-                Color.hsb(r.nextDouble() * 360, 0.7, 0.9));
-        b.vx = (r.nextDouble() - 0.5) * 10;
-        b.bounciness = bounciness;
-        bodies.add(b);
+        double m = radius * radius; // Mass proportional to area
+
+        // Initial Position
+        double px = 100 + r.nextDouble() * 600;
+        double py = 50.0;
+        Vector<Real> pos = toVector(px, py, 0.0);
+
+        // Initial Velocity
+        double vx = (r.nextDouble() - 0.5) * 10;
+        double vy = 0.0;
+        Vector<Real> vel = toVector(vx, vy, 0.0);
+
+        // Dummy Inertia (Identity matrix, 3x3 diagonal)
+        Real one = Real.ONE;
+        Real zero = Real.ZERO;
+        List<List<Real>> rows = new ArrayList<>();
+        rows.add(Arrays.asList(one, zero, zero));
+        rows.add(Arrays.asList(zero, one, zero));
+        rows.add(Arrays.asList(zero, zero, one));
+        DenseMatrix<Real> inertia = new DenseMatrix<>(rows, Reals.getInstance());
+
+        // Create Physics Body
+        RigidBody rb = new RigidBody(pos, Real.of(m), inertia, null);
+        rb.setVelocity(vel);
+
+        // Visual Wrapper
+        VisualBody vb = new VisualBody(rb, radius, Color.hsb(r.nextDouble() * 360, 0.7, 0.9));
+        vb.bounciness = bouncinessVal;
+
+        bodies.add(vb);
         countLabel.setText("Bodies: " + bodies.size());
     }
 
+    private Vector<Real> toVector(double x, double y, double z) {
+        return DenseVector.of(Arrays.asList(Real.of(x), Real.of(y), Real.of(z)), Reals.getInstance());
+    }
+
     private void update() {
-        for (Body b : bodies) {
-            b.vy += gravity;
-            b.x += b.vx;
-            b.y += b.vy;
+        Real dt = Real.of(0.2); // Slower time step for stability with Real types overhead
+        Vector<Real> gravityForce = toVector(0, gravityVal, 0);
+
+        for (VisualBody vb : bodies) {
+            RigidBody b = vb.physicsBody;
+
+            // Apply Gravity (F = m*g) - Here simplified as adding to velocity or applying
+            // force
+            // Since we integrate, let's update velocity directly for gravity?
+            // Or apply constant force.
+            // b.applyForce(gravityForce.multiply(Real.of(vb.radius*vb.radius)),
+            // b.getPosition());
+            // Simplified: Add gravity to velocity manually or use force.
+            // Let's use velocity addition for stability in this simple demo
+            Vector<Real> grav = toVector(0, gravityVal, 0);
+            b.setVelocity(b.getVelocity().add(grav));
+
+            // Integrate
+            b.integrate(dt);
+
+            // Fetch state back
+            double x = b.getPosition().get(0).doubleValue();
+            double y = b.getPosition().get(1).doubleValue();
+            double vx = b.getVelocity().get(0).doubleValue();
+            double vy = b.getVelocity().get(1).doubleValue();
 
             // Floor collision
-            if (b.y + b.radius > 600) {
-                b.y = 600 - b.radius;
-                b.vy *= -b.bounciness;
+            if (y + vb.radius > 600) {
+                y = 600 - vb.radius;
+                vy *= -vb.bounciness;
+                b.setPosition(toVector(x, y, 0));
+                b.setVelocity(toVector(vx, vy, 0));
             }
             // Wall collisions
-            if (b.x - b.radius < 0) {
-                b.x = b.radius;
-                b.vx *= -b.bounciness;
+            if (x - vb.radius < 0) {
+                x = vb.radius;
+                vx *= -vb.bounciness;
+                b.setPosition(toVector(x, y, 0));
+                b.setVelocity(toVector(vx, vy, 0));
             }
-            if (b.x + b.radius > 800) {
-                b.x = 800 - b.radius;
-                b.vx *= -b.bounciness;
+            if (x + vb.radius > 800) {
+                x = 800 - vb.radius;
+                vx *= -vb.bounciness;
+                b.setPosition(toVector(x, y, 0));
+                b.setVelocity(toVector(vx, vy, 0));
             }
         }
 
         // Inter-body collisions
         for (int i = 0; i < bodies.size(); i++) {
             for (int j = i + 1; j < bodies.size(); j++) {
-                Body b1 = bodies.get(i);
-                Body b2 = bodies.get(j);
-                double dx = b2.x - b1.x;
-                double dy = b2.y - b1.y;
+                VisualBody vb1 = bodies.get(i);
+                VisualBody vb2 = bodies.get(j);
+                RigidBody b1 = vb1.physicsBody;
+                RigidBody b2 = vb2.physicsBody;
+
+                double x1 = b1.getPosition().get(0).doubleValue();
+                double y1 = b1.getPosition().get(1).doubleValue();
+                double x2 = b2.getPosition().get(0).doubleValue();
+                double y2 = b2.getPosition().get(1).doubleValue();
+
+                double dx = x2 - x1;
+                double dy = y2 - y1;
                 double dist = Math.sqrt(dx * dx + dy * dy);
-                double minDist = b1.radius + b2.radius;
+                double minDist = vb1.radius + vb2.radius;
 
                 if (dist < minDist) {
                     // Simple impulse response
                     double nx = dx / dist;
                     double ny = dy / dist;
-                    double relVelX = b2.vx - b1.vx;
-                    double relVelY = b2.vy - b1.vy;
+
+                    double vx1 = b1.getVelocity().get(0).doubleValue();
+                    double vy1 = b1.getVelocity().get(1).doubleValue();
+                    double vx2 = b2.getVelocity().get(0).doubleValue();
+                    double vy2 = b2.getVelocity().get(1).doubleValue();
+
+                    double relVelX = vx2 - vx1;
+                    double relVelY = vy2 - vy1;
                     double velAlongNormal = relVelX * nx + relVelY * ny;
 
                     if (velAlongNormal > 0)
                         continue;
 
-                    double e = Math.min(b1.bounciness, b2.bounciness);
+                    double e = Math.min(vb1.bounciness, vb2.bounciness);
+                    double m1 = vb1.radius * vb1.radius;
+                    double m2 = vb2.radius * vb2.radius; // Mass approx
+
                     double jImpulse = -(1 + e) * velAlongNormal;
-                    jImpulse /= (1 / b1.mass + 1 / b2.mass);
+                    jImpulse /= (1 / m1 + 1 / m2);
 
                     double impulseX = jImpulse * nx;
                     double impulseY = jImpulse * ny;
 
-                    b1.vx -= 1 / b1.mass * impulseX;
-                    b1.vy -= 1 / b1.mass * impulseY;
-                    b2.vx += 1 / b2.mass * impulseX;
-                    b2.vy += 1 / b2.mass * impulseY;
+                    vx1 -= 1 / m1 * impulseX;
+                    vy1 -= 1 / m1 * impulseY;
+                    vx2 += 1 / m2 * impulseX;
+                    vy2 += 1 / m2 * impulseY;
 
-                    // Positional correction to prevent sticking
+                    b1.setVelocity(toVector(vx1, vy1, 0));
+                    b2.setVelocity(toVector(vx2, vy2, 0));
+
+                    // Positional correction
                     double percent = 0.2, slop = 0.01;
-                    double correction = Math.max(minDist - dist - slop, 0) / (1 / b1.mass + 1 / b2.mass) * percent;
-                    b1.x -= 1 / b1.mass * nx * correction;
-                    b1.y -= 1 / b1.mass * ny * correction;
-                    b2.x += 1 / b2.mass * nx * correction;
-                    b2.y += 1 / b2.mass * ny * correction;
+                    double correction = Math.max(minDist - dist - slop, 0) / (1 / m1 + 1 / m2) * percent;
+
+                    x1 -= 1 / m1 * nx * correction;
+                    y1 -= 1 / m1 * ny * correction;
+                    x2 += 1 / m2 * nx * correction;
+                    y2 += 1 / m2 * ny * correction;
+
+                    b1.setPosition(toVector(x1, y1, 0));
+                    b2.setPosition(toVector(x2, y2, 0));
                 }
             }
         }
@@ -208,18 +310,21 @@ public class RigidBodyViewer extends Application {
 
     private void render() {
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setFill(Color.web("#1a1a2e"));
-        gc.fillRect(0, 0, 800, 600);
+        gc.clearRect(0, 0, 800, 600); // Transparent cleanup if BG is set by Pane
 
         // Floor line
         gc.setStroke(Color.web("#444"));
         gc.strokeLine(0, 599, 800, 599);
 
-        for (Body b : bodies) {
-            gc.setFill(b.color);
-            gc.fillOval(b.x - b.radius, b.y - b.radius, b.radius * 2, b.radius * 2);
+        for (VisualBody vb : bodies) {
+            RigidBody b = vb.physicsBody;
+            double x = b.getPosition().get(0).doubleValue();
+            double y = b.getPosition().get(1).doubleValue();
+
+            gc.setFill(vb.color);
+            gc.fillOval(x - vb.radius, y - vb.radius, vb.radius * 2, vb.radius * 2);
             gc.setStroke(Color.WHITE);
-            gc.strokeOval(b.x - b.radius, b.y - b.radius, b.radius * 2, b.radius * 2);
+            gc.strokeOval(x - vb.radius, y - vb.radius, vb.radius * 2, vb.radius * 2);
         }
     }
 

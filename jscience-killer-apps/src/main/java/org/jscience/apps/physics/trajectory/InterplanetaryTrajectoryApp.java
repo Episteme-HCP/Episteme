@@ -15,14 +15,15 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 
 import org.jscience.apps.framework.KillerAppBase;
-import org.jscience.physics.astronomy.SolarSystemLoader;
 import org.jscience.physics.astronomy.StarSystem;
 import org.jscience.physics.astronomy.CelestialBody;
 import org.jscience.physics.astronomy.Planet;
 import org.jscience.physics.loaders.HorizonsEphemerisLoader;
+import org.jscience.physics.astronomy.SolarSystemLoader;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -130,35 +131,47 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
                 .map(CelestialBody::getName)
                 .collect(Collectors.toList());
 
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+
+        grid.add(new Label(i18n.get("trajectory.label.origin")), 0, 0);
         originBox = new ComboBox<>(FXCollections.observableArrayList(planets));
         originBox.setValue("Earth");
         originBox.setOnAction(e -> updateSelection());
+        grid.add(originBox, 1, 0);
 
+        grid.add(new Label(i18n.get("trajectory.label.target")), 0, 1);
         targetBox = new ComboBox<>(FXCollections.observableArrayList(planets));
         targetBox.setValue("Mars");
         targetBox.setOnAction(e -> updateSelection());
+        grid.add(targetBox, 1, 1);
 
-        // Update body references
-        updateSelection();
-
-        // Dates
+        grid.add(new Label(i18n.get("trajectory.label.departure")), 0, 2);
         launchDatePicker = new DatePicker(LocalDate.now());
         launchDatePicker.setOnAction(e -> drawSolarSystem());
+        grid.add(launchDatePicker, 1, 2);
 
+        grid.add(new Label(i18n.get("trajectory.label.duration")), 0, 3);
         flightDurationSpinner = new Spinner<>(30, 1000, 180, 10); // Min 30 days, Max 1000, Default 180
         flightDurationSpinner.setEditable(true);
         flightDurationSpinner.valueProperty().addListener((o, ov, nv) -> drawSolarSystem());
+        grid.add(flightDurationSpinner, 1, 3);
 
         // Calc Button
         Button calcBtn = new Button(i18n.get("trajectory.button.calculate"));
         calcBtn.setMaxWidth(Double.MAX_VALUE);
         calcBtn.getStyleClass().add("primary-button"); // If theme supports it
         calcBtn.setStyle("-fx-background-color: #007bff; -fx-text-fill: white; -fx-font-weight: bold;");
-        calcBtn.setOnAction(e -> calculateTrajectory());
+        calcBtn.setOnAction(
+                e -> calculateTrajectory(originBox.getValue(), targetBox.getValue(), flightDurationSpinner.getValue()));
+        grid.add(calcBtn, 0, 4, 2, 1);
 
         // Results
-        deltaVLabel = new Label("Delta-V: -- km/s");
+        grid.add(new Label(i18n.get("trajectory.label.deltav")), 0, 5);
+        deltaVLabel = new Label("--");
         deltaVLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+        grid.add(deltaVLabel, 1, 5);
 
         missionLog = new TextArea();
         missionLog.setEditable(false);
@@ -167,15 +180,12 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
 
         panel.getChildren().addAll(
                 title,
-                new Label(i18n.get("trajectory.label.origin") + ":"), originBox,
-                new Label(i18n.get("trajectory.label.target") + ":"), targetBox,
+                grid,
                 new Separator(),
-                new Label(i18n.get("trajectory.label.departure") + ":"), launchDatePicker,
-                new Label(i18n.get("trajectory.label.duration") + ":"), flightDurationSpinner,
-                new Separator(),
-                calcBtn,
-                deltaVLabel,
                 new Label(i18n.get("trajectory.label.log") + ":"), missionLog);
+
+        // Update body references
+        updateSelection();
 
         return panel;
     }
@@ -334,21 +344,21 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
         return days / 36525.0;
     }
 
-    private void calculateTrajectory() {
+    private void calculateTrajectory(String origin, String target, double durationDays) {
         if (originBody == null || targetBody == null)
             return;
         if (!(originBody instanceof Planet) || !(targetBody instanceof Planet))
             return;
 
         LocalDate d1 = launchDatePicker.getValue();
-        int duration = flightDurationSpinner.getValue();
+        int duration = (int) durationDays; // Use the duration from the slider/spinner
         LocalDate d2 = d1.plusDays(duration);
 
         missionLog.appendText("--------------------------------\n");
-        missionLog.appendText("Analyzing Transfer:\n");
-        missionLog.appendText("Launcher: " + originBody.getName() + " -> " + targetBody.getName() + "\n");
-        missionLog.appendText("Launch: " + d1 + "\n");
-        missionLog.appendText("Arrival: " + d2 + " (" + duration + " days)\n");
+        missionLog.appendText(i18n.get("trajectory.log.analyzing") + "\n");
+        missionLog.appendText(MessageFormat.format(i18n.get("trajectory.log.launcher"), origin, target) + "\n");
+        missionLog.appendText(MessageFormat.format(i18n.get("trajectory.log.launch"), d1) + "\n");
+        missionLog.appendText(MessageFormat.format(i18n.get("trajectory.log.arrival"), d2, duration) + "\n");
 
         double[] pos1 = calculatePosition((Planet) originBody, d1);
         double[] pos2 = calculatePosition((Planet) targetBody, d2);

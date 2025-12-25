@@ -22,12 +22,12 @@ public class ArtsColorTheoryDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Arts: Color Harmony";
+        return org.jscience.social.i18n.I18n.getInstance().get("ArtsColorTheory.title");
     }
 
     @Override
     public String getDescription() {
-        return "Interactive Color Wheel demonstrating complementary, analogous, and triadic harmonies.";
+        return org.jscience.social.i18n.I18n.getInstance().get("ArtsColorTheory.desc");
     }
 
     @Override
@@ -65,20 +65,24 @@ public class ArtsColorTheoryDemo implements DemoProvider {
         harmonies.setPadding(new Insets(20));
         harmonies.setAlignment(Pos.CENTER);
 
-        harmonies.getChildren().add(new Label("Complementary (Contrast)"));
+        harmonies.getChildren()
+                .add(new Label(org.jscience.social.i18n.I18n.getInstance().get("arts.color.label.comp")));
         harmonies.getChildren().add(compBox);
 
         HBox ana = new HBox(10, ana1Box, ana2Box);
         ana.setAlignment(Pos.CENTER);
-        harmonies.getChildren().add(new Label("Analogous (Harmony)"));
+        harmonies.getChildren()
+                .add(new Label(org.jscience.social.i18n.I18n.getInstance().get("arts.color.label.analog")));
         harmonies.getChildren().add(ana);
 
         HBox tri = new HBox(10, tri1Box, tri2Box);
         tri.setAlignment(Pos.CENTER);
-        harmonies.getChildren().add(new Label("Triadic (Vibrant)"));
+        harmonies.getChildren()
+                .add(new Label(org.jscience.social.i18n.I18n.getInstance().get("arts.color.label.triad")));
         harmonies.getChildren().add(tri);
 
-        VBox main = new VBox(10, new Label("Select Hue"), hueSlider, colorBox);
+        VBox main = new VBox(10, new Label(org.jscience.social.i18n.I18n.getInstance().get("arts.color.label.hue")),
+                hueSlider, colorBox);
         main.setAlignment(Pos.CENTER);
 
         root.setCenter(main);

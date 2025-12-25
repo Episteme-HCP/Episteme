@@ -22,6 +22,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import org.jscience.geology.Earthquake;
 
 /**
  * Earthquake Map Viewer.
@@ -56,7 +57,6 @@ public class EarthquakeMapViewer extends Application {
 
         Label titleLabel = new Label("Earthquake Map");
         titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        titleLabel.setTextFill(Color.WHITE);
 
         Label explainLabel = new Label(
                 "Visualization of global seismic activity.\n\n" +
@@ -69,11 +69,10 @@ public class EarthquakeMapViewer extends Application {
                         "• Scroll to zoom\n" +
                         "• Hover for coordinates");
         explainLabel.setWrapText(true);
-        explainLabel.setTextFill(Color.LIGHTGRAY);
 
         // Legend
         Label legendLabel = new Label("Magnitude Legend:");
-        legendLabel.setTextFill(Color.WHITE);
+
         legendLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
 
         VBox legend = new VBox(3);
@@ -84,11 +83,11 @@ public class EarthquakeMapViewer extends Application {
                 createLegendItem(Color.RED, "> 6.0 (Strong)"));
 
         coordLabel = new Label("Lat: --, Lon: --");
-        coordLabel.setTextFill(Color.CYAN);
+
         coordLabel.setFont(Font.font("Consolas", 12));
 
         infoLabel = new Label("Hover over quake for details");
-        infoLabel.setTextFill(Color.YELLOW);
+
         infoLabel.setWrapText(true);
 
         infoPanel.getChildren().addAll(
@@ -113,13 +112,13 @@ public class EarthquakeMapViewer extends Application {
 
             // Check if hovering over a quake
             for (Earthquake q : quakes) {
-                double qx = lonToX(q.lon);
-                double qy = latToY(q.lat);
-                double size = Math.pow(q.mag, 1.5) * 2;
+                double qx = lonToX(q.getLon());
+                double qy = latToY(q.getLat());
+                double size = Math.pow(q.getMag(), 1.5) * 2;
                 if (Math.abs(e.getX() - qx) < size && Math.abs(e.getY() - qy) < size) {
                     infoLabel.setText(String.format(
                             "Magnitude: %.1f\nLocation: %.2f°, %.2f°\nDepth: ~%.0f km",
-                            q.mag, q.lat, q.lon, q.depth));
+                            q.getMag(), q.getLat(), q.getLon(), q.getDepth()));
                     return;
                 }
             }
@@ -157,6 +156,7 @@ public class EarthquakeMapViewer extends Application {
         }.start();
 
         Scene scene = new Scene(root, WIDTH + 220, HEIGHT);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle("JScience Earthquake Map");
         stage.setScene(scene);
         stage.show();
@@ -237,25 +237,25 @@ public class EarthquakeMapViewer extends Application {
 
         // Draw quakes
         for (Earthquake q : quakes) {
-            double x = lonToX(q.lon);
-            double y = latToY(q.lat);
+            double x = lonToX(q.getLon());
+            double y = latToY(q.getLat());
 
-            double size = Math.pow(q.mag, 1.5) * 2 * zoom;
+            double size = Math.pow(q.getMag(), 1.5) * 2 * zoom;
 
             // Color by magnitude
             Color c;
-            if (q.mag > 6)
+            if (q.getMag() > 6)
                 c = Color.hsb(0, 1, 1, 0.8);
-            else if (q.mag > 5)
+            else if (q.getMag() > 5)
                 c = Color.hsb(40, 1, 1, 0.7);
-            else if (q.mag > 3)
+            else if (q.getMag() > 3)
                 c = Color.hsb(80, 1, 1, 0.6);
             else
                 c = Color.hsb(120, 1, 1, 0.5);
 
             // Pulse effect for strong quakes
-            double pulse = (Math.sin(now / 200_000_000.0 + q.lat) + 1) / 2;
-            if (q.mag > 6)
+            double pulse = (Math.sin(now / 200_000_000.0 + q.getLat()) + 1) / 2;
+            if (q.getMag() > 6)
                 size += pulse * 5;
 
             gc.setFill(c);
@@ -282,18 +282,6 @@ public class EarthquakeMapViewer extends Application {
 
     private double yToLat(double y) {
         return 90 - ((y - offsetY) / (HEIGHT * zoom)) * 180.0;
-    }
-
-    private static class Earthquake {
-        double lat, lon, mag, depth;
-
-        Earthquake(double lat, double lon, double mag, double depth) {
-            this.lat = lat;
-            this.lon = lon;
-            this.mag = mag;
-            this.depth = depth;
-        }
-
     }
 
     public static void show(Stage stage) {

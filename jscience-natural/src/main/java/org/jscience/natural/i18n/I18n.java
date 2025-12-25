@@ -12,7 +12,7 @@ public class I18n {
     private ResourceBundle bundle;
 
     private I18n() {
-        setLocale(Locale.getDefault());
+        org.jscience.ui.i18n.I18n.getInstance().addBundle(BUNDLE_BASE);
     }
 
     public static synchronized I18n getInstance() {
@@ -23,18 +23,10 @@ public class I18n {
     }
 
     public void setLocale(Locale locale) {
-        try {
-            this.bundle = ResourceBundle.getBundle(BUNDLE_BASE, locale);
-        } catch (Exception e) {
-            this.bundle = ResourceBundle.getBundle(BUNDLE_BASE, Locale.ENGLISH);
-        }
+        org.jscience.ui.i18n.I18n.getInstance().setLocale(locale);
     }
 
     public String get(String key) {
-        try {
-            return bundle.getString(key);
-        } catch (Exception e) {
-            return "!" + key + "!";
-        }
+        return org.jscience.ui.i18n.I18n.getInstance().get(key);
     }
 }

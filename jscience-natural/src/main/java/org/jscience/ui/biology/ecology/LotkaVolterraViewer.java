@@ -116,6 +116,7 @@ public class LotkaVolterraViewer extends Application {
         }.start();
 
         Scene scene = new Scene(root, 1000, 800);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle("Lotka-Volterra Engine");
         stage.setScene(scene);
         stage.show();

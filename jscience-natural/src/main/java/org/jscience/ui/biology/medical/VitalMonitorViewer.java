@@ -81,6 +81,7 @@ public class VitalMonitorViewer extends Application {
         }.start();
 
         Scene scene = new Scene(root, 900, 500);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle("JScience Vital Constants Monitor");
         stage.setScene(scene);
         stage.show();

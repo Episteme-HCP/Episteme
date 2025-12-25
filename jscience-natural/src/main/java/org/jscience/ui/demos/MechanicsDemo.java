@@ -16,12 +16,12 @@ public class MechanicsDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Mechanics Simulation";
+        return org.jscience.natural.i18n.I18n.getInstance().get("Mechanics.title");
     }
 
     @Override
     public String getDescription() {
-        return "Mass-spring system demonstrating harmonic oscillation using Real types.";
+        return org.jscience.natural.i18n.I18n.getInstance().get("Mechanics.desc");
     }
 
     @Override

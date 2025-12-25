@@ -12,7 +12,24 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public interface Spectrometer extends Sensor<Real> {
     enum SpectroscopyType {
-        UV_VIS, INFRARED, RAMAN, MASS, NMR, FLUORESCENCE, ATOMIC_ABSORPTION
+        UV_VIS("device.spectrometer.type.uvvis"),
+        INFRARED("device.spectrometer.type.ir"),
+        RAMAN("device.spectrometer.type.raman"),
+        MASS("device.spectrometer.type.mass"),
+        NMR("device.spectrometer.type.nmr"),
+        FLUORESCENCE("device.spectrometer.type.fluorescence"),
+        ATOMIC_ABSORPTION("device.spectrometer.type.aa");
+
+        private final String i18nKey;
+
+        SpectroscopyType(String i18nKey) {
+            this.i18nKey = i18nKey;
+        }
+
+        @Override
+        public String toString() {
+            return org.jscience.natural.i18n.I18n.getInstance().get(i18nKey);
+        }
     }
 
     SpectroscopyType getType();

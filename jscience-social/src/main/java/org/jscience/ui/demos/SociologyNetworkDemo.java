@@ -22,12 +22,12 @@ public class SociologyNetworkDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Sociology: Social Network Graph";
+        return org.jscience.social.i18n.I18n.getInstance().get("SociologyNetwork.title");
     }
 
     @Override
     public String getDescription() {
-        return "Force-directed graph simulation representing social connections and clusters.";
+        return org.jscience.social.i18n.I18n.getInstance().get("SociologyNetwork.desc");
     }
 
     private static class Node {

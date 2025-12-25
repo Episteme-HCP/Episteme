@@ -3,8 +3,13 @@ package org.jscience.ui.physics.astronomy;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.*;
+import javafx.scene.Scene;
+import org.jscience.natural.i18n.I18n;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.StackPane;
+import javafx.geometry.Pos;
+import javafx.geometry.Insets;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -47,6 +52,7 @@ public class StarSystemViewer extends Application {
     private JulianDate currentDate = new JulianDate(JulianDate.J2000);
     private double timeScale = 1.0;
     private boolean paused = false;
+    private double simulationSpeed = 1.0;
 
     private Map<CelestialBody, Node> bodyNodes = new HashMap<>();
     private double scaleFactor = 1e-9;
@@ -61,7 +67,21 @@ public class StarSystemViewer extends Application {
     private Label dateLabel;
 
     private enum Preset {
-        SOLAR_SYSTEM, BLACK_HOLE, NEUTRON_STAR, SUPERGIANT
+        SOLAR_SYSTEM("starsystem.preset.solar"),
+        BLACK_HOLE("starsystem.preset.blackhole"),
+        NEUTRON_STAR("starsystem.preset.neutron"),
+        SUPERGIANT("starsystem.preset.supergiant");
+
+        private final String i18nKey;
+
+        Preset(String i18nKey) {
+            this.i18nKey = i18nKey;
+        }
+
+        @Override
+        public String toString() {
+            return org.jscience.natural.i18n.I18n.getInstance().get(i18nKey);
+        }
     }
 
     @Override
@@ -168,6 +188,7 @@ public class StarSystemViewer extends Application {
 
         Scene scene = new Scene(root, 1280, 800);
         scene.setFill(Color.BLACK);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
 
         scene.widthProperty().addListener((o, old, v) -> subScene.setWidth(v.doubleValue() - 200));
         scene.heightProperty().addListener((o, old, v) -> subScene.setHeight(v.doubleValue()));
@@ -361,14 +382,14 @@ public class StarSystemViewer extends Application {
 
     private void updateLabels() {
         if (dateLabel != null)
-            dateLabel.setText("Date: " + currentDate.getValue());
+            dateLabel.setText(I18n.getInstance().get("starsystem.date") + ": " + currentDate.getValue());
     }
 
     private VBox createOverlay() {
         VBox box = new VBox(15);
         box.setStyle("-fx-background-color: #222; -fx-padding: 10;");
 
-        Label title = new Label("System Presets");
+        Label title = new Label(I18n.getInstance().get("starsystem.presets"));
         title.setTextFill(Color.WHITE);
 
         ComboBox<Preset> combo = new ComboBox<>();
@@ -381,6 +402,38 @@ public class StarSystemViewer extends Application {
 
         box.getChildren().addAll(title, combo);
         return box;
+    }
+
+    private VBox createHUD() {
+        // HUD
+        VBox hud = new VBox(10);
+        hud.setPadding(new Insets(10));
+        hud.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5); -fx-background-radius: 10;");
+        hud.setMaxWidth(300);
+        StackPane.setAlignment(hud, Pos.TOP_LEFT);
+        StackPane.setMargin(hud, new Insets(10));
+
+        Label title = new Label(I18n.getInstance().get("starsystem.title"));
+        title.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
+
+        dateLabel = new Label(I18n.getInstance().get("starsystem.date"));
+        dateLabel.setStyle("-fx-text-fill: #00ff00; -fx-font-family: monospace;");
+
+        Label speedLabel = new Label(I18n.getInstance().get("starsystem.speed"));
+        speedLabel.setStyle("-fx-text-fill: #aaa;");
+
+        Slider speedSlider = new Slider(0.1, 5.0, 1.0);
+        speedSlider.valueProperty().addListener((o, old, val) -> simulationSpeed = val.doubleValue());
+
+        Button pauseBtn = new Button(I18n.getInstance().get("starsystem.pause"));
+        pauseBtn.setOnAction(e -> {
+            paused = !paused;
+            pauseBtn.setText(
+                    paused ? I18n.getInstance().get("starsystem.resume") : I18n.getInstance().get("starsystem.pause"));
+        });
+
+        hud.getChildren().addAll(title, dateLabel, new Separator(), speedLabel, speedSlider, pauseBtn);
+        return hud;
     }
 
     public static void main(String[] args) {

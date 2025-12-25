@@ -5,24 +5,28 @@
 package org.jscience.apps.physics.relativity;
 
 import javafx.animation.AnimationTimer;
-
+import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 import org.jscience.apps.framework.KillerAppBase;
+import org.jscience.physics.astronomy.loaders.StarLoader;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 /**
- * Relativistic Flight Simulator.
+ * Special Relativity Spaceflight Simulator.
  * <p>
- * Visualizes the effects of traveling near the speed of light.
- * Demonstraits Relativistic Aberration (searchlight effect) and Doppler Shift.
+ * Visualizes time dilation and length contraction at relativistic speeds.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -37,6 +41,11 @@ public class RelativisticFlightApp extends KillerAppBase {
     private Label gammaLabel;
     private CheckBox dopplerCheck;
     private CheckBox aberrationCheck;
+
+    // Time Dilation Labels
+    private Label earthClockLabel;
+    private Label shipClockLabel;
+    private Label explanationLabel;
 
     // Starfield
     private static class Star {
@@ -89,69 +98,30 @@ public class RelativisticFlightApp extends KillerAppBase {
     }
 
     private void initStars() {
-        // 1. Load Real Stars
-        try (var is = getClass().getResourceAsStream("data/stars.csv")) {
-            if (is != null) {
-                List<org.jscience.physics.astronomy.loaders.StarLoader.Star> realStars = org.jscience.physics.astronomy.loaders.StarLoader
-                        .loadCSV(is);
-
-                for (org.jscience.physics.astronomy.loaders.StarLoader.Star s : realStars) {
-                    // Convert RA/Dec to Theta/Phi
-                    // RA 0-360 -> Phi 0-2PI
-                    double phi = Math.toRadians(s.ra);
-                    // Dec +90 to -90 -> Theta 0 to PI
-                    double theta = Math.toRadians(90 - s.dec);
-
-                    // Color based on Spectral Type
-                    Color c = getColorForSpectralType(s.spectralType);
-
-                    // Size based on magnitude (smaller mag = brighter/larger)
-                    // limit size between 2 and 6
-                    double size = Math.max(2, 6 - s.mag);
-
-                    stars.add(new Star(theta, phi, c, size));
-                }
-                // System.out.println("Loaded " + realStars.size() + " real stars.");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // 2. Fill background with random faint stars
-        Random rand = new Random();
+        stars.clear();
+        java.util.Random rand = new java.util.Random(42); // Fixed seed for reproducibility
         for (int i = 0; i < STAR_COUNT; i++) {
-            double z = rand.nextDouble() * 2 - 1;
-            double theta = Math.acos(z);
-            double phi = rand.nextDouble() * 2 * Math.PI;
+            // Uniform distribution on sphere
+            double theta = Math.acos(1 - 2 * rand.nextDouble()); // 0 to PI
+            double phi = 2 * Math.PI * rand.nextDouble(); // 0 to 2*PI
 
-            Color c = Color.rgb(200, 200, 255, rand.nextDouble() * 0.5 + 0.1); // Faint
-            stars.add(new Star(theta, phi, c, rand.nextDouble() * 1.5 + 0.5));
+            // Random star color (white to blue/yellow)
+            double hue = rand.nextDouble() * 60 - 30; // -30 to 30 (yellow to blue range)
+            if (hue < 0)
+                hue += 360;
+            double saturation = rand.nextDouble() * 0.3;
+            double brightness = 0.5 + rand.nextDouble() * 0.5;
+            Color color = Color.hsb(hue, saturation, brightness);
+
+            double size = 1 + rand.nextDouble() * 2;
+
+            stars.add(new Star(theta, phi, color, size));
         }
-    }
-
-    private Color getColorForSpectralType(String type) {
-        if (type == null)
-            return Color.WHITE;
-        if (type.startsWith("O"))
-            return Color.web("#9bb0ff"); // Blue
-        if (type.startsWith("B"))
-            return Color.web("#aabfff"); // Blue-white
-        if (type.startsWith("A"))
-            return Color.web("#cad7ff"); // White
-        if (type.startsWith("F"))
-            return Color.web("#f8f7ff"); // Yellow-white
-        if (type.startsWith("G"))
-            return Color.web("#fff4ea"); // Yellow
-        if (type.startsWith("K"))
-            return Color.web("#ffd2a1"); // Orange
-        if (type.startsWith("M"))
-            return Color.web("#ffcc6f"); // Red
-        return Color.WHITE;
     }
 
     private VBox createControls() {
         VBox box = new VBox(10);
-        box.setMaxHeight(200);
+        box.setMaxHeight(220);
         box.setMaxWidth(700);
         box.setStyle("-fx-background-color: rgba(30, 30, 30, 0.85); -fx-padding: 15; -fx-background-radius: 10;");
 
@@ -165,32 +135,37 @@ public class RelativisticFlightApp extends KillerAppBase {
         gammaLabel = new Label(i18n.get("relativity.label.gamma") + ": 1.00");
         gammaLabel.setTextFill(Color.ORANGE);
 
-        // Time dilation visualization
-        Label timeDilationTitle = new Label("⏱️ Time Dilation Clocks");
-        timeDilationTitle.setTextFill(Color.LIGHTGRAY);
-        timeDilationTitle.setStyle("-fx-font-weight: bold;");
+        earthClockLabel = new Label(java.text.MessageFormat.format(i18n.get("relativity.clock.earth"), "1.00"));
+        earthClockLabel.setTextFill(Color.LIGHTBLUE);
 
-        Label earthClockLabel = new Label("🌍 Earth: 1.00 year");
-        earthClockLabel.setTextFill(Color.LIGHTGREEN);
+        shipClockLabel = new Label(java.text.MessageFormat.format(i18n.get("relativity.clock.ship"), "1.00"));
+        shipClockLabel.setTextFill(Color.LIGHTGREEN);
 
-        Label shipClockLabel = new Label("🛸 Ship: 1.00 year");
-        shipClockLabel.setTextFill(Color.LIGHTBLUE);
-
-        Label dilationExplanation = new Label("At this speed, 1 year on Earth = 1.00 year on ship");
-        dilationExplanation.setTextFill(Color.GRAY);
-        dilationExplanation.setStyle("-fx-font-size: 11px;");
+        explanationLabel = new Label(
+                java.text.MessageFormat.format(i18n.get("relativity.label.explanation"), 0, "1.00"));
+        explanationLabel.setWrapText(true);
+        explanationLabel.setTextFill(Color.GRAY);
+        explanationLabel.setFont(Font.font(10));
 
         speedSlider = new Slider(0, 0.999, 0);
         speedSlider.setShowTickLabels(false);
         speedSlider.valueProperty().addListener((o, ov, nv) -> {
             beta = nv.doubleValue();
             updateLabels();
-            // Update time dilation display
             double gamma = 1.0 / Math.sqrt(1 - beta * beta);
-            earthClockLabel.setText(String.format("🌍 Earth: %.2f years", gamma));
-            shipClockLabel.setText("🛸 Ship: 1.00 year");
-            dilationExplanation
-                    .setText(String.format("At %.1f%% c: 1 year on ship = %.2f years on Earth", beta * 100, gamma));
+            gammaLabel.setText(java.text.MessageFormat.format(i18n.get("relativity.label.gamma_val"),
+                    String.format("%.2f", gamma)));
+
+            double shipTime = 1.0;
+            double earthTime = shipTime * gamma;
+
+            earthClockLabel.setText(
+                    java.text.MessageFormat.format(i18n.get("relativity.clock.earth"),
+                            String.format("%.2f", earthTime)));
+            shipClockLabel.setText(
+                    java.text.MessageFormat.format(i18n.get("relativity.clock.ship"), String.format("%.2f", shipTime)));
+            explanationLabel.setText(java.text.MessageFormat.format(i18n.get("relativity.label.explanation"),
+                    (int) (beta * 100), String.format("%.2f", earthTime)));
         });
 
         HBox toggles = new HBox(20);
@@ -210,16 +185,17 @@ public class RelativisticFlightApp extends KillerAppBase {
         clocks.setAlignment(javafx.geometry.Pos.CENTER);
 
         box.getChildren().addAll(title, speedSlider, new HBox(20, speedLabel, gammaLabel),
-                timeDilationTitle, clocks, dilationExplanation, toggles);
+                clocks, explanationLabel, toggles);
         return box;
     }
 
     private void updateLabels() {
-        speedLabel.setText(String.format(i18n.get("relativity.label.speed") + ": %.3f c", beta));
+        speedLabel.setText(java.text.MessageFormat.format(i18n.get("relativity.label.speed") + ": {0} c",
+                String.format("%.3f", beta)));
         if (beta >= 1.0)
             beta = 0.9999;
         double gamma = 1.0 / Math.sqrt(1 - beta * beta);
-        gammaLabel.setText(String.format("γ: %.2f", gamma));
+        gammaLabel.setText(java.text.MessageFormat.format("γ: {0}", String.format("%.2f", gamma)));
     }
 
     private void startLoop() {

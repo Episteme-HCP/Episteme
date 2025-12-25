@@ -2,7 +2,7 @@
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
  */
-package org.jscience.ui.computing;
+package org.jscience.ui.computing.ai;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -121,8 +121,9 @@ public class GameOfLifeViewer extends Application {
         root.setBottom(controls);
 
         Scene scene = new Scene(root);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
 
-        new AnimationTimer() {
+        new javafx.animation.AnimationTimer() {
             @Override
             public void handle(long now) {
                 if (!paused) {

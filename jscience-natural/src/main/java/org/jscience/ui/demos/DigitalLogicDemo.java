@@ -10,7 +10,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.application.Application;
+import javafx.application.Application;
 import org.jscience.ui.DemoProvider;
+import org.jscience.natural.i18n.I18n;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,17 +25,17 @@ public class DigitalLogicDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return "Computing";
+        return I18n.getInstance().get("digital.category");
     }
 
     @Override
     public String getName() {
-        return "Digital Logic Simulator";
+        return I18n.getInstance().get("digital.title");
     }
 
     @Override
     public String getDescription() {
-        return "Interactive logic circuit designer.";
+        return I18n.getInstance().get("digital.desc");
     }
 
     @Override
@@ -61,25 +63,26 @@ public class DigitalLogicDemo implements DemoProvider {
             VBox toolbar = new VBox(10);
             toolbar.setStyle("-fx-padding: 10; -fx-background-color: #ddd;");
 
-            Button btnAnd = new Button("Add AND");
+            Button btnAnd = new Button(I18n.getInstance().get("digital.add.and"));
             btnAnd.setOnAction(e -> addGate(new Gate(GateType.AND, 100, 100)));
-            Button btnOr = new Button("Add OR");
+            Button btnOr = new Button(I18n.getInstance().get("digital.add.or"));
             btnOr.setOnAction(e -> addGate(new Gate(GateType.OR, 100, 150)));
-            Button btnNot = new Button("Add NOT");
+            Button btnNot = new Button(I18n.getInstance().get("digital.add.not"));
             btnNot.setOnAction(e -> addGate(new Gate(GateType.NOT, 100, 200)));
-            Button btnIn = new Button("Add INPUT Switch");
+            Button btnIn = new Button(I18n.getInstance().get("digital.add.in"));
             btnIn.setOnAction(e -> addGate(new Gate(GateType.INPUT, 50, 100)));
-            Button btnOut = new Button("Add OUTPUT Bulb");
+            Button btnOut = new Button(I18n.getInstance().get("digital.add.out"));
             btnOut.setOnAction(e -> addGate(new Gate(GateType.OUTPUT, 300, 100)));
 
-            Button clear = new Button("Clear");
+            Button clear = new Button(I18n.getInstance().get("digital.clear"));
             clear.setOnAction(e -> {
                 gates.clear();
                 wires.clear();
                 draw(canvas);
             });
 
-            toolbar.getChildren().addAll(new Label("Components"), btnIn, btnOut, btnAnd, btnOr, btnNot, clear);
+            toolbar.getChildren().addAll(new Label(I18n.getInstance().get("digital.components")), btnIn, btnOut, btnAnd,
+                    btnOr, btnNot, clear);
             root.setLeft(toolbar);
 
             // Interaction
@@ -167,7 +170,8 @@ public class DigitalLogicDemo implements DemoProvider {
             draw(canvas);
 
             Scene scene = new Scene(root, 1000, 700);
-            stage.setTitle("Digital Logic Simulator");
+            org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
+            stage.setTitle(I18n.getInstance().get("digital.title"));
             stage.setScene(scene);
             stage.show();
         }
@@ -217,7 +221,23 @@ public class DigitalLogicDemo implements DemoProvider {
     }
 
     enum GateType {
-        INPUT, OUTPUT, AND, OR, NOT, NAND
+        INPUT("digital.gate.input"),
+        OUTPUT("digital.gate.output"),
+        AND("digital.gate.and"),
+        OR("digital.gate.or"),
+        NOT("digital.gate.not"),
+        NAND("digital.gate.nand");
+
+        private final String i18nKey;
+
+        GateType(String i18nKey) {
+            this.i18nKey = i18nKey;
+        }
+
+        @Override
+        public String toString() {
+            return org.jscience.natural.i18n.I18n.getInstance().get(i18nKey);
+        }
     }
 
     static class Port {
@@ -345,7 +365,8 @@ public class DigitalLogicDemo implements DemoProvider {
                 gc.fillRect(x, y, 40, 30);
                 gc.strokeRect(x, y, 40, 30);
                 gc.setFill(Color.BLACK);
-                gc.fillText(isOn ? "ON" : "OFF", x + 5, y + 20);
+                gc.fillText(isOn ? I18n.getInstance().get("digital.on") : I18n.getInstance().get("digital.off"), x + 5,
+                        y + 20);
             } else if (type == GateType.OUTPUT) {
                 gc.setFill(isOn ? Color.YELLOW : Color.GRAY);
                 gc.fillOval(x, y, 40, 40);

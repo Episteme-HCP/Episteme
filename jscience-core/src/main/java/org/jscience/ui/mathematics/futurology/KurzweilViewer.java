@@ -92,12 +92,12 @@ public class KurzweilViewer extends Application {
     @Override
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #0a0a1a;");
+        root.getStyleClass().add("root");
 
         // Title
         Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("kurzweil.header"));
         title.setFont(Font.font("System", FontWeight.BOLD, 22));
-        title.setTextFill(Color.WHITE);
+        title.getStyleClass().add("header-label");
         title.setPadding(new Insets(15));
         BorderPane.setAlignment(title, Pos.CENTER);
         root.setTop(title);
@@ -110,7 +110,7 @@ public class KurzweilViewer extends Application {
         // Linear timeline
         VBox linearBox = new VBox(5);
         Label linearLabel = new Label("Linear (Calendar) Time");
-        linearLabel.setTextFill(Color.LIGHTGRAY);
+
         linearLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
         linearCanvas = new Canvas(WIDTH - 250, 180);
         linearBox.getChildren().addAll(linearLabel, linearCanvas);
@@ -118,7 +118,7 @@ public class KurzweilViewer extends Application {
         // Logarithmic timeline (Kurzweil perspective)
         VBox logBox = new VBox(5);
         Label logLabel = new Label("Kurzweil (Exponential) Time - Paradigm Shifts Accelerate");
-        logLabel.setTextFill(Color.ORANGE);
+
         logLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
         logCanvas = new Canvas(WIDTH - 250, 180);
         logBox.getChildren().addAll(logLabel, logCanvas);
@@ -179,7 +179,7 @@ public class KurzweilViewer extends Application {
 
         // Dual clocks
         Label clockTitle = new Label("Dual Clocks");
-        clockTitle.setTextFill(Color.WHITE);
+
         clockTitle.setFont(Font.font("System", FontWeight.BOLD, 14));
 
         VBox linearClock = new VBox(5);
@@ -206,7 +206,6 @@ public class KurzweilViewer extends Application {
         Separator sep = new Separator();
 
         Label controlLabel = new Label("Acceleration Base:");
-        controlLabel.setTextFill(Color.WHITE);
 
         Slider accelSlider = new Slider(1.1, 5.0, accelerationFactor);
         accelSlider.setShowTickLabels(true);

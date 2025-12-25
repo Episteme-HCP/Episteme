@@ -12,7 +12,21 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public interface PressureGauge extends Sensor<Real> {
     enum GaugeType {
-        BOURDON, DIAPHRAGM, PIEZOELECTRIC, CAPACITIVE
+        BOURDON("device.pressure.type.bourdon"),
+        DIAPHRAGM("device.pressure.type.diaphragm"),
+        PIEZOELECTRIC("device.pressure.type.piezo"),
+        CAPACITIVE("device.pressure.type.capacitive");
+
+        private final String i18nKey;
+
+        GaugeType(String i18nKey) {
+            this.i18nKey = i18nKey;
+        }
+
+        @Override
+        public String toString() {
+            return org.jscience.natural.i18n.I18n.getInstance().get(i18nKey);
+        }
     }
 
     GaugeType getType();

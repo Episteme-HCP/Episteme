@@ -140,6 +140,7 @@ public class ChemicalReactionViewer extends Application {
         BorderPane.setMargin(formulaPanel, new Insets(0, 0, 0, 15));
 
         Scene scene = new Scene(root, 900, 600);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle("JScience Chemical Reaction Parser");
         stage.setScene(scene);
         stage.show();

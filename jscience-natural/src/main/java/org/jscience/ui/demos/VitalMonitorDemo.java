@@ -16,12 +16,12 @@ public class VitalMonitorDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Vital Constants Monitor";
+        return org.jscience.natural.i18n.I18n.getInstance().get("vital.title");
     }
 
     @Override
     public String getDescription() {
-        return "Medical monitor mockup showing real-time ECG and SpO2 waveforms with heart rate tracking.";
+        return org.jscience.natural.i18n.I18n.getInstance().get("vital.desc");
     }
 
     @Override

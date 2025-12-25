@@ -20,6 +20,7 @@ import javafx.util.Duration;
 
 import org.jscience.apps.framework.ChartFactory;
 import org.jscience.apps.framework.KillerAppBase;
+import org.jscience.biology.ecology.Epidemiology;
 import org.jscience.biology.ecology.PopulationDynamics;
 import org.jscience.geography.loaders.WorldBankLoader;
 import org.jscience.mathematics.numbers.real.Real;
@@ -66,8 +67,8 @@ public class PandemicForecasterApp extends KillerAppBase {
 
     @Override
     protected Region createMainContent() {
-        // Load country data
-        loadCountryData();
+        // Initialize explicitly to empty list to avoid NPE in createControlPanel
+        countries = new java.util.ArrayList<>();
 
         // Main split pane: Chart | Parameters
         SplitPane mainSplit = new SplitPane();
@@ -85,6 +86,16 @@ public class PandemicForecasterApp extends KillerAppBase {
         mainSplit.getItems().addAll(chartArea, controlPanel);
         mainSplit.setDividerPositions(0.7);
 
+        // Load data after UI init
+        loadCountryData();
+        // Need to manually refresh country list in selector now that data is loaded
+        if (countrySelector != null) {
+            countrySelector.setItems(FXCollections.observableArrayList(countries));
+            if (!countries.isEmpty()) {
+                countrySelector.getSelectionModel().selectFirst();
+            }
+        }
+
         return mainSplit;
     }
 
@@ -99,11 +110,11 @@ public class PandemicForecasterApp extends KillerAppBase {
         area.setPadding(new Insets(10));
 
         // Title
-        Label title = new Label("📊 " + i18n.get("pandemic.panel.chart"));
+        Label title = new Label(i18n.get("pandemic.panel.chart"));
         title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         // SEIR Chart
-        seirChart = ChartFactory.createLineChart("SEIR Epidemic Model", "Day", "Population");
+        seirChart = ChartFactory.createLineChart(i18n.get("pandemic.panel.chart"), "Day", "Population");
         seirChart.setAnimated(false);
         seirChart.setCreateSymbols(false);
 
@@ -133,9 +144,9 @@ public class PandemicForecasterApp extends KillerAppBase {
         stats.setPadding(new Insets(10));
         stats.setStyle("-fx-background-color: #f5f5f5; -fx-background-radius: 5;");
 
-        populationLabel = new Label("Population: --");
-        peakLabel = new Label("Peak Infected: --");
-        totalLabel = new Label("Total Recovered: --");
+        populationLabel = new Label(java.text.MessageFormat.format(i18n.get("pandemic.label.population"), "--"));
+        peakLabel = new Label(java.text.MessageFormat.format(i18n.get("pandemic.label.peak"), "--"));
+        totalLabel = new Label(java.text.MessageFormat.format(i18n.get("pandemic.label.total"), "--"));
 
         populationLabel.setStyle("-fx-font-size: 14px;");
         peakLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #d32f2f;");
@@ -151,7 +162,7 @@ public class PandemicForecasterApp extends KillerAppBase {
         panel.setStyle("-fx-background-color: #fafafa; -fx-border-color: #ddd; -fx-border-width: 0 0 0 1;");
 
         // Country selector
-        Label countryLabel = new Label("🌍 Select Country:");
+        Label countryLabel = new Label(i18n.get("pandemic.label.select"));
         countryLabel.setStyle("-fx-font-weight: bold;");
         countrySelector = new ComboBox<>();
         countrySelector.setItems(FXCollections.observableArrayList(countries));
@@ -199,13 +210,13 @@ public class PandemicForecasterApp extends KillerAppBase {
         daysSlider.setBlockIncrement(10);
 
         // R0 display
-        Label r0Label = new Label("Basic Reproduction Number (R₀): --");
+        Label r0Label = new Label(java.text.MessageFormat.format(i18n.get("pandemic.label.r0"), "--"));
         r0Label.setStyle("-fx-font-style: italic;");
         betaSlider.valueProperty().addListener((o, ov, nv) -> updateR0Label(r0Label));
         gammaSlider.valueProperty().addListener((o, ov, nv) -> updateR0Label(r0Label));
 
         // Event log
-        Label logLabel = new Label("📋 Event Log:");
+        Label logLabel = new Label(i18n.get("pandemic.log.header"));
         logLabel.setStyle("-fx-font-weight: bold;");
         eventLog = new ListView<>();
         eventLog.setPrefHeight(150);
@@ -242,7 +253,7 @@ public class PandemicForecasterApp extends KillerAppBase {
         double beta = betaSlider.getValue();
         double gamma = gammaSlider.getValue();
         double r0 = beta / gamma;
-        label.setText(String.format("Basic Reproduction Number (R₀): %.2f", r0));
+        label.setText(java.text.MessageFormat.format(i18n.get("pandemic.label.r0"), String.format("%.2f", r0)));
         if (r0 > 1) {
             label.setTextFill(Color.DARKRED);
         } else {
@@ -253,8 +264,10 @@ public class PandemicForecasterApp extends KillerAppBase {
     private void onCountrySelected() {
         org.jscience.geography.Region selected = countrySelector.getValue();
         if (selected != null) {
-            populationLabel.setText("Population: " + formatNumber(selected.getPopulation()));
-            log("Selected: " + selected.getName());
+            populationLabel.setText(
+                    java.text.MessageFormat.format(i18n.get("pandemic.label.population"),
+                            formatNumber(selected.getPopulation())));
+            log(java.text.MessageFormat.format(i18n.get("pandemic.log.selected"), selected.getName()));
         }
     }
 
@@ -267,7 +280,7 @@ public class PandemicForecasterApp extends KillerAppBase {
 
         org.jscience.geography.Region country = countrySelector.getValue();
         if (country == null) {
-            showError("Error", "Please select a country first.");
+            showError(i18n.get("dialog.error.title"), i18n.get("pandemic.error.select"));
             return;
         }
 
@@ -291,7 +304,8 @@ public class PandemicForecasterApp extends KillerAppBase {
                 Real.of(0) // R
         };
 
-        log("Starting simulation: " + country.getName() + ", Pop=" + formatNumber(N) + ", β=" + betaSlider.getValue());
+        log(java.text.MessageFormat.format(i18n.get("pandemic.log.start"), country.getName(), formatNumber(N),
+                betaSlider.getValue()));
 
         try {
             simulationResults = PopulationDynamics.seirModel(initial, beta, sigma, gamma, dt, days);
@@ -334,8 +348,10 @@ public class PandemicForecasterApp extends KillerAppBase {
             for (int d = 0; d <= day; d++) {
                 maxI = Math.max(maxI, simulationResults[d][2].doubleValue());
             }
-            peakLabel.setText("Peak Infected: " + formatNumber((long) maxI));
-            totalLabel.setText("Total Recovered: " + formatNumber((long) r));
+            peakLabel.setText(
+                    java.text.MessageFormat.format(i18n.get("pandemic.label.peak"), formatNumber((long) maxI)));
+            totalLabel
+                    .setText(java.text.MessageFormat.format(i18n.get("pandemic.label.total"), formatNumber((long) r)));
         }
     }
 
@@ -346,7 +362,7 @@ public class PandemicForecasterApp extends KillerAppBase {
         isRunning = false;
         setStatus(i18n.get("status.complete"));
         setProgress(0);
-        log("Simulation complete: " + currentDay + " days");
+        log(java.text.MessageFormat.format(i18n.get("pandemic.log.complete"), currentDay));
     }
 
     @Override
@@ -369,7 +385,7 @@ public class PandemicForecasterApp extends KillerAppBase {
         currentDay = 0;
         simulationResults = null;
         setStatus(i18n.get("status.ready"));
-        log("Reset complete");
+        log(i18n.get("pandemic.log.reset"));
     }
 
     private void clearChart() {
@@ -377,8 +393,8 @@ public class PandemicForecasterApp extends KillerAppBase {
         expSeriesE.getData().clear();
         infSeriesI.getData().clear();
         recSeriesR.getData().clear();
-        peakLabel.setText("Peak Infected: --");
-        totalLabel.setText("Total Recovered: --");
+        peakLabel.setText(java.text.MessageFormat.format(i18n.get("pandemic.label.peak"), "--"));
+        totalLabel.setText(java.text.MessageFormat.format(i18n.get("pandemic.label.total"), "--"));
     }
 
     // ===== File Operations =====
@@ -391,7 +407,7 @@ public class PandemicForecasterApp extends KillerAppBase {
     @Override
     protected void doExport(File file, String format) {
         if (simulationResults == null) {
-            showInfo("Export", "No simulation data to export. Run a simulation first.");
+            showInfo(i18n.get("menu.file.export"), i18n.get("pandemic.info.no_data"));
             return;
         }
 
@@ -406,8 +422,9 @@ public class PandemicForecasterApp extends KillerAppBase {
                             simulationResults[d][2].doubleValue(),
                             simulationResults[d][3].doubleValue());
                 }
-                log("Exported to: " + file.getName());
-                showInfo("Export", "Data exported successfully to " + file.getName());
+                log(java.text.MessageFormat.format(i18n.get("pandemic.log.export"), file.getName()));
+                showInfo(i18n.get("menu.file.export"),
+                        java.text.MessageFormat.format(i18n.get("pandemic.info.export"), file.getName()));
             } catch (Exception e) {
                 showError("Export Error", e.getMessage());
             }

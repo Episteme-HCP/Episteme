@@ -46,6 +46,18 @@
             <artifactId>assertj-core</artifactId>
         </dependency>
 
+        <!-- TestFX (UI Testing) -->
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-junit5</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- JMH Benchmarking -->
         <dependency>
             <groupId>org.openjdk.jmh</groupId>

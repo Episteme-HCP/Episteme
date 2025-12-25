@@ -16,12 +16,12 @@ public class LotkaVolterraDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Lotka-Volterra Population Dynamics";
+        return org.jscience.natural.i18n.I18n.getInstance().get("LotkaVolterra.title");
     }
 
     @Override
     public String getDescription() {
-        return "Predator-prey simulation showing oscillating population cycles and phase-space trajectories.";
+        return org.jscience.natural.i18n.I18n.getInstance().get("LotkaVolterra.desc");
     }
 
     @Override

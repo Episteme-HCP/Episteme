@@ -7,12 +7,16 @@ import java.util.ResourceBundle;
  * Internationalization helper for JScience Core UI.
  */
 public class I18n {
-    private static final String BUNDLE_BASE = "org.jscience.ui.i18n.messages";
+
     private static I18n instance;
-    private ResourceBundle bundle;
+    private static final java.util.List<ResourceBundle> bundles = new java.util.ArrayList<>();
+    private java.util.Locale currentLocale = Locale.getDefault();
+
+    private final java.util.List<String> bundleNames = new java.util.ArrayList<>();
 
     private I18n() {
-        setLocale(Locale.getDefault());
+        // Core bundle
+        addBundle("org.jscience.ui.i18n.messages");
     }
 
     public static synchronized I18n getInstance() {
@@ -22,19 +26,36 @@ public class I18n {
         return instance;
     }
 
-    public void setLocale(Locale locale) {
+    public void addBundle(String baseName) {
+        if (!bundleNames.contains(baseName)) {
+            bundleNames.add(baseName);
+            loadBundle(baseName);
+        }
+    }
+
+    private void loadBundle(String baseName) {
         try {
-            this.bundle = ResourceBundle.getBundle(BUNDLE_BASE, locale);
+            ResourceBundle b = ResourceBundle.getBundle(baseName, currentLocale);
+            bundles.add(b);
         } catch (Exception e) {
-            this.bundle = ResourceBundle.getBundle(BUNDLE_BASE, Locale.ENGLISH);
+            System.err.println("Could not load bundle: " + baseName);
+        }
+    }
+
+    public void setLocale(Locale locale) {
+        this.currentLocale = locale;
+        bundles.clear();
+        for (String baseName : bundleNames) {
+            loadBundle(baseName);
         }
     }
 
     public String get(String key) {
-        try {
-            return bundle.getString(key);
-        } catch (Exception e) {
-            return "!" + key + "!";
+        for (ResourceBundle b : bundles) {
+            if (b.containsKey(key)) {
+                return b.getString(key);
+            }
         }
+        return "!" + key + "!";
     }
 }

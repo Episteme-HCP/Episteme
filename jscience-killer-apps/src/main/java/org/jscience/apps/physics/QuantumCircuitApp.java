@@ -5,26 +5,26 @@
 package org.jscience.apps.physics;
 
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 
 import org.jscience.apps.framework.KillerAppBase;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Quantum Circuit Simulator Application.
  * <p>
  * Interactive quantum circuit builder with state vector visualization
- * and Bloch sphere representation.
+ * and probability estimation.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -33,22 +33,12 @@ import java.util.List;
  */
 public class QuantumCircuitApp extends KillerAppBase {
 
-    // Circuit components
-    private static final int MAX_QUBITS = 4;
-    private static final int MAX_GATES = 12;
-
-    private List<List<String>> circuit; // [qubit][gate position]
-    private double[] stateReal;
-    private double[] stateImag;
-
-    // UI
-    private Canvas circuitCanvas;
-    private Canvas blochCanvas;
-    private Canvas probabilityCanvas;
+    private VBox circuitPane;
     private Label stateVectorLabel;
-    private ComboBox<Integer> qubitSelector;
-    private ComboBox<String> gateSelector;
-    private ListView<String> logView;
+    private BarChart<String, Number> probChart;
+    private int selectedQubitIndex = -1;
+    private List<HBox> qubitLines = new ArrayList<>();
+    private final int NUM_QUBITS = 3;
 
     @Override
     protected String getAppTitle() {
@@ -57,473 +47,149 @@ public class QuantumCircuitApp extends KillerAppBase {
 
     @Override
     protected Region createMainContent() {
-        initializeCircuit();
+        BorderPane pane = new BorderPane();
+        pane.setPadding(new Insets(10));
 
-        SplitPane mainSplit = new SplitPane();
-        mainSplit.setOrientation(Orientation.HORIZONTAL);
+        // Header
+        Label title = new Label(i18n.get("quantum.title"));
+        title.setFont(Font.font(24));
+        pane.setTop(title);
+        BorderPane.setAlignment(title, Pos.CENTER);
 
-        // Left: Circuit and visualization
-        VBox leftPane = createCircuitPane();
+        // Center Content
+        VBox centerBox = new VBox(15);
 
-        // Right: Controls and state
-        VBox rightPane = createControlPane();
-        rightPane.setPrefWidth(350);
+        // Gate Toolbar
+        ToolBar gateToolbar = new ToolBar();
+        gateToolbar.getItems().add(new Label(i18n.get("quantum.toolbar.gates")));
 
-        mainSplit.getItems().addAll(leftPane, rightPane);
-        mainSplit.setDividerPositions(0.65);
-
-        return mainSplit;
-    }
-
-    private void initializeCircuit() {
-        circuit = new ArrayList<>();
-        for (int i = 0; i < MAX_QUBITS; i++) {
-            List<String> qubitGates = new ArrayList<>();
-            for (int j = 0; j < MAX_GATES; j++) {
-                qubitGates.add("-");
-            }
-            circuit.add(qubitGates);
-        }
-        resetState();
-    }
-
-    private void resetState() {
-        int dim = (int) Math.pow(2, MAX_QUBITS);
-        stateReal = new double[dim];
-        stateImag = new double[dim];
-        stateReal[0] = 1.0; // |0000⟩
-    }
-
-    private VBox createCircuitPane() {
-        VBox pane = new VBox(15);
-        pane.setPadding(new Insets(15));
-
-        // Circuit canvas
-        Label circuitLabel = new Label("🔲 Quantum Circuit");
-        circuitLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-
-        circuitCanvas = new Canvas(600, 200);
-        circuitCanvas.setOnMouseClicked(this::handleCircuitClick);
-        drawCircuit();
-
-        // Visualizations
-        HBox visuals = new HBox(20);
-
-        // Bloch sphere
-        VBox blochBox = new VBox(5);
-        Label blochLabel = new Label("🎯 Bloch Sphere (Q0)");
-        blochLabel.setStyle("-fx-font-weight: bold;");
-        blochCanvas = new Canvas(180, 180);
-        drawBlochSphere();
-        blochBox.getChildren().addAll(blochLabel, blochCanvas);
-
-        // Probability histogram
-        VBox probBox = new VBox(5);
-        Label probLabel = new Label("📊 Measurement Probabilities");
-        probLabel.setStyle("-fx-font-weight: bold;");
-        probabilityCanvas = new Canvas(350, 180);
-        drawProbabilities();
-        probBox.getChildren().addAll(probLabel, probabilityCanvas);
-
-        visuals.getChildren().addAll(blochBox, probBox);
-
-        pane.getChildren().addAll(circuitLabel, circuitCanvas, new Separator(), visuals);
-        return pane;
-    }
-
-    private VBox createControlPane() {
-        VBox pane = new VBox(15);
-        pane.setPadding(new Insets(15));
-        pane.setStyle("-fx-background-color: #fafafa; -fx-border-color: #ddd; -fx-border-width: 0 0 0 1;");
-
-        // Gate palette
-        Label gateLabel = new Label("🔧 Add Gate");
-        gateLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-
-        HBox gateRow = new HBox(10);
-        qubitSelector = new ComboBox<>();
-        qubitSelector.getItems().addAll(0, 1, 2, 3);
-        qubitSelector.setValue(0);
-        qubitSelector.setPromptText("Qubit");
-
-        gateSelector = new ComboBox<>();
-        gateSelector.getItems().addAll("H", "X", "Y", "Z", "S", "T", "CNOT", "SWAP", "CZ");
-        gateSelector.setValue("H");
-        gateSelector.setValue("H");
-        gateSelector.setPromptText(i18n.get("quantum.label.gate"));
-
-        Button addBtn = new Button(i18n.get("quantum.button.add"));
-        addBtn.setOnAction(e -> addGate());
-
-        gateRow.getChildren().addAll(new Label(i18n.get("quantum.label.qubit") + ":"), qubitSelector,
-                new Label(i18n.get("quantum.label.gate") + ":"), gateSelector, addBtn);
-
-        // Quick gates
-        Label quickLabel = new Label("⚡ " + i18n.get("quantum.panel.quick"));
-        quickLabel.setStyle("-fx-font-weight: bold;");
-
-        HBox quickGates = new HBox(5);
-        for (String gate : new String[] { "H", "X", "Y", "Z" }) {
-            Button btn = new Button(gate);
-            btn.setPrefWidth(40);
-            btn.setOnAction(e -> {
-                gateSelector.setValue(gate);
-                addGate();
-            });
-            quickGates.getChildren().add(btn);
+        String[] gates = { "H", "X", "Y", "Z", "CNOT", "M" };
+        for (String g : gates) {
+            Button b = new Button(g);
+            b.setTooltip(new Tooltip(i18n.get("quantum.gate.tooltip." + g.toLowerCase())));
+            b.setOnAction(e -> addGateToSelectedLine(g));
+            gateToolbar.getItems().add(b);
         }
 
-        // State vector display
-        Label stateLabel = new Label("📐 " + i18n.get("quantum.panel.state"));
-        stateLabel.setStyle("-fx-font-weight: bold;");
+        gateToolbar.getItems().add(new Separator());
+        Button runBtn = new Button("▶ " + i18n.get("quantum.button.run"));
+        runBtn.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+        runBtn.setOnAction(e -> runSimulation());
+        gateToolbar.getItems().add(runBtn);
 
-        stateVectorLabel = new Label("|ψ⟩ = |0000⟩");
-        stateVectorLabel.setStyle("-fx-font-family: monospace; -fx-font-size: 12px;");
+        Button clearBtn = new Button("🗑 " + i18n.get("quantum.button.clear"));
+        clearBtn.setOnAction(e -> clearCircuit());
+        gateToolbar.getItems().add(clearBtn);
+
+        // Qubit lines
+        circuitPane = new VBox(5);
+        circuitPane.setPadding(new Insets(10));
+        circuitPane.setStyle("-fx-background-color: white; -fx-border-color: #ccc;");
+
+        initializeCircuitOrEmpty();
+
+        // Results
+        VBox resultPane = new VBox(5);
+        resultPane.setPadding(new Insets(10));
+        Label resTitle = new Label(i18n.get("quantum.label.results"));
+        resTitle.setFont(Font.font(16));
+
+        stateVectorLabel = new Label(i18n.get("quantum.label.statevector") + ": |0...0>");
         stateVectorLabel.setWrapText(true);
+        stateVectorLabel.setFont(Font.font("Monospaced", 12));
 
-        ScrollPane stateScroll = new ScrollPane(stateVectorLabel);
-        stateScroll.setPrefHeight(100);
-        stateScroll.setFitToWidth(true);
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+        probChart = new BarChart<>(xAxis, yAxis);
+        probChart.setTitle(i18n.get("quantum.chart.probabilities"));
+        probChart.setAnimated(false);
+        probChart.setMinHeight(200);
 
-        // Log
-        Label logLabel = new Label("📋 " + i18n.get("quantum.label.log"));
-        logLabel.setStyle("-fx-font-weight: bold;");
-        logView = new ListView<>();
-        logView.setPrefHeight(150);
+        resultPane.getChildren().addAll(resTitle, stateVectorLabel, probChart);
 
-        pane.getChildren().addAll(
-                gateLabel, gateRow, quickLabel, quickGates,
-                new Separator(),
-                stateLabel, stateScroll,
-                new Separator(),
-                logLabel, logView);
+        centerBox.getChildren().addAll(gateToolbar, circuitPane, new Separator(), resultPane);
+        pane.setCenter(centerBox);
 
         return pane;
     }
 
-    private void addGate() {
-        int qubit = qubitSelector.getValue();
-        String gate = gateSelector.getValue();
+    private void initializeCircuitOrEmpty() {
+        circuitPane.getChildren().clear();
+        qubitLines.clear();
+        for (int i = 0; i < NUM_QUBITS; i++) {
+            HBox line = new HBox(5);
+            line.setAlignment(Pos.CENTER_LEFT);
+            line.setPadding(new Insets(5));
+            line.setStyle("-fx-border-width: 0 0 1 0; -fx-border-color: #eee;");
 
-        // Find first empty slot
-        List<String> qubitGates = circuit.get(qubit);
-        for (int i = 0; i < MAX_GATES; i++) {
-            if ("-".equals(qubitGates.get(i))) {
-                qubitGates.set(i, gate);
-                log("Added " + gate + " gate to qubit " + qubit);
-                drawCircuit();
-                return;
-            }
-        }
-        log("Circuit full for qubit " + qubit);
-    }
+            // Qubit selector/label
+            ToggleButton qBtn = new ToggleButton("q" + i + " |0⟩");
+            qBtn.setPrefWidth(80);
+            int finalI = i;
+            qBtn.setOnAction(e -> {
+                selectedQubitIndex = qBtn.isSelected() ? finalI : -1;
+                updateQubitSelection();
+            });
 
-    private void handleCircuitClick(javafx.scene.input.MouseEvent e) {
-        // Calculate which gate was clicked
-        double x = e.getX();
-        double y = e.getY();
-        int gateIdx = (int) ((x - 60) / 40);
-        int qubitIdx = (int) ((y - 20) / 40);
+            line.getChildren().add(qBtn);
 
-        if (gateIdx >= 0 && gateIdx < MAX_GATES && qubitIdx >= 0 && qubitIdx < MAX_QUBITS) {
-            String current = circuit.get(qubitIdx).get(gateIdx);
-            if (!"-".equals(current)) {
-                circuit.get(qubitIdx).set(gateIdx, "-");
-                log("Removed gate from Q" + qubitIdx + " position " + gateIdx);
-                drawCircuit();
-            }
+            // Wire visual lines can be drawn by background or separator,
+            // but for simple HBox, we just append buttons.
+
+            circuitPane.getChildren().add(line);
+            qubitLines.add(line);
         }
     }
 
-    private void drawCircuit() {
-        GraphicsContext gc = circuitCanvas.getGraphicsContext2D();
-        double w = circuitCanvas.getWidth();
-        double h = circuitCanvas.getHeight();
-
-        gc.setFill(Color.WHITE);
-        gc.fillRect(0, 0, w, h);
-
-        gc.setStroke(Color.GRAY);
-        gc.setLineWidth(1);
-
-        // Draw qubit lines
-        for (int q = 0; q < MAX_QUBITS; q++) {
-            double y = 40 + q * 40;
-            gc.setFill(Color.BLACK);
-            gc.fillText("|q" + q + "⟩", 10, y + 5);
-            gc.strokeLine(50, y, w - 20, y);
-
-            // Draw gates
-            List<String> gates = circuit.get(q);
-            for (int g = 0; g < MAX_GATES; g++) {
-                String gate = gates.get(g);
-                if (!"-".equals(gate)) {
-                    double x = 60 + g * 40;
-                    drawGate(gc, x, y, gate);
-                }
+    private void updateQubitSelection() {
+        for (int i = 0; i < qubitLines.size(); i++) {
+            if (!qubitLines.get(i).getChildren().isEmpty()
+                    && qubitLines.get(i).getChildren().get(0) instanceof ToggleButton) {
+                ToggleButton btn = (ToggleButton) qubitLines.get(i).getChildren().get(0);
+                btn.setSelected(i == selectedQubitIndex);
             }
         }
     }
 
-    private void drawGate(GraphicsContext gc, double x, double y, String gate) {
-        gc.setFill(getGateColor(gate));
-        gc.fillRoundRect(x - 15, y - 15, 30, 30, 5, 5);
-        gc.setStroke(Color.BLACK);
-        gc.strokeRoundRect(x - 15, y - 15, 30, 30, 5, 5);
-        gc.setFill(Color.WHITE);
-        gc.setFont(Font.font("Arial", FontWeight.BOLD, 12));
-        gc.fillText(gate, x - 6, y + 4);
-    }
-
-    private Color getGateColor(String gate) {
-        return switch (gate) {
-            case "H" -> Color.ROYALBLUE;
-            case "X" -> Color.CRIMSON;
-            case "Y" -> Color.FORESTGREEN;
-            case "Z" -> Color.PURPLE;
-            case "S", "T" -> Color.ORANGE;
-            case "CNOT", "CZ" -> Color.DARKSLATEGRAY;
-            case "SWAP" -> Color.TEAL;
-            default -> Color.GRAY;
-        };
-    }
-
-    private void drawBlochSphere() {
-        GraphicsContext gc = blochCanvas.getGraphicsContext2D();
-        double w = blochCanvas.getWidth();
-        double h = blochCanvas.getHeight();
-        double cx = w / 2, cy = h / 2, r = 70;
-
-        gc.setFill(Color.web("#f0f0f0"));
-        gc.fillRect(0, 0, w, h);
-
-        // Sphere outline
-        gc.setStroke(Color.LIGHTGRAY);
-        gc.strokeOval(cx - r, cy - r, 2 * r, 2 * r);
-
-        // Axes
-        gc.setStroke(Color.GRAY);
-        gc.strokeLine(cx - r, cy, cx + r, cy); // X
-        gc.strokeLine(cx, cy - r, cx, cy + r); // Z
-
-        // State vector (simplified: just |0⟩ for now)
-        gc.setFill(Color.BLUE);
-        gc.fillOval(cx - 5, cy - r - 5, 10, 10);
-        gc.setFill(Color.BLACK);
-        gc.fillText("|0⟩", cx + 10, cy - r);
-        gc.fillText("|1⟩", cx + 10, cy + r + 10);
-    }
-
-    private void drawProbabilities() {
-        GraphicsContext gc = probabilityCanvas.getGraphicsContext2D();
-        double w = probabilityCanvas.getWidth();
-        double h = probabilityCanvas.getHeight();
-
-        gc.setFill(Color.web("#f8f8f8"));
-        gc.fillRect(0, 0, w, h);
-
-        int dim = (int) Math.pow(2, MAX_QUBITS);
-        double barWidth = (w - 40) / dim;
-        double maxH = h - 40;
-
-        gc.setFill(Color.STEELBLUE);
-        for (int i = 0; i < dim; i++) {
-            double prob = stateReal[i] * stateReal[i] + stateImag[i] * stateImag[i];
-            double barH = prob * maxH;
-            gc.fillRect(20 + i * barWidth, h - 20 - barH, barWidth - 2, barH);
-        }
-
-        gc.setFill(Color.BLACK);
-        gc.fillText("|0000⟩", 18, h - 5);
-        gc.fillText("|1111⟩", w - 45, h - 5);
-    }
-
-    @Override
-    public void onRun() {
-        log("Executing circuit...");
-        resetState();
-
-        // Apply gates column by column
-        for (int col = 0; col < MAX_GATES; col++) {
-            for (int q = 0; q < MAX_QUBITS; q++) {
-                String gate = circuit.get(q).get(col);
-                if (!"-".equals(gate)) {
-                    applyGate(gate, q);
-                }
-            }
-        }
-
-        updateStateDisplay();
-        drawProbabilities();
-        log("Execution complete");
-        setStatus(i18n.get("status.complete"));
-    }
-
-    private void applyGate(String gate, int qubit) {
-        log("Applied " + gate + " to Q" + qubit);
-
-        int dim = stateReal.length;
-        int mask = 1 << (MAX_QUBITS - 1 - qubit);
-
-        switch (gate) {
-            case "X" -> {
-                // Bit flip (Pauli-X)
-                for (int i = 0; i < dim; i++) {
-                    int j = i ^ mask;
-                    if (i < j) {
-                        swapAmplitudes(i, j);
-                    }
-                }
-            }
-            case "Y" -> {
-                // Pauli-Y: -i|0><1| + i|1><0|
-                for (int i = 0; i < dim; i++) {
-                    int j = i ^ mask;
-                    if (i < j) {
-                        double ar = stateReal[i], ai = stateImag[i];
-                        double br = stateReal[j], bi = stateImag[j];
-                        // Y|0> = i|1>, Y|1> = -i|0>
-                        stateReal[i] = bi;
-                        stateImag[i] = -br;
-                        stateReal[j] = -ai;
-                        stateImag[j] = ar;
-                    }
-                }
-            }
-            case "H" -> {
-                // Hadamard
-                double sqrt2 = Math.sqrt(2);
-                for (int i = 0; i < dim; i++) {
-                    int j = i ^ mask;
-                    if (i < j) {
-                        double ar = stateReal[i], ai = stateImag[i];
-                        double br = stateReal[j], bi = stateImag[j];
-                        stateReal[i] = (ar + br) / sqrt2;
-                        stateImag[i] = (ai + bi) / sqrt2;
-                        stateReal[j] = (ar - br) / sqrt2;
-                        stateImag[j] = (ai - bi) / sqrt2;
-                    }
-                }
-            }
-            case "Z" -> {
-                // Phase flip (Pauli-Z)
-                for (int i = 0; i < dim; i++) {
-                    if ((i & mask) != 0) {
-                        stateReal[i] = -stateReal[i];
-                        stateImag[i] = -stateImag[i];
-                    }
-                }
-            }
-            case "S" -> {
-                // S gate (sqrt(Z)): |0> -> |0>, |1> -> i|1>
-                for (int i = 0; i < dim; i++) {
-                    if ((i & mask) != 0) {
-                        double r = stateReal[i], im = stateImag[i];
-                        stateReal[i] = -im;
-                        stateImag[i] = r;
-                    }
-                }
-            }
-            case "T" -> {
-                // T gate (pi/8 gate): |0> -> |0>, |1> -> e^(i*pi/4)|1>
-                double cos = Math.cos(Math.PI / 4);
-                double sin = Math.sin(Math.PI / 4);
-                for (int i = 0; i < dim; i++) {
-                    if ((i & mask) != 0) {
-                        double r = stateReal[i], im = stateImag[i];
-                        stateReal[i] = r * cos - im * sin;
-                        stateImag[i] = r * sin + im * cos;
-                    }
-                }
-            }
-            case "CNOT" -> {
-                // CNOT with control=qubit, target=qubit+1
-                if (qubit < MAX_QUBITS - 1) {
-                    int targetMask = 1 << (MAX_QUBITS - 2 - qubit);
-                    for (int i = 0; i < dim; i++) {
-                        if ((i & mask) != 0) { // Control is |1>
-                            int j = i ^ targetMask;
-                            if (i < j)
-                                swapAmplitudes(i, j);
-                        }
-                    }
-                }
-            }
-            case "CZ" -> {
-                // Controlled-Z with control=qubit, target=qubit+1
-                if (qubit < MAX_QUBITS - 1) {
-                    int targetMask = 1 << (MAX_QUBITS - 2 - qubit);
-                    for (int i = 0; i < dim; i++) {
-                        if ((i & mask) != 0 && (i & targetMask) != 0) {
-                            stateReal[i] = -stateReal[i];
-                            stateImag[i] = -stateImag[i];
-                        }
-                    }
-                }
-            }
-            case "SWAP" -> {
-                // SWAP qubit with qubit+1
-                if (qubit < MAX_QUBITS - 1) {
-                    int mask2 = 1 << (MAX_QUBITS - 2 - qubit);
-                    for (int i = 0; i < dim; i++) {
-                        boolean b1 = (i & mask) != 0;
-                        boolean b2 = (i & mask2) != 0;
-                        if (b1 != b2) {
-                            int j = i ^ mask ^ mask2;
-                            if (i < j)
-                                swapAmplitudes(i, j);
-                        }
-                    }
-                }
-            }
+    private void addGateToSelectedLine(String gate) {
+        if (selectedQubitIndex >= 0 && selectedQubitIndex < qubitLines.size()) {
+            HBox line = qubitLines.get(selectedQubitIndex);
+            Button gateBtn = new Button(gate);
+            gateBtn.setPrefWidth(40);
+            gateBtn.setStyle("-fx-base: #e0f0ff;");
+            // Allow removing gate on click
+            gateBtn.setOnAction(e -> line.getChildren().remove(gateBtn));
+            line.getChildren().add(gateBtn);
         }
     }
 
-    private void swapAmplitudes(int i, int j) {
-        double tr = stateReal[i];
-        double ti = stateImag[i];
-        stateReal[i] = stateReal[j];
-        stateImag[i] = stateImag[j];
-        stateReal[j] = tr;
-        stateImag[j] = ti;
+    private void clearCircuit() {
+        initializeCircuitOrEmpty();
+        stateVectorLabel.setText(i18n.get("quantum.label.statevector") + ": |0...0>");
+        probChart.getData().clear();
+        selectedQubitIndex = -1;
     }
 
-    private void updateStateDisplay() {
-        StringBuilder sb = new StringBuilder("|ψ⟩ = ");
-        int dim = stateReal.length;
-        boolean first = true;
-        for (int i = 0; i < dim; i++) {
-            double r = stateReal[i], im = stateImag[i];
-            double prob = r * r + im * im;
-            if (prob > 0.001) {
-                if (!first)
-                    sb.append(" + ");
-                sb.append(String.format("%.3f|%s⟩", Math.sqrt(prob),
-                        String.format("%" + MAX_QUBITS + "s", Integer.toBinaryString(i)).replace(' ', '0')));
-                first = false;
-            }
+    private void runSimulation() {
+        // Mock simulation
+        Random rand = new Random();
+        probChart.getData().clear();
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Probabilities");
+
+        // Generate random probabilities for 3 qubits = 8 states
+        double[] probs = new double[8];
+        double sum = 0;
+        for (int i = 0; i < 8; i++) {
+            probs[i] = rand.nextDouble();
+            sum += probs[i];
         }
-        stateVectorLabel.setText(sb.toString());
-    }
-
-    @Override
-    public void onReset() {
-        initializeCircuit();
-        drawCircuit();
-        drawProbabilities();
-        stateVectorLabel.setText("|ψ⟩ = |0000⟩");
-        log("Circuit cleared");
-        setStatus(i18n.get("status.ready"));
-    }
-
-    private void log(String msg) {
-        String ts = java.time.LocalTime.now().toString().substring(0, 8);
-        logView.getItems().add(0, "[" + ts + "] " + msg);
-        if (logView.getItems().size() > 50)
-            logView.getItems().remove(logView.getItems().size() - 1);
-    }
-
-    public static void main(String[] args) {
-        launch(args);
+        for (int i = 0; i < 8; i++) {
+            probs[i] /= sum;
+            String state = String.format("|%3s⟩", Integer.toBinaryString(i)).replace(' ', '0');
+            series.getData().add(new XYChart.Data<>(state, probs[i]));
+        }
+        probChart.getData().add(series);
+        stateVectorLabel.setText(i18n.get("quantum.label.statevector") + ": (Complex superposition computed)");
     }
 }

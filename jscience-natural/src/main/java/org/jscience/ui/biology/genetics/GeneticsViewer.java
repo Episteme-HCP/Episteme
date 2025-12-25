@@ -104,6 +104,7 @@ public class GeneticsViewer extends Application {
         drawAxes();
 
         Scene scene = new Scene(root, 950, 520);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle("JScience - Genetic Drift Simulation");
         stage.setScene(scene);
         stage.show();

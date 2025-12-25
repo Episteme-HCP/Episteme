@@ -4,6 +4,7 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import org.jscience.natural.i18n.I18n;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
@@ -27,9 +28,19 @@ import java.util.Random;
  */
 public class FluidDynamicsViewer extends Application {
 
-    private static final int N = 100;
+    private int N = 100;
     private static final int SCALE = 6;
     private static final int PARTICLE_COUNT = 500;
+
+    private void resetSimulation() {
+        if (solver != null) {
+            solver.initialize(N, SCALE);
+        }
+        particles.clear();
+        for (int i = 0; i < PARTICLE_COUNT; i++) {
+            particles.add(new Particle(rand.nextDouble() * N * SCALE, rand.nextDouble() * N * SCALE));
+        }
+    }
 
     private double viscosity = 0.0001;
     private boolean showField = true;
@@ -39,6 +50,12 @@ public class FluidDynamicsViewer extends Application {
     private double zOff = 0;
     private List<Particle> particles = new ArrayList<>();
     private Random rand = new Random();
+
+    // Solver
+    private FluidSolver solver;
+    private long lastFrameTime = 0;
+    private int frameCount = 0;
+    private Label fpsLabel;
 
     // Mouse interaction
     private double mouseX = -1, mouseY = -1;
@@ -56,14 +73,19 @@ public class FluidDynamicsViewer extends Application {
             particles.add(new Particle(rand.nextDouble() * N * SCALE, rand.nextDouble() * N * SCALE));
         }
 
+        // Initialize Default Solver
+        solver = new PrimitiveFluidSolver();
+        stage.setTitle(I18n.getInstance().get("fluid.title"));
+
         // Controls Panel
         VBox controls = new VBox(10);
-        controls.setPadding(new Insets(15));
-        controls.setStyle("-fx-background-color: #0f0f1a;");
+        controls.setPadding(new Insets(10));
+        controls.setStyle("-fx-background-color: #333;");
         controls.setPrefWidth(220);
 
-        Label titleLabel = new Label("Fluid Dynamics");
-        titleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #00d4ff;");
+        Label titleLabel = new Label(I18n.getInstance().get("fluid.controls"));
+        titleLabel.setTextFill(Color.WHITE);
+        titleLabel.setStyle("-fx-font-weight: bold;");
 
         // Info text
         Label infoLabel = new Label(
@@ -76,13 +98,48 @@ public class FluidDynamicsViewer extends Application {
         infoLabel.setWrapText(true);
         infoLabel.setStyle("-fx-text-fill: #aaa;");
 
+        // Grid Resolution Control
+        Label resLabel = new Label(I18n.getInstance().get("fluid.resolution"));
+        resLabel.setTextFill(Color.LIGHTGRAY);
+        ComboBox<Integer> resCombo = new ComboBox<>();
+        resCombo.getItems().addAll(32, 64, 128);
+        resCombo.setValue(N);
+        resCombo.setOnAction(e -> {
+            int newN = resCombo.getValue();
+            if (newN != N) {
+                N = newN;
+                resetSimulation();
+                // Recreate canvas with new size
+                canvas.setWidth(N * SCALE);
+                canvas.setHeight(N * SCALE);
+            }
+        });
+
         // Viscosity slider
-        Label viscLabel = new Label("Viscosity: 0.01");
-        viscLabel.setStyle("-fx-text-fill: white;");
-        Slider viscSlider = new Slider(0.001, 0.1, 0.01);
-        viscSlider.valueProperty().addListener((o, old, val) -> {
-            viscosity = val.doubleValue();
-            viscLabel.setText(String.format("Viscosity: %.3f", viscosity));
+        Label viscLabel = new Label(I18n.getInstance().get("fluid.viscosity"));
+        viscLabel.setTextFill(Color.LIGHTGRAY);
+        Slider viscSlider = new Slider(0, 0.001, 0.0001); // Very low viscosity for stability
+        viscSlider.valueProperty().addListener((o, ov, nv) -> viscosity = nv.doubleValue());
+
+        // FPS Label
+        fpsLabel = new Label(I18n.getInstance().get("fluid.fps"));
+        fpsLabel.setTextFill(Color.YELLOW);
+        fpsLabel.setStyle("-fx-font-family: monospace;");
+
+        // Solver Switch
+        Label engineLabel = new Label("Physics Engine:");
+        engineLabel.setStyle("-fx-text-fill: white;");
+        ToggleButton engineSwitch = new ToggleButton("Mode: Primitive");
+        engineSwitch.setMaxWidth(Double.MAX_VALUE);
+        engineSwitch.setOnAction(e -> {
+            if (engineSwitch.isSelected()) {
+                solver = new ObjectFluidSolver();
+                engineSwitch.setText("Mode: Scientific (Real)");
+            } else {
+                solver = new PrimitiveFluidSolver();
+                engineSwitch.setText("Mode: Primitive (double)");
+            }
+            solver.initialize(N, SCALE);
         });
 
         // Speed slider
@@ -127,6 +184,11 @@ public class FluidDynamicsViewer extends Application {
                 viscLabel, viscSlider,
                 speedLabel, speedSlider,
                 new Separator(),
+                viscLabel, viscSlider,
+                speedLabel, speedSlider,
+                new Separator(),
+                engineLabel, engineSwitch, fpsLabel,
+                new Separator(),
                 fieldCheck, particleCheck,
                 colorLabel, colorCombo,
                 new Separator(),
@@ -153,6 +215,38 @@ public class FluidDynamicsViewer extends Application {
             @Override
             public void handle(long now) {
                 speed = speedSlider.getValue();
+                speed = speedSlider.getValue();
+
+                // FPS Calc
+                long cur = System.nanoTime();
+                if (frameCount % 30 == 0 && lastFrameTime > 0) {
+                    double fps = 30.0 * 1e9 / (cur - lastFrameTime);
+                    fpsLabel.setText(String.format("FPS: %.1f", fps));
+                    lastFrameTime = cur;
+                } else if (lastFrameTime == 0) {
+                    lastFrameTime = cur;
+                }
+                if (frameCount % 30 == 0)
+                    lastFrameTime = cur;
+                frameCount++;
+
+                // Solver Step
+                solver.step(speed, viscosity, zOff);
+
+                // Add Force
+                if (mousePressed) {
+                    solver.addForce(mouseX, mouseY, 0, 0); // Direction not used yet
+                } else {
+                    // Primitive solver might need manual clear?
+                    // Interface addForce is stateful in current impl.
+                    // Ideally we pass force in step or explicit method.
+                    // For now, let's just update solver state.
+                    if (solver instanceof PrimitiveFluidSolver) {
+                        ((PrimitiveFluidSolver) solver).clearForce();
+                    }
+                    // Ideally add clearForce to interface
+                }
+
                 drawFluid(canvas, speed);
                 updateParticles(speed);
                 zOff += 0.01 * speed;
@@ -160,6 +254,7 @@ public class FluidDynamicsViewer extends Application {
         }.start();
 
         Scene scene = new Scene(root, N * SCALE + 220, N * SCALE);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle("JScience Fluid Dynamics Viewer");
         stage.setScene(scene);
         stage.show();
@@ -172,7 +267,7 @@ public class FluidDynamicsViewer extends Application {
         if (showField) {
             for (int y = 0; y < N; y++) {
                 for (int x = 0; x < N; x++) {
-                    double[] flow = getFlowAt(x * SCALE, y * SCALE);
+                    double[] flow = solver.getFlowAt(x * SCALE, y * SCALE);
                     double mag = Math.sqrt(flow[0] * flow[0] + flow[1] * flow[1]);
                     Color c = getFlowColor(mag);
                     gc.setFill(c);
@@ -216,36 +311,9 @@ public class FluidDynamicsViewer extends Application {
         };
     }
 
-    private double[] getFlowAt(double px, double py) {
-        // Simplified flow field based on simplex-like noise
-        double x = px / SCALE;
-        double y = py / SCALE;
-
-        double vx = Math.sin(x * 0.1 + zOff) * Math.cos(y * 0.08 + zOff * 0.7);
-        double vy = Math.cos(x * 0.08 + zOff * 0.6) * Math.sin(y * 0.1 + zOff);
-
-        // Add mouse influence
-        if (mousePressed && mouseX > 0) {
-            double dx = px - mouseX;
-            double dy = py - mouseY;
-            double dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 100) {
-                double influence = (100 - dist) / 100.0;
-                vx += influence * 2 * Math.signum(-dx);
-                vy += influence * 2 * Math.signum(-dy);
-            }
-        }
-
-        // Dampen by viscosity
-        vx *= (1.0 - viscosity);
-        vy *= (1.0 - viscosity);
-
-        return new double[] { vx, vy };
-    }
-
     private void updateParticles(double speed) {
         for (Particle p : particles) {
-            double[] flow = getFlowAt(p.x, p.y);
+            double[] flow = solver.getFlowAt(p.x, p.y);
             p.vx = p.vx * 0.9 + flow[0] * speed;
             p.vy = p.vy * 0.9 + flow[1] * speed;
             p.x += p.vx;

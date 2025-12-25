@@ -16,12 +16,12 @@ public class GeometryBoardDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Interactive Geometry Board";
+        return org.jscience.natural.i18n.I18n.getInstance().get("GeometryBoard.title");
     }
 
     @Override
     public String getDescription() {
-        return "Construct geometric figures like lines, circles, and points to explore Euclidean theorems.";
+        return org.jscience.natural.i18n.I18n.getInstance().get("GeometryBoard.desc");
     }
 
     @Override

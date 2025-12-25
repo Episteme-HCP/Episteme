@@ -1,8 +1,11 @@
+
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
  */
 package org.jscience.ui.physics.waves;
+
+import org.jscience.natural.i18n.I18n;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -12,6 +15,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.LinearGradient;
@@ -31,59 +35,80 @@ public class SpectrographViewer extends Application {
     private double time = 0;
     private double sensitivity = 1.0;
 
+    private SpectrumProvider provider;
+    private Label fpsLabel;
+    private long lastFrameTime = 0;
+    private int frameCount = 0;
+
     @Override
     public void start(Stage stage) {
         VBox root = new VBox(10);
         root.setPadding(new Insets(20));
         root.setStyle("-fx-background-color: #111;");
 
-        Label title = new Label("Frequency Spectrograph");
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
+        Label title = new Label(I18n.getInstance().get("spectrograph.title"));
+        // ...
+        Label sensLbl = new Label(I18n.getInstance().get("spectrograph.sensitivity"));
+        // ...
+        fpsLabel = new Label(I18n.getInstance().get("spectrograph.fps"));
+        // ...
+        ToggleButton engineSwitch = new ToggleButton(I18n.getInstance().get("spectrograph.mode.primitive"));
+        engineSwitch.setOnAction(e -> {
+            if (engineSwitch.isSelected()) {
+                provider = new ObjectSpectrumProvider(BANDS);
+                engineSwitch.setText(I18n.getInstance().get("spectrograph.mode.scientific"));
+            } else {
+                provider = new PrimitiveSpectrumProvider(BANDS);
+                engineSwitch.setText(I18n.getInstance().get("spectrograph.mode.primitive"));
+            }
+        });
+        // Canvas setup
+        Canvas canvas = new Canvas(560, 400);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        root.getChildren().addAll(title, sensLbl, fpsLabel, engineSwitch, canvas);
 
-        Canvas canvas = new Canvas(800, 400);
+        // Gradient
+        LinearGradient gradient = new LinearGradient(0, 1, 0, 0, true, javafx.scene.paint.CycleMethod.NO_CYCLE,
+                new Stop(0, Color.web("#00ff00")),
+                new Stop(0.5, Color.web("#ffff00")),
+                new Stop(1.0, Color.web("#ff0000")));
 
-        HBox controls = new HBox(10);
-        controls.setPadding(new Insets(10));
-        Slider sensSlider = new Slider(0.1, 5, 1);
-        sensSlider.valueProperty().addListener((o, ov, nv) -> sensitivity = nv.doubleValue());
-        Label sensLbl = new Label("Sensitivity");
-        sensLbl.setTextFill(Color.WHITE);
-        controls.getChildren().addAll(sensLbl, sensSlider);
+        // Provider init
+        provider = new PrimitiveSpectrumProvider(BANDS);
 
-        root.getChildren().addAll(title, canvas, controls);
-
-        LinearGradient gradient = new LinearGradient(0, 400, 0, 0, false, null,
-                new Stop(0, Color.BLUE),
-                new Stop(0.5, Color.YELLOW),
-                new Stop(1, Color.RED));
-
-        new AnimationTimer() {
+        // Animation Loop
+        AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 updateSpectrum();
-                render(canvas.getGraphicsContext2D(), gradient);
-            }
-        }.start();
+                render(gc, gradient);
 
-        Scene scene = new Scene(root, 850, 500);
-        stage.setTitle("JScience Waveform Analyzer");
+                // FPS calculation
+                if (lastFrameTime > 0) {
+                    double fps = 1_000_000_000.0 / (now - lastFrameTime);
+                    if (frameCount++ % 60 == 0) {
+                        fpsLabel.setText(String.format("FPS: %.1f", fps));
+                    }
+                }
+                lastFrameTime = now;
+            }
+        };
+        timer.start();
+
+        stage.setTitle(I18n.getInstance().get("spectrograph.window"));
+        Scene scene = new Scene(root, 600, 500);
+
+        // Theme
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
+
         stage.setScene(scene);
         stage.show();
     }
 
     private void updateSpectrum() {
         time += 0.1;
-        for (int i = 0; i < BANDS; i++) {
-            // Mock harmonic noise
-            double base = Math.sin(time + i * 0.2) * 0.5 + 0.5;
-            double high = Math.sin(time * 2.5 + i * 0.5) * 0.3;
-            double random = Math.random() * 0.2;
-
-            // Falloff for high frequencies
-            double falloff = Math.exp(-i / (double) BANDS);
-
-            spectrum[i] = (base + high + random) * falloff * sensitivity;
-        }
+        provider.update(time, sensitivity);
+        spectrum = provider.getSpectrum();
     }
 
     private void render(GraphicsContext gc, LinearGradient gradient) {

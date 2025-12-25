@@ -16,12 +16,12 @@ public class GeneticsDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Genetic Drift";
+        return org.jscience.natural.i18n.I18n.getInstance().get("Genetics.title");
     }
 
     @Override
     public String getDescription() {
-        return "Simulates allele frequency changes over generations (Drift).";
+        return org.jscience.natural.i18n.I18n.getInstance().get("Genetics.desc");
     }
 
     @Override

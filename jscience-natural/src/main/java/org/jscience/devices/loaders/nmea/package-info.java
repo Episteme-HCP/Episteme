@@ -23,4 +23,4 @@
 /**
  * Provides support for NMEA 0183 standard signals (GPS).
  */
-package org.jscience.devices.signals.nmea;
+package org.jscience.devices.loaders.nmea;

@@ -16,12 +16,12 @@ public class MolecularViewerDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Molecular Viewer";
+        return org.jscience.natural.i18n.I18n.getInstance().get("MolecularViewer.title");
     }
 
     @Override
     public String getDescription() {
-        return "3D visualization of molecules including DNA, proteins, and small molecules with CPK coloring.";
+        return org.jscience.natural.i18n.I18n.getInstance().get("MolecularViewer.desc");
     }
 
     @Override

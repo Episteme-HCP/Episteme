@@ -136,6 +136,7 @@ public class ClothSimulationViewer extends Application {
         timer.start();
 
         Scene scene = new Scene(root, 1000, 700);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle("JScience - 3D Cloth Simulation");
         stage.setScene(scene);
         stage.show();

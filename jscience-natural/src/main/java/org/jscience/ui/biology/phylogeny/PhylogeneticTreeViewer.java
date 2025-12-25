@@ -154,6 +154,7 @@ public class PhylogeneticTreeViewer extends Application {
         });
 
         Scene scene = new Scene(root, 900, 750);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle("JScience Phylogenetic Tree Viewer");
         stage.setScene(scene);
         stage.show();

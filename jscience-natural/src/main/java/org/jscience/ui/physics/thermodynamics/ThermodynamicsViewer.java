@@ -24,6 +24,7 @@ package org.jscience.ui.physics.thermodynamics;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import org.jscience.natural.i18n.I18n;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -53,17 +54,17 @@ public class ThermodynamicsViewer extends Application {
     public void start(Stage stage) {
         gas = new IdealGas(Real.of(1.0), Real.of(293.15), Real.of(101325)); // 1 mol, 20C, 1 atm
 
-        stage.setTitle("Thermodynamics Dashboard");
+        stage.setTitle(I18n.getInstance().get("thermo.dashboard"));
 
         // PV Diagram
         NumberAxis xAxis = new NumberAxis("Volume (m^3)", 0, 0.1, 0.01);
         NumberAxis yAxis = new NumberAxis("Pressure (Pa)", 0, 200000, 20000);
         LineChart<Number, Number> pvChart = new LineChart<>(xAxis, yAxis);
-        pvChart.setTitle("PV Diagram (Isothermal Expansion)");
+        pvChart.setTitle(I18n.getInstance().get("thermo.chart.title"));
         pvChart.setCreateSymbols(false);
 
         pvSeries = new XYChart.Series<>();
-        pvSeries.setName("Isotherm T=" + gas.getTemperature() + "K");
+        pvSeries.setName(I18n.getInstance().get("thermo.series.name") + gas.getTemperature() + "K");
         pvChart.getData().add(pvSeries);
 
         // Controls
@@ -71,13 +72,13 @@ public class ThermodynamicsViewer extends Application {
         tempSlider.setShowTickLabels(true);
         tempSlider.setShowTickMarks(true);
 
-        infoLabel = new Label("Temperature: 293.15 K");
+        infoLabel = new Label(I18n.getInstance().get("thermo.temp.label"));
 
         tempSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             updateGraph(newVal.doubleValue());
         });
 
-        VBox controls = new VBox(10, new Label("Temperature (K)"), tempSlider, infoLabel);
+        VBox controls = new VBox(10, new Label(I18n.getInstance().get("thermo.temp.control")), tempSlider, infoLabel);
         controls.setStyle("-fx-padding: 10; -fx-background-color: #16213e;");
 
         BorderPane root = new BorderPane();
@@ -86,6 +87,7 @@ public class ThermodynamicsViewer extends Application {
         root.setBottom(controls);
 
         Scene scene = new Scene(root, 800, 600);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setScene(scene);
         stage.show();
 

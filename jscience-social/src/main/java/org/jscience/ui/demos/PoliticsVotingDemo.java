@@ -25,12 +25,12 @@ public class PoliticsVotingDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Politics: Voting Systems Simulation";
+        return org.jscience.social.i18n.I18n.getInstance().get("PoliticsVoting.title");
     }
 
     @Override
     public String getDescription() {
-        return "Simulates First-Past-The-Post vs Proportional Representation with random voter preferences.";
+        return org.jscience.social.i18n.I18n.getInstance().get("PoliticsVoting.desc");
     }
 
     @Override
@@ -40,21 +40,21 @@ public class PoliticsVotingDemo implements DemoProvider {
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
         BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
-        chart.setTitle("Election Results");
+        chart.setTitle(org.jscience.social.i18n.I18n.getInstance().get("pol.voting.chart.title"));
 
-        Button runFPTP = new Button("Run First-Past-The-Post");
-        Button runPR = new Button("Run Proportional Representation");
+        Button runFPTP = new Button(org.jscience.social.i18n.I18n.getInstance().get("pol.voting.btn.fptp"));
+        Button runPR = new Button(org.jscience.social.i18n.I18n.getInstance().get("pol.voting.btn.pr"));
 
-        Label status = new Label("Click a button to simulate an election.");
+        Label status = new Label(org.jscience.social.i18n.I18n.getInstance().get("pol.voting.label.instruction"));
 
         runFPTP.setOnAction(e -> {
             simulateElection(chart, true);
-            status.setText("FPTP: Winner takes all per district.");
+            status.setText(org.jscience.social.i18n.I18n.getInstance().get("pol.voting.status.fptp"));
         });
 
         runPR.setOnAction(e -> {
             simulateElection(chart, false);
-            status.setText("PR: Seats allocated by total vote share.");
+            status.setText(org.jscience.social.i18n.I18n.getInstance().get("pol.voting.status.pr"));
         });
 
         VBox controls = new VBox(10, runFPTP, runPR, status);
@@ -115,7 +115,7 @@ public class PoliticsVotingDemo implements DemoProvider {
         }
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Seats");
+        series.setName(org.jscience.social.i18n.I18n.getInstance().get("pol.voting.series.seats"));
         for (String p : parties) {
             series.getData().add(new XYChart.Data<>(p, seats.get(p)));
         }

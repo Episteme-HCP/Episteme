@@ -1,5 +1,8 @@
 package org.jscience.ui.physics.mechanics;
 
+import org.jscience.natural.i18n.I18n;
+import org.jscience.physics.PhysicalConstants;
+
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -7,10 +10,12 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 /**
@@ -24,13 +29,14 @@ import javafx.stage.Stage;
 public class MechanicsViewer extends Application {
 
     private double mass = 5.0; // kg
-    private double k = 10.0; // N/m (Spring constant)
-    private double c = 0.5; // Ns/m (Damping)
+    private double springConstant = 10.0; // N/m (Spring constant)
+    private double damping = 0.5; // Ns/m (Damping)
 
     private double position = 100; // Displacement from equilibrium (pixels)
     private double velocity = 0;
 
     private Canvas canvas;
+    private Label energyLabel; // Declared energyLabel
 
     @Override
     public void start(Stage stage) {
@@ -39,38 +45,57 @@ public class MechanicsViewer extends Application {
         canvas = new Canvas(400, 600);
         root.setCenter(canvas);
 
+        // Controls
         VBox controls = new VBox(10);
-        controls.setPadding(new Insets(15));
-        controls.setPrefWidth(200);
-        controls.setStyle("-fx-background-color: #16213e;");
+        controls.setPadding(new Insets(10));
+        controls.setPrefWidth(200); // Added to maintain layout
+        controls.setStyle("-fx-background-color: #333;");
 
-        Label title = new Label("⚙️ Mass-Spring-Damper");
-        title.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #00d9ff;");
+        // Title
+        Label title = new Label(I18n.getInstance().get("mechanics.title"));
+        title.setStyle("-fx-font-size: 24px; -fx-text-fill: white; border: 1px solid white; -fx-padding: 10;");
 
-        Slider kSlider = new Slider(1, 50, 10);
-        kSlider.valueProperty().addListener((o, old, v) -> k = v.doubleValue());
+        // Mass Control
+        Label massLabel = new Label(I18n.getInstance().get("mechanics.mass"));
+        massLabel.setTextFill(Color.WHITE);
+        Slider massSlider = new Slider(0.1, 10.0, 1.0);
+        massSlider.setShowTickLabels(true);
+        massSlider.setShowTickMarks(true);
+        massSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            mass = newVal.doubleValue();
+        });
 
-        Slider mSlider = new Slider(1, 20, 5);
-        mSlider.valueProperty().addListener((o, old, v) -> mass = v.doubleValue());
+        // Spring Constant Control
+        Label kLabel = new Label(I18n.getInstance().get("mechanics.spring"));
+        kLabel.setTextFill(Color.WHITE);
+        Slider kSlider = new Slider(0.1, 50.0, 10.0);
+        kSlider.setShowTickLabels(true);
+        kSlider.setShowTickMarks(true);
+        kSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            springConstant = newVal.doubleValue();
+        });
 
-        Slider cSlider = new Slider(0, 5, 0.5);
-        cSlider.valueProperty().addListener((o, old, v) -> c = v.doubleValue());
+        // Damping Control
+        Label cLabel = new Label(I18n.getInstance().get("mechanics.damping"));
+        cLabel.setTextFill(Color.WHITE);
+        Slider cSlider = new Slider(0.0, 2.0, 0.1);
+        cSlider.setShowTickLabels(true);
+        cSlider.setShowTickMarks(true);
+        cSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            damping = newVal.doubleValue();
+        });
 
-        Label kLabel = new Label("Spring Constant (k):");
-        kLabel.setStyle("-fx-text-fill: #888;");
-        Label mLabel = new Label("Mass (m):");
-        mLabel.setStyle("-fx-text-fill: #888;");
-        Label cLabel = new Label("Damping (c):");
-        cLabel.setStyle("-fx-text-fill: #888;");
-        Label hintLabel = new Label("Click and drag mass");
-        hintLabel.setStyle("-fx-text-fill: #666;");
+        // Energy Monitor
+        energyLabel = new Label(I18n.getInstance().get("mechanics.energy"));
+        energyLabel.setTextFill(Color.YELLOW);
+        energyLabel.setFont(Font.font("Monospaced", 16));
 
         controls.getChildren().addAll(
-                title, new javafx.scene.control.Separator(),
+                title, new Separator(), // Added Separator import
+                massLabel, massSlider,
                 kLabel, kSlider,
-                mLabel, mSlider,
                 cLabel, cSlider,
-                hintLabel);
+                energyLabel);
         root.setRight(controls);
 
         canvas.setOnMouseDragged(e -> {
@@ -96,6 +121,7 @@ public class MechanicsViewer extends Application {
         }.start();
 
         Scene scene = new Scene(root, 600, 600);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle("JScience Mechanics Demo");
         stage.setScene(scene);
         stage.show();
@@ -103,7 +129,7 @@ public class MechanicsViewer extends Application {
 
     private void update(double dt) {
         // Stage 1: Spring Mass
-        double force = -k * position - c * velocity;
+        double force = -springConstant * position - damping * velocity;
         double a = force / mass;
         velocity += a * dt * 50;
         position += velocity * dt * 50;

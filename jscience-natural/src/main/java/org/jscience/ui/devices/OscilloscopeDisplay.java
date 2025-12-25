@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jscience.ui.engineering.instruments;
+package org.jscience.ui.devices;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -37,13 +37,13 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Oscilloscope extends Pane {
+public class OscilloscopeDisplay extends Pane {
 
     private final Canvas canvas;
     private final List<Double> dataPoints = new LinkedList<>();
     private final int maxPoints = 500;
 
-    public Oscilloscope() {
+    public OscilloscopeDisplay() {
         this.canvas = new Canvas();
         getChildren().add(canvas);
 

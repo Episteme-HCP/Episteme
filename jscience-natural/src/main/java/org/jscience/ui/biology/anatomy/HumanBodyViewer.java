@@ -14,7 +14,12 @@ import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.jscience.biology.loaders.StlMeshLoader;
+import org.jscience.natural.i18n.I18n;
+
+import java.io.File;
 
 /**
  * 3D Human Body Anatomy Viewer.
@@ -63,6 +68,7 @@ public class HumanBodyViewer extends Application {
         root.setRight(controls);
 
         Scene scene = new Scene(root, 1200, 800);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle("JScience Human Body Anatomy Viewer");
         stage.setScene(scene);
         stage.show();
@@ -124,22 +130,28 @@ public class HumanBodyViewer extends Application {
         controls.setPrefWidth(280);
 
         // Title
-        Label title = new Label("Anatomy Layers");
+        Label title = new Label(I18n.getInstance().get("humanbody.layers"));
         title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8af;");
 
         // Layer checkboxes
-        CheckBox skeletonCheck = createLayerCheckbox("Skeleton", skeletonLayer, Color.IVORY, true);
-        CheckBox muscleCheck = createLayerCheckbox("Muscles", muscleLayer, Color.INDIANRED, false);
-        CheckBox organCheck = createLayerCheckbox("Internal Organs", organLayer, Color.CORAL, false);
-        CheckBox nervousCheck = createLayerCheckbox("Nervous System", nervousLayer, Color.YELLOW, false);
-        CheckBox circulatoryCheck = createLayerCheckbox("Circulatory System", circulatoryLayer, Color.DARKRED, false);
-        CheckBox skinCheck = createLayerCheckbox("Skin (Transparent)", skinLayer, Color.PEACHPUFF, false);
+        CheckBox skeletonCheck = createLayerCheckbox(I18n.getInstance().get("humanbody.skeleton"), skeletonLayer,
+                Color.IVORY, true);
+        CheckBox muscleCheck = createLayerCheckbox(I18n.getInstance().get("humanbody.muscle"), muscleLayer,
+                Color.INDIANRED, false);
+        CheckBox organCheck = createLayerCheckbox(I18n.getInstance().get("humanbody.organs"), organLayer, Color.CORAL,
+                false);
+        CheckBox nervousCheck = createLayerCheckbox(I18n.getInstance().get("humanbody.nervous"), nervousLayer,
+                Color.YELLOW, false);
+        CheckBox circulatoryCheck = createLayerCheckbox(I18n.getInstance().get("humanbody.circulatory"),
+                circulatoryLayer, Color.DARKRED, false);
+        CheckBox skinCheck = createLayerCheckbox(I18n.getInstance().get("humanbody.skin"), skinLayer, Color.PEACHPUFF,
+                false);
 
         // Preset buttons
-        Label presetsLabel = new Label("Quick Presets:");
+        Label presetsLabel = new Label(I18n.getInstance().get("humanbody.presets"));
         presetsLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
 
-        Button skeletonOnlyBtn = new Button("Skeleton Only");
+        Button skeletonOnlyBtn = new Button(I18n.getInstance().get("humanbody.preset.skeleton"));
         skeletonOnlyBtn.setMaxWidth(Double.MAX_VALUE);
         skeletonOnlyBtn.setOnAction(e -> {
             skeletonCheck.setSelected(true);
@@ -151,7 +163,7 @@ public class HumanBodyViewer extends Application {
             updateLayerVisibility();
         });
 
-        Button muscularBtn = new Button("Muscular System");
+        Button muscularBtn = new Button(I18n.getInstance().get("humanbody.preset.muscle"));
         muscularBtn.setMaxWidth(Double.MAX_VALUE);
         muscularBtn.setOnAction(e -> {
             skeletonCheck.setSelected(true);
@@ -163,7 +175,7 @@ public class HumanBodyViewer extends Application {
             updateLayerVisibility();
         });
 
-        Button fullBodyBtn = new Button("Full Body");
+        Button fullBodyBtn = new Button(I18n.getInstance().get("humanbody.preset.full"));
         fullBodyBtn.setMaxWidth(Double.MAX_VALUE);
         fullBodyBtn.setOnAction(e -> {
             skeletonCheck.setSelected(true);
@@ -176,20 +188,25 @@ public class HumanBodyViewer extends Application {
         });
 
         // Info panel
-        Label infoTitle = new Label("Information:");
+        Label infoTitle = new Label(I18n.getInstance().get("humanbody.info"));
         infoTitle.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
 
-        infoLabel = new Label("Click on body parts for details.\n\nDrag to rotate.\nScroll to zoom.");
+        infoLabel = new Label(I18n.getInstance().get("humanbody.clickinfo"));
         infoLabel.setWrapText(true);
         infoLabel.setStyle("-fx-text-fill: #aaa;");
 
         // Instructions
-        Label instructLabel = new Label(
-                "Controls:\n" +
-                        "• Drag: Rotate view\n" +
-                        "• Scroll: Zoom in/out\n" +
-                        "• Checkboxes: Toggle layers");
+        Label instructLabel = new Label(I18n.getInstance().get("humanbody.controls"));
         instructLabel.setStyle("-fx-text-fill: #666; -fx-font-size: 11px;");
+
+        // Load STL Model section
+        Label loadTitle = new Label(I18n.getInstance().get("humanbody.loadmodel"));
+        loadTitle.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
+
+        Button loadStlBtn = new Button(I18n.getInstance().get("humanbody.loadstl"));
+        loadStlBtn.setMaxWidth(Double.MAX_VALUE);
+        loadStlBtn.setStyle("-fx-background-color: #4a9eff; -fx-text-fill: white;");
+        loadStlBtn.setOnAction(e -> loadStlModel());
 
         controls.getChildren().addAll(
                 title, new Separator(),
@@ -197,6 +214,8 @@ public class HumanBodyViewer extends Application {
                 nervousCheck, circulatoryCheck, skinCheck,
                 new Separator(),
                 presetsLabel, skeletonOnlyBtn, muscularBtn, fullBodyBtn,
+                new Separator(),
+                loadTitle, loadStlBtn,
                 new Separator(),
                 infoTitle, infoLabel,
                 new Separator(),
@@ -218,6 +237,35 @@ public class HumanBodyViewer extends Application {
 
     private void updateLayerVisibility() {
         // Called after preset buttons
+    }
+
+    /**
+     * Opens a file chooser to load an external STL anatomical model.
+     */
+    private void loadStlModel() {
+        FileChooser fc = new FileChooser();
+        fc.setTitle(I18n.getInstance().get("humanbody.loadstl.title"));
+        fc.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("STL Files", "*.stl"));
+
+        File file = fc.showOpenDialog(null);
+        if (file != null) {
+            try {
+                MeshView mesh = StlMeshLoader.load(file);
+                PhongMaterial material = new PhongMaterial(Color.BEIGE);
+                material.setSpecularColor(Color.WHITE);
+                mesh.setMaterial(material);
+                mesh.setDrawMode(DrawMode.FILL);
+                mesh.setId(file.getName());
+
+                // Add to skeleton layer for visibility control
+                skeletonLayer.getChildren().add(mesh);
+
+                infoLabel.setText(I18n.getInstance().get("humanbody.loaded") + ": " + file.getName());
+            } catch (Exception e) {
+                infoLabel.setText(I18n.getInstance().get("humanbody.loaderror") + ": " + e.getMessage());
+            }
+        }
     }
 
     private void build3DBody() {

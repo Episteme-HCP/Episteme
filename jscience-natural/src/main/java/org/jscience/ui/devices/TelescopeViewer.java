@@ -80,7 +80,6 @@ public class TelescopeViewer extends BorderPane {
         // Title
         Label title = new Label("🔭 Telescope Control");
         title.setFont(Font.font("System", FontWeight.BOLD, 18));
-        title.setTextFill(Color.WHITE);
 
         // Status panel
         HBox statusBox = createStatusPanel();
@@ -107,10 +106,10 @@ public class TelescopeViewer extends BorderPane {
         // RA display
         VBox raBox = new VBox(2);
         Label raTitle = new Label("Right Ascension");
-        raTitle.setTextFill(Color.LIGHTGRAY);
+
         raTitle.setFont(Font.font("System", 10));
         raLabel = new Label("00h 00m 00.00s");
-        raLabel.setTextFill(Color.LIME);
+
         raLabel.setFont(Font.font("Monospace", FontWeight.BOLD, 14));
         raBox.getChildren().addAll(raTitle, raLabel);
         raBox.setAlignment(Pos.CENTER);
@@ -118,10 +117,10 @@ public class TelescopeViewer extends BorderPane {
         // Dec display
         VBox decBox = new VBox(2);
         Label decTitle = new Label("Declination");
-        decTitle.setTextFill(Color.LIGHTGRAY);
+
         decTitle.setFont(Font.font("System", 10));
         decLabel = new Label("+00° 00' 00.00\"");
-        decLabel.setTextFill(Color.LIME);
+
         decLabel.setFont(Font.font("Monospace", FontWeight.BOLD, 14));
         decBox.getChildren().addAll(decTitle, decLabel);
         decBox.setAlignment(Pos.CENTER);
@@ -129,7 +128,7 @@ public class TelescopeViewer extends BorderPane {
         // Status
         VBox statusBox = new VBox(2);
         Label statusTitle = new Label("Status");
-        statusTitle.setTextFill(Color.LIGHTGRAY);
+
         statusTitle.setFont(Font.font("System", 10));
         statusLabel = new Label("DISCONNECTED");
         statusLabel.setTextFill(Color.ORANGE);
@@ -148,7 +147,7 @@ public class TelescopeViewer extends BorderPane {
     private VBox createControlPanel() {
         // Target input
         Label targetLabel = new Label("Slew to Target");
-        targetLabel.setTextFill(Color.WHITE);
+
         targetLabel.setFont(Font.font("System", FontWeight.BOLD, 12));
 
         HBox inputRow = new HBox(10);

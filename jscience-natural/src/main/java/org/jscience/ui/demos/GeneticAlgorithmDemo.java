@@ -16,12 +16,12 @@ public class GeneticAlgorithmDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Genetic Algorithms: Evolving Pathfinders";
+        return org.jscience.natural.i18n.I18n.getInstance().get("GeneticAlgorithm.title");
     }
 
     @Override
     public String getDescription() {
-        return "Simulates evolution through natural selection: agents learn to navigate a 2D space to reach a target.";
+        return org.jscience.natural.i18n.I18n.getInstance().get("GeneticAlgorithm.desc");
     }
 
     @Override

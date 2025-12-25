@@ -4,6 +4,8 @@
  */
 package org.jscience.apps.anatomy;
 
+import org.jscience.biology.loaders.StlMeshLoader;
+
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 import org.junit.jupiter.api.Test;

@@ -12,7 +12,7 @@ public class ThermodynamicsDemo implements DemoProvider {
 
     @Override
     public String getDescription() {
-        return "Visualizes thermodynamic cycles (Carnot, Otto, Diesel) and efficiency.";
+        return org.jscience.natural.i18n.I18n.getInstance().get("thermo.desc");
     }
 
     @Override

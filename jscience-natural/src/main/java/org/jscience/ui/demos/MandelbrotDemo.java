@@ -16,12 +16,12 @@ public class MandelbrotDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Mandelbrot Fractal";
+        return org.jscience.natural.i18n.I18n.getInstance().get("mandelbrot.title");
     }
 
     @Override
     public String getDescription() {
-        return "Interactive Mandelbrot set explorer with zoom and pan controls.";
+        return org.jscience.natural.i18n.I18n.getInstance().get("mandelbrot.desc");
     }
 
     @Override

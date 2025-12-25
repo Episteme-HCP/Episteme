@@ -16,12 +16,12 @@ public class MetamathDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Metamath Logic Prover";
+        return org.jscience.natural.i18n.I18n.getInstance().get("Metamath.title");
     }
 
     @Override
     public String getDescription() {
-        return "Interactive symbolic proof explorer demonstrating step-by-step logical deductions (Metamath-style).";
+        return org.jscience.natural.i18n.I18n.getInstance().get("Metamath.desc");
     }
 
     @Override

@@ -20,12 +20,12 @@ public class HumanBodyDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Human Body Anatomy";
+        return org.jscience.natural.i18n.I18n.getInstance().get("HumanBody.title");
     }
 
     @Override
     public String getDescription() {
-        return "Interactive 3D viewer of human anatomy with layers for skeleton, muscles, organs, nervous and circulatory systems.";
+        return org.jscience.natural.i18n.I18n.getInstance().get("HumanBody.desc");
     }
 
     @Override

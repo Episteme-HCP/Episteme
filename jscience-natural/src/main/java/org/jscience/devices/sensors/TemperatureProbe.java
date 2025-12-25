@@ -12,7 +12,21 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public interface TemperatureProbe extends Sensor<Real> {
     enum ProbeType {
-        THERMOCOUPLE, RTD, THERMISTOR, INFRARED
+        THERMOCOUPLE("device.temp.type.thermocouple"),
+        RTD("device.temp.type.rtd"),
+        THERMISTOR("device.temp.type.thermistor"),
+        INFRARED("device.temp.type.infrared");
+
+        private final String i18nKey;
+
+        ProbeType(String i18nKey) {
+            this.i18nKey = i18nKey;
+        }
+
+        @Override
+        public String toString() {
+            return org.jscience.natural.i18n.I18n.getInstance().get(i18nKey);
+        }
     }
 
     ProbeType getType();

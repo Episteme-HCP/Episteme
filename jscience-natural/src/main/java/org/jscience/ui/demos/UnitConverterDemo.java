@@ -16,12 +16,12 @@ public class UnitConverterDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Measure Converter";
+        return org.jscience.natural.i18n.I18n.getInstance().get("unit.title");
     }
 
     @Override
     public String getDescription() {
-        return "Scientific unit conversion tool for physical quantities like length, mass, energy, and temperature.";
+        return org.jscience.natural.i18n.I18n.getInstance().get("unit.desc");
     }
 
     @Override

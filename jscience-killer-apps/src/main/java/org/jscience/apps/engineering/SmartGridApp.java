@@ -22,6 +22,7 @@ import javafx.util.Duration;
 import org.jscience.apps.framework.ChartFactory;
 import org.jscience.apps.framework.KillerAppBase;
 
+import java.text.MessageFormat;
 import java.util.Random;
 
 /**
@@ -143,6 +144,8 @@ public class SmartGridApp extends KillerAppBase {
         loadBalanceBar.setPrefWidth(200);
 
         statusBox.getChildren().addAll(new Label("Freq:"), frequencyLabel, loadBalanceBar, statusLabel);
+        statusBox.getChildren().addAll(new Label(i18n.get("grid.label.freq_short")), frequencyLabel, loadBalanceBar,
+                statusLabel);
 
         box.getChildren().addAll(loadChart, statusBox);
         VBox.setVgrow(loadChart, Priority.ALWAYS);
@@ -154,29 +157,29 @@ public class SmartGridApp extends KillerAppBase {
         box.setPadding(new Insets(15));
         box.setStyle("-fx-background-color: #2b2b2b;"); // Dark control room theme
 
-        Label title = new Label("🎛️ Control Room");
+        Label title = new Label(i18n.get("grid.panel.control"));
         title.setTextFill(Color.WHITE);
         title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         // Coal
-        VBox coalBox = createControlGroup("🏭 Coal/Gas Baseload", 0, 1000, 500, Color.ORANGE);
+        VBox coalBox = createControlGroup(i18n.get("grid.control.coal"), 0, 1000, 500, Color.ORANGE);
         coalOutputSlider = (Slider) coalBox.getChildren().get(1);
 
         // Wind
-        VBox windBox = createControlGroup("💨 Wind Farm Capacity", 0, 500, 100, Color.CYAN);
+        VBox windBox = createControlGroup(i18n.get("grid.control.wind"), 0, 500, 100, Color.CYAN);
         windCapacitySlider = (Slider) windBox.getChildren().get(1);
 
         // Solar
-        VBox solarBox = createControlGroup("☀️ Solar Array Capacity", 0, 500, 100, Color.YELLOW);
+        VBox solarBox = createControlGroup(i18n.get("grid.control.solar"), 0, 500, 100, Color.YELLOW);
         solarCapacitySlider = (Slider) solarBox.getChildren().get(1);
 
         // Demand
-        VBox demandBox = createControlGroup("🏙️ City Demand Scaling", 50, 200, 100, Color.MAGENTA);
+        VBox demandBox = createControlGroup(i18n.get("grid.control.demand"), 50, 200, 100, Color.MAGENTA);
         demandScaleSlider = (Slider) demandBox.getChildren().get(1);
 
         // Battery Status
         VBox batteryBox = new VBox(5);
-        Label batteryTitle = new Label("🔋 Battery Storage");
+        Label batteryTitle = new Label(i18n.get("grid.label.battery_title"));
         batteryTitle.setTextFill(Color.LIGHTGREEN);
         batteryTitle.setStyle("-fx-font-weight: bold;");
 
@@ -184,12 +187,13 @@ public class SmartGridApp extends KillerAppBase {
         batteryBar.setMaxWidth(Double.MAX_VALUE);
         batteryBar.setStyle("-fx-accent: #27ae60;");
 
-        batteryLabel = new Label(String.format("%.0f / %.0f MWh", batteryCharge, batteryCapacity));
+        batteryLabel = new Label(
+                MessageFormat.format(i18n.get("grid.label.battery_charge"), batteryCharge, batteryCapacity));
         batteryLabel.setTextFill(Color.LIGHTGRAY);
 
         batteryBox.getChildren().addAll(batteryTitle, batteryBar, batteryLabel);
 
-        Button tripReset = new Button("🔄 Manual Trip Reset");
+        Button tripReset = new Button(i18n.get("grid.button.reset"));
         tripReset.setMaxWidth(Double.MAX_VALUE);
         tripReset.setOnAction(e -> resetSimulation());
 
@@ -207,9 +211,10 @@ public class SmartGridApp extends KillerAppBase {
         sli.setShowTickLabels(true);
         sli.setShowTickMarks(true);
 
-        Label valLbl = new Label(String.format("%.0f MW", val));
+        Label valLbl = new Label(MessageFormat.format(i18n.get("grid.label.mw_value"), val));
         valLbl.setTextFill(Color.LIGHTGRAY);
-        sli.valueProperty().addListener((o, ov, nv) -> valLbl.setText(String.format("%.0f MW", nv.doubleValue())));
+        sli.valueProperty().addListener(
+                (o, ov, nv) -> valLbl.setText(MessageFormat.format(i18n.get("grid.label.mw_value"), nv.doubleValue())));
 
         box.getChildren().addAll(lbl, sli, valLbl);
         return box;
@@ -269,7 +274,8 @@ public class SmartGridApp extends KillerAppBase {
 
         // Update battery UI
         batteryBar.setProgress(batteryCharge / batteryCapacity);
-        batteryLabel.setText(String.format("%.0f / %.0f MWh", batteryCharge, batteryCapacity));
+        batteryLabel
+                .setText(MessageFormat.format(i18n.get("grid.label.battery_charge"), batteryCharge, batteryCapacity));
 
         // Effective supply includes battery contribution
         currentSupply = generation + (imbalance < 0 ? batteryPower : 0);
@@ -286,7 +292,8 @@ public class SmartGridApp extends KillerAppBase {
 
         // Blackout conditions
         if (gridFrequency < 48.0 || gridFrequency > 52.0) {
-            triggerBlackout("Frequency Instability: " + String.format("%.2f", gridFrequency) + " Hz");
+            triggerBlackout(
+                    MessageFormat.format(i18n.get("grid.log.blackout_reason"), String.format("%.2f", gridFrequency)));
         }
     }
 
@@ -302,15 +309,15 @@ public class SmartGridApp extends KillerAppBase {
     }
 
     private void updateStatus() {
-        frequencyLabel.setText(String.format("%.2f Hz", gridFrequency));
+        frequencyLabel.setText(MessageFormat.format(i18n.get("grid.label.freq"), gridFrequency));
         frequencyLabel.setTextFill(Math.abs(gridFrequency - 50) < 0.2 ? Color.BLACK : Color.RED);
 
         if (Math.abs(gridFrequency - 50) < 0.5) {
-            statusLabel.setText("STABLE");
+            statusLabel.setText(i18n.get("grid.status.stable"));
             statusLabel.setStyle(
                     "-fx-font-size: 18px; -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 5 10 5 10; -fx-background-radius: 4;");
         } else {
-            statusLabel.setText("UNSTABLE");
+            statusLabel.setText(i18n.get("grid.status.unstable"));
             statusLabel.setStyle(
                     "-fx-font-size: 18px; -fx-background-color: #FF5722; -fx-text-fill: white; -fx-padding: 5 10 5 10; -fx-background-radius: 4;");
         }

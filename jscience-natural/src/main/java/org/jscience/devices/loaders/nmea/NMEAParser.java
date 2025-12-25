@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jscience.devices.signals.nmea;
+package org.jscience.devices.loaders.nmea;
 
 import java.io.InputStream;
 import java.util.Scanner;
@@ -29,6 +29,7 @@ import org.jscience.devices.Sensor;
 /**
  * A basic NMEA parser that acts as a Sensor for NMEA messages.
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

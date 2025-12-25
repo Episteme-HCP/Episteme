@@ -25,12 +25,12 @@ public class LinguisticsWordFreqDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Linguistics: Word Frequency (Zipf)";
+        return org.jscience.social.i18n.I18n.getInstance().get("LinguisticsWordFreq.title");
     }
 
     @Override
     public String getDescription() {
-        return "Analyzes text and visualizes word frequency, demonstrating Zipf's Law.";
+        return org.jscience.social.i18n.I18n.getInstance().get("LinguisticsWordFreq.desc");
     }
 
     @Override
@@ -38,19 +38,19 @@ public class LinguisticsWordFreqDemo implements DemoProvider {
         BorderPane root = new BorderPane();
 
         TextArea input = new TextArea(
-                "Enter some text here to analyze... The quick brown fox jumps over the lazy dog. The dog barks using words.");
+                org.jscience.social.i18n.I18n.getInstance().get("ling.freq.input.placeholder"));
         input.setWrapText(true);
         input.setPrefHeight(100);
 
-        Button analyzeBtn = new Button("Analyze FREQ");
+        Button analyzeBtn = new Button(org.jscience.social.i18n.I18n.getInstance().get("ling.freq.btn.analyze"));
 
         CategoryAxis xAxis = new CategoryAxis();
-        xAxis.setLabel("Word");
+        xAxis.setLabel(org.jscience.social.i18n.I18n.getInstance().get("ling.freq.axis.word"));
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("Frequency");
+        yAxis.setLabel(org.jscience.social.i18n.I18n.getInstance().get("ling.freq.axis.freq"));
 
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
-        barChart.setTitle("Word Frequencies");
+        barChart.setTitle(org.jscience.social.i18n.I18n.getInstance().get("ling.freq.chart.title"));
         barChart.setAnimated(true);
 
         analyzeBtn.setOnAction(e -> {
@@ -60,7 +60,7 @@ public class LinguisticsWordFreqDemo implements DemoProvider {
                     .collect(Collectors.groupingBy(w -> w, Collectors.counting()));
 
             XYChart.Series<String, Number> series = new XYChart.Series<>();
-            series.setName("Counts");
+            series.setName(org.jscience.social.i18n.I18n.getInstance().get("ling.freq.series.counts"));
 
             counts.entrySet().stream()
                     .sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))

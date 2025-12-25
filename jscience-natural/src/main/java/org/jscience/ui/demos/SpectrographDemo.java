@@ -16,12 +16,12 @@ public class SpectrographDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Frequency Spectrograph";
+        return org.jscience.natural.i18n.I18n.getInstance().get("Spectrograph.title");
     }
 
     @Override
     public String getDescription() {
-        return "Real-time spectrum analyzer visualizing frequency distribution and harmonic signals.";
+        return org.jscience.natural.i18n.I18n.getInstance().get("Spectrograph.desc");
     }
 
     @Override

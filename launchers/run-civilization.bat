@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-set APP_CLASS=org.jscience.apps.social.CivilizationApp
+set APP_CLASS=org.jscience.apps.sociology.CivilizationApp
 set LIB_DIR=lib
 set MODULE_PATH=..\jscience-killer-apps\target\classes;..\jscience-core\target\classes;..\jscience-natural\target\classes;..\jscience-social\target\classes;..\jscience-mathematics\target\classes
 

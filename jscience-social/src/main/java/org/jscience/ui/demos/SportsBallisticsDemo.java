@@ -22,12 +22,12 @@ public class SportsBallisticsDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return "Sports: Ballistics Trajectory";
+        return org.jscience.social.i18n.I18n.getInstance().get("SportsBallistics.title");
     }
 
     @Override
     public String getDescription() {
-        return "Simulates projectile motion for different sports balls (gravity, drag).";
+        return org.jscience.social.i18n.I18n.getInstance().get("SportsBallistics.desc");
     }
 
     private static class Ball {
@@ -46,12 +46,16 @@ public class SportsBallisticsDemo implements DemoProvider {
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         ComboBox<String> sportSelector = new ComboBox<>();
-        sportSelector.getItems().addAll("Basketball", "Tennis Ball", "Golf Ball", "Bowling Ball");
-        sportSelector.setValue("Basketball");
+        sportSelector.getItems().addAll(
+                org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.sport.basketball"),
+                org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.sport.tennis"),
+                org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.sport.golf"),
+                org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.sport.bowling"));
+        sportSelector.setValue(org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.sport.basketball"));
 
         Slider angleSlider = new Slider(0, 90, 45);
         Slider powerSlider = new Slider(0, 50, 20);
-        Button launchBtn = new Button("Launch");
+        Button launchBtn = new Button(org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.btn.launch"));
 
         VBox controls = new VBox(10, sportSelector, angleSlider, powerSlider, launchBtn);
         root.setRight(controls);
@@ -112,35 +116,34 @@ public class SportsBallisticsDemo implements DemoProvider {
                     b.vy = Math.sin(angRad) * pow;
 
                     String sport = sportSelector.getValue();
-                    switch (sport) {
-                        case "Basketball":
-                            b.color = Color.ORANGE;
-                            b.radius = 15;
-                            b.mass = 0.62;
-                            b.area = 0.045;
-                            b.dragCoeff = 0.47;
-                            break;
-                        case "Tennis Ball":
-                            b.color = Color.YELLOW;
-                            b.radius = 5;
-                            b.mass = 0.058;
-                            b.area = 0.0033;
-                            b.dragCoeff = 0.5;
-                            break;
-                        case "Golf Ball":
-                            b.color = Color.WHITE;
-                            b.radius = 3;
-                            b.mass = 0.046;
-                            b.area = 0.0014;
-                            b.dragCoeff = 0.3;
-                            break; // Dimples help
-                        case "Bowling Ball":
-                            b.color = Color.BLACK;
-                            b.radius = 20;
-                            b.mass = 7.0;
-                            b.area = 0.07;
-                            b.dragCoeff = 0.47;
-                            break;
+                    if (sport.equals(
+                            org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.sport.basketball"))) {
+                        b.color = Color.ORANGE;
+                        b.radius = 15;
+                        b.mass = 0.62;
+                        b.area = 0.045;
+                        b.dragCoeff = 0.47;
+                    } else if (sport.equals(
+                            org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.sport.tennis"))) {
+                        b.color = Color.YELLOW;
+                        b.radius = 5;
+                        b.mass = 0.058;
+                        b.area = 0.0033;
+                        b.dragCoeff = 0.5;
+                    } else if (sport
+                            .equals(org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.sport.golf"))) {
+                        b.color = Color.WHITE;
+                        b.radius = 3;
+                        b.mass = 0.046;
+                        b.area = 0.0014;
+                        b.dragCoeff = 0.3;
+                    } else if (sport.equals(
+                            org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.sport.bowling"))) {
+                        b.color = Color.BLACK;
+                        b.radius = 20;
+                        b.mass = 7.0;
+                        b.area = 0.07;
+                        b.dragCoeff = 0.47;
                     }
                 });
             }

@@ -193,15 +193,12 @@ public class PeriodicTableViewer extends Application {
 
         Label atomicNum = new Label(String.valueOf(element.getAtomicNumber()));
         atomicNum.setFont(Font.font("Arial", 10));
-        atomicNum.setTextFill(Color.WHITE);
 
         Label symbolLbl = new Label(element.getSymbol());
         symbolLbl.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        symbolLbl.setTextFill(Color.WHITE);
 
         Label name = new Label(truncate(element.getName(), 8));
         name.setFont(Font.font("Arial", 9));
-        name.setTextFill(Color.LIGHTGRAY);
 
         content.getChildren().addAll(atomicNum, symbolLbl, name);
 
@@ -269,7 +266,6 @@ public class PeriodicTableViewer extends Application {
 
         Label title = new Label("Element Details");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        title.setTextFill(Color.WHITE);
 
         Label hint = new Label("Click an element to see details");
         hint.setTextFill(Color.LIGHTGRAY);
@@ -613,7 +609,7 @@ public class PeriodicTableViewer extends Application {
         nameLbl.setTextFill(Color.LIGHTGRAY);
         nameLbl.setMinWidth(120);
         Label valueLbl = new Label(value);
-        valueLbl.setTextFill(Color.WHITE);
+
         row.getChildren().addAll(nameLbl, valueLbl);
         return row;
     }

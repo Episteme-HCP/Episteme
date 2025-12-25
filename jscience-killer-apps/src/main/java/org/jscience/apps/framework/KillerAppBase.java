@@ -17,6 +17,9 @@ import java.io.File;
 import java.util.Locale;
 import java.util.prefs.Preferences;
 
+import org.jscience.ui.DemoProvider;
+import org.jscience.ui.ThemeManager;
+
 /**
  * Abstract base class for all JScience Killer Apps.
  * Provides standard application framework with menus, toolbars, status bar,
@@ -26,7 +29,7 @@ import java.util.prefs.Preferences;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public abstract class KillerAppBase extends Application {
+public abstract class KillerAppBase extends Application implements DemoProvider {
 
     protected Stage primaryStage;
     protected BorderPane rootPane;
@@ -80,6 +83,27 @@ public abstract class KillerAppBase extends Application {
 
         // Post-init
         onAppReady();
+    }
+
+    // ===== DemoProvider Implementation =====
+
+    @Override
+    public String getCategory() {
+        return "Killer Apps";
+    }
+
+    @Override
+    public String getName() {
+        return getAppTitle().replace(" - JScience", "");
+    }
+
+    @Override
+    public void show(Stage stage) {
+        try {
+            start(stage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // ===== Abstract methods - subclasses must implement =====
@@ -165,21 +189,20 @@ public abstract class KillerAppBase extends Application {
     // ===== Theme =====
 
     protected void applyTheme(Scene scene) {
-        if ("dark".equals(currentTheme)) {
-            scene.getRoot().setStyle(
-                    "-fx-base: #2b2b2b; " +
-                            "-fx-background: #1e1e1e; " +
-                            "-fx-control-inner-background: #3c3c3c; " +
-                            "-fx-text-fill: #e0e0e0;");
-        } else {
-            scene.getRoot().setStyle("");
-        }
+        ThemeManager.getInstance().setTheme(currentTheme); // Ensure manager knows current (if local preference was
+                                                           // loaded)
+        // OR better: use manager as source of truth.
+        // But KillerAppBase loads its own prefs in start().
+        // Let's assume ThemeManager prevails for global consistency.
+        ThemeManager.getInstance().applyTheme(scene);
+        this.currentTheme = ThemeManager.getInstance().getCurrentTheme();
     }
 
     public void setTheme(String theme) {
         this.currentTheme = theme;
+        ThemeManager.getInstance().setTheme(theme);
         if (primaryStage != null && primaryStage.getScene() != null) {
-            applyTheme(primaryStage.getScene());
+            ThemeManager.getInstance().applyTheme(primaryStage.getScene());
         }
     }
 
