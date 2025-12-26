@@ -60,7 +60,7 @@ public class GalaxyViewer extends Application {
     @Override
     public void start(Stage stage) {
         StackPane root = new StackPane();
-        root.setStyle("-fx-background-color: black;");
+        root.getStyleClass().add("dark-viewer-root");
 
         Canvas canvas = new Canvas(1000, 800);
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -72,18 +72,18 @@ public class GalaxyViewer extends Application {
         // UI Controls Panel
         VBox controls = new VBox(10);
         controls.setPadding(new javafx.geometry.Insets(10));
-        controls.setStyle("-fx-background-color: rgba(20,20,40,0.8); -fx-padding: 15;");
+        controls.getStyleClass().add("dark-viewer-sidebar");
         controls.setMaxWidth(200);
         controls.setMaxHeight(300);
         controls.setAlignment(javafx.geometry.Pos.TOP_LEFT);
         StackPane.setAlignment(controls, javafx.geometry.Pos.TOP_LEFT);
 
         javafx.scene.control.Label titleLbl = new javafx.scene.control.Label("Galaxy Simulation");
-        titleLbl.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8af;");
+        titleLbl.getStyleClass().add("dark-label-accent");
 
         // Galaxy type selector
         javafx.scene.control.Label typeLbl = new javafx.scene.control.Label("Galaxy Type:");
-        typeLbl.setStyle("-fx-text-fill: white;");
+        typeLbl.getStyleClass().add("dark-label");
         galaxyTypeCombo = new javafx.scene.control.ComboBox<>();
         galaxyTypeCombo.getItems().addAll("Spiral (2 arms)", "Spiral (3 arms)", "Barred Spiral", "Elliptical");
         galaxyTypeCombo.setValue("Spiral (2 arms)");
@@ -98,11 +98,11 @@ public class GalaxyViewer extends Application {
         btnReset.setOnAction(e -> resetGalaxy());
 
         timeLabel = new javafx.scene.control.Label("Time: 0 Myr");
-        timeLabel.setStyle("-fx-text-fill: cyan; -fx-font-family: monospace;");
+        timeLabel.getStyleClass().add("dark-label-accent");
 
         // FPS Label
         fpsLabel = new javafx.scene.control.Label("FPS: --");
-        fpsLabel.setStyle("-fx-text-fill: yellow; -fx-font-family: monospace;");
+        fpsLabel.getStyleClass().add("dark-label");
 
         // Simulator Switch
         javafx.scene.control.ToggleButton simSwitch = new javafx.scene.control.ToggleButton("Mode: Primitive");
@@ -127,7 +127,7 @@ public class GalaxyViewer extends Application {
         });
 
         javafx.scene.control.Label infoLbl = new javafx.scene.control.Label("Controls:\n• Scroll: Zoom\n• Drag: Pan");
-        infoLbl.setStyle("-fx-text-fill: #888;");
+        infoLbl.getStyleClass().add("dark-label-muted");
 
         controls.getChildren().addAll(titleLbl, new javafx.scene.control.Separator(), typeLbl, galaxyTypeCombo,
                 btnCollision, btnReset, new javafx.scene.control.Separator(),

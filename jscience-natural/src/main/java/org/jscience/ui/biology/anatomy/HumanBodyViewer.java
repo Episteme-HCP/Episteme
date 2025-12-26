@@ -55,7 +55,7 @@ public class HumanBodyViewer extends Application {
     @Override
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #1a1a2e;");
+        root.getStyleClass().add("dark-viewer-root");
 
         // Build 3D scene
         build3DBody();
@@ -126,12 +126,12 @@ public class HumanBodyViewer extends Application {
     private VBox createControlPanel() {
         VBox controls = new VBox(15);
         controls.setPadding(new Insets(20));
-        controls.setStyle("-fx-background-color: #2a2a4a;");
+        controls.getStyleClass().add("dark-viewer-sidebar");
         controls.setPrefWidth(280);
 
         // Title
         Label title = new Label(I18n.getInstance().get("humanbody.layers"));
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8af;");
+        title.getStyleClass().add("dark-label-accent");
 
         // Layer checkboxes
         CheckBox skeletonCheck = createLayerCheckbox(I18n.getInstance().get("humanbody.skeleton"), skeletonLayer,
@@ -149,7 +149,7 @@ public class HumanBodyViewer extends Application {
 
         // Preset buttons
         Label presetsLabel = new Label(I18n.getInstance().get("humanbody.presets"));
-        presetsLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
+        presetsLabel.getStyleClass().add("dark-label");
 
         Button skeletonOnlyBtn = new Button(I18n.getInstance().get("humanbody.preset.skeleton"));
         skeletonOnlyBtn.setMaxWidth(Double.MAX_VALUE);
@@ -189,7 +189,7 @@ public class HumanBodyViewer extends Application {
 
         // Info panel
         Label infoTitle = new Label(I18n.getInstance().get("humanbody.info"));
-        infoTitle.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
+        infoTitle.getStyleClass().add("dark-label");
 
         infoLabel = new Label(I18n.getInstance().get("humanbody.clickinfo"));
         infoLabel.setWrapText(true);

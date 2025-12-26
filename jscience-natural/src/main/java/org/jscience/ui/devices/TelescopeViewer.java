@@ -75,7 +75,7 @@ public class TelescopeViewer extends BorderPane {
 
     private void initializeUI() {
         setPadding(new Insets(15));
-        setStyle("-fx-background-color: #1a1a2e;");
+        getStyleClass().add("dark-viewer-root");
 
         // Title
         Label title = new Label("🔭 Telescope Control");
@@ -139,7 +139,7 @@ public class TelescopeViewer extends BorderPane {
         HBox panel = new HBox(30, raBox, decBox, statusBox);
         panel.setAlignment(Pos.CENTER);
         panel.setPadding(new Insets(10));
-        panel.setStyle("-fx-background-color: #16213e; -fx-background-radius: 8;");
+        panel.getStyleClass().add("dark-viewer-sidebar");
 
         return panel;
     }
@@ -162,11 +162,11 @@ public class TelescopeViewer extends BorderPane {
         decInput.setPromptText("Dec (°)");
 
         Button slewBtn = new Button("Slew");
-        slewBtn.setStyle("-fx-background-color: #0f4c75; -fx-text-fill: white;");
+        slewBtn.getStyleClass().add("accent-button-blue");
         slewBtn.setOnAction(e -> slewToTarget());
 
         Button stopBtn = new Button("Stop");
-        stopBtn.setStyle("-fx-background-color: #c23a3a; -fx-text-fill: white;");
+        stopBtn.getStyleClass().add("accent-button-red");
         stopBtn.setOnAction(e -> stopSlew());
 
         inputRow.getChildren().addAll(

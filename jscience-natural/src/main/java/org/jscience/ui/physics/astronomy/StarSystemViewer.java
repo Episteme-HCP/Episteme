@@ -387,7 +387,7 @@ public class StarSystemViewer extends Application {
 
     private VBox createOverlay() {
         VBox box = new VBox(15);
-        box.setStyle("-fx-background-color: #222; -fx-padding: 10;");
+        box.getStyleClass().add("dark-viewer-controls");
 
         Label title = new Label(I18n.getInstance().get("starsystem.presets"));
         title.setTextFill(Color.WHITE);
@@ -408,19 +408,19 @@ public class StarSystemViewer extends Application {
         // HUD
         VBox hud = new VBox(10);
         hud.setPadding(new Insets(10));
-        hud.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5); -fx-background-radius: 10;");
+        hud.getStyleClass().add("dark-viewer-sidebar");
         hud.setMaxWidth(300);
         StackPane.setAlignment(hud, Pos.TOP_LEFT);
         StackPane.setMargin(hud, new Insets(10));
 
         Label title = new Label(I18n.getInstance().get("starsystem.title"));
-        title.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
+        title.getStyleClass().add("dark-label");
 
         dateLabel = new Label(I18n.getInstance().get("starsystem.date"));
-        dateLabel.setStyle("-fx-text-fill: #00ff00; -fx-font-family: monospace;");
+        dateLabel.getStyleClass().add("dark-label-accent");
 
         Label speedLabel = new Label(I18n.getInstance().get("starsystem.speed"));
-        speedLabel.setStyle("-fx-text-fill: #aaa;");
+        speedLabel.getStyleClass().add("dark-label-muted");
 
         Slider speedSlider = new Slider(0.1, 5.0, 1.0);
         speedSlider.valueProperty().addListener((o, old, val) -> simulationSpeed = val.doubleValue());
