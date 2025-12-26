@@ -37,7 +37,7 @@ public class VitalMonitorViewer extends Application {
     @Override
     public void start(Stage stage) {
         GridPane root = new GridPane();
-        root.setStyle("-fx-background-color: black;");
+        root.getStyleClass().add("dark-viewer-root");
         root.setPadding(new Insets(10));
         root.setHgap(10);
         root.setVgap(10);
@@ -55,7 +55,7 @@ public class VitalMonitorViewer extends Application {
         // Numerical Panel
         VBox vitalsPanel = new VBox(20);
         vitalsPanel.setPadding(new Insets(10));
-        vitalsPanel.setStyle("-fx-border-color: #444; -fx-border-width: 2;");
+        vitalsPanel.getStyleClass().add("dark-viewer-sidebar");
 
         Label hrLabel = createVitalLabel("HR", Color.LIME, "72");
         Label spLabel = createVitalLabel("SpO2", Color.CYAN, "98%");
@@ -91,7 +91,7 @@ public class VitalMonitorViewer extends Application {
         VBox box = new VBox(5);
         Label lbl = new Label(title);
         lbl.setTextFill(color);
-        lbl.setStyle("-fx-font-weight: bold;");
+        lbl.getStyleClass().add("dark-label-accent");
         box.getChildren().addAll(lbl, canvas);
         return box;
     }
@@ -99,7 +99,7 @@ public class VitalMonitorViewer extends Application {
     private Label createVitalLabel(String title, Color color, String value) {
         Label lbl = new Label(title + "\n" + value);
         lbl.setTextFill(color);
-        lbl.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-alignment: center;");
+        lbl.getStyleClass().add("large-value-label");
         return lbl;
     }
 

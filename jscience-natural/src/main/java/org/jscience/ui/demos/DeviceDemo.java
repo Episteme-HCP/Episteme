@@ -96,7 +96,7 @@ public class DeviceDemo extends Application {
             controls.getStyleClass().add("demo-controls");
 
             Label infoLabel = new Label(I18n.getInstance().get("device.thermometer.info"));
-            infoLabel.setStyle("-fx-text-fill: white;");
+            infoLabel.getStyleClass().add("dark-label");
 
             Slider tempSlider = new Slider(-20, 50, 20);
             tempSlider.setShowTickLabels(true);
@@ -104,7 +104,7 @@ public class DeviceDemo extends Application {
             tempSlider.setMajorTickUnit(10);
 
             Label sliderLabel = new Label(I18n.getInstance().get("device.thermometer.label"));
-            sliderLabel.setStyle("-fx-text-fill: lightgray;");
+            sliderLabel.getStyleClass().add("dark-label-muted");
 
             controls.getChildren().addAll(infoLabel, sliderLabel, tempSlider);
             panel.setBottom(controls);
@@ -131,7 +131,7 @@ public class DeviceDemo extends Application {
             controls.getStyleClass().add("demo-controls");
 
             Label infoLabel = new Label(I18n.getInstance().get("device.pressure.info"));
-            infoLabel.setStyle("-fx-text-fill: white;");
+            infoLabel.getStyleClass().add("dark-label");
 
             Slider pressureSlider = new Slider(0, 10, 5);
             pressureSlider.setShowTickLabels(true);
@@ -139,7 +139,7 @@ public class DeviceDemo extends Application {
             pressureSlider.setMajorTickUnit(2);
 
             Label sliderLabel = new Label(I18n.getInstance().get("device.pressure.label"));
-            sliderLabel.setStyle("-fx-text-fill: lightgray;");
+            sliderLabel.getStyleClass().add("dark-label-muted");
 
             controls.getChildren().addAll(infoLabel, sliderLabel, pressureSlider);
             panel.setBottom(controls);
@@ -166,7 +166,7 @@ public class DeviceDemo extends Application {
             controls.getStyleClass().add("demo-controls");
 
             Label infoLabel = new Label(I18n.getInstance().get("device.oscilloscope.info"));
-            infoLabel.setStyle("-fx-text-fill: white;");
+            infoLabel.getStyleClass().add("dark-label");
 
             HBox waveformControls = new HBox(10);
             ComboBox<String> waveformType = new ComboBox<>();
@@ -176,12 +176,12 @@ public class DeviceDemo extends Application {
             Slider freqSlider = new Slider(1, 100, 10);
             freqSlider.setShowTickLabels(true);
             Label freqLabel = new Label(I18n.getInstance().get("device.oscilloscope.freq"));
-            freqLabel.setStyle("-fx-text-fill: lightgray;");
+            freqLabel.getStyleClass().add("dark-label-muted");
 
             waveformControls.getChildren().addAll(new Label(I18n.getInstance().get("device.oscilloscope.waveform")),
                     waveformType, freqLabel, freqSlider);
             waveformControls.getChildren().filtered(n -> n instanceof Label)
-                    .forEach(n -> ((Label) n).setStyle("-fx-text-fill: lightgray;"));
+                    .forEach(n -> ((Label) n).getStyleClass().add("dark-label-muted"));
 
             controls.getChildren().addAll(infoLabel, waveformControls);
             panel.setBottom(controls);
@@ -203,7 +203,7 @@ public class DeviceDemo extends Application {
             panel.setCenter(viewer);
         } catch (Exception e) {
             Label errorLabel = new Label(I18n.getInstance().get("device.telescope.error") + " " + e.getMessage());
-            errorLabel.setStyle("-fx-text-fill: red;");
+            errorLabel.getStyleClass().add("dark-label-accent");
             panel.setCenter(errorLabel);
         }
 
