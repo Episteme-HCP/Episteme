@@ -92,7 +92,7 @@ public class UnitConverterViewer extends Application {
         root.getChildren().addAll(title, catRow, grid, convertBtn);
 
         Scene scene = new Scene(root, 600, 350);
-        stage.setTitle("JScience - Scientific Converter");
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.converter"));
         stage.setScene(scene);
         stage.show();
     }

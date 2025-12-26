@@ -79,7 +79,7 @@ public class CSGViewer extends Application {
         });
 
         Scene scene = new Scene(root, 1100, 700);
-        stage.setTitle("JScience - Constructive Solid Geometry");
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.csg"));
         stage.setScene(scene);
         stage.show();
     }

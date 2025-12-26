@@ -124,7 +124,7 @@ public class GeometryBoardViewer extends Application {
         root.setRight(sidebar);
 
         Scene scene = new Scene(root, 1200, 800);
-        stage.setTitle("JScience Geometry Board");
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.geometry"));
         stage.setScene(scene);
         stage.show();
     }

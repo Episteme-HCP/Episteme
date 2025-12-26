@@ -47,7 +47,7 @@ public class FormulaNotationViewer extends Application {
         });
 
         Scene scene = new Scene(root, 800, 700);
-        stage.setTitle("JScience - Formula Display");
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.formula"));
         stage.setScene(scene);
         stage.show();
     }

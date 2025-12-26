@@ -144,7 +144,7 @@ public class PlottingViewer extends Application {
         addFunction();
 
         Scene scene = new Scene(root, 800, 500);
-        stage.setTitle("JScience - Full Plotting Demo");
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.plotting"));
         stage.setScene(scene);
         stage.show();
     }

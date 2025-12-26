@@ -71,7 +71,7 @@ public class MetamathViewer extends Application {
         root.setRight(sidebar);
 
         Scene scene = new Scene(root, 900, 600);
-        stage.setTitle("JScience - Metamath Prover");
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.metamath"));
         stage.setScene(scene);
         stage.show();
     }
