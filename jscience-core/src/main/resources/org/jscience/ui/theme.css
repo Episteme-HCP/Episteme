@@ -114,3 +114,18 @@
    No, usually sky maps are dark. 
    I will make the CONTROLS light, but the CANVAS remains black (it's space).
 */
+
+/* Demo-specific panels and controls */
+.demo-tab-pane {
+    -fx-background-color: #fdfbf7;
+}
+
+.demo-panel {
+    -fx-background-color: #fdfbf7;
+}
+
+.demo-controls {
+    -fx-background-color: #f5f5f5;
+    -fx-background-radius: 8;
+    -fx-padding: 10;
+}

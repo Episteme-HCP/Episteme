@@ -54,7 +54,7 @@ public class DeviceDemo extends Application {
 
         TabPane tabPane = new TabPane();
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        tabPane.setStyle("-fx-background-color: #1a1a2e;");
+        tabPane.getStyleClass().add("demo-tab-pane");
 
         // Thermometer Tab
         Tab thermometerTab = new Tab(I18n.getInstance().get("device.tab.thermometer"));
@@ -84,7 +84,7 @@ public class DeviceDemo extends Application {
     private BorderPane createThermometerPanel() {
         BorderPane panel = new BorderPane();
         panel.setPadding(new Insets(20));
-        panel.setStyle("-fx-background-color: #1a1a2e;");
+        panel.getStyleClass().add("demo-panel");
 
         try {
             ThermometerViewer viewer = new ThermometerViewer();
@@ -93,7 +93,7 @@ public class DeviceDemo extends Application {
             // Controls
             VBox controls = new VBox(10);
             controls.setPadding(new Insets(10));
-            controls.setStyle("-fx-background-color: #16213e; -fx-background-radius: 8;");
+            controls.getStyleClass().add("demo-controls");
 
             Label infoLabel = new Label(I18n.getInstance().get("device.thermometer.info"));
             infoLabel.setStyle("-fx-text-fill: white;");
@@ -119,7 +119,7 @@ public class DeviceDemo extends Application {
     private BorderPane createPressureGaugePanel() {
         BorderPane panel = new BorderPane();
         panel.setPadding(new Insets(20));
-        panel.setStyle("-fx-background-color: #1a1a2e;");
+        panel.getStyleClass().add("demo-panel");
 
         try {
             PressureGaugeViewer viewer = new PressureGaugeViewer();
@@ -128,7 +128,7 @@ public class DeviceDemo extends Application {
             // Controls
             VBox controls = new VBox(10);
             controls.setPadding(new Insets(10));
-            controls.setStyle("-fx-background-color: #16213e; -fx-background-radius: 8;");
+            controls.getStyleClass().add("demo-controls");
 
             Label infoLabel = new Label(I18n.getInstance().get("device.pressure.info"));
             infoLabel.setStyle("-fx-text-fill: white;");
@@ -154,7 +154,7 @@ public class DeviceDemo extends Application {
     private BorderPane createOscilloscopePanel() {
         BorderPane panel = new BorderPane();
         panel.setPadding(new Insets(20));
-        panel.setStyle("-fx-background-color: #1a1a2e;");
+        panel.getStyleClass().add("demo-panel");
 
         try {
             OscilloscopeViewer viewer = new OscilloscopeViewer();
@@ -163,7 +163,7 @@ public class DeviceDemo extends Application {
             // Controls
             VBox controls = new VBox(10);
             controls.setPadding(new Insets(10));
-            controls.setStyle("-fx-background-color: #16213e; -fx-background-radius: 8;");
+            controls.getStyleClass().add("demo-controls");
 
             Label infoLabel = new Label(I18n.getInstance().get("device.oscilloscope.info"));
             infoLabel.setStyle("-fx-text-fill: white;");
@@ -196,7 +196,7 @@ public class DeviceDemo extends Application {
     private BorderPane createTelescopePanel() {
         BorderPane panel = new BorderPane();
         panel.setPadding(new Insets(10));
-        panel.setStyle("-fx-background-color: #0a0a1a;");
+        panel.getStyleClass().add("demo-panel");
 
         try {
             TelescopeViewer viewer = new TelescopeViewer();
