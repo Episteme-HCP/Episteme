@@ -20,10 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jscience.ui.mathematics.futurology;
+package org.jscience.ui.demos;
 
 import javafx.animation.AnimationTimer;
-import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -35,11 +34,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import org.jscience.ui.DemoProvider;
 
 import java.util.*;
 
 /**
- * Kurzweil Time Visualization - Exponential vs Linear Time.
+ * Kurzweil Time Visualization Demo - Exponential vs Linear Time.
  * <p>
  * Demonstrates Ray Kurzweil's concept of accelerating change and the
  * technological singularity, showing how exponential time appears to
@@ -50,7 +50,7 @@ import java.util.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class KurzweilViewer extends Application {
+public class KurzweilDemo implements DemoProvider {
 
     private static final int WIDTH = 1000;
     private static final int HEIGHT = 700;
@@ -58,9 +58,9 @@ public class KurzweilViewer extends Application {
     // Time tracking
     private double realTimeSeconds = 0;
     private double kurzweilTime = 0;
-    private double accelerationFactor = 2.0; // Doubling rate
+    private double accelerationFactor = 2.0;
 
-    // Historical milestones (year, description)
+    // Historical milestones
     private static final List<Milestone> MILESTONES = List.of(
             new Milestone(-3000000, "First stone tools"),
             new Milestone(-100000, "Language development"),
@@ -90,14 +90,29 @@ public class KurzweilViewer extends Application {
     private boolean running = true;
 
     @Override
-    public void start(Stage stage) {
+    public String getCategory() {
+        return org.jscience.social.i18n.I18n.getInstance().get("category.economics");
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.social.i18n.I18n.getInstance().get("kurzweil.title");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.social.i18n.I18n.getInstance().get("kurzweil.desc");
+    }
+
+    @Override
+    public void show(Stage stage) {
         BorderPane root = new BorderPane();
-        root.getStyleClass().add("root");
+        root.getStyleClass().add("dark-viewer-root");
 
         // Title
-        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("kurzweil.header"));
+        Label title = new Label(org.jscience.social.i18n.I18n.getInstance().get("kurzweil.header"));
         title.setFont(Font.font("System", FontWeight.BOLD, 22));
-        title.getStyleClass().add("header-label");
+        title.getStyleClass().add("dark-label-accent");
         title.setPadding(new Insets(15));
         BorderPane.setAlignment(title, Pos.CENTER);
         root.setTop(title);
@@ -110,15 +125,15 @@ public class KurzweilViewer extends Application {
         // Linear timeline
         VBox linearBox = new VBox(5);
         Label linearLabel = new Label("Linear (Calendar) Time");
-
+        linearLabel.getStyleClass().add("dark-label");
         linearLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
         linearCanvas = new Canvas(WIDTH - 250, 180);
         linearBox.getChildren().addAll(linearLabel, linearCanvas);
 
-        // Logarithmic timeline (Kurzweil perspective)
+        // Logarithmic timeline
         VBox logBox = new VBox(5);
         Label logLabel = new Label("Kurzweil (Exponential) Time - Paradigm Shifts Accelerate");
-
+        logLabel.getStyleClass().add("dark-label");
         logLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
         logCanvas = new Canvas(WIDTH - 250, 180);
         logBox.getChildren().addAll(logLabel, logCanvas);
@@ -126,7 +141,7 @@ public class KurzweilViewer extends Application {
         centerBox.getChildren().addAll(linearBox, logBox);
         root.setCenter(centerBox);
 
-        // Right sidebar - clocks and controls
+        // Right sidebar
         VBox sidebar = createSidebar();
         root.setRight(sidebar);
 
@@ -140,7 +155,6 @@ public class KurzweilViewer extends Application {
         description.setWrapText(true);
         description.setEditable(false);
         description.setPrefHeight(100);
-        description.setStyle("-fx-control-inner-background: #16213e; -fx-text-fill: #aaa;");
         root.setBottom(description);
 
         // Animation
@@ -166,7 +180,8 @@ public class KurzweilViewer extends Application {
         timer.start();
 
         Scene scene = new Scene(root, WIDTH, HEIGHT);
-        stage.setTitle("JScience - Kurzweil Time Visualization");
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
+        stage.setTitle(getName());
         stage.setScene(scene);
         stage.show();
     }
@@ -175,11 +190,11 @@ public class KurzweilViewer extends Application {
         VBox sidebar = new VBox(20);
         sidebar.setPadding(new Insets(20));
         sidebar.setPrefWidth(220);
-        sidebar.setStyle("-fx-background-color: #16213e;");
+        sidebar.getStyleClass().add("dark-viewer-sidebar");
 
         // Dual clocks
         Label clockTitle = new Label("Dual Clocks");
-
+        clockTitle.getStyleClass().add("dark-label");
         clockTitle.setFont(Font.font("System", FontWeight.BOLD, 14));
 
         VBox linearClock = new VBox(5);
@@ -206,6 +221,7 @@ public class KurzweilViewer extends Application {
         Separator sep = new Separator();
 
         Label controlLabel = new Label("Acceleration Base:");
+        controlLabel.getStyleClass().add("dark-label-muted");
 
         Slider accelSlider = new Slider(1.1, 5.0, accelerationFactor);
         accelSlider.setShowTickLabels(true);
@@ -217,6 +233,7 @@ public class KurzweilViewer extends Application {
 
         Button resetBtn = new Button("Reset");
         resetBtn.setMaxWidth(Double.MAX_VALUE);
+        resetBtn.getStyleClass().add("accent-button-blue");
         resetBtn.setOnAction(e -> {
             realTimeSeconds = 0;
             kurzweilTime = 0;
@@ -236,7 +253,6 @@ public class KurzweilViewer extends Application {
     private void updateTime(double deltaSeconds) {
         realTimeSeconds += deltaSeconds;
 
-        // Kurzweil time accelerates exponentially
         double acceleration = Math.pow(accelerationFactor, realTimeSeconds / 10.0);
         kurzweilTime += deltaSeconds * acceleration;
 
@@ -258,13 +274,11 @@ public class KurzweilViewer extends Application {
         gc.setFill(Color.rgb(10, 10, 30));
         gc.fillRect(0, 0, w, h);
 
-        // Timeline axis
         double y = h / 2;
         gc.setStroke(Color.GRAY);
         gc.setLineWidth(2);
         gc.strokeLine(30, y, w - 30, y);
 
-        // Draw milestones linearly from -3M to 2100
         double minYear = -100000;
         double maxYear = 2100;
 
@@ -273,11 +287,9 @@ public class KurzweilViewer extends Application {
                 continue;
             double x = 30 + (m.year - minYear) / (maxYear - minYear) * (w - 60);
 
-            // Event dot
             gc.setFill(m.year <= 2025 ? Color.CYAN : Color.ORANGE);
             gc.fillOval(x - 4, y - 4, 8, 8);
 
-            // Label
             gc.setFill(Color.WHITE);
             gc.setFont(Font.font("System", 9));
             gc.save();
@@ -287,7 +299,6 @@ public class KurzweilViewer extends Application {
             gc.restore();
         }
 
-        // Year markers
         gc.setFill(Color.GRAY);
         gc.setFont(Font.font("System", 10));
         for (int year : List.of(-100000, -10000, 0, 1000, 1900, 2000, 2050)) {
@@ -304,16 +315,13 @@ public class KurzweilViewer extends Application {
         gc.setFill(Color.rgb(20, 10, 10));
         gc.fillRect(0, 0, w, h);
 
-        // Timeline axis
         double y = h / 2;
         gc.setStroke(Color.ORANGE);
         gc.setLineWidth(2);
         gc.strokeLine(30, y, w - 30, y);
 
-        // Logarithmic placement - recent events spread out
-        double logMin = Math.log(1); // 1 year ago
-        double logMax = Math.log(3000000); // 3M years ago
-
+        double logMin = Math.log(1);
+        double logMax = Math.log(3000000);
         int currentYear = 2025;
 
         for (Milestone m : MILESTONES) {
@@ -321,12 +329,10 @@ public class KurzweilViewer extends Application {
             double logYears = Math.log(yearsAgo);
             double x = w - 30 - (logYears - logMin) / (logMax - logMin) * (w - 60);
 
-            // Event dot (larger for recent)
             double size = 6 + (1 - logYears / logMax) * 6;
             gc.setFill(m.year >= 2000 ? Color.YELLOW : (m.year >= 1900 ? Color.ORANGE : Color.DARKORANGE));
             gc.fillOval(x - size / 2, y - size / 2, size, size);
 
-            // Label
             gc.setFill(Color.WHITE);
             gc.setFont(Font.font("System", 9));
             gc.save();
@@ -336,7 +342,6 @@ public class KurzweilViewer extends Application {
             gc.restore();
         }
 
-        // Annotations
         gc.setFill(Color.ORANGE);
         gc.setFont(Font.font("System", 11));
         gc.fillText("← More change per unit time (Singularity)", w - 250, h - 15);
@@ -344,13 +349,5 @@ public class KurzweilViewer extends Application {
     }
 
     private static record Milestone(int year, String label) {
-    }
-
-    public static void show(Stage stage) {
-        new KurzweilViewer().start(stage);
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }

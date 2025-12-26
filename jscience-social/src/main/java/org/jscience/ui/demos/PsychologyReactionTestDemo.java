@@ -11,7 +11,7 @@ import org.jscience.ui.DemoProvider;
 
 import java.util.Random;
 
-public class PsychologyReactionTest implements DemoProvider {
+public class PsychologyReactionTestDemo implements DemoProvider {
 
     @Override
     public String getCategory() {

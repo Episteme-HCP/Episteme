@@ -1,4 +1,4 @@
-package org.jscience.geology;
+package org.jscience.earth.seismology;
 
 /**
  * Represents a seismic event.

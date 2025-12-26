@@ -22,7 +22,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import org.jscience.geology.Earthquake;
+import org.jscience.earth.seismology.Earthquake;
 
 /**
  * Earthquake Map Viewer.
