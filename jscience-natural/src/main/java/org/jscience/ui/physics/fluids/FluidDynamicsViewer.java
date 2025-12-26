@@ -255,7 +255,7 @@ public class FluidDynamicsViewer extends Application {
 
         Scene scene = new Scene(root, N * SCALE + 220, N * SCALE);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle("JScience Fluid Dynamics Viewer");
+        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.fluid"));
         stage.setScene(scene);
         stage.show();
     }

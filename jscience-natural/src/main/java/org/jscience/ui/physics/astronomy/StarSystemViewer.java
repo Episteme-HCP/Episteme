@@ -193,7 +193,7 @@ public class StarSystemViewer extends Application {
         scene.widthProperty().addListener((o, old, v) -> subScene.setWidth(v.doubleValue() - 200));
         scene.heightProperty().addListener((o, old, v) -> subScene.setHeight(v.doubleValue()));
 
-        stage.setTitle("JScience Star System Viewer");
+        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.starsystem"));
         stage.setScene(scene);
         stage.show();
 

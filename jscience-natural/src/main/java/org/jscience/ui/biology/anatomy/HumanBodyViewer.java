@@ -69,7 +69,7 @@ public class HumanBodyViewer extends Application {
 
         Scene scene = new Scene(root, 1200, 800);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle("JScience Human Body Anatomy Viewer");
+        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.humanbody"));
         stage.setScene(scene);
         stage.show();
     }

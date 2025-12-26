@@ -157,7 +157,7 @@ public class EarthquakeMapViewer extends Application {
 
         Scene scene = new Scene(root, WIDTH + 220, HEIGHT);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle("JScience Earthquake Map");
+        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.earthquake"));
         stage.setScene(scene);
         stage.show();
     }

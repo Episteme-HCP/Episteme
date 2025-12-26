@@ -176,7 +176,7 @@ public class GalaxyViewer extends Application {
 
         Scene scene = new Scene(root, 1000, 800);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle("JScience Galaxy Viewer - Spiral Structure Simulation");
+        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.galaxy"));
         stage.setScene(scene);
         stage.show();
     }

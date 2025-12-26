@@ -152,7 +152,7 @@ public class StellarSkyViewer extends Application {
 
         Scene scene = new Scene(root, WIDTH + 250, HEIGHT);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle("JScience Interactive Sky Viewer");
+        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.sky"));
         stage.setScene(scene);
         stage.show();
     }

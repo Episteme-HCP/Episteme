@@ -141,7 +141,7 @@ public class LSystemViewer extends Application {
 
         Scene scene = new Scene(root, 900, 700);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle("JScience L-System 3D Viewer");
+        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.lsystem"));
         stage.setScene(scene);
         stage.show();
     }

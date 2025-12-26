@@ -136,7 +136,7 @@ public class GameOfLifeViewer extends Application {
             }
         }.start();
 
-        stage.setTitle("JScience Game of Life - Enhanced");
+        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.gameoflife"));
         stage.setScene(scene);
         stage.show();
         draw();
