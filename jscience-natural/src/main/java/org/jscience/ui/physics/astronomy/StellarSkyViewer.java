@@ -94,15 +94,15 @@ public class StellarSkyViewer extends Application {
         // Controls
         VBox controls = new VBox(10);
         controls.setPadding(new Insets(10));
-        controls.setStyle("-fx-background-color: rgba(30, 30, 40, 0.8); -fx-background-radius: 10;");
+        controls.getStyleClass().add("dark-viewer-sidebar");
         controls.setMaxWidth(250);
 
         Label titleLabel = new Label(I18n.getInstance().get("sky.title"));
-        titleLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
+        titleLabel.getStyleClass().add("dark-label");
 
         // Latitude Slider
         Label latLabel = new Label(I18n.getInstance().get("sky.lat"));
-        latLabel.setStyle("-fx-text-fill: #aaa;");
+        latLabel.getStyleClass().add("dark-label-muted");
         Slider latSlider = new Slider(-90, 90, observerLat);
         latSlider.setShowTickLabels(true);
         latSlider.valueProperty().addListener((o, old, val) -> {
@@ -112,7 +112,7 @@ public class StellarSkyViewer extends Application {
 
         // Longitude Slider
         Label lonLabel = new Label(I18n.getInstance().get("sky.lon"));
-        lonLabel.setStyle("-fx-text-fill: #aaa;");
+        lonLabel.getStyleClass().add("dark-label-muted");
         Slider lonSlider = new Slider(-180, 180, observerLon);
         lonSlider.setShowTickLabels(true);
         lonSlider.valueProperty().addListener((o, old, val) -> {
@@ -123,7 +123,7 @@ public class StellarSkyViewer extends Application {
         // Time Travel
         Label timeLabel = new Label(I18n.getInstance().get("sky.instruction"));
         timeLabel.setWrapText(true);
-        timeLabel.setStyle("-fx-text-fill: #aaa; -fx-font-style: italic;");
+        timeLabel.getStyleClass().add("dark-label-muted");
         Slider timeSlider = new Slider(-2000, 3000, 0); // Years from J2000
         timeSlider.setShowTickLabels(true);
         timeSlider.setMajorTickUnit(1000);
@@ -133,7 +133,7 @@ public class StellarSkyViewer extends Application {
         });
 
         showConstellations = new CheckBox(I18n.getInstance().get("sky.stars")); // Replaced existing showConstellations
-        showConstellations.setStyle("-fx-text-fill: white;");
+        showConstellations.getStyleClass().add("dark-label");
         showConstellations.setSelected(true); // Set to true as per original default
         showConstellations.selectedProperty().addListener((o, old, val) -> {
             // showConstellations = val; // This is already the field itself

@@ -67,10 +67,10 @@ public class ClothSimulationViewer extends Application {
         // Controls
         VBox controls = new VBox(10);
         controls.setPadding(new javafx.geometry.Insets(10));
-        controls.setStyle("-fx-background-color: #333; -fx-text-fill: white;");
+        controls.getStyleClass().add("dark-viewer-controls");
 
         Label title = new Label("3D Cloth Simulation");
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
+        title.getStyleClass().add("dark-label");
 
         Button resetBtn = new Button("Reset Simulation");
         resetBtn.setOnAction(e -> {

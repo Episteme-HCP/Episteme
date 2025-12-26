@@ -65,7 +65,7 @@ public class GeneticAlgorithmViewer extends Application {
     @Override
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #1a1a2e;");
+        root.getStyleClass().add("dark-viewer-root");
 
         canvas = new Canvas(800, 600);
         root.setCenter(canvas);
@@ -73,24 +73,24 @@ public class GeneticAlgorithmViewer extends Application {
         VBox sidebar = new VBox(15);
         sidebar.setPadding(new Insets(15));
         sidebar.setPrefWidth(180);
-        sidebar.setStyle("-fx-background-color: #16213e;");
+        sidebar.getStyleClass().add("dark-viewer-sidebar");
 
         Label title = new Label(I18n.getInstance().get("geneticalgo.title"));
-        title.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #00d9ff;");
+        title.getStyleClass().add("dark-label-accent");
 
         Label genLabel = new Label(I18n.getInstance().get("geneticalgo.generation") + " 1");
-        genLabel.setStyle("-fx-text-fill: #aaa;");
+        genLabel.getStyleClass().add("dark-label-muted");
 
         Label fitLabel = new Label(I18n.getInstance().get("geneticalgo.fitness") + " 0.00");
-        fitLabel.setStyle("-fx-text-fill: #aaa;");
+        fitLabel.getStyleClass().add("dark-label-muted");
 
         Label reachLabel = new Label(I18n.getInstance().get("geneticalgo.reached") + " 0/50");
-        reachLabel.setStyle("-fx-text-fill: #aaa;");
+        reachLabel.getStyleClass().add("dark-label-muted");
 
         Separator sep1 = new Separator();
 
         Label speedLabel = new Label(I18n.getInstance().get("geneticalgo.speed") + " 1x");
-        speedLabel.setStyle("-fx-text-fill: #888;");
+        speedLabel.getStyleClass().add("dark-label-muted");
         javafx.scene.control.Slider speedSlider = new javafx.scene.control.Slider(1, 5, 1);
         speedSlider.setShowTickLabels(true);
         speedSlider.setMajorTickUnit(1);
@@ -103,11 +103,11 @@ public class GeneticAlgorithmViewer extends Application {
 
         Button resetBtn = new Button(I18n.getInstance().get("geneticalgo.restart"));
         resetBtn.setMaxWidth(Double.MAX_VALUE);
-        resetBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+        resetBtn.getStyleClass().add("accent-button-green");
         resetBtn.setOnAction(e -> restart());
 
         Label descLabel = new Label(I18n.getInstance().get("geneticalgo.desc"));
-        descLabel.setStyle("-fx-text-fill: #666; -fx-font-size: 11px;");
+        descLabel.getStyleClass().add("dark-label-muted");
         descLabel.setWrapText(true);
 
         sidebar.getChildren().addAll(title, new Separator(), genLabel, fitLabel, reachLabel,

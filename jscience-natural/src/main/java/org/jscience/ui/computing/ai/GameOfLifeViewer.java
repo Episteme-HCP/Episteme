@@ -69,13 +69,13 @@ public class GameOfLifeViewer extends Application {
         // Wrap canvas in a pane to center it
         VBox canvasContainer = new VBox(canvas);
         canvasContainer.setPadding(new Insets(10));
-        canvasContainer.setStyle("-fx-background-color: #222; -fx-alignment: center;");
+        canvasContainer.getStyleClass().add("dark-viewer-root");
         root.setCenter(canvasContainer);
 
         // Controls Area
         HBox controls = new HBox(10);
         controls.setPadding(new Insets(10));
-        controls.setStyle("-fx-background-color: #333;");
+        controls.getStyleClass().add("dark-viewer-controls");
 
         Button btnPlay = new Button("Play");
         Button btnStep = new Button("Step");
