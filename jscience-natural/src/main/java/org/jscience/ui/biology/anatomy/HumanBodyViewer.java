@@ -292,74 +292,301 @@ public class HumanBodyViewer extends Application {
         PhongMaterial boneMat = new PhongMaterial(Color.IVORY);
         boneMat.setSpecularColor(Color.WHITE);
 
-        // Skull
+        PhongMaterial boneDark = new PhongMaterial(Color.ANTIQUEWHITE);
+        boneDark.setSpecularColor(Color.LIGHTGRAY);
+
+        // ===== SKULL =====
         Sphere skull = new Sphere(25);
         skull.setMaterial(boneMat);
         skull.setTranslateY(-150);
-        skull.setOnMouseClicked(e -> showInfo("Skull (Cranium)", "Protects the brain. Composed of 22 bones."));
+        skull.setOnMouseClicked(e -> showInfo("Skull (Cranium)",
+                "Protects the brain. Composed of 22 bones:\n• 8 cranial bones\n• 14 facial bones\nWeight: ~1 kg"));
 
-        // Spine
+        // Mandible (jaw)
+        Box mandible = new Box(30, 8, 15);
+        mandible.setMaterial(boneDark);
+        mandible.setTranslateY(-130);
+        mandible.setTranslateZ(10);
+        mandible.setOnMouseClicked(e -> showInfo("Mandible (Jaw)",
+                "Strongest facial bone. Only movable skull bone.\nContains 16 teeth (lower)."));
+
+        // ===== SPINE =====
         Group spine = new Group();
+        // Cervical (7), Thoracic (12), Lumbar (5), Sacral (5 fused)
+        String[] regions = { "Cervical", "Cervical", "Cervical", "Cervical", "Cervical", "Cervical", "Cervical",
+                "Thoracic", "Thoracic", "Thoracic", "Thoracic", "Thoracic", "Thoracic",
+                "Thoracic", "Thoracic", "Thoracic", "Thoracic", "Thoracic", "Thoracic",
+                "Lumbar", "Lumbar", "Lumbar", "Lumbar", "Lumbar" };
         for (int i = 0; i < 24; i++) {
-            Cylinder vertebra = new Cylinder(8, 6);
-            vertebra.setMaterial(boneMat);
-            vertebra.setTranslateY(-120 + i * 8);
+            double radius = i < 7 ? 6 : (i < 19 ? 8 : 10);
+            Cylinder vertebra = new Cylinder(radius, 5);
+            vertebra.setMaterial((i % 2 == 0) ? boneMat : boneDark);
+            vertebra.setTranslateY(-120 + i * 7);
+            int idx = i;
+            vertebra.setOnMouseClicked(e -> showInfo(regions[idx] + " Vertebra",
+                    "Part of " + regions[idx].toLowerCase() + " spine region.\n" +
+                            (idx < 7 ? "C" + (idx + 1) : (idx < 19 ? "T" + (idx - 6) : "L" + (idx - 18)))));
             spine.getChildren().add(vertebra);
         }
-        spine.setOnMouseClicked(e -> showInfo("Spine (Vertebral Column)", "33 vertebrae protecting the spinal cord."));
 
-        // Ribcage
+        // Sacrum
+        Box sacrum = new Box(35, 25, 15);
+        sacrum.setMaterial(boneDark);
+        sacrum.setTranslateY(55);
+        sacrum.setOnMouseClicked(e -> showInfo("Sacrum", "5 fused vertebrae. Connects spine to pelvis."));
+
+        // Coccyx (tailbone)
+        Sphere coccyx = new Sphere(6);
+        coccyx.setMaterial(boneDark);
+        coccyx.setTranslateY(72);
+        coccyx.setOnMouseClicked(e -> showInfo("Coccyx (Tailbone)", "3-5 fused vertebrae. Vestigial tail."));
+
+        // ===== SHOULDER GIRDLE =====
+        // Clavicles
+        Cylinder clavicleL = new Cylinder(3, 55);
+        clavicleL.setMaterial(boneMat);
+        clavicleL.setTranslateX(-30);
+        clavicleL.setTranslateY(-115);
+        clavicleL.setRotationAxis(Rotate.Z_AXIS);
+        clavicleL.setRotate(85);
+        clavicleL.setOnMouseClicked(e -> showInfo("Clavicle (Collarbone)",
+                "Connects arm to body. Most commonly fractured bone."));
+
+        Cylinder clavicleR = new Cylinder(3, 55);
+        clavicleR.setMaterial(boneMat);
+        clavicleR.setTranslateX(30);
+        clavicleR.setTranslateY(-115);
+        clavicleR.setRotationAxis(Rotate.Z_AXIS);
+        clavicleR.setRotate(-85);
+
+        // Scapulae (shoulder blades)
+        Box scapulaL = new Box(25, 35, 5);
+        scapulaL.setMaterial(boneDark);
+        scapulaL.setTranslateX(-45);
+        scapulaL.setTranslateY(-95);
+        scapulaL.setTranslateZ(-15);
+        scapulaL.setOnMouseClicked(e -> showInfo("Scapula (Shoulder Blade)",
+                "Triangular bone connecting humerus to clavicle.\n17 muscles attach to it."));
+
+        Box scapulaR = new Box(25, 35, 5);
+        scapulaR.setMaterial(boneDark);
+        scapulaR.setTranslateX(45);
+        scapulaR.setTranslateY(-95);
+        scapulaR.setTranslateZ(-15);
+
+        // ===== RIBCAGE =====
         Group ribcage = new Group();
+        // True ribs (1-7), False ribs (8-10), Floating ribs (11-12)
         for (int i = 0; i < 12; i++) {
-            // Left rib
-            Cylinder ribL = new Cylinder(2, 60);
-            ribL.setMaterial(boneMat);
+            double length = 55 - i * 2;
+            double angle = 50 + i * 3;
+
+            Cylinder ribL = new Cylinder(2, length);
+            ribL.setMaterial((i < 7) ? boneMat : boneDark);
             ribL.setTranslateX(-35);
             ribL.setTranslateY(-100 + i * 7);
             ribL.setRotationAxis(Rotate.Z_AXIS);
-            ribL.setRotate(60);
+            ribL.setRotate(angle);
+            int ribNum = i + 1;
+            ribL.setOnMouseClicked(e -> showInfo(
+                    "Rib #" + ribNum + (ribNum <= 7 ? " (True)" : ribNum <= 10 ? " (False)" : " (Floating)"),
+                    ribNum <= 7 ? "Directly attached to sternum."
+                            : ribNum <= 10 ? "Attached to sternum via cartilage."
+                                    : "Floating rib, not attached to sternum."));
             ribcage.getChildren().add(ribL);
 
-            // Right rib
-            Cylinder ribR = new Cylinder(2, 60);
-            ribR.setMaterial(boneMat);
+            Cylinder ribR = new Cylinder(2, length);
+            ribR.setMaterial((i < 7) ? boneMat : boneDark);
             ribR.setTranslateX(35);
             ribR.setTranslateY(-100 + i * 7);
             ribR.setRotationAxis(Rotate.Z_AXIS);
-            ribR.setRotate(-60);
+            ribR.setRotate(-angle);
             ribcage.getChildren().add(ribR);
         }
-        ribcage.setOnMouseClicked(e -> showInfo("Ribcage", "12 pairs of ribs protecting heart and lungs."));
 
-        // Pelvis
-        Box pelvis = new Box(80, 30, 30);
-        pelvis.setMaterial(boneMat);
-        pelvis.setTranslateY(70);
-        pelvis.setOnMouseClicked(e -> showInfo("Pelvis", "Supports the spine and protects pelvic organs."));
+        // Sternum (breastbone)
+        Cylinder sternum = new Cylinder(8, 60);
+        sternum.setMaterial(boneMat);
+        sternum.setTranslateY(-75);
+        sternum.setTranslateZ(25);
+        sternum.setOnMouseClicked(e -> showInfo("Sternum (Breastbone)",
+                "3 parts: Manubrium, Body, Xiphoid process.\nProtects heart."));
+        ribcage.getChildren().add(sternum);
 
-        // Arms
-        Cylinder armL = new Cylinder(5, 100);
-        armL.setMaterial(boneMat);
-        armL.setTranslateX(-60);
-        armL.setTranslateY(-50);
+        // ===== PELVIS =====
+        // Hip bones (Ilium, Ischium, Pubis)
+        Box hipL = new Box(35, 40, 20);
+        hipL.setMaterial(boneMat);
+        hipL.setTranslateX(-25);
+        hipL.setTranslateY(75);
+        hipL.setOnMouseClicked(e -> showInfo("Hip Bone (Os Coxae)",
+                "3 fused bones: Ilium, Ischium, Pubis.\nForms hip socket (acetabulum)."));
 
-        Cylinder armR = new Cylinder(5, 100);
-        armR.setMaterial(boneMat);
-        armR.setTranslateX(60);
-        armR.setTranslateY(-50);
+        Box hipR = new Box(35, 40, 20);
+        hipR.setMaterial(boneMat);
+        hipR.setTranslateX(25);
+        hipR.setTranslateY(75);
 
-        // Legs
-        Cylinder legL = new Cylinder(7, 150);
-        legL.setMaterial(boneMat);
-        legL.setTranslateX(-25);
-        legL.setTranslateY(160);
+        // ===== ARMS =====
+        // Humerus (upper arm)
+        Cylinder humerusL = new Cylinder(6, 80);
+        humerusL.setMaterial(boneMat);
+        humerusL.setTranslateX(-60);
+        humerusL.setTranslateY(-55);
+        humerusL.setOnMouseClicked(e -> showInfo("Humerus",
+                "Upper arm bone. Articulates with scapula (shoulder) and radius/ulna (elbow)."));
 
-        Cylinder legR = new Cylinder(7, 150);
-        legR.setMaterial(boneMat);
-        legR.setTranslateX(25);
-        legR.setTranslateY(160);
+        Cylinder humerusR = new Cylinder(6, 80);
+        humerusR.setMaterial(boneMat);
+        humerusR.setTranslateX(60);
+        humerusR.setTranslateY(-55);
 
-        skeletonLayer.getChildren().addAll(skull, spine, ribcage, pelvis, armL, armR, legL, legR);
+        // Radius and Ulna (forearm)
+        Cylinder radiusL = new Cylinder(4, 70);
+        radiusL.setMaterial(boneDark);
+        radiusL.setTranslateX(-58);
+        radiusL.setTranslateY(15);
+        Cylinder ulnaL = new Cylinder(4, 75);
+        ulnaL.setMaterial(boneMat);
+        ulnaL.setTranslateX(-62);
+        ulnaL.setTranslateY(15);
+
+        Cylinder radiusR = new Cylinder(4, 70);
+        radiusR.setMaterial(boneDark);
+        radiusR.setTranslateX(58);
+        radiusR.setTranslateY(15);
+        Cylinder ulnaR = new Cylinder(4, 75);
+        ulnaR.setMaterial(boneMat);
+        ulnaR.setTranslateX(62);
+        ulnaR.setTranslateY(15);
+
+        // ===== HANDS =====
+        Group handL = buildHand(boneMat, boneDark, -60, 60);
+        Group handR = buildHand(boneMat, boneDark, 60, 60);
+
+        // ===== LEGS =====
+        // Femur (thigh)
+        Cylinder femurL = new Cylinder(9, 120);
+        femurL.setMaterial(boneMat);
+        femurL.setTranslateX(-25);
+        femurL.setTranslateY(150);
+        femurL.setOnMouseClicked(e -> showInfo("Femur (Thigh Bone)",
+                "Longest, strongest bone in body.\nLength: ~48 cm. Supports body weight."));
+
+        Cylinder femurR = new Cylinder(9, 120);
+        femurR.setMaterial(boneMat);
+        femurR.setTranslateX(25);
+        femurR.setTranslateY(150);
+
+        // Patella (kneecap)
+        Sphere patellaL = new Sphere(8);
+        patellaL.setMaterial(boneDark);
+        patellaL.setTranslateX(-25);
+        patellaL.setTranslateY(215);
+        patellaL.setTranslateZ(10);
+        patellaL.setOnMouseClicked(e -> showInfo("Patella (Kneecap)",
+                "Largest sesamoid bone. Protects knee joint."));
+
+        Sphere patellaR = new Sphere(8);
+        patellaR.setMaterial(boneDark);
+        patellaR.setTranslateX(25);
+        patellaR.setTranslateY(215);
+        patellaR.setTranslateZ(10);
+
+        // Tibia and Fibula (lower leg)
+        Cylinder tibiaL = new Cylinder(7, 100);
+        tibiaL.setMaterial(boneMat);
+        tibiaL.setTranslateX(-22);
+        tibiaL.setTranslateY(275);
+        tibiaL.setOnMouseClicked(e -> showInfo("Tibia (Shinbone)",
+                "Second largest bone. Bears body weight."));
+
+        Cylinder fibulaL = new Cylinder(4, 95);
+        fibulaL.setMaterial(boneDark);
+        fibulaL.setTranslateX(-30);
+        fibulaL.setTranslateY(275);
+
+        Cylinder tibiaR = new Cylinder(7, 100);
+        tibiaR.setMaterial(boneMat);
+        tibiaR.setTranslateX(22);
+        tibiaR.setTranslateY(275);
+
+        Cylinder fibulaR = new Cylinder(4, 95);
+        fibulaR.setMaterial(boneDark);
+        fibulaR.setTranslateX(30);
+        fibulaR.setTranslateY(275);
+
+        // ===== FEET =====
+        Group footL = buildFoot(boneMat, boneDark, -25, 330);
+        Group footR = buildFoot(boneMat, boneDark, 25, 330);
+
+        skeletonLayer.getChildren().addAll(
+                skull, mandible,
+                spine, sacrum, coccyx,
+                clavicleL, clavicleR, scapulaL, scapulaR,
+                ribcage,
+                hipL, hipR,
+                humerusL, humerusR, radiusL, ulnaL, radiusR, ulnaR,
+                handL, handR,
+                femurL, femurR, patellaL, patellaR,
+                tibiaL, fibulaL, tibiaR, fibulaR,
+                footL, footR);
+    }
+
+    private Group buildHand(PhongMaterial boneMat, PhongMaterial boneDark, double x, double y) {
+        Group hand = new Group();
+        // Carpals (wrist - 8 bones)
+        Box carpals = new Box(18, 10, 8);
+        carpals.setMaterial(boneDark);
+        carpals.setTranslateX(x);
+        carpals.setTranslateY(y);
+        carpals.setOnMouseClicked(e -> showInfo("Carpals (Wrist)", "8 bones in 2 rows. Allows wrist flexibility."));
+
+        // Metacarpals and Phalanges
+        for (int f = 0; f < 5; f++) {
+            double fingerX = x + (f - 2) * 4;
+            double length = f == 0 ? 12 : 20; // thumb shorter
+
+            Cylinder metacarpal = new Cylinder(2, length);
+            metacarpal.setMaterial(boneMat);
+            metacarpal.setTranslateX(fingerX);
+            metacarpal.setTranslateY(y + 12);
+            hand.getChildren().add(metacarpal);
+
+            Cylinder phalanx = new Cylinder(1.5, length * 0.8);
+            phalanx.setMaterial(boneDark);
+            phalanx.setTranslateX(fingerX);
+            phalanx.setTranslateY(y + 25);
+            hand.getChildren().add(phalanx);
+        }
+        hand.getChildren().add(carpals);
+        return hand;
+    }
+
+    private Group buildFoot(PhongMaterial boneMat, PhongMaterial boneDark, double x, double y) {
+        Group foot = new Group();
+        // Tarsals (ankle - 7 bones)
+        Box tarsals = new Box(25, 15, 12);
+        tarsals.setMaterial(boneDark);
+        tarsals.setTranslateX(x);
+        tarsals.setTranslateY(y);
+        tarsals.setTranslateZ(8);
+        tarsals.setOnMouseClicked(e -> showInfo("Tarsals (Ankle)", "7 bones including calcaneus (heel)."));
+
+        // Metatarsals
+        for (int t = 0; t < 5; t++) {
+            double toeX = x + (t - 2) * 5;
+            Cylinder metatarsal = new Cylinder(2, 18);
+            metatarsal.setMaterial(boneMat);
+            metatarsal.setTranslateX(toeX);
+            metatarsal.setTranslateY(y + 15);
+            metatarsal.setTranslateZ(15);
+            metatarsal.setRotationAxis(Rotate.X_AXIS);
+            metatarsal.setRotate(70);
+            foot.getChildren().add(metatarsal);
+        }
+        foot.getChildren().add(tarsals);
+        return foot;
     }
 
     private void buildMuscles() {
