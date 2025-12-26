@@ -64,7 +64,7 @@ public class FluidDynamicsViewer extends Application {
     @Override
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #1a1a2e;");
+        root.getStyleClass().add("dark-viewer-root");
 
         Canvas canvas = new Canvas(N * SCALE, N * SCALE);
 
@@ -80,12 +80,12 @@ public class FluidDynamicsViewer extends Application {
         // Controls Panel
         VBox controls = new VBox(10);
         controls.setPadding(new Insets(10));
-        controls.setStyle("-fx-background-color: #333;");
+        controls.getStyleClass().add("dark-viewer-controls");
         controls.setPrefWidth(220);
 
         Label titleLabel = new Label(I18n.getInstance().get("fluid.controls"));
         titleLabel.setTextFill(Color.WHITE);
-        titleLabel.setStyle("-fx-font-weight: bold;");
+        titleLabel.getStyleClass().add("dark-label");
 
         // Info text
         Label infoLabel = new Label(
@@ -96,7 +96,7 @@ public class FluidDynamicsViewer extends Application {
                         "Click and drag to add flow\n" +
                         "disturbance.");
         infoLabel.setWrapText(true);
-        infoLabel.setStyle("-fx-text-fill: #aaa;");
+        infoLabel.getStyleClass().add("dark-label-muted");
 
         // Grid Resolution Control
         Label resLabel = new Label(I18n.getInstance().get("fluid.resolution"));
@@ -124,11 +124,11 @@ public class FluidDynamicsViewer extends Application {
         // FPS Label
         fpsLabel = new Label(I18n.getInstance().get("fluid.fps"));
         fpsLabel.setTextFill(Color.YELLOW);
-        fpsLabel.setStyle("-fx-font-family: monospace;");
+        fpsLabel.getStyleClass().add("dark-label");
 
         // Solver Switch
         Label engineLabel = new Label("Physics Engine:");
-        engineLabel.setStyle("-fx-text-fill: white;");
+        engineLabel.getStyleClass().add("dark-label");
         ToggleButton engineSwitch = new ToggleButton("Mode: Primitive");
         engineSwitch.setMaxWidth(Double.MAX_VALUE);
         engineSwitch.setOnAction(e -> {
@@ -144,7 +144,7 @@ public class FluidDynamicsViewer extends Application {
 
         // Speed slider
         Label speedLabel = new Label("Flow Speed: 1.0");
-        speedLabel.setStyle("-fx-text-fill: white;");
+        speedLabel.getStyleClass().add("dark-label");
         Slider speedSlider = new Slider(0.1, 3.0, 1.0);
         speedSlider.valueProperty().addListener((o, old, val) -> {
             speedLabel.setText(String.format("Flow Speed: %.1f", val.doubleValue()));
@@ -153,17 +153,17 @@ public class FluidDynamicsViewer extends Application {
         // Display toggles
         CheckBox fieldCheck = new CheckBox("Show Flow Field");
         fieldCheck.setSelected(true);
-        fieldCheck.setStyle("-fx-text-fill: white;");
+        fieldCheck.getStyleClass().add("dark-label");
         fieldCheck.setOnAction(e -> showField = fieldCheck.isSelected());
 
         CheckBox particleCheck = new CheckBox("Show Particles");
         particleCheck.setSelected(true);
-        particleCheck.setStyle("-fx-text-fill: white;");
+        particleCheck.getStyleClass().add("dark-label");
         particleCheck.setOnAction(e -> showParticles = particleCheck.isSelected());
 
         // Color scheme
         Label colorLabel = new Label("Color Scheme:");
-        colorLabel.setStyle("-fx-text-fill: white;");
+        colorLabel.getStyleClass().add("dark-label");
         ComboBox<String> colorCombo = new ComboBox<>();
         colorCombo.getItems().addAll("Blue", "Fire", "Green", "Rainbow");
         colorCombo.setValue("Blue");

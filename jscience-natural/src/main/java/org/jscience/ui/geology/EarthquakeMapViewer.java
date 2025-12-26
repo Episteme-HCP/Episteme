@@ -52,7 +52,7 @@ public class EarthquakeMapViewer extends Application {
         // Info Panel
         VBox infoPanel = new VBox(10);
         infoPanel.setPadding(new Insets(10));
-        infoPanel.setStyle("-fx-background-color: #222; -fx-text-fill: white;");
+        infoPanel.getStyleClass().add("dark-viewer-sidebar");
         infoPanel.setPrefWidth(220);
 
         Label titleLabel = new Label("Earthquake Map");
@@ -98,7 +98,7 @@ public class EarthquakeMapViewer extends Application {
         BorderPane root = new BorderPane();
         root.setCenter(canvas);
         root.setRight(infoPanel);
-        root.setStyle("-fx-background-color: #111;");
+        root.getStyleClass().add("dark-viewer-root");
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
 

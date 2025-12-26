@@ -94,7 +94,7 @@ public class CircuitSimulatorViewer extends Application {
         // Toolbar
         HBox toolbar = new HBox(10);
         toolbar.setPadding(new Insets(10));
-        toolbar.setStyle("-fx-background-color: #333;");
+        toolbar.getStyleClass().add("viewer-toolbar");
 
         ToggleGroup group = new ToggleGroup();
         toolbar.getChildren().addAll(
@@ -148,7 +148,7 @@ public class CircuitSimulatorViewer extends Application {
         VBox sidebar = new VBox(10);
         sidebar.setPadding(new Insets(10));
         sidebar.setPrefWidth(200);
-        sidebar.setStyle("-fx-background-color: #eee;");
+        sidebar.getStyleClass().add("viewer-sidebar");
         sidebar.getChildren().add(new Label("Click and drag on grid to place components."));
         sidebar.getChildren().add(new Label("Components snap to 20px grid."));
         root.setRight(sidebar);

@@ -88,10 +88,10 @@ public class OscilloscopeViewer extends Application {
                 new Label("Signal Frequency"), freqSlider, freqLabel,
                 new Label("Signal Amplitude"), ampSlider, ampLabel);
         controls.setPadding(new Insets(10));
-        controls.setStyle("-fx-background-color: #16213e;");
+        controls.getStyleClass().add("dark-viewer-sidebar");
 
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #1a1a2e;");
+        root.getStyleClass().add("dark-viewer-root");
         root.setCenter(display);
         root.setBottom(controls);
 
