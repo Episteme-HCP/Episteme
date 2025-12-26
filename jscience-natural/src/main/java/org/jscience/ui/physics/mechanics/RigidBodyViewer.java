@@ -64,7 +64,7 @@ public class RigidBodyViewer extends Application {
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
         root.setId("root"); // CSS hook
-        root.setStyle("-fx-background-color: #1a1a2e;"); // Fallback
+        root.getStyleClass().add("dark-viewer-root");
 
         canvas = new Canvas(800, 600);
         root.setCenter(canvas);
@@ -72,18 +72,18 @@ public class RigidBodyViewer extends Application {
         VBox sidebar = new VBox(12);
         sidebar.setPadding(new Insets(15));
         sidebar.setPrefWidth(180);
-        sidebar.setStyle("-fx-background-color: #16213e;");
+        sidebar.getStyleClass().add("dark-viewer-sidebar");
 
         Label title = new Label(I18n.getInstance().get("rigid.title"));
-        title.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #00d9ff;");
+        title.getStyleClass().add("dark-label-accent");
 
         countLabel = new Label(I18n.getInstance().get("rigid.bodies"));
-        countLabel.setStyle("-fx-text-fill: #aaa;");
+        countLabel.getStyleClass().add("dark-label-muted");
 
         Separator sep1 = new Separator();
 
         Label gravLabel = new Label(I18n.getInstance().get("rigid.gravity"));
-        gravLabel.setStyle("-fx-text-fill: #888;");
+        gravLabel.getStyleClass().add("dark-label-muted");
         Slider gravSlider = new Slider(0, 2, 0.5);
         gravSlider.setShowTickLabels(true);
         gravSlider.valueProperty().addListener((o, ov, nv) -> {
@@ -92,7 +92,7 @@ public class RigidBodyViewer extends Application {
         });
 
         Label bounceLabel = new Label(I18n.getInstance().get("rigid.bounciness"));
-        bounceLabel.setStyle("-fx-text-fill: #888;");
+        bounceLabel.getStyleClass().add("dark-label-muted");
         Slider bounceSlider = new Slider(0.1, 1.0, 0.8);
         bounceSlider.setShowTickLabels(true);
         bounceSlider.valueProperty().addListener((o, ov, nv) -> {
@@ -104,7 +104,7 @@ public class RigidBodyViewer extends Application {
 
         Button addBtn = new Button(I18n.getInstance().get("rigid.add"));
         addBtn.setMaxWidth(Double.MAX_VALUE);
-        addBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+        addBtn.getStyleClass().add("accent-button-green");
         addBtn.setOnAction(e -> addBody());
 
         Button add5Btn = new Button(I18n.getInstance().get("rigid.add5"));
@@ -116,7 +116,7 @@ public class RigidBodyViewer extends Application {
 
         Button clearBtn = new Button(I18n.getInstance().get("rigid.clear"));
         clearBtn.setMaxWidth(Double.MAX_VALUE);
-        clearBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
+        clearBtn.getStyleClass().add("accent-button-red");
         clearBtn.setOnAction(e -> {
             bodies.clear();
             countLabel.setText(I18n.getInstance().get("rigid.bodies"));

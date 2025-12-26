@@ -129,3 +129,72 @@
     -fx-background-radius: 8;
     -fx-padding: 10;
 }
+
+/* Viewer-specific panels */
+.viewer-root {
+    -fx-background-color: #fdfbf7;
+}
+
+.viewer-sidebar {
+    -fx-background-color: #f8f8f0;
+    -fx-padding: 15;
+}
+
+.viewer-toolbar {
+    -fx-background-color: #e8e8e0;
+    -fx-padding: 8;
+}
+
+/* Dark viewer backgrounds (for space, sky, etc.) */
+.dark-viewer-root {
+    -fx-background-color: #1a1a2e;
+}
+
+.dark-viewer-sidebar {
+    -fx-background-color: #16213e;
+    -fx-padding: 15;
+}
+
+.dark-viewer-controls {
+    -fx-background-color: #333333;
+    -fx-background-radius: 8;
+    -fx-padding: 10;
+}
+
+/* Accent buttons */
+.accent-button-green {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+}
+
+.accent-button-red {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+}
+
+.accent-button-blue {
+    -fx-background-color: #0f4c75;
+    -fx-text-fill: white;
+}
+
+/* Labels for dark backgrounds */
+.dark-label {
+    -fx-text-fill: white;
+}
+
+.dark-label-muted {
+    -fx-text-fill: #aaaaaa;
+}
+
+.dark-label-accent {
+    -fx-text-fill: #00d9ff;
+}
+
+/* Info panels */
+.info-panel {
+    -fx-background-color: #fafafa;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 10;
+}

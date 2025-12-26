@@ -40,7 +40,7 @@ public class MechanicsViewer extends Application {
     @Override
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #1a1a2e;");
+        root.getStyleClass().add("dark-viewer-root");
         canvas = new Canvas(400, 600);
         root.setCenter(canvas);
 
@@ -48,11 +48,11 @@ public class MechanicsViewer extends Application {
         VBox controls = new VBox(10);
         controls.setPadding(new Insets(10));
         controls.setPrefWidth(200); // Added to maintain layout
-        controls.setStyle("-fx-background-color: #333;");
+        controls.getStyleClass().add("dark-viewer-controls");
 
         // Title
         Label title = new Label(I18n.getInstance().get("mechanics.title"));
-        title.setStyle("-fx-font-size: 24px; -fx-text-fill: white; border: 1px solid white; -fx-padding: 10;");
+        title.getStyleClass().add("dark-label-accent");
 
         // Mass Control
         Label massLabel = new Label(I18n.getInstance().get("mechanics.mass"));
