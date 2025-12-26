@@ -15,17 +15,17 @@ public class PsychologyReactionTest implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return "Psychology";
+        return org.jscience.social.i18n.I18n.getInstance().get("category.psychology");
     }
 
     @Override
     public String getName() {
-        return "Psychology: Reaction Time Test";
+        return org.jscience.social.i18n.I18n.getInstance().get("PsychologyReaction.title");
     }
 
     @Override
     public String getDescription() {
-        return "Measures human reaction time to visual stimuli.";
+        return org.jscience.social.i18n.I18n.getInstance().get("PsychologyReaction.desc");
     }
 
     private long startTime = 0;

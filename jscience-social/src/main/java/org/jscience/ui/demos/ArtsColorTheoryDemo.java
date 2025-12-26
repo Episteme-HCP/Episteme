@@ -17,7 +17,7 @@ public class ArtsColorTheoryDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return "Arts"; // Arts section
+        return org.jscience.social.i18n.I18n.getInstance().get("category.arts");
     }
 
     @Override

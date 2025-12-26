@@ -15,7 +15,7 @@ public class HistoryTimelineDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return "History";
+        return org.jscience.social.i18n.I18n.getInstance().get("category.history");
     }
 
     @Override

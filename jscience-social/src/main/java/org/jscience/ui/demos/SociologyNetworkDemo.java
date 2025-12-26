@@ -17,7 +17,7 @@ public class SociologyNetworkDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return "Sociology";
+        return org.jscience.social.i18n.I18n.getInstance().get("category.sociology");
     }
 
     @Override

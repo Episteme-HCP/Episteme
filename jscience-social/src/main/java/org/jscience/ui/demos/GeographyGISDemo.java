@@ -15,7 +15,7 @@ public class GeographyGISDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return "Geography";
+        return org.jscience.social.i18n.I18n.getInstance().get("category.geography");
     }
 
     @Override

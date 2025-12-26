@@ -20,7 +20,7 @@ public class PoliticsVotingDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return "Politics";
+        return org.jscience.social.i18n.I18n.getInstance().get("category.politics");
     }
 
     @Override

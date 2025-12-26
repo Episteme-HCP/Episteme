@@ -11,7 +11,7 @@ import org.jscience.ui.mathematics.futurology.KurzweilViewer;
 public class KurzweilDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return org.jscience.social.i18n.I18n.getInstance().get("matrix.category"); // Reusing category
+        return org.jscience.social.i18n.I18n.getInstance().get("category.economics");
     }
 
     @Override
@@ -31,6 +31,6 @@ public class KurzweilDemo implements DemoProvider {
 
     @Override
     public boolean isViewer() {
-        return true;
+        return false; // Show in demo list
     }
 }

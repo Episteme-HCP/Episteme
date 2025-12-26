@@ -17,7 +17,7 @@ public class SportsBallisticsDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return "Sports"; // Sports section
+        return org.jscience.social.i18n.I18n.getInstance().get("category.sports");
     }
 
     @Override

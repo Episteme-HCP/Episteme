@@ -15,7 +15,7 @@ public class ArchitectureStabilityDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return "Architecture";
+        return org.jscience.social.i18n.I18n.getInstance().get("category.architecture");
     }
 
     @Override
