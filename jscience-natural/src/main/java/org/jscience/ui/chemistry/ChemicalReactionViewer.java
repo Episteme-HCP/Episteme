@@ -31,15 +31,15 @@ public class ChemicalReactionViewer extends Application {
     @Override
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #1a1a2e;");
+        root.getStyleClass().add("dark-viewer-root");
         root.setPadding(new Insets(15));
 
         // Header
         VBox header = new VBox(5);
         Label title = new Label("Chemical Reaction Parser");
-        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #00d9ff;");
+        title.getStyleClass().add("dark-label-accent");
         Label subtitle = new Label("Enter chemical equations to parse and analyze");
-        subtitle.setStyle("-fx-text-fill: #888;");
+        subtitle.getStyleClass().add("dark-label-muted");
         header.getChildren().addAll(title, subtitle);
         root.setTop(header);
         BorderPane.setMargin(header, new Insets(0, 0, 15, 0));
@@ -47,10 +47,10 @@ public class ChemicalReactionViewer extends Application {
         // Input area
         VBox inputBox = new VBox(5);
         inputBox.setPadding(new Insets(10));
-        inputBox.setStyle("-fx-background-color: #16213e; -fx-background-radius: 5;");
+        inputBox.getStyleClass().add("dark-viewer-sidebar");
 
         Label inputLabel = new Label("Reaction Equation:");
-        inputLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #aaa;");
+        inputLabel.getStyleClass().add("dark-label-muted");
 
         inputArea = new TextArea();
         inputArea.setPromptText("Enter chemical equation, e.g.: 2H2 + O2 -> 2H2O");
@@ -66,7 +66,7 @@ public class ChemicalReactionViewer extends Application {
                 createExampleButton("Photosynthesis", "6CO2 + 6H2O -> C6H12O6 + 6O2"));
 
         Button parseBtn = new Button("Parse & Analyze");
-        parseBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;");
+        parseBtn.getStyleClass().add("accent-button-green");
         parseBtn.setOnAction(e -> parseReaction());
 
         inputBox.getChildren().addAll(inputLabel, inputArea, examples, parseBtn);
@@ -74,10 +74,10 @@ public class ChemicalReactionViewer extends Application {
         // Output area
         VBox outputBox = new VBox(5);
         outputBox.setPadding(new Insets(10));
-        outputBox.setStyle("-fx-background-color: #16213e; -fx-background-radius: 5;");
+        outputBox.getStyleClass().add("dark-viewer-sidebar");
 
         Label outputLabel = new Label("Analysis Results:");
-        outputLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #aaa;");
+        outputLabel.getStyleClass().add("dark-label-muted");
 
         outputArea = new TextArea();
         outputArea.setEditable(false);

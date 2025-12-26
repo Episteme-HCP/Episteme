@@ -93,7 +93,7 @@ public class TelescopeViewer extends BorderPane {
         drawSkyView();
 
         StackPane canvasPane = new StackPane(skyCanvas);
-        canvasPane.setStyle("-fx-background-color: #000011; -fx-background-radius: 150;");
+        canvasPane.getStyleClass().add("dark-viewer-root");
         setCenter(canvasPane);
         BorderPane.setMargin(canvasPane, new Insets(15));
 
@@ -189,14 +189,14 @@ public class TelescopeViewer extends BorderPane {
         VBox panel = new VBox(10, targetLabel, inputRow, presetRow);
         panel.setAlignment(Pos.CENTER);
         panel.setPadding(new Insets(15));
-        panel.setStyle("-fx-background-color: #16213e; -fx-background-radius: 8;");
+        panel.getStyleClass().add("dark-viewer-sidebar");
 
         return panel;
     }
 
     private Button createPresetButton(String name, double ra, double dec) {
         Button btn = new Button(name);
-        btn.setStyle("-fx-background-color: #1b4965; -fx-text-fill: white; -fx-font-size: 10;");
+        btn.getStyleClass().add("accent-button-blue");
         btn.setOnAction(e -> {
             raInput.setText(String.format("%.2f", ra));
             decInput.setText(String.format("%.2f", dec));

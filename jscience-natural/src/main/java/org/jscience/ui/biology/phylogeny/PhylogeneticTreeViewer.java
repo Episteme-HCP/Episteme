@@ -123,7 +123,7 @@ public class PhylogeneticTreeViewer extends Application {
         root.setCenter(canvas);
 
         Label infoPanel = new Label("Click Node for Details | Toggle View");
-        infoPanel.setStyle("-fx-padding: 10; -fx-background-color: #16213e; -fx-text-fill: #aaa;");
+        infoPanel.getStyleClass().add("dark-viewer-sidebar");
 
         javafx.scene.control.Button toggleBtn = new javafx.scene.control.Button("Switch View (Linear/Radial)");
         toggleBtn.setOnAction(e -> {

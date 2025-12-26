@@ -44,7 +44,7 @@ public class SpectrographViewer extends Application {
     public void start(Stage stage) {
         VBox root = new VBox(10);
         root.setPadding(new Insets(20));
-        root.setStyle("-fx-background-color: #111;");
+        root.getStyleClass().add("dark-viewer-root");
 
         Label title = new Label(I18n.getInstance().get("spectrograph.title"));
         // ...

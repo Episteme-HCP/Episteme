@@ -119,7 +119,7 @@ public class MolecularViewer extends Application {
         // UI
         VBox controls = new VBox(10);
         controls.setPadding(new Insets(10));
-        controls.setStyle("-fx-background-color: #16213e; -fx-border-color: #333; -fx-border-width: 0 0 0 1;");
+        controls.getStyleClass().add("dark-viewer-sidebar");
 
         ComboBox<String> selector = new ComboBox<>();
         selector.setItems(FXCollections.observableArrayList(
@@ -194,7 +194,7 @@ public class MolecularViewer extends Application {
     private javafx.scene.Node create2DView() {
         planarCanvas = new javafx.scene.canvas.Canvas(800, 600);
         javafx.scene.layout.StackPane container = new javafx.scene.layout.StackPane(planarCanvas);
-        container.setStyle("-fx-background-color: white;");
+        container.getStyleClass().add("viewer-root");
         return container;
     }
 

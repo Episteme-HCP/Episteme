@@ -98,7 +98,7 @@ public class PeriodicTableViewer extends Application {
         ChemistryDataLoader.loadElements();
 
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #1a1a2e;");
+        root.getStyleClass().add("dark-viewer-root");
 
         // Main table grid
         GridPane tableGrid = createTableGrid();
@@ -107,7 +107,7 @@ public class PeriodicTableViewer extends Application {
         Group contentGroup = new Group(tableGrid);
         StackPane zoomPane = new StackPane(contentGroup);
         zoomPane.setAlignment(Pos.CENTER);
-        zoomPane.setStyle("-fx-background-color: #1a1a2e;");
+        zoomPane.getStyleClass().add("dark-viewer-root");
 
         ScrollPane scrollPane = new ScrollPane(zoomPane);
         scrollPane.setFitToWidth(true);
@@ -129,7 +129,7 @@ public class PeriodicTableViewer extends Application {
         HBox topBar = new HBox(10, new Label("Zoom:"), zoomSlider);
         topBar.setAlignment(Pos.CENTER_LEFT);
         topBar.setPadding(new Insets(10));
-        topBar.setStyle("-fx-background-color: #16213e; -fx-text-fill: white;");
+        topBar.getStyleClass().add("dark-viewer-sidebar");
         ((Label) topBar.getChildren().get(0)).setTextFill(Color.WHITE);
 
         root.setTop(null); // No top bar - zoom removed per request
@@ -150,7 +150,7 @@ public class PeriodicTableViewer extends Application {
         grid.setHgap(3);
         grid.setVgap(3);
         grid.setPadding(new Insets(20));
-        grid.setStyle("-fx-background-color: #1a1a2e;");
+        grid.getStyleClass().add("dark-viewer-root");
 
         for (int row = 0; row < LAYOUT.length; row++) {
             for (int col = 0; col < LAYOUT[row].length; col++) {
@@ -262,7 +262,7 @@ public class PeriodicTableViewer extends Application {
         VBox panel = new VBox(10);
         panel.setPadding(new Insets(20));
         panel.setPrefWidth(300);
-        panel.setStyle("-fx-background-color: #16213e;");
+        panel.getStyleClass().add("dark-viewer-sidebar");
 
         Label title = new Label("Element Details");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 18));
