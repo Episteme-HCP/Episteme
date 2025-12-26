@@ -58,8 +58,8 @@ public class ResistorColorCodeViewer extends Application {
         VBox root = new VBox(20);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: #1a1a2e;");
-        resultLabel.setStyle("-fx-text-fill: #00d9ff; -fx-font-size: 16px;");
+        root.getStyleClass().add("dark-viewer-root");
+        resultLabel.getStyleClass().add("dark-label-accent");
 
         // Resistor Visual
         StackPane resistorBody = new StackPane();
