@@ -81,9 +81,14 @@ public class SimulatedPressureGauge extends SimulatedDevice implements PressureG
         if (!isConnected()) {
             throw new IOException("Device not connected");
         }
-        // Simple noise simulation
+
+        // Simulating environmental fluctuations (atmospheric tides, wind etc)
+        // A slowly varying sine component + measurement noise
+        double time = System.currentTimeMillis() / 10000.0; // Very slow
+        double fluctuation = 0.2 * Math.sin(time); // +/- 0.2 kPa
+
         double noise = (Math.random() - 0.5) * accuracy.doubleValue();
-        lastReading = basePressure.add(Real.of(noise));
+        lastReading = basePressure.add(Real.of(fluctuation + noise));
         return lastReading;
     }
 

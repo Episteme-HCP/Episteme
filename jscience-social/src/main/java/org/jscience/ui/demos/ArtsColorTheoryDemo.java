@@ -17,17 +17,17 @@ public class ArtsColorTheoryDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return org.jscience.social.i18n.I18n.getInstance().get("category.arts");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.arts");
     }
 
     @Override
     public String getName() {
-        return org.jscience.social.i18n.I18n.getInstance().get("ArtsColorTheory.title");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("ArtsColorTheory.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.social.i18n.I18n.getInstance().get("ArtsColorTheory.desc");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("ArtsColorTheory.desc");
     }
 
     @Override
@@ -45,52 +45,82 @@ public class ArtsColorTheoryDemo implements DemoProvider {
         Rectangle tri1Box = new Rectangle(50, 50); // Triad +120
         Rectangle tri2Box = new Rectangle(50, 50); // Triad -120
 
+        // Labels for codes
+        Label mainCode = new Label();
+        Label compCode = new Label();
+        Label ana1Code = new Label();
+        Label ana2Code = new Label();
+        Label tri1Code = new Label();
+        Label tri2Code = new Label();
+
         Runnable update = () -> {
             double hue = hueSlider.getValue();
+
             Color c = Color.hsb(hue, 1.0, 1.0);
             colorBox.setFill(c);
+            mainCode.setText(toHex(c));
 
-            compBox.setFill(Color.hsb((hue + 180) % 360, 1.0, 1.0));
+            Color comp = Color.hsb((hue + 180) % 360, 1.0, 1.0);
+            compBox.setFill(comp);
+            compCode.setText(toHex(comp));
 
-            ana1Box.setFill(Color.hsb((hue + 30) % 360, 1.0, 1.0));
-            ana2Box.setFill(Color.hsb((hue - 30 + 360) % 360, 1.0, 1.0));
+            Color ana1 = Color.hsb((hue + 30) % 360, 1.0, 1.0);
+            ana1Box.setFill(ana1);
+            ana1Code.setText(toHex(ana1));
 
-            tri1Box.setFill(Color.hsb((hue + 120) % 360, 1.0, 1.0));
-            tri2Box.setFill(Color.hsb((hue - 120 + 360) % 360, 1.0, 1.0));
+            Color ana2 = Color.hsb((hue - 30 + 360) % 360, 1.0, 1.0);
+            ana2Box.setFill(ana2);
+            ana2Code.setText(toHex(ana2));
+
+            Color tri1 = Color.hsb((hue + 120) % 360, 1.0, 1.0);
+            tri1Box.setFill(tri1);
+            tri1Code.setText(toHex(tri1));
+
+            Color tri2 = Color.hsb((hue - 120 + 360) % 360, 1.0, 1.0);
+            tri2Box.setFill(tri2);
+            tri2Code.setText(toHex(tri2));
         };
         hueSlider.valueProperty().addListener(e -> update.run());
         update.run();
 
-        VBox harmonies = new VBox(20);
+        VBox harmonies = new VBox(15);
         harmonies.setPadding(new Insets(20));
         harmonies.setAlignment(Pos.CENTER);
 
         harmonies.getChildren()
-                .add(new Label(org.jscience.social.i18n.I18n.getInstance().get("arts.color.label.comp")));
-        harmonies.getChildren().add(compBox);
+                .add(new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("arts.color.label.comp")));
+        harmonies.getChildren().addAll(compBox, compCode);
 
-        HBox ana = new HBox(10, ana1Box, ana2Box);
+        HBox ana = new HBox(10, new VBox(5, ana1Box, ana1Code), new VBox(5, ana2Box, ana2Code));
         ana.setAlignment(Pos.CENTER);
         harmonies.getChildren()
-                .add(new Label(org.jscience.social.i18n.I18n.getInstance().get("arts.color.label.analog")));
+                .add(new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("arts.color.label.analog")));
         harmonies.getChildren().add(ana);
 
-        HBox tri = new HBox(10, tri1Box, tri2Box);
+        HBox tri = new HBox(10, new VBox(5, tri1Box, tri1Code), new VBox(5, tri2Box, tri2Code));
         tri.setAlignment(Pos.CENTER);
         harmonies.getChildren()
-                .add(new Label(org.jscience.social.i18n.I18n.getInstance().get("arts.color.label.triad")));
+                .add(new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("arts.color.label.triad")));
         harmonies.getChildren().add(tri);
 
-        VBox main = new VBox(10, new Label(org.jscience.social.i18n.I18n.getInstance().get("arts.color.label.hue")),
-                hueSlider, colorBox);
+        VBox main = new VBox(10, new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("arts.color.label.hue")),
+                hueSlider, colorBox, mainCode);
         main.setAlignment(Pos.CENTER);
 
         root.setCenter(main);
         root.setRight(harmonies);
 
         Scene scene = new Scene(root, 600, 400);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle(getName());
         stage.setScene(scene);
         stage.show();
+    }
+
+    private String toHex(Color c) {
+        return String.format("#%02X%02X%02X",
+                (int) (c.getRed() * 255),
+                (int) (c.getGreen() * 255),
+                (int) (c.getBlue() * 255));
     }
 }

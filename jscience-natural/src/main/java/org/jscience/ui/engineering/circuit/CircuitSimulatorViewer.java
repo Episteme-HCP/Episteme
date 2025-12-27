@@ -43,7 +43,7 @@ public class CircuitSimulatorViewer extends Application {
 
         @Override
         public String toString() {
-            return org.jscience.natural.i18n.I18n.getInstance().get(i18nKey);
+            return org.jscience.ui.i18n.I18n.getInstance().get(i18nKey);
         }
     }
 
@@ -155,7 +155,7 @@ public class CircuitSimulatorViewer extends Application {
 
         Scene scene = new Scene(root, 1200, 800);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.circuit"));
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.circuit"));
         stage.setScene(scene);
         stage.show();
     }

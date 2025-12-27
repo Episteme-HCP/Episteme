@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.i18n.LanguageMenu;
 
 /**
  * JScience Master Demo Launcher.
@@ -81,7 +82,7 @@ public class JScienceDemoApp extends Application {
         root.setTop(topContainer);
 
         // Discovery
-        Map<String, List<DemoProvider>> demosByCategory = new TreeMap<>();
+        Map<String, List<DemoProvider>> demosByCategory = new TreeMap<>(java.text.Collator.getInstance());
 
         try {
             ServiceLoader<DemoProvider> loader = ServiceLoader.load(DemoProvider.class);
@@ -109,6 +110,15 @@ public class JScienceDemoApp extends Application {
         } else {
             // Demos sections
             for (Map.Entry<String, List<DemoProvider>> entry : demosByCategory.entrySet()) {
+                // Remove generic/duplicate category if present
+                if ("Social Sciences".equalsIgnoreCase(entry.getKey())
+                        || "Sciences Sociales".equalsIgnoreCase(entry.getKey())) {
+                    continue;
+                }
+
+                // Sort demos by name
+                Collections.sort(entry.getValue(), Comparator.comparing(DemoProvider::getName));
+
                 TitledPane section = createSection(entry.getKey(), entry.getValue());
                 allContent.getChildren().add(section);
             }
@@ -135,20 +145,7 @@ public class JScienceDemoApp extends Application {
         MenuBar menuBar = new MenuBar();
 
         // Language Menu
-        Menu languageMenu = new Menu(I18n.getInstance().get("app.menu.language"));
-        ToggleGroup langGroup = new ToggleGroup();
-
-        RadioMenuItem englishItem = new RadioMenuItem("English");
-        englishItem.setToggleGroup(langGroup);
-        englishItem.setSelected(Locale.getDefault().getLanguage().equals("en"));
-        englishItem.setOnAction(e -> setLocale(Locale.ENGLISH));
-
-        RadioMenuItem frenchItem = new RadioMenuItem("Français");
-        frenchItem.setToggleGroup(langGroup);
-        frenchItem.setSelected(Locale.getDefault().getLanguage().equals("fr"));
-        frenchItem.setOnAction(e -> setLocale(Locale.FRENCH));
-
-        languageMenu.getItems().addAll(englishItem, frenchItem);
+        Menu languageMenu = new LanguageMenu(this::buildUI);
 
         // Theme Menu
         Menu themeMenu = new Menu(I18n.getInstance().get("app.menu.theme"));
@@ -174,12 +171,6 @@ public class JScienceDemoApp extends Application {
 
         menuBar.getMenus().addAll(languageMenu, themeMenu);
         return menuBar;
-    }
-
-    private void setLocale(Locale locale) {
-        Locale.setDefault(locale);
-        I18n.getInstance().setLocale(locale);
-        buildUI();
     }
 
     private VBox createHeader() {
@@ -235,7 +226,20 @@ public class JScienceDemoApp extends Application {
         });
 
         VBox info = new VBox(5);
-        Label name = new Label(demo.getName());
+        String titleText = demo.getName();
+        String prefix = demo.getCategory() + " : ";
+        if (titleText.startsWith(prefix)) {
+            titleText = titleText.substring(prefix.length());
+        } else if (titleText.contains(" : ")) {
+            // Specific fallback for cases like "Économie : ..." vs "Economie" category
+            // mismatch
+            String[] parts = titleText.split(" : ", 2);
+            if (parts.length > 1 && demo.getCategory().contains(parts[0])) {
+                titleText = parts[1];
+            }
+        }
+
+        Label name = new Label(titleText);
         name.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         String desc = demo.getDescription();

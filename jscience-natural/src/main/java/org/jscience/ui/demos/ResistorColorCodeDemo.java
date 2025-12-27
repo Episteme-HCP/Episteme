@@ -4,20 +4,22 @@ import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.engineering.components.ResistorColorCodeViewer;
 
+import org.jscience.ui.i18n.I18n;
+
 public class ResistorColorCodeDemo implements DemoProvider {
     @Override
     public String getName() {
-        return "Resistor Color Codes";
+        return I18n.getInstance().get("ResistorColorCode.title");
     }
 
     @Override
     public String getDescription() {
-        return "Calculates resistor values from color bands.";
+        return I18n.getInstance().get("ResistorColorCode.desc");
     }
 
     @Override
     public String getCategory() {
-        return "Engineering";
+        return I18n.getInstance().get("category.engineering");
     }
 
     @Override

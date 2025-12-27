@@ -55,7 +55,12 @@ public class MarketCrashApp extends KillerAppBase {
 
     @Override
     protected String getAppTitle() {
-        return i18n.get("market.title") + " - JScience";
+        return i18n.get("market.title");
+    }
+
+    @Override
+    public String getDescription() {
+        return i18n.get("market.desc");
     }
 
     @Override

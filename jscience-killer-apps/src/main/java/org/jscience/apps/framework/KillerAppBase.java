@@ -19,6 +19,7 @@ import java.util.prefs.Preferences;
 
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.ThemeManager;
+import org.jscience.ui.i18n.I18n;
 
 /**
  * Abstract base class for all JScience Killer Apps.
@@ -89,7 +90,7 @@ public abstract class KillerAppBase extends Application implements DemoProvider 
 
     @Override
     public String getCategory() {
-        return "Killer Apps";
+        return I18n.getInstance().get("category.killer_apps");
     }
 
     @Override

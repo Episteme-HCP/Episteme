@@ -17,17 +17,17 @@ public class EconomicsMarketDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return org.jscience.social.i18n.I18n.getInstance().get("category.economics");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.economics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.social.i18n.I18n.getInstance().get("econ.market.title");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.social.i18n.I18n.getInstance().get("econ.market.desc");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.desc");
     }
 
     @Override
@@ -35,20 +35,20 @@ public class EconomicsMarketDemo implements DemoProvider {
         BorderPane root = new BorderPane();
 
         // Axes
-        NumberAxis xAxis = new NumberAxis(org.jscience.social.i18n.I18n.getInstance().get("econ.market.axis.quantity"),
+        NumberAxis xAxis = new NumberAxis(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.axis.quantity"),
                 0, 100, 10);
-        NumberAxis yAxis = new NumberAxis(org.jscience.social.i18n.I18n.getInstance().get("econ.market.axis.price"), 0,
+        NumberAxis yAxis = new NumberAxis(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.axis.price"), 0,
                 100, 10);
 
         LineChart<Number, Number> lineChart = new LineChart<>(xAxis, yAxis);
-        lineChart.setTitle(org.jscience.social.i18n.I18n.getInstance().get("econ.market.chart.title"));
+        lineChart.setTitle(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.chart.title"));
         lineChart.setAnimated(false); // crucial for smooth slider updates
 
         XYChart.Series<Number, Number> supplySeries = new XYChart.Series<>();
-        supplySeries.setName(org.jscience.social.i18n.I18n.getInstance().get("econ.market.series.supply"));
+        supplySeries.setName(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.series.supply"));
 
         XYChart.Series<Number, Number> demandSeries = new XYChart.Series<>();
-        demandSeries.setName(org.jscience.social.i18n.I18n.getInstance().get("econ.market.series.demand"));
+        demandSeries.setName(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.series.demand"));
 
         lineChart.getData().add(supplySeries);
         lineChart.getData().add(demandSeries);
@@ -95,9 +95,9 @@ public class EconomicsMarketDemo implements DemoProvider {
         updateGraph.run(); // Init
 
         VBox controls = new VBox(10,
-                new Label(org.jscience.social.i18n.I18n.getInstance().get("econ.market.label.shift_supply")),
+                new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.label.shift_supply")),
                 supplyShift,
-                new Label(org.jscience.social.i18n.I18n.getInstance().get("econ.market.label.shift_demand")),
+                new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.label.shift_demand")),
                 demandShift);
         controls.setStyle("-fx-padding: 10; -fx-background-color: #f0f0f0;");
 
@@ -105,6 +105,7 @@ public class EconomicsMarketDemo implements DemoProvider {
         root.setBottom(controls);
 
         Scene scene = new Scene(root, 800, 600);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle(getName());
         stage.setScene(scene);
         stage.show();

@@ -6,22 +6,24 @@ package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
-import org.jscience.ui.geology.EarthquakeMapViewer;
+import org.jscience.ui.earth.EarthquakeMapViewer;
+
+import org.jscience.ui.i18n.I18n;
 
 public class EarthquakeDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Earth Sciences";
+        return I18n.getInstance().get("category.earth_sciences");
     }
 
     @Override
     public String getName() {
-        return "Earthquake Map";
+        return I18n.getInstance().get("earthquake.label.title");
     }
 
     @Override
     public String getDescription() {
-        return "Seismic activity visualization showing 'Ring of Fire' data.";
+        return I18n.getInstance().get("earthquake.desc");
     }
 
     @Override

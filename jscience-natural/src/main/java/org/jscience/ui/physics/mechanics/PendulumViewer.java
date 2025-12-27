@@ -20,7 +20,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import org.jscience.natural.i18n.I18n;
+import org.jscience.ui.i18n.I18n;
 import org.jscience.physics.PhysicalConstants;
 
 /**
@@ -59,16 +59,16 @@ public class PendulumViewer extends Application {
         VBox controls = new VBox(10);
         controls.setPadding(new Insets(10));
         Slider lengthSlider = new Slider(0.5, 5.0, 2.0);
-        Label lengthLabel = new Label("Length: 2.0 m");
+        Label lengthLabel = new Label(String.format(I18n.getInstance().get("pendulum.length.fmt"), 2.0));
         lengthSlider.valueProperty().addListener((obs, old, val) -> {
             length = val.doubleValue();
-            lengthLabel.setText(String.format("Length: %.1f m", length));
+            lengthLabel.setText(String.format(I18n.getInstance().get("pendulum.length.fmt"), length));
             recalcFrequency();
             phaseData.getData().clear();
             time = 0;
         });
 
-        controls.getChildren().addAll(new Label("Pendulum Parameters"), lengthLabel, lengthSlider);
+        controls.getChildren().addAll(new Label(I18n.getInstance().get("pendulum.params")), lengthLabel, lengthSlider);
 
         root.setCenter(canvas);
         root.setRight(chart);
@@ -96,7 +96,7 @@ public class PendulumViewer extends Application {
 
         Scene scene = new Scene(root, 900, 500);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.pendulum"));
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.pendulum"));
         stage.setScene(scene);
         stage.show();
     }

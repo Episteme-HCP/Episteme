@@ -8,20 +8,22 @@ import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.mathematics.numbers.real.PlottingViewer;
 
+import org.jscience.ui.i18n.I18n;
+
 public class PlottingDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return I18n.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return "Plotting Demo";
+        return I18n.getInstance().get("plotting.title");
     }
 
     @Override
     public String getDescription() {
-        return "2D Plotting of functions using JScience Real types.";
+        return I18n.getInstance().get("plotting.desc");
     }
 
     @Override

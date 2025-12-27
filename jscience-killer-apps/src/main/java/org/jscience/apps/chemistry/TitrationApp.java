@@ -111,7 +111,12 @@ public class TitrationApp extends KillerAppBase {
 
     @Override
     protected String getAppTitle() {
-        return i18n.get("titration.title") + " - JScience";
+        return i18n.get("titration.title");
+    }
+
+    @Override
+    public String getDescription() {
+        return i18n.get("titration.desc");
     }
 
     @Override

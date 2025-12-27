@@ -73,15 +73,35 @@ public class SimulatedOscilloscope extends SimulatedDevice implements Oscillosco
         this.triggerLevel = volts;
     }
 
+    private double frequency = 1000.0; // 1 kHz default
+    private double amplitude = 1.0;
+    private double phase = 0.0;
+
+    public void setSignal(double freq, double amp) {
+        this.frequency = freq;
+        this.amplitude = amp;
+    }
+
     @Override
     public double[] captureWaveform(int channel) {
         if (!isConnected())
             throw new IllegalStateException("Not connected");
-        // Mock Sine wave
-        double[] wave = new double[100];
-        for (int i = 0; i < 100; i++) {
-            wave[i] = Math.sin(i * 0.1);
+
+        int points = 500;
+        double[] wave = new double[points];
+        double dt = timeBase / 10.0 / points; // 10 divisions wide?
+
+        for (int i = 0; i < points; i++) {
+            double t = i * dt + phase;
+            // Add some noise and harmonics
+            double signal = amplitude * Math.sin(2 * Math.PI * frequency * t);
+            signal += 0.05 * Math.sin(2 * Math.PI * frequency * 3 * t); // 3rd harmonic
+            signal += (Math.random() - 0.5) * 0.02 * amplitude; // noise
+            wave[i] = signal;
         }
+        // Advance phase for next capture to simulate "moving" wave if not triggered
+        phase += dt * points * 1.5;
+
         return wave;
     }
 

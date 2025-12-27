@@ -99,7 +99,7 @@ public class ResistorColorCodeViewer extends Application {
 
         Scene scene = new Scene(root, 500, 300);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.resistor"));
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.resistor"));
         stage.setScene(scene);
         stage.show();
     }

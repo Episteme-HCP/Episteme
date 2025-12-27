@@ -54,6 +54,8 @@
                     <exclude>**/*.gltf</exclude>
                     <exclude>**/*.glb</exclude>
                     <exclude>**/*.bin</exclude>
+                    <exclude>**/*.fbx</exclude>
+                    <exclude>**/*.stl</exclude>
                 </excludes>
             </resource>
             <resource>
@@ -68,6 +70,8 @@
                     <include>**/*.gltf</include>
                     <include>**/*.glb</include>
                     <include>**/*.bin</include>
+                    <include>**/*.fbx</include>
+                    <include>**/*.stl</include>
                 </includes>
             </resource>
         </resources>

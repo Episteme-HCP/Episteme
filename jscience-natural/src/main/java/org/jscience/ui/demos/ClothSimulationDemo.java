@@ -7,21 +7,22 @@ package org.jscience.ui.demos;
 import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.computing.simulation.ClothSimulationViewer;
+import org.jscience.ui.i18n.I18n;
 
 public class ClothSimulationDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Physics";
+        return I18n.getInstance().get("category.physics");
     }
 
     @Override
     public String getName() {
-        return "3D Cloth Simulation";
+        return I18n.getInstance().get("ClothSimulation.title");
     }
 
     @Override
     public String getDescription() {
-        return "Mass-spring particle system simulating a 3D hanging cloth with gravity and damping controls.";
+        return I18n.getInstance().get("ClothSimulation.desc");
     }
 
     @Override

@@ -43,13 +43,22 @@ public class SimulatedTemperatureProbe extends SimulatedDevice implements Temper
         return maxTemp;
     }
 
+    private final double thermalInertia = 0.2; // 0.2 means it takes a few steps to reach target
+
     @Override
     public Real measure(Real actualTemp) {
         if (!isConnected())
             throw new IllegalStateException("Device not connected");
-        // Simple noise simulation
+
+        // Thermal inertia simulation: lastReading moves toward actualTemp
+        double current = lastReading.doubleValue();
+        double target = actualTemp.doubleValue();
+        double next = current + (target - current) * thermalInertia;
+
+        // Add measurement noise
         double noise = (Math.random() - 0.5) * accuracy.doubleValue();
-        lastReading = actualTemp.add(Real.of(noise));
+        lastReading = Real.of(next + noise);
+
         return lastReading;
     }
 

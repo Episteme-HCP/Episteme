@@ -83,10 +83,12 @@ public class HorizonsEphemerisLoader {
                                     java.util.Arrays.asList(Real.of(vx), Real.of(vy), Real.of(vz)),
                                     Reals.getInstance());
 
-                            // Time Parsing (Simplified for demo)
-                            // Ideally parse JDTDB or Date String
-                            // For now just storing dummy time if parsing fails or complex
-                            Instant tp = Instant.now(); // TODO: Parse from JDTDB
+                            // Parse time from JDTDB (Julian Day Terrestrial Barycentric Dynamical Time)
+                            double jd = Double.parseDouble(parts[0].trim());
+                            // Convert JD to Unix epoch: JD 2440587.5 = Unix epoch (1970-01-01 00:00:00 UTC)
+                            double daysSinceUnixEpoch = jd - 2440587.5;
+                            long millisSinceEpoch = (long) (daysSinceUnixEpoch * 86400000.0);
+                            Instant tp = Instant.ofEpochMilli(millisSinceEpoch);
 
                             points.add(new EphemerisPoint(tp, pos, vel));
                         }

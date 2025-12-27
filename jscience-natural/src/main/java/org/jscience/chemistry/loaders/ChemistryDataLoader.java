@@ -65,14 +65,13 @@ public class ChemistryDataLoader {
             System.err.println("ERROR: ChemistryDataLoader cannot function because ObjectMapper failed to initialize.");
             return;
         }
-        System.out.println("DEBUG: ChemistryDataLoader.loadElements() called.");
+
         try (InputStream is = ChemistryDataLoader.class.getResourceAsStream("/org/jscience/chemistry/elements.json")) {
             if (is == null) {
-                System.out.println("DEBUG: elements.json NOT FOUND in /org/jscience/chemistry/");
+
                 LOGGER.warning("elements.json not found in /org/jscience/chemistry/");
                 return;
             }
-            System.out.println("DEBUG: elements.json found. Parsing...");
 
             ElementListWrapper wrapper = MAPPER.readValue(is, ElementListWrapper.class);
             List<ElementData> elements = wrapper.elements;
@@ -156,7 +155,7 @@ public class ChemistryDataLoader {
             loadMolecules();
 
         } catch (Exception e) {
-            System.out.println("DEBUG: Exception loading elements: " + e);
+
             e.printStackTrace();
             LOGGER.severe("Failed to load elements.json: " + e.getMessage());
         }
@@ -165,7 +164,7 @@ public class ChemistryDataLoader {
     public static void loadMolecules() {
         if (MAPPER == null)
             return;
-        System.out.println("DEBUG: ChemistryDataLoader.loadMolecules() called.");
+
         try (InputStream is = ChemistryDataLoader.class.getResourceAsStream("/org/jscience/chemistry/molecules.json")) {
             if (is == null) {
                 LOGGER.warning("molecules.json not found in /org/jscience/chemistry/");
@@ -188,7 +187,7 @@ public class ChemistryDataLoader {
                 }
             }
         } catch (Exception e) {
-            System.out.println("DEBUG: Exception loading molecules: " + e);
+
             e.printStackTrace();
         }
     }

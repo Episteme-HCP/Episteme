@@ -8,20 +8,22 @@ import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.chemistry.PeriodicTableViewer;
 
+import org.jscience.ui.i18n.I18n;
+
 public class PeriodicTableDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Chemistry";
+        return I18n.getInstance().get("category.chemistry");
     }
 
     @Override
     public String getName() {
-        return "Periodic Table";
+        return I18n.getInstance().get("PeriodicTable.title");
     }
 
     @Override
     public String getDescription() {
-        return "Interactive periodic table with all 118 elements, color-coded by category.";
+        return I18n.getInstance().get("PeriodicTable.desc");
     }
 
     @Override

@@ -8,20 +8,22 @@ import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.chemistry.MolecularViewer;
 
+import org.jscience.ui.i18n.I18n;
+
 public class MolecularViewerDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Chemistry";
+        return I18n.getInstance().get("category.chemistry");
     }
 
     @Override
     public String getName() {
-        return org.jscience.natural.i18n.I18n.getInstance().get("MolecularViewer.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("MolecularViewer.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.natural.i18n.I18n.getInstance().get("MolecularViewer.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("MolecularViewer.desc");
     }
 
     @Override

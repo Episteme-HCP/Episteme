@@ -8,20 +8,22 @@ import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.physics.mechanics.RigidBodyViewer;
 
+import org.jscience.ui.i18n.I18n;
+
 public class RigidBodyDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Physics";
+        return I18n.getInstance().get("category.physics");
     }
 
     @Override
     public String getName() {
-        return "Rigid Body Mechanics";
+        return I18n.getInstance().get("RigidBody.title");
     }
 
     @Override
     public String getDescription() {
-        return "2D physics simulation of colliding circles with impulse response, mass properties, and elastic bouncing.";
+        return I18n.getInstance().get("RigidBody.desc");
     }
 
     @Override

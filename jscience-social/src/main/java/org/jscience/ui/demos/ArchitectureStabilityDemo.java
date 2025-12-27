@@ -15,17 +15,17 @@ public class ArchitectureStabilityDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return org.jscience.social.i18n.I18n.getInstance().get("category.architecture");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.architecture");
     }
 
     @Override
     public String getName() {
-        return org.jscience.social.i18n.I18n.getInstance().get("ArchitectureStability.title");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("ArchitectureStability.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.social.i18n.I18n.getInstance().get("ArchitectureStability.desc");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("ArchitectureStability.desc");
     }
 
     @Override
@@ -36,17 +36,26 @@ public class ArchitectureStabilityDemo implements DemoProvider {
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        Button addBlockBtn = new Button(org.jscience.social.i18n.I18n.getInstance().get("arch.stability.btn.add"));
-        Button resetBtn = new Button(org.jscience.social.i18n.I18n.getInstance().get("arch.stability.btn.reset"));
-        Label status = new Label(org.jscience.social.i18n.I18n.getInstance().get("arch.stability.label.stable"));
+        Button addBlockBtn = new Button(org.jscience.ui.i18n.SocialI18n.getInstance().get("arch.stability.btn.add"));
+        Button addHeavyBtn = new Button("Add Heavy Destabilizer"); // TODO: I18n
+        Button resetBtn = new Button(org.jscience.ui.i18n.SocialI18n.getInstance().get("arch.stability.btn.reset"));
+        Label status = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("arch.stability.label.stable"));
         status.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
 
         // State
+        class Block {
+            double offset;
+            double mass;
+
+            public Block(double o, double m) {
+                offset = o;
+                mass = m;
+            }
+        }
         class State {
-            int blocks = 0;
+            java.util.List<Block> blocks = new java.util.ArrayList<>();
             double comX = 300; // Center of Mass X
             boolean collapsed = false;
-            java.util.List<Double> offsets = new java.util.ArrayList<>();
         }
         State s = new State();
 
@@ -54,50 +63,58 @@ public class ArchitectureStabilityDemo implements DemoProvider {
             gc.clearRect(0, 0, 600, 600);
 
             // Ground
-            gc.setFill(Color.BROWN);
+            gc.setFill(Color.LIGHTGREEN);
             gc.fillRect(0, 550, 600, 50);
 
-            // Base
-            gc.setFill(Color.DARKGRAY);
+            // Base (Table) - Changed Color
+            gc.setFill(Color.SADDLEBROWN);
             gc.fillRect(250, 500, 100, 50);
 
             double currentY = 500;
-            double totalMassX = 300 * 10; // Base mass
+            double totalMassX = 300 * 10; // Base mass (10) at 300
             double totalMass = 10;
 
-            for (int i = 0; i < s.blocks; i++) {
+            for (Block b : s.blocks) {
                 currentY -= 50;
-                double off = s.offsets.get(i);
-                double bx = 250 + off;
+                double bx = 250 + b.offset;
 
-                gc.setFill(s.collapsed ? Color.RED : Color.GRAY);
-                gc.setStroke(Color.BLACK);
-                gc.fillRect(bx, currentY, 100, 50);
-                gc.strokeRect(bx, currentY, 100, 50);
+                // Optimization: Don't draw if off-screen
+                if (currentY > -50 && currentY < 600) {
+                    gc.setFill(s.collapsed ? Color.RED : (b.mass > 1 ? Color.DARKRED : Color.GRAY));
+                    gc.setStroke(Color.BLACK);
+                    gc.fillRect(bx, currentY, 100, 50);
+                    gc.strokeRect(bx, currentY, 100, 50);
+
+                    if (b.mass > 1) {
+                        gc.setFill(Color.WHITE);
+                        gc.fillText("HEAVY", bx + 30, currentY + 30);
+                    }
+                }
 
                 if (!s.collapsed) {
-                    totalMassX += (bx + 50) * 1;
-                    totalMass += 1;
+                    totalMassX += (bx + 50) * b.mass;
+                    totalMass += b.mass;
                 }
             }
 
             s.comX = totalMassX / totalMass;
 
             // Draw COM Line
-            gc.setStroke(Color.RED);
+            gc.setStroke(Color.BLUE); // Changed to Blue for visibility
             gc.setLineWidth(2);
             gc.strokeLine(s.comX, 0, s.comX, 600);
 
             // Text
             gc.setFill(Color.BLACK);
             gc.fillText(
-                    String.format(org.jscience.social.i18n.I18n.getInstance().get("arch.stability.label.com"), s.comX),
+                    String.format(org.jscience.ui.i18n.SocialI18n.getInstance().get("arch.stability.label.com"),
+                            s.comX),
                     10, 20);
 
             // Stability check (Simplified: if COM outside base [250, 350])
             if (s.comX < 250 || s.comX > 350) {
                 s.collapsed = true;
-                status.setText(org.jscience.social.i18n.I18n.getInstance().get("arch.stability.label.collapsed"));
+                status.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("arch.stability.label.collapsed"));
                 status.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
             }
         };
@@ -105,27 +122,34 @@ public class ArchitectureStabilityDemo implements DemoProvider {
         addBlockBtn.setOnAction(e -> {
             if (s.collapsed)
                 return;
-            s.blocks++;
-            s.offsets.add((Math.random() - 0.5) * 60); // Random shift -30 to +30
+            s.blocks.add(new Block((Math.random() - 0.5) * 60, 1.0));
+            draw.run();
+        });
+
+        addHeavyBtn.setOnAction(e -> {
+            if (s.collapsed)
+                return;
+            // Add a heavy block with extreme offset to destabilize
+            s.blocks.add(new Block(45, 5.0));
             draw.run();
         });
 
         resetBtn.setOnAction(e -> {
-            s.blocks = 0;
-            s.offsets.clear();
+            s.blocks.clear();
             s.collapsed = false;
-            status.setText(org.jscience.social.i18n.I18n.getInstance().get("arch.stability.label.stable"));
+            status.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("arch.stability.label.stable"));
             status.setStyle("-fx-text-fill: green;");
             draw.run();
         });
 
-        VBox controls = new VBox(10, addBlockBtn, resetBtn, status);
+        VBox controls = new VBox(10, addBlockBtn, addHeavyBtn, resetBtn, status);
         controls.setStyle("-fx-padding: 10;");
         root.setRight(controls);
 
         draw.run();
 
         Scene scene = new Scene(root, 800, 600);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle(getName());
         stage.setScene(scene);
         stage.show();

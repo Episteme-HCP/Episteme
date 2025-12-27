@@ -88,7 +88,12 @@ public class CrystalStructureApp extends KillerAppBase {
 
     @Override
     protected String getAppTitle() {
-        return i18n.get("crystal.title") + " - JScience";
+        return i18n.get("crystal.title");
+    }
+
+    @Override
+    public String getDescription() {
+        return i18n.get("crystal.desc");
     }
 
     @Override

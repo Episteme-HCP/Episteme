@@ -48,6 +48,7 @@ import org.jscience.measure.Quantities;
  * {@link Quantity} properties.
  * Loads data from elements.json.
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -216,14 +217,17 @@ public final class PeriodicTable {
             elem.setAtomicMass(Quantities.create(massVal, UNIFIED_ATOMIC_MASS));
         }
 
-        if (node.containsKey("density"))
-            elem.setDensity(Quantities.create(((Number) node.get("density")).doubleValue(), G_PER_CM3));
+        Object densityObj = node.get("density");
+        if (densityObj instanceof Number)
+            elem.setDensity(Quantities.create(((Number) densityObj).doubleValue(), G_PER_CM3));
 
-        if (node.containsKey("melt"))
-            elem.setMeltingPoint(Quantities.create(((Number) node.get("melt")).doubleValue(), KELVIN));
+        Object meltObj = node.get("melt");
+        if (meltObj instanceof Number)
+            elem.setMeltingPoint(Quantities.create(((Number) meltObj).doubleValue(), KELVIN));
 
-        if (node.containsKey("boil"))
-            elem.setBoilingPoint(Quantities.create(((Number) node.get("boil")).doubleValue(), KELVIN));
+        Object boilObj = node.get("boil");
+        if (boilObj instanceof Number)
+            elem.setBoilingPoint(Quantities.create(((Number) boilObj).doubleValue(), KELVIN));
 
         // Register
         table.put(name.toLowerCase(), elem);

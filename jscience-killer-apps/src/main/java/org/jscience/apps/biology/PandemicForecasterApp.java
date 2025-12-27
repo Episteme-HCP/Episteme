@@ -61,7 +61,12 @@ public class PandemicForecasterApp extends KillerAppBase {
 
     @Override
     protected String getAppTitle() {
-        return i18n.get("pandemic.title") + " - JScience";
+        return i18n.get("pandemic.title");
+    }
+
+    @Override
+    public String getDescription() {
+        return i18n.get("pandemic.desc");
     }
 
     @Override

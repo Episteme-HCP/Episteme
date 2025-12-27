@@ -15,17 +15,17 @@ public class HistoryTimelineDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return org.jscience.social.i18n.I18n.getInstance().get("category.history");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.history");
     }
 
     @Override
     public String getName() {
-        return org.jscience.social.i18n.I18n.getInstance().get("hist.timeline.title");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.timeline.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.social.i18n.I18n.getInstance().get("hist.timeline.desc");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.timeline.desc");
     }
 
     @Override
@@ -42,26 +42,33 @@ public class HistoryTimelineDemo implements DemoProvider {
         content.getChildren().add(axis);
 
         // Add Eras (Rectangles behind)
-        addEra(content, "Ancient Era", 50, 400, Color.LIGHTYELLOW);
-        addEra(content, "Classical Era", 400, 700, Color.LIGHTGOLDENRODYELLOW);
-        addEra(content, "Medieval Era", 700, 1000, Color.LIGHTGRAY);
-        addEra(content, "Renaissance", 1000, 1300, Color.LAVENDER);
-        addEra(content, "Industrial", 1300, 1600, Color.LIGHTSTEELBLUE);
-        addEra(content, "Modern Era", 1600, 1950, Color.LIGHTCYAN);
+        addEra(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.era.ancient"), 50, 400,
+                Color.LIGHTYELLOW);
+        addEra(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.era.classical"), 400, 700,
+                Color.LIGHTGOLDENRODYELLOW);
+        addEra(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.era.medieval"), 700, 1000,
+                Color.LIGHTGRAY);
+        addEra(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.era.renaissance"), 1000, 1300,
+                Color.LAVENDER);
+        addEra(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.era.industrial"), 1300, 1600,
+                Color.LIGHTSTEELBLUE);
+        addEra(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.era.modern"), 1600, 1950,
+                Color.LIGHTCYAN);
 
         // Add Events
-        addEvent(content, "Event A", 100, 200, true);
-        addEvent(content, "Event B", 350, 200, false);
-        addEvent(content, "Empire Rise", 500, 200, true);
-        addEvent(content, "Empire Fall", 650, 200, false);
-        addEvent(content, "Discovery X", 1100, 200, true);
-        addEvent(content, "Revolution Y", 1450, 200, false);
-        addEvent(content, "War Z", 1700, 200, true);
-        addEvent(content, "Internet", 1900, 200, false);
+        addEvent(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.event.a"), 100, 200, true);
+        addEvent(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.event.b"), 350, 200, false);
+        addEvent(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.event.empire_rise"), 500, 200, true);
+        addEvent(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.event.empire_fall"), 650, 200, false);
+        addEvent(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.event.discovery"), 1100, 200, true);
+        addEvent(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.event.revolution"), 1450, 200, false);
+        addEvent(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.event.war"), 1700, 200, true);
+        addEvent(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.event.internet"), 1900, 200, false);
 
         scroll.setContent(content);
 
         Scene scene = new Scene(scroll, 800, 450);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle(getName());
         stage.setScene(scene);
         stage.show();

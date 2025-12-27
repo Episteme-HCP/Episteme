@@ -48,6 +48,9 @@ public class SimulatedMicroscope extends SimulatedDevice implements Microscope {
         this.currentMagnification = magnification;
     }
 
+    private double focus = 0.5;
+    private double lightingLevel = 0.8;
+
     @Override
     public Real getApparentSize(Real actualSize) {
         return actualSize.multiply(currentMagnification);
@@ -55,6 +58,25 @@ public class SimulatedMicroscope extends SimulatedDevice implements Microscope {
 
     @Override
     public boolean isResolvable(Real featureSize) {
-        return featureSize.compareTo(resolution) >= 0;
+        // Feature is resolvable if it's larger than resolution,
+        // but also depends on focus and lighting.
+        double effectiveResolution = resolution.doubleValue();
+
+        // Poor focus increases the minimum resolvable size
+        effectiveResolution /= (0.1 + 0.9 * focus);
+
+        // Poor lighting decreases contrast and prevents resolution
+        if (lightingLevel < 0.2)
+            return false;
+
+        return featureSize.doubleValue() >= effectiveResolution;
+    }
+
+    public void setFocus(double focus) {
+        this.focus = Math.max(0, Math.min(1.0, focus));
+    }
+
+    public void setLightingLevel(double level) {
+        this.lightingLevel = Math.max(0, Math.min(1.0, level));
     }
 }

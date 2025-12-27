@@ -22,7 +22,7 @@
  */
 package org.jscience.ui.demos;
 
-import org.jscience.natural.i18n.I18n;
+import org.jscience.ui.i18n.I18n;
 import org.jscience.ui.devices.OscilloscopeViewer;
 import org.jscience.ui.devices.PressureGaugeViewer;
 import org.jscience.ui.devices.TelescopeViewer;
@@ -45,10 +45,31 @@ import javafx.stage.Stage;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class DeviceDemo extends Application {
+import org.jscience.ui.DemoProvider;
+
+public class DeviceDemo extends Application implements DemoProvider {
 
     @Override
+    public String getCategory() {
+        return I18n.getInstance().get("category.engineering");
+    }
 
+    @Override
+    public String getName() {
+        return I18n.getInstance().get("device.title");
+    }
+
+    @Override
+    public String getDescription() {
+        return "Demonstration of simulated devices.";
+    }
+
+    @Override
+    public void show(Stage stage) {
+        start(stage);
+    }
+
+    @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle(I18n.getInstance().get("device.title"));
 

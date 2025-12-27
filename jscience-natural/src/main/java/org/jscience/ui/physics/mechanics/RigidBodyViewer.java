@@ -23,7 +23,7 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.mathematics.sets.Reals;
 import org.jscience.physics.classical.mechanics.RigidBody;
-import org.jscience.natural.i18n.I18n;
+import org.jscience.ui.i18n.I18n;
 
 import java.util.ArrayList;
 import java.util.Arrays;

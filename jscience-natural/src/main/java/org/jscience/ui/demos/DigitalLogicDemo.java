@@ -10,9 +10,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.application.Application;
-import javafx.application.Application;
 import org.jscience.ui.DemoProvider;
-import org.jscience.natural.i18n.I18n;
+import org.jscience.ui.i18n.I18n;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,7 @@ public class DigitalLogicDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("digital.category");
+        return I18n.getInstance().get("category.computing");
     }
 
     @Override
@@ -236,7 +235,7 @@ public class DigitalLogicDemo implements DemoProvider {
 
         @Override
         public String toString() {
-            return org.jscience.natural.i18n.I18n.getInstance().get(i18nKey);
+            return org.jscience.ui.i18n.I18n.getInstance().get(i18nKey);
         }
     }
 

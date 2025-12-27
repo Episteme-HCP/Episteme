@@ -8,20 +8,22 @@ import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.physics.mechanics.PendulumViewer;
 
+import org.jscience.ui.i18n.I18n;
+
 public class PendulumDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Physics";
+        return I18n.getInstance().get("category.physics");
     }
 
     @Override
     public String getName() {
-        return "Pendulum Simulation";
+        return I18n.getInstance().get("Pendulum.title");
     }
 
     @Override
     public String getDescription() {
-        return "Simple harmonic motion simulation with phase space trajectory plotting.";
+        return I18n.getInstance().get("Pendulum.desc");
     }
 
     @Override

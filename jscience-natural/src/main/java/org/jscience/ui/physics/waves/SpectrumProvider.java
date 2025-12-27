@@ -17,4 +17,11 @@ public interface SpectrumProvider {
     double[] getSpectrum();
 
     String getName();
+
+    /**
+     * Sets the simulated audio source pattern.
+     * 
+     * @param pattern "Sine", "Noise", "Harmonics", "Voice"
+     */
+    void setSourcePattern(String pattern);
 }

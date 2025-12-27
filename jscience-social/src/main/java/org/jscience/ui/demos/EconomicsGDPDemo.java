@@ -27,37 +27,37 @@ public class EconomicsGDPDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return org.jscience.social.i18n.I18n.getInstance().get("category.economics");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.economics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.social.i18n.I18n.getInstance().get("EconomicsGDP.title");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("EconomicsGDP.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.social.i18n.I18n.getInstance().get("EconomicsGDP.desc");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("EconomicsGDP.desc");
     }
 
     @Override
     public void show(Stage stage) {
         NumberAxis xAxis = new NumberAxis(0, 50, 5);
-        xAxis.setLabel(org.jscience.social.i18n.I18n.getInstance().get("econ.gdp.axis.years"));
+        xAxis.setLabel(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.gdp.axis.years"));
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel(org.jscience.social.i18n.I18n.getInstance().get("econ.gdp.axis.gdp"));
+        yAxis.setLabel(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.gdp.axis.gdp"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle(org.jscience.social.i18n.I18n.getInstance().get("econ.gdp.chart.title"));
+        chart.setTitle(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.gdp.chart.title"));
         chart.setCreateSymbols(false);
 
         Slider rateSlider = new Slider(0.5, 5.0, 2.0);
         rateSlider.setShowTickLabels(true);
         Label rateLabel = new Label(
-                String.format(org.jscience.social.i18n.I18n.getInstance().get("econ.gdp.label.rate_fmt"), 2.0));
+                String.format(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.gdp.label.rate_fmt"), 2.0));
 
         rateSlider.valueProperty().addListener((obs, old, val) -> {
-            rateLabel.setText(String.format(org.jscience.social.i18n.I18n.getInstance().get("econ.gdp.label.rate_fmt"),
+            rateLabel.setText(String.format(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.gdp.label.rate_fmt"),
                     val.doubleValue()));
             updateChart(chart, val.doubleValue() / 100.0);
         });
@@ -65,7 +65,7 @@ public class EconomicsGDPDemo implements DemoProvider {
         updateChart(chart, 0.02);
 
         VBox controls = new VBox(10,
-                new Label(org.jscience.social.i18n.I18n.getInstance().get("econ.gdp.label.rate_control")), rateSlider,
+                new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.gdp.label.rate_control")), rateSlider,
                 rateLabel);
         controls.setPadding(new Insets(10));
 
@@ -74,7 +74,8 @@ public class EconomicsGDPDemo implements DemoProvider {
         root.setBottom(controls);
 
         Scene scene = new Scene(root, 800, 600);
-        stage.setTitle(org.jscience.social.i18n.I18n.getInstance().get("econ.gdp.window.title"));
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
+        stage.setTitle(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.gdp.window.title"));
         stage.setScene(scene);
         stage.show();
     }
@@ -82,7 +83,7 @@ public class EconomicsGDPDemo implements DemoProvider {
     private void updateChart(LineChart<Number, Number> chart, double rate) {
         chart.getData().clear();
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
-        series.setName(org.jscience.social.i18n.I18n.getInstance().get("econ.gdp.chart.series"));
+        series.setName(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.gdp.chart.series"));
         double gdp = 25.0; // Starting GDP in trillions
         for (int year = 0; year <= 50; year++) {
             series.getData().add(new XYChart.Data<>(year, gdp));

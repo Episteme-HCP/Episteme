@@ -51,6 +51,7 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
     private StarSystem solarSystem;
     private CelestialBody originBody;
     private CelestialBody targetBody;
+    private List<HorizonsEphemerisLoader.EphemerisPoint> realEphemerisPoints;
 
     // Simulation scale: Pixels per AU
     private static final double SCALE = 100.0;
@@ -59,7 +60,7 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
 
     @Override
     protected String getAppTitle() {
-        return i18n.get("trajectory.title") + " - JScience";
+        return i18n.get("trajectory.title");
     }
 
     @Override
@@ -98,22 +99,20 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
 
     private void loadData() {
         // Load our JSON resource
-        solarSystem = SolarSystemLoader.load("org/jscience/astronomy/solarsystem.json");
+        solarSystem = SolarSystemLoader.load("org/jscience/physics/astronomy/solarsystem.json");
 
         // Load Real Mars Ephemeris
         try (var is = getClass().getResourceAsStream("data/mars_horizons.txt")) {
             if (is != null) {
-                List<HorizonsEphemerisLoader.EphemerisPoint> marsPoints = HorizonsEphemerisLoader.loadEphemeris(is);
-                System.out.println("Loaded " + marsPoints.size() + " real ephemeris points for Mars.");
-                // In a real app, we would inject these into the Planet object or a
-                // TrajectoryService
-                // For this demo, we can store them to overlay on the graph
-                // TODO: Store in a member variable if needed for visualization override
+                realEphemerisPoints = HorizonsEphemerisLoader.loadEphemeris(is);
+                System.out.println("Loaded " + realEphemerisPoints.size() + " real ephemeris points for Mars.");
             } else {
                 System.err.println("Mars ephemeris file not found.");
+                realEphemerisPoints = new java.util.ArrayList<>();
             }
         } catch (Exception e) {
             e.printStackTrace();
+            realEphemerisPoints = new java.util.ArrayList<>();
         }
     }
 

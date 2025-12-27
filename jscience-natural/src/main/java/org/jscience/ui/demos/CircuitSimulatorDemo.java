@@ -7,21 +7,22 @@ package org.jscience.ui.demos;
 import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.engineering.circuit.CircuitSimulatorViewer;
+import org.jscience.ui.i18n.I18n;
 
 public class CircuitSimulatorDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Engineering";
+        return I18n.getInstance().get("category.engineering");
     }
 
     @Override
     public String getName() {
-        return "Electrical Circuit Designer";
+        return I18n.getInstance().get("CircuitSimulator.title");
     }
 
     @Override
     public String getDescription() {
-        return "Interactive schematic editor for electrical circuits with resistors, capacitors, and power sources.";
+        return I18n.getInstance().get("CircuitSimulator.desc");
     }
 
     @Override

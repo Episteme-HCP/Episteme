@@ -1,22 +1,45 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ */
 package org.jscience.ui.i18n;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
- * Internationalization helper for JScience Core UI.
+ * Internationalization helper for JScience UI.
+ * <p>
+ * Manages multiple resource bundles and provides centralized access to
+ * localized strings. Supports dynamic locale switching.
+ * </p>
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class I18n {
-
+    private static final String CORE_BUNDLE_BASE = "org.jscience.ui.i18n.messages_core";
     private static I18n instance;
-    private static final java.util.List<ResourceBundle> bundles = new java.util.ArrayList<>();
-    private java.util.Locale currentLocale = Locale.getDefault();
 
-    private final java.util.List<String> bundleNames = new java.util.ArrayList<>();
+    private Locale currentLocale = Locale.getDefault();
+    private final List<String> bundleBases = new ArrayList<>();
+    private final Map<String, ResourceBundle> bundles = new HashMap<>();
 
     private I18n() {
-        // Core bundle
-        addBundle("org.jscience.ui.i18n.messages");
+        // Auto-register all known bundles
+        addBundle(CORE_BUNDLE_BASE);
+        // Try to load natural and social bundles (they may not be on classpath)
+        tryAddBundle("org.jscience.ui.i18n.messages_natural");
+        tryAddBundle("org.jscience.ui.i18n.messages_social");
+    }
+
+    private void tryAddBundle(String bundleBase) {
+        try {
+            ResourceBundle.getBundle(bundleBase, currentLocale);
+            addBundle(bundleBase);
+        } catch (MissingResourceException e) {
+            // Bundle not available, skip
+        }
     }
 
     public static synchronized I18n getInstance() {
@@ -26,36 +49,80 @@ public class I18n {
         return instance;
     }
 
-    public void addBundle(String baseName) {
-        if (!bundleNames.contains(baseName)) {
-            bundleNames.add(baseName);
-            loadBundle(baseName);
+    /**
+     * Registers an additional resource bundle base name.
+     * 
+     * @param bundleBase the bundle base name (e.g.,
+     *                   "org.jscience.ui.i18n.messages_natural")
+     */
+    public void addBundle(String bundleBase) {
+        if (!bundleBases.contains(bundleBase)) {
+            bundleBases.add(bundleBase);
+            loadBundle(bundleBase);
         }
     }
 
-    private void loadBundle(String baseName) {
-        try {
-            ResourceBundle b = ResourceBundle.getBundle(baseName, currentLocale);
-            bundles.add(b);
-        } catch (Exception e) {
-            System.err.println("Could not load bundle: " + baseName);
-        }
-    }
-
+    /**
+     * Sets the current locale and reloads all bundles.
+     * 
+     * @param locale the new locale
+     */
     public void setLocale(Locale locale) {
         this.currentLocale = locale;
         bundles.clear();
-        for (String baseName : bundleNames) {
-            loadBundle(baseName);
+        for (String base : bundleBases) {
+            loadBundle(base);
         }
     }
 
+    /**
+     * Gets the current locale.
+     * 
+     * @return current locale
+     */
+    public Locale getLocale() {
+        return currentLocale;
+    }
+
+    /**
+     * Retrieves a localized string for the given key.
+     * Searches all registered bundles in order of registration.
+     * 
+     * @param key the resource key
+     * @return the localized string, or the key itself if not found
+     */
     public String get(String key) {
-        for (ResourceBundle b : bundles) {
-            if (b.containsKey(key)) {
-                return b.getString(key);
+        for (String base : bundleBases) {
+            ResourceBundle bundle = bundles.get(base);
+            if (bundle != null) {
+                try {
+                    return bundle.getString(key);
+                } catch (MissingResourceException e) {
+                    // Try next bundle
+                }
             }
         }
-        return "!" + key + "!";
+        // Return key as fallback
+        return key;
+    }
+
+    /**
+     * Retrieves a localized string with format arguments.
+     * 
+     * @param key  the resource key
+     * @param args format arguments
+     * @return the formatted localized string
+     */
+    public String get(String key, Object... args) {
+        return String.format(get(key), args);
+    }
+
+    private void loadBundle(String bundleBase) {
+        try {
+            ResourceBundle bundle = ResourceBundle.getBundle(bundleBase, currentLocale);
+            bundles.put(bundleBase, bundle);
+        } catch (MissingResourceException e) {
+            System.err.println("I18n: Bundle not found: " + bundleBase + " for locale " + currentLocale);
+        }
     }
 }

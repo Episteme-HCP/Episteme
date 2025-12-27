@@ -8,20 +8,22 @@ import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.computing.ai.GameOfLifeViewer;
 
+import org.jscience.ui.i18n.I18n;
+
 public class GameOfLifeDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Computing";
+        return I18n.getInstance().get("category.computing");
     }
 
     @Override
     public String getName() {
-        return org.jscience.natural.i18n.I18n.getInstance().get("life.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("life.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.natural.i18n.I18n.getInstance().get("life.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("life.desc");
     }
 
     @Override

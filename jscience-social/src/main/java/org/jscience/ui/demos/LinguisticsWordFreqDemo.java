@@ -20,17 +20,17 @@ public class LinguisticsWordFreqDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return org.jscience.social.i18n.I18n.getInstance().get("category.linguistics");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.linguistics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.social.i18n.I18n.getInstance().get("LinguisticsWordFreq.title");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("LinguisticsWordFreq.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.social.i18n.I18n.getInstance().get("LinguisticsWordFreq.desc");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("LinguisticsWordFreq.desc");
     }
 
     @Override
@@ -38,19 +38,19 @@ public class LinguisticsWordFreqDemo implements DemoProvider {
         BorderPane root = new BorderPane();
 
         TextArea input = new TextArea(
-                org.jscience.social.i18n.I18n.getInstance().get("ling.freq.input.placeholder"));
+                org.jscience.ui.i18n.SocialI18n.getInstance().get("ling.freq.input.placeholder"));
         input.setWrapText(true);
         input.setPrefHeight(100);
 
-        Button analyzeBtn = new Button(org.jscience.social.i18n.I18n.getInstance().get("ling.freq.btn.analyze"));
+        Button analyzeBtn = new Button(org.jscience.ui.i18n.SocialI18n.getInstance().get("ling.freq.btn.analyze"));
 
         CategoryAxis xAxis = new CategoryAxis();
-        xAxis.setLabel(org.jscience.social.i18n.I18n.getInstance().get("ling.freq.axis.word"));
+        xAxis.setLabel(org.jscience.ui.i18n.SocialI18n.getInstance().get("ling.freq.axis.word"));
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel(org.jscience.social.i18n.I18n.getInstance().get("ling.freq.axis.freq"));
+        yAxis.setLabel(org.jscience.ui.i18n.SocialI18n.getInstance().get("ling.freq.axis.freq"));
 
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
-        barChart.setTitle(org.jscience.social.i18n.I18n.getInstance().get("ling.freq.chart.title"));
+        barChart.setTitle(org.jscience.ui.i18n.SocialI18n.getInstance().get("ling.freq.chart.title"));
         barChart.setAnimated(true);
 
         analyzeBtn.setOnAction(e -> {
@@ -60,7 +60,7 @@ public class LinguisticsWordFreqDemo implements DemoProvider {
                     .collect(Collectors.groupingBy(w -> w, Collectors.counting()));
 
             XYChart.Series<String, Number> series = new XYChart.Series<>();
-            series.setName(org.jscience.social.i18n.I18n.getInstance().get("ling.freq.series.counts"));
+            series.setName(org.jscience.ui.i18n.SocialI18n.getInstance().get("ling.freq.series.counts"));
 
             counts.entrySet().stream()
                     .sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))
@@ -78,6 +78,7 @@ public class LinguisticsWordFreqDemo implements DemoProvider {
         root.setCenter(barChart);
 
         Scene scene = new Scene(root, 800, 600);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle(getName());
         stage.setScene(scene);
         stage.show();

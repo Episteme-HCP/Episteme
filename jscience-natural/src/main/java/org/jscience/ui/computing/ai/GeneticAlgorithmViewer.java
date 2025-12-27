@@ -12,6 +12,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import org.jscience.ui.i18n.I18n;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -20,7 +21,6 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import org.jscience.natural.i18n.I18n;
 
 /**
  * Genetic Algorithm Visualization: Evolving Pathfinders.
@@ -127,9 +127,10 @@ public class GeneticAlgorithmViewer extends Application {
                         evaluate();
                         selection();
                         generation++;
-                        genLabel.setText("Generation: " + generation);
+                        genLabel.setText(I18n.getInstance().get("geneticalgo.generation") + " " + generation);
                         fitLabel.setText(String.format("Best Fitness: %.2f", bestFitness));
-                        reachLabel.setText("Reached: " + reachedCount + "/" + popSize);
+                        reachLabel.setText(
+                                I18n.getInstance().get("geneticalgo.reached") + " " + reachedCount + "/" + popSize);
                         count = 0;
                     }
                 }
@@ -139,7 +140,7 @@ public class GeneticAlgorithmViewer extends Application {
 
         Scene scene = new Scene(root, 950, 600);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.geneticalgo"));
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.geneticalgo"));
         stage.setScene(scene);
         stage.show();
     }

@@ -16,6 +16,8 @@ import javafx.scene.control.Separator;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.ThemeManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,14 +56,14 @@ public class LorenzViewer extends Application {
         sidebar.setPadding(new Insets(20));
         sidebar.setStyle("-fx-background-color: #222; -fx-text-fill: white;");
 
-        Label title = new Label("Lorenz Attractor");
+        Label title = new Label(I18n.getInstance().get("lorenz.title"));
         title.setTextFill(Color.WHITE);
         title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         sidebar.getChildren().addAll(title, new Separator(),
-                createSlider("σ (Prandtl)", 0, 50, sigma, v -> sigma = v),
-                createSlider("ρ (Rayleigh)", 0, 100, rho, v -> rho = v),
-                createSlider("β (Geometric)", 0, 10, beta, v -> beta = v));
+                createSlider(I18n.getInstance().get("lorenz.param.sigma"), 0, 50, sigma, v -> sigma = v),
+                createSlider(I18n.getInstance().get("lorenz.param.rho"), 0, 100, rho, v -> rho = v),
+                createSlider(I18n.getInstance().get("lorenz.param.beta"), 0, 10, beta, v -> beta = v));
         root.setRight(sidebar);
 
         new AnimationTimer() {
@@ -73,8 +75,9 @@ public class LorenzViewer extends Application {
         }.start();
 
         Scene scene = new Scene(root, 1050, 650);
-        stage.setTitle("JScience - Chaos Theory");
+        stage.setTitle(I18n.getInstance().get("viewer.lorenz"));
         stage.setScene(scene);
+        ThemeManager.getInstance().applyTheme(scene);
         stage.show();
     }
 

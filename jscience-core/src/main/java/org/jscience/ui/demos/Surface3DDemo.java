@@ -8,15 +8,17 @@ import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.mathematics.numbers.real.Surface3DViewer;
 
+import org.jscience.ui.i18n.I18n;
+
 public class Surface3DDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return I18n.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return "3D Surface Plotter";
+        return I18n.getInstance().get("viewer.surface3d");
     }
 
     @Override

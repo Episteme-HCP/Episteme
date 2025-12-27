@@ -26,7 +26,6 @@ import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 
 import java.io.*;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -75,7 +74,7 @@ public class StlMeshLoader {
      * @throws IOException if URL cannot be accessed
      */
     public static MeshView loadFromUrl(String url) throws IOException {
-        try (InputStream is = new BufferedInputStream(new URL(url).openStream())) {
+        try (InputStream is = new BufferedInputStream(java.net.URI.create(url).toURL().openStream())) {
             return load(is);
         }
     }

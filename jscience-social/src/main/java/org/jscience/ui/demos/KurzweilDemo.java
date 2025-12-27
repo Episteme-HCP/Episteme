@@ -62,25 +62,25 @@ public class KurzweilDemo implements DemoProvider {
 
     // Historical milestones
     private static final List<Milestone> MILESTONES = List.of(
-            new Milestone(-3000000, "First stone tools"),
-            new Milestone(-100000, "Language development"),
-            new Milestone(-10000, "Agricultural revolution"),
-            new Milestone(-3000, "Writing invented"),
-            new Milestone(-500, "Philosophy, mathematics"),
-            new Milestone(1, "Common era begins"),
-            new Milestone(1440, "Printing press"),
-            new Milestone(1750, "Industrial Revolution"),
-            new Milestone(1879, "Electric light bulb"),
-            new Milestone(1903, "First powered flight"),
-            new Milestone(1945, "First computer (ENIAC)"),
-            new Milestone(1969, "Moon landing"),
-            new Milestone(1971, "Microprocessor"),
-            new Milestone(1989, "World Wide Web"),
-            new Milestone(2007, "Smartphone revolution"),
-            new Milestone(2012, "Deep learning breakthrough"),
-            new Milestone(2022, "ChatGPT / Large Language Models"),
-            new Milestone(2025, "Present day"),
-            new Milestone(2045, "Predicted Singularity"));
+            new Milestone(-3000000, "kurzweil.milestone.tools"),
+            new Milestone(-100000, "kurzweil.milestone.language"),
+            new Milestone(-10000, "kurzweil.milestone.agriculture"),
+            new Milestone(-3000, "kurzweil.milestone.writing"),
+            new Milestone(-500, "kurzweil.milestone.philosophy"),
+            new Milestone(1, "kurzweil.milestone.common"),
+            new Milestone(1440, "kurzweil.milestone.print"),
+            new Milestone(1750, "kurzweil.milestone.industrial"),
+            new Milestone(1879, "kurzweil.milestone.bulb"),
+            new Milestone(1903, "kurzweil.milestone.flight"),
+            new Milestone(1945, "kurzweil.milestone.computer"),
+            new Milestone(1969, "kurzweil.milestone.moon"),
+            new Milestone(1971, "kurzweil.milestone.micro"),
+            new Milestone(1989, "kurzweil.milestone.www"),
+            new Milestone(2007, "kurzweil.milestone.phone"),
+            new Milestone(2012, "kurzweil.milestone.dl"),
+            new Milestone(2022, "kurzweil.milestone.llm"),
+            new Milestone(2025, "kurzweil.milestone.now"),
+            new Milestone(2045, "kurzweil.milestone.singularity"));
 
     private Canvas linearCanvas;
     private Canvas logCanvas;
@@ -91,17 +91,17 @@ public class KurzweilDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return org.jscience.social.i18n.I18n.getInstance().get("category.economics");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.economics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.social.i18n.I18n.getInstance().get("kurzweil.title");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.social.i18n.I18n.getInstance().get("kurzweil.desc");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.desc");
     }
 
     @Override
@@ -110,7 +110,7 @@ public class KurzweilDemo implements DemoProvider {
         root.getStyleClass().add("dark-viewer-root");
 
         // Title
-        Label title = new Label(org.jscience.social.i18n.I18n.getInstance().get("kurzweil.header"));
+        Label title = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.header"));
         title.setFont(Font.font("System", FontWeight.BOLD, 22));
         title.getStyleClass().add("dark-label-accent");
         title.setPadding(new Insets(15));
@@ -124,7 +124,7 @@ public class KurzweilDemo implements DemoProvider {
 
         // Linear timeline
         VBox linearBox = new VBox(5);
-        Label linearLabel = new Label("Linear (Calendar) Time");
+        Label linearLabel = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.label.linear"));
         linearLabel.getStyleClass().add("dark-label");
         linearLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
         linearCanvas = new Canvas(WIDTH - 250, 180);
@@ -132,7 +132,7 @@ public class KurzweilDemo implements DemoProvider {
 
         // Logarithmic timeline
         VBox logBox = new VBox(5);
-        Label logLabel = new Label("Kurzweil (Exponential) Time - Paradigm Shifts Accelerate");
+        Label logLabel = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.label.log"));
         logLabel.getStyleClass().add("dark-label");
         logLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
         logCanvas = new Canvas(WIDTH - 250, 180);
@@ -147,11 +147,7 @@ public class KurzweilDemo implements DemoProvider {
 
         // Description at bottom
         TextArea description = new TextArea(
-                "Ray Kurzweil's Law of Accelerating Returns states that technological progress " +
-                        "is exponential, not linear. Each paradigm shift enables the next one faster.\n\n" +
-                        "• Linear time: Calendar years pass at constant rate\n" +
-                        "• Kurzweil time: Subjective technological progress accelerates exponentially\n" +
-                        "• The Singularity: When technology changes so fast humans cannot keep up (~2045)");
+                org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.desc.text"));
         description.setWrapText(true);
         description.setEditable(false);
         description.setPrefHeight(100);
@@ -193,12 +189,12 @@ public class KurzweilDemo implements DemoProvider {
         sidebar.getStyleClass().add("dark-viewer-sidebar");
 
         // Dual clocks
-        Label clockTitle = new Label("Dual Clocks");
+        Label clockTitle = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.sidebar.clock"));
         clockTitle.getStyleClass().add("dark-label");
         clockTitle.setFont(Font.font("System", FontWeight.BOLD, 14));
 
         VBox linearClock = new VBox(5);
-        Label linearClockLabel = new Label("Real Time (s):");
+        Label linearClockLabel = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.sidebar.linear"));
         linearClockLabel.setTextFill(Color.LIGHTGRAY);
         realTimeLabel = new Label("0.00");
         realTimeLabel.setFont(Font.font("Monospace", FontWeight.BOLD, 24));
@@ -206,21 +202,21 @@ public class KurzweilDemo implements DemoProvider {
         linearClock.getChildren().addAll(linearClockLabel, realTimeLabel);
 
         VBox kurzweilClock = new VBox(5);
-        Label kurzweilClockLabel = new Label("Kurzweil Time:");
+        Label kurzweilClockLabel = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.sidebar.kurzweil"));
         kurzweilClockLabel.setTextFill(Color.LIGHTGRAY);
         kurzweilTimeLabel = new Label("0.00");
         kurzweilTimeLabel.setFont(Font.font("Monospace", FontWeight.BOLD, 24));
         kurzweilTimeLabel.setTextFill(Color.ORANGE);
         kurzweilClock.getChildren().addAll(kurzweilClockLabel, kurzweilTimeLabel);
 
-        accelerationLabel = new Label("Acceleration: 1.00x");
+        accelerationLabel = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.sidebar.accel") + " 1.00x");
         accelerationLabel.setTextFill(Color.YELLOW);
         accelerationLabel.setFont(Font.font("System", 12));
 
         // Controls
         Separator sep = new Separator();
 
-        Label controlLabel = new Label("Acceleration Base:");
+        Label controlLabel = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.sidebar.base"));
         controlLabel.getStyleClass().add("dark-label-muted");
 
         Slider accelSlider = new Slider(1.1, 5.0, accelerationFactor);
@@ -231,7 +227,7 @@ public class KurzweilDemo implements DemoProvider {
             accelerationFactor = nv.doubleValue();
         });
 
-        Button resetBtn = new Button("Reset");
+        Button resetBtn = new Button(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.btn.reset"));
         resetBtn.setMaxWidth(Double.MAX_VALUE);
         resetBtn.getStyleClass().add("accent-button-blue");
         resetBtn.setOnAction(e -> {
@@ -239,7 +235,7 @@ public class KurzweilDemo implements DemoProvider {
             kurzweilTime = 0;
         });
 
-        ToggleButton pauseBtn = new ToggleButton("Pause");
+        ToggleButton pauseBtn = new ToggleButton(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.btn.pause"));
         pauseBtn.setMaxWidth(Double.MAX_VALUE);
         pauseBtn.setOnAction(e -> running = !pauseBtn.isSelected());
 
@@ -258,7 +254,8 @@ public class KurzweilDemo implements DemoProvider {
 
         realTimeLabel.setText(String.format("%.2f s", realTimeSeconds));
         kurzweilTimeLabel.setText(String.format("%.2f", kurzweilTime));
-        accelerationLabel.setText(String.format("Acceleration: %.2fx", acceleration));
+        accelerationLabel.setText(String.format(
+                org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.sidebar.accel") + " %.2fx", acceleration));
     }
 
     private void drawTimelines() {
@@ -295,7 +292,8 @@ public class KurzweilDemo implements DemoProvider {
             gc.save();
             gc.translate(x, y - 10);
             gc.rotate(-45);
-            gc.fillText(m.label.substring(0, Math.min(20, m.label.length())), 0, 0);
+            String label = org.jscience.ui.i18n.SocialI18n.getInstance().get(m.label);
+            gc.fillText(label.substring(0, Math.min(20, label.length())), 0, 0);
             gc.restore();
         }
 
@@ -338,14 +336,15 @@ public class KurzweilDemo implements DemoProvider {
             gc.save();
             gc.translate(x, y - 12);
             gc.rotate(-45);
-            gc.fillText(m.label.substring(0, Math.min(18, m.label.length())), 0, 0);
+            String label = org.jscience.ui.i18n.SocialI18n.getInstance().get(m.label);
+            gc.fillText(label.substring(0, Math.min(18, label.length())), 0, 0);
             gc.restore();
         }
 
         gc.setFill(Color.ORANGE);
         gc.setFont(Font.font("System", 11));
-        gc.fillText("← More change per unit time (Singularity)", w - 250, h - 15);
-        gc.fillText("Distant past →", 30, h - 15);
+        gc.fillText(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.chart.more"), w - 250, h - 15);
+        gc.fillText(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.chart.past"), 30, h - 15);
     }
 
     private static record Milestone(int year, String label) {

@@ -6,22 +6,24 @@ package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
-import org.jscience.ui.biology.medical.VitalMonitorViewer;
+import org.jscience.ui.devices.VitalMonitorViewer;
+
+import org.jscience.ui.i18n.I18n;
 
 public class VitalMonitorDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Biology";
+        return I18n.getInstance().get("category.biology");
     }
 
     @Override
     public String getName() {
-        return org.jscience.natural.i18n.I18n.getInstance().get("vital.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("vital.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.natural.i18n.I18n.getInstance().get("vital.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("vital.desc");
     }
 
     @Override

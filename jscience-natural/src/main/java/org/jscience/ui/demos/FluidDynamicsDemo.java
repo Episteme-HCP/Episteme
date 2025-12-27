@@ -7,21 +7,22 @@ package org.jscience.ui.demos;
 import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.physics.fluids.FluidDynamicsViewer;
+import org.jscience.ui.i18n.I18n;
 
 public class FluidDynamicsDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Physics";
+        return I18n.getInstance().get("category.physics");
     }
 
     @Override
     public String getName() {
-        return "Fluid Dynamics";
+        return I18n.getInstance().get("FluidDynamics.title");
     }
 
     @Override
     public String getDescription() {
-        return "Lattice Boltzmann simulation of fluid flow.";
+        return I18n.getInstance().get("FluidDynamics.desc");
     }
 
     @Override

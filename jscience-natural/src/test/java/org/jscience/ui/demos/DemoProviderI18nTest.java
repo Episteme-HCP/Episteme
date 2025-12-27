@@ -4,7 +4,7 @@
  */
 package org.jscience.ui.demos;
 
-import org.jscience.natural.i18n.I18n;
+import org.jscience.ui.i18n.I18n;
 import org.jscience.ui.DemoProvider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -137,7 +137,7 @@ public class DemoProviderI18nTest {
     class I18nPropertyFileParity {
 
         private static final String[] LANGUAGES = { "en", "fr", "es", "de", "zh" };
-        private static final String RESOURCE_PATH = "/org/jscience/natural/i18n/messages_%s.properties";
+        private static final String RESOURCE_PATH = "/org/jscience/ui/i18n/messages_natural_%s.properties";
 
         @Test
         void allLanguageFilesExist() {

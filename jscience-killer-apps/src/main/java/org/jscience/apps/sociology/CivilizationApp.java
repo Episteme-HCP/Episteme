@@ -50,7 +50,12 @@ public class CivilizationApp extends KillerAppBase {
 
     @Override
     protected String getAppTitle() {
-        return i18n.get("civilization.title") + " - JScience";
+        return i18n.get("civilization.title");
+    }
+
+    @Override
+    public String getDescription() {
+        return i18n.get("civilization.desc");
     }
 
     @Override
@@ -109,21 +114,24 @@ public class CivilizationApp extends KillerAppBase {
 
         HBox sliders = new HBox(20);
 
-        sliders.getChildren().add(createSlider("Consumption Rate", 0.5, 5.0, 1.0, v -> consumptionPerCapita = v));
-        sliders.getChildren().add(createSlider("Birth Rate", 0.0, 0.2, 0.05, v -> birthRateBase = v));
-        sliders.getChildren().add(createSlider("Tech Innovation", 0.0, 0.05, 0.0, v -> innovationRate = v));
+        sliders.getChildren().add(
+                createSlider(i18n.get("civilization.label.consumption"), 0.5, 5.0, 1.0, v -> consumptionPerCapita = v));
+        sliders.getChildren()
+                .add(createSlider(i18n.get("civilization.label.birth"), 0.0, 0.2, 0.05, v -> birthRateBase = v));
+        sliders.getChildren()
+                .add(createSlider(i18n.get("civilization.label.innovation"), 0.0, 0.05, 0.0, v -> innovationRate = v));
 
         HBox buttons = new HBox(10);
-        Button btnReset = new Button("Reset Simulation");
+        Button btnReset = new Button(i18n.get("civilization.button.reset"));
         btnReset.setOnAction(e -> reset());
 
-        ToggleButton btnPause = new ToggleButton("Run / Pause");
+        ToggleButton btnPause = new ToggleButton(i18n.get("civilization.button.run"));
         btnPause.setSelected(false);
         btnPause.selectedProperty().addListener((o, ov, nv) -> running = nv);
 
         buttons.getChildren().addAll(btnReset, btnPause);
 
-        box.getChildren().addAll(new Label("Simulation Parameters"), sliders, buttons);
+        box.getChildren().addAll(new Label(i18n.get("civilization.label.params")), sliders, buttons);
         return box;
     }
 
@@ -214,16 +222,16 @@ public class CivilizationApp extends KillerAppBase {
 
     private void updateStatus(double dPop) {
         if (population <= 10) {
-            statusLabel.setText("EXTINCT");
+            statusLabel.setText(i18n.get("civilization.status.extinct"));
             statusLabel.setTextFill(Color.BLACK);
         } else if (dPop < -10) {
-            statusLabel.setText("COLLAPSE");
+            statusLabel.setText(i18n.get("civilization.status.collapse"));
             statusLabel.setTextFill(Color.RED);
         } else if (dPop < 0) {
-            statusLabel.setText("DECLINING");
+            statusLabel.setText(i18n.get("civilization.status.declining"));
             statusLabel.setTextFill(Color.ORANGE);
         } else {
-            statusLabel.setText("THRIVING");
+            statusLabel.setText(i18n.get("civilization.status.thriving"));
             statusLabel.setTextFill(Color.GREEN);
         }
     }
@@ -236,7 +244,7 @@ public class CivilizationApp extends KillerAppBase {
         popSeries.getData().clear();
         resSeries.getData().clear();
         polSeries.getData().clear();
-        statusLabel.setText("STABLE");
+        statusLabel.setText(i18n.get("civilization.status.stable"));
     }
 
     public static void main(String[] args) {

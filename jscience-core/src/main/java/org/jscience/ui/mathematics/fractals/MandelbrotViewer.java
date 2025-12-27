@@ -12,6 +12,8 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.ThemeManager;
 
 /**
  * Interactive Mandelbrot Set Viewer.
@@ -47,7 +49,8 @@ public class MandelbrotViewer extends Application {
         StackPane canvasPane = new StackPane(canvas);
 
         // Controls
-        javafx.scene.control.ToggleButton modeBtn = new javafx.scene.control.ToggleButton("Julia Set Mode");
+        javafx.scene.control.ToggleButton modeBtn = new javafx.scene.control.ToggleButton(
+                I18n.getInstance().get("mandelbrot.mode.julia"));
         modeBtn.setTranslateY(20);
         modeBtn.setTranslateX(20);
         javafx.scene.layout.VBox controls = new javafx.scene.layout.VBox(modeBtn);
@@ -146,8 +149,9 @@ public class MandelbrotViewer extends Application {
             render();
         });
 
-        stage.setTitle("JScience Fractal Explorer - Julia/Mandelbrot");
+        stage.setTitle(I18n.getInstance().get("viewer.mandelbrot"));
         stage.setScene(scene);
+        ThemeManager.getInstance().applyTheme(scene);
         stage.show();
     }
 

@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
  * </ul>
  * </p>
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -76,7 +77,7 @@ public class StarCatalog implements MiniCatalog<StarCatalog.Star> {
      */
     private void loadFromJSON() {
         try {
-            InputStream is = getClass().getResourceAsStream("/org/jscience/astronomy/stars.json");
+            InputStream is = getClass().getResourceAsStream("/org/jscience/physics/astronomy/stars.json");
             if (is == null) {
                 System.err.println("Could not load stars.json");
                 return;

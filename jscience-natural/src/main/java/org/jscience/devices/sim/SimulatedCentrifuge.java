@@ -22,15 +22,6 @@ public class SimulatedCentrifuge extends SimulatedDevice implements Centrifuge {
     }
 
     @Override
-    public void start(Real rpm) {
-        if (rpm.compareTo(maxRPM) > 0) {
-            throw new IllegalArgumentException("RPM exceeds maximum: " + maxRPM);
-        }
-        this.currentRPM = rpm;
-        this.running = true;
-    }
-
-    @Override
     public void stop() {
         this.currentRPM = Real.ZERO;
         this.running = false;
@@ -61,11 +52,31 @@ public class SimulatedCentrifuge extends SimulatedDevice implements Centrifuge {
 
     @Override
     public Real getCurrentRPM() {
+        if (running && currentRPM.doubleValue() < targetRPM.doubleValue()) {
+            // Mock acceleration: 50 RPM per call for simulation speed
+            double next = Math.min(targetRPM.doubleValue(), currentRPM.doubleValue() + 50);
+            currentRPM = Real.of(next);
+        } else if (!running && currentRPM.doubleValue() > 0) {
+            // Mock deceleration
+            double next = Math.max(0, currentRPM.doubleValue() - 50);
+            currentRPM = Real.of(next);
+        }
         return currentRPM;
+    }
+
+    private Real targetRPM = Real.ZERO;
+
+    @Override
+    public void start(Real rpm) {
+        if (rpm.compareTo(maxRPM) > 0) {
+            throw new IllegalArgumentException("RPM exceeds maximum: " + maxRPM);
+        }
+        this.targetRPM = rpm;
+        this.running = true;
     }
 
     @Override
     public boolean isRunning() {
-        return running;
+        return running || currentRPM.doubleValue() > 0;
     }
 }

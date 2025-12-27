@@ -11,21 +11,23 @@ import org.jscience.ui.chemistry.ChemicalReactionViewer;
 /**
  * Demo provider for the Chemical Reaction Parser.
  */
+import org.jscience.ui.i18n.I18n;
+
 public class ChemicalReactionDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return "Chemistry";
+        return I18n.getInstance().get("category.chemistry");
     }
 
     @Override
     public String getName() {
-        return "Chemical Reaction Parser";
+        return I18n.getInstance().get("ChemicalReaction.title");
     }
 
     @Override
     public String getDescription() {
-        return "Parse and analyze chemical equations, check if reactions are balanced, and view element counts.";
+        return I18n.getInstance().get("ChemicalReaction.desc");
     }
 
     @Override

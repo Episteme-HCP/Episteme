@@ -17,7 +17,7 @@ import javafx.scene.transform.Translate;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.jscience.biology.loaders.StlMeshLoader;
-import org.jscience.natural.i18n.I18n;
+import org.jscience.ui.i18n.I18n;
 
 import java.io.File;
 
@@ -69,7 +69,7 @@ public class HumanBodyViewer extends Application {
 
         Scene scene = new Scene(root, 1200, 800);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.humanbody"));
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbody"));
         stage.setScene(scene);
         stage.show();
     }
@@ -193,11 +193,11 @@ public class HumanBodyViewer extends Application {
 
         infoLabel = new Label(I18n.getInstance().get("humanbody.clickinfo"));
         infoLabel.setWrapText(true);
-        infoLabel.setStyle("-fx-text-fill: #aaa;");
+        infoLabel.setStyle("-fx-text-fill: #cccccc;");
 
         // Instructions
         Label instructLabel = new Label(I18n.getInstance().get("humanbody.controls"));
-        instructLabel.setStyle("-fx-text-fill: #666; -fx-font-size: 11px;");
+        instructLabel.setStyle("-fx-text-fill: #cccccc; -fx-font-size: 11px;");
 
         // Load STL Model section
         Label loadTitle = new Label(I18n.getInstance().get("humanbody.loadmodel"));
@@ -269,23 +269,68 @@ public class HumanBodyViewer extends Application {
     }
 
     private void build3DBody() {
-        // Build skeleton
-        buildSkeleton();
+        // Try loading Z-Anatomy OBJ models first, fallback to procedural geometry
+        if (!tryLoadObjModel("/org/jscience/medicine/anatomy/models/SkeletalSystem100.obj", skeletonLayer,
+                Color.IVORY)) {
+            buildSkeleton();
+        }
 
-        // Build muscles
-        buildMuscles();
+        if (!tryLoadObjModel("/org/jscience/medicine/anatomy/models/MuscularSystem100.obj", muscleLayer,
+                Color.INDIANRED)) {
+            buildMuscles();
+        }
 
-        // Build organs
-        buildOrgans();
+        if (!tryLoadObjModel("/org/jscience/medicine/anatomy/models/VisceralSystem100.obj", organLayer, Color.CORAL)) {
+            buildOrgans();
+        }
 
-        // Build nervous system
-        buildNervousSystem();
+        if (!tryLoadObjModel("/org/jscience/medicine/anatomy/models/NervousSystem100.obj", nervousLayer, Color.GOLD)) {
+            buildNervousSystem();
+        }
 
-        // Build circulatory system
-        buildCirculatorySystem();
+        if (!tryLoadObjModel("/org/jscience/medicine/anatomy/models/CardioVascular41.obj", circulatoryLayer,
+                Color.DARKRED)) {
+            buildCirculatorySystem();
+        }
 
-        // Build skin
+        // Skin is always procedural (semi-transparent)
         buildSkin();
+    }
+
+    /**
+     * Attempts to load an OBJ model from resources into the specified layer.
+     * 
+     * @return true if successful, false if model not found
+     */
+    private boolean tryLoadObjModel(String resourcePath, Group layer, Color color) {
+        try {
+            java.net.URL url = getClass().getResource(resourcePath);
+            if (url == null) {
+                return false;
+            }
+            Group model = org.jscience.biology.loaders.ObjMeshLoader.load(url);
+            if (model.getChildren().isEmpty()) {
+                return false;
+            }
+            // Apply material color
+            PhongMaterial mat = new PhongMaterial(color);
+            mat.setSpecularColor(Color.WHITE);
+            for (javafx.scene.Node node : model.getChildren()) {
+                if (node instanceof MeshView) {
+                    ((MeshView) node).setMaterial(mat);
+                }
+            }
+            // Scale and center the model
+            model.setScaleX(0.5);
+            model.setScaleY(0.5);
+            model.setScaleZ(0.5);
+            layer.getChildren().add(model);
+            System.out.println("Loaded Z-Anatomy model: " + resourcePath);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Failed to load OBJ model " + resourcePath + ": " + e.getMessage());
+            return false;
+        }
     }
 
     private void buildSkeleton() {

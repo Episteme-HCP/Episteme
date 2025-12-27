@@ -4,7 +4,6 @@
  */
 package org.jscience.ui.computing.ai;
 
-import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -12,6 +11,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import org.jscience.ui.i18n.I18n;
 import javafx.scene.control.Slider;
 
 import javafx.scene.layout.BorderPane;
@@ -77,16 +77,17 @@ public class GameOfLifeViewer extends Application {
         controls.setPadding(new Insets(10));
         controls.getStyleClass().add("dark-viewer-controls");
 
-        Button btnPlay = new Button("Play");
-        Button btnStep = new Button("Step");
-        Button btnClear = new Button("Clear");
-        Button btnRandom = new Button("Randomize");
+        Button btnPlay = new Button(I18n.getInstance().get("life.btn.play"));
+        Button btnStep = new Button(I18n.getInstance().get("life.btn.step"));
+        Button btnClear = new Button(I18n.getInstance().get("life.btn.clear"));
+        Button btnRandom = new Button(I18n.getInstance().get("life.btn.random"));
 
         Slider speedSlider = new Slider(10, 500, 50); // ms delay
         speedSlider.setShowTickLabels(false);
         speedSlider.setShowTickMarks(false);
-        Label speedLabel = new Label("Speed");
-        speedLabel.setTextFill(Color.WHITE);
+        Label speedLabel = new Label(I18n.getInstance().get("life.speed"));
+        Label speedValue = new Label(String.format("%.0f", speedSlider.getValue()));
+        speedValue.setMinWidth(30);
 
         btnPlay.setOnAction(e -> {
             paused = !paused;
@@ -95,14 +96,14 @@ public class GameOfLifeViewer extends Application {
 
         btnStep.setOnAction(e -> {
             paused = true;
-            btnPlay.setText("Play");
+            btnPlay.setText(I18n.getInstance().get("life.btn.play"));
             life.nextGeneration();
             draw();
         });
 
         btnClear.setOnAction(e -> {
             paused = true;
-            btnPlay.setText("Play");
+            btnPlay.setText(I18n.getInstance().get("life.btn.play"));
             life = new ConwayLife(WIDTH, HEIGHT); // Reset
             draw();
         });
@@ -113,11 +114,12 @@ public class GameOfLifeViewer extends Application {
             // Invert: Left (10) = slow (500ms), Right (500) = fast (10ms)
             double invertedDelay = 510 - val.doubleValue();
             updateInterval = (long) (invertedDelay * 1_000_000);
+            speedValue.setText(String.format("%.0f", val.doubleValue()));
         });
         // Initialize slider to match default updateInterval (460ms -> slider value 50)
         speedSlider.setValue(50); // Middle-slow, actual delay = 460ms
 
-        controls.getChildren().addAll(btnPlay, btnStep, btnClear, btnRandom, speedLabel, speedSlider);
+        controls.getChildren().addAll(btnPlay, btnStep, btnClear, btnRandom, speedLabel, speedSlider, speedValue);
         root.setBottom(controls);
 
         Scene scene = new Scene(root);
@@ -136,7 +138,7 @@ public class GameOfLifeViewer extends Application {
             }
         }.start();
 
-        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.gameoflife"));
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.gameoflife"));
         stage.setScene(scene);
         stage.show();
         draw();

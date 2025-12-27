@@ -7,7 +7,12 @@ package org.jscience.ui.biology.genetics;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+
+import org.jscience.ui.i18n.I18n;
 import javafx.scene.layout.*;
 
 import javafx.stage.Stage;
@@ -28,18 +33,22 @@ public class SequenceAlignmentViewer extends Application {
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(20));
-        root.setStyle("-fx-background-color: #1a1a2e;");
+        root.getStyleClass().add("dark-viewer-root");
 
         // Input
         VBox inputs = new VBox(10);
         seq1Field = new TextField("GATTACA");
         seq2Field = new TextField("GCATGCU");
-        Button alignBtn = new Button("Align Sequences");
+        Button alignBtn = new Button(I18n.getInstance().get("align.btn.align"));
         alignBtn.setMaxWidth(Double.MAX_VALUE);
-        alignBtn.setStyle("-fx-background-color: #3f51b5; -fx-text-fill: white;");
         alignBtn.setOnAction(e -> runAlignment());
 
-        inputs.getChildren().addAll(new Label("Sequence 1:"), seq1Field, new Label("Sequence 2:"), seq2Field, alignBtn);
+        Label l1 = new Label(I18n.getInstance().get("align.seq1"));
+        l1.getStyleClass().add("dark-label");
+        Label l2 = new Label(I18n.getInstance().get("align.seq2"));
+        l2.getStyleClass().add("dark-label");
+
+        inputs.getChildren().addAll(l1, seq1Field, l2, seq2Field, alignBtn);
         root.setTop(inputs);
 
         // Result Matrix
@@ -55,13 +64,17 @@ public class SequenceAlignmentViewer extends Application {
         // Alignment result
         VBox results = new VBox(5);
         results.setPadding(new Insets(10));
-        results.setStyle("-fx-background-color: #16213e; -fx-border-color: #333;");
-        scoreLabel = new Label("Score: 0");
-        scoreLabel.setStyle("-fx-text-fill: #00d9ff; -fx-font-size: 14px;");
-        align1Label = new Label("---");
+        results.getStyleClass().add("dark-panel");
+
+        scoreLabel = new Label(String.format(I18n.getInstance().get("align.score.fmt"), 0));
+        scoreLabel.getStyleClass().add("dark-label-info");
+
+        align1Label = new Label(I18n.getInstance().get("align.default"));
         align2Label = new Label("---");
-        align1Label.setStyle("-fx-font-family: monospace; -fx-font-size: 16px; -fx-text-fill: lime;");
-        align2Label.setStyle("-fx-font-family: monospace; -fx-font-size: 16px; -fx-text-fill: cyan;");
+
+        align1Label.getStyleClass().add("dark-label-mono");
+        align2Label.getStyleClass().add("dark-label-mono");
+
         results.getChildren().addAll(scoreLabel, align1Label, align2Label);
         root.setBottom(results);
 
@@ -69,7 +82,7 @@ public class SequenceAlignmentViewer extends Application {
 
         Scene scene = new Scene(root, 800, 600);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle("DNA Sequence Alignment");
+        stage.setTitle(I18n.getInstance().get("align.title"));
         stage.setScene(scene);
         stage.show();
     }
@@ -121,7 +134,7 @@ public class SequenceAlignmentViewer extends Application {
             }
         }
 
-        scoreLabel.setText("Score: " + score[n][m]);
+        scoreLabel.setText(String.format(I18n.getInstance().get("align.score.fmt"), score[n][m]));
         align1Label.setText(a1.reverse().toString());
         align2Label.setText(a2.reverse().toString());
 
@@ -142,7 +155,7 @@ public class SequenceAlignmentViewer extends Application {
                 Label l = new Label(String.valueOf(score[i][j]));
                 l.setPrefSize(40, 30);
                 l.setAlignment(javafx.geometry.Pos.CENTER);
-                l.setStyle("-fx-border-color: #444; -fx-background-color: #2a2a4a; -fx-text-fill: white;");
+                l.getStyleClass().add("dark-cell");
                 matrixGrid.add(l, i + 1, j + 1);
             }
         }
@@ -150,7 +163,7 @@ public class SequenceAlignmentViewer extends Application {
 
     private Label createHeaderLabel(String text) {
         Label l = new Label(text);
-        l.setStyle("-fx-font-weight: bold; -fx-text-fill: #3f51b5;");
+        l.getStyleClass().add("dark-header");
         l.setPrefSize(40, 30);
         l.setAlignment(javafx.geometry.Pos.CENTER);
         return l;

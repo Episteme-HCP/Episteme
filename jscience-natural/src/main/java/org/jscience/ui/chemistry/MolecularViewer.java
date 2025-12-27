@@ -163,7 +163,7 @@ public class MolecularViewer extends Application {
         detailLabel.setWrapText(true);
         detailLabel.setStyle("-fx-font-family: 'Consolas', monospace; -fx-font-size: 11px;");
 
-        Label header = new Label("Molecular Viewer");
+        Label header = new Label(org.jscience.ui.i18n.I18n.getInstance().get("MolecularViewer.title"));
         header.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
         VBox legend = createLegend();
@@ -182,7 +182,7 @@ public class MolecularViewer extends Application {
         loadModel("Benzene (Orbitals)");
 
         Scene scene = new Scene(root, 1024, 768);
-        primaryStage.setTitle("JScience Molecular Viewer");
+        primaryStage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("MolecularViewer.title"));
         primaryStage.setScene(scene);
         primaryStage.show();
     }

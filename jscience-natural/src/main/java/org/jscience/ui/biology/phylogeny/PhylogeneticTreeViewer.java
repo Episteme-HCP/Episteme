@@ -34,10 +34,11 @@ public class PhylogeneticTreeViewer extends Application {
 
         Node(String name) {
             this.name = name;
-            // Random traits for demo
-            trait1 = Math.random();
-            trait2 = Math.random();
-            trait3 = Math.random();
+            // Deterministic traits based on name hash for stability
+            int h = Math.abs(name.hashCode());
+            trait1 = (h % 100) / 100.0;
+            trait2 = ((h / 100) % 100) / 100.0;
+            trait3 = ((h / 10000) % 100) / 100.0;
         }
 
         void add(Node n) {
@@ -65,7 +66,7 @@ public class PhylogeneticTreeViewer extends Application {
                 minY = Math.min(minY, child.y);
                 maxY = Math.max(maxY, child.y);
             }
-            node.x = 50 + depth * 100;
+            node.x = 50 + depth * 150; // Widen tree to fit labels
             node.y = (minY + maxY) / 2;
         }
     }
@@ -99,7 +100,6 @@ public class PhylogeneticTreeViewer extends Application {
                 currentStart = childEnd;
             }
             node.angle = (myMinAngle + myMaxAngle) / 2;
-            // Polarity fix: Nodes position themselves at mean angle of children
         }
 
         // Convert Polar to Cartesian for rendering convenience
@@ -116,19 +116,23 @@ public class PhylogeneticTreeViewer extends Application {
         return sum;
     }
 
+    private Node treeRoot;
+
     @Override
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
+        root.getStyleClass().add("dark-viewer-root"); // Theme background
+
         Canvas canvas = new Canvas(900, 700);
         root.setCenter(canvas);
 
-        Label infoPanel = new Label("Click Node for Details | Toggle View");
+        Label infoPanel = new Label("Click Node for Details | Heatmap: Simulated Genetic Markers");
         infoPanel.getStyleClass().add("dark-viewer-sidebar");
 
         javafx.scene.control.Button toggleBtn = new javafx.scene.control.Button("Switch View (Linear/Radial)");
         toggleBtn.setOnAction(e -> {
             radialMode = !radialMode;
-            updateLayoutAndDraw(canvas, infoPanel.getText());
+            updateLayoutAndDraw(canvas);
         });
 
         javafx.scene.layout.HBox controls = new javafx.scene.layout.HBox(10, toggleBtn, infoPanel);
@@ -136,8 +140,7 @@ public class PhylogeneticTreeViewer extends Application {
         root.setBottom(controls);
 
         this.treeRoot = buildSampleTree();
-        // totalLeaves = countLeaves(treeRoot); // Unused
-        updateLayoutAndDraw(canvas, "");
+        updateLayoutAndDraw(canvas);
 
         canvas.setOnMouseClicked(e -> {
             Node clicked = findNode(treeRoot, e.getX(), e.getY());
@@ -148,21 +151,19 @@ public class PhylogeneticTreeViewer extends Application {
                 drawTree(canvas.getGraphicsContext2D(), treeRoot);
             } else {
                 selectedNode = null;
-                infoPanel.setText("Click Node for Details | Toggle View");
+                infoPanel.setText("Click Node for Details | Heatmap: Simulated Genetic Markers");
                 drawTree(canvas.getGraphicsContext2D(), treeRoot);
             }
         });
 
         Scene scene = new Scene(root, 900, 750);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.phylogeny"));
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogeny"));
         stage.setScene(scene);
         stage.show();
     }
 
-    private Node treeRoot;
-
-    private void updateLayoutAndDraw(Canvas canvas, String info) {
+    private void updateLayoutAndDraw(Canvas canvas) {
         leafCounter = 0;
         if (radialMode) {
             layoutRadial(treeRoot, 0, Math.PI * 2, 50);
@@ -180,28 +181,45 @@ public class PhylogeneticTreeViewer extends Application {
             if (found != null)
                 return found;
         }
-        return null; // Simplified: usually check heatmap area too
+        return null;
     }
 
     private void drawTree(GraphicsContext gc, Node node) {
         // Clear background
         if (node == treeRoot) {
-            gc.setFill(Color.web("#1a1a2e"));
-            gc.fillRect(0, 0, 900, 700);
+            gc.clearRect(0, 0, 900, 700);
+
+            // Draw Headers for Linear Mode
+            if (!radialMode) {
+                gc.setFill(Color.GRAY);
+                gc.fillText("Marker 1", 620, 20);
+                gc.fillText("Marker 2", 640, 20);
+                gc.fillText("Marker 3", 660, 20);
+            }
         }
 
-        gc.setStroke(Color.web("#666"));
+        gc.setStroke(Color.web("#888"));
         gc.setLineWidth(1);
 
         // Draw Links
         for (Node child : node.children) {
             if (radialMode) {
-                // Curved lines for radial? Or straight for simplicity
                 gc.strokeLine(node.x, node.y, child.x, child.y);
             } else {
                 // Elbow
                 gc.strokeLine(node.x, node.y, node.x, child.y);
                 gc.strokeLine(node.x, child.y, child.x, child.y);
+
+                // Add distance label (simulated distance)
+                double midX = (node.x + child.x) / 2;
+                double midY = child.y; // horizontal part
+                String dist = String.format("%.1f", Math.abs(child.x - node.x) / 100.0);
+
+                gc.save();
+                gc.setFill(Color.web("#aaa"));
+                gc.setFont(javafx.scene.text.Font.font(9));
+                gc.fillText(dist, node.x + 5, child.y - 3);
+                gc.restore();
             }
             drawTree(gc, child);
         }
@@ -211,32 +229,29 @@ public class PhylogeneticTreeViewer extends Application {
             gc.setFill(Color.RED);
             gc.fillOval(node.x - 6, node.y - 6, 12, 12);
         } else {
-            gc.setFill(node.children.isEmpty() ? Color.FORESTGREEN : Color.DARKBLUE);
+            gc.setFill(node.children.isEmpty() ? Color.web("#2e8b57") : Color.web("#4682b4"));
             gc.fillOval(node.x - 4, node.y - 4, 8, 8);
         }
 
         // Draw Node Name (for non-leaves in linear, or selected in radial)
         if (!radialMode || node == selectedNode) {
-            gc.setFill(Color.LIGHTGRAY);
+            gc.setFill(Color.web("#ccc"));
             gc.setTextAlign(TextAlignment.LEFT);
             gc.setTextBaseline(VPos.CENTER);
-            gc.fillText(node.name, node.x + 10, node.y);
+            gc.fillText(node.name, node.x + 10, node.y - 10);
         }
 
         // Draw Metadata Heatmap (Only leaves)
         if (node.children.isEmpty()) {
             if (radialMode) {
-                // Draw outward along radius
                 double ang = node.angle;
                 drawRadialHeatmap(gc, node, 310, ang);
             } else {
-                // Draw to the right
                 drawLinearHeatmap(gc, node, 620, node.y);
             }
         }
     }
 
-    // Helper to draw heatmap cells
     private void drawLinearHeatmap(GraphicsContext gc, Node n, double startX, double y) {
         // Text Label
         gc.setFill(Color.LIGHTGRAY);
@@ -259,13 +274,11 @@ public class PhylogeneticTreeViewer extends Application {
         double x2 = 400 + (startRadius + 25) * Math.cos(angle);
         double y2 = 300 + (startRadius + 25) * Math.sin(angle);
         drawDot(gc, x2, y2, getColor(n.trait2));
-
-        // Label? Maybe too crowded in radial without rotation math
     }
 
     private void drawCell(GraphicsContext gc, double x, double y, Color c) {
         gc.setFill(c);
-        gc.fillRect(x, y, 18, 18); // slight gap
+        gc.fillRect(x, y, 18, 18);
         gc.setStroke(Color.BLACK);
         gc.strokeRect(x, y, 18, 18);
     }
@@ -276,7 +289,6 @@ public class PhylogeneticTreeViewer extends Application {
     }
 
     private Color getColor(double val) {
-        // Red (high) to Blue (low)
         return Color.hsb((1.0 - val) * 240, 0.8, 0.9);
     }
 

@@ -85,7 +85,12 @@ public class CrisprDesignApp extends KillerAppBase {
 
     @Override
     protected String getAppTitle() {
-        return i18n.get("crispr.title") + " - JScience";
+        return i18n.get("crispr.title");
+    }
+
+    @Override
+    public String getDescription() {
+        return i18n.get("crispr.desc");
     }
 
     @Override

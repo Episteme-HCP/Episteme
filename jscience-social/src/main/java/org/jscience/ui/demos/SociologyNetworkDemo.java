@@ -17,17 +17,17 @@ public class SociologyNetworkDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return org.jscience.social.i18n.I18n.getInstance().get("category.sociology");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.sociology");
     }
 
     @Override
     public String getName() {
-        return org.jscience.social.i18n.I18n.getInstance().get("SociologyNetwork.title");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("SociologyNetwork.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.social.i18n.I18n.getInstance().get("SociologyNetwork.desc");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("SociologyNetwork.desc");
     }
 
     private static class Node {
@@ -81,6 +81,7 @@ public class SociologyNetworkDemo implements DemoProvider {
         timer.start();
 
         Scene scene = new Scene(root, 800, 600);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle(getName());
         stage.setScene(scene);
         stage.show();

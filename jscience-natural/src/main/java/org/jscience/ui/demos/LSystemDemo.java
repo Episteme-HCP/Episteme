@@ -8,20 +8,22 @@ import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.biology.lsystems.LSystemViewer;
 
+import org.jscience.ui.i18n.I18n;
+
 public class LSystemDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Biology";
+        return I18n.getInstance().get("category.biology");
     }
 
     @Override
     public String getName() {
-        return org.jscience.natural.i18n.I18n.getInstance().get("LSystem.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("LSystem.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.natural.i18n.I18n.getInstance().get("LSystem.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("LSystem.desc");
     }
 
     @Override

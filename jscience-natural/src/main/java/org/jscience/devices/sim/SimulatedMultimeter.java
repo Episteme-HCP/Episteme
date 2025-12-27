@@ -30,6 +30,12 @@ public class SimulatedMultimeter extends SimulatedDevice implements Multimeter {
     public Real readValue() throws IOException {
         if (!isConnected())
             throw new IOException("Not connected");
+
+        if (currentValue.doubleValue() == 0.0) {
+            // Simulate background noise if not probing anything
+            double noise = (Math.random() - 0.5) * 0.01; // +/- 10mV noise
+            return Real.of(noise);
+        }
         return currentValue;
     }
 

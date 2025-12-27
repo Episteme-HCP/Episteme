@@ -1,6 +1,6 @@
 package org.jscience.ui.physics.mechanics;
 
-import org.jscience.natural.i18n.I18n;
+import org.jscience.ui.i18n.I18n;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -121,7 +121,7 @@ public class MechanicsViewer extends Application {
 
         Scene scene = new Scene(root, 600, 600);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.mechanics"));
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.mechanics"));
         stage.setScene(scene);
         stage.show();
     }

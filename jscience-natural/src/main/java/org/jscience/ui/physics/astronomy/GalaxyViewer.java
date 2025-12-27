@@ -13,6 +13,7 @@ import javafx.scene.effect.BlendMode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import org.jscience.ui.i18n.I18n;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -110,10 +111,10 @@ public class GalaxyViewer extends Application {
         simSwitch.setOnAction(e -> {
             if (simSwitch.isSelected()) {
                 simulator = new ObjectGalaxySimulator();
-                simSwitch.setText("Mode: Scientific (Object)");
+                simSwitch.setText(I18n.getInstance().get("galaxy.mode.scientific"));
             } else {
                 simulator = new PrimitiveGalaxySimulator();
-                simSwitch.setText("Mode: Primitive (double)");
+                simSwitch.setText(I18n.getInstance().get("galaxy.mode.primitive"));
             }
             // Re-init with current stars
             simulator.init(stars);
@@ -176,7 +177,7 @@ public class GalaxyViewer extends Application {
 
         Scene scene = new Scene(root, 1000, 800);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.galaxy"));
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxy"));
         stage.setScene(scene);
         stage.show();
     }

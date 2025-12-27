@@ -4,20 +4,22 @@ import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.physics.thermodynamics.ThermodynamicsViewer;
 
+import org.jscience.ui.i18n.I18n;
+
 public class ThermodynamicsDemo implements DemoProvider {
     @Override
     public String getName() {
-        return "Thermodynamics";
+        return I18n.getInstance().get("Thermodynamics.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.natural.i18n.I18n.getInstance().get("thermo.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("thermo.desc");
     }
 
     @Override
     public String getCategory() {
-        return "Physics";
+        return I18n.getInstance().get("category.physics");
     }
 
     @Override

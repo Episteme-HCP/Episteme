@@ -4,12 +4,9 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.*;
 import javafx.scene.Scene;
-import org.jscience.natural.i18n.I18n;
+import org.jscience.ui.i18n.I18n;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.StackPane;
-import javafx.geometry.Pos;
-import javafx.geometry.Insets;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -52,7 +49,6 @@ public class StarSystemViewer extends Application {
     private JulianDate currentDate = new JulianDate(JulianDate.J2000);
     private double timeScale = 1.0;
     private boolean paused = false;
-    private double simulationSpeed = 1.0;
 
     private Map<CelestialBody, Node> bodyNodes = new HashMap<>();
     private double scaleFactor = 1e-9;
@@ -80,7 +76,7 @@ public class StarSystemViewer extends Application {
 
         @Override
         public String toString() {
-            return org.jscience.natural.i18n.I18n.getInstance().get(i18nKey);
+            return org.jscience.ui.i18n.I18n.getInstance().get(i18nKey);
         }
     }
 
@@ -193,7 +189,7 @@ public class StarSystemViewer extends Application {
         scene.widthProperty().addListener((o, old, v) -> subScene.setWidth(v.doubleValue() - 200));
         scene.heightProperty().addListener((o, old, v) -> subScene.setHeight(v.doubleValue()));
 
-        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.starsystem"));
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.starsystem"));
         stage.setScene(scene);
         stage.show();
 
@@ -402,38 +398,6 @@ public class StarSystemViewer extends Application {
 
         box.getChildren().addAll(title, combo);
         return box;
-    }
-
-    private VBox createHUD() {
-        // HUD
-        VBox hud = new VBox(10);
-        hud.setPadding(new Insets(10));
-        hud.getStyleClass().add("dark-viewer-sidebar");
-        hud.setMaxWidth(300);
-        StackPane.setAlignment(hud, Pos.TOP_LEFT);
-        StackPane.setMargin(hud, new Insets(10));
-
-        Label title = new Label(I18n.getInstance().get("starsystem.title"));
-        title.getStyleClass().add("dark-label");
-
-        dateLabel = new Label(I18n.getInstance().get("starsystem.date"));
-        dateLabel.getStyleClass().add("dark-label-accent");
-
-        Label speedLabel = new Label(I18n.getInstance().get("starsystem.speed"));
-        speedLabel.getStyleClass().add("dark-label-muted");
-
-        Slider speedSlider = new Slider(0.1, 5.0, 1.0);
-        speedSlider.valueProperty().addListener((o, old, val) -> simulationSpeed = val.doubleValue());
-
-        Button pauseBtn = new Button(I18n.getInstance().get("starsystem.pause"));
-        pauseBtn.setOnAction(e -> {
-            paused = !paused;
-            pauseBtn.setText(
-                    paused ? I18n.getInstance().get("starsystem.resume") : I18n.getInstance().get("starsystem.pause"));
-        });
-
-        hud.getChildren().addAll(title, dateLabel, new Separator(), speedLabel, speedSlider, pauseBtn);
-        return hud;
     }
 
     public static void main(String[] args) {

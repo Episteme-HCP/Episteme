@@ -42,7 +42,12 @@ public class QuantumCircuitApp extends KillerAppBase {
 
     @Override
     protected String getAppTitle() {
-        return i18n.get("quantum.title") + " - JScience";
+        return i18n.get("quantum.title");
+    }
+
+    @Override
+    public String getDescription() {
+        return i18n.get("quantum.desc");
     }
 
     @Override

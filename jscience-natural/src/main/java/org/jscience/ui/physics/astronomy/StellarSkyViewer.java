@@ -2,9 +2,9 @@ package org.jscience.ui.physics.astronomy;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import org.jscience.natural.i18n.I18n;
+import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.ThemeManager;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
@@ -36,7 +36,7 @@ import java.util.Map;
  * - Time Travel (Precession + Sidereal rotation)
  * - Location (Lat/Lon)
  * - Constellations
- * - Mouse Interaction (Hover Info, Drag to Rotate Time)
+ * - Mouse Interaction (Hover Info, Drag to Rotate Time, Click to Lock)
  */
 public class StellarSkyViewer extends Application {
 
@@ -53,6 +53,7 @@ public class StellarSkyViewer extends Application {
     private double hourOfDay = 22.0; // 10 PM default
     private double observerLat = 48.8566; // Paris
     private double observerLon = 2.3522;
+    private boolean selectionLocked = false;
 
     // UI
     private Canvas skyCanvas;
@@ -62,7 +63,6 @@ public class StellarSkyViewer extends Application {
 
     // Interaction
     private double lastMouseX;
-
     private StarLoader.Star hoveredStar;
 
     @Override
@@ -79,15 +79,23 @@ public class StellarSkyViewer extends Application {
         // Mouse Listeners
         skyCanvas.setOnMousePressed(e -> {
             lastMouseX = e.getX();
-
         });
 
         skyCanvas.setOnMouseDragged(this::handleDrag);
         skyCanvas.setOnMouseMoved(this::handleHover);
         skyCanvas.setOnMouseClicked(e -> {
             if (hoveredStar != null) {
-                // Persistent info or action
-                stage.setTitle(I18n.getInstance().get("sky.window.title"));
+                selectionLocked = true;
+                infoLabel.setText(String.format(
+                        "SELECTED: %s\nMag: %.2f\nType: %s\nAlt: %.1f°\nAz: %.1f°\nDist: %.1f ly",
+                        hoveredStar.name, hoveredStar.mag, hoveredStar.spectralType,
+                        calculatePosition(hoveredStar).getAltitude(), calculatePosition(hoveredStar).getAzimuth(),
+                        hoveredStar.dist));
+                drawSky();
+            } else {
+                selectionLocked = false;
+                infoLabel.setText("");
+                drawSky();
             }
         });
 
@@ -107,7 +115,7 @@ public class StellarSkyViewer extends Application {
         latSlider.setShowTickLabels(true);
         latSlider.valueProperty().addListener((o, old, val) -> {
             observerLat = val.doubleValue();
-            drawSky(); // Changed from updateSky() to drawSky()
+            drawSky();
         });
 
         // Longitude Slider
@@ -117,50 +125,75 @@ public class StellarSkyViewer extends Application {
         lonSlider.setShowTickLabels(true);
         lonSlider.valueProperty().addListener((o, old, val) -> {
             observerLon = val.doubleValue();
-            drawSky(); // Changed from updateSky() to drawSky()
+            drawSky();
         });
 
-        // Time Travel
+        // Date Picker
+        Label dateLabel = new Label(I18n.getInstance().get("starsystem.date"));
+        dateLabel.getStyleClass().add("dark-label-muted");
+        DatePicker datePicker = new DatePicker(java.time.LocalDate.now());
+        datePicker.valueProperty().addListener((o, old, date) -> {
+            if (date != null) {
+                // Approximate J2000 conversion
+                java.time.LocalDate j2000 = java.time.LocalDate.of(2000, 1, 1);
+                long days = java.time.temporal.ChronoUnit.DAYS.between(j2000, date);
+                yearsFromJ2000 = days / 365.25;
+                drawSky();
+            }
+        });
+
+        // Time Travel Slider
         Label timeLabel = new Label(I18n.getInstance().get("sky.instruction"));
         timeLabel.setWrapText(true);
         timeLabel.getStyleClass().add("dark-label-muted");
-        Slider timeSlider = new Slider(-2000, 3000, 0); // Years from J2000
+
+        Slider timeSlider = new Slider(-2000, 3000, 0);
         timeSlider.setShowTickLabels(true);
         timeSlider.setMajorTickUnit(1000);
         timeSlider.valueProperty().addListener((o, old, val) -> {
-            yearsFromJ2000 = val.doubleValue(); // Changed from simulatePrecession() to direct assignment
-            drawSky(); // Added drawSky()
+            yearsFromJ2000 = val.doubleValue();
+
+            // Update DatePicker to reflect slider
+            java.time.LocalDate j2000 = java.time.LocalDate.of(2000, 1, 1);
+            java.time.LocalDate estimated = j2000.plusDays((long) (yearsFromJ2000 * 365.25));
+            datePicker.setValue(estimated);
+
+            drawSky();
         });
 
-        showConstellations = new CheckBox(I18n.getInstance().get("sky.stars")); // Replaced existing showConstellations
+        showConstellations = new CheckBox(I18n.getInstance().get("sky.stars"));
         showConstellations.getStyleClass().add("dark-label");
-        showConstellations.setSelected(true); // Set to true as per original default
-        showConstellations.selectedProperty().addListener((o, old, val) -> {
-            // showConstellations = val; // This is already the field itself
-            drawSky(); // Changed from updateSky() to drawSky()
-        });
+        showConstellations.setSelected(true);
+        showConstellations.selectedProperty().addListener((o, old, val) -> drawSky());
 
-        controls.getChildren().addAll(titleLabel, latLabel, latSlider, lonLabel, lonSlider,
-                new Separator(), timeLabel, timeSlider, showConstellations); // Removed infoLabel, added
-                                                                             // showConstellations
+        // Info Label Area
+        infoLabel = new Label(I18n.getInstance().get("sky.info"));
+        infoLabel.setWrapText(true);
+        infoLabel.getStyleClass().add("dark-label-info");
+        infoLabel.setStyle(
+                "-fx-text-fill: cyan; -fx-padding: 10; -fx-background-color: #222; -fx-background-radius: 5;");
+        infoLabel.setMaxWidth(Double.MAX_VALUE);
 
-        // The original root is a BorderPane, so setRight is appropriate.
-        // The instruction's StackPane.setAlignment/setMargin would not work directly.
+        controls.getChildren().addAll(
+                titleLabel,
+                latLabel, latSlider,
+                lonLabel, lonSlider,
+                new Separator(),
+                dateLabel, datePicker,
+                timeLabel, timeSlider,
+                showConstellations,
+                new Separator(),
+                infoLabel);
+
         root.setRight(controls);
 
         drawSky();
 
         Scene scene = new Scene(root, WIDTH + 250, HEIGHT);
-        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.sky"));
+        ThemeManager.getInstance().applyTheme(scene);
+        stage.setTitle(I18n.getInstance().get("viewer.sky"));
         stage.setScene(scene);
         stage.show();
-    }
-
-    private Slider createSlider(String tooltip, double min, double max, double val) {
-        Slider s = new Slider(min, max, val);
-        s.setTooltip(new Tooltip(tooltip));
-        return s;
     }
 
     private void loadData() {
@@ -191,20 +224,19 @@ public class StellarSkyViewer extends Application {
 
     private void handleDrag(MouseEvent e) {
         double dx = e.getX() - lastMouseX;
-        // Dragging X changes Hour Angle (Time)
-        // Sensitivity: 1 pixel = 0.05 hours?
         hourOfDay -= dx * 0.05;
         if (hourOfDay < 0)
             hourOfDay += 24;
         if (hourOfDay > 24)
             hourOfDay -= 24;
-
         lastMouseX = e.getX();
-
         drawSky();
     }
 
     private void handleHover(MouseEvent e) {
+        if (selectionLocked)
+            return;
+
         double mx = e.getX();
         double my = e.getY();
         double w = skyCanvas.getWidth();
@@ -214,28 +246,14 @@ public class StellarSkyViewer extends Application {
         double radius = Math.min(w, h) / 2 - 20;
 
         hoveredStar = null;
-        double minDist = 10.0; // 10px hit area
-
-        // We need to re-project to check hit.
-        // Optimization: Save projected coordinates?
-        // For 30 stars, we can just re-iterate.
+        double minDist = 10.0;
 
         infoLabel.setText("");
 
         for (StarLoader.Star star : stars) {
             HorizontalCoordinate hor = calculatePosition(star);
             if (hor.getAltitude() > 0) {
-                // Projection
                 double r = radius * (90 - hor.getAltitude()) / 90.0;
-
-                // Azimuth: 0=N, 90=E.
-                // Screen: Y up is -Y.
-                // Let's use standard convention: N up (Y-), E left (X-)? Or E right?
-                // Looking UP: E is LEFT.
-                // 0 (N) -> (0, -r).
-                // 90 (E) -> (-r, 0).
-                // θ math: 0 -> -90 deg.
-
                 double x = cx - r * Math.sin(Math.toRadians(hor.getAzimuth()));
                 double y = cy - r * Math.cos(Math.toRadians(hor.getAzimuth()));
 
@@ -243,30 +261,25 @@ public class StellarSkyViewer extends Application {
                 if (dist < minDist) {
                     minDist = dist;
                     hoveredStar = star;
-
                     infoLabel.setText(String.format(
-                            "Star: %s\nMag: %.2f\nType: %s\nAlt: %.1f°\nAz: %.1f°",
+                            "HOVER: %s\nMag: %.2f\nType: %s\nAlt: %.1f°\nAz: %.1f°",
                             star.name, star.mag, star.spectralType, hor.getAltitude(), hor.getAzimuth()));
                 }
             }
         }
+        drawSky();
     }
 
     private HorizontalCoordinate calculatePosition(StarLoader.Star star) {
-        // 1. Precession
         double[] eqNow = Precession.apply(star.ra, star.dec, yearsFromJ2000);
         EquatorialCoordinate eq = new EquatorialCoordinate(eqNow[0], eqNow[1]);
 
-        // 2. Local Sidereal Time
-        // Approximate JD: J2000 + years * 365.25 + day fraction
         double jdVal = JulianDate.J2000 + (yearsFromJ2000 * 365.25);
-        // Add Day rotation
-        jdVal += (hourOfDay - 12.0) / 24.0; // JD starts at Noon
+        jdVal += (hourOfDay - 12.0) / 24.0;
 
         JulianDate jd = new JulianDate(jdVal);
         Real lmst = SiderealTime.lmstDegrees(jd, Real.of(observerLon));
 
-        // 3. Horizontal
         return CoordinateConverter.equatorialToHorizontal(eq, observerLat, lmst.doubleValue());
     }
 
@@ -278,16 +291,13 @@ public class StellarSkyViewer extends Application {
         double cy = h / 2;
         double radius = Math.min(w, h) / 2 - 20;
 
-        // Background
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, w, h);
 
-        // Horizon Circle
         gc.setStroke(Color.DARKBLUE);
         gc.setLineWidth(2);
         gc.strokeOval(cx - radius, cy - radius, radius * 2, radius * 2);
 
-        // Cardinal Points
         gc.setFill(Color.GRAY);
         gc.setFont(Font.font(12));
         gc.fillText("N", cx, cy - radius - 5);
@@ -295,35 +305,29 @@ public class StellarSkyViewer extends Application {
         gc.fillText("E", cx - radius - 15, cy);
         gc.fillText("W", cx + radius + 5, cy);
 
-        // Store positions for line drawing
         Map<String, double[]> positions = new HashMap<>();
 
-        // Draw Stars
         for (StarLoader.Star star : stars) {
             HorizontalCoordinate hor = calculatePosition(star);
 
             if (hor.getAltitude() > 0) {
-                // Projection: Zenith Equidistant
-                // r is proportional to zenith distance (90 - Alt)
                 double r = radius * (90 - hor.getAltitude()) / 90.0;
-
-                // Azimuth 0 is North (Up). Azimuth 90 is East (Left in sky chart lookin up)
-                // x = -sin(az)
-                // y = -cos(az)
                 double azRad = Math.toRadians(hor.getAzimuth());
                 double x = cx - r * Math.sin(azRad);
                 double y = cy - r * Math.cos(azRad);
 
                 positions.put(star.name, new double[] { x, y });
 
-                // Draw Star
                 double size = Math.max(2, 6 - star.mag);
                 Color col = getColor(star.spectralType);
 
-                // Highlight hovered
-                if (star == hoveredStar) {
+                if (star == hoveredStar || (selectionLocked && star == hoveredStar)) {
                     gc.setStroke(Color.RED);
                     gc.strokeOval(x - size, y - size, size * 2, size * 2);
+                    if (selectionLocked && star == hoveredStar) {
+                        gc.setStroke(Color.CYAN); // Different color for locked
+                        gc.strokeOval(x - size - 2, y - size - 2, size * 2 + 4, size * 2 + 4);
+                    }
                     col = Color.WHITE;
                 }
 
@@ -332,7 +336,6 @@ public class StellarSkyViewer extends Application {
             }
         }
 
-        // Draw Constellations
         if (showConstellations.isSelected()) {
             gc.setStroke(Color.color(0.2, 0.2, 0.5, 0.5));
             gc.setLineWidth(1);

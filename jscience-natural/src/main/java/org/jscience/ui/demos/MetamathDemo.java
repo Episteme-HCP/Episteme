@@ -8,20 +8,22 @@ import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.mathematics.logic.MetamathViewer;
 
+import org.jscience.ui.i18n.I18n;
+
 public class MetamathDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return I18n.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.natural.i18n.I18n.getInstance().get("Metamath.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("Metamath.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.natural.i18n.I18n.getInstance().get("Metamath.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("Metamath.desc");
     }
 
     @Override

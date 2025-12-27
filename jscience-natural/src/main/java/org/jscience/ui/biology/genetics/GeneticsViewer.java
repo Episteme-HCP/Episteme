@@ -8,6 +8,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import org.jscience.ui.i18n.I18n;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
@@ -62,36 +63,29 @@ public class GeneticsViewer extends Application {
         freqSlider.valueProperty().addListener((o, old, val) -> initialFreq = val.doubleValue());
 
         HBox controls = new HBox(15,
-                new Label("Pop Size:"), popSpinner,
-                new Label("Generations:"), genSpinner,
-                new Label("Initial Freq:"), freqSlider,
+                new Label(I18n.getInstance().get("genetics.popsize")), popSpinner,
+                new Label(I18n.getInstance().get("genetics.generations")), genSpinner,
+                new Label(I18n.getInstance().get("genetics.initialfreq")), freqSlider,
                 runBtn);
         controls.setPadding(new Insets(10));
         controls.setAlignment(Pos.CENTER_LEFT);
-        controls.setStyle("-fx-background-color: #16213e;");
+        controls.getStyleClass().add("dark-viewer-sidebar");
 
         // Info Panel
         VBox infoPanel = new VBox(10);
         infoPanel.setPadding(new Insets(10));
-        infoPanel.setStyle("-fx-background-color: #0f3460;");
+        infoPanel.getStyleClass().add("dark-viewer-sidebar");
         infoPanel.setPrefWidth(200);
 
-        Label titleLabel = new Label("Genetic Drift Simulation");
-        titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #00d9ff;");
+        Label titleLabel = new Label(I18n.getInstance().get("genetics.subtitle"));
+        titleLabel.getStyleClass().add("dark-header");
 
-        Label explanationLabel = new Label(
-                "This demonstrates genetic drift - random changes in allele " +
-                        "frequency in a population over generations.\n\n" +
-                        "The Wright-Fisher model simulates binomial sampling " +
-                        "of alleles each generation.\n\n" +
-                        "- Smaller populations show more drift\n" +
-                        "- Frequency can fixate at 0 or 1\n" +
-                        "- Initial frequency affects trajectory");
+        Label explanationLabel = new Label(I18n.getInstance().get("genetics.explanation"));
         explanationLabel.setWrapText(true);
-        explanationLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #aaa;");
+        explanationLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #cccccc;");
 
-        statusLabel = new Label("Click 'Run Simulation' to start");
-        statusLabel.setStyle("-fx-font-style: italic; -fx-text-fill: #888;");
+        statusLabel = new Label(I18n.getInstance().get("genetics.status.start"));
+        statusLabel.setStyle("-fx-font-style: italic; -fx-text-fill: #cccccc;");
 
         infoPanel.getChildren().addAll(titleLabel, new Separator(), explanationLabel, new Separator(), statusLabel);
 
@@ -99,13 +93,13 @@ public class GeneticsViewer extends Application {
         root.setCenter(canvas);
         root.setBottom(controls);
         root.setRight(infoPanel);
-        root.setStyle("-fx-background-color: #1a1a2e;");
+        root.getStyleClass().add("dark-viewer-root");
 
         drawAxes();
 
         Scene scene = new Scene(root, 950, 520);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.genetics"));
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.genetics"));
         stage.setScene(scene);
         stage.show();
     }
@@ -125,8 +119,9 @@ public class GeneticsViewer extends Application {
             freq = (double) count / popSize;
         }
 
-        String outcome = freq >= 0.99 ? "FIXED (1.0)" : freq <= 0.01 ? "LOST (0.0)" : String.format("%.3f", freq);
-        statusLabel.setText("Final Frequency: " + outcome);
+        String outcome = freq >= 0.99 ? I18n.getInstance().get("genetics.outcome.fixed")
+                : freq <= 0.01 ? I18n.getInstance().get("genetics.outcome.lost") : String.format("%.3f", freq);
+        statusLabel.setText(String.format(I18n.getInstance().get("genetics.frequency"), outcome));
 
         drawAxes();
         drawHistory();
@@ -134,8 +129,7 @@ public class GeneticsViewer extends Application {
 
     private void drawAxes() {
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setFill(Color.web("#1a1a2e"));
-        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         // Axes
         gc.setStroke(Color.LIGHTGRAY);
@@ -145,9 +139,9 @@ public class GeneticsViewer extends Application {
 
         // Labels
         gc.setFill(Color.LIGHTGRAY);
-        gc.fillText("Generation", 350, 385);
-        gc.fillText("Allele", 5, 180);
-        gc.fillText("Frequency", 5, 195);
+        gc.fillText(I18n.getInstance().get("genetics.axis.generation"), 350, 385);
+        gc.fillText(I18n.getInstance().get("genetics.axis.allele"), 5, 180);
+        gc.fillText(I18n.getInstance().get("genetics.axis.frequency"), 5, 195);
 
         // Y-axis ticks
         gc.setStroke(Color.web("#444"));

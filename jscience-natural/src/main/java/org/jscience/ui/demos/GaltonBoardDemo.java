@@ -7,21 +7,22 @@ package org.jscience.ui.demos;
 import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.mathematics.statistics.GaltonBoardViewer;
+import org.jscience.ui.i18n.I18n;
 
 public class GaltonBoardDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return I18n.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return "Galton Board";
+        return I18n.getInstance().get("GaltonBoard.title");
     }
 
     @Override
     public String getDescription() {
-        return "Statistical demonstration of the normal distribution via ball simulation.";
+        return I18n.getInstance().get("GaltonBoard.desc");
     }
 
     @Override

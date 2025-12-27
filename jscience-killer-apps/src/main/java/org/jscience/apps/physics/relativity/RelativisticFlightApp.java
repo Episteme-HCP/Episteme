@@ -64,7 +64,7 @@ public class RelativisticFlightApp extends KillerAppBase {
 
     @Override
     protected String getAppTitle() {
-        return i18n.get("relativity.title") + " - JScience";
+        return i18n.get("relativity.title");
     }
 
     @Override

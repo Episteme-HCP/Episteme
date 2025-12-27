@@ -8,20 +8,22 @@ import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.biology.genetics.SequenceAlignmentViewer;
 
+import org.jscience.ui.i18n.I18n;
+
 public class SequenceAlignmentDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Biology";
+        return I18n.getInstance().get("category.biology");
     }
 
     @Override
     public String getName() {
-        return org.jscience.natural.i18n.I18n.getInstance().get("SequenceAlignment.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("SequenceAlignment.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.natural.i18n.I18n.getInstance().get("SequenceAlignment.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("SequenceAlignment.desc");
     }
 
     @Override

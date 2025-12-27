@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import org.jscience.chemistry.ChemicalReactionParser;
 import org.jscience.chemistry.ChemicalReactionParser.Formula;
 import org.jscience.chemistry.ChemicalReactionParser.Reaction;
+import org.jscience.ui.i18n.I18n;
 
 /**
  * Chemical Reaction Viewer and Parser Demo.
@@ -36,9 +37,9 @@ public class ChemicalReactionViewer extends Application {
 
         // Header
         VBox header = new VBox(5);
-        Label title = new Label("Chemical Reaction Parser");
+        Label title = new Label(I18n.getInstance().get("chemical.title.parser"));
         title.getStyleClass().add("dark-label-accent");
-        Label subtitle = new Label("Enter chemical equations to parse and analyze");
+        Label subtitle = new Label(I18n.getInstance().get("chemical.subtitle"));
         subtitle.getStyleClass().add("dark-label-muted");
         header.getChildren().addAll(title, subtitle);
         root.setTop(header);
@@ -49,7 +50,7 @@ public class ChemicalReactionViewer extends Application {
         inputBox.setPadding(new Insets(10));
         inputBox.getStyleClass().add("dark-viewer-sidebar");
 
-        Label inputLabel = new Label("Reaction Equation:");
+        Label inputLabel = new Label(I18n.getInstance().get("chemical.label.eqn"));
         inputLabel.getStyleClass().add("dark-label-muted");
 
         inputArea = new TextArea();
@@ -65,7 +66,7 @@ public class ChemicalReactionViewer extends Application {
                 createExampleButton("Neutralization", "HCl + NaOH -> NaCl + H2O"),
                 createExampleButton("Photosynthesis", "6CO2 + 6H2O -> C6H12O6 + 6O2"));
 
-        Button parseBtn = new Button("Parse & Analyze");
+        Button parseBtn = new Button(I18n.getInstance().get("chemical.btn.parse"));
         parseBtn.getStyleClass().add("accent-button-green");
         parseBtn.setOnAction(e -> parseReaction());
 
@@ -76,7 +77,7 @@ public class ChemicalReactionViewer extends Application {
         outputBox.setPadding(new Insets(10));
         outputBox.getStyleClass().add("dark-viewer-sidebar");
 
-        Label outputLabel = new Label("Analysis Results:");
+        Label outputLabel = new Label(I18n.getInstance().get("chemical.label.results"));
         outputLabel.getStyleClass().add("dark-label-muted");
 
         outputArea = new TextArea();
@@ -100,7 +101,7 @@ public class ChemicalReactionViewer extends Application {
         formulaPanel.setStyle("-fx-background-color: #0f3460; -fx-background-radius: 5;");
         formulaPanel.setPrefWidth(250);
 
-        Label formulaTitle = new Label("Quick Formula Parser");
+        Label formulaTitle = new Label(I18n.getInstance().get("chemical.label.quick"));
         formulaTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: #00d9ff;");
 
         TextField formulaInput = new TextField();
@@ -111,7 +112,7 @@ public class ChemicalReactionViewer extends Application {
         formulaOutput.setPrefRowCount(6);
         formulaOutput.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 11px;");
 
-        Button parseFormulaBtn = new Button("Parse Formula");
+        Button parseFormulaBtn = new Button(I18n.getInstance().get("chemical.btn.formula"));
         parseFormulaBtn.setMaxWidth(Double.MAX_VALUE);
         parseFormulaBtn.setOnAction(e -> {
             try {
@@ -141,7 +142,7 @@ public class ChemicalReactionViewer extends Application {
 
         Scene scene = new Scene(root, 900, 600);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.chemical"));
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.chemical"));
         stage.setScene(scene);
         stage.show();
     }
@@ -159,7 +160,7 @@ public class ChemicalReactionViewer extends Application {
     private void parseReaction() {
         String input = inputArea.getText().trim();
         if (input.isEmpty()) {
-            outputArea.setText("Please enter a chemical equation.");
+            outputArea.setText(I18n.getInstance().get("chemical.msg.enter"));
             return;
         }
 
@@ -193,16 +194,16 @@ public class ChemicalReactionViewer extends Application {
             outputArea.setText(sb.toString());
 
             if (balanced) {
-                statusLabel.setText("✓ Equation is balanced");
+                statusLabel.setText(I18n.getInstance().get("chemical.status.balanced"));
                 statusLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: green;");
             } else {
-                statusLabel.setText("✗ Equation is NOT balanced");
+                statusLabel.setText(I18n.getInstance().get("chemical.status.unbalanced"));
                 statusLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: red;");
             }
 
         } catch (Exception e) {
             outputArea.setText("Error parsing equation:\n" + e.getMessage());
-            statusLabel.setText("Parse error");
+            statusLabel.setText(I18n.getInstance().get("chemical.status.error"));
             statusLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: red;");
         }
     }

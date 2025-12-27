@@ -24,7 +24,7 @@ package org.jscience.ui.physics.thermodynamics;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import org.jscience.natural.i18n.I18n;
+import org.jscience.ui.i18n.I18n;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;

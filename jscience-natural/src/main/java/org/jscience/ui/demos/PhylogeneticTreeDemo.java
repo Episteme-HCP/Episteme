@@ -8,20 +8,22 @@ import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.biology.phylogeny.PhylogeneticTreeViewer;
 
+import org.jscience.ui.i18n.I18n;
+
 public class PhylogeneticTreeDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Biology";
+        return I18n.getInstance().get("category.biology");
     }
 
     @Override
     public String getName() {
-        return "Phylogenetic Tree";
+        return I18n.getInstance().get("PhylogeneticTree.title");
     }
 
     @Override
     public String getDescription() {
-        return "Interactive evolutionary tree browser showing taxonomic relationships.";
+        return I18n.getInstance().get("PhylogeneticTree.desc");
     }
 
     @Override

@@ -8,20 +8,22 @@ import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.physics.astronomy.GalaxyViewer;
 
+import org.jscience.ui.i18n.I18n;
+
 public class GalaxyDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Physics";
+        return I18n.getInstance().get("category.physics");
     }
 
     @Override
     public String getName() {
-        return "Galaxy Viewer";
+        return I18n.getInstance().get("Galaxy.title");
     }
 
     @Override
     public String getDescription() {
-        return "Particle simulation of a spiral galaxy with 15,000 density-wave stars.";
+        return I18n.getInstance().get("Galaxy.desc");
     }
 
     @Override

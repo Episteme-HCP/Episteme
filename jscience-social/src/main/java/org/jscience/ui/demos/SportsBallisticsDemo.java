@@ -1,6 +1,7 @@
 package org.jscience.ui.demos;
 
 import javafx.animation.AnimationTimer;
+import org.jscience.ui.i18n.SocialI18n;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -17,17 +18,17 @@ public class SportsBallisticsDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return org.jscience.social.i18n.I18n.getInstance().get("category.sports");
+        return SocialI18n.getInstance().get("category.sports");
     }
 
     @Override
     public String getName() {
-        return org.jscience.social.i18n.I18n.getInstance().get("SportsBallistics.title");
+        return SocialI18n.getInstance().get("SportsBallistics.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.social.i18n.I18n.getInstance().get("SportsBallistics.desc");
+        return SocialI18n.getInstance().get("SportsBallistics.desc");
     }
 
     private static class Ball {
@@ -47,15 +48,15 @@ public class SportsBallisticsDemo implements DemoProvider {
 
         ComboBox<String> sportSelector = new ComboBox<>();
         sportSelector.getItems().addAll(
-                org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.sport.basketball"),
-                org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.sport.tennis"),
-                org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.sport.golf"),
-                org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.sport.bowling"));
-        sportSelector.setValue(org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.sport.basketball"));
+                SocialI18n.getInstance().get("sports.ballistics.sport.basketball"),
+                SocialI18n.getInstance().get("sports.ballistics.sport.tennis"),
+                SocialI18n.getInstance().get("sports.ballistics.sport.golf"),
+                SocialI18n.getInstance().get("sports.ballistics.sport.bowling"));
+        sportSelector.setValue(SocialI18n.getInstance().get("sports.ballistics.sport.basketball"));
 
         Slider angleSlider = new Slider(0, 90, 45);
         Slider powerSlider = new Slider(0, 50, 20);
-        Button launchBtn = new Button(org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.btn.launch"));
+        Button launchBtn = new Button(SocialI18n.getInstance().get("sports.ballistics.btn.launch"));
 
         VBox controls = new VBox(10, sportSelector, angleSlider, powerSlider, launchBtn);
         root.setRight(controls);
@@ -117,28 +118,28 @@ public class SportsBallisticsDemo implements DemoProvider {
 
                     String sport = sportSelector.getValue();
                     if (sport.equals(
-                            org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.sport.basketball"))) {
+                            SocialI18n.getInstance().get("sports.ballistics.sport.basketball"))) {
                         b.color = Color.ORANGE;
                         b.radius = 15;
                         b.mass = 0.62;
                         b.area = 0.045;
                         b.dragCoeff = 0.47;
                     } else if (sport.equals(
-                            org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.sport.tennis"))) {
+                            SocialI18n.getInstance().get("sports.ballistics.sport.tennis"))) {
                         b.color = Color.YELLOW;
                         b.radius = 5;
                         b.mass = 0.058;
                         b.area = 0.0033;
                         b.dragCoeff = 0.5;
                     } else if (sport
-                            .equals(org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.sport.golf"))) {
+                            .equals(SocialI18n.getInstance().get("sports.ballistics.sport.golf"))) {
                         b.color = Color.WHITE;
                         b.radius = 3;
                         b.mass = 0.046;
                         b.area = 0.0014;
                         b.dragCoeff = 0.3;
                     } else if (sport.equals(
-                            org.jscience.social.i18n.I18n.getInstance().get("sports.ballistics.sport.bowling"))) {
+                            SocialI18n.getInstance().get("sports.ballistics.sport.bowling"))) {
                         b.color = Color.BLACK;
                         b.radius = 20;
                         b.mass = 7.0;
@@ -150,6 +151,7 @@ public class SportsBallisticsDemo implements DemoProvider {
         }.start();
 
         Scene scene = new Scene(root, 900, 500);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle(getName());
         stage.setScene(scene);
         stage.show();

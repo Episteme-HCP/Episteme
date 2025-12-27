@@ -8,20 +8,22 @@ import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.physics.astronomy.StarSystemViewer;
 
+import org.jscience.ui.i18n.I18n;
+
 public class StarSystemDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Physics";
+        return I18n.getInstance().get("category.physics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.natural.i18n.I18n.getInstance().get("starsystem.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("starsystem.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.natural.i18n.I18n.getInstance().get("starsystem.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("starsystem.desc");
     }
 
     @Override

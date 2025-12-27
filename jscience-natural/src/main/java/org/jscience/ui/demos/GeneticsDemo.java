@@ -8,20 +8,22 @@ import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.biology.genetics.GeneticsViewer;
 
+import org.jscience.ui.i18n.I18n;
+
 public class GeneticsDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Biology";
+        return I18n.getInstance().get("category.biology");
     }
 
     @Override
     public String getName() {
-        return org.jscience.natural.i18n.I18n.getInstance().get("Genetics.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("Genetics.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.natural.i18n.I18n.getInstance().get("Genetics.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("Genetics.desc");
     }
 
     @Override

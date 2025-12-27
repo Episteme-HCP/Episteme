@@ -22,6 +22,8 @@ public class SimulatedPHMeter extends SimulatedDevice implements PHMeter {
         return accuracy;
     }
 
+    private Real calibrationOffset = Real.ZERO;
+
     @Override
     public Real measure(Real actualPH) {
         if (!isConnected())
@@ -31,8 +33,9 @@ public class SimulatedPHMeter extends SimulatedDevice implements PHMeter {
             throw new IllegalArgumentException("pH must be between 0 and 14");
         }
 
+        // Add some noise and apply calibration offset
         double noise = (Math.random() - 0.5) * accuracy.doubleValue();
-        lastReading = actualPH.add(Real.of(noise));
+        lastReading = actualPH.add(Real.of(noise)).add(calibrationOffset);
         return lastReading;
     }
 
@@ -40,7 +43,20 @@ public class SimulatedPHMeter extends SimulatedDevice implements PHMeter {
     public Real readValue() throws IOException {
         if (!isConnected())
             throw new IOException("Device not connected");
-        return lastReading;
+        // Add a tiny bit of electronic noise even on stable reading
+        double drift = (Math.random() - 0.5) * 0.005;
+        return lastReading.add(Real.of(drift));
+    }
+
+    /**
+     * Calibrates the meter using a known buffer.
+     * 
+     * @param bufferPH the known pH of the calibration buffer
+     */
+    public void calibrate(Real bufferPH) {
+        // Simple 1-point calibration: adjust offset to match buffer
+        double diff = bufferPH.doubleValue() - lastReading.doubleValue();
+        this.calibrationOffset = Real.of(diff);
     }
 
     @Override

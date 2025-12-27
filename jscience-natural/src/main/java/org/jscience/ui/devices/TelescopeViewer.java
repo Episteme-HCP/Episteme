@@ -29,6 +29,7 @@ import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import org.jscience.ui.i18n.I18n;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -78,7 +79,7 @@ public class TelescopeViewer extends BorderPane {
         getStyleClass().add("dark-viewer-root");
 
         // Title
-        Label title = new Label("🔭 Telescope Control");
+        Label title = new Label(I18n.getInstance().get("telescope.title"));
         title.setFont(Font.font("System", FontWeight.BOLD, 18));
 
         // Status panel
@@ -105,10 +106,10 @@ public class TelescopeViewer extends BorderPane {
     private HBox createStatusPanel() {
         // RA display
         VBox raBox = new VBox(2);
-        Label raTitle = new Label("Right Ascension");
+        Label raTitle = new Label(I18n.getInstance().get("telescope.ra.title"));
 
         raTitle.setFont(Font.font("System", 10));
-        raLabel = new Label("00h 00m 00.00s");
+        raLabel = new Label(I18n.getInstance().get("telescope.ra.default"));
 
         raLabel.setFont(Font.font("Monospace", FontWeight.BOLD, 14));
         raBox.getChildren().addAll(raTitle, raLabel);
@@ -116,10 +117,10 @@ public class TelescopeViewer extends BorderPane {
 
         // Dec display
         VBox decBox = new VBox(2);
-        Label decTitle = new Label("Declination");
+        Label decTitle = new Label(I18n.getInstance().get("telescope.dec.title"));
 
         decTitle.setFont(Font.font("System", 10));
-        decLabel = new Label("+00° 00' 00.00\"");
+        decLabel = new Label(I18n.getInstance().get("telescope.dec.default"));
 
         decLabel.setFont(Font.font("Monospace", FontWeight.BOLD, 14));
         decBox.getChildren().addAll(decTitle, decLabel);
@@ -127,10 +128,10 @@ public class TelescopeViewer extends BorderPane {
 
         // Status
         VBox statusBox = new VBox(2);
-        Label statusTitle = new Label("Status");
+        Label statusTitle = new Label(I18n.getInstance().get("telescope.status.title"));
 
         statusTitle.setFont(Font.font("System", 10));
-        statusLabel = new Label("DISCONNECTED");
+        statusLabel = new Label(I18n.getInstance().get("telescope.status.disconnected"));
         statusLabel.setTextFill(Color.ORANGE);
         statusLabel.setFont(Font.font("System", FontWeight.BOLD, 12));
         statusBox.getChildren().addAll(statusTitle, statusLabel);
@@ -146,7 +147,7 @@ public class TelescopeViewer extends BorderPane {
 
     private VBox createControlPanel() {
         // Target input
-        Label targetLabel = new Label("Slew to Target");
+        Label targetLabel = new Label(I18n.getInstance().get("telescope.target"));
 
         targetLabel.setFont(Font.font("System", FontWeight.BOLD, 12));
 
@@ -161,11 +162,11 @@ public class TelescopeViewer extends BorderPane {
         decInput.setPrefWidth(80);
         decInput.setPromptText("Dec (°)");
 
-        Button slewBtn = new Button("Slew");
+        Button slewBtn = new Button(I18n.getInstance().get("telescope.btn.slew"));
         slewBtn.getStyleClass().add("accent-button-blue");
         slewBtn.setOnAction(e -> slewToTarget());
 
-        Button stopBtn = new Button("Stop");
+        Button stopBtn = new Button(I18n.getInstance().get("telescope.btn.stop"));
         stopBtn.getStyleClass().add("accent-button-red");
         stopBtn.setOnAction(e -> stopSlew());
 
@@ -211,7 +212,7 @@ public class TelescopeViewer extends BorderPane {
             telescope.setPositionCallback(this::updatePosition);
             updateStatusDisplay();
         } catch (Exception e) {
-            statusLabel.setText("ERROR");
+            statusLabel.setText(I18n.getInstance().get("telescope.status.error"));
             statusLabel.setTextFill(Color.RED);
         }
     }
@@ -223,10 +224,10 @@ public class TelescopeViewer extends BorderPane {
             telescope.slewTo(ra, dec);
             updateStatusDisplay();
         } catch (NumberFormatException e) {
-            statusLabel.setText("INVALID INPUT");
+            statusLabel.setText(I18n.getInstance().get("telescope.status.invalid"));
             statusLabel.setTextFill(Color.RED);
         } catch (Exception e) {
-            statusLabel.setText("SLEW ERROR");
+            statusLabel.setText(I18n.getInstance().get("telescope.status.slew_error"));
             statusLabel.setTextFill(Color.RED);
         }
     }

@@ -4,7 +4,7 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import org.jscience.natural.i18n.I18n;
+import org.jscience.ui.i18n.I18n;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
@@ -127,27 +127,27 @@ public class FluidDynamicsViewer extends Application {
         fpsLabel.getStyleClass().add("dark-label");
 
         // Solver Switch
-        Label engineLabel = new Label("Physics Engine:");
+        Label engineLabel = new Label(I18n.getInstance().get("fluid.label.engine"));
         engineLabel.getStyleClass().add("dark-label");
         ToggleButton engineSwitch = new ToggleButton("Mode: Primitive");
         engineSwitch.setMaxWidth(Double.MAX_VALUE);
         engineSwitch.setOnAction(e -> {
             if (engineSwitch.isSelected()) {
                 solver = new ObjectFluidSolver();
-                engineSwitch.setText("Mode: Scientific (Real)");
+                engineSwitch.setText(I18n.getInstance().get("fluid.mode.scientific"));
             } else {
                 solver = new PrimitiveFluidSolver();
-                engineSwitch.setText("Mode: Primitive (double)");
+                engineSwitch.setText(I18n.getInstance().get("fluid.mode.primitive"));
             }
             solver.initialize(N, SCALE);
         });
 
         // Speed slider
-        Label speedLabel = new Label("Flow Speed: 1.0");
+        Label speedLabel = new Label(String.format(I18n.getInstance().get("fluid.label.speed.fmt"), 1.0));
         speedLabel.getStyleClass().add("dark-label");
         Slider speedSlider = new Slider(0.1, 3.0, 1.0);
         speedSlider.valueProperty().addListener((o, old, val) -> {
-            speedLabel.setText(String.format("Flow Speed: %.1f", val.doubleValue()));
+            speedLabel.setText(String.format(I18n.getInstance().get("fluid.label.speed.fmt"), val.doubleValue()));
         });
 
         // Display toggles
@@ -162,7 +162,7 @@ public class FluidDynamicsViewer extends Application {
         particleCheck.setOnAction(e -> showParticles = particleCheck.isSelected());
 
         // Color scheme
-        Label colorLabel = new Label("Color Scheme:");
+        Label colorLabel = new Label(I18n.getInstance().get("fluid.label.color"));
         colorLabel.getStyleClass().add("dark-label");
         ComboBox<String> colorCombo = new ComboBox<>();
         colorCombo.getItems().addAll("Blue", "Fire", "Green", "Rainbow");
@@ -170,7 +170,7 @@ public class FluidDynamicsViewer extends Application {
         colorCombo.setOnAction(e -> colorScheme = colorCombo.getValue());
 
         // Reset button
-        Button resetBtn = new Button("Reset Particles");
+        Button resetBtn = new Button(I18n.getInstance().get("fluid.btn.reset"));
         resetBtn.setMaxWidth(Double.MAX_VALUE);
         resetBtn.setOnAction(e -> {
             particles.clear();
@@ -255,7 +255,7 @@ public class FluidDynamicsViewer extends Application {
 
         Scene scene = new Scene(root, N * SCALE + 220, N * SCALE);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(org.jscience.natural.i18n.I18n.getInstance().get("viewer.fluid"));
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.fluid"));
         stage.setScene(scene);
         stage.show();
     }

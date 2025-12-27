@@ -19,6 +19,7 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.ui.mathematics.MatrixViewer;
+import org.jscience.ui.ThemeManager;
 
 /**
  * Enhanced Matrix Viewer with multiple display modes.
@@ -38,7 +39,7 @@ public class MatrixDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("matrix.category");
+        return I18n.getInstance().get("category.mathematics");
     }
 
     @Override
@@ -101,35 +102,35 @@ public class MatrixDemo implements DemoProvider {
 
         Separator sep1 = new Separator();
 
-        Label viewLabel = new Label("View Mode");
+        Label viewLabel = new Label(I18n.getInstance().get("matrix.view.label"));
         viewLabel.setStyle("-fx-text-fill: #aaa; -fx-font-weight: bold;");
 
         ToggleGroup viewGroup = new ToggleGroup();
-        RadioButton tableRadio = new RadioButton("Table View");
+        RadioButton tableRadio = new RadioButton(I18n.getInstance().get("matrix.view.table"));
         tableRadio.setStyle("-fx-text-fill: #888;");
         tableRadio.setToggleGroup(viewGroup);
         tableRadio.setSelected(true);
         tableRadio.setOnAction(e -> showTableView());
 
-        RadioButton heatmapRadio = new RadioButton("Heatmap View");
+        RadioButton heatmapRadio = new RadioButton(I18n.getInstance().get("matrix.view.heatmap"));
         heatmapRadio.setStyle("-fx-text-fill: #888;");
         heatmapRadio.setToggleGroup(viewGroup);
         heatmapRadio.setOnAction(e -> showHeatmapView());
 
         Separator sep2 = new Separator();
 
-        Label opsLabel = new Label("Operations");
+        Label opsLabel = new Label(I18n.getInstance().get("matrix.ops.label"));
         opsLabel.setStyle("-fx-text-fill: #aaa; -fx-font-weight: bold;");
 
-        Button transposeBtn = new Button("Transpose");
+        Button transposeBtn = new Button(I18n.getInstance().get("matrix.ops.transpose"));
         transposeBtn.setMaxWidth(Double.MAX_VALUE);
         transposeBtn.setOnAction(e -> transpose());
 
-        Button scaleBtn = new Button("Scale × 2");
+        Button scaleBtn = new Button(I18n.getInstance().get("matrix.ops.scale"));
         scaleBtn.setMaxWidth(Double.MAX_VALUE);
         scaleBtn.setOnAction(e -> scale(2.0));
 
-        infoLabel = new Label("8×8 Matrix");
+        infoLabel = new Label("8x8 " + I18n.getInstance().get("matrix.info.matrix"));
         infoLabel.setStyle("-fx-text-fill: #00d9ff; -fx-font-size: 12px;");
 
         controls.getChildren().addAll(
@@ -149,8 +150,9 @@ public class MatrixDemo implements DemoProvider {
         generateMatrix();
 
         Scene scene = new Scene(root, 900, 650);
-        stage.setTitle("JScience - Matrix Viewer");
+        stage.setTitle(I18n.getInstance().get("matrix.title"));
         stage.setScene(scene);
+        ThemeManager.getInstance().applyTheme(scene);
         stage.show();
     }
 
@@ -165,7 +167,7 @@ public class MatrixDemo implements DemoProvider {
         }
         matrix = MatrixFactory.create(data, Real.ZERO);
         updateViews();
-        infoLabel.setText(rows + "×" + cols + " Matrix");
+        infoLabel.setText(rows + "\u00D7" + cols + " " + I18n.getInstance().get("matrix.info.matrix"));
     }
 
     private void generateIdentity() {
@@ -180,7 +182,7 @@ public class MatrixDemo implements DemoProvider {
         rowsSpinner.getValueFactory().setValue(size);
         colsSpinner.getValueFactory().setValue(size);
         updateViews();
-        infoLabel.setText(size + "×" + size + " Identity");
+        infoLabel.setText(size + "\u00D7" + size + " " + I18n.getInstance().get("matrix.info.identity"));
     }
 
     private void transpose() {
@@ -192,7 +194,8 @@ public class MatrixDemo implements DemoProvider {
             rowsSpinner.getValueFactory().setValue(c);
             colsSpinner.getValueFactory().setValue(r);
             updateViews();
-            infoLabel.setText(matrix.rows() + "×" + matrix.cols() + " (Transposed)");
+            infoLabel.setText(matrix.rows() + "\u00D7" + matrix.cols() + " ("
+                    + I18n.getInstance().get("matrix.info.transposed") + ")");
         }
     }
 
@@ -208,7 +211,8 @@ public class MatrixDemo implements DemoProvider {
             }
             matrix = MatrixFactory.create(data, Real.ZERO);
             updateViews();
-            infoLabel.setText(matrix.rows() + "×" + matrix.cols() + " (Scaled ×" + factor + ")");
+            infoLabel.setText(matrix.rows() + "\u00D7" + matrix.cols() + " ("
+                    + I18n.getInstance().get("matrix.info.scaled") + " \u00D7" + factor + ")");
         }
     }
 

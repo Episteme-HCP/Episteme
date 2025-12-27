@@ -1,6 +1,7 @@
 package org.jscience.ui.demos;
 
 import javafx.scene.Scene;
+import org.jscience.ui.i18n.SocialI18n;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
@@ -20,17 +21,17 @@ public class PoliticsVotingDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return org.jscience.social.i18n.I18n.getInstance().get("category.politics");
+        return SocialI18n.getInstance().get("category.politics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.social.i18n.I18n.getInstance().get("PoliticsVoting.title");
+        return SocialI18n.getInstance().get("PoliticsVoting.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.social.i18n.I18n.getInstance().get("PoliticsVoting.desc");
+        return SocialI18n.getInstance().get("PoliticsVoting.desc");
     }
 
     @Override
@@ -40,21 +41,21 @@ public class PoliticsVotingDemo implements DemoProvider {
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
         BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
-        chart.setTitle(org.jscience.social.i18n.I18n.getInstance().get("pol.voting.chart.title"));
+        chart.setTitle(SocialI18n.getInstance().get("pol.voting.chart.title"));
 
-        Button runFPTP = new Button(org.jscience.social.i18n.I18n.getInstance().get("pol.voting.btn.fptp"));
-        Button runPR = new Button(org.jscience.social.i18n.I18n.getInstance().get("pol.voting.btn.pr"));
+        Button runFPTP = new Button(SocialI18n.getInstance().get("pol.voting.btn.fptp"));
+        Button runPR = new Button(SocialI18n.getInstance().get("pol.voting.btn.pr"));
 
-        Label status = new Label(org.jscience.social.i18n.I18n.getInstance().get("pol.voting.label.instruction"));
+        Label status = new Label(SocialI18n.getInstance().get("pol.voting.label.instruction"));
 
         runFPTP.setOnAction(e -> {
             simulateElection(chart, true);
-            status.setText(org.jscience.social.i18n.I18n.getInstance().get("pol.voting.status.fptp"));
+            status.setText(SocialI18n.getInstance().get("pol.voting.status.fptp"));
         });
 
         runPR.setOnAction(e -> {
             simulateElection(chart, false);
-            status.setText(org.jscience.social.i18n.I18n.getInstance().get("pol.voting.status.pr"));
+            status.setText(SocialI18n.getInstance().get("pol.voting.status.pr"));
         });
 
         VBox controls = new VBox(10, runFPTP, runPR, status);
@@ -64,6 +65,7 @@ public class PoliticsVotingDemo implements DemoProvider {
         root.setBottom(controls);
 
         Scene scene = new Scene(root, 800, 600);
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle(getName());
         stage.setScene(scene);
         stage.show();
@@ -115,7 +117,7 @@ public class PoliticsVotingDemo implements DemoProvider {
         }
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName(org.jscience.social.i18n.I18n.getInstance().get("pol.voting.series.seats"));
+        series.setName(SocialI18n.getInstance().get("pol.voting.series.seats"));
         for (String p : parties) {
             series.getData().add(new XYChart.Data<>(p, seats.get(p)));
         }

@@ -24,7 +24,7 @@ public interface Centrifuge extends Device {
 
         @Override
         public String toString() {
-            return org.jscience.natural.i18n.I18n.getInstance().get(i18nKey);
+            return org.jscience.ui.i18n.I18n.getInstance().get(i18nKey);
         }
     }
 

@@ -8,15 +8,17 @@ import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.mathematics.FormulaNotationViewer;
 
+import org.jscience.ui.i18n.I18n;
+
 public class FormulaNotationDemo implements DemoProvider {
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return I18n.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return "Scientific Formula Display";
+        return I18n.getInstance().get("viewer.formula");
     }
 
     @Override

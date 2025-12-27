@@ -73,7 +73,12 @@ public class SmartGridApp extends KillerAppBase {
 
     @Override
     protected String getAppTitle() {
-        return i18n.get("grid.title") + " - JScience";
+        return i18n.get("grid.title");
+    }
+
+    @Override
+    public String getDescription() {
+        return i18n.get("grid.desc");
     }
 
     @Override
@@ -100,7 +105,7 @@ public class SmartGridApp extends KillerAppBase {
         VBox box = new VBox(10);
         box.setPadding(new Insets(10));
 
-        Label title = new Label("🏙️ Grid Network Map");
+        Label title = new Label("🏙️ " + i18n.get("grid.viz.title"));
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
         gridCanvas = new Canvas(300, 500);
@@ -115,15 +120,15 @@ public class SmartGridApp extends KillerAppBase {
         VBox box = new VBox(10);
         box.setPadding(new Insets(10));
 
-        loadChart = ChartFactory.createAreaChart("Grid Stability (MW)", "Time", "Power (MW)");
+        loadChart = ChartFactory.createAreaChart(i18n.get("grid.chart.title"), "Time", "Power (MW)");
         loadChart.setAnimated(false);
         loadChart.setCreateSymbols(false);
 
         supplySeries = new XYChart.Series<>();
-        supplySeries.setName("Total Supply");
+        supplySeries.setName(i18n.get("grid.series.supply"));
 
         demandSeries = new XYChart.Series<>();
-        demandSeries.setName("Total Demand");
+        demandSeries.setName(i18n.get("grid.series.demand"));
 
         @SuppressWarnings("unchecked")
         XYChart.Series<Number, Number>[] series = new XYChart.Series[] { supplySeries, demandSeries };
@@ -136,14 +141,13 @@ public class SmartGridApp extends KillerAppBase {
         frequencyLabel = new Label("50.00 Hz");
         frequencyLabel.setStyle("-fx-font-size: 24px; -fx-font-family: monospace; -fx-font-weight: bold;");
 
-        statusLabel = new Label("STABLE");
+        statusLabel = new Label(i18n.get("grid.status.stable"));
         statusLabel.setStyle(
                 "-fx-font-size: 18px; -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 5 10 5 10; -fx-background-radius: 4;");
 
         loadBalanceBar = new ProgressBar(0.5);
         loadBalanceBar.setPrefWidth(200);
 
-        statusBox.getChildren().addAll(new Label("Freq:"), frequencyLabel, loadBalanceBar, statusLabel);
         statusBox.getChildren().addAll(new Label(i18n.get("grid.label.freq_short")), frequencyLabel, loadBalanceBar,
                 statusLabel);
 
@@ -353,33 +357,33 @@ public class SmartGridApp extends KillerAppBase {
         gc.setFill(blackout ? Color.BLACK : Color.VIOLET);
         gc.fillOval(cx - 30, cy - 30, 60, 60);
         gc.setFill(Color.WHITE);
-        gc.fillText("CITY\n" + (int) currentDemand + "MW", cx - 15, cy);
+        gc.fillText(i18n.get("grid.viz.city") + "\n" + (int) currentDemand + "MW", cx - 15, cy);
 
         // Draw Wind
         gc.setFill(Color.CYAN);
         gc.fillOval(cx - 100, cy - 120, 40, 40);
         gc.setFill(Color.BLACK);
-        gc.fillText("WIND\n" + (int) (windF * 100) + "%", cx - 95, cy - 100);
+        gc.fillText(i18n.get("grid.viz.wind") + "\n" + (int) (windF * 100) + "%", cx - 95, cy - 100);
 
         // Draw Solar
         gc.setFill(solarF > 0.1 ? Color.YELLOW : Color.DARKGRAY);
         gc.fillOval(cx + 60, cy - 120, 40, 40);
         gc.setFill(Color.BLACK);
-        gc.fillText("SUN\n" + (int) (solarF * 100) + "%", cx + 65, cy - 100);
+        gc.fillText(i18n.get("grid.viz.sun") + "\n" + (int) (solarF * 100) + "%", cx + 65, cy - 100);
 
         // Draw Coal
         gc.setFill(Color.ORANGE);
         gc.fillRect(cx - 20, cy + 100, 40, 40);
         gc.setFill(Color.BLACK);
-        gc.fillText("PLANT", cx - 15, cy + 125);
+        gc.fillText(i18n.get("grid.viz.plant"), cx - 15, cy + 125);
     }
 
     private void triggerBlackout(String reason) {
         blackout = true;
-        statusLabel.setText("BLACKOUT");
+        statusLabel.setText(i18n.get("grid.status.blackout"));
         statusLabel.setStyle(
                 "-fx-font-size: 18px; -fx-background-color: #000000; -fx-text-fill: red; -fx-padding: 5 10 5 10; -fx-background-radius: 4;");
-        log("💥 GRID FAILURE: " + reason);
+        log("💥 " + MessageFormat.format(i18n.get("grid.log.blackout"), reason));
         loop.stop();
     }
 

@@ -15,6 +15,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import org.jscience.ui.i18n.I18n;
 
 /**
  * Lotka-Volterra Predator-Prey Dynamics Simulation.
@@ -45,33 +46,45 @@ public class LotkaVolterraViewer extends Application {
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(10));
-        root.setStyle("-fx-background-color: #1a1a2e;");
+        root.getStyleClass().add("dark-viewer-root");
 
         // Charts
         VBox chartsBox = new VBox(10);
 
         // Time series chart
         NumberAxis xAxisTime = new NumberAxis();
-        xAxisTime.setLabel("Time");
+        xAxisTime.setLabel(I18n.getInstance().get("lotka.axis.time"));
         NumberAxis yAxisPop = new NumberAxis();
-        yAxisPop.setLabel("Population");
+        yAxisPop.setLabel(I18n.getInstance().get("lotka.axis.pop"));
 
         LineChart<Number, Number> timeChart = new LineChart<>(xAxisTime, yAxisPop);
-        timeChart.setTitle("Population over Time");
+        timeChart.setTitle(I18n.getInstance().get("lotka.chart.time"));
         timeChart.setCreateSymbols(false);
-        preySeries.setName("Prey (x)");
-        predSeries.setName("Predators (y)");
+        preySeries.setName(I18n.getInstance().get("lotka.series.prey"));
+        predSeries.setName(I18n.getInstance().get("lotka.series.pred"));
+
         timeChart.getData().addAll(preySeries, predSeries);
+
+        // Custom Colors
+        // Wait for node to be created
+        preySeries.nodeProperty().addListener((o, old, node) -> {
+            if (node != null)
+                node.setStyle("-fx-stroke: #2ecc71; -fx-stroke-width: 2px;");
+        });
+        predSeries.nodeProperty().addListener((o, old, node) -> {
+            if (node != null)
+                node.setStyle("-fx-stroke: #e74c3c; -fx-stroke-width: 2px;");
+        });
 
         // Phase space chart
         NumberAxis xAxisPhase = new NumberAxis();
-        xAxisPhase.setLabel("Prey (x)");
+        xAxisPhase.setLabel(I18n.getInstance().get("lotka.axis.prey"));
         NumberAxis yAxisPhase = new NumberAxis();
-        yAxisPhase.setLabel("Predators (y)");
+        yAxisPhase.setLabel(I18n.getInstance().get("lotka.axis.pred"));
 
         ScatterChart<Number, Number> phaseChart = new ScatterChart<>(xAxisPhase, yAxisPhase);
-        phaseChart.setTitle("Phase Space (y vs x)");
-        phaseSeries.setName("Trajectory");
+        phaseChart.setTitle(I18n.getInstance().get("lotka.chart.phase"));
+        phaseSeries.setName(I18n.getInstance().get("lotka.series.traj"));
         phaseChart.getData().add(phaseSeries);
         phaseChart.setLegendVisible(false);
 
@@ -82,23 +95,23 @@ public class LotkaVolterraViewer extends Application {
         VBox sidebar = new VBox(15);
         sidebar.setPadding(new Insets(10));
         sidebar.setPrefWidth(250);
-        sidebar.setStyle("-fx-background-color: #16213e;");
+        sidebar.getStyleClass().add("dark-viewer-sidebar");
 
-        Label controlTitle = new Label("Simulation Parameters");
-        controlTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: #00d9ff;");
+        Label controlTitle = new Label(I18n.getInstance().get("lotka.header.params"));
+        controlTitle.getStyleClass().add("dark-header");
 
         sidebar.getChildren().addAll(
                 controlTitle,
-                createSliderLabel("α (Prey growth)", 0, 5, alpha, v -> alpha = v),
-                createSliderLabel("β (Predation)", 0, 5, beta, v -> beta = v),
-                createSliderLabel("δ (Predator growth)", 0, 5, delta, v -> delta = v),
-                createSliderLabel("γ (Predator death)", 0, 5, gamma, v -> gamma = v));
+                createSliderLabel(I18n.getInstance().get("lotka.label.alpha"), 0, 5, alpha, v -> alpha = v),
+                createSliderLabel(I18n.getInstance().get("lotka.label.beta"), 0, 5, beta, v -> beta = v),
+                createSliderLabel(I18n.getInstance().get("lotka.label.delta"), 0, 5, delta, v -> delta = v),
+                createSliderLabel(I18n.getInstance().get("lotka.label.gamma"), 0, 5, gamma, v -> gamma = v));
 
-        Button startBtn = new Button("Start / Stop");
+        Button startBtn = new Button(I18n.getInstance().get("lotka.btn.start"));
         startBtn.setMaxWidth(Double.MAX_VALUE);
         startBtn.setOnAction(e -> running = !running);
 
-        Button resetBtn = new Button("Reset");
+        Button resetBtn = new Button(I18n.getInstance().get("lotka.btn.reset"));
         resetBtn.setMaxWidth(Double.MAX_VALUE);
         resetBtn.setOnAction(e -> reset());
 
@@ -117,7 +130,8 @@ public class LotkaVolterraViewer extends Application {
 
         Scene scene = new Scene(root, 1000, 800);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle("Lotka-Volterra Engine");
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
+        stage.setTitle(I18n.getInstance().get("lotka.title"));
         stage.setScene(scene);
         stage.show();
     }
