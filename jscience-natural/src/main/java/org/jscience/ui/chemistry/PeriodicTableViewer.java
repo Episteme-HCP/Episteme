@@ -42,7 +42,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
 import javafx.scene.shape.MeshView;
-import java.util.stream.Collectors;
+
 import java.util.List;
 import java.util.ArrayList;
 import javafx.scene.text.Font;

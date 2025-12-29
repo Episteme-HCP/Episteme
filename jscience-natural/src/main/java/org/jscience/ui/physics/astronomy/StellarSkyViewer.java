@@ -385,7 +385,6 @@ public class StellarSkyViewer extends Application {
         String type; // "Galaxy", "Nebula", "Cluster"
         double ra; // Degrees
         double dec; // Degrees
-        double mag;
 
         DeepSkyObject(String name, String type, double ra, double dec, double mag) {
             this.name = name;

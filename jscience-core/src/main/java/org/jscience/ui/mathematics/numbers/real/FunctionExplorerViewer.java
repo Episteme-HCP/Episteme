@@ -5,13 +5,11 @@
 package org.jscience.ui.mathematics.numbers.real;
 
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.scene.chart.LineChart;
-import javafx.scene.chart.XYChart;
 import javafx.collections.FXCollections;
 
 import org.jscience.mathematics.numbers.real.Real;
@@ -19,8 +17,6 @@ import org.jscience.mathematics.parser.SimpleExpressionParser;
 import org.jscience.mathematics.analysis.SymbolicUtil;
 import org.jscience.ui.ThemeManager;
 import org.jscience.ui.plotting.Plot2D;
-import org.jscience.ui.plotting.Plot3D;
-import org.jscience.ui.plotting.PlotFactory;
 import org.jscience.ui.plotting.backends.JavaFXPlot2D;
 import org.jscience.ui.plotting.backends.JavaFXPlot3D;
 import org.jscience.ui.i18n.I18n;
