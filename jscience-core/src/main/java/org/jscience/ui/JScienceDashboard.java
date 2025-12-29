@@ -89,28 +89,107 @@ public class JScienceDashboard extends Application {
     }
 
     private Tab createGeneralTab() {
-        VBox content = new VBox(20);
-        content.setPadding(new Insets(30));
+        VBox content = new VBox(25);
+        content.setPadding(new Insets(40));
         content.setAlignment(Pos.CENTER);
 
-        // Simple Text/Logo
+        // --- ATOM GRAPHIC ---
+        // Programmatic Atom Icon (Nucleus + Electrons)
+        StackPane atomIcon = new StackPane();
+
+        // Nucleus
+        javafx.scene.shape.Circle nucleus = new javafx.scene.shape.Circle(15, javafx.scene.paint.Color.ORANGERED);
+        nucleus.setEffect(new javafx.scene.effect.DropShadow(10, javafx.scene.paint.Color.ORANGERED));
+
+        // Orbits (Ellipses)
+        javafx.scene.shape.Ellipse orbit1 = new javafx.scene.shape.Ellipse(60, 20);
+        orbit1.setFill(null);
+        orbit1.setStroke(javafx.scene.paint.Color.LIGHTBLUE);
+        orbit1.setStrokeWidth(2);
+        orbit1.setRotate(0);
+
+        javafx.scene.shape.Ellipse orbit2 = new javafx.scene.shape.Ellipse(60, 20);
+        orbit2.setFill(null);
+        orbit2.setStroke(javafx.scene.paint.Color.LIGHTBLUE);
+        orbit2.setStrokeWidth(2);
+        orbit2.setRotate(60);
+
+        javafx.scene.shape.Ellipse orbit3 = new javafx.scene.shape.Ellipse(60, 20);
+        orbit3.setFill(null);
+        orbit3.setStroke(javafx.scene.paint.Color.LIGHTBLUE);
+        orbit3.setStrokeWidth(2);
+        orbit3.setRotate(120);
+
+        // Electrons (Small circles on orbits - static for now, animations could be
+        // added)
+        javafx.scene.shape.Circle electron1 = new javafx.scene.shape.Circle(4, javafx.scene.paint.Color.CYAN);
+        electron1.setTranslateX(60); // On orbit 1
+
+        javafx.scene.shape.Circle electron2 = new javafx.scene.shape.Circle(4, javafx.scene.paint.Color.CYAN);
+        electron2.setTranslateX(30);
+        electron2.setTranslateY(52); // Approx on orbit 2
+
+        javafx.scene.shape.Circle electron3 = new javafx.scene.shape.Circle(4, javafx.scene.paint.Color.CYAN);
+        electron3.setTranslateX(-30);
+        electron3.setTranslateY(52); // Approx on orbit 3
+
+        atomIcon.getChildren().addAll(orbit1, orbit2, orbit3, electron1, electron2, electron3, nucleus);
+
+        // --- TITLE ---
         Label title = new Label("JScience Dashboard");
-        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #333333;");
+        if (Application.getUserAgentStylesheet() != null && Application.getUserAgentStylesheet().contains("caspian")) {
+            title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: white;");
+        }
 
-        Label subtitle = new Label("Scientific Library & Environment");
-        subtitle.setStyle("-fx-font-size: 14px; -fx-text-fill: gray;");
+        Label subtitle = new Label("Universal Scientific Computing Environment");
+        subtitle.setStyle("-fx-font-size: 16px; -fx-text-fill: gray;");
 
-        GridPane grid = new GridPane();
-        grid.setHgap(15);
-        grid.setVgap(10);
-        grid.setAlignment(Pos.CENTER);
+        // --- VERSION INFO ---
+        GridPane infoGrid = new GridUtils.Builder()
+                .addRow("Version:", org.jscience.JScienceVersion.VERSION)
+                .addRow("Build Date:", org.jscience.JScienceVersion.BUILD_DATE)
+                .addRow("Java Version:", System.getProperty("java.version"))
+                .build();
 
-        grid.addRow(0, new Label("Version:"), new Label("5.0.0-SNAPSHOT"));
-        grid.addRow(1, new Label("Main Author:"), new Label("Silvere Martin-Michiellot"));
-        grid.addRow(2, new Label("License:"), new Label("MIT"));
+        // --- AUTHORS ---
+        VBox authorsBox = new VBox(5);
+        authorsBox.setAlignment(Pos.CENTER);
+        Label authorsHeader = new Label("Authors");
+        authorsHeader.setStyle("-fx-font-weight: bold; -fx-underline: true;");
+        authorsBox.getChildren().add(authorsHeader);
 
-        content.getChildren().addAll(title, subtitle, new Separator(), grid);
+        for (String author : org.jscience.JScienceVersion.AUTHORS) {
+            authorsBox.getChildren().add(new Label(author));
+        }
+
+        content.getChildren().addAll(atomIcon, title, subtitle, new Separator(), infoGrid, new Separator(), authorsBox);
         return new Tab(I18n.getInstance().get("dashboard.tab.general", "General"), content);
+    }
+
+    // Helper to build grids quickly
+    private static class GridUtils {
+        static class Builder {
+            GridPane grid = new GridPane();
+            int row = 0;
+
+            Builder() {
+                grid.setHgap(20);
+                grid.setVgap(10);
+                grid.setAlignment(Pos.CENTER);
+            }
+
+            Builder addRow(String label, String value) {
+                Label l = new Label(label);
+                l.setStyle("-fx-font-weight: bold;");
+                grid.addRow(row++, l, new Label(value));
+                return this;
+            }
+
+            GridPane build() {
+                return grid;
+            }
+        }
     }
 
     private Tab createI18nTab() {
