@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.measure;
 
 import org.jscience.mathematics.numbers.real.Real;
@@ -33,23 +34,8 @@ import org.jscience.mathematics.numbers.real.Real;
  * </p>
  * <p>
  * <b>Example Usage:</b>
- * 
- * <pre>{@code
- * // Simple linear conversion
- * UnitConverter toKm = LinearConverter.of(0.001);
- * Real km = toKm.convert(Real.of(1000)); // 1 km
- * 
- * // Temperature conversion (affine)
- * UnitConverter cToF = LinearConverter.of(1.8, 32); // °C to °F
- * Real fahrenheit = cToF.convert(Real.of(0)); // 32°F
- * 
- * // Chained conversions
- * UnitConverter mToFt = LinearConverter.of(3.28084);
- * UnitConverter ftToMile = LinearConverter.of(1.0 / 5280);
- * UnitConverter mToMile = mToFt.concatenate(ftToMile);
- * }</pre>
- * </p>
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

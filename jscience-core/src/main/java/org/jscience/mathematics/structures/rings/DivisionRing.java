@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.structures.rings;
 
 /**
@@ -30,7 +31,7 @@ package org.jscience.mathematics.structures.rings;
  * Division rings satisfy all field axioms except for commutative
  * multiplication.
  * </p>
- * 
+ *
  * <h2>Mathematical Definition</h2>
  * <p>
  * A division ring (D, +, ×) is a ring with unity (1 ≠ 0) such that:
@@ -39,15 +40,14 @@ package org.jscience.mathematics.structures.rings;
  * 1</li>
  * </ul>
  * </p>
- * 
+ *
  * <h2>Examples</h2>
  * <ul>
  * <li>ℍ - Quaternions (non-commutative)</li>
  * <li>Field - Commutative division ring</li>
  * </ul>
- * 
- * @param <E> the type of elements in this division ring
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

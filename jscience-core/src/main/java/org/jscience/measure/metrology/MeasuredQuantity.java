@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.measure.metrology;
 
 import org.jscience.mathematics.numbers.real.Real;
@@ -34,43 +35,8 @@ import org.jscience.measure.Quantity;
  * </p>
  * <p>
  * <b>Example Usage:</b>
- * 
- * <pre>{@code
- * // Length measurement: 10.0 ± 0.2 m (95% confidence)
- * MeasuredQuantity<Length> length = MeasuredQuantities.create(
- *         Quantities.create(10.0, Units.METER),
- *         Quantities.create(0.2, Units.METER),
- *         0.95 // 95% confidence level
- * );
- * 
- * // Uncertainty propagates automatically!
- * MeasuredQuantity<Length> doubled = length.multiply(2.0); // 20.0 ± 0.4 m
- * }</pre>
- * </p>
- * 
- * <h2>Uncertainty Representation</h2>
- * <p>
- * Uncertainties are expressed as standard uncertainties (1σ) or expanded
- * uncertainties (kσ, where k is the coverage factor). Common confidence
- * levels:
- * </p>
- * <ul>
- * <li>68.3% → k=1 (1σ)</li>
- * <li>95.4% → k=2 (2σ)</li>
- * <li>99.7% → k=3 (3σ)</li>
- * </ul>
- * 
- * <h2>Uncertainty Propagation</h2>
- * <p>
- * For independent measurements:
- * </p>
- * <ul>
- * <li><b>Addition/Subtraction</b>: σ_z = √(σ_x² + σ_y²)</li>
- * <li><b>Multiplication/Division</b>: σ_z/z = √((σ_x/x)² + (σ_y/y)²)</li>
- * </ul>
- * 
- * @param <Q> the quantity type
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

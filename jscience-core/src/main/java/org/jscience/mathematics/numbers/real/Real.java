@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.numbers.real;
 
 import java.math.BigDecimal;
@@ -32,26 +33,8 @@ import org.jscience.mathematics.structures.rings.FieldElement;
  * <p>
  * Real numbers form a Field under addition and multiplication.
  * This class provides a smart factory that chooses the backing implementation
- * based on the current {@link org.jscience.mathematics.context.MathContext}
- * preference.
- * </p>
- * <ul>
- * <li><b>FAST</b>: Uses {@code float} (32-bit)</li>
- * <li><b>NORMAL</b>: Uses {@code double} (64-bit) - Default</li>
- * <li><b>EXACT</b>: Uses {@link BigDecimal} (arbitrary precision)</li>
- * </ul>
- * 
- * <h2>Usage</h2>
- * 
- * <pre>
- * {@code
- * // Default (NORMAL precision -> double)
- * Real pi = Real.of(3.14159);
- * }
- * </pre>
- * 
- * * @author Silvere Martin-Michiellot
- * 
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

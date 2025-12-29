@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 /**
  * Cholesky decomposition: A = LL^T for symmetric positive definite matrices.
  * <p>
@@ -27,69 +28,28 @@
  * More efficient than LU for SPD matrices: O(n³/3) vs O(2n³/3).
  * Numerically stable, preserves positive definiteness.
  * </p>
- * 
+ *
  * <p><b>When to use</b>:</p>
  * <ul>
- *   <li>Solving Ax=b when A is symmetric positive definite</li>
- *   <li>Computing matrix inverse for SPD matrices</li>
- *   <li>Computing determinant efficiently</li>
- *   <li>Least squares problems with normal equations</li>
+ * <li>Solving Ax=b when A is symmetric positive definite</li>
+ * <li>Computing matrix inverse for SPD matrices</li>
+ * <li>Computing determinant efficiently</li>
+ * <li>Least squares problems with normal equations</li>
  * </ul>
- * 
+ *
  * <p><b>Prerequisites</b>:</p>
  * <ul>
- *   <li>Matrix must be square (n × n)</li>
- *   <li>Matrix must be symmetric: A = A^T</li>
- *   <li>Matrix must be positive definite: x^T A x > 0 for all x ≠ 0</li>
+ * <li>Matrix must be square (n × n)</li>
+ * <li>Matrix must be symmetric: A = A^T</li>
+ * <li>Matrix must be positive definite: x^T A x > 0 for all x ≠ 0</li>
  * </ul>
- * 
+ *
  * <p><b>Algorithm complexity</b>: O(n³/3) for decomposition, O(n²) for solving Ax=b</p>
- * 
+ *
  * <p><b>Alternatives</b>:</p>
  * <ul>
- *   <li>Use {@link LUDecomposition} for general square matrices</li>
- *   <li>Use {@link SVDDecomposition} for rank-deficient or ill-conditioned matrices</li>
- *   <li>Use {@link org.jscience.mathematics.linear.sparse.ConjugateGradient} for large sparse SPD systems</li>
- * </ul>
- * 
- * <p><b>Usage example</b>:</p>
- * <pre>{@code
- * // Create symmetric positive definite matrix
- * Real[][] data = {
- *     {Real.of(4), Real.of(2)},
- *     {Real.of(2), Real.of(3)}
- * };
- * Matrix<Real> A = DenseMatrix.of(Arrays.asList(
- *     Arrays.asList(data[0]),
- *     Arrays.asList(data[1])
- * ), Reals.getInstance());
- * 
- * // Decompose
- * CholeskyDecomposition chol = CholeskyDecomposition.decompose(A);
- * 
- * // Solve Ax = b
- * Real[] b = {Real.of(6), Real.of(5)};
- * Real[] x = chol.solve(b);
- * 
- * // Compute determinant
- * Real det = chol.determinant();
- * }</pre>
- * 
- * <p><b>Performance notes</b>:</p>
- * <ul>
- *   <li>Fast for small to medium matrices (n < 1000)</li>
- *   <li>For large sparse matrices, use iterative solvers instead</li>
- *   <li>Numerically stable for well-conditioned matrices</li>
- *   <li>May fail if matrix is not positive definite (throws IllegalArgumentException)</li>
- * </ul>
- * 
- * <p><b>Implementation details</b>: Uses Cholesky-Banachiewicz algorithm.</p>
- * 
- * @see LUDecomposition
- * @see QRDecomposition
- * @see SVDDecomposition
- * @see org.jscience.mathematics.linear.sparse.ConjugateGradient
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

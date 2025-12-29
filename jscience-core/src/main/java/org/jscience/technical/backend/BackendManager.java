@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.technical.backend;
 
 import java.util.*;
@@ -28,25 +29,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Manages compute backends and provides access to the default backend.
  * <p>
- * Backends are auto-discovered via {@link java.util.ServiceLoader} and
- * registered
- * automatically at class initialization.
- * </p>
- * <p>
- * <b>Usage:</b>
- * 
- * <pre>
- * // Use default backend (highest priority available)
- * ComputeBackend backend = BackendManager.getDefault();
- * 
- * // Select specific backend
- * ComputeBackend cpu = BackendManager.select("CPU");
- * 
- * // List all backends
- * Collection&lt;String&gt; names = BackendManager.getAvailableBackendNames();
- * </pre>
- * </p>
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

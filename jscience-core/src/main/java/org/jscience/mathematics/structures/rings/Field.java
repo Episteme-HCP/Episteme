@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.structures.rings;
 
 /**
@@ -32,7 +33,7 @@ package org.jscience.mathematics.structures.rings;
  * mathematics,
  * appearing in linear algebra, number theory, and many applications.
  * </p>
- * 
+ *
  * <h2>Mathematical Definition</h2>
  * <p>
  * A field (F, +, ×) is a ring satisfying:
@@ -43,7 +44,7 @@ package org.jscience.mathematics.structures.rings;
  * </ol>
  * This means (F \ {0}, ×) forms an abelian group.
  * </p>
- * 
+ *
  * <h2>Examples</h2>
  * <ul>
  * <li>ℚ - Rational numbers</li>
@@ -53,50 +54,17 @@ package org.jscience.mathematics.structures.rings;
  * <li>ℚ(√2) - Rationals extended with √2</li>
  * <li>ℝ(x) - Rational functions over reals</li>
  * </ul>
- * 
+ *
  * <h2>Not Fields</h2>
  * <ul>
  * <li>ℤ - Integers (no multiplicative inverses: 2⁻¹ ∉ ℤ)</li>
  * <li>M₂(ℝ) - 2×2 matrices (not commutative)</li>
  * <li>ℤ/6ℤ - Integers mod 6 (zero divisors: 2 × 3 = 0 mod 6)</li>
  * </ul>
- * 
+ *
  * <h2>Usage</h2>
- * 
- * <pre>{@code
- * // Rational number field
- * Field<Rational> rationals = RationalField.getInstance();
- * 
- * Rational a = new Rational(3, 4); // 3/4
- * Rational b = new Rational(2, 5); // 2/5
- * 
- * // Field operations
- * Rational sum = rationals.add(a, b); // 23/20
- * Rational product = rationals.multiply(a, b); // 6/20 = 3/10
- * Rational inverse = rationals.inverse(a); // 4/3
- * Rational quotient = rationals.divide(a, b); // 15/8
- * 
- * // Field axioms
- * Rational one = rationals.one(); // 1
- * Rational check = rationals.multiply(a, inverse); // 3/4 × 4/3 = 1
- * assert check.equals(one);
- * }</pre>
- * 
- * <h2>Scientific Applications</h2>
- * <p>
- * Fields are essential for:
- * <ul>
- * <li><strong>Linear Algebra</strong>: Vector spaces defined over fields</li>
- * <li><strong>Differential Equations</strong>: Solutions in field of
- * functions</li>
- * <li><strong>Quantum Mechanics</strong>: Complex Hilbert spaces</li>
- * <li><strong>Signal Processing</strong>: Fourier transforms over ℂ</li>
- * <li><strong>Cryptography</strong>: Finite fields 𝔽ₚ</li>
- * </ul>
- * </p>
- * 
- * @param <E> the type of elements in this field
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.bibliography.loaders;
 
 import org.jscience.io.cache.ResourceCache;
@@ -36,23 +37,15 @@ import java.util.Optional;
  * <b>What it does</b>: Resolves DOIs to get publication metadata including
  * title, authors, journal, year, and citation information.
  * </p>
- * 
+ *
  * <p>
  * <b>Data Source</b>: CrossRef REST API (https://api.crossref.org)
  * </p>
  * <p>
  * <b>License</b>: Public API, free for non-commercial use.
  * </p>
- * 
- * <pre>{@code
- * // Resolve a DOI
- * CitationInfo citation = CrossRef.resolve("10.1038/nature12373");
- * System.out.println(citation.getTitle());
- * System.out.println(citation.formatAPA());
- * }</pre>
- * 
- * * @author Silvere Martin-Michiellot
- * 
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

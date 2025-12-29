@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.numbers.integers;
 
 import java.math.BigInteger;
@@ -33,23 +34,8 @@ import org.jscience.mathematics.structures.rings.Semiring;
  * most efficient backing implementation:
  * </p>
  * <ul>
- * <li>Small values (≤ 2³¹-1): Uses {@code int} for maximum performance</li>
- * <li>Medium values (≤ 2⁶³-1): Uses {@code long} for good performance</li>
- * <li>Large values (> 2⁶³-1): Uses {@link BigInteger} for arbitrary
- * precision</li>
- * </ul>
- * 
- * <h2>Usage</h2>
- * 
- * <pre>
- * {@code
- * // Smart factory chooses optimal backing
- * Natural small = Natural.of(100); // Uses int internally
- * Natural large = Natural.of(1_000_000_000_000L); // Uses long
- * Natural huge = Natural.of(new BigInteger("999999999999999999999")); // Uses BigInteger
- * }
- * </pre>
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

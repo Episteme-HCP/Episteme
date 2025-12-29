@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.measure;
 
 /**
@@ -33,7 +34,7 @@ package org.jscience.measure;
  * Dimensions enable dimensional analysis - checking that equations are
  * dimensionally consistent. For example:
  * </p>
- * 
+ *
  * <pre>
  * Force = Mass × Acceleration
  * [F] = [M] × [L][T]⁻²
@@ -41,22 +42,8 @@ package org.jscience.measure;
  * </pre>
  * <p>
  * <b>Example Usage:</b>
- * 
- * <pre>{@code
- * // Base dimensions
- * Dimension length = Dimension.LENGTH; // [L¹]
- * Dimension mass = Dimension.MASS; // [M¹]
- * Dimension time = Dimension.TIME; // [T¹]
- * 
- * // Derived dimensions
- * Dimension velocity = length.divide(time); // [L¹T⁻¹]
- * Dimension force = mass.multiply(length).divide(time.pow(2)); // [M¹L¹T⁻²]
- * 
- * // Dimensional checking
- * assert force.equals(Dimension.of(1, 1, -2, 0, 0, 0, 0));
- * }</pre>
- * </p>
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

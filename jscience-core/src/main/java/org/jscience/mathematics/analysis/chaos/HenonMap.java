@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.analysis.chaos;
 
 import org.jscience.mathematics.geometry.Point2D;
@@ -33,13 +34,14 @@ import org.jscience.mathematics.numbers.real.Real;
  * A discrete-time dynamical system that exhibits chaotic behavior.
  * Classic values: a = 1.4, b = 0.3.
  * </p>
- * 
+ *
  * <h2>References</h2>
  * <ul>
  * <li>Michel Hénon, "A two-dimensional mapping with a strange attractor",
  * Communications in Mathematical Physics, Vol. 50, No. 1, 1976, pp. 69-77</li>
  * </ul>
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

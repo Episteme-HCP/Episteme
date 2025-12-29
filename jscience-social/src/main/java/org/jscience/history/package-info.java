@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,18 +20,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 /**
  * History package - historical events, timelines, and chronology.
  * <p>
  * Key classes:
  * <ul>
- * <li>{@link org.jscience.history.Event} - historical events with dates and
- * categories</li>
- * <li>{@link org.jscience.history.Timeline} - sequences of events</li>
- * </ul>
- * </p>
  *
  * @author Silvere Martin-Michiellot
- * @since 2.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 package org.jscience.history;

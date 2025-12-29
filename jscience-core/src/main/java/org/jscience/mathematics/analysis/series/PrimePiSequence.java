@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.analysis.series;
 
 import org.jscience.mathematics.numbers.integers.Integer;
@@ -41,22 +42,22 @@ import java.util.List;
  * <li>π(1000) = 168</li>
  * </ul>
  * </p>
- * 
+ *
  * <h2>Asymptotic Behavior</h2>
  * <p>
  * The Prime Number Theorem states that:
- * 
+ *
  * <pre>
  * π(n) ~ n / ln(n)
  * </pre>
- * 
+ *
  * More precisely, Legendre's approximation:
- * 
+ *
  * <pre>
  * π(n) ≈ n / (ln(n) - 1.08366)
  * </pre>
  * </p>
- * 
+ *
  * <h2>Implementation</h2>
  * <p>
  * This implementation uses:
@@ -66,10 +67,10 @@ import java.util.List;
  * <li>Caching for performance</li>
  * </ul>
  * </p>
- * 
+ *
  * <h2>OEIS Reference</h2>
  * <a href="https://oeis.org/A000720">A000720</a>
- * 
+ *
  * <h2>References</h2>
  * <ul>
  * <li>Gauss, C. F. (1849). Letter to Encke</li>
@@ -78,7 +79,8 @@ import java.util.List;
  * <li>Riemann, B. (1859). "On the Number of Primes Less Than a Given
  * Magnitude"</li>
  * </ul>
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

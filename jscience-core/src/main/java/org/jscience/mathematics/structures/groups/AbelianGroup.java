@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.structures.groups;
 
 /**
@@ -29,7 +30,7 @@ package org.jscience.mathematics.structures.groups;
  * in many areas of mathematics. The addition operation in most number
  * systems forms an abelian group.
  * </p>
- * 
+ *
  * <h2>Mathematical Definition</h2>
  * <p>
  * An abelian group (G, +) satisfies all group axioms plus:
@@ -41,7 +42,7 @@ package org.jscience.mathematics.structures.groups;
  * <strong>Convention</strong>: Abelian groups are typically written with
  * additive notation (+, 0, −a) rather than multiplicative (∗, e, a⁻¹).
  * </p>
- * 
+ *
  * <h2>Examples</h2>
  * <ul>
  * <li>(ℤ, +) - Integers with addition</li>
@@ -51,35 +52,10 @@ package org.jscience.mathematics.structures.groups;
  * <li>(ℝⁿ, +) - n-dimensional vectors with addition</li>
  * <li>(ℤ/nℤ, +) - Integers modulo n</li>
  * </ul>
- * 
+ *
  * <h2>Additive Notation</h2>
- * 
- * <pre>{@code
- * // For abelian groups, we use additive notation:
- * E add(E a, E b)      // a + b  (group operation)
- * E zero()             // 0      (identity element)
- * E negate(E a)        // -a     (inverse element)
- * }</pre>
- * 
- * <h2>Usage</h2>
- * 
- * <pre>{@code
- * // Real numbers form an abelian group under addition
- * AbelianGroup<Double> reals = RealAdditionGroup.getInstance();
- * 
- * Double a = 5.0;
- * Double b = 3.0;
- * Double sum = reals.add(a, b); // 8.0
- * Double zero = reals.zero(); // 0.0
- * Double negA = reals.negate(a); // -5.0
- * Double check = reals.add(a, negA); // 0.0
- * 
- * // Commutativity
- * assert reals.add(a, b).equals(reals.add(b, a));
- * }</pre>
- * 
- * @param <E> the type of elements in this abelian group
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.biology.loaders;
 
 import java.io.BufferedReader;
@@ -35,25 +36,19 @@ import java.net.URL;
  * classification.
  * Useful for bioinformatics and genetics applications.
  * </p>
- * 
+ *
  * <p>
  * <b>Data Source</b>: NCBI (https://www.ncbi.nlm.nih.gov/taxonomy)
  * </p>
  * <p>
  * <b>License</b>: Public Domain (US Government work).
  * </p>
- * 
+ *
  * <p>
  * <b>Usage example</b>:
  * </p>
- * 
- * <pre>{@code
- * // Get taxonomy info for human (ID 9606)
- * String json = NcbiTaxonomy.fetchTaxonomyJson(9606);
- * }</pre>
- * 
- * * @author Silvere Martin-Michiellot
- * 
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

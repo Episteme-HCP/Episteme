@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.logic.modal;
 
 import org.jscience.mathematics.logic.Logic;
@@ -44,7 +45,7 @@ import org.jscience.mathematics.logic.propositional.Proposition;
  * <li><strong>S5</strong>: S4 + symmetry (◇φ → □◇φ)</li>
  * </ul>
  * </p>
- * 
+ *
  * <h2>References</h2>
  * <ul>
  * <li>Saul Kripke, "Semantical Considerations on Modal Logic",
@@ -52,9 +53,8 @@ import org.jscience.mathematics.logic.propositional.Proposition;
  * <li>C. I. Lewis and C. H. Langford, "Symbolic Logic",
  * Century Company, 1932 (foundational work)</li>
  * </ul>
- * 
- * @param <T> truth value type
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

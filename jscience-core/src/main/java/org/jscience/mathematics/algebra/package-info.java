@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,26 +20,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 /**
  * Core algebraic structures following mathematical hierarchy.
  * <p>
  * This package defines fundamental algebraic concepts:
  * </p>
- * 
+ *
  * <pre>
  * Set (membership)
- *   ↓
+ * ↓
  * Magma (binary operation)
- *   ↓
+ * ↓
  * Group (identity + inverse)
- *   ↓
+ * ↓
  * AbelianGroup (commutativity)
- *   ↓
+ * ↓
  * Ring (second operation: multiplication)
- *   ↓
+ * ↓
  * Field (division)
  * </pre>
- * 
+ *
  * <h2>Design Philosophy</h2>
  * <p>
  * These interfaces respect pure mathematical definitions while enabling
@@ -50,24 +51,11 @@
  * <li>BigDecimal for arbitrary precision</li>
  * <li>GPU types for acceleration</li>
  * </ul>
- * 
+ *
  * <h2>Usage Example</h2>
- * 
- * <pre>{@code
- * // Real numbers form a field
- * Field<Double> reals = RealField.getInstance();
- * 
- * Double a = 5.0;
- * Double b = 3.0;
- * 
- * // Field operations
- * Double sum = reals.add(a, b); // 8.0
- * Double product = reals.multiply(a, b); // 15.0
- * Double quotient = reals.divide(a, b); // 1.666...
- * }</pre>
- * 
- * @see org.jscience.mathematics.algebra.Set
- * @see org.jscience.mathematics.algebra.Field
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 package org.jscience.mathematics.algebra;

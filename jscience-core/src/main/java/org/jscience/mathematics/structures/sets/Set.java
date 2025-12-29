@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.structures.sets;
 
 /**
@@ -31,14 +32,14 @@ package org.jscience.mathematics.structures.sets;
  * operations
  * and properties to sets.
  * </p>
- * 
+ *
  * <h2>Mathematical Definition</h2>
  * <p>
  * A set S is a well-defined collection of distinct objects, considered as a
  * whole.
  * The objects are called elements or members of the set.
  * </p>
- * 
+ *
  * <h2>Examples</h2>
  * <ul>
  * <li>ℕ = {0, 1, 2, 3, ...} - Natural numbers</li>
@@ -46,21 +47,10 @@ package org.jscience.mathematics.structures.sets;
  * <li>ℝ - Real numbers</li>
  * <li>ℂ - Complex numbers</li>
  * </ul>
- * 
+ *
  * <h2>Usage in JScience</h2>
- * 
- * <pre>{@code
- * // Set is the base for all algebraic structures
- * Set<Integer> integers = IntegerSet.getInstance();
- * boolean contains = integers.contains(42);
- * 
- * // Higher structures extend Set:
- * Group<Double> realNumbers = RealNumberGroup.getInstance();
- * // Group IS-A Set, but with additional group operations
- * }</pre>
- * 
- * @param <E> the type of elements in this set
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

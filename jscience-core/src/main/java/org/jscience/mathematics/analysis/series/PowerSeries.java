@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.analysis.series;
 
 import org.jscience.mathematics.numbers.real.Real;
@@ -37,20 +38,21 @@ import java.util.function.Function;
  * <li>Behavior at |x| = R varies</li>
  * </ul>
  * </p>
- * 
+ *
  * <h2>Common Examples</h2>
- * 
+ *
  * <pre>
  * // e^x = Σ x^n/n!, R = ∞
  * PowerSeries exp = PowerSeries.exponential();
- * 
+ *
  * // sin(x) = Σ (-1)^n * x^(2n+1)/(2n+1)!, R = ∞
  * PowerSeries sin = PowerSeries.sine();
- * 
+ *
  * // 1/(1-x) = Σ x^n, R = 1
  * PowerSeries geometric = new PowerSeries(n -> Real.ONE);
  * </pre>
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

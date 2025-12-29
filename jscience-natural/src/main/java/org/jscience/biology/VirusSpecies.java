@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.biology;
 
 import java.util.*;
@@ -29,18 +30,10 @@ import java.util.*;
  * <p>
  * VirusSpecies provides taxonomy-level information about a virus,
  * distinguishing species definitions from individual virus particles
- * (represented by {@link Virus}).
- * </p>
- * <p>
- * Unlike cellular organisms, viruses are classified by the ICTV
- * (International Committee on Taxonomy of Viruses) using a hierarchical
- * system: Realm → Kingdom → Phylum → Class → Order → Family → Genus → Species
- * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @see Virus
  */
 public class VirusSpecies {
 

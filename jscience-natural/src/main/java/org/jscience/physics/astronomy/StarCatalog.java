@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.physics.astronomy;
 
 import org.jscience.mathematics.numbers.real.Real;
@@ -39,20 +40,8 @@ import java.util.stream.Collectors;
 /**
  * Star catalog with Quantity-based astronomical data loaded from JSON.
  * <p>
- * Implements {@link MiniCatalog} for standardized catalog access. Uses JScience
- * Quantities for physical properties: Mass, Temperature, Power, Length.
- * </p>
- * <p>
- * Features:
- * <ul>
- * <li>Load from JSON resources</li>
- * <li>Filter by spectral type, temperature range</li>
- * <li>Find nearest stars by distance</li>
- * <li>Hertzsprung-Russell diagram positioning</li>
- * </ul>
- * </p>
- * * @author Silvere Martin-Michiellot
- * 
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

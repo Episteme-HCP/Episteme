@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.analysis.series;
 
 import org.jscience.mathematics.numbers.integers.Integer;
@@ -40,21 +41,21 @@ import java.math.BigInteger;
  * {{1},{2},{3}}</li>
  * </ul>
  * </p>
- * 
+ *
  * <h2>Recurrence Relations</h2>
  * <p>
  * Bell numbers satisfy several recurrence relations:
- * 
+ *
  * <pre>
  * B(n+1) = Σ(k=0 to n) C(n,k) * B(k)
  * </pre>
- * 
+ *
  * where C(n,k) is the binomial coefficient "n choose k".
  * </p>
- * 
+ *
  * <p>
  * They can also be computed using the Bell triangle (Aitken's array):
- * 
+ *
  * <pre>
  * 1
  * 1  2
@@ -62,27 +63,28 @@ import java.math.BigInteger;
  * 5  7  10  15
  * 15 20 27  37  52
  * </pre>
- * 
+ *
  * Each row starts with the last element of the previous row, and each element
  * is the sum of the element to its left and the element above-left.
  * </p>
- * 
+ *
  * <h2>Properties</h2>
  * <ul>
  * <li>Exponential generating function: exp(e^x - 1)</li>
  * <li>Asymptotic behavior: B(n) ~ (n/log n)^n / e^(n/log n - n)</li>
  * <li>Growth rate: faster than exponential</li>
  * </ul>
- * 
+ *
  * <h2>OEIS Reference</h2>
  * <a href="https://oeis.org/A000110">A000110</a>
- * 
+ *
  * <h2>References</h2>
  * <ul>
  * <li>Bell, E. T. (1934). "Exponential polynomials"</li>
  * <li>Comtet, L. (1974). "Advanced Combinatorics"</li>
  * </ul>
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

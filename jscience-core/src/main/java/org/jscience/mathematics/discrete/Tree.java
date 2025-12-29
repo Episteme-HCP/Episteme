@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.discrete;
 
 import java.util.List;
@@ -29,21 +30,8 @@ import java.util.Optional;
  * Represents a tree data structure - a connected acyclic graph.
  * <p>
  * A tree is a graph where any two vertices are connected by exactly one path.
- * This interface extends {@link Graph} to provide tree-specific operations
- * such as root access, parent/child navigation, and depth calculations.
- * </p>
- * <p>
- * Tree structures are fundamental in many scientific domains:
- * <ul>
- * <li>Phylogenetics - evolutionary trees of species</li>
- * <li>Linguistics - parse trees, syntax trees</li>
- * <li>Computer science - decision trees, search trees</li>
- * <li>Mathematics - spanning trees, hierarchical structures</li>
- * </ul>
- * </p>
  *
- * @param <V> the type of vertices (nodes)
- * * @author Silvere Martin-Michiellot
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

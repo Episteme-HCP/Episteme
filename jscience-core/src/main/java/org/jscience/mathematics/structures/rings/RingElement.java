@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.structures.rings;
 
 /**
@@ -30,38 +31,14 @@ package org.jscience.mathematics.structures.rings;
  * to ensure type safety: operations return the same type as the implementing
  * class.
  * </p>
- * 
+ *
  * <h2>Ring Axioms</h2>
  * <p>
  * Elements must satisfy:
  * </p>
  * <ul>
- * <li>(R, +) is an abelian group with identity {@code zero()}</li>
- * <li>(R, *) is a monoid with identity {@code one()}</li>
- * <li>Multiplication distributes over addition</li>
- * </ul>
- * 
- * <h2>Example Usage</h2>
- * 
- * <pre>{@code
- * // Generic algorithm that works with any RingElement
- * public static <E extends RingElement<E>> E power(E base, int n) {
- *     E result = base.one();
- *     for (int i = 0; i < n; i++) {
- *         result = result.multiply(base);
- *     }
- *     return result;
- * }
- * 
- * // Works with Integer, Real, Complex, Polynomial, etc.
- * Integer result = power(Integer.of(2), 10); // 1024
- * }</pre>
- * 
- * @param <E> the self-type (implementing class)
- * 
- * @see FieldElement
- * @see GroupElement
- * @see Ring * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

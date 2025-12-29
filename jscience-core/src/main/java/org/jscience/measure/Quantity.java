@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.measure;
 
 import org.jscience.mathematics.numbers.real.Real;
@@ -33,24 +34,8 @@ import org.jscience.mathematics.numbers.real.Real;
  * </p>
  * <p>
  * <b>Example Usage:</b>
- * 
- * <pre>{@code
- * Quantity<Length> distance = Quantities.create(100, Units.METER);
- * Quantity<Time> time = Quantities.create(10, Units.SECOND);
- * 
- * // Type-safe operations
- * Quantity<Velocity> speed = distance.divide(time);  // 10 m/s
- * 
- * // Unit conversion
- * Quantity<Length> km = distance.to(Units.KILOMETER);  // 0.1 km
- * 
- * #// Compile error - incompatible dimensions
- * // distance.add(time);  // ❌ Won't compile
- * }</pre>
- * </p>
- * 
- * @param <Q> the quantity type (e.g., Length, Mass, Time)
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

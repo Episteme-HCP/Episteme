@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.physics.classical.waves.electromagnetism.circuits;
 
 import java.util.ArrayList;
@@ -33,25 +34,10 @@ import org.jscience.mathematics.linearalgebra.backends.LinearAlgebraProvider;
 
 /**
  * A headless circuit simulator using Modified Nodal Analysis (MNA).
- * 
+ *
  * <p>
- * This class manages a collection of {@link CircuitElement}s and provides
- * methods to analyze and simulate the circuit. The simulation uses sparse
- * matrix techniques for efficiency.
- * </p>
- * 
- * <h3>Usage Example:</h3>
- * 
- * <pre>
- * Circuit circuit = new Circuit();
- * circuit.add(new VoltageSource(10.0)); // 10V source
- * circuit.add(new Resistor(100.0)); // 100 ohm resistor
- * circuit.add(new Ground()); // Ground reference
- * circuit.analyze();
- * circuit.step();
- * double current = circuit.getElement(1).getCurrent();
- * </pre>
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

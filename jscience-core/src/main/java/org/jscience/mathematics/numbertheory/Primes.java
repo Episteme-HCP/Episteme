@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.numbertheory;
 
 import java.math.BigInteger;
@@ -32,7 +33,7 @@ import java.util.*;
  * Eratosthenes
  * and the Miller-Rabin probabilistic primality test.
  * </p>
- * 
+ *
  * <h2>References</h2>
  * <ul>
  * <li>Eratosthenes of Cyrene, Sieve of Eratosthenes, circa 240 BCE (ancient
@@ -43,7 +44,8 @@ import java.util.*;
  * <li>Michael O. Rabin, "Probabilistic Algorithm for Testing Primality",
  * Journal of Number Theory, Vol. 12, No. 1, 1980, pp. 128-138</li>
  * </ul>
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

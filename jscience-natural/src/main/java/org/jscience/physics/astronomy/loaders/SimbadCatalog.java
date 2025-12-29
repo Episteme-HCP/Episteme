@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.physics.astronomy.loaders;
 
 import org.jscience.io.cache.ResourceCache;
@@ -39,26 +40,19 @@ import java.util.Optional;
  * galaxies, and other objects.
  * Uses the CDS (Centre de Données astronomiques de Strasbourg) Sesame resolver.
  * </p>
- * 
+ *
  * <p>
  * <b>Data Source</b>: CDS Strasbourg (http://cds.u-strasbg.fr/)
  * </p>
  * <p>
  * <b>License</b>: Free for research/educational use with acknowledgement.
  * </p>
- * 
+ *
  * <p>
  * <b>Usage example</b>:
  * </p>
- * 
- * <pre>{@code
- * // Get position of Sirius
- * String xml = SimbadCatalog.resolve("Sirius");
- * // Returns XML with RA, Dec, proper motions, etc.
- * }</pre>
- * 
- * * @author Silvere Martin-Michiellot
- * 
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

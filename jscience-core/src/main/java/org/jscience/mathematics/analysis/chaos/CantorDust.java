@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.analysis.chaos;
 
 import org.jscience.mathematics.numbers.real.Real;
@@ -34,7 +35,7 @@ import java.util.List;
  * and removing the center square, similar to the Cantor set but in 2D.
  * Also known as the Cantor square.
  * </p>
- * 
+ *
  * <h2>Construction</h2>
  * <ol>
  * <li>Start with a unit square [0,1] × [0,1]</li>
@@ -42,7 +43,7 @@ import java.util.List;
  * <li>Remove the center square</li>
  * <li>Repeat for each remaining square</li>
  * </ol>
- * 
+ *
  * <h2>Properties</h2>
  * <ul>
  * <li>Hausdorff dimension: log(8)/log(3) ≈ 1.8928</li>
@@ -51,14 +52,15 @@ import java.util.List;
  * <li>Self-similar fractal</li>
  * <li>Nowhere dense but perfect set</li>
  * </ul>
- * 
+ *
  * <h2>References</h2>
  * <ul>
  * <li>Cantor, Georg (1883). "Über unendliche, lineare
  * Punktmannigfaltigkeiten"</li>
  * <li>Mandelbrot, B. (1982). "The Fractal Geometry of Nature"</li>
  * </ul>
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

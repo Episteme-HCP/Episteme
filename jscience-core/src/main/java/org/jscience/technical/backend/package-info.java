@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 /**
  * Pluggable compute backend abstraction layer.
  * <p>
@@ -31,32 +32,8 @@
  * <p>
  * <b>Key interfaces:</b>
  * <ul>
- * <li>{@link org.jscience.technicals.backend.ComputeBackend} - SPI for backend
- * implementations</li>
- * <li>{@link org.jscience.technicals.backend.ExecutionContext} - Context for
- * running
- * operations</li>
- * <li>{@link org.jscience.technicals.backend.Operation} - Functional interface
- * for
- * computations</li>
- * </ul>
- * </p>
- * <p>
- * <b>Usage example:</b>
- * 
- * <pre>
- * // Use default backend (transparent)
- * ComputeBackend backend = BackendManager.getDefault();
- * try (ExecutionContext ctx = backend.createContext()) {
- *     Double result = ctx.execute(context -> Math.sqrt(2.0));
- * }
- * 
- * // Or select specific backend
- * ComputeBackend gpu = BackendManager.select("GPU");
- * </pre>
- * </p>
- * 
- * @author Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

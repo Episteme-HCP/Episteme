@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.structures.rings;
 
 /**
@@ -28,7 +29,7 @@ package org.jscience.mathematics.structures.rings;
  * A field element extends ring element with division (multiplicative inverse).
  * Every non-zero field element has a multiplicative inverse.
  * </p>
- * 
+ *
  * <h2>Field Axioms</h2>
  * <p>
  * In addition to ring axioms:
@@ -37,25 +38,10 @@ package org.jscience.mathematics.structures.rings;
  * <li>Every non-zero element has a multiplicative inverse</li>
  * <li>(F \ {0}, *) is an abelian group</li>
  * </ul>
- * 
+ *
  * <h2>Example Usage</h2>
- * 
- * <pre>{@code
- * // Generic algorithm requiring division
- * public static <E extends FieldElement<E>> E average(List<E> elements) {
- *     E sum = elements.get(0).zero();
- *     for (E e : elements) {
- *         sum = sum.add(e);
- *     }
- *     // Division is available because E is a FieldElement
- *     return sum.divide(Real.of(elements.size()));
- * }
- * }</pre>
- * 
- * @param <E> the self-type (implementing class)
- * 
- * @see RingElement
- * @see Field * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

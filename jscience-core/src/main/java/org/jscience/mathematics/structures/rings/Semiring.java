@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.structures.rings;
 
 import org.jscience.mathematics.structures.groups.AbelianMonoid;
@@ -39,7 +40,7 @@ import org.jscience.mathematics.structures.groups.AbelianMonoid;
  * <p>
  * The term "rig" is a pun on "ring": a ring without "n" (negative).
  * </p>
- * 
+ *
  * <h2>Examples</h2>
  * <ul>
  * <li>(ℕ, +, ×) - Natural numbers (including 0)</li>
@@ -47,11 +48,8 @@ import org.jscience.mathematics.structures.groups.AbelianMonoid;
  * multiplication</li>
  * <li>(Languages, ∪, ·) - Formal languages with union and concatenation</li>
  * </ul>
- * 
- * @param <E> the type of elements in this semiring
- * 
- * @see Ring
- * @see AbelianMonoid * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

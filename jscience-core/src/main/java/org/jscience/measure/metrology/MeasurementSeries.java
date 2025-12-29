@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.measure.metrology;
 
 import java.util.ArrayList;
@@ -39,25 +40,8 @@ import org.jscience.measure.Quantity;
  * </p>
  * <p>
  * <b>Example Usage:</b>
- * 
- * <pre>{@code
- * MeasurementSeries<Mass> series = new MeasurementSeries<>();
- * 
- * // Add measurements
- * series.addMeasurement(Quantities.create(100.2, GRAM));
- * series.addMeasurement(Quantities.create(100.1, GRAM));
- * series.addMeasurement(Quantities.create(100.3, GRAM));
- * // ... more measurements
- * 
- * // Statistical analysis
- * Quantity<Mass> mean = series.getMean();
- * Quantity<Mass> stdDev = series.getStandardDeviation();
- * MeasuredQuantity<Mass> result = series.getConfidenceInterval(0.95);
- * }</pre>
- * </p>
- * 
- * @param <Q> the quantity type
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

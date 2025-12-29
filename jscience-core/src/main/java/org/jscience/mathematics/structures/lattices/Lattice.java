@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.structures.lattices;
 
 import org.jscience.mathematics.structures.sets.Set;
@@ -27,7 +28,7 @@ import org.jscience.mathematics.structures.sets.Set;
 /**
  * A lattice is a set equipped with two commutative, associative and idempotent
  * binary operations: join (∨) and meet (∧), connected by absorption laws.
- * 
+ *
  * <h2>Mathematical Definition</h2>
  * <p>
  * A lattice (L, ∨, ∧) satisfies:
@@ -42,7 +43,7 @@ import org.jscience.mathematics.structures.sets.Set;
  * </li>
  * </ul>
  * </p>
- * 
+ *
  * <h2>Examples</h2>
  * <ul>
  * <li>Boolean Algebra ({0,1}, OR, AND)</li>
@@ -50,10 +51,8 @@ import org.jscience.mathematics.structures.sets.Set;
  * <li>Natural Numbers (ℕ, max, min)</li>
  * <li>Divisibility (ℕ, lcm, gcd)</li>
  * </ul>
- * 
- * @param <E> the type of elements
- * 
- * @see BooleanAlgebra * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

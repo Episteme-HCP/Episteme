@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 /**
  * Graph traversal strategies and algorithms.
  * <p>
@@ -29,33 +30,8 @@
  * <p>
  * <b>Standard traversals:</b>
  * <ul>
- * <li>{@link org.jscience.mathematics.discrete.graph.DFSTraversal} -
- * Depth-first search</li>
- * <li>{@link org.jscience.mathematics.discrete.graph.BFSTraversal} -
- * Breadth-first search</li>
- * </ul>
- * </p>
- * <p>
- * <b>Usage example:</b>
- * 
- * <pre>
- * Graph&lt;String&gt; graph = new DirectedGraph&lt;&gt;();
- * // ... populate graph ...
- * 
- * // DFS traversal
- * graph.dfs("start", (vertex, depth) -> {
- *     System.out.println(" ".repeat(depth) + vertex);
- * });
- * 
- * // Custom strategy
- * GraphTraversalStrategy&lt;String&gt; strategy = new BFSTraversal&lt;&gt;();
- * graph.traverse("start", strategy, (vertex, depth) -> {
- *     System.out.println("Level " + depth + ": " + vertex);
- * });
- * </pre>
- * </p>
- * 
- * @author Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

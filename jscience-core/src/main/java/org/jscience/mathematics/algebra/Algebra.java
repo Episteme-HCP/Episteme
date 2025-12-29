@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.algebra;
 
 import org.jscience.mathematics.structures.spaces.Module;
@@ -27,7 +28,7 @@ import org.jscience.mathematics.structures.rings.Ring;
 
 /**
  * An algebra over a field is a vector space equipped with a bilinear product.
- * 
+ *
  * <h2>Mathematical Definition</h2>
  * <p>
  * An algebra A over a field K is a vector space equipped with a binary
@@ -39,7 +40,7 @@ import org.jscience.mathematics.structures.rings.Ring;
  * <li>(ax) · (by) = (ab) (x · y)</li>
  * </ul>
  * </p>
- * 
+ *
  * <h2>Examples</h2>
  * <ul>
  * <li>Square matrices (Mₙ(K))</li>
@@ -48,12 +49,8 @@ import org.jscience.mathematics.structures.rings.Ring;
  * <li>Quaternions (as ℝ-algebra)</li>
  * <li>Lie Algebras (with bracket [x,y] as product)</li>
  * </ul>
- * 
- * @param <E> the type of algebra elements
- * @param <F> the type of scalars
- * 
- * @see VectorSpace
- * @see Ring * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

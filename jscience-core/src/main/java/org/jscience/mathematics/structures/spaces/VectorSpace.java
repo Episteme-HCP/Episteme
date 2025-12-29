@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.structures.spaces;
 
 import org.jscience.mathematics.structures.rings.Field;
@@ -29,13 +30,13 @@ import org.jscience.mathematics.structures.rings.Field;
  * <p>
  * This is the central structure of linear algebra.
  * </p>
- * 
+ *
  * <h2>Mathematical Definition</h2>
  * <p>
  * A vector space V over a field F is a module where the scalar ring is a field.
  * Elements of V are called vectors, elements of F are called scalars.
  * </p>
- * 
+ *
  * <h2>Examples</h2>
  * <ul>
  * <li>ℝⁿ (Euclidean space)</li>
@@ -43,12 +44,8 @@ import org.jscience.mathematics.structures.rings.Field;
  * <li>Function spaces (e.g., L²)</li>
  * <li>Polynomial spaces</li>
  * </ul>
- * 
- * @param <V> the type of vectors
- * @param <F> the type of scalars (must be a Field)
- * 
- * @see Field
- * @see Module * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

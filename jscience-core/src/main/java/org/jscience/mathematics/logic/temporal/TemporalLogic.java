@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.logic.temporal;
 
 import org.jscience.mathematics.logic.Logic;
@@ -38,7 +39,7 @@ import org.jscience.mathematics.logic.propositional.Proposition;
  * <li>U (Until) - p U q means p holds until q becomes true</li>
  * </ul>
  * </p>
- * 
+ *
  * <h2>References</h2>
  * <ul>
  * <li>Amir Pnueli, "The Temporal Logic of Programs",
@@ -50,9 +51,8 @@ import org.jscience.mathematics.logic.propositional.Proposition;
  * ACM Transactions on Programming Languages and Systems, Vol. 8, No. 2, 1986,
  * pp. 244-263</li>
  * </ul>
- * 
- * @param <T> truth value type
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

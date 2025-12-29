@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,18 +20,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 /**
  * Automata theory implementations including cellular automata, finite state
  * machines, and formal grammars.
  * <p>
  * This package provides:
  * <ul>
- * <li>{@link CellularAutomaton} - Interface for cellular automata</li>
- * <li>{@link ConwayLife} - Conway's Game of Life</li>
- * <li>{@link FiniteStateMachine} - Generic FSM implementation</li>
- * <li>{@link Grammar} - Context-free grammar support</li>
- * </ul>
- * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)

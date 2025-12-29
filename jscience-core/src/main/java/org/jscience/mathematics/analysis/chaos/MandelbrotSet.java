@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.analysis.chaos;
 
 import org.jscience.mathematics.numbers.complex.Complex;
@@ -30,7 +31,7 @@ import org.jscience.mathematics.numbers.complex.Complex;
  * The Mandelbrot set M ⊂ ℂ is defined as:
  * M = { c ∈ ℂ : the sequence z₀ = 0, zₙ₊₁ = zₙ² + c remains bounded }
  * </p>
- * 
+ *
  * <h2>References</h2>
  * <ul>
  * <li>Benoit B. Mandelbrot, "The Fractal Geometry of Nature",
@@ -39,7 +40,8 @@ import org.jscience.mathematics.numbers.complex.Complex;
  * complexes",
  * Publications Mathématiques d'Orsay, 1984-1985</li>
  * </ul>
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

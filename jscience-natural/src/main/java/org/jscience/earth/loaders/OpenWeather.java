@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.earth.loaders;
 
 import org.jscience.io.cache.ResourceCache;
@@ -37,19 +38,12 @@ import java.util.Optional;
  * <b>What it does</b>: Fetches current weather conditions including
  * temperature, pressure, humidity, wind, and cloud cover.
  * </p>
- * 
+ *
  * <p>
  * <b>Data Source</b>: OpenWeatherMap API (requires API key)
  * </p>
- * 
- * <pre>{@code
- * // Get weather for a city
- * WeatherInfo weather = OpenWeather.getByCity("Paris");
- * System.out.println(weather.getTemperature()); // Returns Quantity<Temperature>
- * }</pre>
- * 
- * * @author Silvere Martin-Michiellot
- * 
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

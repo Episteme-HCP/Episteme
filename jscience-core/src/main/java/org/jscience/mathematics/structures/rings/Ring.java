@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.structures.rings;
 
 import org.jscience.mathematics.structures.groups.AbelianGroup;
@@ -30,7 +31,7 @@ import org.jscience.mathematics.structures.groups.AbelianGroup;
  * Rings are fundamental algebraic structures that generalize arithmetic.
  * They appear throughout mathematics, from number theory to algebraic geometry.
  * </p>
- * 
+ *
  * <h2>Mathematical Definition</h2>
  * <p>
  * A ring (R, +, ×) consists of:
@@ -47,7 +48,7 @@ import org.jscience.mathematics.structures.groups.AbelianGroup;
  * </li>
  * </ol>
  * </p>
- * 
+ *
  * <h2>Examples</h2>
  * <ul>
  * <li>(ℤ, +, ×) - Integers (commutative ring with unity)</li>
@@ -56,7 +57,7 @@ import org.jscience.mathematics.structures.groups.AbelianGroup;
  * <li>(ℤ/nℤ, +, ×) - Integers modulo n</li>
  * <li>(ℝ[x], +, ×) - Polynomials with real coefficients</li>
  * </ul>
- * 
+ *
  * <h2>Special Types of Rings</h2>
  * <ul>
  * <li><strong>Commutative Ring</strong>: Multiplication commutes (a × b = b ×
@@ -68,36 +69,10 @@ import org.jscience.mathematics.structures.groups.AbelianGroup;
  * inverse</li>
  * <li><strong>Field</strong>: Commutative division ring</li>
  * </ul>
- * 
+ *
  * <h2>Usage</h2>
- * 
- * <pre>{@code
- * // Integer ring
- * Ring<Integer> integers = IntegerRing.getInstance();
- * 
- * Integer a = 5;
- * Integer b = 3;
- * 
- * // Ring operations
- * Integer sum = integers.add(a, b); // 8 (abelian group)
- * Integer product = integers.multiply(a, b); // 15 (ring multiplication)
- * Integer diff = integers.subtract(a, b); // 2
- * 
- * // Ring properties
- * Integer zero = integers.zero(); // 0 (additive identity)
- * Integer one = integers.one(); // 1 (multiplicative identity)
- * 
- * // Distributivity: a × (b + c) = (a × b) + (a × c)
- * Integer c = 2;
- * Integer left = integers.multiply(a, integers.add(b, c));
- * Integer right = integers.add(
- *         integers.multiply(a, b),
- *         integers.multiply(a, c));
- * assert left.equals(right); // 5 × (3 + 2) = 5 × 3 + 5 × 2 = 25
- * }</pre>
- * 
- * @param <E> the type of elements in this ring
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

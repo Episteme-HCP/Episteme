@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.physics.classical.waves.electromagnetism.components;
 
 import java.util.ArrayList;
@@ -29,10 +30,10 @@ import org.jscience.mathematics.numbers.real.Real;
 /**
  * Represents a parallel connection of circuit components.
  * The total voltage across each component is the same, and the total current is
- * the sum of the currents. * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- 
  */
 public class ParallelCircuit implements CircuitComponent {
     private final List<CircuitComponent> components = new ArrayList<>();

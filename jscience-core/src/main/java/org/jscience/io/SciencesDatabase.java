@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.io;
 
 import org.w3c.dom.Document;
@@ -37,33 +38,12 @@ import java.util.*;
  * with attribution.
  * Database contains 600+ scientific disciplines from acarology to zoology.
  * </p>
- * 
+ *
  * <p>
  * <b>Usage example</b>:
  * </p>
- * 
- * <pre>{@code
- * // Find a science by name
- * Optional<Science> astro = SciencesDatabase.find("astronomy");
- * Science s = astro.get();
- * System.out.println(s.getName() + ": " + s.getDescription());
- * // Output: "Astronomy: study of celestial bodies"
- * 
- * // Search by keyword
- * List<Science> bio = SciencesDatabase.search("biology");
- * // Returns: biology, microbiology, astrobiology, etc.
- * }</pre>
- * 
- * <p>
- * <b>Performance</b>:
- * </p>
- * <ul>
- * <li>Lazy loading: Database loads on first access</li>
- * <li>Cached: Subsequent accesses are O(1)</li>
- * <li>Memory: ~70KB for full database</li>
- * </ul>
- * 
- * @see <a href="http://phrontistery.50megs.com">Phrontistery Word List</a> * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

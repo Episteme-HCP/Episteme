@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.linearalgebra.matrices.solvers;
 
 import org.jscience.mathematics.linearalgebra.Matrix;
@@ -32,57 +33,8 @@ import org.jscience.mathematics.numbers.real.Real;
  * <p>
  * Analyzes matrix properties and selects the optimal decomposition method.
  * Harmonized with
- * {@link org.jscience.mathematics.linearalgebra.MatrixFactory}
- * and {@link org.jscience.mathematics.linearalgebra.tensors.TensorFactory}.
- * </p>
- * 
- * <h2>Algorithm Selection</h2>
- * <table border="1">
- * <tr>
- * <th>Matrix Type</th>
- * <th>Recommended Solver</th>
- * </tr>
- * <tr>
- * <td>Symmetric positive definite</td>
- * <td>CHOLESKY</td>
- * </tr>
- * <tr>
- * <td>Square, general</td>
- * <td>LU</td>
- * </tr>
- * <tr>
- * <td>Overdetermined (m &gt; n)</td>
- * <td>QR</td>
- * </tr>
- * <tr>
- * <td>Ill-conditioned, rank-deficient</td>
- * <td>SVD</td>
- * </tr>
- * <tr>
- * <td>Large sparse, SPD</td>
- * <td>CONJUGATE_GRADIENT</td>
- * </tr>
- * <tr>
- * <td>Large sparse, general</td>
- * <td>BICGSTAB or GMRES</td>
- * </tr>
- * </table>
- * 
- * <h2>Usage</h2>
- * 
- * <pre>
- * // Auto-select best solver
- * Real[] x = MatrixSolver.solve(A, b);
- * 
- * // Force specific solver
- * Real[] x = MatrixSolver.solve(A, b, Strategy.SVD);
- * 
- * // Get recommendation
- * Strategy recommended = MatrixSolver.recommend(A);
- * </pre>
- * 
- * * @author Silvere Martin-Michiellot
- * 
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

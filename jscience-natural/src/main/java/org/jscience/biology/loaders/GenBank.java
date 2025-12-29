@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.biology.loaders;
 
 import org.jscience.io.cache.ResourceCache;
@@ -36,24 +37,15 @@ import java.util.Optional;
  * <b>What it does</b>: Fetches nucleotide and protein sequences using
  * NCBI E-utilities (efetch/esearch).
  * </p>
- * 
+ *
  * <p>
  * <b>Data Source</b>: NCBI Entrez E-utilities API
  * </p>
  * <p>
  * <b>Usage example</b>:
  * </p>
- * 
- * <pre>{@code
- * // Get sequence by accession number
- * SequenceInfo seq = GenBank.getSequence("NC_000913.3");
- * 
- * // Get FASTA format
- * String fasta = GenBank.getFasta("NC_000913.3");
- * }</pre>
- * 
- * * @author Silvere Martin-Michiellot
- * 
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

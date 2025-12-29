@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.linearalgebra.tensors;
 
 /**
@@ -29,29 +30,28 @@ package org.jscience.mathematics.linearalgebra.tensors;
  * to arbitrary dimensions. They are fundamental in physics, machine learning,
  * and numerical computing.
  * </p>
- * 
+ *
  * <h2>Rank and Shape</h2>
  * <ul>
  * <li><b>Rank</b>: Number of dimensions (e.g., rank 3 = 3D tensor)</li>
  * <li><b>Shape</b>: Size of each dimension (e.g., [2, 3, 4] = 2×3×4)</li>
  * <li><b>Size</b>: Total number of elements (product of shape)</li>
  * </ul>
- * 
+ *
  * <h2>Example</h2>
- * 
+ *
  * <pre>
  * // 2×3 matrix (rank 2 tensor)
  * Tensor&lt;Real&gt; matrix = Tensor.of(new Real[][] {
- *         { Real.of(1), Real.of(2), Real.of(3) },
- *         { Real.of(4), Real.of(5), Real.of(6) }
+ * { Real.of(1), Real.of(2), Real.of(3) },
+ * { Real.of(4), Real.of(5), Real.of(6) }
  * });
- * 
+ *
  * // 3D tensor (rank 3)
  * Tensor&lt;Real&gt; tensor3d = Tensor.zeros(Real.class, 2, 3, 4);
  * </pre>
- * 
- * @param <T> the type of elements
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

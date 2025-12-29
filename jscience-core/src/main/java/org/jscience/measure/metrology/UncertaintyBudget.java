@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.measure.metrology;
 
 import java.util.LinkedHashMap;
@@ -36,48 +37,8 @@ import org.jscience.measure.Quantity;
  * </p>
  * <p>
  * <b>Example Usage:</b>
- * 
- * <pre>{@code
- * UncertaintyBudget<Mass> budget = new UncertaintyBudget<>();
- * 
- * // Type A (statistical)
- * budget.addSource("Repeatability",
- *         Quantities.create(0.05, GRAM),
- *         UncertaintyType.TYPE_A);
- * 
- * // Type B (systematic)
- * budget.addSource("Calibration",
- *         Quantities.create(0.1, GRAM),
- *         UncertaintyType.TYPE_B);
- * 
- * budget.addSource("Temperature",
- *         Quantities.create(0.02, GRAM),
- *         UncertaintyType.TYPE_B);
- * 
- * // Combined: √(0.05² + 0.1² + 0.02²) = 0.112 g
- * Quantity<Mass> combined = budget.getCombinedUncertainty();
- * 
- * // Expanded (k=2): 2 × 0.112 = 0.224 g
- * Quantity<Mass> expanded = budget.getExpandedUncertainty(2.0);
- * }</pre>
- * </p>
- * 
- * <h2>Uncertainty Types</h2>
- * <ul>
- * <li><b>Type A</b>: Evaluated by statistical methods (repeated
- * measurements)</li>
- * <li><b>Type B</b>: Evaluated by other means (specifications, calibration,
- * experience)</li>
- * </ul>
- * 
- * <h2>References</h2>
- * <ul>
- * <li>ISO/IEC Guide 98-3:2008 - Uncertainty of measurement (GUM)</li>
- * <li>JCGM 100:2008 - Evaluation of measurement data</li>
- * </ul>
- * 
- * @param <Q> the quantity type
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

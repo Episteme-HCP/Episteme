@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.analysis.series;
 
 import org.jscience.mathematics.numbers.real.Real;
@@ -34,14 +35,15 @@ import org.jscience.mathematics.numbers.real.Real;
  * The partial sum H_n ≈ ln(n) + γ where γ ≈ 0.5772 is the Euler-Mascheroni
  * constant.
  * </p>
- * 
+ *
  * <h2>Example</h2>
- * 
+ *
  * <pre>
  * HarmonicSeries series = new HarmonicSeries();
  * Real h10 = series.partialSum(10); // 1 + 1/2 + 1/3 + ... + 1/10
  * </pre>
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

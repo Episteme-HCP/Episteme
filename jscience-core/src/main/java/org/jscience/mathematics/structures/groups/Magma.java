@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.structures.groups;
 
 import org.jscience.mathematics.structures.sets.Set;
@@ -30,7 +31,7 @@ import org.jscience.mathematics.structures.sets.Set;
  * This is the simplest algebraic structure with an operation. The operation
  * is not required to be associative, commutative, or have an identity element.
  * </p>
- * 
+ *
  * <h2>Mathematical Definition</h2>
  * <p>
  * A magma (S, ∗) consists of:
@@ -40,7 +41,7 @@ import org.jscience.mathematics.structures.sets.Set;
  * </ul>
  * The only requirement is closure: for all a, b ∈ S, a ∗ b ∈ S.
  * </p>
- * 
+ *
  * <h2>Examples</h2>
  * <ul>
  * <li>(ℕ, −) - Natural numbers with subtraction (not a semigroup, not
@@ -48,36 +49,22 @@ import org.jscience.mathematics.structures.sets.Set;
  * <li>(ℤ, ÷) - Integers with division (not closed, only a partial magma)</li>
  * <li>(ℝ, +) - Real numbers with addition (actually a group)</li>
  * </ul>
- * 
+ *
  * <h2>Hierarchy</h2>
- * 
+ *
  * <pre>
  * Magma (closure)
- *   ↓
+ * ↓
  * Semigroup (+ associativity)
- *   ↓
+ * ↓
  * Monoid (+ identity)
- *   ↓
+ * ↓
  * Group (+ inverse)
  * </pre>
- * 
+ *
  * <h2>Usage</h2>
- * 
- * <pre>{@code
- * // Simple magma - natural number subtraction
- * Magma<Integer> naturalSub = new Magma<>() {
- *     public Integer operate(Integer a, Integer b) {
- *         int result = a - b;
- *         return result >= 0 ? result : 0; // Keep in ℕ
- *     }
- * };
- * 
- * Integer result = naturalSub.operate(5, 3); // 2
- * Integer result2 = naturalSub.operate(3, 5); // 0 (forced closure)
- * }</pre>
- * 
- * @param <E> the type of elements in this magma
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

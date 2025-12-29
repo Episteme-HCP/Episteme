@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.mathematics.algebra.algebras;
 
 import org.jscience.mathematics.structures.groups.Magma;
@@ -32,7 +33,7 @@ import org.jscience.mathematics.structures.groups.Magma;
  * A Loop adds the requirement of a neutral element (identity).
  * Unlike Groups, Loops are not required to be associative.
  * </p>
- * 
+ *
  * <h2>Mathematical Definition</h2>
  * <p>
  * A loop (L, ·) is a set L with a binary operation · such that:
@@ -43,9 +44,8 @@ import org.jscience.mathematics.structures.groups.Magma;
  * for all a ∈ L.</li>
  * </ul>
  * </p>
- * 
- * @param <E> the type of elements
- * * @author Silvere Martin-Michiellot
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.chemistry.loaders;
 
 import org.jscience.io.cache.ResourceCache;
@@ -39,28 +40,19 @@ import java.util.Optional;
  * Retrieves structures, properties (molecular weight, formula), and
  * identifiers.
  * </p>
- * 
+ *
  * <p>
  * <b>Data Source</b>: PubChem PUG REST API (https://pubchem.ncbi.nlm.nih.gov/)
  * </p>
  * <p>
  * <b>License</b>: Public Domain (US Government work).
  * </p>
- * 
+ *
  * <p>
  * <b>Usage example</b>:
  * </p>
- * 
- * <pre>{@code
- * // Search for Aspirin
- * String json = PubChem.search("aspirin");
- * 
- * // Get properties (MolecularFormula, MolecularWeight)
- * String props = PubChem.getProperties("aspirin", "MolecularFormula,MolecularWeight");
- * }</pre>
- * 
- * * @author Silvere Martin-Michiellot
- * 
+ *
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
