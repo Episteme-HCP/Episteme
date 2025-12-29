@@ -205,8 +205,8 @@ public class JScienceDashboard extends Application {
                 new LocaleItem("English", Locale.ENGLISH),
                 new LocaleItem("Français", Locale.FRENCH),
                 new LocaleItem("Deutsch", Locale.GERMAN),
-                new LocaleItem("Español", new Locale("es")),
-                new LocaleItem("中文", new Locale("zh")));
+                new LocaleItem("Español", Locale.of("es")),
+                new LocaleItem("中文", Locale.of("zh")));
 
         langList.setMaxHeight(200);
         langList.setMaxWidth(300);
