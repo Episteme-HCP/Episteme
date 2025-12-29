@@ -8,3 +8,5 @@ org.jscience.apps.physics.relativity.RelativisticFlightApp
 org.jscience.apps.physics.trajectory.InterplanetaryTrajectoryApp
 org.jscience.apps.sociology.CivilizationApp
 org.jscience.apps.economics.MarketCrashApp
+org.jscience.apps.engineering.traffic.CarTrafficDemo
+org.jscience.apps.sociology.sports.SportsResultsDemo

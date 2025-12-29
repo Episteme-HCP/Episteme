@@ -1,10 +1,15 @@
 package org.jscience.ui.demos;
 
 import javafx.animation.AnimationTimer;
-import javafx.scene.Group;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
@@ -33,11 +38,17 @@ public class SociologyNetworkDemo implements DemoProvider {
     private static class Node {
         double x, y, vx, vy;
         Color color;
+        String name;
+        int age;
+        String city;
 
-        Node(double x, double y, Color c) {
+        Node(double x, double y, Color c, String name, int age, String city) {
             this.x = x;
             this.y = y;
             this.color = c;
+            this.name = name;
+            this.age = age;
+            this.city = city;
         }
     }
 
@@ -52,14 +63,60 @@ public class SociologyNetworkDemo implements DemoProvider {
 
     @Override
     public void show(Stage stage) {
-        Group root = new Group();
+        BorderPane root = new BorderPane();
+
+        // Canvas Center
         Canvas canvas = new Canvas(800, 600);
-        root.getChildren().add(canvas);
+        Pane canvasPane = new Pane(canvas);
+        canvasPane.setPrefSize(800, 600);
+        root.setCenter(canvasPane);
+
         GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        // Right Sidebar
+        VBox sidebar = new VBox(15);
+        sidebar.setPadding(new Insets(15));
+        sidebar.setPrefWidth(250);
+        sidebar.setStyle("-fx-background-color: #f4f4f4; -fx-border-color: #ddd; -fx-border-width: 0 0 0 1;");
+
+        Label title = new Label(getName());
+        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+        Label desc = new Label(getDescription());
+        desc.setWrapText(true);
+
+        Separator sep = new Separator();
+
+        Label detailsTitle = new Label("Person Details");
+        detailsTitle.setStyle("-fx-font-weight: bold;");
+
+        Label details = new Label("Click on a person node to view details.");
+        details.setWrapText(true);
+
+        sidebar.getChildren().addAll(title, desc, sep, detailsTitle, details);
+        root.setRight(sidebar);
 
         List<Node> nodes = new ArrayList<>();
         List<Edge> edges = new ArrayList<>();
         Random rand = new Random();
+
+        // Mouse Interaction
+        canvas.setOnMouseClicked(e -> {
+            boolean found = false;
+            double mx = e.getX();
+            double my = e.getY();
+            for (Node n : nodes) {
+                double dist = Math.sqrt(Math.pow(n.x - mx, 2) + Math.pow(n.y - my, 2));
+                if (dist < 10) { // Radius + margin
+                    details.setText("Name: " + n.name + "\nAge: " + n.age + "\nCity: " + n.city);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                details.setText("Click on a person node to view details.");
+            }
+        });
 
         // Create Clusters
         createCluster(nodes, edges, 15, 200, 200, Color.BLUE, rand);
@@ -80,18 +137,25 @@ public class SociologyNetworkDemo implements DemoProvider {
         };
         timer.start();
 
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, 1050, 600);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle(getName());
         stage.setScene(scene);
         stage.show();
     }
 
+    private static final String[] NAMES = { "Alice", "Bob", "Charlie", "David", "Eve", "Frank", "Grace", "Heidi",
+            "Ivan", "Judy" };
+    private static final String[] CITIES = { "Paris", "New York", "London", "Tokyo", "Berlin", "Sydney", "Toronto" };
+
     private void createCluster(List<Node> nodes, List<Edge> edges, int count, double cx, double cy, Color color,
             Random r) {
         int startIdx = nodes.size();
         for (int i = 0; i < count; i++) {
-            nodes.add(new Node(cx + r.nextDouble() * 100 - 50, cy + r.nextDouble() * 100 - 50, color));
+            String name = NAMES[r.nextInt(NAMES.length)] + " " + (nodes.size() + 1);
+            int age = 20 + r.nextInt(40);
+            String city = CITIES[r.nextInt(CITIES.length)];
+            nodes.add(new Node(cx + r.nextDouble() * 100 - 50, cy + r.nextDouble() * 100 - 50, color, name, age, city));
             if (i > 0) {
                 // Connect to previous in cluster
                 edges.add(new Edge(nodes.get(startIdx + i), nodes.get(startIdx + r.nextInt(i))));

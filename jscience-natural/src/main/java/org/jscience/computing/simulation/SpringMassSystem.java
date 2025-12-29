@@ -25,6 +25,7 @@ package org.jscience.computing.simulation;
 /**
  * Spring-mass particle system for cloth/soft body simulation.
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -121,6 +122,8 @@ public class SpringMassSystem {
     public void step(double dt) {
         computeForces();
         for (int i = 0; i < numParticles; i++) {
+            if (Double.isInfinite(masses[i]))
+                continue; // Fixed particle
             int idx = i * 3;
             double inv = 1.0 / masses[i];
             velocities[idx] += forces[idx] * inv * dt;

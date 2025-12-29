@@ -27,7 +27,7 @@ import java.security.SecureRandom;
 /**
  * Generates Social Security Number-like identifiers.
  * <p>
- * Produces identifiers in the format XXX-XX-XXXX.
+ * Produces identifiers in the format ###-##-####.
  * Note: These are NOT valid SSNs and are for testing/simulation only.
  * </p>
  *

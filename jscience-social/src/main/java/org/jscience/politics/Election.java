@@ -23,103 +23,60 @@
 package org.jscience.politics;
 
 import java.time.LocalDate;
-import java.util.*;
-import org.jscience.mathematics.numbers.real.Real;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import org.jscience.util.identity.Identifiable;
+import org.jscience.util.Temporal;
 
 /**
- * Represents an election.
- * * @author Silvere Martin-Michiellot
- * 
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Represents a political election.
  */
-public class Election {
+public class Election implements Identifiable<String>, Temporal {
 
-    public enum Type {
-        PRESIDENTIAL, PARLIAMENTARY, LOCAL, REFERENDUM, PRIMARY
-    }
-
-    private final String name;
-    private final Type type;
+    private final String id;
+    private final String title;
     private final LocalDate date;
-    private String country;
-    private final Map<String, Long> results = new LinkedHashMap<>();
-    private long totalVotes;
-    private Real turnoutPercentage;
-    private String winner;
+    private final Country country;
+    private final Map<String, Integer> results = new HashMap<>(); // Candidate/Party -> Votes
 
-    public Election(String name, Type type, LocalDate date) {
-        this.name = name;
-        this.type = type;
+    public Election(String title, Country country, LocalDate date) {
+        this.id = UUID.randomUUID().toString();
+        this.title = title;
+        this.country = country;
         this.date = date;
     }
 
-    // Getters
-    public String getName() {
-        return name;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public long getTotalVotes() {
-        return totalVotes;
-    }
-
-    public Real getTurnoutPercentage() {
-        return turnoutPercentage;
-    }
-
-    public String getWinner() {
-        return winner;
-    }
-
-    public Map<String, Long> getResults() {
-        return Collections.unmodifiableMap(results);
-    }
-
-    // Setters
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public void setTotalVotes(long votes) {
-        this.totalVotes = votes;
-    }
-
-    public void setTurnoutPercentage(Real turnout) {
-        this.turnoutPercentage = turnout;
-    }
-
-    public void setWinner(String winner) {
-        this.winner = winner;
-    }
-
-    public void addResult(String candidate, long votes) {
-        results.put(candidate, votes);
-    }
-
-    /**
-     * Calculates vote share for a candidate.
-     */
-    public Real getVoteShare(String candidate) {
-        if (totalVotes == 0)
-            return Real.ZERO;
-        Long votes = results.get(candidate);
-        return votes != null ? Real.of(votes * 100.0 / totalVotes) : Real.ZERO;
+    @Override
+    public String getId() {
+        return id;
     }
 
     @Override
-    public String toString() {
-        return String.format("%s (%s, %s) - Winner: %s", name, type, date, winner);
+    public java.time.Instant getTimestamp() {
+        return java.time.Instant.from(date.atStartOfDay(java.time.ZoneId.of("UTC")));
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public Country getCountry() {
+        return country;
+    }
+
+    public void addVote(String candidate, int count) {
+        results.merge(candidate, count, Integer::sum);
+    }
+
+    public Map<String, Integer> getResults() {
+        return results;
+    }
+
+    public String getWinner() {
+        return results.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
     }
 }

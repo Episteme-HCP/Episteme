@@ -16,7 +16,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import javax.measure.Unit;
+import org.jscience.measure.Unit;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -40,61 +40,69 @@ public class UnitConverterViewer extends Application {
 
     @Override
     public void start(Stage stage) {
-        VBox root = new VBox(20);
-        root.setPadding(new Insets(20));
-        root.setStyle("-fx-background-color: #f4f4f4;");
+        try {
+            VBox root = new VBox(20);
+            root.setPadding(new Insets(20));
 
-        setupUnits();
+            setupUnits();
 
-        Label title = new Label("Universal Measure Converter");
-        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+            Label title = new Label("Universal Measure Converter");
+            title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
-        // Category
-        HBox catRow = new HBox(10);
-        categoryBox = new ComboBox<>();
-        categoryBox.getItems().addAll(unitsByCategory.keySet());
-        categoryBox.setValue("Length");
-        categoryBox.setOnAction(e -> updateUnitLists());
-        catRow.getChildren().addAll(new Label("Category:"), categoryBox);
+            // Category
+            HBox catRow = new HBox(10);
+            categoryBox = new ComboBox<>();
+            categoryBox.getItems().addAll(unitsByCategory.keySet());
+            categoryBox.setValue("Length");
+            categoryBox.setOnAction(e -> updateUnitLists());
+            catRow.getChildren().addAll(new Label("Category:"), categoryBox);
 
-        // Conversion grid
-        GridPane grid = new GridPane();
-        grid.setHgap(20);
-        grid.setVgap(15);
+            // Conversion grid
+            GridPane grid = new GridPane();
+            grid.setHgap(20);
+            grid.setVgap(15);
 
-        inputField = new TextField("1.0");
-        outputField = new TextField();
-        outputField.setEditable(false);
-        outputField.setStyle("-fx-background-color: #e8f5e9; -fx-font-weight: bold;");
+            inputField = new TextField("1.0");
+            outputField = new TextField();
+            outputField.setEditable(false);
+            outputField.setStyle("-fx-font-weight: bold;");
 
-        fromUnitBox = new ComboBox<>();
-        toUnitBox = new ComboBox<>();
+            fromUnitBox = new ComboBox<>();
+            toUnitBox = new ComboBox<>();
 
-        grid.add(new Label("From:"), 0, 0);
-        grid.add(inputField, 1, 0);
-        grid.add(fromUnitBox, 2, 0);
+            grid.add(new Label("From:"), 0, 0);
+            grid.add(inputField, 1, 0);
+            grid.add(fromUnitBox, 2, 0);
 
-        grid.add(new Label("To:"), 0, 1);
-        grid.add(outputField, 1, 1);
-        grid.add(toUnitBox, 2, 1);
+            grid.add(new Label("To:"), 0, 1);
+            grid.add(outputField, 1, 1);
+            grid.add(toUnitBox, 2, 1);
 
-        updateUnitLists();
+            updateUnitLists();
 
-        Button convertBtn = new Button("Convert");
-        convertBtn.setMaxWidth(Double.MAX_VALUE);
-        convertBtn.setStyle("-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-padding: 10;");
-        convertBtn.setOnAction(e -> doConvert());
+            Button convertBtn = new Button("Convert");
+            convertBtn.setMaxWidth(Double.MAX_VALUE);
+            convertBtn.setOnAction(e -> doConvert());
 
-        inputField.setOnAction(e -> doConvert());
-        fromUnitBox.setOnAction(e -> doConvert());
-        toUnitBox.setOnAction(e -> doConvert());
+            inputField.setOnAction(e -> doConvert());
+            fromUnitBox.setOnAction(e -> doConvert());
+            toUnitBox.setOnAction(e -> doConvert());
 
-        root.getChildren().addAll(title, catRow, grid, convertBtn);
+            root.getChildren().addAll(title, catRow, grid, convertBtn);
 
-        Scene scene = new Scene(root, 600, 350);
-        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.converter"));
-        stage.setScene(scene);
-        stage.show();
+            Scene scene = new Scene(root, 600, 350);
+            stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.converter"));
+            stage.setScene(scene);
+            stage.show();
+        } catch (Exception e) {
+            VBox errRoot = new VBox(20);
+            errRoot.setPadding(new Insets(20));
+            errRoot.getChildren().add(new Label("Error launching Unit Converter:\n" + e.getMessage()));
+            Scene errScene = new Scene(errRoot, 400, 200);
+            stage.setScene(errScene);
+            stage.show();
+            e.printStackTrace();
+        }
     }
 
     private void setupUnits() {

@@ -22,7 +22,7 @@
  */
 package org.jscience.ui.devices;
 
-import org.jscience.devices.sim.SimulatedTelescope;
+import org.jscience.device.sim.SimulatedTelescope;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

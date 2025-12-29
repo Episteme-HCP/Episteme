@@ -32,6 +32,7 @@
             <version>${project.version}</version>
         </dependency>
 
+
         <!-- JavaFX -->
         <dependency>
             <groupId>org.openjfx</groupId>

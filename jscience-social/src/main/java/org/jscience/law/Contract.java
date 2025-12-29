@@ -23,144 +23,81 @@
 package org.jscience.law;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import org.jscience.util.identity.Identifiable;
+import org.jscience.util.Temporal;
+import org.jscience.sociology.Person;
 
 /**
  * Represents a legal contract between parties.
- * <p>
- * Modernized from v1 with support for contract lifecycle and terms.
- * </p>
- * * @author Silvere Martin-Michiellot
+ * 
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Contract {
-
-    public enum Type {
-        EMPLOYMENT, SERVICE, SALES, LEASE, LICENSE, PARTNERSHIP,
-        NON_DISCLOSURE, INSURANCE, LOAN, WARRANTY
-    }
-
-    public enum Status {
-        DRAFT, PENDING_SIGNATURE, ACTIVE, SUSPENDED, TERMINATED, EXPIRED
-    }
+public class Contract implements Identifiable<String>, Temporal {
 
     private final String id;
-    private final Type type;
-    private final String firstParty;
-    private final String secondParty;
-    private final LocalDate effectiveDate;
-    private LocalDate expirationDate;
-    private Status status;
-    private final List<String> terms = new ArrayList<>();
-    private final Map<String, Object> metadata = new HashMap<>();
+    private final String title;
+    private final LocalDate date;
+    private final List<Person> parties = new ArrayList<>();
+    private final List<String> clauses = new ArrayList<>();
+    private boolean valid;
 
-    public Contract(String id, Type type, String firstParty, String secondParty,
-            LocalDate effectiveDate) {
-        this.id = id;
-        this.type = type;
-        this.firstParty = firstParty;
-        this.secondParty = secondParty;
-        this.effectiveDate = effectiveDate;
-        this.status = Status.DRAFT;
+    public Contract(String title, LocalDate date) {
+        this.id = UUID.randomUUID().toString();
+        this.title = title;
+        this.date = date;
+        this.valid = true;
     }
 
-    // Getters
+    @Override
     public String getId() {
         return id;
     }
 
-    public Type getType() {
-        return type;
+    public String getTitle() {
+        return title;
     }
 
-    public String getFirstParty() {
-        return firstParty;
+    @Override
+    public java.time.Instant getTimestamp() {
+        return date != null ? java.time.Instant.ofEpochSecond(date.toEpochDay() * 86400) : java.time.Instant.MIN;
     }
 
-    public String getSecondParty() {
-        return secondParty;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public LocalDate getEffectiveDate() {
-        return effectiveDate;
+    public boolean isValid() {
+        return valid;
     }
 
-    public LocalDate getExpirationDate() {
-        return expirationDate;
+    public void setValid(boolean valid) {
+        this.valid = valid;
     }
 
-    public Status getStatus() {
-        return status;
+    public void addParty(Person person) {
+        parties.add(person);
     }
 
-    public List<String> getTerms() {
-        return Collections.unmodifiableList(terms);
+    public List<Person> getParties() {
+        return Collections.unmodifiableList(parties);
     }
 
-    // Setters
-    public void setExpirationDate(LocalDate expirationDate) {
-        this.expirationDate = expirationDate;
+    public void addClause(String clause) {
+        clauses.add(clause);
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public void addTerm(String term) {
-        terms.add(term);
-    }
-
-    public void setMetadata(String key, Object value) {
-        metadata.put(key, value);
-    }
-
-    public Object getMetadata(String key) {
-        return metadata.get(key);
-    }
-
-    /**
-     * Checks if contract is currently active.
-     */
-    public boolean isActive() {
-        if (status != Status.ACTIVE)
-            return false;
-        LocalDate today = LocalDate.now();
-        if (today.isBefore(effectiveDate))
-            return false;
-        if (expirationDate != null && today.isAfter(expirationDate))
-            return false;
-        return true;
-    }
-
-    /**
-     * Signs and activates the contract.
-     */
-    public void sign() {
-        if (status == Status.DRAFT || status == Status.PENDING_SIGNATURE) {
-            status = Status.ACTIVE;
-        }
-    }
-
-    /**
-     * Terminates the contract.
-     */
-    public void terminate() {
-        status = Status.TERMINATED;
-    }
-
-    /**
-     * Returns duration of contract in days (or -1 if no expiration).
-     */
-    public long getDurationDays() {
-        if (expirationDate == null)
-            return -1;
-        return java.time.temporal.ChronoUnit.DAYS.between(effectiveDate, expirationDate);
+    public List<String> getClauses() {
+        return Collections.unmodifiableList(clauses);
     }
 
     @Override
     public String toString() {
-        return String.format("Contract[%s] %s between %s and %s (%s)",
-                id, type, firstParty, secondParty, status);
+        return String.format("Contract: %s (%s)", title, date);
     }
 }

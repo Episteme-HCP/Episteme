@@ -44,11 +44,11 @@ public class PandemicForecasterApp extends KillerAppBase {
 
     // UI Components
     private ComboBox<org.jscience.geography.Region> countrySelector;
-    private Slider betaSlider, sigmaSlider, gammaSlider, initialSlider, daysSlider;
+    private Slider betaSlider, sigmaSlider, gammaSlider, muSlider, initialSlider, daysSlider;
     private LineChart<Number, Number> seirChart;
-    private XYChart.Series<Number, Number> susSeriesS, expSeriesE, infSeriesI, recSeriesR;
+    private XYChart.Series<Number, Number> susSeriesS, expSeriesE, infSeriesI, recSeriesR, deaSeriesD;
     private ListView<String> eventLog;
-    private Label populationLabel, peakLabel, totalLabel;
+    private Label populationLabel, peakLabel, totalLabel, deadLabel;
 
     // Simulation State
     private Timeline simulationTimeline;
@@ -126,10 +126,12 @@ public class PandemicForecasterApp extends KillerAppBase {
         expSeriesE = ChartFactory.createSeries(i18n.get("pandemic.label.exposed"));
         infSeriesI = ChartFactory.createSeries(i18n.get("pandemic.label.infectious"));
         recSeriesR = ChartFactory.createSeries(i18n.get("pandemic.label.recovered"));
+        deaSeriesD = ChartFactory.createSeries(i18n.get("pandemic.label.deceased"));
+        deaSeriesD.setName("Deceased"); // Fallback if i18n missing
 
         @SuppressWarnings("unchecked")
         XYChart.Series<Number, Number>[] series = new XYChart.Series[] { susSeriesS, expSeriesE, infSeriesI,
-                recSeriesR };
+                recSeriesR, deaSeriesD };
         seirChart.getData().addAll(series);
 
         // Style series
@@ -151,12 +153,14 @@ public class PandemicForecasterApp extends KillerAppBase {
         populationLabel = new Label(java.text.MessageFormat.format(i18n.get("pandemic.label.population"), "--"));
         peakLabel = new Label(java.text.MessageFormat.format(i18n.get("pandemic.label.peak"), "--"));
         totalLabel = new Label(java.text.MessageFormat.format(i18n.get("pandemic.label.total"), "--"));
+        deadLabel = new Label(java.text.MessageFormat.format(i18n.get("pandemic.label.dead"), "--"));
 
         populationLabel.setStyle("-fx-font-size: 14px;");
         peakLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #d32f2f;");
         totalLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #388e3c;");
+        deadLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #000000;");
 
-        stats.getChildren().addAll(populationLabel, peakLabel, totalLabel);
+        stats.getChildren().addAll(populationLabel, peakLabel, totalLabel, deadLabel);
         return stats;
     }
 
@@ -203,6 +207,10 @@ public class PandemicForecasterApp extends KillerAppBase {
         VBox gammaBox = createSliderWithLabel(i18n.get("pandemic.param.gamma"), 0.05, 0.5, 0.1);
         gammaSlider = (Slider) gammaBox.getChildren().get(1);
 
+        // Mu (mortality rate)
+        VBox muBox = createSliderWithLabel(i18n.get("pandemic.param.mu"), 0.00, 0.1, 0.005);
+        muSlider = (Slider) muBox.getChildren().get(1);
+
         // Initial infected
         VBox initialBox = createSliderWithLabel(i18n.get("pandemic.param.initial"), 1, 10000, 100);
         initialSlider = (Slider) initialBox.getChildren().get(1);
@@ -230,7 +238,7 @@ public class PandemicForecasterApp extends KillerAppBase {
                 countryLabel, countrySelector,
                 new Separator(),
                 paramLabel,
-                betaBox, sigmaBox, gammaBox,
+                betaBox, sigmaBox, gammaBox, muBox,
                 new Separator(),
                 initialBox, daysBox,
                 r0Label,
@@ -299,20 +307,22 @@ public class PandemicForecasterApp extends KillerAppBase {
         Real beta = Real.of(betaSlider.getValue());
         Real sigma = Real.of(sigmaSlider.getValue());
         Real gamma = Real.of(gammaSlider.getValue());
+        Real mu = Real.of(muSlider.getValue());
         Real dt = Real.of(1.0);
 
         Real[] initial = new Real[] {
                 Real.of(N - I0), // S
                 Real.of(0), // E
                 Real.of(I0), // I
-                Real.of(0) // R
+                Real.of(0), // R
+                Real.of(0) // D
         };
 
         log(java.text.MessageFormat.format(i18n.get("pandemic.log.start"), country.getName(), formatNumber(N),
                 betaSlider.getValue()));
 
         try {
-            simulationResults = PopulationDynamics.seirModel(initial, beta, sigma, gamma, dt, days);
+            simulationResults = PopulationDynamics.seirdModel(initial, beta, sigma, gamma, mu, dt, days);
             startAnimation(days);
             isRunning = true;
             setStatus(i18n.get("status.running"));
@@ -340,11 +350,13 @@ public class PandemicForecasterApp extends KillerAppBase {
         double e = simulationResults[day][1].doubleValue();
         double i = simulationResults[day][2].doubleValue();
         double r = simulationResults[day][3].doubleValue();
+        double dVal = simulationResults[day][4].doubleValue();
 
         susSeriesS.getData().add(new XYChart.Data<>(day, s));
         expSeriesE.getData().add(new XYChart.Data<>(day, e));
         infSeriesI.getData().add(new XYChart.Data<>(day, i));
         recSeriesR.getData().add(new XYChart.Data<>(day, r));
+        deaSeriesD.getData().add(new XYChart.Data<>(day, dVal));
 
         // Update peak
         if (day > 0) {
@@ -356,6 +368,8 @@ public class PandemicForecasterApp extends KillerAppBase {
                     java.text.MessageFormat.format(i18n.get("pandemic.label.peak"), formatNumber((long) maxI)));
             totalLabel
                     .setText(java.text.MessageFormat.format(i18n.get("pandemic.label.total"), formatNumber((long) r)));
+            deadLabel.setText(
+                    java.text.MessageFormat.format(i18n.get("pandemic.label.dead"), formatNumber((long) dVal)));
         }
     }
 
@@ -397,8 +411,10 @@ public class PandemicForecasterApp extends KillerAppBase {
         expSeriesE.getData().clear();
         infSeriesI.getData().clear();
         recSeriesR.getData().clear();
+        deaSeriesD.getData().clear();
         peakLabel.setText(java.text.MessageFormat.format(i18n.get("pandemic.label.peak"), "--"));
         totalLabel.setText(java.text.MessageFormat.format(i18n.get("pandemic.label.total"), "--"));
+        deadLabel.setText(java.text.MessageFormat.format(i18n.get("pandemic.label.dead"), "--"));
     }
 
     // ===== File Operations =====

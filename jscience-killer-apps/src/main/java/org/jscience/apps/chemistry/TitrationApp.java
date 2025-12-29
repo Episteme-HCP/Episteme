@@ -134,6 +134,7 @@ public class TitrationApp extends KillerAppBase {
         split.setDividerPositions(0.4);
 
         startSimulation();
+        reset();
         return split;
     }
 

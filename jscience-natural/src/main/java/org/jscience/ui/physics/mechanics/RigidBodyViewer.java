@@ -64,7 +64,7 @@ public class RigidBodyViewer extends Application {
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
         root.setId("root"); // CSS hook
-        root.getStyleClass().add("dark-viewer-root");
+        // root.getStyleClass().add("dark-viewer-root");
 
         canvas = new Canvas(800, 600);
         root.setCenter(canvas);

@@ -303,6 +303,16 @@ public final class JScience {
      * 
      * @param args command line arguments
      */
+    /**
+     * Main entry point.
+     * <p>
+     * Tries to launch the JScience Dashboard (JavaFX) if available.
+     * Falls back to CLI report if the Dashboard class cannot be found (e.g.
+     * core-only classpath).
+     * </p>
+     * 
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         // Parse system properties
         String modeProp = System.getProperty("org.jscience.compute.mode");
@@ -327,6 +337,20 @@ public final class JScience {
             setIntPrecision();
         } else if ("long".equalsIgnoreCase(intProp)) {
             setLongPrecision();
+        }
+
+        // Try to launch Dashboard via Reflection
+        try {
+            Class<?> dashboardClass = Class.forName("org.jscience.ui.JScienceDashboard");
+            java.lang.reflect.Method mainMethod = dashboardClass.getMethod("main", String[].class);
+            System.out.println("Launching JScience Dashboard...");
+            mainMethod.invoke(null, (Object) args);
+            return;
+        } catch (ClassNotFoundException e) {
+            System.out.println("JScience Dashboard not found in classpath. Showing CLI report.");
+        } catch (Exception e) {
+            System.err.println("Failed to launch JScience Dashboard: " + e.getMessage());
+            e.printStackTrace();
         }
 
         System.out.println(getConfigurationReport());

@@ -10,13 +10,15 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import org.jscience.ui.i18n.I18n;
 import javafx.scene.control.Separator;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.jscience.ui.i18n.I18n;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +39,7 @@ public class GeneticAlgorithmViewer extends Application {
     private int reachedCount = 0;
     private double bestFitness = 0;
     private int speed = 1;
+    private boolean paused = false;
     private final Random rand = new Random();
 
     private final double targetX = 400, targetY = 50;
@@ -91,7 +94,7 @@ public class GeneticAlgorithmViewer extends Application {
 
         Label speedLabel = new Label(I18n.getInstance().get("geneticalgo.speed") + " 1x");
         speedLabel.getStyleClass().add("dark-label-muted");
-        javafx.scene.control.Slider speedSlider = new javafx.scene.control.Slider(1, 5, 1);
+        Slider speedSlider = new Slider(1, 5, 1);
         speedSlider.setShowTickLabels(true);
         speedSlider.setMajorTickUnit(1);
         speedSlider.valueProperty().addListener((o, ov, nv) -> {
@@ -100,6 +103,13 @@ public class GeneticAlgorithmViewer extends Application {
         });
 
         Separator sep2 = new Separator();
+
+        Button pauseBtn = new Button(I18n.getInstance().get("toolbar.pause"));
+        pauseBtn.setMaxWidth(Double.MAX_VALUE);
+        pauseBtn.setOnAction(e -> {
+            paused = !paused;
+            pauseBtn.setText(paused ? I18n.getInstance().get("toolbar.run") : I18n.getInstance().get("toolbar.pause"));
+        });
 
         Button resetBtn = new Button(I18n.getInstance().get("geneticalgo.restart"));
         resetBtn.setMaxWidth(Double.MAX_VALUE);
@@ -111,7 +121,7 @@ public class GeneticAlgorithmViewer extends Application {
         descLabel.setWrapText(true);
 
         sidebar.getChildren().addAll(title, new Separator(), genLabel, fitLabel, reachLabel,
-                sep1, speedLabel, speedSlider, sep2, resetBtn, new Separator(), descLabel);
+                sep1, speedLabel, speedSlider, sep2, pauseBtn, resetBtn, new Separator(), descLabel);
         root.setRight(sidebar);
 
         restart();
@@ -119,24 +129,50 @@ public class GeneticAlgorithmViewer extends Application {
         new AnimationTimer() {
             @Override
             public void handle(long now) {
-                for (int s = 0; s < speed; s++) {
-                    if (count < lifespan) {
-                        updatePhysics();
-                        count++;
-                    } else {
-                        evaluate();
-                        selection();
-                        generation++;
-                        genLabel.setText(I18n.getInstance().get("geneticalgo.generation") + " " + generation);
-                        fitLabel.setText(String.format("Best Fitness: %.2f", bestFitness));
-                        reachLabel.setText(
-                                I18n.getInstance().get("geneticalgo.reached") + " " + reachedCount + "/" + popSize);
-                        count = 0;
+                if (!paused) {
+                    for (int s = 0; s < speed; s++) {
+                        if (count < lifespan) {
+                            updatePhysics();
+                            count++;
+                        } else {
+                            evaluate();
+                            selection();
+                            generation++;
+                            genLabel.setText(I18n.getInstance().get("geneticalgo.generation") + " " + generation);
+                            fitLabel.setText(String.format("Best Fitness: %.2f", bestFitness));
+                            reachLabel.setText(
+                                    I18n.getInstance().get("geneticalgo.reached") + " " + reachedCount + "/" + popSize);
+                            count = 0;
+                        }
                     }
                 }
                 render();
             }
         }.start();
+
+        canvas.setOnMouseClicked(e -> {
+            double mx = e.getX();
+            double my = e.getY();
+            DNA closest = null;
+            double minDist = 50;
+            for (DNA d : population) {
+                double dist = Math.sqrt(Math.pow(d.x - mx, 2) + Math.pow(d.y - my, 2));
+                if (dist < minDist) {
+                    minDist = dist;
+                    closest = d;
+                }
+            }
+            if (closest != null) {
+                Alert info = new Alert(Alert.AlertType.INFORMATION);
+                info.setTitle("Genome Detail");
+                info.setHeaderText("DNA Info");
+                info.setContentText("Fitness: " + String.format("%.4f", closest.fitness) +
+                        "\nReached: " + closest.reached +
+                        "\nCrashed: " + closest.crashed +
+                        "\nPosition: " + (int) closest.x + "," + (int) closest.y);
+                info.showAndWait();
+            }
+        });
 
         Scene scene = new Scene(root, 950, 600);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
@@ -199,6 +235,11 @@ public class GeneticAlgorithmViewer extends Application {
             int n = (int) ((d.fitness / maxFit) * 100);
             for (int j = 0; j < n; j++)
                 pool.add(d);
+        }
+
+        if (pool.isEmpty()) {
+            // Should not happen unless maxFit is 0
+            pool.addAll(population);
         }
 
         for (int i = 0; i < popSize; i++) {

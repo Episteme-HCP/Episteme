@@ -23,35 +23,52 @@
 package org.jscience.sports;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
+import org.jscience.util.identity.Identifiable;
+import org.jscience.util.Temporal;
 
 /**
  * Represents a sports match/game.
- * * @author Silvere Martin-Michiellot
+ * 
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Match {
+public class Match implements Identifiable<String>, Temporal {
 
     public enum Status {
         SCHEDULED, IN_PROGRESS, COMPLETED, POSTPONED, CANCELLED
     }
 
+    private final String id;
     private final Sport sport;
     private final LocalDateTime dateTime;
-    private final String homeTeam;
-    private final String awayTeam;
+    private final Team homeTeam;
+    private final Team awayTeam;
     private String venue;
     private Status status;
     private int homeScore;
     private int awayScore;
     private String competition;
 
-    public Match(Sport sport, LocalDateTime dateTime, String homeTeam, String awayTeam) {
+    public Match(Sport sport, LocalDateTime dateTime, Team homeTeam, Team awayTeam) {
+        this.id = UUID.randomUUID().toString();
         this.sport = sport;
         this.dateTime = dateTime;
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
         this.status = Status.SCHEDULED;
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public java.time.Instant getTimestamp() {
+        return dateTime != null ? java.time.Instant.ofEpochSecond(dateTime.toEpochSecond(java.time.ZoneOffset.UTC))
+                : java.time.Instant.MIN;
     }
 
     // Getters
@@ -63,11 +80,11 @@ public class Match {
         return dateTime;
     }
 
-    public String getHomeTeam() {
+    public Team getHomeTeam() {
         return homeTeam;
     }
 
-    public String getAwayTeam() {
+    public Team getAwayTeam() {
         return awayTeam;
     }
 
@@ -116,7 +133,7 @@ public class Match {
     /**
      * Returns the winner or null if tie/not finished.
      */
-    public String getWinner() {
+    public Team getWinner() {
         if (status != Status.COMPLETED)
             return null;
         if (homeScore > awayScore)
@@ -137,9 +154,9 @@ public class Match {
     public String toString() {
         if (status == Status.COMPLETED) {
             return String.format("%s vs %s: %d-%d (%s)",
-                    homeTeam, awayTeam, homeScore, awayScore, sport.getName());
+                    homeTeam.getName(), awayTeam.getName(), homeScore, awayScore, sport.getName());
         }
         return String.format("%s vs %s @ %s (%s)",
-                homeTeam, awayTeam, dateTime, status);
+                homeTeam.getName(), awayTeam.getName(), dateTime, status);
     }
 }

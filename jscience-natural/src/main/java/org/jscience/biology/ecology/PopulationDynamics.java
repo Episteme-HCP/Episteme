@@ -228,39 +228,65 @@ public class PopulationDynamics {
      * @param steps      number of steps
      * @return Real[steps][4] containing S, E, I, R for each step
      */
-    public static Real[][] seirModel(Real[] initialPop, Real beta, Real sigma, Real gamma, Real dt, int steps) {
-        Real[][] result = new Real[steps][4];
+    /**
+     * SEIRD Model (Susceptible, Exposed, Infectious, Recovered, Deceased).
+     * 
+     * dS/dt = -beta * S * I / N
+     * dE/dt = beta * S * I / N - sigma * E
+     * dI/dt = sigma * E - (gamma + mu) * I
+     * dR/dt = gamma * I
+     * dD/dt = mu * I
+     * 
+     * @param initialPop [S, E, I, R, D]
+     * @param beta       rate of spread
+     * @param sigma      rate of progression (1/incubation)
+     * @param gamma      rate of recovery (1/infectious_to_recovery)
+     * @param mu         rate of mortality (1/infectious_to_death)
+     * @param dt         time step
+     * @param steps      number of steps
+     * @return Real[steps][5] containing S, E, I, R, D
+     */
+    public static Real[][] seirdModel(Real[] initialPop, Real beta, Real sigma, Real gamma, Real mu, Real dt,
+            int steps) {
+        Real[][] result = new Real[steps][5];
         Real S = initialPop[0];
         Real E = initialPop[1];
         Real I = initialPop[2];
         Real R = initialPop[3];
-        Real N = S.add(E).add(I).add(R); // Total population assumed constant
+        Real D = initialPop.length > 4 ? initialPop[4] : Real.ZERO;
+        Real N = S.add(E).add(I).add(R).add(D); // Total initial population
 
         for (int t = 0; t < steps; t++) {
             result[t][0] = S;
             result[t][1] = E;
             result[t][2] = I;
             result[t][3] = R;
+            result[t][4] = D;
 
             // dS = -beta * S * I / N
-            Real dS = beta.multiply(S).multiply(I).divide(N).negate().multiply(dt);
+            Real transmission = beta.multiply(S).multiply(I).divide(N);
+            Real dS = transmission.negate().multiply(dt);
 
             // dE = beta * S * I / N - sigma * E
-            Real transmission = beta.multiply(S).multiply(I).divide(N);
             Real progression = sigma.multiply(E);
             Real dE = transmission.subtract(progression).multiply(dt);
 
-            // dI = sigma * E - gamma * I
+            // dI = sigma * E - (gamma + mu) * I
             Real recovery = gamma.multiply(I);
-            Real dI = progression.subtract(recovery).multiply(dt);
+            Real death = mu.multiply(I);
+            Real dI = progression.subtract(recovery).subtract(death).multiply(dt);
 
             // dR = gamma * I
             Real dR = recovery.multiply(dt);
+
+            // dD = mu * I
+            Real dD = death.multiply(dt);
 
             S = S.add(dS);
             E = E.add(dE);
             I = I.add(dI);
             R = R.add(dR);
+            D = D.add(dD);
 
             // Safety clamp
             if (S.doubleValue() < 0)
@@ -271,6 +297,23 @@ public class PopulationDynamics {
                 I = Real.ZERO;
             if (R.doubleValue() < 0)
                 R = Real.ZERO;
+            if (D.doubleValue() < 0)
+                D = Real.ZERO;
+        }
+        return result;
+    }
+
+    public static Real[][] seirModel(Real[] initialPop, Real beta, Real sigma, Real gamma, Real dt, int steps) {
+        // Delegate to SEIRD with mu = 0
+        Real mu = Real.ZERO;
+        Real[][] seird = seirdModel(initialPop, beta, sigma, gamma, mu, dt, steps);
+        // Convert to 4 columns
+        Real[][] result = new Real[steps][4];
+        for (int i = 0; i < steps; i++) {
+            result[i][0] = seird[i][0];
+            result[i][1] = seird[i][1];
+            result[i][2] = seird[i][2];
+            result[i][3] = seird[i][3];
         }
         return result;
     }

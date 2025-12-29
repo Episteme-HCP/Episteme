@@ -22,76 +22,60 @@
  */
 package org.jscience.arts;
 
+import java.util.UUID;
+import org.jscience.util.identity.Identifiable;
+import org.jscience.sociology.Person;
+
 /**
- * Represents an artwork with attribution and classification.
- * * @author Silvere Martin-Michiellot
+ * Represents a piece of artwork.
+ * 
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Artwork {
+public class Artwork implements Identifiable<String> {
 
-    public enum Medium {
-        PAINTING, SCULPTURE, PHOTOGRAPHY, DRAWING, PRINT, MIXED_MEDIA,
-        DIGITAL, INSTALLATION, PERFORMANCE, VIDEO, TEXTILE, CERAMIC
+    public enum Type {
+        PAINTING, SCULPTURE, LITERATURE, MUSIC, FILM, ARCHITECTURE, OTHER
     }
 
-    public enum Period {
-        ANCIENT, MEDIEVAL, RENAISSANCE, BAROQUE, NEOCLASSICAL, ROMANTIC,
-        IMPRESSIONIST, MODERN, CONTEMPORARY, POSTMODERN
-    }
-
+    private final String id;
     private final String title;
-    private final String artist;
+    private final Person creator;
     private final int year;
-    private final Medium medium;
-    private final Period period;
-    private final String location; // museum/collection
+    private final Type type;
 
-    public Artwork(String title, String artist, int year, Medium medium,
-            Period period, String location) {
+    public Artwork(String title, Person creator, int year, Type type) {
+        this.id = UUID.randomUUID().toString();
         this.title = title;
-        this.artist = artist;
+        this.creator = creator;
         this.year = year;
-        this.medium = medium;
-        this.period = period;
-        this.location = location;
+        this.type = type;
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public String getArtist() {
-        return artist;
+    public Person getCreator() {
+        return creator;
     }
 
     public int getYear() {
         return year;
     }
 
-    public Medium getMedium() {
-        return medium;
-    }
-
-    public Period getPeriod() {
-        return period;
-    }
-
-    public String getLocation() {
-        return location;
+    public Type getType() {
+        return type;
     }
 
     @Override
     public String toString() {
-        return String.format("\"%s\" by %s (%d) - %s, %s",
-                title, artist, year, medium, period);
+        return String.format("'%s' by %s (%d)", title, creator != null ? creator.getName() : "Unknown", year);
     }
-
-    // Famous artworks
-    public static final Artwork MONA_LISA = new Artwork("Mona Lisa", "Leonardo da Vinci",
-            1503, Medium.PAINTING, Period.RENAISSANCE, "Louvre, Paris");
-    public static final Artwork STARRY_NIGHT = new Artwork("The Starry Night", "Vincent van Gogh",
-            1889, Medium.PAINTING, Period.IMPRESSIONIST, "MoMA, New York");
-    public static final Artwork DAVID = new Artwork("David", "Michelangelo",
-            1504, Medium.SCULPTURE, Period.RENAISSANCE, "Galleria dell'Accademia, Florence");
 }

@@ -22,98 +22,68 @@
  */
 package org.jscience.sociology;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import org.jscience.linguistics.Language;
+import org.jscience.philosophy.Belief;
+import org.jscience.util.identity.Identifiable;
 
 /**
- * Represents a culture or cultural group.
- * * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Represents the culture of a group or society.
  */
-public class Culture {
+public class Culture implements Identifiable<String> {
 
     private final String name;
-    private String description;
-    private String region;
-    private String primaryLanguage;
-    private final List<String> traditions = new ArrayList<>();
-    private final List<String> values = new ArrayList<>();
-    private final List<String> taboos = new ArrayList<>();
-    private String religion;
+    private final Language language;
+    private final Set<Belief> beliefs = new HashSet<>();
+    private final Set<String> celebrations = new HashSet<>(); // Simplified string representation for now
+    private final Set<String> rituals = new HashSet<>();
 
-    public Culture(String name) {
+    public Culture(String name, Language language) {
         this.name = name;
+        this.language = language;
     }
 
-    public Culture(String name, String region) {
-        this(name);
-        this.region = region;
+    @Override
+    public String getId() {
+        return name;
     }
 
-    // Getters
     public String getName() {
         return name;
     }
 
-    public String getDescription() {
-        return description;
+    public Language getLanguage() {
+        return language;
     }
 
-    public String getRegion() {
-        return region;
+    public void addBelief(Belief belief) {
+        beliefs.add(belief);
     }
 
-    public String getPrimaryLanguage() {
-        return primaryLanguage;
+    public Set<Belief> getBeliefs() {
+        return Collections.unmodifiableSet(beliefs);
     }
 
-    public String getReligion() {
-        return religion;
+    public void addCelebration(String celebration) {
+        celebrations.add(celebration);
     }
 
-    public List<String> getTraditions() {
-        return Collections.unmodifiableList(traditions);
+    public Set<String> getCelebrations() {
+        return Collections.unmodifiableSet(celebrations);
     }
 
-    public List<String> getValues() {
-        return Collections.unmodifiableList(values);
+    public void addRitual(String ritual) {
+        rituals.add(ritual);
     }
 
-    public List<String> getTaboos() {
-        return Collections.unmodifiableList(taboos);
-    }
-
-    // Setters
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setRegion(String region) {
-        this.region = region;
-    }
-
-    public void setPrimaryLanguage(String language) {
-        this.primaryLanguage = language;
-    }
-
-    public void setReligion(String religion) {
-        this.religion = religion;
-    }
-
-    public void addTradition(String tradition) {
-        traditions.add(tradition);
-    }
-
-    public void addValue(String value) {
-        values.add(value);
-    }
-
-    public void addTaboo(String taboo) {
-        taboos.add(taboo);
+    public Set<String> getRituals() {
+        return Collections.unmodifiableSet(rituals);
     }
 
     @Override
     public String toString() {
-        return String.format("Culture '%s' (%s)", name, region);
+        return name;
     }
 }

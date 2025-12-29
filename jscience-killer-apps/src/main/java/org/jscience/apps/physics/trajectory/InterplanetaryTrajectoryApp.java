@@ -119,10 +119,10 @@ public class InterplanetaryTrajectoryApp extends KillerAppBase {
     private VBox createControls() {
         VBox panel = new VBox(15);
         panel.setPadding(new Insets(20));
-        panel.setStyle("-fx-background-color: #16213e; -fx-border-color: #333; -fx-border-width: 0 0 0 1;");
+        // Removed dark background
 
         Label title = new Label("🚀 " + i18n.get("trajectory.panel.config"));
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #00d9ff;");
+        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;"); // Removed cyan text
 
         // Planet Selection
         List<String> planets = solarSystem.getBodies().stream()

@@ -192,7 +192,7 @@ public class FormulaNotationViewer extends Application {
         p2.setFont(Font.font("Serif", 14));
         den.getChildren().addAll(r, new VBox(p2) {
             {
-                setPadding(new Insets(-10, 0, 0, 0));
+                setPadding(new Insets(-10, 0, 0, 0)); // Superscript (negative top padding)
             }
         });
 

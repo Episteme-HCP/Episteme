@@ -17,7 +17,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.jscience.ui.i18n.I18n;
-import org.jscience.ui.ThemeManager;
+// import org.jscience.ui.ThemeManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,17 +47,17 @@ public class LorenzViewer extends Application {
     @Override
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #000;");
+        // Use light background instead of black
+        root.setStyle("-fx-background-color: #f8f8f8;");
 
         canvas = new Canvas(800, 600);
         root.setCenter(canvas);
 
         VBox sidebar = new VBox(15);
         sidebar.setPadding(new Insets(20));
-        sidebar.setStyle("-fx-background-color: #222; -fx-text-fill: white;");
+        sidebar.setStyle("-fx-background-color: #eee;");
 
         Label title = new Label(I18n.getInstance().get("lorenz.title"));
-        title.setTextFill(Color.WHITE);
         title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         sidebar.getChildren().addAll(title, new Separator(),
@@ -77,7 +77,8 @@ public class LorenzViewer extends Application {
         Scene scene = new Scene(root, 1050, 650);
         stage.setTitle(I18n.getInstance().get("viewer.lorenz"));
         stage.setScene(scene);
-        ThemeManager.getInstance().applyTheme(scene);
+        // ThemeManager.getInstance().applyTheme(scene); // User requested light
+        // background
         stage.show();
     }
 
@@ -120,7 +121,6 @@ public class LorenzViewer extends Application {
 
     private VBox createSlider(String name, double min, double max, double val, java.util.function.DoubleConsumer c) {
         Label l = new Label(name);
-        l.setTextFill(Color.WHITE);
         Slider s = new Slider(min, max, val);
         s.valueProperty().addListener((o, ov, nv) -> {
             c.accept(nv.doubleValue());

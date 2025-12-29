@@ -31,7 +31,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Country {
+public class Country extends org.jscience.geography.Place implements org.jscience.util.identity.Identifiable<String> {
 
     private String name;
     private String alpha2;
@@ -43,6 +43,7 @@ public class Country {
     private Real areaSqKm;
 
     public Country(String name, String alpha2) {
+        super(name, Type.COUNTRY);
         this.name = name;
         this.alpha2 = alpha2;
         this.areaSqKm = Real.ZERO;
@@ -57,6 +58,10 @@ public class Country {
         this.continent = continent;
         this.population = population;
         this.areaSqKm = areaSqKm;
+
+        // Update Place fields as possible
+        this.setRegion(continent);
+        this.setCountry(name); // It is the country itself
     }
 
     public Country(String name, String alpha2, String alpha3, int numericCode,
@@ -64,6 +69,12 @@ public class Country {
         this(name, alpha2, alpha3, numericCode, capital, continent, population, Real.of(areaSqKm));
     }
 
+    @Override
+    public String getId() {
+        return alpha3 != null ? alpha3 : alpha2;
+    }
+
+    @Override
     public String getName() {
         return name;
     }
@@ -88,7 +99,13 @@ public class Country {
         return continent;
     }
 
-    public long getPopulation() {
+    @Override
+    public int getPopulation() {
+        return (int) population; // Place uses int, Country uses long. Potential overflow for China/India but
+                                 // Place should be updated eventually.
+    }
+
+    public long getPopulationLong() {
         return population;
     }
 

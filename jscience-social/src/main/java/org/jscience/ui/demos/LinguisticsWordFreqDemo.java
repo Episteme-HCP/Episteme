@@ -40,7 +40,25 @@ public class LinguisticsWordFreqDemo implements DemoProvider {
         TextArea input = new TextArea(
                 org.jscience.ui.i18n.SocialI18n.getInstance().get("ling.freq.input.placeholder"));
         input.setWrapText(true);
-        input.setPrefHeight(100);
+        input.setPrefHeight(200);
+        input.setText(
+                "The study of linguistics explores the structure and meaning of language. " +
+                        "Language is a complex system of communication that involves phonetics, syntax, semantics, and pragmatics. "
+                        +
+                        "Phonetics studies the sounds of speech, while syntax governs the structure of sentences. " +
+                        "Semantics concerns the meaning of words and sentences, and pragmatics looks at how context influences interpretation. "
+                        +
+                        "Computational linguistics applies computer science to the analysis of language, enabling technologies like machine translation, "
+                        +
+                        "speech recognition, and natural language processing. " +
+                        "The frequency of words follows Zipf's law, which states that the frequency of any word is inversely proportional to its rank in the frequency table. "
+                        +
+                        "For example, the most common word will occur approximately twice as often as the second most common word, three times as often as the third, and so on. "
+                        +
+                        "This distribution is found in many natural languages and even in constructed languages. " +
+                        "Understanding word frequency is crucial for cryptography, search engines, and data compression. "
+                        +
+                        "In this demo, we analyze the frequency of words in this text to see if common words like 'the', 'of', and 'and' dominate the distribution.");
 
         Button analyzeBtn = new Button(org.jscience.ui.i18n.SocialI18n.getInstance().get("ling.freq.btn.analyze"));
 
@@ -51,9 +69,9 @@ public class LinguisticsWordFreqDemo implements DemoProvider {
 
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
         barChart.setTitle(org.jscience.ui.i18n.SocialI18n.getInstance().get("ling.freq.chart.title"));
-        barChart.setAnimated(true);
+        barChart.setAnimated(false); // Fix rendering glitch at startup
 
-        analyzeBtn.setOnAction(e -> {
+        Runnable analyze = () -> {
             String text = input.getText().toLowerCase().replaceAll("[^a-z ]", "");
             Map<String, Long> counts = Arrays.stream(text.split("\\s+"))
                     .filter(w -> !w.isEmpty())
@@ -69,7 +87,9 @@ public class LinguisticsWordFreqDemo implements DemoProvider {
 
             barChart.getData().clear();
             barChart.getData().add(series);
-        });
+        };
+
+        analyzeBtn.setOnAction(e -> analyze.run());
 
         VBox top = new VBox(10, input, analyzeBtn);
         top.setStyle("-fx-padding: 10;");
@@ -82,5 +102,8 @@ public class LinguisticsWordFreqDemo implements DemoProvider {
         stage.setTitle(getName());
         stage.setScene(scene);
         stage.show();
+
+        // Run initial analysis
+        analyze.run();
     }
 }

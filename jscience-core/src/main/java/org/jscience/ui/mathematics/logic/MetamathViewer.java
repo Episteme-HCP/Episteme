@@ -22,11 +22,30 @@ import java.util.List;
  */
 public class MetamathViewer extends Application {
 
-    private VBox proofStepsBox;
+    private static class Theorem {
+        String name;
+        String formula;
+        String[] steps;
+
+        Theorem(String name, String formula, String[] steps) {
+            this.name = name;
+            this.formula = formula;
+            this.steps = steps;
+        }
+    }
+
+    private List<Theorem> theorems = new ArrayList<>();
+    private Theorem currentTheorem;
     private List<String> currentSteps = new ArrayList<>();
+
+    private VBox proofStepsBox;
+    private ComboBox<String> theoremSelector;
+    private Label theoremLabel;
 
     @Override
     public void start(Stage stage) {
+        initTheorems();
+
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(10));
 
@@ -35,22 +54,41 @@ public class MetamathViewer extends Application {
         header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
         root.setTop(header);
 
-        // Current Theorem
+        // Center
         VBox center = new VBox(20);
         center.setPadding(new Insets(20));
 
-        Label theoremLabel = new Label("Theorem: (p ∨ q) ∧ ¬p ⊢ q (Disjunctive Syllogism)");
-        theoremLabel.setStyle("-fx-font-size: 16px; -fx-background-color: #e3f2fd; -fx-padding: 10;");
+        // Theorem Selection
+        HBox selectorBox = new HBox(10);
+        selectorBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        theoremSelector = new ComboBox<>();
+        for (Theorem t : theorems) {
+            theoremSelector.getItems().add(t.name);
+        }
+        theoremSelector.getSelectionModel().selectFirst();
+        theoremSelector.setOnAction(e -> {
+            int idx = theoremSelector.getSelectionModel().getSelectedIndex();
+            if (idx >= 0 && idx < theorems.size()) {
+                loadTheorem(theorems.get(idx));
+            }
+        });
+
+        selectorBox.getChildren().addAll(new Label("Select Theorem:"), theoremSelector);
+
+        theoremLabel = new Label();
+        theoremLabel.setStyle(
+                "-fx-font-size: 16px; -fx-background-color: #e3f2fd; -fx-padding: 10; -fx-background-radius: 5;");
+        theoremLabel.setMaxWidth(Double.MAX_VALUE);
 
         proofStepsBox = new VBox(10);
         ScrollPane scroll = new ScrollPane(proofStepsBox);
         scroll.setFitToWidth(true);
         scroll.setPrefHeight(400);
 
-        center.getChildren().addAll(theoremLabel, new Label("Step-by-step proof:"), scroll);
+        center.getChildren().addAll(selectorBox, theoremLabel, new Label("Step-by-step proof:"), scroll);
         root.setCenter(center);
 
-        // Actions
+        // Sidebar
         VBox sidebar = new VBox(10);
         sidebar.setPadding(new Insets(10));
         sidebar.setPrefWidth(200);
@@ -62,13 +100,15 @@ public class MetamathViewer extends Application {
 
         Button resetBtn = new Button("Reset Proof");
         resetBtn.setMaxWidth(Double.MAX_VALUE);
-        resetBtn.setOnAction(e -> {
-            currentSteps.clear();
-            proofStepsBox.getChildren().clear();
-        });
+        resetBtn.setOnAction(e -> loadTheorem(currentTheorem));
 
         sidebar.getChildren().addAll(new Label("Logic Tactics"), nextStepBtn, resetBtn);
         root.setRight(sidebar);
+
+        // Load initial
+        if (!theorems.isEmpty()) {
+            loadTheorem(theorems.get(0));
+        }
 
         Scene scene = new Scene(root, 900, 600);
         stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.metamath"));
@@ -76,23 +116,61 @@ public class MetamathViewer extends Application {
         stage.show();
     }
 
-    private void applyTactic() {
-        String[] allSteps = {
-                "1. (p ∨ q) ∧ ¬p [Hypothesis]",
-                "2. (p ∨ q) [Simplification (1)]",
-                "3. ¬p [Simplification (1)]",
-                "4. p → q [Material Implication (2)]",
-                "5. q [Modus Ponens (3, 4)]",
-                "Q.E.D."
-        };
+    private void initTheorems() {
+        theorems.add(new Theorem(
+                "Disjunctive Syllogism",
+                "(p ∨ q) ∧ ¬p ⊢ q",
+                new String[] {
+                        "1. (p ∨ q) ∧ ¬p [Hypothesis]",
+                        "2. (p ∨ q) [Simplification (1)]",
+                        "3. ¬p [Simplification (1)]",
+                        "4. p → q [Material Implication (2)]",
+                        "5. q [Modus Ponens (3, 4)]",
+                        "Q.E.D."
+                }));
+        theorems.add(new Theorem(
+                "Modus Tollens",
+                "(p → q) ∧ ¬q ⊢ ¬p",
+                new String[] {
+                        "1. (p → q) ∧ ¬q [Hypothesis]",
+                        "2. p → q [Simplification (1)]",
+                        "3. ¬q [Simplification (1)]",
+                        "4. ¬q → ¬p [Transposition (2)]",
+                        "5. ¬p [Modus Ponens (3, 4)]",
+                        "Q.E.D."
+                }));
+        theorems.add(new Theorem(
+                "Double Negation",
+                "p ⊢ ¬¬p",
+                new String[] {
+                        "1. p [Hypothesis]",
+                        "2. p ∨ p [Addition]",
+                        "3. ¬p → p [Material Implication (2)]",
+                        "4. ¬¬p ∨ p [Material Implication]",
+                        "5. ¬¬p [Derived Step]",
+                        "Q.E.D."
+                }));
+    }
 
-        if (currentSteps.size() < allSteps.length) {
-            String step = allSteps[currentSteps.size()];
+    private void loadTheorem(Theorem t) {
+        currentTheorem = t;
+        currentSteps.clear();
+        proofStepsBox.getChildren().clear();
+        theoremLabel.setText("Theorem: " + t.formula + " (" + t.name + ")");
+    }
+
+    private void applyTactic() {
+        if (currentTheorem == null)
+            return;
+
+        if (currentSteps.size() < currentTheorem.steps.length) {
+            String step = currentTheorem.steps[currentSteps.size()];
             currentSteps.add(step);
 
             Label l = new Label(step);
             l.setStyle("-fx-font-family: monospace; -fx-font-size: 14px; -fx-background-color: " +
-                    (step.contains("Q.E.D") ? "#c8e6c9" : "white") + "; -fx-padding: 5;");
+                    (step.contains("Q.E.D") ? "#c8e6c9" : "white")
+                    + "; -fx-padding: 5; -fx-border-color: #eee; -fx-border-width: 0 0 1 0;");
             proofStepsBox.getChildren().add(l);
         }
     }

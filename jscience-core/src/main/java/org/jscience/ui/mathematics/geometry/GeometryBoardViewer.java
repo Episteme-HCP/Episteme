@@ -26,7 +26,7 @@ import java.util.List;
 public class GeometryBoardViewer extends Application {
 
     private enum Tool {
-        POINT, LINE, CIRCLE, SELECT
+        POINT, LINE, CIRCLE, TRIANGLE, SELECT
     }
 
     private Tool selectedTool = Tool.POINT;
@@ -52,6 +52,7 @@ public class GeometryBoardViewer extends Application {
     @Override
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
+        root.setStyle("-fx-background-color: white;");
 
         // Toolbar
         HBox toolbar = new HBox(10);
@@ -60,12 +61,13 @@ public class GeometryBoardViewer extends Application {
 
         ToggleGroup group = new ToggleGroup();
         toolbar.getChildren().addAll(
-                createToolBtn("Point", Tool.POINT, group),
-                createToolBtn("Line", Tool.LINE, group),
-                createToolBtn("Circle", Tool.CIRCLE, group),
-                createToolBtn("Select", Tool.SELECT, group),
+                createToolBtn(org.jscience.ui.i18n.I18n.getInstance().get("geometry.tool.point"), Tool.POINT, group),
+                createToolBtn(org.jscience.ui.i18n.I18n.getInstance().get("geometry.tool.line"), Tool.LINE, group),
+                createToolBtn(org.jscience.ui.i18n.I18n.getInstance().get("geometry.tool.circle"), Tool.CIRCLE, group),
+                createToolBtn("Triangle", Tool.TRIANGLE, group),
+                createToolBtn(org.jscience.ui.i18n.I18n.getInstance().get("geometry.tool.select"), Tool.SELECT, group),
                 new Separator(),
-                new Button("Clear") {
+                new Button(org.jscience.ui.i18n.I18n.getInstance().get("geometry.button.clear")) {
                     {
                         setOnAction(e -> {
                             objects.clear();
@@ -92,7 +94,7 @@ public class GeometryBoardViewer extends Application {
                     objects.add(new GeometricObject(Tool.POINT, startX, startY, startX, startY));
                     draw();
                     break;
-                default: // LINE, CIRCLE
+                default: // LINE, CIRCLE, TRIANGLE
                     dragging = true;
                     break;
             }
@@ -120,7 +122,7 @@ public class GeometryBoardViewer extends Application {
         sidebar.setPrefWidth(200);
         sidebar.setStyle("-fx-background-color: #fafafa;");
         sidebar.getChildren()
-                .add(new Label("Exploration:\n1. Place points\n2. Draw lines through points\n3. Create circles"));
+                .add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("geometry.help")));
         root.setRight(sidebar);
 
         Scene scene = new Scene(root, 1200, 800);
@@ -150,6 +152,9 @@ public class GeometryBoardViewer extends Application {
             }
         }
 
+        // Draw Intersections (Red Dots)
+        drawIntersections(gc);
+
         for (GeometricObject obj : objects) {
             drawObject(gc, obj, Color.BLACK);
         }
@@ -177,6 +182,27 @@ public class GeometryBoardViewer extends Application {
                 double r = Math.sqrt(Math.pow(obj.x2 - obj.x1, 2) + Math.pow(obj.y2 - obj.y1, 2));
                 gc.strokeOval(obj.x1 - r, obj.y1 - r, 2 * r, 2 * r);
             }
+            case TRIANGLE -> {
+                // double[] xPoints = { obj.x1, obj.x2, obj.x1 - (obj.x2 - obj.x1) };
+                // double[] yPoints = { obj.y1, obj.y2, obj.y2 };
+                // Isosceles using bounding box logic
+                // Let's make it simpler: Side 1 is (x1,y1) to (x2,y2). Point 3 is calculated to
+                // make isosceles?
+                // Or just width/height box?
+                // Let's use bounding box: Start(x1,y1) is top-center, End(x2,y2) is
+                // bottom-right corner?
+                // No, start-drag-end.
+                // Let's define: P1(x1, y2), P2(x2, y2), P3((x1+x2)/2, y1). Triangle inside the
+                // box defined by drag.
+                double minX = Math.min(obj.x1, obj.x2);
+                double maxX = Math.max(obj.x1, obj.x2);
+                double minY = Math.min(obj.y1, obj.y2);
+                double maxY = Math.max(obj.y1, obj.y2);
+
+                double[] xs = { (minX + maxX) / 2, minX, maxX };
+                double[] ys = { minY, maxY, maxY };
+                gc.strokePolygon(xs, ys, 3);
+            }
         }
     }
 
@@ -185,6 +211,44 @@ public class GeometryBoardViewer extends Application {
         gc.setGlobalAlpha(0.3);
         drawObject(gc, new GeometricObject(selectedTool, x1, y1, x2, y2), Color.BLUE);
         gc.setGlobalAlpha(1.0);
+    }
+
+    private void drawIntersections(GraphicsContext gc) {
+        gc.setFill(Color.RED);
+        for (int i = 0; i < objects.size(); i++) {
+            for (int j = i + 1; j < objects.size(); j++) {
+                GeometricObject o1 = objects.get(i);
+                GeometricObject o2 = objects.get(j);
+
+                // Only Line-Line for simplicity initially, maybe Line-Circle
+                if (o1.type == Tool.LINE && o2.type == Tool.LINE) {
+                    // Check intersection
+                    // Line 1: (x1, y1) -> (x2, y2)
+                    // Line 2: (x3, y3) -> (x4, y4)
+                    // Denom = (y4-y3)(x2-x1) - (x4-x3)(y2-y1)
+                    double x1 = o1.x1, y1 = o1.y1, x2 = o1.x2, y2 = o1.y2;
+                    double x3 = o2.x1, y3 = o2.y1, x4 = o2.x2, y4 = o2.y2;
+
+                    // Extend lines infinitely for intersection? Or just segments?
+                    // Usually geometry board implies segments or infinite lines.
+                    // The drawing code extends lines infinitely:
+                    // gc.strokeLine(obj.x1 - dx * 100, ...);
+                    // So we should treat them as infinite lines.
+
+                    double det = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+                    if (Math.abs(det) > 1e-6) {
+                        double t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / det;
+                        double px = x1 + t * (x2 - x1);
+                        double py = y1 + t * (y2 - y1);
+
+                        // Check if on screen
+                        if (px >= 0 && px <= canvas.getWidth() && py >= 0 && py <= canvas.getHeight()) {
+                            gc.fillOval(px - 3, py - 3, 6, 6);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public static void show(Stage stage) {

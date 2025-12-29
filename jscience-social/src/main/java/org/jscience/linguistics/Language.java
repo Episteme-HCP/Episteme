@@ -22,45 +22,58 @@
  */
 package org.jscience.linguistics;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import org.jscience.util.identity.Identifiable;
 
 /**
- * Represents a natural language. * @author Silvere Martin-Michiellot
+ * Represents a human language.
+ * 
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- 
  */
-public class Language {
+public class Language implements Identifiable<String> {
 
+        private final String code; // ISO 639-1 (2 letters) or ISO 639-3 (3 letters)
         private final String name;
-        private final Set<Phoneme> phonemes;
-        private final Set<Character> graphemes;
+        private final String family;
 
-        public Language(String name) {
+        public Language(String code, String name) {
+                this(code, name, null);
+        }
+
+        public Language(String code, String name, String family) {
+                this.code = code;
                 this.name = name;
-                this.phonemes = new HashSet<>();
-                this.graphemes = new HashSet<>();
+                this.family = family;
+        }
+
+        @Override
+        public String getId() {
+                return code;
+        }
+
+        public String getCode() {
+                return code;
         }
 
         public String getName() {
                 return name;
         }
 
-        public void addPhoneme(Phoneme phoneme) {
-                phonemes.add(phoneme);
+        public String getFamily() {
+                return family;
         }
 
-        public Set<Phoneme> getPhonemes() {
-                return Collections.unmodifiableSet(phonemes);
+        @Override
+        public String toString() {
+                return String.format("%s (%s)", name, code);
         }
 
-        public void addGrapheme(char c) {
-                graphemes.add(c);
-        }
-
-        public Set<Character> getGraphemes() {
-                return Collections.unmodifiableSet(graphemes);
-        }
+        // Common Languages
+        public static final Language ENGLISH = new Language("en", "English", "Indo-European");
+        public static final Language FRENCH = new Language("fr", "French", "Indo-European");
+        public static final Language SPANISH = new Language("es", "Spanish", "Indo-European");
+        public static final Language GERMAN = new Language("de", "German", "Indo-European");
+        public static final Language CHINESE = new Language("zh", "Chinese", "Sino-Tibetan");
+        public static final Language ARABIC = new Language("ar", "Arabic", "Afroasiatic");
 }

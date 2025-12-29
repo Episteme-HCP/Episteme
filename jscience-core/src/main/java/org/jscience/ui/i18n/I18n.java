@@ -31,6 +31,7 @@ public class I18n {
         // Try to load natural and social bundles (they may not be on classpath)
         tryAddBundle("org.jscience.ui.i18n.messages_natural");
         tryAddBundle("org.jscience.ui.i18n.messages_social");
+        tryAddBundle("org.jscience.ui.i18n.messages_apps");
     }
 
     private void tryAddBundle(String bundleBase) {
@@ -107,6 +108,33 @@ public class I18n {
     }
 
     /**
+     * Retrieves a localized string for the given key, returning the default value
+     * if not found.
+     * 
+     * @param key          the resource key
+     * @param defaultValue the value to return if key is missing
+     * @return the localized string or defaultValue
+     */
+    public String get(String key, String defaultValue) {
+        String value = get(key);
+        // get(key) returns key if missing, so we check if it returned the key
+        if (value.equals(key) && !hasKey(key)) {
+            return defaultValue;
+        }
+        return value;
+    }
+
+    private boolean hasKey(String key) {
+        for (String base : bundleBases) {
+            ResourceBundle bundle = bundles.get(base);
+            if (bundle != null && bundle.containsKey(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Retrieves a localized string with format arguments.
      * 
      * @param key  the resource key
@@ -114,7 +142,15 @@ public class I18n {
      * @return the formatted localized string
      */
     public String get(String key, Object... args) {
-        return String.format(get(key), args);
+        String val = get(key);
+        if (args.length > 0) {
+            try {
+                return String.format(val, args);
+            } catch (Exception e) {
+                return val + Arrays.toString(args);
+            }
+        }
+        return val;
     }
 
     private void loadBundle(String bundleBase) {

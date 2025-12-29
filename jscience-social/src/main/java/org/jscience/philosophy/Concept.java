@@ -22,69 +22,40 @@
  */
 package org.jscience.philosophy;
 
+import org.jscience.util.identity.Identifiable;
+
 /**
  * Represents a philosophical concept or idea.
- * * @author Silvere Martin-Michiellot
+ * 
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Concept {
-
-    public enum Branch {
-        METAPHYSICS, EPISTEMOLOGY, ETHICS, AESTHETICS, LOGIC,
-        POLITICAL, PHILOSOPHY_OF_MIND, PHILOSOPHY_OF_SCIENCE
-    }
-
-    public enum Tradition {
-        WESTERN, EASTERN, ANALYTIC, CONTINENTAL, PRAGMATIST,
-        EXISTENTIALIST, PHENOMENOLOGICAL
-    }
+public class Concept implements Identifiable<String> {
 
     private final String name;
-    private final String description;
-    private final Branch branch;
-    private final Tradition tradition;
-    private final String originatingPhilosopher;
+    private final String definition;
 
-    public Concept(String name, String description, Branch branch,
-            Tradition tradition, String originatingPhilosopher) {
+    public Concept(String name, String definition) {
         this.name = name;
-        this.description = description;
-        this.branch = branch;
-        this.tradition = tradition;
-        this.originatingPhilosopher = originatingPhilosopher;
+        this.definition = definition;
+    }
+
+    @Override
+    public String getId() {
+        return name.toLowerCase().replace(" ", "_");
     }
 
     public String getName() {
         return name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public Branch getBranch() {
-        return branch;
-    }
-
-    public Tradition getTradition() {
-        return tradition;
-    }
-
-    public String getOriginatingPhilosopher() {
-        return originatingPhilosopher;
+    public String getDefinition() {
+        return definition;
     }
 
     @Override
     public String toString() {
-        return String.format("%s (%s, %s) - %s", name, branch, tradition, originatingPhilosopher);
+        return name;
     }
-
-    // Notable concepts
-    public static final Concept CATEGORICAL_IMPERATIVE = new Concept("Categorical Imperative",
-            "Act only according to maxims you could will to be universal law",
-            Branch.ETHICS, Tradition.WESTERN, "Immanuel Kant");
-    public static final Concept COGITO = new Concept("Cogito Ergo Sum",
-            "I think, therefore I am",
-            Branch.EPISTEMOLOGY, Tradition.WESTERN, "René Descartes");
 }

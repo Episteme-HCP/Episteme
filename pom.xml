@@ -1,399 +1,380 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-
-    <groupId>org.jscience</groupId>
-    <artifactId>jscience-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-
-    <name>JScience Unifying Parent</name>
-    <description>JScience - Unified Scientific Computing Framework (Parent POM)</description>
-    <url>https://github.com/silvere/unified-science</url>
-    <inceptionYear>2025</inceptionYear>
-
-    <modules>
-        <module>jscience-core</module>
-        <module>jscience-natural</module>
-        <module>jscience-social</module>
-        <module>jscience-benchmarks</module>
-        <module>jscience-killer-apps</module>
-    </modules>
-
-    <licenses>
-        <license>
-            <name>MIT License</name>
-            <url>https://opensource.org/licenses/MIT</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <id>silvere</id>
-            <name>Silvere Martin-Michiellot</name>
-            <email>silvere.martin@gmail.com</email>
-            <roles>
-                <role>Lead Architect</role>
-                <role>Original Author</role>
-            </roles>
-        </developer>
-        <developer>
-            <id>gemini</id>
-            <name>Gemini AI (Google DeepMind)</name>
-            <roles>
-                <role>Implementation</role>
-                <role>Architecture Design</role>
-            </roles>
-        </developer>
-    </developers>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>21</maven.compiler.release>
-
-        <!-- JSR-385 Units of Measurement -->
-        <uom.version>2.2</uom.version>
-        <indriya.version>2.2</indriya.version>
-
-        <!-- Logging -->
-        <slf4j.version>2.0.9</slf4j.version>
-        <logback.version>1.4.11</logback.version>
-
-        <!-- Testing -->
-        <junit.version>5.10.1</junit.version>
-        <assertj.version>3.25.1</assertj.version>
-
-        <!-- Web/JSON -->
-        <javalin.version>6.1.3</javalin.version>
-        <jackson.version>2.16.1</jackson.version>
-
-        <!-- GPU/Performance -->
-        <jcuda.version>12.0.0</jcuda.version>
-
-        <!-- UI (JavaFX) -->
-        <javafx.version>21.0.1</javafx.version>
-    </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <!-- Internal modules -->
-            <dependency>
-                <groupId>org.jscience</groupId>
-                <artifactId>jscience-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jscience</groupId>
-                <artifactId>jscience-natural</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <!-- Web Server (Javalin) -->
-            <dependency>
-                <groupId>io.javalin</groupId>
-                <artifactId>javalin</artifactId>
-                <version>${javalin.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>${jackson.version}</version>
-            </dependency>
-
-            <!-- JSR-385: Units of Measurement API -->
-            <dependency>
-                <groupId>javax.measure</groupId>
-                <artifactId>unit-api</artifactId>
-                <version>${uom.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>tech.units</groupId>
-                <artifactId>indriya</artifactId>
-                <version>${indriya.version}</version>
-            </dependency>
-
-            <!-- Logging -->
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>${logback.version}</version>
-            </dependency>
-
-            <!-- Testing -->
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.platform</groupId>
-                <artifactId>junit-platform-suite</artifactId>
-                <version>1.10.1</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.assertj</groupId>
-                <artifactId>assertj-core</artifactId>
-                <version>${assertj.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <!-- TestFX (UI Testing) -->
-            <dependency>
-                <groupId>org.testfx</groupId>
-                <artifactId>testfx-core</artifactId>
-                <version>4.0.18</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.testfx</groupId>
-                <artifactId>testfx-junit5</artifactId>
-                <version>4.0.18</version>
-                <scope>test</scope>
-            </dependency>
-
-            <!-- JMH Benchmarking -->
-            <dependency>
-                <groupId>org.openjdk.jmh</groupId>
-                <artifactId>jmh-core</artifactId>
-                <version>1.37</version>
-            </dependency>
-            <dependency>
-                <groupId>org.openjdk.jmh</groupId>
-                <artifactId>jmh-generator-annprocess</artifactId>
-                <version>1.37</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <!-- Benchmark Comparison Libraries -->
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-math3</artifactId>
-                <version>3.6.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.ejml</groupId>
-                <artifactId>ejml-all</artifactId>
-                <version>0.43</version>
-            </dependency>
-            <!-- Colt (scientific computing) -->
-            <dependency>
-                <groupId>colt</groupId>
-                <artifactId>colt</artifactId>
-                <version>1.2.0</version>
-            </dependency>
-            <!-- JBlas (native BLAS) -->
-            <dependency>
-                <groupId>org.jblas</groupId>
-                <artifactId>jblas</artifactId>
-                <version>1.2.5</version>
-            </dependency>
-
-            <!-- JFreeChart for Benchmark Graphs -->
-            <dependency>
-                <groupId>org.jfree</groupId>
-                <artifactId>jfreechart</artifactId>
-                <version>1.5.4</version>
-            </dependency>
-
-            <!-- JCUDA (optional - for GPU support) -->
-            <dependency>
-                <groupId>org.jcuda</groupId>
-                <artifactId>jcuda</artifactId>
-                <version>${jcuda.version}</version>
-                <optional>true</optional>
-            </dependency>
-            <dependency>
-                <groupId>org.jcuda</groupId>
-                <artifactId>jcublas</artifactId>
-                <version>${jcuda.version}</version>
-                <optional>true</optional>
-            </dependency>
-
-            <!-- JOCL (OpenCL support) -->
-            <dependency>
-                <groupId>org.jocl</groupId>
-                <artifactId>jocl</artifactId>
-                <version>2.0.4</version>
-                <optional>true</optional>
-            </dependency>
-
-            <!-- Legacy Dependencies -->
-            <dependency>
-                <groupId>org.jdom</groupId>
-                <artifactId>jdom</artifactId>
-                <version>1.1.3</version>
-            </dependency>
-            <dependency>
-                <groupId>jaxen</groupId>
-                <artifactId>jaxen</artifactId>
-                <version>1.2.0</version>
-            </dependency>
-            <dependency>
-                <groupId>javolution</groupId>
-                <artifactId>javolution</artifactId>
-                <version>5.5.1</version>
-            </dependency>
-            <dependency>
-                <groupId>xerces</groupId>
-                <artifactId>xercesImpl</artifactId>
-                <version>2.12.2</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.vecmath</groupId>
-                <artifactId>vecmath</artifactId>
-                <version>1.5.2</version>
-            </dependency>
-
-            <!-- JavaFX (UI) -->
-            <dependency>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-controls</artifactId>
-                <version>${javafx.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-fxml</artifactId>
-                <version>${javafx.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-swing</artifactId>
-                <version>${javafx.version}</version>
-            </dependency>
-
-            <!-- ND4J (Tensor Operations) -->
-            <dependency>
-                <groupId>org.nd4j</groupId>
-                <artifactId>nd4j-native</artifactId>
-                <version>1.0.0-M2.1</version>
-                <optional>true</optional>
-            </dependency>
-
-            <!-- gRPC / Protobuf -->
-            <dependency>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-netty-shaded</artifactId>
-                <version>1.60.0</version>
-                <scope>runtime</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-stub</artifactId>
-                <version>1.60.0</version>
-            </dependency>
-            <dependency>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-protobuf</artifactId>
-                <version>1.60.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.protobuf</groupId>
-                <artifactId>protobuf-java</artifactId>
-                <version>3.25.1</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.annotation</groupId>
-                <artifactId>javax.annotation-api</artifactId>
-                <version>1.3.2</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.11.0</version>
-                    <configuration>
-                        <release>21</release>
-                        <compilerArgs>
-                            <arg>--add-modules</arg>
-                            <arg>jdk.incubator.vector</arg>
-                        </compilerArgs>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.2.5</version>
-                    <configuration>
-                        <argLine>@{argLine} --add-modules jdk.incubator.vector</argLine>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.11</version>
-                    <executions>
-                        <execution>
-                            <id>prepare-agent</id>
-                            <goals>
-                                <goal>prepare-agent</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>report</id>
-                            <phase>test</phase>
-                            <goals>
-                                <goal>report</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.6.3</version>
-                    <configuration>
-                        <show>protected</show>
-                        <nohelp>true</nohelp>
-                        <failOnError>false</failOnError>
-                        <doclint>none</doclint>
-                        <!-- Frame-based layout for alphabetical navigation -->
-                        <notree>false</notree>
-                        <noindex>false</noindex>
-                        <splitindex>true</splitindex>
-                        <author>true</author>
-                        <version>true</version>
-                        <use>true</use>
-                        <windowtitle>JScience API Documentation</windowtitle>
-                        <doctitle>JScience - Scientific Computing for Java</doctitle>
-                        <header>&lt;b&gt;JScience ${project.version}&lt;/b&gt;</header>
-                        <footer>&lt;i&gt;Copyright © 2024 JScience Team&lt;/i&gt;</footer>
-                        <additionalOptions>
-                            <additionalOption>--add-modules</additionalOption>
-                            <additionalOption>jdk.incubator.vector</additionalOption>
-                        </additionalOptions>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>kr.motd.maven</groupId>
-                    <artifactId>os-maven-plugin</artifactId>
-                    <version>1.7.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.xolstice.maven.plugins</groupId>
-                    <artifactId>protobuf-maven-plugin</artifactId>
-                    <version>0.6.1</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.jscience</groupId>
+  <artifactId>jscience-parent</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>JScience Unifying Parent</name>
+  <description>JScience - Unified Scientific Computing Framework (Parent POM)</description>
+  <url>https://github.com/silvere/unified-science</url>
+  <inceptionYear>2025</inceptionYear>
+  <modules>
+    <module>jscience-core</module>
+    <module>jscience-natural</module>
+    <module>jscience-social</module>
+    <module>jscience-benchmarks</module>
+    <module>jscience-killer-apps</module>
+    <module>jscience-jni</module>
+    <module>jscience-server</module>
+  </modules>
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://opensource.org/licenses/MIT</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/silveremartin-dev/JScience</url>
+    </repository>
+  </distributionManagement>
+  <developers>
+    <developer>
+      <id>silvere</id>
+      <name>Silvere Martin-Michiellot</name>
+      <email>silvere.martin@gmail.com</email>
+      <roles>
+        <role>Lead Architect</role>
+        <role>Original Author</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>gemini</id>
+      <name>Gemini AI (Google DeepMind)</name>
+      <roles>
+        <role>Implementation</role>
+        <role>Architecture Design</role>
+      </roles>
+    </developer>
+  </developers>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>21</maven.compiler.release>
+    <!-- JSR-385 Units of Measurement -->
+    <uom.version>2.2</uom.version>
+    <indriya.version>2.2</indriya.version>
+    <!-- Logging -->
+    <slf4j.version>2.0.9</slf4j.version>
+    <logback.version>1.4.11</logback.version>
+    <!-- Testing -->
+    <junit.version>5.10.1</junit.version>
+    <assertj.version>3.25.1</assertj.version>
+    <!-- Web/JSON -->
+    <javalin.version>6.1.3</javalin.version>
+    <jackson.version>2.16.1</jackson.version>
+    <!-- GPU/Performance -->
+    <jcuda.version>12.0.0</jcuda.version>
+    <!-- UI (JavaFX) -->
+    <javafx.version>21.0.1</javafx.version>
+  </properties>
+  <dependencyManagement>
+    <dependencies>
+      <!-- Internal modules -->
+      <dependency>
+        <groupId>org.jscience</groupId>
+        <artifactId>jscience-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jscience</groupId>
+        <artifactId>jscience-natural</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <!-- Web Server (Javalin) -->
+      <dependency>
+        <groupId>io.javalin</groupId>
+        <artifactId>javalin</artifactId>
+        <version>${javalin.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <!-- JSR-385: Units of Measurement API -->
+      <dependency>
+        <groupId>javax.measure</groupId>
+        <artifactId>unit-api</artifactId>
+        <version>${uom.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>tech.units</groupId>
+        <artifactId>indriya</artifactId>
+        <version>${indriya.version}</version>
+      </dependency>
+      <!-- Logging -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${logback.version}</version>
+      </dependency>
+      <!-- Testing -->
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.platform</groupId>
+        <artifactId>junit-platform-suite</artifactId>
+        <version>1.10.1</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${assertj.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <!-- TestFX (UI Testing) -->
+      <dependency>
+        <groupId>org.testfx</groupId>
+        <artifactId>testfx-core</artifactId>
+        <version>4.0.18</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.testfx</groupId>
+        <artifactId>testfx-junit5</artifactId>
+        <version>4.0.18</version>
+        <scope>test</scope>
+      </dependency>
+      <!-- JMH Benchmarking -->
+      <dependency>
+        <groupId>org.openjdk.jmh</groupId>
+        <artifactId>jmh-core</artifactId>
+        <version>1.37</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openjdk.jmh</groupId>
+        <artifactId>jmh-generator-annprocess</artifactId>
+        <version>1.37</version>
+        <scope>provided</scope>
+      </dependency>
+      <!-- Benchmark Comparison Libraries -->
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-math3</artifactId>
+        <version>3.6.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.ejml</groupId>
+        <artifactId>ejml-all</artifactId>
+        <version>0.43</version>
+      </dependency>
+      <!-- Colt (scientific computing) -->
+      <dependency>
+        <groupId>colt</groupId>
+        <artifactId>colt</artifactId>
+        <version>1.2.0</version>
+      </dependency>
+      <!-- JBlas (native BLAS) -->
+      <dependency>
+        <groupId>org.jblas</groupId>
+        <artifactId>jblas</artifactId>
+        <version>1.2.5</version>
+      </dependency>
+      <!-- JFreeChart for Benchmark Graphs -->
+      <dependency>
+        <groupId>org.jfree</groupId>
+        <artifactId>jfreechart</artifactId>
+        <version>1.5.4</version>
+      </dependency>
+      <!-- JCUDA (optional - for GPU support) -->
+      <dependency>
+        <groupId>org.jcuda</groupId>
+        <artifactId>jcuda</artifactId>
+        <version>${jcuda.version}</version>
+        <optional>true</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.jcuda</groupId>
+        <artifactId>jcublas</artifactId>
+        <version>${jcuda.version}</version>
+        <optional>true</optional>
+      </dependency>
+      <!-- JOCL (OpenCL support) -->
+      <dependency>
+        <groupId>org.jocl</groupId>
+        <artifactId>jocl</artifactId>
+        <version>2.0.4</version>
+        <optional>true</optional>
+      </dependency>
+      <!-- Legacy Dependencies -->
+      <dependency>
+        <groupId>org.jdom</groupId>
+        <artifactId>jdom</artifactId>
+        <version>1.1.3</version>
+      </dependency>
+      <dependency>
+        <groupId>jaxen</groupId>
+        <artifactId>jaxen</artifactId>
+        <version>1.2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>javolution</groupId>
+        <artifactId>javolution</artifactId>
+        <version>5.5.1</version>
+      </dependency>
+      <dependency>
+        <groupId>xerces</groupId>
+        <artifactId>xercesImpl</artifactId>
+        <version>2.12.2</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.vecmath</groupId>
+        <artifactId>vecmath</artifactId>
+        <version>1.5.2</version>
+      </dependency>
+      <!-- JavaFX (UI) -->
+      <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-controls</artifactId>
+        <version>${javafx.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-fxml</artifactId>
+        <version>${javafx.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-swing</artifactId>
+        <version>${javafx.version}</version>
+      </dependency>
+      <!-- ND4J (Tensor Operations) -->
+      <dependency>
+        <groupId>org.nd4j</groupId>
+        <artifactId>nd4j-native</artifactId>
+        <version>1.0.0-M2.1</version>
+        <optional>true</optional>
+      </dependency>
+      <!-- gRPC / Protobuf -->
+      <dependency>
+        <groupId>io.grpc</groupId>
+        <artifactId>grpc-netty-shaded</artifactId>
+        <version>1.60.0</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.grpc</groupId>
+        <artifactId>grpc-stub</artifactId>
+        <version>1.60.0</version>
+      </dependency>
+      <dependency>
+        <groupId>io.grpc</groupId>
+        <artifactId>grpc-protobuf</artifactId>
+        <version>1.60.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.protobuf</groupId>
+        <artifactId>protobuf-java</artifactId>
+        <version>3.25.1</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.annotation</groupId>
+        <artifactId>javax.annotation-api</artifactId>
+        <version>1.3.2</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.11.0</version>
+          <configuration>
+            <release>21</release>
+            <compilerArgs>
+              <arg>--add-modules</arg>
+              <arg>jdk.incubator.vector</arg>
+            </compilerArgs>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>3.2.5</version>
+          <configuration>
+            <argLine>@{argLine} --add-modules jdk.incubator.vector</argLine>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.8.11</version>
+          <executions>
+            <execution>
+              <id>prepare-agent</id>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>report</id>
+              <phase>test</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>3.6.3</version>
+          <configuration>
+            <show>protected</show>
+            <nohelp>true</nohelp>
+            <failOnError>false</failOnError>
+            <doclint>none</doclint>
+            <!-- Frame-based layout for alphabetical navigation -->
+            <notree>false</notree>
+            <noindex>false</noindex>
+            <splitindex>true</splitindex>
+            <author>true</author>
+            <version>true</version>
+            <use>true</use>
+            <windowtitle>JScience API Documentation</windowtitle>
+            <doctitle>JScience - Scientific Computing for Java</doctitle>
+            <header>&lt;b&gt;JScience ${project.version}&lt;/b&gt;</header>
+            <footer>&lt;i&gt;Copyright © 2024 JScience Team&lt;/i&gt;</footer>
+            <additionalOptions>
+              <additionalOption>--add-modules</additionalOption>
+              <additionalOption>jdk.incubator.vector</additionalOption>
+            </additionalOptions>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>kr.motd.maven</groupId>
+          <artifactId>os-maven-plugin</artifactId>
+          <version>1.7.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.xolstice.maven.plugins</groupId>
+          <artifactId>protobuf-maven-plugin</artifactId>
+          <version>0.6.1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>

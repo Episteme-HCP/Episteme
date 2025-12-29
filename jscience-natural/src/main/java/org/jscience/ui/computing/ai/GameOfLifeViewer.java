@@ -4,178 +4,213 @@
  */
 package org.jscience.ui.computing.ai;
 
-import javafx.application.Application;
+import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import org.jscience.ui.i18n.I18n;
-import javafx.scene.control.Slider;
-
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 import org.jscience.computing.ai.automata.ConwayLife;
+import org.jscience.ui.NumericParameter;
+import org.jscience.ui.Parameter;
+import org.jscience.ui.ScientificViewer;
+import org.jscience.ui.Simulatable;
+import org.jscience.ui.i18n.I18n;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Game of Life Viewer.
- * Visualizes Cellular Automata with interactive controls.
+ * Game of Life Viewer refactored to the new architecture.
+ * Visualizes Cellular Automata with consistent parameter controls.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.1
+ * @since 1.2
  */
-public class GameOfLifeViewer extends Application {
+public class GameOfLifeViewer extends VBox implements ScientificViewer, Simulatable {
 
-    private static final int CELL_SIZE = 5;
+    // Base constants for the simulation logic
     private static final int WIDTH = 160;
     private static final int HEIGHT = 100;
 
     private ConwayLife life;
     private Canvas canvas;
-    private boolean paused = true;
+    private boolean playing = false;
     private long lastUpdate = 0;
-    private long updateInterval = 460_000_000; // 460ms default (matches slider value 50)
+    private double simulationSpeed = 1.0;
+    private double initialDensity = 0.2;
+    private Color cellColor = Color.LIME;
 
-    @Override
-    public void start(Stage stage) {
+    private final List<Parameter<?>> parameters = new ArrayList<>();
+    private AnimationTimer timer;
+
+    public GameOfLifeViewer() {
+        super(10);
+        setPadding(new Insets(10));
+        getStyleClass().add("dark-viewer-root");
+
         life = new ConwayLife(WIDTH, HEIGHT);
-        // Canvas Area
-        BorderPane root = new BorderPane();
-        canvas = new Canvas(WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE);
+        setupParameters();
+        buildUI();
+        setupAnimation();
 
         randomize();
+    }
+
+    private void setupParameters() {
+        parameters.add(new NumericParameter(
+                I18n.getInstance().get("life.param.density", "Initial Density"),
+                "Density of alive cells when randomizing",
+                0.01, 1.0, 0.05, 0.2,
+                val -> this.initialDensity = val));
+
+        parameters.add(new Parameter<Color>(
+                I18n.getInstance().get("life.param.color", "Cell Color"),
+                "Color of the alive cells",
+                Color.LIME,
+                val -> {
+                    this.cellColor = val;
+                    draw();
+                }));
+    }
+
+    private void buildUI() {
+        // Initial size, will be bound later
+        canvas = new Canvas(WIDTH * 5, HEIGHT * 5);
+
+        // Ensure it fills the container
+        canvas.widthProperty().bind(this.widthProperty().subtract(20));
+        canvas.heightProperty().bind(this.heightProperty().subtract(20));
+
+        // Redraw when Canvas is resized
+        canvas.widthProperty().addListener(obs -> draw());
+        canvas.heightProperty().addListener(obs -> draw());
+
         canvas.setOnMouseClicked(e -> {
-            int x = (int) (e.getX() / CELL_SIZE);
-            int y = (int) (e.getY() / CELL_SIZE);
+            double cellW = canvas.getWidth() / WIDTH;
+            double cellH = canvas.getHeight() / HEIGHT;
+            int x = (int) (e.getX() / cellW);
+            int y = (int) (e.getY() / cellH);
             if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
                 life.setState(x, y, !life.getState(x, y));
                 draw();
             }
         });
+
         canvas.setOnMouseDragged(e -> {
-            int x = (int) (e.getX() / CELL_SIZE);
-            int y = (int) (e.getY() / CELL_SIZE);
+            double cellW = canvas.getWidth() / WIDTH;
+            double cellH = canvas.getHeight() / HEIGHT;
+            int x = (int) (e.getX() / cellW);
+            int y = (int) (e.getY() / cellH);
             if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
                 life.setState(x, y, true);
                 draw();
             }
         });
 
-        // Wrap canvas in a pane to center it
-        VBox canvasContainer = new VBox(canvas);
-        canvasContainer.setPadding(new Insets(10));
-        canvasContainer.getStyleClass().add("dark-viewer-root");
-        root.setCenter(canvasContainer);
+        getChildren().add(canvas);
+    }
 
-        // Controls Area
-        HBox controls = new HBox(10);
-        controls.setPadding(new Insets(10));
-        controls.getStyleClass().add("dark-viewer-controls");
-
-        Button btnPlay = new Button(I18n.getInstance().get("life.btn.play"));
-        Button btnStep = new Button(I18n.getInstance().get("life.btn.step"));
-        Button btnClear = new Button(I18n.getInstance().get("life.btn.clear"));
-        Button btnRandom = new Button(I18n.getInstance().get("life.btn.random"));
-
-        Slider speedSlider = new Slider(10, 500, 50); // ms delay
-        speedSlider.setShowTickLabels(false);
-        speedSlider.setShowTickMarks(false);
-        Label speedLabel = new Label(I18n.getInstance().get("life.speed"));
-        Label speedValue = new Label(String.format("%.0f", speedSlider.getValue()));
-        speedValue.setMinWidth(30);
-
-        btnPlay.setOnAction(e -> {
-            paused = !paused;
-            btnPlay.setText(paused ? "Play" : "Pause");
-        });
-
-        btnStep.setOnAction(e -> {
-            paused = true;
-            btnPlay.setText(I18n.getInstance().get("life.btn.play"));
-            life.nextGeneration();
-            draw();
-        });
-
-        btnClear.setOnAction(e -> {
-            paused = true;
-            btnPlay.setText(I18n.getInstance().get("life.btn.play"));
-            life = new ConwayLife(WIDTH, HEIGHT); // Reset
-            draw();
-        });
-
-        btnRandom.setOnAction(e -> randomize());
-
-        speedSlider.valueProperty().addListener((obs, old, val) -> {
-            // Invert: Left (10) = slow (500ms), Right (500) = fast (10ms)
-            double invertedDelay = 510 - val.doubleValue();
-            updateInterval = (long) (invertedDelay * 1_000_000);
-            speedValue.setText(String.format("%.0f", val.doubleValue()));
-        });
-        // Initialize slider to match default updateInterval (460ms -> slider value 50)
-        speedSlider.setValue(50); // Middle-slow, actual delay = 460ms
-
-        controls.getChildren().addAll(btnPlay, btnStep, btnClear, btnRandom, speedLabel, speedSlider, speedValue);
-        root.setBottom(controls);
-
-        Scene scene = new Scene(root);
-        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-
-        new javafx.animation.AnimationTimer() {
+    private void setupAnimation() {
+        timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (!paused) {
-                    if (now - lastUpdate > updateInterval) {
-                        life.nextGeneration();
-                        draw();
-                        lastUpdate = now;
-                    }
+                if (!playing)
+                    return;
+
+                // Speed factor: 1.0 = ~460ms interval, 5.0 = fast, 0.1 = slow
+                // Baseline: 500ms / speed
+                long intervalNs = (long) ((500.0 / simulationSpeed) * 1_000_000);
+
+                if (now - lastUpdate > intervalNs) {
+                    life.nextGeneration();
+                    draw();
+                    lastUpdate = now;
                 }
             }
-        }.start();
+        };
+    }
 
-        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.gameoflife"));
-        stage.setScene(scene);
-        stage.show();
+    private void draw() {
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        double w = canvas.getWidth();
+        double h = canvas.getHeight();
+
+        if (w <= 0 || h <= 0)
+            return;
+
+        gc.setFill(Color.BLACK);
+        gc.fillRect(0, 0, w, h);
+
+        double cellW = w / WIDTH;
+        double cellH = h / HEIGHT;
+
+        gc.setFill(cellColor);
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                if (life.getState(x, y)) {
+                    gc.fillRect(x * cellW, y * cellH, cellW - 0.5, cellH - 0.5);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void play() {
+        this.playing = true;
+        timer.start();
+    }
+
+    @Override
+    public void pause() {
+        this.playing = false;
+    }
+
+    @Override
+    public void stop() {
+        this.playing = false;
+        reset();
+    }
+
+    @Override
+    public void step() {
+        life.nextGeneration();
         draw();
+    }
+
+    @Override
+    public void setSpeed(double multiplier) {
+        this.simulationSpeed = multiplier;
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return playing;
+    }
+
+    @Override
+    public void reset() {
+        life = new ConwayLife(WIDTH, HEIGHT);
+        randomize();
+    }
+
+    @Override
+    public boolean isRunning() {
+        return playing;
+    }
+
+    @Override
+    public List<Parameter<?>> getParameters() {
+        return parameters;
     }
 
     private void randomize() {
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
-                if (Math.random() < 0.2)
-                    life.setState(x, y, true);
-                else
-                    life.setState(x, y, false);
+                life.setState(x, y, Math.random() < initialDensity);
             }
         }
         draw();
-    }
-
-    private void draw() {
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setFill(Color.BLACK);
-        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-
-        gc.setFill(Color.LIME);
-        for (int x = 0; x < WIDTH; x++) {
-            for (int y = 0; y < HEIGHT; y++) {
-                if (life.getState(x, y)) {
-                    gc.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE - 1, CELL_SIZE - 1);
-                }
-            }
-        }
-    }
-
-    public static void show(Stage stage) {
-        new GameOfLifeViewer().start(stage);
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }

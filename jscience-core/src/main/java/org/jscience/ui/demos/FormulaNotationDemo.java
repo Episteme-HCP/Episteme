@@ -23,7 +23,7 @@ public class FormulaNotationDemo implements DemoProvider {
 
     @Override
     public String getDescription() {
-        return "Visualizes complex mathematical notation and physical laws using custom rendering techniques.";
+        return I18n.getInstance().get("FormulaNotation.desc");
     }
 
     @Override

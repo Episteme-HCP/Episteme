@@ -27,10 +27,11 @@ import java.util.*;
 /**
  * Represents a society.
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Society {
+public class Society implements org.jscience.geography.Locatable {
 
     public enum Type {
         HUNTER_GATHERER, PASTORAL, HORTICULTURAL, AGRICULTURAL,
@@ -43,6 +44,7 @@ public class Society {
     private long population;
     private String governmentType;
     private final List<Group> institutions = new ArrayList<>();
+    private org.jscience.geography.Place location;
 
     public Society(String name) {
         this.name = name;
@@ -76,6 +78,15 @@ public class Society {
 
     public List<Group> getInstitutions() {
         return Collections.unmodifiableList(institutions);
+    }
+
+    @Override
+    public org.jscience.geography.Place getLocation() {
+        return location;
+    }
+
+    public void setLocation(org.jscience.geography.Place location) {
+        this.location = location;
     }
 
     // Setters

@@ -37,7 +37,6 @@ public class ArchitectureStabilityDemo implements DemoProvider {
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         Button addBlockBtn = new Button(org.jscience.ui.i18n.SocialI18n.getInstance().get("arch.stability.btn.add"));
-        Button addHeavyBtn = new Button("Add Heavy Destabilizer"); // TODO: I18n
         Button resetBtn = new Button(org.jscience.ui.i18n.SocialI18n.getInstance().get("arch.stability.btn.reset"));
         Label status = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("arch.stability.label.stable"));
         status.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
@@ -80,15 +79,10 @@ public class ArchitectureStabilityDemo implements DemoProvider {
 
                 // Optimization: Don't draw if off-screen
                 if (currentY > -50 && currentY < 600) {
-                    gc.setFill(s.collapsed ? Color.RED : (b.mass > 1 ? Color.DARKRED : Color.GRAY));
+                    gc.setFill(s.collapsed ? Color.RED : Color.GRAY);
                     gc.setStroke(Color.BLACK);
                     gc.fillRect(bx, currentY, 100, 50);
                     gc.strokeRect(bx, currentY, 100, 50);
-
-                    if (b.mass > 1) {
-                        gc.setFill(Color.WHITE);
-                        gc.fillText("HEAVY", bx + 30, currentY + 30);
-                    }
                 }
 
                 if (!s.collapsed) {
@@ -126,14 +120,6 @@ public class ArchitectureStabilityDemo implements DemoProvider {
             draw.run();
         });
 
-        addHeavyBtn.setOnAction(e -> {
-            if (s.collapsed)
-                return;
-            // Add a heavy block with extreme offset to destabilize
-            s.blocks.add(new Block(45, 5.0));
-            draw.run();
-        });
-
         resetBtn.setOnAction(e -> {
             s.blocks.clear();
             s.collapsed = false;
@@ -142,7 +128,7 @@ public class ArchitectureStabilityDemo implements DemoProvider {
             draw.run();
         });
 
-        VBox controls = new VBox(10, addBlockBtn, addHeavyBtn, resetBtn, status);
+        VBox controls = new VBox(10, addBlockBtn, resetBtn, status);
         controls.setStyle("-fx-padding: 10;");
         root.setRight(controls);
 

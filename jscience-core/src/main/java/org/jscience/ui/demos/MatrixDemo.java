@@ -19,7 +19,7 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.ui.DemoProvider;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.ui.mathematics.MatrixViewer;
-import org.jscience.ui.ThemeManager;
+// import org.jscience.ui.ThemeManager;
 
 /**
  * Enhanced Matrix Viewer with multiple display modes.
@@ -55,11 +55,11 @@ public class MatrixDemo implements DemoProvider {
     @Override
     public void show(Stage stage) {
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #1a1a2e;");
+        root.setStyle("-fx-background-color: white;");
 
         // Header
         Label header = new Label(I18n.getInstance().get("matrix.label.header"));
-        header.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #00d9ff;");
+        header.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: black;");
         HBox headerBox = new HBox(header);
         headerBox.setAlignment(Pos.CENTER);
         headerBox.setPadding(new Insets(15));
@@ -70,7 +70,7 @@ public class MatrixDemo implements DemoProvider {
         VBox controls = new VBox(15);
         controls.setPadding(new Insets(15));
         controls.setPrefWidth(220);
-        controls.setStyle("-fx-background-color: #16213e;");
+        controls.setStyle("-fx-background-color: #f4f4f4;");
 
         Label sizeLabel = new Label(I18n.getInstance().get("matrix.label.size"));
         sizeLabel.setStyle("-fx-text-fill: #aaa; -fx-font-weight: bold;");
@@ -78,16 +78,16 @@ public class MatrixDemo implements DemoProvider {
         HBox rowBox = new HBox(10);
         rowBox.setAlignment(Pos.CENTER_LEFT);
         Label rowLabel = new Label(I18n.getInstance().get("matrix.label.rows") + ":");
-        rowLabel.setStyle("-fx-text-fill: #888;");
-        rowsSpinner = new Spinner<>(2, 20, 8);
+        // rowLabel.setStyle("-fx-text-fill: #888;");
+        rowsSpinner = new Spinner<>(2, 50, 8);
         rowsSpinner.setPrefWidth(80);
         rowBox.getChildren().addAll(rowLabel, rowsSpinner);
 
         HBox colBox = new HBox(10);
         colBox.setAlignment(Pos.CENTER_LEFT);
         Label colLabel = new Label(I18n.getInstance().get("matrix.label.cols") + ":");
-        colLabel.setStyle("-fx-text-fill: #888;");
-        colsSpinner = new Spinner<>(2, 20, 8);
+        // colLabel.setStyle("-fx-text-fill: #888;");
+        colsSpinner = new Spinner<>(2, 50, 8);
         colsSpinner.setPrefWidth(80);
         colBox.getChildren().addAll(colLabel, colsSpinner);
 
@@ -131,7 +131,7 @@ public class MatrixDemo implements DemoProvider {
         scaleBtn.setOnAction(e -> scale(2.0));
 
         infoLabel = new Label("8x8 " + I18n.getInstance().get("matrix.info.matrix"));
-        infoLabel.setStyle("-fx-text-fill: #00d9ff; -fx-font-size: 12px;");
+        infoLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;"); // Removed blue
 
         controls.getChildren().addAll(
                 sizeLabel, rowBox, colBox, generateBtn, identityBtn,
@@ -142,7 +142,7 @@ public class MatrixDemo implements DemoProvider {
 
         // View Container (Center)
         viewContainer = new StackPane();
-        viewContainer.setStyle("-fx-background-color: #0f3460;");
+        viewContainer.setStyle("-fx-background-color: white; -fx-border-color: lightgray;");
         viewContainer.setPadding(new Insets(20));
         root.setCenter(viewContainer);
 
@@ -152,7 +152,7 @@ public class MatrixDemo implements DemoProvider {
         Scene scene = new Scene(root, 900, 650);
         stage.setTitle(I18n.getInstance().get("matrix.title"));
         stage.setScene(scene);
-        ThemeManager.getInstance().applyTheme(scene);
+        // ThemeManager.getInstance().applyTheme(scene);
         stage.show();
     }
 
@@ -219,7 +219,38 @@ public class MatrixDemo implements DemoProvider {
     private void updateViews() {
         tableViewer = new MatrixViewer<>(matrix);
         createHeatmap();
-        showTableView();
+        // Persist view mode
+        // Persist view mode (logic checks container children)
+        // Hacky way to get radio, better to store reference or check toggle group.
+        // Actually I have references to radios in show(), but they are local variables.
+        // I should make them fields or check logic.
+        // Wait, 'updateViews' is called from generateMatrix, generateIdentity, etc.
+        // I should check existing children of viewContainer to see what was shown?
+        // Or check toggle group if I had access.
+        // Refactoring to make ToggleGroup a field would be best, but let's try to just
+        // check viewContainer content?
+        // Actually, let's keep it simple: defaulting to TableView is annoying.
+        // I will rely on the ToggleGroup which I should promote to field or access
+        // differently.
+        // Since I can't easily promote to field in replace_file_content without
+        // changing class definition,
+        // I will assume TableView for now but wait, I can change the class definition
+        // block if I include it.
+        // But I am replacing lines 133-313.
+
+        // Let's check viewContainer.
+        boolean heatmapActive = false;
+        if (!viewContainer.getChildren().isEmpty()) {
+            if (viewContainer.getChildren().get(0) instanceof Canvas) {
+                heatmapActive = true;
+            }
+        }
+
+        if (heatmapActive) {
+            showHeatmapView();
+        } else {
+            showTableView();
+        }
     }
 
     private void showTableView() {
@@ -244,7 +275,11 @@ public class MatrixDemo implements DemoProvider {
         int cols = matrix.cols();
         int cellSize = Math.min(50, Math.max(20, 500 / Math.max(rows, cols)));
 
-        heatmapCanvas = new Canvas(cols * cellSize + 2, rows * cellSize + 2);
+        int legendWidth = 60;
+        int width = cols * cellSize + legendWidth + 20;
+        int height = rows * cellSize + 2;
+
+        heatmapCanvas = new Canvas(Math.max(width, 200), Math.max(height, 200));
         GraphicsContext gc = heatmapCanvas.getGraphicsContext2D();
 
         // Find min/max for normalization
@@ -269,7 +304,7 @@ public class MatrixDemo implements DemoProvider {
                 // Blue to Red gradient
                 Color color = Color.hsb(240 - norm * 240, 0.8, 0.9);
                 gc.setFill(color);
-                gc.fillRect(j * cellSize + 1, i * cellSize + 1, cellSize - 1, cellSize - 1);
+                gc.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
 
                 // Value text (if cells are large enough)
                 if (cellSize >= 35) {
@@ -284,10 +319,31 @@ public class MatrixDemo implements DemoProvider {
         gc.setStroke(Color.web("#333"));
         gc.setLineWidth(1);
         for (int i = 0; i <= rows; i++) {
-            gc.strokeLine(0, i * cellSize, cols * cellSize, i * cellSize);
+            // gc.strokeLine(0, i * cellSize, cols * cellSize, i * cellSize);
+            // Better grid: rects
+            for (int j = 0; j < cols; j++) {
+                gc.strokeRect(j * cellSize, i * cellSize, cellSize, cellSize);
+            }
         }
-        for (int j = 0; j <= cols; j++) {
-            gc.strokeLine(j * cellSize, 0, j * cellSize, rows * cellSize);
+
+        // Legend on Right
+        double legendX = cols * cellSize + 10;
+        double legendH = rows * cellSize;
+        if (legendH < 100)
+            legendH = 100; // Min height for legend
+
+        // Gradient Bar
+        for (int i = 0; i < legendH; i++) {
+            double ratio = 1.0 - (double) i / legendH; // 1 at top (Red), 0 at bottom (Blue)
+            gc.setFill(Color.hsb(240 - ratio * 240, 0.8, 0.9));
+            gc.fillRect(legendX, i, 15, 1);
         }
+        gc.setStroke(Color.BLACK);
+        gc.strokeRect(legendX, 0, 15, legendH);
+
+        // Labels
+        gc.setFill(Color.BLACK);
+        gc.fillText(String.format("%.1f", max), legendX + 20, 10);
+        gc.fillText(String.format("%.1f", min), legendX + 20, legendH);
     }
 }

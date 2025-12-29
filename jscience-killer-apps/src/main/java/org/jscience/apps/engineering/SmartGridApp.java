@@ -38,6 +38,11 @@ import java.util.Random;
  */
 public class SmartGridApp extends KillerAppBase {
 
+    @Override
+    protected void onAppReady() {
+        setTheme("light");
+    }
+
     // UI Components
     private AreaChart<Number, Number> loadChart;
     private XYChart.Series<Number, Number> supplySeries;
@@ -159,10 +164,9 @@ public class SmartGridApp extends KillerAppBase {
     private VBox createControlRoom() {
         VBox box = new VBox(15);
         box.setPadding(new Insets(15));
-        box.setStyle("-fx-background-color: #2b2b2b;"); // Dark control room theme
+        box.setStyle("-fx-background-color: #f5f5f5;"); // Light control panel theme
 
         Label title = new Label(i18n.get("grid.panel.control"));
-        title.setTextFill(Color.WHITE);
         title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         // Coal
@@ -184,7 +188,7 @@ public class SmartGridApp extends KillerAppBase {
         // Battery Status
         VBox batteryBox = new VBox(5);
         Label batteryTitle = new Label(i18n.get("grid.label.battery_title"));
-        batteryTitle.setTextFill(Color.LIGHTGREEN);
+        batteryTitle.setTextFill(Color.DARKGREEN);
         batteryTitle.setStyle("-fx-font-weight: bold;");
 
         batteryBar = new ProgressBar(0.5);
@@ -193,7 +197,7 @@ public class SmartGridApp extends KillerAppBase {
 
         batteryLabel = new Label(
                 MessageFormat.format(i18n.get("grid.label.battery_charge"), batteryCharge, batteryCapacity));
-        batteryLabel.setTextFill(Color.LIGHTGRAY);
+        batteryLabel.setTextFill(Color.DARKGRAY);
 
         batteryBox.getChildren().addAll(batteryTitle, batteryBar, batteryLabel);
 
@@ -216,7 +220,7 @@ public class SmartGridApp extends KillerAppBase {
         sli.setShowTickMarks(true);
 
         Label valLbl = new Label(MessageFormat.format(i18n.get("grid.label.mw_value"), val));
-        valLbl.setTextFill(Color.LIGHTGRAY);
+        valLbl.setTextFill(Color.DARKGRAY);
         sli.valueProperty().addListener(
                 (o, ov, nv) -> valLbl.setText(MessageFormat.format(i18n.get("grid.label.mw_value"), nv.doubleValue())));
 

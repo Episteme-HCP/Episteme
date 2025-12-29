@@ -130,7 +130,8 @@ public class MolecularViewer extends Application {
                 "Water",
                 "Benzene (Orbitals)",
                 "DNA",
-                "Protein"));
+                "Protein",
+                "Protein Folding Simulation"));
         selector.setValue("Benzene (Orbitals)");
         selector.setMaxWidth(Double.MAX_VALUE);
         selector.setOnAction(e -> loadModel(selector.getValue()));
@@ -139,12 +140,41 @@ public class MolecularViewer extends Application {
         showBondsBox.setSelected(true);
         showBondsBox.setOnAction(e -> toggleBonds(showBondsBox.isSelected()));
 
-        showOrbitalsBox = new CheckBox("Show Orbitals");
-        showOrbitalsBox.setSelected(false);
         showOrbitalsBox.setOnAction(e -> {
             showOrbitals = showOrbitalsBox.isSelected();
             // Reload current model to apply orbitals
             loadModel(selector.getValue());
+        });
+
+        // Protein Folding Controls
+        Label foldLabel = new Label("Folding Progress:");
+        Slider foldSlider = new Slider(0, 100, 0);
+        foldSlider.setShowTickLabels(true);
+        foldSlider.setShowTickMarks(true);
+        foldSlider.setMajorTickUnit(50);
+        foldSlider.setBlockIncrement(10);
+
+        Button playFoldBtn = new Button("Animate Folding");
+        playFoldBtn.setMaxWidth(Double.MAX_VALUE);
+        playFoldBtn.setOnAction(e -> animateFolding(foldSlider));
+
+        VBox foldControls = new VBox(5, new Separator(), foldLabel, foldSlider, playFoldBtn);
+        foldControls.setVisible(false); // Hidden by default
+        foldSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (selector.getValue().contains("Folding")) {
+                updateProteinFolding(newVal.doubleValue() / 100.0);
+            }
+        });
+
+        // Listener to show/hide fold controls
+        selector.valueProperty().addListener((obs, oldVal, newVal) -> {
+            boolean isFolding = newVal != null && newVal.contains("Folding");
+            foldControls.setVisible(isFolding);
+            foldControls.setManaged(isFolding);
+            if (!isFolding) {
+                // Reset
+                foldSlider.setValue(0);
+            }
         });
 
         // Planar (2D) View Toggle
@@ -174,6 +204,7 @@ public class MolecularViewer extends Application {
                 new Separator(),
                 new Label("Molecule Info:"),
                 detailLabel,
+                foldControls,
                 new Separator(),
                 new Label("Legend:"),
                 legend);
@@ -259,6 +290,10 @@ public class MolecularViewer extends Application {
         } else if (name.contains("DNA")) {
             createDNA();
             detailLabel.setText("Deoxyribonucleic Acid (DNA)\nDouble Helix");
+        } else if (name.contains("Protein Folding")) {
+            createProteinFoldingSimulation();
+            detailLabel.setText(
+                    "Protein Folding Simulation\nDrag slider to fold.\n\nDemonstrates transition from\nprimary structure (linear)\nto secondary (alpha-helix).");
         } else if (name.contains("Protein")) {
             createProtein();
             detailLabel.setText("Generic Protein Structure\nAlpha Helix");
@@ -798,6 +833,7 @@ public class MolecularViewer extends Application {
         Atom o2 = new Atom(PeriodicTable.bySymbol("O"), vec(2.1, -1.2, 0));
 
         g.addAtom(n);
+
         g.addAtom(ca);
         g.addAtom(c);
         g.addAtom(o1);
@@ -898,5 +934,130 @@ public class MolecularViewer extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    // --- Protein Folding Simulation ---
+    private List<javafx.scene.Node> dynamicAtoms = new ArrayList<>();
+    private List<javafx.scene.Node> dynamicBonds = new ArrayList<>();
+
+    private void animateFolding(Slider slider) {
+        javafx.animation.Timeline timeline = new javafx.animation.Timeline();
+        // 0 to 100 in 2 seconds
+        javafx.animation.KeyValue kv = new javafx.animation.KeyValue(slider.valueProperty(), 100);
+        javafx.animation.KeyFrame kf = new javafx.animation.KeyFrame(javafx.util.Duration.seconds(3), kv);
+
+        // Reset first
+        slider.setValue(0);
+
+        timeline.getKeyFrames().add(kf);
+        timeline.play();
+    }
+
+    private void updateProteinFolding(double t) {
+        // t is 0.0 (Unfolded) to 1.0 (Folded)
+        // Interpolate positions of dynamicAtoms
+
+        // Model Parameters
+        int count = dynamicAtoms.size();
+        double dist = 2.0; // Distance between residues
+
+        // Linear State: Along X axis, centered
+        double startX = -(count * dist) / 2.0;
+
+        // Helix State
+        double radius = 3.0; // Helix radius
+        double rise = 0.5; // Vertical rise per residue
+        double angleStep = Math.toRadians(45); // Turn per residue
+        double helixStartY = -(count * rise) / 2.0; // Center Y
+
+        for (int i = 0; i < count; i++) {
+            javafx.scene.Node n = dynamicAtoms.get(i);
+
+            // 1. Calculate Linear Pos
+            double lx = startX + i * dist;
+            double ly = 0;
+            double lz = 0;
+
+            // 2. Calculate Helix Pos
+            double hAngle = i * angleStep;
+            double hx = Math.cos(hAngle) * radius;
+            double hy = helixStartY + i * rise;
+            double hz = Math.sin(hAngle) * radius;
+
+            // 3. Interpolate
+            // Use easing? t * t for ease in? Linear is fine for demo
+            double x = lx * (1 - t) + hx * t;
+            double y = ly * (1 - t) + hy * t;
+            double z = lz * (1 - t) + hz * t;
+
+            n.setTranslateX(x);
+            n.setTranslateY(y);
+            n.setTranslateZ(z);
+        }
+
+        // Remove old bonds
+        moleculeGroup.getChildren().removeAll(dynamicBonds);
+        dynamicBonds.clear();
+
+        // Re-create bonds
+        PhongMaterial bondMat = new PhongMaterial(Color.LIGHTGRAY);
+        for (int i = 0; i < count - 1; i++) {
+            javafx.scene.Node n1 = dynamicAtoms.get(i);
+            javafx.scene.Node n2 = dynamicAtoms.get(i + 1);
+
+            javafx.geometry.Point3D p1 = new javafx.geometry.Point3D(n1.getTranslateX(), n1.getTranslateY(),
+                    n1.getTranslateZ());
+            javafx.geometry.Point3D p2 = new javafx.geometry.Point3D(n2.getTranslateX(), n2.getTranslateY(),
+                    n2.getTranslateZ());
+
+            createDynamicBond(p1, p2, bondMat);
+        }
+    }
+
+    private void createDynamicBond(javafx.geometry.Point3D p1, javafx.geometry.Point3D p2, PhongMaterial mat) {
+        javafx.geometry.Point3D diff = p2.subtract(p1);
+        double len = diff.magnitude();
+        javafx.geometry.Point3D mid = p1.midpoint(p2);
+        javafx.geometry.Point3D axis = diff.crossProduct(new javafx.geometry.Point3D(0, 1, 0));
+        double angle = Math.acos(diff.normalize().dotProduct(new javafx.geometry.Point3D(0, 1, 0)));
+        if (axis.magnitude() < 1e-4)
+            axis = new javafx.geometry.Point3D(1, 0, 0);
+
+        Cylinder c = new Cylinder(0.3, len);
+        c.setMaterial(mat);
+        c.setRotationAxis(axis);
+        c.setRotate(-Math.toDegrees(angle));
+        c.setTranslateX(mid.getX());
+        c.setTranslateY(mid.getY());
+        c.setTranslateZ(mid.getZ());
+
+        moleculeGroup.getChildren().add(c);
+        dynamicBonds.add(c);
+    }
+
+    private void createProteinFoldingSimulation() {
+        dynamicAtoms.clear();
+        dynamicBonds.clear();
+
+        // Create 40 "Amino Acid" spheres
+        int count = 40;
+
+        PhongMaterial mat = new PhongMaterial(Color.web("#8A2BE2"));
+        mat.setSpecularColor(Color.WHITE);
+
+        for (int i = 0; i < count; i++) {
+            Sphere s = new Sphere(0.8);
+            // Alternate colors for variety
+            if (i % 2 == 0)
+                s.setMaterial(new PhongMaterial(Color.ORANGE));
+            else
+                s.setMaterial(new PhongMaterial(Color.CYAN));
+
+            moleculeGroup.getChildren().add(s);
+            dynamicAtoms.add(s);
+        }
+
+        // Initial Update (t=0)
+        updateProteinFolding(0);
     }
 }

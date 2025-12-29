@@ -1,16 +1,11 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
- */
 package org.jscience.ui.demos;
 
-import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import javafx.scene.Node;
+import org.jscience.ui.SimulationDemo;
 import org.jscience.ui.devices.VitalMonitorViewer;
-
 import org.jscience.ui.i18n.I18n;
 
-public class VitalMonitorDemo implements DemoProvider {
+public class VitalMonitorDemo extends SimulationDemo {
     @Override
     public String getCategory() {
         return I18n.getInstance().get("category.biology");
@@ -18,16 +13,27 @@ public class VitalMonitorDemo implements DemoProvider {
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("vital.title");
+        return I18n.getInstance().get("vital.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("vital.desc");
+        return I18n.getInstance().get("vital.short_desc", "Medical vital signs monitoring");
     }
 
     @Override
-    public void show(Stage stage) {
-        VitalMonitorViewer.show(stage);
+    protected String getLongDescription() {
+        return "This professional vital signs monitor simulates a real-world medical device. " +
+                "It displays real-time waveforms for ECG (Electrocardiogram) and Plethysmograph (SpO2), " +
+                "along with numerical values for heart rate, blood pressure, oxygen saturation, " +
+                "respiration rate, and temperature. You can adjust patient parameters in real-time " +
+                "to see how the monitor reacts.";
+    }
+
+    @Override
+    protected Node createViewerNode() {
+        VitalMonitorViewer vmv = new VitalMonitorViewer();
+        vmv.play();
+        return vmv;
     }
 }

@@ -38,6 +38,8 @@ public class CivilizationApp extends KillerAppBase {
     private double consumptionPerCapita = 1.0;
     private double pollutionFactor = 0.1;
     private double innovationRate = 0.0; // Reduces consumption/pollution
+    private double regenerationRate = 0.0;
+    private double aggression = 0.0;
 
     private double time = 0;
     private boolean running = false;
@@ -85,6 +87,7 @@ public class CivilizationApp extends KillerAppBase {
         return mainStack;
     }
 
+    @SuppressWarnings("unchecked")
     private LineChart<Number, Number> createChart() {
         NumberAxis xAxis = new NumberAxis();
         xAxis.setLabel(i18n.get("civilization.label.years"));
@@ -120,6 +123,10 @@ public class CivilizationApp extends KillerAppBase {
                 .add(createSlider(i18n.get("civilization.label.birth"), 0.0, 0.2, 0.05, v -> birthRateBase = v));
         sliders.getChildren()
                 .add(createSlider(i18n.get("civilization.label.innovation"), 0.0, 0.05, 0.0, v -> innovationRate = v));
+        sliders.getChildren()
+                .add(createSlider(i18n.get("civilization.label.regen"), 0.0, 1.0, 0.0, v -> regenerationRate = v));
+        sliders.getChildren()
+                .add(createSlider(i18n.get("civilization.label.aggression"), 0.0, 1.0, 0.0, v -> aggression = v));
 
         HBox buttons = new HBox(10);
         Button btnReset = new Button(i18n.get("civilization.button.reset"));
@@ -185,7 +192,8 @@ public class CivilizationApp extends KillerAppBase {
         double birthRate = birthRateBase * scarcity;
 
         // Death Rate rises with pollution and starvation
-        double deathRate = 0.02 + pollutionDeath + (1.0 - scarcity) * 0.1;
+        // Aggression increases base death rate (wars)
+        double deathRate = 0.02 + pollutionDeath + (1.0 - scarcity) * 0.1 + (aggression * 0.05);
 
         double dPop = population * (birthRate - deathRate);
         double dRes = -(population * effectiveConsumption);
@@ -193,7 +201,7 @@ public class CivilizationApp extends KillerAppBase {
 
         // Update
         population += dPop;
-        resources += dRes;
+        resources += dRes + (100 * regenerationRate); // Regeneration
         pollution += dPol;
 
         if (population < 0)

@@ -33,12 +33,18 @@ import javafx.scene.SubScene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
 import javafx.scene.shape.MeshView;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.ArrayList;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.transform.Rotate;
@@ -179,43 +185,44 @@ public class PeriodicTableViewer extends Application {
 
     private StackPane createElementCell(String symbol) {
         Element element = PeriodicTable.bySymbol(symbol);
+
+        // Even if null (shouldn't be for standard table) or sparse, we try to create a
+        // cell
         if (element == null) {
-            StackPane placeholder = new StackPane();
-            Label lbl = new Label(symbol);
-            lbl.setTextFill(Color.GRAY);
-            placeholder.getChildren().add(lbl);
-            placeholder.setPrefSize(60, 70);
-            placeholder.setStyle("-fx-background-color: #2d2d44; -fx-background-radius: 5;");
-            return placeholder;
+            // Create a dummy element wrapper for display if real data missing
+            element = new Element("Unknown", symbol);
+            element.setAtomicNumber(0);
         }
+
+        final Element finalElement = element;
 
         VBox content = new VBox(2);
         content.setAlignment(Pos.CENTER);
         content.setPadding(new Insets(5));
 
-        Label atomicNum = new Label(String.valueOf(element.getAtomicNumber()));
+        Label atomicNum = new Label(String.valueOf(finalElement.getAtomicNumber()));
         atomicNum.setFont(Font.font("Arial", 10));
 
-        Label symbolLbl = new Label(element.getSymbol());
+        Label symbolLbl = new Label(finalElement.getSymbol());
         symbolLbl.setFont(Font.font("Arial", FontWeight.BOLD, 18));
 
-        Label name = new Label(truncate(element.getName(), 8));
+        Label name = new Label(truncate(finalElement.getName(), 8));
         name.setFont(Font.font("Arial", 9));
 
         content.getChildren().addAll(atomicNum, symbolLbl, name);
 
         StackPane cell = new StackPane(content);
         cell.setPrefSize(60, 70);
-        cell.setStyle(getCategoryStyle(element));
+        cell.setStyle(getCategoryStyle(finalElement));
 
-        Tooltip tooltip = new Tooltip(getTooltipText(element));
+        Tooltip tooltip = new Tooltip(getTooltipText(finalElement));
         tooltip.setStyle("-fx-font-size: 12px;");
         Tooltip.install(cell, tooltip);
 
-        cell.setOnMouseClicked(e -> showElementDetails(element));
+        cell.setOnMouseClicked(e -> showElementDetails(finalElement));
 
         // Hover
-        String style = getCategoryStyle(element);
+        String style = getCategoryStyle(finalElement);
         cell.setOnMouseEntered(
                 e -> cell.setStyle(style + " -fx-opacity: 0.8; -fx-border-color: white; -fx-border-width: 2;"));
         cell.setOnMouseExited(e -> cell.setStyle(style));
@@ -225,22 +232,37 @@ public class PeriodicTableViewer extends Application {
 
     private String getCategoryStyle(Element element) {
         String baseStyle = "-fx-background-radius: 5; -fx-cursor: hand;";
-        if (element.getCategory() == null) {
+        Element.ElementCategory cat = element.getCategory();
+
+        if (cat == null) {
             return "-fx-background-color: #576574;" + baseStyle; // Default Gray
         }
-        return switch (element.getCategory()) {
-            case ALKALI_METAL -> "-fx-background-color: #ff6b6b;" + baseStyle; // Red
-            case ALKALINE_EARTH_METAL -> "-fx-background-color: #feca57;" + baseStyle; // Yellow-Orange
-            case TRANSITION_METAL -> "-fx-background-color: #54a0ff;" + baseStyle; // Blue
-            case POST_TRANSITION_METAL -> "-fx-background-color: #48dbfb;" + baseStyle; // Light Blue
-            case METALLOID -> "-fx-background-color: #1dd1a1;" + baseStyle; // Green
-            case NONMETAL -> "-fx-background-color: #00d2d3;" + baseStyle; // Teal
-            case HALOGEN -> "-fx-background-color: #ff9ff3;" + baseStyle; // Pink
-            case NOBLE_GAS -> "-fx-background-color: #c8d6e5;" + baseStyle; // Light Gray/Blue
-            case LANTHANIDE -> "-fx-background-color: #ff9f43;" + baseStyle; // Orange
-            case ACTINIDE -> "-fx-background-color: #ee5253;" + baseStyle; // Dark Red
-            default -> "-fx-background-color: #8395a7;" + baseStyle;
-        };
+
+        // Explicit mapping to avoid cache issues
+        switch (cat) {
+            case ALKALI_METAL:
+                return "-fx-background-color: #ff6b6b;" + baseStyle; // Red
+            case ALKALINE_EARTH_METAL:
+                return "-fx-background-color: #feca57;" + baseStyle; // Yellow-Orange
+            case TRANSITION_METAL:
+                return "-fx-background-color: #54a0ff;" + baseStyle; // Blue
+            case POST_TRANSITION_METAL:
+                return "-fx-background-color: #48dbfb;" + baseStyle; // Light Blue
+            case METALLOID:
+                return "-fx-background-color: #1dd1a1;" + baseStyle; // Green
+            case NONMETAL:
+                return "-fx-background-color: #00d2d3;" + baseStyle; // Teal
+            case HALOGEN:
+                return "-fx-background-color: #ff9ff3;" + baseStyle; // Pink
+            case NOBLE_GAS:
+                return "-fx-background-color: #c8d6e5;" + baseStyle; // Light Gray/Blue
+            case LANTHANIDE:
+                return "-fx-background-color: #ff9f43;" + baseStyle; // Orange
+            case ACTINIDE:
+                return "-fx-background-color: #ee5253;" + baseStyle; // Dark Red
+            default:
+                return "-fx-background-color: #8395a7;" + baseStyle;
+        }
     }
 
     private String getTooltipText(Element element) {
@@ -255,10 +277,14 @@ public class PeriodicTableViewer extends Application {
         return sb.toString();
     }
 
+    private TabPane detailsTabPane;
+    private VBox electronicContent;
+    private VBox nuclearContent;
+
     private VBox createDetailPanel() {
         VBox panel = new VBox(10);
-        panel.setPadding(new Insets(20));
-        panel.setPrefWidth(300);
+        panel.setPadding(new Insets(10));
+        panel.setPrefWidth(320); // Slightly wider
         panel.getStyleClass().add("dark-viewer-sidebar");
 
         Label title = new Label(I18n.getInstance().get("periodic.details"));
@@ -268,23 +294,64 @@ public class PeriodicTableViewer extends Application {
         Label hint = new Label(I18n.getInstance().get("periodic.hint"));
         hint.setTextFill(Color.LIGHTGRAY);
         hint.setWrapText(true);
+        // ID for easy clearing if needed, though we'll just update tabs
+        hint.setId("hint-label");
 
-        panel.getChildren().addAll(title, hint);
+        detailsTabPane = new TabPane();
+
+        Tab elecTab = new Tab("Electronic");
+        electronicContent = new VBox(10);
+        electronicContent.setPadding(new Insets(10));
+        ScrollPane elecScroll = new ScrollPane(electronicContent);
+        elecScroll.setFitToWidth(true);
+        elecTab.setContent(elecScroll);
+        elecTab.setClosable(false);
+
+        Tab nucTab = new Tab("Nuclear");
+        nuclearContent = new VBox(10);
+        nuclearContent.setPadding(new Insets(10));
+        ScrollPane nucScroll = new ScrollPane(nuclearContent);
+        nucScroll.setFitToWidth(true);
+        nucTab.setContent(nucScroll);
+        nucTab.setClosable(false);
+
+        detailsTabPane.getTabs().addAll(elecTab, nucTab);
+        detailsTabPane.setVisible(false); // Hide until selection
+
+        panel.getChildren().addAll(title, hint, detailsTabPane);
         return panel;
     }
 
     private void showElementDetails(Element element) {
-        detailPanel.getChildren().clear();
+        // Show Tabs
+        detailPanel.getChildren().removeIf(n -> n.getId() != null && n.getId().equals("hint-label"));
+        detailsTabPane.setVisible(true);
 
-        Label title = new Label(element.getName());
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 24));
-        title.getStyleClass().add("dark-header");
+        // --- Header (Common) ---
+        // We could move this to the top of the sidebar, but let's put it in both tabs
+        // or just top of Electronic?
+        // Let's put common header in Electronic for now, or maybe update a fixed header
+        // in the panel.
+        // Actually, let's look at previous impl: it cleared detailPanel.
+        // Now detailPanel has fixed structure. Let's make "Electronic" the main view.
 
+        electronicContent.getChildren().clear();
+        nuclearContent.getChildren().clear();
+
+        // Common Header
+        VBox headerBox = new VBox(5);
+        headerBox.setAlignment(Pos.CENTER);
         Label symbol = new Label(element.getSymbol());
         symbol.setFont(Font.font("Arial", FontWeight.BOLD, 48));
-        symbol.setTextFill(Color.web("#54a0ff")); // Accent color
+        symbol.setTextFill(Color.web("#54a0ff"));
+        Label name = new Label(element.getName());
+        name.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        headerBox.getChildren().addAll(symbol, name);
 
-        // ... (Infer Group/Period logic unchanged) ...
+        // --- Electronic Tab Content ---
+        electronicContent.getChildren().add(headerBox);
+
+        // Properties
         int inferredGroup = element.getGroup();
         int inferredPeriod = element.getPeriod();
         if (inferredGroup == 0 || inferredPeriod == 0) {
@@ -305,29 +372,49 @@ public class PeriodicTableViewer extends Application {
 
         VBox props = new VBox(5);
         props.getChildren().add(createPropLabel("Atomic Number", String.valueOf(element.getAtomicNumber())));
+        props.getChildren().add(
+                createPropLabel("Category", element.getCategory() != null ? element.getCategory().name() : "Unknown"));
         props.getChildren().add(createPropLabel("Group", String.valueOf(inferredGroup)));
         props.getChildren().add(createPropLabel("Period", String.valueOf(inferredPeriod)));
-
-        if (element.getCategory() != null) {
-            props.getChildren().add(createPropLabel("Category", element.getCategory().name()));
-        }
         if (element.getAtomicMass() != null) {
-            // Corrected display: do not divide by 1e-27, assume value is already in 'u'
             props.getChildren().add(createPropLabel("Atomic Mass",
                     String.format("%.4f u", element.getAtomicMass().getValue().doubleValue())));
         }
-        // ... (Other properties unchanged) ...
         if (element.getDensity() != null) {
             props.getChildren().add(createPropLabel("Density",
                     String.format("%.3f g/cm³", element.getDensity().getValue().doubleValue())));
         }
 
-        // 3D Atom Structure
+        electronicContent.getChildren().addAll(props, new Separator());
+
+        // Atom Orbital View
         SubScene atomView = createAtomView(element);
         VBox atomBox = new VBox(5, new Label(I18n.getInstance().get("periodic.structure")), atomView);
         atomBox.setStyle("-fx-border-color: #666; -fx-border-width: 1px;");
+        electronicContent.getChildren().add(atomBox);
 
-        detailPanel.getChildren().addAll(title, symbol, props, new Separator(), atomBox);
+        // --- Nuclear Tab Content ---
+        // Header duplicate? Or maybe just compact info
+        Label nucHeader = new Label(element.getName() + " (" + element.getSymbol() + ")");
+        nucHeader.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+
+        nuclearContent.getChildren().add(nucHeader);
+        nuclearContent.getChildren().add(new Separator());
+
+        // Nucleus Visualization (Bohr Model / Shells)
+        SubScene nucleusView = createNucleusView(element);
+        VBox nucBox = new VBox(5, new Label("Nucleus Structure (Simplified)"), nucleusView);
+        nucBox.setStyle("-fx-border-color: #666; -fx-border-width: 1px;");
+        nuclearContent.getChildren().add(nucBox);
+
+        // Isotopes List
+        Label isoLabel = new Label("Known Isotopes:");
+        isoLabel.setStyle("-fx-font-weight: bold;");
+        ListView<String> isoList = new ListView<>();
+        isoList.setPrefHeight(200);
+        isoList.setItems(getIsotopes(element));
+
+        nuclearContent.getChildren().addAll(new Separator(), isoLabel, isoList);
     }
 
     private SubScene createAtomView(Element element) {
@@ -338,31 +425,60 @@ public class PeriodicTableViewer extends Application {
         nucleus.setMaterial(new javafx.scene.paint.PhongMaterial(Color.RED));
         root.getChildren().add(nucleus);
 
-        // 2. Orbitals
+        // 2. Determine orbital type based on element's position
         int group = element.getGroup();
         int period = element.getPeriod();
-        if (group == 0)
-            createFOrbital(root);
-        else if (group <= 2)
+
+        // Infer group/period from layout if not set in element data
+        if (group == 0 || period == 0) {
+            for (int r = 0; r < LAYOUT.length; r++) {
+                for (int c = 0; c < LAYOUT[r].length; c++) {
+                    if (element.getSymbol().equals(LAYOUT[r][c])) {
+                        period = r + 1;
+                        group = c + 1;
+                        // Lanthanides/Actinides
+                        if (r == 8) {
+                            period = 6;
+                            group = 0;
+                        } // Lanthanides (f-block)
+                        if (r == 9) {
+                            period = 7;
+                            group = 0;
+                        } // Actinides (f-block)
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Select orbital type based on block (s, p, d, f)
+        // s-block: groups 1-2 (alkali, alkaline earth)
+        // p-block: groups 13-18
+        // d-block: groups 3-12 (transition metals)
+        // f-block: lanthanides/actinides (group 0 after inference)
+        if (group == 0) {
+            createFOrbital(root, period);
+        } else if (group <= 2) {
             createSOrbital(root, period);
-        else if (group >= 13)
+        } else if (group >= 13) {
             createPOrbital(root, period);
-        else
+        } else {
             createDOrbital(root, period);
+        }
 
         // Lighting - Brighter
         javafx.scene.PointLight light = new javafx.scene.PointLight(Color.WHITE);
-        light.setTranslateZ(-150); // Closer to camera
+        light.setTranslateZ(-150);
         light.setTranslateY(-50);
         root.getChildren().add(light);
 
-        javafx.scene.AmbientLight ambient = new javafx.scene.AmbientLight(Color.rgb(150, 150, 150)); // Brighter
+        javafx.scene.AmbientLight ambient = new javafx.scene.AmbientLight(Color.rgb(150, 150, 150));
         root.getChildren().add(ambient);
 
         SubScene subScene = new SubScene(root, 260, 260, true, SceneAntialiasing.BALANCED);
-        subScene.setFill(Color.web("#222")); // Dark gray background
+        subScene.setFill(Color.web("#222"));
         PerspectiveCamera camera = new PerspectiveCamera(true);
-        camera.setTranslateZ(-140); // Move back a bit
+        camera.setTranslateZ(-140);
         subScene.setCamera(camera);
 
         // Auto-rotate
@@ -415,14 +531,14 @@ public class PeriodicTableViewer extends Application {
         root.getChildren().add(torus);
     }
 
-    private void createFOrbital(Group root) {
-        // Complex 8-lobe structure approximation
-        double size = 20;
-        // Cubic arrangement of lobes
+    private void createFOrbital(Group root, int principalN) {
+        // Complex 8-lobe structure approximation for f-orbitals
+        double size = 15 + principalN * 2;
+        // Create multiple lobe pairs in different orientations
         createLobePair(root, new javafx.geometry.Point3D(1, 1, 1), size, Color.MAGENTA);
         createLobePair(root, new javafx.geometry.Point3D(1, -1, 1), size, Color.MAGENTA);
-        createLobePair(root, new javafx.geometry.Point3D(-1, 1, 1), size, Color.MAGENTA);
-        createLobePair(root, new javafx.geometry.Point3D(-1, -1, 1), size, Color.MAGENTA);
+        createLobePair(root, new javafx.geometry.Point3D(-1, 1, 1), size, Color.ORCHID);
+        createLobePair(root, new javafx.geometry.Point3D(-1, -1, 1), size, Color.ORCHID);
     }
 
     private void createLobePair(Group root, javafx.geometry.Point3D axis, double scale, Color color) {
@@ -558,6 +674,124 @@ public class PeriodicTableViewer extends Application {
 
         row.getChildren().addAll(nameLbl, valueLbl);
         return row;
+    }
+
+    private SubScene createNucleusView(Element element) {
+        Group root = new Group();
+
+        // Nucleon Model: Simplified cluster of protons and neutrons
+        int protons = element.getAtomicNumber();
+        int massNumber = (element.getAtomicMass() != null)
+                ? (int) Math.round(element.getAtomicMass().getValue().doubleValue())
+                : protons * 2;
+        int neutrons = massNumber - protons;
+
+        // Use a packing algorithm or random sphere sampling within a radius
+        // Simple approach: Fibonacci Sphere or just random inside sphere
+
+        // Optimize for performance: Don't draw 200 spheres if heavy.
+        // Limit vis for high Z
+        int displayLimit = 150;
+        int pToShow = Math.min(protons, displayLimit / 2);
+        int nToShow = Math.min(neutrons, displayLimit / 2);
+
+        double nucleusRadius = Math.pow(massNumber, 1.0 / 3.0) * 4.0;
+
+        PhongMaterial pMat = new PhongMaterial(Color.RED);
+        pMat.setSpecularColor(Color.WHITE);
+        PhongMaterial nMat = new PhongMaterial(Color.GRAY);
+        nMat.setSpecularColor(Color.WHITE);
+
+        for (int i = 0; i < pToShow + nToShow; i++) {
+            boolean isProton = i < pToShow;
+            // Random pos inside unit sphere * radius
+            double u = Math.random();
+            double v = Math.random();
+            double theta = 2 * Math.PI * u;
+            double phi = Math.acos(2 * v - 1);
+            double r = Math.cbrt(Math.random()) * nucleusRadius;
+
+            double x = r * Math.sin(phi) * Math.cos(theta);
+            double y = r * Math.sin(phi) * Math.sin(theta);
+            double z = r * Math.cos(phi);
+
+            Sphere s = new Sphere(2.5); // Nucleon size
+            s.setMaterial(isProton ? pMat : nMat);
+            s.setTranslateX(x);
+            s.setTranslateY(y);
+            s.setTranslateZ(z);
+            root.getChildren().add(s);
+        }
+
+        javafx.scene.PointLight light = new javafx.scene.PointLight(Color.WHITE);
+        light.setTranslateZ(-100);
+        root.getChildren().add(light);
+        root.getChildren().add(new javafx.scene.AmbientLight(Color.rgb(100, 100, 100)));
+
+        SubScene subScene = new SubScene(root, 260, 200, true, SceneAntialiasing.BALANCED);
+        subScene.setFill(Color.web("#222"));
+        PerspectiveCamera camera = new PerspectiveCamera(true);
+        camera.setTranslateZ(-100);
+        subScene.setCamera(camera);
+
+        RotateTransition rt = new RotateTransition(javafx.util.Duration.seconds(15), root);
+        rt.setAxis(Rotate.Y_AXIS);
+        rt.setByAngle(360);
+        rt.setCycleCount(javafx.animation.Animation.INDEFINITE);
+        rt.play();
+
+        return subScene;
+    }
+
+    private javafx.collections.ObservableList<String> getIsotopes(Element element) {
+        List<String> isos = new ArrayList<>();
+        int z = element.getAtomicNumber();
+        String sym = element.getSymbol();
+
+        // Mock Data Logic based on Z
+        // Real logic would require a database.
+        // We generate plausible isotopes around the atomic mass.
+
+        int mass = (element.getAtomicMass() != null)
+                ? (int) Math.round(element.getAtomicMass().getValue().doubleValue())
+                : z * 2;
+
+        // Stable
+        isos.add(sym + "-" + mass + " (Stable, Abundance: ~90%)");
+
+        // Some variants
+        if (Math.random() > 0.3)
+            isos.add(sym + "-" + (mass + 1) + " (Stable, Abundance: ~9%)");
+        if (Math.random() > 0.5)
+            isos.add(sym + "-" + (mass + 2) + " (Stable, Abundance: ~1%)");
+
+        // Unstable
+        isos.add(sym + "-" + (mass - 1) + " (Unstable, t1/2: ~hours)");
+        isos.add(sym + "-" + (mass + 3) + " (Unstable, t1/2: ~years)");
+
+        // H Special Case
+        if (sym.equals("H")) {
+            isos.clear();
+            isos.add("H-1 (Protium) - Stable (99.98%)");
+            isos.add("H-2 (Deuterium) - Stable (0.02%)");
+            isos.add("H-3 (Tritium) - Unstable (12.32y)");
+        }
+        // C Special Case
+        if (sym.equals("C")) {
+            isos.clear();
+            isos.add("C-12 - Stable (98.9%)");
+            isos.add("C-13 - Stable (1.1%)");
+            isos.add("C-14 - Unstable (5730y)");
+        }
+        // U Special Case
+        if (sym.equals("U")) {
+            isos.clear();
+            isos.add("U-238 - Unstable (4.5e9y) (99.3%)");
+            isos.add("U-235 - Unstable (7.0e8y) (0.7%)");
+            isos.add("U-234 - Unstable (2.4e5y) (Trace)");
+        }
+
+        return javafx.collections.FXCollections.observableArrayList(isos);
     }
 
     private String truncate(String s, int max) {

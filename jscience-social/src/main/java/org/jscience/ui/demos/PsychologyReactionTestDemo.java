@@ -35,7 +35,7 @@ public class PsychologyReactionTestDemo implements DemoProvider {
     public void show(Stage stage) {
         StackPane root = new StackPane();
         Label instruction = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.inst.start"));
-        instruction.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
+        instruction.setStyle("-fx-font-size: 20px;"); // Removed white text
 
         Button mainBtn = new Button(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.btn.start"));
         mainBtn.setStyle("-fx-font-size: 16px;");
@@ -44,13 +44,14 @@ public class PsychologyReactionTestDemo implements DemoProvider {
         center.setAlignment(javafx.geometry.Pos.CENTER);
         root.getChildren().add(center);
 
-        root.setStyle("-fx-background-color: #333;");
+        // root.setStyle("-fx-background-color: #333;"); // Removed dark background
 
         mainBtn.setOnAction(e -> {
             if (mainBtn.getText().equals(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.btn.start")) ||
                     mainBtn.getText().equals(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.btn.try"))) {
                 instruction.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.inst.wait"));
-                root.setStyle("-fx-background-color: #cc3333;"); // Red
+                root.setStyle("-fx-background-color: #cc3333;"); // Red (Keep for functionality)
+                instruction.setStyle("-fx-font-size: 20px; -fx-text-fill: white;"); // Ensure text is white on red
                 mainBtn.setVisible(false);
                 waiting = true;
 
@@ -75,7 +76,8 @@ public class PsychologyReactionTestDemo implements DemoProvider {
                                     instruction.setText(String.format(
                                             org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.result.fmt"),
                                             elapsed));
-                                    root.setStyle("-fx-background-color: #333;");
+                                    root.setStyle(""); // Reset to default
+                                    instruction.setStyle("-fx-font-size: 20px;"); // Reset text color
                                     mainBtn.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.btn.try"));
                                     mainBtn.setVisible(true);
                                     startTime = 0;
@@ -94,7 +96,8 @@ public class PsychologyReactionTestDemo implements DemoProvider {
             if (waiting && startTime == 0) {
                 waiting = false;
                 instruction.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.penalty"));
-                root.setStyle("-fx-background-color: #333;");
+                root.setStyle(""); // Reset to default
+                instruction.setStyle("-fx-font-size: 20px;"); // Reset text color
                 mainBtn.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.btn.try"));
                 mainBtn.setVisible(true);
             }

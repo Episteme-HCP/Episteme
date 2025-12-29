@@ -42,7 +42,7 @@ public class HistoricalEra {
     private FuzzyDate endDate;
     private String description;
     private String region;
-    private final List<Event> keyEvents = new ArrayList<>();
+    private final List<HistoricalEvent> keyEvents = new ArrayList<>();
 
     public HistoricalEra(String name) {
         this.name = name;
@@ -75,7 +75,7 @@ public class HistoricalEra {
         return region;
     }
 
-    public List<Event> getKeyEvents() {
+    public List<HistoricalEvent> getKeyEvents() {
         return Collections.unmodifiableList(keyEvents);
     }
 
@@ -96,7 +96,7 @@ public class HistoricalEra {
         this.region = region;
     }
 
-    public void addKeyEvent(Event event) {
+    public void addKeyEvent(HistoricalEvent event) {
         keyEvents.add(event);
     }
 

@@ -58,19 +58,54 @@ public class ChemicalReactionViewer extends Application {
         inputArea.setPrefRowCount(3);
         inputArea.setWrapText(true);
 
-        // Example buttons
-        HBox examples = new HBox(10);
-        examples.getChildren().addAll(
-                createExampleButton("Water synthesis", "2H2 + O2 -> 2H2O"),
-                createExampleButton("Combustion", "CH4 + 2O2 -> CO2 + 2H2O"),
-                createExampleButton("Neutralization", "HCl + NaOH -> NaCl + H2O"),
-                createExampleButton("Photosynthesis", "6CO2 + 6H2O -> C6H12O6 + 6O2"));
+        // Example Selection (ComboBox)
+        ComboBox<String> exampleCombo = new ComboBox<>();
+        exampleCombo.setPromptText("Select an example...");
+        exampleCombo.getItems().addAll(
+                "2H2 + O2 -> 2H2O",
+                "CH4 + 2O2 -> CO2 + 2H2O",
+                "HCl + NaOH -> NaCl + H2O",
+                "6CO2 + 6H2O -> C6H12O6 + 6O2", // Photosynthesis
+                "C8H18 + 12.5O2 -> 8CO2 + 9H2O", // Octane Combustion
+                "Fe2O3 + 3CO -> 2Fe + 3CO2" // Iron Ore Reduction
+        );
+        exampleCombo.setMaxWidth(Double.MAX_VALUE);
+        exampleCombo.setOnAction(e -> {
+            if (exampleCombo.getValue() != null) {
+                inputArea.setText(exampleCombo.getValue());
+                parseReaction();
+            }
+        });
+
+        // Load File Button
+        Button loadFileBtn = new Button(I18n.getInstance().get("chemical.btn.load"));
+        loadFileBtn.setMaxWidth(Double.MAX_VALUE);
+        loadFileBtn.setOnAction(e -> {
+            javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+            fileChooser.setTitle("Open Reaction File");
+            fileChooser.getExtensionFilters()
+                    .add(new javafx.stage.FileChooser.ExtensionFilter("Text Files", "*.txt", "*.rxn"));
+            java.io.File file = fileChooser.showOpenDialog(stage);
+            if (file != null) {
+                try {
+                    String content = java.nio.file.Files.readString(file.toPath());
+                    inputArea.setText(content.trim());
+                    parseReaction();
+                } catch (Exception ex) {
+                    outputArea.setText("Error reading file: " + ex.getMessage());
+                }
+            }
+        });
+
+        HBox controls = new HBox(10, exampleCombo, loadFileBtn);
+        HBox.setHgrow(exampleCombo, Priority.ALWAYS);
 
         Button parseBtn = new Button(I18n.getInstance().get("chemical.btn.parse"));
         parseBtn.getStyleClass().add("accent-button-green");
+        parseBtn.setMaxWidth(Double.MAX_VALUE);
         parseBtn.setOnAction(e -> parseReaction());
 
-        inputBox.getChildren().addAll(inputLabel, inputArea, examples, parseBtn);
+        inputBox.getChildren().addAll(inputLabel, inputArea, controls, parseBtn);
 
         // Output area
         VBox outputBox = new VBox(5);
@@ -98,10 +133,12 @@ public class ChemicalReactionViewer extends Application {
         // Formula parser panel on right
         VBox formulaPanel = new VBox(10);
         formulaPanel.setPadding(new Insets(10));
-        formulaPanel.setStyle("-fx-background-color: #0f3460; -fx-background-radius: 5;");
+        // Requested Styling: #222 Background
+        formulaPanel.setStyle("-fx-background-color: #222222; -fx-background-radius: 5;");
         formulaPanel.setPrefWidth(250);
 
         Label formulaTitle = new Label(I18n.getInstance().get("chemical.label.quick"));
+        // Requested Styling: #00d9ff Title (cyan accent)
         formulaTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: #00d9ff;");
 
         TextField formulaInput = new TextField();
@@ -110,7 +147,9 @@ public class ChemicalReactionViewer extends Application {
         TextArea formulaOutput = new TextArea();
         formulaOutput.setEditable(false);
         formulaOutput.setPrefRowCount(6);
-        formulaOutput.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 11px;");
+        // Requested Styling: #aaa Text
+        formulaOutput.setStyle(
+                "-fx-font-family: 'Consolas'; -fx-font-size: 11px; -fx-text-fill: #aaaaaa; -fx-control-inner-background: #333333;");
 
         Button parseFormulaBtn = new Button(I18n.getInstance().get("chemical.btn.formula"));
         parseFormulaBtn.setMaxWidth(Double.MAX_VALUE);
@@ -145,16 +184,6 @@ public class ChemicalReactionViewer extends Application {
         stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.chemical"));
         stage.setScene(scene);
         stage.show();
-    }
-
-    private Button createExampleButton(String label, String equation) {
-        Button btn = new Button(label);
-        btn.setStyle("-fx-font-size: 10px;");
-        btn.setOnAction(e -> {
-            inputArea.setText(equation);
-            parseReaction();
-        });
-        return btn;
     }
 
     private void parseReaction() {

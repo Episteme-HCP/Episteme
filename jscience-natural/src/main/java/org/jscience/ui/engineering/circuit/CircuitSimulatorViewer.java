@@ -48,6 +48,8 @@ public class CircuitSimulatorViewer extends Application {
     }
 
     private ComponentType selectedType = ComponentType.WIRE;
+    private boolean isSelectMode = false;
+    private Component selectedComponent = null;
 
     private static class Component {
         ComponentType type;
@@ -104,11 +106,25 @@ public class CircuitSimulatorViewer extends Application {
                 createToolButton("Capacitor", ComponentType.CAPACITOR, group),
                 createToolButton("Inductor", ComponentType.INDUCTOR, group),
                 createToolButton("Ground", ComponentType.GROUND, group),
+                createToolButton("Meter", ComponentType.METER, group),
                 new Separator(),
+                createSelectButton(group),
+                new Button("Delete") {
+                    {
+                        setOnAction(e -> {
+                            if (selectedComponent != null) {
+                                components.remove(selectedComponent);
+                                selectedComponent = null;
+                                draw();
+                            }
+                        });
+                    }
+                },
                 new Button("Clear") {
                     {
                         setOnAction(e -> {
                             components.clear();
+                            selectedComponent = null;
                             draw();
                         });
                     }
@@ -120,18 +136,24 @@ public class CircuitSimulatorViewer extends Application {
         draw(); // Initial grid
 
         canvas.setOnMousePressed(e -> {
-            startX = snap(e.getX());
-            startY = snap(e.getY());
-            dragging = true;
+            if (isSelectMode) {
+                handleSelection(e.getX(), e.getY());
+            } else {
+                startX = snap(e.getX());
+                startY = snap(e.getY());
+                dragging = true;
+            }
         });
 
         canvas.setOnMouseDragged(e -> {
-            draw();
-            drawComponentGhost(startX, startY, snap(e.getX()), snap(e.getY()));
+            if (!isSelectMode) {
+                draw();
+                drawComponentGhost(startX, startY, snap(e.getX()), snap(e.getY()));
+            }
         });
 
         canvas.setOnMouseReleased(e -> {
-            if (dragging) {
+            if (dragging && !isSelectMode) {
                 double endX = snap(e.getX());
                 double endY = snap(e.getY());
                 if (startX != endX || startY != endY) {
@@ -163,10 +185,68 @@ public class CircuitSimulatorViewer extends Application {
     private ToggleButton createToolButton(String name, ComponentType type, ToggleGroup group) {
         ToggleButton btn = new ToggleButton(name);
         btn.setToggleGroup(group);
-        btn.setOnAction(e -> selectedType = type);
+        btn.setOnAction(e -> {
+            selectedType = type;
+            isSelectMode = false;
+            selectedComponent = null;
+            draw();
+        });
         if (type == ComponentType.WIRE)
             btn.setSelected(true);
         return btn;
+    }
+
+    private ToggleButton createSelectButton(ToggleGroup group) {
+        ToggleButton btn = new ToggleButton("Select");
+        btn.setToggleGroup(group);
+        btn.setOnAction(e -> {
+            isSelectMode = true;
+            // selectedComponent = null; // Don't clear immediately, handy to keep selection
+        });
+        return btn;
+    }
+
+    private void handleSelection(double x, double y) {
+        selectedComponent = null;
+        for (Component c : components) {
+            // Simple hit testing for line segment
+            double dist = distancePointToSegment(x, y, c.x1, c.y1, c.x2, c.y2);
+            if (dist < 10) {
+                selectedComponent = c;
+                break;
+            }
+        }
+        draw();
+    }
+
+    private double distancePointToSegment(double x, double y, double x1, double y1, double x2, double y2) {
+        double A = x - x1;
+        double B = y - y1;
+        double C = x2 - x1;
+        double D = y2 - y1;
+
+        double dot = A * C + B * D;
+        double len_sq = C * C + D * D;
+        double param = -1;
+        if (len_sq != 0) // in case of 0 length line
+            param = dot / len_sq;
+
+        double xx, yy;
+
+        if (param < 0) {
+            xx = x1;
+            yy = y1;
+        } else if (param > 1) {
+            xx = x2;
+            yy = y2;
+        } else {
+            xx = x1 + param * C;
+            yy = y1 + param * D;
+        }
+
+        double dx = x - xx;
+        double dy = y - yy;
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
     private double snap(double val) {
@@ -189,13 +269,13 @@ public class CircuitSimulatorViewer extends Application {
 
         // Components
         for (Component c : components) {
-            drawComponent(gc, c);
+            drawComponent(gc, c, c == selectedComponent);
         }
     }
 
-    private void drawComponent(GraphicsContext gc, Component c) {
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(2);
+    private void drawComponent(GraphicsContext gc, Component c, boolean selected) {
+        gc.setStroke(selected ? Color.RED : Color.BLACK);
+        gc.setLineWidth(selected ? 3 : 2);
 
         double midX = (c.x1 + c.x2) / 2;
         double midY = (c.y1 + c.y2) / 2;
@@ -247,7 +327,7 @@ public class CircuitSimulatorViewer extends Application {
         gc.setStroke(Color.BLUE);
         gc.setGlobalAlpha(0.5);
         Component ghost = new Component(selectedType, x1, y1, x2, y2);
-        drawComponent(gc, ghost);
+        drawComponent(gc, ghost, false);
         gc.setGlobalAlpha(1.0);
     }
 

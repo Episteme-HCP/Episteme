@@ -1,38 +1,38 @@
-Betelgeuse,Bellatrix
-Betelgeuse,Alnitak
-Rigel,Saiph
-Rigel,Alnitak
-Alnitak,Alnilam
-Alnilam,Mintaka
-Mintaka,Saiph
-Bellatrix,Mintaka
-Dubhe,Merak
-Merak,Phad
-Phad,Megrez
-Megrez,Alioth
-Alioth,Mizar
-Mizar,Alkaid
-Antares,Graffias
-Antares,Wei
-Vega,Epsilon Lyrae
-Vega,Zeta Lyrae
-Canopus,Miaplacidus
-Sirius,Mirzam
-Castor,Pollux
-Procyon,Gomeisa
-Altair,Tarazed
-Altair,Alshain
-Deneb,Sadr
-Sadr,Gienah
-Sadr,Rukh
-Achernar,Ankaa
-Spica,Porrima
-Regulus,Algieba
-Algieba,Adhafera
-Adhafera,Rasalas
-Fomalhaut,Skat
-Aldebaran,Elnath
-Aldebaran,Ain
-Capella,Menkalinan
-Arcturus,Izar
-Achernar,Phoenix
+Betelgeuse,Bellatrix,Orion
+Betelgeuse,Alnitak,Orion
+Rigel,Saiph,Orion
+Rigel,Alnitak,Orion
+Alnitak,Alnilam,Orion
+Alnilam,Mintaka,Orion
+Mintaka,Saiph,Orion
+Bellatrix,Mintaka,Orion
+Dubhe,Merak,Ursa Major
+Merak,Phad,Ursa Major
+Phad,Megrez,Ursa Major
+Megrez,Alioth,Ursa Major
+Alioth,Mizar,Ursa Major
+Mizar,Alkaid,Ursa Major
+Antares,Graffias,Scorpius
+Antares,Wei,Scorpius
+Vega,Epsilon Lyrae,Lyra
+Vega,Zeta Lyrae,Lyra
+Canopus,Miaplacidus,Carina
+Sirius,Mirzam,Canis Major
+Castor,Pollux,Gemini
+Procyon,Gomeisa,Canis Minor
+Altair,Tarazed,Aquila
+Altair,Alshain,Aquila
+Deneb,Sadr,Cygnus
+Sadr,Gienah,Cygnus
+Sadr,Rukh,Cygnus
+Achernar,Ankaa,Phoenix
+Spica,Porrima,Virgo
+Regulus,Algieba,Leo
+Algieba,Adhafera,Leo
+Adhafera,Rasalas,Leo
+Fomalhaut,Skat,Piscis Austrinus
+Aldebaran,Elnath,Taurus
+Aldebaran,Ain,Taurus
+Capella,Menkalinan,Auriga
+Arcturus,Izar,Bootes
+Achernar,Phoenix,Phoenix

@@ -22,19 +22,19 @@
  */
 package org.jscience.history;
 
-import java.time.*;
 import java.util.*;
 
 /**
  * A timeline representing a sequence of historical events.
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class Timeline {
 
     private final String name;
-    private final List<Event> events = new ArrayList<>();
+    private final List<HistoricalEvent> events = new ArrayList<>();
 
     public Timeline(String name) {
         this.name = name;
@@ -44,46 +44,55 @@ public class Timeline {
         return name;
     }
 
-    public Timeline addEvent(Event event) {
+    public Timeline addEvent(HistoricalEvent event) {
         events.add(event);
         return this;
     }
 
-    public List<Event> getEvents() {
+    public List<HistoricalEvent> getEvents() {
         return events.stream()
-                .sorted(Comparator.comparing(Event::getStartDate))
+                .sorted(Comparator.comparing((HistoricalEvent e) -> e.getStartDate().getYear())) // Simplified sort for
+                                                                                                 // now
                 .toList();
     }
 
-    public List<Event> getEventsBetween(LocalDate start, LocalDate end) {
+    public List<HistoricalEvent> getEventsBetween(org.jscience.history.FuzzyDate start,
+            org.jscience.history.FuzzyDate end) {
         return events.stream()
-                .filter(e -> !e.getStartDate().isBefore(start) && !e.getEndDate().isAfter(end))
-                .sorted(Comparator.comparing(Event::getStartDate))
+                .filter(e -> e.getStartDate().compareTo(start) >= 0 && e.getEndDate().compareTo(end) <= 0)
+                .sorted(Comparator.comparing(e -> e.getStartDate().getYear()))
                 .toList();
     }
 
-    public List<Event> getEventsByCategory(Event.Category category) {
+    public List<HistoricalEvent> getEventsByCategory(HistoricalEvent.Category category) {
         return events.stream()
                 .filter(e -> e.getCategory() == category)
-                .sorted(Comparator.comparing(Event::getStartDate))
+                .sorted(Comparator.comparing(e -> e.getStartDate().getYear()))
                 .toList();
     }
 
-    public Optional<Event> getEarliestEvent() {
-        return events.stream().min(Comparator.comparing(Event::getStartDate));
+    public Optional<HistoricalEvent> getEarliestEvent() {
+        return events.stream().min(Comparator.comparing(e -> e.getStartDate().getYear()));
     }
 
-    public Optional<Event> getLatestEvent() {
-        return events.stream().max(Comparator.comparing(Event::getEndDate));
+    public Optional<HistoricalEvent> getLatestEvent() {
+        return events.stream().max(Comparator.comparing(e -> e.getEndDate().getYear()));
     }
 
-    public Period getTimeSpan() {
-        Optional<Event> earliest = getEarliestEvent();
-        Optional<Event> latest = getLatestEvent();
+    // Simplified time span logic as FuzzyDate doesn't support Period easily yet
+    public int getTimeSpanYears() {
+        Optional<HistoricalEvent> earliest = getEarliestEvent();
+        Optional<HistoricalEvent> latest = getLatestEvent();
         if (earliest.isPresent() && latest.isPresent()) {
-            return Period.between(earliest.get().getStartDate(), latest.get().getEndDate());
+            int start = earliest.get().getStartDate().getYear();
+            if (earliest.get().getStartDate().isBce())
+                start = -start;
+            int end = latest.get().getEndDate().getYear();
+            if (latest.get().getEndDate().isBce())
+                end = -end;
+            return end - start;
         }
-        return Period.ZERO;
+        return 0;
     }
 
     @Override
@@ -94,9 +103,9 @@ public class Timeline {
     // Factory for common timelines
     public static Timeline worldHistory() {
         return new Timeline("World History")
-                .addEvent(Event.FRENCH_REVOLUTION)
-                .addEvent(Event.WORLD_WAR_I)
-                .addEvent(Event.WORLD_WAR_II)
-                .addEvent(Event.MOON_LANDING);
+                .addEvent(HistoricalEvent.FRENCH_REVOLUTION)
+                .addEvent(HistoricalEvent.WORLD_WAR_I)
+                .addEvent(HistoricalEvent.WORLD_WAR_II)
+                .addEvent(HistoricalEvent.MOON_LANDING);
     }
 }

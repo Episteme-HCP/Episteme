@@ -41,6 +41,7 @@ import java.util.List;
  * Always available (built into Java 8+).
  * </p>
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -179,5 +180,13 @@ public class JavaFXPlot2D implements Plot2D {
     public Plot2D addSeries(List<Real> xData, List<Real> yData, String label, SeriesStyle style) {
         // Basic implementation - ignore styling for now
         return addData(xData, yData, label);
+    }
+
+    /**
+     * Returns the underlying JavaFX Chart node.
+     * Specific to JavaFXBackend.
+     */
+    public javafx.scene.chart.LineChart<Number, Number> getNode() {
+        return chart;
     }
 }

@@ -85,6 +85,7 @@ public class MarketCrashApp extends KillerAppBase {
         return mainSplit;
     }
 
+    @SuppressWarnings("unchecked")
     private VBox createChartArea() {
         VBox area = new VBox(10);
         area.setPadding(new Insets(10));

@@ -4,7 +4,7 @@
  */
 package org.jscience.medicine;
 
-import org.jscience.devices.Sensor;
+import org.jscience.device.Sensor;
 
 /**
  * Interface for vital signs monitoring devices.

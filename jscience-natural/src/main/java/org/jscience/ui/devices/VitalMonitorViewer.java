@@ -5,23 +5,20 @@
 package org.jscience.ui.devices;
 
 import javafx.animation.AnimationTimer;
-import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.Stage;
 
 import org.jscience.medicine.VitalSigns;
 import org.jscience.medicine.VitalSignsMonitor;
-import org.jscience.devices.sim.SimulatedVitalSignsMonitor;
-import org.jscience.ui.ThemeManager;
+import org.jscience.device.sim.SimulatedVitalSignsMonitor;
 import org.jscience.ui.i18n.I18n;
 
 /**
@@ -36,7 +33,22 @@ import org.jscience.ui.i18n.I18n;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class VitalMonitorViewer extends Application {
+import org.jscience.ui.NumericParameter;
+import org.jscience.ui.Parameter;
+import org.jscience.ui.ScientificViewer;
+import org.jscience.ui.Simulatable;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Professional Vital Signs Monitor display.
+ * Now refactored as a reusable panel.
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+public class VitalMonitorViewer extends BorderPane implements ScientificViewer, Simulatable {
 
     // Colors matching professional medical monitors
     private static final Color HR_COLOR = Color.web("#00FF00"); // Green ECG
@@ -58,27 +70,40 @@ public class VitalMonitorViewer extends Application {
     private Label rrValueLabel;
     private Label tempValueLabel;
 
-    /**
-     * Creates a viewer with a default simulated monitor.
-     */
+    private final List<Parameter<?>> parameters = new ArrayList<>();
+    private AnimationTimer timer;
+    private boolean playing = false;
+
     public VitalMonitorViewer() {
         this(new SimulatedVitalSignsMonitor("SimMonitor"));
     }
 
-    /**
-     * Creates a viewer for the specified monitor.
-     *
-     * @param monitor the vital signs monitor to display
-     */
     public VitalMonitorViewer(VitalSignsMonitor monitor) {
         this.monitor = monitor;
+        setStyle("-fx-background-color: black;");
+
+        setupParameters();
+        buildUI();
+        setupAnimation();
     }
 
-    @Override
-    public void start(Stage stage) {
-        BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: black;");
+    private void setupParameters() {
+        if (monitor instanceof SimulatedVitalSignsMonitor sim) {
+            parameters.add(new NumericParameter(
+                    I18n.getInstance().get("vital.param.hr", "Target HR"),
+                    "Base heart rate in beats per minute",
+                    40, 200, 1, sim.getBaseHeartRate(),
+                    val -> sim.setBaseHeartRate(val.intValue())));
 
+            parameters.add(new NumericParameter(
+                    I18n.getInstance().get("vital.param.spo2", "Target SpO2"),
+                    "Base oxygen saturation level",
+                    70, 100, 1, sim.getBaseSpO2(),
+                    val -> sim.setBaseSpO2(val.intValue())));
+        }
+    }
+
+    private void buildUI() {
         // Main content - waveforms on left, values on right
         HBox mainContent = new HBox(10);
         mainContent.setPadding(new Insets(10));
@@ -90,35 +115,80 @@ public class VitalMonitorViewer extends Application {
 
         // Right side - Vital values
         VBox valuesPanel = createValuesPanel();
-        valuesPanel.setMinWidth(180);
-        valuesPanel.setMaxWidth(200);
+        valuesPanel.setMinWidth(200);
+        valuesPanel.setMaxWidth(300); // Increased from 200 to allow full text display
 
         mainContent.getChildren().addAll(waveformPanel, valuesPanel);
-        root.setCenter(mainContent);
+        setCenter(mainContent);
+    }
 
-        // Animation timer for updating display
-        AnimationTimer timer = new AnimationTimer() {
+    private void setupAnimation() {
+        timer = new AnimationTimer() {
             private long lastUpdate = 0;
 
             @Override
             public void handle(long now) {
-                // Update waveforms every frame
+                if (!playing)
+                    return;
+
                 drawWaveforms();
 
-                // Update values less frequently (every 100ms)
                 if (now - lastUpdate > 100_000_000) {
                     updateVitalValues();
                     lastUpdate = now;
                 }
             }
         };
-        timer.start();
+    }
 
-        Scene scene = new Scene(root, 900, 500);
-        ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(I18n.getInstance().get("vital.title"));
-        stage.setScene(scene);
-        stage.show();
+    @Override
+    public void play() {
+        this.playing = true;
+        if (timer != null)
+            timer.start();
+    }
+
+    @Override
+    public void pause() {
+        this.playing = false;
+    }
+
+    @Override
+    public void stop() {
+        this.playing = false;
+        reset();
+    }
+
+    @Override
+    public void step() {
+        drawWaveforms();
+        updateVitalValues();
+    }
+
+    @Override
+    public void setSpeed(double multiplier) {
+        // Medical simulation is real-time by nature, but we could adjust logic if
+        // needed
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return playing;
+    }
+
+    @Override
+    public void reset() {
+        // Reset buffers if any
+    }
+
+    @Override
+    public boolean isRunning() {
+        return playing;
+    }
+
+    @Override
+    public List<Parameter<?>> getParameters() {
+        return parameters;
     }
 
     private VBox createWaveformPanel() {
@@ -136,23 +206,11 @@ public class VitalMonitorViewer extends Application {
         ecgLabelBox.setMinWidth(40);
 
         ecgCanvas = new Canvas(600, 120);
-        ecgCanvas.setStyle("-fx-background-color: black;");
+        // Bind width to parent for resizing
+        ecgCanvas.widthProperty().bind(panel.widthProperty().subtract(50));
+
         HBox.setHgrow(ecgCanvas, Priority.ALWAYS);
-
         ecgRow.getChildren().addAll(ecgLabelBox, ecgCanvas);
-
-        // NIBP waveform placeholder (shows flatline for now)
-        HBox bpRow = new HBox(5);
-        bpRow.setAlignment(Pos.CENTER_LEFT);
-
-        Label nibpLabel = createSmallLabel("NIBP", BP_COLOR);
-        nibpLabel.setMinWidth(40);
-
-        Canvas bpCanvas = new Canvas(600, 40);
-        drawFlatline(bpCanvas.getGraphicsContext2D(), BP_COLOR);
-        HBox.setHgrow(bpCanvas, Priority.ALWAYS);
-
-        bpRow.getChildren().addAll(nibpLabel, bpCanvas);
 
         // SpO2 plethysmograph
         HBox spo2Row = new HBox(5);
@@ -162,23 +220,12 @@ public class VitalMonitorViewer extends Application {
         spo2Label.setMinWidth(40);
 
         plethCanvas = new Canvas(600, 80);
-        HBox.setHgrow(plethCanvas, Priority.ALWAYS);
+        plethCanvas.widthProperty().bind(panel.widthProperty().subtract(50));
 
+        HBox.setHgrow(plethCanvas, Priority.ALWAYS);
         spo2Row.getChildren().addAll(spo2Label, plethCanvas);
 
-        // RR label row
-        HBox rrRow = new HBox(5);
-        rrRow.setAlignment(Pos.CENTER_LEFT);
-
-        Label rrLabel = createSmallLabel("RR", RR_COLOR);
-        rrLabel.setMinWidth(40);
-
-        Canvas rrCanvas = new Canvas(600, 30);
-        drawFlatline(rrCanvas.getGraphicsContext2D(), RR_COLOR);
-
-        rrRow.getChildren().addAll(rrLabel, rrCanvas);
-
-        panel.getChildren().addAll(ecgRow, bpRow, spo2Row, rrRow);
+        panel.getChildren().addAll(ecgRow, spo2Row);
         VBox.setVgrow(ecgRow, Priority.ALWAYS);
         VBox.setVgrow(spo2Row, Priority.ALWAYS);
 
@@ -191,24 +238,19 @@ public class VitalMonitorViewer extends Application {
         panel.setStyle("-fx-background-color: black;");
         panel.setAlignment(Pos.TOP_RIGHT);
 
-        // HR Value
-        hrValueLabel = new Label("89");
+        hrValueLabel = new Label("--");
         VBox hrBox = createValueBox("Heart Rate", hrValueLabel, "bpm", HR_VALUE_COLOR);
 
-        // BP Value
-        bpValueLabel = new Label("108/68");
+        bpValueLabel = new Label("--/--");
         VBox bpBox = createValueBox("Blood Pressure", bpValueLabel, "mmHg", BP_COLOR);
 
-        // SpO2 Value
-        spo2ValueLabel = new Label("99");
+        spo2ValueLabel = new Label("--");
         VBox spo2Box = createValueBox("Oxygen Saturation", spo2ValueLabel, "%", SPO2_COLOR);
 
-        // RR Value
-        rrValueLabel = new Label("16");
+        rrValueLabel = new Label("--");
         VBox rrBox = createValueBox("Respiration", rrValueLabel, "bpm", RR_COLOR);
 
-        // Temperature
-        tempValueLabel = new Label("98.6");
+        tempValueLabel = new Label("--.-");
         VBox tempBox = createValueBox("Temperature", tempValueLabel, "°F", TEMP_COLOR);
 
         panel.getChildren().addAll(hrBox, bpBox, spo2Box, rrBox, tempBox);
@@ -219,7 +261,6 @@ public class VitalMonitorViewer extends Application {
         VBox box = new VBox(2);
         box.setAlignment(Pos.CENTER_RIGHT);
 
-        // Value with unit
         HBox valueRow = new HBox(5);
         valueRow.setAlignment(Pos.CENTER_RIGHT);
 
@@ -232,7 +273,6 @@ public class VitalMonitorViewer extends Application {
 
         valueRow.getChildren().addAll(valueLabel, unitLabel);
 
-        // Title
         Label titleLabel = new Label(title);
         titleLabel.setFont(Font.font("Arial", 11));
         titleLabel.setTextFill(color);
@@ -249,36 +289,35 @@ public class VitalMonitorViewer extends Application {
     }
 
     private void drawWaveforms() {
-        // Draw ECG
-        double[] ecg = monitor.getECGWaveform();
-        drawWaveform(ecgCanvas.getGraphicsContext2D(), ecg, HR_COLOR, 80);
+        if (ecgCanvas == null || plethCanvas == null)
+            return;
 
-        // Draw Pleth (SpO2)
+        double[] ecg = monitor.getECGWaveform();
+        // Reduced amplitude to 50 to fit in 120px height (Center 60 +/- 50 = 10 to 110)
+        drawWaveform(ecgCanvas.getGraphicsContext2D(), ecg, HR_COLOR, 50);
+
         double[] pleth = monitor.getPlethWaveform();
-        drawWaveform(plethCanvas.getGraphicsContext2D(), pleth, SPO2_COLOR, 60);
+        // Reduced amplitude to 35 to fit in 80px height
+        drawWaveform(plethCanvas.getGraphicsContext2D(), pleth, SPO2_COLOR, 35);
     }
 
     private void drawWaveform(GraphicsContext gc, double[] data, Color color, double amplitude) {
         double w = gc.getCanvas().getWidth();
         double h = gc.getCanvas().getHeight();
 
-        // Clear with black background
         gc.setFill(BACKGROUND);
         gc.fillRect(0, 0, w, h);
 
-        // Draw grid lines (subtle)
         gc.setStroke(Color.web("#1a1a1a"));
         gc.setLineWidth(1);
-        for (double x = 0; x < w; x += 50) {
+        for (double x = 0; x < w; x += 50)
             gc.strokeLine(x, 0, x, h);
-        }
-        for (double y = 0; y < h; y += 20) {
+        for (double y = 0; y < h; y += 20)
             gc.strokeLine(0, y, w, y);
-        }
 
-        // Draw waveform
         gc.setStroke(color);
         gc.setLineWidth(2);
+        gc.setLineJoin(StrokeLineJoin.ROUND);
         gc.beginPath();
 
         double midY = h / 2;
@@ -288,42 +327,23 @@ public class VitalMonitorViewer extends Application {
             double x = i * step;
             double y = midY - data[i] * amplitude;
 
-            if (i == 0) {
+            if (i == 0)
                 gc.moveTo(x, y);
-            } else {
+            else
                 gc.lineTo(x, y);
-            }
         }
         gc.stroke();
     }
 
-    private void drawFlatline(GraphicsContext gc, Color color) {
-        double w = gc.getCanvas().getWidth();
-        double h = gc.getCanvas().getHeight();
-
-        gc.setFill(BACKGROUND);
-        gc.fillRect(0, 0, w, h);
-
-        gc.setStroke(color.deriveColor(0, 1, 0.3, 1));
-        gc.setLineWidth(1);
-        gc.strokeLine(0, h / 2, w, h / 2);
-    }
-
     private void updateVitalValues() {
         VitalSigns vitals = monitor.getVitalSigns();
+        if (vitals == null)
+            return;
 
         hrValueLabel.setText(String.valueOf(vitals.heartRate()));
         bpValueLabel.setText(vitals.bloodPressureString());
         spo2ValueLabel.setText(String.valueOf(vitals.spO2()));
         rrValueLabel.setText(String.valueOf(vitals.respirationRate()));
         tempValueLabel.setText(vitals.temperatureString());
-    }
-
-    public static void show(Stage stage) {
-        new VitalMonitorViewer().start(stage);
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }

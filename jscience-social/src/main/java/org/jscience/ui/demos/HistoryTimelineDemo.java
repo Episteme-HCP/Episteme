@@ -1,15 +1,8 @@
 package org.jscience.ui.demos;
 
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import org.jscience.ui.DemoProvider;
+import org.jscience.ui.history.HistoryTimelineViewer;
 
 public class HistoryTimelineDemo implements DemoProvider {
 
@@ -30,70 +23,7 @@ public class HistoryTimelineDemo implements DemoProvider {
 
     @Override
     public void show(Stage stage) {
-        ScrollPane scroll = new ScrollPane();
-        Pane content = new Pane();
-        content.setPrefHeight(400);
-        content.setPrefWidth(2000); // Long timeline
-
-        // Draw Axis
-        Line axis = new Line(50, 200, 1950, 200);
-        axis.setStroke(Color.BLACK);
-        axis.setStrokeWidth(2);
-        content.getChildren().add(axis);
-
-        // Add Eras (Rectangles behind)
-        addEra(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.era.ancient"), 50, 400,
-                Color.LIGHTYELLOW);
-        addEra(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.era.classical"), 400, 700,
-                Color.LIGHTGOLDENRODYELLOW);
-        addEra(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.era.medieval"), 700, 1000,
-                Color.LIGHTGRAY);
-        addEra(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.era.renaissance"), 1000, 1300,
-                Color.LAVENDER);
-        addEra(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.era.industrial"), 1300, 1600,
-                Color.LIGHTSTEELBLUE);
-        addEra(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.era.modern"), 1600, 1950,
-                Color.LIGHTCYAN);
-
-        // Add Events
-        addEvent(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.event.a"), 100, 200, true);
-        addEvent(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.event.b"), 350, 200, false);
-        addEvent(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.event.empire_rise"), 500, 200, true);
-        addEvent(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.event.empire_fall"), 650, 200, false);
-        addEvent(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.event.discovery"), 1100, 200, true);
-        addEvent(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.event.revolution"), 1450, 200, false);
-        addEvent(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.event.war"), 1700, 200, true);
-        addEvent(content, org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.event.internet"), 1900, 200, false);
-
-        scroll.setContent(content);
-
-        Scene scene = new Scene(scroll, 800, 450);
-        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(getName());
-        stage.setScene(scene);
-        stage.show();
+        HistoryTimelineViewer.show(stage);
     }
 
-    private void addEra(Pane root, String name, double startX, double endX, Color c) {
-        Rectangle rect = new Rectangle(startX, 50, endX - startX, 300);
-        rect.setFill(c);
-        rect.setOpacity(0.5);
-        Label lbl = new Label(name);
-        lbl.setLayoutX(startX + 10);
-        lbl.setLayoutY(60);
-        lbl.setStyle("-fx-font-weight: bold;");
-        root.getChildren().addAll(rect, lbl);
-    }
-
-    private void addEvent(Pane root, String name, double x, double y, boolean up) {
-        Circle point = new Circle(x, y, 5, Color.RED);
-        double labelY = up ? y - 40 : y + 40;
-        Line stem = new Line(x, y, x, labelY);
-        Label lbl = new Label(name);
-        lbl.setLayoutX(x - 20);
-        lbl.setLayoutY(up ? labelY - 20 : labelY);
-        lbl.setStyle("-fx-background-color: white; -fx-padding: 3; -fx-border-color: black; -fx-border-width: 1;");
-
-        root.getChildren().addAll(stem, point, lbl);
-    }
 }

@@ -37,6 +37,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Controller for handling simulation API requests and WebSocket streaming.
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -87,8 +88,14 @@ public class SimulationController {
         if (!isRunning.get())
             return;
 
-        // Create a dummy payload
-        String payload = "{\"time\": " + System.currentTimeMillis() + ", \"value\": " + Math.random() + "}";
+        // Generate synthetic but realistic metrics
+        double value = 0.5 + 0.4 * Math.sin(System.currentTimeMillis() / 1000.0);
+        double load = 15.0 + 10.0 * Math.random();
+        int rate = 100 + (int) (20 * Math.random());
+
+        String payload = String.format(
+                "{\"time\": %d, \"value\": %.4f, \"load\": %.1f, \"rate\": %d}",
+                System.currentTimeMillis(), value, load, rate);
 
         for (WsConnectContext client : clients) {
             if (client.session.isOpen()) {

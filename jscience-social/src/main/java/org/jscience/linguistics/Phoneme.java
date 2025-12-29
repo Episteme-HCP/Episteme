@@ -23,10 +23,12 @@
 package org.jscience.linguistics;
 
 /**
- * Represents a basic unit of sound in a language. * @author Silvere Martin-Michiellot
+ * Represents a basic unit of sound in a language. * @author Silvere
+ * Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- 
+ * 
  */
 public class Phoneme {
 
@@ -36,9 +38,9 @@ public class Phoneme {
     public Phoneme(Language language, String symbol) {
         this.language = language;
         this.symbol = symbol;
-        if (language != null) {
-            language.addPhoneme(this);
-        }
+        // if (language != null) {
+        // language.addPhoneme(this);
+        // }
     }
 
     public Language getLanguage() {

@@ -22,65 +22,50 @@
  */
 package org.jscience.psychology;
 
-import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.util.identity.Identifiable;
 
 /**
- * Represents a psychological behavior pattern.
- * * @author Silvere Martin-Michiellot
+ * Represents a psychological behavior or pattern.
  * 
+ * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Behavior {
+public class Behavior implements Identifiable<String> {
 
     public enum Type {
-        COGNITIVE, EMOTIONAL, SOCIAL, MOTOR, VERBAL, ADAPTIVE, MALADAPTIVE
-    }
-
-    public enum Frequency {
-        RARE, OCCASIONAL, FREQUENT, CONSTANT
+        INSTINCTIVE, LEARNED, EMOTIONAL, COGNITIVE, SOCIAL
     }
 
     private final String name;
-    private final String description;
     private final Type type;
-    private final Frequency frequency;
-    private final Real intensity; // 0.0 to 1.0
+    private final String description;
 
-    public Behavior(String name, String description, Type type, Frequency frequency, Real intensity) {
+    public Behavior(String name, Type type, String description) {
         this.name = name;
-        this.description = description;
         this.type = type;
-        this.frequency = frequency;
-        this.intensity = intensity.max(Real.ZERO).min(Real.ONE);
+        this.description = description;
+    }
+
+    @Override
+    public String getId() {
+        return name;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
     public Type getType() {
         return type;
     }
 
-    public Frequency getFrequency() {
-        return frequency;
-    }
-
-    public Real getIntensity() {
-        return intensity;
-    }
-
-    public boolean isAdaptive() {
-        return type == Type.ADAPTIVE;
+    public String getDescription() {
+        return description;
     }
 
     @Override
     public String toString() {
-        return String.format("%s (%s, %s, intensity=%.2f)", name, type, frequency, intensity.doubleValue());
+        return String.format("%s (%s)", name, type);
     }
 }

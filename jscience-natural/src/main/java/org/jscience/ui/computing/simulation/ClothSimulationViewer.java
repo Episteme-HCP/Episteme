@@ -58,11 +58,16 @@ public class ClothSimulationViewer extends Application {
         camera.setTranslateY(-10);
         subScene.setCamera(camera);
 
+        // Camera
         Group cameraGroup = new Group();
-        cameraGroup.getTransforms().addAll(rotateY, rotateX);
+        cameraGroup.getChildren().add(camera);
+        // Initial camera position relative to pivot
+        camera.setTranslateZ(-80);
+        camera.setTranslateY(-20);
+
         world.getChildren().add(cameraGroup);
-        // We actually want the world to rotate or camera to orbit.
-        // Let's orbit the camera group.
+        // Rotations apply to the camera group (orbiting center)
+        cameraGroup.getTransforms().addAll(rotateY, rotateX);
 
         // Controls
         VBox controls = new VBox(10);
@@ -118,6 +123,12 @@ public class ClothSimulationViewer extends Application {
             rotateX.setAngle(rotateX.getAngle() - (event.getSceneY() - mouseOldY));
             mouseOldX = event.getSceneX();
             mouseOldY = event.getSceneY();
+        });
+        // Zoom on scroll
+        subScene.setOnScroll(event -> {
+            double z = camera.getTranslateZ();
+            double newZ = z + event.getDeltaY() * 0.1;
+            camera.setTranslateZ(Math.max(-200, Math.min(-5, newZ)));
         });
 
         // Animation
@@ -201,7 +212,7 @@ public class ClothSimulationViewer extends Application {
         meshView.setDrawMode(DrawMode.FILL);
 
         PhongMaterial material = new PhongMaterial();
-        material.setDiffuseColor(Color.CORNFLOWERBLUE);
+        material.setDiffuseColor(Color.LIGHTBLUE);
         material.setSpecularColor(Color.WHITE);
         meshView.setMaterial(material);
 

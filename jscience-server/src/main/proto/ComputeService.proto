@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package org.jscience.server.proto;
+
+option java_multiple_files = true;
+option java_package = "org.jscience.server.proto";
+option java_outer_classname = "ComputeServiceProto";
+
+// The distributed compute service definition.
+service ComputeService {
+  // Submits a single task for execution
+  rpc SubmitTask (TaskRequest) returns (TaskResponse) {}
+
+  // Streams status updates or partial results for a task
+  rpc StreamResults (TaskIdentifier) returns (stream TaskResult) {}
+  
+  // Checking server health/status
+  rpc GetStatus (Empty) returns (ServerStatus) {}
+}
+
+message Empty {}
+
+message TaskRequest {
+  string taskId = 1;
+  // Serialized Java object (Callable<T>)
+  bytes serializedTask = 2;
+  // Priority (optional)
+  int32 priority = 3;
+}
+
+message TaskResponse {
+  string taskId = 1;
+  // Enum status: QUEUED, SUBMITTED
+  Status status = 2;
+  string message = 3;
+}
+
+message TaskIdentifier {
+  string taskId = 1;
+}
+
+message TaskResult {
+  string taskId = 1;
+  Status status = 2;
+  // Serialized result object or exception
+  bytes serializedData = 3;
+  // Progress percentage (0-100)
+  int32 progress = 4;
+  string errorMessage = 5;
+}
+
+message ServerStatus {
+  int32 activeWorkers = 1;
+  int32 queuedTasks = 2;
+  double systemLoad = 3;
+}
+
+enum Status {
+  UNKNOWN = 0;
+  QUEUED = 1;
+  RUNNING = 2;
+  COMPLETED = 3;
+  FAILED = 4;
+}

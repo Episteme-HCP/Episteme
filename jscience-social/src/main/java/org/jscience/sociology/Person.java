@@ -33,7 +33,8 @@ import java.util.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Person {
+public class Person
+        implements org.jscience.util.identity.Identifiable<String>, org.jscience.geography.Locatable {
 
     public enum Gender {
         MALE, FEMALE, OTHER, UNSPECIFIED
@@ -65,6 +66,11 @@ public class Person {
         this.wealth = Money.usd(0);
     }
 
+    public Person(String name, Gender gender) {
+        this(java.util.UUID.randomUUID().toString(), name, gender, java.time.LocalDate.now().minusYears(20), "Unknown");
+    }
+
+    @Override
     public String getId() {
         return id;
     }
@@ -105,6 +111,7 @@ public class Person {
         }
     }
 
+    @Override
     public Place getLocation() {
         return location;
     }

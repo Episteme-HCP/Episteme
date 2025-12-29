@@ -2,4 +2,5 @@ org.jscience.ui.demos.FormulaNotationDemo
 org.jscience.ui.demos.MatrixDemo
 org.jscience.ui.demos.PlottingDemo
 org.jscience.ui.demos.Surface3DDemo
+org.jscience.ui.demos.DistributionsDemo
 

@@ -39,7 +39,7 @@ import java.util.Collections;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Place {
+public class Place implements org.jscience.geography.Locatable {
 
     public enum Type {
         CITY, TOWN, VILLAGE, NEIGHBORHOOD, LANDMARK,
@@ -80,7 +80,12 @@ public class Place {
         return type;
     }
 
-    public Coordinate getLocation() {
+    @Override
+    public Place getLocation() {
+        return this;
+    }
+
+    public Coordinate getCoordinate() {
         return location;
     }
 

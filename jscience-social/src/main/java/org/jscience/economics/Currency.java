@@ -32,7 +32,7 @@ import java.util.Map;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Currency {
+public class Currency implements org.jscience.util.identity.Identifiable<String> {
 
     private final String code; // ISO 4217 code (e.g., "USD")
     private final String name; // Full name (e.g., "US Dollar")
@@ -44,6 +44,11 @@ public class Currency {
         this.name = name;
         this.symbol = symbol;
         this.decimals = decimals;
+    }
+
+    @Override
+    public String getId() {
+        return code;
     }
 
     public String getCode() {

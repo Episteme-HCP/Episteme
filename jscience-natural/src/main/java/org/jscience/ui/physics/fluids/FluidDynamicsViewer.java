@@ -10,6 +10,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -30,7 +31,7 @@ public class FluidDynamicsViewer extends Application {
 
     private int N = 100;
     private static final int SCALE = 6;
-    private static final int PARTICLE_COUNT = 500;
+    private static final int PARTICLE_COUNT = 5000;
 
     private void resetSimulation() {
         if (solver != null) {
@@ -64,7 +65,7 @@ public class FluidDynamicsViewer extends Application {
     @Override
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
-        root.getStyleClass().add("dark-viewer-root");
+        // Removed dark-viewer-root style
 
         Canvas canvas = new Canvas(N * SCALE, N * SCALE);
 
@@ -80,12 +81,10 @@ public class FluidDynamicsViewer extends Application {
         // Controls Panel
         VBox controls = new VBox(10);
         controls.setPadding(new Insets(10));
-        controls.getStyleClass().add("dark-viewer-controls");
         controls.setPrefWidth(220);
 
         Label titleLabel = new Label(I18n.getInstance().get("fluid.controls"));
-        titleLabel.setTextFill(Color.WHITE);
-        titleLabel.getStyleClass().add("dark-label");
+        titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
         // Info text
         Label infoLabel = new Label(
@@ -96,11 +95,10 @@ public class FluidDynamicsViewer extends Application {
                         "Click and drag to add flow\n" +
                         "disturbance.");
         infoLabel.setWrapText(true);
-        infoLabel.getStyleClass().add("dark-label-muted");
+        // infoLabel.getStyleClass().add("dark-label-muted");
 
         // Grid Resolution Control
-        Label resLabel = new Label(I18n.getInstance().get("fluid.resolution"));
-        resLabel.setTextFill(Color.LIGHTGRAY);
+        new Label(I18n.getInstance().get("fluid.resolution")); // Label created but variable not needed
         ComboBox<Integer> resCombo = new ComboBox<>();
         resCombo.getItems().addAll(32, 64, 128);
         resCombo.setValue(N);
@@ -117,18 +115,20 @@ public class FluidDynamicsViewer extends Application {
 
         // Viscosity slider
         Label viscLabel = new Label(I18n.getInstance().get("fluid.viscosity"));
-        viscLabel.setTextFill(Color.LIGHTGRAY);
-        Slider viscSlider = new Slider(0, 0.001, 0.0001); // Very low viscosity for stability
+        // viscLabel.setTextFill(Color.LIGHTGRAY);
+        Slider viscSlider = new Slider(0, 0.05, 0.0001); // Increased range for visibility
+        viscSlider.setShowTickLabels(true);
+        viscSlider.setShowTickMarks(true);
         viscSlider.valueProperty().addListener((o, ov, nv) -> viscosity = nv.doubleValue());
 
         // FPS Label
         fpsLabel = new Label(I18n.getInstance().get("fluid.fps"));
-        fpsLabel.setTextFill(Color.YELLOW);
-        fpsLabel.getStyleClass().add("dark-label");
+        // fpsLabel.setTextFill(Color.LIGHTGRAY);
+        // fpsLabel.getStyleClass().add("dark-label");
 
         // Solver Switch
         Label engineLabel = new Label(I18n.getInstance().get("fluid.label.engine"));
-        engineLabel.getStyleClass().add("dark-label");
+        // engineLabel.getStyleClass().add("dark-label");
         ToggleButton engineSwitch = new ToggleButton("Mode: Primitive");
         engineSwitch.setMaxWidth(Double.MAX_VALUE);
         engineSwitch.setOnAction(e -> {
@@ -144,7 +144,6 @@ public class FluidDynamicsViewer extends Application {
 
         // Speed slider
         Label speedLabel = new Label(String.format(I18n.getInstance().get("fluid.label.speed.fmt"), 1.0));
-        speedLabel.getStyleClass().add("dark-label");
         Slider speedSlider = new Slider(0.1, 3.0, 1.0);
         speedSlider.valueProperty().addListener((o, old, val) -> {
             speedLabel.setText(String.format(I18n.getInstance().get("fluid.label.speed.fmt"), val.doubleValue()));
@@ -153,17 +152,14 @@ public class FluidDynamicsViewer extends Application {
         // Display toggles
         CheckBox fieldCheck = new CheckBox("Show Flow Field");
         fieldCheck.setSelected(true);
-        fieldCheck.getStyleClass().add("dark-label");
         fieldCheck.setOnAction(e -> showField = fieldCheck.isSelected());
 
         CheckBox particleCheck = new CheckBox("Show Particles");
         particleCheck.setSelected(true);
-        particleCheck.getStyleClass().add("dark-label");
         particleCheck.setOnAction(e -> showParticles = particleCheck.isSelected());
 
         // Color scheme
         Label colorLabel = new Label(I18n.getInstance().get("fluid.label.color"));
-        colorLabel.getStyleClass().add("dark-label");
         ComboBox<String> colorCombo = new ComboBox<>();
         colorCombo.getItems().addAll("Blue", "Fire", "Green", "Rainbow");
         colorCombo.setValue("Blue");
@@ -184,9 +180,6 @@ public class FluidDynamicsViewer extends Application {
                 viscLabel, viscSlider,
                 speedLabel, speedSlider,
                 new Separator(),
-                viscLabel, viscSlider,
-                speedLabel, speedSlider,
-                new Separator(),
                 engineLabel, engineSwitch, fpsLabel,
                 new Separator(),
                 fieldCheck, particleCheck,
@@ -194,7 +187,17 @@ public class FluidDynamicsViewer extends Application {
                 new Separator(),
                 resetBtn);
 
-        root.setCenter(canvas);
+        StackPane displayStack = new StackPane();
+        displayStack.getChildren().add(canvas);
+
+        // Start Button Overlay
+        Button startBtn = new Button("CLICK TO START SIMULATION");
+        startBtn.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-base: #4CAF50;");
+        startBtn.setPadding(new Insets(20));
+
+        displayStack.getChildren().add(startBtn);
+
+        root.setCenter(displayStack);
         root.setRight(controls);
 
         // Mouse interaction
@@ -209,7 +212,7 @@ public class FluidDynamicsViewer extends Application {
         });
         canvas.setOnMouseReleased(e -> mousePressed = false);
 
-        new AnimationTimer() {
+        AnimationTimer timer = new AnimationTimer() {
             private double speed = 1.0;
 
             @Override
@@ -251,7 +254,12 @@ public class FluidDynamicsViewer extends Application {
                 updateParticles(speed);
                 zOff += 0.01 * speed;
             }
-        }.start();
+        };
+
+        startBtn.setOnAction(e -> {
+            startBtn.setVisible(false);
+            timer.start();
+        });
 
         Scene scene = new Scene(root, N * SCALE + 220, N * SCALE);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
@@ -297,7 +305,9 @@ public class FluidDynamicsViewer extends Application {
         }
 
         // Labels
-        gc.setFill(Color.WHITE);
+        gc.setFill(Color.BLACK); // Changed to BLACK to be visible on non-dark background if flow is light
+        // gc.fillText("Particles: " + particles.size(), 10, 20); // Removed as
+        // redundant with sidebar? Or Keep? Keep.
         gc.fillText("Particles: " + particles.size(), 10, 20);
     }
 

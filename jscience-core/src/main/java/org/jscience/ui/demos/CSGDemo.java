@@ -23,7 +23,7 @@ public class CSGDemo implements DemoProvider {
 
     @Override
     public String getDescription() {
-        return "Visualization of 3D boolean operations (Union, Difference, Intersection) on solid primitives.";
+        return I18n.getInstance().get("CSG.desc");
     }
 
     @Override

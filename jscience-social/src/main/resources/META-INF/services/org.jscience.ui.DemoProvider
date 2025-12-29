@@ -8,5 +8,5 @@ org.jscience.ui.demos.LinguisticsWordFreqDemo
 org.jscience.ui.demos.PoliticsVotingDemo
 org.jscience.ui.demos.PsychologyReactionTestDemo
 org.jscience.ui.demos.SociologyNetworkDemo
-org.jscience.ui.demos.SportsBallisticsDemo
+
 org.jscience.ui.demos.KurzweilDemo
