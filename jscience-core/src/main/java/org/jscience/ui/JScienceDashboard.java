@@ -391,50 +391,26 @@ public class JScienceDashboard extends Application {
         VBox content = new VBox(15);
         content.setPadding(new Insets(20));
 
-        Label header = new Label(I18n.getInstance().get("dashboard.loaders.header", "Known Data Loaders & Formats"));
+        Label header = new Label(I18n.getInstance().get("dashboard.loaders.header", "Known Data Loaders (Discovered)"));
         header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        TextArea loaderList = new TextArea();
-        loaderList.setEditable(false);
-        loaderList.setStyle("-fx-font-family: 'Consolas', 'Monospace';");
+        ListView<DashboardDiscovery.ClassInfo> list = new ListView<>();
+        list.getItems().addAll(DashboardDiscovery.getInstance().findClasses("Loader"));
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== Geography & Earth Support ===\n");
-        sb.append(" - GeoJSON (GeoJsonLoader)\n");
-        sb.append(" - World Bank Data (WorldBankLoader)\n");
-        sb.append(" - CIA World Factbook (FactbookLoader)\n");
-        sb.append(" - OpenWeatherMap API (OpenWeatherLoader)\n");
-        sb.append(" - Weather Data (WeatherDataLoader)\n\n");
+        list.setCellFactory(param -> new ListCell<>() {
+            @Override
+            protected void updateItem(DashboardDiscovery.ClassInfo item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.simpleName + " (" + item.fullName + ")");
+                }
+            }
+        });
 
-        sb.append("=== Astronomy & Physics ===\n");
-        sb.append(" - NASA Horizons (HorizonsEphemerisLoader)\n");
-        sb.append(" - VizieR Catalog (VizieRLoader)\n");
-        sb.append(" - SIMBAD Database (SimbadLoader)\n");
-        sb.append(" - Star Catalog (StarLoader)\n");
-        sb.append(" - Solar System Ephemeris (SolarSystemLoader)\n\n");
-
-        sb.append("=== Biology & Chemistry ===\n");
-        sb.append(" - PDB Protein Bank (PDBLoader, GenericPDBLoader)\n");
-        sb.append(" - FASTA Sequences (FastaLoader)\n");
-        sb.append(" - UniProt (UniProtLoader)\n");
-        sb.append(" - NCBI Taxonomy (NCBITaxonomyLoader)\n");
-        sb.append(" - PubChem (PubChemLoader)\n");
-        sb.append(" - ChEBI (ChEBILoader)\n");
-        sb.append(" - IUPAC Gold Book (IUPACGoldBookLoader)\n");
-        sb.append(" - CIF Crystallography (CIFLoader)\n\n");
-
-        sb.append("=== Social Sciences ===\n");
-        sb.append(" - Financial Markets (FinancialMarketLoader)\n");
-        sb.append(" - Time Series CSV (CSVTimeSeriesLoader)\n");
-
-        sb.append("=== System & Assets ===\n");
-        sb.append(" - 3D Models (ObjMeshLoader, StlMeshLoader)\n");
-        sb.append(" - Resources (ResourceLoader, PropertiesLoader)\n");
-
-        loaderList.setText(sb.toString());
-
-        content.getChildren().addAll(header, loaderList);
-        VBox.setVgrow(loaderList, Priority.ALWAYS);
+        content.getChildren().addAll(header, list);
+        VBox.setVgrow(list, Priority.ALWAYS);
         return new Tab("Loaders", content);
     }
 
