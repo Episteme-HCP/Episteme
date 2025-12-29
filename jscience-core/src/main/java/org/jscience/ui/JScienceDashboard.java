@@ -12,6 +12,9 @@ import org.jscience.ui.i18n.I18n;
 
 import java.io.File;
 import java.util.Locale;
+import java.lang.reflect.Modifier;
+import java.util.stream.Collectors;
+import org.jscience.ui.DashboardDiscovery;
 
 /**
  * Main Dashboard for JScience Application.
@@ -208,106 +211,22 @@ public class JScienceDashboard extends Application {
         VBox content = new VBox(15);
         content.setPadding(new Insets(20));
 
-        Label header = new Label(I18n.getInstance().get("dashboard.apps.header", "Applications & Ecosystem"));
+        Label header = new Label(
+                I18n.getInstance().get("dashboard.apps.header", "Applications & Ecosystem (Discovered)"));
         header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         Accordion accordion = new Accordion();
 
-        // 1. Killer Apps
-        TitledPane appsPane = new TitledPane("Applications (Complete Solutions)", createAppList(
-                new AppEntry("Civilization Dynamics", "org.jscience.apps.sociology.CivilizationApp",
-                        "Societal simulation"),
-                new AppEntry("Interplanetary Trajectory",
-                        "org.jscience.apps.physics.trajectory.InterplanetaryTrajectoryApp", "Hohmann transfer"),
-                new AppEntry("Relativistic Flight", "org.jscience.apps.physics.relativity.RelativisticFlightApp",
-                        "Special relativity sim"),
-                new AppEntry("Quantum Circuit", "org.jscience.apps.physics.QuantumCircuitApp",
-                        "Quantum computing simulator"),
-                new AppEntry("Smart Grid", "org.jscience.apps.engineering.SmartGridApp", "Power distribution"),
-                new AppEntry("Market Crash Sim", "org.jscience.apps.economics.MarketCrashApp", "Agent-based economics"),
-                new AppEntry("Titration Lab", "org.jscience.apps.chemistry.TitrationApp", "Acid-Base simulation"),
-                new AppEntry("Crystal Structure", "org.jscience.apps.chemistry.CrystalStructureApp",
-                        "3D lattice visualization"),
-                new AppEntry("Pandemic Forecaster", "org.jscience.apps.biology.PandemicForecasterApp",
-                        "SEIR disease modeling"),
-                new AppEntry("CRISPR Design", "org.jscience.apps.biology.CrisprDesignApp", "Genomic editing tool")));
+        DashboardDiscovery discovery = DashboardDiscovery.getInstance();
 
-        // 2. Interactive Demos
-        TitledPane demosPane = new TitledPane("Interactive Demos", createAppList(
-                // Physics
-                new AppEntry("Newtonian Lab", "org.jscience.ui.physics.mechanics.NewtonianMechanicsLabViewer",
-                        "Springs & Pendulums (Viewer)"),
-                new AppEntry("Rigid Body", "org.jscience.ui.demos.RigidBodyDemo", "Physics Engine"),
-                new AppEntry("Thermodynamics", "org.jscience.ui.demos.ThermodynamicsDemo", "Heat & Energy"),
-                new AppEntry("Spectrograph", "org.jscience.ui.demos.SpectrographDemo", "Wave Analysis"),
-                // Biology
-                new AppEntry("Species Browser", "org.jscience.ui.demos.SpeciesBrowserDemo", "Taxonomy Explorer"),
-                new AppEntry("Sequence Alignment", "org.jscience.ui.demos.SequenceAlignmentDemo", "DNA Comparison"),
-                new AppEntry("Phylogenetic Tree", "org.jscience.ui.demos.PhylogeneticTreeDemo", "Evolutionary History"),
-                // Engineering
-                new AppEntry("Car Traffic", "org.jscience.apps.engineering.traffic.CarTrafficDemo", "Traffic IDM Sim"),
-                new AppEntry("Resistor Colors", "org.jscience.ui.demos.ResistorColorCodeDemo", "Component ID"),
-                new AppEntry("Sensor/Actuator", "org.jscience.ui.demos.SensorActuatorDemo", "Device Interaction"),
-                // Mathematics
-                new AppEntry("Matrix Operations", "org.jscience.ui.demos.MatrixDemo", "Linear Algebra"),
-                new AppEntry("CSG Geometry", "org.jscience.ui.demos.CSGDemo", "Constructive Solid Geometry"),
-                new AppEntry("Surface 3D", "org.jscience.ui.demos.Surface3DDemo", "3D Plotting"),
-                new AppEntry("Distributions", "org.jscience.ui.demos.DistributionsDemo", "Statistical Models"),
-                // Social
-                new AppEntry("Politics & Voting", "org.jscience.ui.demos.PoliticsVotingDemo", "Election Systems"),
-                new AppEntry("Economics Market", "org.jscience.ui.demos.EconomicsMarketDemo", "Supply/Demand"),
-                new AppEntry("GDP Visualizer", "org.jscience.ui.demos.EconomicsGDPDemo", "Macroeconomics"),
-                new AppEntry("Geography GIS", "org.jscience.ui.demos.GeographyGISDemo", "Spatial Data"),
-                new AppEntry("History Timeline", "org.jscience.ui.demos.HistoryTimelineDemo", "Historical Events"),
-                new AppEntry("Linguistics", "org.jscience.ui.demos.LinguisticsWordFreqDemo", "Word Frequency"),
-                new AppEntry("Psychology Reaction", "org.jscience.ui.demos.PsychologyReactionTestDemo",
-                        "Response Time"),
-                new AppEntry("Sociology Network", "org.jscience.ui.demos.SociologyNetworkDemo", "Social Graph"),
-                new AppEntry("Arts Color Theory", "org.jscience.ui.demos.ArtsColorTheoryDemo", "Color Models"),
-                new AppEntry("Architecture", "org.jscience.ui.demos.ArchitectureStabilityDemo", "Structural Stability"),
-                // General
-                new AppEntry("Unit Converter", "org.jscience.ui.demos.UnitConverterDemo", "Quantity Conversion")));
+        // 1. Applications
+        TitledPane appsPane = new TitledPane("Applications", createAppList(discovery.findClasses("App")));
 
-        // 3. Data Viewers
-        TitledPane viewersPane = new TitledPane("Viewers & Explorers", createAppList(
-                // Physics / Astronomy
-                new AppEntry("Stellar Sky", "org.jscience.ui.physics.astronomy.StellarSkyViewer", "Night Sky Map"),
-                new AppEntry("Star System", "org.jscience.ui.physics.astronomy.StarSystemViewer", "Orbits & Planets"),
-                new AppEntry("Galaxy Viewer", "org.jscience.ui.physics.astronomy.GalaxyViewer", "Galactic Structure"),
-                new AppEntry("Fluid Dynamics", "org.jscience.ui.physics.fluids.FluidDynamicsViewer",
-                        "Lattice Boltzmann"),
-                new AppEntry("Thermodynamics Viewer", "org.jscience.ui.physics.thermodynamics.ThermodynamicsViewer",
-                        "PV Diagrams"),
-                new AppEntry("Mechanics Viewer", "org.jscience.ui.physics.mechanics.MechanicsViewer",
-                        "Motion Analysis"),
-                // System
-                new AppEntry("Cloth Sim", "org.jscience.ui.computing.simulation.ClothSimulationViewer",
-                        "Physics Simulation"),
-                new AppEntry("Game of Life", "org.jscience.ui.computing.ai.GameOfLifeViewer", "Cellular Automata"),
-                new AppEntry("Genetic Algorithm", "org.jscience.ui.computing.ai.GeneticAlgorithmViewer",
-                        "Evolution Sim"),
-                // Chemistry
-                new AppEntry("Periodic Table", "org.jscience.ui.chemistry.PeriodicTableViewer", "Elements"),
-                new AppEntry("Molecular Viewer", "org.jscience.ui.chemistry.MolecularViewer", "3D Molecules"),
-                new AppEntry("Chemical Reaction", "org.jscience.ui.chemistry.ChemicalReactionViewer", "Stoichiometry"),
-                // Biology
-                new AppEntry("Human Body", "org.jscience.ui.biology.anatomy.HumanBodyViewer", "Anatomy Explorer"),
-                new AppEntry("Bio Motion", "org.jscience.ui.biology.anatomy.BioMotionViewer", "Kinematics"),
-                new AppEntry("L-Systems", "org.jscience.ui.biology.lsystems.LSystemViewer", "Plant Growth"),
-                new AppEntry("Genetics Viewer", "org.jscience.ui.biology.genetics.GeneticsViewer", "DNA/RNA"),
-                new AppEntry("Species Browser", "org.jscience.ui.biology.ecology.SpeciesBrowserViewer", "Biodiversity"),
-                new AppEntry("Lotka-Volterra", "org.jscience.ui.biology.ecology.LotkaVolterraViewer", "Predator-Prey"),
-                // Math
-                new AppEntry("Function Explorer", "org.jscience.ui.mathematics.numbers.real.FunctionExplorerViewer",
-                        "Plotting Tool"),
-                new AppEntry("Matrix Viewer", "org.jscience.ui.mathematics.vector.MatrixViewer", "Data Viz"),
-                // Devices
-                new AppEntry("Circuit Simulator", "org.jscience.ui.engineering.circuit.CircuitSimulatorViewer",
-                        "Electronics"),
-                new AppEntry("Earthquake Map", "org.jscience.ui.earth.EarthquakeMapViewer", "Seismology"),
-                new AppEntry("Vital Monitor", "org.jscience.ui.devices.VitalMonitorViewer", "Medical Device"),
-                new AppEntry("Telescope Feed", "org.jscience.ui.devices.TelescopeViewer", "Device Interface"),
-                new AppEntry("Spectrometer", "org.jscience.ui.devices.SpectrometerViewer", "Device Interface")));
+        // 2. Demos
+        TitledPane demosPane = new TitledPane("Interactive Demos", createAppList(discovery.findClasses("Demo")));
+
+        // 3. Viewers
+        TitledPane viewersPane = new TitledPane("Viewers & Explorers", createAppList(discovery.findClasses("Viewer")));
 
         accordion.getPanes().addAll(appsPane, demosPane, viewersPane);
         appsPane.setExpanded(true);
@@ -316,24 +235,23 @@ public class JScienceDashboard extends Application {
         return new Tab(I18n.getInstance().get("dashboard.tab.apps", "Apps"), content);
     }
 
-    private ListView<AppEntry> createAppList(AppEntry... entries) {
-        ListView<AppEntry> list = new ListView<>();
-        for (AppEntry entry : entries)
-            list.getItems().add(entry);
+    private ListView<DashboardDiscovery.ClassInfo> createAppList(java.util.List<DashboardDiscovery.ClassInfo> entries) {
+        ListView<DashboardDiscovery.ClassInfo> list = new ListView<>();
+        list.getItems().addAll(entries);
 
         list.setCellFactory(param -> new ListCell<>() {
             @Override
-            protected void updateItem(AppEntry item, boolean empty) {
+            protected void updateItem(DashboardDiscovery.ClassInfo item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText(null);
                     setGraphic(null);
                 } else {
                     VBox box = new VBox(2);
-                    Label name = new Label(item.name);
+                    Label name = new Label(item.simpleName);
                     name.setStyle("-fx-font-weight: bold;");
-                    Label desc = new Label(item.description);
-                    desc.setStyle("-fx-font-size: 0.9em; -fx-text-fill: gray;");
+                    Label desc = new Label(item.fullName);
+                    desc.setStyle("-fx-font-size: 0.8em; -fx-text-fill: gray;");
                     box.getChildren().addAll(name, desc);
                     setGraphic(box);
                 }
@@ -342,9 +260,9 @@ public class JScienceDashboard extends Application {
 
         list.setOnMouseClicked(e -> {
             if (e.getClickCount() == 2) {
-                AppEntry selected = list.getSelectionModel().getSelectedItem();
+                DashboardDiscovery.ClassInfo selected = list.getSelectionModel().getSelectedItem();
                 if (selected != null)
-                    launchApp(selected.className);
+                    launchApp(selected.fullName);
             }
         });
 
@@ -378,18 +296,6 @@ public class JScienceDashboard extends Application {
         }
     }
 
-    private static class AppEntry {
-        String name;
-        String className;
-        String description;
-
-        AppEntry(String n, String c, String d) {
-            this.name = n;
-            this.className = c;
-            this.description = d;
-        }
-    }
-
     private Tab createLibrariesTab() {
         VBox content = new VBox(15);
         content.setPadding(new Insets(20));
@@ -399,29 +305,31 @@ public class JScienceDashboard extends Application {
 
         TextArea libInfo = new TextArea();
         libInfo.setEditable(false);
-        libInfo.setPrefHeight(400); // Taller as requested
+        libInfo.setPrefHeight(400);
         libInfo.setStyle("-fx-font-family: 'Consolas', 'Monospace';");
 
         StringBuilder sb = new StringBuilder();
-        sb.append("=== Linear Algebra Providers ===\n");
-        sb.append("CPUDenseLinearAlgebraProvider: Active\n");
-        sb.append("CPUSparseLinearAlgebraProvider: Available\n");
-        sb.append("CUDADenseLinearAlgebraProvider: Input Required\n");
-        sb.append("GRPCLinearAlgebraProvider: Disconnected\n");
-
-        sb.append("\n=== Native Library Support ===\n");
-        sb.append("ND4J Support: ").append(checkClass("org.nd4j.linalg.factory.Nd4j") ? "Available" : "Not Found")
-                .append("\n");
-        sb.append("OpenCL (JOCL): ").append(checkClass("org.jocl.CL") ? "Available" : "Not Found").append("\n");
-        sb.append("CUDA (JCuda): ").append(checkClass("jcuda.Pointer") ? "Available" : "Not Found").append("\n");
-        sb.append("JNI Bridge: ").append(checkClass("org.jscience.jni.JNIBridge") ? "Available" : "Not Found")
-                .append("\n");
-
-        sb.append("\n=== Biology Packages ===\n");
-        sb.append("BioJava (Embedded): Partial\n");
-
-        sb.append("\n=== Social Data ===\n");
-        sb.append("GeoNames: Offline Mode\n");
+        sb.append("=== JScience Runtime Properties ===\n");
+        // Inspect JScience class reflectively
+        try {
+            Class<?> cls = Class.forName("org.jscience.JScience");
+            java.lang.reflect.Method[] methods = cls.getMethods();
+            for (java.lang.reflect.Method m : methods) {
+                if (Modifier.isStatic(m.getModifiers()) && m.getName().startsWith("get")
+                        && m.getParameterCount() == 0 && !m.getName().equals("getClass")) {
+                    Object val = m.invoke(null);
+                    sb.append(m.getName().substring(3)).append(": ").append(val).append("\n");
+                }
+                // Check for "is" methods too like isGpuAvailable
+                if (Modifier.isStatic(m.getModifiers()) && m.getName().startsWith("is")
+                        && m.getParameterCount() == 0) {
+                    Object val = m.invoke(null);
+                    sb.append(m.getName()).append(": ").append(val).append("\n");
+                }
+            }
+        } catch (Exception e) {
+            sb.append("Error inspecting JScience properties: ").append(e.getMessage()).append("\n");
+        }
 
         libInfo.setText(sb.toString());
         content.getChildren().addAll(header, libInfo);
