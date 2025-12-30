@@ -158,6 +158,11 @@ public abstract class AbstractDemo extends Application implements DemoProvider {
         return box;
     }
 
+    @Override
+    public String getDescription() {
+        return getLongDescription();
+    }
+
     protected abstract Node createViewerNode();
 
     protected abstract String getLongDescription();

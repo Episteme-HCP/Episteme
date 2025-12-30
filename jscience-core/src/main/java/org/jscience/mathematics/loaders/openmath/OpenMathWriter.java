@@ -42,7 +42,31 @@ import org.jscience.mathematics.numbers.complex.Complex;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class OpenMathWriter implements Serializer<Object> {
+public class OpenMathWriter implements Serializer<Object>, org.jscience.io.OutputLoader<Object> {
+
+    @Override
+    public Object load(String resourceId) throws Exception {
+        // Writers aren't typically used for loading, but we satisfy the interface
+        return null;
+    }
+
+    @Override
+    public void save(Object resource, String destination) throws Exception {
+        java.io.File file = new java.io.File(destination);
+        try (java.io.FileOutputStream fos = new java.io.FileOutputStream(file)) {
+            write(resource, fos);
+        }
+    }
+
+    @Override
+    public String getResourcePath() {
+        return "/";
+    }
+
+    @Override
+    public Class<Object> getResourceType() {
+        return Object.class;
+    }
 
     @Override
     public void write(Object object, OutputStream output) throws IOException {

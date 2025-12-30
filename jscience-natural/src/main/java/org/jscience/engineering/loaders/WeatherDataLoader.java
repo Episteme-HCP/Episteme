@@ -38,7 +38,25 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class WeatherDataLoader {
+public class WeatherDataLoader implements org.jscience.io.InputLoader<List<WeatherDataLoader.WeatherRecord>> {
+
+    @Override
+    public List<WeatherRecord> load(String resourceId) throws java.io.IOException {
+        try (InputStream is = getClass().getResourceAsStream(resourceId)) {
+            return loadCSV(is);
+        }
+    }
+
+    @Override
+    public String getResourcePath() {
+        return "/data/weather/";
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<List<WeatherRecord>> getResourceType() {
+        return (Class) List.class;
+    }
 
     public static class WeatherRecord {
         public int hour;

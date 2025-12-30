@@ -45,6 +45,7 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 import org.jscience.chemistry.Atom;
+import org.jscience.ui.i18n.I18n;
 import org.jscience.chemistry.MolecularGraph;
 import org.jscience.chemistry.PeriodicTable;
 import org.jscience.chemistry.loaders.ChemistryDataLoader;
@@ -74,7 +75,7 @@ public class MolecularViewer extends Application {
     private final Translate t = new Translate(0, 0, 30); // Z+ is into screen
 
     private double mouseX, mouseY;
-    private Label detailLabel = new Label("Select a molecule...");
+    private Label detailLabel = new Label(I18n.getInstance().get("molecule.view.select", "Select a molecule..."));
     private CheckBox showBondsBox;
     private CheckBox showOrbitalsBox;
     private boolean showOrbitals = false;
@@ -137,7 +138,7 @@ public class MolecularViewer extends Application {
         selector.setMaxWidth(Double.MAX_VALUE);
         selector.setOnAction(e -> loadModel(selector.getValue()));
 
-        showBondsBox = new CheckBox("Show Bonds");
+        showBondsBox = new CheckBox(I18n.getInstance().get("molecule.view.bonds", "Show Bonds"));
         showBondsBox.setSelected(true);
         showBondsBox.setOnAction(e -> toggleBonds(showBondsBox.isSelected()));
 
@@ -148,14 +149,14 @@ public class MolecularViewer extends Application {
         });
 
         // Protein Folding Controls
-        Label foldLabel = new Label("Folding Progress:");
+        Label foldLabel = new Label(I18n.getInstance().get("molecule.fold.progress", "Folding Progress:"));
         Slider foldSlider = new Slider(0, 100, 0);
         foldSlider.setShowTickLabels(true);
         foldSlider.setShowTickMarks(true);
         foldSlider.setMajorTickUnit(50);
         foldSlider.setBlockIncrement(10);
 
-        Button playFoldBtn = new Button("Animate Folding");
+        Button playFoldBtn = new Button(I18n.getInstance().get("molecule.fold.animate", "Animate Folding"));
         playFoldBtn.setMaxWidth(Double.MAX_VALUE);
         playFoldBtn.setOnAction(e -> animateFolding(foldSlider));
 
@@ -179,7 +180,7 @@ public class MolecularViewer extends Application {
         });
 
         // Planar (2D) View Toggle
-        CheckBox planarViewBox = new CheckBox("Planar (2D) View");
+        CheckBox planarViewBox = new CheckBox(I18n.getInstance().get("molecule.view.planar", "Planar (2D) View"));
         planarViewBox.setSelected(false);
         planarViewBox.setOnAction(e -> {
             planarMode = planarViewBox.isSelected();
@@ -200,14 +201,14 @@ public class MolecularViewer extends Application {
         VBox legend = createLegend();
 
         controls.getChildren().addAll(header, new Separator(),
-                new Label("Load Model:"), selector,
+                new Label(I18n.getInstance().get("molecule.view.load", "Load Model:")), selector,
                 showBondsBox, showOrbitalsBox, planarViewBox,
                 new Separator(),
-                new Label("Molecule Info:"),
+                new Label(I18n.getInstance().get("molecule.view.info", "Molecule Info:")),
                 detailLabel,
                 foldControls,
                 new Separator(),
-                new Label("Legend:"),
+                new Label(I18n.getInstance().get("molecule.view.legend", "Legend:")),
                 legend);
         root.setRight(controls);
 
@@ -287,17 +288,20 @@ public class MolecularViewer extends Application {
 
         if (name.contains("Benzene")) {
             createBenzene();
-            detailLabel.setText("Benzene (C6H6)\nDelocalized Pi System\nRed/Green lobes represent p-orbitals.");
+            detailLabel.setText(I18n.getInstance().get("molecule.desc.benzene",
+                    "Benzene (C6H6)\nDelocalized Pi System\nRed/Green lobes represent p-orbitals."));
         } else if (name.contains("DNA")) {
             createDNA();
-            detailLabel.setText("Deoxyribonucleic Acid (DNA)\nDouble Helix");
+            detailLabel
+                    .setText(I18n.getInstance().get("molecule.desc.dna", "Deoxyribonucleic Acid (DNA)\nDouble Helix"));
         } else if (name.contains("Protein Folding")) {
             createProteinFoldingSimulation();
-            detailLabel.setText(
-                    "Protein Folding Simulation\nDrag slider to fold.\n\nDemonstrates transition from\nprimary structure (linear)\nto secondary (alpha-helix).");
+            detailLabel.setText(I18n.getInstance().get("molecule.desc.fold",
+                    "Protein Folding Simulation\nDrag slider to fold.\n\nDemonstrates transition from\nprimary structure (linear)\nto secondary (alpha-helix)."));
         } else if (name.contains("Protein")) {
             createProtein();
-            detailLabel.setText("Generic Protein Structure\nAlpha Helix");
+            detailLabel
+                    .setText(I18n.getInstance().get("molecule.desc.protein", "Generic Protein Structure\nAlpha Helix"));
         } else {
             MolecularGraph g = null;
             if (name.contains("Ethanol"))
@@ -314,8 +318,10 @@ public class MolecularViewer extends Application {
             if (g != null) {
                 renderGraph(g);
                 String formula = calculateFormula(g);
-                detailLabel.setText("Name: " + name + "\nFormula: " + formula + "\nAtoms: " + g.getAtoms().size()
-                        + "\nBonds: " + g.getBonds().size());
+                detailLabel.setText(I18n.getInstance().get("molecule.name", "Name: %s", name) + "\n" +
+                        I18n.getInstance().get("molecule.label.formula", "Formula: %s", formula) + "\n" +
+                        I18n.getInstance().get("molecule.atoms", "Atoms: %d", (long) g.getAtoms().size()) + "\n" +
+                        I18n.getInstance().get("molecule.bonds", "Bonds: %d", (long) g.getBonds().size()));
             }
         }
     }
@@ -458,21 +464,23 @@ public class MolecularViewer extends Application {
 
     private void showAtomDetails(Atom atom) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Element: ").append(atom.getElement().getName());
+        sb.append(I18n.getInstance().get("molecule.element", "Element: %s", atom.getElement().getName()));
         sb.append(" (").append(atom.getElement().getSymbol()).append(")\n");
-        sb.append("At No: ").append(atom.getElement().getAtomicNumber()).append("\n");
+        sb.append(I18n.getInstance().get("molecule.atomic_number", "At No: %d",
+                (long) atom.getElement().getAtomicNumber())).append("\n");
         if (atom.getElement().getAtomicMass() != null) {
-            sb.append("Mass: ")
-                    .append(String.format("%.4f u", atom.getElement().getAtomicMass().getValue().doubleValue()));
+            sb.append(I18n.getInstance().get("molecule.mass", "Mass: %s",
+                    String.format("%.4f u", atom.getElement().getAtomicMass().getValue().doubleValue())));
         }
-        sb.append("\nPos: ").append(atom.getPosition().toString());
+        sb.append("\n").append(I18n.getInstance().get("molecule.pos", "Pos: %s", atom.getPosition().toString()));
 
         // Append context to curr details
         String current = detailLabel.getText();
-        if (current.contains("Formula:")) {
+        String selectedHeader = I18n.getInstance().get("molecule.selected", "\n\nSelected:\n");
+        if (current.contains("Formula:") || current.contains("Atoms:")) {
             detailLabel.setText(current.substring(0,
-                    current.indexOf("\n\nSelected:") == -1 ? current.length() : current.indexOf("\n\nSelected:"))
-                    + "\n\nSelected:\n" + sb.toString());
+                    current.indexOf(selectedHeader) == -1 ? current.length() : current.indexOf(selectedHeader))
+                    + selectedHeader + sb.toString());
         } else {
             detailLabel.setText(sb.toString());
         }

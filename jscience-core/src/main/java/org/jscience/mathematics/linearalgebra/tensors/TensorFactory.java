@@ -24,7 +24,6 @@
 package org.jscience.mathematics.linearalgebra.tensors;
 
 import org.jscience.mathematics.linearalgebra.tensors.backends.TensorProvider;
-import org.jscience.mathematics.linearalgebra.tensors.backends.CPUDenseTensorProvider;
 
 import java.util.List;
 

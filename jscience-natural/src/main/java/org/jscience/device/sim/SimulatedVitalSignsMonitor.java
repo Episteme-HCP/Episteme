@@ -61,6 +61,10 @@ public class SimulatedVitalSignsMonitor extends SimulatedDevice implements Vital
     private double[] plethBuffer = new double[waveformSize];
     private int bufferIndex = 0;
 
+    public SimulatedVitalSignsMonitor() {
+        this("Vital Signs Monitor");
+    }
+
     public SimulatedVitalSignsMonitor(String name) {
         super(name);
         // Initialize buffers

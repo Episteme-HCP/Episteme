@@ -29,6 +29,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jscience.io.AbstractLoader;
+
 /**
  * Loads Star Catalog Data (CSV).
  *
@@ -36,7 +38,32 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class StarLoader {
+public class StarLoader extends AbstractLoader<List<StarLoader.Star>> {
+
+    @Override
+    protected List<Star> loadFromSource(String id) throws Exception {
+        // StarLoader typically loads a full catalog from resource
+        return loadResource(id);
+    }
+
+    @Override
+    public String getResourcePath() {
+        return "/org/jscience/physics/astronomy/data/";
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<List<Star>> getResourceType() {
+        return (Class) List.class;
+    }
+
+    public List<Star> loadResource(String path) throws Exception {
+        try (InputStream is = getClass().getResourceAsStream(path)) {
+            if (is == null)
+                throw new java.io.IOException("Star catalog not found: " + path);
+            return loadCSV(is);
+        }
+    }
 
     public static class Star {
         public String name;

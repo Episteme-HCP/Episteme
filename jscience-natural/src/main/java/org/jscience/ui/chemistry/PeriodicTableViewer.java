@@ -191,7 +191,7 @@ public class PeriodicTableViewer extends Application {
         // cell
         if (element == null) {
             // Create a dummy element wrapper for display if real data missing
-            element = new Element("Unknown", symbol);
+            element = new Element(I18n.getInstance().get("periodic.unknown", "Unknown"), symbol);
             element.setAtomicNumber(0);
         }
 
@@ -269,10 +269,12 @@ public class PeriodicTableViewer extends Application {
     private String getTooltipText(Element element) {
         StringBuilder sb = new StringBuilder();
         sb.append(element.getName()).append(" (").append(element.getSymbol()).append(")\n");
-        sb.append("Atomic Number: ").append(element.getAtomicNumber()).append("\n");
+        sb.append(I18n.getInstance().get("periodic.attr.atomic_number", "Atomic Number")).append(": ")
+                .append(element.getAtomicNumber()).append("\n");
         if (element.getAtomicMass() != null) {
             // Display value directy (assuming it's in atomic mass units)
-            sb.append("Atomic Mass: ").append(String.format("%.4f u", element.getAtomicMass().getValue().doubleValue()))
+            sb.append(I18n.getInstance().get("periodic.attr.atomic_mass", "Atomic Mass")).append(": ")
+                    .append(String.format("%.4f u", element.getAtomicMass().getValue().doubleValue()))
                     .append("\n");
         }
         return sb.toString();
@@ -300,7 +302,7 @@ public class PeriodicTableViewer extends Application {
 
         detailsTabPane = new TabPane();
 
-        Tab elecTab = new Tab("Electronic");
+        Tab elecTab = new Tab(I18n.getInstance().get("periodic.electronic", "Electronic"));
         electronicContent = new VBox(10);
         electronicContent.setPadding(new Insets(10));
         ScrollPane elecScroll = new ScrollPane(electronicContent);
@@ -308,7 +310,7 @@ public class PeriodicTableViewer extends Application {
         elecTab.setContent(elecScroll);
         elecTab.setClosable(false);
 
-        Tab nucTab = new Tab("Nuclear");
+        Tab nucTab = new Tab(I18n.getInstance().get("periodic.nuclear", "Nuclear"));
         nuclearContent = new VBox(10);
         nuclearContent.setPadding(new Insets(10));
         ScrollPane nucScroll = new ScrollPane(nuclearContent);
@@ -372,18 +374,23 @@ public class PeriodicTableViewer extends Application {
         }
 
         VBox props = new VBox(5);
-        props.getChildren().add(createPropLabel("Atomic Number", String.valueOf(element.getAtomicNumber())));
+        props.getChildren().add(createPropLabel(I18n.getInstance().get("periodic.attr.atomic_number", "Atomic Number"),
+                String.valueOf(element.getAtomicNumber())));
         props.getChildren().add(
-                createPropLabel("Category", element.getCategory() != null ? element.getCategory().name() : "Unknown"));
-        props.getChildren().add(createPropLabel("Group", String.valueOf(inferredGroup)));
-        props.getChildren().add(createPropLabel("Period", String.valueOf(inferredPeriod)));
+                createPropLabel(I18n.getInstance().get("periodic.attr.category", "Category"),
+                        element.getCategory() != null ? element.getCategory().name()
+                                : I18n.getInstance().get("periodic.unknown", "Unknown")));
+        props.getChildren().add(
+                createPropLabel(I18n.getInstance().get("periodic.attr.group", "Group"), String.valueOf(inferredGroup)));
+        props.getChildren().add(createPropLabel(I18n.getInstance().get("periodic.attr.period", "Period"),
+                String.valueOf(inferredPeriod)));
         if (element.getAtomicMass() != null) {
-            props.getChildren().add(createPropLabel("Atomic Mass",
+            props.getChildren().add(createPropLabel(I18n.getInstance().get("periodic.attr.atomic_mass", "Atomic Mass"),
                     String.format("%.4f u", element.getAtomicMass().getValue().doubleValue())));
         }
         if (element.getDensity() != null) {
-            props.getChildren().add(createPropLabel("Density",
-                    String.format("%.3f g/cm³", element.getDensity().getValue().doubleValue())));
+            props.getChildren().add(createPropLabel(I18n.getInstance().get("periodic.attr.density", "Density"),
+                    String.format("%.3f g/cm\u00B3", element.getDensity().getValue().doubleValue())));
         }
 
         electronicContent.getChildren().addAll(props, new Separator());
@@ -404,12 +411,14 @@ public class PeriodicTableViewer extends Application {
 
         // Nucleus Visualization (Bohr Model / Shells)
         SubScene nucleusView = createNucleusView(element);
-        VBox nucBox = new VBox(5, new Label("Nucleus Structure (Simplified)"), nucleusView);
+        VBox nucBox = new VBox(5,
+                new Label(I18n.getInstance().get("periodic.nucleus.title", "Nucleus Structure (Simplified)")),
+                nucleusView);
         nucBox.setStyle("-fx-border-color: #666; -fx-border-width: 1px;");
         nuclearContent.getChildren().add(nucBox);
 
         // Isotopes List
-        Label isoLabel = new Label("Known Isotopes:");
+        Label isoLabel = new Label(I18n.getInstance().get("periodic.isotopes.title", "Known Isotopes:"));
         isoLabel.setStyle("-fx-font-weight: bold;");
         ListView<String> isoList = new ListView<>();
         isoList.setPrefHeight(200);

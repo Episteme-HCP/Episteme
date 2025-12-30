@@ -41,7 +41,25 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GeoJsonLoader {
+public class GeoJsonLoader implements org.jscience.io.InputLoader<List<org.jscience.geography.Region>> {
+
+    @Override
+    public List<org.jscience.geography.Region> load(String resourceId) throws java.io.IOException {
+        try (InputStream is = getClass().getResourceAsStream(resourceId)) {
+            return loadRegions(is);
+        }
+    }
+
+    @Override
+    public String getResourcePath() {
+        return "/";
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<List<org.jscience.geography.Region>> getResourceType() {
+        return (Class) List.class;
+    }
 
     private final ObjectMapper mapper;
 

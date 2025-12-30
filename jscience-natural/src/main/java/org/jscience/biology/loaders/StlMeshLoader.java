@@ -41,7 +41,26 @@ import java.nio.ByteOrder;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class StlMeshLoader {
+public class StlMeshLoader implements org.jscience.io.InputLoader<javafx.scene.shape.MeshView> {
+
+    @Override
+    public javafx.scene.shape.MeshView load(String resourceId) throws java.io.IOException {
+        if (resourceId.startsWith("http")) {
+            return loadFromUrl(resourceId);
+        }
+        return loadFromPath(resourceId);
+    }
+
+    @Override
+    public String getResourcePath() {
+        return "/";
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<javafx.scene.shape.MeshView> getResourceType() {
+        return (Class) javafx.scene.shape.MeshView.class;
+    }
 
     /**
      * Loads an STL mesh from a file path.
@@ -50,7 +69,7 @@ public class StlMeshLoader {
      * @return MeshView containing the loaded geometry
      * @throws IOException if file cannot be read
      */
-    public static MeshView load(String filePath) throws IOException {
+    public static MeshView loadFromPath(String filePath) throws IOException {
         return load(new File(filePath));
     }
 

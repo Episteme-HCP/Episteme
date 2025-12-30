@@ -1,24 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.jscience.biology.loaders;
@@ -29,19 +11,42 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import org.jscience.io.AbstractLoader;
 
 /**
- * 
+ * Loader for UniProt protein database.
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class UniProtLoader {
+public class UniProtLoader extends AbstractLoader<Map<String, String>> {
 
     private static final String API_URL = "https://rest.uniprot.org/uniprotkb/";
     private static final String SEARCH_URL = "https://rest.uniprot.org/uniprotkb/search?query=";
 
-    private UniProtLoader() {
+    @Override
+    protected Map<String, String> loadFromSource(String resourceId) throws Exception {
+        // resourceId should be accession or query
+        Map<String, String> res = fetchByAccession(resourceId);
+        if (res == null) {
+            res = searchByName(resourceId);
+        }
+        return res;
+    }
+
+    @Override
+    public String getResourcePath() {
+        return API_URL;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<Map<String, String>> getResourceType() {
+        return (Class) Map.class;
+    }
+
+    public UniProtLoader() {
     }
 
     /**

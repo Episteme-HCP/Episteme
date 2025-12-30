@@ -39,6 +39,10 @@ public class SimulatedMultimeter extends SimulatedDevice implements Multimeter {
     private Function function = Function.DC_VOLTAGE;
     private Real currentValue = Real.ZERO;
 
+    public SimulatedMultimeter() {
+        this("Multimeter");
+    }
+
     public SimulatedMultimeter(String name) {
         super(name);
     }

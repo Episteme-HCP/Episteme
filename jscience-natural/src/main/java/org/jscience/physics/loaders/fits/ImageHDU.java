@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.ByteOrder;
-import org.jscience.mathematics.linearalgebra.matrices.DenseMatrix;
+
 import org.jscience.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 
 /**

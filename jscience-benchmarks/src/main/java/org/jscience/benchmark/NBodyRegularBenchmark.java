@@ -226,7 +226,7 @@ public class NBodyRegularBenchmark {
      * Main benchmark runner.
      */
     public static void main(String[] args) {
-        System.out.println("N-Body Gravitational Simulation Benchmark");
+        System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("benchmark.nbody.regular.title"));
         System.out.println("==========================================");
 
         int[] bodyCounts = { 100, 500, 1000, 2000 };
@@ -241,8 +241,8 @@ public class NBodyRegularBenchmark {
             double stepsPerSec = steps * 1000.0 / time;
             double pairwiseOps = (long) n * (n - 1) / 2 * steps;
 
-            System.out.printf("N=%4d: %6d ms for %d steps (%.1f steps/s, %.1e interactions)%n",
-                    n, time, steps, stepsPerSec, pairwiseOps);
+            System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("benchmark.nbody.regular.result", n, time,
+                    steps, stepsPerSec, pairwiseOps));
         }
     }
 }

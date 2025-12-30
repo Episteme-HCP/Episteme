@@ -36,11 +36,34 @@ import java.util.LinkedHashMap;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class PDBLoader {
+public class PDBLoader implements org.jscience.io.InputLoader<Map<String, String>> {
 
     private static final String API_URL = "https://data.rcsb.org/rest/v1/core/entry/";
+    private static PDBLoader instance;
 
-    private PDBLoader() {
+    public PDBLoader() {
+    }
+
+    public static synchronized PDBLoader getInstance() {
+        if (instance == null)
+            instance = new PDBLoader();
+        return instance;
+    }
+
+    @Override
+    public Map<String, String> load(String resourceId) throws Exception {
+        return fetchById(resourceId);
+    }
+
+    @Override
+    public String getResourcePath() {
+        return API_URL;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<Map<String, String>> getResourceType() {
+        return (Class) Map.class;
     }
 
     /**

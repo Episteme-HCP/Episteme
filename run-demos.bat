@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-set APP_CLASS=org.jscience.ui.JScienceDemoApp
+set APP_CLASS=org.jscience.ui.JScienceDemosApp
 set LIB_DIR=launchers\lib
 set MODULE_PATH=jscience-killer-apps\target\classes;jscience-core\target\classes;jscience-natural\target\classes;jscience-social\target\classes
 

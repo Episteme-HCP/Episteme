@@ -192,7 +192,8 @@ public class CrisprDesignApp extends KillerAppBase {
 
     private void loadFasta() {
         FileChooser fc = new FileChooser();
-        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("FASTA Files", "*.fasta", "*.fa"));
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter(i18n.get("crispr.file.fasta"), "*.fasta", "*.fa"));
+
         File f = fc.showOpenDialog(null);
         if (f != null) {
             try (java.io.FileInputStream fis = new java.io.FileInputStream(f)) {

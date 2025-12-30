@@ -36,13 +36,17 @@ import java.io.IOException;
  */
 public class SimulatedSpectrometer extends SimulatedDevice implements Spectrometer {
 
-    private final SpectroscopyType type;
+    private final Spectrometer.SpectroscopyType type;
     private final double minWavelength;
     private final double maxWavelength;
     private final double resolution;
     private double integrationTime = 10.0;
 
-    public SimulatedSpectrometer(String name, SpectroscopyType type, double min, double max, double res) {
+    public SimulatedSpectrometer() {
+        this("Spectrometer", Spectrometer.SpectroscopyType.UV_VIS, 190, 1100, 0.5);
+    }
+
+    public SimulatedSpectrometer(String name, Spectrometer.SpectroscopyType type, double min, double max, double res) {
         super(name);
         this.type = type;
         this.minWavelength = min;
@@ -51,7 +55,7 @@ public class SimulatedSpectrometer extends SimulatedDevice implements Spectromet
     }
 
     @Override
-    public SpectroscopyType getType() {
+    public Spectrometer.SpectroscopyType getType() {
         return type;
     }
 

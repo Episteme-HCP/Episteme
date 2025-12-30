@@ -31,10 +31,7 @@ import org.jscience.linguistics.*;
 import org.jscience.philosophy.*;
 import org.jscience.psychology.*;
 import org.jscience.sociology.Person;
-import org.jscience.geography.Place;
-
 import java.time.LocalDate;
-import java.util.Set;
 
 public class Phase2DomainTest {
 

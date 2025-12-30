@@ -47,7 +47,26 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ObjMeshLoader {
+public class ObjMeshLoader implements org.jscience.io.InputLoader<javafx.scene.Group> {
+
+    @Override
+    public javafx.scene.Group load(String resourceId) throws IOException {
+        if (resourceId.startsWith("http") || resourceId.startsWith("file:")) {
+            return load(java.net.URI.create(resourceId).toURL());
+        }
+        return loadResource(resourceId);
+    }
+
+    @Override
+    public String getResourcePath() {
+        return "/";
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<javafx.scene.Group> getResourceType() {
+        return (Class) javafx.scene.Group.class;
+    }
 
     /**
      * Loads an OBJ model from a file.

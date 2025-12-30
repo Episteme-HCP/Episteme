@@ -26,6 +26,7 @@ package org.jscience.physics.relativity;
 import org.jscience.mathematics.linearalgebra.tensors.Tensor;
 import org.jscience.mathematics.linearalgebra.tensors.DenseTensor;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.geometry.Vector4D;
 
 /**
  * The Schwarzschild metric describing spacetime around a static, spherically

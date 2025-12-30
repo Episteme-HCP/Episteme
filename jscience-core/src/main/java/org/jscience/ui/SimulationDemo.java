@@ -74,7 +74,7 @@ public abstract class SimulationDemo extends AbstractDemo {
             panel.getChildren().add(vcrControls);
 
             // Speed control
-            Label speedLbl = new Label("Speed:");
+            Label speedLbl = new Label(I18n.getInstance().get("demo.simulation.speed", "Speed:"));
             Slider speedSlider = new Slider(0.1, 5.0, 1.0);
             speedSlider.valueProperty()
                     .addListener((obs, oldVal, newVal) -> simulatable.setSpeed(newVal.doubleValue()));

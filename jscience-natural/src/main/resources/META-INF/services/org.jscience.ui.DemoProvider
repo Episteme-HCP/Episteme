@@ -8,3 +8,4 @@ org.jscience.ui.demos.RigidBodyDemo
 org.jscience.ui.demos.MetamathDemo
 org.jscience.ui.demos.PeripheralsDemo
 org.jscience.ui.demos.SensorActuatorDemo
+org.jscience.ui.demos.DigitalLogicDemo

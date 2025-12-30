@@ -54,6 +54,6 @@ public class HumanBodyDemo implements DemoProvider {
 
     @Override
     public void show(Stage stage) {
-        HumanBodyViewer.show(stage);
+        HumanBodyViewer.launchMain(stage);
     }
 }

@@ -131,6 +131,7 @@ public class ComputeContext {
     private volatile RealPrecision realPrecision = RealPrecision.NORMAL;
     private volatile OverflowMode overflowMode = OverflowMode.SAFE;
     private volatile ComputeMode computeMode = ComputeMode.AUTO;
+    private volatile java.math.MathContext mathContext = java.math.MathContext.DECIMAL128;
 
     private ComputeContext() {
         // Providers are registered lazily
@@ -246,6 +247,15 @@ public class ComputeContext {
 
     public ComputeContext setComputeMode(ComputeMode computeMode) {
         this.computeMode = computeMode;
+        return this;
+    }
+
+    public java.math.MathContext getMathContext() {
+        return mathContext;
+    }
+
+    public ComputeContext setMathContext(java.math.MathContext mathContext) {
+        this.mathContext = mathContext;
         return this;
     }
 
@@ -422,6 +432,7 @@ public class ComputeContext {
                 "backend=" + backend +
                 ", floatPrecision=" + floatPrecision +
                 ", intPrecision=" + intPrecision +
+                ", mathContext=" + mathContext +
                 ", providers=" + providers.keySet() +
                 '}';
     }

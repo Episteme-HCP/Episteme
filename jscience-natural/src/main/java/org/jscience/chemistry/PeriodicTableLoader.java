@@ -44,9 +44,25 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class PeriodicTableLoader {
+public class PeriodicTableLoader implements org.jscience.io.InputLoader<List<Element>> {
 
-    public static List<Element> load(String resourcePath) {
+    @Override
+    public List<Element> load(String resourceId) throws Exception {
+        return loadFromResource(resourceId);
+    }
+
+    @Override
+    public String getResourcePath() {
+        return "/";
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<List<Element>> getResourceType() {
+        return (Class) List.class;
+    }
+
+    public static List<Element> loadFromResource(String resourcePath) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             InputStream is = PeriodicTableLoader.class.getResourceAsStream(resourcePath);

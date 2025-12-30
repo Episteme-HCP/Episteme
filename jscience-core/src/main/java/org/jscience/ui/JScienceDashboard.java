@@ -35,9 +35,10 @@ import org.jscience.ui.i18n.I18n;
 
 import java.io.File;
 import java.util.Locale;
-import java.lang.reflect.Modifier;
-import java.util.stream.Collectors;
-import org.jscience.ui.DashboardDiscovery;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Main Dashboard for JScience Application.
@@ -73,9 +74,6 @@ public class JScienceDashboard extends Application {
         refreshUI();
     }
 
-    /**
-     * Recreates the scene to apply locale changes dynamically.
-     */
     private void refreshUI() {
         int selectedIndex = 0;
         if (primaryStage.getScene() != null) {
@@ -87,102 +85,95 @@ public class JScienceDashboard extends Application {
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         tabPane.getTabs().clear();
 
+        I18n i18n = I18n.getInstance();
+
         tabPane.getTabs().addAll(
-                createGeneralTab(),
-                createI18nTab(),
-                createThemesTab(),
-                createComputingTab(),
-                createLibrariesTab(),
-                createLoadersTab(),
-                createAppsTab(),
-                createDevicesTab());
+                createGeneralTab(i18n),
+                createI18nTab(i18n),
+                createThemesTab(i18n),
+                createComputingTab(i18n),
+                createLibrariesTab(i18n),
+                createLoadersTab(i18n),
+                createAppsTab(i18n),
+                createDevicesTab(i18n));
+
+        tabPane.getTabs().get(0).setId("tab-general");
+        tabPane.getTabs().get(1).setId("tab-i18n");
+        tabPane.getTabs().get(2).setId("tab-themes");
+        tabPane.getTabs().get(3).setId("tab-computing");
+        tabPane.getTabs().get(4).setId("tab-libraries");
+        tabPane.getTabs().get(5).setId("tab-loaders");
+        tabPane.getTabs().get(6).setId("tab-apps");
+        tabPane.getTabs().get(7).setId("tab-devices");
+
+        tabPane.getSelectionModel().select(selectedIndex);
 
         tabPane.getSelectionModel().select(selectedIndex);
 
         StackPane root = new StackPane(tabPane);
-        Scene scene = new Scene(root, 1100, 750);
 
-        // Restore theme
-        String currentTheme = System.getProperty("jscience.theme", "Modena");
-        if ("Caspian".equalsIgnoreCase(currentTheme)) {
-            Application.setUserAgentStylesheet(Application.STYLESHEET_CASPIAN);
+        if (primaryStage.getScene() == null) {
+            Scene scene = new Scene(root, 1100, 750);
+            applyCurrentTheme(scene); // Apply to new scene
+            primaryStage.setScene(scene);
         } else {
-            Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+            Scene scene = primaryStage.getScene();
+            scene.setRoot(root);
+            applyCurrentTheme(scene); // Re-apply theme to ensure styles match
         }
 
-        primaryStage.setTitle(I18n.getInstance().get("app.title", "JScience Dashboard"));
-        primaryStage.setScene(scene);
+        primaryStage.setTitle(i18n.get("app.title", "JScience Dashboard"));
+        // primaryStage.setScene(scene); // Removed as setScene/setRoot handled above
         primaryStage.show();
     }
 
-    private Tab createGeneralTab() {
+    private void applyCurrentTheme(Scene scene) {
+        String currentTheme = System.getProperty("jscience.theme", "Modena");
+        scene.getStylesheets().clear();
+
+        if ("Caspian".equalsIgnoreCase(currentTheme)) {
+            Application.setUserAgentStylesheet(Application.STYLESHEET_CASPIAN);
+        } else if ("HighContrast".equalsIgnoreCase(currentTheme)) {
+            Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+            scene.getStylesheets().add(getClass().getResource("/org/jscience/ui/high-contrast.css").toExternalForm());
+        } else {
+            Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+        }
+    }
+
+    private Tab createGeneralTab(I18n i18n) {
         VBox content = new VBox(25);
         content.setPadding(new Insets(40));
         content.setAlignment(Pos.CENTER);
 
         // --- ATOM GRAPHIC ---
-        // Programmatic Atom Icon (Nucleus + Electrons)
         StackPane atomIcon = new StackPane();
-
-        // Nucleus
         javafx.scene.shape.Circle nucleus = new javafx.scene.shape.Circle(15, javafx.scene.paint.Color.ORANGERED);
         nucleus.setEffect(new javafx.scene.effect.DropShadow(10, javafx.scene.paint.Color.ORANGERED));
 
-        // Orbits (Ellipses)
-        javafx.scene.shape.Ellipse orbit1 = new javafx.scene.shape.Ellipse(60, 20);
-        orbit1.setFill(null);
-        orbit1.setStroke(javafx.scene.paint.Color.LIGHTBLUE);
-        orbit1.setStrokeWidth(2);
-        orbit1.setRotate(0);
-
-        javafx.scene.shape.Ellipse orbit2 = new javafx.scene.shape.Ellipse(60, 20);
-        orbit2.setFill(null);
-        orbit2.setStroke(javafx.scene.paint.Color.LIGHTBLUE);
-        orbit2.setStrokeWidth(2);
-        orbit2.setRotate(60);
-
-        javafx.scene.shape.Ellipse orbit3 = new javafx.scene.shape.Ellipse(60, 20);
-        orbit3.setFill(null);
-        orbit3.setStroke(javafx.scene.paint.Color.LIGHTBLUE);
-        orbit3.setStrokeWidth(2);
-        orbit3.setRotate(120);
-
-        // Electrons (Small circles on orbits - static for now, animations could be
-        // added)
-        javafx.scene.shape.Circle electron1 = new javafx.scene.shape.Circle(4, javafx.scene.paint.Color.CYAN);
-        electron1.setTranslateX(60); // On orbit 1
-
-        javafx.scene.shape.Circle electron2 = new javafx.scene.shape.Circle(4, javafx.scene.paint.Color.CYAN);
-        electron2.setTranslateX(30);
-        electron2.setTranslateY(52); // Approx on orbit 2
-
-        javafx.scene.shape.Circle electron3 = new javafx.scene.shape.Circle(4, javafx.scene.paint.Color.CYAN);
-        electron3.setTranslateX(-30);
-        electron3.setTranslateY(52); // Approx on orbit 3
-
-        atomIcon.getChildren().addAll(orbit1, orbit2, orbit3, electron1, electron2, electron3, nucleus);
+        atomIcon.getChildren().addAll(createOrbit(60, 20, 0), createOrbit(60, 20, 60), createOrbit(60, 20, 120),
+                nucleus);
 
         // --- TITLE ---
-        Label title = new Label("JScience Dashboard");
-        title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #333333;");
-        if (Application.getUserAgentStylesheet() != null && Application.getUserAgentStylesheet().contains("caspian")) {
-            title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: white;");
-        }
+        Label title = new Label(i18n.get("dashboard.general.title", "JScience Dashboard"));
+        title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
 
-        Label subtitle = new Label("Universal Scientific Computing Environment");
+        Label subtitle = new Label(
+                i18n.get("dashboard.general.subtitle", "Universal Scientific Computing Environment"));
         subtitle.setStyle("-fx-font-size: 16px; -fx-text-fill: gray;");
 
-        // --- VERSION INFO ---
         GridPane infoGrid = new GridUtils.Builder()
-                .addRow("Version:", org.jscience.JScienceVersion.VERSION)
-                .addRow("Build Date:", org.jscience.JScienceVersion.BUILD_DATE)
-                .addRow("Java Version:", System.getProperty("java.version"))
+                .addRow(i18n.get("dashboard.general.version", "Version") + ":", org.jscience.JScienceVersion.VERSION)
+                .addRow(i18n.get("dashboard.general.build", "Build Date") + ":",
+                        org.jscience.JScienceVersion.BUILD_DATE)
+                .addRow(i18n.get("dashboard.general.java", "Java Version") + ":", System.getProperty("java.version"))
                 .build();
+        infoGrid.setAlignment(Pos.CENTER);
 
         // --- AUTHORS ---
         VBox authorsBox = new VBox(5);
         authorsBox.setAlignment(Pos.CENTER);
-        Label authorsHeader = new Label("Authors");
+        Label authorsHeader = new Label(i18n.get("dashboard.general.authors", "Authors"));
         authorsHeader.setStyle("-fx-font-weight: bold; -fx-underline: true;");
         authorsBox.getChildren().add(authorsHeader);
 
@@ -191,10 +182,18 @@ public class JScienceDashboard extends Application {
         }
 
         content.getChildren().addAll(atomIcon, title, subtitle, new Separator(), infoGrid, new Separator(), authorsBox);
-        return new Tab(I18n.getInstance().get("dashboard.tab.general", "General"), content);
+        return new Tab(i18n.get("dashboard.tab.general", "General"), content);
     }
 
-    // Helper to build grids quickly
+    private javafx.scene.Node createOrbit(double rx, double ry, double rotate) {
+        javafx.scene.shape.Ellipse orbit = new javafx.scene.shape.Ellipse(rx, ry);
+        orbit.setFill(null);
+        orbit.setStroke(javafx.scene.paint.Color.LIGHTBLUE);
+        orbit.setStrokeWidth(2);
+        orbit.setRotate(rotate);
+        return orbit;
+    }
+
     private static class GridUtils {
         static class Builder {
             GridPane grid = new GridPane();
@@ -219,27 +218,52 @@ public class JScienceDashboard extends Application {
         }
     }
 
-    private Tab createI18nTab() {
+    private Tab createI18nTab(I18n i18n) {
         VBox content = new VBox(20);
         content.setPadding(new Insets(20));
-        content.setAlignment(Pos.CENTER);
+        content.setAlignment(Pos.TOP_LEFT);
 
-        Label header = new Label(I18n.getInstance().get("dashboard.i18n.select", "Language Selection"));
-        header.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
+        Label header = new Label(i18n.get("dashboard.i18n.header", "Language Selection"));
+        header.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
 
         ListView<LocaleItem> langList = new ListView<>();
-        langList.getItems().addAll(
-                new LocaleItem("English", Locale.ENGLISH),
-                new LocaleItem("Français", Locale.FRENCH),
-                new LocaleItem("Deutsch", Locale.GERMAN),
-                new LocaleItem("Español", Locale.of("es")),
-                new LocaleItem("中文", Locale.of("zh")));
 
-        langList.setMaxHeight(200);
-        langList.setMaxWidth(300);
+        // Dynamic discovery of languages
+        List<LocaleItem> items = new ArrayList<>();
+        // Default languages
+        items.add(new LocaleItem(i18n.get("dashboard.lang.en", "English"), Locale.ENGLISH));
 
-        // Select current
-        Locale current = I18n.getInstance().getLocale();
+        List<String> resources = DashboardDiscovery.getInstance().findResources("messages_core_");
+        for (String res : resources) {
+            try {
+                // messages_core_fr.properties -> fr
+                String filename = new File(res).getName();
+                String code = filename.substring("messages_core_".length(), filename.indexOf('.'));
+                Locale loc = Locale.of(code);
+                String displayName = loc.getDisplayLanguage(loc);
+                // Capitalize first letter
+                if (displayName.length() > 0)
+                    displayName = displayName.substring(0, 1).toUpperCase() + displayName.substring(1);
+
+                boolean exists = false;
+                for (LocaleItem item : items) {
+                    if (item.locale.getLanguage().equals(loc.getLanguage()))
+                        exists = true;
+                }
+
+                if (!exists) {
+                    items.add(new LocaleItem(displayName + " (" + code + ")", loc));
+                }
+            } catch (Exception e) {
+                // ignore invalid filenames
+            }
+        }
+
+        langList.getItems().addAll(items);
+        langList.setMaxHeight(250);
+        langList.setMaxWidth(350);
+
+        Locale current = i18n.getLocale();
         for (LocaleItem item : langList.getItems()) {
             if (item.locale.getLanguage().equals(current.getLanguage())) {
                 langList.getSelectionModel().select(item);
@@ -247,242 +271,605 @@ public class JScienceDashboard extends Application {
             }
         }
 
-        // Apply on selection
         langList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && !newVal.locale.equals(current)) {
-                I18n.getInstance().setLocale(newVal.locale);
+                i18n.setLocale(newVal.locale);
                 refreshUI();
             }
         });
 
+        langList.setId("lang-list");
         content.getChildren().addAll(header, langList);
-        return new Tab(I18n.getInstance().get("dashboard.tab.i18n", "Language"), content);
+        return new Tab(i18n.get("dashboard.tab.i18n", "Languages"), content);
     }
 
-    private Tab createThemesTab() {
+    private Tab createComputingTab(I18n i18n) {
         VBox content = new VBox(20);
         content.setPadding(new Insets(20));
 
-        Label header = new Label("Theme Selection");
-        header.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
-
-        ListView<String> themeList = new ListView<>();
-        themeList.getItems().addAll("Light (Modena)", "Dark (Caspian)", "High Contrast");
-        themeList.setMaxHeight(150);
-        themeList.setMaxWidth(300);
-
-        themeList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                if (newVal.contains("Modena")) {
-                    System.setProperty("jscience.theme", "Modena");
-                    Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
-                } else if (newVal.contains("Caspian")) {
-                    System.setProperty("jscience.theme", "Caspian");
-                    Application.setUserAgentStylesheet(Application.STYLESHEET_CASPIAN);
-                }
-                // High contrast logic could go here
-            }
-        });
-
-        VBox box = new VBox(10);
-        box.setAlignment(Pos.CENTER);
-        box.getChildren().addAll(themeList);
-
-        content.getChildren().addAll(header, box);
-        return new Tab(I18n.getInstance().get("dashboard.tab.themes", "Themes"), content);
-    }
-
-    private Tab createComputingTab() {
-        // ... (Keep existing simple)
-        VBox content = new VBox(15);
-        content.setPadding(new Insets(20));
-
-        Label header = new Label(I18n.getInstance().get("dashboard.computing.header", "Computing Context"));
-        header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        Label header = new Label(i18n.get("dashboard.computing.header", "Computing Management"));
+        header.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
 
         GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
+        grid.setHgap(30);
+        grid.setVgap(25);
 
-        grid.addRow(0, new Label(I18n.getInstance().get("dashboard.computing.mode", "Compute Mode:")),
-                new Label(JScience.getComputeMode().toString()));
-        grid.addRow(1, new Label(I18n.getInstance().get("dashboard.computing.gpu", "GPU Available:")),
-                new Label(JScience.isGpuAvailable() ? "Yes" : "No"));
+        // --- Compute Mode ---
+        ComboBox<org.jscience.mathematics.context.ComputeMode> modeBox = new ComboBox<>();
+        modeBox.getItems().addAll(org.jscience.mathematics.context.ComputeMode.values());
+        modeBox.setValue(JScience.getComputeMode());
+        modeBox.setOnAction(e -> {
+            JScience.setComputeMode(modeBox.getValue());
+            JScience.savePreferences();
+        });
+        VBox modeInfo = createInfoBox(i18n.get("dashboard.computing.mode", "Mode de calcul"),
+                i18n.get("dashboard.computing.desc.mode",
+                        "AUTO préfère le GPU, sinon utilise le CPU si indisponible."));
+
+        // --- Float Precision ---
+        ComboBox<org.jscience.ComputeContext.FloatPrecision> floatBox = new ComboBox<>();
+        floatBox.getItems().addAll(org.jscience.ComputeContext.FloatPrecision.values());
+        floatBox.setValue(JScience.getFloatPrecisionMode());
+        floatBox.setOnAction(e -> {
+            if (floatBox.getValue() == org.jscience.ComputeContext.FloatPrecision.FLOAT)
+                JScience.setFloatPrecision();
+            else
+                JScience.setDoublePrecision();
+            JScience.savePreferences();
+        });
+        VBox floatInfo = createInfoBox(i18n.get("dashboard.computing.float_precision", "Float Precision"),
+                i18n.get("dashboard.computing.desc.precision", "FLOAT (32-bit) / DOUBLE (64-bit)"));
+
+        // --- Integer Precision ---
+        ComboBox<org.jscience.ComputeContext.IntPrecision> intBox = new ComboBox<>();
+        intBox.getItems().addAll(org.jscience.ComputeContext.IntPrecision.values());
+        intBox.setValue(JScience.getIntPrecisionMode());
+        intBox.setOnAction(e -> {
+            if (intBox.getValue() == org.jscience.ComputeContext.IntPrecision.INT)
+                JScience.setIntPrecision();
+            else
+                JScience.setLongPrecision();
+            JScience.savePreferences();
+        });
+        VBox intInfo = createInfoBox(i18n.get("dashboard.computing.int_precision", "Integer Precision"),
+                "INT (32-bit) vs LONG (64-bit)");
+
+        // --- MathContext Precision ---
+        Spinner<Integer> precSpinner = new Spinner<>(0, 10000, JScience.getMathContext().getPrecision());
+        precSpinner.setEditable(true);
+        precSpinner.setPrefWidth(150);
+        precSpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                java.math.MathContext old = JScience.getMathContext();
+                JScience.setMathContext(new java.math.MathContext(newVal, old.getRoundingMode()));
+                JScience.savePreferences();
+            }
+        });
+        VBox precInfo = createInfoBox(i18n.get("dashboard.computing.precision", "Précision décimale"),
+                i18n.get("dashboard.computing.desc.precision_digits", "Chiffres (0 = Illimité)"));
+
+        // --- MathContext Rounding ---
+        ComboBox<java.math.RoundingMode> roundBox = new ComboBox<>();
+        roundBox.getItems().addAll(java.math.RoundingMode.values());
+        roundBox.setValue(JScience.getMathContext().getRoundingMode());
+        roundBox.setPrefWidth(150);
+        roundBox.setOnAction(e -> {
+            java.math.MathContext old = JScience.getMathContext();
+            JScience.setMathContext(new java.math.MathContext(old.getPrecision(), roundBox.getValue()));
+            JScience.savePreferences();
+        });
+        VBox roundInfo = createInfoBox(i18n.get("dashboard.computing.rounding", "Mode d'arrondi"),
+                i18n.get("dashboard.computing.desc.rounding", "Stratégie d'arrondi"));
+
+        Label gpuVal = new Label(JScience.isGpuAvailable() ? i18n.get("dashboard.libraries.available", "Available")
+                : i18n.get("dashboard.libraries.not_available", "Not Available"));
+        gpuVal.setStyle(JScience.isGpuAvailable() ? "-fx-text-fill: #27ae60; -fx-font-weight: bold;"
+                : "-fx-text-fill: #c0392b;");
+
+        grid.addRow(0, createHeaderLabel(i18n.get("dashboard.computing.mode", "Compute Mode")), modeBox, modeInfo);
+        grid.addRow(1, createHeaderLabel(i18n.get("dashboard.computing.float_precision", "Float Precision")), floatBox,
+                floatInfo);
+        grid.addRow(2, createHeaderLabel(i18n.get("dashboard.computing.int_precision", "Integer Precision")), intBox,
+                intInfo);
+        grid.addRow(3, createHeaderLabel(i18n.get("dashboard.computing.gpu", "GPU Support")), gpuVal);
+        grid.addRow(4, createHeaderLabel(i18n.get("dashboard.computing.precision", "Decimal Precision")), precSpinner,
+                precInfo);
+        grid.addRow(5, createHeaderLabel(i18n.get("dashboard.computing.rounding", "Rounding Mode")), roundBox,
+                roundInfo);
 
         content.getChildren().addAll(header, grid);
-        return new Tab(I18n.getInstance().get("dashboard.tab.computing", "Computing"), content);
+        return new Tab(i18n.get("dashboard.tab.computing", "Computing"), content);
     }
 
-    private Tab createAppsTab() {
+    private VBox createInfoBox(String title, String tooltipText) {
+        VBox box = new VBox();
+        Label help = new Label("(?)");
+        help.setTooltip(new Tooltip(tooltipText));
+        help.setStyle("-fx-text-fill: blue; -fx-cursor: hand;");
+        Label text = new Label(tooltipText);
+        text.setStyle("-fx-font-size: 10px; -fx-text-fill: #666;");
+        box.getChildren().add(text);
+        return box;
+    }
+
+    private Tab createLibrariesTab(I18n i18n) {
+        VBox content = new VBox(20);
+        content.setPadding(new Insets(20));
+
+        ScrollPane scroll = new ScrollPane(content);
+        scroll.setFitToWidth(true);
+        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+
+        Label headerTitle = new Label(i18n.get("dashboard.libraries.header", "Available Libraries & Status"));
+        headerTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
+        content.getChildren().add(headerTitle);
+
+        // --- HELP SECTION ---
+        Label helpText = new Label(i18n.get("dashboard.libraries.explain.text",
+                "Ces bibliothèques sont listées pour les raisons suivantes :\n" +
+                        "1. Elles sont nécessaires au fonctionnement de JScience\n" +
+                        "2. Elles offrent des fonctionnalités étendues (GPU, Formats, etc.)"));
+        helpText.setStyle("-fx-text-fill: black;");
+        helpText.setWrapText(true);
+        content.getChildren().add(helpText);
+
+        // --- STANDARDS ---
+        content.getChildren().add(createLibCategory(i18n, "standards", List.of(
+                new LibInfo("jsr385", true),
+                new LibInfo("indriya", isClassAvailable("tech.units.indriya.format.SimpleUnitFormat"))), i18n));
+
+        // --- MATH ENGINES ---
+        content.getChildren().add(createLibCategory(i18n, "math", List.of(
+                new LibInfo("commonsmath", isClassAvailable("org.apache.commons.math3.util.Precision")),
+                new LibInfo("ejml", isClassAvailable("org.ejml.EjmlParameters")),
+                new LibInfo("colt", isClassAvailable("cern.colt.Version")),
+                new LibInfo("jblas", isClassAvailable("org.jblas.NativeBlas")),
+                new LibInfo("jsci_core", true)), i18n));
+
+        // --- HARDWARE ACCELERATION ---
+        content.getChildren().add(createLibCategory(i18n, "hardware", List.of(
+                new LibInfo("jcuda", JScience.isCudaAvailable()),
+                new LibInfo("jocl", JScience.isOpenCLAvailable()),
+                new LibInfo("nd4j", JScience.isND4JAvailable())), i18n));
+
+        // --- VISUALIZATION ---
+        content.getChildren().add(createLibCategory(i18n, "vis", List.of(
+                new LibInfo("jfreechart", isClassAvailable("org.jfree.chart.JFreeChart")),
+                new LibInfo("javafx", isClassAvailable("javafx.application.Application"))), i18n));
+
+        // --- INFRASTRUCTURE ---
+        content.getChildren().add(createLibCategory(i18n, "framework", List.of(
+                new LibInfo("javalin", isClassAvailable("io.javalin.Javalin")),
+                new LibInfo("jackson", isClassAvailable("com.fasterxml.jackson.databind.ObjectMapper")),
+                new LibInfo("slf4j", isClassAvailable("org.slf4j.LoggerFactory")),
+                new LibInfo("grpc", isClassAvailable("io.grpc.ManagedChannel"))), i18n));
+
+        return new Tab(i18n.get("dashboard.tab.libraries", "Libraries"), scroll);
+    }
+
+    private static class LibInfo {
+        final String key;
+        final boolean available;
+
+        LibInfo(String key, boolean available) {
+            this.key = key;
+            this.available = available;
+        }
+    }
+
+    private VBox createLibCategory(I18n i18n, String catKey, List<LibInfo> libs, I18n i18nRef) {
+        VBox box = new VBox(12);
+        Label header = new Label(i18n.get("dashboard.libraries.cat." + catKey, catKey));
+        header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: black;");
+
+        Label desc = new Label(i18n.get("dashboard.libraries.cat." + catKey + ".desc", ""));
+        desc.setStyle("-fx-text-fill: #555; -fx-font-style: italic;");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(35);
+        grid.setVgap(12);
+        int r = 0;
+        for (LibInfo lib : libs) {
+            addLibRow(grid, r++, lib.key, lib.available, "", i18n);
+        }
+
+        box.getChildren().addAll(header, desc, grid, new Separator());
+        return box;
+    }
+
+    private void addLibRow(GridPane grid, int row, String nameKey, boolean available, String descKey, I18n i18n) {
+        String name = i18n.get("lib." + nameKey + ".name", nameKey);
+        String desc = i18n.get("lib." + nameKey + ".desc", descKey);
+
+        Label nameLabel = new Label(name);
+        nameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1a1a1a;");
+
+        Label descLabel = new Label(desc);
+        descLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #444;");
+        descLabel.setWrapText(true);
+        descLabel.setMaxWidth(500);
+
+        Label statusLabel = new Label(available ? i18n.get("dashboard.libraries.available", "Available")
+                : i18n.get("dashboard.libraries.not_available", "Not Available"));
+        statusLabel.setStyle("-fx-text-fill: " + (available ? "#27ae60" : "#c0392b") + "; -fx-font-weight: bold;");
+
+        grid.addRow(row, nameLabel, statusLabel, descLabel);
+    }
+
+    private Tab createLoadersTab(I18n i18n) {
+        VBox content = new VBox(20);
+        content.setPadding(new Insets(20));
+
+        Label header = new Label(i18n.get("dashboard.loaders.header", "Known Data Loaders & Formats"));
+        header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+        Label hint = new Label("Recherche des chargeurs...");
+        hint.setStyle("-fx-font-style: italic; -fx-text-fill: #777;");
+
+        Accordion accordion = new Accordion();
+        // VBox.setVgrow(accordion, Priority.ALWAYS); // Removed to prevent empty space
+        // at bottom
+
+        // Discover loaders dynamically
+        List<DashboardDiscovery.ClassInfo> loaders = DashboardDiscovery.getInstance().findClasses("Loader");
+
+        // Group by package/domain
+        Map<String, List<DashboardDiscovery.ClassInfo>> grouped = new LinkedHashMap<>();
+        for (DashboardDiscovery.ClassInfo info : loaders) {
+            String category = getCategoryFromPackage(info.fullName);
+            grouped.computeIfAbsent(category, k -> new ArrayList<>()).add(info);
+        }
+
+        for (Map.Entry<String, List<DashboardDiscovery.ClassInfo>> entry : grouped.entrySet()) {
+            List<AppEntry> entries = new ArrayList<>();
+            for (DashboardDiscovery.ClassInfo info : entry.getValue()) {
+                String pkg = "";
+                int lastDot = info.fullName.lastIndexOf('.');
+                if (lastDot > 0)
+                    pkg = info.fullName.substring(0, lastDot);
+                entries.add(new AppEntry(info.simpleName, info.fullName, pkg));
+            }
+            // Loaders are not launchable (false)
+            // Use static VBox list to avoid empty space issues
+            TitledPane pane = new TitledPane(entry.getKey() + " (" + entries.size() + ")",
+                    createStaticEntryList(entries));
+            accordion.getPanes().add(pane);
+        }
+
+        if (!accordion.getPanes().isEmpty()) {
+            accordion.setExpandedPane(accordion.getPanes().get(0));
+        }
+
+        hint.setText(loaders.size() + " chargeurs trouvés");
+
+        content.getChildren().addAll(header, hint, accordion);
+        return new Tab(i18n.get("dashboard.tab.loaders", "Loaders"), content);
+    }
+
+    private String getCategoryFromPackage(String fullName) {
+        if (fullName.contains(".geography.") || fullName.contains(".earth."))
+            return "Geography & Earth";
+        if (fullName.contains(".physics.") || fullName.contains(".astronomy."))
+            return "Astronomy & Physics";
+        if (fullName.contains(".biology."))
+            return "Biology & Biochemistry";
+        if (fullName.contains(".chemistry."))
+            return "Chemistry";
+        if (fullName.contains(".economics.") || fullName.contains(".history."))
+            return "Social Sciences";
+        if (fullName.contains(".device.") || fullName.contains(".nmea"))
+            return "Devices & Sensors";
+        if (fullName.contains(".mathematics.") || fullName.contains(".io."))
+            return "Core & Mathematics";
+        if (fullName.contains(".engineering."))
+            return "Engineering";
+        return "Other";
+    }
+
+    private Label createHeaderLabel(String text) {
+        Label l = new Label(text + ":");
+        l.setStyle("-fx-font-weight: bold;");
+        return l;
+    }
+
+    private boolean isClassAvailable(String className) {
+        try {
+            Class.forName(className);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    private Tab createThemesTab(I18n i18n) {
+        VBox content = new VBox(20);
+        content.setPadding(new Insets(20));
+        content.setAlignment(Pos.TOP_LEFT);
+
+        Label header = new Label(i18n.get("dashboard.themes.header", "Visual Theme Selection"));
+        header.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
+
+        VBox themeSelector = new VBox(10);
+        Label comboLabel = new Label(i18n.get("dashboard.themes.select", "Choose Interface Style:"));
+        comboLabel.setStyle("-fx-font-weight: bold;");
+
+        ComboBox<String> themeCombo = new ComboBox<>();
+        themeCombo.getItems().addAll("Modena", "Caspian", "High Contrast");
+        String currentTheme = System.getProperty("jscience.theme", "Modena");
+        if ("HighContrast".equals(currentTheme))
+            currentTheme = "High Contrast";
+        themeCombo.setValue(currentTheme);
+        themeCombo.setPrefWidth(250);
+
+        themeCombo.setOnAction(e -> {
+            String selected = themeCombo.getValue().replace(" ", "");
+            applyDashboardTheme(selected);
+        });
+
+        themeSelector.getChildren().addAll(comboLabel, themeCombo);
+
+        VBox previewBox = new VBox(15);
+        previewBox.setPadding(new Insets(20));
+        previewBox.setStyle("-fx-border-color: #ddd; -fx-border-radius: 5; -fx-background-color: #fdfdfd;");
+        previewBox.getChildren().addAll(
+                new Label("Theme Preview Components:"),
+                new Button("Sample Button"),
+                new CheckBox("Sample CheckBox"),
+                new ProgressBar(0.6));
+
+        content.getChildren().addAll(header, themeSelector, previewBox);
+        return new Tab(i18n.get("dashboard.tab.themes", "Themes"), content);
+    }
+
+    private void applyDashboardTheme(String theme) {
+        System.setProperty("jscience.theme", theme);
+        refreshUI();
+    }
+
+    private Tab createAppsTab(I18n i18n) {
         VBox content = new VBox(15);
         content.setPadding(new Insets(20));
 
-        Label header = new Label(
-                I18n.getInstance().get("dashboard.apps.header", "Applications & Ecosystem (Discovered)"));
+        Label header = new Label(i18n.get("dashboard.apps.header", "Applications, Demos & Viewers"));
         header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+        Label hint = new Label("Discovering from classpath...");
+        hint.setStyle("-fx-font-style: italic; -fx-text-fill: #777;");
 
         Accordion accordion = new Accordion();
 
+        // Compute all available apps/demos
         DashboardDiscovery discovery = DashboardDiscovery.getInstance();
+        List<DashboardDiscovery.ClassInfo> rawApps = discovery.findClasses("Demo");
+        rawApps.addAll(discovery.findClasses("Viewer"));
 
-        // 1. Applications
-        TitledPane appsPane = new TitledPane("Applications", createAppList(discovery.findClasses("App")));
+        // Deduplicate by full name
+        List<DashboardDiscovery.ClassInfo> allApps = new ArrayList<>();
+        java.util.Set<String> seen = new java.util.HashSet<>();
+        for (DashboardDiscovery.ClassInfo info : rawApps) {
+            if (seen.add(info.fullName)) {
+                allApps.add(info);
+            }
+        }
 
-        // 2. Demos
-        TitledPane demosPane = new TitledPane("Interactive Demos", createAppList(discovery.findClasses("Demo")));
+        // Categorize discovered apps
+        List<AppEntry> apps = new ArrayList<>();
+        List<AppEntry> demos = new ArrayList<>();
+        List<AppEntry> viewers = new ArrayList<>();
+        List<AppEntry> others = new ArrayList<>();
 
-        // 3. Viewers
-        TitledPane viewersPane = new TitledPane("Viewers & Explorers", createAppList(discovery.findClasses("Viewer")));
+        for (DashboardDiscovery.ClassInfo info : allApps) {
+            String desc = getAppDescription(info.fullName);
+            AppEntry entry = new AppEntry(info.simpleName, info.fullName, desc);
+
+            if (info.simpleName.endsWith("Viewer") || info.fullName.contains(".viewers.")) {
+                viewers.add(entry);
+            } else if (info.simpleName.endsWith("Demo") || info.fullName.contains(".demos.")) {
+                demos.add(entry);
+            } else if (info.simpleName.endsWith("App") || info.fullName.contains(".apps.")) {
+                apps.add(entry);
+            } else {
+                others.add(entry);
+            }
+        }
+
+        // Create panes
+        TitledPane appsPane = new TitledPane(
+                i18n.get("dashboard.apps.category.apps", "Scientific Applications") + " (" + apps.size() + ")",
+                createAppList(true, apps.toArray(new AppEntry[0])));
+        TitledPane demosPane = new TitledPane(
+                i18n.get("dashboard.apps.category.demos", "Interactive Demos") + " (" + demos.size() + ")",
+                createAppList(true, demos.toArray(new AppEntry[0])));
+        TitledPane viewersPane = new TitledPane(
+                i18n.get("dashboard.apps.category.viewers", "Data Viewers & Tools") + " (" + viewers.size() + ")",
+                createAppList(true, viewers.toArray(new AppEntry[0])));
 
         accordion.getPanes().addAll(appsPane, demosPane, viewersPane);
-        appsPane.setExpanded(true);
 
-        content.getChildren().addAll(header, accordion);
-        return new Tab(I18n.getInstance().get("dashboard.tab.apps", "Apps"), content);
+        if (!others.isEmpty()) {
+            TitledPane othersPane = new TitledPane("Autres / Others (" + others.size() + ")",
+                    createAppList(true, others.toArray(new AppEntry[0])));
+            accordion.getPanes().add(othersPane);
+        }
+
+        if (!apps.isEmpty())
+            appsPane.setExpanded(true);
+        else if (!demos.isEmpty())
+            demosPane.setExpanded(true);
+        else if (!viewers.isEmpty())
+            viewersPane.setExpanded(true);
+
+        hint.setText("Discovered " + allApps.size() + " apps/demos/viewers");
+
+        content.getChildren().addAll(header, hint, accordion);
+        VBox.setVgrow(accordion, Priority.ALWAYS);
+        return new Tab(i18n.get("dashboard.tab.apps", "Apps"), content);
     }
 
-    private ListView<DashboardDiscovery.ClassInfo> createAppList(java.util.List<DashboardDiscovery.ClassInfo> entries) {
-        ListView<DashboardDiscovery.ClassInfo> list = new ListView<>();
-        list.getItems().addAll(entries);
+    private String getAppDescription(String className) {
+        try {
+            Class<?> cls = Class.forName(className);
+            if (DemoProvider.class.isAssignableFrom(cls)) {
+                DemoProvider dp = (DemoProvider) cls.getDeclaredConstructor().newInstance();
+                return dp.getDescription();
+            }
+        } catch (Exception e) {
+            // Ignore
+        }
+        // Fallback: derive from package
+        if (className.contains(".physics."))
+            return "Physics simulation";
+        if (className.contains(".biology."))
+            return "Biology simulation";
+        if (className.contains(".chemistry."))
+            return "Chemistry visualization";
+        if (className.contains(".astronomy."))
+            return "Astronomy tool";
+        if (className.contains(".mathematics."))
+            return "Mathematics tool";
+        if (className.contains(".engineering."))
+            return "Engineering simulation";
+        if (className.contains(".sociology.") || className.contains(".economics."))
+            return "Social science";
+        return "JScience application";
+    }
+
+    private VBox createStaticEntryList(List<AppEntry> entries) {
+        VBox container = new VBox(0);
+        container.setPadding(new Insets(2));
+        for (AppEntry item : entries) {
+            VBox box = new VBox(2);
+            box.setPadding(new Insets(5, 10, 5, 10));
+            Label name = new Label(item.name);
+            name.setStyle("-fx-font-weight: bold;");
+            Label desc = new Label(item.description);
+            desc.setStyle("-fx-font-size: 0.9em; -fx-text-fill: gray;");
+            box.getChildren().addAll(name, desc);
+            container.getChildren().add(box);
+            // Optional: Separator (if desired, like ListView cells)
+            if (entries.indexOf(item) < entries.size() - 1) {
+                // Separator sep = new Separator();
+                // container.getChildren().add(sep);
+            }
+        }
+        return container;
+    }
+
+    private ListView<AppEntry> createAppList(boolean enableLaunch, AppEntry... entries) {
+        ListView<AppEntry> list = new ListView<>();
+        for (AppEntry entry : entries)
+            list.getItems().add(entry);
 
         list.setCellFactory(param -> new ListCell<>() {
             @Override
-            protected void updateItem(DashboardDiscovery.ClassInfo item, boolean empty) {
+            protected void updateItem(AppEntry item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText(null);
                     setGraphic(null);
                 } else {
                     VBox box = new VBox(2);
-                    Label name = new Label(item.simpleName);
+                    Label name = new Label(item.name);
                     name.setStyle("-fx-font-weight: bold;");
-                    Label desc = new Label(item.fullName);
-                    desc.setStyle("-fx-font-size: 0.8em; -fx-text-fill: gray;");
+                    Label desc = new Label(item.description);
+                    desc.setStyle("-fx-font-size: 0.9em; -fx-text-fill: gray;");
                     box.getChildren().addAll(name, desc);
                     setGraphic(box);
                 }
             }
         });
 
-        list.setOnMouseClicked(e -> {
-            if (e.getClickCount() == 2) {
-                DashboardDiscovery.ClassInfo selected = list.getSelectionModel().getSelectedItem();
-                if (selected != null)
-                    launchApp(selected.fullName);
-            }
-        });
+        if (enableLaunch) {
+            list.setOnMouseClicked(e -> {
+                if (e.getClickCount() == 2) {
+                    AppEntry selected = list.getSelectionModel().getSelectedItem();
+                    if (selected != null)
+                        launchApp(selected.className);
+                }
+            });
+        }
 
         return list;
     }
 
+    private static class AppEntry {
+        String name;
+        String className;
+        String description;
+
+        AppEntry(String n, String c, String d) {
+            this.name = n;
+            this.className = c;
+            this.description = d;
+        }
+    }
+
     private void launchApp(String className) {
         try {
-            String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
-            String classpath = System.getProperty("java.class.path");
-
-            // Collect current JVM arguments (includes -D, -X, --module-path, --add-modules,
-            // etc.)
-            java.util.List<String> vmArgs = java.lang.management.ManagementFactory.getRuntimeMXBean()
-                    .getInputArguments();
-
-            java.util.List<String> command = new java.util.ArrayList<>();
-            command.add(javaBin);
-            command.addAll(vmArgs); // Propagate all VM args
-            command.add("-cp");
-            command.add(classpath);
-            command.add("org.jscience.ui.AppLauncher");
-            command.add(className);
-
-            ProcessBuilder pb = new ProcessBuilder(command);
-            pb.inheritIO();
-            pb.start();
-
-        } catch (Exception e) {
-            new Alert(Alert.AlertType.ERROR, "Could not launch app: " + className + "\n" + e.getMessage()).show();
-        }
-    }
-
-    private Tab createLibrariesTab() {
-        VBox content = new VBox(15);
-        content.setPadding(new Insets(20));
-
-        Label header = new Label(I18n.getInstance().get("dashboard.libraries.header", "Loaded Libraries & Providers"));
-        header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-
-        TextArea libInfo = new TextArea();
-        libInfo.setEditable(false);
-        libInfo.setPrefHeight(400);
-        libInfo.setStyle("-fx-font-family: 'Consolas', 'Monospace';");
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== JScience Runtime Properties ===\n");
-        // Inspect JScience class reflectively
-        try {
-            Class<?> cls = Class.forName("org.jscience.JScience");
-            java.lang.reflect.Method[] methods = cls.getMethods();
-            for (java.lang.reflect.Method m : methods) {
-                if (Modifier.isStatic(m.getModifiers()) && m.getName().startsWith("get")
-                        && m.getParameterCount() == 0 && !m.getName().equals("getClass")) {
-                    Object val = m.invoke(null);
-                    sb.append(m.getName().substring(3)).append(": ").append(val).append("\n");
-                }
-                // Check for "is" methods too like isGpuAvailable
-                if (Modifier.isStatic(m.getModifiers()) && m.getName().startsWith("is")
-                        && m.getParameterCount() == 0) {
-                    Object val = m.invoke(null);
-                    sb.append(m.getName()).append(": ").append(val).append("\n");
-                }
+            Class<?> cls = Class.forName(className);
+            if (Application.class.isAssignableFrom(cls)) {
+                // Launch in new Stage
+                Stage stage = new Stage();
+                Application app = (Application) cls.getDeclaredConstructor().newInstance();
+                app.start(stage);
             }
         } catch (Exception e) {
-            sb.append("Error inspecting JScience properties: ").append(e.getMessage()).append("\n");
+            new Alert(Alert.AlertType.ERROR, "Failed to launch app: " + e.getMessage()).show();
+            e.printStackTrace();
         }
-
-        libInfo.setText(sb.toString());
-        content.getChildren().addAll(header, libInfo);
-        return new Tab(I18n.getInstance().get("dashboard.tab.libraries", "Libraries"), content);
     }
 
-    private Tab createDevicesTab() {
+    private Tab createDevicesTab(I18n i18n) {
         VBox content = new VBox(15);
         content.setPadding(new Insets(20));
 
-        Label header = new Label(
-                I18n.getInstance().get("dashboard.devices.header", "Available Devices (Simulated & JNI)"));
+        Label header = new Label(i18n.get("dashboard.devices.header", "Available Devices (Simulated & JNI)"));
         header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+        // Create simulated device instances
+        Map<String, org.jscience.device.sim.SimulatedDevice> devices = new LinkedHashMap<>();
+        devices.put("Generic GPIB Device", new org.jscience.device.sim.SimulatedGPIBDevice());
+        devices.put("Generic USB Device", new org.jscience.device.sim.SimulatedUSBDevice());
+
+        // Also discover any other devices
+        List<DashboardDiscovery.ClassInfo> discoveredDevices = DashboardDiscovery.getInstance().findClasses("Device");
+        for (DashboardDiscovery.ClassInfo info : discoveredDevices) {
+            if (!devices.containsKey(info.simpleName)) {
+                try {
+                    Class<?> cls = Class.forName(info.fullName);
+                    if (org.jscience.device.sim.SimulatedDevice.class.isAssignableFrom(cls)) {
+                        org.jscience.device.sim.SimulatedDevice dev = (org.jscience.device.sim.SimulatedDevice) cls
+                                .getDeclaredConstructor().newInstance();
+                        devices.put(info.simpleName, dev);
+                    }
+                } catch (Exception e) {
+                    // Ignore devices that can't be instantiated
+                }
+            }
+        }
 
         SplitPane split = new SplitPane();
         ListView<String> deviceList = new ListView<>();
-        deviceList.getItems().addAll(
-                "Simulated Centrifuge", "Simulated Microscope", "Simulated Multimeter",
-                "Simulated Oscilloscope", "Simulated PHMeter", "Simulated Spectrometer",
-                "Simulated Telescope", "Simulated Temperature Probe", "Simulated PressureGauge",
-                "Simulated Vital Signs Monitor", "Generic GPIB Device", "Generic USB Sensor");
+        deviceList.getItems().addAll(devices.keySet());
 
-        TextArea details = new TextArea("Select a device to view detailed properties.");
+        TextArea details = new TextArea(
+                i18n.get("dashboard.devices.select_hint", "Select a device to view detailed properties."));
         details.setEditable(false);
         details.setWrapText(true);
         details.setStyle("-fx-font-family: 'Consolas', 'Monospace';");
 
         deviceList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("Device: ").append(newVal).append("\n");
-                sb.append("Status: Connected (Simulated)\n");
-                sb.append("Driver: org.jscience.device.sim.").append(newVal.replace(" ", "")).append("\n");
-                sb.append("ID: ").append(String.format("%08X", Math.abs(newVal.hashCode()))).append("\n");
-                sb.append("Manufacturer: JScience Sims Inc.\n");
-                sb.append("Firmware: v2.1.4\n\n");
-                sb.append("=== Capabilities ===\n");
-                sb.append(" [x] Data Logging\n");
-                sb.append(" [x] Remote Control\n");
-                sb.append(" [x] Asynchronous I/O\n");
-                sb.append(" [ ] High Voltage Protection\n\n");
-                sb.append("=== Current Readings ===\n");
-                sb.append(" Power: ON\n");
-                sb.append(" Uptime: 42s\n");
-                sb.append(" Error Code: 0x00\n");
-
-                details.setText(sb.toString());
+                org.jscience.device.sim.SimulatedDevice device = devices.get(newVal);
+                if (device != null) {
+                    try {
+                        device.connect();
+                        details.setText(device.getFormattedInfo());
+                    } catch (Exception e) {
+                        details.setText(
+                                i18n.get("dashboard.devices.error", "Error connecting to device: ") + e.getMessage());
+                    }
+                }
             }
         });
 
@@ -490,42 +877,20 @@ public class JScienceDashboard extends Application {
         split.setDividerPositions(0.35);
         content.getChildren().addAll(header, split);
         VBox.setVgrow(split, Priority.ALWAYS);
-        return new Tab(I18n.getInstance().get("dashboard.tab.devices", "Devices"), content);
+        return new Tab(i18n.get("dashboard.tab.devices", "Devices"), content);
     }
 
-    private Tab createLoadersTab() {
-        VBox content = new VBox(15);
-        content.setPadding(new Insets(20));
-
-        Label header = new Label(I18n.getInstance().get("dashboard.loaders.header", "Known Data Loaders (Discovered)"));
-        header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-
-        ListView<DashboardDiscovery.ClassInfo> list = new ListView<>();
-        list.getItems().addAll(DashboardDiscovery.getInstance().findClasses("Loader"));
-
-        list.setCellFactory(param -> new ListCell<>() {
-            @Override
-            protected void updateItem(DashboardDiscovery.ClassInfo item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.simpleName + " (" + item.fullName + ")");
-                }
-            }
-        });
-
-        content.getChildren().addAll(header, list);
-        VBox.setVgrow(list, Priority.ALWAYS);
-        return new Tab("Loaders", content);
-    }
-
-    private boolean checkClass(String className) {
+    private void testDevice(String className) {
         try {
-            Class.forName(className);
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
+            Class<?> cls = Class.forName(className);
+            org.jscience.device.Device device = (org.jscience.device.Device) cls.getDeclaredConstructor().newInstance();
+            device.connect();
+            boolean ok = device.isConnected();
+            device.disconnect();
+            new Alert(Alert.AlertType.INFORMATION, "Device " + className + " connection: " + (ok ? "OK" : "FAILED"))
+                    .show();
+        } catch (Exception e) {
+            new Alert(Alert.AlertType.ERROR, "Failed to connect to device: " + e.getMessage()).show();
         }
     }
 

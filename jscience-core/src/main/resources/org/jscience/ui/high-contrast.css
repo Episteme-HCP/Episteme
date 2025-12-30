@@ -1,0 +1,80 @@
+/* High Contrast Theme for JScience Dashboard */
+
+.root {
+    -fx-base: #000000;
+    -fx-background: #000000;
+    -fx-control-inner-background: #000000;
+    -fx-text-base-color: #FFFF00; /* Yellow text on black */
+    -fx-accent: #FFFFFF;
+    -fx-focus-color: #FFFF00;
+}
+
+.label {
+    -fx-text-fill: #FFFF00;
+}
+
+.button {
+    -fx-background-color: #000000;
+    -fx-text-fill: #FFFF00;
+    -fx-border-color: #FFFF00;
+    -fx-border-width: 2px;
+}
+
+.button:hover {
+    -fx-background-color: #FFFF00;
+    -fx-text-fill: #000000;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: #000000;
+}
+
+.tab {
+    -fx-background-color: #000000;
+    -fx-border-color: #FFFF00;
+    -fx-border-width: 1px;
+}
+
+.tab:selected {
+    -fx-background-color: #FFFF00;
+}
+
+.tab:selected .tab-label {
+    -fx-text-fill: #000000;
+}
+
+.list-view {
+    -fx-background-color: #000000;
+    -fx-border-color: #FFFF00;
+}
+
+.list-cell {
+    -fx-text-fill: #FFFF00;
+}
+
+.list-cell:selected {
+    -fx-background-color: #FFFF00;
+    -fx-text-fill: #000000;
+}
+
+.text-area {
+    -fx-control-inner-background: #000000;
+    -fx-text-fill: #FFFF00;
+    -fx-border-color: #FFFF00;
+}
+
+.separator .line {
+    -fx-border-color: #FFFF00;
+    -fx-border-width: 1px;
+}
+
+.titled-pane > .title {
+    -fx-background-color: #000000;
+    -fx-text-fill: #FFFF00;
+    -fx-border-color: #FFFF00;
+}
+
+.titled-pane > .content {
+    -fx-background-color: #000000;
+    -fx-border-color: #FFFF00;
+}

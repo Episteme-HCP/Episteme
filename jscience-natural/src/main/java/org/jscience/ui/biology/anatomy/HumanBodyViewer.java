@@ -35,6 +35,7 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.jscience.biology.loaders.ObjMeshLoader;
 import org.jscience.biology.loaders.StlMeshLoader;
 import org.jscience.ui.i18n.I18n;
 
@@ -49,7 +50,32 @@ import java.io.File;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class HumanBodyViewer extends Application {
+public class HumanBodyViewer extends Application implements org.jscience.ui.DemoProvider {
+
+    @Override
+    public String getCategory() {
+        return "Biology";
+    }
+
+    @Override
+    public String getName() {
+        return "Human Body Anatomy";
+    }
+
+    @Override
+    public String getDescription() {
+        return "3D Interactive Human Anatomy with skeleton, muscles and organs.";
+    }
+
+    @Override
+    public boolean isViewer() {
+        return true;
+    }
+
+    @Override
+    public void show(javafx.stage.Stage stage) {
+        start(stage);
+    }
 
     private final Group world = new Group();
     private final Group bodyGroup = new Group();
@@ -71,8 +97,12 @@ public class HumanBodyViewer extends Application {
     // Info display
     private Label infoLabel;
 
+    public static void launchMain(javafx.stage.Stage stage) {
+        new HumanBodyViewer().start(stage);
+    }
+
     @Override
-    public void start(Stage stage) {
+    public void start(javafx.stage.Stage stage) {
         BorderPane root = new BorderPane();
         root.getStyleClass().add("dark-viewer-root");
 
@@ -327,7 +357,7 @@ public class HumanBodyViewer extends Application {
             if (url == null) {
                 return false;
             }
-            Group model = org.jscience.biology.loaders.ObjMeshLoader.load(url);
+            Group model = ObjMeshLoader.load(url);
             if (model.getChildren().isEmpty()) {
                 return false;
             }
@@ -363,16 +393,16 @@ public class HumanBodyViewer extends Application {
         Sphere skull = new Sphere(25);
         skull.setMaterial(boneMat);
         skull.setTranslateY(-150);
-        skull.setOnMouseClicked(e -> showInfo("Skull (Cranium)",
-                "Protects the brain. Composed of 22 bones:\n• 8 cranial bones\n• 14 facial bones\nWeight: ~1 kg"));
+        skull.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.skull.name"),
+                I18n.getInstance().get("humanbody.skeleton.skull.desc")));
 
         // Mandible (jaw)
         Box mandible = new Box(30, 8, 15);
         mandible.setMaterial(boneDark);
         mandible.setTranslateY(-130);
         mandible.setTranslateZ(10);
-        mandible.setOnMouseClicked(e -> showInfo("Mandible (Jaw)",
-                "Strongest facial bone. Only movable skull bone.\nContains 16 teeth (lower)."));
+        mandible.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.mandible.name"),
+                I18n.getInstance().get("humanbody.skeleton.mandible.desc")));
 
         // ===== SPINE =====
         Group spine = new Group();
@@ -387,9 +417,10 @@ public class HumanBodyViewer extends Application {
             vertebra.setMaterial((i % 2 == 0) ? boneMat : boneDark);
             vertebra.setTranslateY(-120 + i * 7);
             int idx = i;
-            vertebra.setOnMouseClicked(e -> showInfo(regions[idx] + " Vertebra",
-                    "Part of " + regions[idx].toLowerCase() + " spine region.\n" +
-                            (idx < 7 ? "C" + (idx + 1) : (idx < 19 ? "T" + (idx - 6) : "L" + (idx - 18)))));
+            vertebra.setOnMouseClicked(e -> showInfo(
+                    I18n.getInstance().get("humanbody.skeleton.vertebra.name", regions[idx]),
+                    I18n.getInstance().get("humanbody.skeleton.vertebra.desc", regions[idx].toLowerCase(),
+                            (idx < 7 ? "C" + (idx + 1) : (idx < 19 ? "T" + (idx - 6) : "L" + (idx - 18))))));
             spine.getChildren().add(vertebra);
         }
 
@@ -397,13 +428,15 @@ public class HumanBodyViewer extends Application {
         Box sacrum = new Box(35, 25, 15);
         sacrum.setMaterial(boneDark);
         sacrum.setTranslateY(55);
-        sacrum.setOnMouseClicked(e -> showInfo("Sacrum", "5 fused vertebrae. Connects spine to pelvis."));
+        sacrum.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.sacrum.name"),
+                I18n.getInstance().get("humanbody.skeleton.sacrum.desc")));
 
         // Coccyx (tailbone)
         Sphere coccyx = new Sphere(6);
         coccyx.setMaterial(boneDark);
         coccyx.setTranslateY(72);
-        coccyx.setOnMouseClicked(e -> showInfo("Coccyx (Tailbone)", "3-5 fused vertebrae. Vestigial tail."));
+        coccyx.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.coccyx.name"),
+                I18n.getInstance().get("humanbody.skeleton.coccyx.desc")));
 
         // ===== SHOULDER GIRDLE =====
         // Clavicles
@@ -413,8 +446,8 @@ public class HumanBodyViewer extends Application {
         clavicleL.setTranslateY(-115);
         clavicleL.setRotationAxis(Rotate.Z_AXIS);
         clavicleL.setRotate(85);
-        clavicleL.setOnMouseClicked(e -> showInfo("Clavicle (Collarbone)",
-                "Connects arm to body. Most commonly fractured bone."));
+        clavicleL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.clavicle.name"),
+                I18n.getInstance().get("humanbody.skeleton.clavicle.desc")));
 
         Cylinder clavicleR = new Cylinder(3, 55);
         clavicleR.setMaterial(boneMat);
@@ -429,8 +462,8 @@ public class HumanBodyViewer extends Application {
         scapulaL.setTranslateX(-45);
         scapulaL.setTranslateY(-95);
         scapulaL.setTranslateZ(-15);
-        scapulaL.setOnMouseClicked(e -> showInfo("Scapula (Shoulder Blade)",
-                "Triangular bone connecting humerus to clavicle.\n17 muscles attach to it."));
+        scapulaL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.scapula.name"),
+                I18n.getInstance().get("humanbody.skeleton.scapula.desc")));
 
         Box scapulaR = new Box(25, 35, 5);
         scapulaR.setMaterial(boneDark);
@@ -452,11 +485,15 @@ public class HumanBodyViewer extends Application {
             ribL.setRotationAxis(Rotate.Z_AXIS);
             ribL.setRotate(angle);
             int ribNum = i + 1;
-            ribL.setOnMouseClicked(e -> showInfo(
-                    "Rib #" + ribNum + (ribNum <= 7 ? " (True)" : ribNum <= 10 ? " (False)" : " (Floating)"),
-                    ribNum <= 7 ? "Directly attached to sternum."
-                            : ribNum <= 10 ? "Attached to sternum via cartilage."
-                                    : "Floating rib, not attached to sternum."));
+            ribL.setOnMouseClicked(e -> {
+                String type = ribNum <= 7 ? I18n.getInstance().get("humanbody.skeleton.rib.true")
+                        : ribNum <= 10 ? I18n.getInstance().get("humanbody.skeleton.rib.false")
+                                : I18n.getInstance().get("humanbody.skeleton.rib.floating");
+                String desc = ribNum <= 7 ? I18n.getInstance().get("humanbody.skeleton.rib.desc.true")
+                        : ribNum <= 10 ? I18n.getInstance().get("humanbody.skeleton.rib.desc.false")
+                                : I18n.getInstance().get("humanbody.skeleton.rib.desc.floating");
+                showInfo(I18n.getInstance().get("humanbody.skeleton.rib.name", (long) ribNum, type), desc);
+            });
             ribcage.getChildren().add(ribL);
 
             Cylinder ribR = new Cylinder(2, length);
@@ -473,8 +510,8 @@ public class HumanBodyViewer extends Application {
         sternum.setMaterial(boneMat);
         sternum.setTranslateY(-75);
         sternum.setTranslateZ(25);
-        sternum.setOnMouseClicked(e -> showInfo("Sternum (Breastbone)",
-                "3 parts: Manubrium, Body, Xiphoid process.\nProtects heart."));
+        sternum.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.sternum.name"),
+                I18n.getInstance().get("humanbody.skeleton.sternum.desc")));
         ribcage.getChildren().add(sternum);
 
         // ===== PELVIS =====
@@ -483,8 +520,8 @@ public class HumanBodyViewer extends Application {
         hipL.setMaterial(boneMat);
         hipL.setTranslateX(-25);
         hipL.setTranslateY(75);
-        hipL.setOnMouseClicked(e -> showInfo("Hip Bone (Os Coxae)",
-                "3 fused bones: Ilium, Ischium, Pubis.\nForms hip socket (acetabulum)."));
+        hipL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.hip.name"),
+                I18n.getInstance().get("humanbody.skeleton.hip.desc")));
 
         Box hipR = new Box(35, 40, 20);
         hipR.setMaterial(boneMat);
@@ -497,8 +534,8 @@ public class HumanBodyViewer extends Application {
         humerusL.setMaterial(boneMat);
         humerusL.setTranslateX(-60);
         humerusL.setTranslateY(-55);
-        humerusL.setOnMouseClicked(e -> showInfo("Humerus",
-                "Upper arm bone. Articulates with scapula (shoulder) and radius/ulna (elbow)."));
+        humerusL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.humerus.name"),
+                I18n.getInstance().get("humanbody.skeleton.humerus.desc")));
 
         Cylinder humerusR = new Cylinder(6, 80);
         humerusR.setMaterial(boneMat);
@@ -534,8 +571,8 @@ public class HumanBodyViewer extends Application {
         femurL.setMaterial(boneMat);
         femurL.setTranslateX(-25);
         femurL.setTranslateY(150);
-        femurL.setOnMouseClicked(e -> showInfo("Femur (Thigh Bone)",
-                "Longest, strongest bone in body.\nLength: ~48 cm. Supports body weight."));
+        femurL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.femur.name"),
+                I18n.getInstance().get("humanbody.skeleton.femur.desc")));
 
         Cylinder femurR = new Cylinder(9, 120);
         femurR.setMaterial(boneMat);
@@ -548,8 +585,8 @@ public class HumanBodyViewer extends Application {
         patellaL.setTranslateX(-25);
         patellaL.setTranslateY(215);
         patellaL.setTranslateZ(10);
-        patellaL.setOnMouseClicked(e -> showInfo("Patella (Kneecap)",
-                "Largest sesamoid bone. Protects knee joint."));
+        patellaL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.patella.name"),
+                I18n.getInstance().get("humanbody.skeleton.patella.desc")));
 
         Sphere patellaR = new Sphere(8);
         patellaR.setMaterial(boneDark);
@@ -562,8 +599,8 @@ public class HumanBodyViewer extends Application {
         tibiaL.setMaterial(boneMat);
         tibiaL.setTranslateX(-22);
         tibiaL.setTranslateY(275);
-        tibiaL.setOnMouseClicked(e -> showInfo("Tibia (Shinbone)",
-                "Second largest bone. Bears body weight."));
+        tibiaL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.tibia.name"),
+                I18n.getInstance().get("humanbody.skeleton.tibia.desc")));
 
         Cylinder fibulaL = new Cylinder(4, 95);
         fibulaL.setMaterial(boneDark);
@@ -604,7 +641,8 @@ public class HumanBodyViewer extends Application {
         carpals.setMaterial(boneDark);
         carpals.setTranslateX(x);
         carpals.setTranslateY(y);
-        carpals.setOnMouseClicked(e -> showInfo("Carpals (Wrist)", "8 bones in 2 rows. Allows wrist flexibility."));
+        carpals.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.carpals.name"),
+                I18n.getInstance().get("humanbody.skeleton.carpals.desc")));
 
         // Metacarpals and Phalanges
         for (int f = 0; f < 5; f++) {
@@ -635,7 +673,8 @@ public class HumanBodyViewer extends Application {
         tarsals.setTranslateX(x);
         tarsals.setTranslateY(y);
         tarsals.setTranslateZ(8);
-        tarsals.setOnMouseClicked(e -> showInfo("Tarsals (Ankle)", "7 bones including calcaneus (heel)."));
+        tarsals.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.tarsals.name"),
+                I18n.getInstance().get("humanbody.skeleton.tarsals.desc")));
 
         // Metatarsals
         for (int t = 0; t < 5; t++) {
@@ -663,7 +702,8 @@ public class HumanBodyViewer extends Application {
         pectoralL.setTranslateX(-25);
         pectoralL.setTranslateY(-80);
         pectoralL.setTranslateZ(15);
-        pectoralL.setOnMouseClicked(e -> showInfo("Pectoralis Major", "Chest muscle for arm movement."));
+        pectoralL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.muscle.pectoral.name"),
+                I18n.getInstance().get("humanbody.muscle.pectoral.desc")));
 
         Box pectoralR = new Box(30, 40, 15);
         pectoralR.setMaterial(muscleMat);
@@ -677,7 +717,8 @@ public class HumanBodyViewer extends Application {
         bicepL.setTranslateX(-60);
         bicepL.setTranslateY(-50);
         bicepL.setTranslateZ(8);
-        bicepL.setOnMouseClicked(e -> showInfo("Biceps Brachii", "Upper arm muscle for flexion."));
+        bicepL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.muscle.bicep.name"),
+                I18n.getInstance().get("humanbody.muscle.bicep.desc")));
 
         Cylinder bicepR = new Cylinder(8, 50);
         bicepR.setMaterial(muscleMat);
@@ -691,7 +732,8 @@ public class HumanBodyViewer extends Application {
         quadL.setTranslateX(-25);
         quadL.setTranslateY(130);
         quadL.setTranslateZ(10);
-        quadL.setOnMouseClicked(e -> showInfo("Quadriceps", "Thigh muscles for leg extension."));
+        quadL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.muscle.quad.name"),
+                I18n.getInstance().get("humanbody.muscle.quad.desc")));
 
         Cylinder quadR = new Cylinder(15, 100);
         quadR.setMaterial(muscleMat);
@@ -727,8 +769,8 @@ public class HumanBodyViewer extends Application {
         heart.setTranslateX(-10);
         heart.setTranslateY(-75);
         heart.setTranslateZ(5);
-        heart.setOnMouseClicked(
-                e -> showInfo("Heart", "Pumps blood through the circulatory system.\n~100,000 beats per day."));
+        heart.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.organ.heart.name"),
+                I18n.getInstance().get("humanbody.organ.heart.desc")));
 
         // Lungs
         PhongMaterial lungMat = new PhongMaterial(Color.LIGHTPINK);
@@ -737,8 +779,8 @@ public class HumanBodyViewer extends Application {
         lungL.setTranslateX(-35);
         lungL.setTranslateY(-75);
         lungL.setScaleY(1.3);
-        lungL.setOnMouseClicked(
-                e -> showInfo("Lungs", "Exchange oxygen and carbon dioxide.\n~15,000 liters of air per day."));
+        lungL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.organ.lungs.name"),
+                I18n.getInstance().get("humanbody.organ.lungs.desc")));
 
         Sphere lungR = new Sphere(30);
         lungR.setMaterial(lungMat);
@@ -752,8 +794,8 @@ public class HumanBodyViewer extends Application {
         liver.setMaterial(liverMat);
         liver.setTranslateX(15);
         liver.setTranslateY(-30);
-        liver.setOnMouseClicked(
-                e -> showInfo("Liver", "Processes nutrients and detoxifies blood.\nLargest internal organ."));
+        liver.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.organ.liver.name"),
+                I18n.getInstance().get("humanbody.organ.liver.desc")));
 
         // Stomach
         PhongMaterial stomachMat = new PhongMaterial(Color.SANDYBROWN);
@@ -762,7 +804,8 @@ public class HumanBodyViewer extends Application {
         stomach.setTranslateX(-20);
         stomach.setTranslateY(-20);
         stomach.setScaleX(0.8);
-        stomach.setOnMouseClicked(e -> showInfo("Stomach", "Digests food with acids and enzymes."));
+        stomach.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.organ.stomach.name"),
+                I18n.getInstance().get("humanbody.organ.stomach.desc")));
 
         // Kidneys
         PhongMaterial kidneyMat = new PhongMaterial(Color.INDIANRED);
@@ -777,8 +820,8 @@ public class HumanBodyViewer extends Application {
         kidneyR.setTranslateX(35);
         kidneyR.setTranslateY(10);
         kidneyR.setScaleY(1.5);
-        kidneyL.setOnMouseClicked(
-                e -> showInfo("Kidneys", "Filter blood and produce urine.\n~180 liters filtered per day."));
+        kidneyL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.organ.kidneys.name"),
+                I18n.getInstance().get("humanbody.organ.kidneys.desc")));
 
         organLayer.getChildren().addAll(heart, lungL, lungR, liver, stomach, kidneyL, kidneyR);
     }
@@ -790,13 +833,15 @@ public class HumanBodyViewer extends Application {
         Sphere brain = new Sphere(22);
         brain.setMaterial(nerveMat);
         brain.setTranslateY(-150);
-        brain.setOnMouseClicked(e -> showInfo("Brain", "Control center of the nervous system.\n~86 billion neurons."));
+        brain.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.nerve.brain.name"),
+                I18n.getInstance().get("humanbody.nerve.brain.desc")));
 
         // Spinal cord
         Cylinder spinalCord = new Cylinder(3, 180);
         spinalCord.setMaterial(nerveMat);
         spinalCord.setTranslateY(-30);
-        spinalCord.setOnMouseClicked(e -> showInfo("Spinal Cord", "Transmits signals between brain and body."));
+        spinalCord.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.nerve.spinalcord.name"),
+                I18n.getInstance().get("humanbody.nerve.spinalcord.desc")));
 
         // Main nerve branches
         for (int i = 0; i < 8; i++) {
@@ -829,14 +874,16 @@ public class HumanBodyViewer extends Application {
         aorta.setMaterial(arteryMat);
         aorta.setTranslateX(5);
         aorta.setTranslateY(-20);
-        aorta.setOnMouseClicked(e -> showInfo("Aorta", "Largest artery. Carries oxygenated blood from heart."));
+        aorta.setOnMouseClicked(e -> showInfo("Aorta", I18n.getInstance().get("humanbody.aorta.desc",
+                "Largest artery. Carries oxygenated blood from heart.")));
 
         // Vena cava
         Cylinder venaCava = new Cylinder(5, 100);
         venaCava.setMaterial(veinMat);
         venaCava.setTranslateX(-5);
         venaCava.setTranslateY(-20);
-        venaCava.setOnMouseClicked(e -> showInfo("Vena Cava", "Largest vein. Returns deoxygenated blood to heart."));
+        venaCava.setOnMouseClicked(e -> showInfo("Vena Cava", I18n.getInstance().get("humanbody.venacava.desc",
+                "Largest vein. Returns deoxygenated blood to heart.")));
 
         // Leg vessels
         Cylinder femArtL = new Cylinder(3, 140);
@@ -877,7 +924,7 @@ public class HumanBodyViewer extends Application {
         }
     }
 
-    public static void show(Stage stage) {
+    public static void launch(Stage stage) {
         new HumanBodyViewer().start(stage);
     }
 

@@ -148,10 +148,16 @@ public class PandemicForecasterApp extends KillerAppBase {
         deaSeriesD = ChartFactory.createSeries(i18n.get("pandemic.label.deceased"));
         deaSeriesD.setName("Deceased"); // Fallback if i18n missing
 
-        @SuppressWarnings("unchecked")
-        XYChart.Series<Number, Number>[] series = new XYChart.Series[] { susSeriesS, expSeriesE, infSeriesI,
-                recSeriesR, deaSeriesD };
-        seirChart.getData().addAll(series);
+        if (susSeriesS != null)
+            seirChart.getData().add(susSeriesS);
+        if (expSeriesE != null)
+            seirChart.getData().add(expSeriesE);
+        if (infSeriesI != null)
+            seirChart.getData().add(infSeriesI);
+        if (recSeriesR != null)
+            seirChart.getData().add(recSeriesR);
+        if (deaSeriesD != null)
+            seirChart.getData().add(deaSeriesD);
 
         // Style series
         susSeriesS.getNode();
@@ -193,7 +199,7 @@ public class PandemicForecasterApp extends KillerAppBase {
         countryLabel.setStyle("-fx-font-weight: bold;");
         countrySelector = new ComboBox<>();
         countrySelector.setItems(FXCollections.observableArrayList(countries));
-        countrySelector.setCellFactory(lv -> new ListCell<>() {
+        countrySelector.setCellFactory(lv -> new ListCell<org.jscience.geography.Region>() {
             @Override
             protected void updateItem(org.jscience.geography.Region item, boolean empty) {
                 super.updateItem(item, empty);

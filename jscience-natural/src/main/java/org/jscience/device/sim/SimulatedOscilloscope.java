@@ -39,8 +39,12 @@ public class SimulatedOscilloscope extends SimulatedDevice implements Oscillosco
     private int channels = 2;
     private double sampleRate = 1e6;
     private double timeBase = 1e-3;
-    private TriggerMode triggerMode = TriggerMode.AUTO;
+    private Oscilloscope.TriggerMode triggerMode = Oscilloscope.TriggerMode.AUTO;
     private double triggerLevel = 0.0;
+
+    public SimulatedOscilloscope() {
+        this("Oscilloscope");
+    }
 
     public SimulatedOscilloscope(String name) {
         super(name);
@@ -81,12 +85,12 @@ public class SimulatedOscilloscope extends SimulatedDevice implements Oscillosco
     }
 
     @Override
-    public TriggerMode getTriggerMode() {
+    public Oscilloscope.TriggerMode getTriggerMode() {
         return triggerMode;
     }
 
     @Override
-    public void setTriggerMode(TriggerMode mode) {
+    public void setTriggerMode(Oscilloscope.TriggerMode mode) {
         this.triggerMode = mode;
     }
 

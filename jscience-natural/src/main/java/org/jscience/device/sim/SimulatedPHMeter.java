@@ -37,7 +37,11 @@ import java.io.IOException;
 public class SimulatedPHMeter extends SimulatedDevice implements PHMeter {
 
     private final Real accuracy;
-    private Real lastReading = NEUTRAL_PH;
+    private Real lastReading = PHMeter.NEUTRAL_PH;
+
+    public SimulatedPHMeter() {
+        this("pH Meter", Real.of(0.01));
+    }
 
     public SimulatedPHMeter(String name, Real accuracy) {
         super(name);
@@ -56,7 +60,7 @@ public class SimulatedPHMeter extends SimulatedDevice implements PHMeter {
         if (!isConnected())
             throw new IllegalStateException("Device not connected");
 
-        if (actualPH.compareTo(MIN_PH) < 0 || actualPH.compareTo(MAX_PH) > 0) {
+        if (actualPH.compareTo(PHMeter.MIN_PH) < 0 || actualPH.compareTo(PHMeter.MAX_PH) > 0) {
             throw new IllegalArgumentException("pH must be between 0 and 14");
         }
 

@@ -4,9 +4,8 @@ org.jscience.apps.chemistry.CrystalStructureApp
 org.jscience.apps.chemistry.TitrationApp
 org.jscience.apps.engineering.SmartGridApp
 org.jscience.apps.physics.QuantumCircuitApp
-org.jscience.apps.physics.relativity.RelativisticFlightApp
-org.jscience.apps.physics.trajectory.InterplanetaryTrajectoryApp
+
 org.jscience.apps.sociology.CivilizationApp
 org.jscience.apps.economics.MarketCrashApp
-org.jscience.apps.engineering.traffic.CarTrafficDemo
-org.jscience.apps.sociology.sports.SportsResultsDemo
+
+org.jscience.apps.sports.SportsResultsDemo

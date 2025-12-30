@@ -44,7 +44,31 @@ import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class NetCDFFile extends AbstractDataFile {
+public class NetCDFFile extends AbstractDataFile implements org.jscience.io.InputLoader<NetCDFFile> {
+
+    @Override
+    public NetCDFFile load(String resourceId) throws Exception {
+        java.nio.file.Path p;
+        if (resourceId.startsWith("file:")) {
+            p = java.nio.file.Paths.get(java.net.URI.create(resourceId));
+        } else {
+            p = java.nio.file.Paths.get(resourceId);
+        }
+        NetCDFFile file = new NetCDFFile(p);
+        file.open();
+        file.readHeader();
+        return file;
+    }
+
+    @Override
+    public String getResourcePath() {
+        return null; // Not strictly classpath based
+    }
+
+    @Override
+    public Class<NetCDFFile> getResourceType() {
+        return NetCDFFile.class;
+    }
 
     // numRecords is read from header but not currently used. Kept for structure.
     @SuppressWarnings("unused")

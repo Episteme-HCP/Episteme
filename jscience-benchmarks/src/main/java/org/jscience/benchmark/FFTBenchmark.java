@@ -29,6 +29,7 @@ import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.mathematics.sets.Complexes;
 
+import org.jscience.ui.i18n.I18n;
 import java.util.Random;
 
 /**
@@ -46,7 +47,7 @@ public class FFTBenchmark {
     private static final int SIZE = 4096; // Power of 2
 
     public static void run() {
-        System.out.println("\n--- FFT Benchmarks ---");
+        System.out.println(I18n.getInstance().get("benchmark.fft.title"));
 
         benchmarkBasicFFT(SIZE);
         benchmarkJScienceFFT(SIZE);
@@ -55,7 +56,7 @@ public class FFTBenchmark {
     private static void benchmarkBasicFFT(int size) {
         Complex[] input = createRandomData(size);
 
-        SimpleBenchmarkRunner.run("Basic Recursive FFT (" + size + " points)", () -> {
+        SimpleBenchmarkRunner.run(I18n.getInstance().get("benchmark.fft.basic", size), () -> {
             basicFFT(input);
         });
     }
@@ -64,7 +65,7 @@ public class FFTBenchmark {
         Complex[] input = createRandomData(size);
         Vector<Complex> vector = new DenseVector<Complex>(java.util.Arrays.asList(input), Complexes.getInstance());
 
-        SimpleBenchmarkRunner.run("JScience FFT (" + size + " points)", () -> {
+        SimpleBenchmarkRunner.run(I18n.getInstance().get("benchmark.fft.jscience", size), () -> {
             FastFourierTransform.transform(vector);
         });
     }

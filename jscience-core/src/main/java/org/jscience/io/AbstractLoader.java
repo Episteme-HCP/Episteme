@@ -46,7 +46,7 @@ import java.util.logging.Logger;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public abstract class AbstractLoader<T> implements ResourceLoader<T> {
+public abstract class AbstractLoader<T> implements InputLoader<T> {
 
     private static final Logger LOGGER = Logger.getLogger(AbstractLoader.class.getName());
 

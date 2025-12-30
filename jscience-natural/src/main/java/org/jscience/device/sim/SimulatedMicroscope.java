@@ -40,6 +40,10 @@ public class SimulatedMicroscope extends SimulatedDevice implements Microscope {
     private final Real resolution;
     private Real currentMagnification = Real.ONE;
 
+    public SimulatedMicroscope() {
+        this("Microscope", Type.OPTICAL, Real.of(1000), Real.of(0.0002));
+    }
+
     public SimulatedMicroscope(String name, Type type, Real maxMagnification, Real resolution) {
         super(name);
         this.type = type;

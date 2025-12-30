@@ -23,7 +23,7 @@
 
 package org.jscience.physics.classical.waves.electromagnetism.fields;
 
-import org.jscience.physics.relativity.Vector4D;
+import org.jscience.mathematics.geometry.Vector4D;
 
 /**
  * Interface for solvers of Maxwell's equations.

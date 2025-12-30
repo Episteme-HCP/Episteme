@@ -44,7 +44,29 @@ import java.util.logging.Logger;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ChemistryDataLoader {
+public class ChemistryDataLoader implements org.jscience.io.InputLoader<Object> {
+
+    @Override
+    public Object load(String id) throws Exception {
+        if ("elements".equals(id)) {
+            loadElements();
+            return PeriodicTable.getElements();
+        } else if ("molecules".equals(id)) {
+            loadMolecules();
+            return MOLECULE_DATA_CACHE.keySet();
+        }
+        return null;
+    }
+
+    @Override
+    public String getResourcePath() {
+        return "/org/jscience/chemistry/";
+    }
+
+    @Override
+    public Class<Object> getResourceType() {
+        return Object.class;
+    }
 
     private static final Logger LOGGER = Logger.getLogger(ChemistryDataLoader.class.getName());
     private static ObjectMapper MAPPER;

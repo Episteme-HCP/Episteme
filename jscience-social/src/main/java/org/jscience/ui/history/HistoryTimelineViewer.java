@@ -75,11 +75,11 @@ public class HistoryTimelineViewer extends BorderPane {
     private double scrollStartH;
 
     private enum CalendarType {
-        GREGORIAN("Gregorian", IsoChronology.INSTANCE),
-        ISLAMIC("Islamic (Hijrah)", HijrahChronology.INSTANCE),
-        THAI("Thai Buddhist", ThaiBuddhistChronology.INSTANCE),
-        JAPANESE("Japanese", JapaneseChronology.INSTANCE),
-        MINGUO("Minguo", MinguoChronology.INSTANCE);
+        GREGORIAN("hist.calendar.gregorian", IsoChronology.INSTANCE),
+        ISLAMIC("hist.calendar.islamic", HijrahChronology.INSTANCE),
+        THAI("hist.calendar.thai", ThaiBuddhistChronology.INSTANCE),
+        JAPANESE("hist.calendar.japanese", JapaneseChronology.INSTANCE),
+        MINGUO("hist.calendar.minguo", MinguoChronology.INSTANCE);
 
         final String name;
         final Chronology chrono;
@@ -91,7 +91,7 @@ public class HistoryTimelineViewer extends BorderPane {
 
         @Override
         public String toString() {
-            return name;
+            return SocialI18n.getInstance().get(name);
         }
     }
 
@@ -188,9 +188,9 @@ public class HistoryTimelineViewer extends BorderPane {
         hint.setStyle("-fx-text-fill: #666;");
 
         toolbar.getChildren().addAll(
-                new Label("Zoom:"), zoomOut, zoomLabel, zoomIn,
+                new Label(SocialI18n.getInstance().get("hist.label.zoom")), zoomOut, zoomLabel, zoomIn,
                 new Separator(),
-                new Label("Calendar:"), calendarSelector,
+                new Label(SocialI18n.getInstance().get("hist.label.calendar")), calendarSelector,
                 new Separator(),
                 hint);
         setTop(toolbar);
@@ -369,7 +369,7 @@ public class HistoryTimelineViewer extends BorderPane {
     private String getFormattedYear(double year, CalendarType type) {
         if (type == CalendarType.GREGORIAN) {
             if (year < 0)
-                return Math.abs((int) year) + " BCE";
+                return Math.abs((int) year) + " " + SocialI18n.getInstance().get("hist.era.bce");
             return (int) year + "";
         }
 
@@ -383,13 +383,13 @@ public class HistoryTimelineViewer extends BorderPane {
             int cYear = cDate.get(java.time.temporal.ChronoField.YEAR);
             String era = "";
             if (type == CalendarType.ISLAMIC)
-                era = " AH";
+                era = " " + SocialI18n.getInstance().get("hist.era.ah");
             else if (type == CalendarType.THAI)
-                era = " BE";
+                era = " " + SocialI18n.getInstance().get("hist.era.be");
             else if (type == CalendarType.JAPANESE)
-                era = " JP";
+                era = " " + SocialI18n.getInstance().get("hist.era.jp");
             else if (type == CalendarType.MINGUO)
-                era = " ROC";
+                era = " " + SocialI18n.getInstance().get("hist.era.roc");
             return cYear + era;
         } catch (Exception e) {
             return (int) year + "";

@@ -73,13 +73,14 @@ public class ChemicalReactionViewer extends Application {
         inputLabel.getStyleClass().add("dark-label-muted");
 
         inputArea = new TextArea();
-        inputArea.setPromptText("Enter chemical equation, e.g.: 2H2 + O2 -> 2H2O");
+        inputArea.setPromptText(
+                I18n.getInstance().get("chemical.prompt.eqn", "Enter chemical equation, e.g.: 2H2 + O2 -> 2H2O"));
         inputArea.setPrefRowCount(3);
         inputArea.setWrapText(true);
 
         // Example Selection (ComboBox)
         ComboBox<String> exampleCombo = new ComboBox<>();
-        exampleCombo.setPromptText("Select an example...");
+        exampleCombo.setPromptText(I18n.getInstance().get("chemical.prompt.example", "Select an example..."));
         exampleCombo.getItems().addAll(
                 "2H2 + O2 -> 2H2O",
                 "CH4 + 2O2 -> CO2 + 2H2O",
@@ -101,9 +102,10 @@ public class ChemicalReactionViewer extends Application {
         loadFileBtn.setMaxWidth(Double.MAX_VALUE);
         loadFileBtn.setOnAction(e -> {
             javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
-            fileChooser.setTitle("Open Reaction File");
+            fileChooser.setTitle(I18n.getInstance().get("chemical.file.open", "Open Reaction File"));
             fileChooser.getExtensionFilters()
-                    .add(new javafx.stage.FileChooser.ExtensionFilter("Text Files", "*.txt", "*.rxn"));
+                    .add(new javafx.stage.FileChooser.ExtensionFilter(
+                            I18n.getInstance().get("chemical.file.type", "Text Files"), "*.txt", "*.rxn"));
             java.io.File file = fileChooser.showOpenDialog(stage);
             if (file != null) {
                 try {
@@ -111,7 +113,8 @@ public class ChemicalReactionViewer extends Application {
                     inputArea.setText(content.trim());
                     parseReaction();
                 } catch (Exception ex) {
-                    outputArea.setText("Error reading file: " + ex.getMessage());
+                    outputArea.setText(
+                            I18n.getInstance().get("chemical.error.read", "Error reading file: %s", ex.getMessage()));
                 }
             }
         });
@@ -161,7 +164,7 @@ public class ChemicalReactionViewer extends Application {
         formulaTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: #00d9ff;");
 
         TextField formulaInput = new TextField();
-        formulaInput.setPromptText("e.g., Ca(OH)2");
+        formulaInput.setPromptText(I18n.getInstance().get("chemical.prompt.formula", "e.g., Ca(OH)2"));
 
         TextArea formulaOutput = new TextArea();
         formulaOutput.setEditable(false);
@@ -176,21 +179,23 @@ public class ChemicalReactionViewer extends Application {
             try {
                 Formula f = ChemicalReactionParser.parseFormula(formulaInput.getText());
                 StringBuilder sb = new StringBuilder();
-                sb.append("Formula: ").append(f.toString()).append("\n");
-                sb.append("Coefficient: ").append(f.getCoefficient()).append("\n");
-                sb.append("Elements:\n");
+                sb.append(I18n.getInstance().get("chemical.label.formula", "Formula: %s", f.toString())).append("\n");
+                sb.append(I18n.getInstance().get("chemical.label.coefficient", "Coefficient: %d",
+                        (long) f.getCoefficient())).append("\n");
+                sb.append(I18n.getInstance().get("chemical.label.elements", "Elements:")).append("\n");
                 for (var entry : f.getElements().entrySet()) {
                     sb.append("  ").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
                 }
                 if (f.getState() != null) {
-                    sb.append("State: ").append(f.getState()).append("\n");
+                    sb.append(I18n.getInstance().get("chemical.label.state", "State: %s", f.getState())).append("\n");
                 }
                 if (f.getCharge() != 0) {
-                    sb.append("Charge: ").append(f.getCharge()).append("\n");
+                    sb.append(I18n.getInstance().get("chemical.label.charge", "Charge: %d", (long) f.getCharge()))
+                            .append("\n");
                 }
                 formulaOutput.setText(sb.toString());
             } catch (Exception ex) {
-                formulaOutput.setText("Error: " + ex.getMessage());
+                formulaOutput.setText(I18n.getInstance().get("chemical.status.error", "Error: %s", ex.getMessage()));
             }
         });
 
@@ -217,26 +222,31 @@ public class ChemicalReactionViewer extends Application {
 
             StringBuilder sb = new StringBuilder();
             sb.append("═══════════════════════════════════════\n");
-            sb.append("PARSED REACTION\n");
+            sb.append(I18n.getInstance().get("chemical.header.parsed", "PARSED REACTION")).append("\n");
             sb.append("═══════════════════════════════════════\n\n");
-            sb.append("Formatted: ").append(reaction.toString()).append("\n\n");
+            sb.append(I18n.getInstance().get("chemical.label.formula", "Formatted: %s", reaction.toString()))
+                    .append("\n\n");
 
-            sb.append("─── REACTANTS ───\n");
+            sb.append("─── ").append(I18n.getInstance().get("chemical.header.reactants", "REACTANTS")).append(" ───\n");
             for (Formula f : reaction.getReactants()) {
                 sb.append("  ").append(formatFormula(f)).append("\n");
             }
 
-            sb.append("\n─── PRODUCTS ───\n");
+            sb.append("\n─── ").append(I18n.getInstance().get("chemical.header.products", "PRODUCTS")).append(" ───\n");
             for (Formula f : reaction.getProducts()) {
                 sb.append("  ").append(formatFormula(f)).append("\n");
             }
 
-            sb.append("\n─── ELEMENT BALANCE ───\n");
+            sb.append("\n─── ").append(I18n.getInstance().get("chemical.header.balance", "ELEMENT BALANCE"))
+                    .append(" ───\n");
             sb.append(reaction.getElementBalance());
 
             boolean balanced = reaction.isBalanced();
             sb.append("\n═══════════════════════════════════════\n");
-            sb.append("RESULT: ").append(balanced ? "✓ BALANCED" : "✗ NOT BALANCED").append("\n");
+            sb.append(I18n.getInstance().get("chemical.result.prefix", "RESULT: "))
+                    .append(balanced ? I18n.getInstance().get("chemical.result.balanced", "✓ BALANCED")
+                            : I18n.getInstance().get("chemical.result.unbalanced", "✗ NOT BALANCED"))
+                    .append("\n");
             sb.append("═══════════════════════════════════════\n");
 
             outputArea.setText(sb.toString());
@@ -250,7 +260,8 @@ public class ChemicalReactionViewer extends Application {
             }
 
         } catch (Exception e) {
-            outputArea.setText("Error parsing equation:\n" + e.getMessage());
+            outputArea.setText(
+                    I18n.getInstance().get("chemical.error.parse", "Error parsing equation:\n%s", e.getMessage()));
             statusLabel.setText(I18n.getInstance().get("chemical.status.error"));
             statusLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: red;");
         }
@@ -259,7 +270,7 @@ public class ChemicalReactionViewer extends Application {
     private String formatFormula(Formula f) {
         StringBuilder sb = new StringBuilder();
         sb.append(f.toString());
-        sb.append(" → Elements: ");
+        sb.append(I18n.getInstance().get("chemical.out.elements", " \u2192 Elements: "));
         for (var e : f.getTotalElements().entrySet()) {
             sb.append(e.getKey()).append("=").append(e.getValue()).append(" ");
         }

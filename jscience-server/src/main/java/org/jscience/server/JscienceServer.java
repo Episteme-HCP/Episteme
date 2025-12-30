@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.Serializable;
+
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -100,7 +100,7 @@ public class JscienceServer extends ComputeServiceGrpc.ComputeServiceImplBase {
                 .setStatus(Status.QUEUED)
                 .setMessage("Task accepted for processing")
                 .build();
-        
+
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
@@ -112,10 +112,11 @@ public class JscienceServer extends ComputeServiceGrpc.ComputeServiceImplBase {
             Callable<?> task = (Callable<?>) ois.readObject();
 
             LOG.info("Executing task " + taskId + "...");
-            Object result = task.call();
+            task.call();
             LOG.info("Task " + taskId + " completed successfully.");
 
-            // In a real system, we would store this result in a DB or cache for retrieval via StreamResults
+            // In a real system, we would store this result in a DB or cache for retrieval
+            // via StreamResults
             // For this simplified implementation, we don't have a callback store yet.
             // Future improvement: Implement a ResultStore map.
 
@@ -123,8 +124,9 @@ public class JscienceServer extends ComputeServiceGrpc.ComputeServiceImplBase {
             LOG.error("Error executing task " + taskId, e);
         }
     }
-    
-    // NOTE: StreamResults would be implemented here to poll the ResultStore and push updates to the client.
+
+    // NOTE: StreamResults would be implemented here to poll the ResultStore and
+    // push updates to the client.
 
     public static void main(String[] args) throws IOException, InterruptedException {
         JscienceServer server = new JscienceServer(50051);

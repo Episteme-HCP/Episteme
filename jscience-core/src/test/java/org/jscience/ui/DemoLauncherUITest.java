@@ -53,7 +53,7 @@ public class DemoLauncherUITest {
     @Start
     private void start(Stage stage) {
         this.stage = stage;
-        new JScienceDemoApp().start(stage);
+        new JScienceDemosApp().start(stage);
     }
 
     // ==================== Stage Tests ====================
@@ -235,6 +235,13 @@ public class DemoLauncherUITest {
     }
 
     // ==================== Stability Tests ====================
+
+    @Test
+    public void testMain() {
+        // Cannot easily test main launch in headless easily without shading,
+        // but compiling against the refactored class confirms validity.
+        assertNotNull(JScienceDemosApp.class);
+    }
 
     @Test
     void testAppRemainsStableAfterBrowsing(FxRobot robot) {

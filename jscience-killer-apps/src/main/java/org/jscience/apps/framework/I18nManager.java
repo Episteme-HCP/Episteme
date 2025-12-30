@@ -77,6 +77,21 @@ public final class I18nManager {
     }
 
     /**
+     * Gets a localized string by key and formats it with arguments.
+     */
+    public String get(String key, Object... args) {
+        String pattern = get(key);
+        if (pattern.startsWith("!") && pattern.endsWith("!")) {
+            return pattern;
+        }
+        try {
+            return java.text.MessageFormat.format(pattern, args);
+        } catch (Exception e) {
+            return "!" + key + " (format error)!";
+        }
+    }
+
+    /**
      * Gets the current locale.
      */
     public Locale getCurrentLocale() {

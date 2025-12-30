@@ -176,9 +176,10 @@ public class TitrationApp extends KillerAppBase {
 
         // Chart
         LineChart<Number, Number> phChart = ChartFactory.createLineChart(i18n.get("titration.panel.chart"),
-                i18n.get("titration.label.volume"), "pH");
+                i18n.get("titration.label.volume"), i18n.get("titration.label.ph_axis"));
         phSeries = new XYChart.Series<>();
-        phSeries.setName("pH");
+        phSeries.setName(i18n.get("titration.series.ph"));
+
         phChart.getData().add(phSeries);
 
         // Status

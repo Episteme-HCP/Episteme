@@ -113,7 +113,9 @@ public class MarketCrashApp extends KillerAppBase {
         Label priceTitle = new Label("📈 " + i18n.get("market.panel.chart"));
         priceTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-        priceChart = ChartFactory.createLineChart(i18n.get("market.panel.chart"), "Day", "Price ($)");
+        priceChart = ChartFactory.createLineChart(i18n.get("market.panel.chart"), i18n.get("market.label.day"),
+                i18n.get("market.label.price_axis"));
+
         priceChart.setAnimated(false);
         priceChart.setCreateSymbols(false);
 
@@ -129,7 +131,8 @@ public class MarketCrashApp extends KillerAppBase {
         Label rsiTitle = new Label("📊 " + i18n.get("market.indicator.rsi"));
         rsiTitle.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 
-        rsiChart = ChartFactory.createLineChart("", "Day", i18n.get("market.indicator.rsi"));
+        rsiChart = ChartFactory.createLineChart("", i18n.get("market.label.day"), i18n.get("market.indicator.rsi"));
+
         rsiChart.setAnimated(false);
         rsiChart.setCreateSymbols(false);
         rsiChart.setPrefHeight(150);
@@ -227,13 +230,14 @@ public class MarketCrashApp extends KillerAppBase {
                 marketData = FinancialMarketLoader.loadCSV(is, "USD");
                 log(java.text.MessageFormat.format(i18n.get("market.log.loaded"), marketData.size()));
             } else {
-                log("Data file not found, creating dummy empty set.");
+                log(i18n.get("market.error.data_not_found"));
                 marketData = new ArrayList<>();
             }
         } catch (Exception e) {
-            log("Error loading data: " + e.getMessage());
+            log(i18n.get("market.error.load", e.getMessage()));
             marketData = new ArrayList<>();
         }
+
     }
 
     @Override

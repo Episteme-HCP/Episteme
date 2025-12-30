@@ -42,7 +42,31 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class OpenMathReader implements Deserializer<Object> {
+public class OpenMathReader implements Deserializer<Object>, org.jscience.io.InputLoader<Object> {
+
+    @Override
+    public Object load(String resourceId) throws Exception {
+        if (resourceId.startsWith("http") || resourceId.startsWith("file:")) {
+            try (InputStream is = new java.net.URI(resourceId).toURL().openStream()) {
+                return read(is);
+            }
+        }
+        try (InputStream is = getClass().getResourceAsStream(resourceId)) {
+            if (is == null)
+                throw new java.io.IOException("OpenMath resource not found: " + resourceId);
+            return read(is);
+        }
+    }
+
+    @Override
+    public String getResourcePath() {
+        return "/";
+    }
+
+    @Override
+    public Class<Object> getResourceType() {
+        return Object.class;
+    }
 
     @Override
     public Object read(InputStream input) throws IOException {

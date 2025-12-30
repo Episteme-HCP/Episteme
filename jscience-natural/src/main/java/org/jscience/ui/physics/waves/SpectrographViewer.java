@@ -98,13 +98,13 @@ public class SpectrographViewer extends VBox implements ScientificViewer, Simula
     private void setupParameters() {
         parameters.add(new NumericParameter(
                 I18n.getInstance().get("spectrograph.sensitivity", "Sensitivity"),
-                "Adjusts the signal responsiveness",
+                I18n.getInstance().get("spectrograph.sensitivity.desc", "Adjusts the signal responsiveness"),
                 0.1, 5.0, 0.1, 1.0,
                 val -> this.sensitivity = val));
 
         parameters.add(new Parameter<String>(
                 I18n.getInstance().get("spectrograph.source", "Source"),
-                "Selects the input signal pattern",
+                I18n.getInstance().get("spectrograph.source.desc", "Selects the input signal pattern"),
                 "Voice",
                 val -> {
                     this.currentPattern = val;
@@ -114,7 +114,7 @@ public class SpectrographViewer extends VBox implements ScientificViewer, Simula
 
         parameters.add(new Parameter<Boolean>(
                 I18n.getInstance().get("spectrograph.mode", "Scientific Mode"),
-                "Toggles between primitive and object-based engines",
+                I18n.getInstance().get("spectrograph.mode.desc", "Toggles between primitive and object-based engines"),
                 false,
                 val -> {
                     if (val) {
@@ -137,7 +137,7 @@ public class SpectrographViewer extends VBox implements ScientificViewer, Simula
 
         getChildren().addAll(spectrumCanvas, spectrogramCanvas);
 
-        fpsLabel = new Label("FPS: --");
+        fpsLabel = new Label(I18n.getInstance().get("spectrograph.fps", "FPS: --"));
         fpsLabel.getStyleClass().add("dark-label-muted");
         getChildren().add(fpsLabel);
     }
@@ -162,7 +162,7 @@ public class SpectrographViewer extends VBox implements ScientificViewer, Simula
                 if (lastFrameTime > 0) {
                     double fps = 1_000_000_000.0 / (now - lastFrameTime);
                     if (frameCount++ % 60 == 0) {
-                        fpsLabel.setText(String.format("FPS: %.1f", fps));
+                        fpsLabel.setText(I18n.getInstance().get("spectrograph.fps.fmt", "FPS: %.1f", fps));
                     }
                 }
                 lastFrameTime = now;
@@ -327,14 +327,17 @@ public class SpectrographViewer extends VBox implements ScientificViewer, Simula
 
                 double val = 0;
 
-                if ("Voice".equals(sourcePattern)) {
+                if (I18n.getInstance().get("spectrograph.source.voice", "Voice").equals(sourcePattern)
+                        || "Voice".equals(sourcePattern)) {
                     // Formant-like bumps
                     val += Math.exp(-Math.pow((i - 20) / 5.0, 2)) * Math.sin(time * 10);
                     val += Math.exp(-Math.pow((i - 50) / 8.0, 2)) * Math.cos(time * 15);
                     val += Math.random() * 0.1;
-                } else if ("White Noise".equals(sourcePattern)) {
+                } else if (I18n.getInstance().get("spectrograph.source.noise", "White Noise").equals(sourcePattern)
+                        || "White Noise".equals(sourcePattern)) {
                     val = Math.random();
-                } else if ("Sine Wave".equals(sourcePattern)) {
+                } else if (I18n.getInstance().get("spectrograph.source.sine", "Sine Wave").equals(sourcePattern)
+                        || "Sine Wave".equals(sourcePattern)) {
                     double center = 64 + 30 * Math.sin(time * 2);
                     val = Math.exp(-Math.pow((i - center) / 2.0, 2));
                 }

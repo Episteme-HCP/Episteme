@@ -25,6 +25,7 @@ package org.jscience.physics.relativity;
 
 import org.jscience.mathematics.linearalgebra.tensors.Tensor;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.geometry.Vector4D;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

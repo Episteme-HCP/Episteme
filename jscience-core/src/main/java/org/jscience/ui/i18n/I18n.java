@@ -51,6 +51,7 @@ public class I18n {
         tryAddBundle("org.jscience.ui.i18n.messages_natural");
         tryAddBundle("org.jscience.ui.i18n.messages_social");
         tryAddBundle("org.jscience.ui.i18n.messages_apps");
+        tryAddBundle("org.jscience.apps.i18n.messages");
     }
 
     private void tryAddBundle(String bundleBase) {
@@ -123,7 +124,7 @@ public class I18n {
             }
         }
         // Return key as fallback
-        return key;
+        return markIfTest(key);
     }
 
     /**
@@ -162,14 +163,30 @@ public class I18n {
      */
     public String get(String key, Object... args) {
         String val = get(key);
-        if (args.length > 0) {
+        if (args.length > 0 && val != null) {
             try {
+                // Detect MessageFormat style {0}
+                if (val.contains("{0}")) {
+                    return java.text.MessageFormat.format(val, args);
+                }
+                // Default to String.format
                 return String.format(val, args);
             } catch (Exception e) {
-                return val + Arrays.toString(args);
+                // Fallback attempt with MessageFormat if String.format failed
+                try {
+                    return java.text.MessageFormat.format(val, args);
+                } catch (Exception e2) {
+                    return val + Arrays.toString(args);
+                }
             }
         }
         return val;
+    }
+
+    private static boolean testMode = false;
+
+    public static void setTestMode(boolean enabled) {
+        testMode = enabled;
     }
 
     private void loadBundle(String bundleBase) {
@@ -177,7 +194,15 @@ public class I18n {
             ResourceBundle bundle = ResourceBundle.getBundle(bundleBase, currentLocale);
             bundles.put(bundleBase, bundle);
         } catch (MissingResourceException e) {
-            System.err.println("I18n: Bundle not found: " + bundleBase + " for locale " + currentLocale);
+            // Ignore (already logged or handled)
         }
+    }
+
+    // Add logic to marked missing keys
+    private String markIfTest(String key) {
+        if (testMode) {
+            return "!!!" + key + "!!!";
+        }
+        return key;
     }
 }

@@ -44,18 +44,20 @@ package org.jscience.mathematics.context;
  *     return a.add(b);
  * });
  * }</pre>
+ * 
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public final class MathContext {
 
     /**
- * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
+     * 
+     * @author Silvere Martin-Michiellot
+     * @author Gemini AI (Google DeepMind)
+     * @since 1.0
+     */
     public enum RealPrecision {
         /** Fast mode - uses float (7 digits, GPU-friendly) */
         FAST,
@@ -91,14 +93,25 @@ public final class MathContext {
     private final RealPrecision realPrecision;
     private final OverflowMode overflowMode;
     private final ComputeMode computeMode;
+    private final java.math.MathContext javaMathContext;
 
     /**
      * Creates a new computation context.
      */
-    public MathContext(RealPrecision realPrecision, OverflowMode overflowMode, ComputeMode computeMode) {
+    public MathContext(RealPrecision realPrecision, OverflowMode overflowMode, ComputeMode computeMode,
+            java.math.MathContext javaMathContext) {
         this.realPrecision = realPrecision;
         this.overflowMode = overflowMode;
         this.computeMode = computeMode;
+        this.javaMathContext = javaMathContext;
+    }
+
+    /**
+     * Creates a new computation context with default java.math.MathContext
+     * (DECIMAL64).
+     */
+    public MathContext(RealPrecision realPrecision, OverflowMode overflowMode, ComputeMode computeMode) {
+        this(realPrecision, overflowMode, computeMode, java.math.MathContext.DECIMAL64);
     }
 
     /**
@@ -128,7 +141,7 @@ public final class MathContext {
     public static MathContext getCurrent() {
         org.jscience.ComputeContext cc = org.jscience.ComputeContext
                 .current();
-        return new MathContext(cc.getRealPrecision(), cc.getOverflowMode(), cc.getComputeMode());
+        return new MathContext(cc.getRealPrecision(), cc.getOverflowMode(), cc.getComputeMode(), cc.getMathContext());
     }
 
     /**
@@ -140,6 +153,7 @@ public final class MathContext {
         cc.setRealPrecision(context.getRealPrecision());
         cc.setOverflowMode(context.getOverflowMode());
         cc.setComputeMode(context.getComputeMode());
+        cc.setMathContext(context.getJavaMathContext());
     }
 
     /**
@@ -153,28 +167,32 @@ public final class MathContext {
      * Creates a fast computation context (float precision).
      */
     public static MathContext fast() {
-        return new MathContext(RealPrecision.FAST, OverflowMode.SAFE);
+        return new MathContext(RealPrecision.FAST, OverflowMode.SAFE, ComputeMode.AUTO,
+                java.math.MathContext.DECIMAL32);
     }
 
     /**
      * Creates a normal computation context (double precision).
      */
     public static MathContext normal() {
-        return new MathContext(RealPrecision.NORMAL, OverflowMode.SAFE);
+        return new MathContext(RealPrecision.NORMAL, OverflowMode.SAFE, ComputeMode.AUTO,
+                java.math.MathContext.DECIMAL64);
     }
 
     /**
      * Creates an exact computation context (BigDecimal).
      */
     public static MathContext exact() {
-        return new MathContext(RealPrecision.EXACT, OverflowMode.SAFE);
+        return new MathContext(RealPrecision.EXACT, OverflowMode.SAFE, ComputeMode.AUTO,
+                java.math.MathContext.UNLIMITED);
     }
 
     /**
      * Creates an unsafe context (no overflow checking).
      */
     public static MathContext unsafe() {
-        return new MathContext(RealPrecision.NORMAL, OverflowMode.UNSAFE);
+        return new MathContext(RealPrecision.NORMAL, OverflowMode.UNSAFE, ComputeMode.AUTO,
+                java.math.MathContext.DECIMAL64);
     }
 
     /**
@@ -219,28 +237,43 @@ public final class MathContext {
     }
 
     /**
+     * Gets the java.math.MathContext.
+     */
+    public java.math.MathContext getJavaMathContext() {
+        return javaMathContext;
+    }
+
+    /**
      * Returns a new context with the specified real precision.
      */
     public MathContext withRealPrecision(RealPrecision realPrecision) {
-        return new MathContext(realPrecision, this.overflowMode, this.computeMode);
+        return new MathContext(realPrecision, this.overflowMode, this.computeMode, this.javaMathContext);
     }
 
     /**
      * Returns a new context with the specified overflow mode.
      */
     public MathContext withOverflowMode(OverflowMode overflowMode) {
-        return new MathContext(this.realPrecision, overflowMode, this.computeMode);
+        return new MathContext(this.realPrecision, overflowMode, this.computeMode, this.javaMathContext);
     }
 
     /**
      * Returns a new context with the specified compute mode.
      */
     public MathContext withComputeMode(ComputeMode computeMode) {
-        return new MathContext(this.realPrecision, this.overflowMode, computeMode);
+        return new MathContext(this.realPrecision, this.overflowMode, computeMode, this.javaMathContext);
+    }
+
+    /**
+     * Returns a new context with the specified java.math.MathContext.
+     */
+    public MathContext withJavaMathContext(java.math.MathContext javaMathContext) {
+        return new MathContext(this.realPrecision, this.overflowMode, this.computeMode, javaMathContext);
     }
 
     @Override
     public String toString() {
-        return "MathContext{real=" + realPrecision + ", overflow=" + overflowMode + ", compute=" + computeMode + "}";
+        return "MathContext{real=" + realPrecision + ", overflow=" + overflowMode + ", compute=" + computeMode
+                + ", javaMC=" + javaMathContext + "}";
     }
 }

@@ -35,6 +35,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.jscience.ui.ThemeManager;
+import org.jscience.ui.i18n.I18n;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,25 +73,25 @@ public class BioMotionViewer extends Application {
         sidebar.setStyle("-fx-padding: 10; -fx-background-color: #eee;");
         sidebar.setPrefWidth(200);
 
-        Label title = new Label("BioMotion Controls");
+        Label title = new Label(I18n.getInstance().get("biomotion.controls", "BioMotion Controls"));
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
-        Button resetBtn = new Button("Reset Walker");
+        Button resetBtn = new Button(I18n.getInstance().get("biomotion.reset", "Reset Walker"));
         resetBtn.setMaxWidth(Double.MAX_VALUE);
         resetBtn.setOnAction(e -> initWalker());
 
         Slider gravSlider = new Slider(0, 20, 9.81);
-        Label gravLabel = new Label("Gravity: 9.81");
+        Label gravLabel = new Label(I18n.getInstance().get("biomotion.gravity", "Gravity: %.2f", 9.81));
         gravSlider.valueProperty().addListener((o, ov, nv) -> {
             gravity = nv.doubleValue();
-            gravLabel.setText(String.format("Gravity: %.2f", gravity));
+            gravLabel.setText(I18n.getInstance().get("biomotion.gravity", "Gravity: %.2f", gravity));
         });
 
         Slider muscleSlider = new Slider(0, 5, 1.0);
-        Label muscleLabel = new Label("Muscle Tone: 1.0");
+        Label muscleLabel = new Label(I18n.getInstance().get("biomotion.muscle", "Muscle Tone: %.1f", 1.0));
         muscleSlider.valueProperty().addListener((o, ov, nv) -> {
             muscleStrength = nv.doubleValue();
-            muscleLabel.setText(String.format("Muscle Tone: %.1f", muscleStrength));
+            muscleLabel.setText(I18n.getInstance().get("biomotion.muscle", "Muscle Tone: %.1f", muscleStrength));
         });
 
         sidebar.getChildren().addAll(title, resetBtn, new Separator(), gravLabel, gravSlider, muscleLabel,
@@ -112,7 +113,7 @@ public class BioMotionViewer extends Application {
 
         Scene scene = new Scene(root, 1000, 600);
         ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle("JScience - BioMotion");
+        stage.setTitle(I18n.getInstance().get("biomotion.title", "JScience - BioMotion"));
         stage.setScene(scene);
         stage.show();
     }

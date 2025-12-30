@@ -1,31 +1,13 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.jscience.economics.loaders;
 
 import org.jscience.economics.Money;
 import org.jscience.history.TimePoint;
-
+import org.jscience.io.InputLoader;
 import org.jscience.mathematics.numbers.real.Real;
 
 import java.io.BufferedReader;
@@ -43,7 +25,39 @@ import java.time.LocalDate;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class FinancialMarketLoader {
+public class FinancialMarketLoader implements InputLoader<List<FinancialMarketLoader.Candle>> {
+
+    private String currencyCode = "USD";
+
+    public FinancialMarketLoader() {
+    }
+
+    public FinancialMarketLoader(String currencyCode) {
+        this.currencyCode = currencyCode;
+    }
+
+    @Override
+    public List<Candle> load(String resourceId) throws Exception {
+        try (InputStream is = getClass().getResourceAsStream(resourceId)) {
+            if (is == null) {
+                try (InputStream fileIs = new java.io.FileInputStream(resourceId)) {
+                    return loadCSV(fileIs, currencyCode);
+                }
+            }
+            return loadCSV(is, currencyCode);
+        }
+    }
+
+    @Override
+    public String getResourcePath() {
+        return "/data/markets/";
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<List<Candle>> getResourceType() {
+        return (Class) List.class;
+    }
 
     public static class Candle {
         public TimePoint time;

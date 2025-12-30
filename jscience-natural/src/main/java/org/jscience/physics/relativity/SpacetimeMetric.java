@@ -26,6 +26,7 @@ package org.jscience.physics.relativity;
 import org.jscience.mathematics.linearalgebra.tensors.Tensor;
 import org.jscience.mathematics.topology.MetricSpace;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.geometry.Vector4D;
 
 /**
  * Interface representing a metric tensor field in spacetime.

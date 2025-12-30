@@ -49,7 +49,33 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class HorizonsEphemerisLoader {
+public class HorizonsEphemerisLoader
+        implements org.jscience.io.InputLoader<List<HorizonsEphemerisLoader.EphemerisPoint>> {
+
+    @Override
+    public List<EphemerisPoint> load(String resourceId) throws Exception {
+        if (resourceId.startsWith("http")) {
+            try (InputStream is = new java.net.URI(resourceId).toURL().openStream()) {
+                return loadEphemeris(is);
+            }
+        }
+        try (InputStream is = getClass().getResourceAsStream(resourceId)) {
+            if (is == null)
+                throw new java.io.IOException("Horizons resource not found: " + resourceId);
+            return loadEphemeris(is);
+        }
+    }
+
+    @Override
+    public String getResourcePath() {
+        return "/";
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<List<EphemerisPoint>> getResourceType() {
+        return (Class) List.class;
+    }
 
     public static class EphemerisPoint {
         public final Instant time;

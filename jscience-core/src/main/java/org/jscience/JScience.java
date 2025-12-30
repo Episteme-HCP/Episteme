@@ -83,6 +83,63 @@ public final class JScience {
         // Prevent instantiation
     }
 
+    static {
+        loadPreferences();
+    }
+
+    /**
+     * Saves current settings to user preferences.
+     */
+    public static void savePreferences() {
+        try {
+            java.util.prefs.Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(JScience.class);
+            prefs.put("compute.mode", getComputeMode().name());
+            prefs.put("float.precision", getFloatPrecisionMode().name());
+            prefs.put("int.precision", getIntPrecisionMode().name());
+            java.math.MathContext mc = getMathContext();
+            prefs.put("math.precision", String.valueOf(mc.getPrecision()));
+            prefs.put("math.rounding", mc.getRoundingMode().name());
+            prefs.flush();
+        } catch (Exception e) {
+            System.err.println("Failed to save preferences: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Loads settings from user preferences.
+     */
+    public static void loadPreferences() {
+        try {
+            java.util.prefs.Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(JScience.class);
+
+            String modeStr = prefs.get("compute.mode", null);
+            if (modeStr != null) {
+                setComputeMode(ComputeMode.valueOf(modeStr));
+            }
+
+            String floatStr = prefs.get("float.precision", null);
+            if (floatStr != null) {
+                ComputeContext.current().setFloatPrecision(ComputeContext.FloatPrecision.valueOf(floatStr));
+            }
+
+            String intStr = prefs.get("int.precision", null);
+            if (intStr != null) {
+                ComputeContext.current().setIntPrecision(ComputeContext.IntPrecision.valueOf(intStr));
+            }
+
+            try {
+                int prec = prefs.getInt("math.precision", 34);
+                String rmStr = prefs.get("math.rounding", "HALF_EVEN");
+                java.math.RoundingMode rm = java.math.RoundingMode.valueOf(rmStr);
+                setMathContext(new java.math.MathContext(prec, rm));
+            } catch (Exception e) {
+                // Ignore math context errors
+            }
+        } catch (Exception e) {
+            // Ignore - use defaults
+        }
+    }
+
     // ================= COMPUTE MODE =================
 
     /**
@@ -103,10 +160,25 @@ public final class JScience {
             case AUTO:
                 if (isGpuAvailable()) {
                     ComputeContext.current().setBackend(ComputeContext.Backend.OPENCL_GPU);
+                    // AUTO logic: On GPU, prioritize Fast performance
+                    setFloatPrecision();
+                    setIntPrecision();
                 } else {
                     ComputeContext.current().setBackend(ComputeContext.Backend.JAVA_CPU);
+                    // AUTO logic: On CPU, prioritize Standard precision
+                    setStandardPrecision();
+                    setLongPrecision();
                 }
                 break;
+        }
+    }
+
+    /**
+     * Re-applies AUTO selection logic based on current environment.
+     */
+    public static void refreshAutoSettings() {
+        if (getComputeMode() == ComputeMode.AUTO) {
+            setComputeMode(ComputeMode.AUTO);
         }
     }
 
@@ -202,6 +274,22 @@ public final class JScience {
         return ComputeContext.current().getIntPrecision();
     }
 
+    // ================= MATH CONTEXT =================
+
+    /**
+     * Sets the global java.math.MathContext for arbitrary precision operations.
+     */
+    public static void setMathContext(java.math.MathContext mathContext) {
+        ComputeContext.current().setMathContext(mathContext);
+    }
+
+    /**
+     * Returns the current java.math.MathContext.
+     */
+    public static java.math.MathContext getMathContext() {
+        return ComputeContext.current().getMathContext();
+    }
+
     // ================= CONVENIENCE CONFIGURATIONS =================
 
     /**
@@ -242,19 +330,56 @@ public final class JScience {
         setLongPrecision();
     }
 
-    // ================= INTROSPECTION & REPORTING =================
-
     /**
      * Checks if GPU acceleration is available on the current system.
      * 
      * @return true if GPU is available, false otherwise
      */
     public static boolean isGpuAvailable() {
+        return isCudaAvailable() || isOpenCLAvailable();
+    }
+
+    /**
+     * Checks if CUDA is available.
+     */
+    public static boolean isCudaAvailable() {
         try {
-            // Check both CUDA and OpenCL backends
-            boolean cuda = new org.jscience.technical.backend.cuda.CudaBackend().isAvailable();
-            boolean opencl = new org.jscience.technical.backend.opencl.OpenCLBackend().isAvailable();
-            return cuda || opencl;
+            return new org.jscience.technical.backend.cuda.CudaBackend().isAvailable();
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    /**
+     * Checks if OpenCL is available.
+     */
+    public static boolean isOpenCLAvailable() {
+        try {
+            return new org.jscience.technical.backend.opencl.OpenCLBackend().isAvailable();
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    /**
+     * Checks if ND4J is available in the classpath.
+     */
+    public static boolean isND4JAvailable() {
+        try {
+            Class.forName("org.nd4j.linalg.factory.Nd4j");
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    /**
+     * Checks if Apache Spark is available in the classpath.
+     */
+    public static boolean isSparkAvailable() {
+        try {
+            Class.forName("org.apache.spark.api.java.JavaSparkContext");
+            return true;
         } catch (Throwable t) {
             return false;
         }

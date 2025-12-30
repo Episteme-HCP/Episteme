@@ -36,13 +36,18 @@ import java.io.IOException;
  */
 public class SimulatedTemperatureProbe extends SimulatedDevice implements TemperatureProbe {
 
-    private final ProbeType type;
+    private final TemperatureProbe.ProbeType type;
     private final Real accuracy;
     private final Real minTemp;
     private final Real maxTemp;
     private Real lastReading = Real.of(293.15); // 20 C
 
-    public SimulatedTemperatureProbe(String name, ProbeType type, Real accuracy, Real minTemp, Real maxTemp) {
+    public SimulatedTemperatureProbe() {
+        this("Temperature Probe", TemperatureProbe.ProbeType.THERMOCOUPLE, Real.of(0.1), Real.of(200), Real.of(1500));
+    }
+
+    public SimulatedTemperatureProbe(String name, TemperatureProbe.ProbeType type, Real accuracy, Real minTemp,
+            Real maxTemp) {
         super(name);
         this.type = type;
         this.accuracy = accuracy;
@@ -51,7 +56,7 @@ public class SimulatedTemperatureProbe extends SimulatedDevice implements Temper
     }
 
     @Override
-    public ProbeType getType() {
+    public TemperatureProbe.ProbeType getType() {
         return type;
     }
 

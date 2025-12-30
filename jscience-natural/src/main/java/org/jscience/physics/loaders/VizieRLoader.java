@@ -36,11 +36,27 @@ import java.util.LinkedHashMap;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class VizieRLoader {
+public class VizieRLoader implements org.jscience.io.InputLoader<Map<String, String>> {
 
     private static final String API_URL = "https://vizier.cds.unistra.fr/viz-bin/votable";
 
-    private VizieRLoader() {
+    public VizieRLoader() {
+    }
+
+    @Override
+    public Map<String, String> load(String resourceId) throws Exception {
+        return queryByObject(resourceId, HIPPARCOS);
+    }
+
+    @Override
+    public String getResourcePath() {
+        return API_URL;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<Map<String, String>> getResourceType() {
+        return (Class) Map.class;
     }
 
     /**

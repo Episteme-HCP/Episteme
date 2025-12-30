@@ -50,14 +50,12 @@ public class GrpcDistributedContext implements DistributedContext {
 
     private final ManagedChannel channel;
     private final ComputeServiceGrpc.ComputeServiceBlockingStub blockingStub;
-    private final ComputeServiceGrpc.ComputeServiceFutureStub futureStub;
 
     public GrpcDistributedContext(String host, int port) {
         this.channel = ManagedChannelBuilder.forAddress(host, port)
                 .usePlaintext() // For demo/dev (no encryption)
                 .build();
         this.blockingStub = ComputeServiceGrpc.newBlockingStub(channel);
-        this.futureStub = ComputeServiceGrpc.newFutureStub(channel);
     }
 
     @Override
@@ -70,7 +68,7 @@ public class GrpcDistributedContext implements DistributedContext {
             oos.flush();
             byte[] bytes = bos.toByteArray();
 
-            TaskRequest request = TaskRequest.newBuilder()
+            TaskRequest.newBuilder()
                     .setSerializedTask(ByteString.copyFrom(bytes))
                     .build();
 
@@ -78,15 +76,18 @@ public class GrpcDistributedContext implements DistributedContext {
             // Note: The blockingStub returns a Response saying "Queued".
             // It does NOT return the result of the calculation.
             // In a full implementation, we would need to poll / stream for the result.
-            // For this version, we will return a Dummy Future that throws NotSupported 
+            // For this version, we will return a Dummy Future that throws NotSupported
             // OR ideally, we wait (but then it's blocking).
-            
+
             // FIXME: The gRPC definition separates submission from result retrieval.
-            // The DistributedContext.submit() expects a Future that eventually yields the result.
-            // To make this work, we'd need a local Future that uses a separate gRPC call (StreamResults)
+            // The DistributedContext.submit() expects a Future that eventually yields the
+            // result.
+            // To make this work, we'd need a local Future that uses a separate gRPC call
+            // (StreamResults)
             // to complete itself.
-            
-            throw new UnsupportedOperationException("Asynchronous gRPC result retrieval not fully implemented yet. Use LocalDistributedContext for now.");
+
+            throw new UnsupportedOperationException(
+                    "Asynchronous gRPC result retrieval not fully implemented yet. Use LocalDistributedContext for now.");
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to serialize or submit task", e);

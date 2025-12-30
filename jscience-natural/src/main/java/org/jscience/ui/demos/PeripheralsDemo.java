@@ -27,10 +27,11 @@ import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.devices.OscilloscopeViewer;
-import org.jscience.ui.devices.VitalMonitorViewer;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.ui.physics.waves.SpectrographViewer;
+import org.jscience.device.sim.SimulatedOscilloscope;
+import org.jscience.ui.devices.OscilloscopeViewer;
+import org.jscience.ui.devices.VitalMonitorViewer;
 
 /**
  * Unified demonstration of all scientific viewers and devices.
@@ -94,8 +95,7 @@ public class PeripheralsDemo extends AbstractDemo {
 
         // Oscilloscope
         try {
-            OscilloscopeViewer osc = new OscilloscopeViewer(
-                    new org.jscience.device.sim.SimulatedOscilloscope("DemoScope"));
+            OscilloscopeViewer osc = new OscilloscopeViewer(new SimulatedOscilloscope("DemoScope"));
             osc.play();
             Tab oscTab = new Tab(I18n.getInstance().get("oscilloscope.title", "Oscilloscope"), osc);
             tabPane.getTabs().add(oscTab);

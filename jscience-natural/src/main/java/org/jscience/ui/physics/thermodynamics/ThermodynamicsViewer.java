@@ -60,8 +60,9 @@ public class ThermodynamicsViewer extends Application {
         stage.setTitle(I18n.getInstance().get("thermo.dashboard"));
 
         // PV Diagram
-        NumberAxis xAxis = new NumberAxis("Volume (m^3)", 0, 0.1, 0.01);
-        NumberAxis yAxis = new NumberAxis("Pressure (Pa)", 0, 200000, 20000);
+        NumberAxis xAxis = new NumberAxis(I18n.getInstance().get("thermo.axis.volume", "Volume (m^3)"), 0, 0.1, 0.01);
+        NumberAxis yAxis = new NumberAxis(I18n.getInstance().get("thermo.axis.pressure", "Pressure (Pa)"), 0, 200000,
+                20000);
         LineChart<Number, Number> pvChart = new LineChart<>(xAxis, yAxis);
         pvChart.setTitle(I18n.getInstance().get("thermo.chart.title"));
         pvChart.setCreateSymbols(false);
@@ -71,7 +72,7 @@ public class ThermodynamicsViewer extends Application {
         pvChart.getData().add(pvSeries);
 
         cycleSeries = new XYChart.Series<>();
-        cycleSeries.setName("Thermodynamic Cycle");
+        cycleSeries.setName(I18n.getInstance().get("thermo.series.cycle", "Thermodynamic Cycle"));
         pvChart.getData().add(cycleSeries);
 
         // Controls
@@ -128,7 +129,7 @@ public class ThermodynamicsViewer extends Application {
 
     private void updateGraph(double temperature) {
         pvSeries.getData().clear();
-        infoLabel.setText(String.format("Temperature: %.2f K", temperature));
+        infoLabel.setText(I18n.getInstance().get("thermo.temp.fmt", "Temperature: %.2f K", temperature));
 
         // Plot P = nRT / V
         double n = 1.0; // moles

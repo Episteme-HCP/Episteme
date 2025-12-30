@@ -91,10 +91,11 @@ public class PhylogeneticTreeViewer extends Application {
         Canvas canvas = new Canvas(900, 700);
         root.setCenter(canvas);
 
-        Label infoPanel = new Label("Click Node for Details | Markers: COI, 16S, CytB");
+        Label infoPanel = new Label(I18n.getInstance().get("phylogeny.info.default"));
         infoPanel.getStyleClass().add("dark-viewer-sidebar");
 
-        javafx.scene.control.Button toggleBtn = new javafx.scene.control.Button("Switch View (Linear/Radial)");
+        javafx.scene.control.Button toggleBtn = new javafx.scene.control.Button(
+                I18n.getInstance().get("phylogeny.toggle_view"));
         toggleBtn.setOnAction(e -> {
             radialMode = !radialMode;
             updateLayoutAndDraw(canvas);
@@ -111,13 +112,13 @@ public class PhylogeneticTreeViewer extends Application {
             Node clicked = findNode(treeRoot, e.getX(), e.getY());
             if (clicked != null) {
                 selectedNode = clicked;
-                String txt = String.format("Selected: %s | COI: %.2f | 16S: %.2f | CytB: %.2f",
+                String txt = I18n.getInstance().get("phylogeny.info.selected",
                         clicked.name, clicked.coi, clicked.rna16s, clicked.cytb);
                 infoPanel.setText(txt);
                 drawTree(canvas.getGraphicsContext2D(), treeRoot);
             } else {
                 selectedNode = null;
-                infoPanel.setText("Click Node for Details | Markers: COI, 16S, CytB");
+                infoPanel.setText(I18n.getInstance().get("phylogeny.info.default"));
                 drawTree(canvas.getGraphicsContext2D(), treeRoot);
             }
         });
@@ -217,9 +218,9 @@ public class PhylogeneticTreeViewer extends Application {
                 gc.setFill(Color.web("#333333")); // Dark grey for headers on light background
                 gc.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, 12));
                 // Shifted right to match heatmap (formerly 620 -> 760)
-                gc.fillText("COI", 760, 20);
-                gc.fillText("16S", 790, 20);
-                gc.fillText("CytB", 820, 20);
+                gc.fillText(I18n.getInstance().get("phylogeny.marker.coi"), 760, 20);
+                gc.fillText(I18n.getInstance().get("phylogeny.marker.rna16s"), 790, 20);
+                gc.fillText(I18n.getInstance().get("phylogeny.marker.cytb"), 820, 20);
             }
         }
 

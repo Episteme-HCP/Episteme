@@ -47,16 +47,14 @@ import java.util.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class FactbookLoader {
+public class FactbookLoader implements org.jscience.io.InputLoader<Map<String, FactbookLoader.CountryProfile>> {
 
     private static final String RESOURCE_PATH = "/data/factbook_countries.json";
     private static FactbookLoader instance;
     private final ObjectMapper mapper;
     private Map<String, CountryProfile> cachedProfiles;
 
-    /**
-     * Extended country profile from CIA Factbook.
-     */
+    // ... (CountryProfile inner class same as before)
     public static class CountryProfile {
         private Region region;
         private Coordinate capital;
@@ -192,6 +190,22 @@ public class FactbookLoader {
             instance = new FactbookLoader();
         }
         return instance;
+    }
+
+    @Override
+    public Map<String, CountryProfile> load(String resourceId) throws Exception {
+        return loadAll();
+    }
+
+    @Override
+    public String getResourcePath() {
+        return RESOURCE_PATH;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<Map<String, CountryProfile>> getResourceType() {
+        return (Class) Map.class;
     }
 
     /**

@@ -81,6 +81,33 @@ public interface Device extends AutoCloseable {
     String getManufacturer();
 
     /**
+     * Returns the firmware version of this device.
+     * 
+     * @return the firmware version, or "N/A" if not applicable
+     */
+    default String getFirmware() {
+        return "N/A";
+    }
+
+    /**
+     * Returns a map of capabilities and their status (active/inactive).
+     * 
+     * @return the capabilities map
+     */
+    default java.util.Map<String, Boolean> getCapabilities() {
+        return java.util.Collections.emptyMap();
+    }
+
+    /**
+     * Returns a map of current status readings (Power, Uptime, etc.).
+     * 
+     * @return the readings map
+     */
+    default java.util.Map<String, String> getReadings() {
+        return java.util.Collections.emptyMap();
+    }
+
+    /**
      * Returns the physical instrument metadata associated with this device.
      * 
      * @return the instrument metadata, or null if not applicable/simulated.

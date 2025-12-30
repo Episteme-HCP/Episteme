@@ -147,7 +147,8 @@ public class QuantumCircuitApp extends KillerAppBase {
             line.setStyle("-fx-border-width: 0 0 1 0; -fx-border-color: #eee;");
 
             // Qubit selector/label
-            ToggleButton qBtn = new ToggleButton("q" + i + " |0⟩");
+            ToggleButton qBtn = new ToggleButton(i18n.get("quantum.label.qubit_title", i));
+
             qBtn.setPrefWidth(80);
             int finalI = i;
             qBtn.setOnAction(e -> {
@@ -199,7 +200,7 @@ public class QuantumCircuitApp extends KillerAppBase {
         Random rand = new Random();
         probChart.getData().clear();
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Probabilities");
+        series.setName(i18n.get("quantum.series.probabilities"));
 
         // Generate random probabilities for 3 qubits = 8 states
         double[] probs = new double[8];
@@ -214,6 +215,8 @@ public class QuantumCircuitApp extends KillerAppBase {
             series.getData().add(new XYChart.Data<>(state, probs[i]));
         }
         probChart.getData().add(series);
-        stateVectorLabel.setText(i18n.get("quantum.label.statevector") + ": (Complex superposition computed)");
+        stateVectorLabel
+                .setText(i18n.get("quantum.label.statevector") + ": " + i18n.get("quantum.status.superposition"));
+
     }
 }

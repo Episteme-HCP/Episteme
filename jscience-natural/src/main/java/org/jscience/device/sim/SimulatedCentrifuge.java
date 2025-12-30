@@ -37,11 +37,15 @@ public class SimulatedCentrifuge extends SimulatedDevice implements Centrifuge {
 
     private final Real maxRPM;
     private final Real maxRCF;
-    private final RotorType rotorType;
+    private final Centrifuge.RotorType rotorType;
     private Real currentRPM = Real.ZERO;
     private boolean running = false;
 
-    public SimulatedCentrifuge(String name, Real maxRPM, Real maxRCF, RotorType rotorType) {
+    public SimulatedCentrifuge() {
+        this("Centrifuge", Real.of(15000), Real.of(25000), Centrifuge.RotorType.FIXED_ANGLE);
+    }
+
+    public SimulatedCentrifuge(String name, Real maxRPM, Real maxRCF, Centrifuge.RotorType rotorType) {
         super(name);
         this.maxRPM = maxRPM;
         this.maxRCF = maxRCF;

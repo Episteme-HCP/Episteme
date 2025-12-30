@@ -126,7 +126,8 @@ public class StellarSkyViewer extends Application {
                 while ((line = br.readLine()) != null) {
                     String[] parts = line.split(",");
                     if (parts.length >= 2) {
-                        String name = (parts.length >= 3) ? parts[2].trim() : "Unknown";
+                        String name = (parts.length >= 3) ? parts[2].trim()
+                                : I18n.getInstance().get("sky.unknown", "Unknown");
                         constellations.add(new ConstellationLine(parts[0].trim(), parts[1].trim(), name));
                     }
                 }
@@ -229,7 +230,7 @@ public class StellarSkyViewer extends Application {
 
         Scene scene = new Scene(root, WIDTH + 280, HEIGHT);
         ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(I18n.getInstance().get("sky.window.title").replace("JScience - ", ""));
+        stage.setTitle(I18n.getInstance().get("sky.window.title", "Night Sky Visualizer").replace("JScience - ", ""));
         stage.setScene(scene);
         stage.show();
     }
@@ -276,11 +277,12 @@ public class StellarSkyViewer extends Application {
         });
 
         // Hour Slider (0-24)
-        Slider hourSlider = createLabeledSlider("Hour", 0, 23, simulationTime.getHour(), val -> {
-            int h = (int) val;
-            simulationTime = simulationTime.withHour(h);
-            drawSky();
-        });
+        Slider hourSlider = createLabeledSlider(I18n.getInstance().get("sky.hour", "Hour"), 0, 23,
+                simulationTime.getHour(), val -> {
+                    int h = (int) val;
+                    simulationTime = simulationTime.withHour(h);
+                    drawSky();
+                });
 
         // Toggles
         showConstellations = new CheckBox(I18n.getInstance().get("sky.stars"));
@@ -296,9 +298,7 @@ public class StellarSkyViewer extends Application {
         showDSO.setSelected(true);
         showDSO.setOnAction(e -> drawSky());
 
-        showTrails = new CheckBox(I18n.getInstance().get("sky.trails")); // Ensure resource has accent or fix text here
-        showTrails.setText("Traînées orbitales"); // Hardcoded fix as per user request if i18n key is missing, or verify
-                                                  // i18n later.
+        showTrails = new CheckBox(I18n.getInstance().get("sky.trails", "Orbit Trails"));
         showTrails.setSelected(false);
         showTrails.setOnAction(e -> drawSky());
 
@@ -415,7 +415,6 @@ public class StellarSkyViewer extends Application {
             this.type = type;
             this.ra = ra;
             this.dec = dec;
-            this.mag = mag;
         }
     }
 
@@ -616,14 +615,15 @@ public class StellarSkyViewer extends Application {
         if (selectedPlanet != null) {
             String type = I18n.getInstance().get("sky.type.planet");
             String orbit = I18n.getInstance().get("sky.orbit.heliocentric");
-            infoLabel.setText(String.format(I18n.getInstance().get("sky.info.planet_fmt"),
-                    selectedPlanet.name, type, orbit));
+            infoLabel.setText(I18n.getInstance().get("sky.info.planet_fmt",
+                    I18n.getInstance().get("sky.planet." + selectedPlanet.name.toLowerCase(), selectedPlanet.name),
+                    type, orbit));
         } else if (selectedStar != null) {
-            infoLabel.setText(String.format(I18n.getInstance().get("sky.info.star_fmt"),
+            infoLabel.setText(I18n.getInstance().get("sky.info.star_fmt",
                     selectedStar.name, selectedStar.mag, selectedStar.spectralType, selectedStar.dist));
         } else if (selectedConstellation != null) {
-            infoLabel.setText(String.format(I18n.getInstance().get("sky.info.constellation_fmt"),
-                    selectedConstellation.name));
+            infoLabel.setText(I18n.getInstance().get("sky.info.constellation_fmt",
+                    selectedConstellation.name, selectedConstellation.star1, selectedConstellation.star2));
         } else {
             infoLabel.setText(I18n.getInstance().get("sky.info.select"));
         }
@@ -1011,7 +1011,8 @@ public class StellarSkyViewer extends Application {
                     // Label
                     gc.setFill(Color.LIGHTGRAY);
                     gc.setFont(Font.font("Arial", 10));
-                    gc.fillText(p.name, pos[0] + 5, pos[1] - 5);
+                    gc.fillText(I18n.getInstance().get("sky.planet." + p.name.toLowerCase(), p.name), pos[0] + 5,
+                            pos[1] - 5);
                 }
             }
 

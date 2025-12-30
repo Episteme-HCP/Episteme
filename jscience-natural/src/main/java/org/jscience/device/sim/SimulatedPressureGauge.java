@@ -37,7 +37,7 @@ import java.io.IOException;
  */
 public class SimulatedPressureGauge extends SimulatedDevice implements PressureGauge {
 
-    private final GaugeType type;
+    private final PressureGauge.GaugeType type;
     private final Real accuracy;
     private Real basePressure = Real.of(101.325); // 1 atm in kPa
     private Real minPressure = Real.of(0.0);
@@ -45,13 +45,18 @@ public class SimulatedPressureGauge extends SimulatedDevice implements PressureG
     private Real lastReading = Real.of(101.325);
     private String pressureUnit = "kPa";
 
+    public SimulatedPressureGauge() {
+        this("Pressure Gauge");
+    }
+
     public SimulatedPressureGauge(String name) {
         super(name);
-        this.type = GaugeType.PIEZOELECTRIC;
+        this.type = PressureGauge.GaugeType.PIEZOELECTRIC;
         this.accuracy = Real.of(0.5);
     }
 
-    public SimulatedPressureGauge(String name, GaugeType type, Real accuracy, Real minPressure, Real maxPressure) {
+    public SimulatedPressureGauge(String name, PressureGauge.GaugeType type, Real accuracy, Real minPressure,
+            Real maxPressure) {
         super(name);
         this.type = type;
         this.accuracy = accuracy;
@@ -60,7 +65,7 @@ public class SimulatedPressureGauge extends SimulatedDevice implements PressureG
     }
 
     @Override
-    public GaugeType getType() {
+    public PressureGauge.GaugeType getType() {
         return type;
     }
 
