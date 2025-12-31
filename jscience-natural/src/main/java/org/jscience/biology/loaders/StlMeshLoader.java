@@ -59,7 +59,7 @@ public class StlMeshLoader implements org.jscience.io.InputLoader<javafx.scene.s
     @Override
     @SuppressWarnings("unchecked")
     public Class<javafx.scene.shape.MeshView> getResourceType() {
-        return (Class) javafx.scene.shape.MeshView.class;
+        return (Class<javafx.scene.shape.MeshView>) (Class<?>) javafx.scene.shape.MeshView.class;
     }
 
     /**

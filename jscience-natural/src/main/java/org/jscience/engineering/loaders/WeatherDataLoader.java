@@ -54,8 +54,8 @@ public class WeatherDataLoader implements org.jscience.io.InputLoader<List<Weath
 
     @Override
     @SuppressWarnings("unchecked")
-    public Class<List<WeatherRecord>> getResourceType() {
-        return (Class) List.class;
+    public Class<List<WeatherDataLoader.WeatherRecord>> getResourceType() {
+        return (Class<List<WeatherDataLoader.WeatherRecord>>) (Class<?>) List.class;
     }
 
     public static class WeatherRecord {

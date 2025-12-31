@@ -25,7 +25,6 @@ package org.jscience.device.loaders.nmea;
 
 import java.io.InputStream;
 import java.util.Scanner;
-import org.jscience.device.Sensor;
 
 // ...
 
@@ -38,27 +37,20 @@ import org.jscience.device.Sensor;
  */
 public class NMEALoader implements org.jscience.io.InputLoader<java.util.List<NMEAMessage>> {
 
-    private InputStream input;
     private Scanner scanner;
-    private final String name;
 
     public NMEALoader() {
-        this.name = "NMEA Loader";
-        this.input = null;
     }
 
     public NMEALoader(InputStream input, String name) {
-        this.input = input;
         this.scanner = new Scanner(input);
-        this.name = name;
     }
 
     @Override
     public java.util.List<NMEAMessage> load(String resourceId) throws Exception {
         // resourceId can be a file path or URL
         java.util.List<NMEAMessage> messages = new java.util.ArrayList<>();
-        try (InputStream is = new java.io.FileInputStream(resourceId);
-                Scanner sc = new Scanner(is)) {
+        try (InputStream is = new java.io.FileInputStream(resourceId); Scanner sc = new Scanner(is)) {
             while (sc.hasNextLine()) {
                 String line = sc.nextLine().trim();
                 if (line.startsWith("$") && NMEAMessage.validateChecksum(line)) {
@@ -77,7 +69,7 @@ public class NMEALoader implements org.jscience.io.InputLoader<java.util.List<NM
     @Override
     @SuppressWarnings("unchecked")
     public Class<java.util.List<NMEAMessage>> getResourceType() {
-        return (Class) java.util.List.class;
+        return (Class<java.util.List<NMEAMessage>>) (Class<?>) java.util.List.class;
     }
 
     /**

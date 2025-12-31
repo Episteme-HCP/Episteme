@@ -45,7 +45,7 @@ public class FASTAParser extends AbstractLoader<List<BioSequence>> {
     @Override
     @SuppressWarnings("unchecked")
     public Class<List<BioSequence>> getResourceType() {
-        return (Class) List.class;
+        return (Class<List<BioSequence>>) (Class<?>) List.class;
     }
 
     /**

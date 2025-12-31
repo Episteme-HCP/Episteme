@@ -43,7 +43,7 @@ public class FactbookLoader implements InputLoader<List<Country>> {
     @Override
     @SuppressWarnings("unchecked")
     public Class<List<Country>> getResourceType() {
-        return (Class) List.class;
+        return (Class<List<Country>>) (Class<?>) List.class;
     }
 
     public List<Country> load(InputStream input) throws Exception {

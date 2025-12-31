@@ -41,7 +41,6 @@ public class InterplanetaryTrajectoryDemo extends AbstractDemo {
     private StarSystem solarSystem;
     private CelestialBody originBody;
     private CelestialBody targetBody;
-    private List<HorizonsEphemerisLoader.EphemerisPoint> realEphemerisPoints;
 
     private static final double SCALE = 100.0;
     private static final double AU = 1.496e11;
@@ -96,12 +95,10 @@ public class InterplanetaryTrajectoryDemo extends AbstractDemo {
 
         try (var is = getClass().getResourceAsStream("data/mars_horizons.txt")) {
             if (is != null) {
-                realEphemerisPoints = HorizonsEphemerisLoader.loadEphemeris(is);
-            } else {
-                realEphemerisPoints = new java.util.ArrayList<>();
+                HorizonsEphemerisLoader.loadEphemeris(is);
             }
         } catch (Exception e) {
-            realEphemerisPoints = new java.util.ArrayList<>();
+            // Log or handle the exception if necessary, but realEphemerisPoints is unused.
         }
     }
 

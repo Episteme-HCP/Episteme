@@ -43,7 +43,7 @@ public class FASTALoader extends AbstractLoader<List<FASTALoader.Sequence>> {
     @Override
     @SuppressWarnings("unchecked")
     public Class<List<Sequence>> getResourceType() {
-        return (Class) List.class;
+        return (Class<List<Sequence>>) (Class<?>) List.class;
     }
 
     public static class Sequence {

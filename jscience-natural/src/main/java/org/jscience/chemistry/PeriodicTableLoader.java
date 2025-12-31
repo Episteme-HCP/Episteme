@@ -59,7 +59,7 @@ public class PeriodicTableLoader implements org.jscience.io.InputLoader<List<Ele
     @Override
     @SuppressWarnings("unchecked")
     public Class<List<Element>> getResourceType() {
-        return (Class) List.class;
+        return (Class<List<Element>>) (Class<?>) List.class;
     }
 
     public static List<Element> loadFromResource(String resourcePath) {

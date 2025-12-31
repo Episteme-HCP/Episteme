@@ -5,10 +5,9 @@
 
 package org.jscience.apps;
 
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
+
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -66,7 +65,7 @@ public class DemosAppCrawlerTest {
     @Start
     private void start(Stage stage) {
         this.mainStage = stage;
-        I18n.getInstance().setTestMode(true);
+        I18n.setTestMode(true);
         new JScienceDemosApp().start(stage);
     }
 
@@ -98,7 +97,7 @@ public class DemosAppCrawlerTest {
 
         // Instead of clicking directly (which might launch blocking stages),
         // we'll find the text of the demos and click them by name to be sure.
-        List<String> demoNames = new ArrayList<>();
+        // Set<String> demoNames = new HashSet<>();
         // Find labels near the buttons or just get the buttons themselves
         // In JScienceDemosApp, the buttons are "Launch" and the demo name is in a label
         // next to it.

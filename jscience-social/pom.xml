@@ -27,11 +27,7 @@
             <artifactId>jscience-natural</artifactId>
         </dependency>
 
-        <!-- Web Server (for Dashboard) -->
-        <dependency>
-            <groupId>io.javalin</groupId>
-            <artifactId>javalin</artifactId>
-        </dependency>
+
 
         <!-- Testing -->
         <dependency>

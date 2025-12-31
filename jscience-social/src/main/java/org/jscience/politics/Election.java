@@ -71,7 +71,7 @@ public class Election implements Identifiable<String>, Temporal {
     }
 
     public void addVote(String candidate, int count) {
-        results.merge(candidate, count, Integer::sum);
+        results.merge(candidate, count, (a, b) -> a + b);
     }
 
     public Map<String, Integer> getResults() {

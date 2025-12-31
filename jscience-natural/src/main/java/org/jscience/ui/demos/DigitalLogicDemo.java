@@ -505,7 +505,7 @@ public class DigitalLogicDemo extends AbstractDemo {
         boolean contains(double mx, double my) {
             // Simple hit test approximation
             double dist = Math.max(50, Math.abs(end.x - start.x) * 0.5);
-            double cmx = (start.x + end.x) / 2; // Rough center check not enough for bezier
+
             // Resampling for hit test
             for (double t = 0; t <= 1; t += 0.05) {
                 double ix = Math.pow(1 - t, 3) * start.x + 3 * Math.pow(1 - t, 2) * t * (start.x + dist)

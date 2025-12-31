@@ -63,7 +63,7 @@ public class PDBLoader implements org.jscience.io.InputLoader<Map<String, String
     @Override
     @SuppressWarnings("unchecked")
     public Class<Map<String, String>> getResourceType() {
-        return (Class) Map.class;
+        return (Class<Map<String, String>>) (Class<?>) Map.class;
     }
 
     /**

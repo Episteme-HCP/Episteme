@@ -56,7 +56,7 @@ public class FinancialMarketLoader implements InputLoader<List<FinancialMarketLo
     @Override
     @SuppressWarnings("unchecked")
     public Class<List<Candle>> getResourceType() {
-        return (Class) List.class;
+        return (Class<List<FinancialMarketLoader.Candle>>) (Class<?>) List.class;
     }
 
     public static class Candle {

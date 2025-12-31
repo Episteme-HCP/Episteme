@@ -54,7 +54,7 @@ public class StarLoader extends AbstractLoader<List<StarLoader.Star>> {
     @Override
     @SuppressWarnings("unchecked")
     public Class<List<Star>> getResourceType() {
-        return (Class) List.class;
+        return (Class<List<Star>>) (Class<?>) List.class;
     }
 
     public List<Star> loadResource(String path) throws Exception {

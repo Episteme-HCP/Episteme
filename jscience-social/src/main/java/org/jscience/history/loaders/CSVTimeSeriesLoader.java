@@ -43,7 +43,7 @@ public class CSVTimeSeriesLoader implements InputLoader<Map<TimePoint, Real>> {
     @Override
     @SuppressWarnings("unchecked")
     public Class<Map<TimePoint, Real>> getResourceType() {
-        return (Class) Map.class;
+        return (Class<Map<TimePoint, Real>>) (Class<?>) Map.class;
     }
 
     /**

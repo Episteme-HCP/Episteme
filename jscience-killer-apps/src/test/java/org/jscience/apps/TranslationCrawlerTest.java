@@ -1,12 +1,10 @@
 package org.jscience.apps;
 
-import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.layout.Pane;
+
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import org.jscience.ui.JScienceDashboard;
 import org.jscience.ui.i18n.I18n;
 import org.junit.jupiter.api.AfterEach;
@@ -24,9 +22,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.testfx.api.FxAssert.verifyThat;
 
 @ExtendWith(ApplicationExtension.class)
 public class TranslationCrawlerTest {
@@ -87,14 +82,14 @@ public class TranslationCrawlerTest {
             // Click on Language tab
             robot.clickOn("Language");
             WaitForAsyncUtils.waitForFxEvents();
-            
+
             // Look for the language in the ListView
             ListView<?> langList = robot.lookup("#lang-list").queryAs(ListView.class);
             if (langList != null) {
                 robot.interact(() -> {
                     for (Object item : langList.getItems()) {
                         if (item.toString().contains(langName)) {
-                            langList.getSelectionModel().select(item);
+                            langList.getSelectionModel().select(langList.getItems().indexOf(item));
                             break;
                         }
                     }
@@ -117,7 +112,7 @@ public class TranslationCrawlerTest {
                 robot.clickOn("#tab-" + tabId.toLowerCase());
                 WaitForAsyncUtils.waitForFxEvents();
                 captureScreenshot(robot, "Tab_" + tabId + "_" + suffix);
-                
+
                 // Collect all visible strings
                 collectStrings(robot.targetWindow().getScene().getRoot(), results, tabId);
             } catch (Exception e) {
@@ -151,7 +146,6 @@ public class TranslationCrawlerTest {
     private void compareTranslations(Map<String, String> en, Map<String, String> fr) {
         System.out.println("Comparing results (" + en.size() + " EN vs " + fr.size() + " FR)...");
         int diffCount = 0;
-        int sameCount = 0;
 
         for (String key : en.keySet()) {
             if (fr.containsKey(key)) {
@@ -162,42 +156,13 @@ public class TranslationCrawlerTest {
                 } else {
                     // Some things are expected to be the same (numbers, names, "JScience")
                     if (enText.matches(".*[a-zA-Z]{3,}.*") && !enText.equals("JScience") && !enText.contains("2025")) {
-                       // Suspicious if long text is identical in EN and FR
-                       // sameCount++;
+                        // Suspicious if long text is identical in EN and FR
+                        // sameCount++;
                     }
                 }
             }
         }
         System.out.println("Found " + diffCount + " translated strings.");
-    }
-
-    private Window getNewestWindow(FxRobot robot) {
-        List<Window> windows = robot.robotContext().getWindowFinder().listWindows();
-        if (windows.size() > 1) {
-            return windows.get(windows.size() - 1); // Assuming last opened is last in list
-        }
-        return null;
-    }
-
-    private void checkVisibleNodesForTranslation(FxRobot robot) {
-        // robot.rootNode() gives the stage root?
-        // Use lookup for all Labeled
-        robot.lookup(".label").queryAll().forEach(this::checkNode);
-        robot.lookup(".button").queryAll().forEach(this::checkNode);
-        robot.lookup(".check-box").queryAll().forEach(this::checkNode);
-        robot.lookup(".radio-button").queryAll().forEach(this::checkNode);
-        // ... add others as needed
-    }
-
-    private void crawlNode(Parent root) {
-        analyzeNode(root);
-        for (Node child : root.getChildrenUnmodifiable()) {
-            if (child instanceof Parent) {
-                crawlNode((Parent) child);
-            } else {
-                analyzeNode(child);
-            }
-        }
     }
 
     private void checkNode(Node node) {

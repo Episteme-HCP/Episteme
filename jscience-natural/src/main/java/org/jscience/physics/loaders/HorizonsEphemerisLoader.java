@@ -73,8 +73,8 @@ public class HorizonsEphemerisLoader
 
     @Override
     @SuppressWarnings("unchecked")
-    public Class<List<EphemerisPoint>> getResourceType() {
-        return (Class) List.class;
+    public Class<List<HorizonsEphemerisLoader.EphemerisPoint>> getResourceType() {
+        return (Class<List<HorizonsEphemerisLoader.EphemerisPoint>>) (Class<?>) List.class;
     }
 
     public static class EphemerisPoint {

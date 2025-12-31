@@ -197,7 +197,7 @@ public class CrisprDesignApp extends KillerAppBase {
         File f = fc.showOpenDialog(null);
         if (f != null) {
             try (java.io.FileInputStream fis = new java.io.FileInputStream(f)) {
-                List<org.jscience.biology.loaders.FastaLoader.Sequence> seqs = org.jscience.biology.loaders.FastaLoader
+                List<org.jscience.biology.loaders.FASTALoader.Sequence> seqs = org.jscience.biology.loaders.FASTALoader
                         .load(fis);
                 if (!seqs.isEmpty()) {
                     genomeArea.setText(seqs.get(0).data.toUpperCase());
@@ -211,7 +211,7 @@ public class CrisprDesignApp extends KillerAppBase {
     private void loadSample() {
         try (java.io.InputStream is = getClass().getResourceAsStream("data/crispr_sample.fasta")) {
             if (is != null) {
-                List<org.jscience.biology.loaders.FastaLoader.Sequence> seqs = org.jscience.biology.loaders.FastaLoader
+                List<org.jscience.biology.loaders.FASTALoader.Sequence> seqs = org.jscience.biology.loaders.FASTALoader
                         .load(is);
                 if (!seqs.isEmpty()) {
                     genomeArea.setText(seqs.get(0).data.toUpperCase());

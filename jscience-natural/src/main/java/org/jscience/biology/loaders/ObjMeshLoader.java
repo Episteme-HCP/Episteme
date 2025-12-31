@@ -65,7 +65,7 @@ public class ObjMeshLoader implements org.jscience.io.InputLoader<javafx.scene.G
     @Override
     @SuppressWarnings("unchecked")
     public Class<javafx.scene.Group> getResourceType() {
-        return (Class) javafx.scene.Group.class;
+        return (Class<javafx.scene.Group>) (Class<?>) javafx.scene.Group.class;
     }
 
     /**

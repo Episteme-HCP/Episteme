@@ -880,20 +880,6 @@ public class JScienceDashboard extends Application {
         return new Tab(i18n.get("dashboard.tab.devices", "Devices"), content);
     }
 
-    private void testDevice(String className) {
-        try {
-            Class<?> cls = Class.forName(className);
-            org.jscience.device.Device device = (org.jscience.device.Device) cls.getDeclaredConstructor().newInstance();
-            device.connect();
-            boolean ok = device.isConnected();
-            device.disconnect();
-            new Alert(Alert.AlertType.INFORMATION, "Device " + className + " connection: " + (ok ? "OK" : "FAILED"))
-                    .show();
-        } catch (Exception e) {
-            new Alert(Alert.AlertType.ERROR, "Failed to connect to device: " + e.getMessage()).show();
-        }
-    }
-
     public static void main(String[] args) {
         launch(args);
     }

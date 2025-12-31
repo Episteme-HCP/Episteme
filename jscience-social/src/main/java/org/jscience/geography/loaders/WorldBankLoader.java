@@ -28,7 +28,6 @@ import java.util.Map;
  */
 public class WorldBankLoader implements InputLoader<List<Region>> {
 
-    private static final String API_URL = "https://api.worldbank.org/v2/country/";
     private static final String RESOURCE_PATH = "/data/worldbank_countries.json";
     private static WorldBankLoader instance;
     private final ObjectMapper mapper = new ObjectMapper();
@@ -56,7 +55,7 @@ public class WorldBankLoader implements InputLoader<List<Region>> {
     @Override
     @SuppressWarnings("unchecked")
     public Class<List<Region>> getResourceType() {
-        return (Class) List.class;
+        return (Class<List<Region>>) (Class<?>) List.class;
     }
 
     /**

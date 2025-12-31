@@ -58,7 +58,7 @@ public class GeoJsonLoader implements org.jscience.io.InputLoader<List<org.jscie
     @Override
     @SuppressWarnings("unchecked")
     public Class<List<org.jscience.geography.Region>> getResourceType() {
-        return (Class) List.class;
+        return (Class<List<org.jscience.geography.Region>>) (Class<?>) List.class;
     }
 
     private final ObjectMapper mapper;

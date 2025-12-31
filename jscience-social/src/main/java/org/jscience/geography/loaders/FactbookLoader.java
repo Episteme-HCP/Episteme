@@ -204,8 +204,8 @@ public class FactbookLoader implements org.jscience.io.InputLoader<Map<String, F
 
     @Override
     @SuppressWarnings("unchecked")
-    public Class<Map<String, CountryProfile>> getResourceType() {
-        return (Class) Map.class;
+    public Class<Map<String, FactbookLoader.CountryProfile>> getResourceType() {
+        return (Class<Map<String, FactbookLoader.CountryProfile>>) (Class<?>) Map.class;
     }
 
     /**
