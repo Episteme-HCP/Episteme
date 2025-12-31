@@ -483,7 +483,7 @@ public class JScienceDashboard extends Application {
         String desc = i18n.get("lib." + nameKey + ".desc", descKey);
 
         Label nameLabel = new Label(name);
-        nameLabel.setStyle("-fx-font-weight: bold;");
+        nameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: black;");
 
         Label descLabel = new Label(desc);
         descLabel.getStyleClass().add("dashboard-description");
@@ -569,7 +569,7 @@ public class JScienceDashboard extends Application {
 
     private Label createHeaderLabel(String text) {
         Label l = new Label(text + ":");
-        l.getStyleClass().add("header-title"); // Use CSS
+        l.getStyleClass().add("form-label"); // Use CSS
         return l;
     }
 
@@ -641,14 +641,20 @@ public class JScienceDashboard extends Application {
 
         // Compute all available apps/demos
         DashboardDiscovery discovery = DashboardDiscovery.getInstance();
-        List<DashboardDiscovery.ClassInfo> rawApps = discovery.findClasses("Demo");
+        List<DashboardDiscovery.ClassInfo> rawApps = discovery.findClasses("Application");
+        rawApps.addAll(discovery.findClasses("Demo"));
         rawApps.addAll(discovery.findClasses("Viewer"));
 
-        // Deduplicate by full name
+        // Deduplicate by full name AND simple name
         List<DashboardDiscovery.ClassInfo> allApps = new ArrayList<>();
         java.util.Set<String> seen = new java.util.HashSet<>();
+        java.util.Set<String> seenSimple = new java.util.HashSet<>();
+
         for (DashboardDiscovery.ClassInfo info : rawApps) {
-            if (seen.add(info.fullName)) {
+            boolean fullNew = seen.add(info.fullName);
+            boolean simpleNew = seenSimple.add(info.simpleName);
+
+            if (fullNew && simpleNew) {
                 allApps.add(info);
             }
         }
@@ -660,11 +666,13 @@ public class JScienceDashboard extends Application {
         List<AppEntry> others = new ArrayList<>();
 
         for (DashboardDiscovery.ClassInfo info : allApps) {
-            // Filter: Ensure it is a valid JavaFX Application
+            // Filter: Ensure it is a valid JavaFX Application or DemoProvider
             try {
                 Class<?> cls = Class.forName(info.fullName);
-                if (!Application.class.isAssignableFrom(cls)
-                        || java.lang.reflect.Modifier.isAbstract(cls.getModifiers()))
+                boolean isApp = Application.class.isAssignableFrom(cls);
+                boolean isDemo = DemoProvider.class.isAssignableFrom(cls);
+
+                if ((!isApp && !isDemo) || java.lang.reflect.Modifier.isAbstract(cls.getModifiers()))
                     continue;
             } catch (Throwable t) {
                 continue;
@@ -714,7 +722,7 @@ public class JScienceDashboard extends Application {
         hint.setText(i18n.get("dashboard.apps.discovered", "Apps Found:") + " " + validCount);
 
         content.getChildren().addAll(header, hint, accordion);
-        VBox.setVgrow(accordion, Priority.ALWAYS);
+        // VBox.setVgrow(accordion, Priority.ALWAYS); // Removed to prevent empty space
         return new Tab(i18n.get("dashboard.tab.apps", "Apps"), content);
     }
 
@@ -809,6 +817,11 @@ public class JScienceDashboard extends Application {
                 Stage stage = new Stage();
                 Application app = (Application) cls.getDeclaredConstructor().newInstance();
                 app.start(stage);
+            } else if (DemoProvider.class.isAssignableFrom(cls)) {
+                // Launch DemoProvider
+                Stage stage = new Stage();
+                DemoProvider demo = (DemoProvider) cls.getDeclaredConstructor().newInstance();
+                demo.show(stage);
             }
         } catch (Exception e) {
             new Alert(Alert.AlertType.ERROR, "Failed to launch app: " + e.getMessage()).show();

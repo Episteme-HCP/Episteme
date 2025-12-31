@@ -1,0 +1,68 @@
+/* main.css - Default styles for JScience Dashboard */
+
+.header-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+    -fx-text-fill: black;
+}
+
+.dashboard-description {
+    -fx-text-fill: #333333;
+    -fx-font-style: italic;
+    -fx-wrap-text: true;
+}
+
+.form-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+    -fx-font-size: 13px;
+}
+
+/* For manual striping (legacy or grid) */
+.row-odd {
+    -fx-background-color: white;
+}
+
+.row-even {
+    -fx-background-color: #e0e0e0;
+}
+
+/* ListView Striping (Official JavaFX way) */
+.list-cell:odd {
+    -fx-background-color: white;
+}
+
+.list-cell:even {
+    -fx-background-color: #e0e0e0;
+}
+
+/* Empty Cells - Hide them */
+.list-cell:empty {
+    -fx-background-color: transparent;
+    -fx-opacity: 0;
+}
+
+/* Selection State - Force Blue Background and White Text */
+.list-cell:filled:selected,
+.list-cell:filled:selected:hover {
+    -fx-background-color: #0096c9;
+    -fx-text-fill: white;
+}
+
+.list-cell:filled:selected .dashboard-description,
+.list-cell:filled:selected .form-label {
+    -fx-text-fill: white;
+}
+
+/* Fix ComboBox Striping - Reset to uniform white */
+.combo-box-popup .list-cell:odd,
+.combo-box-popup .list-cell:even {
+    -fx-background-color: white;
+    -fx-text-fill: black;
+}
+
+.combo-box-popup .list-cell:filled:selected,
+.combo-box-popup .list-cell:filled:selected:hover {
+    -fx-background-color: #0096c9;
+    -fx-text-fill: white;
+}
