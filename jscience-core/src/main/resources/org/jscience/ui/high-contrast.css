@@ -4,7 +4,8 @@
     -fx-base: #000000;
     -fx-background: #000000;
     -fx-control-inner-background: #000000;
-    -fx-text-base-color: #FFFF00; /* Yellow text on black */
+    -fx-text-base-color: #FFFF00;
+    /* Yellow text on black */
     -fx-accent: #FFFFFF;
     -fx-focus-color: #FFFF00;
 }
@@ -68,13 +69,25 @@
     -fx-border-width: 1px;
 }
 
-.titled-pane > .title {
+.titled-pane>.title {
     -fx-background-color: #000000;
     -fx-text-fill: #FFFF00;
     -fx-border-color: #FFFF00;
 }
 
-.titled-pane > .content {
+.titled-pane>.content {
     -fx-background-color: #000000;
     -fx-border-color: #FFFF00;
+}
+
+/* New classes for readability */
+.dashboard-subtitle,
+.dashboard-description,
+.dashboard-help,
+.header-title {
+    -fx-text-fill: #FFFF00;
+}
+
+.row-even {
+    -fx-background-color: #000000;
 }

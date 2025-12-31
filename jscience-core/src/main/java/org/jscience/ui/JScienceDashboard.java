@@ -130,6 +130,7 @@ public class JScienceDashboard extends Application {
     private void applyCurrentTheme(Scene scene) {
         String currentTheme = System.getProperty("jscience.theme", "Modena");
         scene.getStylesheets().clear();
+        scene.getStylesheets().add(getClass().getResource("/org/jscience/ui/main.css").toExternalForm());
 
         if ("Caspian".equalsIgnoreCase(currentTheme)) {
             Application.setUserAgentStylesheet(Application.STYLESHEET_CASPIAN);
@@ -160,7 +161,7 @@ public class JScienceDashboard extends Application {
 
         Label subtitle = new Label(
                 i18n.get("dashboard.general.subtitle", "Universal Scientific Computing Environment"));
-        subtitle.setStyle("-fx-font-size: 16px; -fx-text-fill: gray;");
+        subtitle.getStyleClass().add("dashboard-subtitle");
 
         GridPane infoGrid = new GridUtils.Builder()
                 .addRow(i18n.get("dashboard.general.version", "Version") + ":", org.jscience.JScienceVersion.VERSION)
@@ -385,9 +386,9 @@ public class JScienceDashboard extends Application {
         VBox box = new VBox();
         Label help = new Label("(?)");
         help.setTooltip(new Tooltip(tooltipText));
-        help.setStyle("-fx-text-fill: blue; -fx-cursor: hand;");
+        help.getStyleClass().add("dashboard-help");
         Label text = new Label(tooltipText);
-        text.setStyle("-fx-font-size: 10px; -fx-text-fill: #666;");
+        text.getStyleClass().add("dashboard-description");
         box.getChildren().add(text);
         return box;
     }
@@ -401,7 +402,7 @@ public class JScienceDashboard extends Application {
         scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
 
         Label headerTitle = new Label(i18n.get("dashboard.libraries.header", "Available Libraries & Status"));
-        headerTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
+        headerTitle.getStyleClass().add("header-title");
         content.getChildren().add(headerTitle);
 
         // --- HELP SECTION ---
@@ -460,10 +461,10 @@ public class JScienceDashboard extends Application {
     private VBox createLibCategory(I18n i18n, String catKey, List<LibInfo> libs, I18n i18nRef) {
         VBox box = new VBox(12);
         Label header = new Label(i18n.get("dashboard.libraries.cat." + catKey, catKey));
-        header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: black;");
+        header.getStyleClass().add("header-title");
 
         Label desc = new Label(i18n.get("dashboard.libraries.cat." + catKey + ".desc", ""));
-        desc.setStyle("-fx-text-fill: #555; -fx-font-style: italic;");
+        desc.getStyleClass().add("dashboard-description");
 
         GridPane grid = new GridPane();
         grid.setHgap(35);
@@ -482,10 +483,10 @@ public class JScienceDashboard extends Application {
         String desc = i18n.get("lib." + nameKey + ".desc", descKey);
 
         Label nameLabel = new Label(name);
-        nameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1a1a1a;");
+        nameLabel.setStyle("-fx-font-weight: bold;");
 
         Label descLabel = new Label(desc);
-        descLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #444;");
+        descLabel.getStyleClass().add("dashboard-description");
         descLabel.setWrapText(true);
         descLabel.setMaxWidth(500);
 
@@ -503,7 +504,7 @@ public class JScienceDashboard extends Application {
         Label header = new Label(i18n.get("dashboard.loaders.header", "Known Data Loaders & Formats"));
         header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        Label hint = new Label("Recherche des chargeurs...");
+        Label hint = new Label(i18n.get("dashboard.loaders.discovering", "Searching for loaders..."));
         hint.setStyle("-fx-font-style: italic; -fx-text-fill: #777;");
 
         Accordion accordion = new Accordion();
@@ -530,9 +531,9 @@ public class JScienceDashboard extends Application {
                 entries.add(new AppEntry(info.simpleName, info.fullName, pkg));
             }
             // Loaders are not launchable (false)
-            // Use static VBox list to avoid empty space issues
+            // Use createAppList for consistent look and feel
             TitledPane pane = new TitledPane(entry.getKey() + " (" + entries.size() + ")",
-                    createStaticEntryList(entries));
+                    createAppList(false, entries.toArray(new AppEntry[0])));
             accordion.getPanes().add(pane);
         }
 
@@ -568,7 +569,7 @@ public class JScienceDashboard extends Application {
 
     private Label createHeaderLabel(String text) {
         Label l = new Label(text + ":");
-        l.setStyle("-fx-font-weight: bold;");
+        l.getStyleClass().add("header-title"); // Use CSS
         return l;
     }
 
@@ -633,7 +634,7 @@ public class JScienceDashboard extends Application {
         Label header = new Label(i18n.get("dashboard.apps.header", "Applications, Demos & Viewers"));
         header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        Label hint = new Label("Discovering from classpath...");
+        Label hint = new Label(i18n.get("dashboard.apps.discovering", "Discovering from classpath..."));
         hint.setStyle("-fx-font-style: italic; -fx-text-fill: #777;");
 
         Accordion accordion = new Accordion();
@@ -659,6 +660,16 @@ public class JScienceDashboard extends Application {
         List<AppEntry> others = new ArrayList<>();
 
         for (DashboardDiscovery.ClassInfo info : allApps) {
+            // Filter: Ensure it is a valid JavaFX Application
+            try {
+                Class<?> cls = Class.forName(info.fullName);
+                if (!Application.class.isAssignableFrom(cls)
+                        || java.lang.reflect.Modifier.isAbstract(cls.getModifiers()))
+                    continue;
+            } catch (Throwable t) {
+                continue;
+            }
+
             String desc = getAppDescription(info.fullName);
             AppEntry entry = new AppEntry(info.simpleName, info.fullName, desc);
 
@@ -699,7 +710,8 @@ public class JScienceDashboard extends Application {
         else if (!viewers.isEmpty())
             viewersPane.setExpanded(true);
 
-        hint.setText("Discovered " + allApps.size() + " apps/demos/viewers");
+        int validCount = apps.size() + demos.size() + viewers.size() + others.size();
+        hint.setText(i18n.get("dashboard.apps.discovered", "Apps Found:") + " " + validCount);
 
         content.getChildren().addAll(header, hint, accordion);
         VBox.setVgrow(accordion, Priority.ALWAYS);
@@ -734,31 +746,14 @@ public class JScienceDashboard extends Application {
         return "JScience application";
     }
 
-    private VBox createStaticEntryList(List<AppEntry> entries) {
-        VBox container = new VBox(0);
-        container.setPadding(new Insets(2));
-        for (AppEntry item : entries) {
-            VBox box = new VBox(2);
-            box.setPadding(new Insets(5, 10, 5, 10));
-            Label name = new Label(item.name);
-            name.setStyle("-fx-font-weight: bold;");
-            Label desc = new Label(item.description);
-            desc.setStyle("-fx-font-size: 0.9em; -fx-text-fill: gray;");
-            box.getChildren().addAll(name, desc);
-            container.getChildren().add(box);
-            // Optional: Separator (if desired, like ListView cells)
-            if (entries.indexOf(item) < entries.size() - 1) {
-                // Separator sep = new Separator();
-                // container.getChildren().add(sep);
-            }
-        }
-        return container;
-    }
-
     private ListView<AppEntry> createAppList(boolean enableLaunch, AppEntry... entries) {
         ListView<AppEntry> list = new ListView<>();
         for (AppEntry entry : entries)
             list.getItems().add(entry);
+
+        list.setFixedCellSize(52);
+        list.prefHeightProperty()
+                .bind(javafx.beans.binding.Bindings.size(list.getItems()).multiply(list.getFixedCellSize()).add(2));
 
         list.setCellFactory(param -> new ListCell<>() {
             @Override
@@ -767,12 +762,14 @@ public class JScienceDashboard extends Application {
                 if (empty || item == null) {
                     setText(null);
                     setGraphic(null);
+                    setStyle("-fx-background-color: transparent;");
                 } else {
                     VBox box = new VBox(2);
+                    box.setPadding(new Insets(5));
                     Label name = new Label(item.name);
                     name.setStyle("-fx-font-weight: bold;");
                     Label desc = new Label(item.description);
-                    desc.setStyle("-fx-font-size: 0.9em; -fx-text-fill: gray;");
+                    desc.getStyleClass().add("dashboard-description");
                     box.getChildren().addAll(name, desc);
                     setGraphic(box);
                 }
