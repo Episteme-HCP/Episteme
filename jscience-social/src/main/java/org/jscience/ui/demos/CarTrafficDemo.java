@@ -39,17 +39,17 @@ public class CarTrafficDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return "Engineering";
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.engineering");
     }
 
     @Override
     public String getName() {
-        return "Car Traffic Simulation";
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("CarTraffic.title");
     }
 
     @Override
     public String getDescription() {
-        return "Simulates traffic flow and phantom jams using the Intelligent Driver Model (IDM).";
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("CarTraffic.desc");
     }
 
     @Override

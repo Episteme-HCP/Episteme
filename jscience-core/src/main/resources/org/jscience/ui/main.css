@@ -33,7 +33,8 @@
 }
 
 .list-cell:even {
-    -fx-background-color: #e0e0e0;
+    -fx-background-color: #f4f4f4;
+    /* Lighter gray */
 }
 
 /* Empty Cells - Hide them */
@@ -45,24 +46,24 @@
 /* Selection State - Force Blue Background and White Text */
 .list-cell:filled:selected,
 .list-cell:filled:selected:hover {
-    -fx-background-color: #0096c9;
-    -fx-text-fill: white;
+    -fx-background-color: #0096c9 !important;
+    -fx-text-fill: white !important;
 }
 
 .list-cell:filled:selected .dashboard-description,
 .list-cell:filled:selected .form-label {
-    -fx-text-fill: white;
+    -fx-text-fill: white !important;
 }
 
 /* Fix ComboBox Striping - Reset to uniform white */
 .combo-box-popup .list-cell:odd,
 .combo-box-popup .list-cell:even {
-    -fx-background-color: white;
-    -fx-text-fill: black;
+    -fx-background-color: white !important;
+    -fx-text-fill: black !important;
 }
 
 .combo-box-popup .list-cell:filled:selected,
 .combo-box-popup .list-cell:filled:selected:hover {
-    -fx-background-color: #0096c9;
-    -fx-text-fill: white;
+    -fx-background-color: #0096c9 !important;
+    -fx-text-fill: white !important;
 }
