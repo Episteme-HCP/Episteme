@@ -25,6 +25,7 @@ package org.jscience.server.auth;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jscience.server.auth.Roles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -154,7 +155,7 @@ public class OidcProvider {
             case "google" -> {
                 // Google doesn't provide roles in ID token, use default
                 String email = payload.path("email").asText("");
-                yield email.endsWith("@admin.com") ? "ADMIN" : "RESEARCHER";
+                yield email.endsWith("@admin.com") ? Roles.ADMIN : Roles.SCIENTIST;
             }
             case "keycloak" -> {
                 // Keycloak stores roles in resource_access or realm_access
@@ -172,11 +173,11 @@ public class OidcProvider {
                 if (groups.isArray() && groups.size() > 0) {
                     String group = groups.get(0).asText("");
                     if (group.contains("admin"))
-                        yield "ADMIN";
+                        yield Roles.ADMIN;
                     if (group.contains("scientist"))
-                        yield "SCIENTIST";
+                        yield Roles.SCIENTIST;
                 }
-                yield "VIEWER";
+                yield Roles.VIEWER;
             }
             case "azure", "microsoft" -> {
                 // Azure AD uses 'roles' claim
@@ -186,7 +187,7 @@ public class OidcProvider {
                 }
                 yield "USER";
             }
-            default -> "VIEWER";
+            default -> Roles.VIEWER;
         };
     }
 
@@ -255,7 +256,7 @@ public class OidcProvider {
          * Checks if the user has admin privileges.
          */
         public boolean isAdmin() {
-            return "ADMIN".equalsIgnoreCase(role);
+            return Roles.isAdmin(role);
         }
     }
 }

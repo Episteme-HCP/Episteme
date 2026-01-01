@@ -23,6 +23,8 @@
 
 package org.jscience.server.gateway;
 
+import org.jscience.server.config.ApplicationConfig;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -34,6 +36,7 @@ import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
 import com.google.protobuf.ByteString;
 import org.jscience.server.proto.*;
+import org.jscience.server.auth.Roles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,7 +106,7 @@ public class RestGateway {
         server.createContext("/api/health", this::handleHealth);
         server.createContext("/api/workers", this::handleWorkers);
 
-        server.setExecutor(Executors.newFixedThreadPool(10));
+        server.setExecutor(Executors.newFixedThreadPool(ApplicationConfig.getInstance().getRestGatewayThreads()));
         server.start();
 
         LOG.info("🚀 REST Gateway started on port {} → gRPC {}:{}", port, grpcHost, grpcPort);
@@ -293,7 +296,7 @@ public class RestGateway {
 
             String username = requestBody.path("username").asText(null);
             String password = requestBody.path("password").asText(null);
-            String role = requestBody.path("role").asText("SCIENTIST");
+            String role = requestBody.path("role").asText(Roles.SCIENTIST);
 
             if (username == null || password == null || username.isEmpty() || password.isEmpty()) {
                 sendError(exchange, 400, "Missing username or password");

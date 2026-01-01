@@ -156,26 +156,13 @@
 
 ### Code Quality
 
-#### 11. Extract Magic Numbers to Constants
+#### 11. Extract Magic Numbers to Constants (COMPLETED)
 
-- **Files**: Multiple
-- **Create**: Constants classes for:
-  - Buffer sizes
-  - Scoring weights
-  - Threshold values
-  - Timeout values
-- **Priority**: 🟢 MEDIUM
-- **Effort**: 3 hours
+- ✅ Moved to `ServiceConstants.java`, `HttpConstants.java`, `SchedulingConstants.java`
 
-#### 12. Service Name & Role Constants
+#### 12. Service Name & Role Constants (COMPLETED)
 
-- **Create**: `jscience-server/src/main/java/org/jscience/server/constants/ServiceConstants.java`
-- **Extract**:
-  - mDNS service names
-  - Role definitions (already has Roles.java, consolidate)
-  - Service identifiers
-- **Priority**: 🟢 MEDIUM
-- **Effort**: 1 hour
+- ✅ Consolidated in `ServiceConstants.java` and `Roles.java`
 
 ---
 
@@ -317,13 +304,10 @@
 
 ### Performance & Scalability
 
-#### 25. Connection Pooling for HTTP Clients
+#### 25. Connection Pooling for HTTP Clients (COMPLETED)
 
-- **Current**: New HttpClient per request in some places
-- **Enhancement**: Reuse connection pools
-- **Benefits**: Better performance, reduced latency
-- **Priority**: 🔵 ENHANCEMENT
-- **Effort**: 2 hours
+- ✅ Configured thread pools in `JscienceServer` and `RestGateway`
+- ✅ Verified `HttpClient` reuse in `WorldBankLoader` and `OidcProvider`
 
 #### 26. Async Processing for External API Calls
 
@@ -391,7 +375,7 @@
 
 ### Small Tasks (1-4 hours)
 
-6. ConfigurationLoader class (2 hours)
+1. ConfigurationLoader class (2 hours)
 2. Move sample data to JSON (2 hours)
 3. Extract magic numbers (3 hours)
 4. Migrate hardcoded values (3 hours)
@@ -405,7 +389,7 @@
 
 ### Medium Tasks (5-12 hours)
 
-15. Unit tests (8 hours)
+1. Unit tests (8 hours)
 2. Integration tests (6 hours)
 3. Caching layer (8 hours)
 4. Async processing (6 hours)
@@ -418,7 +402,7 @@
 
 ### Large Tasks (13+ hours)
 
-23. Secrets management (16 hours)
+1. Secrets management (16 hours)
 2. CI/CD pipeline (16 hours)
 3. Spring Boot migration (40 hours)
 
@@ -441,7 +425,7 @@
 
 ### Phase 2: Quality & Documentation (Week 2-3)
 
-7. Move sample data to JSON (2 hours)
+1. Move sample data to JSON (2 hours)
 2. Extract magic numbers (3 hours)
 3. Document JSON schemas (1 hour)
 4. API documentation (8 hours)
@@ -451,7 +435,7 @@
 
 ### Phase 3: Enhancements (Month 2)
 
-12. JWKS signature verification (4 hours)
+1. JWKS signature verification (4 hours)
 2. Artifact logging (3 hours)
 3. Bulk indicator fetching (2 hours)
 4. Connection pooling (2 hours)
@@ -462,7 +446,7 @@
 
 ### Phase 4: Production Hardening (Month 3)
 
-18. Caching layer (8 hours)
+1. Caching layer (8 hours)
 2. Prometheus metrics (6 hours)
 3. Secrets management (16 hours)
 4. CI/CD pipeline (16 hours)
@@ -472,7 +456,7 @@
 
 ### Phase 5: Advanced Features (Month 4+)
 
-23. Offline mode (12 hours)
+1. Offline mode (12 hours)
 2. Spring Boot migration (40 hours - optional)
 
 **Total**: ~52 hours → **Enterprise features**

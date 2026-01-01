@@ -28,14 +28,15 @@ import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 import org.jscience.server.proto.ComputeServiceGrpc;
 import org.jscience.server.proto.*;
+import org.jscience.server.config.ApplicationConfig;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.jscience.server.auth.Roles;
 
 import java.io.IOException;
-import java.util.concurrent.*;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * JScience Grid Compute Server.
@@ -77,7 +78,7 @@ public class JscienceServer extends ComputeServiceGrpc.ComputeServiceImplBase {
                             !adminPass.equalsIgnoreCase("admin") &&
                             !adminPass.equalsIgnoreCase("secret") &&
                             !adminPass.equalsIgnoreCase("password")) {
-                        userRepository.save(new org.jscience.server.model.User(adminUser, adminPass, "ADMIN"));
+                        userRepository.save(new org.jscience.server.model.User(adminUser, adminPass, Roles.ADMIN));
                         LOG.info("✓ Created admin user: {}", adminUser);
                     } else {
                         LOG.error("🔴 SECURITY: Admin password rejected - too weak or uses default value");
@@ -115,7 +116,9 @@ public class JscienceServer extends ComputeServiceGrpc.ComputeServiceImplBase {
             }
         }
 
+        Executor executor = Executors.newFixedThreadPool(ApplicationConfig.getInstance().getTaskProcessingThreads());
         this.server = builder
+                .executor(executor)
                 .addService(this)
                 .addService(new DeviceServiceImpl())
                 .addService(new DataServiceImpl())
