@@ -21,14 +21,5 @@
  * SOFTWARE.
  */
 
-/**
- * Provides support for OpenMath standard.
- * <p>
- * Supports reading and writing OpenMath objects using StAX.
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.mathematics.loaders.openmath;
+

@@ -27,7 +27,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 /**
- * The RSA (Rivest–Shamir–Adleman) encryption algorithm.
+ * The RSA (RivestÃ¢â‚¬â€œShamirÃ¢â‚¬â€œAdleman) encryption algorithm.
  * <p>
  * RSA is a public-key cryptosystem that is widely used for secure data
  * transmission.
@@ -42,7 +42,7 @@ import java.security.SecureRandom;
  * (cryptosystem)</a></li>
  * <li>Rivest, R. L., Shamir, A., & Adleman, L. (1978).
  * "A Method for Obtaining Digital Signatures and Public-Key Cryptosystems".
- * <i>Communications of the ACM</i>, 21(2), 120–126.</li>
+ * <i>Communications of the ACM</i>, 21(2), 120Ã¢â‚¬â€œ126.</li>
  * <li>Menezes, A. J., van Oorschot, P. C., & Vanstone, S. A. (1996).
  * <i>Handbook of Applied Cryptography</i>. CRC Press.</li>
  * </ul>
@@ -99,10 +99,10 @@ public class RSAAlgorithm {
         // Compute n = p * q
         BigInteger n = p.multiply(q);
 
-        // Compute φ(n) = (p-1)(q-1)
+        // Compute Ãâ€ (n) = (p-1)(q-1)
         BigInteger phi = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
 
-        // Choose e such that 1 < e < φ(n) and gcd(e, φ(n)) = 1
+        // Choose e such that 1 < e < Ãâ€ (n) and gcd(e, Ãâ€ (n)) = 1
         BigInteger e = BigInteger.valueOf(65537); // Common choice (2^16 + 1)
 
         // Ensure gcd(e, phi) = 1
@@ -110,7 +110,7 @@ public class RSAAlgorithm {
             e = e.add(BigInteger.ONE);
         }
 
-        // Compute d ≡ e^(-1) (mod φ(n))
+        // Compute d Ã¢â€°Â¡ e^(-1) (mod Ãâ€ (n))
         BigInteger d = e.modInverse(phi);
 
         return new KeyPair(new PublicKey(n, e), new PrivateKey(n, d));
@@ -148,3 +148,4 @@ public class RSAAlgorithm {
         return verified.equals(message);
     }
 }
+

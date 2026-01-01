@@ -71,6 +71,10 @@ public class ThemeManager {
         setTheme(dark ? "dark" : "light");
     }
 
+    public void toggleTheme() {
+        setDarkTheme(!isDarkTheme());
+    }
+
     /**
      * Applies the current theme to the given Scene.
      */
@@ -93,3 +97,5 @@ public class ThemeManager {
         }
     }
 }
+
+

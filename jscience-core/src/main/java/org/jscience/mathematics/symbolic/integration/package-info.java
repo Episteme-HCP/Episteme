@@ -21,11 +21,5 @@
  * SOFTWARE.
  */
 
-/**
- * Classes and interfaces for org.jscience.mathematics.symbolic.integration.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.mathematics.symbolic.integration;
+

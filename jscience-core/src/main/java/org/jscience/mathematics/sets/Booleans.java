@@ -28,7 +28,7 @@ import org.jscience.mathematics.structures.sets.FiniteSet;
 import org.jscience.mathematics.numbers.integers.Boolean;
 
 /**
- * The structure of Boolean values (𝔹 = {0, 1}).
+ * The structure of Boolean values (Ã°Ââ€Â¹ = {0, 1}).
  * <p>
  * This class represents the <strong>structure</strong> of Booleans.
  * </p>
@@ -95,7 +95,7 @@ public final class Booleans implements Semiring<Boolean>, FiniteSet<Boolean> {
 
     @Override
     public String description() {
-        return "𝔹 (Booleans)";
+        return "Ã°Ââ€Â¹ (Booleans)";
     }
 
     @Override
@@ -110,6 +110,7 @@ public final class Booleans implements Semiring<Boolean>, FiniteSet<Boolean> {
 
     @Override
     public String toString() {
-        return "Booleans(𝔹)";
+        return "Booleans(Ã°Ââ€Â¹)";
     }
 }
+

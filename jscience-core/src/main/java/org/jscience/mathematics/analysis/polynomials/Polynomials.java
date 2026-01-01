@@ -82,7 +82,7 @@ public final class Polynomials {
      * Evaluates the derivative of the Legendre polynomial P'_n(x) at the given
      * point.
      * Uses the relation:
-     * P'_n(x) = n (x P_n(x) - P_{n-1}(x)) / (x^2 - 1) for x != ±1
+     * P'_n(x) = n (x P_n(x) - P_{n-1}(x)) / (x^2 - 1) for x != Ã‚Â±1
      * 
      * @param n degree of the polynomial
      * @param x point at which to evaluate
@@ -105,7 +105,7 @@ public final class Polynomials {
 
         Real x2m1 = x.multiply(x).subtract(Real.ONE);
 
-        // Handle case where x is very close to ±1
+        // Handle case where x is very close to Ã‚Â±1
         if (x2m1.abs().compareTo(Real.of(1e-14)) < 0) {
             // Use alternative formula at endpoints
             // P'_n(1) = n(n+1)/2, P'_n(-1) = (-1)^{n+1} n(n+1)/2
@@ -123,7 +123,7 @@ public final class Polynomials {
 
     /**
      * Evaluates the Chebyshev polynomial of the first kind T_n(x).
-     * T_n(cos(θ)) = cos(nθ)
+     * T_n(cos(ÃŽÂ¸)) = cos(nÃŽÂ¸)
      * 
      * @param n degree
      * @param x point (typically in [-1, 1])
@@ -248,3 +248,5 @@ public final class Polynomials {
         return Ln;
     }
 }
+
+

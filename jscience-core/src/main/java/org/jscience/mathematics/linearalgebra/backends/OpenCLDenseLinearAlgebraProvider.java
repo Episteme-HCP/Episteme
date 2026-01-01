@@ -421,3 +421,5 @@ public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvide
         return cpuProvider.scale(scalar, a);
     }
 }
+
+

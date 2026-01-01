@@ -28,7 +28,7 @@ import java.util.*;
 /**
  * Floyd-Warshall algorithm for all-pairs shortest paths.
  * <p>
- * Computes shortest paths between all pairs of vertices in O(V³) time.
+ * Computes shortest paths between all pairs of vertices in O(VÃ‚Â³) time.
  * Can handle negative weights but will detect negative cycles.
  * </p>
  *
@@ -128,3 +128,5 @@ public class FloydWarshallShortestPath<V, W> {
         return Optional.of(result);
     }
 }
+
+

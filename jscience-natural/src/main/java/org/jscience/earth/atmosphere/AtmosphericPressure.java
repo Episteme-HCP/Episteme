@@ -39,11 +39,11 @@ public class AtmosphericPressure {
 
     // Sea level standard values
     public static final double P0 = 101325.0; // Pa
-    public static final double T0 = 288.15; // K (15°C)
+    public static final double T0 = 288.15; // K (15Ã‚Â°C)
     public static final double L = 0.0065; // Temperature lapse rate K/m
-    public static final double g = 9.80665; // m/s²
+    public static final double g = 9.80665; // m/sÃ‚Â²
     public static final double M = 0.0289644; // Molar mass of air kg/mol
-    public static final double R = 8.31447; // Universal gas constant J/(mol·K)
+    public static final double R = 8.31447; // Universal gas constant J/(molÃ‚Â·K)
 
     private AtmosphericPressure() {
     }
@@ -87,3 +87,5 @@ public class AtmosphericPressure {
         return T0 - L * altitudeMeters;
     }
 }
+
+

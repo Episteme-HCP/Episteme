@@ -106,6 +106,17 @@ public class I18n {
     }
 
     /**
+     * Toggles between English and French.
+     */
+    public void toggleLanguage() {
+        if (currentLocale.getLanguage().equals(Locale.FRENCH.getLanguage())) {
+            setLocale(Locale.ENGLISH);
+        } else {
+            setLocale(Locale.FRENCH);
+        }
+    }
+
+    /**
      * Retrieves a localized string for the given key.
      * Searches all registered bundles in order of registration.
      * 
@@ -144,7 +155,7 @@ public class I18n {
         return value;
     }
 
-    private boolean hasKey(String key) {
+    public boolean hasKey(String key) {
         for (String base : bundleBases) {
             ResourceBundle bundle = bundles.get(base);
             if (bundle != null && bundle.containsKey(key)) {
@@ -206,3 +217,5 @@ public class I18n {
         return key;
     }
 }
+
+

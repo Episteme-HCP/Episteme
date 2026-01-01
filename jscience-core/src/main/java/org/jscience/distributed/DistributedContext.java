@@ -42,14 +42,32 @@ import java.util.concurrent.Future;
 public interface DistributedContext {
 
     /**
-     * Submits a task for execution.
+     * Priority levels for distributed tasks.
+     */
+    enum Priority {
+        LOW, NORMAL, HIGH, CRITICAL
+    }
+
+    /**
+     * Submits a task for execution with NORMAL priority.
      * 
      * @param <T>  Result type
-     * @param task Task to execute (must be Serializable for true distributed
-     *             contexts)
+     * @param task Task to execute
      * @return Future representing the result
      */
     <T extends Serializable> Future<T> submit(Callable<T> task);
+
+    /**
+     * Submits a task for execution with a specific priority.
+     * 
+     * @param <T>      Result type
+     * @param task     Task to execute
+     * @param priority Priority level
+     * @return Future representing the result
+     */
+    default <T extends Serializable> Future<T> submit(Callable<T> task, Priority priority) {
+        return submit(task);
+    }
 
     /**
      * Submits a collection of tasks for execution.
@@ -70,3 +88,4 @@ public interface DistributedContext {
      */
     void shutdown();
 }
+

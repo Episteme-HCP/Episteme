@@ -31,15 +31,15 @@ import org.jscience.mathematics.analysis.DifferentiableFunction;
 /**
  * Represents a parametric curve in N-dimensional space.
  * <p>
- * A parametric curve is defined by: C(t) = (x₁(t), x₂(t), ..., xₙ(t))
+ * A parametric curve is defined by: C(t) = (xÃ¢â€šÂ(t), xÃ¢â€šâ€š(t), ..., xÃ¢â€šâ„¢(t))
  * where t is the parameter, typically in some interval [a, b].
  * </p>
  * <p>
  * Examples:
- * - Line: C(t) = P₀ + t*d
+ * - Line: C(t) = PÃ¢â€šâ‚¬ + t*d
  * - Circle: C(t) = (r*cos(t), r*sin(t))
  * - Helix: C(t) = (r*cos(t), r*sin(t), h*t)
- * - Bézier curve: C(t) = Σ Bᵢ(t)*Pᵢ
+ * - BÃƒÂ©zier curve: C(t) = ÃŽÂ£ BÃ¡ÂµÂ¢(t)*PÃ¡ÂµÂ¢
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -118,7 +118,7 @@ public interface ParametricCurve extends DifferentiableFunction<Real, Vector<Rea
     /**
      * Computes the arc length from t0 to t1.
      * <p>
-     * Arc length: L = ∫[t0,t1] ||C'(t)|| dt
+     * Arc length: L = Ã¢Ë†Â«[t0,t1] ||C'(t)|| dt
      * </p>
      * 
      * @param t0       the start parameter
@@ -143,10 +143,10 @@ public interface ParametricCurve extends DifferentiableFunction<Real, Vector<Rea
     /**
      * Returns the curvature at parameter t.
      * <p>
-     * Curvature: κ = ||C'(t) × C''(t)|| / ||C'(t)||³
+     * Curvature: ÃŽÂº = ||C'(t) Ãƒâ€” C''(t)|| / ||C'(t)||Ã‚Â³
      * </p>
      * <p>
-     * For 2D curves: κ = |x'y'' - y'x''| / (x'² + y'²)^(3/2)
+     * For 2D curves: ÃŽÂº = |x'y'' - y'x''| / (x'Ã‚Â² + y'Ã‚Â²)^(3/2)
      * </p>
      * 
      * @param t the parameter value
@@ -163,7 +163,7 @@ public interface ParametricCurve extends DifferentiableFunction<Real, Vector<Rea
         Vector<Real> secondDeriv = tangentPlus.subtract(tangentMinus)
                 .multiply(Real.of(0.5).divide(h));
 
-        // Curvature = ||C' × C''|| / ||C'||³
+        // Curvature = ||C' Ãƒâ€” C''|| / ||C'||Ã‚Â³
         Vector<Real> cross = firstDeriv.cross(secondDeriv);
         Real numerator = cross.norm();
         Real denominator = firstDeriv.norm().pow(3);
@@ -191,7 +191,7 @@ public interface ParametricCurve extends DifferentiableFunction<Real, Vector<Rea
                 .multiply(Real.of(0.5).divide(h));
 
         // Normal is perpendicular to tangent, in direction of curvature
-        // N = (T' - (T'·T)T) / ||T' - (T'·T)T||
+        // N = (T' - (T'Ã‚Â·T)T) / ||T' - (T'Ã‚Â·T)T||
         Vector<Real> unitTangent = tangent.normalize();
         Real projection = secondDeriv.dot(unitTangent);
         Vector<Real> normal = secondDeriv.subtract(unitTangent.multiply(projection));
@@ -199,3 +199,5 @@ public interface ParametricCurve extends DifferentiableFunction<Real, Vector<Rea
         return normal.normalize();
     }
 }
+
+

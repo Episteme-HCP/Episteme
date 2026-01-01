@@ -36,12 +36,12 @@ import org.jscience.mathematics.structures.groups.Magma;
  *
  * <h2>Mathematical Definition</h2>
  * <p>
- * A loop (L, ·) is a set L with a binary operation · such that:
+ * A loop (L, Ã‚Â·) is a set L with a binary operation Ã‚Â· such that:
  * <ul>
- * <li>For every a, b ∈ L, there exist unique x, y ∈ L such that a · x = b and y
- * · a = b.</li>
- * <li>There exists an identity element e ∈ L such that a · e = a and e · a = a
- * for all a ∈ L.</li>
+ * <li>For every a, b Ã¢Ë†Ë† L, there exist unique x, y Ã¢Ë†Ë† L such that a Ã‚Â· x = b and y
+ * Ã‚Â· a = b.</li>
+ * <li>There exists an identity element e Ã¢Ë†Ë† L such that a Ã‚Â· e = a and e Ã‚Â· a = a
+ * for all a Ã¢Ë†Ë† L.</li>
  * </ul>
  * </p>
  *
@@ -60,23 +60,24 @@ public interface Loop<E> extends Magma<E> {
 
     /**
      * Left division.
-     * Returns the unique x such that a · x = b.
+     * Returns the unique x such that a Ã‚Â· x = b.
      * Often denoted as a \ b.
      * 
      * @param a the left operand
      * @param b the result
-     * @return x such that a · x = b
+     * @return x such that a Ã‚Â· x = b
      */
     E leftDivide(E a, E b);
 
     /**
      * Right division.
-     * Returns the unique y such that y · a = b.
+     * Returns the unique y such that y Ã‚Â· a = b.
      * Often denoted as b / a.
      * 
      * @param a the right operand
      * @param b the result
-     * @return y such that y · a = b
+     * @return y such that y Ã‚Â· a = b
      */
     E rightDivide(E a, E b);
 }
+

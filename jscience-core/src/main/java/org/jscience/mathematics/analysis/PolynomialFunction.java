@@ -137,3 +137,4 @@ public class PolynomialFunction<R> implements DifferentiableFunction<R, R>, Inte
         return polynomial.toString();
     }
 }
+

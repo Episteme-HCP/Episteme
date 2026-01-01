@@ -66,7 +66,7 @@ public class UncertaintyBudget<Q extends Quantity<Q>> {
     /**
      * Adds an uncertainty source with sensitivity coefficient.
      * <p>
-     * The sensitivity coefficient c_i represents ∂f/∂x_i, the partial
+     * The sensitivity coefficient c_i represents Ã¢Ë†â€šf/Ã¢Ë†â€šx_i, the partial
      * derivative of the measurement function with respect to the input.
      * </p>
      * 
@@ -83,7 +83,7 @@ public class UncertaintyBudget<Q extends Quantity<Q>> {
     /**
      * Returns the combined standard uncertainty.
      * <p>
-     * Combined uncertainty u_c = √(Σ u_i²), where u_i are individual
+     * Combined uncertainty u_c = Ã¢Ë†Å¡(ÃŽÂ£ u_iÃ‚Â²), where u_i are individual
      * standard uncertainties (possibly multiplied by sensitivity coefficients).
      * </p>
      * 
@@ -99,7 +99,7 @@ public class UncertaintyBudget<Q extends Quantity<Q>> {
 
         for (UncertaintySource<Q> source : sources.values()) {
 
-            // u_i effective = c_i × u_i
+            // u_i effective = c_i Ãƒâ€” u_i
             Real u = source.uncertainty.getValue();
             Real c = source.sensitivityCoefficient;
             Real effectiveU = u.multiply(c);
@@ -116,7 +116,7 @@ public class UncertaintyBudget<Q extends Quantity<Q>> {
     /**
      * Returns the expanded uncertainty.
      * <p>
-     * Expanded uncertainty U = k × u_c, where k is the coverage factor.
+     * Expanded uncertainty U = k Ãƒâ€” u_c, where k is the coverage factor.
      * Common values:
      * </p>
      * <ul>
@@ -152,7 +152,7 @@ public class UncertaintyBudget<Q extends Quantity<Q>> {
     /**
      * Returns the contribution of each source to the combined uncertainty.
      * <p>
-     * Contribution percentage = (c_i × u_i)² / u_c² × 100%
+     * Contribution percentage = (c_i Ãƒâ€” u_i)Ã‚Â² / u_cÃ‚Â² Ãƒâ€” 100%
      * </p>
      * 
      * @return a map of source names to percentage contributions
@@ -236,3 +236,4 @@ public class UncertaintyBudget<Q extends Quantity<Q>> {
         }
     }
 }
+

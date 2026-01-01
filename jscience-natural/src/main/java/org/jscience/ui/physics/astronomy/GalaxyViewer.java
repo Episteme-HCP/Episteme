@@ -146,7 +146,7 @@ public class GalaxyViewer extends Application {
             simulator.setGalaxy2State(g2x, g2y, g2vx, g2vy);
         });
 
-        javafx.scene.control.Label infoLbl = new javafx.scene.control.Label("Controls:\n• Scroll: Zoom\n• Drag: Pan");
+        javafx.scene.control.Label infoLbl = new javafx.scene.control.Label("Controls:\nÃ¢â‚¬Â¢ Scroll: Zoom\nÃ¢â‚¬Â¢ Drag: Pan");
         infoLbl.getStyleClass().add("dark-label-muted");
 
         controls.getChildren().addAll(titleLbl, new javafx.scene.control.Separator(), typeLbl, galaxyTypeCombo,
@@ -338,3 +338,5 @@ public class GalaxyViewer extends Application {
         new GalaxyViewer().start(stage);
     }
 }
+
+

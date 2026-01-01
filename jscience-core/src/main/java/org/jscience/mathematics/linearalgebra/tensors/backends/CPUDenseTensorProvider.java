@@ -171,3 +171,4 @@ public class CPUDenseTensorProvider implements TensorProvider {
         return true;
     }
 }
+

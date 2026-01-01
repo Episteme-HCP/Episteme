@@ -24,7 +24,7 @@
 package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.ViewerProvider;
 import org.jscience.ui.mathematics.statistics.DistributionsViewer;
 
 /**
@@ -33,7 +33,8 @@ import org.jscience.ui.mathematics.statistics.DistributionsViewer;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class DistributionsDemo implements DemoProvider {
+public class DistributionsDemo implements ViewerProvider {
+
     @Override
     public String getName() {
         return "Statistical Distributions";
@@ -54,3 +55,5 @@ public class DistributionsDemo implements DemoProvider {
         DistributionsViewer.show(stage);
     }
 }
+
+

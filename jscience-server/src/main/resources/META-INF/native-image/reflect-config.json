@@ -1,0 +1,30 @@
+[
+    {
+        "name": "org.jscience.server.JscienceServer",
+        "allDeclaredConstructors": true,
+        "allPublicConstructors": true,
+        "allDeclaredMethods": true,
+        "allPublicMethods": true
+    },
+    {
+        "name": "ch.qos.logback.core.ConsoleAppender",
+        "allDeclaredConstructors": true
+    },
+    {
+        "name": "net.logstash.logback.appender.LogstashTcpSocketAppender",
+        "allDeclaredConstructors": true
+    },
+    {
+        "name": "net.logstash.logback.encoder.LogstashEncoder",
+        "allDeclaredConstructors": true
+    },
+    {
+        "name": "io.grpc.netty.shaded.io.netty.channel.socket.nio.NioServerSocketChannel",
+        "methods": [
+            {
+                "name": "<init>",
+                "parameterTypes": []
+            }
+        ]
+    }
+]

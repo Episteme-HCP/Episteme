@@ -251,9 +251,9 @@ public class FuzzyLocation {
         if (hasCoordinates()) {
             if (sb.length() > 0)
                 sb.append(" ");
-            sb.append(String.format("[%.4f°, %.4f°]", latitude, longitude));
+            sb.append(String.format("[%.4fÃ‚Â°, %.4fÃ‚Â°]", latitude, longitude));
             if (uncertaintyKm > 0) {
-                sb.append(String.format(" ±%.1f km", uncertaintyKm));
+                sb.append(String.format(" Ã‚Â±%.1f km", uncertaintyKm));
             }
         }
 
@@ -277,3 +277,5 @@ public class FuzzyLocation {
         return Objects.hash(latitude, longitude, name, country);
     }
 }
+
+

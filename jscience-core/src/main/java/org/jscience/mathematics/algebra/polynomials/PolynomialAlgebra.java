@@ -107,7 +107,7 @@ public class PolynomialAlgebra {
             return Integer.ZERO;
         }
 
-        // Sylvester matrix is (m+n) × (m+n)
+        // Sylvester matrix is (m+n) Ãƒâ€” (m+n)
         // First n rows: coefficients of a shifted
         // Last m rows: coefficients of b shifted
 
@@ -120,7 +120,7 @@ public class PolynomialAlgebra {
     /**
      * Discriminant of polynomial.
      * <p>
-     * Δ(f) = (-1)^(n(n-1)/2) * Res(f, f') / lc(f)
+     * ÃŽâ€(f) = (-1)^(n(n-1)/2) * Res(f, f') / lc(f)
      * Zero iff f has repeated root.
      * </p>
      */
@@ -130,7 +130,7 @@ public class PolynomialAlgebra {
     }
 
     /**
-     * Square-free factorization: f = ∏ f_i^i
+     * Square-free factorization: f = Ã¢Ë†Â f_i^i
      * <p>
      * Separates polynomial into square-free parts.
      * First step in complete factorization.
@@ -212,7 +212,7 @@ public class PolynomialAlgebra {
         // Eisenstein's criterion:
         // If exists prime p such that:
         // - p divides all coefficients except leading
-        // - p² doesn't divide constant term
+        // - pÃ‚Â² doesn't divide constant term
         // Then polynomial is irreducible
 
         Integer constant = p.coefficient(0);
@@ -244,7 +244,7 @@ public class PolynomialAlgebra {
 
             // Check if prime doesn't divide leading coefficient
             if (!leading.mod(prime).isZero()) {
-                // Check if prime² doesn't divide constant
+                // Check if primeÃ‚Â² doesn't divide constant
                 Integer pSquared = prime.multiply(prime);
                 if (!constant.mod(pSquared).isZero()) {
                     return true; // Eisenstein's criterion satisfied
@@ -275,3 +275,5 @@ public class PolynomialAlgebra {
         return result;
     }
 }
+
+

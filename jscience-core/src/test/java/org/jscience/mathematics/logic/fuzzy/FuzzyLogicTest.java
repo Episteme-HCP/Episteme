@@ -70,3 +70,4 @@ public class FuzzyLogicTest {
         assertEquals(0.5, TNorm.MINIMUM.apply(0.5, 1.0), EPSILON);
     }
 }
+

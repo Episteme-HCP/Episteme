@@ -28,7 +28,7 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.structures.rings.FieldElement;
 
 /**
- * Represents a complex number (ℂ), defined as a + bi where a, b are Real
+ * Represents a complex number (Ã¢â€žâ€š), defined as a + bi where a, b are Real
  * numbers.
  * <p>
  * Complex numbers form a Field under addition and multiplication.
@@ -434,3 +434,5 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
         return false;
     }
 }
+
+

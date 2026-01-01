@@ -73,3 +73,5 @@ public interface Spectrometer extends Sensor<Real> {
 
     void calibrate(double[] referenceWavelengths, double[] measuredWavelengths);
 }
+
+

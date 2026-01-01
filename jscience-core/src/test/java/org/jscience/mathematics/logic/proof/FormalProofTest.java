@@ -110,3 +110,5 @@ public class FormalProofTest {
         assertTrue(eqRule.isValid(Arrays.asList(a, b), c));
     }
 }
+
+

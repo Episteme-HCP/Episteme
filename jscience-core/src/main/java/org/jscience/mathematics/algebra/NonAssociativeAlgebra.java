@@ -54,3 +54,4 @@ public interface NonAssociativeAlgebra<E, S> extends Module<E, S> {
      */
     E multiply(E a, E b);
 }
+

@@ -180,3 +180,4 @@ public class PrimeSequence implements IntegerSequence {
         return "p(n) = n-th prime number";
     }
 }
+

@@ -42,7 +42,7 @@ public class EllipticCurve {
     private static final SecureRandom random = new SecureRandom();
 
     /**
-     * Point on elliptic curve y² = x³ + ax + b (mod p)
+     * Point on elliptic curve yÃ‚Â² = xÃ‚Â³ + ax + b (mod p)
      */
     public static class Point {
         public final BigInteger x;
@@ -77,12 +77,12 @@ public class EllipticCurve {
 
         @Override
         public String toString() {
-            return isInfinity ? "∞" : "(" + x + ", " + y + ")";
+            return isInfinity ? "Ã¢Ë†Å¾" : "(" + x + ", " + y + ")";
         }
     }
 
     /**
-     * Elliptic curve parameters: y² = x³ + ax + b (mod p)
+     * Elliptic curve parameters: yÃ‚Â² = xÃ‚Â³ + ax + b (mod p)
      */
     public static class Curve {
         public final BigInteger a;
@@ -130,20 +130,20 @@ public class EllipticCurve {
                 // Point doubling
                 return doublePoint(P, curve);
             } else {
-                // P + (-P) = ∞
+                // P + (-P) = Ã¢Ë†Å¾
                 return Point.INFINITY;
             }
         }
 
-        // Slope: λ = (y2 - y1) / (x2 - x1)
+        // Slope: ÃŽÂ» = (y2 - y1) / (x2 - x1)
         BigInteger dy = Q.y.subtract(P.y).mod(p);
         BigInteger dx = Q.x.subtract(P.x).mod(p);
         BigInteger lambda = dy.multiply(dx.modInverse(p)).mod(p);
 
-        // x3 = λ² - x1 - x2
+        // x3 = ÃŽÂ»Ã‚Â² - x1 - x2
         BigInteger x3 = lambda.pow(2).subtract(P.x).subtract(Q.x).mod(p);
 
-        // y3 = λ(x1 - x3) - y1
+        // y3 = ÃŽÂ»(x1 - x3) - y1
         BigInteger y3 = lambda.multiply(P.x.subtract(x3)).subtract(P.y).mod(p);
 
         return new Point(x3, y3);
@@ -159,15 +159,15 @@ public class EllipticCurve {
         BigInteger p = curve.p;
         BigInteger a = curve.a;
 
-        // λ = (3x² + a) / 2y
+        // ÃŽÂ» = (3xÃ‚Â² + a) / 2y
         BigInteger numerator = P.x.pow(2).multiply(BigInteger.valueOf(3)).add(a).mod(p);
         BigInteger denominator = P.y.multiply(BigInteger.valueOf(2)).mod(p);
         BigInteger lambda = numerator.multiply(denominator.modInverse(p)).mod(p);
 
-        // x3 = λ² - 2x
+        // x3 = ÃŽÂ»Ã‚Â² - 2x
         BigInteger x3 = lambda.pow(2).subtract(P.x.multiply(BigInteger.valueOf(2))).mod(p);
 
-        // y3 = λ(x - x3) - y
+        // y3 = ÃŽÂ»(x - x3) - y
         BigInteger y3 = lambda.multiply(P.x.subtract(x3)).subtract(P.y).mod(p);
 
         return new Point(x3, y3);
@@ -228,3 +228,5 @@ public class EllipticCurve {
         return multiply(privateKey, otherPublicKey, curve);
     }
 }
+
+

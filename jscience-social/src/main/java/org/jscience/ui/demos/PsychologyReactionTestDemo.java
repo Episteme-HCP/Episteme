@@ -30,7 +30,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.AppProvider;
 
 import java.util.Random;
 
@@ -40,11 +40,16 @@ import java.util.Random;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class PsychologyReactionTestDemo implements DemoProvider {
+public class PsychologyReactionTestDemo implements AppProvider {
+
+    @Override
+    public boolean isDemo() {
+        return true;
+    }
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.psychology");
+        return "Psychology";
     }
 
     @Override
@@ -139,3 +144,5 @@ public class PsychologyReactionTestDemo implements DemoProvider {
         stage.show();
     }
 }
+
+

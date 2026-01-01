@@ -34,13 +34,13 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public class Acoustics {
 
-    /** Speed of sound in air at 20°C */
+    /** Speed of sound in air at 20Ã‚Â°C */
     public static final Real C_AIR_20C = Real.of(343.0);
     /** Speed of sound in water */
     public static final Real C_WATER = Real.of(1480.0);
 
     /**
-     * Speed of sound in air: v ≈ 331 + 0.6T (m/s, T in °C)
+     * Speed of sound in air: v Ã¢â€°Ë† 331 + 0.6T (m/s, T in Ã‚Â°C)
      */
     public static Real speedOfSoundInAir(Real temperatureCelsius) {
         return Real.of(331).add(Real.of(0.6).multiply(temperatureCelsius));
@@ -55,8 +55,8 @@ public class Acoustics {
     }
 
     /**
-     * Sound intensity level (decibels): L = 10 log₁₀(I/I₀)
-     * where I₀ = 10⁻¹² W/m² (threshold of hearing)
+     * Sound intensity level (decibels): L = 10 logÃ¢â€šÂÃ¢â€šâ‚¬(I/IÃ¢â€šâ‚¬)
+     * where IÃ¢â€šâ‚¬ = 10Ã¢ÂÂ»Ã‚Â¹Ã‚Â² W/mÃ‚Â² (threshold of hearing)
      */
     public static Real soundIntensityLevel(Real intensity) {
         Real I0 = Real.of(1e-12);
@@ -64,8 +64,8 @@ public class Acoustics {
     }
 
     /**
-     * Pressure to decibels: L = 20 log₁₀(p/p₀)
-     * where p₀ = 2×10⁻⁵ Pa (reference pressure)
+     * Pressure to decibels: L = 20 logÃ¢â€šÂÃ¢â€šâ‚¬(p/pÃ¢â€šâ‚¬)
+     * where pÃ¢â€šâ‚¬ = 2Ãƒâ€”10Ã¢ÂÂ»Ã¢ÂÂµ Pa (reference pressure)
      */
     public static Real pressureToDecibels(Real pressure) {
         Real p0 = Real.of(2e-5);
@@ -98,21 +98,21 @@ public class Acoustics {
     }
 
     /**
-     * Beat frequency: f_beat = |f₁ - f₂|
+     * Beat frequency: f_beat = |fÃ¢â€šÂ - fÃ¢â€šâ€š|
      */
     public static Real beatFrequency(Real freq1, Real freq2) {
         return freq1.subtract(freq2).abs();
     }
 
     /**
-     * Acoustic impedance: Z = ρv (density × sound speed)
+     * Acoustic impedance: Z = ÃÂv (density Ãƒâ€” sound speed)
      */
     public static Real acousticImpedance(Real density, Real soundSpeed) {
         return density.multiply(soundSpeed);
     }
 
     /**
-     * Sound intensity from power: I = P/(4πr²)
+     * Sound intensity from power: I = P/(4Ãâ‚¬rÃ‚Â²)
      */
     public static Real soundIntensity(Real power, Real distance) {
         Real area = Real.of(4).multiply(Real.PI).multiply(distance.pow(2));
@@ -129,7 +129,7 @@ public class Acoustics {
 
     /**
      * Frequency to MIDI note number.
-     * n = 69 + 12 * log₂(f/440)
+     * n = 69 + 12 * logÃ¢â€šâ€š(f/440)
      */
     public static int frequencyToMidi(Real frequency) {
         // n = 69 + 12 * log(f/440) / log(2)
@@ -140,3 +140,5 @@ public class Acoustics {
         return (int) Math.round(result.doubleValue());
     }
 }
+
+

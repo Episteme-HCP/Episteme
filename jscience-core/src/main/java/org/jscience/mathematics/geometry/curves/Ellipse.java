@@ -35,7 +35,7 @@ import java.util.Arrays;
  * Represents an ellipse curve.
  * <p>
  * An ellipse is a conic section with two focal points.
- * Parametric form: C(t) = (a·cos(t), b·sin(t))
+ * Parametric form: C(t) = (aÃ‚Â·cos(t), bÃ‚Â·sin(t))
  * where a is the semi-major axis and b is the semi-minor axis.
  * </p>
  *
@@ -91,7 +91,7 @@ public class Ellipse implements ParametricCurve {
 
     @Override
     public Vector<Real> tangent(Real t, Real h) {
-        // Analytical tangent: C'(t) = (-a·sin(t), b·cos(t))
+        // Analytical tangent: C'(t) = (-aÃ‚Â·sin(t), bÃ‚Â·cos(t))
         Real dx = semiMajorAxis.multiply(Real.of(Math.sin(t.doubleValue()))).negate();
         Real dy = semiMinorAxis.multiply(Real.of(Math.cos(t.doubleValue())));
         return new DenseVector<>(Arrays.asList(dx, dy), org.jscience.mathematics.sets.Reals.getInstance());
@@ -99,7 +99,7 @@ public class Ellipse implements ParametricCurve {
 
     @Override
     public Real curvature(Real t, Real h) {
-        // Analytical curvature: κ = ab / (a²sin²(t) + b²cos²(t))^(3/2)
+        // Analytical curvature: ÃŽÂº = ab / (aÃ‚Â²sinÃ‚Â²(t) + bÃ‚Â²cosÃ‚Â²(t))^(3/2)
         Real a = semiMajorAxis;
         Real b = semiMinorAxis;
         Real sinT = Real.of(Math.sin(t.doubleValue()));
@@ -141,7 +141,7 @@ public class Ellipse implements ParametricCurve {
 
     /**
      * Returns the eccentricity of the ellipse.
-     * e = √(1 - (b/a)²)
+     * e = Ã¢Ë†Å¡(1 - (b/a)Ã‚Â²)
      * 
      * @return the eccentricity
      */
@@ -152,7 +152,7 @@ public class Ellipse implements ParametricCurve {
 
     /**
      * Returns the area of the ellipse.
-     * A = πab
+     * A = Ãâ‚¬ab
      * 
      * @return the area
      */
@@ -162,7 +162,7 @@ public class Ellipse implements ParametricCurve {
 
     /**
      * Returns the approximate perimeter using Ramanujan's approximation.
-     * P ≈ π(3(a+b) - √((3a+b)(a+3b)))
+     * P Ã¢â€°Ë† Ãâ‚¬(3(a+b) - Ã¢Ë†Å¡((3a+b)(a+3b)))
      * 
      * @return the approximate perimeter
      */
@@ -176,3 +176,5 @@ public class Ellipse implements ParametricCurve {
         return Real.of(Math.PI).multiply(Real.of(3).multiply(sum).subtract(sqrt));
     }
 }
+
+

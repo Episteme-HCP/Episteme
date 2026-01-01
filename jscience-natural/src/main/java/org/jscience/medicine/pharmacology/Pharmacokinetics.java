@@ -73,7 +73,7 @@ public class Pharmacokinetics {
      */
     public static Pharmacokinetics fromHalfLife(Quantity<Time> halfLife, Quantity<Volume> volume,
             double bioavailability) {
-        // ke = ln(2) / t½
+        // ke = ln(2) / tÃ‚Â½
         // Calculate value in 1/s (Hertz) then create Quantity
         double keVal = Math.log(2) / halfLife.to(Units.SECOND).getValue().doubleValue();
         Quantity<Frequency> ke = Quantities.create(keVal, Units.HERTZ);
@@ -82,7 +82,7 @@ public class Pharmacokinetics {
 
     /**
      * Elimination half-life.
-     * t½ = ln(2) / ke
+     * tÃ‚Â½ = ln(2) / ke
      */
     public Quantity<Time> getHalfLife() {
         double keVal = ke.to(Units.HERTZ).getValue().doubleValue();
@@ -150,7 +150,7 @@ public class Pharmacokinetics {
 
     /**
      * Steady-state average concentration with repeated dosing.
-     * Css,avg = (F*D) / (Math.abs(CL) * τ)
+     * Css,avg = (F*D) / (Math.abs(CL) * Ãâ€ž)
      * CL * tau -> Volume
      * Dose / Volume -> Concentration
      */
@@ -192,3 +192,5 @@ public class Pharmacokinetics {
         return String.format("Pharmacokinetics{ke=%s, Vd=%s, F=%.2f}", ke, vd, bioavailability);
     }
 }
+
+

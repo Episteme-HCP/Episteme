@@ -21,15 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Seismology and earthquake analysis.
- * <p>
- * Includes magnitude calculations, energy estimation, and seismic wave
- * analysis.
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.earth.seismology;
+
+

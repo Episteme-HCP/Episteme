@@ -45,3 +45,4 @@ public interface InferenceRule {
      */
     boolean isValid(List<Formula> premises, Formula conclusion);
 }
+

@@ -34,7 +34,7 @@ import org.jscience.mathematics.linearalgebra.Vector;
  * It divides the space into two half-spaces.
  * </p>
  * <p>
- * Defined by: {x | ⟨x - point, normal⟩ = 0}
+ * Defined by: {x | Ã¢Å¸Â¨x - point, normalÃ¢Å¸Â© = 0}
  * where point is any point on the hyperplane and normal is the normal vector.
  * </p>
  * <p>
@@ -88,7 +88,7 @@ public class Hyperplane implements GeometricObject<PointND> {
             throw new IllegalArgumentException("Need exactly " + dim + " points for " + dim + "D hyperplane");
         }
 
-        // For 3D plane through 3 points: normal = (p1-p0) × (p2-p0)
+        // For 3D plane through 3 points: normal = (p1-p0) Ãƒâ€” (p2-p0)
         // For general ND: compute normal from (N-1) vectors
 
         // Simplified for 3D case
@@ -125,7 +125,7 @@ public class Hyperplane implements GeometricObject<PointND> {
             return false;
         }
 
-        // Check if ⟨p - point, normal⟩ = 0
+        // Check if Ã¢Å¸Â¨p - point, normalÃ¢Å¸Â© = 0
         Vector<Real> diff = p.toVector().subtract(point.toVector());
         Real dot = diff.dot(normal);
 
@@ -230,8 +230,8 @@ public class Hyperplane implements GeometricObject<PointND> {
             return null; // Line is parallel but not in hyperplane
         }
 
-        // Solve: ⟨(point_line + t*dir) - point_plane, normal⟩ = 0
-        // t = ⟨point_plane - point_line, normal⟩ / ⟨dir, normal⟩
+        // Solve: Ã¢Å¸Â¨(point_line + t*dir) - point_plane, normalÃ¢Å¸Â© = 0
+        // t = Ã¢Å¸Â¨point_plane - point_line, normalÃ¢Å¸Â© / Ã¢Å¸Â¨dir, normalÃ¢Å¸Â©
 
         Vector<Real> diff = point.toVector().subtract(line.getPoint().toVector());
         Real numerator = diff.dot(normal);
@@ -267,3 +267,5 @@ public class Hyperplane implements GeometricObject<PointND> {
         return normal.hashCode();
     }
 }
+
+

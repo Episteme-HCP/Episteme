@@ -27,10 +27,10 @@ import org.jscience.mathematics.geometry.Point2D;
 
 /**
  * The Standard Map (Chirikov-Taylor map):
- * p_{n+1} = (p_n + K * sin(theta_n)) mod 2π
- * theta_{n+1} = (theta_n + p_{n+1}) mod 2π
+ * p_{n+1} = (p_n + K * sin(theta_n)) mod 2Ãâ‚¬
+ * theta_{n+1} = (theta_n + p_{n+1}) mod 2Ãâ‚¬
  * <p>
- * An area-preserving chaotic map from a square with side 2π onto itself.
+ * An area-preserving chaotic map from a square with side 2Ãâ‚¬ onto itself.
  * Used to model the motion of a kicked rotator.
  * </p>
  *
@@ -72,12 +72,12 @@ public class StandardMap implements DiscreteMap<Point2D> {
 
     @Override
     public String getDomain() {
-        return "[0, 2π]²";
+        return "[0, 2Ãâ‚¬]Ã‚Â²";
     }
 
     @Override
     public String getCodomain() {
-        return "[0, 2π]²";
+        return "[0, 2Ãâ‚¬]Ã‚Â²";
     }
 
     @Override
@@ -85,3 +85,4 @@ public class StandardMap implements DiscreteMap<Point2D> {
         return "StandardMap(K=" + K + ")";
     }
 }
+

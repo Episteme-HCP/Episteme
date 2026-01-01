@@ -69,3 +69,5 @@ public class VectorFunctionTest {
         assertEquals(2.0, J.get(1, 1).doubleValue(), 1e-4);
     }
 }
+
+

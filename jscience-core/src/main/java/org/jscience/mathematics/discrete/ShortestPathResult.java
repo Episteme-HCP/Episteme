@@ -109,3 +109,5 @@ public class ShortestPathResult<V, W> {
         return "ShortestPath[" + source + " -> " + target + " = " + distance + ", path=" + path + "]";
     }
 }
+
+

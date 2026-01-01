@@ -111,3 +111,5 @@ public enum ActivationFunction {
 
     public abstract double derivative(double output);
 }
+
+

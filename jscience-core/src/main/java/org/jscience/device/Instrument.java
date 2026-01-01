@@ -45,3 +45,5 @@ public interface Instrument extends Device {
      */
     void calibrate();
 }
+
+

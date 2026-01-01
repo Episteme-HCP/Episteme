@@ -76,3 +76,4 @@ public class UniformDistribution extends ContinuousDistribution {
         return String.format("U([%.4f, %.4f])", a.doubleValue(), b.doubleValue());
     }
 }
+

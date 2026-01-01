@@ -65,3 +65,5 @@ public class Syllogism {
                 majorPremise.getStatement(), minorPremise.getStatement(), conclusion.getStatement());
     }
 }
+
+

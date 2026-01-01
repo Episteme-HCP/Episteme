@@ -64,3 +64,5 @@ public class FibonacciSequence implements InfiniteSequence<Integer> {
         throw new ArithmeticException("Fibonacci sequence diverges to infinity");
     }
 }
+
+

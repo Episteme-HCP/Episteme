@@ -22,20 +22,6 @@
  */
 
 /**
- * Provides mathematical structures and algorithms.
- * <p>
- * This package includes subpackages for:
- * <ul>
- * <li>Linear Algebra (Matrices, Vectors, Tensors)</li>
- * <li>Geometry and Topology</li>
- * <li>Algebraic Structures (Groups, Rings, Fields)</li>
- * <li>Analysis and Functions</li>
- * <li>Discrete Mathematics</li>
- * </ul>
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Includes subpackages for:
  */
 package org.jscience.mathematics;

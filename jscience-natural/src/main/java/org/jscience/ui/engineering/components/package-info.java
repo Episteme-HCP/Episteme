@@ -21,11 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * JavaFX-based user interface components and scientific viewers.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.ui.engineering.components;
+
+

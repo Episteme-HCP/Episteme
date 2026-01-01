@@ -30,16 +30,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Prime counting function π(n) (OEIS A000720).
+ * Prime counting function Ãâ‚¬(n) (OEIS A000720).
  * <p>
- * π(n) gives the number of primes less than or equal to n.
+ * Ãâ‚¬(n) gives the number of primes less than or equal to n.
  * For example:
  * <ul>
- * <li>π(1) = 0: no primes ≤ 1</li>
- * <li>π(2) = 1: {2}</li>
- * <li>π(10) = 4: {2, 3, 5, 7}</li>
- * <li>π(100) = 25</li>
- * <li>π(1000) = 168</li>
+ * <li>Ãâ‚¬(1) = 0: no primes Ã¢â€°Â¤ 1</li>
+ * <li>Ãâ‚¬(2) = 1: {2}</li>
+ * <li>Ãâ‚¬(10) = 4: {2, 3, 5, 7}</li>
+ * <li>Ãâ‚¬(100) = 25</li>
+ * <li>Ãâ‚¬(1000) = 168</li>
  * </ul>
  * </p>
  *
@@ -48,13 +48,13 @@ import java.util.List;
  * The Prime Number Theorem states that:
  *
  * <pre>
- * π(n) ~ n / ln(n)
+ * Ãâ‚¬(n) ~ n / ln(n)
  * </pre>
  *
  * More precisely, Legendre's approximation:
  *
  * <pre>
- * π(n) ≈ n / (ln(n) - 1.08366)
+ * Ãâ‚¬(n) Ã¢â€°Ë† n / (ln(n) - 1.08366)
  * </pre>
  * </p>
  *
@@ -74,7 +74,7 @@ import java.util.List;
  * <h2>References</h2>
  * <ul>
  * <li>Gauss, C. F. (1849). Letter to Encke</li>
- * <li>Hadamard, J. & de la Vallée Poussin, C. (1896). "Prime Number
+ * <li>Hadamard, J. & de la VallÃƒÂ©e Poussin, C. (1896). "Prime Number
  * Theorem"</li>
  * <li>Riemann, B. (1859). "On the Number of Primes Less Than a Given
  * Magnitude"</li>
@@ -102,17 +102,17 @@ public class PrimePiSequence implements IntegerSequence {
     public Integer get(Natural n) {
         long value = n.longValue();
         if (value < 0) {
-            throw new IllegalArgumentException("π(n) is only defined for non-negative n");
+            throw new IllegalArgumentException("Ãâ‚¬(n) is only defined for non-negative n");
         }
 
         return Integer.of(countPrimes(value));
     }
 
     /**
-     * Counts the number of primes ≤ n.
+     * Counts the number of primes Ã¢â€°Â¤ n.
      * 
      * @param n the upper bound
-     * @return π(n)
+     * @return Ãâ‚¬(n)
      */
     public int countPrimes(long n) {
         if (cache.containsKey(n)) {
@@ -231,10 +231,10 @@ public class PrimePiSequence implements IntegerSequence {
     }
 
     /**
-     * Approximates π(n) using the Prime Number Theorem.
+     * Approximates Ãâ‚¬(n) using the Prime Number Theorem.
      * 
      * @param n the value
-     * @return approximation of π(n)
+     * @return approximation of Ãâ‚¬(n)
      */
     public double approximatePi(long n) {
         if (n < 2)
@@ -250,7 +250,7 @@ public class PrimePiSequence implements IntegerSequence {
      * Returns all primes up to n.
      * 
      * @param n the upper bound
-     * @return list of primes ≤ n
+     * @return list of primes Ã¢â€°Â¤ n
      */
     public List<Long> getPrimesUpTo(long n) {
         List<Long> primes = new ArrayList<>();
@@ -294,10 +294,10 @@ public class PrimePiSequence implements IntegerSequence {
     }
 
     /**
-     * Returns π(n) for the first n values.
+     * Returns Ãâ‚¬(n) for the first n values.
      * 
      * @param count number of terms
-     * @return array [π(0), π(1), ..., π(count-1)]
+     * @return array [Ãâ‚¬(0), Ãâ‚¬(1), ..., Ãâ‚¬(count-1)]
      */
     public int[] getFirstN(int count) {
         int[] result = new int[count];
@@ -312,3 +312,4 @@ public class PrimePiSequence implements IntegerSequence {
         return "PrimePiSequence(A000720): 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, ...";
     }
 }
+

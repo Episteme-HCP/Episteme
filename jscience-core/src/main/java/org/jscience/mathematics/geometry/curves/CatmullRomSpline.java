@@ -40,10 +40,10 @@ import java.util.List;
  * neighboring points.
  * </p>
  * <p>
- * The curve is defined by a set of control points P₀, P₁, ..., Pₙ and uses
+ * The curve is defined by a set of control points PÃ¢â€šâ‚¬, PÃ¢â€šÂ, ..., PÃ¢â€šâ„¢ and uses
  * the formula:
- * P(t) = 0.5 * [(2P₁) + (-P₀ + P₂)t + (2P₀ - 5P₁ + 4P₂ - P₃)t² + (-P₀ + 3P₁ -
- * 3P₂ + P₃)t³]
+ * P(t) = 0.5 * [(2PÃ¢â€šÂ) + (-PÃ¢â€šâ‚¬ + PÃ¢â€šâ€š)t + (2PÃ¢â€šâ‚¬ - 5PÃ¢â€šÂ + 4PÃ¢â€šâ€š - PÃ¢â€šÆ’)tÃ‚Â² + (-PÃ¢â€šâ‚¬ + 3PÃ¢â€šÂ -
+ * 3PÃ¢â€šâ€š + PÃ¢â€šÆ’)tÃ‚Â³]
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -131,8 +131,8 @@ public class CatmullRomSpline {
             Real v2 = p2.get(i);
             Real v3 = p3.get(i);
 
-            // P(t) = 0.5 * [(2P₁) + (-P₀ + P₂)t + (2P₀ - 5P₁ + 4P₂ - P₃)t² + (-P₀ + 3P₁ -
-            // 3P₂ + P₃)t³]
+            // P(t) = 0.5 * [(2PÃ¢â€šÂ) + (-PÃ¢â€šâ‚¬ + PÃ¢â€šâ€š)t + (2PÃ¢â€šâ‚¬ - 5PÃ¢â€šÂ + 4PÃ¢â€šâ€š - PÃ¢â€šÆ’)tÃ‚Â² + (-PÃ¢â€šâ‚¬ + 3PÃ¢â€šÂ -
+            // 3PÃ¢â€šâ€š + PÃ¢â€šÆ’)tÃ‚Â³]
             Real term1 = v1.multiply(Real.of(2));
 
             Real term2 = v0.negate().add(v2).multiply(t);
@@ -212,3 +212,4 @@ public class CatmullRomSpline {
         return "CatmullRomSpline(points=" + controlPoints.size() + ", segments=" + getNumSegments() + ")";
     }
 }
+

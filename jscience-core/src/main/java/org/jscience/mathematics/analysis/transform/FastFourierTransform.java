@@ -133,3 +133,4 @@ public final class FastFourierTransform {
         return new DenseVector<>(resultList, Complexes.getInstance());
     }
 }
+

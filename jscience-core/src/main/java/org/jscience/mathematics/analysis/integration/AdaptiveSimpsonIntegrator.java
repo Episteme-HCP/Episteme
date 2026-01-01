@@ -90,3 +90,5 @@ public class AdaptiveSimpsonIntegrator implements Integrator {
                 adaptiveSimpsonRec(f, c, b, eps / 2.0, Sright, fc, fb, fe, depth - 1);
     }
 }
+
+

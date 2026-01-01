@@ -100,10 +100,10 @@ public class ComputeContext {
      */
     public enum IntPrecision {
         /**
-         * 32-bit integers (int) - faster, smaller memory footprint, range ±2.1 billion
+         * 32-bit integers (int) - faster, smaller memory footprint, range Ã‚Â±2.1 billion
          */
         INT,
-        /** 64-bit integers (long) - larger range ±9.2 × 10^18 */
+        /** 64-bit integers (long) - larger range Ã‚Â±9.2 Ãƒâ€” 10^18 */
         LONG
     }
 
@@ -194,8 +194,8 @@ public class ComputeContext {
      * This affects GPU integer operations and integer matrix arithmetic:
      * <ul>
      * <li>INT: Faster on many GPUs (especially consumer GPUs), smaller memory,
-     * but limited to ±2.1 billion range</li>
-     * <li>LONG: Larger range (±9.2 × 10^18), but slower on some GPUs
+     * but limited to Ã‚Â±2.1 billion range</li>
+     * <li>LONG: Larger range (Ã‚Â±9.2 Ãƒâ€” 10^18), but slower on some GPUs
      * (many consumer GPUs have weak int64 support)</li>
      * </ul>
      * </p>
@@ -437,3 +437,5 @@ public class ComputeContext {
                 '}';
     }
 }
+
+

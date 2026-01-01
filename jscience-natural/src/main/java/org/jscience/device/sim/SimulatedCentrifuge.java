@@ -116,3 +116,5 @@ public class SimulatedCentrifuge extends SimulatedDevice implements Centrifuge {
         start(command);
     }
 }
+
+

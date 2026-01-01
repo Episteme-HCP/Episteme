@@ -50,7 +50,7 @@ public class MonteCarloIntegration {
     }
 
     /**
-     * 1D Monte Carlo integration: ∫[a,b] f(x) dx.
+     * 1D Monte Carlo integration: Ã¢Ë†Â«[a,b] f(x) dx.
      * 
      * @param f       Function to integrate
      * @param a       Lower bound
@@ -157,3 +157,5 @@ public class MonteCarloIntegration {
         return new double[] { estimate, stdError };
     }
 }
+
+

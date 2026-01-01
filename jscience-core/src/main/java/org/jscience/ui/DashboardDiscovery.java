@@ -23,23 +23,23 @@
 
 package org.jscience.ui;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.lang.reflect.Modifier;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Service to dynamically discover JScience components (Apps, Loaders, Themes)
- * from the classpath.
+ * Service to dynamically discover JScience components (Apps, Demos, Viewers)
+ * using the modern ServiceLoader mechanism (SPI).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @since 1.1
  */
 public class DashboardDiscovery {
 
+    private static final Logger logger = LoggerFactory.getLogger(DashboardDiscovery.class);
     private static final DashboardDiscovery INSTANCE = new DashboardDiscovery();
 
     public static DashboardDiscovery getInstance() {
@@ -47,17 +47,57 @@ public class DashboardDiscovery {
     }
 
     /**
-     * Finds all accessible classes that match the given name suffix (e.g.,
-     * "Loader", "Viewer").
+     * Discovers all available ViewerProvider implementations using ServiceLoader.
+     * Use {@link #getProvidersByType()} for categorized results.
      */
+    public List<ViewerProvider> getProviders() {
+        List<ViewerProvider> results = new ArrayList<>();
+        try {
+            ServiceLoader<ViewerProvider> loader = ServiceLoader.load(ViewerProvider.class);
+            for (ViewerProvider provider : loader) {
+                results.add(provider);
+            }
+        } catch (Throwable e) {
+            logger.error("Error loading providers via SPI", e);
+        }
+        return results;
+    }
+
+    public enum ProviderType {
+        APP, DEMO, VIEWER
+    }
+
+    /**
+     * Discovers providers and groups them by type (APP, DEMO, VIEWER) and then by
+     * Category.
+     */
+    public Map<ProviderType, Map<String, List<ViewerProvider>>> getProvidersByType() {
+        Map<ProviderType, Map<String, List<ViewerProvider>>> groupedProviders = new EnumMap<>(ProviderType.class);
+
+        for (ViewerProvider provider : getProviders()) {
+            ProviderType type = ProviderType.VIEWER;
+            if (provider instanceof AppProvider) {
+                type = ((AppProvider) provider).isDemo() ? ProviderType.DEMO : ProviderType.APP;
+            }
+
+            groupedProviders
+                    .computeIfAbsent(type, k -> new TreeMap<>(java.text.Collator.getInstance()))
+                    .computeIfAbsent(provider.getCategory(), c -> new ArrayList<>())
+                    .add(provider);
+        }
+        return groupedProviders;
+    }
+
+    // --- Legacy Scanning Methods (Required for Loaders, Devices, and I18n) ---
+
     public List<ClassInfo> findClasses(String suffix) {
         Set<String> processed = new HashSet<>();
         List<ClassInfo> results = new ArrayList<>();
         String classpath = System.getProperty("java.class.path");
-        String[] paths = classpath.split(File.pathSeparator);
+        String[] paths = classpath.split(java.io.File.pathSeparator);
 
         for (String path : paths) {
-            File file = new File(path);
+            java.io.File file = new java.io.File(path);
             if (file.isDirectory()) {
                 scanDirectory(file, "", suffix, results, processed);
             } else if (file.getName().endsWith(".jar")) {
@@ -67,7 +107,6 @@ public class DashboardDiscovery {
             }
         }
 
-        // Sort by simple name, then full name
         results.sort(Comparator.comparing((ClassInfo c) -> c.simpleName)
                 .thenComparing(c -> c.fullName));
         return results;
@@ -78,13 +117,13 @@ public class DashboardDiscovery {
                 || name.startsWith("javafx") || name.startsWith("sun") || name.startsWith("oracle");
     }
 
-    private void scanDirectory(File directory, String packageName, String suffix, List<ClassInfo> results,
+    private void scanDirectory(java.io.File directory, String packageName, String suffix, List<ClassInfo> results,
             Set<String> processed) {
-        File[] files = directory.listFiles();
+        java.io.File[] files = directory.listFiles();
         if (files == null)
             return;
 
-        for (File file : files) {
+        for (java.io.File file : files) {
             if (file.isDirectory()) {
                 String newPackage = packageName.isEmpty() ? file.getName() : packageName + "." + file.getName();
                 scanDirectory(file, newPackage, suffix, results, processed);
@@ -124,26 +163,9 @@ public class DashboardDiscovery {
                                 }
                             }
 
-                            if ("Demo".equals(suffix) || className.endsWith("App")) {
-                                try {
-                                    Class<?> demoProvider = Class.forName("org.jscience.ui.DemoProvider", false,
-                                            this.getClass().getClassLoader());
-                                    if (!demoProvider.isAssignableFrom(cls)) {
-                                        continue;
-                                    }
-                                } catch (ClassNotFoundException e) {
-                                    // Fallback to AbstractDemo if DemoProvider not found
-                                    try {
-                                        Class<?> abstractDemo = Class.forName("org.jscience.ui.AbstractDemo", false,
-                                                this.getClass().getClassLoader());
-                                        if (!abstractDemo.isAssignableFrom(cls)) {
-                                            continue;
-                                        }
-                                    } catch (ClassNotFoundException e2) {
-                                        continue;
-                                    }
-                                }
-                            }
+                            // Note: We don't check for DemoProvider here anymore as we rely on the caller
+                            // or just class presence
+                            // for legacy reasons. Real ViewerProviders should use getProviders().
 
                             processed.add(fullClassName);
                             String desc = "JScience " + (isDeviceRequested ? "Device" : suffix);
@@ -157,11 +179,11 @@ public class DashboardDiscovery {
         }
     }
 
-    private void scanJar(File jarFile, String suffix, List<ClassInfo> results, Set<String> processed) {
-        try (JarFile jar = new JarFile(jarFile)) {
-            Enumeration<JarEntry> entries = jar.entries();
+    private void scanJar(java.io.File jarFile, String suffix, List<ClassInfo> results, Set<String> processed) {
+        try (java.util.jar.JarFile jar = new java.util.jar.JarFile(jarFile)) {
+            Enumeration<java.util.jar.JarEntry> entries = jar.entries();
             while (entries.hasMoreElements()) {
-                JarEntry entry = entries.nextElement();
+                java.util.jar.JarEntry entry = entries.nextElement();
                 if (entry.getName().endsWith(".class")) {
                     String entryName = entry.getName();
                     String className = entryName.replace('/', '.').substring(0, entryName.length() - 6);
@@ -169,7 +191,6 @@ public class DashboardDiscovery {
                         continue;
 
                     boolean matchesSuffix = className.endsWith(suffix);
-                    // Special case: if suffix is "Demo", also include "App" (for Killer Apps)
                     if ("Demo".equals(suffix) && className.endsWith("App")) {
                         matchesSuffix = true;
                     }
@@ -196,26 +217,6 @@ public class DashboardDiscovery {
                                     }
                                 }
 
-                                if ("Demo".equals(suffix) || className.endsWith("App")) {
-                                    try {
-                                        Class<?> demoProvider = Class.forName("org.jscience.ui.DemoProvider", false,
-                                                this.getClass().getClassLoader());
-                                        if (!demoProvider.isAssignableFrom(cls)) {
-                                            continue;
-                                        }
-                                    } catch (ClassNotFoundException e) {
-                                        try {
-                                            Class<?> abstractDemo = Class.forName("org.jscience.ui.AbstractDemo", false,
-                                                    this.getClass().getClassLoader());
-                                            if (!abstractDemo.isAssignableFrom(cls)) {
-                                                continue;
-                                            }
-                                        } catch (ClassNotFoundException e2) {
-                                            continue;
-                                        }
-                                    }
-                                }
-
                                 processed.add(className);
                                 String simpleName = className.substring(className.lastIndexOf('.') + 1);
                                 results.add(new ClassInfo(simpleName, className, "From " + jarFile.getName()));
@@ -226,40 +227,32 @@ public class DashboardDiscovery {
                     }
                 }
             }
-        } catch (IOException e) {
+        } catch (java.io.IOException e) {
             // Ignore
         }
     }
 
-    /**
-     * Finds resources on the classpath matching the given pattern.
-     * 
-     * @param pattern substring to match (e.g., "messages_core")
-     * @return list of matching resource paths
-     */
     public List<String> findResources(String pattern) {
         List<String> results = new ArrayList<>();
         String classpath = System.getProperty("java.class.path");
-        String[] paths = classpath.split(File.pathSeparator);
+        String[] paths = classpath.split(java.io.File.pathSeparator);
 
         for (String path : paths) {
-            File file = new File(path);
+            java.io.File file = new java.io.File(path);
             if (file.isDirectory()) {
                 scanDirectoryForResources(file, "", pattern, results);
             }
-            // Jar scanning for resources omitted for brevity/speed in this context
-            // as we mostly care about project files for now.
-            // If needed, can be added similar to scanJar.
         }
         return results;
     }
 
-    private void scanDirectoryForResources(File directory, String packageName, String pattern, List<String> results) {
-        File[] files = directory.listFiles();
+    private void scanDirectoryForResources(java.io.File directory, String packageName, String pattern,
+            List<String> results) {
+        java.io.File[] files = directory.listFiles();
         if (files == null)
             return;
 
-        for (File file : files) {
+        for (java.io.File file : files) {
             if (file.isDirectory()) {
                 String newPackage = packageName.isEmpty() ? file.getName() : packageName + "/" + file.getName();
                 scanDirectoryForResources(file, newPackage, pattern, results);
@@ -289,3 +282,5 @@ public class DashboardDiscovery {
         }
     }
 }
+
+

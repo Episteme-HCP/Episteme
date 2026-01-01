@@ -275,3 +275,5 @@ public class GeometryBoardViewer extends Application {
         new GeometryBoardViewer().start(stage);
     }
 }
+
+

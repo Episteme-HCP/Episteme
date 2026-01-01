@@ -64,3 +64,5 @@ public class LogisticMap implements DiscreteMap {
         return 1.0;
     }
 }
+
+

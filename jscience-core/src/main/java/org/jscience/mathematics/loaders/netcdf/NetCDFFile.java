@@ -403,3 +403,4 @@ public class NetCDFFile extends AbstractDataFile implements org.jscience.io.Inpu
         return (total + 3) & ~3;
     }
 }
+

@@ -70,7 +70,7 @@ public class ProjectileMotion {
     private final Real initialSpeed; // m/s
     private final Real launchAngle; // radians
     private final Real launchHeight; // m
-    private final Real gravity; // m/s²
+    private final Real gravity; // m/sÃ‚Â²
 
     /**
      * Creates projectile with specified parameters.
@@ -118,7 +118,7 @@ public class ProjectileMotion {
         Real vX = initialSpeed.multiply(launchAngle.cos());
         Real vY = initialSpeed.multiply(launchAngle.sin());
 
-        // Time when y = 0: solve y = h + vY*t - 0.5*g*t² = 0
+        // Time when y = 0: solve y = h + vY*t - 0.5*g*tÃ‚Â² = 0
         Real discriminant = vY.multiply(vY).add(Real.TWO.multiply(gravity).multiply(launchHeight));
         Real t = vY.add(discriminant.sqrt()).divide(gravity);
 
@@ -180,7 +180,7 @@ public class ProjectileMotion {
     }
 
     /**
-     * Calculates optimal launch angle for maximum range (45°).
+     * Calculates optimal launch angle for maximum range (45Ã‚Â°).
      *
      * @return optimal angle in degrees
      */
@@ -260,8 +260,10 @@ public class ProjectileMotion {
 
     @Override
     public String toString() {
-        return String.format("ProjectileMotion{v0=%s m/s, θ=%s°, h0=%s m, range=%s}",
+        return String.format("ProjectileMotion{v0=%s m/s, ÃŽÂ¸=%sÃ‚Â°, h0=%s m, range=%s}",
                 initialSpeed, launchAngle.toDegrees(), launchHeight,
                 getRange());
     }
 }
+
+

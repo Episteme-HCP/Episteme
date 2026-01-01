@@ -21,14 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Pharmacology and pharmacokinetics calculations.
- * <p>
- * Includes drug concentration modeling, dosing calculations, and ADME models.
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.medicine.pharmacology;
+
+

@@ -57,7 +57,7 @@ public class ReactionBalancer {
      * @return A balanced ChemicalReaction object.
      */
     public static ChemicalReaction balance(String equation) {
-        String[] sides = equation.split("->|=|→");
+        String[] sides = equation.split("->|=|Ã¢â€ â€™");
         if (sides.length != 2) {
             throw new IllegalArgumentException("Invalid equation format: " + equation);
         }
@@ -358,3 +358,5 @@ public class ReactionBalancer {
     }
 
 }
+
+

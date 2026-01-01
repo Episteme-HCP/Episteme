@@ -181,3 +181,5 @@ public class Vector3D extends DenseVector<Real> implements
         return new Vector3D(x().add(other.x()), y().add(other.y()), z().add(other.z()));
     }
 }
+
+

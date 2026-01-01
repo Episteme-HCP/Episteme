@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package org.jscience.server.proto;
+
+option java_multiple_files = true;
+option java_package = "org.jscience.server.proto";
+option java_outer_classname = "DataServiceProto";
+
+// Service for streaming large datasets (Data Lake)
+service DataService {
+  // Streams chunks of genome sequence for a specific region
+  rpc StreamGenomeData (GenomeRegionRequest) returns (stream GenomeChunk) {}
+  
+  // Streams objects from the star catalog within a sky region
+  rpc StreamStarCatalog (SkyRegionRequest) returns (stream StarObject) {}
+}
+
+message GenomeRegionRequest {
+  string chromosome = 1;
+  int64 startBase = 2;
+  int64 endBase = 3;
+}
+
+message GenomeChunk {
+  string sequence = 1;
+  int64 startBase = 2;
+}
+
+message SkyRegionRequest {
+  double minRa = 1;
+  double maxRa = 2;
+  double minDec = 3;
+  double maxDec = 4;
+}
+
+message StarObject {
+  string starId = 1;
+  double ra = 2;
+  double dec = 3;
+  double magnitude = 4;
+  string type = 5;
+}

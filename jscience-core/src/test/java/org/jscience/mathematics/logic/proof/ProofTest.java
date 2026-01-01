@@ -109,3 +109,4 @@ public class ProofTest {
         assertFalse(verifier.verify(proof), "Invalid proof should be rejected");
     }
 }
+

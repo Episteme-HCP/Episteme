@@ -21,38 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Cholesky decomposition: A = LL^T for symmetric positive definite matrices.
- * <p>
- * <b>What it does</b>: Decomposes A into lower triangular L such that A = LL^T.
- * More efficient than LU for SPD matrices: O(n³/3) vs O(2n³/3).
- * Numerically stable, preserves positive definiteness.
- * </p>
- *
- * <p><b>When to use</b>:</p>
- * <ul>
- * <li>Solving Ax=b when A is symmetric positive definite</li>
- * <li>Computing matrix inverse for SPD matrices</li>
- * <li>Computing determinant efficiently</li>
- * <li>Least squares problems with normal equations</li>
- * </ul>
- *
- * <p><b>Prerequisites</b>:</p>
- * <ul>
- * <li>Matrix must be square (n × n)</li>
- * <li>Matrix must be symmetric: A = A^T</li>
- * <li>Matrix must be positive definite: x^T A x > 0 for all x ≠ 0</li>
- * </ul>
- *
- * <p><b>Algorithm complexity</b>: O(n³/3) for decomposition, O(n²) for solving Ax=b</p>
- *
- * <p><b>Alternatives</b>:</p>
- * <ul>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.mathematics.linearalgebra.matrices.solvers;
 
 import org.jscience.mathematics.numbers.real.Real;
@@ -75,8 +43,8 @@ public class CholeskyDecomposition {
      * <p>
      * <b>Algorithm steps</b>:
      * <ol>
-     * <li>For each diagonal element: L[i][i] = sqrt(A[i][i] - Σ L[i][k]²)</li>
-     * <li>For each off-diagonal: L[i][j] = (A[i][j] - Σ L[i][k]*L[j][k]) /
+     * <li>For each diagonal element: L[i][i] = sqrt(A[i][i] - ÃŽÂ£ L[i][k]Ã‚Â²)</li>
+     * <li>For each off-diagonal: L[i][j] = (A[i][j] - ÃŽÂ£ L[i][k]*L[j][k]) /
      * L[j][j]</li>
      * </ol>
      * </p>
@@ -149,7 +117,7 @@ public class CholeskyDecomposition {
      * <li>Forward substitution: Solve Ly = b for y</li>
      * <li>Backward substitution: Solve L^T x = y for x</li>
      * </ol>
-     * Complexity: O(n²)
+     * Complexity: O(nÃ‚Â²)
      * </p>
      * 
      * @param b right-hand side vector
@@ -182,7 +150,7 @@ public class CholeskyDecomposition {
     }
 
     /**
-     * Computes determinant efficiently: det(A) = (∏ L[i][i])²
+     * Computes determinant efficiently: det(A) = (Ã¢Ë†Â L[i][i])Ã‚Â²
      * <p>
      * Complexity: O(n)
      * </p>
@@ -201,7 +169,7 @@ public class CholeskyDecomposition {
      * Computes matrix inverse using Cholesky.
      * <p>
      * Solves AX = I by solving Ax_i = e_i for each column.
-     * Complexity: O(n³)
+     * Complexity: O(nÃ‚Â³)
      * </p>
      * 
      * @return inverse of original matrix A
@@ -278,3 +246,4 @@ public class CholeskyDecomposition {
         return DenseMatrix.of(rows, Reals.getInstance());
     }
 }
+

@@ -41,3 +41,4 @@ public interface Quasigroup<E> extends Magma<E> {
     // No additional methods required for the interface definition,
     // but implies existence of left and right division.
 }
+

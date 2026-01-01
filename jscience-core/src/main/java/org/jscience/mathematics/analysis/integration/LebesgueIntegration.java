@@ -50,7 +50,7 @@ public class LebesgueIntegration {
      * Monte Carlo integration.
      * <p>
      * Approximates the integral of f over a hypercube defined by bounds.
-     * Converges as O(1/√N), independent of dimension.
+     * Converges as O(1/Ã¢Ë†Å¡N), independent of dimension.
      * </p>
      * 
      * @param f           function to integrate (takes Vector<Real>, returns Real)
@@ -98,11 +98,11 @@ public class LebesgueIntegration {
      * Integration of a simple function (step function).
      * <p>
      * Fundamental to definition of Lebesgue integral.
-     * ∫ f dμ = Σ a_i * μ(E_i)
+     * Ã¢Ë†Â« f dÃŽÂ¼ = ÃŽÂ£ a_i * ÃŽÂ¼(E_i)
      * </p>
      * 
      * @param values   values (a_i) taken by the function
-     * @param measures measures μ(E_i) of the sets where function takes value a_i
+     * @param measures measures ÃŽÂ¼(E_i) of the sets where function takes value a_i
      * @return the integral value
      */
     public static Real integrateSimpleFunction(List<Real> values, List<Real> measures) {
@@ -117,3 +117,4 @@ public class LebesgueIntegration {
         return sum;
     }
 }
+

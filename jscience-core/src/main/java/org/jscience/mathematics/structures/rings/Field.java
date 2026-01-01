@@ -36,30 +36,30 @@ package org.jscience.mathematics.structures.rings;
  *
  * <h2>Mathematical Definition</h2>
  * <p>
- * A field (F, +, ×) is a ring satisfying:
+ * A field (F, +, Ãƒâ€”) is a ring satisfying:
  * <ol>
- * <li>Commutativity of multiplication: a × b = b × a</li>
- * <li>Existence of unity: ∃ 1 ∈ F such that 1 × a = a for all a</li>
- * <li>Multiplicative inverses: ∀ a ∈ F \ {0}, ∃ a⁻¹ such that a × a⁻¹ = 1</li>
+ * <li>Commutativity of multiplication: a Ãƒâ€” b = b Ãƒâ€” a</li>
+ * <li>Existence of unity: Ã¢Ë†Æ’ 1 Ã¢Ë†Ë† F such that 1 Ãƒâ€” a = a for all a</li>
+ * <li>Multiplicative inverses: Ã¢Ë†â‚¬ a Ã¢Ë†Ë† F \ {0}, Ã¢Ë†Æ’ aÃ¢ÂÂ»Ã‚Â¹ such that a Ãƒâ€” aÃ¢ÂÂ»Ã‚Â¹ = 1</li>
  * </ol>
- * This means (F \ {0}, ×) forms an abelian group.
+ * This means (F \ {0}, Ãƒâ€”) forms an abelian group.
  * </p>
  *
  * <h2>Examples</h2>
  * <ul>
- * <li>ℚ - Rational numbers</li>
- * <li>ℝ - Real numbers</li>
- * <li>ℂ - Complex numbers</li>
- * <li>𝔽ₚ - Integers modulo prime p</li>
- * <li>ℚ(√2) - Rationals extended with √2</li>
- * <li>ℝ(x) - Rational functions over reals</li>
+ * <li>Ã¢â€žÅ¡ - Rational numbers</li>
+ * <li>Ã¢â€žÂ - Real numbers</li>
+ * <li>Ã¢â€žâ€š - Complex numbers</li>
+ * <li>Ã°Ââ€Â½Ã¢â€šÅ¡ - Integers modulo prime p</li>
+ * <li>Ã¢â€žÅ¡(Ã¢Ë†Å¡2) - Rationals extended with Ã¢Ë†Å¡2</li>
+ * <li>Ã¢â€žÂ(x) - Rational functions over reals</li>
  * </ul>
  *
  * <h2>Not Fields</h2>
  * <ul>
- * <li>ℤ - Integers (no multiplicative inverses: 2⁻¹ ∉ ℤ)</li>
- * <li>M₂(ℝ) - 2×2 matrices (not commutative)</li>
- * <li>ℤ/6ℤ - Integers mod 6 (zero divisors: 2 × 3 = 0 mod 6)</li>
+ * <li>Ã¢â€žÂ¤ - Integers (no multiplicative inverses: 2Ã¢ÂÂ»Ã‚Â¹ Ã¢Ë†â€° Ã¢â€žÂ¤)</li>
+ * <li>MÃ¢â€šâ€š(Ã¢â€žÂ) - 2Ãƒâ€”2 matrices (not commutative)</li>
+ * <li>Ã¢â€žÂ¤/6Ã¢â€žÂ¤ - Integers mod 6 (zero divisors: 2 Ãƒâ€” 3 = 0 mod 6)</li>
  * </ul>
  *
  * <h2>Usage</h2>
@@ -73,14 +73,14 @@ public interface Field<E> extends Ring<E> {
     /**
      * Returns the multiplicative inverse of a non-zero element.
      * <p>
-     * For element a ≠ 0, returns a⁻¹ such that: a × a⁻¹ = a⁻¹ × a = 1
+     * For element a Ã¢â€°Â  0, returns aÃ¢ÂÂ»Ã‚Â¹ such that: a Ãƒâ€” aÃ¢ÂÂ»Ã‚Â¹ = aÃ¢ÂÂ»Ã‚Â¹ Ãƒâ€” a = 1
      * </p>
      * <p>
      * Examples:
      * <ul>
-     * <li>In ℚ: inverse(2/3) = 3/2</li>
-     * <li>In ℝ: inverse(5.0) = 0.2</li>
-     * <li>In ℂ: inverse(3+4i) = (3-4i)/25</li>
+     * <li>In Ã¢â€žÅ¡: inverse(2/3) = 3/2</li>
+     * <li>In Ã¢â€žÂ: inverse(5.0) = 0.2</li>
+     * <li>In Ã¢â€žâ€š: inverse(3+4i) = (3-4i)/25</li>
      * </ul>
      * </p>
      * 
@@ -97,12 +97,12 @@ public interface Field<E> extends Ring<E> {
     /**
      * Returns the quotient of two elements (division).
      * <p>
-     * Defined as: a ÷ b = a × b⁻¹
+     * Defined as: a ÃƒÂ· b = a Ãƒâ€” bÃ¢ÂÂ»Ã‚Â¹
      * </p>
      * 
      * @param dividend the dividend (numerator)
      * @param divisor  the divisor (denominator, must be non-zero)
-     * @return dividend ÷ divisor
+     * @return dividend ÃƒÂ· divisor
      * @throws NullPointerException if either argument is null
      * @throws ArithmeticException  if divisor is zero
      * 
@@ -145,8 +145,8 @@ public interface Field<E> extends Ring<E> {
      * <p>
      * Examples:
      * <ul>
-     * <li>char(ℚ) = char(ℝ) = char(ℂ) = 0</li>
-     * <li>char(𝔽ₚ) = p (for prime p)</li>
+     * <li>char(Ã¢â€žÅ¡) = char(Ã¢â€žÂ) = char(Ã¢â€žâ€š) = 0</li>
+     * <li>char(Ã°Ââ€Â½Ã¢â€šÅ¡) = p (for prime p)</li>
      * </ul>
      * </p>
      * 
@@ -154,3 +154,4 @@ public interface Field<E> extends Ring<E> {
      */
     int characteristic();
 }
+

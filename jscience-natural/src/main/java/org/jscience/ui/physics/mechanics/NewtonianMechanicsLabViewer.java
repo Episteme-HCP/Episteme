@@ -242,7 +242,7 @@ public class NewtonianMechanicsLabViewer {
         List<Point2D> phaseTrail = new ArrayList<>();
 
         controls.getChildren().addAll(title, new Separator(), lenSlider.getParent(), resetBtn, periodLabel,
-                new Separator(), new Label("Phase Space (Ω vs θ)"), phaseCanvas);
+                new Separator(), new Label("Phase Space (ÃŽÂ© vs ÃŽÂ¸)"), phaseCanvas);
 
         HBox layout = new HBox(20, canvas, controls);
         layout.setPadding(new Insets(20));
@@ -497,7 +497,7 @@ public class NewtonianMechanicsLabViewer {
                 }
 
                 double p = m1[0] * v1[0] + m2[0] * v2[0];
-                momentumLabel.setText(String.format("Total Momentum: %.2f kg·m/s", p));
+                momentumLabel.setText(String.format("Total Momentum: %.2f kgÃ‚Â·m/s", p));
                 drawCollision(canvas, x1[0], x2[0], m1[0], m2[0]);
             }
         }.start();
@@ -587,3 +587,5 @@ public class NewtonianMechanicsLabViewer {
         gc.fillOval(curX - 3, curY - 3, 6, 6);
     }
 }
+
+

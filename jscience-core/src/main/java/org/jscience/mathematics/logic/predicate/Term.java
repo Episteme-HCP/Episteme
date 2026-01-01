@@ -50,3 +50,5 @@ public interface Term {
      */
     boolean isVariable();
 }
+
+

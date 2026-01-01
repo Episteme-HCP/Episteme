@@ -43,24 +43,24 @@ import org.jscience.measure.quantity.Velocity;
  */
 public class QuantumMechanics {
 
-    /** Heisenberg uncertainty: Δx × Δp ≥ ℏ/2 */
+    /** Heisenberg uncertainty: ÃŽâ€x Ãƒâ€” ÃŽâ€p Ã¢â€°Â¥ Ã¢â€žÂ/2 */
     public static Real heisenbergUncertainty() {
         return PhysicalConstants.h_bar.divide(Real.TWO);
     }
 
-    /** De Broglie wavelength: λ = h/p */
+    /** De Broglie wavelength: ÃŽÂ» = h/p */
     public static Real deBroglieWavelength(Real momentum) {
         return PhysicalConstants.h.divide(momentum);
     }
 
-    /** Hydrogen atom energy levels: E_n = -13.6 eV / n² */
+    /** Hydrogen atom energy levels: E_n = -13.6 eV / nÃ‚Â² */
     public static Real hydrogenEnergyLevel(int n) {
         if (n <= 0)
             throw new IllegalArgumentException("n must be positive");
         return Real.of(-13.6).divide(Real.of(n * n));
     }
 
-    /** Rydberg formula: 1/λ = R(1/n₁² - 1/n₂²) */
+    /** Rydberg formula: 1/ÃŽÂ» = R(1/nÃ¢â€šÂÃ‚Â² - 1/nÃ¢â€šâ€šÃ‚Â²) */
     public static Real rydbergWavelength(int n1, int n2) {
         if (n1 >= n2)
             throw new IllegalArgumentException("n1 must be < n2");
@@ -70,18 +70,18 @@ public class QuantumMechanics {
         return Real.ONE.divide(R.multiply(term1.subtract(term2)));
     }
 
-    /** Compton shift: Δλ = (h/mc)(1 - cos θ) */
+    /** Compton shift: ÃŽâ€ÃŽÂ» = (h/mc)(1 - cos ÃŽÂ¸) */
     public static Real comptonShift(Real scatteringAngle) {
         Real comptonWavelength = PhysicalConstants.h.divide(PhysicalConstants.m_e.multiply(PhysicalConstants.c));
         return comptonWavelength.multiply(Real.ONE.subtract(scatteringAngle.cos()));
     }
 
-    /** Fine structure constant: α ≈ 1/137 */
+    /** Fine structure constant: ÃŽÂ± Ã¢â€°Ë† 1/137 */
     public static Real fineStructureConstant() {
         return PhysicalConstants.alpha;
     }
 
-    /** Bohr radius: a₀ ≈ 0.529 Å */
+    /** Bohr radius: aÃ¢â€šâ‚¬ Ã¢â€°Ë† 0.529 Ãƒâ€¦ */
     public static Real bohrRadius() {
         Real numerator = Real.of(4).multiply(Real.PI).multiply(PhysicalConstants.epsilon_0)
                 .multiply(PhysicalConstants.h_bar.pow(2));
@@ -96,7 +96,7 @@ public class QuantumMechanics {
         return Quantities.create(h.multiply(fVal), Units.JOULE);
     }
 
-    /** De Broglie wavelength: λ = h / (m * v) */
+    /** De Broglie wavelength: ÃŽÂ» = h / (m * v) */
     public static Quantity<Length> deBroglieWavelength(Quantity<Mass> m, Quantity<Velocity> v) {
         Real h = PhysicalConstants.h;
         Real mVal = m.to(Units.KILOGRAM).getValue();
@@ -108,3 +108,5 @@ public class QuantumMechanics {
         return Quantities.create(h.divide(p), Units.METER);
     }
 }
+
+

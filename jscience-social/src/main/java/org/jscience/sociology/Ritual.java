@@ -35,3 +35,5 @@ public class Ritual extends Situation {
         super(name, description);
     }
 }
+
+

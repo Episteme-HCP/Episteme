@@ -102,5 +102,7 @@ public class Building {
     public static final Building EMPIRE_STATE = new Building("Empire State Building", Style.ART_DECO,
             Type.COMMERCIAL, 1931, "Shreve, Lamb & Harmon", "New York, USA", 443);
     public static final Building SAGRADA_FAMILIA = new Building("Sagrada Familia", Style.ART_NOUVEAU,
-            Type.RELIGIOUS, 1882, "Antoni Gaudí", "Barcelona, Spain", 172);
+            Type.RELIGIOUS, 1882, "Antoni GaudÃƒÂ­", "Barcelona, Spain", 172);
 }
+
+

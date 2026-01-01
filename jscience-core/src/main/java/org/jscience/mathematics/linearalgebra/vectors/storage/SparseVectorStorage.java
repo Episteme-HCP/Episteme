@@ -75,3 +75,5 @@ public class SparseVectorStorage<E> implements VectorStorage<E> {
         return new SparseVectorStorage<>(dimension, zero, data);
     }
 }
+
+

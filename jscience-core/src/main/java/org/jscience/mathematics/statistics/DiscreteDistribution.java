@@ -72,3 +72,4 @@ public abstract class DiscreteDistribution implements ProbabilityDistribution {
         return quantile(Real.of(Math.random()));
     }
 }
+

@@ -129,7 +129,7 @@ public class SmartGridApp extends KillerAppBase {
         VBox box = new VBox(10);
         box.setPadding(new Insets(10));
 
-        Label title = new Label("🏙️ " + i18n.get("grid.viz.title"));
+        Label title = new Label("Ã°Å¸Ââ„¢Ã¯Â¸Â " + i18n.get("grid.viz.title"));
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
         gridCanvas = new Canvas(300, 500);
@@ -406,7 +406,7 @@ public class SmartGridApp extends KillerAppBase {
         statusLabel.setText(i18n.get("grid.status.blackout"));
         statusLabel.setStyle(
                 "-fx-font-size: 18px; -fx-background-color: #000000; -fx-text-fill: red; -fx-padding: 5 10 5 10; -fx-background-radius: 4;");
-        log("💥 " + MessageFormat.format(i18n.get("grid.log.blackout"), reason));
+        log("Ã°Å¸â€™Â¥ " + MessageFormat.format(i18n.get("grid.log.blackout"), reason));
         loop.stop();
     }
 
@@ -433,3 +433,5 @@ public class SmartGridApp extends KillerAppBase {
         launch(args);
     }
 }
+
+

@@ -22,10 +22,6 @@
  */
 
 /**
- * Architecture package - buildings, structures, and architectural styles.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * - buildings, structures, and architectural styles.
  */
 package org.jscience.architecture;

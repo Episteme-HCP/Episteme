@@ -222,3 +222,4 @@ final class NaturalLong extends Natural {
         return element != null;
     }
 }
+

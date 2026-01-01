@@ -44,3 +44,4 @@ public interface Deserializer<T> {
      */
     T read(InputStream input) throws IOException;
 }
+

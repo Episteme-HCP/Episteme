@@ -28,9 +28,9 @@ package org.jscience.mathematics.logic.multivalued;
  * <p>
  * Linear logic treats propositions as resources that are consumed when used.
  * Key connectives:
- * - ⊗ (tensor): multiplicative conjunction
- * - ⅋ (par): multiplicative disjunction
- * - ⊕ (plus): additive disjunction
+ * - Ã¢Å â€” (tensor): multiplicative conjunction
+ * - Ã¢â€¦â€¹ (par): multiplicative disjunction
+ * - Ã¢Å â€¢ (plus): additive disjunction
  * - & (with): additive conjunction
  * - ! (bang): unlimited resource
  * - ? (whimper): unlimited consumption
@@ -101,7 +101,7 @@ public class LinearLogic {
     }
 
     /**
-     * Tensor product (⊗) - multiplicative conjunction.
+     * Tensor product (Ã¢Å â€”) - multiplicative conjunction.
      * Both resources must be available.
      * 
      * @param a first proposition
@@ -114,11 +114,11 @@ public class LinearLogic {
         }
         a.use();
         b.use();
-        return new Proposition(a.getName() + " ⊗ " + b.getName(), 1);
+        return new Proposition(a.getName() + " Ã¢Å â€” " + b.getName(), 1);
     }
 
     /**
-     * Plus (⊕) - additive disjunction.
+     * Plus (Ã¢Å â€¢) - additive disjunction.
      * Choose one of the resources.
      * 
      * @param a           first proposition
@@ -173,3 +173,4 @@ public class LinearLogic {
         return "Linear Logic";
     }
 }
+

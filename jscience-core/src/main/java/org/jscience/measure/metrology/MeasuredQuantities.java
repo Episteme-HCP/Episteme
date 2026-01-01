@@ -46,7 +46,7 @@ public final class MeasuredQuantities {
      * 
      * @param <Q>             the quantity type
      * @param value           the central value
-     * @param uncertainty     the absolute uncertainty (±)
+     * @param uncertainty     the absolute uncertainty (Ã‚Â±)
      * @param confidenceLevel the confidence level (e.g., 0.95 for 95%)
      * @return the measured quantity
      */
@@ -62,13 +62,13 @@ public final class MeasuredQuantities {
      * 
      * @param <Q>         the quantity type
      * @param value       the central value
-     * @param uncertainty the absolute uncertainty (±)
+     * @param uncertainty the absolute uncertainty (Ã‚Â±)
      * @return the measured quantity with 95% confidence
      */
     public static <Q extends Quantity<Q>> MeasuredQuantity<Q> create(
             Quantity<Q> value,
             Quantity<Q> uncertainty) {
-        return create(value, uncertainty, 0.954); // ~95% (2σ)
+        return create(value, uncertainty, 0.954); // ~95% (2ÃÆ’)
     }
 
     /**
@@ -117,3 +117,4 @@ public final class MeasuredQuantities {
         return create(value, zero, 1.0); // 100% confidence
     }
 }
+

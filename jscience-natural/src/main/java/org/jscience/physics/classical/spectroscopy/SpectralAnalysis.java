@@ -43,17 +43,17 @@ public class SpectralAnalysis {
     private SpectralAnalysis() {
     }
 
-    /** Wien's displacement law: λ_max = b / T */
+    /** Wien's displacement law: ÃŽÂ»_max = b / T */
     public static Real wienPeakWavelength(Real temperatureKelvin) {
         return WIEN_B.divide(temperatureKelvin);
     }
 
-    /** Stefan-Boltzmann: P = σ * A * T⁴ */
+    /** Stefan-Boltzmann: P = ÃÆ’ * A * TÃ¢ÂÂ´ */
     public static Real stefanBoltzmannPower(Real areaM2, Real temperatureKelvin) {
         return SIGMA.multiply(areaM2).multiply(temperatureKelvin.pow(4));
     }
 
-    /** Planck radiance: B(λ,T) = (2hc²/λ⁵) / (exp(hc/λkT) - 1) */
+    /** Planck radiance: B(ÃŽÂ»,T) = (2hcÃ‚Â²/ÃŽÂ»Ã¢ÂÂµ) / (exp(hc/ÃŽÂ»kT) - 1) */
     public static Real planckRadiance(Real wavelengthMeters, Real temperatureKelvin) {
         Real numerator = Real.TWO.multiply(H).multiply(C.pow(2)).divide(wavelengthMeters.pow(5));
         Real exponent = H.multiply(C).divide(wavelengthMeters.multiply(K).multiply(temperatureKelvin));
@@ -61,12 +61,12 @@ public class SpectralAnalysis {
         return numerator.divide(denominator);
     }
 
-    /** Photon energy: E = hc/λ */
+    /** Photon energy: E = hc/ÃŽÂ» */
     public static Real photonEnergy(Real wavelengthMeters) {
         return H.multiply(C).divide(wavelengthMeters);
     }
 
-    /** Wavelength from energy: λ = hc/E */
+    /** Wavelength from energy: ÃŽÂ» = hc/E */
     public static Real wavelengthFromEnergy(Real energyJoules) {
         return H.multiply(C).divide(energyJoules);
     }
@@ -76,3 +76,5 @@ public class SpectralAnalysis {
         return WIEN_B.divide(peakWavelengthMeters);
     }
 }
+
+

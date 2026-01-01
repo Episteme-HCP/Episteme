@@ -86,14 +86,14 @@ public class DistributionsViewer extends Application {
         controls.setStyle("-fx-background-color: #f4f4f4; -fx-padding: 10;");
 
         Slider meanSlider = new Slider(-5, 5, 0);
-        Label meanLabel = new Label("Mean (μ): 0.0");
+        Label meanLabel = new Label("Mean (ÃŽÂ¼): 0.0");
         meanSlider.valueProperty()
-                .addListener((o, ov, nv) -> meanLabel.setText(String.format("Mean (μ): %.1f", nv.doubleValue())));
+                .addListener((o, ov, nv) -> meanLabel.setText(String.format("Mean (ÃŽÂ¼): %.1f", nv.doubleValue())));
 
         Slider stdSlider = new Slider(0.1, 3, 1.0);
-        Label stdLabel = new Label("Std Dev (σ): 1.0");
+        Label stdLabel = new Label("Std Dev (ÃÆ’): 1.0");
         stdSlider.valueProperty()
-                .addListener((o, ov, nv) -> stdLabel.setText(String.format("Std Dev (σ): %.1f", nv.doubleValue())));
+                .addListener((o, ov, nv) -> stdLabel.setText(String.format("Std Dev (ÃÆ’): %.1f", nv.doubleValue())));
 
         controls.getChildren().addAll(new Label("Parameters"), new Separator(), meanLabel, meanSlider, stdLabel,
                 stdSlider);
@@ -109,7 +109,7 @@ public class DistributionsViewer extends Application {
         chart.setCreateSymbols(false);
 
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
-        series.setName("N(μ, σ²)");
+        series.setName("N(ÃŽÂ¼, ÃÆ’Ã‚Â²)");
         chart.getData().add(series);
 
         // Update logic
@@ -148,9 +148,9 @@ public class DistributionsViewer extends Application {
         controls.setStyle("-fx-background-color: #f4f4f4; -fx-padding: 10;");
 
         Slider lambdaSlider = new Slider(0.1, 20, 5);
-        Label lambdaLabel = new Label("Lambda (λ): 5.0");
+        Label lambdaLabel = new Label("Lambda (ÃŽÂ»): 5.0");
         lambdaSlider.valueProperty()
-                .addListener((o, ov, nv) -> lambdaLabel.setText(String.format("Lambda (λ): %.1f", nv.doubleValue())));
+                .addListener((o, ov, nv) -> lambdaLabel.setText(String.format("Lambda (ÃŽÂ»): %.1f", nv.doubleValue())));
 
         controls.getChildren().addAll(new Label("Parameters"), new Separator(), lambdaLabel, lambdaSlider);
 
@@ -164,7 +164,7 @@ public class DistributionsViewer extends Application {
         chart.setAnimated(false);
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("P(k; λ)");
+        series.setName("P(k; ÃŽÂ»)");
         chart.getData().add(series);
 
         Runnable update = () -> {
@@ -272,3 +272,5 @@ public class DistributionsViewer extends Application {
         launch(args);
     }
 }
+
+

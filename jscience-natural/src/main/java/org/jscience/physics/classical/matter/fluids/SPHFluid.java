@@ -44,7 +44,7 @@ public class SPHFluid {
 
     // Simulation parameters
     private double mass = 1.0; // Particle mass
-    private double restDensity = 1000; // kg/m³ (water)
+    private double restDensity = 1000; // kg/mÃ‚Â³ (water)
     private double stiffness = 100; // Pressure stiffness
     private double viscosity = 0.1; // Viscosity coefficient
     private double smoothingRadius = 0.1; // h
@@ -276,3 +276,5 @@ public class SPHFluid {
         return fluid;
     }
 }
+
+

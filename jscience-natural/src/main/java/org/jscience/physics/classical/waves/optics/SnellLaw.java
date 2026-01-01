@@ -94,3 +94,5 @@ public class SnellLaw {
         return n2.divide(n1).atan();
     }
 }
+
+

@@ -65,3 +65,5 @@ public class SpectrometerViewer extends AbstractDeviceViewer<Spectrometer> {
         // dynamic update
     }
 }
+
+

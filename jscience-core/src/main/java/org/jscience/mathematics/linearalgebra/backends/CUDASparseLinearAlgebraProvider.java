@@ -145,3 +145,5 @@ public class CUDASparseLinearAlgebraProvider<E> implements LinearAlgebraProvider
         return cpuProvider.scale(scalar, a);
     }
 }
+
+

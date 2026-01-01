@@ -33,7 +33,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * <p>
  * A "complex interval" is actually a rectangular region in the complex plane,
  * defined by intervals on both the real and imaginary axes:
- * [a, b] × [c, d]i represents all z = x + yi where x ∈ [a,b] and y ∈ [c,d].
+ * [a, b] Ãƒâ€” [c, d]i represents all z = x + yi where x Ã¢Ë†Ë† [a,b] and y Ã¢Ë†Ë† [c,d].
  * </p>
  * <p>
  * These regions are useful for:
@@ -57,7 +57,7 @@ public final class ComplexInterval {
     /**
      * Creates a rectangular region in the complex plane.
      * <p>
-     * Returns all z = x + yi where x ∈ [realMin, realMax] and y ∈ [imagMin,
+     * Returns all z = x + yi where x Ã¢Ë†Ë† [realMin, realMax] and y Ã¢Ë†Ë† [imagMin,
      * imagMax].
      * </p>
      * 
@@ -113,14 +113,14 @@ public final class ComplexInterval {
     }
 
     /**
-     * Creates the unit square [0, 1] × [0, 1]i.
+     * Creates the unit square [0, 1] Ãƒâ€” [0, 1]i.
      */
     public static FieldIntervalND<Real> unitSquare() {
         return rectangle(0, 1, 0, 1);
     }
 
     /**
-     * Creates the standard Mandelbrot viewing region [-2.5, 1] × [-1.5, 1.5]i.
+     * Creates the standard Mandelbrot viewing region [-2.5, 1] Ãƒâ€” [-1.5, 1.5]i.
      */
     public static FieldIntervalND<Real> mandelbrotRegion() {
         return rectangle(-2.5, 1.0, -1.5, 1.5);
@@ -223,3 +223,4 @@ public final class ComplexInterval {
                 region.getMin(1).add(dy), region.getMax(1).add(dy));
     }
 }
+

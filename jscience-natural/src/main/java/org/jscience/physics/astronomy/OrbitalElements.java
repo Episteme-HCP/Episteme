@@ -37,8 +37,8 @@ import java.util.Arrays;
  * <li>a: Semi-major axis (m)</li>
  * <li>e: Eccentricity (dimensionless)</li>
  * <li>i: Inclination (rad)</li>
- * <li>Ω (Omega): Longitude of ascending node (rad)</li>
- * <li>ω (omega): Argument of periapsis (rad)</li>
+ * <li>ÃŽÂ© (Omega): Longitude of ascending node (rad)</li>
+ * <li>Ãâ€° (omega): Argument of periapsis (rad)</li>
  * <li>M: Mean anomaly at epoch (rad)</li>
  * </ul>
  * </p>
@@ -146,3 +146,5 @@ public class OrbitalElements {
         return new Object[] { pos, vel };
     }
 }
+
+

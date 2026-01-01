@@ -83,3 +83,5 @@ public class NaturalPojoTests {
         PojoTester.testPojo(ThermodynamicProperties.class);
     }
 }
+
+

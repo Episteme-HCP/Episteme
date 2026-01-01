@@ -32,7 +32,7 @@ import java.util.Random;
  * <p>
  * Swarm of particles exploring search space.
  * Each particle: position, velocity, personal best, global best.
- * Update: v = ωv + c₁rand()(pbest - x) + c₂rand()(gbest - x)
+ * Update: v = Ãâ€°v + cÃ¢â€šÂrand()(pbest - x) + cÃ¢â€šâ€šrand()(gbest - x)
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -49,9 +49,9 @@ public class ParticleSwarmOptimization {
     private final Random random = new Random();
 
     // PSO parameters
-    private Real inertiaWeight = Real.of(0.7298); // ω: inertia
-    private Real cognitiveCoeff = Real.of(1.49618); // c₁: personal attraction
-    private Real socialCoeff = Real.of(1.49618); // c₂: global attraction
+    private Real inertiaWeight = Real.of(0.7298); // Ãâ€°: inertia
+    private Real cognitiveCoeff = Real.of(1.49618); // cÃ¢â€šÂ: personal attraction
+    private Real socialCoeff = Real.of(1.49618); // cÃ¢â€šâ€š: global attraction
 
     /**
      * Particle in swarm.
@@ -170,7 +170,7 @@ public class ParticleSwarmOptimization {
                     .multiply(r2)
                     .multiply(globalBest[i].subtract(particle.position[i]));
 
-            // Update velocity: v = ωv + c₁r₁(pbest - x) + c₂r₂(gbest - x)
+            // Update velocity: v = Ãâ€°v + cÃ¢â€šÂrÃ¢â€šÂ(pbest - x) + cÃ¢â€šâ€šrÃ¢â€šâ€š(gbest - x)
             particle.velocity[i] = inertiaWeight.multiply(particle.velocity[i])
                     .add(cognitive)
                     .add(social);
@@ -218,7 +218,7 @@ public class ParticleSwarmOptimization {
     /**
      * Constriction coefficient PSO variant.
      * <p>
-     * χ = 2κ / |2 - φ - √(φ² - 4φ)|, φ = c₁ + c₂ > 4
+     * Ãâ€¡ = 2ÃŽÂº / |2 - Ãâ€  - Ã¢Ë†Å¡(Ãâ€ Ã‚Â² - 4Ãâ€ )|, Ãâ€  = cÃ¢â€šÂ + cÃ¢â€šâ€š > 4
      * Guarantees convergence.
      * </p>
      */
@@ -239,3 +239,5 @@ public class ParticleSwarmOptimization {
         this.socialCoeff = chi.multiply(socialCoeff);
     }
 }
+
+

@@ -24,7 +24,7 @@
 package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.ViewerProvider;
 import org.jscience.ui.biology.anatomy.BioMotionViewer;
 
 /**
@@ -33,15 +33,17 @@ import org.jscience.ui.biology.anatomy.BioMotionViewer;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class BioMotionDemoProvider implements DemoProvider {
+public class BioMotionDemoProvider implements ViewerProvider {
+
     @Override
     public String getName() {
-        return "BioMotion Simulation";
+        return org.jscience.ui.i18n.I18n.getInstance().get("biomotion.title", "BioMotion Simulation");
     }
 
     @Override
     public String getDescription() {
-        return "Physics-based biological motion simulation (Skeleton/Walker).";
+        return org.jscience.ui.i18n.I18n.getInstance().get("biomotion.desc",
+                "Physics-based biological motion simulation (Skeleton/Walker).");
     }
 
     @Override
@@ -54,3 +56,5 @@ public class BioMotionDemoProvider implements DemoProvider {
         BioMotionViewer.show(stage);
     }
 }
+
+

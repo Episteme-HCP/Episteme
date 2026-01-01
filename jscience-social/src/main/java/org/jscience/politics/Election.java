@@ -85,3 +85,5 @@ public class Election implements Identifiable<String>, Temporal {
                 .orElse(null);
     }
 }
+
+

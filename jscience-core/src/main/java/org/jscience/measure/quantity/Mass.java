@@ -36,7 +36,7 @@ import org.jscience.measure.Quantity;
  * <ul>
  * <li><b>Metric</b>: kilogram, gram, milligram, tonne (metric ton)</li>
  * <li><b>Imperial</b>: pound, ounce, ton (short ton), stone</li>
- * <li><b>Atomic</b>: atomic mass unit (u or Da), electronvolt/c²</li>
+ * <li><b>Atomic</b>: atomic mass unit (u or Da), electronvolt/cÃ‚Â²</li>
  * </ul>
  *
  * @author Silvere Martin-Michiellot
@@ -45,3 +45,4 @@ import org.jscience.measure.Quantity;
  */
 public interface Mass extends Quantity<Mass> {
 }
+

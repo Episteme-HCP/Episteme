@@ -36,7 +36,7 @@ public class EnzymeKinetics {
 
     /**
      * Michaelis-Menten equation.
-     * v = (Vmax · [S]) / (Km + [S])
+     * v = (Vmax Ã‚Â· [S]) / (Km + [S])
      * 
      * @param S    Substrate concentration
      * @param Vmax Maximum velocity
@@ -49,7 +49,7 @@ public class EnzymeKinetics {
 
     /**
      * Lineweaver-Burk (double reciprocal) transformation.
-     * 1/v = (Km/Vmax) · (1/[S]) + 1/Vmax
+     * 1/v = (Km/Vmax) Ã‚Â· (1/[S]) + 1/Vmax
      * Returns array with [slope, intercept].
      */
     public static Real[] lineweaverBurkParams(Real Vmax, Real Km) {
@@ -70,7 +70,7 @@ public class EnzymeKinetics {
 
     /**
      * Competitive inhibition: apparent Km increased.
-     * Km_app = Km · (1 + [I]/Ki)
+     * Km_app = Km Ã‚Â· (1 + [I]/Ki)
      */
     public static Real competitiveKm(Real Km, Real I, Real Ki) {
         return Km.multiply(Real.ONE.add(I.divide(Ki)));
@@ -103,8 +103,8 @@ public class EnzymeKinetics {
 
     /**
      * Catalytic efficiency.
-     * η = kcat / Km
-     * Higher is better (diffusion limit ~10⁸-10⁹ M⁻¹s⁻¹)
+     * ÃŽÂ· = kcat / Km
+     * Higher is better (diffusion limit ~10Ã¢ÂÂ¸-10Ã¢ÂÂ¹ MÃ¢ÂÂ»Ã‚Â¹sÃ¢ÂÂ»Ã‚Â¹)
      */
     public static Real catalyticEfficiency(Real kcat, Real Km) {
         return kcat.divide(Km);
@@ -112,7 +112,7 @@ public class EnzymeKinetics {
 
     /**
      * Hill equation for cooperative binding.
-     * θ = [S]^n / (K + [S]^n)
+     * ÃŽÂ¸ = [S]^n / (K + [S]^n)
      * 
      * @param S Substrate concentration
      * @param K Apparent dissociation constant
@@ -124,3 +124,5 @@ public class EnzymeKinetics {
         return Sn.divide(K.add(Sn));
     }
 }
+
+

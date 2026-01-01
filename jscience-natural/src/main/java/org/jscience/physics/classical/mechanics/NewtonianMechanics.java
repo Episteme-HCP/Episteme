@@ -45,10 +45,10 @@ public class NewtonianMechanics {
     }
 
     /**
-     * Kinetic energy: KE = (1/2)mv²
+     * Kinetic energy: KE = (1/2)mvÃ‚Â²
      */
     public static Quantity<Energy> kineticEnergy(Quantity<Mass> mass, Quantity<Velocity> velocity) {
-        // KE = 0.5 * m * v²
+        // KE = 0.5 * m * vÃ‚Â²
         Real half = Real.of(0.5);
         return mass.multiply(velocity).multiply(velocity).multiply(half).asType(Energy.class);
     }
@@ -70,3 +70,5 @@ public class NewtonianMechanics {
         return mass.multiply(g).multiply(height).asType(Energy.class);
     }
 }
+
+

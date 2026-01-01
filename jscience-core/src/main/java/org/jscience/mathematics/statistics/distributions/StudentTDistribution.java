@@ -64,19 +64,20 @@ public class StudentTDistribution extends ContinuousDistribution {
     @Override
     public Real mean() {
         if (degreesOfFreedom <= 1)
-            throw new ArithmeticException("Mean undefined for ν ≤ 1");
+            throw new ArithmeticException("Mean undefined for ÃŽÂ½ Ã¢â€°Â¤ 1");
         return Real.ZERO;
     }
 
     @Override
     public Real variance() {
         if (degreesOfFreedom <= 2)
-            throw new ArithmeticException("Variance undefined for ν ≤ 2");
+            throw new ArithmeticException("Variance undefined for ÃŽÂ½ Ã¢â€°Â¤ 2");
         return Real.of((double) degreesOfFreedom / (degreesOfFreedom - 2));
     }
 
     @Override
     public String toString() {
-        return String.format("t(ν=%d)", degreesOfFreedom);
+        return String.format("t(ÃŽÂ½=%d)", degreesOfFreedom);
     }
 }
+

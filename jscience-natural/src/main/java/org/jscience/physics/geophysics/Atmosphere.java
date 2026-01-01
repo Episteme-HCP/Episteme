@@ -55,10 +55,10 @@ public class Atmosphere implements Serializable {
     /** Temperature lapse rate (K/m) in troposphere */
     public static final Real LAPSE_RATE = Real.of(0.0065);
 
-    /** Gas constant for dry air (J/(kg·K)) */
+    /** Gas constant for dry air (J/(kgÃ‚Â·K)) */
     public static final Real R_AIR = Real.of(287.05);
 
-    /** Gravitational acceleration (m/s²) */
+    /** Gravitational acceleration (m/sÃ‚Â²) */
     private static final Real G = PhysicalConstants.g_n;
 
     // --- Data Model Fields (from earth/Atmosphere) ---
@@ -151,7 +151,7 @@ public class Atmosphere implements Serializable {
 
     /**
      * Air density from temperature and pressure.
-     * ρ = P / (R * T)
+     * ÃÂ = P / (R * T)
      */
     public static Real density(Real pressure, Real temperature) {
         return pressure.divide(R_AIR.multiply(temperature));
@@ -173,7 +173,7 @@ public class Atmosphere implements Serializable {
 
     /**
      * Speed of sound in air.
-     * c = sqrt(γ * R * T) where γ = 1.4 for diatomic gas
+     * c = sqrt(ÃŽÂ³ * R * T) where ÃŽÂ³ = 1.4 for diatomic gas
      */
     public static Real speedOfSound(Real temperature) {
         return Real.of(1.4).multiply(R_AIR).multiply(temperature).sqrt();
@@ -181,7 +181,7 @@ public class Atmosphere implements Serializable {
 
     /**
      * Relative humidity from dew point and temperature.
-     * RH ≈ 100 * exp(17.625 * Td / (243.04 + Td)) / exp(17.625 * T / (243.04 + T))
+     * RH Ã¢â€°Ë† 100 * exp(17.625 * Td / (243.04 + Td)) / exp(17.625 * T / (243.04 + T))
      */
     public static Real relativeHumidity(Real tempCelsius, Real dewPointCelsius) {
         Real es = saturationVaporPressure(tempCelsius);
@@ -241,3 +241,5 @@ public class Atmosphere implements Serializable {
                 .add(Real.of(0.3965).multiply(T).multiply(V));
     }
 }
+
+

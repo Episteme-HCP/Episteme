@@ -36,10 +36,10 @@ import org.jscience.mathematics.numbers.real.Real;
  * <p>
  * <b>Parameter Ranges:</b>
  * <ul>
- * <li>0 ≤ r ≤ 1: Population dies out</li>
+ * <li>0 Ã¢â€°Â¤ r Ã¢â€°Â¤ 1: Population dies out</li>
  * <li>1 < r < 3: Converges to (r-1)/r</li>
- * <li>3 ≤ r < 1+√6 ≈ 3.45: Oscillates between two values</li>
- * <li>r ≈ 3.57: Period-doubling cascade to chaos</li>
+ * <li>3 Ã¢â€°Â¤ r < 1+Ã¢Ë†Å¡6 Ã¢â€°Ë† 3.45: Oscillates between two values</li>
+ * <li>r Ã¢â€°Ë† 3.57: Period-doubling cascade to chaos</li>
  * <li>r = 4: Fully chaotic on [0, 1]</li>
  * </ul>
  * </p>
@@ -48,7 +48,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * <ul>
  * <li>May, Robert M. (1976). "Simple mathematical models with very complicated
  * dynamics".
- * <i>Nature</i>. <b>261</b> (5560): 459–467. doi:10.1038/261459a0</li>
+ * <i>Nature</i>. <b>261</b> (5560): 459Ã¢â‚¬â€œ467. doi:10.1038/261459a0</li>
  * <li><a href="https://en.wikipedia.org/wiki/Logistic_map">Wikipedia: Logistic
  * map</a></li>
  * </ul>
@@ -127,3 +127,4 @@ public class LogisticMap implements DiscreteMap<Double> {
         return "LogisticMap(r=" + r + ")";
     }
 }
+

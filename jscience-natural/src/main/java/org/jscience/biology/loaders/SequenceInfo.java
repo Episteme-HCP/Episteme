@@ -161,3 +161,5 @@ public class SequenceInfo {
                 accession, type, getLength(), getGCContent() * 100);
     }
 }
+
+

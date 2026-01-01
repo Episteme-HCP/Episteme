@@ -60,3 +60,5 @@ public class NativeDeviceBridge {
      */
     public native double readSensorValue(String deviceId);
 }
+
+

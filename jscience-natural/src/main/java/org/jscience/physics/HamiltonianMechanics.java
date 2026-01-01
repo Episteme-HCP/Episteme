@@ -28,8 +28,8 @@ import org.jscience.mathematics.numbers.real.Real;
 /**
  * Hamiltonian mechanics - phase space formulation of classical mechanics.
  * <p>
- * Hamiltonian: H = Σpᵢq̇ᵢ - L
- * Hamilton's equations: q̇ = ∂H/∂p, ṗ = -∂H/∂q
+ * Hamiltonian: H = ÃŽÂ£pÃ¡ÂµÂ¢qÃŒâ€¡Ã¡ÂµÂ¢ - L
+ * Hamilton's equations: qÃŒâ€¡ = Ã¢Ë†â€šH/Ã¢Ë†â€šp, Ã¡Â¹â€” = -Ã¢Ë†â€šH/Ã¢Ë†â€šq
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -39,7 +39,7 @@ import org.jscience.mathematics.numbers.real.Real;
 public class HamiltonianMechanics {
 
     /**
-     * Hamiltonian for free particle: H = p²/(2m)
+     * Hamiltonian for free particle: H = pÃ‚Â²/(2m)
      */
     public static Real hamiltonianFreeParticle(Real momentum, Real mass) {
         return momentum.multiply(momentum).divide(Real.TWO.multiply(mass));
@@ -53,14 +53,14 @@ public class HamiltonianMechanics {
     }
 
     /**
-     * Hamiltonian from Lagrangian: H = pq̇ - L
+     * Hamiltonian from Lagrangian: H = pqÃŒâ€¡ - L
      */
     public static Real hamiltonianFromLagrangian(Real momentum, Real velocity, Real lagrangian) {
         return momentum.multiply(velocity).subtract(lagrangian);
     }
 
     /**
-     * Hamiltonian for harmonic oscillator: H = p²/(2m) + ½kx²
+     * Hamiltonian for harmonic oscillator: H = pÃ‚Â²/(2m) + Ã‚Â½kxÃ‚Â²
      */
     public static Real hamiltonianHarmonicOscillator(Real momentum, Real mass,
             Real springConstant, Real position) {
@@ -70,7 +70,7 @@ public class HamiltonianMechanics {
     }
 
     /**
-     * Poisson bracket: {f,g} = Σᵢ(∂f/∂qᵢ ∂g/∂pᵢ - ∂f/∂pᵢ ∂g/∂qᵢ)
+     * Poisson bracket: {f,g} = ÃŽÂ£Ã¡ÂµÂ¢(Ã¢Ë†â€šf/Ã¢Ë†â€šqÃ¡ÂµÂ¢ Ã¢Ë†â€šg/Ã¢Ë†â€špÃ¡ÂµÂ¢ - Ã¢Ë†â€šf/Ã¢Ë†â€špÃ¡ÂµÂ¢ Ã¢Ë†â€šg/Ã¢Ë†â€šqÃ¡ÂµÂ¢)
      * Simplified 1D version
      */
     public static Real poissonBracket1D(Real dfDq, Real dfDp, Real dgDq, Real dgDp) {
@@ -78,7 +78,7 @@ public class HamiltonianMechanics {
     }
 
     /**
-     * Phase space volume element: dΓ = Πᵢ dqᵢ dpᵢ
+     * Phase space volume element: dÃŽâ€œ = ÃŽÂ Ã¡ÂµÂ¢ dqÃ¡ÂµÂ¢ dpÃ¡ÂµÂ¢
      * (Preserved by Hamiltonian flow - Liouville's theorem)
      */
     public static Real phaseSpaceVolume(Real[] q, Real[] p) {
@@ -92,7 +92,7 @@ public class HamiltonianMechanics {
 
     /**
      * Hamiltonian for charged particle in EM field:
-     * H = (p - qA)²/(2m) + qφ
+     * H = (p - qA)Ã‚Â²/(2m) + qÃâ€ 
      * (Simplified scalar version)
      */
     public static Real hamiltonianEMField(Real momentum, Real charge, Real vectorPotential,
@@ -103,3 +103,5 @@ public class HamiltonianMechanics {
         return kinetic.add(potential);
     }
 }
+
+

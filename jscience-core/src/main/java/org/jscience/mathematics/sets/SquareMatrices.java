@@ -30,9 +30,9 @@ import org.jscience.mathematics.structures.rings.Field;
 import org.jscience.mathematics.structures.rings.Ring;
 
 /**
- * The structure of n×n square matrices over a field, forming a ring.
+ * The structure of nÃƒâ€”n square matrices over a field, forming a ring.
  * <p>
- * For a given field F and dimension n, the set of n×n matrices forms a ring
+ * For a given field F and dimension n, the set of nÃƒâ€”n matrices forms a ring
  * under matrix addition and multiplication. Unlike scalar rings, matrix
  * multiplication is generally <strong>not commutative</strong>.
  * </p>
@@ -42,7 +42,7 @@ import org.jscience.mathematics.structures.rings.Ring;
  * <li>Addition: closed, associative, commutative, with zero matrix</li>
  * <li>Multiplication: closed, associative, with identity matrix</li>
  * <li>Distributive: A(B + C) = AB + AC</li>
- * <li>Non-commutative: AB ≠ BA in general</li>
+ * <li>Non-commutative: AB Ã¢â€°Â  BA in general</li>
  * </ul>
  * 
  * @param <E> the type of scalar elements in the field
@@ -66,7 +66,7 @@ public final class SquareMatrices<E> implements Ring<Matrix<E>> {
     }
 
     /**
-     * Returns the SquareMatrices structure for n×n matrices over a field.
+     * Returns the SquareMatrices structure for nÃƒâ€”n matrices over a field.
      */
     public static <E> SquareMatrices<E> of(Field<E> scalarField, int dimension) {
         return new SquareMatrices<>(scalarField, dimension);
@@ -149,7 +149,7 @@ public final class SquareMatrices<E> implements Ring<Matrix<E>> {
 
     private void validateDimensions(Matrix<E> m) {
         if (m.rows() != dimension || m.cols() != dimension) {
-            throw new IllegalArgumentException("Matrix must be " + dimension + "×" + dimension);
+            throw new IllegalArgumentException("Matrix must be " + dimension + "Ãƒâ€”" + dimension);
         }
     }
 
@@ -178,6 +178,7 @@ public final class SquareMatrices<E> implements Ring<Matrix<E>> {
 
     @Override
     public String toString() {
-        return "SquareMatrices(" + dimension + "×" + dimension + " over " + scalarField + ")";
+        return "SquareMatrices(" + dimension + "Ãƒâ€”" + dimension + " over " + scalarField + ")";
     }
 }
+

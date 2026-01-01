@@ -185,3 +185,5 @@ public class ObjectGalaxySimulator implements GalaxySimulator {
         return "Scientific (Vector<Real>)";
     }
 }
+
+

@@ -58,3 +58,5 @@ public class PolymerProperties {
         return Tg_inf - (K / Mn);
     }
 }
+
+

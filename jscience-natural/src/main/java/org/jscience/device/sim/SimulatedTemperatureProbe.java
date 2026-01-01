@@ -101,3 +101,5 @@ public class SimulatedTemperatureProbe extends SimulatedDevice implements Temper
         return lastReading;
     }
 }
+
+

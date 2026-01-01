@@ -103,28 +103,10 @@ public class StlMeshLoader implements org.jscience.io.InputLoader<javafx.scene.s
      * Loads an STL mesh from an InputStream.
      *
      * @param in Input stream containing STL data
-     * @return MeshView containing the loaded geometry
-     * @throws IOException if stream cannot be read
      */
     public static MeshView load(InputStream in) throws IOException {
-        byte[] allBytes = in.readAllBytes();
-
-        if (isAscii(allBytes)) {
-            throw new UnsupportedOperationException("ASCII STL not yet implemented. Please use Binary STL.");
-        }
-
-        return loadBinary(allBytes);
-    }
-
-    private static boolean isAscii(byte[] bytes) {
-        if (bytes.length < 5)
-            return false;
-        String start = new String(bytes, 0, 5);
-        return "solid".equalsIgnoreCase(start);
-    }
-
-    private static MeshView loadBinary(byte[] bytes) {
-        ByteBuffer bb = ByteBuffer.wrap(bytes);
+        byte[] data = in.readAllBytes();
+        ByteBuffer bb = ByteBuffer.wrap(data);
         bb.order(ByteOrder.LITTLE_ENDIAN);
 
         if (bb.remaining() < 84)
@@ -185,3 +167,4 @@ public class StlMeshLoader implements org.jscience.io.InputLoader<javafx.scene.s
         return new MeshView(mesh);
     }
 }
+

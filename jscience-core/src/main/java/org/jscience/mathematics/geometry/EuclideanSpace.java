@@ -75,7 +75,7 @@ public interface EuclideanSpace<V> extends AffineSpace<V> {
     /**
      * Computes the norm (length) of a vector.
      * <p>
-     * For Euclidean spaces, this is the L2 norm: √(x₁² + x₂² + ... + xₙ²)
+     * For Euclidean spaces, this is the L2 norm: Ã¢Ë†Å¡(xÃ¢â€šÂÃ‚Â² + xÃ¢â€šâ€šÃ‚Â² + ... + xÃ¢â€šâ„¢Ã‚Â²)
      * </p>
      * 
      * @param vector the vector
@@ -86,7 +86,7 @@ public interface EuclideanSpace<V> extends AffineSpace<V> {
     /**
      * Computes the inner product (dot product) of two vectors.
      * <p>
-     * For Euclidean spaces: ⟨u,v⟩ = u₁v₁ + u₂v₂ + ... + uₙvₙ
+     * For Euclidean spaces: Ã¢Å¸Â¨u,vÃ¢Å¸Â© = uÃ¢â€šÂvÃ¢â€šÂ + uÃ¢â€šâ€švÃ¢â€šâ€š + ... + uÃ¢â€šâ„¢vÃ¢â€šâ„¢
      * </p>
      * 
      * @param u the first vector
@@ -98,8 +98,8 @@ public interface EuclideanSpace<V> extends AffineSpace<V> {
     /**
      * Computes the angle between two vectors.
      * <p>
-     * Returns the angle in radians, in the range [0, π].
-     * Uses the formula: cos(θ) = ⟨u,v⟩ / (‖u‖ ‖v‖)
+     * Returns the angle in radians, in the range [0, Ãâ‚¬].
+     * Uses the formula: cos(ÃŽÂ¸) = Ã¢Å¸Â¨u,vÃ¢Å¸Â© / (Ã¢â‚¬â€“uÃ¢â‚¬â€“ Ã¢â‚¬â€“vÃ¢â‚¬â€“)
      * </p>
      * 
      * @param u the first vector
@@ -128,4 +128,6 @@ public interface EuclideanSpace<V> extends AffineSpace<V> {
         return innerProduct(u, v).abs().doubleValue() < 1e-10;
     }
 }
+
+
 

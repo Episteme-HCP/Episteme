@@ -40,10 +40,10 @@ import org.jscience.physics.PhysicalConstants;
 public class Relativity {
 
     /**
-     * Lorentz factor: γ = 1/√(1 - v²/c²)
+     * Lorentz factor: ÃŽÂ³ = 1/Ã¢Ë†Å¡(1 - vÃ‚Â²/cÃ‚Â²)
      */
     /**
-     * Lorentz factor: γ = 1/√(1 - v²/c²)
+     * Lorentz factor: ÃŽÂ³ = 1/Ã¢Ë†Å¡(1 - vÃ‚Â²/cÃ‚Â²)
      */
     public static Real lorentzFactor(Real velocity) {
         Real c = PhysicalConstants.SPEED_OF_LIGHT.getValue();
@@ -53,7 +53,7 @@ public class Relativity {
     }
 
     /**
-     * Time dilation: Δt = γΔt₀
+     * Time dilation: ÃŽâ€t = ÃŽÂ³ÃŽâ€tÃ¢â€šâ‚¬
      * Returns dilated time for moving observer
      */
     public static Real timeDilation(Real properTime, Real velocity) {
@@ -61,7 +61,7 @@ public class Relativity {
     }
 
     /**
-     * Length contraction: L = L₀/γ
+     * Length contraction: L = LÃ¢â€šâ‚¬/ÃŽÂ³
      * Returns contracted length in moving frame
      */
     public static Real lengthContraction(Real properLength, Real velocity) {
@@ -69,14 +69,14 @@ public class Relativity {
     }
 
     /**
-     * Relativistic momentum: p = γm₀v
+     * Relativistic momentum: p = ÃŽÂ³mÃ¢â€šâ‚¬v
      */
     public static Real relativisticMomentum(Real restMass, Real velocity) {
         return lorentzFactor(velocity).multiply(restMass).multiply(velocity);
     }
 
     /**
-     * Relativistic kinetic energy: KE = (γ - 1)m₀c²
+     * Relativistic kinetic energy: KE = (ÃŽÂ³ - 1)mÃ¢â€šâ‚¬cÃ‚Â²
      */
     public static Real relativisticKineticEnergy(Real restMass, Real velocity) {
         Real c = PhysicalConstants.SPEED_OF_LIGHT.getValue();
@@ -85,7 +85,7 @@ public class Relativity {
     }
 
     /**
-     * Total relativistic energy: E = γm₀c²
+     * Total relativistic energy: E = ÃŽÂ³mÃ¢â€šâ‚¬cÃ‚Â²
      */
     public static Real totalEnergy(Real restMass, Real velocity) {
         Real c = PhysicalConstants.SPEED_OF_LIGHT.getValue();
@@ -93,7 +93,7 @@ public class Relativity {
     }
 
     /**
-     * Energy-momentum relation: E² = (pc)² + (m₀c²)²
+     * Energy-momentum relation: EÃ‚Â² = (pc)Ã‚Â² + (mÃ¢â€šâ‚¬cÃ‚Â²)Ã‚Â²
      * Returns total energy from momentum
      */
     public static Real energyFromMomentum(Real momentum, Real restMass) {
@@ -104,7 +104,7 @@ public class Relativity {
     }
 
     /**
-     * Velocity addition formula: v = (v₁ + v₂)/(1 + v₁v₂/c²)
+     * Velocity addition formula: v = (vÃ¢â€šÂ + vÃ¢â€šâ€š)/(1 + vÃ¢â€šÂvÃ¢â€šâ€š/cÃ‚Â²)
      */
     public static Real velocityAddition(Real v1, Real v2) {
         Real c = PhysicalConstants.SPEED_OF_LIGHT.getValue();
@@ -114,8 +114,8 @@ public class Relativity {
     }
 
     /**
-     * Doppler effect (relativistic): f = f₀√((1-β)/(1+β))
-     * For source moving directly away (β = v/c)
+     * Doppler effect (relativistic): f = fÃ¢â€šâ‚¬Ã¢Ë†Å¡((1-ÃŽÂ²)/(1+ÃŽÂ²))
+     * For source moving directly away (ÃŽÂ² = v/c)
      */
     public static Real relativisticDoppler(Real sourceFreq, Real velocity, boolean approaching) {
         Real c = PhysicalConstants.SPEED_OF_LIGHT.getValue();
@@ -132,7 +132,7 @@ public class Relativity {
     }
 
     /**
-     * Schwarzschild radius: r_s = 2GM/c²
+     * Schwarzschild radius: r_s = 2GM/cÃ‚Â²
      * Event horizon radius for black hole
      */
     public static Real schwarzschildRadius(Real mass) {
@@ -142,7 +142,7 @@ public class Relativity {
     }
 
     /**
-     * Gravitational time dilation: t = t₀/√(1 - r_s/r)
+     * Gravitational time dilation: t = tÃ¢â€šâ‚¬/Ã¢Ë†Å¡(1 - r_s/r)
      * Near massive object at distance r
      */
     public static Real gravitationalTimeDilation(Real properTime, Real radius, Real schwarzschildRadius) {
@@ -151,7 +151,7 @@ public class Relativity {
     }
 
     /**
-     * Escape velocity: v_esc = √(2GM/r) = c√(r_s/r)
+     * Escape velocity: v_esc = Ã¢Ë†Å¡(2GM/r) = cÃ¢Ë†Å¡(r_s/r)
      */
     public static Real escapeVelocity(Real mass, Real radius) {
         Real G = PhysicalConstants.GRAVITATIONAL_CONSTANT.getValue();
@@ -159,9 +159,11 @@ public class Relativity {
     }
 
     /**
-     * Photon sphere radius: r_ph = 3GM/c² = 1.5 r_s
+     * Photon sphere radius: r_ph = 3GM/cÃ‚Â² = 1.5 r_s
      */
     public static Real photonSphereRadius(Real mass) {
         return Real.of(1.5).multiply(schwarzschildRadius(mass));
     }
 }
+
+

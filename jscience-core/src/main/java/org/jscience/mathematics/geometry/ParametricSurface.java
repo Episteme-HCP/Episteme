@@ -32,14 +32,14 @@ import org.jscience.mathematics.analysis.DifferentiableFunction;
  * Represents a parametric surface in 3D space.
  * <p>
  * A parametric surface is defined by: S(u,v) = (x(u,v), y(u,v), z(u,v))
- * where (u,v) are parameters, typically in some domain D ⊂ ℝ².
+ * where (u,v) are parameters, typically in some domain D Ã¢Å â€š Ã¢â€žÂÃ‚Â².
  * </p>
  * <p>
  * Examples:
- * - Plane: S(u,v) = P₀ + u*a + v*b
- * - Sphere: S(θ,φ) = (r*sin(θ)*cos(φ), r*sin(θ)*sin(φ), r*cos(θ))
+ * - Plane: S(u,v) = PÃ¢â€šâ‚¬ + u*a + v*b
+ * - Sphere: S(ÃŽÂ¸,Ãâ€ ) = (r*sin(ÃŽÂ¸)*cos(Ãâ€ ), r*sin(ÃŽÂ¸)*sin(Ãâ€ ), r*cos(ÃŽÂ¸))
  * - Torus: S(u,v) = ((R+r*cos(v))*cos(u), (R+r*cos(v))*sin(u), r*sin(v))
- * - Cylinder: S(θ,z) = (r*cos(θ), r*sin(θ), z)
+ * - Cylinder: S(ÃŽÂ¸,z) = (r*cos(ÃŽÂ¸), r*sin(ÃŽÂ¸), z)
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -77,7 +77,7 @@ public interface ParametricSurface extends DifferentiableFunction<Vector<Real>, 
     PointND at(Real u, Real v);
 
     /**
-     * Returns the partial derivative ∂S/∂u.
+     * Returns the partial derivative Ã¢Ë†â€šS/Ã¢Ë†â€šu.
      * <p>
      * This is the tangent vector in the u-direction.
      * </p>
@@ -96,7 +96,7 @@ public interface ParametricSurface extends DifferentiableFunction<Vector<Real>, 
     }
 
     /**
-     * Returns the partial derivative ∂S/∂v.
+     * Returns the partial derivative Ã¢Ë†â€šS/Ã¢Ë†â€šv.
      * <p>
      * This is the tangent vector in the v-direction.
      * </p>
@@ -117,7 +117,7 @@ public interface ParametricSurface extends DifferentiableFunction<Vector<Real>, 
     /**
      * Returns the normal vector at (u, v).
      * <p>
-     * The normal is computed as: N = ∂S/∂u × ∂S/∂v
+     * The normal is computed as: N = Ã¢Ë†â€šS/Ã¢Ë†â€šu Ãƒâ€” Ã¢Ë†â€šS/Ã¢Ë†â€šv
      * </p>
      * 
      * @param u the first parameter
@@ -136,7 +136,7 @@ public interface ParametricSurface extends DifferentiableFunction<Vector<Real>, 
     /**
      * Returns the surface area element dS.
      * <p>
-     * dS = ||∂S/∂u × ∂S/∂v|| du dv
+     * dS = ||Ã¢Ë†â€šS/Ã¢Ë†â€šu Ãƒâ€” Ã¢Ë†â€šS/Ã¢Ë†â€šv|| du dv
      * </p>
      * 
      * @param u the first parameter
@@ -155,7 +155,7 @@ public interface ParametricSurface extends DifferentiableFunction<Vector<Real>, 
     /**
      * Computes the surface area over a parameter domain.
      * <p>
-     * Area = ∫∫_D ||∂S/∂u × ∂S/∂v|| du dv
+     * Area = Ã¢Ë†Â«Ã¢Ë†Â«_D ||Ã¢Ë†â€šS/Ã¢Ë†â€šu Ãƒâ€” Ã¢Ë†â€šS/Ã¢Ë†â€šv|| du dv
      * </p>
      * 
      * @param u0        minimum u parameter
@@ -190,9 +190,9 @@ public interface ParametricSurface extends DifferentiableFunction<Vector<Real>, 
     /**
      * Returns the first fundamental form coefficients (E, F, G).
      * <p>
-     * E = ⟨∂S/∂u, ∂S/∂u⟩
-     * F = ⟨∂S/∂u, ∂S/∂v⟩
-     * G = ⟨∂S/∂v, ∂S/∂v⟩
+     * E = Ã¢Å¸Â¨Ã¢Ë†â€šS/Ã¢Ë†â€šu, Ã¢Ë†â€šS/Ã¢Ë†â€šuÃ¢Å¸Â©
+     * F = Ã¢Å¸Â¨Ã¢Ë†â€šS/Ã¢Ë†â€šu, Ã¢Ë†â€šS/Ã¢Ë†â€švÃ¢Å¸Â©
+     * G = Ã¢Å¸Â¨Ã¢Ë†â€šS/Ã¢Ë†â€šv, Ã¢Ë†â€šS/Ã¢Ë†â€švÃ¢Å¸Â©
      * </p>
      * 
      * @param u the first parameter
@@ -214,7 +214,7 @@ public interface ParametricSurface extends DifferentiableFunction<Vector<Real>, 
     /**
      * Returns the Gaussian curvature at (u, v).
      * <p>
-     * K = (LN - M²) / (EG - F²)
+     * K = (LN - MÃ‚Â²) / (EG - FÃ‚Â²)
      * where L, M, N are second fundamental form coefficients
      * and E, F, G are first fundamental form coefficients.
      * </p>
@@ -240,7 +240,9 @@ public interface ParametricSurface extends DifferentiableFunction<Vector<Real>, 
         Vector<Real> nMinusV = normal(u, v.subtract(h), h);
         Vector<Real> dnDv = nPlusV.subtract(nMinusV).multiply(Real.of(0.5).divide(h));
 
-        // K ≈ ||dnDu × dnDv||
+        // K Ã¢â€°Ë† ||dnDu Ãƒâ€” dnDv||
         return dnDu.cross(dnDv).norm();
     }
 }
+
+

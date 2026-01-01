@@ -68,3 +68,4 @@ public class Proof {
         return steps.get(steps.size() - 1);
     }
 }
+

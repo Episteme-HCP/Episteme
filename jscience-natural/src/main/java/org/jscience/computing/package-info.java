@@ -21,19 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Provides computational intelligence and algorithm support.
- * <p>
- * This field encompasses:
- * <ul>
- * <li>Artificial Intelligence (Neural Networks, ML)</li>
- * <li>Datastructures (KD-Trees, Graphs)</li>
- * <li>Distributed Computing (Grid, Cloud interactions)</li>
- * </ul>
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.computing;
+
+

@@ -22,13 +22,6 @@
  */
 
 /**
- * Geography package - coordinates, distances, and geospatial calculations.
- * <p>
- * Key classes:
- * <ul>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * - coordinates, distances, and geospatial calculations.
  */
 package org.jscience.geography;

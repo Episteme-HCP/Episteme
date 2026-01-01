@@ -1,0 +1,11 @@
+org.jscience.ui.demos.GeneticAlgorithmDemo
+org.jscience.ui.demos.UnitConverterDemo
+org.jscience.ui.demos.SequenceAlignmentDemo
+org.jscience.ui.demos.SpeciesBrowserDemo
+org.jscience.ui.demos.BioMotionDemoProvider
+org.jscience.ui.demos.GeometryBoardDemo
+org.jscience.ui.demos.RigidBodyDemo
+org.jscience.ui.demos.MetamathDemo
+org.jscience.ui.demos.PeripheralsDemo
+
+org.jscience.ui.demos.DigitalLogicDemo

@@ -32,7 +32,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.AppProvider;
 
 /**
  * 
@@ -40,11 +40,16 @@ import org.jscience.ui.DemoProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ArchitectureStabilityDemo implements DemoProvider {
+public class ArchitectureStabilityDemo implements AppProvider {
+
+    @Override
+    public boolean isDemo() {
+        return true;
+    }
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.architecture");
+        return "Architecture";
     }
 
     @Override
@@ -170,3 +175,5 @@ public class ArchitectureStabilityDemo implements DemoProvider {
         stage.show();
     }
 }
+
+

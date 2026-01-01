@@ -50,9 +50,9 @@ public interface MeasuredQuantity<Q extends Quantity<Q>> {
     Quantity<Q> getValue();
 
     /**
-     * Returns the absolute uncertainty (±).
+     * Returns the absolute uncertainty (Ã‚Â±).
      * <p>
-     * This is the standard uncertainty (1σ) or expanded uncertainty (kσ)
+     * This is the standard uncertainty (1ÃÆ’) or expanded uncertainty (kÃÆ’)
      * depending on the confidence level.
      * </p>
      * 
@@ -76,9 +76,9 @@ public interface MeasuredQuantity<Q extends Quantity<Q>> {
      * Common levels:
      * </p>
      * <ul>
-     * <li>0.683 (68.3%) → 1σ</li>
-     * <li>0.954 (95.4%) → 2σ</li>
-     * <li>0.997 (99.7%) → 3σ</li>
+     * <li>0.683 (68.3%) Ã¢â€ â€™ 1ÃÆ’</li>
+     * <li>0.954 (95.4%) Ã¢â€ â€™ 2ÃÆ’</li>
+     * <li>0.997 (99.7%) Ã¢â€ â€™ 3ÃÆ’</li>
      * </ul>
      * 
      * @return the confidence level between 0 and 1
@@ -88,7 +88,7 @@ public interface MeasuredQuantity<Q extends Quantity<Q>> {
     /**
      * Returns the coverage factor k.
      * <p>
-     * For normal distributions: k ≈ 1 for 68%, k ≈ 2 for 95%, k ≈ 3 for 99.7%
+     * For normal distributions: k Ã¢â€°Ë† 1 for 68%, k Ã¢â€°Ë† 2 for 95%, k Ã¢â€°Ë† 3 for 99.7%
      * </p>
      * 
      * @return the coverage factor
@@ -107,7 +107,7 @@ public interface MeasuredQuantity<Q extends Quantity<Q>> {
     /**
      * Adds another measured quantity.
      * <p>
-     * Uncertainty propagation: σ_z = √(σ_x² + σ_y²)
+     * Uncertainty propagation: ÃÆ’_z = Ã¢Ë†Å¡(ÃÆ’_xÃ‚Â² + ÃÆ’_yÃ‚Â²)
      * </p>
      * 
      * @param other the quantity to add
@@ -118,7 +118,7 @@ public interface MeasuredQuantity<Q extends Quantity<Q>> {
     /**
      * Subtracts another measured quantity.
      * <p>
-     * Uncertainty propagation: σ_z = √(σ_x² + σ_y²)
+     * Uncertainty propagation: ÃÆ’_z = Ã¢Ë†Å¡(ÃÆ’_xÃ‚Â² + ÃÆ’_yÃ‚Â²)
      * </p>
      * 
      * @param other the quantity to subtract
@@ -129,7 +129,7 @@ public interface MeasuredQuantity<Q extends Quantity<Q>> {
     /**
      * Multiplies by a scalar (exact, no uncertainty).
      * <p>
-     * Uncertainty propagation: σ_z = |scalar| × σ_x
+     * Uncertainty propagation: ÃÆ’_z = |scalar| Ãƒâ€” ÃÆ’_x
      * </p>
      * 
      * @param scalar the exact multiplier
@@ -150,7 +150,7 @@ public interface MeasuredQuantity<Q extends Quantity<Q>> {
     /**
      * Multiplies by another measured quantity.
      * <p>
-     * Uncertainty propagation: σ_z/z = √((σ_x/x)² + (σ_y/y)²)
+     * Uncertainty propagation: ÃÆ’_z/z = Ã¢Ë†Å¡((ÃÆ’_x/x)Ã‚Â² + (ÃÆ’_y/y)Ã‚Â²)
      * </p>
      * 
      * @param <R>   the other quantity type
@@ -162,7 +162,7 @@ public interface MeasuredQuantity<Q extends Quantity<Q>> {
     /**
      * Divides by a scalar (exact, no uncertainty).
      * <p>
-     * Uncertainty propagation: σ_z = σ_x / |scalar|
+     * Uncertainty propagation: ÃÆ’_z = ÃÆ’_x / |scalar|
      * </p>
      * 
      * @param scalar the exact divisor
@@ -183,7 +183,7 @@ public interface MeasuredQuantity<Q extends Quantity<Q>> {
     /**
      * Divides by another measured quantity.
      * <p>
-     * Uncertainty propagation: σ_z/z = √((σ_x/x)² + (σ_y/y)²)
+     * Uncertainty propagation: ÃÆ’_z/z = Ã¢Ë†Å¡((ÃÆ’_x/x)Ã‚Â² + (ÃÆ’_y/y)Ã‚Â²)
      * </p>
      * 
      * @param <R>   the other quantity type
@@ -210,8 +210,8 @@ public interface MeasuredQuantity<Q extends Quantity<Q>> {
     /**
      * Returns a string representation in scientific notation.
      * <p>
-     * Format: "value ± uncertainty unit (confidence%)"
-     * Example: "10.0 ± 0.2 m (95%)"
+     * Format: "value Ã‚Â± uncertainty unit (confidence%)"
+     * Example: "10.0 Ã‚Â± 0.2 m (95%)"
      * </p>
      * 
      * @return the formatted string
@@ -221,8 +221,8 @@ public interface MeasuredQuantity<Q extends Quantity<Q>> {
     /**
      * Returns a string representation with relative uncertainty.
      * <p>
-     * Format: "value unit ± percentage%"
-     * Example: "10.0 m ± 2.0%"
+     * Format: "value unit Ã‚Â± percentage%"
+     * Example: "10.0 m Ã‚Â± 2.0%"
      * </p>
      * 
      * @return the formatted string
@@ -253,7 +253,7 @@ public interface MeasuredQuantity<Q extends Quantity<Q>> {
     /**
      * Returns true if this measurement is consistent with another.
      * <p>
-     * Consistency check: |x - y| ≤ k√(σ_x² + σ_y²)
+     * Consistency check: |x - y| Ã¢â€°Â¤ kÃ¢Ë†Å¡(ÃÆ’_xÃ‚Â² + ÃÆ’_yÃ‚Â²)
      * </p>
      * 
      * @param other the other measurement
@@ -273,3 +273,4 @@ public interface MeasuredQuantity<Q extends Quantity<Q>> {
      */
     Real getStandardizedDifference(MeasuredQuantity<Q> other);
 }
+

@@ -45,7 +45,7 @@ public class MatrixLieAlgebra<E> implements LieAlgebra<Matrix<E>, E> {
     }
 
     /**
-     * Returns the dimension of the Lie algebra (n^2 for n×n matrices).
+     * Returns the dimension of the Lie algebra (n^2 for nÃƒâ€”n matrices).
      */
     public int dimension() {
         return n * n; // Dimension of n x n matrices is n^2
@@ -158,3 +158,4 @@ public class MatrixLieAlgebra<E> implements LieAlgebra<Matrix<E>, E> {
                 "Lie Algebras do not have a multiplicative identity for the bracket operation");
     }
 }
+

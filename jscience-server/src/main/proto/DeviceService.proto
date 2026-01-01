@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package org.jscience.server.proto;
+
+option java_multiple_files = true;
+option java_package = "org.jscience.server.proto";
+option java_outer_classname = "DeviceServiceProto";
+
+import "ComputeService.proto";
+
+// Service for controlling remote scientific instruments
+service DeviceService {
+  // Discover available devices
+  rpc ListDevices (Empty) returns (DeviceList) {}
+
+  // Connect/Disconnect
+  rpc Connect (DeviceIdentifier) returns (DeviceConnectionStatus) {}
+  rpc Disconnect (DeviceIdentifier) returns (DeviceConnectionStatus) {}
+
+  // Send a control command
+  rpc SendCommand (DeviceCommand) returns (CommandResponse) {}
+
+  // Subscribe to device telemetry/data stream
+  rpc SubscribeTelemetry (DeviceIdentifier) returns (stream DeviceData) {}
+}
+
+message DeviceList {
+  repeated DeviceInfo devices = 1;
+}
+
+message DeviceInfo {
+  string deviceId = 1;
+  string name = 2;
+  string type = 3; // TELESCOPE, MICROSCOPE, SENSOR, ROBOT_ARM
+  bool connected = 4;
+}
+
+message DeviceIdentifier {
+  string deviceId = 1;
+}
+
+message DeviceConnectionStatus {
+  string deviceId = 1;
+  bool connected = 2;
+  string message = 3;
+}
+
+message DeviceCommand {
+  string deviceId = 1;
+  string command = 2; // e.g. "MOVE_X", "CAPTURE", "SET_TEMP"
+  map<string, string> parameters = 3;
+}
+
+message CommandResponse {
+  string commandId = 1;
+  bool success = 2;
+  string resultMessage = 3;
+}
+
+message DeviceData {
+  string deviceId = 1;
+  int64 timestamp = 2;
+  string dataType = 3; // IMAGE, SPECTRAL, LOG, POSITION
+  bytes dataPayload = 4; // Binary data
+  map<string, double> numericReadings = 5; // Simple key-value metrics
+}

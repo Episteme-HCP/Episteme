@@ -63,3 +63,4 @@ public final class SI {
         public static final Unit<MagneticFluxDensity> TESLA = (Unit<MagneticFluxDensity>) WEBER.divide(METRE.pow(2));
         public static final Unit<Inductance> HENRY = (Unit<Inductance>) WEBER.divide(AMPERE);
 }
+

@@ -145,3 +145,5 @@ public class Note {
     public static final Note MIDDLE_C = new Note(Pitch.C, 4);
     public static final Note A440 = new Note(Pitch.A, 4);
 }
+
+

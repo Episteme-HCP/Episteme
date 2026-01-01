@@ -28,7 +28,7 @@ import org.jscience.measure.Quantity;
 /**
  * Represents velocity (speed in a direction).
  * <p>
- * Velocity is derived from Length ÷ Time (L/T).
+ * Velocity is derived from Length ÃƒÂ· Time (L/T).
  * The SI unit is meters per second (m/s).
  * </p>
  * <p>
@@ -46,3 +46,4 @@ import org.jscience.measure.Quantity;
  */
 public interface Velocity extends Quantity<Velocity> {
 }
+

@@ -131,3 +131,5 @@ public class Observer {
     public static final Observer LA_PALMA = new Observer("La Palma", 28.7606, -17.8816, 2396);
     public static final Observer GREENWICH = new Observer("Greenwich", 51.4769, -0.0005, 48);
 }
+
+

@@ -68,7 +68,7 @@ public class DivisionExpression<T extends Ring<T>> implements Expression<T> {
 
     @Override
     public Expression<T> differentiate(Variable<T> variable) {
-        // Quotient rule: (f/g)' = (f'g - fg') / g²
+        // Quotient rule: (f/g)' = (f'g - fg') / gÃ‚Â²
         Expression<T> fPrime = numerator.differentiate(variable);
         Expression<T> gPrime = denominator.differentiate(variable);
 
@@ -170,3 +170,4 @@ public class DivisionExpression<T extends Ring<T>> implements Expression<T> {
         return new ProductExpression<>(minusOne, expr, ring);
     }
 }
+

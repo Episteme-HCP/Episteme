@@ -41,3 +41,4 @@ public interface ContinuousFunction<D, C> extends Function<D, C> {
         return true;
     }
 }
+

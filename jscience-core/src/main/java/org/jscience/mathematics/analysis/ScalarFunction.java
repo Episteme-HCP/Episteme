@@ -35,3 +35,4 @@ import org.jscience.mathematics.numbers.real.Real;
 public interface ScalarFunction<D> extends Function<D, Real> {
     // Marker interface for scalar-valued functions
 }
+

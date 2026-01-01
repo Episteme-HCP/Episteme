@@ -115,3 +115,5 @@ public class StarLoader extends AbstractLoader<List<StarLoader.Star>> {
         return stars;
     }
 }
+
+

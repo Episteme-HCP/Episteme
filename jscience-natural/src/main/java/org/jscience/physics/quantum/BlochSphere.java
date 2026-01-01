@@ -42,8 +42,8 @@ public class BlochSphere {
     /**
      * Converts qubit amplitudes to Bloch sphere coordinates.
      * 
-     * @param alpha Amplitude of |0⟩ state
-     * @param beta  Amplitude of |1⟩ state
+     * @param alpha Amplitude of |0Ã¢Å¸Â© state
+     * @param beta  Amplitude of |1Ã¢Å¸Â© state
      * @return double[3] = {x, y, z} on unit sphere
      */
     public static double[] toBlochCoordinates(Complex alpha, Complex beta) {
@@ -82,8 +82,8 @@ public class BlochSphere {
     /**
      * Converts Bloch sphere coordinates back to qubit state.
      * 
-     * @param theta Polar angle (0 to π)
-     * @param phi   Azimuthal angle (0 to 2π)
+     * @param theta Polar angle (0 to Ãâ‚¬)
+     * @param phi   Azimuthal angle (0 to 2Ãâ‚¬)
      * @return Complex[2] = {alpha, beta}
      */
     public static Complex[] fromBlochAngles(double theta, double phi) {
@@ -95,10 +95,12 @@ public class BlochSphere {
     /**
      * Special states on the Bloch sphere.
      */
-    public static final double[] STATE_ZERO = { 0.0, 0.0, 1.0 }; // |0⟩ = north pole
-    public static final double[] STATE_ONE = { 0.0, 0.0, -1.0 }; // |1⟩ = south pole
-    public static final double[] STATE_PLUS = { 1.0, 0.0, 0.0 }; // |+⟩ = +x
-    public static final double[] STATE_MINUS = { -1.0, 0.0, 0.0 }; // |-⟩ = -x
-    public static final double[] STATE_PLUS_I = { 0.0, 1.0, 0.0 }; // |+i⟩ = +y
-    public static final double[] STATE_MINUS_I = { 0.0, -1.0, 0.0 }; // |-i⟩ = -y
+    public static final double[] STATE_ZERO = { 0.0, 0.0, 1.0 }; // |0Ã¢Å¸Â© = north pole
+    public static final double[] STATE_ONE = { 0.0, 0.0, -1.0 }; // |1Ã¢Å¸Â© = south pole
+    public static final double[] STATE_PLUS = { 1.0, 0.0, 0.0 }; // |+Ã¢Å¸Â© = +x
+    public static final double[] STATE_MINUS = { -1.0, 0.0, 0.0 }; // |-Ã¢Å¸Â© = -x
+    public static final double[] STATE_PLUS_I = { 0.0, 1.0, 0.0 }; // |+iÃ¢Å¸Â© = +y
+    public static final double[] STATE_MINUS_I = { 0.0, -1.0, 0.0 }; // |-iÃ¢Å¸Â© = -y
 }
+
+

@@ -112,3 +112,5 @@ public class DenseMatrix<E> extends GenericMatrix<E> {
         return sb.toString();
     }
 }
+
+

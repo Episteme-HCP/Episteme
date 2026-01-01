@@ -35,11 +35,11 @@ import org.jscience.mathematics.structures.sets.FiniteSet;
  * 
  * <h2>Mathematical Definition</h2>
  * <p>
- * A Boolean algebra (B, ∧, ∨, ¬, 0, 1) consists of:
+ * A Boolean algebra (B, Ã¢Ë†Â§, Ã¢Ë†Â¨, Ã‚Â¬, 0, 1) consists of:
  * <ul>
  * <li>A set B (typically {false, true} or {0, 1})</li>
- * <li>Binary operations: ∧ (AND), ∨ (OR)</li>
- * <li>Unary operation: ¬ (NOT)</li>
+ * <li>Binary operations: Ã¢Ë†Â§ (AND), Ã¢Ë†Â¨ (OR)</li>
+ * <li>Unary operation: Ã‚Â¬ (NOT)</li>
  * <li>Constants: 0 (false), 1 (true)</li>
  * </ul>
  * </p>
@@ -47,19 +47,19 @@ import org.jscience.mathematics.structures.sets.FiniteSet;
  * <h2>Boolean Algebra Laws</h2>
  * 
  * <pre>
- * Commutative:    a ∧ b = b ∧ a,  a ∨ b = b ∨ a
- * Associative:    (a ∧ b) ∧ c = a ∧ (b ∧ c)
- * Distributive:   a ∧ (b ∨ c) = (a ∧ b) ∨ (a ∧ c)
- * Identity:       a ∧ 1 = a,  a ∨ 0 = a
- * Complement:     a ∧ ¬a = 0,  a ∨ ¬a = 1
- * De Morgan:      ¬(a ∧ b) = ¬a ∨ ¬b
+ * Commutative:    a Ã¢Ë†Â§ b = b Ã¢Ë†Â§ a,  a Ã¢Ë†Â¨ b = b Ã¢Ë†Â¨ a
+ * Associative:    (a Ã¢Ë†Â§ b) Ã¢Ë†Â§ c = a Ã¢Ë†Â§ (b Ã¢Ë†Â§ c)
+ * Distributive:   a Ã¢Ë†Â§ (b Ã¢Ë†Â¨ c) = (a Ã¢Ë†Â§ b) Ã¢Ë†Â¨ (a Ã¢Ë†Â§ c)
+ * Identity:       a Ã¢Ë†Â§ 1 = a,  a Ã¢Ë†Â¨ 0 = a
+ * Complement:     a Ã¢Ë†Â§ Ã‚Â¬a = 0,  a Ã¢Ë†Â¨ Ã‚Â¬a = 1
+ * De Morgan:      Ã‚Â¬(a Ã¢Ë†Â§ b) = Ã‚Â¬a Ã¢Ë†Â¨ Ã‚Â¬b
  * </pre>
  * 
  * <h2>Applications</h2>
  * <ul>
  * <li><strong>Digital Logic</strong>: Circuit design, gates</li>
  * <li><strong>Programming</strong>: Conditional logic, bitwise operations</li>
- * <li><strong>Set Theory</strong>: ∩ (AND), ∪ (OR), complement (NOT)</li>
+ * <li><strong>Set Theory</strong>: Ã¢Ë†Â© (AND), Ã¢Ë†Âª (OR), complement (NOT)</li>
  * <li><strong>Database Queries</strong>: SQL WHERE clauses</li>
  * <li><strong>AI/Logic</strong>: Propositional logic, inference</li>
  * </ul>
@@ -186,12 +186,12 @@ public final class BooleanAlgebra implements Semiring<Boolean>, FiniteSet<Boolea
     // --- Boolean Algebra Operations ---
 
     /**
-     * Logical AND (conjunction, meet, ∧).
+     * Logical AND (conjunction, meet, Ã¢Ë†Â§).
      * <p>
      * Truth table:
      * 
      * <pre>
-     * a     b     a ∧ b
+     * a     b     a Ã¢Ë†Â§ b
      * false false false
      * false true  false
      * true  false false
@@ -201,19 +201,19 @@ public final class BooleanAlgebra implements Semiring<Boolean>, FiniteSet<Boolea
      * 
      * @param a first operand
      * @param b second operand
-     * @return a ∧ b
+     * @return a Ã¢Ë†Â§ b
      */
     public Boolean and(Boolean a, Boolean b) {
         return a && b;
     }
 
     /**
-     * Logical OR (disjunction, join, ∨).
+     * Logical OR (disjunction, join, Ã¢Ë†Â¨).
      * <p>
      * Truth table:
      * 
      * <pre>
-     * a     b     a ∨ b
+     * a     b     a Ã¢Ë†Â¨ b
      * false false false
      * false true  true
      * true  false true
@@ -223,31 +223,31 @@ public final class BooleanAlgebra implements Semiring<Boolean>, FiniteSet<Boolea
      * 
      * @param a first operand
      * @param b second operand
-     * @return a ∨ b
+     * @return a Ã¢Ë†Â¨ b
      */
     public Boolean or(Boolean a, Boolean b) {
         return a || b;
     }
 
     /**
-     * Logical NOT (complement, negation, ¬).
+     * Logical NOT (complement, negation, Ã‚Â¬).
      * 
      * @param a the operand
-     * @return ¬a
+     * @return Ã‚Â¬a
      */
     public Boolean not(Boolean a) {
         return !a;
     }
 
     /**
-     * Logical XOR (exclusive or, ⊕).
+     * Logical XOR (exclusive or, Ã¢Å â€¢).
      * <p>
      * Returns true if operands differ.
      * </p>
      * 
      * @param a first operand
      * @param b second operand
-     * @return a ⊕ b
+     * @return a Ã¢Å â€¢ b
      */
     public Boolean xor(Boolean a, Boolean b) {
         return a ^ b;
@@ -261,7 +261,7 @@ public final class BooleanAlgebra implements Semiring<Boolean>, FiniteSet<Boolea
      * 
      * @param a first operand
      * @param b second operand
-     * @return ¬(a ∧ b)
+     * @return Ã‚Â¬(a Ã¢Ë†Â§ b)
      */
     public Boolean nand(Boolean a, Boolean b) {
         return not(and(a, b));
@@ -275,36 +275,36 @@ public final class BooleanAlgebra implements Semiring<Boolean>, FiniteSet<Boolea
      * 
      * @param a first operand
      * @param b second operand
-     * @return ¬(a ∨ b)
+     * @return Ã‚Â¬(a Ã¢Ë†Â¨ b)
      */
     public Boolean nor(Boolean a, Boolean b) {
         return not(or(a, b));
     }
 
     /**
-     * Logical implication (→).
+     * Logical implication (Ã¢â€ â€™).
      * <p>
-     * a → b is equivalent to ¬a ∨ b.
+     * a Ã¢â€ â€™ b is equivalent to Ã‚Â¬a Ã¢Ë†Â¨ b.
      * False implies anything; true implies only true.
      * </p>
      * 
      * @param a premise
      * @param b conclusion
-     * @return a → b
+     * @return a Ã¢â€ â€™ b
      */
     public Boolean implies(Boolean a, Boolean b) {
         return or(not(a), b);
     }
 
     /**
-     * Logical equivalence (biconditional, ↔).
+     * Logical equivalence (biconditional, Ã¢â€ â€).
      * <p>
      * True if both operands have the same value.
      * </p>
      * 
      * @param a first operand
      * @param b second operand
-     * @return a ↔ b
+     * @return a Ã¢â€ â€ b
      */
     public Boolean equivalent(Boolean a, Boolean b) {
         return a.equals(b);
@@ -315,3 +315,4 @@ public final class BooleanAlgebra implements Semiring<Boolean>, FiniteSet<Boolea
         return "BooleanAlgebra";
     }
 }
+

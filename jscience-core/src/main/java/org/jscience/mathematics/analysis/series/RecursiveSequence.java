@@ -79,3 +79,4 @@ public abstract class RecursiveSequence<T> implements Sequence<T> {
         cache.clear();
     }
 }
+

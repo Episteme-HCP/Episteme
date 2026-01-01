@@ -31,6 +31,7 @@ import java.util.Objects;
  * This class is immutable and thread-safe.
  * </p>
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -173,7 +174,7 @@ final class StandardDimension implements Dimension {
         appendExponent(sb, "M", mass);
         appendExponent(sb, "T", time);
         appendExponent(sb, "I", electricCurrent);
-        appendExponent(sb, "Θ", temperature);
+        appendExponent(sb, "\u0398", temperature); // Theta
         appendExponent(sb, "N", amountOfSubstance);
         appendExponent(sb, "J", luminousIntensity);
 
@@ -186,7 +187,7 @@ final class StandardDimension implements Dimension {
         if (exp == 0)
             return;
         if (sb.length() > 1)
-            sb.append("⋅");
+            sb.append("\u00B7"); // Middle dot (or \u22C5)
         sb.append(symbol);
         if (exp != 1) {
             sb.append(superscript(exp));
@@ -195,10 +196,11 @@ final class StandardDimension implements Dimension {
 
     private String superscript(int n) {
         String s = String.valueOf(Math.abs(n));
-        s = s.replace('0', '⁰').replace('1', '¹').replace('2', '²')
-                .replace('3', '³').replace('4', '⁴').replace('5', '⁵')
-                .replace('6', '⁶').replace('7', '⁷').replace('8', '⁸')
-                .replace('9', '⁹');
-        return n < 0 ? "⁻" + s : s;
+        s = s.replace('0', '\u2070').replace('1', '\u00B9').replace('2', '\u00B2')
+                .replace('3', '\u00B3').replace('4', '\u2074').replace('5', '\u2075')
+                .replace('6', '\u2076').replace('7', '\u2077').replace('8', '\u2078')
+                .replace('9', '\u2079');
+        return n < 0 ? "\u207B" + s : s;
     }
 }
+

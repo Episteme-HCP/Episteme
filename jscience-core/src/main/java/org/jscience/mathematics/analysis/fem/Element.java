@@ -74,3 +74,4 @@ public interface Element {
      */
     List<QuadraturePoint> getQuadraturePoints();
 }
+

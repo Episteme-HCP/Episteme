@@ -52,3 +52,5 @@ public interface SpectrumProvider {
      */
     void setSourcePattern(String pattern);
 }
+
+

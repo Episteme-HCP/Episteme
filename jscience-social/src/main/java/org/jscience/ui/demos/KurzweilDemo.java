@@ -35,7 +35,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.AppProvider;
 
 import java.util.*;
 
@@ -51,7 +51,7 @@ import java.util.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class KurzweilDemo implements DemoProvider {
+public class KurzweilDemo implements AppProvider {
 
     private static final int WIDTH = 1000;
     private static final int HEIGHT = 700;
@@ -91,8 +91,13 @@ public class KurzweilDemo implements DemoProvider {
     private boolean running = true;
 
     @Override
+    public boolean isDemo() {
+        return true;
+    }
+
+    @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.economics");
+        return "Economics";
     }
 
     @Override
@@ -195,7 +200,8 @@ public class KurzweilDemo implements DemoProvider {
         clockTitle.setFont(Font.font("System", FontWeight.BOLD, 14));
 
         VBox linearClock = new VBox(5);
-        Label linearClockLabel = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.sidebar.linear"));
+        Label linearClockLabel = new Label(
+                org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.sidebar.linear"));
         linearClockLabel.setTextFill(Color.LIGHTGRAY);
         realTimeLabel = new Label("0.00");
         realTimeLabel.setFont(Font.font("Monospace", FontWeight.BOLD, 24));
@@ -203,14 +209,16 @@ public class KurzweilDemo implements DemoProvider {
         linearClock.getChildren().addAll(linearClockLabel, realTimeLabel);
 
         VBox kurzweilClock = new VBox(5);
-        Label kurzweilClockLabel = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.sidebar.kurzweil"));
+        Label kurzweilClockLabel = new Label(
+                org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.sidebar.kurzweil"));
         kurzweilClockLabel.setTextFill(Color.LIGHTGRAY);
         kurzweilTimeLabel = new Label("0.00");
         kurzweilTimeLabel.setFont(Font.font("Monospace", FontWeight.BOLD, 24));
         kurzweilTimeLabel.setTextFill(Color.ORANGE);
         kurzweilClock.getChildren().addAll(kurzweilClockLabel, kurzweilTimeLabel);
 
-        accelerationLabel = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.sidebar.accel") + " 1.00x");
+        accelerationLabel = new Label(
+                org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.sidebar.accel") + " 1.00x");
         accelerationLabel.setTextFill(Color.YELLOW);
         accelerationLabel.setFont(Font.font("System", 12));
 
@@ -236,7 +244,8 @@ public class KurzweilDemo implements DemoProvider {
             kurzweilTime = 0;
         });
 
-        ToggleButton pauseBtn = new ToggleButton(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.btn.pause"));
+        ToggleButton pauseBtn = new ToggleButton(
+                org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.btn.pause"));
         pauseBtn.setMaxWidth(Double.MAX_VALUE);
         pauseBtn.setOnAction(e -> running = !pauseBtn.isSelected());
 
@@ -351,3 +360,5 @@ public class KurzweilDemo implements DemoProvider {
     private static record Milestone(int year, String label) {
     }
 }
+
+

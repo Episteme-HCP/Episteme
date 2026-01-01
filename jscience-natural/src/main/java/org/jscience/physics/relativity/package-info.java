@@ -21,15 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Special and General Relativity.
- * <p>
- * Provides classes for Lorentz transformations, spacetime metrics,
- * and relativistic dynamics.
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.physics.relativity;
+
+

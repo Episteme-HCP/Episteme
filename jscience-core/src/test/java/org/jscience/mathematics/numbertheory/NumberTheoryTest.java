@@ -80,3 +80,4 @@ public class NumberTheoryTest {
         assertEquals(168, primes1000.size()); // 168 primes under 1000
     }
 }
+

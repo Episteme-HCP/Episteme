@@ -125,3 +125,4 @@ public class SpecialFunctionsTest {
         assertEquals(-SpecialFunctions.erf(x).doubleValue(), SpecialFunctions.erf(x.negate()).doubleValue(), TOLERANCE);
     }
 }
+

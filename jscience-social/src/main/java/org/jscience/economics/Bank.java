@@ -190,7 +190,9 @@ public class Bank {
 
     public static Bank ecb() {
         Bank ecb = new Bank("European Central Bank", "ECBFDEFF", Type.CENTRAL, "Frankfurt, Germany");
-        ecb.setTotalAssets(Real.of(8_500_000_000_000.0)); // €8.5 trillion
+        ecb.setTotalAssets(Real.of(8_500_000_000_000.0)); // Ã¢â€šÂ¬8.5 trillion
         return ecb;
     }
 }
+
+

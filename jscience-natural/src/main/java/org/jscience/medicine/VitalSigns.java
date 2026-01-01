@@ -51,3 +51,5 @@ public record VitalSigns(
         return String.format("%.1f", temperature);
     }
 }
+
+

@@ -34,7 +34,7 @@ package org.jscience.mathematics.logic.fuzzy;
  * Common t-norms include:
  * - Minimum: min(a, b)
  * - Product: a * b
- * - Łukasiewicz: max(0, a + b - 1)
+ * - Ã…Âukasiewicz: max(0, a + b - 1)
  * - Drastic: min(a,b) if max(a,b)=1, else 0
  * </p>
  *
@@ -96,7 +96,7 @@ public interface TNorm {
     };
 
     /**
-     * Łukasiewicz t-norm: max(0, a + b - 1)
+     * Ã…Âukasiewicz t-norm: max(0, a + b - 1)
      */
     TNorm LUKASIEWICZ = new TNorm() {
         @Override
@@ -106,7 +106,7 @@ public interface TNorm {
 
         @Override
         public String toString() {
-            return "Łukasiewicz T-norm";
+            return "Ã…Âukasiewicz T-norm";
         }
     };
 
@@ -147,7 +147,7 @@ public interface TNorm {
     };
 
     /**
-     * Hamacher product t-norm: (a*b)/(a+b-a*b) if a+b≠0, else 0
+     * Hamacher product t-norm: (a*b)/(a+b-a*b) if a+bÃ¢â€°Â 0, else 0
      */
     TNorm HAMACHER_PRODUCT = new TNorm() {
         @Override
@@ -164,3 +164,4 @@ public interface TNorm {
         }
     };
 }
+

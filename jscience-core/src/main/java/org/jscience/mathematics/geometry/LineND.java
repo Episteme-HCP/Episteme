@@ -33,7 +33,7 @@ import org.jscience.mathematics.linearalgebra.Vector;
  * in both directions along the direction vector.
  * </p>
  * <p>
- * Parametric form: L(t) = point + t * direction, where t ∈ ℝ
+ * Parametric form: L(t) = point + t * direction, where t Ã¢Ë†Ë† Ã¢â€žÂ
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -169,7 +169,7 @@ public class LineND implements GeometricObject<PointND> {
         // Lines are parallel if directions are parallel
         // Check if cross product is zero (for 3D) or directions are proportional
         Real dot = this.direction.dot(other.direction).abs();
-        return Math.abs(dot.doubleValue() - 1.0) < 1e-10; // dot = ±1 means parallel
+        return Math.abs(dot.doubleValue() - 1.0) < 1e-10; // dot = Ã‚Â±1 means parallel
     }
 
     /**
@@ -241,3 +241,5 @@ public class LineND implements GeometricObject<PointND> {
         return direction.hashCode();
     }
 }
+
+

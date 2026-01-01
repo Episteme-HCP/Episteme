@@ -251,3 +251,5 @@ public class LatticeBoltzmannSolver {
         return height;
     }
 }
+
+

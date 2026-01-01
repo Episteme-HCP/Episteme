@@ -26,7 +26,7 @@ package org.jscience.mathematics.analysis.series;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * Geometric series: Σ ar^n, n=0..∞
+ * Geometric series: ÃŽÂ£ ar^n, n=0..Ã¢Ë†Å¾
  * <p>
  * A geometric series converges if and only if |r| < 1.
  * When convergent, the sum is: S = a/(1-r)
@@ -92,7 +92,7 @@ public class GeometricSeries implements InfiniteSeries<Real> {
             throw new IllegalArgumentException("n must be non-negative");
         }
 
-        // S_n = a * (1 - r^(n+1)) / (1 - r) if r ≠ 1
+        // S_n = a * (1 - r^(n+1)) / (1 - r) if r Ã¢â€°Â  1
         // S_n = a * (n+1) if r = 1
 
         if (r.equals(Real.ONE)) {
@@ -150,3 +150,4 @@ public class GeometricSeries implements InfiniteSeries<Real> {
                 a, r, isConvergent() ? "convergent" : "divergent");
     }
 }
+

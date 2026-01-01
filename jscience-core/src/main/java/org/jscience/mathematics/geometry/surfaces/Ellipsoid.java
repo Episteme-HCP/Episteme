@@ -35,8 +35,8 @@ import java.util.Arrays;
  * Represents an ellipsoidal surface.
  * <p>
  * An ellipsoid is a quadric surface with three semi-axes.
- * Parametric form: S(θ, φ) = (a·sin(θ)·cos(φ), b·sin(θ)·sin(φ), c·cos(θ))
- * where θ ∈ [0, π] (polar angle), φ ∈ [0, 2π] (azimuthal angle)
+ * Parametric form: S(ÃŽÂ¸, Ãâ€ ) = (aÃ‚Â·sin(ÃŽÂ¸)Ã‚Â·cos(Ãâ€ ), bÃ‚Â·sin(ÃŽÂ¸)Ã‚Â·sin(Ãâ€ ), cÃ‚Â·cos(ÃŽÂ¸))
+ * where ÃŽÂ¸ Ã¢Ë†Ë† [0, Ãâ‚¬] (polar angle), Ãâ€  Ã¢Ë†Ë† [0, 2Ãâ‚¬] (azimuthal angle)
  * a, b, c are the semi-axes
  * </p>
  *
@@ -82,7 +82,7 @@ public class Ellipsoid implements ParametricSurface {
 
     @Override
     public PointND at(Real u, Real v) {
-        // u = θ ∈ [0, π], v = φ ∈ [0, 2π]
+        // u = ÃŽÂ¸ Ã¢Ë†Ë† [0, Ãâ‚¬], v = Ãâ€  Ã¢Ë†Ë† [0, 2Ãâ‚¬]
         Real sinTheta = Real.of(Math.sin(u.doubleValue()));
         Real cosTheta = Real.of(Math.cos(u.doubleValue()));
         Real sinPhi = Real.of(Math.sin(v.doubleValue()));
@@ -97,7 +97,7 @@ public class Ellipsoid implements ParametricSurface {
 
     @Override
     public Vector<Real> partialU(Real u, Real v, Real h) {
-        // ∂S/∂θ = (a·cos(θ)·cos(φ), b·cos(θ)·sin(φ), -c·sin(θ))
+        // Ã¢Ë†â€šS/Ã¢Ë†â€šÃŽÂ¸ = (aÃ‚Â·cos(ÃŽÂ¸)Ã‚Â·cos(Ãâ€ ), bÃ‚Â·cos(ÃŽÂ¸)Ã‚Â·sin(Ãâ€ ), -cÃ‚Â·sin(ÃŽÂ¸))
         Real cosTheta = Real.of(Math.cos(u.doubleValue()));
         Real sinTheta = Real.of(Math.sin(u.doubleValue()));
         Real sinPhi = Real.of(Math.sin(v.doubleValue()));
@@ -112,7 +112,7 @@ public class Ellipsoid implements ParametricSurface {
 
     @Override
     public Vector<Real> partialV(Real u, Real v, Real h) {
-        // ∂S/∂φ = (-a·sin(θ)·sin(φ), b·sin(θ)·cos(φ), 0)
+        // Ã¢Ë†â€šS/Ã¢Ë†â€šÃâ€  = (-aÃ‚Â·sin(ÃŽÂ¸)Ã‚Â·sin(Ãâ€ ), bÃ‚Â·sin(ÃŽÂ¸)Ã‚Â·cos(Ãâ€ ), 0)
         Real sinTheta = Real.of(Math.sin(u.doubleValue()));
         Real sinPhi = Real.of(Math.sin(v.doubleValue()));
         Real cosPhi = Real.of(Math.cos(v.doubleValue()));
@@ -161,7 +161,7 @@ public class Ellipsoid implements ParametricSurface {
     }
 
     /**
-     * Returns the approximate volume using the formula V = (4/3)πabc.
+     * Returns the approximate volume using the formula V = (4/3)Ãâ‚¬abc.
      * 
      * @return the volume
      */
@@ -195,3 +195,5 @@ public class Ellipsoid implements ParametricSurface {
         return term.subtract(Real.ONE).abs().compareTo(tolerance) <= 0;
     }
 }
+
+

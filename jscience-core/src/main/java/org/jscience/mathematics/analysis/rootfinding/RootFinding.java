@@ -39,7 +39,7 @@ import org.jscience.mathematics.numbers.real.Real;
 public class RootFinding {
 
     /**
-     * Newton-Raphson method: xₙ₊₁ = xₙ - f(xₙ)/f'(xₙ)
+     * Newton-Raphson method: xÃ¢â€šâ„¢Ã¢â€šÅ Ã¢â€šÂ = xÃ¢â€šâ„¢ - f(xÃ¢â€šâ„¢)/f'(xÃ¢â€šâ„¢)
      * <p>
      * Quadratic convergence near root. Requires derivative.
      * </p>
@@ -118,7 +118,7 @@ public class RootFinding {
     }
 
     /**
-     * Secant method: xₙ₊₁ = xₙ - f(xₙ) * (xₙ - xₙ₋₁) / (f(xₙ) - f(xₙ₋₁))
+     * Secant method: xÃ¢â€šâ„¢Ã¢â€šÅ Ã¢â€šÂ = xÃ¢â€šâ„¢ - f(xÃ¢â€šâ„¢) * (xÃ¢â€šâ„¢ - xÃ¢â€šâ„¢Ã¢â€šâ€¹Ã¢â€šÂ) / (f(xÃ¢â€šâ„¢) - f(xÃ¢â€šâ„¢Ã¢â€šâ€¹Ã¢â€šÂ))
      * <p>
      * Superlinear convergence. Does not require derivative.
      * </p>
@@ -248,3 +248,5 @@ public class RootFinding {
         return b;
     }
 }
+
+

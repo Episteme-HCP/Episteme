@@ -66,3 +66,5 @@ public interface TemperatureProbe extends Sensor<Real> {
      */
     Real measure(Real actualTemp);
 }
+
+

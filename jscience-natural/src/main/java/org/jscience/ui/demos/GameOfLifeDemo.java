@@ -69,3 +69,5 @@ public class GameOfLifeDemo extends SimulationDemo {
         launch(args);
     }
 }
+
+

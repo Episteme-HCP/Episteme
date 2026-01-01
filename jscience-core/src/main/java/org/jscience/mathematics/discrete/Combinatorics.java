@@ -230,3 +230,4 @@ public class Combinatorics {
         return binomial(n, k).equals(binomial(n - 1, k - 1).add(binomial(n - 1, k)));
     }
 }
+

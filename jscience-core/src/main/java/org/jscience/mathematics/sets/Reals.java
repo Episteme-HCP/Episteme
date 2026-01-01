@@ -28,10 +28,10 @@ import org.jscience.mathematics.structures.sets.InfiniteSet;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * The structure of real numbers (ℝ).
+ * The structure of real numbers (Ã¢â€žÂ).
  * <p>
  * This class represents the <strong>structure</strong> of real numbers,
- * not individual elements. It implements {@link Field} because ℝ forms
+ * not individual elements. It implements {@link Field} because Ã¢â€žÂ forms
  * a field under addition and multiplication.
  * </p>
  * <p>
@@ -123,7 +123,7 @@ public final class Reals implements Field<Real>, InfiniteSet<Real> {
 
     @Override
     public boolean isCountable() {
-        return false; // ℝ is uncountable
+        return false; // Ã¢â€žÂ is uncountable
     }
 
     @Override
@@ -138,11 +138,12 @@ public final class Reals implements Field<Real>, InfiniteSet<Real> {
 
     @Override
     public String description() {
-        return "ℝ (Real Numbers)";
+        return "Ã¢â€žÂ (Real Numbers)";
     }
 
     @Override
     public String toString() {
-        return "Reals(ℝ)";
+        return "Reals(Ã¢â€žÂ)";
     }
 }
+

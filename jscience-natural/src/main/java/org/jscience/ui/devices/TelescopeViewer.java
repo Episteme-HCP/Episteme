@@ -161,7 +161,7 @@ public class TelescopeViewer extends BorderPane {
 
         decInput = new TextField("45.0");
         decInput.setPrefWidth(80);
-        decInput.setPromptText("Dec (°)");
+        decInput.setPromptText("Dec (Ã‚Â°)");
 
         Button slewBtn = new Button(I18n.getInstance().get("telescope.btn.slew"));
         slewBtn.getStyleClass().add("accent-button-blue");
@@ -309,3 +309,5 @@ public class TelescopeViewer extends BorderPane {
         return telescope;
     }
 }
+
+

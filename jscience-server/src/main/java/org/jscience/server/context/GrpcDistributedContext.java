@@ -27,6 +27,7 @@ import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.jscience.distributed.DistributedContext;
+import org.jscience.distributed.DistributedContext.Priority;
 import org.jscience.server.proto.ComputeServiceGrpc;
 import org.jscience.server.proto.TaskRequest;
 import org.jscience.server.proto.ServerStatus;
@@ -60,37 +61,135 @@ public class GrpcDistributedContext implements DistributedContext {
 
     @Override
     public <T extends Serializable> Future<T> submit(Callable<T> task) {
+        return submit(task, Priority.NORMAL);
+    }
+
+    @Override
+    public <T extends Serializable> Future<T> submit(Callable<T> task, Priority priority) {
+        // Map Priority
+        org.jscience.server.proto.Priority protoPriority;
+        switch (priority) {
+            case HIGH:
+                protoPriority = org.jscience.server.proto.Priority.HIGH;
+                break;
+            case CRITICAL:
+                protoPriority = org.jscience.server.proto.Priority.CRITICAL;
+                break;
+            case LOW:
+                protoPriority = org.jscience.server.proto.Priority.LOW;
+                break;
+            default:
+                protoPriority = org.jscience.server.proto.Priority.NORMAL;
+        }
+
         // Serialize Task
+        final ByteString serializedTask;
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(bos);
             oos.writeObject(task);
             oos.flush();
-            byte[] bytes = bos.toByteArray();
+            serializedTask = ByteString.copyFrom(bos.toByteArray());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize task", e);
+        }
 
-            TaskRequest.newBuilder()
-                    .setSerializedTask(ByteString.copyFrom(bytes))
+        // Submit to Server
+        final String taskId = java.util.UUID.randomUUID().toString();
+        try {
+            TaskRequest request = TaskRequest.newBuilder()
+                    .setTaskId(taskId)
+                    .setSerializedTask(serializedTask)
+                    .setPriority(protoPriority)
                     .build();
 
-            // Submit
-            // Note: The blockingStub returns a Response saying "Queued".
-            // It does NOT return the result of the calculation.
-            // In a full implementation, we would need to poll / stream for the result.
-            // For this version, we will return a Dummy Future that throws NotSupported
-            // OR ideally, we wait (but then it's blocking).
-
-            // FIXME: The gRPC definition separates submission from result retrieval.
-            // The DistributedContext.submit() expects a Future that eventually yields the
-            // result.
-            // To make this work, we'd need a local Future that uses a separate gRPC call
-            // (StreamResults)
-            // to complete itself.
-
-            throw new UnsupportedOperationException(
-                    "Asynchronous gRPC result retrieval not fully implemented yet. Use LocalDistributedContext for now.");
-
+            // Submit is blocking/synchronous in this simple stub, but returns quickly
+            // (QUEUED)
+            blockingStub.submitTask(request);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to serialize or submit task", e);
+            throw new RuntimeException("Failed to submit task to server", e);
+        }
+
+        // Return a Future that retrieves the result via gRPC
+        return new GrpcFuture<>(taskId);
+    }
+
+    private class GrpcFuture<T> implements Future<T> {
+        private final String taskId;
+        private boolean cancelled = false;
+        private boolean done = false;
+
+        public GrpcFuture(String taskId) {
+            this.taskId = taskId;
+        }
+
+        @Override
+        public boolean cancel(boolean mayInterruptIfRunning) {
+            // Cancellation not yet supported by gRPC protocol implementation
+            this.cancelled = true;
+            return true;
+        }
+
+        @Override
+        public boolean isCancelled() {
+            return cancelled;
+        }
+
+        @Override
+        public boolean isDone() {
+            return done;
+        }
+
+        @Override
+        public T get() throws InterruptedException, ExecutionException {
+            try {
+                return get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                throw new ExecutionException(e);
+            }
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+            // Poll or Stream for result
+            // For now, we make a blocking call to streamResults which waits on the server
+            // side
+            // or returns immediately if done.
+            // Ideally we would treat this as a stream and wait for a COMPLETED status.
+
+            try {
+                org.jscience.server.proto.TaskIdentifier request = org.jscience.server.proto.TaskIdentifier.newBuilder()
+                        .setTaskId(taskId)
+                        .build();
+
+                // This call might block if the server implementation blocks (which it does now)
+                // But typically gRPC streaming returns an Iterator.
+                java.util.Iterator<org.jscience.server.proto.TaskResult> responses = blockingStub
+                        .streamResults(request);
+
+                if (responses.hasNext()) {
+                    org.jscience.server.proto.TaskResult resultProto = responses.next();
+
+                    if (resultProto.getStatus() == org.jscience.server.proto.Status.FAILED) {
+                        throw new ExecutionException(new RuntimeException(resultProto.getErrorMessage()));
+                    }
+
+                    if (!resultProto.getSerializedData().isEmpty()) {
+                        java.io.ByteArrayInputStream bis = new java.io.ByteArrayInputStream(
+                                resultProto.getSerializedData().toByteArray());
+                        java.io.ObjectInputStream ois = new java.io.ObjectInputStream(bis);
+                        T result = (T) ois.readObject();
+                        this.done = true;
+                        return result;
+                    }
+                }
+
+                throw new ExecutionException(new RuntimeException("Server closed stream without result"));
+
+            } catch (Exception e) {
+                throw new ExecutionException(e);
+            }
         }
     }
 
@@ -115,3 +214,5 @@ public class GrpcDistributedContext implements DistributedContext {
         channel.shutdown();
     }
 }
+
+

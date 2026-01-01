@@ -174,3 +174,5 @@ public class BraKet {
         return (isDual ? "<" : "|") + "Psi" + (isDual ? "|" : ">") + " (dim=" + stateVector.dimension() + ")";
     }
 }
+
+

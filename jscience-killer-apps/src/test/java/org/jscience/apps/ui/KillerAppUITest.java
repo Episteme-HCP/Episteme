@@ -156,3 +156,5 @@ public class KillerAppUITest {
         assertTrue(stage.isResizable(), "Window should be resizable");
     }
 }
+
+

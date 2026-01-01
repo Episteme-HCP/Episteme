@@ -67,7 +67,7 @@ public class PhysicsTest {
         @SuppressWarnings("unused")
         Real mass = Real.of(10.0); // 10 kg
         @SuppressWarnings("unused")
-        Real accel = Real.of(9.8); // 9.8 m/s²
+        Real accel = Real.of(9.8); // 9.8 m/sÃ‚Â²
 
         // Expected: F = 10 * 9.8 = 98 N (simplified, needs Quantity)
         // This is a simplified test; full test would use Quantity types
@@ -96,13 +96,13 @@ public class PhysicsTest {
      */
     @Test
     public void testLagrangianMechanics() {
-        // Free particle: L = T = ½mv²
+        // Free particle: L = T = Ã‚Â½mvÃ‚Â²
         Real mass = Real.of(2.0);
         Real velocity = Real.of(3.0);
 
         Real lagrangian = LagrangianMechanics.lagrangianFreeParticle(mass, velocity);
 
-        // Expected: ½ * 2 * 9 = 9
+        // Expected: Ã‚Â½ * 2 * 9 = 9
         assertEquals(9.0, lagrangian.doubleValue(), TOLERANCE);
     }
 
@@ -111,7 +111,7 @@ public class PhysicsTest {
      */
     @Test
     public void testHamiltonianMechanics() {
-        // Free particle: H = p²/(2m)
+        // Free particle: H = pÃ‚Â²/(2m)
         Real momentum = Real.of(6.0);
         Real mass = Real.of(2.0);
 
@@ -126,8 +126,8 @@ public class PhysicsTest {
      */
     @Test
     public void testStatisticalMechanics() {
-        // Boltzmann entropy: S = k ln(Ω)
-        Real numMicrostates = Real.of(Math.E); // Ω = e
+        // Boltzmann entropy: S = k ln(ÃŽÂ©)
+        Real numMicrostates = Real.of(Math.E); // ÃŽÂ© = e
 
         Real entropy = StatisticalMechanics.boltzmannEntropy(numMicrostates);
 
@@ -148,8 +148,8 @@ public class PhysicsTest {
                 Quantities.create(273.15, Units.KELVIN),
                 Quantities.create(0.0224, Units.METER.pow(3).asType(Volume.class)));
 
-        // Expected: P ≈ 101325 Pa (1 atm)
-        // PV = nRT -> P = nRT/V = 1 * 8.314 * 273.15 / 0.0224 ≈ 101383 Pa
+        // Expected: P Ã¢â€°Ë† 101325 Pa (1 atm)
+        // PV = nRT -> P = nRT/V = 1 * 8.314 * 273.15 / 0.0224 Ã¢â€°Ë† 101383 Pa
         assertEquals(101325.0, pressure.getValue().doubleValue(), 1000.0);
     }
 
@@ -203,3 +203,4 @@ public class PhysicsTest {
         assertEquals(1.0, halfLife.doubleValue(), TOLERANCE);
     }
 }
+

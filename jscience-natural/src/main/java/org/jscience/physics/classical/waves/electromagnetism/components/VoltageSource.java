@@ -71,3 +71,5 @@ public class VoltageSource extends CircuitElement implements CircuitComponent {
         // Constant voltage, nothing to update
     }
 }
+
+

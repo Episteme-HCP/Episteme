@@ -148,3 +148,4 @@ public final class WaveletTransform {
         return new DenseVector<>(result, null);
     }
 }
+

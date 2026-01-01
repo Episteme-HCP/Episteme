@@ -94,7 +94,7 @@ public class StatisticalTests {
     }
 
     /**
-     * Coefficient of determination R²: proportion of variance explained.
+     * Coefficient of determination RÃ‚Â²: proportion of variance explained.
      */
     public static Real rSquared(List<Real> x, List<Real> y) {
         Real[] regression = linearRegression(x, y);
@@ -238,11 +238,11 @@ public class StatisticalTests {
             }
             Real groupMean = groupSum.divide(Real.of(ni));
 
-            // Sum of Squares Between: Σ ni * (mean_i - grandMean)^2
+            // Sum of Squares Between: ÃŽÂ£ ni * (mean_i - grandMean)^2
             Real diffBetween = groupMean.subtract(grandMean);
             ssb = ssb.add(Real.of(ni).multiply(diffBetween.multiply(diffBetween)));
 
-            // Sum of Squares Within: Σ Σ (val_ij - mean_i)^2
+            // Sum of Squares Within: ÃŽÂ£ ÃŽÂ£ (val_ij - mean_i)^2
             for (Real val : group) {
                 Real diffWithin = val.subtract(groupMean);
                 ssw = ssw.add(diffWithin.multiply(diffWithin));
@@ -262,3 +262,5 @@ public class StatisticalTests {
         return msb.divide(msw);
     }
 }
+
+

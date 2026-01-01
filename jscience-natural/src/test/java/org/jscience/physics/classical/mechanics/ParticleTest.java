@@ -69,3 +69,5 @@ public class ParticleTest {
                 assertEquals(1.0, p.getPosition().get(1).doubleValue(), 0.001);
         }
 }
+
+

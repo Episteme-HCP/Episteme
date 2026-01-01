@@ -87,3 +87,5 @@ public class SiderealTime {
         return degrees.divide(Real.of(15));
     }
 }
+
+

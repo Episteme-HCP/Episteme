@@ -65,7 +65,7 @@ public class FuzzyLogic {
 
     /**
      * Gaussian membership function.
-     * μ(x) = exp(-(x-c)²/(2σ²))
+     * ÃŽÂ¼(x) = exp(-(x-c)Ã‚Â²/(2ÃÆ’Ã‚Â²))
      */
     public static Real gaussian(Real x, Real center, Real sigma) {
         Real diff = x.subtract(center);
@@ -110,3 +110,5 @@ public class FuzzyLogic {
         return denominator.isZero() ? Real.ZERO : numerator.divide(denominator);
     }
 }
+
+

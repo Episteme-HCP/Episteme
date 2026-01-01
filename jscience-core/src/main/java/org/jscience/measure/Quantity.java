@@ -239,3 +239,4 @@ public interface Quantity<Q extends Quantity<Q>> {
      */
     Quantity<?> sqrt();
 }
+

@@ -255,3 +255,5 @@ public class EinsteinSummation {
         return new DenseTensor<>(resultData, outputShape);
     }
 }
+
+

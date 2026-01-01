@@ -68,3 +68,5 @@ public interface Microscope extends Device {
 
     boolean isResolvable(Real featureSize);
 }
+
+

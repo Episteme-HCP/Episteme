@@ -115,3 +115,5 @@ public class Inductor extends CircuitElement implements CircuitComponent {
         return 0;
     }
 }
+
+

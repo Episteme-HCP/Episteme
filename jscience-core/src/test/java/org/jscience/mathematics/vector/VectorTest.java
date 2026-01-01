@@ -76,3 +76,5 @@ public class VectorTest {
         assertEquals(Real.of(5), norm);
     }
 }
+
+

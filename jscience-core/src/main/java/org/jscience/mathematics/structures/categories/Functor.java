@@ -67,3 +67,4 @@ public interface Functor<O1, M1, O2, M2> {
      */
     Category<O2, M2> getTargetCategory();
 }
+

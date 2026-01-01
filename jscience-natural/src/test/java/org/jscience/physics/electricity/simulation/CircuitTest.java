@@ -43,7 +43,7 @@ public class CircuitTest {
     private static final double TOLERANCE = 1e-6;
 
     /**
-     * Tests Ohm's Law: A 10V source with a 100Ω resistor should produce 0.1A
+     * Tests Ohm's Law: A 10V source with a 100ÃŽÂ© resistor should produce 0.1A
      * current.
      */
     @Test
@@ -54,7 +54,7 @@ public class CircuitTest {
         // Source from (0,0) to (0,1). V(0,1) - V(0,0) = 10V.
         source.setCoordinates(0, 0, 0, 1);
 
-        Resistor resistor = new Resistor(100.0); // 100Ω
+        Resistor resistor = new Resistor(100.0); // 100ÃŽÂ©
         // Resistor from (0,1) to (0,0). Current flows 10V -> 0V.
         resistor.setCoordinates(0, 1, 0, 0);
 
@@ -80,7 +80,7 @@ public class CircuitTest {
     }
 
     /**
-     * Tests power dissipation: P = I² * R = V² / R
+     * Tests power dissipation: P = IÃ‚Â² * R = VÃ‚Â² / R
      */
     @Test
     public void testPowerDissipation() {
@@ -102,7 +102,7 @@ public class CircuitTest {
         circuit.analyze();
         circuit.step();
 
-        // Expected power: P = V² / R = 100 / 100 = 1W
+        // Expected power: P = VÃ‚Â² / R = 100 / 100 = 1W
         double expectedPower = 1.0;
         double actualPower = Math.abs(resistor.getPower());
 
@@ -170,7 +170,7 @@ public class CircuitTest {
 
     /**
      * Tests RC Circuit step response.
-     * 10V Source, 100kΩ Resistor, 1µF Capacitor.
+     * 10V Source, 100kÃŽÂ© Resistor, 1Ã‚ÂµF Capacitor.
      * Tau = R * C = 100e3 * 1e-6 = 0.1s.
      * At t = 0.1s, Voltage should be ~6.32V (10 * (1 - e^-1)).
      */
@@ -182,11 +182,11 @@ public class CircuitTest {
         VoltageSource source = new VoltageSource(10.0);
         source.setCoordinates(0, 0, 0, 1);
 
-        Resistor resistor = new Resistor(100e3); // 100kΩ
+        Resistor resistor = new Resistor(100e3); // 100kÃŽÂ©
         resistor.setCoordinates(0, 1, 0, 2);
 
         org.jscience.physics.classical.waves.electromagnetism.components.Capacitor capacitor = new org.jscience.physics.classical.waves.electromagnetism.components.Capacitor(
-                1e-6); // 1µF
+                1e-6); // 1Ã‚ÂµF
         capacitor.setCoordinates(0, 2, 0, 0);
 
         Ground ground = new Ground();
@@ -217,7 +217,7 @@ public class CircuitTest {
 
     /**
      * Tests RL Circuit step response.
-     * 10V Source, 100Ω Resistor, 1H Inductor.
+     * 10V Source, 100ÃŽÂ© Resistor, 1H Inductor.
      * Tau = L / R = 1 / 100 = 0.01s.
      * At t = 0.01s, Current should be ~0.0632A (0.1 * (1 - e^-1)).
      */
@@ -229,7 +229,7 @@ public class CircuitTest {
         VoltageSource source = new VoltageSource(10.0);
         source.setCoordinates(0, 0, 0, 1);
 
-        Resistor resistor = new Resistor(100.0); // 100Ω
+        Resistor resistor = new Resistor(100.0); // 100ÃŽÂ©
         resistor.setCoordinates(0, 1, 0, 2);
 
         org.jscience.physics.classical.waves.electromagnetism.components.Inductor inductor = new org.jscience.physics.classical.waves.electromagnetism.components.Inductor(
@@ -258,3 +258,4 @@ public class CircuitTest {
                 "Inductor current at 1 Tau should be approx " + expectedCurrent + " A");
     }
 }
+

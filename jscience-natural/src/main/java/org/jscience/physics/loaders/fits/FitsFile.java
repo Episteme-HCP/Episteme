@@ -111,3 +111,5 @@ public class FitsFile extends AbstractDataFile {
         throw new IOException("No valid 2D Image HDU found in FITS file.");
     }
 }
+
+

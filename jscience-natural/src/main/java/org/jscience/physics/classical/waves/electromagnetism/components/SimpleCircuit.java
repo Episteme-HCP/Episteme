@@ -57,3 +57,5 @@ public class SimpleCircuit implements CircuitComponent {
         return total;
     }
 }
+
+

@@ -43,8 +43,8 @@ public class Precession {
      */
     public static double[] apply(double raJ2000, double decJ2000, double yearsFromJ2000) {
         // Approximate formulas (valid for a few centuries/millennia)
-        // m ≈ 3.075 s/yr ≈ 46.125 arcsec/yr ≈ 0.0128125 deg/yr
-        // n ≈ 1.336 s/yr ≈ 20.043 arcsec/yr ≈ 0.0055675 deg/yr
+        // m Ã¢â€°Ë† 3.075 s/yr Ã¢â€°Ë† 46.125 arcsec/yr Ã¢â€°Ë† 0.0128125 deg/yr
+        // n Ã¢â€°Ë† 1.336 s/yr Ã¢â€°Ë† 20.043 arcsec/yr Ã¢â€°Ë† 0.0055675 deg/yr
 
         double t = yearsFromJ2000;
 
@@ -76,3 +76,5 @@ public class Precession {
         return deg < 0 ? deg + 360.0 : deg;
     }
 }
+
+

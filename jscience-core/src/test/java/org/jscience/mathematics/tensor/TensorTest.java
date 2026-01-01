@@ -177,3 +177,4 @@ public class TensorTest {
         assertThat(sliced.get(0, 0).doubleValue()).isEqualTo(5.0);
     }
 }
+

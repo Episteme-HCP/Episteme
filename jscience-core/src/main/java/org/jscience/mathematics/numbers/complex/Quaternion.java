@@ -220,3 +220,5 @@ public final class Quaternion implements Field<Quaternion> {
         return a.multiply(b);
     }
 }
+
+

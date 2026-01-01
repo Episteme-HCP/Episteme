@@ -79,7 +79,7 @@ public class Kinematics {
 
     /**
      * Denavit-Hartenberg transformation matrix.
-     * T = Rz(θ) * Tz(d) * Tx(a) * Rx(α)
+     * T = Rz(ÃŽÂ¸) * Tz(d) * Tx(a) * Rx(ÃŽÂ±)
      * 
      * @param theta Joint angle (radians)
      * @param d     Link offset
@@ -125,7 +125,7 @@ public class Kinematics {
 
     /**
      * Jacobian for 2-link planar arm (velocity kinematics).
-     * J = [dx/dθ1, dx/dθ2; dy/dθ1, dy/dθ2]
+     * J = [dx/dÃŽÂ¸1, dx/dÃŽÂ¸2; dy/dÃŽÂ¸1, dy/dÃŽÂ¸2]
      */
     public static double[][] jacobian2Link(double L1, double L2, double theta1, double theta2) {
         double s1 = Math.sin(theta1);
@@ -167,7 +167,7 @@ public class Kinematics {
 
     /**
      * Cubic polynomial trajectory.
-     * θ(t) = a0 + a1*t + a2*t² + a3*t³
+     * ÃŽÂ¸(t) = a0 + a1*t + a2*tÃ‚Â² + a3*tÃ‚Â³
      * With zero velocity at start and end.
      */
     public static double cubicTrajectory(double t, double totalTime,
@@ -185,3 +185,5 @@ public class Kinematics {
         return a0 + a1 * s + a2 * s * s + a3 * s * s * s;
     }
 }
+
+

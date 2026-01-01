@@ -36,8 +36,8 @@ import java.util.Arrays;
  * <p>
  * A cone is a surface formed by lines connecting a point (apex) to a circular
  * base.
- * Parametric form: S(θ, t) = (t·r·cos(θ), t·r·sin(θ), t·h)
- * where θ ∈ [0, 2π], t ∈ [0, 1], r is base radius, h is height
+ * Parametric form: S(ÃŽÂ¸, t) = (tÃ‚Â·rÃ‚Â·cos(ÃŽÂ¸), tÃ‚Â·rÃ‚Â·sin(ÃŽÂ¸), tÃ‚Â·h)
+ * where ÃŽÂ¸ Ã¢Ë†Ë† [0, 2Ãâ‚¬], t Ã¢Ë†Ë† [0, 1], r is base radius, h is height
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -79,7 +79,7 @@ public class Cone implements ParametricSurface {
 
     @Override
     public PointND at(Real u, Real v) {
-        // u = θ ∈ [0, 2π], v = t ∈ [0, 1] (0 = apex, 1 = base)
+        // u = ÃŽÂ¸ Ã¢Ë†Ë† [0, 2Ãâ‚¬], v = t Ã¢Ë†Ë† [0, 1] (0 = apex, 1 = base)
         Real x = apex.get(0).add(v.multiply(baseRadius).multiply(Real.of(Math.cos(u.doubleValue()))));
         Real y = apex.get(1).add(v.multiply(baseRadius).multiply(Real.of(Math.sin(u.doubleValue()))));
         Real z = apex.get(2).subtract(v.multiply(height));
@@ -88,7 +88,7 @@ public class Cone implements ParametricSurface {
 
     @Override
     public Vector<Real> partialU(Real u, Real v, Real h) {
-        // ∂S/∂θ = (-vr·sin(θ), vr·cos(θ), 0)
+        // Ã¢Ë†â€šS/Ã¢Ë†â€šÃŽÂ¸ = (-vrÃ‚Â·sin(ÃŽÂ¸), vrÃ‚Â·cos(ÃŽÂ¸), 0)
         Real dx = v.multiply(baseRadius).multiply(Real.of(Math.sin(u.doubleValue()))).negate();
         Real dy = v.multiply(baseRadius).multiply(Real.of(Math.cos(u.doubleValue())));
         Real dz = Real.ZERO;
@@ -97,7 +97,7 @@ public class Cone implements ParametricSurface {
 
     @Override
     public Vector<Real> partialV(Real u, Real v, Real h) {
-        // ∂S/∂t = (r·cos(θ), r·sin(θ), -h)
+        // Ã¢Ë†â€šS/Ã¢Ë†â€št = (rÃ‚Â·cos(ÃŽÂ¸), rÃ‚Â·sin(ÃŽÂ¸), -h)
         Real dx = baseRadius.multiply(Real.of(Math.cos(u.doubleValue())));
         Real dy = baseRadius.multiply(Real.of(Math.sin(u.doubleValue())));
         Real dz = height.negate();
@@ -142,7 +142,7 @@ public class Cone implements ParametricSurface {
 
     /**
      * Returns the slant height.
-     * l = √(r² + h²)
+     * l = Ã¢Ë†Å¡(rÃ‚Â² + hÃ‚Â²)
      * 
      * @return the slant height
      */
@@ -154,7 +154,7 @@ public class Cone implements ParametricSurface {
 
     /**
      * Returns the lateral surface area.
-     * A = πrl where l is slant height
+     * A = Ãâ‚¬rl where l is slant height
      * 
      * @return the lateral surface area
      */
@@ -164,7 +164,7 @@ public class Cone implements ParametricSurface {
 
     /**
      * Returns the total surface area (including base).
-     * A = πr(r + l)
+     * A = Ãâ‚¬r(r + l)
      * 
      * @return the total surface area
      */
@@ -174,7 +174,7 @@ public class Cone implements ParametricSurface {
 
     /**
      * Returns the volume of the cone.
-     * V = (1/3)πr²h
+     * V = (1/3)Ãâ‚¬rÃ‚Â²h
      * 
      * @return the volume
      */
@@ -182,3 +182,5 @@ public class Cone implements ParametricSurface {
         return Real.of(Math.PI / 3).multiply(baseRadius).multiply(baseRadius).multiply(height);
     }
 }
+
+

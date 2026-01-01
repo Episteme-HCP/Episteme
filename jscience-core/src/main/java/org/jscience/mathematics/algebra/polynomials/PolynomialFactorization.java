@@ -106,13 +106,13 @@ public class PolynomialFactorization {
     }
 
     /**
-     * Factors quadratic ax² + bx + c.
+     * Factors quadratic axÃ‚Â² + bx + c.
      * <p>
      * Returns null if not factorable over integers.
      * </p>
      */
     public static List<Polynomial<Integer>> factorQuadratic(Integer a, Integer b, Integer c) {
-        // Discriminant: Δ = b² - 4ac
+        // Discriminant: ÃŽâ€ = bÃ‚Â² - 4ac
         Integer disc = b.multiply(b).subtract(a.multiply(c).multiply(Integer.of(4)));
 
         // Check if perfect square
@@ -127,7 +127,7 @@ public class PolynomialFactorization {
             return null; // Not perfect square
         }
 
-        // Roots: (-b ± √Δ) / 2a
+        // Roots: (-b Ã‚Â± Ã¢Ë†Å¡ÃŽâ€) / 2a
         Integer sqrtDisc = Integer.of(sqrt);
         Integer twoA = a.multiply(Integer.of(2));
 
@@ -163,3 +163,5 @@ public class PolynomialFactorization {
         return result;
     }
 }
+
+

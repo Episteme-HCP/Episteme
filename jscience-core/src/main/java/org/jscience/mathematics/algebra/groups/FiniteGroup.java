@@ -51,3 +51,5 @@ public interface FiniteGroup<E> extends Group<E> {
      */
     Iterable<E> elements();
 }
+
+

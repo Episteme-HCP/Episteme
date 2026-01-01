@@ -27,7 +27,7 @@ package org.jscience.mathematics.analysis.series;
  * Represents an infinite series.
  * <p>
  * An infinite series is the sum of an infinite sequence of terms:
- * S = Σ a(k), k=0..∞
+ * S = ÃŽÂ£ a(k), k=0..Ã¢Ë†Å¾
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -39,10 +39,10 @@ public interface InfiniteSeries<T> {
     /**
      * Computes the partial sum of the first n terms.
      * <p>
-     * S_n = Σ a(k), k=0..n
+     * S_n = ÃŽÂ£ a(k), k=0..n
      * </p>
      * 
-     * @param n the number of terms to sum (n ≥ 0)
+     * @param n the number of terms to sum (n Ã¢â€°Â¥ 0)
      * @return the partial sum S_n
      */
     T partialSum(int n);
@@ -50,7 +50,7 @@ public interface InfiniteSeries<T> {
     /**
      * Determines if this series is convergent.
      * <p>
-     * A series converges if lim(n→∞) S_n exists and is finite.
+     * A series converges if lim(nÃ¢â€ â€™Ã¢Ë†Å¾) S_n exists and is finite.
      * </p>
      * 
      * @return true if convergent, false if divergent
@@ -60,7 +60,7 @@ public interface InfiniteSeries<T> {
     /**
      * Returns the limit of the series if convergent.
      * <p>
-     * L = lim(n→∞) S_n
+     * L = lim(nÃ¢â€ â€™Ã¢Ë†Å¾) S_n
      * </p>
      * 
      * @return the limit L
@@ -71,8 +71,9 @@ public interface InfiniteSeries<T> {
     /**
      * Returns the k-th term of this series.
      * 
-     * @param k the term index (k ≥ 0)
+     * @param k the term index (k Ã¢â€°Â¥ 0)
      * @return the term a(k)
      */
     T term(int k);
 }
+

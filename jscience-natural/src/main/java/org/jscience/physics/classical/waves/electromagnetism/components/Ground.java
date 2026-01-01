@@ -67,3 +67,5 @@ public class Ground extends CircuitElement implements CircuitComponent {
         return true;
     }
 }
+
+

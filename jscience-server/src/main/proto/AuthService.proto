@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package org.jscience.server.proto;
+
+option java_multiple_files = true;
+option java_package = "org.jscience.server.proto";
+option java_outer_classname = "AuthServiceProto";
+
+// Authentication Service for User Management
+service AuthService {
+  // Register a new user
+  rpc Register (RegisterRequest) returns (AuthResponse) {}
+
+  // Login with username and password
+  rpc Login (LoginRequest) returns (AuthResponse) {}
+
+  // Validate an existing token
+  rpc ValidateToken (TokenRequest) returns (ValidationResponse) {}
+}
+
+message RegisterRequest {
+  string username = 1;
+  string password = 2;
+  string role = 3; // ADMIN, SCIENTIST, VIEWER
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message AuthResponse {
+  bool success = 1;
+  string token = 2; // JWT Token
+  string message = 3;
+}
+
+message TokenRequest {
+  string token = 1;
+}
+
+message ValidationResponse {
+  bool valid = 1;
+  string username = 2;
+  string role = 3;
+}

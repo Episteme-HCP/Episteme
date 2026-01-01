@@ -132,3 +132,4 @@ public class Monomial<T extends Ring<T>> implements Comparable<Monomial<T>> {
         return this.toString().compareTo(o.toString());
     }
 }
+

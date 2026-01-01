@@ -101,9 +101,9 @@ public class DensityMatrix {
      */
     public DensityMatrix amplitudeDamping(double gamma) {
         // For a single qubit:
-        // E0 = [[1, 0], [0, sqrt(1-γ)]] (no decay)
-        // E1 = [[0, sqrt(γ)], [0, 0]] (decay)
-        // ρ' = E0 ρ E0† + E1 ρ E1†
+        // E0 = [[1, 0], [0, sqrt(1-ÃŽÂ³)]] (no decay)
+        // E1 = [[0, sqrt(ÃŽÂ³)], [0, 0]] (decay)
+        // ÃÂ' = E0 ÃÂ E0Ã¢â‚¬Â  + E1 ÃÂ E1Ã¢â‚¬Â 
 
         int dim = matrix.rows();
         Complex[][] newData = new Complex[dim][dim];
@@ -118,13 +118,13 @@ public class DensityMatrix {
             Complex rho10 = matrix.get(1, 0);
             Complex rho11 = matrix.get(1, 1);
 
-            // ρ'00 = ρ00 + γρ11
+            // ÃÂ'00 = ÃÂ00 + ÃŽÂ³ÃÂ11
             newData[0][0] = rho00.add(rho11.multiply(Complex.of(gamma)));
-            // ρ'01 = sqrt(1-γ) ρ01
+            // ÃÂ'01 = sqrt(1-ÃŽÂ³) ÃÂ01
             newData[0][1] = rho01.multiply(Complex.of(sqrtOneMinusGamma));
-            // ρ'10 = sqrt(1-γ) ρ10
+            // ÃÂ'10 = sqrt(1-ÃŽÂ³) ÃÂ10
             newData[1][0] = rho10.multiply(Complex.of(sqrtOneMinusGamma));
-            // ρ'11 = (1-γ) ρ11
+            // ÃÂ'11 = (1-ÃŽÂ³) ÃÂ11
             newData[1][1] = rho11.multiply(Complex.of(1 - gamma));
         } else {
             // For larger systems, just return copy (simplified)
@@ -168,7 +168,7 @@ public class DensityMatrix {
 
     /**
      * Depolarizing channel.
-     * ρ → (1-p)ρ + (p/3)(XρX + YρY + ZρZ)
+     * ÃÂ Ã¢â€ â€™ (1-p)ÃÂ + (p/3)(XÃÂX + YÃÂY + ZÃÂZ)
      * 
      * @param p Error probability
      * @return Depolarized density matrix
@@ -177,7 +177,7 @@ public class DensityMatrix {
         int dim = matrix.rows();
         Complex[][] newData = new Complex[dim][dim];
 
-        // For single qubit: ρ → (1-p)ρ + (p/2)I
+        // For single qubit: ÃÂ Ã¢â€ â€™ (1-p)ÃÂ + (p/2)I
         if (dim == 2) {
             double oneMinusP = 1 - p;
             double pOver2 = p / 2.0;
@@ -193,7 +193,7 @@ public class DensityMatrix {
                 }
             }
         } else {
-            // Generalized depolarizing: ρ → (1-p)ρ + p*I/d
+            // Generalized depolarizing: ÃÂ Ã¢â€ â€™ (1-p)ÃÂ + p*I/d
             double invDim = 1.0 / dim;
             for (int i = 0; i < dim; i++) {
                 for (int j = 0; j < dim; j++) {
@@ -211,13 +211,13 @@ public class DensityMatrix {
     }
 
     /**
-     * Von Neumann entropy: S(ρ) = -Tr(ρ log ρ)
+     * Von Neumann entropy: S(ÃÂ) = -Tr(ÃÂ log ÃÂ)
      * For pure states S = 0, for maximally mixed S = log(d)
      * 
      * @return Entropy in nats (use log base e)
      */
     public double vonNeumannEntropy() {
-        // Simplified: compute eigenvalues and -Σ λ_i log(λ_i)
+        // Simplified: compute eigenvalues and -ÃŽÂ£ ÃŽÂ»_i log(ÃŽÂ»_i)
         // For now, use purity-based approximation for 2-level system
         double gamma = purity();
         if (gamma >= 0.9999)
@@ -226,8 +226,8 @@ public class DensityMatrix {
         int dim = matrix.rows();
         if (dim == 2) {
             // For 2-level: use closed form based on purity
-            // S = -λ+ log(λ+) - λ- log(λ-)
-            // where λ± = (1 ± sqrt(2γ-1))/2 when γ = Tr(ρ²)
+            // S = -ÃŽÂ»+ log(ÃŽÂ»+) - ÃŽÂ»- log(ÃŽÂ»-)
+            // where ÃŽÂ»Ã‚Â± = (1 Ã‚Â± sqrt(2ÃŽÂ³-1))/2 when ÃŽÂ³ = Tr(ÃÂÃ‚Â²)
             double x = Math.sqrt(2 * gamma - 1);
             double lambdaPlus = (1 + x) / 2;
             double lambdaMinus = (1 - x) / 2;
@@ -247,3 +247,5 @@ public class DensityMatrix {
         return matrix;
     }
 }
+
+

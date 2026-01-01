@@ -27,9 +27,9 @@ import org.jscience.mathematics.analysis.Function;
 import org.jscience.mathematics.numbers.integers.Natural;
 
 /**
- * A mathematical sequence a(n) for n ≥ 0.
+ * A mathematical sequence a(n) for n Ã¢â€°Â¥ 0.
  * <p>
- * A sequence is a function from natural numbers to type T: ℕ → T.
+ * A sequence is a function from natural numbers to type T: Ã¢â€žâ€¢ Ã¢â€ â€™ T.
  * Compatible with OEIS (Online Encyclopedia of Integer Sequences) format.
  * </p>
  * <p>
@@ -46,7 +46,7 @@ public interface Sequence<T> extends Function<Natural, T> {
      * This is the canonical method using JScience number types.
      * </p>
      * 
-     * @param n the index (n ≥ 0)
+     * @param n the index (n Ã¢â€°Â¥ 0)
      * @return a(n)
      * @throws IllegalArgumentException if n is negative
      */
@@ -69,7 +69,7 @@ public interface Sequence<T> extends Function<Natural, T> {
      * Delegates to {@link #get(Natural)} after converting to Natural.
      * </p>
      * 
-     * @param n the index (must be ≥ 0)
+     * @param n the index (must be Ã¢â€°Â¥ 0)
      * @return a(n)
      * @throws IllegalArgumentException if n < 0
      */
@@ -93,7 +93,7 @@ public interface Sequence<T> extends Function<Natural, T> {
 
     @Override
     default String getDomain() {
-        return "ℕ (Natural numbers)";
+        return "Ã¢â€žâ€¢ (Natural numbers)";
     }
 
     /**
@@ -124,3 +124,4 @@ public interface Sequence<T> extends Function<Natural, T> {
         return "Not specified";
     }
 }
+

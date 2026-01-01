@@ -27,7 +27,7 @@ import org.jscience.mathematics.geometry.Point2D;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * The Hénon Map:
+ * The HÃƒÂ©non Map:
  * x_{n+1} = 1 - a * x_n^2 + y_n
  * y_{n+1} = b * x_n
  * <p>
@@ -37,7 +37,7 @@ import org.jscience.mathematics.numbers.real.Real;
  *
  * <h2>References</h2>
  * <ul>
- * <li>Michel Hénon, "A two-dimensional mapping with a strange attractor",
+ * <li>Michel HÃƒÂ©non, "A two-dimensional mapping with a strange attractor",
  * Communications in Mathematical Physics, Vol. 50, No. 1, 1976, pp. 69-77</li>
  * </ul>
  *
@@ -51,14 +51,14 @@ public class HenonMap implements DiscreteMap<Point2D> {
     private final Real b;
 
     /**
-     * Creates a Hénon Map with default chaotic parameters (a=1.4, b=0.3).
+     * Creates a HÃƒÂ©non Map with default chaotic parameters (a=1.4, b=0.3).
      */
     public HenonMap() {
         this(1.4, 0.3);
     }
 
     /**
-     * Creates a Hénon Map with specified parameters (double precision).
+     * Creates a HÃƒÂ©non Map with specified parameters (double precision).
      * <p>
      * For arbitrary precision, use {@link #HenonMap(Real, Real)}.
      * </p>
@@ -71,7 +71,7 @@ public class HenonMap implements DiscreteMap<Point2D> {
     }
 
     /**
-     * Creates a Hénon Map with specified parameters (arbitrary precision).
+     * Creates a HÃƒÂ©non Map with specified parameters (arbitrary precision).
      * 
      * @param a parameter a
      * @param b parameter b
@@ -112,12 +112,12 @@ public class HenonMap implements DiscreteMap<Point2D> {
 
     @Override
     public String getDomain() {
-        return "ℝ²";
+        return "Ã¢â€žÂÃ‚Â²";
     }
 
     @Override
     public String getCodomain() {
-        return "ℝ²";
+        return "Ã¢â€žÂÃ‚Â²";
     }
 
     @Override
@@ -125,3 +125,4 @@ public class HenonMap implements DiscreteMap<Point2D> {
         return "HenonMap(a=" + a + ", b=" + b + ")";
     }
 }
+

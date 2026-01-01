@@ -39,7 +39,7 @@ public class StatisticsTest {
         assertEquals(0.0, normal.mean().doubleValue(), 1e-10);
         assertEquals(1.0, normal.getStdDev().doubleValue(), 1e-10);
 
-        // PDF at mean should be maximum (≈0.3989)
+        // PDF at mean should be maximum (Ã¢â€°Ë†0.3989)
         Real pdfAtMean = normal.density(Real.ZERO);
         assertTrue(pdfAtMean.doubleValue() > 0.39 && pdfAtMean.doubleValue() < 0.40);
 
@@ -68,3 +68,5 @@ public class StatisticsTest {
         assertTrue(sample.compareTo(Real.ZERO) >= 0 && sample.compareTo(Real.ONE) <= 0);
     }
 }
+
+

@@ -120,3 +120,5 @@ public class Treatment {
         return String.format("Treatment '%s' (%s) - %d days", name, type, durationDays);
     }
 }
+
+

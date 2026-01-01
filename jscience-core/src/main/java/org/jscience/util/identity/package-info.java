@@ -21,21 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Identity generation utilities for diverse ID formats.
- * <p>
- * Provides factories for generating various types of identifiers:
- * <ul>
- * <li>UUID - Universally Unique Identifiers</li>
- * <li>SSN - Social Security Number format</li>
- * <li>ISBN - International Standard Book Number</li>
- * <li>DOI - Digital Object Identifier</li>
- * <li>Custom - User-defined formats</li>
- * </ul>
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.util.identity;
+
+

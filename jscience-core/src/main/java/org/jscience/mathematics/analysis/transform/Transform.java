@@ -30,15 +30,15 @@ import org.jscience.mathematics.analysis.Bijection;
  * <p>
  * A transform maps a function or signal from one domain (e.g., time) to another
  * (e.g., frequency). Transforms are bijective, meaning they have well-defined
- * inverses (e.g., Fourier ↔ Inverse Fourier).
+ * inverses (e.g., Fourier Ã¢â€ â€ Inverse Fourier).
  * </p>
  * <p>
  * <b>Common transforms:</b>
  * <ul>
- * <li><b>Fourier Transform</b>: time domain ↔ frequency domain</li>
- * <li><b>Laplace Transform</b>: time domain ↔ s-domain</li>
- * <li><b>Wavelet Transform</b>: signal ↔ time-frequency representation</li>
- * <li><b>Z-Transform</b>: discrete-time ↔ z-domain</li>
+ * <li><b>Fourier Transform</b>: time domain Ã¢â€ â€ frequency domain</li>
+ * <li><b>Laplace Transform</b>: time domain Ã¢â€ â€ s-domain</li>
+ * <li><b>Wavelet Transform</b>: signal Ã¢â€ â€ time-frequency representation</li>
+ * <li><b>Z-Transform</b>: discrete-time Ã¢â€ â€ z-domain</li>
  * </ul>
  * </p>
  *
@@ -51,12 +51,13 @@ public interface Transform<D, C> extends Bijection<D, C> {
     /**
      * Returns the inverse transform.
      * <p>
-     * For example, if this is the Fourier Transform (time → frequency),
-     * the inverse is the Inverse Fourier Transform (frequency → time).
+     * For example, if this is the Fourier Transform (time Ã¢â€ â€™ frequency),
+     * the inverse is the Inverse Fourier Transform (frequency Ã¢â€ â€™ time).
      * </p>
      * 
-     * @return the inverse transform T⁻¹
+     * @return the inverse transform TÃ¢ÂÂ»Ã‚Â¹
      */
     @Override
     Transform<C, D> inverse();
 }
+

@@ -57,3 +57,5 @@ public class SocialI18n {
         return org.jscience.ui.i18n.I18n.getInstance().get(key);
     }
 }
+
+

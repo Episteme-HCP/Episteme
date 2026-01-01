@@ -27,7 +27,7 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.statistics.ContinuousDistribution;
 
 /**
- * Exponential distribution Exp(λ).
+ * Exponential distribution Exp(ÃŽÂ»).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -72,6 +72,7 @@ public class ExponentialDistribution extends ContinuousDistribution {
 
     @Override
     public String toString() {
-        return String.format("Exp(λ=%.4f)", lambda.doubleValue());
+        return String.format("Exp(ÃŽÂ»=%.4f)", lambda.doubleValue());
     }
 }
+

@@ -60,3 +60,5 @@ public interface VectorStorage<E> extends Serializable {
      */
     VectorStorage<E> copy();
 }
+
+

@@ -103,3 +103,4 @@ public abstract class ContinuousDistribution implements ProbabilityDistribution 
         return quantile(Real.of(Math.random()));
     }
 }
+

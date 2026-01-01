@@ -66,7 +66,7 @@ public final class Units {
         /**
          * The SI unit of mass: kilogram (kg).
          * <p>
-         * Defined by the Planck constant h = 6.62607015×10⁻³⁴ kg⋅m²⋅s⁻¹.
+         * Defined by the Planck constant h = 6.62607015Ãƒâ€”10Ã¢ÂÂ»Ã‚Â³Ã¢ÂÂ´ kgÃ¢â€¹â€¦mÃ‚Â²Ã¢â€¹â€¦sÃ¢ÂÂ»Ã‚Â¹.
          * </p>
          */
         public static final Unit<Mass> KILOGRAM = new StandardUnit<>("kg", "kilogram", Dimension.MASS);
@@ -85,7 +85,7 @@ public final class Units {
         public static final Unit<Temperature> KELVIN = new StandardUnit<>("K", "kelvin", Dimension.TEMPERATURE);
 
         /**
-         * Celsius: °C = K - 273.15
+         * Celsius: Ã‚Â°C = K - 273.15
          * Since add(offset) means Value(Base) = Value(Derived) + Offset usually?
          * Let's test assumption: If 0 C = 273.15 K.
          * If Val(K) = Val(C) + 273.15. then add(273.15).
@@ -145,10 +145,10 @@ public final class Units {
         /** Millimeter: 1 mm = 0.001 m */
         public static final Unit<Length> MILLIMETER = METER.divide(1000);
 
-        /** Micrometer: 1 μm = 10⁻⁶ m */
+        /** Micrometer: 1 ÃŽÂ¼m = 10Ã¢ÂÂ»Ã¢ÂÂ¶ m */
         public static final Unit<Length> MICROMETER = METER.divide(1_000_000);
 
-        /** Nanometer: 1 nm = 10⁻⁹ m */
+        /** Nanometer: 1 nm = 10Ã¢ÂÂ»Ã¢ÂÂ¹ m */
         public static final Unit<Length> NANOMETER = METER.divide(1_000_000_000);
 
         // ========== METRIC MASS UNITS ==========
@@ -156,7 +156,7 @@ public final class Units {
         /** Gram: 1 g = 0.001 kg */
         public static final Unit<Mass> GRAM = KILOGRAM.divide(1000);
 
-        /** Milligram: 1 mg = 10⁻⁶ kg */
+        /** Milligram: 1 mg = 10Ã¢ÂÂ»Ã¢ÂÂ¶ kg */
         public static final Unit<Mass> MILLIGRAM = GRAM.divide(1000);
 
         /** Tonne (metric ton): 1 t = 1000 kg */
@@ -179,10 +179,10 @@ public final class Units {
         /** Millisecond: 1 ms = 0.001 s */
         public static final Unit<Time> MILLISECOND = SECOND.divide(1000);
 
-        /** Microsecond: 1 μs = 10⁻⁶ s */
+        /** Microsecond: 1 ÃŽÂ¼s = 10Ã¢ÂÂ»Ã¢ÂÂ¶ s */
         public static final Unit<Time> MICROSECOND = SECOND.divide(1_000_000);
 
-        /** Nanosecond: 1 ns = 10⁻⁹ s */
+        /** Nanosecond: 1 ns = 10Ã¢ÂÂ»Ã¢ÂÂ¹ s */
         public static final Unit<Time> NANOSECOND = SECOND.divide(1_000_000_000);
 
         // ========== DERIVED SI UNITS ==========
@@ -193,19 +193,19 @@ public final class Units {
         public static final Unit<Dimensionless> ONE = new StandardUnit<>("1", "one", Dimension.DIMENSIONLESS);
 
         /**
-         * Square meter: m² (area).
+         * Square meter: mÃ‚Â² (area).
          */
         @SuppressWarnings("unchecked")
         public static final Unit<Area> SQUARE_METER = (Unit<Area>) METER.pow(2);
 
         /**
-         * Cubic meter: m³ (volume).
+         * Cubic meter: mÃ‚Â³ (volume).
          */
         @SuppressWarnings("unchecked")
         public static final Unit<Volume> CUBIC_METER = (Unit<Volume>) METER.pow(3);
 
         /**
-         * Kilogram per cubic meter: kg/m³ (density).
+         * Kilogram per cubic meter: kg/mÃ‚Â³ (density).
          */
         @SuppressWarnings("unchecked")
         public static final Unit<MassDensity> KILOGRAM_PER_CUBIC_METER = (Unit<MassDensity>) KILOGRAM
@@ -224,14 +224,14 @@ public final class Units {
         public static final Unit<Velocity> KILOMETER_PER_HOUR = (Unit<Velocity>) KILOMETER.divide(HOUR);
 
         /**
-         * Meter per second squared: m/s² (acceleration).
+         * Meter per second squared: m/sÃ‚Â² (acceleration).
          */
         @SuppressWarnings("unchecked")
         public static final Unit<Acceleration> METERS_PER_SECOND_SQUARED = (Unit<Acceleration>) METER
                         .divide(SECOND.multiply(SECOND));
 
         /**
-         * Joule: J (energy). 1 J = 1 kg⋅m²/s²
+         * Joule: J (energy). 1 J = 1 kgÃ¢â€¹â€¦mÃ‚Â²/sÃ‚Â²
          */
         @SuppressWarnings("unchecked")
         public static final Unit<Energy> JOULE = (Unit<Energy>) KILOGRAM.multiply(METER).multiply(METER)
@@ -253,14 +253,14 @@ public final class Units {
         public static final Unit<Energy> KILOWATT_HOUR = (Unit<Energy>) WATT_HOUR.multiply(1000);
 
         /**
-         * Newton: N (force). 1 N = 1 kg⋅m/s²
+         * Newton: N (force). 1 N = 1 kgÃ¢â€¹â€¦m/sÃ‚Â²
          */
         @SuppressWarnings("unchecked")
         public static final Unit<Force> NEWTON = (Unit<Force>) KILOGRAM.multiply(METER)
                         .divide(SECOND.multiply(SECOND));
 
         /**
-         * Pascal: Pa (pressure). 1 Pa = 1 N/m² = 1 kg/(m⋅s²)
+         * Pascal: Pa (pressure). 1 Pa = 1 N/mÃ‚Â² = 1 kg/(mÃ¢â€¹â€¦sÃ‚Â²)
          */
         @SuppressWarnings("unchecked")
         public static final Unit<Pressure> PASCAL = (Unit<Pressure>) NEWTON.divide(SQUARE_METER);
@@ -272,33 +272,33 @@ public final class Units {
         public static final Unit<Frequency> HERTZ = (Unit<Frequency>) ONE.divide(SECOND);
 
         /**
-         * Volt: V (electric potential). 1 V = 1 W/A = 1 J/(A⋅s)
+         * Volt: V (electric potential). 1 V = 1 W/A = 1 J/(AÃ¢â€¹â€¦s)
          */
         @SuppressWarnings("unchecked")
         public static final Unit<ElectricPotential> VOLT = (Unit<ElectricPotential>) WATT.divide(AMPERE);
 
         /**
-         * Coulomb: C (electric charge). 1 C = 1 A⋅s
+         * Coulomb: C (electric charge). 1 C = 1 AÃ¢â€¹â€¦s
          */
         @SuppressWarnings("unchecked")
         public static final Unit<ElectricCharge> COULOMB = (Unit<ElectricCharge>) AMPERE.multiply(SECOND);
 
         /**
-         * Farad: F (capacitance). Simplified as C²⋅s²/(kg⋅m²)
+         * Farad: F (capacitance). Simplified as CÃ‚Â²Ã¢â€¹â€¦sÃ‚Â²/(kgÃ¢â€¹â€¦mÃ‚Â²)
          */
         @SuppressWarnings("unchecked")
         public static final Unit<ElectricCapacitance> FARAD = (Unit<ElectricCapacitance>) COULOMB.multiply(COULOMB)
                         .multiply(SECOND).multiply(SECOND).divide(KILOGRAM.multiply(METER).multiply(METER));
 
         /**
-         * Henry: H (inductance). 1 H = kg⋅m²/(s²⋅A²)
+         * Henry: H (inductance). 1 H = kgÃ¢â€¹â€¦mÃ‚Â²/(sÃ‚Â²Ã¢â€¹â€¦AÃ‚Â²)
          */
         @SuppressWarnings("unchecked")
         public static final Unit<Inductance> HENRY = (Unit<Inductance>) KILOGRAM.multiply(METER).multiply(METER)
                         .divide(SECOND.multiply(SECOND).multiply(AMPERE).multiply(AMPERE));
 
         /**
-         * Ohm: Ω (electric resistance). 1 Ω = 1 V/A
+         * Ohm: ÃŽÂ© (electric resistance). 1 ÃŽÂ© = 1 V/A
          */
         @SuppressWarnings("unchecked")
         public static final Unit<ElectricResistance> OHM = (Unit<ElectricResistance>) VOLT.divide(AMPERE);
@@ -329,7 +329,7 @@ public final class Units {
 
         // ========== NON-SI UNITS ==========
 
-        /** Litre: 1 L = 0.001 m³ */
+        /** Litre: 1 L = 0.001 mÃ‚Â³ */
         public static final Unit<Volume> LITRE = (Unit<Volume>) CUBIC_METER.divide(1000);
 
         /** US Liquid Gallon: 1 gal = 3.785411784 L */
@@ -341,10 +341,10 @@ public final class Units {
         /** Bar: 1 bar = 100000 Pa */
         public static final Unit<Pressure> BAR = (Unit<Pressure>) PASCAL.multiply(100000);
 
-        /** Pound per square inch: 1 psi ≈ 6894.76 Pa */
+        /** Pound per square inch: 1 psi Ã¢â€°Ë† 6894.76 Pa */
         public static final Unit<Pressure> POUND_PER_SQUARE_INCH = (Unit<Pressure>) PASCAL.multiply(6894.75729);
 
-        /** Millimeter of mercury: 1 mmHg ≈ 133.322 Pa */
+        /** Millimeter of mercury: 1 mmHg Ã¢â€°Ë† 133.322 Pa */
         public static final Unit<Pressure> MILLIMETRE_OF_MERCURY = (Unit<Pressure>) PASCAL.multiply(133.322387415);
 
         /** Calorie (thermochemical): 1 cal = 4.184 J */
@@ -353,14 +353,14 @@ public final class Units {
         /** Kilocalorie (food calorie): 1 kcal = 1000 cal */
         public static final Unit<Energy> KILOCALORIE = (Unit<Energy>) CALORIE.multiply(1000);
 
-        /** Electronvolt: 1 eV ≈ 1.602×10⁻¹⁹ J */
+        /** Electronvolt: 1 eV Ã¢â€°Ë† 1.602Ãƒâ€”10Ã¢ÂÂ»Ã‚Â¹Ã¢ÂÂ¹ J */
         public static final Unit<Energy> ELECTRON_VOLT = (Unit<Energy>) JOULE.multiply(1.602176634e-19);
 
-        /** Degree: 1° = π/180 rad */
+        /** Degree: 1Ã‚Â° = Ãâ‚¬/180 rad */
         @SuppressWarnings("unchecked")
         public static final Unit<Angle> DEGREE_ANGLE = (Unit<Angle>) ((Unit<?>) RADIAN).multiply(Math.PI / 180.0);
 
-        /** Minute (angle): 1' = 1°/60 */
+        /** Minute (angle): 1' = 1Ã‚Â°/60 */
         public static final Unit<Angle> MINUTE_ANGLE = (Unit<Angle>) DEGREE_ANGLE.divide(60);
 
         /** Second (angle): 1" = 1'/60 */
@@ -373,13 +373,13 @@ public final class Units {
         @SuppressWarnings("unchecked")
         public static final Unit<Velocity> KNOT = (Unit<Velocity>) METER.multiply(1852).divide(HOUR);
 
-        /** Light-year: 1 ly ≈ 9.461×10¹⁵ m */
+        /** Light-year: 1 ly Ã¢â€°Ë† 9.461Ãƒâ€”10Ã‚Â¹Ã¢ÂÂµ m */
         public static final Unit<Length> LIGHT_YEAR = (Unit<Length>) METER.multiply(9.4607304725808e15);
 
         /** Nautical Mile: 1852 m */
         public static final Unit<Length> NAUTICAL_MILE = (Unit<Length>) METER.multiply(1852);
 
-        /** Mach: Speed of sound in air at 20°C ≈ 343.2 m/s */
+        /** Mach: Speed of sound in air at 20Ã‚Â°C Ã¢â€°Ë† 343.2 m/s */
         public static final Unit<Velocity> MACH = (Unit<Velocity>) METER_PER_SECOND.multiply(343.2);
 
         // ========== COMMON ALIASES ==========
@@ -449,17 +449,17 @@ public final class Units {
                 UNIT_BY_SYMBOL.put("Hz", HERTZ);
                 UNIT_BY_SYMBOL.put("m/s", METER_PER_SECOND);
                 UNIT_BY_SYMBOL.put("km/h", KILOMETER_PER_HOUR);
-                UNIT_BY_SYMBOL.put("m/s²", METERS_PER_SECOND_SQUARED);
-                UNIT_BY_SYMBOL.put("m²", SQUARE_METER);
-                UNIT_BY_SYMBOL.put("m³", CUBIC_METER);
-                UNIT_BY_SYMBOL.put("kg/m³", KILOGRAM_PER_CUBIC_METER);
+                UNIT_BY_SYMBOL.put("m/sÃ‚Â²", METERS_PER_SECOND_SQUARED);
+                UNIT_BY_SYMBOL.put("mÃ‚Â²", SQUARE_METER);
+                UNIT_BY_SYMBOL.put("mÃ‚Â³", CUBIC_METER);
+                UNIT_BY_SYMBOL.put("kg/mÃ‚Â³", KILOGRAM_PER_CUBIC_METER);
                 UNIT_BY_SYMBOL.put("kg/m^3", KILOGRAM_PER_CUBIC_METER);
                 UNIT_BY_SYMBOL.put("m^2", SQUARE_METER);
                 UNIT_BY_SYMBOL.put("m^3", CUBIC_METER);
                 UNIT_BY_SYMBOL.put("m/s^2", METERS_PER_SECOND_SQUARED);
 
                 UNIT_BY_SYMBOL.put("Ohm", OHM);
-                UNIT_BY_SYMBOL.put("Ω", OHM);
+                UNIT_BY_SYMBOL.put("ÃŽÂ©", OHM);
 
                 // Additional
                 UNIT_BY_SYMBOL.put("L", LITRE);
@@ -480,8 +480,8 @@ public final class Units {
                 UNIT_BY_SYMBOL.put("yr", YEAR);
                 UNIT_BY_SYMBOL.put("kn", KNOT);
 
-                UNIT_BY_SYMBOL.put("°C", CELSIUS);
-                UNIT_BY_SYMBOL.put("°F", FAHRENHEIT);
+                UNIT_BY_SYMBOL.put("Ã‚Â°C", CELSIUS);
+                UNIT_BY_SYMBOL.put("Ã‚Â°F", FAHRENHEIT);
         }
 
         /**
@@ -499,3 +499,4 @@ public final class Units {
                 return unit;
         }
 }
+

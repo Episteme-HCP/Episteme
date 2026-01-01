@@ -86,3 +86,5 @@ public class SolverTest {
         assertEquals(0.04975, v3, 0.01, "V3 should be approx 0.05");
     }
 }
+
+

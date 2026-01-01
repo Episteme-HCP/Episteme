@@ -54,12 +54,12 @@ public class Nucleus {
     public static final Real NEUTRON_MASS = Real.of(1.67492749804e-27);
     /** Atomic mass unit in kg */
     public static final Real AMU = Real.of(1.66053906660e-27);
-    /** Speed of light squared in m²/s² */
+    /** Speed of light squared in mÃ‚Â²/sÃ‚Â² */
     public static final Real C_SQUARED = Real.of(299792458).pow(2);
-    /** Nuclear radius constant r₀ in meters */
+    /** Nuclear radius constant rÃ¢â€šâ‚¬ in meters */
     public static final Real R0_METERS = Real.of(1.2e-15);
 
-    // Weizsäcker formula coefficients in MeV
+    // WeizsÃƒÂ¤cker formula coefficients in MeV
     private static final Real A_VOLUME = Real.of(15.8);
     private static final Real A_SURFACE = Real.of(18.3);
     private static final Real A_COULOMB = Real.of(0.72);
@@ -105,7 +105,7 @@ public class Nucleus {
     }
 
     /**
-     * Approximate nuclear radius: R = r₀ A^(1/3) where r₀ ≈ 1.2 fm.
+     * Approximate nuclear radius: R = rÃ¢â€šâ‚¬ A^(1/3) where rÃ¢â€šâ‚¬ Ã¢â€°Ë† 1.2 fm.
      *
      * @return nuclear radius as Length quantity
      */
@@ -122,9 +122,9 @@ public class Nucleus {
     }
 
     /**
-     * Semi-empirical binding energy (Weizsäcker formula).
+     * Semi-empirical binding energy (WeizsÃƒÂ¤cker formula).
      * <p>
-     * B = aᵥA - aₛA^(2/3) - aᴄZ(Z-1)/A^(1/3) - aₐ(N-Z)²/A + δ
+     * B = aÃ¡ÂµÂ¥A - aÃ¢â€šâ€ºA^(2/3) - aÃ¡Â´â€žZ(Z-1)/A^(1/3) - aÃ¢â€šÂ(N-Z)Ã‚Â²/A + ÃŽÂ´
      * </p>
      *
      * @return binding energy in MeV as Real
@@ -185,7 +185,7 @@ public class Nucleus {
      */
     public boolean isLikelyStable() {
         Real npRatio = getNeutronsReal().divide(getProtonsReal());
-        // Stable nuclei: N/Z ≈ 1 for light, increases for heavy
+        // Stable nuclei: N/Z Ã¢â€°Ë† 1 for light, increases for heavy
         Real idealRatio = Real.ONE.add(Real.of(0.015).multiply(getMassNumberReal()));
         Real deviation = npRatio.subtract(idealRatio).abs();
         return deviation.compareTo(Real.of(0.3)) < 0;
@@ -219,3 +219,5 @@ public class Nucleus {
         return symbol + "-" + getMassNumber();
     }
 }
+
+

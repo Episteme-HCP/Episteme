@@ -202,3 +202,5 @@ public class PressureGaugeViewer extends PhysicalMeasureInstrument<Pressure> {
         gc.fillText(name, cx, cy + 60);
     }
 }
+
+

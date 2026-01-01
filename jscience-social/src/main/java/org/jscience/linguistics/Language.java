@@ -78,3 +78,5 @@ public class Language implements Identifiable<String> {
         public static final Language CHINESE = new Language("zh", "Chinese", "Sino-Tibetan");
         public static final Language ARABIC = new Language("ar", "Arabic", "Afroasiatic");
 }
+
+

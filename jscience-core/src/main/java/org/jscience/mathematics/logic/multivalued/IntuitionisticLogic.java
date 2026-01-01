@@ -28,7 +28,7 @@ import org.jscience.mathematics.logic.Logic;
 /**
  * Intuitionistic (constructive) logic.
  * <p>
- * Intuitionistic logic rejects the law of excluded middle (A ∨ ¬A).
+ * Intuitionistic logic rejects the law of excluded middle (A Ã¢Ë†Â¨ Ã‚Â¬A).
  * A proposition is true only if there is a constructive proof.
  * Uses Heyting algebra semantics instead of Boolean algebra.
  * </p>
@@ -76,7 +76,7 @@ public class IntuitionisticLogic implements Logic<Boolean> {
     @Override
     public Boolean implies(Boolean a, Boolean b) {
         // In intuitionistic logic, implication is primitive
-        // A → B is true if we can construct B from A
+        // A Ã¢â€ â€™ B is true if we can construct B from A
         return !a || b;
     }
 
@@ -85,7 +85,7 @@ public class IntuitionisticLogic implements Logic<Boolean> {
      * In intuitionistic logic, this is NOT a tautology.
      * 
      * @param a the proposition
-     * @return A ∨ ¬A (not always true)
+     * @return A Ã¢Ë†Â¨ Ã‚Â¬A (not always true)
      */
     public Boolean excludedMiddle(Boolean a) {
         return or(a, not(a));
@@ -93,10 +93,10 @@ public class IntuitionisticLogic implements Logic<Boolean> {
 
     /**
      * Double negation elimination is NOT valid in intuitionistic logic.
-     * ¬¬A does not imply A.
+     * Ã‚Â¬Ã‚Â¬A does not imply A.
      * 
      * @param a the proposition
-     * @return ¬¬A
+     * @return Ã‚Â¬Ã‚Â¬A
      */
     public Boolean doubleNegation(Boolean a) {
         return not(not(a));
@@ -107,3 +107,4 @@ public class IntuitionisticLogic implements Logic<Boolean> {
         return "Intuitionistic Logic";
     }
 }
+

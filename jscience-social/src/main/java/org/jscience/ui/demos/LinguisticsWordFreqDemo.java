@@ -33,7 +33,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.AppProvider;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -45,11 +45,16 @@ import java.util.stream.Collectors;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class LinguisticsWordFreqDemo implements DemoProvider {
+public class LinguisticsWordFreqDemo implements AppProvider {
+
+    @Override
+    public boolean isDemo() {
+        return true;
+    }
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.linguistics");
+        return "Linguistics";
     }
 
     @Override
@@ -136,3 +141,5 @@ public class LinguisticsWordFreqDemo implements DemoProvider {
         analyze.run();
     }
 }
+
+

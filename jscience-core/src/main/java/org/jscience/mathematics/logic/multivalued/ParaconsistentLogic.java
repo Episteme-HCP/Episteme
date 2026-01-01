@@ -136,3 +136,4 @@ public class ParaconsistentLogic implements Logic<ParaconsistentLogic.TruthValue
         return "Paraconsistent Logic (4-valued)";
     }
 }
+

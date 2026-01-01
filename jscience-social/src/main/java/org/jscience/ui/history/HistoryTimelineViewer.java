@@ -404,3 +404,5 @@ public class HistoryTimelineViewer extends BorderPane {
         stage.show();
     }
 }
+
+

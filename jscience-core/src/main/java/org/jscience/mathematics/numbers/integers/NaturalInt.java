@@ -236,3 +236,4 @@ final class NaturalInt extends Natural {
         return element != null;
     }
 }
+

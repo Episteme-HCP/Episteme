@@ -24,7 +24,7 @@
 package org.jscience.mathematics.analysis.pde;
 
 /**
- * 1D Wave equation solver: ∂²u/∂t² = c² ∂²u/∂x²
+ * 1D Wave equation solver: Ã¢Ë†â€šÃ‚Â²u/Ã¢Ë†â€štÃ‚Â² = cÃ‚Â² Ã¢Ë†â€šÃ‚Â²u/Ã¢Ë†â€šxÃ‚Â²
  * <p>
  * Uses explicit finite difference (leapfrog) scheme.
  * </p>
@@ -72,7 +72,7 @@ public class WaveEquationSolver {
         for (int i = 0; i < nx; i++) {
             double x = i * dx;
             uCurr[i] = displacement.applyAsDouble(x);
-            // First step: u_prev ≈ u_curr - v*dt
+            // First step: u_prev Ã¢â€°Ë† u_curr - v*dt
             uPrev[i] = uCurr[i] - velocity.applyAsDouble(x) * dt;
         }
     }
@@ -104,7 +104,7 @@ public class WaveEquationSolver {
     }
 
     /**
-     * Step with free boundary conditions (∂u/∂x = 0).
+     * Step with free boundary conditions (Ã¢Ë†â€šu/Ã¢Ë†â€šx = 0).
      */
     public void stepFreeBoundary(double dt) {
         double r2 = (c * dt / dx) * (c * dt / dx);
@@ -201,3 +201,5 @@ public class WaveEquationSolver {
         return solver;
     }
 }
+
+

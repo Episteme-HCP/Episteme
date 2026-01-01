@@ -72,3 +72,5 @@ public class OpenCLProviderTest {
                 System.out.println(org.jscience.util.PerformanceLogger.getReport());
         }
 }
+
+

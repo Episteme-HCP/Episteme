@@ -128,7 +128,7 @@ public class SVDDecomposition {
             }
         }
 
-        // Compute eigenvalues of A^T * A (these are σ²)
+        // Compute eigenvalues of A^T * A (these are ÃÆ’Ã‚Â²)
         EigenDecomposition eigen = EigenDecomposition.decompose(createMatrix(AtA));
         Real[] eigenvalues = eigen.getEigenvalues();
 
@@ -143,7 +143,7 @@ public class SVDDecomposition {
         // V is eigenvectors of A^T * A
         Matrix<Real> V = eigen.getEigenvectors();
 
-        // Compute U = A * V * Σ^(-1)
+        // Compute U = A * V * ÃŽÂ£^(-1)
         List<List<Real>> uRows = new ArrayList<>();
         for (int i = 0; i < m; i++) {
             List<Real> row = new ArrayList<>();
@@ -209,9 +209,9 @@ public class SVDDecomposition {
     }
 
     /**
-     * Condition number: σ_max / σ_min
+     * Condition number: ÃÆ’_max / ÃÆ’_min
      * <p>
-     * Indicates numerical stability. κ > 10^15 is ill-conditioned.
+     * Indicates numerical stability. ÃŽÂº > 10^15 is ill-conditioned.
      * </p>
      */
     public Real conditionNumber() {
@@ -227,10 +227,10 @@ public class SVDDecomposition {
     }
 
     /**
-     * Moore-Penrose pseudoinverse: A^+ = V Σ^+ U^T
+     * Moore-Penrose pseudoinverse: A^+ = V ÃŽÂ£^+ U^T
      */
     public Matrix<Real> pseudoInverse(Real tolerance) {
-        // Σ^+ : invert non-zero singular values
+        // ÃŽÂ£^+ : invert non-zero singular values
         int n = V.rows();
         int m = U.rows();
 
@@ -253,3 +253,4 @@ public class SVDDecomposition {
         return DenseMatrix.of(result, Reals.getInstance());
     }
 }
+

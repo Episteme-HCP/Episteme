@@ -144,3 +144,5 @@ public class VirusLoader extends AbstractLoader<VirusSpecies> {
         public List<String> hostRange;
     }
 }
+
+

@@ -269,3 +269,5 @@ public class ClothSimulationViewer extends Application {
         new ClothSimulationViewer().start(stage);
     }
 }
+
+

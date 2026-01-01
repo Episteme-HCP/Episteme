@@ -110,3 +110,4 @@ public interface WeightedGraph<V, W> extends Graph<V> {
         return addEdge(source, target, getDefaultWeight());
     }
 }
+

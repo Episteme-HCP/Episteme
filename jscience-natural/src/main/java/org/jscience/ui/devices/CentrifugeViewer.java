@@ -67,3 +67,5 @@ public class CentrifugeViewer extends AbstractDeviceViewer<Centrifuge> {
         // Update current RPM from device if needed
     }
 }
+
+

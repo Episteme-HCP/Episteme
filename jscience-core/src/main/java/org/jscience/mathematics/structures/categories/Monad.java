@@ -26,11 +26,11 @@ package org.jscience.mathematics.structures.categories;
 /**
  * Represents a Monad in Category Theory.
  * <p>
- * A Monad on a category C is an endofunctor T: C → C equipped with two natural
+ * A Monad on a category C is an endofunctor T: C Ã¢â€ â€™ C equipped with two natural
  * transformations:
  * <ul>
- * <li>Unit (η): Id → T</li>
- * <li>Multiplication (μ): T² → T</li>
+ * <li>Unit (ÃŽÂ·): Id Ã¢â€ â€™ T</li>
+ * <li>Multiplication (ÃŽÂ¼): TÃ‚Â² Ã¢â€ â€™ T</li>
  * </ul>
  * satisfying associativity and identity laws.
  * </p>
@@ -46,7 +46,7 @@ package org.jscience.mathematics.structures.categories;
 public interface Monad<O, M> extends Functor<O, M, O, M> {
 
     /**
-     * The unit natural transformation (η).
+     * The unit natural transformation (ÃŽÂ·).
      * Lifts a value into the monadic context.
      * Also known as 'return' or 'pure'.
      * 
@@ -56,7 +56,7 @@ public interface Monad<O, M> extends Functor<O, M, O, M> {
     M unit(O object);
 
     /**
-     * The multiplication natural transformation (μ).
+     * The multiplication natural transformation (ÃŽÂ¼).
      * Flattens a nested monadic value.
      * Also known as 'join' or 'flatten'.
      * 
@@ -77,3 +77,4 @@ public interface Monad<O, M> extends Functor<O, M, O, M> {
     // In a concrete implementation (like ListMonad), this would be:
     // List<Y> bind(List<X> list, Function<X, List<Y>> f)
 }
+

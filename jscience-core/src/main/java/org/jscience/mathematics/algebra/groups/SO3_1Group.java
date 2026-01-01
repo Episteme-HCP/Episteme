@@ -32,7 +32,7 @@ import java.util.*;
 
 /**
  * The group of all linear transformations of Minkowski space that preserve the
- * spacetime interval ds²=-c²dt²+dx²+dy²+dz².
+ * spacetime interval dsÃ‚Â²=-cÃ‚Â²dtÃ‚Â²+dxÃ‚Â²+dyÃ‚Â²+dzÃ‚Â².
  * Elements are represented as 4x4 matrices.
  *
  * @author Silvere Martin-Michiellot
@@ -118,8 +118,8 @@ public class SO3_1Group implements Group<Matrix<Real>> {
         Real g = Real.of(gamma);
         Real gb = Real.of(-gamma * beta);
 
-        // t' = γt - γβx
-        // x' = -γβt + γx
+        // t' = ÃŽÂ³t - ÃŽÂ³ÃŽÂ²x
+        // x' = -ÃŽÂ³ÃŽÂ²t + ÃŽÂ³x
         data[0][0] = g;
         data[0][1] = gb;
         data[1][0] = gb;
@@ -136,3 +136,4 @@ public class SO3_1Group implements Group<Matrix<Real>> {
         return new DenseMatrix<>(rows, Reals.getInstance());
     }
 }
+

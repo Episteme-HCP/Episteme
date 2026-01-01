@@ -215,3 +215,5 @@ public class GaltonBoardViewer extends Application {
         launch(args);
     }
 }
+
+

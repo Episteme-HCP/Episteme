@@ -39,13 +39,13 @@ import java.util.List;
  * rate of increase of the scalar field.
  * </p>
  * <p>
- * Definition: ∇f = (∂f/∂x₁, ∂f/∂x₂, ..., ∂f/∂xₙ)
+ * Definition: Ã¢Ë†â€¡f = (Ã¢Ë†â€šf/Ã¢Ë†â€šxÃ¢â€šÂ, Ã¢Ë†â€šf/Ã¢Ë†â€šxÃ¢â€šâ€š, ..., Ã¢Ë†â€šf/Ã¢Ë†â€šxÃ¢â€šâ„¢)
  * </p>
  * <p>
  * Physical interpretation:
  * - Direction of steepest ascent
- * - Electric field: E = -∇φ (negative gradient of potential)
- * - Force from potential: F = -∇U
+ * - Electric field: E = -Ã¢Ë†â€¡Ãâ€  (negative gradient of potential)
+ * - Force from potential: F = -Ã¢Ë†â€¡U
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -57,7 +57,7 @@ public class Gradient {
     /**
      * Computes the gradient of a scalar field at a point using finite differences.
      * <p>
-     * Uses central difference: ∂f/∂xᵢ ≈ (f(x + h*eᵢ) - f(x - h*eᵢ)) / (2h)
+     * Uses central difference: Ã¢Ë†â€šf/Ã¢Ë†â€šxÃ¡ÂµÂ¢ Ã¢â€°Ë† (f(x + h*eÃ¡ÂµÂ¢) - f(x - h*eÃ¡ÂµÂ¢)) / (2h)
      * </p>
      * 
      * @param field the scalar field
@@ -70,7 +70,7 @@ public class Gradient {
         List<Real> gradComponents = new ArrayList<>(n);
 
         for (int i = 0; i < n; i++) {
-            // Create points shifted by ±h in the i-th direction
+            // Create points shifted by Ã‚Â±h in the i-th direction
             PointND pointPlus = shiftPoint(point, i, h);
             PointND pointMinus = shiftPoint(point, i, h.negate());
 
@@ -121,3 +121,5 @@ public class Gradient {
         return new PointND(newCoords);
     }
 }
+
+

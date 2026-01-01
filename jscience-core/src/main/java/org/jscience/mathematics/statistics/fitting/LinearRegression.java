@@ -36,7 +36,7 @@ public class LinearRegression {
 
     private final double slope; // b
     private final double intercept; // a
-    private final double rSquared; // R²
+    private final double rSquared; // RÃ‚Â²
     private final double standardError;
     private final int n;
 
@@ -147,6 +147,8 @@ public class LinearRegression {
 
     @Override
     public String toString() {
-        return String.format("y = %.6f + %.6f*x (R² = %.4f)", intercept, slope, rSquared);
+        return String.format("y = %.6f + %.6f*x (RÃ‚Â² = %.4f)", intercept, slope, rSquared);
     }
 }
+
+

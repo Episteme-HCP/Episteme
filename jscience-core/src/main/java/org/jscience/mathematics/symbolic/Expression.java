@@ -102,3 +102,4 @@ public interface Expression<T extends Ring<T>> {
      */
     T evaluate(Map<Variable<T>, T> assignments);
 }
+

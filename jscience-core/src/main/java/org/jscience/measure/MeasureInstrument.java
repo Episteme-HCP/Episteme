@@ -236,3 +236,5 @@ public abstract class MeasureInstrument {
     public record MeasurementRecord(Instant timestamp, Quantity<?> value) {
     }
 }
+
+

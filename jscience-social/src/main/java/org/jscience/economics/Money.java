@@ -100,3 +100,5 @@ public class Money {
         return new Money(Real.of(amount), Currency.EUR);
     }
 }
+
+

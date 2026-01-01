@@ -135,3 +135,5 @@ public class PrimitiveGalaxySimulator implements GalaxySimulator {
         return "Primitive (double)";
     }
 }
+
+

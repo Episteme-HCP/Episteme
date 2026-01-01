@@ -58,7 +58,7 @@ public class Magnitude {
 
     /**
      * Calculates distance modulus.
-     * μ = m - M = 5 * log10(d) - 5
+     * ÃŽÂ¼ = m - M = 5 * log10(d) - 5
      */
     public static Real distanceModulus(Real apparentMag, Real absoluteMag) {
         return apparentMag.subtract(absoluteMag);
@@ -66,7 +66,7 @@ public class Magnitude {
 
     /**
      * Calculates distance from distance modulus.
-     * d = 10^((μ + 5) / 5)
+     * d = 10^((ÃŽÂ¼ + 5) / 5)
      */
     public static Real distanceFromModulus(Real distanceModulus) {
         return Real.of(10).pow(distanceModulus.add(Real.of(5)).divide(Real.of(5)));
@@ -74,7 +74,7 @@ public class Magnitude {
 
     /**
      * Combines magnitudes of multiple sources.
-     * m_total = -2.5 * log10(Σ 10^(-m_i/2.5))
+     * m_total = -2.5 * log10(ÃŽÂ£ 10^(-m_i/2.5))
      */
     public static Real combine(Real... magnitudes) {
         Real totalFlux = Real.ZERO;
@@ -112,7 +112,7 @@ public class Magnitude {
 
     /**
      * Converts absolute magnitude to luminosity (solar units).
-     * L/L☉ = 10^((M☉ - M) / 2.5)
+     * L/LÃ¢Ëœâ€° = 10^((MÃ¢Ëœâ€° - M) / 2.5)
      */
     public static Real toLuminosity(Real absoluteMag) {
         return Real.of(10).pow(SUN_ABSOLUTE.subtract(absoluteMag).divide(Real.of(2.5)));
@@ -120,7 +120,7 @@ public class Magnitude {
 
     /**
      * Converts luminosity to absolute magnitude.
-     * M = M☉ - 2.5 * log10(L/L☉)
+     * M = MÃ¢Ëœâ€° - 2.5 * log10(L/LÃ¢Ëœâ€°)
      */
     public static Real fromLuminosity(Real luminositySolar) {
         return SUN_ABSOLUTE.subtract(Real.of(2.5).multiply(luminositySolar.log10()));
@@ -143,3 +143,5 @@ public class Magnitude {
     /** Vega apparent magnitude (defines magnitude zero point) */
     public static final Real VEGA = Real.of(0.03);
 }
+
+

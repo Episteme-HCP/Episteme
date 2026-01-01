@@ -42,7 +42,7 @@ import java.util.function.BinaryOperator;
  * <ul>
  * <li>Addition: (a + b)</li>
  * <li>Additive inverse/subtraction: (a - b)</li>
- * <li>Multiplication: (a × b)</li>
+ * <li>Multiplication: (a Ãƒâ€” b)</li>
  * <li>Additive identity (zero)</li>
  * <li>Multiplicative identity (one)</li>
  * </ul>
@@ -183,3 +183,4 @@ public class RingIntervalND<T extends Comparable<T>> extends OrderedSetIntervalN
         return new RingIntervalND<>(newMin, newMax, newClosedLeft, newClosedRight, subtractor);
     }
 }
+

@@ -48,7 +48,7 @@ public class EllipticFunctions {
      * $K(m) = \int_0^{\pi/2} \frac{d\theta}{\sqrt{1 - m\sin^2\theta}}$
      * </p>
      * 
-     * @param m Parameter (0 ≤ m < 1)
+     * @param m Parameter (0 Ã¢â€°Â¤ m < 1)
      * @return K(m)
      */
     public static Real completeK(Real m) {
@@ -84,7 +84,7 @@ public class EllipticFunctions {
      * $E(m) = \int_0^{\pi/2} \sqrt{1 - m\sin^2\theta} d\theta$
      * </p>
      * 
-     * @param m Parameter (0 ≤ m ≤ 1)
+     * @param m Parameter (0 Ã¢â€°Â¤ m Ã¢â€°Â¤ 1)
      * @return E(m)
      */
     public static Real completeE(Real m) {
@@ -123,14 +123,14 @@ public class EllipticFunctions {
     // ==================== Incomplete Elliptic Integrals ====================
 
     /**
-     * Incomplete elliptic integral of the first kind: F(φ, m).
+     * Incomplete elliptic integral of the first kind: F(Ãâ€ , m).
      * <p>
      * $F(\phi, m) = \int_0^{\phi} \frac{d\theta}{\sqrt{1 - m\sin^2\theta}}$
      * </p>
      * 
      * @param phi Amplitude angle (radians)
-     * @param m   Parameter (0 ≤ m < 1)
-     * @return F(φ, m)
+     * @param m   Parameter (0 Ã¢â€°Â¤ m < 1)
+     * @return F(Ãâ€ , m)
      */
     public static double incompleteF(double phi, double m) {
         if (m < 0 || m >= 1) {
@@ -139,7 +139,7 @@ public class EllipticFunctions {
         if (phi == 0)
             return 0;
 
-        // Reduce phi to [0, π/2]
+        // Reduce phi to [0, Ãâ‚¬/2]
         int sign = (phi < 0) ? -1 : 1;
         phi = Math.abs(phi);
         int periods = (int) (phi / Math.PI);
@@ -197,7 +197,7 @@ public class EllipticFunctions {
      * </p>
      * 
      * @param u Argument
-     * @param m Parameter (0 ≤ m ≤ 1)
+     * @param m Parameter (0 Ã¢â€°Â¤ m Ã¢â€°Â¤ 1)
      * @return Array [sn, cn, dn]
      */
     public static double[] jacobi(double u, double m) {
@@ -256,3 +256,5 @@ public class EllipticFunctions {
         return Real.of(jacobi(u.doubleValue(), m.doubleValue())[2]);
     }
 }
+
+

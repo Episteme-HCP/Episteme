@@ -72,3 +72,5 @@ public class EconomicsRestorationTest {
         assertTrue(widgetFactory.getInventory().contains(widget));
     }
 }
+
+

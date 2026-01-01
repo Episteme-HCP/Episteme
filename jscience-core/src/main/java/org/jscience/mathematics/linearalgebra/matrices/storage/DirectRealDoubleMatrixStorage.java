@@ -110,3 +110,5 @@ public class DirectRealDoubleMatrixStorage implements RealDoubleMatrixStorage {
         return copy;
     }
 }
+
+

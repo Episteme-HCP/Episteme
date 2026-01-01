@@ -42,3 +42,4 @@ public interface QuantityCapable {
         return true;
     }
 }
+

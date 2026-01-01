@@ -48,8 +48,8 @@ public class ChemicalReaction {
     private final Map<String, Integer> reactants; // Compound -> coefficient
     private final Map<String, Integer> products; // Compound -> coefficient
     private final String equation;
-    private Quantity<Energy> enthalpy; // ΔH
-    private Quantity<Energy> gibbsFreeEnergy; // ΔG
+    private Quantity<Energy> enthalpy; // ÃŽâ€H
+    private Quantity<Energy> gibbsFreeEnergy; // ÃŽâ€G
     private Quantity<Energy> activationEnergy; // Ea
     private Quantity<Frequency> preExponentialFactor; // A (Arrhenius) - simplified unit inverse time
 
@@ -107,7 +107,7 @@ public class ChemicalReaction {
      * Format: "2H2 + O2 -> 2H2O" or "CH4 + 2O2 = CO2 + 2H2O"
      */
     public static ChemicalReaction parse(String equation) {
-        String[] sides = equation.split("->|=|→");
+        String[] sides = equation.split("->|=|Ã¢â€ â€™");
         if (sides.length != 2) {
             throw new IllegalArgumentException("Invalid equation format: " + equation);
         }
@@ -265,7 +265,7 @@ public class ChemicalReaction {
             first = false;
         }
 
-        sb.append(" → ");
+        sb.append(" Ã¢â€ â€™ ");
 
         first = true;
         for (Map.Entry<String, Integer> e : products.entrySet()) {
@@ -278,7 +278,7 @@ public class ChemicalReaction {
         }
 
         if (enthalpy.getValue().doubleValue() != 0) {
-            sb.append(" (ΔH = ").append(enthalpy).append(")");
+            sb.append(" (ÃŽâ€H = ").append(enthalpy).append(")");
         }
 
         return sb.toString();
@@ -287,3 +287,5 @@ public class ChemicalReaction {
     // Removed hardcoded factory methods (combustionMethane, etc.) to encourage data
     // loading.
 }
+
+

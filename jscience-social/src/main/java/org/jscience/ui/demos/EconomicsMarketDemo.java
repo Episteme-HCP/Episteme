@@ -34,7 +34,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.AppProvider;
 
 /**
  * 
@@ -42,11 +42,16 @@ import org.jscience.ui.DemoProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class EconomicsMarketDemo implements DemoProvider {
+public class EconomicsMarketDemo implements AppProvider {
+
+    @Override
+    public boolean isDemo() {
+        return true;
+    }
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.economics");
+        return "Economics";
     }
 
     @Override
@@ -64,9 +69,11 @@ public class EconomicsMarketDemo implements DemoProvider {
         BorderPane root = new BorderPane();
 
         // Axes
-        NumberAxis xAxis = new NumberAxis(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.axis.quantity"),
+        NumberAxis xAxis = new NumberAxis(
+                org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.axis.quantity"),
                 0, 100, 10);
-        NumberAxis yAxis = new NumberAxis(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.axis.price"), 0,
+        NumberAxis yAxis = new NumberAxis(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.axis.price"),
+                0,
                 100, 10);
 
         LineChart<Number, Number> lineChart = new LineChart<>(xAxis, yAxis);
@@ -140,3 +147,5 @@ public class EconomicsMarketDemo implements DemoProvider {
         stage.show();
     }
 }
+
+

@@ -33,9 +33,9 @@ import org.jscience.mathematics.logic.propositional.Proposition;
  * Linear Temporal Logic (LTL) extends propositional logic with temporal
  * operators:
  * <ul>
- * <li>□ (Always/Globally) - true at all future times</li>
- * <li>◇ (Eventually/Finally) - true at some future time</li>
- * <li>○ (Next) - true in the next state</li>
+ * <li>Ã¢â€“Â¡ (Always/Globally) - true at all future times</li>
+ * <li>Ã¢â€”â€¡ (Eventually/Finally) - true at some future time</li>
+ * <li>Ã¢â€”â€¹ (Next) - true in the next state</li>
  * <li>U (Until) - p U q means p holds until q becomes true</li>
  * </ul>
  * </p>
@@ -59,35 +59,35 @@ import org.jscience.mathematics.logic.propositional.Proposition;
 public interface TemporalLogic<T> extends Logic<T> {
 
     /**
-     * Temporal operator: □φ (Always/Globally).
-     * True if φ is true at all future time points.
+     * Temporal operator: Ã¢â€“Â¡Ãâ€  (Always/Globally).
+     * True if Ãâ€  is true at all future time points.
      * 
      * @param proposition the proposition
-     * @return □φ
+     * @return Ã¢â€“Â¡Ãâ€ 
      */
     T always(Proposition<T> proposition);
 
     /**
-     * Temporal operator: ◇φ (Eventually/Finally).
-     * True if φ is true at some future time point.
+     * Temporal operator: Ã¢â€”â€¡Ãâ€  (Eventually/Finally).
+     * True if Ãâ€  is true at some future time point.
      * 
      * @param proposition the proposition
-     * @return ◇φ
+     * @return Ã¢â€”â€¡Ãâ€ 
      */
     T eventually(Proposition<T> proposition);
 
     /**
-     * Temporal operator: ○φ (Next).
-     * True if φ is true in the next state.
+     * Temporal operator: Ã¢â€”â€¹Ãâ€  (Next).
+     * True if Ãâ€  is true in the next state.
      * 
      * @param proposition the proposition
-     * @return ○φ
+     * @return Ã¢â€”â€¹Ãâ€ 
      */
     T next(Proposition<T> proposition);
 
     /**
-     * Temporal operator: φ U ψ (Until).
-     * True if φ holds until ψ becomes true.
+     * Temporal operator: Ãâ€  U ÃË† (Until).
+     * True if Ãâ€  holds until ÃË† becomes true.
      * 
      * @param p first proposition
      * @param q second proposition
@@ -95,3 +95,4 @@ public interface TemporalLogic<T> extends Logic<T> {
      */
     T until(Proposition<T> p, Proposition<T> q);
 }
+

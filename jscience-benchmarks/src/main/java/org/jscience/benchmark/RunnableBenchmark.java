@@ -70,3 +70,5 @@ public interface RunnableBenchmark {
         return 10;
     }
 }
+
+

@@ -163,3 +163,4 @@ public class Variable<T extends Ring<T>> implements Expression<T> {
         return Objects.hash(symbol);
     }
 }
+

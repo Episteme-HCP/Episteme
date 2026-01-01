@@ -60,3 +60,5 @@ public class Earthquake {
         return depth;
     }
 }
+
+

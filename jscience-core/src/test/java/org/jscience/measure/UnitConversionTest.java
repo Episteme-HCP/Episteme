@@ -42,11 +42,11 @@ public class UnitConversionTest {
     @Test
     public void testTemperatureConversions() {
         // Celsius to Fahrenheit
-        // 0°C = 32°F
+        // 0Ã‚Â°C = 32Ã‚Â°F
         Assertions.assertEquals(32.0, UnitConversion.celsiusToFahrenheit(0), DELTA);
-        // 100°C = 212°F
+        // 100Ã‚Â°C = 212Ã‚Â°F
         Assertions.assertEquals(212.0, UnitConversion.celsiusToFahrenheit(100), DELTA);
-        // -40°C = -40°F
+        // -40Ã‚Â°C = -40Ã‚Â°F
         Assertions.assertEquals(-40.0, UnitConversion.celsiusToFahrenheit(-40), DELTA);
 
         // Fahrenheit to Celsius
@@ -54,7 +54,7 @@ public class UnitConversionTest {
         Assertions.assertEquals(100.0, UnitConversion.fahrenheitToCelsius(212), DELTA);
 
         // Kelvin conversions
-        // 0°C = 273.15K
+        // 0Ã‚Â°C = 273.15K
         Assertions.assertEquals(273.15, UnitConversion.celsiusToKelvin(0), DELTA);
         Assertions.assertEquals(0.0, UnitConversion.kelvinToCelsius(273.15), DELTA);
     }
@@ -87,3 +87,5 @@ public class UnitConversionTest {
         Assertions.assertEquals(273.15, kVal2.doubleValue(), DELTA);
     }
 }
+
+

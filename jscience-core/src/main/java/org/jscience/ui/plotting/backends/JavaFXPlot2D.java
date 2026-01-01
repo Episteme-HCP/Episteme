@@ -191,3 +191,5 @@ public class JavaFXPlot2D implements Plot2D {
         return chart;
     }
 }
+
+

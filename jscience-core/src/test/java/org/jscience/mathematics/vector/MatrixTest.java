@@ -110,3 +110,4 @@ public class MatrixTest {
                 assertEquals(Real.of(4), t.get(1, 1));
         }
 }
+

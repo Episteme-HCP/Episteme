@@ -175,5 +175,7 @@ public class Country extends org.jscience.geography.Place implements org.jscienc
     public static final Country JAPAN = new Country("Japan", "JP", "JPN", 392,
             "Tokyo", "Asia", 126_000_000L, 377_975.0);
     public static final Country BRAZIL = new Country("Brazil", "BR", "BRA", 76,
-            "Brasília", "South America", 212_000_000L, 8_515_767.0);
+            "BrasÃƒÂ­lia", "South America", 212_000_000L, 8_515_767.0);
 }
+
+

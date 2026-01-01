@@ -118,3 +118,4 @@ public interface RingElement<E extends RingElement<E>> {
         return this.equals(one());
     }
 }
+

@@ -28,7 +28,7 @@ import org.jscience.mathematics.logic.propositional.Proposition;
 /**
  * Represents a quantifier in predicate logic.
  * <p>
- * Examples: Universal (∀), Existential (∃).
+ * Examples: Universal (Ã¢Ë†â‚¬), Existential (Ã¢Ë†Æ’).
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -58,3 +58,5 @@ public interface Quantifier<T> extends Proposition<T> {
      */
     String getType();
 }
+
+

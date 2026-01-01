@@ -18,6 +18,8 @@
     <module>jscience-killer-apps</module>
     <module>jscience-jni</module>
     <module>jscience-server</module>
+    <module>jscience-worker</module>
+    <module>jscience-client</module>
   </modules>
   <licenses>
     <license>

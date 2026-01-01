@@ -50,7 +50,7 @@ public class RelativisticMechanics {
 
     /**
      * Calculates the Lorentz factor (gamma) given a velocity v.
-     * gamma = 1 / sqrt(1 - v²/c²)
+     * gamma = 1 / sqrt(1 - vÃ‚Â²/cÃ‚Â²)
      *
      * @param v velocity
      * @return Lorentz factor as Real (dimensionless)
@@ -82,7 +82,7 @@ public class RelativisticMechanics {
 
     /**
      * Calculates Total Relativistic Energy.
-     * E = gamma * m₀ * c²
+     * E = gamma * mÃ¢â€šâ‚¬ * cÃ‚Â²
      *
      * @param restMass rest mass
      * @param v        velocity
@@ -94,14 +94,14 @@ public class RelativisticMechanics {
         Real c = PhysicalConstants.SPEED_OF_LIGHT.to(Units.METER_PER_SECOND).getValue();
         Real cSquared = c.multiply(c);
 
-        // E = gamma * m0 * c²
+        // E = gamma * m0 * cÃ‚Â²
         Real energyVal = gamma.multiply(m0).multiply(cSquared);
         return Quantities.create(energyVal, Units.JOULE);
     }
 
     /**
      * Calculates Kinetic Energy.
-     * KE = (gamma - 1) * m₀ * c²
+     * KE = (gamma - 1) * mÃ¢â€šâ‚¬ * cÃ‚Â²
      *
      * @param restMass rest mass
      * @param v        velocity
@@ -118,7 +118,7 @@ public class RelativisticMechanics {
     }
 
     /**
-     * Rest energy: E₀ = m₀c²
+     * Rest energy: EÃ¢â€šâ‚¬ = mÃ¢â€šâ‚¬cÃ‚Â²
      *
      * @param restMass rest mass
      * @return rest energy
@@ -131,11 +131,11 @@ public class RelativisticMechanics {
     }
 
     /**
-     * Relativistic momentum: p = gamma * m₀ * v
+     * Relativistic momentum: p = gamma * mÃ¢â€šâ‚¬ * v
      *
      * @param restMass rest mass
      * @param v        velocity
-     * @return momentum (kg·m/s)
+     * @return momentum (kgÃ‚Â·m/s)
      */
     public static Real relativisticMomentum(Quantity<Mass> restMass, Quantity<Velocity> v) {
         Real gamma = lorentzFactor(v);
@@ -144,3 +144,5 @@ public class RelativisticMechanics {
         return gamma.multiply(m0).multiply(vVal);
     }
 }
+
+

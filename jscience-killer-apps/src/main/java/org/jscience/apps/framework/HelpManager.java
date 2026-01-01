@@ -105,7 +105,7 @@ public class HelpManager {
         VBox box = new VBox(8);
         box.setPadding(new Insets(10, 0, 10, 0));
 
-        Label sectionTitle = new Label("📌 " + section.title);
+        Label sectionTitle = new Label("Ã°Å¸â€œÅ’ " + section.title);
         sectionTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #34495e;");
         box.getChildren().add(sectionTitle);
 
@@ -176,3 +176,5 @@ public class HelpManager {
         }
     }
 }
+
+

@@ -60,10 +60,10 @@ public abstract class SimulationDemo extends AbstractDemo {
             HBox vcrControls = new HBox(5);
             vcrControls.setAlignment(Pos.CENTER);
 
-            playBtn = new Button("▶");
-            pauseBtn = new Button("⏸");
-            stopBtn = new Button("⏹");
-            stepBtn = new Button("⏭");
+            playBtn = new Button("Ã¢â€“Â¶");
+            pauseBtn = new Button("Ã¢ÂÂ¸");
+            stopBtn = new Button("Ã¢ÂÂ¹");
+            stepBtn = new Button("Ã¢ÂÂ­");
 
             playBtn.setOnAction(e -> simulatable.play());
             pauseBtn.setOnAction(e -> simulatable.pause());
@@ -84,3 +84,5 @@ public abstract class SimulationDemo extends AbstractDemo {
         return panel;
     }
 }
+
+

@@ -22,12 +22,6 @@
  */
 
 /**
- * Provides the Hardware Abstraction Layer (HAL) for scientific devices.
- * <p>
- * This package defines generic interfaces for
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Defines generic interfaces for
  */
 package org.jscience.device;

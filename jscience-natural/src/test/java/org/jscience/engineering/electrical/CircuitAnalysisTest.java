@@ -68,3 +68,5 @@ public class CircuitAnalysisTest {
         assertEquals(5.0, rTotal.doubleValue(), 1e-9);
     }
 }
+
+

@@ -186,3 +186,4 @@ final class StandardQuantity<Q extends Quantity<Q>> implements Quantity<Q> {
         }
     }
 }
+

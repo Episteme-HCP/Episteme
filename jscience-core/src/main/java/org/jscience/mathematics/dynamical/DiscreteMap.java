@@ -45,3 +45,5 @@ public interface DiscreteMap extends DynamicalMap<double[]> {
      */
     double hausdorffDimension();
 }
+
+

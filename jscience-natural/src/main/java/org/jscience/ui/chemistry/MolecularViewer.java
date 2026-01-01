@@ -1070,3 +1070,5 @@ public class MolecularViewer extends Application {
         updateProteinFolding(0);
     }
 }
+
+

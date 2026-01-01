@@ -86,3 +86,5 @@ public class FuzzyLogic implements Logic<Real> {
         return Real.ONE.subtract(a);
     }
 }
+
+

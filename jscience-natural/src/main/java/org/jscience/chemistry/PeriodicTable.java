@@ -58,7 +58,7 @@ public final class PeriodicTable {
     // Custom Units derived for XML/JSON data
     private static final Unit<Temperature> KELVIN = Units.KELVIN;
 
-    // 1 u ≈ 1.66053906660e-27 kg
+    // 1 u Ã¢â€°Ë† 1.66053906660e-27 kg
     private static final Unit<Mass> UNIFIED_ATOMIC_MASS = Units.KILOGRAM.multiply(1.66053906660e-27);
 
     // Note: Creating composite units directly using operations on base units
@@ -235,3 +235,5 @@ public final class PeriodicTable {
         symbolToName.put(symbol, name);
     }
 }
+
+

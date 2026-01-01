@@ -97,3 +97,4 @@ public class SU3Group implements Group<Matrix<Complex>> {
         return true;
     }
 }
+

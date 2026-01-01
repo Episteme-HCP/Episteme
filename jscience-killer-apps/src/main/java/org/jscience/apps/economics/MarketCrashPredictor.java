@@ -66,16 +66,16 @@ public class MarketCrashPredictor {
     }
 
     public static void main(String[] args) {
-        System.out.println("╔══════════════════════════════════════════════╗");
-        System.out.println("║     JScience Market Crash Predictor          ║");
-        System.out.println("║     Technical Analysis & Risk Assessment     ║");
-        System.out.println("╚══════════════════════════════════════════════╝");
+        System.out.println("Ã¢â€¢â€Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢â€”");
+        System.out.println("Ã¢â€¢â€˜     JScience Market Crash Predictor          Ã¢â€¢â€˜");
+        System.out.println("Ã¢â€¢â€˜     Technical Analysis & Risk Assessment     Ã¢â€¢â€˜");
+        System.out.println("Ã¢â€¢Å¡Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â");
         System.out.println();
 
         // Generate sample market data (simulating historical prices)
         List<Candle> marketData = generateSampleData();
 
-        System.out.println("📊 Analyzing " + marketData.size() + " trading days of data...");
+        System.out.println("Ã°Å¸â€œÅ  Analyzing " + marketData.size() + " trading days of data...");
         System.out.println();
 
         // Calculate Technical Indicators
@@ -89,7 +89,7 @@ public class MarketCrashPredictor {
         System.out.println();
 
         // SMA Analysis
-        System.out.println("═══ MOVING AVERAGE ANALYSIS ═══");
+        System.out.println("Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â MOVING AVERAGE ANALYSIS Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â");
         Real sma20 = TechnicalIndicators.sma(candles, 20);
         Real sma50 = TechnicalIndicators.sma(candles, 50);
         Real sma200 = TechnicalIndicators.sma(candles, 200);
@@ -103,28 +103,28 @@ public class MarketCrashPredictor {
 
         boolean belowSMA200 = TechnicalIndicators.isBelowSMA(candles, 200, 0.05);
         if (belowSMA200) {
-            System.out.println("  ⚠️  WARNING: Price >5% below 200-day SMA (bearish)");
+            System.out.println("  Ã¢Å¡Â Ã¯Â¸Â  WARNING: Price >5% below 200-day SMA (bearish)");
         }
         System.out.println();
 
         // RSI Analysis
-        System.out.println("═══ RSI ANALYSIS ═══");
+        System.out.println("Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â RSI ANALYSIS Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â");
         Real rsi = TechnicalIndicators.rsi(candles, 14);
         if (rsi != null) {
             double rsiVal = rsi.doubleValue();
             System.out.printf("  14-day RSI: %.1f%n", rsiVal);
             if (rsiVal < 30) {
-                System.out.println("  📉 OVERSOLD condition detected");
+                System.out.println("  Ã°Å¸â€œâ€° OVERSOLD condition detected");
             } else if (rsiVal > 70) {
-                System.out.println("  📈 OVERBOUGHT condition detected");
+                System.out.println("  Ã°Å¸â€œË† OVERBOUGHT condition detected");
             } else {
-                System.out.println("  ✓ RSI in neutral zone");
+                System.out.println("  Ã¢Å“â€œ RSI in neutral zone");
             }
         }
         System.out.println();
 
         // Volatility Analysis
-        System.out.println("═══ VOLATILITY ANALYSIS ═══");
+        System.out.println("Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â VOLATILITY ANALYSIS Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â");
         Real vol20 = TechnicalIndicators.volatility(candles, 20);
         Real vol50 = TechnicalIndicators.volatility(candles, 50);
         if (vol20 != null && vol50 != null) {
@@ -134,13 +134,13 @@ public class MarketCrashPredictor {
             System.out.printf("  50-day Volatility: %.2f%%%n", longVol);
 
             if (shortVol > longVol * 2) {
-                System.out.println("  ⚠️  VOLATILITY SPIKE: Short-term vol >2x long-term");
+                System.out.println("  Ã¢Å¡Â Ã¯Â¸Â  VOLATILITY SPIKE: Short-term vol >2x long-term");
             }
         }
         System.out.println();
 
         // Bollinger Bands
-        System.out.println("═══ BOLLINGER BANDS (20, 2σ) ═══");
+        System.out.println("Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â BOLLINGER BANDS (20, 2ÃÆ’) Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â");
         Real[] bb = TechnicalIndicators.bollingerBands(candles, 20, 2.0);
         if (bb != null) {
             System.out.printf("  Lower Band:  $%.2f%n", bb[0].doubleValue());
@@ -148,18 +148,18 @@ public class MarketCrashPredictor {
             System.out.printf("  Upper Band:  $%.2f%n", bb[2].doubleValue());
 
             if (currentPrice < bb[0].doubleValue()) {
-                System.out.println("  ⚠️  Price BELOW lower Bollinger Band");
+                System.out.println("  Ã¢Å¡Â Ã¯Â¸Â  Price BELOW lower Bollinger Band");
             }
         }
         System.out.println();
 
         // Overall Risk Assessment
         RiskLevel risk = calculateRiskLevel(candles, rsi, vol20, vol50, belowSMA200, bb, currentPrice);
-        System.out.println("╔══════════════════════════════════════════════╗");
-        System.out.println("║           RISK ASSESSMENT                    ║");
-        System.out.println("╠══════════════════════════════════════════════╣");
-        System.out.printf("║  %s%n", risk);
-        System.out.println("╚══════════════════════════════════════════════╝");
+        System.out.println("Ã¢â€¢â€Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢â€”");
+        System.out.println("Ã¢â€¢â€˜           RISK ASSESSMENT                    Ã¢â€¢â€˜");
+        System.out.println("Ã¢â€¢Â Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â£");
+        System.out.printf("Ã¢â€¢â€˜  %s%n", risk);
+        System.out.println("Ã¢â€¢Å¡Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â");
     }
 
     private static RiskLevel calculateRiskLevel(List<Candle> candles, Real rsi,
@@ -262,3 +262,5 @@ public class MarketCrashPredictor {
         return candles;
     }
 }
+
+

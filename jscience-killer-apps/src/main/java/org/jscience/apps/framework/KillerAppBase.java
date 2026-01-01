@@ -36,7 +36,7 @@ import java.io.File;
 import java.util.Locale;
 import java.util.prefs.Preferences;
 
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.AppProvider;
 import org.jscience.ui.ThemeManager;
 import org.jscience.ui.i18n.I18n;
 
@@ -49,7 +49,7 @@ import org.jscience.ui.i18n.I18n;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public abstract class KillerAppBase extends Application implements DemoProvider {
+public abstract class KillerAppBase extends Application implements AppProvider {
 
     protected Stage primaryStage;
     protected BorderPane rootPane;
@@ -105,7 +105,12 @@ public abstract class KillerAppBase extends Application implements DemoProvider 
         onAppReady();
     }
 
-    // ===== DemoProvider Implementation =====
+    // ===== AppProvider Implementation =====
+
+    @Override
+    public boolean isDemo() {
+        return false;
+    }
 
     @Override
     public String getCategory() {
@@ -153,16 +158,16 @@ public abstract class KillerAppBase extends Application implements DemoProvider 
     protected ToolBar createToolBar() {
         toolBar = new ToolBar();
 
-        Button runBtn = new Button("▶ " + i18n.get("toolbar.run"));
+        Button runBtn = new Button("Ã¢â€“Â¶ " + i18n.get("toolbar.run"));
         runBtn.setOnAction(e -> onRun());
 
-        Button pauseBtn = new Button("⏸ " + i18n.get("toolbar.pause"));
+        Button pauseBtn = new Button("Ã¢ÂÂ¸ " + i18n.get("toolbar.pause"));
         pauseBtn.setOnAction(e -> onPause());
 
-        Button stopBtn = new Button("⏹ " + i18n.get("toolbar.stop"));
+        Button stopBtn = new Button("Ã¢ÂÂ¹ " + i18n.get("toolbar.stop"));
         stopBtn.setOnAction(e -> onStop());
 
-        Button resetBtn = new Button("↺ " + i18n.get("toolbar.reset"));
+        Button resetBtn = new Button("Ã¢â€ Âº " + i18n.get("toolbar.reset"));
         resetBtn.setOnAction(e -> onReset());
 
         toolBar.getItems().addAll(runBtn, pauseBtn, stopBtn, new Separator(), resetBtn);
@@ -424,7 +429,7 @@ public abstract class KillerAppBase extends Application implements DemoProvider 
         about.setTitle(i18n.get("menu.help.about"));
         about.setHeaderText(getAppTitle());
         about.setContentText("JScience Killer Apps\nVersion " + i18n.get("app.version") +
-                "\n\n© 2025 Silvere Martin-Michiellot\nPowered by Gemini AI");
+                "\n\nÃ‚Â© 2025 Silvere Martin-Michiellot\nPowered by Gemini AI");
         about.showAndWait();
     }
 
@@ -448,3 +453,5 @@ public abstract class KillerAppBase extends Application implements DemoProvider 
         alert.showAndWait();
     }
 }
+
+

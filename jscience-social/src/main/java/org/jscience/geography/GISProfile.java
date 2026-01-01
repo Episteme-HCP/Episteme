@@ -69,21 +69,26 @@ public class GISProfile {
                 coords.add(Real.of(x));
                 coords.add(Real.of(y));
                 break;
-            case EQUIRECTANGULAR:
-                coords.add(Real.of(lonRad));
-                coords.add(Real.of(latRad));
+            case ORTHOGRAPHIC:
+                // Orthographic projection (simplified)
+                x = Math.cos(latRad) * Math.sin(lonRad);
+                y = Math.cos(latRad) * Math.cos(lonRad);
+                coords.add(Real.of(x));
+                coords.add(Real.of(y));
                 break;
             default:
-                throw new UnsupportedOperationException("Projection not implemented");
+                // Equirectangular (default)
+                coords.add(Real.of(lonRad));
+                coords.add(Real.of(latRad));
         }
-        return DenseVector.of(coords, Real.ZERO);
+        return new DenseVector<>(coords, Real.ZERO);
+
     }
 
     /**
-     * Calculates great-circle distance (Haversine) between two coordinates.
-     * 
      * @return distance as a Length quantity
      */
+
     public static Quantity<Length> calculateDistance(Coordinate c1, Coordinate c2) {
         return c1.distanceTo(c2);
     }
@@ -95,3 +100,4 @@ public class GISProfile {
         return c1.distanceTo(c2).to(Units.METER).getValue().doubleValue();
     }
 }
+

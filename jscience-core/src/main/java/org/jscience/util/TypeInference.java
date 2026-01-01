@@ -174,3 +174,4 @@ public class TypeInference {
         throw new ClassCastException("Cannot cast " + value.getClass() + " to " + clazz);
     }
 }
+

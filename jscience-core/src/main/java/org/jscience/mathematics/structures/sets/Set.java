@@ -42,10 +42,10 @@ package org.jscience.mathematics.structures.sets;
  *
  * <h2>Examples</h2>
  * <ul>
- * <li>ℕ = {0, 1, 2, 3, ...} - Natural numbers</li>
- * <li>ℤ = {..., -2, -1, 0, 1, 2, ...} - Integers</li>
- * <li>ℝ - Real numbers</li>
- * <li>ℂ - Complex numbers</li>
+ * <li>Ã¢â€žâ€¢ = {0, 1, 2, 3, ...} - Natural numbers</li>
+ * <li>Ã¢â€žÂ¤ = {..., -2, -1, 0, 1, 2, ...} - Integers</li>
+ * <li>Ã¢â€žÂ - Real numbers</li>
+ * <li>Ã¢â€žâ€š - Complex numbers</li>
  * </ul>
  *
  * <h2>Usage in JScience</h2>
@@ -76,7 +76,7 @@ public interface Set<E> {
     /**
      * Returns {@code true} if this set contains no elements.
      * <p>
-     * The empty set (∅) is a fundamental concept in set theory.
+     * The empty set (Ã¢Ë†â€¦) is a fundamental concept in set theory.
      * It is the unique set containing no elements.
      * </p>
      * 
@@ -89,8 +89,8 @@ public interface Set<E> {
      * <p>
      * Examples:
      * <ul>
-     * <li>"ℝ (Real Numbers)"</li>
-     * <li>"ℤ/12ℤ (Integers modulo 12)"</li>
+     * <li>"Ã¢â€žÂ (Real Numbers)"</li>
+     * <li>"Ã¢â€žÂ¤/12Ã¢â€žÂ¤ (Integers modulo 12)"</li>
      * <li>"{1, 2, 3, 4, 5}"</li>
      * </ul>
      * </p>
@@ -99,3 +99,4 @@ public interface Set<E> {
      */
     String description();
 }
+

@@ -98,3 +98,5 @@ public class AdvancedOpticsTest {
         assertEquals(-1.0, out.getDirection()[2].doubleValue(), 1e-6);
     }
 }
+
+

@@ -111,3 +111,5 @@ public class SimulatedMicroscope extends SimulatedDevice implements Microscope {
         this.lightingLevel = Math.max(0, Math.min(1.0, level));
     }
 }
+
+

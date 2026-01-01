@@ -89,27 +89,12 @@ public class GenericVector<E> implements Vector<E> {
     }
 
     public Tensor<E> toTensor() {
-        // Convert to 1D Tensor
-        // Tensor<E> t = TensorFactory.zeros((Class<E>)field.zero().getClass(),
-        // dimension());
-        // For now, simpler approach:
-        // We need element class.
-        // Let's rely on array creation if possible?
-        // Or just return null for now if TensorFactory is not ready?
-        // Let's try to assume we can get class from zero()
-        // But zero() returns E.
-        // Hack:
-        // return TensorFactory.of(storage.toArray(), dimension());
-        // Wait, storage.toArray() might not be T[].
-        // Let's leave it as throwing for now or basic implementation?
-        // The error was "create(GenericVector) undefined".
-        // Let's implemented it using an array.
-        // Assuming toArray() exists or similar in storage?
-        // Logic:
-        // E[] data = (E[]) new Object[dimension()];
-        // for(int i=0; i<dimension(); i++) data[i] = get(i);
-        // return TensorFactory.of(data, dimension());
-        throw new UnsupportedOperationException("toTensor not fully implemented yet");
+        @SuppressWarnings("unchecked")
+        E[] data = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), dimension());
+        for (int i = 0; i < dimension(); i++) {
+            data[i] = get(i);
+        }
+        return org.jscience.mathematics.linearalgebra.tensors.TensorFactory.of(data, dimension());
     }
 
     // ================= Vector<E> Implementation =================

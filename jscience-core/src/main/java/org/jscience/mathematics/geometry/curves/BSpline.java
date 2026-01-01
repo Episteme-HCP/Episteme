@@ -41,9 +41,9 @@ import java.util.List;
  * <p>
  * This implementation supports uniform B-splines of degree p (order p+1).
  * The curve is defined by:
- * - n+1 control points: P₀, P₁, ..., Pₙ
+ * - n+1 control points: PÃ¢â€šâ‚¬, PÃ¢â€šÂ, ..., PÃ¢â€šâ„¢
  * - Degree p (typically 2 for quadratic, 3 for cubic)
- * - Knot vector with m+1 values: t₀, t₁, ..., tₘ where m = n + p + 1
+ * - Knot vector with m+1 values: tÃ¢â€šâ‚¬, tÃ¢â€šÂ, ..., tÃ¢â€šËœ where m = n + p + 1
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -245,3 +245,4 @@ public class BSpline {
         return p2.subtract(p1).multiply(Real.of(1.0 / dt));
     }
 }
+

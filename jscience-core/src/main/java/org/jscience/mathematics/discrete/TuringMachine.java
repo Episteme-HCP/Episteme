@@ -28,15 +28,15 @@ import java.util.*;
 /**
  * Turing Machine (TM).
  * <p>
- * A TM is defined by M = (Q, Γ, b, Σ, δ, q₀, F) where:
+ * A TM is defined by M = (Q, ÃŽâ€œ, b, ÃŽÂ£, ÃŽÂ´, qÃ¢â€šâ‚¬, F) where:
  * <ul>
  * <li>Q is a finite set of states</li>
- * <li>Γ is the tape alphabet</li>
- * <li>b ∈ Γ is the blank symbol</li>
- * <li>Σ ⊆ Γ \ {b} is the input alphabet</li>
- * <li>δ: Q × Γ → Q × Γ × {L, R} is the transition function</li>
- * <li>q₀ ∈ Q is the initial state</li>
- * <li>F ⊆ Q is the set of accepting states</li>
+ * <li>ÃŽâ€œ is the tape alphabet</li>
+ * <li>b Ã¢Ë†Ë† ÃŽâ€œ is the blank symbol</li>
+ * <li>ÃŽÂ£ Ã¢Å â€  ÃŽâ€œ \ {b} is the input alphabet</li>
+ * <li>ÃŽÂ´: Q Ãƒâ€” ÃŽâ€œ Ã¢â€ â€™ Q Ãƒâ€” ÃŽâ€œ Ãƒâ€” {L, R} is the transition function</li>
+ * <li>qÃ¢â€šâ‚¬ Ã¢Ë†Ë† Q is the initial state</li>
+ * <li>F Ã¢Å â€  Q is the set of accepting states</li>
  * </ul>
  * </p>
  *
@@ -151,3 +151,4 @@ public class TuringMachine<S, T> {
         return false; // Max steps reached
     }
 }
+

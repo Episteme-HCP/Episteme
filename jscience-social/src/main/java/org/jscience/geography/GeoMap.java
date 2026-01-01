@@ -120,3 +120,5 @@ public class GeoMap {
         return new Coordinate(bottomLat, rightLon);
     }
 }
+
+

@@ -39,12 +39,12 @@ public class FluidMechanics {
 
     /**
      * Bernoulli's equation (incompressible flow):
-     * P + ½ρv² + ρgh = constant
+     * P + Ã‚Â½ÃÂvÃ‚Â² + ÃÂgh = constant
      * 
      * Returns pressure at point 2 given conditions at point 1
      */
     public static Real bernoulliPressure(Real P1, Real rho, Real v1, Real v2, Real h1, Real h2, Real g) {
-        // P1 + ½ρv1² + ρgh1 = P2 + ½ρv2² + ρgh2
+        // P1 + Ã‚Â½ÃÂv1Ã‚Â² + ÃÂgh1 = P2 + Ã‚Â½ÃÂv2Ã‚Â² + ÃÂgh2
         Real term1 = P1;
         Real term2 = Real.of(0.5).multiply(rho).multiply(v1.multiply(v1).subtract(v2.multiply(v2)));
         Real term3 = rho.multiply(g).multiply(h1.subtract(h2));
@@ -52,7 +52,7 @@ public class FluidMechanics {
     }
 
     /**
-     * Reynolds number: Re = ρvL/μ = vL/ν
+     * Reynolds number: Re = ÃÂvL/ÃŽÂ¼ = vL/ÃŽÂ½
      * Determines laminar (Re < 2300) vs turbulent (Re > 4000) flow
      */
     public static Real reynoldsNumber(Real density, Real velocity, Real charLength, Real dynamicViscosity) {
@@ -60,14 +60,14 @@ public class FluidMechanics {
     }
 
     /**
-     * Reynolds number (kinematic viscosity version): Re = vL/ν
+     * Reynolds number (kinematic viscosity version): Re = vL/ÃŽÂ½
      */
     public static Real reynoldsNumberKinematic(Real velocity, Real charLength, Real kinematicViscosity) {
         return velocity.multiply(charLength).divide(kinematicViscosity);
     }
 
     /**
-     * Continuity equation (mass conservation): A₁v₁ = A₂v₂
+     * Continuity equation (mass conservation): AÃ¢â€šÂvÃ¢â€šÂ = AÃ¢â€šâ€švÃ¢â€šâ€š
      * Returns velocity at point 2
      */
     public static Real continuityVelocity(Real area1, Real vel1, Real area2) {
@@ -76,7 +76,7 @@ public class FluidMechanics {
 
     /**
      * Hagen-Poiseuille equation (laminar pipe flow):
-     * Q = πΔPr⁴/(8μL)
+     * Q = Ãâ‚¬ÃŽâ€PrÃ¢ÂÂ´/(8ÃŽÂ¼L)
      * 
      * Returns volumetric flow rate
      */
@@ -88,14 +88,14 @@ public class FluidMechanics {
     }
 
     /**
-     * Stokes' law (drag on sphere): F_drag = 6πμrv
+     * Stokes' law (drag on sphere): F_drag = 6Ãâ‚¬ÃŽÂ¼rv
      */
     public static Real stokesDrag(Real viscosity, Real radius, Real velocity) {
         return Real.of(6 * Math.PI).multiply(viscosity).multiply(radius).multiply(velocity);
     }
 
     /**
-     * Terminal velocity (sphere falling): v_t = (2r²g(ρ_s - ρ_f))/(9μ)
+     * Terminal velocity (sphere falling): v_t = (2rÃ‚Â²g(ÃÂ_s - ÃÂ_f))/(9ÃŽÂ¼)
      */
     public static Real terminalVelocity(Real radius, Real g, Real sphereDensity,
             Real fluidDensity, Real viscosity) {
@@ -107,7 +107,7 @@ public class FluidMechanics {
     }
 
     /**
-     * Drag coefficient: C_d = 2F_d/(ρv²A)
+     * Drag coefficient: C_d = 2F_d/(ÃÂvÃ‚Â²A)
      */
     public static Real dragCoefficient(Real dragForce, Real density, Real velocity, Real area) {
         return Real.TWO.multiply(dragForce).divide(
@@ -115,7 +115,7 @@ public class FluidMechanics {
     }
 
     /**
-     * Lift coefficient: C_l = 2F_l/(ρv²A)
+     * Lift coefficient: C_l = 2F_l/(ÃÂvÃ‚Â²A)
      */
     public static Real liftCoefficient(Real liftForce, Real density, Real velocity, Real area) {
         return Real.TWO.multiply(liftForce).divide(
@@ -130,7 +130,7 @@ public class FluidMechanics {
     }
 
     /**
-     * Froude number: Fr = v/√(gL)
+     * Froude number: Fr = v/Ã¢Ë†Å¡(gL)
      * Ratio of inertial to gravitational forces
      */
     public static Real froudeNumber(Real velocity, Real g, Real charLength) {
@@ -138,10 +138,12 @@ public class FluidMechanics {
     }
 
     /**
-     * Weber number: We = ρv²L/σ
+     * Weber number: We = ÃÂvÃ‚Â²L/ÃÆ’
      * Ratio of inertial to surface tension forces
      */
     public static Real weberNumber(Real density, Real velocity, Real charLength, Real surfaceTension) {
         return density.multiply(velocity).multiply(velocity).multiply(charLength).divide(surfaceTension);
     }
 }
+
+

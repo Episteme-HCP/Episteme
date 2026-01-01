@@ -40,8 +40,8 @@ import org.jscience.physics.PhysicalConstants;
 public class Electromagnetism {
 
     /**
-     * Coulomb's law: F = k * |q1*q2| / r²
-     * where k = 1/(4πε₀)
+     * Coulomb's law: F = k * |q1*q2| / rÃ‚Â²
+     * where k = 1/(4Ãâ‚¬ÃŽÂµÃ¢â€šâ‚¬)
      */
     public static Quantity<Force> coulombForce(
             Quantity<ElectricCharge> q1,
@@ -87,7 +87,7 @@ public class Electromagnetism {
     }
 
     /**
-     * Capacitor energy: E = (1/2)CV²
+     * Capacitor energy: E = (1/2)CVÃ‚Â²
      */
     public static Quantity<Energy> capacitorEnergy(
             Quantity<ElectricCapacitance> capacitance,
@@ -96,3 +96,5 @@ public class Electromagnetism {
         return capacitance.multiply(voltage).multiply(voltage).multiply(half).asType(Energy.class);
     }
 }
+
+

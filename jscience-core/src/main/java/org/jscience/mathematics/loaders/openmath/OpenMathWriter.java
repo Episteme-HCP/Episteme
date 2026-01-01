@@ -155,3 +155,4 @@ public class OpenMathWriter implements Serializer<Object>, org.jscience.io.Outpu
         writer.writeEndElement(); // OMA
     }
 }
+

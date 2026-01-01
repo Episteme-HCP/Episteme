@@ -70,3 +70,4 @@ public class OptimizationTest {
         assertTrue(result.abs().compareTo(Real.of(0.1)) < 0);
     }
 }
+

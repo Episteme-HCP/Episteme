@@ -1,0 +1,36 @@
+# Multi-stage build for JScience Server
+FROM eclipse-temurin:21-jdk-alpine AS builder
+
+# Install Maven
+RUN apk add --no-cache maven
+
+WORKDIR /build
+COPY pom.xml .
+COPY jscience-core jscience-core
+COPY jscience-server jscience-server
+
+# Build server module (skip tests for faster build)
+RUN mvn package -pl jscience-server -am -DskipTests
+
+# Runtime image
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+# Copy the built JAR and dependencies
+COPY --from=builder /build/jscience-server/target/jscience-server-1.0.0-SNAPSHOT.jar /app/server.jar
+COPY --from=builder /build/jscience-server/target/lib /app/lib
+
+# Copy certs if available
+COPY certs /app/certs
+
+# Expose gRPC port
+EXPOSE 50051
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD nc -z localhost 50051 || exit 1
+
+# Run server
+ENTRYPOINT ["java", "-cp", "server.jar:lib/*", "org.jscience.server.JscienceServer"]
+CMD []

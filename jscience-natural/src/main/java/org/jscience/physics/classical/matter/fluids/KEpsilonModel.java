@@ -26,11 +26,11 @@ package org.jscience.physics.classical.matter.fluids;
 /**
  * k-epsilon turbulence model for RANS simulations.
  *
- * Standard k-ε model equations:
- * Dk/Dt = P_k - ε + ∇·((ν + ν_t/σ_k)∇k)
- * Dε/Dt = C_ε1 * ε/k * P_k - C_ε2 * ε²/k + ∇·((ν + ν_t/σ_ε)∇ε)
+ * Standard k-ÃŽÂµ model equations:
+ * Dk/Dt = P_k - ÃŽÂµ + Ã¢Ë†â€¡Ã‚Â·((ÃŽÂ½ + ÃŽÂ½_t/ÃÆ’_k)Ã¢Ë†â€¡k)
+ * DÃŽÂµ/Dt = C_ÃŽÂµ1 * ÃŽÂµ/k * P_k - C_ÃŽÂµ2 * ÃŽÂµÃ‚Â²/k + Ã¢Ë†â€¡Ã‚Â·((ÃŽÂ½ + ÃŽÂ½_t/ÃÆ’_ÃŽÂµ)Ã¢Ë†â€¡ÃŽÂµ)
  *
- * where ν_t = C_μ * k²/ε (turbulent viscosity)
+ * where ÃŽÂ½_t = C_ÃŽÂ¼ * kÃ‚Â²/ÃŽÂµ (turbulent viscosity)
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -38,7 +38,7 @@ package org.jscience.physics.classical.matter.fluids;
  */
 public class KEpsilonModel {
 
-    // Standard k-ε model constants
+    // Standard k-ÃŽÂµ model constants
     public static final double C_MU = 0.09;
     public static final double C_EPS1 = 1.44;
     public static final double C_EPS2 = 1.92;
@@ -94,9 +94,9 @@ public class KEpsilonModel {
     }
 
     /**
-     * Estimates inlet k and ε from turbulence intensity and length scale.
-     * k = 1.5 * (U * I)²
-     * ε = C_μ^(3/4) * k^(3/2) / L
+     * Estimates inlet k and ÃŽÂµ from turbulence intensity and length scale.
+     * k = 1.5 * (U * I)Ã‚Â²
+     * ÃŽÂµ = C_ÃŽÂ¼^(3/4) * k^(3/2) / L
      */
     public static double[] estimateInletConditions(double velocity, double turbulenceIntensity,
             double lengthScale) {
@@ -117,7 +117,7 @@ public class KEpsilonModel {
     }
 
     /**
-     * Performs one time step of k-ε model.
+     * Performs one time step of k-ÃŽÂµ model.
      * 
      * @param dt Time step
      */
@@ -128,7 +128,7 @@ public class KEpsilonModel {
         // Compute production term
         double[][] Pk = computeProduction();
 
-        // Update k and ε (explicit Euler, simplified)
+        // Update k and ÃŽÂµ (explicit Euler, simplified)
         for (int x = 1; x < width - 1; x++) {
             for (int y = 1; y < height - 1; y++) {
                 double localK = k[x][y];
@@ -140,10 +140,10 @@ public class KEpsilonModel {
                 if (localEps < 1e-12)
                     localEps = 1e-12;
 
-                // k equation: dk/dt = P_k - ε
+                // k equation: dk/dt = P_k - ÃŽÂµ
                 double dkdt = Pk[x][y] - localEps;
 
-                // ε equation: dε/dt = C_ε1 * ε/k * P_k - C_ε2 * ε²/k
+                // ÃŽÂµ equation: dÃŽÂµ/dt = C_ÃŽÂµ1 * ÃŽÂµ/k * P_k - C_ÃŽÂµ2 * ÃŽÂµÃ‚Â²/k
                 double depsdt = C_EPS1 * localEps / localK * Pk[x][y]
                         - C_EPS2 * localEps * localEps / localK;
 
@@ -158,7 +158,7 @@ public class KEpsilonModel {
     }
 
     private void computeTurbulentViscosity() {
-        // ν_t = C_μ * k²/ε
+        // ÃŽÂ½_t = C_ÃŽÂ¼ * kÃ‚Â²/ÃŽÂµ
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 double localK = Math.max(k[x][y], 1e-10);
@@ -169,7 +169,7 @@ public class KEpsilonModel {
     }
 
     private double[][] computeProduction() {
-        // P_k = ν_t * S² where S² = 2*S_ij*S_ij
+        // P_k = ÃŽÂ½_t * SÃ‚Â² where SÃ‚Â² = 2*S_ij*S_ij
         double[][] Pk = new double[width][height];
 
         for (int x = 0; x < width; x++) {
@@ -179,7 +179,7 @@ public class KEpsilonModel {
                 double s22 = dvdy[x][y];
                 double s12 = 0.5 * (dudy[x][y] + dvdx[x][y]);
 
-                // S² = 2*(s11² + s22² + 2*s12²)
+                // SÃ‚Â² = 2*(s11Ã‚Â² + s22Ã‚Â² + 2*s12Ã‚Â²)
                 double s2 = 2.0 * (s11 * s11 + s22 * s22 + 2 * s12 * s12);
 
                 Pk[x][y] = nuT[x][y] * s2;
@@ -215,3 +215,5 @@ public class KEpsilonModel {
         return nuT;
     }
 }
+
+

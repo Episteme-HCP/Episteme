@@ -62,3 +62,4 @@ public interface FiniteSet<E> extends Set<E>, Iterable<E> {
     @Override
     Iterator<E> iterator();
 }
+

@@ -22,13 +22,6 @@
  */
 
 /**
- * Linguistics package - languages, scripts, and linguistic analysis.
- * <p>
- * Key classes:
- * <ul>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * - languages, scripts, and linguistic analysis.
  */
 package org.jscience.linguistics;

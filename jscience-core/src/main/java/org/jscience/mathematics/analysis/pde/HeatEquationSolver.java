@@ -26,7 +26,7 @@ package org.jscience.mathematics.analysis.pde;
 /**
  * Finite Difference solver for 1D heat equation.
  * <p>
- * Solves: ∂u/∂t = α ∂²u/∂x²
+ * Solves: Ã¢Ë†â€šu/Ã¢Ë†â€št = ÃŽÂ± Ã¢Ë†â€šÃ‚Â²u/Ã¢Ë†â€šxÃ‚Â²
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -82,7 +82,7 @@ public class HeatEquationSolver {
 
     /**
      * Explicit Euler time step (FTCS scheme).
-     * Stable if dt <= dx²/(2α)
+     * Stable if dt <= dxÃ‚Â²/(2ÃŽÂ±)
      */
     public void stepExplicit(double dt) {
         double r = alpha * dt / (dx * dx);
@@ -224,3 +224,5 @@ public class HeatEquationSolver {
         return i * dx;
     }
 }
+
+

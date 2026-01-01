@@ -21,14 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Nuclear physics and radioactivity.
- * <p>
- * Models radioactive decay, isotopes, and nuclear reactions.
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.physics.nuclear;
+
+

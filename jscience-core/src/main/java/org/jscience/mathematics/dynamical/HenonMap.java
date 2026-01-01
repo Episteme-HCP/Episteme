@@ -24,7 +24,7 @@
 package org.jscience.mathematics.dynamical;
 
 /**
- * Represents the Hénon map:
+ * Represents the HÃƒÂ©non map:
  * x_{n+1} = 1 - a * x_n^2 + y_n
  * y_{n+1} = b * x_n
  *
@@ -38,14 +38,14 @@ public class HenonMap implements DiscreteMap {
     private final double b;
 
     /**
-     * Creates a Hénon map with standard parameters a=1.4, b=0.3.
+     * Creates a HÃƒÂ©non map with standard parameters a=1.4, b=0.3.
      */
     public HenonMap() {
         this(1.4, 0.3);
     }
 
     /**
-     * Creates a Hénon map with specified parameters.
+     * Creates a HÃƒÂ©non map with specified parameters.
      *
      * @param a parameter a
      * @param b parameter b
@@ -58,7 +58,7 @@ public class HenonMap implements DiscreteMap {
     @Override
     public double[] map(double[] state) {
         if (state.length != 2) {
-            throw new IllegalArgumentException("Hénon map is 2-dimensional");
+            throw new IllegalArgumentException("HÃƒÂ©non map is 2-dimensional");
         }
         double x = state[0];
         double y = state[1];
@@ -80,3 +80,5 @@ public class HenonMap implements DiscreteMap {
         return 1.26;
     }
 }
+
+

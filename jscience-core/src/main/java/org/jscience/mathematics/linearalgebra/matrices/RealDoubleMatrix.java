@@ -182,3 +182,5 @@ public class RealDoubleMatrix extends GenericMatrix<Real> {
         return super.add(other);
     }
 }
+
+

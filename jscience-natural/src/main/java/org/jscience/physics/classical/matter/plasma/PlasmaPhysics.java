@@ -54,7 +54,7 @@ public class PlasmaPhysics {
 
     /**
      * Debye length: characteristic screening distance.
-     * λ_D = √(ε₀ k_B T / n e²)
+     * ÃŽÂ»_D = Ã¢Ë†Å¡(ÃŽÂµÃ¢â€šâ‚¬ k_B T / n eÃ‚Â²)
      */
     public static Real debyeLength(Real temperature, Real density) {
         return EPSILON_0.multiply(K_B).multiply(temperature)
@@ -63,7 +63,7 @@ public class PlasmaPhysics {
 
     /**
      * Plasma frequency: natural oscillation frequency.
-     * ω_p = √(n e² / ε₀ m_e)
+     * Ãâ€°_p = Ã¢Ë†Å¡(n eÃ‚Â² / ÃŽÂµÃ¢â€šâ‚¬ m_e)
      */
     public static Real plasmaFrequency(Real density) {
         return density.multiply(E.pow(2)).divide(EPSILON_0.multiply(M_E)).sqrt();
@@ -78,7 +78,7 @@ public class PlasmaPhysics {
 
     /**
      * Electron cyclotron frequency (gyrofrequency).
-     * ω_ce = eB / m_e
+     * Ãâ€°_ce = eB / m_e
      */
     public static Real electronCyclotronFrequency(Real magneticField) {
         return E.multiply(magneticField).divide(M_E);
@@ -86,7 +86,7 @@ public class PlasmaPhysics {
 
     /**
      * Ion cyclotron frequency.
-     * ω_ci = ZeB / m_i
+     * Ãâ€°_ci = ZeB / m_i
      */
     public static Real ionCyclotronFrequency(Real magneticField, Real ionMass, int chargeNumber) {
         return Real.of(chargeNumber).multiply(E).multiply(magneticField).divide(ionMass);
@@ -102,7 +102,7 @@ public class PlasmaPhysics {
 
     /**
      * Thermal velocity.
-     * v_th = √(k_B T / m)
+     * v_th = Ã¢Ë†Å¡(k_B T / m)
      */
     public static Real thermalVelocity(Real temperature, Real mass) {
         return K_B.multiply(temperature).divide(mass).sqrt();
@@ -110,7 +110,7 @@ public class PlasmaPhysics {
 
     /**
      * Plasma parameter: number of particles in Debye sphere.
-     * Λ = n λ_D³
+     * ÃŽâ€º = n ÃŽÂ»_DÃ‚Â³
      */
     public static Real plasmaParameter(Real density, Real debyeLength) {
         return density.multiply(debyeLength.pow(3));
@@ -118,7 +118,7 @@ public class PlasmaPhysics {
 
     /**
      * Coulomb logarithm (approximate).
-     * ln(Λ) ≈ ln(12π n λ_D³)
+     * ln(ÃŽâ€º) Ã¢â€°Ë† ln(12Ãâ‚¬ n ÃŽÂ»_DÃ‚Â³)
      */
     public static Real coulombLogarithm(Real density, Real temperature) {
         Real lambdaD = debyeLength(temperature, density);
@@ -126,8 +126,8 @@ public class PlasmaPhysics {
     }
 
     /**
-     * Alfvén velocity.
-     * v_A = B / √(μ₀ ρ)
+     * AlfvÃƒÂ©n velocity.
+     * v_A = B / Ã¢Ë†Å¡(ÃŽÂ¼Ã¢â€šâ‚¬ ÃÂ)
      */
     public static Real alfvenVelocity(Real magneticField, Real massDensity) {
         return magneticField.divide(MU_0.multiply(massDensity).sqrt());
@@ -135,7 +135,7 @@ public class PlasmaPhysics {
 
     /**
      * Sound speed in plasma.
-     * c_s = √(γ k_B T / m_i)
+     * c_s = Ã¢Ë†Å¡(ÃŽÂ³ k_B T / m_i)
      */
     public static Real soundSpeed(Real temperature, Real ionMass, Real gamma) {
         return gamma.multiply(K_B).multiply(temperature).divide(ionMass).sqrt();
@@ -143,7 +143,7 @@ public class PlasmaPhysics {
 
     /**
      * Beta: ratio of plasma pressure to magnetic pressure.
-     * β = nkT / (B²/2μ₀)
+     * ÃŽÂ² = nkT / (BÃ‚Â²/2ÃŽÂ¼Ã¢â€šâ‚¬)
      */
     public static Real beta(Real density, Real temperature, Real magneticField) {
         Real plasmaPressure = density.multiply(K_B).multiply(temperature);
@@ -172,3 +172,5 @@ public class PlasmaPhysics {
         return num.divide(den);
     }
 }
+
+

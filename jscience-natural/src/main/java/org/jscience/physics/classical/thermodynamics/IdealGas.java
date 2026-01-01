@@ -45,7 +45,7 @@ import org.jscience.measure.quantity.Energy;
  */
 public class IdealGas implements ThermodynamicState {
 
-    /** Gas constant R = 8.314462618 J/(mol·K) */
+    /** Gas constant R = 8.314462618 J/(molÃ‚Â·K) */
     private static final Real R = Real.of(8.314462618);
     /** Degrees of freedom for monatomic gas */
     private static final Real DEGREES_OF_FREEDOM = Real.of(3);
@@ -187,3 +187,5 @@ public class IdealGas implements ThermodynamicState {
         return amountOfSubstance;
     }
 }
+
+

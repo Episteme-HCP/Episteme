@@ -24,7 +24,7 @@
 package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.AppProvider;
 import org.jscience.ui.history.HistoryTimelineViewer;
 
 /**
@@ -33,11 +33,16 @@ import org.jscience.ui.history.HistoryTimelineViewer;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class HistoryTimelineDemo implements DemoProvider {
+public class HistoryTimelineDemo implements AppProvider {
+
+    @Override
+    public boolean isDemo() {
+        return true;
+    }
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.history");
+        return "History";
     }
 
     @Override
@@ -56,3 +61,5 @@ public class HistoryTimelineDemo implements DemoProvider {
     }
 
 }
+
+

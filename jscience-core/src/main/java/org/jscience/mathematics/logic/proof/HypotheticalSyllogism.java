@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Hypothetical Syllogism inference rule.
  * <p>
- * From A → B and B → C, infer A → C.
+ * From A Ã¢â€ â€™ B and B Ã¢â€ â€™ C, infer A Ã¢â€ â€™ C.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -44,3 +44,4 @@ public class HypotheticalSyllogism implements InferenceRule {
         return true;
     }
 }
+

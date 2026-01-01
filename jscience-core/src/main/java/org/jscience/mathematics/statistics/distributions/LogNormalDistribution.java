@@ -77,6 +77,7 @@ public class LogNormalDistribution extends ContinuousDistribution {
 
     @Override
     public String toString() {
-        return String.format("LogNormal(μ=%.4f, σ=%.4f)", mu.doubleValue(), sigma.doubleValue());
+        return String.format("LogNormal(ÃŽÂ¼=%.4f, ÃÆ’=%.4f)", mu.doubleValue(), sigma.doubleValue());
     }
 }
+

@@ -53,3 +53,5 @@ public interface Preorder<E> extends Category<E, Boolean> {
         return true;
     }
 }
+
+

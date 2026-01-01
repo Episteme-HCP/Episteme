@@ -28,10 +28,10 @@ import org.jscience.mathematics.structures.sets.InfiniteSet;
 import org.jscience.mathematics.numbers.integers.Integer;
 
 /**
- * The structure of integers (ℤ = {..., -2, -1, 0, 1, 2, ...}).
+ * The structure of integers (Ã¢â€žÂ¤ = {..., -2, -1, 0, 1, 2, ...}).
  * <p>
  * This class represents the <strong>structure</strong> of integers,
- * not individual elements. It implements {@link Ring} because ℤ forms
+ * not individual elements. It implements {@link Ring} because Ã¢â€žÂ¤ forms
  * a commutative ring with unity under addition and multiplication.
  * </p>
  * <p>
@@ -114,7 +114,7 @@ public final class Integers implements Ring<Integer>, InfiniteSet<Integer> {
     public Integer inverse(Integer element) {
         // Integers don't have multiplicative inverses in general
         if (element.isOne() || element.equals(Integer.MINUS_ONE)) {
-            return element; // Only ±1 are self-inverse
+            return element; // Only Ã‚Â±1 are self-inverse
         }
         throw new UnsupportedOperationException(
                 "Multiplicative inverse not defined for integers (use Rationals instead)");
@@ -124,7 +124,7 @@ public final class Integers implements Ring<Integer>, InfiniteSet<Integer> {
 
     @Override
     public boolean isCountable() {
-        return true; // ℤ is countably infinite
+        return true; // Ã¢â€žÂ¤ is countably infinite
     }
 
     @Override
@@ -139,11 +139,12 @@ public final class Integers implements Ring<Integer>, InfiniteSet<Integer> {
 
     @Override
     public String description() {
-        return "ℤ (Integers)";
+        return "Ã¢â€žÂ¤ (Integers)";
     }
 
     @Override
     public String toString() {
-        return "Integers(ℤ)";
+        return "Integers(Ã¢â€žÂ¤)";
     }
 }
+

@@ -65,3 +65,5 @@ public class StatisticalTestsTest {
         assertEquals(24.0, f.doubleValue(), DELTA);
     }
 }
+
+

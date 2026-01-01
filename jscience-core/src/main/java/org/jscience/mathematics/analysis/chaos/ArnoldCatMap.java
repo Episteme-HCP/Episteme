@@ -59,12 +59,12 @@ public class ArnoldCatMap implements DiscreteMap<Point2D> {
 
     @Override
     public String getDomain() {
-        return "[0, 1]² (Torus)";
+        return "[0, 1]Ã‚Â² (Torus)";
     }
 
     @Override
     public String getCodomain() {
-        return "[0, 1]² (Torus)";
+        return "[0, 1]Ã‚Â² (Torus)";
     }
 
     @Override
@@ -72,3 +72,4 @@ public class ArnoldCatMap implements DiscreteMap<Point2D> {
         return "ArnoldCatMap";
     }
 }
+

@@ -154,7 +154,7 @@ public class Polyhedron implements org.jscience.mathematics.discrete.Graph<Point
     }
 
     private Real triangleArea(Point3D a, Point3D b, Point3D c) {
-        // Area = 0.5 * |AB × AC|
+        // Area = 0.5 * |AB Ãƒâ€” AC|
         Real abx = b.getX().subtract(a.getX());
         Real aby = b.getY().subtract(a.getY());
         Real abz = b.getZ().subtract(a.getZ());
@@ -564,3 +564,5 @@ public class Polyhedron implements org.jscience.mathematics.discrete.Graph<Point
                 vertexCount(), faceCount(), edgeCount());
     }
 }
+
+

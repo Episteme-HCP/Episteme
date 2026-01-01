@@ -169,3 +169,4 @@ public class ProductExpression<T extends Ring<T>> implements Expression<T> {
         return "(" + left + " * " + right + ")";
     }
 }
+

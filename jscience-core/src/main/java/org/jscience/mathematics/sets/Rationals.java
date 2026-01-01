@@ -28,10 +28,10 @@ import org.jscience.mathematics.structures.sets.InfiniteSet;
 import org.jscience.mathematics.numbers.rationals.Rational;
 
 /**
- * The structure of rational numbers (ℚ).
+ * The structure of rational numbers (Ã¢â€žÅ¡).
  * <p>
  * This class represents the <strong>structure</strong> of rational numbers,
- * implementing {@link Field} because ℚ forms a field under addition and
+ * implementing {@link Field} because Ã¢â€žÅ¡ forms a field under addition and
  * multiplication.
  * </p>
  * <p>
@@ -116,7 +116,7 @@ public final class Rationals implements Field<Rational>, InfiniteSet<Rational> {
 
     @Override
     public boolean isCountable() {
-        return true; // ℚ is countable
+        return true; // Ã¢â€žÅ¡ is countable
     }
 
     @Override
@@ -131,11 +131,13 @@ public final class Rationals implements Field<Rational>, InfiniteSet<Rational> {
 
     @Override
     public String description() {
-        return "ℚ (Rational Numbers)";
+        return "Ã¢â€žÅ¡ (Rational Numbers)";
     }
 
     @Override
     public String toString() {
-        return "Rationals(ℚ)";
+        return "Rationals(Ã¢â€žÅ¡)";
     }
 }
+
+

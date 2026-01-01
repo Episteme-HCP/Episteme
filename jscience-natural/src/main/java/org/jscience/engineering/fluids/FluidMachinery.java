@@ -35,7 +35,7 @@ import org.jscience.physics.PhysicalConstants;
  */
 public class FluidMachinery {
 
-    /** Water density (kg/m³) */
+    /** Water density (kg/mÃ‚Â³) */
     public static final Real RHO_WATER = Real.of(1000);
 
     /** Use PhysicalConstants for standard gravity */
@@ -43,7 +43,7 @@ public class FluidMachinery {
 
     /**
      * Pump hydraulic power.
-     * P_h = ρ * g * Q * H
+     * P_h = ÃÂ * g * Q * H
      */
     public static Real hydraulicPower(Real density, Real flowRate, Real head) {
         return density.multiply(G).multiply(flowRate).multiply(head);
@@ -51,7 +51,7 @@ public class FluidMachinery {
 
     /**
      * Pump efficiency.
-     * η = P_hydraulic / P_shaft
+     * ÃŽÂ· = P_hydraulic / P_shaft
      */
     public static Real pumpEfficiency(Real hydraulicPower, Real shaftPower) {
         return hydraulicPower.divide(shaftPower);
@@ -147,3 +147,5 @@ public class FluidMachinery {
         return Q1.multiply(D2.divide(D1).pow(3)).multiply(N2.divide(N1));
     }
 }
+
+

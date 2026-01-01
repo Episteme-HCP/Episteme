@@ -38,12 +38,12 @@ public class IRSpectrum {
         OH_ALCOHOL("O-H (alcohol)", 3200, 3550, "broad"),
         OH_CARBOXYLIC("O-H (carboxylic acid)", 2500, 3300, "very broad"),
         NH_AMINE("N-H (amine)", 3300, 3500, "medium"),
-        CH_ALKANE("C-H (sp³)", 2850, 3000, "strong"),
-        CH_ALKENE("C-H (sp²)", 3000, 3100, "medium"),
+        CH_ALKANE("C-H (spÃ‚Â³)", 2850, 3000, "strong"),
+        CH_ALKENE("C-H (spÃ‚Â²)", 3000, 3100, "medium"),
         CH_ALKYNE("C-H (sp)", 3300, 3300, "strong, sharp"),
         CH_ALDEHYDE("C-H (aldehyde)", 2700, 2850, "two peaks"),
-        CC_TRIPLE("C≡C", 2100, 2260, "weak"),
-        CN_TRIPLE("C≡N (nitrile)", 2210, 2260, "medium"),
+        CC_TRIPLE("CÃ¢â€°Â¡C", 2100, 2260, "weak"),
+        CN_TRIPLE("CÃ¢â€°Â¡N (nitrile)", 2210, 2260, "medium"),
         CC_DOUBLE("C=C", 1620, 1680, "variable"),
         CO_DOUBLE_KETONE("C=O (ketone)", 1705, 1725, "strong"),
         CO_DOUBLE_ALDEHYDE("C=O (aldehyde)", 1720, 1740, "strong"),
@@ -98,7 +98,7 @@ public class IRSpectrum {
         return matches;
     }
 
-    /** Wavelength (μm) to wavenumber (cm⁻¹): ν̃ = 10000 / λ */
+    /** Wavelength (ÃŽÂ¼m) to wavenumber (cmÃ¢ÂÂ»Ã‚Â¹): ÃŽÂ½ÃŒÆ’ = 10000 / ÃŽÂ» */
     public static Real wavelengthToWavenumber(Real wavelengthMicrons) {
         return Real.of(10000).divide(wavelengthMicrons);
     }
@@ -108,10 +108,12 @@ public class IRSpectrum {
         return Real.of(10000).divide(wavenumber);
     }
 
-    /** Stretching frequency: ν̃ = (1/2πc) · √(k/μ) */
+    /** Stretching frequency: ÃŽÂ½ÃŒÆ’ = (1/2Ãâ‚¬c) Ã‚Â· Ã¢Ë†Å¡(k/ÃŽÂ¼) */
     public static Real stretchingFrequency(Real k, Real mu) {
         Real c = Real.of(2.998e10);
         return Real.ONE.divide(Real.TWO_PI.multiply(c))
                 .multiply(k.divide(mu).sqrt());
     }
 }
+
+

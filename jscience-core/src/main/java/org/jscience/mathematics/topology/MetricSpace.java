@@ -48,3 +48,5 @@ public interface MetricSpace<T> extends TopologicalSpace<T> {
     Real distance(T a, T b);
 }
 
+
+

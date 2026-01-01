@@ -71,3 +71,5 @@ public class Religion implements Identifiable<String> {
     public static final Religion BUDDHISM = new Religion("Buddhism");
     public static final Religion JUDAISM = new Religion("Judaism");
 }
+
+

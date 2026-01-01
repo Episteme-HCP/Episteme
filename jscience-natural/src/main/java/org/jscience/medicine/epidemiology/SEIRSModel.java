@@ -38,12 +38,12 @@ import org.jscience.measure.quantity.Time;
  * </p>
  *
  * <pre>
- * S → E → I → R → S
+ * S Ã¢â€ â€™ E Ã¢â€ â€™ I Ã¢â€ â€™ R Ã¢â€ â€™ S
  *
- * dS/dt = -βSI/N + ξR
- * dE/dt = βSI/N - σE
- * dI/dt = σE - γI
- * dR/dt = γI - ξR
+ * dS/dt = -ÃŽÂ²SI/N + ÃŽÂ¾R
+ * dE/dt = ÃŽÂ²SI/N - ÃÆ’E
+ * dI/dt = ÃÆ’E - ÃŽÂ³I
+ * dR/dt = ÃŽÂ³I - ÃŽÂ¾R
  * </pre>
  *
  * @author Silvere Martin-Michiellot
@@ -70,10 +70,10 @@ public class SEIRSModel {
      * @param population       total population
      * @param initialExposed   initial exposed individuals
      * @param initialInfected  initial infectious individuals
-     * @param transmissionRate β
-     * @param incubationRate   σ (1/latent period)
-     * @param recoveryRate     γ (1/infectious period)
-     * @param immunityLossRate ξ (1/immunity duration)
+     * @param transmissionRate ÃŽÂ²
+     * @param incubationRate   ÃÆ’ (1/latent period)
+     * @param recoveryRate     ÃŽÂ³ (1/infectious period)
+     * @param immunityLossRate ÃŽÂ¾ (1/immunity duration)
      */
     public SEIRSModel(int population, int initialExposed, int initialInfected,
             Quantity<Frequency> transmissionRate,
@@ -93,7 +93,7 @@ public class SEIRSModel {
         this.time = Quantities.create(0, Units.SECOND);
     }
 
-    /** Basic reproduction number R₀ = β/γ */
+    /** Basic reproduction number RÃ¢â€šâ‚¬ = ÃŽÂ²/ÃŽÂ³ */
     public Real getR0() {
         return beta.divide(gamma).getValue();
     }
@@ -206,10 +206,10 @@ public class SEIRSModel {
     /** Seasonal flu: ~6 month immunity */
     public static SEIRSModel seasonalFlu(int population, int initialCases) {
         return new SEIRSModel(population, 0, initialCases,
-                Quantities.create(0.3 / 86400.0, Units.HERTZ), // β
-                Quantities.create(0.5 / 86400.0, Units.HERTZ), // σ (2d latent)
-                Quantities.create(0.2 / 86400.0, Units.HERTZ), // γ (5d infectious)
-                Quantities.create(1.0 / (180 * 86400.0), Units.HERTZ)); // ξ (180d immunity)
+                Quantities.create(0.3 / 86400.0, Units.HERTZ), // ÃŽÂ²
+                Quantities.create(0.5 / 86400.0, Units.HERTZ), // ÃÆ’ (2d latent)
+                Quantities.create(0.2 / 86400.0, Units.HERTZ), // ÃŽÂ³ (5d infectious)
+                Quantities.create(1.0 / (180 * 86400.0), Units.HERTZ)); // ÃŽÂ¾ (180d immunity)
     }
 
     /** Common cold: ~2 week immunity */
@@ -230,3 +230,5 @@ public class SEIRSModel {
                 Quantities.create(1.0 / (365 * 86400.0), Units.HERTZ)); // 1 year immunity
     }
 }
+
+

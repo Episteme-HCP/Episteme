@@ -134,7 +134,7 @@ public final class Boolean implements Semiring<Boolean>, Lattice<Boolean>, Finit
 
    @Override
    public String description() {
-      return "𝔹 = {0, 1}";
+      return "Ã°Ââ€Â¹ = {0, 1}";
    }
 
    // Magma interface
@@ -168,3 +168,4 @@ public final class Boolean implements Semiring<Boolean>, Lattice<Boolean>, Finit
       return java.lang.Boolean.toString(value);
    }
 }
+

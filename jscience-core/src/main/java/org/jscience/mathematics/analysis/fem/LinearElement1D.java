@@ -135,3 +135,4 @@ public class LinearElement1D implements Element {
         return quadraturePoints;
     }
 }
+

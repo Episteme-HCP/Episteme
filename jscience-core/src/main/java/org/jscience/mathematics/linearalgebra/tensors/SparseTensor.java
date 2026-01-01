@@ -141,46 +141,53 @@ public class SparseTensor<T> implements Tensor<T> {
                     });
                 });
             } else {
-                for (Map.Entry<Integer, T> entry : o.data.entrySet()) {
-                    resultData.merge(entry.getKey(), entry.getValue(), (v1, v2) -> {
-                        @SuppressWarnings("unchecked")
-                        Ring<T> r = (Ring<T>) v1;
-                        return r.add(v1, v2);
-                    });
-                }
+                o.data.forEach((k, v) -> resultData.merge(k, v, (v1, v2) -> {
+                    @SuppressWarnings("unchecked")
+                    Ring<T> r = (Ring<T>) v1;
+                    return r.add(v1, v2);
+                }));
             }
 
             // Remove zeros
             resultData.values().removeIf(v -> v.equals(zero));
             return new SparseTensor<>(resultData, this.shape, this.zero);
-        } else {
-            // Fallback for dense
-            throw new UnsupportedOperationException("Sparse + Dense not fully implemented yet");
+        } else
+
+        {
+            // Fallback for dense (Sparse + Dense = Dense)
+            Tensor<T> result = other.copy();
+            for (Map.Entry<Integer, T> entry : this.data.entrySet()) {
+                int[] indices = indicesFromFlat(entry.getKey());
+                T current = result.get(indices);
+                @SuppressWarnings("unchecked")
+                T sum = ((Ring<T>) current).add(current, entry.getValue());
+                result.set(sum, indices);
+            }
+            return result;
         }
     }
 
     @Override
+
     public Tensor<T> subtract(Tensor<T> other) {
         if (other instanceof SparseTensor) {
-            SparseTensor<T> result = new SparseTensor<>(this.shape, this.zero);
-            result.data.putAll(this.data);
-
             SparseTensor<T> o = (SparseTensor<T>) other;
-            for (Map.Entry<Integer, T> entry : o.data.entrySet()) {
-                int idx = entry.getKey();
-                T val = entry.getValue();
-                T current = result.data.getOrDefault(idx, zero);
+            ConcurrentHashMap<Integer, T> resultData = new ConcurrentHashMap<>(this.data);
+
+            o.data.forEach((k, v) -> resultData.merge(k, v, (v1, v2) -> {
                 @SuppressWarnings("unchecked")
-                T newVal = ((Ring<T>) current).subtract(current, val);
-                if (newVal.equals(zero)) {
-                    result.data.remove(idx);
-                } else {
-                    result.data.put(idx, newVal);
-                }
-            }
-            return result;
+                Ring<T> r = (Ring<T>) v1; // Assuming T implements Ring logic or similar structure
+                return r.subtract(v1, v2);
+            }));
+
+            return new SparseTensor<>(resultData, this.shape, this.zero);
         }
-        throw new UnsupportedOperationException("Sparse - Dense not fully implemented yet");
+
+        @SuppressWarnings("unchecked")
+        Ring<T> ringStructure = (Ring<T>) this.zero;
+        T minusOne = ringStructure.negate(ringStructure.one());
+        Tensor<T> negOther = other.scale(minusOne);
+        return this.add(negOther);
     }
 
     @Override

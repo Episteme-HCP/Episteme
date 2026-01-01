@@ -154,9 +154,11 @@ public class Geodesy {
         public static Real pressureRatio(Real altitudeM) {
                 Real M = Real.of(0.0289644); // Molar mass of air (kg/mol)
                 Real g = PhysicalConstants.g_n;
-                Real R = Real.of(8.31447); // Gas constant (J/(mol·K))
+                Real R = Real.of(8.31447); // Gas constant (J/(molÃ‚Â·K))
                 Real T = Real.of(288.15); // Standard temperature (K)
 
                 return M.negate().multiply(g).multiply(altitudeM).divide(R.multiply(T)).exp();
         }
 }
+
+

@@ -57,7 +57,7 @@ public class FormulaNotationViewer extends Application {
         formulaList.getChildren().addAll(
                 createFormulaBox("Euler's Identity", createEulerIdentity()),
                 createFormulaBox("Quadratic Formula", createQuadraticFormula()),
-                createFormulaBox("Schrödinger Equation", createSchrodingerEquation()),
+                createFormulaBox("SchrÃƒÂ¶dinger Equation", createSchrodingerEquation()),
                 createFormulaBox("Newton's Law of Gravitation", createGravitationLaw()));
 
         root.getChildren().addAll(title, new Separator(), new ScrollPane(formulaList) {
@@ -92,7 +92,7 @@ public class FormulaNotationViewer extends Application {
         hbox.setAlignment(javafx.geometry.Pos.CENTER);
         Text base = new Text("e");
         base.setFont(Font.font("Serif", 36));
-        Text expo = new Text("iπ");
+        Text expo = new Text("iÃâ‚¬");
         expo.setFont(Font.font("Serif", 20));
         VBox vExponent = new VBox(expo);
         vExponent.setPadding(new Insets(-20, 0, 0, 0));
@@ -113,12 +113,12 @@ public class FormulaNotationViewer extends Application {
 
         HBox numerator = new HBox(2);
         numerator.setAlignment(javafx.geometry.Pos.CENTER);
-        Text b = new Text("-b ± ");
+        Text b = new Text("-b Ã‚Â± ");
         b.setFont(Font.font("Serif", 24));
 
         HBox sqrt = new HBox(0);
         sqrt.setAlignment(javafx.geometry.Pos.BOTTOM_LEFT);
-        Text rootSym = new Text("√");
+        Text rootSym = new Text("Ã¢Ë†Å¡");
         rootSym.setFont(Font.font("Serif", 30));
         VBox underRoot = new VBox(2);
         underRoot.setStyle("-fx-border-color: black; -fx-border-width: 1 0 0 0;");
@@ -153,21 +153,21 @@ public class FormulaNotationViewer extends Application {
     private HBox createSchrodingerEquation() {
         HBox hbox = new HBox(5);
         hbox.setAlignment(javafx.geometry.Pos.CENTER);
-        Text prefix = new Text("iħ");
+        Text prefix = new Text("iÃ„Â§");
         prefix.setFont(Font.font("Serif", 36));
 
         VBox partial = new VBox(0);
         partial.setAlignment(javafx.geometry.Pos.CENTER);
-        Text pTop = new Text("∂ψ");
+        Text pTop = new Text("Ã¢Ë†â€šÃË†");
         pTop.setFont(Font.font("Serif", 18));
         Region l = new Region();
         l.setPrefHeight(1);
         l.setStyle("-fx-background-color: black;");
-        Text pBot = new Text("∂t");
+        Text pBot = new Text("Ã¢Ë†â€št");
         pBot.setFont(Font.font("Serif", 18));
         partial.getChildren().addAll(pTop, l, pBot);
 
-        Text eq = new Text(" = Ĥψ");
+        Text eq = new Text(" = Ã„Â¤ÃË†");
         eq.setFont(Font.font("Serif", 36));
         hbox.getChildren().addAll(prefix, partial, eq);
         return hbox;
@@ -225,3 +225,5 @@ public class FormulaNotationViewer extends Application {
         new FormulaNotationViewer().start(stage);
     }
 }
+
+

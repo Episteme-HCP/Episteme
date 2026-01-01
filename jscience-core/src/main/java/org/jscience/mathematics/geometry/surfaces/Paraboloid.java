@@ -34,13 +34,13 @@ import java.util.Arrays;
 /**
  * Represents a paraboloidal surface.
  * <p>
- * A paraboloid is a quadric surface with equation z = (x²/a²) + (y²/b²).
- * Parametric form: S(u, v) = (u, v, u²/a² + v²/b²)
+ * A paraboloid is a quadric surface with equation z = (xÃ‚Â²/aÃ‚Â²) + (yÃ‚Â²/bÃ‚Â²).
+ * Parametric form: S(u, v) = (u, v, uÃ‚Â²/aÃ‚Â² + vÃ‚Â²/bÃ‚Â²)
  * </p>
  * <p>
  * Special cases:
  * - a = b: Circular paraboloid (paraboloid of revolution)
- * - a ≠ b: Elliptic paraboloid
+ * - a Ã¢â€°Â  b: Elliptic paraboloid
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -82,7 +82,7 @@ public class Paraboloid implements ParametricSurface {
 
     @Override
     public PointND at(Real u, Real v) {
-        // S(u, v) = (u, v, u²/a² + v²/b²)
+        // S(u, v) = (u, v, uÃ‚Â²/aÃ‚Â² + vÃ‚Â²/bÃ‚Â²)
         Real x = vertex.get(0).add(u);
         Real y = vertex.get(1).add(v);
 
@@ -95,7 +95,7 @@ public class Paraboloid implements ParametricSurface {
 
     @Override
     public Vector<Real> partialU(Real u, Real v, Real h) {
-        // ∂S/∂u = (1, 0, 2u/a²)
+        // Ã¢Ë†â€šS/Ã¢Ë†â€šu = (1, 0, 2u/aÃ‚Â²)
         Real dx = Real.ONE;
         Real dy = Real.ZERO;
         Real dz = Real.of(2).multiply(u).divide(scaleA.multiply(scaleA));
@@ -105,7 +105,7 @@ public class Paraboloid implements ParametricSurface {
 
     @Override
     public Vector<Real> partialV(Real u, Real v, Real h) {
-        // ∂S/∂v = (0, 1, 2v/b²)
+        // Ã¢Ë†â€šS/Ã¢Ë†â€šv = (0, 1, 2v/bÃ‚Â²)
         Real dx = Real.ZERO;
         Real dy = Real.ONE;
         Real dz = Real.of(2).multiply(v).divide(scaleB.multiply(scaleB));
@@ -115,7 +115,7 @@ public class Paraboloid implements ParametricSurface {
 
     @Override
     public Real gaussianCurvature(Real u, Real v, Real h) {
-        // Gaussian curvature: K = 4/(a²b²(1 + 4u²/a⁴ + 4v²/b⁴)²)
+        // Gaussian curvature: K = 4/(aÃ‚Â²bÃ‚Â²(1 + 4uÃ‚Â²/aÃ¢ÂÂ´ + 4vÃ‚Â²/bÃ¢ÂÂ´)Ã‚Â²)
         Real a2 = scaleA.multiply(scaleA);
         Real b2 = scaleB.multiply(scaleB);
         Real a4 = a2.multiply(a2);
@@ -158,7 +158,7 @@ public class Paraboloid implements ParametricSurface {
 
     /**
      * Returns the focal length for a circular paraboloid (a = b).
-     * f = a²/4
+     * f = aÃ‚Â²/4
      * 
      * @return the focal length
      * @throws IllegalStateException if not a circular paraboloid
@@ -170,3 +170,5 @@ public class Paraboloid implements ParametricSurface {
         return scaleA.multiply(scaleA).divide(Real.of(4));
     }
 }
+
+

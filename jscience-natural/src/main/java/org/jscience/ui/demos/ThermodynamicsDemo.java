@@ -24,7 +24,7 @@
 package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.AppProvider;
 import org.jscience.ui.physics.thermodynamics.ThermodynamicsViewer;
 
 import org.jscience.ui.i18n.I18n;
@@ -35,7 +35,12 @@ import org.jscience.ui.i18n.I18n;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ThermodynamicsDemo implements DemoProvider {
+public class ThermodynamicsDemo implements AppProvider {
+    @Override
+    public boolean isDemo() {
+        return true;
+    }
+
     @Override
     public String getName() {
         return I18n.getInstance().get("Thermodynamics.title");
@@ -48,7 +53,7 @@ public class ThermodynamicsDemo implements DemoProvider {
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.physics");
+        return "Physics";
     }
 
     @Override
@@ -56,3 +61,5 @@ public class ThermodynamicsDemo implements DemoProvider {
         new ThermodynamicsViewer().start(stage);
     }
 }
+
+

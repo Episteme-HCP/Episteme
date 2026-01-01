@@ -133,3 +133,4 @@ public final class Quaternions implements Field<Quaternion>, InfiniteSet<Quatern
         return "Quaternions(H)";
     }
 }
+

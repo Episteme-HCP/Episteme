@@ -27,7 +27,7 @@ import org.jscience.mathematics.numbers.integers.Integer;
 import org.jscience.mathematics.numbers.integers.Natural;
 
 /**
- * Square numbers sequence: a(n) = n².
+ * Square numbers sequence: a(n) = nÃ‚Â².
  * <p>
  * OEIS A000290: The squares.
  * </p>
@@ -56,11 +56,12 @@ public class SquareSequence implements IntegerSequence {
 
     @Override
     public String getFormula() {
-        return "a(n) = n²";
+        return "a(n) = nÃ‚Â²";
     }
 
     @Override
     public String getCodomain() {
-        return "ℤ⁺ ∪ {0}";
+        return "Ã¢â€žÂ¤Ã¢ÂÂº Ã¢Ë†Âª {0}";
     }
 }
+

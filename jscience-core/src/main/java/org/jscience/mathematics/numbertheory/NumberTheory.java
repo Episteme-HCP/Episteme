@@ -45,7 +45,7 @@ public class NumberTheory {
     /**
      * Miller-Rabin primality test.
      * <p>
-     * Probabilistic test with error probability ≤ 4^(-k).
+     * Probabilistic test with error probability Ã¢â€°Â¤ 4^(-k).
      * </p>
      * 
      * @param n number to test
@@ -156,7 +156,7 @@ public class NumberTheory {
     }
 
     /**
-     * Modular inverse: finds x such that (a * x) ≡ 1 (mod m).
+     * Modular inverse: finds x such that (a * x) Ã¢â€°Â¡ 1 (mod m).
      */
     public static Natural modInverse(Natural a, Natural m) {
         Integer[] result = extendedGCD(Integer.of(a.toBigInteger()), Integer.of(m.toBigInteger()));
@@ -171,7 +171,7 @@ public class NumberTheory {
     }
 
     /**
-     * Euler's totient function φ(n): count of numbers ≤ n coprime to n.
+     * Euler's totient function Ãâ€ (n): count of numbers Ã¢â€°Â¤ n coprime to n.
      */
     public static Natural eulerTotient(Natural n) {
         if (n.equals(Natural.ONE))
@@ -274,3 +274,5 @@ public class NumberTheory {
         return millerRabin(n, 20);
     }
 }
+
+

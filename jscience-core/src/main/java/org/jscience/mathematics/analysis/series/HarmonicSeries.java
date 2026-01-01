@@ -26,13 +26,13 @@ package org.jscience.mathematics.analysis.series;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * Harmonic series: Σ 1/n, n=1..∞
+ * Harmonic series: ÃŽÂ£ 1/n, n=1..Ã¢Ë†Å¾
  * <p>
  * The harmonic series is known to diverge, though it grows very slowly.
  * It is useful in many areas of mathematics and computer science.
  * </p>
  * <p>
- * The partial sum H_n ≈ ln(n) + γ where γ ≈ 0.5772 is the Euler-Mascheroni
+ * The partial sum H_n Ã¢â€°Ë† ln(n) + ÃŽÂ³ where ÃŽÂ³ Ã¢â€°Ë† 0.5772 is the Euler-Mascheroni
  * constant.
  * </p>
  *
@@ -49,7 +49,7 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public class HarmonicSeries implements InfiniteSeries<Real> {
 
-    /** Euler-Mascheroni constant γ ≈ 0.5772156649 */
+    /** Euler-Mascheroni constant ÃŽÂ³ Ã¢â€°Ë† 0.5772156649 */
     public static final Real EULER_MASCHERONI = Real.of(0.5772156649015329);
 
     @Override
@@ -88,7 +88,7 @@ public class HarmonicSeries implements InfiniteSeries<Real> {
     /**
      * Approximates the n-th harmonic number using the asymptotic formula.
      * <p>
-     * H_n ≈ ln(n) + γ + 1/(2n) for large n
+     * H_n Ã¢â€°Ë† ln(n) + ÃŽÂ³ + 1/(2n) for large n
      * </p>
      * 
      * @param n the index
@@ -99,7 +99,7 @@ public class HarmonicSeries implements InfiniteSeries<Real> {
             throw new IllegalArgumentException("n must be positive");
         }
 
-        // H_n ≈ ln(n) + γ
+        // H_n Ã¢â€°Ë† ln(n) + ÃŽÂ³
         Real lnN = Real.of(Math.log(n));
         return lnN.add(EULER_MASCHERONI);
     }
@@ -119,6 +119,7 @@ public class HarmonicSeries implements InfiniteSeries<Real> {
 
     @Override
     public String toString() {
-        return "HarmonicSeries(Σ 1/n, divergent)";
+        return "HarmonicSeries(ÃŽÂ£ 1/n, divergent)";
     }
 }
+

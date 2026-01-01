@@ -239,3 +239,5 @@ public class CliffordAlgebra<E> implements Ring<CliffordAlgebra.Multivector<E>> 
         }
     }
 }
+
+

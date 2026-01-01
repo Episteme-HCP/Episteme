@@ -137,3 +137,5 @@ public class OpenCLSparseLinearAlgebraProvider<E> implements LinearAlgebraProvid
         return cpuProvider.scale(scalar, a);
     }
 }
+
+

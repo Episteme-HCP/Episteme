@@ -220,16 +220,16 @@ public class TitrationApp extends KillerAppBase {
         indicatorSelector.setMaxWidth(Double.MAX_VALUE);
 
         box.getChildren().addAll(
-                new Label("🧪 " + i18n.get("titration.panel.setup")),
-                new Label("⚗️ " + i18n.get("titration.label.acidtype")),
+                new Label("Ã°Å¸Â§Âª " + i18n.get("titration.panel.setup")),
+                new Label("Ã¢Å¡â€”Ã¯Â¸Â " + i18n.get("titration.label.acidtype")),
                 acidSelector,
                 phChart,
                 phLabel, volumeLabel,
                 new Separator(),
-                new Label("🎨 " + i18n.get("titration.label.indicator")),
+                new Label("Ã°Å¸Å½Â¨ " + i18n.get("titration.label.indicator")),
                 indicatorSelector,
                 new Separator(),
-                new Label("🚰 " + i18n.get("titration.label.titrant")),
+                new Label("Ã°Å¸Å¡Â° " + i18n.get("titration.label.titrant")),
                 valveSlider,
                 resetButton);
         VBox.setVgrow(phChart, Priority.ALWAYS);
@@ -420,3 +420,5 @@ public class TitrationApp extends KillerAppBase {
         launch(args);
     }
 }
+
+

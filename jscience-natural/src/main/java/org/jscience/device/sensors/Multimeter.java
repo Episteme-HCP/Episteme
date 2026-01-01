@@ -64,3 +64,5 @@ public interface Multimeter extends Sensor<Real> {
 
     // Additional methods for unit support or ranges could go here
 }
+
+

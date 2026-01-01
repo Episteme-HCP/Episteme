@@ -243,3 +243,5 @@ public final class ChartFactory {
         chart.lookup(".chart-legend").setStyle("-fx-background-color: #2b2b2b;");
     }
 }
+
+

@@ -1,0 +1,30 @@
+# Multi-stage build for JScience Worker
+FROM eclipse-temurin:21-jdk-alpine AS builder
+
+# Install Maven
+RUN apk add --no-cache maven
+
+WORKDIR /build
+COPY pom.xml .
+COPY jscience-core jscience-core
+COPY jscience-server jscience-server
+COPY jscience-worker jscience-worker
+
+# Build worker module (skip tests for faster build)
+RUN mvn package -pl jscience-worker -am -DskipTests
+
+# Runtime image
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+# Copy the built JAR and dependencies
+COPY --from=builder /build/jscience-worker/target/jscience-worker-1.0.0-SNAPSHOT.jar /app/worker.jar
+COPY --from=builder /build/jscience-worker/target/lib /app/lib
+
+# Environment variables for server connection
+ENV SERVER_HOST=server
+ENV SERVER_PORT=50051
+
+# Run worker (connects to server)
+ENTRYPOINT ["sh", "-c", "java -cp worker.jar:lib/* org.jscience.worker.WorkerNode $SERVER_HOST $SERVER_PORT"]

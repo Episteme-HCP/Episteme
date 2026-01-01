@@ -27,9 +27,9 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.statistics.ContinuousDistribution;
 
 /**
- * Normal (Gaussian) distribution N(μ, σ²).
+ * Normal (Gaussian) distribution N(ÃŽÂ¼, ÃÆ’Ã‚Â²).
  * <p>
- * PDF: f(x) = (1/(σ√(2π))) exp(-(x-μ)²/(2σ²))
+ * PDF: f(x) = (1/(ÃÆ’Ã¢Ë†Å¡(2Ãâ‚¬))) exp(-(x-ÃŽÂ¼)Ã‚Â²/(2ÃÆ’Ã‚Â²))
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -80,6 +80,7 @@ public class NormalDistribution extends ContinuousDistribution {
 
     @Override
     public String toString() {
-        return String.format("N(μ=%.4f, σ=%.4f)", mean.doubleValue(), stdDev.doubleValue());
+        return String.format("N(ÃŽÂ¼=%.4f, ÃÆ’=%.4f)", mean.doubleValue(), stdDev.doubleValue());
     }
 }
+

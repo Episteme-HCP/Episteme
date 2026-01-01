@@ -96,3 +96,5 @@ public class NMEALoader implements org.jscience.io.InputLoader<java.util.List<NM
             scanner.close();
     }
 }
+
+

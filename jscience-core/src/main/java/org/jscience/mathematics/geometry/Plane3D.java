@@ -274,3 +274,5 @@ public class Plane3D implements GeometricObject<Point3D> {
         return new Line3D(new Vector3D(px, py, pz), dir);
     }
 }
+
+

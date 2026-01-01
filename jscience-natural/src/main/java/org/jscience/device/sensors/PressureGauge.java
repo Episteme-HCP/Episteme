@@ -71,3 +71,5 @@ public interface PressureGauge extends Sensor<Real> {
      */
     Real measure(Real actualPressure);
 }
+
+

@@ -66,3 +66,5 @@ public class Article implements Identifiable<String> {
         return String.format("%s: %s", id, content);
     }
 }
+
+

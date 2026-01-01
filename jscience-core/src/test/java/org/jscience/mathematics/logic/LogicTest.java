@@ -107,3 +107,4 @@ public class LogicTest {
         assertTrue(ctl.EF(s -> ctl.holds(s, "p")).contains("s1"));
     }
 }
+

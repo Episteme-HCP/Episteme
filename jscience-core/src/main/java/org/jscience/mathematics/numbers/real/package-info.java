@@ -21,11 +21,5 @@
  * SOFTWARE.
  */
 
-/**
- * Real numbers (ℝ) and arbitrary precision decimal arithmetic.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.mathematics.numbers.real;
+

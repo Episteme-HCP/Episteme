@@ -109,10 +109,12 @@ public class Bond {
         String bondSymbol = switch (order) {
             case SINGLE -> "-";
             case DOUBLE -> "=";
-            case TRIPLE -> "≡";
+            case TRIPLE -> "Ã¢â€°Â¡";
             case AROMATIC -> "~";
-            case COORDINATION -> "→";
+            case COORDINATION -> "Ã¢â€ â€™";
         };
         return atom1.getElement().getSymbol() + bondSymbol + atom2.getElement().getSymbol();
     }
 }
+
+

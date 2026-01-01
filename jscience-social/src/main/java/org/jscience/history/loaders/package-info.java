@@ -21,11 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Temporal events, timelines, and historical data modeling.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.history.loaders;
+
+

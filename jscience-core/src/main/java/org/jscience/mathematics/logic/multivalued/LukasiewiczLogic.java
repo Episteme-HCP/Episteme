@@ -26,14 +26,14 @@ package org.jscience.mathematics.logic.multivalued;
 import org.jscience.mathematics.logic.Logic;
 
 /**
- * Łukasiewicz infinite-valued logic.
+ * Ã…Âukasiewicz infinite-valued logic.
  * <p>
- * In Łukasiewicz logic, truth values are real numbers in [0,1].
+ * In Ã…Âukasiewicz logic, truth values are real numbers in [0,1].
  * Operations are defined as:
- * - Negation: ¬a = 1 - a
- * - Implication: a → b = min(1, 1 - a + b)
- * - Conjunction: a ∧ b = max(0, a + b - 1)
- * - Disjunction: a ∨ b = min(1, a + b)
+ * - Negation: Ã‚Â¬a = 1 - a
+ * - Implication: a Ã¢â€ â€™ b = min(1, 1 - a + b)
+ * - Conjunction: a Ã¢Ë†Â§ b = max(0, a + b - 1)
+ * - Disjunction: a Ã¢Ë†Â¨ b = min(1, a + b)
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -68,25 +68,25 @@ public class LukasiewiczLogic implements Logic<Double> {
 
     @Override
     public Double and(Double a, Double b) {
-        // Łukasiewicz conjunction: max(0, a + b - 1)
+        // Ã…Âukasiewicz conjunction: max(0, a + b - 1)
         return Math.max(0.0, a + b - 1.0);
     }
 
     @Override
     public Double or(Double a, Double b) {
-        // Łukasiewicz disjunction: min(1, a + b)
+        // Ã…Âukasiewicz disjunction: min(1, a + b)
         return Math.min(1.0, a + b);
     }
 
     @Override
     public Double not(Double a) {
-        // Łukasiewicz negation: 1 - a
+        // Ã…Âukasiewicz negation: 1 - a
         return 1.0 - a;
     }
 
     @Override
     public Double implies(Double a, Double b) {
-        // Łukasiewicz implication: min(1, 1 - a + b)
+        // Ã…Âukasiewicz implication: min(1, 1 - a + b)
         return Math.min(1.0, 1.0 - a + b);
     }
 
@@ -105,7 +105,7 @@ public class LukasiewiczLogic implements Logic<Double> {
     }
 
     /**
-     * Computes the Łukasiewicz distance between two truth values.
+     * Computes the Ã…Âukasiewicz distance between two truth values.
      * 
      * @param a first value
      * @param b second value
@@ -117,6 +117,7 @@ public class LukasiewiczLogic implements Logic<Double> {
 
     @Override
     public String toString() {
-        return "Łukasiewicz Logic";
+        return "Ã…Âukasiewicz Logic";
     }
 }
+

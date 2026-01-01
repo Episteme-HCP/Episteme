@@ -83,3 +83,4 @@ public interface ComposableSeries<T> {
      */
     int degree();
 }
+

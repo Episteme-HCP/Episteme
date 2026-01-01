@@ -59,6 +59,8 @@ public class HalfCell {
 
     @Override
     public String toString() {
-        return String.format("%s (E° = %s)", reaction, standardPotential);
+        return String.format("%s (EÃ‚Â° = %s)", reaction, standardPotential);
     }
 }
+
+

@@ -35,7 +35,7 @@ import org.jscience.chemistry.ChemicalReaction;
 public class ElectrodeReaction {
 
     private final ChemicalReaction reaction;
-    private final double standardPotential; // E° (Volts) vs SHE
+    private final double standardPotential; // EÃ‚Â° (Volts) vs SHE
 
     public ElectrodeReaction(ChemicalReaction reaction, double e0) {
         this.reaction = reaction;
@@ -52,7 +52,7 @@ public class ElectrodeReaction {
 
     /**
      * Calculates potential at non-standard conditions using Nernst equation.
-     * E = E° - (RT/nF) * ln(Q)
+     * E = EÃ‚Â° - (RT/nF) * ln(Q)
      */
     public double calculatePotential(double temperature, int n, double reactionQuotientQ) {
         org.jscience.measure.Quantity<org.jscience.measure.quantity.ElectricPotential> e0 = org.jscience.measure.Quantities
@@ -64,3 +64,5 @@ public class ElectrodeReaction {
                 .to(org.jscience.measure.Units.VOLT).getValue().doubleValue();
     }
 }
+
+

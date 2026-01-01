@@ -362,3 +362,5 @@ public class JavaFXPlot3D implements Plot3D {
         System.err.println("Snapshot export not supported.");
     }
 }
+
+

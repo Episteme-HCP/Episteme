@@ -249,7 +249,7 @@ public final class JScience {
      * Sets 32-bit int precision for GPU/numerical integer operations.
      * <p>
      * Faster on most GPUs (especially consumer GPUs), smaller memory footprint,
-     * but limited to range ±2.1 billion.
+     * but limited to range Ã‚Â±2.1 billion.
      * </p>
      */
     public static void setIntPrecision() {
@@ -259,7 +259,7 @@ public final class JScience {
     /**
      * Sets 64-bit long precision for GPU/numerical integer operations.
      * <p>
-     * Larger range (±9.2 × 10^18) but slower on some GPUs,
+     * Larger range (Ã‚Â±9.2 Ãƒâ€” 10^18) but slower on some GPUs,
      * as many consumer GPUs have weak int64 support.
      * </p>
      */
@@ -315,6 +315,7 @@ public final class JScience {
     public static void configureForPrecision() {
         setComputeMode(ComputeMode.CPU);
         setExactPrecision();
+        setDoublePrecision();
         setLongPrecision();
     }
 

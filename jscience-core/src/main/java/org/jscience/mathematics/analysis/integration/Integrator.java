@@ -61,3 +61,5 @@ public interface Integrator {
      */
     Real integrate(RealFunction f, Real a, Real b, Real tolerance);
 }
+
+

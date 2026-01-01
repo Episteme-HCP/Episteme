@@ -244,3 +244,5 @@ public class PointND implements GeometricObject<PointND>, org.jscience.mathemati
         return coordinates.hashCode();
     }
 }
+
+

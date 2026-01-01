@@ -63,3 +63,5 @@ public class SociologyRestorationTest {
         assertTrue(wedding instanceof Situation);
     }
 }
+
+

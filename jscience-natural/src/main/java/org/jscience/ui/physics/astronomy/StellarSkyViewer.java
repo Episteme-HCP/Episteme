@@ -1075,3 +1075,5 @@ public class StellarSkyViewer extends Application {
         new StellarSkyViewer().start(stage);
     }
 }
+
+

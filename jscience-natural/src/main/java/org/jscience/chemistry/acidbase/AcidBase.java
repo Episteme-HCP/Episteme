@@ -43,10 +43,10 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public class AcidBase {
 
-    /** Standard temperature for Kw (25°C) */
+    /** Standard temperature for Kw (25Ã‚Â°C) */
     public static final Real STANDARD_TEMP_K = Real.of(298.15);
 
-    /** Water ionization constant at 25°C */
+    /** Water ionization constant at 25Ã‚Â°C */
     public static final Real KW_25C = Real.of(1.0e-14);
 
     private static final Real FOURTEEN = Real.of(14.0);
@@ -89,8 +89,8 @@ public class AcidBase {
     }
 
     /**
-     * Converts pH to pOH at 25°C.
-     * (pH + pOH = 14 at 25°C)
+     * Converts pH to pOH at 25Ã‚Â°C.
+     * (pH + pOH = 14 at 25Ã‚Â°C)
      */
     public static Real pHtopOH(Real pH) {
         return FOURTEEN.subtract(pH);
@@ -109,10 +109,10 @@ public class AcidBase {
 
     /**
      * Calculates pH of a weak acid solution.
-     * Uses simplified Ka expression: Ka = x²/(Ca - x)
+     * Uses simplified Ka expression: Ka = xÃ‚Â²/(Ca - x)
      */
     public static Real weakAcidpH(Real Ka, Real acidConcentration) {
-        // Solve x² + Ka*x - Ka*Ca = 0
+        // Solve xÃ‚Â² + Ka*x - Ka*Ca = 0
         Real a = Real.ONE;
         Real b = Ka;
         Real c = Ka.negate().multiply(acidConcentration);
@@ -136,7 +136,7 @@ public class AcidBase {
 
     /**
      * Buffer capacity (Van Slyke equation approximation).
-     * β = 2.303 * C * Ka * [H+] / (Ka + [H+])²
+     * ÃŽÂ² = 2.303 * C * Ka * [H+] / (Ka + [H+])Ã‚Â²
      */
     public static Real bufferCapacity(Real totalBufferConc, Real Ka, Real pH) {
         Real h = hConcentration(pH);
@@ -170,3 +170,5 @@ public class AcidBase {
         return "Strongly Basic";
     }
 }
+
+

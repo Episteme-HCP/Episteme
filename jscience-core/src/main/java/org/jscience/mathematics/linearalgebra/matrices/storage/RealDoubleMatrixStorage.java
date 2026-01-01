@@ -47,3 +47,5 @@ public interface RealDoubleMatrixStorage extends MatrixStorage<org.jscience.math
      */
     double[] toDoubleArray();
 }
+
+

@@ -97,7 +97,7 @@ public class StandardUnit<Q extends Quantity<Q>> implements Unit<Q> {
                 Real.of(factor));
         UnitConverter combined = this.toSystemUnit.concatenate(converter);
 
-        String newSymbol = factor + "×" + symbol;
+        String newSymbol = factor + "Ãƒâ€”" + symbol;
         return new StandardUnit<>(newSymbol, name, dimension, combined);
     }
 
@@ -145,14 +145,14 @@ public class StandardUnit<Q extends Quantity<Q>> implements Unit<Q> {
 
     public Unit<?> pow(int exponent) {
         Dimension newDim = dimension.pow(exponent);
-        String newSymbol = symbol + (exponent == 2 ? "²" : exponent == 3 ? "³" : "^" + exponent);
+        String newSymbol = symbol + (exponent == 2 ? "Ã‚Â²" : exponent == 3 ? "Ã‚Â³" : "^" + exponent);
 
         return new StandardUnit<>(newSymbol, name, newDim, UnitConverter.identity());
     }
 
     public Unit<?> sqrt() {
         Dimension newDim = dimension.sqrt();
-        String newSymbol = "√" + symbol;
+        String newSymbol = "Ã¢Ë†Å¡" + symbol;
 
         return new StandardUnit<>(newSymbol, name, newDim, UnitConverter.identity());
     }
@@ -187,3 +187,4 @@ public class StandardUnit<Q extends Quantity<Q>> implements Unit<Q> {
     // Unused CompoundConverter removed
 
 }
+

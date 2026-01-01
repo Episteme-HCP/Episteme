@@ -73,3 +73,5 @@ public interface VitalSignsMonitor extends Sensor<VitalSigns> {
      */
     double getSampleRate();
 }
+
+

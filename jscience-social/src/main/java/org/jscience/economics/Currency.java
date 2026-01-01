@@ -75,10 +75,10 @@ public class Currency implements org.jscience.util.identity.Identifiable<String>
 
     // Common currencies
     public static final Currency USD = new Currency("USD", "US Dollar", "$", 2);
-    public static final Currency EUR = new Currency("EUR", "Euro", "€", 2);
-    public static final Currency GBP = new Currency("GBP", "British Pound", "£", 2);
-    public static final Currency JPY = new Currency("JPY", "Japanese Yen", "¥", 0);
-    public static final Currency CNY = new Currency("CNY", "Chinese Yuan", "¥", 2);
+    public static final Currency EUR = new Currency("EUR", "Euro", "Ã¢â€šÂ¬", 2);
+    public static final Currency GBP = new Currency("GBP", "British Pound", "Ã‚Â£", 2);
+    public static final Currency JPY = new Currency("JPY", "Japanese Yen", "Ã‚Â¥", 0);
+    public static final Currency CNY = new Currency("CNY", "Chinese Yuan", "Ã‚Â¥", 2);
     public static final Currency CHF = new Currency("CHF", "Swiss Franc", "CHF", 2);
 
     // Registry for flyweight pattern
@@ -100,3 +100,5 @@ public class Currency implements org.jscience.util.identity.Identifiable<String>
         return CACHE.computeIfAbsent(upper, c -> new Currency(c, c, c, 2));
     }
 }
+
+

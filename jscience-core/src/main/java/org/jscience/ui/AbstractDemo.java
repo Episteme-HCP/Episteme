@@ -34,6 +34,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+
 import org.jscience.ui.i18n.I18n;
 
 /**
@@ -44,7 +45,12 @@ import org.jscience.ui.i18n.I18n;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public abstract class AbstractDemo extends Application implements DemoProvider {
+public abstract class AbstractDemo extends Application implements AppProvider {
+
+    @Override
+    public boolean isDemo() {
+        return true;
+    }
 
     protected ScientificViewer viewer;
     private VBox controlPanel;
@@ -172,3 +178,5 @@ public abstract class AbstractDemo extends Application implements DemoProvider {
         start(stage);
     }
 }
+
+

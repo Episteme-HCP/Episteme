@@ -35,7 +35,7 @@ import org.jscience.mathematics.numbers.real.Real;
 public class ForceField {
 
     /**
-     * Lennard-Jones 12-6 potential. V(r) = ε * [(σ/r)^12 - 2*(σ/r)^6]
+     * Lennard-Jones 12-6 potential. V(r) = ÃŽÂµ * [(ÃÆ’/r)^12 - 2*(ÃÆ’/r)^6]
      */
     public static Real lennardJones(Real r, Real epsilon, Real sigma) {
         Real ratio = sigma.divide(r);
@@ -44,7 +44,7 @@ public class ForceField {
         return epsilon.multiply(r12.subtract(Real.TWO.multiply(r6)));
     }
 
-    /** Lennard-Jones force. F(r) = 12ε/r * [(σ/r)^12 - (σ/r)^6] */
+    /** Lennard-Jones force. F(r) = 12ÃŽÂµ/r * [(ÃÆ’/r)^12 - (ÃÆ’/r)^6] */
     public static Real lennardJonesForce(Real r, Real epsilon, Real sigma) {
         Real ratio = sigma.divide(r);
         Real r6 = ratio.pow(6);
@@ -52,30 +52,30 @@ public class ForceField {
         return Real.of(12).multiply(epsilon).divide(r).multiply(r12.subtract(r6));
     }
 
-    /** Harmonic bond stretching: V(r) = 0.5 * k * (r - r0)² */
+    /** Harmonic bond stretching: V(r) = 0.5 * k * (r - r0)Ã‚Â² */
     public static Real bondStretch(Real r, Real r0, Real k) {
         Real dr = r.subtract(r0);
         return Real.of(0.5).multiply(k).multiply(dr.pow(2));
     }
 
-    /** Harmonic angle bending: V(θ) = 0.5 * k * (θ - θ0)² */
+    /** Harmonic angle bending: V(ÃŽÂ¸) = 0.5 * k * (ÃŽÂ¸ - ÃŽÂ¸0)Ã‚Â² */
     public static Real angleBend(Real theta, Real theta0, Real k) {
         Real dTheta = theta.subtract(theta0);
         return Real.of(0.5).multiply(k).multiply(dTheta.pow(2));
     }
 
-    /** Torsional potential: V(φ) = V_n/2 * [1 + cos(n*φ - γ)] */
+    /** Torsional potential: V(Ãâ€ ) = V_n/2 * [1 + cos(n*Ãâ€  - ÃŽÂ³)] */
     public static Real torsion(Real phi, Real Vn, int n, Real gamma) {
         Real cosArg = Real.of(n).multiply(phi).subtract(gamma).cos();
         return Vn.divide(Real.TWO).multiply(Real.ONE.add(cosArg));
     }
 
-    /** Coulomb interaction (kcal/mol when q in e, r in Å) */
+    /** Coulomb interaction (kcal/mol when q in e, r in Ãƒâ€¦) */
     public static Real coulomb(Real q1, Real q2, Real r) {
         return Real.of(332.06).multiply(q1).multiply(q2).divide(r);
     }
 
-    /** Morse potential: V(r) = D_e * [1 - exp(-a*(r-r_e))]² */
+    /** Morse potential: V(r) = D_e * [1 - exp(-a*(r-r_e))]Ã‚Â² */
     public static Real morse(Real r, Real re, Real De, Real a) {
         Real exp = a.negate().multiply(r.subtract(re)).exp();
         return De.multiply(Real.ONE.subtract(exp).pow(2));
@@ -136,3 +136,5 @@ public class ForceField {
         return totalEnergy;
     }
 }
+
+

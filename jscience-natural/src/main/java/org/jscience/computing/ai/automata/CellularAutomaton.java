@@ -91,3 +91,5 @@ public interface CellularAutomaton<S> {
         // Default no-op
     }
 }
+
+

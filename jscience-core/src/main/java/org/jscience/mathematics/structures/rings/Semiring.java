@@ -29,12 +29,12 @@ import org.jscience.mathematics.structures.groups.AbelianMonoid;
  * A semiring (or rig) is an algebraic structure similar to a ring, but without
  * the requirement that each element must have an additive inverse.
  * <p>
- * A semiring (R, +, ×) consists of:
+ * A semiring (R, +, Ãƒâ€”) consists of:
  * <ul>
  * <li>(R, +) is a commutative monoid with identity element 0.</li>
- * <li>(R, ×) is a monoid with identity element 1.</li>
+ * <li>(R, Ãƒâ€”) is a monoid with identity element 1.</li>
  * <li>Multiplication distributes over addition.</li>
- * <li>Multiplication by 0 annihilates R: 0 × a = a × 0 = 0.</li>
+ * <li>Multiplication by 0 annihilates R: 0 Ãƒâ€” a = a Ãƒâ€” 0 = 0.</li>
  * </ul>
  * </p>
  * <p>
@@ -43,10 +43,10 @@ import org.jscience.mathematics.structures.groups.AbelianMonoid;
  *
  * <h2>Examples</h2>
  * <ul>
- * <li>(ℕ, +, ×) - Natural numbers (including 0)</li>
- * <li>(Boolean Algebra, ∨, ∧) - Booleans with OR as addition, AND as
+ * <li>(Ã¢â€žâ€¢, +, Ãƒâ€”) - Natural numbers (including 0)</li>
+ * <li>(Boolean Algebra, Ã¢Ë†Â¨, Ã¢Ë†Â§) - Booleans with OR as addition, AND as
  * multiplication</li>
- * <li>(Languages, ∪, ·) - Formal languages with union and concatenation</li>
+ * <li>(Languages, Ã¢Ë†Âª, Ã‚Â·) - Formal languages with union and concatenation</li>
  * </ul>
  *
  * @author Silvere Martin-Michiellot
@@ -63,14 +63,14 @@ public interface Semiring<E> extends AbelianMonoid<E> {
      * 
      * @param a the first factor
      * @param b the second factor
-     * @return a × b
+     * @return a Ãƒâ€” b
      */
     E multiply(E a, E b);
 
     /**
      * Returns the multiplicative identity (one element).
      * <p>
-     * Satisfies: 1 × a = a × 1 = a for all elements a.
+     * Satisfies: 1 Ãƒâ€” a = a Ãƒâ€” 1 = a for all elements a.
      * </p>
      * 
      * @return the multiplicative identity
@@ -106,3 +106,4 @@ public interface Semiring<E> extends AbelianMonoid<E> {
         return result;
     }
 }
+

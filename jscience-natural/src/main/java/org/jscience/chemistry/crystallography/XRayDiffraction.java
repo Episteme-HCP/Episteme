@@ -49,3 +49,5 @@ public class XRayDiffraction {
         return Math.asin(sinTheta);
     }
 }
+
+

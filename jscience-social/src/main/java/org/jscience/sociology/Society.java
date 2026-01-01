@@ -116,3 +116,5 @@ public class Society implements org.jscience.geography.Locatable {
         return String.format("Society '%s' (%s, pop: %d)", name, type, population);
     }
 }
+
+

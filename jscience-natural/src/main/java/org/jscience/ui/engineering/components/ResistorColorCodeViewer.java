@@ -159,3 +159,5 @@ public class ResistorColorCodeViewer extends Application {
         launch(args);
     }
 }
+
+

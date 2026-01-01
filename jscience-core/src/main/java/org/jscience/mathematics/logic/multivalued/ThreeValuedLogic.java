@@ -92,3 +92,5 @@ public class ThreeValuedLogic implements Logic<ThreeValuedLogic.Value> {
         }
     }
 }
+
+

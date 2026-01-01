@@ -22,24 +22,6 @@
  */
 
 /**
- * Provides metrology support for measurements with uncertainty.
- * <p>
- * This package implements the science of measurement following ISO/IEC Guide
- * 98-3
- * (Guide to the Expression of Uncertainty in Measurement - GUM). It provides
- * tools
- * for handling measurement uncertainty, statistical analysis of repeated
- * measurements,
- * and uncertainty budgets.
- * </p>
- *
- * <h2>Core Concepts</h2>
- *
- * <h3>Measured Quantities</h3>
- * <p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Implements the science of measurement following ISO/IEC Guide
  */
 package org.jscience.measure.metrology;

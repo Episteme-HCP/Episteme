@@ -36,13 +36,13 @@ public class UnitCell {
 
     /** The seven crystal systems. */
     public enum CrystalSystem {
-        CUBIC("Cubic", "a=b=c, α=β=γ=90°"),
-        TETRAGONAL("Tetragonal", "a=b≠c, α=β=γ=90°"),
-        ORTHORHOMBIC("Orthorhombic", "a≠b≠c, α=β=γ=90°"),
-        HEXAGONAL("Hexagonal", "a=b≠c, α=β=90°, γ=120°"),
-        TRIGONAL("Trigonal", "a=b=c, α=β=γ≠90°"),
-        MONOCLINIC("Monoclinic", "a≠b≠c, α=γ=90°, β≠90°"),
-        TRICLINIC("Triclinic", "a≠b≠c, α≠β≠γ≠90°");
+        CUBIC("Cubic", "a=b=c, ÃŽÂ±=ÃŽÂ²=ÃŽÂ³=90Ã‚Â°"),
+        TETRAGONAL("Tetragonal", "a=bÃ¢â€°Â c, ÃŽÂ±=ÃŽÂ²=ÃŽÂ³=90Ã‚Â°"),
+        ORTHORHOMBIC("Orthorhombic", "aÃ¢â€°Â bÃ¢â€°Â c, ÃŽÂ±=ÃŽÂ²=ÃŽÂ³=90Ã‚Â°"),
+        HEXAGONAL("Hexagonal", "a=bÃ¢â€°Â c, ÃŽÂ±=ÃŽÂ²=90Ã‚Â°, ÃŽÂ³=120Ã‚Â°"),
+        TRIGONAL("Trigonal", "a=b=c, ÃŽÂ±=ÃŽÂ²=ÃŽÂ³Ã¢â€°Â 90Ã‚Â°"),
+        MONOCLINIC("Monoclinic", "aÃ¢â€°Â bÃ¢â€°Â c, ÃŽÂ±=ÃŽÂ³=90Ã‚Â°, ÃŽÂ²Ã¢â€°Â 90Ã‚Â°"),
+        TRICLINIC("Triclinic", "aÃ¢â€°Â bÃ¢â€°Â c, ÃŽÂ±Ã¢â€°Â ÃŽÂ²Ã¢â€°Â ÃŽÂ³Ã¢â€°Â 90Ã‚Â°");
 
         private final String constraints;
 
@@ -55,7 +55,7 @@ public class UnitCell {
         }
     }
 
-    private final Real a, b, c; // Lattice parameters (Å)
+    private final Real a, b, c; // Lattice parameters (Ãƒâ€¦)
     private final Real alpha, beta, gamma; // Angles (degrees)
     private final CrystalSystem system;
 
@@ -138,7 +138,7 @@ public class UnitCell {
 
     /**
      * Calculates unit cell volume.
-     * V = abc * sqrt(1 - cos²α - cos²β - cos²γ + 2cosα·cosβ·cosγ)
+     * V = abc * sqrt(1 - cosÃ‚Â²ÃŽÂ± - cosÃ‚Â²ÃŽÂ² - cosÃ‚Â²ÃŽÂ³ + 2cosÃŽÂ±Ã‚Â·cosÃŽÂ²Ã‚Â·cosÃŽÂ³)
      */
     public Real volume() {
         Real cosA = alpha.toRadians().cos();
@@ -172,7 +172,7 @@ public class UnitCell {
 
     /**
      * Bragg's law: calculates diffraction angle.
-     * nλ = 2d·sin(θ)
+     * nÃŽÂ» = 2dÃ‚Â·sin(ÃŽÂ¸)
      */
     public static Real braggAngle(Real d, Real wavelength, int n) {
         Real sinTheta = Real.of(n).multiply(wavelength).divide(Real.TWO.multiply(d));
@@ -215,9 +215,11 @@ public class UnitCell {
     public static final UnitCell DIAMOND = cubic(3.567);
     public static final UnitCell SILICON = cubic(5.431);
 
-    /** Cu-Kα X-ray wavelength */
+    /** Cu-KÃŽÂ± X-ray wavelength */
     public static final Real CU_K_ALPHA = Real.of(1.5406);
 
-    /** Mo-Kα X-ray wavelength */
+    /** Mo-KÃŽÂ± X-ray wavelength */
     public static final Real MO_K_ALPHA = Real.of(0.7107);
 }
+
+

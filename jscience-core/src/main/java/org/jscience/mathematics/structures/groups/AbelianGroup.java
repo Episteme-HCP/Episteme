@@ -35,22 +35,22 @@ package org.jscience.mathematics.structures.groups;
  * <p>
  * An abelian group (G, +) satisfies all group axioms plus:
  * <ul>
- * <li><strong>Commutativity</strong>: ∀ a, b ∈ G: a + b = b + a</li>
+ * <li><strong>Commutativity</strong>: Ã¢Ë†â‚¬ a, b Ã¢Ë†Ë† G: a + b = b + a</li>
  * </ul>
  * </p>
  * <p>
  * <strong>Convention</strong>: Abelian groups are typically written with
- * additive notation (+, 0, −a) rather than multiplicative (∗, e, a⁻¹).
+ * additive notation (+, 0, Ã¢Ë†â€™a) rather than multiplicative (Ã¢Ë†â€”, e, aÃ¢ÂÂ»Ã‚Â¹).
  * </p>
  *
  * <h2>Examples</h2>
  * <ul>
- * <li>(ℤ, +) - Integers with addition</li>
- * <li>(ℚ, +) - Rationals with addition</li>
- * <li>(ℝ, +) - Reals with addition</li>
- * <li>(ℂ, +) - Complex numbers with addition</li>
- * <li>(ℝⁿ, +) - n-dimensional vectors with addition</li>
- * <li>(ℤ/nℤ, +) - Integers modulo n</li>
+ * <li>(Ã¢â€žÂ¤, +) - Integers with addition</li>
+ * <li>(Ã¢â€žÅ¡, +) - Rationals with addition</li>
+ * <li>(Ã¢â€žÂ, +) - Reals with addition</li>
+ * <li>(Ã¢â€žâ€š, +) - Complex numbers with addition</li>
+ * <li>(Ã¢â€žÂÃ¢ÂÂ¿, +) - n-dimensional vectors with addition</li>
+ * <li>(Ã¢â€žÂ¤/nÃ¢â€žÂ¤, +) - Integers modulo n</li>
  * </ul>
  *
  * <h2>Additive Notation</h2>
@@ -105,3 +105,4 @@ public interface AbelianGroup<E> extends Group<E>, AbelianMonoid<E> {
         return true;
     }
 }
+

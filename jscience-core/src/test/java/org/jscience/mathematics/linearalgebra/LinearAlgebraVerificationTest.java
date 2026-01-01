@@ -77,3 +77,5 @@ public class LinearAlgebraVerificationTest {
         assertEquals(4.0, t.get(1, 1).doubleValue(), 1e-9, "Value check");
     }
 }
+
+

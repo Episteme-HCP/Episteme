@@ -61,18 +61,18 @@ public class RateEquation {
         return rate;
     }
 
-    /** Zero-order integrated rate law. [A] = [A]₀ - k·t */
+    /** Zero-order integrated rate law. [A] = [A]Ã¢â€šâ‚¬ - kÃ‚Â·t */
     public static Real zeroOrderConcentration(Real A0, Real k, Real t) {
         Real result = A0.subtract(k.multiply(t));
         return result.compareTo(Real.ZERO) < 0 ? Real.ZERO : result;
     }
 
-    /** First-order integrated rate law. [A] = [A]₀ · exp(-k·t) */
+    /** First-order integrated rate law. [A] = [A]Ã¢â€šâ‚¬ Ã‚Â· exp(-kÃ‚Â·t) */
     public static Real firstOrderConcentration(Real A0, Real k, Real t) {
         return A0.multiply(k.negate().multiply(t).exp());
     }
 
-    /** Second-order integrated rate law. 1/[A] = 1/[A]₀ + k·t */
+    /** Second-order integrated rate law. 1/[A] = 1/[A]Ã¢â€šâ‚¬ + kÃ‚Â·t */
     public static Real secondOrderConcentration(Real A0, Real k, Real t) {
         return Real.ONE.divide(A0.inverse().add(k.multiply(t)));
     }
@@ -92,14 +92,14 @@ public class RateEquation {
     }
 
     /**
-     * Arrhenius equation: k = A · exp(-Ea/(R·T))
+     * Arrhenius equation: k = A Ã‚Â· exp(-Ea/(RÃ‚Â·T))
      * 
      * @param A  Pre-exponential factor
      * @param Ea Activation energy (kJ/mol)
      * @param T  Temperature (K)
      */
     public static Real arrhenius(Real A, Real Ea, Real T) {
-        Real R = Real.of(0.008314); // kJ/(mol·K)
+        Real R = Real.of(0.008314); // kJ/(molÃ‚Â·K)
         return A.multiply(Ea.negate().divide(R.multiply(T)).exp());
     }
 
@@ -111,7 +111,7 @@ public class RateEquation {
 
     /**
      * Eyring equation (transition state theory).
-     * k = (k_B·T/h) · exp(-ΔG‡/(R·T))
+     * k = (k_BÃ‚Â·T/h) Ã‚Â· exp(-ÃŽâ€GÃ¢â‚¬Â¡/(RÃ‚Â·T))
      */
     public static Real eyring(Real T, Real deltaG_act) {
         Real kB = Real.of(1.380649e-23);
@@ -121,3 +121,5 @@ public class RateEquation {
         return prefactor.multiply(deltaG_act.multiply(Real.of(1000)).negate().divide(R.multiply(T)).exp());
     }
 }
+
+

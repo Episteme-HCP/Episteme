@@ -31,12 +31,12 @@ import java.util.function.Predicate;
  * <p>
  * CTL is a branching-time temporal logic used for model checking.
  * It extends propositional logic with temporal operators:
- * - AG φ: φ holds on All paths Globally
- * - EG φ: φ holds on some path Globally
- * - AF φ: φ holds on All paths Finally
- * - EF φ: φ holds on some path Finally
- * - A[φ U ψ]: φ Until ψ on All paths
- * - E[φ U ψ]: φ Until ψ on some path
+ * - AG Ãâ€ : Ãâ€  holds on All paths Globally
+ * - EG Ãâ€ : Ãâ€  holds on some path Globally
+ * - AF Ãâ€ : Ãâ€  holds on All paths Finally
+ * - EF Ãâ€ : Ãâ€  holds on some path Finally
+ * - A[Ãâ€  U ÃË†]: Ãâ€  Until ÃË† on All paths
+ * - E[Ãâ€  U ÃË†]: Ãâ€  Until ÃË† on some path
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -107,10 +107,10 @@ public class CTL<S, P> {
     }
 
     /**
-     * AG φ: φ holds on All paths Globally.
+     * AG Ãâ€ : Ãâ€  holds on All paths Globally.
      * 
      * @param phi the predicate
-     * @return the set of states where AG φ holds
+     * @return the set of states where AG Ãâ€  holds
      */
     public Set<S> AG(Predicate<S> phi) {
         Set<S> result = new HashSet<>(states);
@@ -128,10 +128,10 @@ public class CTL<S, P> {
     }
 
     /**
-     * EG φ: φ holds on some path Globally.
+     * EG Ãâ€ : Ãâ€  holds on some path Globally.
      * 
      * @param phi the predicate
-     * @return the set of states where EG φ holds
+     * @return the set of states where EG Ãâ€  holds
      */
     public Set<S> EG(Predicate<S> phi) {
         Set<S> result = states.stream().filter(phi::test).collect(HashSet::new, Set::add, Set::addAll);
@@ -148,10 +148,10 @@ public class CTL<S, P> {
     }
 
     /**
-     * EF φ: φ holds on some path Finally.
+     * EF Ãâ€ : Ãâ€  holds on some path Finally.
      * 
      * @param phi the predicate
-     * @return the set of states where EF φ holds
+     * @return the set of states where EF Ãâ€  holds
      */
     public Set<S> EF(Predicate<S> phi) {
         Set<S> result = states.stream().filter(phi::test).collect(HashSet::new, Set::add, Set::addAll);
@@ -170,10 +170,10 @@ public class CTL<S, P> {
     }
 
     /**
-     * AF φ: φ holds on All paths Finally.
+     * AF Ãâ€ : Ãâ€  holds on All paths Finally.
      * 
      * @param phi the predicate
-     * @return the set of states where AF φ holds
+     * @return the set of states where AF Ãâ€  holds
      */
     public Set<S> AF(Predicate<S> phi) {
         Set<S> result = states.stream().filter(phi::test).collect(HashSet::new, Set::add, Set::addAll);
@@ -193,11 +193,11 @@ public class CTL<S, P> {
     }
 
     /**
-     * E[φ U ψ]: φ Until ψ on some path.
+     * E[Ãâ€  U ÃË†]: Ãâ€  Until ÃË† on some path.
      * 
      * @param phi the first predicate
      * @param psi the second predicate
-     * @return the set of states where E[φ U ψ] holds
+     * @return the set of states where E[Ãâ€  U ÃË†] holds
      */
     public Set<S> EU(Predicate<S> phi, Predicate<S> psi) {
         Set<S> result = states.stream().filter(psi::test).collect(HashSet::new, Set::add, Set::addAll);
@@ -233,3 +233,4 @@ public class CTL<S, P> {
         return transitions.values().stream().mapToInt(Set::size).sum();
     }
 }
+

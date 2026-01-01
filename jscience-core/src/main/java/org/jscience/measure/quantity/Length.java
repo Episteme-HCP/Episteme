@@ -46,3 +46,4 @@ import org.jscience.measure.Quantity;
  */
 public interface Length extends Quantity<Length> {
 }
+

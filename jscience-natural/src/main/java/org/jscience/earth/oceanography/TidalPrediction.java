@@ -62,7 +62,7 @@ public class TidalPrediction {
     public static final Real O1_SPEED = Real.of(13.943035);
     public static final Real M4_SPEED = Real.of(57.968208);
 
-    /** Predict height: h(t) = h₀ + Σ Aᵢ cos(ωᵢt - φᵢ) */
+    /** Predict height: h(t) = hÃ¢â€šâ‚¬ + ÃŽÂ£ AÃ¡ÂµÂ¢ cos(Ãâ€°Ã¡ÂµÂ¢t - Ãâ€ Ã¡ÂµÂ¢) */
     public static Real predictHeight(Real meanSeaLevel, TidalConstituent[] constituents, Real hoursFromEpoch) {
         Real height = meanSeaLevel;
         for (TidalConstituent c : constituents) {
@@ -96,3 +96,5 @@ public class TidalPrediction {
         return Real.of(360).subtract(phase).divide(M2_SPEED);
     }
 }
+
+

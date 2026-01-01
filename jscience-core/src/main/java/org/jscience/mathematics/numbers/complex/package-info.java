@@ -21,11 +21,5 @@
  * SOFTWARE.
  */
 
-/**
- * Complex numbers (ℂ) and related algebraic operations.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.mathematics.numbers.complex;
+

@@ -39,7 +39,7 @@ public class VerletIntegrator {
     /**
      * Velocity Verlet integration step.
      * <p>
-     * For systems: d²x/dt² = a(x), where a is acceleration.
+     * For systems: dÃ‚Â²x/dtÃ‚Â² = a(x), where a is acceleration.
      * </p>
      * 
      * @param positions    Current positions x[n]
@@ -180,3 +180,5 @@ public class VerletIntegrator {
         return new double[][] { xNew, vNew };
     }
 }
+
+

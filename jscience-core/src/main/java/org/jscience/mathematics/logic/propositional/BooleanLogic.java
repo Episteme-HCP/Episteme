@@ -68,3 +68,5 @@ public class BooleanLogic implements Logic<Boolean> {
         return !a;
     }
 }
+
+

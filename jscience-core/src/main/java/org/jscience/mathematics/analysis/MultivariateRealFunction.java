@@ -49,7 +49,7 @@ public interface MultivariateRealFunction extends Function<Vector<Real>, Real> {
      * Computes the gradient of the function at the given point.
      * <p>
      * The gradient is the vector of partial derivatives:
-     * ∇f = (∂f/∂x1, ∂f/∂x2, ..., ∂f/∂xn)
+     * Ã¢Ë†â€¡f = (Ã¢Ë†â€šf/Ã¢Ë†â€šx1, Ã¢Ë†â€šf/Ã¢Ë†â€šx2, ..., Ã¢Ë†â€šf/Ã¢Ë†â€šxn)
      * </p>
      * 
      * @param point the point at which to compute the gradient
@@ -71,7 +71,7 @@ public interface MultivariateRealFunction extends Function<Vector<Real>, Real> {
      * 
      * @param point         the point at which to compute the derivative
      * @param variableIndex the index of the variable (0-based)
-     * @return the partial derivative ∂f/∂xi
+     * @return the partial derivative Ã¢Ë†â€šf/Ã¢Ë†â€šxi
      */
     default Real partialDerivative(Vector<Real> point, int variableIndex) {
         // Central difference approximation: (f(x+h) - f(x-h)) / 2h
@@ -112,3 +112,4 @@ public interface MultivariateRealFunction extends Function<Vector<Real>, Real> {
         return "R";
     }
 }
+

@@ -44,7 +44,7 @@ public class StatisticalMechanics {
     /** Exponent for Maxwell-Boltzmann prefactor: 3/2 */
     private static final Real THREE_HALVES = Real.of(3).divide(Real.TWO);
 
-    /** Partition function: Z = Σᵢ e^(-Eᵢ/kT) */
+    /** Partition function: Z = ÃŽÂ£Ã¡ÂµÂ¢ e^(-EÃ¡ÂµÂ¢/kT) */
     public static Real partitionFunction(Vector<Real> energies, Real temperature) {
         Real kT = PhysicalConstants.k_B.multiply(temperature);
         Real Z = Real.ZERO;
@@ -55,7 +55,7 @@ public class StatisticalMechanics {
         return Z;
     }
 
-    /** Boltzmann entropy: S = k ln(Ω) */
+    /** Boltzmann entropy: S = k ln(ÃŽÂ©) */
     public static Real boltzmannEntropy(Real numMicrostates) {
         return PhysicalConstants.k_B.multiply(numMicrostates.log());
     }
@@ -76,19 +76,19 @@ public class StatisticalMechanics {
         return kT.pow(2).multiply(dZdT).divide(partitionFunction);
     }
 
-    /** Heat capacity: C = ∂<E>/∂T */
+    /** Heat capacity: C = Ã¢Ë†â€š<E>/Ã¢Ë†â€šT */
     public static Real heatCapacity(Real dEnergyDT) {
         return dEnergyDT;
     }
 
-    /** Fermi-Dirac distribution: f(E) = 1/(e^((E-μ)/kT) + 1) */
+    /** Fermi-Dirac distribution: f(E) = 1/(e^((E-ÃŽÂ¼)/kT) + 1) */
     public static Real fermiDiracDistribution(Real energy, Real chemicalPotential, Real temperature) {
         Real kT = PhysicalConstants.k_B.multiply(temperature);
         Real exponent = energy.subtract(chemicalPotential).divide(kT);
         return Real.ONE.divide(Real.ONE.add(exponent.exp()));
     }
 
-    /** Bose-Einstein distribution: f(E) = 1/(e^((E-μ)/kT) - 1) */
+    /** Bose-Einstein distribution: f(E) = 1/(e^((E-ÃŽÂ¼)/kT) - 1) */
     public static Real boseEinsteinDistribution(Real energy, Real chemicalPotential, Real temperature) {
         Real kT = PhysicalConstants.k_B.multiply(temperature);
         Real exponent = energy.subtract(chemicalPotential).divide(kT);
@@ -105,3 +105,5 @@ public class StatisticalMechanics {
         return internalEnergy.subtract(temperature.multiply(entropy));
     }
 }
+
+

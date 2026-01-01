@@ -212,3 +212,4 @@ public interface Matrix<E> extends Ring<Matrix<E>>, Module<Matrix<E>, E> {
         return t;
     }
 }
+

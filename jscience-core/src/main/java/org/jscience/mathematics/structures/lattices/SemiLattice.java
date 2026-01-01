@@ -30,16 +30,16 @@ import org.jscience.mathematics.structures.groups.Magma;
  * operation.
  * <p>
  * This structure represents half of a lattice. The operation is typically
- * called "join" (∨) or "meet" (∧).
+ * called "join" (Ã¢Ë†Â¨) or "meet" (Ã¢Ë†Â§).
  * </p>
  *
  * <h2>Mathematical Definition</h2>
  * <p>
- * A semilattice (S, •) satisfies:
+ * A semilattice (S, Ã¢â‚¬Â¢) satisfies:
  * <ul>
- * <li><strong>Associativity</strong>: (a • b) • c = a • (b • c)</li>
- * <li><strong>Commutativity</strong>: a • b = b • a</li>
- * <li><strong>Idempotency</strong>: a • a = a</li>
+ * <li><strong>Associativity</strong>: (a Ã¢â‚¬Â¢ b) Ã¢â‚¬Â¢ c = a Ã¢â‚¬Â¢ (b Ã¢â‚¬Â¢ c)</li>
+ * <li><strong>Commutativity</strong>: a Ã¢â‚¬Â¢ b = b Ã¢â‚¬Â¢ a</li>
+ * <li><strong>Idempotency</strong>: a Ã¢â‚¬Â¢ a = a</li>
  * </ul>
  * </p>
  *
@@ -63,7 +63,7 @@ public interface SemiLattice<E> extends Magma<E> {
     }
 
     /**
-     * Tests for idempotency (a • a = a).
+     * Tests for idempotency (a Ã¢â‚¬Â¢ a = a).
      * 
      * @return always true for semilattices
      */
@@ -71,3 +71,4 @@ public interface SemiLattice<E> extends Magma<E> {
         return true;
     }
 }
+

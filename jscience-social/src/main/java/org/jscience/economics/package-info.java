@@ -22,10 +22,6 @@
  */
 
 /**
- * Economics package - economic modeling, currency, and financial calculations.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * - economic modeling, currency, and financial calculations.
  */
 package org.jscience.economics;

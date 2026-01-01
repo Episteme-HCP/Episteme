@@ -48,3 +48,5 @@ public interface RealDoubleVectorStorage extends VectorStorage<Real> {
      */
     double[] toDoubleArray();
 }
+
+

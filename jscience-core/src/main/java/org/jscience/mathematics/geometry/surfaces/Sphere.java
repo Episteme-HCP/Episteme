@@ -34,8 +34,8 @@ import java.util.Arrays;
  * Represents a sphere as a parametric surface.
  * <p>
  * Spherical coordinates parametrization:
- * S(θ,φ) = center + (r*sin(θ)*cos(φ), r*sin(θ)*sin(φ), r*cos(θ))
- * where θ ∈ [0,π] is the polar angle and φ ∈ [0,2π] is the azimuthal angle.
+ * S(ÃŽÂ¸,Ãâ€ ) = center + (r*sin(ÃŽÂ¸)*cos(Ãâ€ ), r*sin(ÃŽÂ¸)*sin(Ãâ€ ), r*cos(ÃŽÂ¸))
+ * where ÃŽÂ¸ Ã¢Ë†Ë† [0,Ãâ‚¬] is the polar angle and Ãâ€  Ã¢Ë†Ë† [0,2Ãâ‚¬] is the azimuthal angle.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -67,9 +67,9 @@ public class Sphere implements ParametricSurface {
 
     @Override
     public PointND at(Real theta, Real phi) {
-        // x = r*sin(θ)*cos(φ)
-        // y = r*sin(θ)*sin(φ)
-        // z = r*cos(θ)
+        // x = r*sin(ÃŽÂ¸)*cos(Ãâ€ )
+        // y = r*sin(ÃŽÂ¸)*sin(Ãâ€ )
+        // z = r*cos(ÃŽÂ¸)
 
         double t = theta.doubleValue();
         double p = phi.doubleValue();
@@ -98,14 +98,14 @@ public class Sphere implements ParametricSurface {
 
     @Override
     public Real gaussianCurvature(Real theta, Real phi, Real h) {
-        // Sphere has constant Gaussian curvature K = 1/r²
+        // Sphere has constant Gaussian curvature K = 1/rÃ‚Â²
         return Real.ONE.divide(radius.multiply(radius));
     }
 
     /**
      * Returns the surface area of the sphere.
      * 
-     * @return 4πr²
+     * @return 4Ãâ‚¬rÃ‚Â²
      */
     public Real surfaceArea() {
         return radius.multiply(radius).multiply(Real.of(4 * Math.PI));
@@ -114,7 +114,7 @@ public class Sphere implements ParametricSurface {
     /**
      * Returns the volume of the sphere.
      * 
-     * @return (4/3)πr³
+     * @return (4/3)Ãâ‚¬rÃ‚Â³
      */
     public Real volume() {
         return radius.pow(3).multiply(Real.of(4.0 / 3.0 * Math.PI));
@@ -155,3 +155,5 @@ public class Sphere implements ParametricSurface {
         return "Sphere(center=" + center + ", radius=" + radius + ")";
     }
 }
+
+

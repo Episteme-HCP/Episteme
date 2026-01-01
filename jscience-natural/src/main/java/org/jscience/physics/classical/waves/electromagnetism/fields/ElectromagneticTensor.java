@@ -149,3 +149,5 @@ public class ElectromagneticTensor {
         return new DenseTensor<>(Edata, 4);
     }
 }
+
+

@@ -61,3 +61,4 @@ public interface DiscreteMap<T> extends Function<T, T> {
         return Double.NaN;
     }
 }
+

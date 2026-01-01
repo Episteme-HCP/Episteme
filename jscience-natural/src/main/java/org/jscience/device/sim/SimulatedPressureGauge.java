@@ -46,7 +46,7 @@ public class SimulatedPressureGauge extends SimulatedDevice implements PressureG
     private String pressureUnit = "kPa";
 
     public SimulatedPressureGauge() {
-        this("Pressure Gauge");
+        this("Simulated PressureGauge");
     }
 
     public SimulatedPressureGauge(String name) {

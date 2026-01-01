@@ -207,3 +207,5 @@ public class Segment3D implements GeometricObject<Point3D> {
         return new Segment3D(newStart, newEnd);
     }
 }
+
+

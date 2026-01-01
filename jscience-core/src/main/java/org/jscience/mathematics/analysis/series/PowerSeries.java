@@ -28,7 +28,7 @@ import org.jscience.mathematics.sequences.InfiniteSequence;
 import java.util.function.Function;
 
 /**
- * Power series: Σ a_n * x^n, n=0..∞
+ * Power series: ÃŽÂ£ a_n * x^n, n=0..Ã¢Ë†Å¾
  * <p>
  * Power series are fundamental for Taylor and Maclaurin expansions.
  * A power series has a radius of convergence R such that:
@@ -42,13 +42,13 @@ import java.util.function.Function;
  * <h2>Common Examples</h2>
  *
  * <pre>
- * // e^x = Σ x^n/n!, R = ∞
+ * // e^x = ÃŽÂ£ x^n/n!, R = Ã¢Ë†Å¾
  * PowerSeries exp = PowerSeries.exponential();
  *
- * // sin(x) = Σ (-1)^n * x^(2n+1)/(2n+1)!, R = ∞
+ * // sin(x) = ÃŽÂ£ (-1)^n * x^(2n+1)/(2n+1)!, R = Ã¢Ë†Å¾
  * PowerSeries sin = PowerSeries.sine();
  *
- * // 1/(1-x) = Σ x^n, R = 1
+ * // 1/(1-x) = ÃŽÂ£ x^n, R = 1
  * PowerSeries geometric = new PowerSeries(n -> Real.ONE);
  * </pre>
  *
@@ -170,7 +170,7 @@ public class PowerSeries implements InfiniteSeries<Real>, InfiniteSequence<Real>
     // Factory methods for common power series
 
     /**
-     * Creates the exponential series: e^x = Σ x^n/n!
+     * Creates the exponential series: e^x = ÃŽÂ£ x^n/n!
      * 
      * @return exponential power series
      */
@@ -185,7 +185,7 @@ public class PowerSeries implements InfiniteSeries<Real>, InfiniteSequence<Real>
     }
 
     /**
-     * Creates the sine series: sin(x) = Σ (-1)^n * x^(2n+1)/(2n+1)!
+     * Creates the sine series: sin(x) = ÃŽÂ£ (-1)^n * x^(2n+1)/(2n+1)!
      * 
      * @return sine power series
      */
@@ -209,7 +209,7 @@ public class PowerSeries implements InfiniteSeries<Real>, InfiniteSequence<Real>
     }
 
     /**
-     * Creates the cosine series: cos(x) = Σ (-1)^n * x^(2n)/(2n)!
+     * Creates the cosine series: cos(x) = ÃŽÂ£ (-1)^n * x^(2n)/(2n)!
      * 
      * @return cosine power series
      */
@@ -232,7 +232,7 @@ public class PowerSeries implements InfiniteSeries<Real>, InfiniteSequence<Real>
     }
 
     /**
-     * Creates the natural logarithm series: ln(1+x) = Σ (-1)^(n-1) * x^n / n for n
+     * Creates the natural logarithm series: ln(1+x) = ÃŽÂ£ (-1)^(n-1) * x^n / n for n
      * >= 1
      * 
      * @return logarithm power series (centered at 0 for ln(1+x))
@@ -250,7 +250,7 @@ public class PowerSeries implements InfiniteSeries<Real>, InfiniteSequence<Real>
     }
 
     /**
-     * Creates the arctangent series: atan(x) = Σ (-1)^n * x^(2n+1) / (2n+1)
+     * Creates the arctangent series: atan(x) = ÃŽÂ£ (-1)^n * x^(2n+1) / (2n+1)
      * 
      * @return arctangent power series
      */
@@ -268,7 +268,7 @@ public class PowerSeries implements InfiniteSeries<Real>, InfiniteSequence<Real>
     }
 
     /**
-     * Creates the hyperbolic sine series: sinh(x) = Σ x^(2n+1)/(2n+1)!
+     * Creates the hyperbolic sine series: sinh(x) = ÃŽÂ£ x^(2n+1)/(2n+1)!
      * 
      * @return hyperbolic sine power series
      */
@@ -285,7 +285,7 @@ public class PowerSeries implements InfiniteSeries<Real>, InfiniteSequence<Real>
     }
 
     /**
-     * Creates the hyperbolic cosine series: cosh(x) = Σ x^(2n)/(2n)!
+     * Creates the hyperbolic cosine series: cosh(x) = ÃŽÂ£ x^(2n)/(2n)!
      * 
      * @return hyperbolic cosine power series
      */
@@ -371,3 +371,4 @@ public class PowerSeries implements InfiniteSeries<Real>, InfiniteSequence<Real>
                 x, radiusOfConvergence, isConvergent() ? "convergent" : "divergent");
     }
 }
+

@@ -127,3 +127,5 @@ public abstract class Resource<Q extends Quantity<Q>> implements Serializable {
         return name + " (" + quantity + ")";
     }
 }
+
+

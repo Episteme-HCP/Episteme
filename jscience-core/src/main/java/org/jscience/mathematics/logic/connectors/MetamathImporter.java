@@ -118,3 +118,4 @@ public class MetamathImporter implements FormalSystemImporter {
         return new String[] { ".mm" };
     }
 }
+

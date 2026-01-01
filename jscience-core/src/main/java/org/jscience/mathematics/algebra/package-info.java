@@ -22,40 +22,6 @@
  */
 
 /**
- * Core algebraic structures following mathematical hierarchy.
- * <p>
- * This package defines fundamental algebraic concepts:
- * </p>
- *
- * <pre>
- * Set (membership)
- * ↓
- * Magma (binary operation)
- * ↓
- * Group (identity + inverse)
- * ↓
- * AbelianGroup (commutativity)
- * ↓
- * Ring (second operation: multiplication)
- * ↓
- * Field (division)
- * </pre>
- *
- * <h2>Design Philosophy</h2>
- * <p>
- * These interfaces respect pure mathematical definitions while enabling
- * practical implementations. All structures are generic, allowing:
- * </p>
- * <ul>
- * <li>Double precision for performance (default)</li>
- * <li>BigDecimal for arbitrary precision</li>
- * <li>GPU types for acceleration</li>
- * </ul>
- *
- * <h2>Usage Example</h2>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Defines fundamental algebraic concepts:
  */
 package org.jscience.mathematics.algebra;

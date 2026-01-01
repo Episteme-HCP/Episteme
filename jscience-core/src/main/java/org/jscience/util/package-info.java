@@ -21,11 +21,5 @@
  * SOFTWARE.
  */
 
-/**
- * Utility classes and core framework infrastructure.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.util;
+

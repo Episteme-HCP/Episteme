@@ -97,3 +97,5 @@ public interface Logic<T> {
         return and(implies(a, b), implies(b, a));
     }
 }
+
+

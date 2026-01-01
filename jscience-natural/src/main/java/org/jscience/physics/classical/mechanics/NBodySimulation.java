@@ -33,7 +33,7 @@ import org.jscience.physics.PhysicalConstants;
 import org.jscience.measure.Units;
 
 /**
- * Direct N-body gravitational simulation (O(n²)).
+ * Direct N-body gravitational simulation (O(nÃ‚Â²)).
  * <p>
  *
  * @author Silvere Martin-Michiellot
@@ -170,3 +170,5 @@ public class NBodySimulation {
         return sim;
     }
 }
+
+

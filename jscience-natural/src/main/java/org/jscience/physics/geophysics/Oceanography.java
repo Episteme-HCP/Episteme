@@ -36,7 +36,7 @@ import org.jscience.physics.PhysicalConstants;
  */
 public class Oceanography {
 
-    /** Standard density of seawater (kg/m³) */
+    /** Standard density of seawater (kg/mÃ‚Â³) */
     public static final Real RHO_SEAWATER = Real.of(1025);
 
     /** Use standard gravitational acceleration from PhysicalConstants */
@@ -44,7 +44,7 @@ public class Oceanography {
 
     /**
      * Deep water wave speed.
-     * c = √(gL / 2π) = gT / 2π
+     * c = Ã¢Ë†Å¡(gL / 2Ãâ‚¬) = gT / 2Ãâ‚¬
      */
     public static Real deepWaterWaveSpeed(Real wavelength) {
         return G.multiply(wavelength).divide(Real.TWO_PI).sqrt();
@@ -59,7 +59,7 @@ public class Oceanography {
 
     /**
      * Shallow water wave speed.
-     * c = √(gh)
+     * c = Ã¢Ë†Å¡(gh)
      */
     public static Real shallowWaterWaveSpeed(Real depth) {
         return G.multiply(depth).sqrt();
@@ -67,7 +67,7 @@ public class Oceanography {
 
     /**
      * General dispersion relation (solved iteratively).
-     * ω² = gk * tanh(kh)
+     * Ãâ€°Ã‚Â² = gk * tanh(kh)
      */
     public static Real waveNumber(Real period, Real depth) {
         Real omega = Real.TWO_PI.divide(period);
@@ -93,7 +93,7 @@ public class Oceanography {
 
     /**
      * Significant wave height from wind (simplified).
-     * H_s ≈ 0.0246 * U² (Fully developed sea)
+     * H_s Ã¢â€°Ë† 0.0246 * UÃ‚Â² (Fully developed sea)
      */
     public static Real significantWaveHeight(Real windSpeed) {
         return Real.of(0.0246).multiply(windSpeed.pow(2));
@@ -101,7 +101,7 @@ public class Oceanography {
 
     /**
      * Tidal constituent prediction.
-     * η(t) = Σ A_i * cos(ω_i * t - φ_i)
+     * ÃŽÂ·(t) = ÃŽÂ£ A_i * cos(Ãâ€°_i * t - Ãâ€ _i)
      */
     public static Real tidalHeight(Real time, Vector<Real> amplitudes,
             Vector<Real> frequencies, Vector<Real> phases) {
@@ -115,7 +115,7 @@ public class Oceanography {
 
     /**
      * M2 tidal constituent frequency (rad/s).
-     * Period ≈ 12.42 hours
+     * Period Ã¢â€°Ë† 12.42 hours
      */
     public static final Real OMEGA_M2 = Real.TWO_PI.divide(Real.of(12.42 * 3600));
 
@@ -130,7 +130,7 @@ public class Oceanography {
      */
     public static Real seawaterDensity(Real temperature, Real salinity) {
         Real rho0 = Real.of(1028.1);
-        Real alpha = Real.of(0.00015); // Thermal expansion (1/°C)
+        Real alpha = Real.of(0.00015); // Thermal expansion (1/Ã‚Â°C)
         Real beta = Real.of(0.00078); // Haline contraction (1/PSU)
 
         // rho0 * (1 - alpha * (temperature - 10) + beta * (salinity - 35))
@@ -159,7 +159,7 @@ public class Oceanography {
 
     /**
      * Mixed layer depth estimate from wind stress.
-     * h_ml ≈ (2 * τ * t / ρ)^(1/2) (simplified Kraus-Turner)
+     * h_ml Ã¢â€°Ë† (2 * Ãâ€ž * t / ÃÂ)^(1/2) (simplified Kraus-Turner)
      */
     public static Real mixedLayerDepth(Real windStress, Real time, Real density) {
         return Real.TWO.multiply(windStress).multiply(time).divide(density).sqrt();
@@ -167,7 +167,7 @@ public class Oceanography {
 
     /**
      * Ekman transport.
-     * M_E = τ / (ρ * f) where f = 2Ω sin(φ)
+     * M_E = Ãâ€ž / (ÃÂ * f) where f = 2ÃŽÂ© sin(Ãâ€ )
      */
     public static Real ekmanTransport(Real windStress, Real latitude) {
         Real omega = Real.of(7.292e-5); // Earth's rotation rate
@@ -176,11 +176,13 @@ public class Oceanography {
     }
 
     /**
-     * Brunt-Väisälä (buoyancy) frequency.
-     * N² = -(g/ρ) * dρ/dz
+     * Brunt-VÃƒÂ¤isÃƒÂ¤lÃƒÂ¤ (buoyancy) frequency.
+     * NÃ‚Â² = -(g/ÃÂ) * dÃÂ/dz
      */
     public static Real bruntVaisalaFrequency(Real densityGradient, Real meanDensity) {
         Real N2 = G.negate().divide(meanDensity).multiply(densityGradient);
         return (N2.compareTo(Real.ZERO) > 0) ? N2.sqrt() : Real.ZERO;
     }
 }
+
+

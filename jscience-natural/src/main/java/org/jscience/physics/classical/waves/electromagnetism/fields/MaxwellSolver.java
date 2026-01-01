@@ -48,3 +48,5 @@ public interface MaxwellSolver {
 
     // Future: solve(Vector4D[] grid, CurrentDensitySource source)
 }
+
+

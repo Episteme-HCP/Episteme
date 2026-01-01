@@ -85,10 +85,10 @@ public class RSA {
         // Compute n = p * q
         BigInteger n = p.multiply(q);
 
-        // Compute φ(n) = (p-1)(q-1)
+        // Compute Ãâ€ (n) = (p-1)(q-1)
         BigInteger phi = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
 
-        // Choose e such that 1 < e < φ(n) and gcd(e, φ(n)) = 1
+        // Choose e such that 1 < e < Ãâ€ (n) and gcd(e, Ãâ€ (n)) = 1
         BigInteger e = BigInteger.valueOf(65537); // Common choice (2^16 + 1)
 
         // Ensure gcd(e, phi) = 1
@@ -96,7 +96,7 @@ public class RSA {
             e = e.add(BigInteger.ONE);
         }
 
-        // Compute d ≡ e^(-1) (mod φ(n))
+        // Compute d Ã¢â€°Â¡ e^(-1) (mod Ãâ€ (n))
         BigInteger d = e.modInverse(phi);
 
         return new KeyPair(new PublicKey(n, e), new PrivateKey(n, d));
@@ -134,3 +134,5 @@ public class RSA {
         return verified.equals(message);
     }
 }
+
+

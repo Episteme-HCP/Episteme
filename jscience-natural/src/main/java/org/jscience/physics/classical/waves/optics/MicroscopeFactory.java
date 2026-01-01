@@ -71,7 +71,7 @@ public class MicroscopeFactory {
 
     /**
      * Calculates numerical aperture (NA).
-     * NA = n * sin(θ)
+     * NA = n * sin(ÃŽÂ¸)
      * 
      * @param refractiveIndex Medium refractive index (1.0 for air, ~1.5 for oil)
      * @param halfAngle       Half-angle of maximum cone of light (radians)
@@ -83,7 +83,7 @@ public class MicroscopeFactory {
 
     /**
      * Calculates resolution limit (Rayleigh criterion).
-     * d = 0.61 * λ / NA
+     * d = 0.61 * ÃŽÂ» / NA
      * 
      * @param wavelength        Wavelength of light
      * @param numericalAperture Numerical aperture of objective
@@ -95,7 +95,7 @@ public class MicroscopeFactory {
 
     /**
      * Calculates depth of field.
-     * DOF ≈ λ * n / NA²
+     * DOF Ã¢â€°Ë† ÃŽÂ» * n / NAÃ‚Â²
      * 
      * @param wavelength        Wavelength of light
      * @param refractiveIndex   Medium refractive index
@@ -106,3 +106,5 @@ public class MicroscopeFactory {
         return wavelength.multiply(refractiveIndex).divide(numericalAperture.pow(2));
     }
 }
+
+

@@ -69,7 +69,7 @@ public class CoordinateConverter {
 
     /**
      * Ecliptic to Equatorial (J2000).
-     * Standard obliquity ε = 23.4392911°
+     * Standard obliquity ÃŽÂµ = 23.4392911Ã‚Â°
      */
     public static EquatorialCoordinate eclipticToEquatorial(double eclipticLon, double eclipticLat) {
         double eps = Math.toRadians(23.4392911);
@@ -110,3 +110,5 @@ public class CoordinateConverter {
         return deg < 0 ? deg + 360.0 : deg;
     }
 }
+
+

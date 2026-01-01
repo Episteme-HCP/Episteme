@@ -96,3 +96,5 @@ public class StlMeshLoaderTest {
         assertEquals(1, mesh.getFaces().size() / 6); // 1 face * 6 indices
     }
 }
+
+

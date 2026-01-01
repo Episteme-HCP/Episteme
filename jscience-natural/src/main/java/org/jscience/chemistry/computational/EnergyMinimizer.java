@@ -102,3 +102,5 @@ public class EnergyMinimizer {
         return energy;
     }
 }
+
+

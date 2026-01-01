@@ -163,3 +163,5 @@ public class Vector4D extends DenseVector<Real> implements
         return new Vector4D(ct().add(other.ct()), x().add(other.x()), y().add(other.y()), z().add(other.z()));
     }
 }
+
+

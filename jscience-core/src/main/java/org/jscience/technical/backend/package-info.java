@@ -22,19 +22,6 @@
  */
 
 /**
- * Pluggable compute backend abstraction layer.
- * <p>
- * This package provides a Service Provider Interface (SPI) for implementing
- * compute backends (CPU, GPU, quantum, etc.) while hiding implementation
- * details
- * from users.
- * </p>
- * <p>
- * <b>Key interfaces:</b>
- * <ul>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Provides a Service Provider Interface (SPI) for implementing
  */
 package org.jscience.technical.backend;

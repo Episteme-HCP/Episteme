@@ -59,7 +59,7 @@ public class DataNormalization {
 
     /**
      * Z-score normalization (standardization).
-     * z = (x - μ) / σ
+     * z = (x - ÃŽÂ¼) / ÃÆ’
      */
     public static double[] zScoreNormalize(double[] data) {
         double mean = mean(data);
@@ -120,3 +120,5 @@ public class DataNormalization {
         return Math.sqrt(sumSq / data.length);
     }
 }
+
+

@@ -34,7 +34,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.AppProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,11 +46,11 @@ import java.util.Random;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GeographyGISDemo implements DemoProvider {
+public class GeographyGISDemo implements AppProvider {
 
     private Canvas canvas;
     private WritableImage terrainCache;
-    private int width = 800;
+    private int width = 800; // ... existing fields
     private int height = 600;
     private long seed;
     private double[][] heightMap;
@@ -61,8 +61,13 @@ public class GeographyGISDemo implements DemoProvider {
     private CheckBox popChk;
 
     @Override
+    public boolean isDemo() {
+        return true;
+    }
+
+    @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.geography");
+        return "Geography";
     }
 
     @Override
@@ -288,3 +293,5 @@ public class GeographyGISDemo implements DemoProvider {
         }
     }
 }
+
+

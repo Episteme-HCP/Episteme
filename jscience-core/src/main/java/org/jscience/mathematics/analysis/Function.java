@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * Represents a mathematical function from a domain D to a codomain C.
  * <p>
- * A function is a relation where for every x ∈ D, there is exactly one y ∈ C
+ * A function is a relation where for every x Ã¢Ë†Ë† D, there is exactly one y Ã¢Ë†Ë† C
  * such that (x, y) is in the relation.
  * </p>
  * <p>
@@ -169,3 +169,4 @@ public interface Function<D, C> extends Relation<D, C>, java.util.function.Funct
         return false;
     }
 }
+

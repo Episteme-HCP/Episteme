@@ -1,0 +1,134 @@
+# JScience Grid - Docker Compose Configuration
+# Spins up 1 Server + 5 Workers + Monitoring Stack (Prometheus/Grafana)
+
+version: '3.8'
+
+services:
+  # ===== JScience Server =====
+  server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.server
+    container_name: jscience-server
+    ports:
+      - "50051:50051" # gRPC port
+      - "8080:8080" # Metrics endpoint (future)
+    environment:
+      - DISCOVERY=true
+      - PORT=50051
+    networks:
+      - jscience-grid
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "50051" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ===== JScience Workers (5 instances) =====
+  worker-1:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    container_name: jscience-worker-1
+    depends_on:
+      server:
+        condition: service_healthy
+    environment:
+      - SERVER_HOST=server
+      - SERVER_PORT=50051
+    networks:
+      - jscience-grid
+
+  worker-2:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    container_name: jscience-worker-2
+    depends_on:
+      server:
+        condition: service_healthy
+    environment:
+      - SERVER_HOST=server
+      - SERVER_PORT=50051
+    networks:
+      - jscience-grid
+
+  worker-3:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    container_name: jscience-worker-3
+    depends_on:
+      server:
+        condition: service_healthy
+    environment:
+      - SERVER_HOST=server
+      - SERVER_PORT=50051
+    networks:
+      - jscience-grid
+
+  worker-4:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    container_name: jscience-worker-4
+    depends_on:
+      server:
+        condition: service_healthy
+    environment:
+      - SERVER_HOST=server
+      - SERVER_PORT=50051
+    networks:
+      - jscience-grid
+
+  worker-5:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    container_name: jscience-worker-5
+    depends_on:
+      server:
+        condition: service_healthy
+    environment:
+      - SERVER_HOST=server
+      - SERVER_PORT=50051
+    networks:
+      - jscience-grid
+
+  # ===== Monitoring Stack =====
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: jscience-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - jscience-grid
+
+  grafana:
+    image: grafana/grafana:10.0.0
+    container_name: jscience-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=jscience
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - jscience-grid
+
+networks:
+  jscience-grid:
+    driver: bridge
+
+volumes:
+  prometheus-data:
+  grafana-data:

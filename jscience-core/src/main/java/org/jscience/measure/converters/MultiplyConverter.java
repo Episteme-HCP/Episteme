@@ -74,6 +74,7 @@ public class MultiplyConverter implements UnitConverter {
 
     @Override
     public String toString() {
-        return "×" + factor;
+        return "Ãƒâ€”" + factor;
     }
 }
+

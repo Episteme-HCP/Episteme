@@ -47,3 +47,5 @@ public interface HilbertSpace<E, S> extends BanachSpace<E, S> {
 
     // Note: norm(x) is typically sqrt(<x, x>)
 }
+
+

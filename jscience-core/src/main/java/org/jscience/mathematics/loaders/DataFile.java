@@ -85,3 +85,4 @@ public interface DataFile extends AutoCloseable {
      */
     String getFormatDescription();
 }
+

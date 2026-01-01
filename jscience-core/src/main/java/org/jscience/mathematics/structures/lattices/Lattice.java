@@ -27,18 +27,18 @@ import org.jscience.mathematics.structures.sets.Set;
 
 /**
  * A lattice is a set equipped with two commutative, associative and idempotent
- * binary operations: join (∨) and meet (∧), connected by absorption laws.
+ * binary operations: join (Ã¢Ë†Â¨) and meet (Ã¢Ë†Â§), connected by absorption laws.
  *
  * <h2>Mathematical Definition</h2>
  * <p>
- * A lattice (L, ∨, ∧) satisfies:
+ * A lattice (L, Ã¢Ë†Â¨, Ã¢Ë†Â§) satisfies:
  * <ul>
- * <li>(L, ∨) is a semilattice (Join)</li>
- * <li>(L, ∧) is a semilattice (Meet)</li>
+ * <li>(L, Ã¢Ë†Â¨) is a semilattice (Join)</li>
+ * <li>(L, Ã¢Ë†Â§) is a semilattice (Meet)</li>
  * <li><strong>Absorption Laws</strong>:
  * <ul>
- * <li>a ∨ (a ∧ b) = a</li>
- * <li>a ∧ (a ∨ b) = a</li>
+ * <li>a Ã¢Ë†Â¨ (a Ã¢Ë†Â§ b) = a</li>
+ * <li>a Ã¢Ë†Â§ (a Ã¢Ë†Â¨ b) = a</li>
  * </ul>
  * </li>
  * </ul>
@@ -47,9 +47,9 @@ import org.jscience.mathematics.structures.sets.Set;
  * <h2>Examples</h2>
  * <ul>
  * <li>Boolean Algebra ({0,1}, OR, AND)</li>
- * <li>Power Set (P(S), ∪, ∩)</li>
- * <li>Natural Numbers (ℕ, max, min)</li>
- * <li>Divisibility (ℕ, lcm, gcd)</li>
+ * <li>Power Set (P(S), Ã¢Ë†Âª, Ã¢Ë†Â©)</li>
+ * <li>Natural Numbers (Ã¢â€žâ€¢, max, min)</li>
+ * <li>Divisibility (Ã¢â€žâ€¢, lcm, gcd)</li>
  * </ul>
  *
  * @author Silvere Martin-Michiellot
@@ -59,20 +59,21 @@ import org.jscience.mathematics.structures.sets.Set;
 public interface Lattice<E> extends Set<E> {
 
     /**
-     * The join operation (∨, least upper bound).
+     * The join operation (Ã¢Ë†Â¨, least upper bound).
      * 
      * @param a first operand
      * @param b second operand
-     * @return a ∨ b
+     * @return a Ã¢Ë†Â¨ b
      */
     E join(E a, E b);
 
     /**
-     * The meet operation (∧, greatest lower bound).
+     * The meet operation (Ã¢Ë†Â§, greatest lower bound).
      * 
      * @param a first operand
      * @param b second operand
-     * @return a ∧ b
+     * @return a Ã¢Ë†Â§ b
      */
     E meet(E a, E b);
 }
+

@@ -37,7 +37,7 @@ public class PoissonDistribution extends DiscreteDistribution {
 
     public PoissonDistribution(Real lambda) {
         if (lambda.compareTo(Real.ZERO) <= 0)
-            throw new IllegalArgumentException("λ must be positive");
+            throw new IllegalArgumentException("ÃŽÂ» must be positive");
         this.lambda = lambda;
     }
 
@@ -66,6 +66,7 @@ public class PoissonDistribution extends DiscreteDistribution {
 
     @Override
     public String toString() {
-        return String.format("Poisson(λ=%.4f)", lambda.doubleValue());
+        return String.format("Poisson(ÃŽÂ»=%.4f)", lambda.doubleValue());
     }
 }
+

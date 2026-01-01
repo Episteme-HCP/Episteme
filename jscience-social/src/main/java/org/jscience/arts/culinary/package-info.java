@@ -22,10 +22,6 @@
  */
 
 /**
- * Culinary arts package - recipes, cooking techniques.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * - recipes, cooking techniques.
  */
 package org.jscience.arts.culinary;

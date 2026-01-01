@@ -243,3 +243,5 @@ public interface SpacetimeMetric extends MetricSpace<Vector4D> {
         return "Spacetime manifold equipped with a metric tensor";
     }
 }
+
+

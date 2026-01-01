@@ -131,3 +131,5 @@ public class TechnicalIndicatorsTest {
         assertFalse(TechnicalIndicators.isBelowSMA(bull, 3, 0.10));
     }
 }
+
+

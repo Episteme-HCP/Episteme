@@ -240,3 +240,4 @@ public final class IntegerInterval {
         return closedOpen(start, end);
     }
 }
+

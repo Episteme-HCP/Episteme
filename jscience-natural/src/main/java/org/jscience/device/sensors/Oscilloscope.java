@@ -77,3 +77,5 @@ public interface Oscilloscope extends Sensor<Real> {
 
     double getBandwidth();
 }
+
+

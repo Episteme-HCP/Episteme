@@ -120,3 +120,5 @@ public class SymmetricMatrixStorage<E> implements MatrixStorage<E> {
         this.upperTriangle = (E[]) new Object[0];
     }
 }
+
+

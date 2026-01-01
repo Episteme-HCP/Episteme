@@ -259,3 +259,4 @@ final class IntegerInt extends Integer {
         return left.multiply(right);
     }
 }
+

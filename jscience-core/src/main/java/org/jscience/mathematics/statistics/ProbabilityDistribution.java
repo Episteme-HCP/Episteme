@@ -27,8 +27,8 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.analysis.ContinuousFunction;
 
 /**
- * A probability distribution P(X ≤ x).
- * This is a mathematical function from ℝ → [0, 1].
+ * A probability distribution P(X Ã¢â€°Â¤ x).
+ * This is a mathematical function from Ã¢â€žÂ Ã¢â€ â€™ [0, 1].
  * <p>
  *
  * @author Silvere Martin-Michiellot
@@ -48,7 +48,7 @@ public interface ProbabilityDistribution extends ContinuousFunction<Real, Real> 
 
     /**
      * Cumulative distribution function (CDF).
-     * F(x) = P(X ≤ x)
+     * F(x) = P(X Ã¢â€°Â¤ x)
      * 
      * @param x the value to evaluate CDF at
      * @return the cumulative probability
@@ -57,10 +57,10 @@ public interface ProbabilityDistribution extends ContinuousFunction<Real, Real> 
 
     /**
      * Quantile function (inverse CDF).
-     * Q(p) = F⁻¹(p)
+     * Q(p) = FÃ¢ÂÂ»Ã‚Â¹(p)
      * 
      * @param p the cumulative probability (0 to 1)
-     * @return the value x such that P(X ≤ x) = p
+     * @return the value x such that P(X Ã¢â€°Â¤ x) = p
      */
     Real quantile(Real p);
 
@@ -109,3 +109,4 @@ public interface ProbabilityDistribution extends ContinuousFunction<Real, Real> 
      */
     boolean isDiscrete();
 }
+

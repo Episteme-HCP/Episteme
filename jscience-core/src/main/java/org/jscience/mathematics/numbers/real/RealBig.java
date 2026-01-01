@@ -184,3 +184,4 @@ final class RealBig extends Real {
         return 0; // Real numbers have characteristic 0 (infinite field)
     }
 }
+

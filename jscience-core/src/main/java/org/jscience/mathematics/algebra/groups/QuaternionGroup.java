@@ -87,3 +87,5 @@ public class QuaternionGroup implements Group<Quaternion> {
         return ELEMENTS.contains(element);
     }
 }
+
+

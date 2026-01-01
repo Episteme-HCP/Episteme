@@ -26,21 +26,21 @@ package org.jscience.mathematics.analysis;
 /**
  * A bijective function (one-to-one and onto mapping).
  * <p>
- * A bijection is a function f: D → C where:
+ * A bijection is a function f: D Ã¢â€ â€™ C where:
  * <ul>
  * <li><b>Injective</b> (one-to-one): f(x) = f(y) implies x = y</li>
- * <li><b>Surjective</b> (onto): For every c ∈ C, there exists d ∈ D such that
+ * <li><b>Surjective</b> (onto): For every c Ã¢Ë†Ë† C, there exists d Ã¢Ë†Ë† D such that
  * f(d) = c</li>
  * </ul>
- * Every bijection has an inverse function f⁻¹: C → D.
+ * Every bijection has an inverse function fÃ¢ÂÂ»Ã‚Â¹: C Ã¢â€ â€™ D.
  * </p>
  * <p>
  * <b>Examples of bijections:</b>
  * <ul>
- * <li>f(x) = 2x (ℝ → ℝ)</li>
- * <li>f(x) = x³ (ℝ → ℝ)</li>
- * <li>exp(x) (ℝ → ℝ⁺), inverse is ln(x)</li>
- * <li>Fourier Transform (time → frequency)</li>
+ * <li>f(x) = 2x (Ã¢â€žÂ Ã¢â€ â€™ Ã¢â€žÂ)</li>
+ * <li>f(x) = xÃ‚Â³ (Ã¢â€žÂ Ã¢â€ â€™ Ã¢â€žÂ)</li>
+ * <li>exp(x) (Ã¢â€žÂ Ã¢â€ â€™ Ã¢â€žÂÃ¢ÂÂº), inverse is ln(x)</li>
+ * <li>Fourier Transform (time Ã¢â€ â€™ frequency)</li>
  * </ul>
  * </p>
  *
@@ -51,12 +51,12 @@ package org.jscience.mathematics.analysis;
 public interface Bijection<D, C> extends Function<D, C> {
 
     /**
-     * Returns the inverse function f⁻¹.
+     * Returns the inverse function fÃ¢ÂÂ»Ã‚Â¹.
      * <p>
-     * For a bijection f: D → C, the inverse f⁻¹: C → D satisfies:
+     * For a bijection f: D Ã¢â€ â€™ C, the inverse fÃ¢ÂÂ»Ã‚Â¹: C Ã¢â€ â€™ D satisfies:
      * <ul>
-     * <li>f⁻¹(f(x)) = x for all x ∈ D</li>
-     * <li>f(f⁻¹(y)) = y for all y ∈ C</li>
+     * <li>fÃ¢ÂÂ»Ã‚Â¹(f(x)) = x for all x Ã¢Ë†Ë† D</li>
+     * <li>f(fÃ¢ÂÂ»Ã‚Â¹(y)) = y for all y Ã¢Ë†Ë† C</li>
      * </ul>
      * </p>
      * 
@@ -64,3 +64,4 @@ public interface Bijection<D, C> extends Function<D, C> {
      */
     Bijection<C, D> inverse();
 }
+

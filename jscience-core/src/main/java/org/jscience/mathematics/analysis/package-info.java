@@ -21,11 +21,5 @@
  * SOFTWARE.
  */
 
-/**
- * Mathematical analysis, including functions, calculus, and numerical methods.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.mathematics.analysis;
+

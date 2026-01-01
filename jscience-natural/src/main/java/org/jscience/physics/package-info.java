@@ -22,20 +22,6 @@
  */
 
 /**
- * Provides classes for physical modeling and simulation.
- * <p>
- * This package covers:
- * <ul>
- * <li>Classical Mechanics (Kinematics, Dynamics, N-Body)</li>
- * <li>Quantum Mechanics (Process descriptions, Circuits)</li>
- * <li>Astronomy and Astrophysics</li>
- * <li>Thermodynamics and Statistical Mechanics</li>
- * <li>Electromagnetism</li>
- * </ul>
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Covers:
  */
 package org.jscience.physics;

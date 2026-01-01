@@ -89,3 +89,5 @@ public class LiftBuilding {
         return new LiftBuilding(name, minFloor, maxFloor);
     }
 }
+
+

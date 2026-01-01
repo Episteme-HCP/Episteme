@@ -42,7 +42,7 @@ public class StructuralAnalysis {
 
     /**
      * Simply supported beam: maximum deflection at center.
-     * δ_max = (5 * w * L⁴) / (384 * E * I)
+     * ÃŽÂ´_max = (5 * w * LÃ¢ÂÂ´) / (384 * E * I)
      */
     public static Real simpleBeamDeflectionUniform(Real w, Real L, Real E, Real I) {
         return Real.of(5).multiply(w).multiply(L.pow(4)).divide(Real.of(384).multiply(E).multiply(I));
@@ -50,7 +50,7 @@ public class StructuralAnalysis {
 
     /**
      * Simply supported beam: deflection under point load at center.
-     * δ_max = (P * L³) / (48 * E * I)
+     * ÃŽÂ´_max = (P * LÃ‚Â³) / (48 * E * I)
      */
     public static Real simpleBeamDeflectionPoint(Real P, Real L, Real E, Real I) {
         return P.multiply(L.pow(3)).divide(Real.of(48).multiply(E).multiply(I));
@@ -58,7 +58,7 @@ public class StructuralAnalysis {
 
     /**
      * Cantilever beam: deflection at free end under uniform load.
-     * δ_max = (w * L⁴) / (8 * E * I)
+     * ÃŽÂ´_max = (w * LÃ¢ÂÂ´) / (8 * E * I)
      */
     public static Real cantileverDeflectionUniform(Real w, Real L, Real E, Real I) {
         return w.multiply(L.pow(4)).divide(Real.of(8).multiply(E).multiply(I));
@@ -66,7 +66,7 @@ public class StructuralAnalysis {
 
     /**
      * Cantilever beam: deflection at free end under point load.
-     * δ_max = (P * L³) / (3 * E * I)
+     * ÃŽÂ´_max = (P * LÃ‚Â³) / (3 * E * I)
      */
     public static Real cantileverDeflectionPoint(Real P, Real L, Real E, Real I) {
         return P.multiply(L.pow(3)).divide(Real.of(3).multiply(E).multiply(I));
@@ -74,7 +74,7 @@ public class StructuralAnalysis {
 
     /**
      * Maximum bending moment for simply supported beam with uniform load.
-     * M_max = w * L² / 8
+     * M_max = w * LÃ‚Â² / 8
      */
     public static Real simpleBeamMomentUniform(Real w, Real L) {
         return w.multiply(L.pow(2)).divide(Real.of(8));
@@ -82,7 +82,7 @@ public class StructuralAnalysis {
 
     /**
      * Maximum bending moment for cantilever with uniform load.
-     * M_max = w * L² / 2
+     * M_max = w * LÃ‚Â² / 2
      */
     public static Real cantileverMomentUniform(Real w, Real L) {
         return w.multiply(L.pow(2)).divide(Real.TWO);
@@ -90,7 +90,7 @@ public class StructuralAnalysis {
 
     /**
      * Bending stress.
-     * σ = M * y / I
+     * ÃÆ’ = M * y / I
      */
     public static Real bendingStress(Real moment, Real distanceFromNA, Real momentOfInertia) {
         return moment.multiply(distanceFromNA).divide(momentOfInertia);
@@ -98,7 +98,7 @@ public class StructuralAnalysis {
 
     /**
      * Shear stress in beam.
-     * τ = V * Q / (I * b)
+     * Ãâ€ž = V * Q / (I * b)
      */
     public static Real shearStress(Real shearForce, Real firstMoment, Real momentOfInertia, Real width) {
         return shearForce.multiply(firstMoment).divide(momentOfInertia.multiply(width));
@@ -106,7 +106,7 @@ public class StructuralAnalysis {
 
     /**
      * Second moment of area for rectangle.
-     * I = b * h³ / 12
+     * I = b * hÃ‚Â³ / 12
      */
     public static Real rectangleMomentOfInertia(Real width, Real height) {
         return width.multiply(height.pow(3)).divide(Real.of(12));
@@ -114,7 +114,7 @@ public class StructuralAnalysis {
 
     /**
      * Second moment of area for circle.
-     * I = π * r⁴ / 4
+     * I = Ãâ‚¬ * rÃ¢ÂÂ´ / 4
      */
     public static Real circleMomentOfInertia(Real radius) {
         return Real.PI.multiply(radius.pow(4)).divide(Real.of(4));
@@ -130,7 +130,7 @@ public class StructuralAnalysis {
 
     /**
      * Column buckling (Euler formula).
-     * P_cr = π² * E * I / (K * L)²
+     * P_cr = Ãâ‚¬Ã‚Â² * E * I / (K * L)Ã‚Â²
      */
     public static Real eulerBucklingLoad(Real E, Real I, Real L, Real K) {
         return Real.PI.pow(2).multiply(E).multiply(I).divide(K.multiply(L).pow(2));
@@ -138,7 +138,7 @@ public class StructuralAnalysis {
 
     /**
      * Slenderness ratio.
-     * λ = K * L / r
+     * ÃŽÂ» = K * L / r
      */
     public static Real slendernessRatio(Real K, Real L, Real radiusOfGyration) {
         return K.multiply(L).divide(radiusOfGyration);
@@ -146,7 +146,7 @@ public class StructuralAnalysis {
 
     /**
      * Radius of gyration.
-     * r = √(I / A)
+     * r = Ã¢Ë†Å¡(I / A)
      */
     public static Real radiusOfGyration(Real momentOfInertia, Real area) {
         return momentOfInertia.divide(area).sqrt();
@@ -161,7 +161,7 @@ public class StructuralAnalysis {
 
     /**
      * Torsional shear stress in circular shaft.
-     * τ = T * r / J where J = πr⁴/2
+     * Ãâ€ž = T * r / J where J = Ãâ‚¬rÃ¢ÂÂ´/2
      */
     public static Real torsionalShearStress(Real torque, Real radius) {
         Real J = Real.PI.multiply(radius.pow(4)).divide(Real.TWO);
@@ -170,7 +170,7 @@ public class StructuralAnalysis {
 
     /**
      * Angle of twist.
-     * θ = T * L / (G * J)
+     * ÃŽÂ¸ = T * L / (G * J)
      */
     public static Real angleOfTwist(Real torque, Real length, Real shearModulus, Real radius) {
         Real J = Real.PI.multiply(radius.pow(4)).divide(Real.TWO);
@@ -200,3 +200,5 @@ public class StructuralAnalysis {
         return Quantities.create(pCr.doubleValue(), Units.NEWTON);
     }
 }
+
+

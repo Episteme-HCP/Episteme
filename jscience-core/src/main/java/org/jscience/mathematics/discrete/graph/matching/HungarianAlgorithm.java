@@ -30,7 +30,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * <p>
  * Finds minimum-cost perfect matching in weighted bipartite graph.
  * Used for: assignment problems, task allocation, resource optimization.
- * O(n³) complexity.
+ * O(nÃ‚Â³) complexity.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -42,7 +42,7 @@ public class HungarianAlgorithm {
     /**
      * Solves assignment problem: minimize total cost.
      * 
-     * @param costMatrix n×n cost matrix (workers × tasks)
+     * @param costMatrix nÃƒâ€”n cost matrix (workers Ãƒâ€” tasks)
      * @return assignment array: assignment[worker] = task
      */
     public static int[] solve(Real[][] costMatrix) {
@@ -287,3 +287,5 @@ public class HungarianAlgorithm {
         return total;
     }
 }
+
+

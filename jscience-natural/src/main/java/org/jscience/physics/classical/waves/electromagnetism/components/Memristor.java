@@ -105,3 +105,5 @@ public class Memristor implements CircuitComponent {
         return state;
     }
 }
+
+

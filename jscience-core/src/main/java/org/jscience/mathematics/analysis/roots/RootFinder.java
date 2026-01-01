@@ -255,3 +255,5 @@ public class RootFinder {
         return roots.stream().mapToDouble(Double::doubleValue).toArray();
     }
 }
+
+

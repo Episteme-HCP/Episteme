@@ -138,3 +138,4 @@ public class Interpolation2D {
         return Real.of(a0 * t * t * t + a1 * t * t + a2 * t + a3);
     }
 }
+

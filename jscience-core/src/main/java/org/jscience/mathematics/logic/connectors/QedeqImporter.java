@@ -123,3 +123,4 @@ public class QedeqImporter implements FormalSystemImporter {
         return new String[] { ".xml", ".qedeq" };
     }
 }
+

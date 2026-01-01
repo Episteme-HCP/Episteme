@@ -175,3 +175,5 @@ public class CSG {
         return new CSG(polygons.stream().map(Polygon::clone).collect(Collectors.toList()));
     }
 }
+
+

@@ -117,7 +117,7 @@ public class SimbadLoader extends AbstractLoader<SimbadLoader.AstronomicalObject
             double minutes = (absDec - d) * 60;
             int m = (int) minutes;
             double s = (minutes - m) * 60;
-            return String.format("%s%02d°%02d'%.2f\"", sign, d, m, s);
+            return String.format("%s%02dÃ‚Â°%02d'%.2f\"", sign, d, m, s);
         }
 
         @Override
@@ -237,3 +237,5 @@ public class SimbadLoader extends AbstractLoader<SimbadLoader.AstronomicalObject
         return Optional.empty();
     }
 }
+
+

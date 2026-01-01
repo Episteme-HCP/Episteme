@@ -63,3 +63,5 @@ public class HistoryDomainTest {
         assertFalse(events.stream().anyMatch(e -> e.getName().equals("French Revolution")));
     }
 }
+
+

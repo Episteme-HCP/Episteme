@@ -56,3 +56,5 @@ public class NaturalI18n {
         return org.jscience.ui.i18n.I18n.getInstance().get(key);
     }
 }
+
+

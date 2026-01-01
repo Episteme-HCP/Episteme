@@ -46,3 +46,5 @@ public interface BanachSpace<E, S> extends Module<E, S> {
      */
     S norm(E element);
 }
+
+

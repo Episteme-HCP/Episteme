@@ -262,3 +262,5 @@ public class AminoAcid extends Molecule {
         return classification.equals("basic") || classification.equals("acidic");
     }
 }
+
+

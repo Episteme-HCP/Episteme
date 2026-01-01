@@ -63,3 +63,5 @@ public class SeriesCircuit implements CircuitComponent {
         return components.get(0).getCurrent(voltage, dt);
     }
 }
+
+

@@ -51,15 +51,15 @@ public class PCA {
     /**
      * Fits PCA model to data.
      * 
-     * @param data        n samples × d features
-     * @param nComponents number of components to keep (≤ d)
+     * @param data        n samples Ãƒâ€” d features
+     * @param nComponents number of components to keep (Ã¢â€°Â¤ d)
      */
     public void fit(Real[][] data, int nComponents) {
         int n = data.length;
         int d = data[0].length;
 
         if (nComponents > d) {
-            throw new IllegalArgumentException("nComponents must be ≤ number of features");
+            throw new IllegalArgumentException("nComponents must be Ã¢â€°Â¤ number of features");
         }
 
         // 1. Center data (subtract mean)
@@ -120,7 +120,7 @@ public class PCA {
      * Transforms data to principal component space.
      * 
      * @param data data to transform (same features as training data)
-     * @return transformed data (n × nComponents)
+     * @return transformed data (n Ãƒâ€” nComponents)
      */
     public Real[][] transform(Real[][] data) {
         if (components == null) {
@@ -214,3 +214,5 @@ public class PCA {
         return DenseMatrix.of(rows, Reals.getInstance());
     }
 }
+
+

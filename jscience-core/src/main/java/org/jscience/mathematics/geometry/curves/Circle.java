@@ -93,11 +93,11 @@ public class Circle implements ParametricCurve {
         Vector<Real> arbitrary = Math.abs(normalizedNormal.get(0).doubleValue()) < 0.9 ? createUnitVector(0, 3)
                 : createUnitVector(1, 3);
 
-        // u = arbitrary - (arbitrary·normal)*normal, then normalize
+        // u = arbitrary - (arbitraryÃ‚Â·normal)*normal, then normalize
         Real projection = arbitrary.dot(normalizedNormal);
         this.u = arbitrary.subtract(normalizedNormal.multiply(projection)).normalize();
 
-        // v = normal × u
+        // v = normal Ãƒâ€” u
         this.v = normalizedNormal.cross(u);
     }
 
@@ -153,7 +153,7 @@ public class Circle implements ParametricCurve {
     /**
      * Returns the circumference of the circle.
      * 
-     * @return 2πr
+     * @return 2Ãâ‚¬r
      */
     public Real circumference() {
         return radius.multiply(Real.of(2 * Math.PI));
@@ -177,3 +177,5 @@ public class Circle implements ParametricCurve {
         return "Circle(center=" + center + ", radius=" + radius + ")";
     }
 }
+
+

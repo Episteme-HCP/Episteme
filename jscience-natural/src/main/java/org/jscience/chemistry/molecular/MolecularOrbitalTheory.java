@@ -36,7 +36,7 @@ public class MolecularOrbitalTheory {
 
     /**
      * Calculates bond order.
-     * Bond Order = (bonding e⁻ - antibonding e⁻) / 2
+     * Bond Order = (bonding eÃ¢ÂÂ» - antibonding eÃ¢ÂÂ») / 2
      */
     public static double bondOrder(int bondingElectrons, int antibondingElectrons) {
         return (bondingElectrons - antibondingElectrons) / 2.0;
@@ -62,8 +62,8 @@ public class MolecularOrbitalTheory {
     }
 
     /**
-     * Simple Hückel MO energy for linear polyene.
-     * E_k = α + 2β cos(kπ/(n+1))
+     * Simple HÃƒÂ¼ckel MO energy for linear polyene.
+     * E_k = ÃŽÂ± + 2ÃŽÂ² cos(kÃâ‚¬/(n+1))
      * 
      * @param n     Number of carbon atoms
      * @param k     Orbital index (1 to n)
@@ -79,38 +79,38 @@ public class MolecularOrbitalTheory {
      */
     public static int[] diatomicMOCount(int totalValenceElectrons) {
         // For homonuclear diatomics, fill in order
-        // σ2s(2) σ*2s(2) σ2p(2) π2p(4) π*2p(4) σ*2p(2)
+        // ÃÆ’2s(2) ÃÆ’*2s(2) ÃÆ’2p(2) Ãâ‚¬2p(4) Ãâ‚¬*2p(4) ÃÆ’*2p(2)
         int bonding = 0;
         int antibonding = 0;
         int remaining = totalValenceElectrons;
 
-        // σ2s bonding
+        // ÃÆ’2s bonding
         int fill = Math.min(2, remaining);
         bonding += fill;
         remaining -= fill;
 
-        // σ*2s antibonding
+        // ÃÆ’*2s antibonding
         fill = Math.min(2, remaining);
         antibonding += fill;
         remaining -= fill;
 
         // For O2, F2 order differs, but simplified here
-        // σ2p bonding
+        // ÃÆ’2p bonding
         fill = Math.min(2, remaining);
         bonding += fill;
         remaining -= fill;
 
-        // π2p bonding (2 orbitals, 4 electrons max)
+        // Ãâ‚¬2p bonding (2 orbitals, 4 electrons max)
         fill = Math.min(4, remaining);
         bonding += fill;
         remaining -= fill;
 
-        // π*2p antibonding
+        // Ãâ‚¬*2p antibonding
         fill = Math.min(4, remaining);
         antibonding += fill;
         remaining -= fill;
 
-        // σ*2p antibonding
+        // ÃÆ’*2p antibonding
         fill = Math.min(2, remaining);
         antibonding += fill;
 
@@ -119,18 +119,20 @@ public class MolecularOrbitalTheory {
 
     /**
      * Predicts magnetism of O2.
-     * O2 has 12 valence electrons, 2 unpaired in π*2p.
+     * O2 has 12 valence electrons, 2 unpaired in Ãâ‚¬*2p.
      */
     public static String o2Magnetism() {
-        return "Paramagnetic (2 unpaired electrons in π*2p)";
+        return "Paramagnetic (2 unpaired electrons in Ãâ‚¬*2p)";
     }
 
     /**
-     * Delocalization energy for benzene (Hückel).
-     * E_deloc = 6α + 8β for benzene vs 6α + 6β for 3 isolated double bonds
-     * Stabilization = 2|β| ≈ 150 kJ/mol
+     * Delocalization energy for benzene (HÃƒÂ¼ckel).
+     * E_deloc = 6ÃŽÂ± + 8ÃŽÂ² for benzene vs 6ÃŽÂ± + 6ÃŽÂ² for 3 isolated double bonds
+     * Stabilization = 2|ÃŽÂ²| Ã¢â€°Ë† 150 kJ/mol
      */
     public static double benzeneDelocalizationEnergy(double beta) {
-        return 2 * Math.abs(beta); // In units of |β|
+        return 2 * Math.abs(beta); // In units of |ÃŽÂ²|
     }
 }
+
+

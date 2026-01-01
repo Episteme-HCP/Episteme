@@ -42,12 +42,12 @@ public class BeamDeflection {
 
     /**
      * Maximum deflection for simply supported beam with center point load.
-     * δ_max = P * L³ / (48 * E * I)
+     * ÃŽÂ´_max = P * LÃ‚Â³ / (48 * E * I)
      * 
      * @param load            Point load (N)
      * @param length          Beam length (m)
      * @param elasticModulus  Young's modulus E (Pa)
-     * @param momentOfInertia Second moment of area I (m⁴)
+     * @param momentOfInertia Second moment of area I (mÃ¢ÂÂ´)
      * @return Maximum deflection
      */
     public static Quantity<Length> simplySupported_CenterLoad(
@@ -63,7 +63,7 @@ public class BeamDeflection {
 
     /**
      * Maximum deflection for cantilever beam with end load.
-     * δ_max = P * L³ / (3 * E * I)
+     * ÃŽÂ´_max = P * LÃ‚Â³ / (3 * E * I)
      */
     public static Quantity<Length> cantilever_EndLoad(
             Quantity<Force> load, Quantity<Length> length,
@@ -78,7 +78,7 @@ public class BeamDeflection {
 
     /**
      * Simply supported beam with uniformly distributed load.
-     * δ_max = 5 * w * L⁴ / (384 * E * I)
+     * ÃŽÂ´_max = 5 * w * LÃ¢ÂÂ´ / (384 * E * I)
      * 
      * @param loadPerMeter Distributed load (N/m)
      */
@@ -93,7 +93,7 @@ public class BeamDeflection {
 
     /**
      * Rectangle moment of inertia.
-     * I = b * h³ / 12
+     * I = b * hÃ‚Â³ / 12
      */
     public static double rectangleMomentOfInertia(double width, double height) {
         return width * Math.pow(height, 3) / 12;
@@ -101,9 +101,11 @@ public class BeamDeflection {
 
     /**
      * Circular cross-section moment of inertia.
-     * I = π * r⁴ / 4
+     * I = Ãâ‚¬ * rÃ¢ÂÂ´ / 4
      */
     public static double circleMomentOfInertia(double radius) {
         return Math.PI * Math.pow(radius, 4) / 4;
     }
 }
+
+

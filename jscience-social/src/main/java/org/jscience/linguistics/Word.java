@@ -129,3 +129,5 @@ public class Word {
         return String.format("%s (%s, %s)", text, language.getName(), partOfSpeech);
     }
 }
+
+

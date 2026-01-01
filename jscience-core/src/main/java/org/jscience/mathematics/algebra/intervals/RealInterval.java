@@ -151,3 +151,4 @@ public final class RealInterval {
         return interval.getMin(0).add(interval.getMax(0)).divide(Real.of(2));
     }
 }
+

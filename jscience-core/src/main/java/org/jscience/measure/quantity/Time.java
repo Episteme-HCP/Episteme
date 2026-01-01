@@ -44,3 +44,4 @@ import org.jscience.measure.Quantity;
  */
 public interface Time extends Quantity<Time> {
 }
+

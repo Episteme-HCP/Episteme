@@ -65,3 +65,5 @@ public class Synapse {
 
     // STDP implementation could go here (modify weight based on spike timing)
 }
+
+

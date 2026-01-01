@@ -144,7 +144,7 @@ public class Segment2D implements GeometricObject<Point2D> {
 
     @Override
     public String toString() {
-        return "Segment2D(" + start + " → " + end + ")";
+        return "Segment2D(" + start + " Ã¢â€ â€™ " + end + ")";
     }
 
     @Override
@@ -163,3 +163,5 @@ public class Segment2D implements GeometricObject<Point2D> {
         return start.hashCode() + end.hashCode();
     }
 }
+
+

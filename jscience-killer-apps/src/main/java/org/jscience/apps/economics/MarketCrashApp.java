@@ -110,7 +110,7 @@ public class MarketCrashApp extends KillerAppBase {
         area.setPadding(new Insets(10));
 
         // Price Chart
-        Label priceTitle = new Label("📈 " + i18n.get("market.panel.chart"));
+        Label priceTitle = new Label("Ã°Å¸â€œË† " + i18n.get("market.panel.chart"));
         priceTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         priceChart = ChartFactory.createLineChart(i18n.get("market.panel.chart"), i18n.get("market.label.day"),
@@ -128,7 +128,7 @@ public class MarketCrashApp extends KillerAppBase {
         VBox.setVgrow(priceChart, Priority.ALWAYS);
 
         // RSI Chart
-        Label rsiTitle = new Label("📊 " + i18n.get("market.indicator.rsi"));
+        Label rsiTitle = new Label("Ã°Å¸â€œÅ  " + i18n.get("market.indicator.rsi"));
         rsiTitle.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 
         rsiChart = ChartFactory.createLineChart("", i18n.get("market.label.day"), i18n.get("market.indicator.rsi"));
@@ -431,3 +431,5 @@ public class MarketCrashApp extends KillerAppBase {
         launch(args);
     }
 }
+
+

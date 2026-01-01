@@ -53,7 +53,7 @@ public class KMeans {
     /**
      * Fits k-means model to data.
      * 
-     * @param data n samples × d features
+     * @param data n samples Ãƒâ€” d features
      * @return cluster assignments for each sample
      */
     public int[] fit(Real[][] data) {
@@ -96,7 +96,7 @@ public class KMeans {
         int firstIdx = random.nextInt(n);
         centroids[0] = data[firstIdx].clone();
 
-        // Remaining centroids: probability proportional to distance²
+        // Remaining centroids: probability proportional to distanceÃ‚Â²
         for (int c = 1; c < k; c++) {
             Real[] distances = new Real[n];
             Real sumDistances = Real.ZERO;
@@ -114,7 +114,7 @@ public class KMeans {
                 sumDistances = sumDistances.add(distances[i]);
             }
 
-            // Select proportional to distance²
+            // Select proportional to distanceÃ‚Â²
             Real r = Real.of(random.nextDouble()).multiply(sumDistances);
             Real cumSum = Real.ZERO;
             for (int i = 0; i < n; i++) {
@@ -212,3 +212,5 @@ public class KMeans {
         return predictions;
     }
 }
+
+

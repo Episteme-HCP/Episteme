@@ -72,3 +72,5 @@ public class ArchitectureRestorationTest {
         assertEquals(10.0, taxi.getSpeed().doubleValue(), 0.001);
     }
 }
+
+

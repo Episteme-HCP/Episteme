@@ -103,3 +103,4 @@ public class KripkeStructure<T> {
         return accessibility.getOrDefault(worldName, new HashSet<>());
     }
 }
+

@@ -53,6 +53,7 @@ public class ChiSquareDistribution extends GammaDistribution {
 
     @Override
     public String toString() {
-        return String.format("χ²(k=%d)", degreesOfFreedom);
+        return String.format("Ãâ€¡Ã‚Â²(k=%d)", degreesOfFreedom);
     }
 }
+

@@ -94,7 +94,7 @@ public class Grammar {
     /**
      * Adds a production rule.
      * <p>
-     * Example: addProduction("S", "a", "B") means S → aB
+     * Example: addProduction("S", "a", "B") means S Ã¢â€ â€™ aB
      * </p>
      *
      * @param lhs        left-hand side (non-terminal)
@@ -231,11 +231,13 @@ public class Grammar {
         sb.append("Productions:\n");
         for (Map.Entry<String, List<List<String>>> entry : productions.entrySet()) {
             for (List<String> rhs : entry.getValue()) {
-                sb.append("  ").append(entry.getKey()).append(" → ");
-                sb.append(rhs.isEmpty() ? "ε" : String.join(" ", rhs));
+                sb.append("  ").append(entry.getKey()).append(" Ã¢â€ â€™ ");
+                sb.append(rhs.isEmpty() ? "ÃŽÂµ" : String.join(" ", rhs));
                 sb.append("\n");
             }
         }
         return sb.toString();
     }
 }
+
+

@@ -60,12 +60,12 @@ public class SIRModel {
         this.time = Quantities.create(0, Units.SECOND);
     }
 
-    /** Basic reproduction number R₀ = β/γ */
+    /** Basic reproduction number RÃ¢â€šâ‚¬ = ÃŽÂ²/ÃŽÂ³ */
     public Real getR0() {
         return beta.divide(gamma).getValue();
     }
 
-    /** Herd immunity threshold (1 - 1/R₀) */
+    /** Herd immunity threshold (1 - 1/RÃ¢â€šâ‚¬) */
     public Real getHerdImmunityThreshold() {
         Real r0 = getR0();
         return r0.compareTo(Real.ONE) > 0 ? Real.ONE.subtract(Real.ONE.divide(r0)) : Real.ZERO;
@@ -189,3 +189,5 @@ public class SIRModel {
                 Quantities.create(0.125 / 86400.0, Units.HERTZ));
     }
 }
+
+

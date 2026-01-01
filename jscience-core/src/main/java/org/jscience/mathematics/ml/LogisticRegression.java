@@ -28,7 +28,7 @@ import org.jscience.mathematics.numbers.real.Real;
 /**
  * Logistic Regression - binary classification using sigmoid function.
  * <p>
- * Model: P(y=1|x) = 1/(1 + e^(-w·x))
+ * Model: P(y=1|x) = 1/(1 + e^(-wÃ‚Â·x))
  * Training: Gradient descent on log-likelihood
  * Applications: Classification, probability estimation
  * </p>
@@ -47,7 +47,7 @@ public class LogisticRegression {
     /**
      * Trains logistic regression model.
      * 
-     * @param X training data (n samples × d features)
+     * @param X training data (n samples Ãƒâ€” d features)
      * @param y binary labels (0 or 1)
      */
     public void fit(Real[][] X, Real[] y) {
@@ -124,10 +124,10 @@ public class LogisticRegression {
     }
 
     /**
-     * Sigmoid function: σ(z) = 1/(1 + e^(-z))
+     * Sigmoid function: ÃÆ’(z) = 1/(1 + e^(-z))
      */
     private Real sigmoid(Real z) {
-        // σ(z) = 1 / (1 + exp(-z))
+        // ÃÆ’(z) = 1 / (1 + exp(-z))
         Real expNegZ = Real.of(Math.exp(-z.doubleValue()));
         return Real.ONE.divide(Real.ONE.add(expNegZ));
     }
@@ -135,7 +135,7 @@ public class LogisticRegression {
     /**
      * Computes log-loss (cross-entropy).
      * <p>
-     * Loss = -1/n Σ [y log(ŷ) + (1-y) log(1-ŷ)]
+     * Loss = -1/n ÃŽÂ£ [y log(Ã…Â·) + (1-y) log(1-Ã…Â·)]
      * </p>
      */
     private Real computeLoss(Real[][] X, Real[] y) {
@@ -175,7 +175,7 @@ public class LogisticRegression {
     }
 
     /**
-     * L2 regularization (Ridge): adds λ||w||² to loss.
+     * L2 regularization (Ridge): adds ÃŽÂ»||w||Ã‚Â² to loss.
      */
     public void fitWithRegularization(Real[][] X, Real[] y, Real lambda) {
         int n = X.length;
@@ -248,3 +248,5 @@ public class LogisticRegression {
         return a.compareTo(b) > 0 ? a : b;
     }
 }
+
+

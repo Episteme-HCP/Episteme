@@ -84,7 +84,7 @@ public class InfiniteSeriesTest {
         Real e0 = exp.at(Real.ZERO).partialSum(10);
         assertThat(e0.doubleValue()).isCloseTo(1.0, within(0.0001));
 
-        // e^1 ≈ 2.71828
+        // e^1 Ã¢â€°Ë† 2.71828
         Real e1 = exp.at(Real.ONE).partialSum(20);
         assertThat(e1.doubleValue()).isCloseTo(Math.E, within(0.0001));
     }
@@ -97,8 +97,9 @@ public class InfiniteSeriesTest {
         Real sin0 = sin.at(Real.ZERO).partialSum(10);
         assertThat(sin0.doubleValue()).isCloseTo(0.0, within(0.0001));
 
-        // sin(π/2) ≈ 1
+        // sin(Ãâ‚¬/2) Ã¢â€°Ë† 1
         Real sinPi2 = sin.at(Real.of(Math.PI / 2)).partialSum(20);
         assertThat(sinPi2.doubleValue()).isCloseTo(1.0, within(0.0001));
     }
 }
+

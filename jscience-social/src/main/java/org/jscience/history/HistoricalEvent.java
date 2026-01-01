@@ -182,3 +182,5 @@ public class HistoricalEvent implements org.jscience.util.identity.Identifiable<
             FuzzyDate.circaBce(2540), Category.CULTURAL,
             new org.jscience.geography.Place("Giza", org.jscience.geography.Place.Type.CITY));
 }
+
+

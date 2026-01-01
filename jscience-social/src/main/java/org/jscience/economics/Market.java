@@ -129,3 +129,5 @@ public class Market {
         return price.multiply(Real.of(quantity));
     }
 }
+
+

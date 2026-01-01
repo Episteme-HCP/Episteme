@@ -100,3 +100,5 @@ public class DenseVector<E> extends GenericVector<E> {
         return sb.toString();
     }
 }
+
+

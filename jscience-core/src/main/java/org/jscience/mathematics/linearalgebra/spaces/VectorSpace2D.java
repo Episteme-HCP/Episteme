@@ -116,3 +116,4 @@ public class VectorSpace2D implements VectorSpace<Vector<Real>, Real> {
         return 2;
     }
 }
+

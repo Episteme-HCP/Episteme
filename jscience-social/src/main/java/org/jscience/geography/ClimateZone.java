@@ -26,7 +26,7 @@ package org.jscience.geography;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * Represents a simplified Köppen climate classification.
+ * Represents a simplified KÃƒÂ¶ppen climate classification.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -76,3 +76,5 @@ public class ClimateZone {
         return annualRainfallMm.doubleValue() > 300 && averageTempCelsius.doubleValue() > 10;
     }
 }
+
+

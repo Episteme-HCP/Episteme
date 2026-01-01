@@ -28,7 +28,7 @@ import org.jscience.mathematics.structures.rings.Ring;
 import org.jscience.mathematics.structures.rings.RingElement;
 
 /**
- * Abstract base class for integers (ℤ = {..., -2, -1, 0, 1, 2, ...}).
+ * Abstract base class for integers (Ã¢â€žÂ¤ = {..., -2, -1, 0, 1, 2, ...}).
  * <p>
  * Integers form a Ring under addition and multiplication.
  * This class provides a smart factory that automatically chooses the
@@ -171,7 +171,7 @@ public abstract class Integer extends Number implements Ring<Integer>, Comparabl
      * Multiplies by another integer.
      * 
      * @param other the multiplicand
-     * @return this × other
+     * @return this Ãƒâ€” other
      */
     public abstract Integer multiply(Integer other);
 
@@ -300,3 +300,4 @@ public abstract class Integer extends Number implements Ring<Integer>, Comparabl
         return ONE;
     }
 }
+

@@ -61,7 +61,7 @@ public class pHCalculator {
 
     /**
      * Calculates pOH from pH.
-     * pOH = 14 - pH (at 25°C)
+     * pOH = 14 - pH (at 25Ã‚Â°C)
      */
     public static Real pOHFromPH(Real pH) {
         return FOURTEEN.subtract(pH);
@@ -80,7 +80,7 @@ public class pHCalculator {
 
     /**
      * Calculates buffer capacity (approximate).
-     * β = 2.303 * C * Ka * [H+] / (Ka + [H+])^2
+     * ÃŽÂ² = 2.303 * C * Ka * [H+] / (Ka + [H+])^2
      */
     public static Real bufferCapacity(Real totalBufferConcentration, Real Ka, Real pH) {
         Real H = Real.of(10).pow(pH.negate());
@@ -104,7 +104,7 @@ public class pHCalculator {
     }
 
     /**
-     * Checks if a solution is neutral (pH ≈ 7).
+     * Checks if a solution is neutral (pH Ã¢â€°Ë† 7).
      */
     public static boolean isNeutral(Real pH, Real tolerance) {
         return pH.subtract(SEVEN).abs().compareTo(tolerance) <= 0;
@@ -124,3 +124,5 @@ public class pHCalculator {
         return Real.of(10).pow(pKa.negate());
     }
 }
+
+

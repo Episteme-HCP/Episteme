@@ -33,7 +33,7 @@ import java.util.List;
 
 /**
  * Solves decay chain problems using Bateman equations.
- * For chain: N₁ → N₂ → N₃ → ... → Stable
+ * For chain: NÃ¢â€šÂ Ã¢â€ â€™ NÃ¢â€šâ€š Ã¢â€ â€™ NÃ¢â€šÆ’ Ã¢â€ â€™ ... Ã¢â€ â€™ Stable
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -46,7 +46,7 @@ public class DecayChain {
      */
     public static class Nuclide {
         public final String name;
-        public final Real decayConstant; // λ in s⁻¹ (0 for stable)
+        public final Real decayConstant; // ÃŽÂ» in sÃ¢ÂÂ»Ã‚Â¹ (0 for stable)
 
         public Nuclide(String name, Real halfLife) {
             this.name = name;
@@ -82,7 +82,7 @@ public class DecayChain {
 
     /**
      * Bateman equation solution for the amount of nuclide i at time t.
-     * N_i(t) = Σ_{j=1}^{i} c_{ij} * exp(-λ_j * t)
+     * N_i(t) = ÃŽÂ£_{j=1}^{i} c_{ij} * exp(-ÃŽÂ»_j * t)
      * 
      * For simplicity, this implementation handles the common case where
      * only the parent nuclide is initially present.
@@ -114,7 +114,7 @@ public class DecayChain {
             if (lambdaJ.isZero())
                 continue; // Stable nuclide
 
-            // Denominator: product of (λ_k - λ_j) for k ≠ j
+            // Denominator: product of (ÃŽÂ»_k - ÃŽÂ»_j) for k Ã¢â€°Â  j
             Real denom = Real.ONE;
             for (int k = 0; k <= nuclideIndex; k++) {
                 if (k != j) {
@@ -137,7 +137,7 @@ public class DecayChain {
 
     /**
      * Get activity of a specific nuclide at time t.
-     * A = λ * N
+     * A = ÃŽÂ» * N
      */
     public Real getActivity(int nuclideIndex, Real time) {
         Real lambda = chain.get(nuclideIndex).decayConstant;
@@ -158,7 +158,7 @@ public class DecayChain {
 
     /**
      * Creates the Uranium-238 decay chain (simplified).
-     * U-238 → Th-234 → Pa-234 → U-234 → ... → Pb-206 (stable)
+     * U-238 Ã¢â€ â€™ Th-234 Ã¢â€ â€™ Pa-234 Ã¢â€ â€™ U-234 Ã¢â€ â€™ ... Ã¢â€ â€™ Pb-206 (stable)
      */
     public static DecayChain uranium238Chain(Real initialU238) {
         List<Nuclide> nuclides = new ArrayList<>();
@@ -186,3 +186,5 @@ public class DecayChain {
         return chain;
     }
 }
+
+

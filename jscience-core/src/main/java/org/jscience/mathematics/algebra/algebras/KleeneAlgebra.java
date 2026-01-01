@@ -35,15 +35,15 @@ import org.jscience.mathematics.structures.rings.Semiring;
  *
  * <h2>Mathematical Definition</h2>
  * <p>
- * A Kleene algebra (K, +, ·, *, 0, 1) is an idempotent semiring (a + a = a)
+ * A Kleene algebra (K, +, Ã‚Â·, *, 0, 1) is an idempotent semiring (a + a = a)
  * equipped with a unary operation * satisfying:
  * <ul>
- * <li>1 + a · a* ≤ a*</li>
- * <li>1 + a* · a ≤ a*</li>
- * <li>b + a · x ≤ x ⇒ a* · b ≤ x</li>
- * <li>b + x · a ≤ x ⇒ b · a* ≤ x</li>
+ * <li>1 + a Ã‚Â· a* Ã¢â€°Â¤ a*</li>
+ * <li>1 + a* Ã‚Â· a Ã¢â€°Â¤ a*</li>
+ * <li>b + a Ã‚Â· x Ã¢â€°Â¤ x Ã¢â€¡â€™ a* Ã‚Â· b Ã¢â€°Â¤ x</li>
+ * <li>b + x Ã‚Â· a Ã¢â€°Â¤ x Ã¢â€¡â€™ b Ã‚Â· a* Ã¢â€°Â¤ x</li>
  * </ul>
- * where a ≤ b is defined as a + b = b.
+ * where a Ã¢â€°Â¤ b is defined as a + b = b.
  * </p>
  *
  * <h2>References</h2>
@@ -72,7 +72,7 @@ public interface KleeneAlgebra<E> extends Semiring<E> {
     E star(E a);
 
     /**
-     * The plus operator (a+ = a · a*).
+     * The plus operator (a+ = a Ã‚Â· a*).
      * Represents one or more repetitions.
      * 
      * @param a the element
@@ -82,3 +82,5 @@ public interface KleeneAlgebra<E> extends Semiring<E> {
         return multiply(a, star(a));
     }
 }
+
+

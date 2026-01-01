@@ -31,7 +31,7 @@ import org.jscience.mathematics.linearalgebra.Vector;
 /**
  * Cosine distance metric.
  * <p>
- * d(x,y) = 1 - cos(θ) = 1 - (x·y)/(||x|| ||y||)
+ * d(x,y) = 1 - cos(ÃŽÂ¸) = 1 - (xÃ‚Â·y)/(||x|| ||y||)
  * </p>
  * <p>
  * Measures the angle between vectors, commonly used in:
@@ -80,3 +80,5 @@ public class CosineMetric implements Metric<Vector<Real>> {
         return Real.ONE.subtract(distance(a, b));
     }
 }
+
+

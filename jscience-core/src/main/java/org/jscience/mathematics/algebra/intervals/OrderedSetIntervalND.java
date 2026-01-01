@@ -321,7 +321,7 @@ public class OrderedSetIntervalND<T extends Comparable<T>> implements Interval<T
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < dimension; i++) {
             if (i > 0) {
-                sb.append(" × ");
+                sb.append(" Ãƒâ€” ");
             }
             sb.append(closedLeft[i] ? "[" : "(");
             sb.append(min[i]);
@@ -364,3 +364,4 @@ public class OrderedSetIntervalND<T extends Comparable<T>> implements Interval<T
         return result;
     }
 }
+

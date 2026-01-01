@@ -96,3 +96,4 @@ public class ModusPonens implements InferenceRule {
         return implAntecedent.equals(antecedent) && implConsequent.equals(consequent);
     }
 }
+

@@ -95,3 +95,5 @@ public class Epidemiology {
         return Real.ONE.subtract(Real.ONE.divide(r0));
     }
 }
+
+

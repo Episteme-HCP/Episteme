@@ -39,13 +39,13 @@ public class WaveOptics {
 
     /**
      * Calculates intensity pattern for single-slit diffraction.
-     * I = I₀ [sin(β)/β]² where β = (π a sin θ) / λ
+     * I = IÃ¢â€šâ‚¬ [sin(ÃŽÂ²)/ÃŽÂ²]Ã‚Â² where ÃŽÂ² = (Ãâ‚¬ a sin ÃŽÂ¸) / ÃŽÂ»
      * 
      * @param theta      Diffraction angle (radians)
      * @param slitWidth  Width of the slit (a)
-     * @param wavelength Wavelength of light (λ)
-     * @param i0         Central intensity (I₀)
-     * @return Intensity at angle θ
+     * @param wavelength Wavelength of light (ÃŽÂ»)
+     * @param i0         Central intensity (IÃ¢â€šâ‚¬)
+     * @return Intensity at angle ÃŽÂ¸
      */
     public static Real singleSlitIntensity(Real theta, Real slitWidth, Real wavelength, Real i0) {
         if (theta.compareTo(Real.ZERO) == 0)
@@ -63,14 +63,14 @@ public class WaveOptics {
     /**
      * Calculates intensity pattern for double-slit interference (Young's
      * experiment).
-     * I = I₀ cos²(δ/2) [diffraction factor neglected for pure interference]
-     * δ = (2π d sin θ) / λ
+     * I = IÃ¢â€šâ‚¬ cosÃ‚Â²(ÃŽÂ´/2) [diffraction factor neglected for pure interference]
+     * ÃŽÂ´ = (2Ãâ‚¬ d sin ÃŽÂ¸) / ÃŽÂ»
      * 
      * @param theta          Viewing angle (radians)
      * @param slitSeparation Distance between slits (d)
-     * @param wavelength     Wavelength of light (λ)
-     * @param i0             Maximum intensity (I₀)
-     * @return Intensity at angle θ
+     * @param wavelength     Wavelength of light (ÃŽÂ»)
+     * @param i0             Maximum intensity (IÃ¢â€šâ‚¬)
+     * @return Intensity at angle ÃŽÂ¸
      */
     public static Real doubleSlitIntensity(Real theta, Real slitSeparation, Real wavelength, Real i0) {
         Real delta = Real.TWO.multiply(Real.PI).multiply(slitSeparation).multiply(theta.sin()).divide(wavelength);
@@ -80,7 +80,7 @@ public class WaveOptics {
 
     /**
      * Malus's Law for polarization.
-     * I = I₀ cos²(θ)
+     * I = IÃ¢â€šâ‚¬ cosÃ‚Â²(ÃŽÂ¸)
      * 
      * @param i0    Initial intensity
      * @param angle Angle between polarizer axis and plane of polarization
@@ -92,8 +92,8 @@ public class WaveOptics {
 
     /**
      * Calculates intensity for diffraction grating.
-     * I = I₀ [sin(Nβ/2) / sin(β/2)]² * [sin(α)/α]²
-     * where α = πa·sinθ/λ, β = πd·sinθ/λ
+     * I = IÃ¢â€šâ‚¬ [sin(NÃŽÂ²/2) / sin(ÃŽÂ²/2)]Ã‚Â² * [sin(ÃŽÂ±)/ÃŽÂ±]Ã‚Â²
+     * where ÃŽÂ± = Ãâ‚¬aÃ‚Â·sinÃŽÂ¸/ÃŽÂ», ÃŽÂ² = Ãâ‚¬dÃ‚Â·sinÃŽÂ¸/ÃŽÂ»
      * 
      * @param theta          Diffraction angle
      * @param slitWidth      Width of each slit (a)
@@ -124,8 +124,8 @@ public class WaveOptics {
 
     /**
      * Airy disk pattern for circular aperture diffraction.
-     * I = I₀ [2J₁(x)/x]² where x = πD·sinθ/λ
-     * Uses approximation for J₁.
+     * I = IÃ¢â€šâ‚¬ [2JÃ¢â€šÂ(x)/x]Ã‚Â² where x = Ãâ‚¬DÃ‚Â·sinÃŽÂ¸/ÃŽÂ»
+     * Uses approximation for JÃ¢â€šÂ.
      * 
      * @param theta      Angle from optical axis
      * @param diameter   Aperture diameter (D)
@@ -151,7 +151,7 @@ public class WaveOptics {
     }
 
     /**
-     * Approximate Bessel function J₁(x) using polynomial series.
+     * Approximate Bessel function JÃ¢â€šÂ(x) using polynomial series.
      */
     private static Real besselJ1Approx(Real x) {
         double xd = x.doubleValue();
@@ -180,9 +180,11 @@ public class WaveOptics {
 
     /**
      * Calculates the resolving power of a grating.
-     * R = λ/Δλ = mN where m is order and N is number of slits.
+     * R = ÃŽÂ»/ÃŽâ€ÃŽÂ» = mN where m is order and N is number of slits.
      */
     public static Real gratingResolvingPower(int diffractionOrder, int numSlits) {
         return Real.of(diffractionOrder * numSlits);
     }
 }
+
+

@@ -27,7 +27,7 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.linearalgebra.Vector;
 
 /**
- * Multivariate function (multiple variables: ℝⁿ → ℝ).
+ * Multivariate function (multiple variables: Ã¢â€žÂÃ¢ÂÂ¿ Ã¢â€ â€™ Ã¢â€žÂ).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -60,3 +60,4 @@ public interface MultivariateFunction extends ScalarFunction<Vector<Real>> {
         throw new UnsupportedOperationException("Gradient not yet implemented");
     }
 }
+

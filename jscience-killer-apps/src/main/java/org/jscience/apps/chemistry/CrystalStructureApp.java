@@ -182,7 +182,7 @@ public class CrystalStructureApp extends KillerAppBase {
 
         Label title = new Label(i18n.get("crystal.panel.view")); // "3D View" or better "Crystal Explorer"
         title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-        title.setText("💎 " + i18n.get("crystal.title"));
+        title.setText("Ã°Å¸â€™Å½ " + i18n.get("crystal.title"));
 
         // Structure Selection
         latticeCombo = new ComboBox<>();
@@ -579,3 +579,5 @@ public class CrystalStructureApp extends KillerAppBase {
         launch(args);
     }
 }
+
+

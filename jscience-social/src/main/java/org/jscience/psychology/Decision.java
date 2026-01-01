@@ -66,3 +66,5 @@ public class Decision {
         return String.format("[%s] %s decided to %s because %s", timestamp, subject, choice, rationale);
     }
 }
+
+

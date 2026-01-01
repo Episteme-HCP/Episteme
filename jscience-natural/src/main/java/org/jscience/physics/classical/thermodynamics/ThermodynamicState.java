@@ -37,7 +37,7 @@ import org.jscience.measure.quantity.Entropy;
  * <ul>
  * <li>$T$: Temperature (K)</li>
  * <li>$P$: Pressure (Pa)</li>
- * <li>$V$: Volume (m³)</li>
+ * <li>$V$: Volume (mÃ‚Â³)</li>
  * <li>$S$: Entropy (J/K)</li>
  * </ul>
  * Also provides an Equation of State (EOS) mechanism.
@@ -91,3 +91,5 @@ public interface ThermodynamicState {
      */
     Quantity<Energy> getEnthalpy();
 }
+
+

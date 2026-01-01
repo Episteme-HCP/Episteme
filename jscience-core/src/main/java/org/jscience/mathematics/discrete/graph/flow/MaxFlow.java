@@ -134,7 +134,7 @@ public class MaxFlow {
     /**
      * Edmonds-Karp algorithm (Ford-Fulkerson with BFS).
      * <p>
-     * O(VE²) complexity - polynomial time.
+     * O(VEÃ‚Â²) complexity - polynomial time.
      * Guaranteed to terminate for irrational capacities.
      * </p>
      */
@@ -216,3 +216,5 @@ public class MaxFlow {
         return false;
     }
 }
+
+

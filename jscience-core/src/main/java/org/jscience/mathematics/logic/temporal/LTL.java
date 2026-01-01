@@ -88,3 +88,4 @@ public class LTL {
         throw new IllegalArgumentException("Formula is not an implication: " + formula);
     }
 }
+

@@ -26,8 +26,8 @@ package org.jscience.measure.quantity;
 import org.jscience.measure.Quantity;
 
 /**
- * Represents an action (energy × time).
- * The SI unit is joule second (J⋅s).
+ * Represents an action (energy Ãƒâ€” time).
+ * The SI unit is joule second (JÃ¢â€¹â€¦s).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,4 +35,6 @@ import org.jscience.measure.Quantity;
  */
 public interface Action extends Quantity<Action> {
 }
+
+
 

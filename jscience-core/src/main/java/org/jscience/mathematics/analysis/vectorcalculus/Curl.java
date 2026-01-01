@@ -38,16 +38,16 @@ import java.util.List;
  * The curl measures the rotation or circulation of a vector field.
  * </p>
  * <p>
- * Definition (3D only): ∇×F = (∂F₃/∂y - ∂F₂/∂z, ∂F₁/∂z - ∂F₃/∂x, ∂F₂/∂x -
- * ∂F₁/∂y)
+ * Definition (3D only): Ã¢Ë†â€¡Ãƒâ€”F = (Ã¢Ë†â€šFÃ¢â€šÆ’/Ã¢Ë†â€šy - Ã¢Ë†â€šFÃ¢â€šâ€š/Ã¢Ë†â€šz, Ã¢Ë†â€šFÃ¢â€šÂ/Ã¢Ë†â€šz - Ã¢Ë†â€šFÃ¢â€šÆ’/Ã¢Ë†â€šx, Ã¢Ë†â€šFÃ¢â€šâ€š/Ã¢Ë†â€šx -
+ * Ã¢Ë†â€šFÃ¢â€šÂ/Ã¢Ë†â€šy)
  * </p>
  * <p>
  * Physical interpretation:
  * - Measures local rotation/vorticity
- * - Fluid dynamics: vorticity ω = ∇×v
- * - Electromagnetism: Faraday's law ∇×E = -∂B/∂t
- * - Ampère's law: ∇×B = μ₀J + μ₀ε₀∂E/∂t
- * - Conservative fields have zero curl: ∇×(∇φ) = 0
+ * - Fluid dynamics: vorticity Ãâ€° = Ã¢Ë†â€¡Ãƒâ€”v
+ * - Electromagnetism: Faraday's law Ã¢Ë†â€¡Ãƒâ€”E = -Ã¢Ë†â€šB/Ã¢Ë†â€št
+ * - AmpÃƒÂ¨re's law: Ã¢Ë†â€¡Ãƒâ€”B = ÃŽÂ¼Ã¢â€šâ‚¬J + ÃŽÂ¼Ã¢â€šâ‚¬ÃŽÂµÃ¢â€šâ‚¬Ã¢Ë†â€šE/Ã¢Ë†â€št
+ * - Conservative fields have zero curl: Ã¢Ë†â€¡Ãƒâ€”(Ã¢Ë†â€¡Ãâ€ ) = 0
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -73,19 +73,19 @@ public class Curl {
             throw new IllegalArgumentException("Curl is only defined for 3D vector fields");
         }
 
-        // curl = (∂F₃/∂y - ∂F₂/∂z, ∂F₁/∂z - ∂F₃/∂x, ∂F₂/∂x - ∂F₁/∂y)
-        // = (∂F₂/∂x₁ - ∂F₁/∂x₂, ∂F₀/∂x₂ - ∂F₂/∂x₀, ∂F₁/∂x₀ - ∂F₀/∂x₁)
-        // where x₀=x, x₁=y, x₂=z and F₀=Fx, F₁=Fy, F₂=Fz
+        // curl = (Ã¢Ë†â€šFÃ¢â€šÆ’/Ã¢Ë†â€šy - Ã¢Ë†â€šFÃ¢â€šâ€š/Ã¢Ë†â€šz, Ã¢Ë†â€šFÃ¢â€šÂ/Ã¢Ë†â€šz - Ã¢Ë†â€šFÃ¢â€šÆ’/Ã¢Ë†â€šx, Ã¢Ë†â€šFÃ¢â€šâ€š/Ã¢Ë†â€šx - Ã¢Ë†â€šFÃ¢â€šÂ/Ã¢Ë†â€šy)
+        // = (Ã¢Ë†â€šFÃ¢â€šâ€š/Ã¢Ë†â€šxÃ¢â€šÂ - Ã¢Ë†â€šFÃ¢â€šÂ/Ã¢Ë†â€šxÃ¢â€šâ€š, Ã¢Ë†â€šFÃ¢â€šâ‚¬/Ã¢Ë†â€šxÃ¢â€šâ€š - Ã¢Ë†â€šFÃ¢â€šâ€š/Ã¢Ë†â€šxÃ¢â€šâ‚¬, Ã¢Ë†â€šFÃ¢â€šÂ/Ã¢Ë†â€šxÃ¢â€šâ‚¬ - Ã¢Ë†â€šFÃ¢â€šâ‚¬/Ã¢Ë†â€šxÃ¢â€šÂ)
+        // where xÃ¢â€šâ‚¬=x, xÃ¢â€šÂ=y, xÃ¢â€šâ€š=z and FÃ¢â€šâ‚¬=Fx, FÃ¢â€šÂ=Fy, FÃ¢â€šâ€š=Fz
 
-        // curlX = ∂Fz/∂y - ∂Fy/∂z = ∂F₂/∂x₁ - ∂F₁/∂x₂
+        // curlX = Ã¢Ë†â€šFz/Ã¢Ë†â€šy - Ã¢Ë†â€šFy/Ã¢Ë†â€šz = Ã¢Ë†â€šFÃ¢â€šâ€š/Ã¢Ë†â€šxÃ¢â€šÂ - Ã¢Ë†â€šFÃ¢â€šÂ/Ã¢Ë†â€šxÃ¢â€šâ€š
         Real curlX = partialDerivative(field, point, 2, 1, h)
                 .subtract(partialDerivative(field, point, 1, 2, h));
 
-        // curlY = ∂Fx/∂z - ∂Fz/∂x = ∂F₀/∂x₂ - ∂F₂/∂x₀
+        // curlY = Ã¢Ë†â€šFx/Ã¢Ë†â€šz - Ã¢Ë†â€šFz/Ã¢Ë†â€šx = Ã¢Ë†â€šFÃ¢â€šâ‚¬/Ã¢Ë†â€šxÃ¢â€šâ€š - Ã¢Ë†â€šFÃ¢â€šâ€š/Ã¢Ë†â€šxÃ¢â€šâ‚¬
         Real curlY = partialDerivative(field, point, 0, 2, h)
                 .subtract(partialDerivative(field, point, 2, 0, h));
 
-        // curlZ = ∂Fy/∂x - ∂Fx/∂y = ∂F₁/∂x₀ - ∂F₀/∂x₁
+        // curlZ = Ã¢Ë†â€šFy/Ã¢Ë†â€šx - Ã¢Ë†â€šFx/Ã¢Ë†â€šy = Ã¢Ë†â€šFÃ¢â€šÂ/Ã¢Ë†â€šxÃ¢â€šâ‚¬ - Ã¢Ë†â€šFÃ¢â€šâ‚¬/Ã¢Ë†â€šxÃ¢â€šÂ
         Real curlZ = partialDerivative(field, point, 1, 0, h)
                 .subtract(partialDerivative(field, point, 0, 1, h));
 
@@ -108,7 +108,7 @@ public class Curl {
     }
 
     /**
-     * Computes the partial derivative ∂Fᵢ/∂xⱼ at a point.
+     * Computes the partial derivative Ã¢Ë†â€šFÃ¡ÂµÂ¢/Ã¢Ë†â€šxÃ¢Â±Â¼ at a point.
      * 
      * @param field          the vector field
      * @param point          the point
@@ -151,3 +151,5 @@ public class Curl {
         return new PointND(newCoords);
     }
 }
+
+

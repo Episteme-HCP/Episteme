@@ -38,12 +38,12 @@ import org.jscience.measure.quantity.Time;
  * </p>
  *
  * <pre>
- * S → E → I → R
+ * S Ã¢â€ â€™ E Ã¢â€ â€™ I Ã¢â€ â€™ R
  *
- * dS/dt = -βSI/N
- * dE/dt = βSI/N - σE
- * dI/dt = σE - γI
- * dR/dt = γI
+ * dS/dt = -ÃŽÂ²SI/N
+ * dE/dt = ÃŽÂ²SI/N - ÃÆ’E
+ * dI/dt = ÃÆ’E - ÃŽÂ³I
+ * dR/dt = ÃŽÂ³I
  * </pre>
  *
  * @author Silvere Martin-Michiellot
@@ -69,9 +69,9 @@ public class SEIRModel {
      * @param population       total population
      * @param initialExposed   initial exposed individuals
      * @param initialInfected  initial infectious individuals
-     * @param transmissionRate β (contacts/time)
-     * @param incubationRate   σ (1/latent period)
-     * @param recoveryRate     γ (1/infectious period)
+     * @param transmissionRate ÃŽÂ² (contacts/time)
+     * @param incubationRate   ÃÆ’ (1/latent period)
+     * @param recoveryRate     ÃŽÂ³ (1/infectious period)
      */
     public SEIRModel(int population, int initialExposed, int initialInfected,
             Quantity<Frequency> transmissionRate,
@@ -89,22 +89,22 @@ public class SEIRModel {
         this.time = Quantities.create(0, Units.SECOND);
     }
 
-    /** Basic reproduction number R₀ = β/γ */
+    /** Basic reproduction number RÃ¢â€šâ‚¬ = ÃŽÂ²/ÃŽÂ³ */
     public Real getR0() {
         return beta.divide(gamma).getValue();
     }
 
-    /** Effective reproduction number Rₑ = R₀ × S/N */
+    /** Effective reproduction number RÃ¢â€šâ€˜ = RÃ¢â€šâ‚¬ Ãƒâ€” S/N */
     public Real getEffectiveR() {
         return getR0().multiply(S).divide(Real.of(population));
     }
 
-    /** Latent period (1/σ) in days */
+    /** Latent period (1/ÃÆ’) in days */
     public double getLatentPeriod() {
         return 1.0 / (sigma.to(Units.HERTZ).getValue().doubleValue() * 86400);
     }
 
-    /** Infectious period (1/γ) in days */
+    /** Infectious period (1/ÃŽÂ³) in days */
     public double getInfectiousPeriod() {
         return 1.0 / (gamma.to(Units.HERTZ).getValue().doubleValue() * 86400);
     }
@@ -207,15 +207,15 @@ public class SEIRModel {
 
     // Factory methods for common diseases
 
-    /** COVID-19 like: R0≈2.5, latent ~5d, infectious ~10d */
+    /** COVID-19 like: R0Ã¢â€°Ë†2.5, latent ~5d, infectious ~10d */
     public static SEIRModel covid19Like(int population, int initialCases) {
         return new SEIRModel(population, 0, initialCases,
-                Quantities.create(0.25 / 86400.0, Units.HERTZ), // β
-                Quantities.create(0.2 / 86400.0, Units.HERTZ), // σ (5d latent)
-                Quantities.create(0.1 / 86400.0, Units.HERTZ)); // γ (10d infectious)
+                Quantities.create(0.25 / 86400.0, Units.HERTZ), // ÃŽÂ²
+                Quantities.create(0.2 / 86400.0, Units.HERTZ), // ÃÆ’ (5d latent)
+                Quantities.create(0.1 / 86400.0, Units.HERTZ)); // ÃŽÂ³ (10d infectious)
     }
 
-    /** Influenza like: R0≈1.5, latent ~2d, infectious ~5d */
+    /** Influenza like: R0Ã¢â€°Ë†1.5, latent ~2d, infectious ~5d */
     public static SEIRModel influenzaLike(int population, int initialCases) {
         return new SEIRModel(population, 0, initialCases,
                 Quantities.create(0.3 / 86400.0, Units.HERTZ),
@@ -223,7 +223,7 @@ public class SEIRModel {
                 Quantities.create(0.2 / 86400.0, Units.HERTZ));
     }
 
-    /** Measles like: R0≈15, latent ~10d, infectious ~8d */
+    /** Measles like: R0Ã¢â€°Ë†15, latent ~10d, infectious ~8d */
     public static SEIRModel measlesLike(int population, int initialCases) {
         return new SEIRModel(population, 0, initialCases,
                 Quantities.create(1.875 / 86400.0, Units.HERTZ),
@@ -231,3 +231,5 @@ public class SEIRModel {
                 Quantities.create(0.125 / 86400.0, Units.HERTZ));
     }
 }
+
+

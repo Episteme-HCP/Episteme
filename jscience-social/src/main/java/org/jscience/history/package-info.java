@@ -22,13 +22,6 @@
  */
 
 /**
- * History package - historical events, timelines, and chronology.
- * <p>
- * Key classes:
- * <ul>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * - historical events, timelines, and chronology.
  */
 package org.jscience.history;

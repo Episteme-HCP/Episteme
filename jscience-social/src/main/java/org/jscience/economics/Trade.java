@@ -117,3 +117,5 @@ public class Trade {
                 id, type, seller, buyer, amount);
     }
 }
+
+

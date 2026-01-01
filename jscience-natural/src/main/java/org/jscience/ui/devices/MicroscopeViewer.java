@@ -53,3 +53,5 @@ public class MicroscopeViewer extends AbstractDeviceViewer<Microscope> {
         }
     }
 }
+
+

@@ -21,11 +21,5 @@
  * SOFTWARE.
  */
 
-/**
- * Geometric structures, transformations, and spatial algorithms.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.mathematics.geometry.triangulation;
+

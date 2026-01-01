@@ -48,3 +48,5 @@ public interface ScientificViewer {
      */
     List<Parameter<?>> getParameters();
 }
+
+

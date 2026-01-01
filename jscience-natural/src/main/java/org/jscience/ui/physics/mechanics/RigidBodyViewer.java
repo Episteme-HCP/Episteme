@@ -354,3 +354,5 @@ public class RigidBodyViewer extends Application {
         new RigidBodyViewer().start(stage);
     }
 }
+
+

@@ -82,7 +82,7 @@ public class FinancialMath {
 
     /**
      * Calculates monthly mortgage payment (Amortization).
-     * M = P [ i(1 + i)^n ] / [ (1 + i)^n – 1]
+     * M = P [ i(1 + i)^n ] / [ (1 + i)^n Ã¢â‚¬â€œ 1]
      *
      * @param principal  The loan amount (P).
      * @param annualRate The annual interest rate.
@@ -111,3 +111,5 @@ public class FinancialMath {
         return new Money(monthlyPayment, principal.getCurrency());
     }
 }
+
+

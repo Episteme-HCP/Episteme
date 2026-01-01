@@ -47,13 +47,13 @@ public final class JScienceUnits {
 
     /**
      * Light year - distance light travels in one Julian year.
-     * Approximately 9.461 × 10^15 meters.
+     * Approximately 9.461 Ãƒâ€” 10^15 meters.
      */
     public static final Unit<Length> LIGHT_YEAR = Units.METER.multiply(9.4607304725808e15);
 
     /**
      * Parsec - parallax of one arcsecond.
-     * Approximately 3.086 × 10^16 meters or 3.26 light-years.
+     * Approximately 3.086 Ãƒâ€” 10^16 meters or 3.26 light-years.
      */
     public static final Unit<Length> PARSEC = Units.METER.multiply(3.0856775814913673e16);
 
@@ -67,7 +67,7 @@ public final class JScienceUnits {
 
     /**
      * Bohr radius - characteristic radius of hydrogen atom ground state.
-     * Approximately 5.292 × 10^-11 meters.
+     * Approximately 5.292 Ãƒâ€” 10^-11 meters.
      */
     public static final Unit<Length> BOHR = Units.METER.multiply(5.29177210903e-11);
 
@@ -78,7 +78,7 @@ public final class JScienceUnits {
 
     /**
      * Electron volt - energy gained by electron through 1V potential.
-     * Approximately 1.602 × 10^-19 joules.
+     * Approximately 1.602 Ãƒâ€” 10^-19 joules.
      */
     public static final Unit<Energy> ELECTRON_VOLT = Units.JOULE.multiply(1.602176634e-19);
 
@@ -93,13 +93,13 @@ public final class JScienceUnits {
 
     /**
      * Solar mass - mass of the Sun.
-     * Approximately 1.989 × 10^30 kilograms.
+     * Approximately 1.989 Ãƒâ€” 10^30 kilograms.
      */
     public static final Unit<Mass> SOLAR_MASS = Units.KILOGRAM.multiply(1.98892e30);
 
     /**
      * Atomic mass unit (Dalton) - 1/12 mass of carbon-12 atom.
-     * Approximately 1.661 × 10^-27 kilograms.
+     * Approximately 1.661 Ãƒâ€” 10^-27 kilograms.
      */
     public static final Unit<Mass> ATOMIC_MASS_UNIT = Units.KILOGRAM.multiply(1.66053906660e-27);
 
@@ -112,3 +112,5 @@ public final class JScienceUnits {
     // public static final Unit<MagneticFluxDensity> GAUSS =
     // Units.TESLA.multiply(1e-4);
 }
+
+

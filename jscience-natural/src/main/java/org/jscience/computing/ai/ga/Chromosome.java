@@ -70,3 +70,5 @@ public interface Chromosome<T> extends Comparable<Chromosome<T>> {
         return Double.compare(this.getFitness(), other.getFitness());
     }
 }
+
+

@@ -22,14 +22,6 @@
  */
 
 /**
- * Automata theory implementations including cellular automata, finite state
- * machines, and formal grammars.
- * <p>
- * This package provides:
- * <ul>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Provides:
  */
 package org.jscience.computing.ai.automata;

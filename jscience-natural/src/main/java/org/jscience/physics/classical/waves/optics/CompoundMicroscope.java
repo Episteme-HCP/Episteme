@@ -108,3 +108,5 @@ public class CompoundMicroscope {
         return objectiveRadius;
     }
 }
+
+

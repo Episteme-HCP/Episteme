@@ -26,14 +26,14 @@ package org.jscience.mathematics.logic.multivalued;
 import org.jscience.mathematics.logic.Logic;
 
 /**
- * Gödel infinite-valued logic (also called Gödel-Dummett logic).
+ * GÃƒÂ¶del infinite-valued logic (also called GÃƒÂ¶del-Dummett logic).
  * <p>
- * In Gödel logic, truth values are real numbers in [0,1].
+ * In GÃƒÂ¶del logic, truth values are real numbers in [0,1].
  * Operations are defined as:
- * - Negation: ¬a = 1 if a = 0, else 0
- * - Implication: a → b = 1 if a ≤ b, else b
- * - Conjunction: a ∧ b = min(a, b)
- * - Disjunction: a ∨ b = max(a, b)
+ * - Negation: Ã‚Â¬a = 1 if a = 0, else 0
+ * - Implication: a Ã¢â€ â€™ b = 1 if a Ã¢â€°Â¤ b, else b
+ * - Conjunction: a Ã¢Ë†Â§ b = min(a, b)
+ * - Disjunction: a Ã¢Ë†Â¨ b = max(a, b)
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -69,25 +69,25 @@ public class GodelLogic implements Logic<Double> {
 
     @Override
     public Double and(Double a, Double b) {
-        // Gödel conjunction: min(a, b)
+        // GÃƒÂ¶del conjunction: min(a, b)
         return Math.min(a, b);
     }
 
     @Override
     public Double or(Double a, Double b) {
-        // Gödel disjunction: max(a, b)
+        // GÃƒÂ¶del disjunction: max(a, b)
         return Math.max(a, b);
     }
 
     @Override
     public Double not(Double a) {
-        // Gödel negation: 1 if a = 0, else 0
+        // GÃƒÂ¶del negation: 1 if a = 0, else 0
         return Math.abs(a) < EPSILON ? 1.0 : 0.0;
     }
 
     @Override
     public Double implies(Double a, Double b) {
-        // Gödel implication: 1 if a ≤ b, else b
+        // GÃƒÂ¶del implication: 1 if a Ã¢â€°Â¤ b, else b
         return a <= b + EPSILON ? 1.0 : b;
     }
 
@@ -118,6 +118,7 @@ public class GodelLogic implements Logic<Double> {
 
     @Override
     public String toString() {
-        return "Gödel Logic";
+        return "GÃƒÂ¶del Logic";
     }
 }
+

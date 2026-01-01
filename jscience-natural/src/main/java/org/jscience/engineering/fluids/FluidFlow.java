@@ -43,7 +43,7 @@ public class FluidFlow {
     private FluidFlow() {
     }
 
-    /** Reynolds number: Re = v * L / ν */
+    /** Reynolds number: Re = v * L / ÃŽÂ½ */
     public static Real reynoldsNumber(Real velocity, Real characteristicLength, Real kinematicViscosity) {
         return velocity.multiply(characteristicLength).divide(kinematicViscosity);
     }
@@ -73,7 +73,7 @@ public class FluidFlow {
         return Quantities.create(P2, Units.PASCAL);
     }
 
-    /** Hagen-Poiseuille: Q = π * ΔP * r⁴ / (8 * μ * L) */
+    /** Hagen-Poiseuille: Q = Ãâ‚¬ * ÃŽâ€P * rÃ¢ÂÂ´ / (8 * ÃŽÂ¼ * L) */
     public static Real laminarPipeFlow(Real pressureDrop, Real radius, Real dynamicViscosity, Real length) {
         return Real.PI.multiply(pressureDrop).multiply(radius.pow(4))
                 .divide(Real.of(8).multiply(dynamicViscosity).multiply(length));
@@ -84,3 +84,5 @@ public class FluidFlow {
         return Real.of(64).divide(reynoldsNumber);
     }
 }
+
+

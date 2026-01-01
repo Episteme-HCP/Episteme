@@ -102,3 +102,5 @@ public class RNAFolding {
                 pair.equals("GU") || pair.equals("UG");
     }
 }
+
+

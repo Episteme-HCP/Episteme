@@ -26,7 +26,7 @@ package org.jscience.mathematics.statistics.fitting;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * Polynomial regression: y = a₀ + a₁x + a₂x² + ... + aₙxⁿ.
+ * Polynomial regression: y = aÃ¢â€šâ‚¬ + aÃ¢â€šÂx + aÃ¢â€šâ€šxÃ‚Â² + ... + aÃ¢â€šâ„¢xÃ¢ÂÂ¿.
  * <p>
  * Uses normal equations with LU decomposition for stability.
  * </p>
@@ -198,7 +198,9 @@ public class PolynomialRegression {
             else if (i > 1)
                 sb.append("*x^").append(i);
         }
-        sb.append(String.format(" (R² = %.4f)", rSquared));
+        sb.append(String.format(" (RÃ‚Â² = %.4f)", rSquared));
         return sb.toString();
     }
 }
+
+

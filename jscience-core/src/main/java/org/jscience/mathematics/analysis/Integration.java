@@ -88,3 +88,5 @@ public final class Integration {
         return new org.jscience.mathematics.analysis.integration.TrapezoidalIntegrator(n).integrate(f, a, b);
     }
 }
+
+

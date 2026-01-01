@@ -22,10 +22,6 @@
  */
 
 /**
- * Theater package - plays, performances, dramatic arts.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * - plays, performances, dramatic arts.
  */
 package org.jscience.arts.theater;

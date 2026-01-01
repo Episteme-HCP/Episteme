@@ -61,7 +61,12 @@ public class EigenDecomposition {
      * </p>
      */
     public enum Algorithm {
+        /**
+         * @deprecated Not implemented in 1.0. Use SIMPLIFIED_POWER_ITERATION instead.
+         */
+        @Deprecated
         INVERSE_ITERATION,
+
         SIMPLIFIED_POWER_ITERATION
     }
 

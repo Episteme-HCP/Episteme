@@ -103,7 +103,7 @@ public interface UnitConverter {
     /**
      * Checks if this converter is linear (scale only, no offset).
      * <p>
-     * Linear converters satisfy: f(x + y) = f(x) + f(y) and f(ax) = a⋅f(x).
+     * Linear converters satisfy: f(x + y) = f(x) + f(y) and f(ax) = aÃ¢â€¹â€¦f(x).
      * </p>
      * 
      * @return true if this converter is linear
@@ -131,3 +131,4 @@ public interface UnitConverter {
         return org.jscience.measure.converters.IdentityConverter.INSTANCE;
     }
 }
+

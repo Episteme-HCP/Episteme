@@ -75,3 +75,5 @@ public class NeuralNetworkTest {
         assertEquals(5.0, ActivationFunction.LINEAR.apply(5), 1e-9);
     }
 }
+
+

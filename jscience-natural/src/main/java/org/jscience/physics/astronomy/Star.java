@@ -80,3 +80,5 @@ public class Star extends CelestialBody {
         return "Star " + super.toString();
     }
 }
+
+

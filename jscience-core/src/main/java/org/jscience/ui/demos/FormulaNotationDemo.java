@@ -24,7 +24,7 @@
 package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.AppProvider;
 import org.jscience.ui.mathematics.FormulaNotationViewer;
 
 import org.jscience.ui.i18n.I18n;
@@ -35,10 +35,15 @@ import org.jscience.ui.i18n.I18n;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class FormulaNotationDemo implements DemoProvider {
+public class FormulaNotationDemo implements AppProvider {
+    @Override
+    public boolean isDemo() {
+        return true;
+    }
+
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.mathematics");
+        return "Mathematics";
     }
 
     @Override
@@ -56,3 +61,5 @@ public class FormulaNotationDemo implements DemoProvider {
         FormulaNotationViewer.show(stage);
     }
 }
+
+

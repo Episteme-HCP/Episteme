@@ -147,3 +147,4 @@ public final class Point3D
         return new Vector3D(x, y, z);
     }
 }
+

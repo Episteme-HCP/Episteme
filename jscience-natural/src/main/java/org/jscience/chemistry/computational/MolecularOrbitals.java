@@ -26,7 +26,7 @@ package org.jscience.chemistry.computational;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * Molecular orbital calculations using Hückel theory.
+ * Molecular orbital calculations using HÃƒÂ¼ckel theory.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -50,7 +50,7 @@ public class MolecularOrbitals {
         this(-6.0, -2.5);
     }
 
-    /** Linear chain energies: E_k = α + 2β·cos(kπ/(n+1)) */
+    /** Linear chain energies: E_k = ÃŽÂ± + 2ÃŽÂ²Ã‚Â·cos(kÃâ‚¬/(n+1)) */
     public Real[] linearChainEnergies(int numAtoms) {
         Real[] energies = new Real[numAtoms];
         for (int k = 1; k <= numAtoms; k++) {
@@ -60,7 +60,7 @@ public class MolecularOrbitals {
         return energies;
     }
 
-    /** Cyclic energies: E_k = α + 2β·cos(2πk/n) */
+    /** Cyclic energies: E_k = ÃŽÂ± + 2ÃŽÂ²Ã‚Â·cos(2Ãâ‚¬k/n) */
     public Real[] cyclicEnergies(int numAtoms) {
         Real[] energies = new Real[numAtoms];
         for (int k = 0; k < numAtoms; k++) {
@@ -71,7 +71,7 @@ public class MolecularOrbitals {
         return energies;
     }
 
-    /** Total π-electron energy */
+    /** Total Ãâ‚¬-electron energy */
     public Real totalPiEnergy(Real[] orbitalEnergies, int numElectrons) {
         Real total = Real.ZERO;
         int electrons = numElectrons;
@@ -127,3 +127,5 @@ public class MolecularOrbitals {
         return beta;
     }
 }
+
+

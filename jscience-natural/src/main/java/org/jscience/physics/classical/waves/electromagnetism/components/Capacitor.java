@@ -98,3 +98,5 @@ public class Capacitor extends CircuitElement implements CircuitComponent {
         current = (vDiff - voltageLast) / compResistance - currentLast;
     }
 }
+
+

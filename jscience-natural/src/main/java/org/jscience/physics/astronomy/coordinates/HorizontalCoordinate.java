@@ -26,8 +26,8 @@ package org.jscience.physics.astronomy.coordinates;
 /**
  * Horizontal (Alt-Az) celestial coordinates.
  *
- * Altitude: Angle above horizon (0° = horizon, 90° = zenith).
- * Azimuth: Angle measured from North, clockwise (0° = N, 90° = E).
+ * Altitude: Angle above horizon (0Ã‚Â° = horizon, 90Ã‚Â° = zenith).
+ * Azimuth: Angle measured from North, clockwise (0Ã‚Â° = N, 90Ã‚Â° = E).
  *
  * These coordinates are local (depend on observer position and time).
  *
@@ -37,7 +37,7 @@ package org.jscience.physics.astronomy.coordinates;
  */
 public class HorizontalCoordinate {
 
-    private final double altitude; // [−90, +90] degrees
+    private final double altitude; // [Ã¢Ë†â€™90, +90] degrees
     private final double azimuth; // [0, 360) degrees
 
     public HorizontalCoordinate(double altitude, double azimuth) {
@@ -124,7 +124,7 @@ public class HorizontalCoordinate {
     }
 
     /**
-     * Returns airmass (secant approximation, valid for alt > 15°).
+     * Returns airmass (secant approximation, valid for alt > 15Ã‚Â°).
      * For lower altitudes, use more accurate formulas.
      */
     public double getAirmass() {
@@ -152,6 +152,8 @@ public class HorizontalCoordinate {
 
     @Override
     public String toString() {
-        return String.format("Alt=%.2f°, Az=%.2f°", altitude, azimuth);
+        return String.format("Alt=%.2fÃ‚Â°, Az=%.2fÃ‚Â°", altitude, azimuth);
     }
 }
+
+

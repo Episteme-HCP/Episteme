@@ -51,3 +51,4 @@ public interface IntegrableFunction<D, C> extends Function<D, C> {
      */
     C integrate(D start, D end);
 }
+

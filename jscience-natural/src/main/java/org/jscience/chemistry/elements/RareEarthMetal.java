@@ -36,3 +36,5 @@ public final class RareEarthMetal extends Element {
         super(name, symbol);
     }
 }
+
+

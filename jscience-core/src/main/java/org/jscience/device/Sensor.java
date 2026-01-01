@@ -44,3 +44,5 @@ public interface Sensor<D> extends Device {
      */
     D readValue() throws IOException;
 }
+
+

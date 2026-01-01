@@ -100,3 +100,4 @@ public class SU2Group implements Group<Matrix<Complex>> {
         return true;
     }
 }
+

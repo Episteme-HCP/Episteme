@@ -31,10 +31,10 @@ package org.jscience.mathematics.structures.groups;
  *
  * <h2>Group Axioms</h2>
  * <ul>
- * <li>Closure: a ∘ b is in G</li>
- * <li>Associativity: (a ∘ b) ∘ c = a ∘ (b ∘ c)</li>
- * <li>Identity: e ∘ a = a ∘ e = a</li>
- * <li>Inverse: a ∘ a⁻¹ = a⁻¹ ∘ a = e</li>
+ * <li>Closure: a Ã¢Ë†Ëœ b is in G</li>
+ * <li>Associativity: (a Ã¢Ë†Ëœ b) Ã¢Ë†Ëœ c = a Ã¢Ë†Ëœ (b Ã¢Ë†Ëœ c)</li>
+ * <li>Identity: e Ã¢Ë†Ëœ a = a Ã¢Ë†Ëœ e = a</li>
+ * <li>Inverse: a Ã¢Ë†Ëœ aÃ¢ÂÂ»Ã‚Â¹ = aÃ¢ÂÂ»Ã‚Â¹ Ã¢Ë†Ëœ a = e</li>
  * </ul>
  *
  * @author Silvere Martin-Michiellot
@@ -47,14 +47,14 @@ public interface GroupElement<E extends GroupElement<E>> {
      * Applies the group operation with another element.
      * 
      * @param other the other element
-     * @return this ∘ other
+     * @return this Ã¢Ë†Ëœ other
      */
     E operate(E other);
 
     /**
      * Returns the inverse of this element.
      * 
-     * @return this⁻¹
+     * @return thisÃ¢ÂÂ»Ã‚Â¹
      */
     E inverse();
 
@@ -65,3 +65,4 @@ public interface GroupElement<E extends GroupElement<E>> {
      */
     E identity();
 }
+

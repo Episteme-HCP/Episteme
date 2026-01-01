@@ -39,9 +39,9 @@ import org.jscience.mathematics.structures.rings.Field;
  *
  * <h2>Examples</h2>
  * <ul>
- * <li>ℝⁿ (Euclidean space)</li>
- * <li>ℂⁿ (Complex coordinate space)</li>
- * <li>Function spaces (e.g., L²)</li>
+ * <li>Ã¢â€žÂÃ¢ÂÂ¿ (Euclidean space)</li>
+ * <li>Ã¢â€žâ€šÃ¢ÂÂ¿ (Complex coordinate space)</li>
+ * <li>Function spaces (e.g., LÃ‚Â²)</li>
  * <li>Polynomial spaces</li>
  * </ul>
  *
@@ -69,3 +69,4 @@ public interface VectorSpace<V, F> extends Module<V, F> {
         return -1;
     }
 }
+

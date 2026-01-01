@@ -83,3 +83,4 @@ public interface WeightedEdge<V, W> {
         return getSource().equals(vertex) || getTarget().equals(vertex);
     }
 }
+

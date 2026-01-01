@@ -117,3 +117,4 @@ public class BandedMatrixStorage<E> implements MatrixStorage<E> {
         return new BandedMatrixStorage<>(data, n, lowerBandwidth, upperBandwidth, zero);
     }
 }
+

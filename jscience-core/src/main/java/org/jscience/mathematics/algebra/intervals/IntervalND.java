@@ -248,3 +248,4 @@ public class IntervalND implements TopologicalSpace<List<Real>> {
         return backing.hashCode();
     }
 }
+

@@ -147,3 +147,5 @@ public class Recipe {
                 name, cuisine, category, getTotalTime(), servings);
     }
 }
+
+

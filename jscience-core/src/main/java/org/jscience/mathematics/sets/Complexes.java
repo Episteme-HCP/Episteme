@@ -28,10 +28,10 @@ import org.jscience.mathematics.structures.sets.InfiniteSet;
 import org.jscience.mathematics.numbers.complex.Complex;
 
 /**
- * The structure of complex numbers (ℂ).
+ * The structure of complex numbers (Ã¢â€žâ€š).
  * <p>
  * This class represents the <strong>structure</strong> of complex numbers,
- * implementing {@link Field} because ℂ forms a field under addition and
+ * implementing {@link Field} because Ã¢â€žâ€š forms a field under addition and
  * multiplication.
  * </p>
  * <p>
@@ -116,7 +116,7 @@ public final class Complexes implements Field<Complex>, InfiniteSet<Complex> {
 
     @Override
     public boolean isCountable() {
-        return false; // ℂ is uncountable
+        return false; // Ã¢â€žâ€š is uncountable
     }
 
     @Override
@@ -131,11 +131,13 @@ public final class Complexes implements Field<Complex>, InfiniteSet<Complex> {
 
     @Override
     public String description() {
-        return "ℂ (Complex Numbers)";
+        return "Ã¢â€žâ€š (Complex Numbers)";
     }
 
     @Override
     public String toString() {
-        return "Complexes(ℂ)";
+        return "Complexes(Ã¢â€žâ€š)";
     }
 }
+
+

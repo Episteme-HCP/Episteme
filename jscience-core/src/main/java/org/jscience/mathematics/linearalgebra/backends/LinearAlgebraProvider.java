@@ -85,3 +85,5 @@ public interface LinearAlgebraProvider<E> extends ComputeBackend {
 
     // Future extensions: eigenvalue, etc.
 }
+
+

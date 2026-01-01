@@ -65,3 +65,5 @@ public abstract class AbstractDeviceViewer<T extends Device> extends VBox {
 
     public abstract void update();
 }
+
+

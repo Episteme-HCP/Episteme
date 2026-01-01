@@ -87,3 +87,5 @@ public class SocialPojoTests {
         PojoTester.testPojo(Note.class);
     }
 }
+
+

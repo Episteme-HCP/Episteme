@@ -27,7 +27,7 @@ import java.math.BigInteger;
 import org.jscience.mathematics.structures.rings.Semiring;
 
 /**
- * Abstract base class for natural numbers (ℕ = {0, 1, 2, ...}).
+ * Abstract base class for natural numbers (Ã¢â€žâ€¢ = {0, 1, 2, ...}).
  * <p>
  * Natural numbers form a semiring under addition and multiplication.
  * This class provides a smart factory that automatically chooses the
@@ -152,7 +152,7 @@ public abstract class Natural extends Number implements Semiring<Natural>, Compa
      * Multiplies by another natural number.
      * 
      * @param other the multiplicand
-     * @return this × other
+     * @return this Ãƒâ€” other
      */
     public abstract Natural multiply(Natural other);
 
@@ -160,7 +160,7 @@ public abstract class Natural extends Number implements Semiring<Natural>, Compa
      * Divides by another natural number (integer division).
      * 
      * @param other the divisor
-     * @return this ÷ other (rounded down)
+     * @return this ÃƒÂ· other (rounded down)
      * @throws ArithmeticException if other is zero
      */
     public abstract Natural divide(Natural other);
@@ -222,3 +222,4 @@ public abstract class Natural extends Number implements Semiring<Natural>, Compa
     @Override
     public abstract int compareTo(Natural other);
 }
+

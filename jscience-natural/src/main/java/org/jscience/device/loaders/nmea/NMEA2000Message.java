@@ -264,3 +264,5 @@ public class NMEA2000Message {
         return sb.toString().trim();
     }
 }
+
+

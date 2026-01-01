@@ -59,3 +59,5 @@ public final class FitsConstants {
     public static final int BITPIX_FLOAT = -32;
     public static final int BITPIX_DOUBLE = -64;
 }
+
+

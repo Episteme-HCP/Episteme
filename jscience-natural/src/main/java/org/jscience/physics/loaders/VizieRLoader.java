@@ -152,3 +152,5 @@ public class VizieRLoader implements org.jscience.io.InputLoader<Map<String, Str
         }
     }
 }
+
+

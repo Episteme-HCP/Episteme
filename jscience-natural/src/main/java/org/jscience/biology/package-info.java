@@ -21,21 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Provides support for biological sciences and bioinformatics.
- * <p>
- * Key features include:
- * <ul>
- * <li>Genetics (DNA/RNA sequences, Alignment)</li>
- * <li>Cell Biology (Metabolism, Organelles)</li>
- * <li>Evolutionary Biology (Phylogenetics, Population Genetics)</li>
- * <li>Neuroscience (Neuron models)</li>
- * <li>Structural Biology (PDB parsing)</li>
- * </ul>
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.biology;
+
+

@@ -77,3 +77,5 @@ public class DoseCalculator {
         return isFemale ? result.multiply(Real.of(0.85)) : result;
     }
 }
+
+

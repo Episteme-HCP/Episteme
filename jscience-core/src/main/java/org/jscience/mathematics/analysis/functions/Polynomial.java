@@ -29,7 +29,7 @@ import org.jscience.mathematics.structures.rings.Ring;
 /**
  * Polynomial with coefficients in a ring.
  * <p>
- * Represents polynomials like: a₀ + a₁x + a₂x² + ... + aₙxⁿ
+ * Represents polynomials like: aÃ¢â€šâ‚¬ + aÃ¢â€šÂx + aÃ¢â€šâ€šxÃ‚Â² + ... + aÃ¢â€šâ„¢xÃ¢ÂÂ¿
  * Supports arithmetic operations and evaluation.
  * </p>
  *
@@ -45,7 +45,7 @@ public class Polynomial<R> {
     /**
      * Creates a polynomial from coefficients (lowest degree first).
      * 
-     * @param coefficients coefficients [a₀, a₁, a₂, ...]
+     * @param coefficients coefficients [aÃ¢â€šâ‚¬, aÃ¢â€šÂ, aÃ¢â€šâ€š, ...]
      * @param ring         the coefficient ring
      */
     public Polynomial(List<R> coefficients, Ring<R> ring) {
@@ -179,7 +179,7 @@ public class Polynomial<R> {
         if (coefficients.isEmpty())
             return ring.zero();
 
-        // Horner's method: a₀ + x(a₁ + x(a₂ + ...))
+        // Horner's method: aÃ¢â€šâ‚¬ + x(aÃ¢â€šÂ + x(aÃ¢â€šâ€š + ...))
         R result = coefficients.get(coefficients.size() - 1);
         for (int i = coefficients.size() - 2; i >= 0; i--) {
             result = ring.add(coefficients.get(i), ring.multiply(x, result));
@@ -197,7 +197,7 @@ public class Polynomial<R> {
 
         List<R> result = new ArrayList<>();
         for (int i = 1; i < coefficients.size(); i++) {
-            // d/dx(aᵢxⁱ) = i·aᵢxⁱ⁻¹
+            // d/dx(aÃ¡ÂµÂ¢xÃ¢ÂÂ±) = iÃ‚Â·aÃ¡ÂµÂ¢xÃ¢ÂÂ±Ã¢ÂÂ»Ã‚Â¹
             R coeff = coefficients.get(i);
             for (int j = 1; j < i; j++) {
                 coeff = ring.add(coeff, coefficients.get(i));
@@ -257,3 +257,5 @@ public class Polynomial<R> {
         return coefficients.hashCode();
     }
 }
+
+

@@ -22,15 +22,6 @@
  */
 
 /**
- * CPU-based compute backend implementation.
- * <p>
- * This package provides the default CPU backend using pure Java.
- * The backend is always available and supports parallel operations
- * via Java parallel streams.
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Provides the default CPU backend using pure Java.
  */
 package org.jscience.technical.backend.cpu;

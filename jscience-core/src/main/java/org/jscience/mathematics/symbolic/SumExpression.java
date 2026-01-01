@@ -70,7 +70,7 @@ public class SumExpression<T extends Ring<T>> implements Expression<T> {
 
     @Override
     public Expression<T> integrate(Variable<T> variable) {
-        // ∫(f + g) = ∫f + ∫g
+        // Ã¢Ë†Â«(f + g) = Ã¢Ë†Â«f + Ã¢Ë†Â«g
         return new SumExpression<>(left.integrate(variable), right.integrate(variable), ring);
     }
 
@@ -151,3 +151,4 @@ public class SumExpression<T extends Ring<T>> implements Expression<T> {
         return "(" + left + " + " + right + ")";
     }
 }
+

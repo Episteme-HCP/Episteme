@@ -88,7 +88,7 @@ public class LevenbergMarquardt {
                 }
             }
 
-            // Add damping: (J^T J + λI)
+            // Add damping: (J^T J + ÃŽÂ»I)
             for (int j = 0; j < p; j++) {
                 jtj[j][j] *= (1 + lambda);
             }
@@ -230,3 +230,5 @@ public class LevenbergMarquardt {
         return fit(model, xData, yData, new double[] { 1.0, 1.0 });
     }
 }
+
+

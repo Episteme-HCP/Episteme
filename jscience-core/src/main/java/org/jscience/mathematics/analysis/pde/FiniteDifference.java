@@ -40,7 +40,7 @@ import org.jscience.mathematics.analysis.Function;
 public class FiniteDifference {
 
     /**
-     * Solves 1D heat equation: ∂u/∂t = α ∂²u/∂x²
+     * Solves 1D heat equation: Ã¢Ë†â€šu/Ã¢Ë†â€št = ÃŽÂ± Ã¢Ë†â€šÃ‚Â²u/Ã¢Ë†â€šxÃ‚Â²
      * <p>
      * Forward Euler (explicit) time stepping.
      * Boundary conditions: u(0,t) = u(L,t) = 0
@@ -60,7 +60,7 @@ public class FiniteDifference {
         Real dx = L.divide(Real.of(nx - 1));
         Real dt = T.divide(Real.of(nt - 1));
 
-        // Stability condition: α*dt/dx² ≤ 0.5
+        // Stability condition: ÃŽÂ±*dt/dxÃ‚Â² Ã¢â€°Â¤ 0.5
         Real stability = alpha.multiply(dt).divide(dx.multiply(dx));
         if (stability.compareTo(Real.of(0.5)) > 0) {
             throw new IllegalArgumentException("Unstable: reduce dt or increase dx");
@@ -83,7 +83,7 @@ public class FiniteDifference {
         // Time stepping
         for (int n = 0; n < nt - 1; n++) {
             for (int i = 1; i < nx - 1; i++) {
-                // u_{i}^{n+1} = u_i^n + α*dt/dx² * (u_{i+1}^n - 2u_i^n + u_{i-1}^n)
+                // u_{i}^{n+1} = u_i^n + ÃŽÂ±*dt/dxÃ‚Â² * (u_{i+1}^n - 2u_i^n + u_{i-1}^n)
                 Real laplacian = u[n][i + 1].add(u[n][i - 1]).subtract(u[n][i].multiply(Real.of(2)));
                 u[n + 1][i] = u[n][i].add(stability.multiply(laplacian));
             }
@@ -93,13 +93,13 @@ public class FiniteDifference {
     }
 
     /**
-     * Solves 1D wave equation: ∂²u/∂t² = c² ∂²u/∂x²
+     * Solves 1D wave equation: Ã¢Ë†â€šÃ‚Â²u/Ã¢Ë†â€štÃ‚Â² = cÃ‚Â² Ã¢Ë†â€šÃ‚Â²u/Ã¢Ë†â€šxÃ‚Â²
      * <p>
      * Explicit central differences in space and time.
      * </p>
      * 
      * @param initial         initial displacement u(x,0)
-     * @param initialVelocity initial velocity ∂u/∂t(x,0)
+     * @param initialVelocity initial velocity Ã¢Ë†â€šu/Ã¢Ë†â€št(x,0)
      * @param c               wave speed
      * @param L               domain length
      * @param T               final time
@@ -114,7 +114,7 @@ public class FiniteDifference {
         Real dx = L.divide(Real.of(nx - 1));
         Real dt = T.divide(Real.of(nt - 1));
 
-        // CFL condition: c*dt/dx ≤ 1
+        // CFL condition: c*dt/dx Ã¢â€°Â¤ 1
         Real cfl = c.multiply(dt).divide(dx);
         if (cfl.compareTo(Real.ONE) > 0) {
             throw new IllegalArgumentException("Unstable: CFL condition violated");
@@ -129,7 +129,7 @@ public class FiniteDifference {
         }
 
         // First time step using initial velocity
-        Real r = cfl.multiply(cfl); // (c*dt/dx)²
+        Real r = cfl.multiply(cfl); // (c*dt/dx)Ã‚Â²
         for (int i = 1; i < nx - 1; i++) {
             Real x = Real.of(i).multiply(dx);
             Real laplacian = u[0][i + 1].add(u[0][i - 1]).subtract(u[0][i].multiply(Real.of(2)));
@@ -156,10 +156,10 @@ public class FiniteDifference {
     }
 
     /**
-     * Solves 2D Poisson equation: ∇²u = f on rectangular domain.
+     * Solves 2D Poisson equation: Ã¢Ë†â€¡Ã‚Â²u = f on rectangular domain.
      * <p>
      * Uses Jacobi iteration (simple iterative solver).
-     * ∂²u/∂x² + ∂²u/∂y² = f
+     * Ã¢Ë†â€šÃ‚Â²u/Ã¢Ë†â€šxÃ‚Â² + Ã¢Ë†â€šÃ‚Â²u/Ã¢Ë†â€šyÃ‚Â² = f
      * </p>
      * 
      * @param source    source term f(x,y)
@@ -234,3 +234,5 @@ public class FiniteDifference {
         return u;
     }
 }
+
+

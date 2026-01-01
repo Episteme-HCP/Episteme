@@ -62,11 +62,11 @@ public class TimeSeries {
     /**
      * Exponential moving average (EMA).
      * <p>
-     * EMA_t = α * X_t + (1-α) * EMA_(t-1)
+     * EMA_t = ÃŽÂ± * X_t + (1-ÃŽÂ±) * EMA_(t-1)
      * </p>
      * 
      * @param data  time series
-     * @param alpha smoothing factor (0 < α < 1)
+     * @param alpha smoothing factor (0 < ÃŽÂ± < 1)
      * @return exponentially smoothed series
      */
     public static Real[] exponentialMovingAverage(Real[] data, Real alpha) {
@@ -89,7 +89,7 @@ public class TimeSeries {
     /**
      * Computes autocorrelation at lag k.
      * <p>
-     * ρ_k = Cov(X_t, X_(t-k)) / Var(X_t)
+     * ÃÂ_k = Cov(X_t, X_(t-k)) / Var(X_t)
      * </p>
      */
     public static Real autocorrelation(Real[] data, int lag) {
@@ -123,7 +123,7 @@ public class TimeSeries {
     }
 
     /**
-     * AutoRegressive model AR(p): X_t = c + Σφ_i*X_(t-i) + ε_t
+     * AutoRegressive model AR(p): X_t = c + ÃŽÂ£Ãâ€ _i*X_(t-i) + ÃŽÂµ_t
      * <p>
      * Fits coefficients using Yule-Walker equations.
      * </p>
@@ -151,7 +151,7 @@ public class TimeSeries {
                 centered[i] = data[i].subtract(mean);
             }
 
-            // Yule-Walker: solve R*φ = r for φ
+            // Yule-Walker: solve R*Ãâ€  = r for Ãâ€ 
             // R[i][j] = autocorr(|i-j|), r[i] = autocorr(i+1)
             coefficients = new Real[order];
             for (int i = 0; i < order; i++) {
@@ -176,7 +176,7 @@ public class TimeSeries {
     }
 
     /**
-     * Moving Average model MA(q): X_t = μ + ε_t + Σθ_i*ε_(t-i)
+     * Moving Average model MA(q): X_t = ÃŽÂ¼ + ÃŽÂµ_t + ÃŽÂ£ÃŽÂ¸_i*ÃŽÂµ_(t-i)
      */
     public static class MAModel {
         private final Real[] coefficients;
@@ -205,7 +205,7 @@ public class TimeSeries {
     /**
      * Differencing to achieve stationarity.
      * <p>
-     * Δ^d X_t = X_t - X_(t-1) applied d times
+     * ÃŽâ€^d X_t = X_t - X_(t-1) applied d times
      * </p>
      */
     public static Real[] difference(Real[] data, int order) {
@@ -288,3 +288,5 @@ public class TimeSeries {
         }
     }
 }
+
+

@@ -77,3 +77,5 @@ public class OpticalMedium {
         return refractiveIndex;
     }
 }
+
+

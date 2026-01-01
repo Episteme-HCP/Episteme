@@ -151,3 +151,4 @@ public final class Vector2D extends org.jscience.mathematics.linearalgebra.vecto
         return "Vector2D" + toString();
     }
 }
+

@@ -34,14 +34,14 @@ package org.jscience.mathematics.linearalgebra.tensors;
  * <h2>Rank and Shape</h2>
  * <ul>
  * <li><b>Rank</b>: Number of dimensions (e.g., rank 3 = 3D tensor)</li>
- * <li><b>Shape</b>: Size of each dimension (e.g., [2, 3, 4] = 2×3×4)</li>
+ * <li><b>Shape</b>: Size of each dimension (e.g., [2, 3, 4] = 2Ãƒâ€”3Ãƒâ€”4)</li>
  * <li><b>Size</b>: Total number of elements (product of shape)</li>
  * </ul>
  *
  * <h2>Example</h2>
  *
  * <pre>
- * // 2×3 matrix (rank 2 tensor)
+ * // 2Ãƒâ€”3 matrix (rank 2 tensor)
  * Tensor&lt;Real&gt; matrix = Tensor.of(new Real[][] {
  * { Real.of(1), Real.of(2), Real.of(3) },
  * { Real.of(4), Real.of(5), Real.of(6) }
@@ -67,7 +67,7 @@ public interface Tensor<T> {
     /**
      * Returns the rank (number of dimensions) of this tensor.
      * 
-     * @return rank ≥ 0
+     * @return rank Ã¢â€°Â¥ 0
      */
     int rank();
 
@@ -116,7 +116,7 @@ public interface Tensor<T> {
      * Element-wise multiplication (Hadamard product).
      * 
      * @param other tensor with same shape
-     * @return this ⊙ other
+     * @return this Ã¢Å â„¢ other
      */
     Tensor<T> multiply(Tensor<T> other);
 
@@ -189,7 +189,7 @@ public interface Tensor<T> {
     /**
      * Sums all elements.
      * 
-     * @return Σ elements
+     * @return ÃŽÂ£ elements
      */
     T sum();
 
@@ -233,3 +233,4 @@ public interface Tensor<T> {
         return EinsteinSummation.einsum(equation, allOperands);
     }
 }
+

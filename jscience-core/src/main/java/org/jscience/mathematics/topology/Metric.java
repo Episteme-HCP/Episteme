@@ -30,10 +30,10 @@ import org.jscience.mathematics.numbers.real.Real;
  * <p>
  * A metric must satisfy:
  * <ul>
- * <li>Non-negativity: d(x,y) ≥ 0</li>
- * <li>Identity: d(x,y) = 0 ⟺ x = y</li>
+ * <li>Non-negativity: d(x,y) Ã¢â€°Â¥ 0</li>
+ * <li>Identity: d(x,y) = 0 Ã¢Å¸Âº x = y</li>
  * <li>Symmetry: d(x,y) = d(y,x)</li>
- * <li>Triangle inequality: d(x,z) ≤ d(x,y) + d(y,z)</li>
+ * <li>Triangle inequality: d(x,z) Ã¢â€°Â¤ d(x,y) + d(y,z)</li>
  * </ul>
  * </p>
  *
@@ -52,4 +52,6 @@ public interface Metric<T> {
      */
     Real distance(T a, T b);
 }
+
+
 

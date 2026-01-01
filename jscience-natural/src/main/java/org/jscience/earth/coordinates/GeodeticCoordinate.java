@@ -158,3 +158,5 @@ public class GeodeticCoordinate {
         return VectorFactory.<Real>create(elements, Real.ZERO);
     }
 }
+
+

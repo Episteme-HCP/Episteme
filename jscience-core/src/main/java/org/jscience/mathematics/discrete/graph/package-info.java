@@ -22,17 +22,6 @@
  */
 
 /**
- * Graph traversal strategies and algorithms.
- * <p>
- * This package provides pluggable traversal algorithms for graphs with optional
- * backend acceleration support.
- * </p>
- * <p>
- * <b>Standard traversals:</b>
- * <ul>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Provides pluggable traversal algorithms for graphs with optional
  */
 package org.jscience.mathematics.discrete.graph;

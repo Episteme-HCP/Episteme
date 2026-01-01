@@ -47,3 +47,5 @@ public interface InfiniteSequence<T> extends Sequence<T> {
      */
     T limit();
 }
+
+

@@ -21,11 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Classes and interfaces for org.jscience.medicine.anthropometry.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.medicine.anthropometry;
+
+

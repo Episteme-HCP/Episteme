@@ -122,3 +122,4 @@ public class GingerbreadManMap implements DiscreteMap<Real[]> {
         return "GingerbreadManMap: x' = 1 - y + |x|, y' = x";
     }
 }
+

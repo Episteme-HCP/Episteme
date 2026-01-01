@@ -208,3 +208,5 @@ public final class TechnicalIndicators {
         return currentPrice < smaPrice * (1 - threshold);
     }
 }
+
+

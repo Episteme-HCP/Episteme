@@ -22,20 +22,6 @@
  */
 
 /**
- * Distributed computing support for JScience.
- * <p>
- * This package provides integration with Apache Spark and Apache Flink for
- * large-scale scientific computing and stream processing.
- * </p>
- *
- * <h2>Apache Spark Integration</h2>
- * <p>
- * Distributed matrix and vector operations using RDDs:
- * </p>
- * <ul>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Provides integration with Apache Spark and Apache Flink for
  */
 package org.jscience.distributed;

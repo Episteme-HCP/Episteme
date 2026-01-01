@@ -76,7 +76,7 @@ public class Polymer {
 
     /**
      * Mark-Houwink equation: intrinsic viscosity.
-     * [η] = K · M^a
+     * [ÃŽÂ·] = K Ã‚Â· M^a
      */
     public static Real intrinsicViscosity(Real M, Real K, Real a) {
         return K.multiply(M.pow(a));
@@ -84,7 +84,7 @@ public class Polymer {
 
     /**
      * End-to-end distance for ideal chain.
-     * <R²>^(1/2) = l·sqrt(n) for freely-jointed chain
+     * <RÃ‚Â²>^(1/2) = lÃ‚Â·sqrt(n) for freely-jointed chain
      */
     public static Real endToEndDistance(int n, Real l) {
         return l.multiply(Real.of(n).sqrt());
@@ -92,7 +92,7 @@ public class Polymer {
 
     /**
      * Radius of gyration for ideal chain.
-     * Rg = <R²>^(1/2) / sqrt(6)
+     * Rg = <RÃ‚Â²>^(1/2) / sqrt(6)
      */
     public static Real radiusOfGyration(int n, Real l) {
         return endToEndDistance(n, l).divide(Real.of(6).sqrt());
@@ -100,11 +100,11 @@ public class Polymer {
 
     /**
      * Flory-Huggins interaction parameter estimation.
-     * χ = V_s(δ_p - δ_s)² / RT
+     * Ãâ€¡ = V_s(ÃŽÂ´_p - ÃŽÂ´_s)Ã‚Â² / RT
      */
     public static Real floryHugginsParameter(Real Vs, Real deltaP,
             Real deltaS, Real T) {
-        Real R = Real.of(1.987); // cal/(mol·K)
+        Real R = Real.of(1.987); // cal/(molÃ‚Â·K)
         Real diff = deltaP.subtract(deltaS);
         return Vs.multiply(diff.pow(2)).divide(R.multiply(T));
     }
@@ -180,3 +180,5 @@ public class Polymer {
     public static final Real PMMA_REPEAT_MASS = Real.of(100.12);
     public static final Real NYLON66_REPEAT_MASS = Real.of(226.32);
 }
+
+

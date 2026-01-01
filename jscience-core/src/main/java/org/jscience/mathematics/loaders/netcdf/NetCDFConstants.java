@@ -56,3 +56,4 @@ public final class NetCDFConstants {
     public static final int NC_FLOAT = 5;
     public static final int NC_DOUBLE = 6;
 }
+

@@ -22,13 +22,6 @@
  */
 
 /**
- * Politics package - political entities, nations, and governance.
- * <p>
- * Key classes:
- * <ul>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * - political entities, nations, and governance.
  */
 package org.jscience.politics;

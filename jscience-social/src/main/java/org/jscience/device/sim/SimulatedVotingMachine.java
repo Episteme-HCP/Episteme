@@ -54,3 +54,5 @@ public class SimulatedVotingMachine extends SimulatedDevice implements VotingMac
         return voteCount;
     }
 }
+
+

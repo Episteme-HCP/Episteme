@@ -31,7 +31,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * Represents a 3D helix (spiral) curve.
  * <p>
  * A helix is a curve that winds around a cylinder at a constant angle.
- * Parametric form: C(t) = (r·cos(t), r·sin(t), h·t)
+ * Parametric form: C(t) = (rÃ‚Â·cos(t), rÃ‚Â·sin(t), hÃ‚Â·t)
  * where r is the radius and h is the pitch (height per radian).
  * </p>
  *
@@ -99,7 +99,7 @@ public class Helix implements ParametricCurve {
 
     @Override
     public org.jscience.mathematics.geometry.Vector3D tangent(Real t, Real h) {
-        // Analytical tangent: C'(t) = (-r·sin(t), r·cos(t), h)
+        // Analytical tangent: C'(t) = (-rÃ‚Â·sin(t), rÃ‚Â·cos(t), h)
         Real dx = radius.multiply(Real.of(Math.sin(t.doubleValue()))).negate();
         Real dy = radius.multiply(Real.of(Math.cos(t.doubleValue())));
         Real dz = pitch;
@@ -108,7 +108,7 @@ public class Helix implements ParametricCurve {
 
     @Override
     public Real curvature(Real t, Real h) {
-        // Analytical curvature: κ = r / (r² + h²)
+        // Analytical curvature: ÃŽÂº = r / (rÃ‚Â² + hÃ‚Â²)
         Real r2 = radius.multiply(radius);
         Real h2 = pitch.multiply(pitch);
         return radius.divide(r2.add(h2));
@@ -142,7 +142,7 @@ public class Helix implements ParametricCurve {
     }
 
     /**
-     * Returns the total height for one complete turn (2π radians).
+     * Returns the total height for one complete turn (2Ãâ‚¬ radians).
      * 
      * @return the height per turn
      */
@@ -150,3 +150,5 @@ public class Helix implements ParametricCurve {
         return pitch.multiply(Real.of(2 * Math.PI));
     }
 }
+
+

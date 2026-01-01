@@ -22,10 +22,6 @@
  */
 
 /**
- * Music package - musical notes, instruments, compositions.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * - musical notes, instruments, compositions.
  */
 package org.jscience.arts.music;

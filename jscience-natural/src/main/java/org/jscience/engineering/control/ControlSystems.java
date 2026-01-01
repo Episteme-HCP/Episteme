@@ -36,7 +36,7 @@ public class ControlSystems {
 
     /**
      * PID controller output.
-     * u(t) = Kp*e + Ki*∫e*dt + Kd*de/dt
+     * u(t) = Kp*e + Ki*Ã¢Ë†Â«e*dt + Kd*de/dt
      */
     public static class PIDController {
         private final Real Kp, Ki, Kd;
@@ -78,7 +78,7 @@ public class ControlSystems {
 
     /**
      * First-order system step response.
-     * y(t) = K * (1 - e^(-t/τ))
+     * y(t) = K * (1 - e^(-t/Ãâ€ž))
      */
     public static Real firstOrderStepResponse(Real K, Real tau, Real t) {
         return K.multiply(Real.ONE.subtract(t.negate().divide(tau).exp()));
@@ -168,3 +168,5 @@ public class ControlSystems {
         return omega.divide(omegaCutoff).atan().negate().toDegrees();
     }
 }
+
+

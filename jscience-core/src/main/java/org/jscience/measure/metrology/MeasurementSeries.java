@@ -120,7 +120,7 @@ public class MeasurementSeries<Q extends Quantity<Q>> {
     /**
      * Returns the standard error of the mean (SEM).
      * <p>
-     * SEM = σ / √n
+     * SEM = ÃÆ’ / Ã¢Ë†Å¡n
      * </p>
      * 
      * @return the standard error
@@ -137,9 +137,9 @@ public class MeasurementSeries<Q extends Quantity<Q>> {
      * For normal distributions:
      * </p>
      * <ul>
-     * <li>68.3% → mean ± 1×SEM</li>
-     * <li>95.4% → mean ± 2×SEM</li>
-     * <li>99.7% → mean ± 3×SEM</li>
+     * <li>68.3% Ã¢â€ â€™ mean Ã‚Â± 1Ãƒâ€”SEM</li>
+     * <li>95.4% Ã¢â€ â€™ mean Ã‚Â± 2Ãƒâ€”SEM</li>
+     * <li>99.7% Ã¢â€ â€™ mean Ã‚Â± 3Ãƒâ€”SEM</li>
      * </ul>
      * 
      * @param confidenceLevel the confidence level (e.g., 0.95)
@@ -243,9 +243,10 @@ public class MeasurementSeries<Q extends Quantity<Q>> {
      * Outlier detection methods.
      */
     public enum OutlierMethod {
-        /** Z-score method (>3σ from mean) */
+        /** Z-score method (>3ÃÆ’ from mean) */
         ZSCORE,
         /** Interquartile range method */
         IQR
     }
 }
+

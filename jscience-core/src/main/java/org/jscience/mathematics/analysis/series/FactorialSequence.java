@@ -27,7 +27,7 @@ import org.jscience.mathematics.numbers.integers.Integer;
 import org.jscience.mathematics.numbers.integers.Natural;
 
 /**
- * Factorial sequence: n! = n × (n-1) × ... × 2 × 1, with 0! = 1.
+ * Factorial sequence: n! = n Ãƒâ€” (n-1) Ãƒâ€” ... Ãƒâ€” 2 Ãƒâ€” 1, with 0! = 1.
  * <p>
  * OEIS A000142: Factorial numbers.
  * </p>
@@ -65,11 +65,12 @@ public class FactorialSequence implements IntegerSequence {
 
     @Override
     public String getFormula() {
-        return "n! = n × (n-1) × ... × 2 × 1, with 0! = 1";
+        return "n! = n Ãƒâ€” (n-1) Ãƒâ€” ... Ãƒâ€” 2 Ãƒâ€” 1, with 0! = 1";
     }
 
     @Override
     public String getCodomain() {
-        return "ℤ⁺";
+        return "Ã¢â€žÂ¤Ã¢ÂÂº";
     }
 }
+

@@ -110,3 +110,5 @@ public class VectorCalculusTest {
         assertEquals(4.0, laplacian.doubleValue(), TOLERANCE.doubleValue());
     }
 }
+
+

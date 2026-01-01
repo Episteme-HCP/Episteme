@@ -40,7 +40,7 @@ public class Cosmology {
     /** Hubble constant (km/s/Mpc) - Planck 2018 */
     public static final Real H0_PLANCK = Real.of(67.4);
 
-    /** Critical density (kg/m³) for H0 = 67.4 */
+    /** Critical density (kg/mÃ‚Â³) for H0 = 67.4 */
     public static final Real RHO_CRIT = Real.of(8.5e-27);
 
     /** Age of universe (seconds) */
@@ -101,7 +101,7 @@ public class Cosmology {
     }
 
     /**
-     * Comoving distance (simplified integral for ΛCDM).
+     * Comoving distance (simplified integral for ÃŽâ€ºCDM).
      */
     public static Real comovingDistance(Real z, Real H0, Real omegaM, Real omegaLambda) {
         int steps = 1000;
@@ -151,7 +151,7 @@ public class Cosmology {
     }
 
     /**
-     * Friedmann equation: H²/H0² = E²(z)
+     * Friedmann equation: HÃ‚Â²/H0Ã‚Â² = EÃ‚Â²(z)
      */
     public static Real friedmannE(Real z, Real omegaM, Real omegaLambda, Real omegaR) {
         Real onePlusZ = Real.ONE.add(z);
@@ -163,9 +163,11 @@ public class Cosmology {
 
     /**
      * Deceleration parameter at present.
-     * q0 = Ωm/2 - ΩΛ
+     * q0 = ÃŽÂ©m/2 - ÃŽÂ©ÃŽâ€º
      */
     public static Real decelerationParameter(Real omegaM, Real omegaLambda) {
         return omegaM.divide(Real.TWO).subtract(omegaLambda);
     }
 }
+
+

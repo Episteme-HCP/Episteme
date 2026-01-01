@@ -21,15 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Geodesy and geographic calculations.
- * <p>
- * Includes distance formulas (Haversine, Vincenty), bearing calculations,
- * and coordinate transformations.
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.earth.geodesy;
+
+

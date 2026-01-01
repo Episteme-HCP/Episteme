@@ -76,3 +76,5 @@ public class Edge implements org.jscience.mathematics.discrete.Graph.Edge<Point2
         return "Edge[" + start + " -> " + end + "]";
     }
 }
+
+

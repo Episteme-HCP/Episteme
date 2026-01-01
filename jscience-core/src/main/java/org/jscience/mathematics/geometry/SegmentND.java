@@ -32,7 +32,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * Unlike a line which extends infinitely, a segment has a definite length.
  * </p>
  * <p>
- * Parametric form: S(t) = start + t*(end - start), where t ∈ [0,1]
+ * Parametric form: S(t) = start + t*(end - start), where t Ã¢Ë†Ë† [0,1]
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -138,7 +138,7 @@ public class SegmentND implements GeometricObject<PointND> {
         Real distEnd = end.distanceTo(p);
         Real segmentLength = length();
 
-        // p is on segment if distStart + distEnd ≈ segmentLength
+        // p is on segment if distStart + distEnd Ã¢â€°Ë† segmentLength
         Real sum = distStart.add(distEnd);
         return Math.abs(sum.subtract(segmentLength).doubleValue()) < 1e-10;
     }
@@ -211,7 +211,7 @@ public class SegmentND implements GeometricObject<PointND> {
 
     @Override
     public String toString() {
-        return "Segment(" + start + " → " + end + ")";
+        return "Segment(" + start + " Ã¢â€ â€™ " + end + ")";
     }
 
     @Override
@@ -231,3 +231,5 @@ public class SegmentND implements GeometricObject<PointND> {
         return start.hashCode() + end.hashCode();
     }
 }
+
+

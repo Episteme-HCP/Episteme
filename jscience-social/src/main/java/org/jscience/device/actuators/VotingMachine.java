@@ -37,3 +37,5 @@ public interface VotingMachine extends Device {
 
     int getVoteCount();
 }
+
+

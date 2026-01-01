@@ -59,3 +59,5 @@ public class ParallelCircuit implements CircuitComponent {
         return total;
     }
 }
+
+

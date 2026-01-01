@@ -52,8 +52,8 @@ public class RadioactiveDecay {
 
     public enum DecayType {
         ALPHA, // Emits He-4 nucleus
-        BETA_MINUS, // n -> p + e- + ν̄e
-        BETA_PLUS, // p -> n + e+ + νe
+        BETA_MINUS, // n -> p + e- + ÃŽÂ½ÃŒâ€že
+        BETA_PLUS, // p -> n + e+ + ÃŽÂ½e
         GAMMA, // Photon emission
         ELECTRON_CAPTURE
     }
@@ -69,21 +69,21 @@ public class RadioactiveDecay {
     }
 
     /**
-     * Decay constant: λ = ln(2) / t½
+     * Decay constant: ÃŽÂ» = ln(2) / tÃ‚Â½
      */
     public Real getDecayConstant() {
         return Real.LN2.divide(halfLife);
     }
 
     /**
-     * Mean lifetime: τ = 1/λ
+     * Mean lifetime: Ãâ€ž = 1/ÃŽÂ»
      */
     public Real getMeanLifetime() {
         return Real.ONE.divide(getDecayConstant());
     }
 
     /**
-     * Remaining nuclei: N(t) = N₀ e^(-λt)
+     * Remaining nuclei: N(t) = NÃ¢â€šâ‚¬ e^(-ÃŽÂ»t)
      */
     public Real remainingNuclei(Real initialCount, Real time) {
         Real exponent = getDecayConstant().negate().multiply(time);
@@ -99,7 +99,7 @@ public class RadioactiveDecay {
     }
 
     /**
-     * Activity: A = λN (decays per second)
+     * Activity: A = ÃŽÂ»N (decays per second)
      */
     public Real activity(Real nucleiCount) {
         return getDecayConstant().multiply(nucleiCount);
@@ -133,7 +133,7 @@ public class RadioactiveDecay {
     /**
      * Carbon-14 dating: estimate age from remaining C-14 ratio.
      * 
-     * @param ratioToModern N/N₀ (ratio of current to modern C-14)
+     * @param ratioToModern N/NÃ¢â€šâ‚¬ (ratio of current to modern C-14)
      * @return age in years
      */
     public static Real carbonDate(Real ratioToModern) {
@@ -205,10 +205,12 @@ public class RadioactiveDecay {
     public String toString() {
         double years = halfLife.doubleValue() / (365.25 * 24 * 3600);
         if (years > 1) {
-            return String.format("RadioactiveDecay{%s, t½=%.3g years}", type, years);
+            return String.format("RadioactiveDecay{%s, tÃ‚Â½=%.3g years}", type, years);
         } else {
             double days = halfLife.doubleValue() / (24 * 3600);
-            return String.format("RadioactiveDecay{%s, t½=%.3g days}", type, days);
+            return String.format("RadioactiveDecay{%s, tÃ‚Â½=%.3g days}", type, days);
         }
     }
 }
+
+

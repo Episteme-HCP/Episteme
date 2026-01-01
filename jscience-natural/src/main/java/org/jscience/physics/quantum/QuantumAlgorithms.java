@@ -40,8 +40,8 @@ public class QuantumAlgorithms {
 
     /**
      * Creates a Grover oracle for a specific marked state.
-     * Oracle flips the sign of the marked state: O|x⟩ = -|x⟩ if x = marked, else
-     * |x⟩
+     * Oracle flips the sign of the marked state: O|xÃ¢Å¸Â© = -|xÃ¢Å¸Â© if x = marked, else
+     * |xÃ¢Å¸Â©
      * 
      * @param numQubits   Number of qubits
      * @param markedState Index of the state to search for
@@ -66,7 +66,7 @@ public class QuantumAlgorithms {
 
     /**
      * Creates the Grover diffusion operator.
-     * D = 2|s⟩⟨s| - I where |s⟩ is the uniform superposition.
+     * D = 2|sÃ¢Å¸Â©Ã¢Å¸Â¨s| - I where |sÃ¢Å¸Â© is the uniform superposition.
      * 
      * @param numQubits Number of qubits
      * @return Diffusion gate
@@ -75,7 +75,7 @@ public class QuantumAlgorithms {
         int dim = 1 << numQubits;
         Complex[][] data = new Complex[dim][dim];
 
-        // 2/N - δ_ij
+        // 2/N - ÃŽÂ´_ij
         Complex twoOverN = Complex.of(2.0 / dim);
 
         for (int i = 0; i < dim; i++) {
@@ -93,7 +93,7 @@ public class QuantumAlgorithms {
 
     /**
      * Optimal number of Grover iterations.
-     * r ≈ (π/4) * sqrt(N)
+     * r Ã¢â€°Ë† (Ãâ‚¬/4) * sqrt(N)
      * 
      * @param numQubits Number of qubits (N = 2^n)
      * @return Optimal iteration count
@@ -113,7 +113,7 @@ public class QuantumAlgorithms {
     public static BraKet groverSearch(int numQubits, int markedState) {
         int dim = 1 << numQubits;
 
-        // Start in uniform superposition |s⟩ = H^⊗n |0⟩^⊗n
+        // Start in uniform superposition |sÃ¢Å¸Â© = H^Ã¢Å â€”n |0Ã¢Å¸Â©^Ã¢Å â€”n
         Complex amp = Complex.of(1.0 / Math.sqrt(dim));
         Complex[] state = new Complex[dim];
         for (int i = 0; i < dim; i++) {
@@ -137,7 +137,7 @@ public class QuantumAlgorithms {
 
     /**
      * Quantum Fourier Transform gate for n qubits.
-     * QFT|j⟩ = (1/sqrt(N)) Σ_k exp(2πijk/N)|k⟩
+     * QFT|jÃ¢Å¸Â© = (1/sqrt(N)) ÃŽÂ£_k exp(2Ãâ‚¬ijk/N)|kÃ¢Å¸Â©
      * 
      * @param numQubits Number of qubits
      * @return QFT gate
@@ -151,7 +151,7 @@ public class QuantumAlgorithms {
 
         for (int j = 0; j < N; j++) {
             for (int k = 0; k < N; k++) {
-                // ω^(jk)
+                // Ãâ€°^(jk)
                 int exponent = (j * k) % N;
                 Complex entry = complexPow(omega, exponent).multiply(scale);
                 data[j][k] = entry;
@@ -198,3 +198,5 @@ public class QuantumAlgorithms {
         return new QuantumGate(new DenseMatrix<>(rowsList, Complex.ZERO));
     }
 }
+
+

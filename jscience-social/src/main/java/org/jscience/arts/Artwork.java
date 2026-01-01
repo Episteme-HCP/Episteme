@@ -80,3 +80,5 @@ public class Artwork implements Identifiable<String> {
         return String.format("'%s' by %s (%d)", title, creator != null ? creator.getName() : "Unknown", year);
     }
 }
+
+

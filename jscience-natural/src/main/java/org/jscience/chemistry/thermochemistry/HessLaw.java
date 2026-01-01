@@ -52,11 +52,11 @@ public class HessLaw {
 
     /**
      * Calculates the enthalpy of reaction using Hess's Law.
-     * ΔH_rxn = Σ(ΔHf products) - Σ(ΔHf reactants)
+     * ÃŽâ€H_rxn = ÃŽÂ£(ÃŽâ€Hf products) - ÃŽÂ£(ÃŽâ€Hf reactants)
      * 
-     * @param productEnthalpies  Map of product formula to (coefficient, ΔHf in
+     * @param productEnthalpies  Map of product formula to (coefficient, ÃŽâ€Hf in
      *                           kJ/mol)
-     * @param reactantEnthalpies Map of reactant formula to (coefficient, ΔHf in
+     * @param reactantEnthalpies Map of reactant formula to (coefficient, ÃŽâ€Hf in
      *                           kJ/mol)
      * @return Enthalpy of reaction in kJ/mol
      */
@@ -85,3 +85,5 @@ public class HessLaw {
         return enthalpyOfReaction.to(Units.JOULE).getValue().doubleValue() < 0;
     }
 }
+
+

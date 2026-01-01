@@ -47,3 +47,4 @@ public interface DifferentiableFunction<D, C> extends ContinuousFunction<D, C> {
         return true;
     }
 }
+

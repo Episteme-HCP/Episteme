@@ -244,3 +244,4 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
         return new SparseMatrix<>(storage, field);
     }
 }
+

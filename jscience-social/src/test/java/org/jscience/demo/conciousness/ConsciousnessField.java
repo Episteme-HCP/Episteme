@@ -34,7 +34,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * </p>
  * <p>
  * <strong>Reference:</strong>
- * Strømme, M. (2025). "Universal consciousness as foundational field: A
+ * StrÃƒÂ¸mme, M. (2025). "Universal consciousness as foundational field: A
  * theoretical
  * bridge between quantum physics and non-dual philosophy." AIP Advances,
  * 15(11).
@@ -44,14 +44,14 @@ import org.jscience.mathematics.numbers.real.Real;
  * The field potential is described by:
  *
  * <pre>
- * V(Φ) = λ/4 (Φ² - Φ₀²)²
+ * V(ÃŽÂ¦) = ÃŽÂ»/4 (ÃŽÂ¦Ã‚Â² - ÃŽÂ¦Ã¢â€šâ‚¬Ã‚Â²)Ã‚Â²
  * </pre>
  *
  * where:
  * <ul>
- * <li>Φ is the consciousness field strength</li>
- * <li>Φ₀ is the vacuum expectation value (symmetry breaking scale)</li>
- * <li>λ is the self-coupling constant</li>
+ * <li>ÃŽÂ¦ is the consciousness field strength</li>
+ * <li>ÃŽÂ¦Ã¢â€šâ‚¬ is the vacuum expectation value (symmetry breaking scale)</li>
+ * <li>ÃŽÂ» is the self-coupling constant</li>
  * </ul>
  * </p>
  *
@@ -79,13 +79,13 @@ public class ConsciousnessField {
     }
 
     /**
-     * Calculates the potential energy density V(Φ).
+     * Calculates the potential energy density V(ÃŽÂ¦).
      * 
      * @param phi field value
      * @return potential energy density
      */
     public Real potential(Real phi) {
-        // V(Φ) = λ/4 (Φ² - Φ₀²)²
+        // V(ÃŽÂ¦) = ÃŽÂ»/4 (ÃŽÂ¦Ã‚Â² - ÃŽÂ¦Ã¢â€šâ‚¬Ã‚Â²)Ã‚Â²
         Real phiSq = phi.pow(2);
         Real phi0Sq = phi0.pow(2);
         Real diff = phiSq.subtract(phi0Sq);
@@ -93,21 +93,21 @@ public class ConsciousnessField {
     }
 
     /**
-     * Calculates the field derivative dV/dΦ.
+     * Calculates the field derivative dV/dÃŽÂ¦.
      * 
      * @param phi field value
      * @return derivative of potential
      */
     public Real potentialDerivative(Real phi) {
-        // dV/dΦ = λ * Φ * (Φ² - Φ₀²)
+        // dV/dÃŽÂ¦ = ÃŽÂ» * ÃŽÂ¦ * (ÃŽÂ¦Ã‚Â² - ÃŽÂ¦Ã¢â€šâ‚¬Ã‚Â²)
         Real phiSq = phi.pow(2);
         Real phi0Sq = phi0.pow(2);
         return lambda.multiply(phi).multiply(phiSq.subtract(phi0Sq));
     }
 
     /**
-     * Checks if the field is in a symmetric state (Φ = 0).
-     * In this model, Φ=0 is a local maximum (unstable) if Φ₀ > 0.
+     * Checks if the field is in a symmetric state (ÃŽÂ¦ = 0).
+     * In this model, ÃŽÂ¦=0 is a local maximum (unstable) if ÃŽÂ¦Ã¢â€šâ‚¬ > 0.
      * 
      * @param phi field value
      * @return true if phi is zero
@@ -117,11 +117,11 @@ public class ConsciousnessField {
     }
 
     /**
-     * Checks if the field is in a ground state (Φ = ±Φ₀).
+     * Checks if the field is in a ground state (ÃŽÂ¦ = Ã‚Â±ÃŽÂ¦Ã¢â€šâ‚¬).
      * 
      * @param phi       field value
      * @param tolerance numerical tolerance
-     * @return true if phi is close to ±Φ₀
+     * @return true if phi is close to Ã‚Â±ÃŽÂ¦Ã¢â€šâ‚¬
      */
     public boolean isGroundState(Real phi, double tolerance) {
         Real diff = phi.abs().subtract(phi0.abs()).abs();
@@ -136,3 +136,5 @@ public class ConsciousnessField {
         return phi0;
     }
 }
+
+

@@ -71,3 +71,5 @@ public class Vertex {
         return new Vertex(Point3D.of(p.x(), p.y(), p.z()), n);
     }
 }
+
+

@@ -74,3 +74,5 @@ public class StarSystem {
         this.bodies.remove(body);
     }
 }
+
+

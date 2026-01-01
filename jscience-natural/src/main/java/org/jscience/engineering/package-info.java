@@ -21,11 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Classes and interfaces for org.jscience.engineering.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.engineering;
+
+

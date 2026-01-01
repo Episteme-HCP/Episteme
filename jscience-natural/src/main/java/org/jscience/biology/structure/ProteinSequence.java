@@ -65,3 +65,5 @@ public class ProteinSequence {
                 .sum() - (sequence.size() - 1) * 18.01528; // Subtract water weight for peptide bonds
     }
 }
+
+

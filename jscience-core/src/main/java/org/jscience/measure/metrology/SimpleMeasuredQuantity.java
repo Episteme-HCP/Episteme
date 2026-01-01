@@ -84,7 +84,7 @@ final class SimpleMeasuredQuantity<Q extends Quantity<Q>> implements MeasuredQua
     @Override
     public MeasuredQuantity<Q> add(MeasuredQuantity<Q> other) {
         // z = x + y
-        // σ_z = √(σ_x² + σ_y²)
+        // ÃÆ’_z = Ã¢Ë†Å¡(ÃÆ’_xÃ‚Â² + ÃÆ’_yÃ‚Â²)
         Quantity<Q> newValue = value.add(other.getValue());
         Quantity<Q> sigma1 = uncertainty;
         Quantity<Q> sigma2 = other.getUncertainty();
@@ -114,8 +114,8 @@ final class SimpleMeasuredQuantity<Q extends Quantity<Q>> implements MeasuredQua
 
     @Override
     public MeasuredQuantity<Q> multiply(Real scalar) {
-        // z = k × x
-        // σ_z = |k| × σ_x
+        // z = k Ãƒâ€” x
+        // ÃÆ’_z = |k| Ãƒâ€” ÃÆ’_x
         Quantity<Q> newValue = value.multiply(scalar);
         Quantity<Q> newUncertainty = uncertainty.multiply(scalar.abs());
         return new SimpleMeasuredQuantity<>(newValue, newUncertainty, confidenceLevel);
@@ -124,8 +124,8 @@ final class SimpleMeasuredQuantity<Q extends Quantity<Q>> implements MeasuredQua
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public <R extends Quantity<R>> MeasuredQuantity<?> multiply(MeasuredQuantity<R> other) {
-        // z = x × y
-        // σ_z/z = √((σ_x/x)² + (σ_y/y)²)
+        // z = x Ãƒâ€” y
+        // ÃÆ’_z/z = Ã¢Ë†Å¡((ÃÆ’_x/x)Ã‚Â² + (ÃÆ’_y/y)Ã‚Â²)
         Quantity<?> newValue = value.multiply(other.getValue());
 
         Real relUncert1 = getRelativeUncertainty();
@@ -141,7 +141,7 @@ final class SimpleMeasuredQuantity<Q extends Quantity<Q>> implements MeasuredQua
     @Override
     public MeasuredQuantity<Q> divide(Real scalar) {
         // z = x / k
-        // σ_z = σ_x / |k|
+        // ÃÆ’_z = ÃÆ’_x / |k|
         Quantity<Q> newValue = value.divide(scalar);
         Quantity<Q> newUncertainty = uncertainty.divide(scalar.abs());
         return new SimpleMeasuredQuantity<>(newValue, newUncertainty, confidenceLevel);
@@ -172,14 +172,14 @@ final class SimpleMeasuredQuantity<Q extends Quantity<Q>> implements MeasuredQua
 
     @Override
     public String toScientificNotation() {
-        return String.format("%s ± %s (%d%%)",
+        return String.format("%s Ã‚Â± %s (%d%%)",
                 value, uncertainty, (int) (confidenceLevel * 100));
     }
 
     @Override
     public String toPercentageNotation() {
         double percentUncertainty = getRelativeUncertainty().doubleValue() * 100;
-        return String.format("%s ± %.1f%%", value, percentUncertainty);
+        return String.format("%s Ã‚Â± %.1f%%", value, percentUncertainty);
     }
 
     @Override
@@ -212,7 +212,7 @@ final class SimpleMeasuredQuantity<Q extends Quantity<Q>> implements MeasuredQua
 
     @Override
     public Real getStandardizedDifference(MeasuredQuantity<Q> other) {
-        // z = |x - y| / √(σ_x² + σ_y²)
+        // z = |x - y| / Ã¢Ë†Å¡(ÃÆ’_xÃ‚Â² + ÃÆ’_yÃ‚Â²)
         Quantity<Q> diff = value.subtract(other.getValue()).abs();
 
         Real s1 = uncertainty.getValue();
@@ -250,3 +250,4 @@ final class SimpleMeasuredQuantity<Q extends Quantity<Q>> implements MeasuredQua
         return result;
     }
 }
+

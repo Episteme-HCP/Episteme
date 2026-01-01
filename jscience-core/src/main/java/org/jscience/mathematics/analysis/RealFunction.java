@@ -62,7 +62,7 @@ public interface RealFunction extends DifferentiableFunction<Real, Real>, Integr
      */
     @Override
     default RealFunction integrate() {
-        // Return numerical antiderivative F(x) = ∫[0,x] f(t) dt
+        // Return numerical antiderivative F(x) = Ã¢Ë†Â«[0,x] f(t) dt
         return x -> integrate(Real.ZERO, x);
     }
 
@@ -83,3 +83,5 @@ public interface RealFunction extends DifferentiableFunction<Real, Real>, Integr
         return x -> x;
     }
 }
+
+

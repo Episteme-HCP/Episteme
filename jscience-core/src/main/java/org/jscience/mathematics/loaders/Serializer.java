@@ -44,3 +44,4 @@ public interface Serializer<T> {
      */
     void write(T object, OutputStream output) throws IOException;
 }
+

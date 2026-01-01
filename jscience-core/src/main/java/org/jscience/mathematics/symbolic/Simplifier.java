@@ -30,10 +30,10 @@ import org.jscience.mathematics.numbers.real.Real;
  * Provides LegacyExpression simplification using algebraic rules.
  * <p>
  * Implements various simplification strategies:
- * - Algebraic identities (0·x = 0, 1·x = x, x+0 = x, etc.)
- * - Constant folding (2+3 → 5)
- * - Like term collection (2x + 3x → 5x)
- * - Trigonometric identities (sin²+cos² = 1, etc.)
+ * - Algebraic identities (0Ã‚Â·x = 0, 1Ã‚Â·x = x, x+0 = x, etc.)
+ * - Constant folding (2+3 Ã¢â€ â€™ 5)
+ * - Like term collection (2x + 3x Ã¢â€ â€™ 5x)
+ * - Trigonometric identities (sinÃ‚Â²+cosÃ‚Â² = 1, etc.)
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -217,7 +217,7 @@ public class Simplifier {
      * Simplifies trigonometric expressions.
      * <p>
      * Rules:
-     * - sin²(x) + cos²(x) = 1
+     * - sinÃ‚Â²(x) + cosÃ‚Â²(x) = 1
      * - sin(0) = 0
      * - cos(0) = 1
      * - tan(0) = 0
@@ -228,11 +228,11 @@ public class Simplifier {
      * @return simplified expression
      */
     public static <T extends Ring<T>> Expression<T> simplifyTrigonometric(Expression<T> expr) {
-        // Check for sin²(x) + cos²(x) pattern
+        // Check for sinÃ‚Â²(x) + cosÃ‚Â²(x) pattern
         if (expr instanceof SumExpression) {
             SumExpression<T> sum = (SumExpression<T>) expr;
 
-            // Check if left is sin²(x) and right is cos²(x)
+            // Check if left is sinÃ‚Â²(x) and right is cosÃ‚Â²(x)
             if (isSinSquared(sum.getLeft()) && isCosSquared(sum.getRight())) {
                 // Extract the argument and check if they're the same
                 FunctionExpression<T> sinPow = (FunctionExpression<T>) ((ProductExpression<T>) sum.getLeft())
@@ -241,7 +241,7 @@ public class Simplifier {
                         .getLeft();
 
                 if (sinPow.getArgument().toString().equals(cosPow.getArgument().toString())) {
-                    // sin²(x) + cos²(x) = 1 - need ring context
+                    // sinÃ‚Â²(x) + cosÃ‚Â²(x) = 1 - need ring context
                     throw new UnsupportedOperationException("Trig identity simplification requires ring context");
                 }
             }
@@ -272,7 +272,7 @@ public class Simplifier {
     /**
      * Collects like terms in an expression.
      * <p>
-     * Example: 2x + 3x → 5x
+     * Example: 2x + 3x Ã¢â€ â€™ 5x
      * </p>
      * 
      * @param <T>  the type
@@ -288,7 +288,7 @@ public class Simplifier {
     /**
      * Expands products in an expression.
      * <p>
-     * Example: (x + 1)(x + 2) → x² + 3x + 2
+     * Example: (x + 1)(x + 2) Ã¢â€ â€™ xÃ‚Â² + 3x + 2
      * </p>
      * 
      * @param <T>  the type
@@ -351,3 +351,4 @@ public class Simplifier {
         return false;
     }
 }
+

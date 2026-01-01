@@ -37,7 +37,7 @@ import org.jscience.physics.PhysicalConstants;
  */
 public class Optics {
 
-    /** Snell's law: n₁sin(θ₁) = n₂sin(θ₂), returns θ₂ */
+    /** Snell's law: nÃ¢â€šÂsin(ÃŽÂ¸Ã¢â€šÂ) = nÃ¢â€šâ€šsin(ÃŽÂ¸Ã¢â€šâ€š), returns ÃŽÂ¸Ã¢â€šâ€š */
     public static Real snellsLaw(Real n1, Real theta1, Real n2) {
         Real sinTheta2 = n1.multiply(theta1.sin()).divide(n2);
         return sinTheta2.asin();
@@ -53,7 +53,7 @@ public class Optics {
         return imageDistance.divide(objectDistance).negate();
     }
 
-    /** Photon energy: E = hc/λ */
+    /** Photon energy: E = hc/ÃŽÂ» */
     public static Quantity<Energy> photonEnergy(Quantity<Length> wavelength) {
         return PhysicalConstants.PLANCK_CONSTANT
                 .multiply(PhysicalConstants.SPEED_OF_LIGHT)
@@ -61,13 +61,13 @@ public class Optics {
                 .asType(Energy.class);
     }
 
-    /** Diffraction grating: d sin(θ) = mλ, returns θ */
+    /** Diffraction grating: d sin(ÃŽÂ¸) = mÃŽÂ», returns ÃŽÂ¸ */
     public static Real diffractionAngle(Real gratingSpacing, int order, Real wavelength) {
         Real sinTheta = Real.of(order).multiply(wavelength).divide(gratingSpacing);
         return sinTheta.asin();
     }
 
-    /** Rayleigh criterion: θ_min = 1.22λ/D */
+    /** Rayleigh criterion: ÃŽÂ¸_min = 1.22ÃŽÂ»/D */
     public static Real rayleighCriterion(Real wavelength, Real apertureDiameter) {
         return Real.of(1.22).multiply(wavelength).divide(apertureDiameter);
     }
@@ -77,9 +77,11 @@ public class Optics {
         return thinLensImageDistance(objectDistance, focalLength);
     }
 
-    /** Lens Maker's: 1/f = (n-1)(1/R₁ - 1/R₂) */
+    /** Lens Maker's: 1/f = (n-1)(1/RÃ¢â€šÂ - 1/RÃ¢â€šâ€š) */
     public static Real lensMakerEquation(Real n, Real r1, Real r2) {
         Real term = n.subtract(Real.ONE).multiply(Real.ONE.divide(r1).subtract(Real.ONE.divide(r2)));
         return Real.ONE.divide(term);
     }
 }
+
+

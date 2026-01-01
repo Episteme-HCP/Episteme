@@ -40,11 +40,11 @@ public class TensorProduct {
 
     /**
      * Computes the tensor (Kronecker) product of two matrices.
-     * (A ⊗ B)_{(i,k),(j,l)} = A_{i,j} * B_{k,l}
+     * (A Ã¢Å â€” B)_{(i,k),(j,l)} = A_{i,j} * B_{k,l}
      * 
      * @param A First matrix
      * @param B Second matrix
-     * @return A ⊗ B
+     * @return A Ã¢Å â€” B
      */
     public static DenseMatrix<Complex> kronecker(DenseMatrix<Complex> A, DenseMatrix<Complex> B) {
         int aRows = A.rows();
@@ -106,7 +106,7 @@ public class TensorProduct {
     }
 
     /**
-     * Creates an n-qubit Hadamard gate: H ⊗ H ⊗ ... ⊗ H
+     * Creates an n-qubit Hadamard gate: H Ã¢Å â€” H Ã¢Å â€” ... Ã¢Å â€” H
      * 
      * @param numQubits Number of qubits
      * @return n-fold tensor product of Hadamard
@@ -124,7 +124,7 @@ public class TensorProduct {
      * Creates an identity gate for n qubits.
      * 
      * @param numQubits Number of qubits
-     * @return 2^n × 2^n identity matrix as gate
+     * @return 2^n Ãƒâ€” 2^n identity matrix as gate
      */
     public static QuantumGate identity(int numQubits) {
         int dim = 1 << numQubits;
@@ -144,7 +144,7 @@ public class TensorProduct {
 
     /**
      * Tensor product of quantum states.
-     * |ψ⟩ ⊗ |φ⟩
+     * |ÃË†Ã¢Å¸Â© Ã¢Å â€” |Ãâ€ Ã¢Å¸Â©
      * 
      * @param psi First state
      * @param phi Second state
@@ -165,3 +165,5 @@ public class TensorProduct {
         return new BraKet(result);
     }
 }
+
+

@@ -64,3 +64,5 @@ public class NMRSpectrum {
     public static final double GAMMA_15N = -27.116e6;
     public static final double GAMMA_31P = 108.291e6;
 }
+
+

@@ -221,33 +221,33 @@ public class ChemicalReactionViewer extends Application {
             Reaction reaction = ChemicalReactionParser.parse(input);
 
             StringBuilder sb = new StringBuilder();
-            sb.append("═══════════════════════════════════════\n");
+            sb.append("Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â\n");
             sb.append(I18n.getInstance().get("chemical.header.parsed", "PARSED REACTION")).append("\n");
-            sb.append("═══════════════════════════════════════\n\n");
+            sb.append("Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â\n\n");
             sb.append(I18n.getInstance().get("chemical.label.formula", "Formatted: %s", reaction.toString()))
                     .append("\n\n");
 
-            sb.append("─── ").append(I18n.getInstance().get("chemical.header.reactants", "REACTANTS")).append(" ───\n");
+            sb.append("Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ ").append(I18n.getInstance().get("chemical.header.reactants", "REACTANTS")).append(" Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬\n");
             for (Formula f : reaction.getReactants()) {
                 sb.append("  ").append(formatFormula(f)).append("\n");
             }
 
-            sb.append("\n─── ").append(I18n.getInstance().get("chemical.header.products", "PRODUCTS")).append(" ───\n");
+            sb.append("\nÃ¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ ").append(I18n.getInstance().get("chemical.header.products", "PRODUCTS")).append(" Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬\n");
             for (Formula f : reaction.getProducts()) {
                 sb.append("  ").append(formatFormula(f)).append("\n");
             }
 
-            sb.append("\n─── ").append(I18n.getInstance().get("chemical.header.balance", "ELEMENT BALANCE"))
-                    .append(" ───\n");
+            sb.append("\nÃ¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ ").append(I18n.getInstance().get("chemical.header.balance", "ELEMENT BALANCE"))
+                    .append(" Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬\n");
             sb.append(reaction.getElementBalance());
 
             boolean balanced = reaction.isBalanced();
-            sb.append("\n═══════════════════════════════════════\n");
+            sb.append("\nÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â\n");
             sb.append(I18n.getInstance().get("chemical.result.prefix", "RESULT: "))
-                    .append(balanced ? I18n.getInstance().get("chemical.result.balanced", "✓ BALANCED")
-                            : I18n.getInstance().get("chemical.result.unbalanced", "✗ NOT BALANCED"))
+                    .append(balanced ? I18n.getInstance().get("chemical.result.balanced", "Ã¢Å“â€œ BALANCED")
+                            : I18n.getInstance().get("chemical.result.unbalanced", "Ã¢Å“â€” NOT BALANCED"))
                     .append("\n");
-            sb.append("═══════════════════════════════════════\n");
+            sb.append("Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â\n");
 
             outputArea.setText(sb.toString());
 
@@ -285,3 +285,5 @@ public class ChemicalReactionViewer extends Application {
         launch(args);
     }
 }
+
+

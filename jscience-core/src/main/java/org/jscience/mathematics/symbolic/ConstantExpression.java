@@ -139,3 +139,4 @@ public class ConstantExpression<T extends Ring<T>> implements Expression<T> {
         return value.hashCode();
     }
 }
+

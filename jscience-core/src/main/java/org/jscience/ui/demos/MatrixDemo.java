@@ -35,9 +35,9 @@ import javafx.stage.Stage;
 import org.jscience.mathematics.linearalgebra.Matrix;
 import org.jscience.mathematics.linearalgebra.matrices.MatrixFactory;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.AppProvider;
 import org.jscience.ui.i18n.I18n;
-import org.jscience.ui.mathematics.MatrixViewer;
+import org.jscience.ui.mathematics.linearalgebra.MatrixViewer;
 // import org.jscience.ui.ThemeManager;
 
 /**
@@ -47,7 +47,7 @@ import org.jscience.ui.mathematics.MatrixViewer;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class MatrixDemo implements DemoProvider {
+public class MatrixDemo implements AppProvider {
 
     private Matrix<Real> matrix;
     private Canvas heatmapCanvas;
@@ -57,8 +57,13 @@ public class MatrixDemo implements DemoProvider {
     private Label infoLabel;
 
     @Override
+    public boolean isDemo() {
+        return true;
+    }
+
+    @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.mathematics");
+        return "Mathematics";
     }
 
     @Override
@@ -366,3 +371,5 @@ public class MatrixDemo implements DemoProvider {
         gc.fillText(String.format("%.1f", min), legendX + 20, legendH);
     }
 }
+
+

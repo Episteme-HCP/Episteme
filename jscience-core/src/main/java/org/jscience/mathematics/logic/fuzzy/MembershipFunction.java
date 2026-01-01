@@ -44,3 +44,4 @@ public interface MembershipFunction<T> {
      */
     double apply(T element);
 }
+

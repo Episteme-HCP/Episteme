@@ -53,3 +53,5 @@ public class MultimeterViewer extends AbstractDeviceViewer<Multimeter> {
         valueLabel.setText("0.00 V"); // device.readValue() needs Exception handling
     }
 }
+
+

@@ -24,7 +24,7 @@
 package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.ViewerProvider;
 import org.jscience.ui.computing.simulation.ClothSimulationViewer;
 import org.jscience.ui.i18n.I18n;
 
@@ -34,10 +34,11 @@ import org.jscience.ui.i18n.I18n;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ClothSimulationDemo implements DemoProvider {
+public class ClothSimulationDemo implements ViewerProvider {
+
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.physics");
+        return "Physics";
     }
 
     @Override
@@ -55,3 +56,5 @@ public class ClothSimulationDemo implements DemoProvider {
         ClothSimulationViewer.show(stage);
     }
 }
+
+

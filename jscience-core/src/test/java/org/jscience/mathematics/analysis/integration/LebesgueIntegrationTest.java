@@ -73,3 +73,4 @@ public class LebesgueIntegrationTest {
         assertEquals(1.0, result.doubleValue(), 0.05);
     }
 }
+

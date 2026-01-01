@@ -35,7 +35,7 @@ import java.util.function.DoubleUnaryOperator;
 public class NumericalDifferentiation {
 
     /**
-     * Forward difference: f'(x) ≈ (f(x+h) - f(x)) / h
+     * Forward difference: f'(x) Ã¢â€°Ë† (f(x+h) - f(x)) / h
      * First-order accurate: O(h)
      */
     public static double forwardDifference(DoubleUnaryOperator f, double x, double h) {
@@ -43,7 +43,7 @@ public class NumericalDifferentiation {
     }
 
     /**
-     * Backward difference: f'(x) ≈ (f(x) - f(x-h)) / h
+     * Backward difference: f'(x) Ã¢â€°Ë† (f(x) - f(x-h)) / h
      * First-order accurate: O(h)
      */
     public static double backwardDifference(DoubleUnaryOperator f, double x, double h) {
@@ -51,16 +51,16 @@ public class NumericalDifferentiation {
     }
 
     /**
-     * Central difference: f'(x) ≈ (f(x+h) - f(x-h)) / 2h
-     * Second-order accurate: O(h²)
+     * Central difference: f'(x) Ã¢â€°Ë† (f(x+h) - f(x-h)) / 2h
+     * Second-order accurate: O(hÃ‚Â²)
      */
     public static double centralDifference(DoubleUnaryOperator f, double x, double h) {
         return (f.applyAsDouble(x + h) - f.applyAsDouble(x - h)) / (2 * h);
     }
 
     /**
-     * Five-point stencil: f'(x) ≈ (-f(x+2h) + 8f(x+h) - 8f(x-h) + f(x-2h)) / 12h
-     * Fourth-order accurate: O(h⁴)
+     * Five-point stencil: f'(x) Ã¢â€°Ë† (-f(x+2h) + 8f(x+h) - 8f(x-h) + f(x-2h)) / 12h
+     * Fourth-order accurate: O(hÃ¢ÂÂ´)
      */
     public static double fivePointStencil(DoubleUnaryOperator f, double x, double h) {
         return (-f.applyAsDouble(x + 2 * h) + 8 * f.applyAsDouble(x + h)
@@ -69,7 +69,7 @@ public class NumericalDifferentiation {
 
     /**
      * Second derivative using central difference:
-     * f''(x) ≈ (f(x+h) - 2f(x) + f(x-h)) / h²
+     * f''(x) Ã¢â€°Ë† (f(x+h) - 2f(x) + f(x-h)) / hÃ‚Â²
      */
     public static double secondDerivative(DoubleUnaryOperator f, double x, double h) {
         return (f.applyAsDouble(x + h) - 2 * f.applyAsDouble(x) + f.applyAsDouble(x - h)) / (h * h);
@@ -179,7 +179,7 @@ public class NumericalDifferentiation {
     }
 
     /**
-     * Laplacian: ∇²f = ∂²f/∂x² + ∂²f/∂y² + ...
+     * Laplacian: Ã¢Ë†â€¡Ã‚Â²f = Ã¢Ë†â€šÃ‚Â²f/Ã¢Ë†â€šxÃ‚Â² + Ã¢Ë†â€šÃ‚Â²f/Ã¢Ë†â€šyÃ‚Â² + ...
      */
     public static double laplacian(java.util.function.Function<double[], Double> f,
             double[] x, double h) {
@@ -197,3 +197,5 @@ public class NumericalDifferentiation {
         return sum / (h * h);
     }
 }
+
+

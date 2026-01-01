@@ -82,3 +82,4 @@ public class PropertyKey<T> {
         return new PropertyKey<>(name, type);
     }
 }
+

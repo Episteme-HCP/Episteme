@@ -28,7 +28,7 @@ import org.jscience.mathematics.structures.rings.Field;
 /**
  * Diagonal matrix storage - only stores diagonal elements.
  * <p>
- * Provides O(n) storage instead of O(n²) for diagonal matrices.
+ * Provides O(n) storage instead of O(nÃ‚Â²) for diagonal matrices.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -89,3 +89,5 @@ public class DiagonalMatrixStorage<E> implements MatrixStorage<E> {
         return diagonal;
     }
 }
+
+

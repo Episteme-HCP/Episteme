@@ -65,3 +65,5 @@ public interface ExtensibleEnum<T extends ExtensibleEnum<T>> {
         return true;
     }
 }
+
+

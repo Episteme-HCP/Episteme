@@ -46,7 +46,7 @@ public class Thermodynamics {
         return n.multiply(R).multiply(T).divide(V).asType(Pressure.class);
     }
 
-    /** Internal energy change: ΔU = nCvΔT */
+    /** Internal energy change: ÃŽâ€U = nCvÃŽâ€T */
     public static Quantity<Energy> internalEnergyChange(
             Quantity<AmountOfSubstance> n,
             Real Cv,
@@ -54,7 +54,7 @@ public class Thermodynamics {
         return n.multiply(Cv).multiply(deltaT).asType(Energy.class);
     }
 
-    /** Carnot efficiency: η = 1 - Tc/Th */
+    /** Carnot efficiency: ÃŽÂ· = 1 - Tc/Th */
     public static Real carnotEfficiency(Quantity<Temperature> Tcold, Quantity<Temperature> Thot) {
         Real tc = Tcold.getValue();
         Real th = Thot.getValue();
@@ -96,7 +96,7 @@ public class Thermodynamics {
         return n.multiply(R).multiply(T).divide(V);
     }
 
-    /** Otto cycle efficiency: η = 1 - 1/r^(γ-1) */
+    /** Otto cycle efficiency: ÃŽÂ· = 1 - 1/r^(ÃŽÂ³-1) */
     public static Real ottoEfficiency(Real compressionRatio, Real gamma) {
         return Real.ONE.subtract(Real.ONE.divide(compressionRatio.pow(gamma.subtract(Real.ONE))));
     }
@@ -109,3 +109,5 @@ public class Thermodynamics {
         return Real.ONE.subtract(term1.multiply(term2));
     }
 }
+
+

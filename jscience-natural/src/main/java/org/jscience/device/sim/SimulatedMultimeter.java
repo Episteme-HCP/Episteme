@@ -77,3 +77,5 @@ public class SimulatedMultimeter extends SimulatedDevice implements Multimeter {
         this.currentValue = value;
     }
 }
+
+

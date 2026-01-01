@@ -33,20 +33,20 @@ import org.jscience.mathematics.structures.rings.Ring;
  * <p>
  * An algebra A over a field K is a vector space equipped with a binary
  * operation
- * (x, y) ↦ x · y such that for all x, y, z ∈ A and a, b ∈ K:
+ * (x, y) Ã¢â€ Â¦ x Ã‚Â· y such that for all x, y, z Ã¢Ë†Ë† A and a, b Ã¢Ë†Ë† K:
  * <ul>
- * <li>(x + y) · z = x · z + y · z</li>
- * <li>x · (y + z) = x · y + x · z</li>
- * <li>(ax) · (by) = (ab) (x · y)</li>
+ * <li>(x + y) Ã‚Â· z = x Ã‚Â· z + y Ã‚Â· z</li>
+ * <li>x Ã‚Â· (y + z) = x Ã‚Â· y + x Ã‚Â· z</li>
+ * <li>(ax) Ã‚Â· (by) = (ab) (x Ã‚Â· y)</li>
  * </ul>
  * </p>
  *
  * <h2>Examples</h2>
  * <ul>
- * <li>Square matrices (Mₙ(K))</li>
+ * <li>Square matrices (MÃ¢â€šâ„¢(K))</li>
  * <li>Polynomials (K[x])</li>
- * <li>Complex numbers (as ℝ-algebra)</li>
- * <li>Quaternions (as ℝ-algebra)</li>
+ * <li>Complex numbers (as Ã¢â€žÂ-algebra)</li>
+ * <li>Quaternions (as Ã¢â€žÂ-algebra)</li>
  * <li>Lie Algebras (with bracket [x,y] as product)</li>
  * </ul>
  *
@@ -68,3 +68,4 @@ public interface Algebra<E, F> extends Module<E, F>, Ring<E> {
         return operate(a, b); // From Magma/Ring
     }
 }
+

@@ -22,13 +22,6 @@
  */
 
 /**
- * Sports package - athletic activities, competitions, and records.
- * <p>
- * Key classes:
- * <ul>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * - athletic activities, competitions, and records.
  */
 package org.jscience.sports;

@@ -71,3 +71,5 @@ public class Constituency {
         return String.format("%s (%d voters)", name, electorateSize);
     }
 }
+
+

@@ -35,7 +35,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.AppProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,11 +47,16 @@ import java.util.Random;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class SociologyNetworkDemo implements DemoProvider {
+public class SociologyNetworkDemo implements AppProvider {
+
+    @Override
+    public boolean isDemo() {
+        return true;
+    }
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.sociology");
+        return "Sociology";
     }
 
     @Override
@@ -268,3 +273,5 @@ public class SociologyNetworkDemo implements DemoProvider {
         }
     }
 }
+
+

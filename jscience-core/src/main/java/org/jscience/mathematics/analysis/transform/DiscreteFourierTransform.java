@@ -173,3 +173,4 @@ public class DiscreteFourierTransform implements Transform<Vector<Complex>, Vect
         return "C^N (Frequency)";
     }
 }
+

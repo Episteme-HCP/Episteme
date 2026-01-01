@@ -21,11 +21,5 @@
  * SOFTWARE.
  */
 
-/**
- * Physical quantities and units of measure system (SI and others).
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.measure.units;
+

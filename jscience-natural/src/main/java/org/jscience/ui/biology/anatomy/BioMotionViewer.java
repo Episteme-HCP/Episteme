@@ -252,3 +252,5 @@ public class BioMotionViewer extends Application {
         new BioMotionViewer().start(stage);
     }
 }
+
+

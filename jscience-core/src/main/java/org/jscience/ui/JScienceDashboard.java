@@ -305,7 +305,7 @@ public class JScienceDashboard extends Application {
         });
         VBox modeInfo = createInfoBox(i18n.get("dashboard.computing.mode", "Mode de calcul"),
                 i18n.get("dashboard.computing.desc.mode",
-                        "AUTO préfère le GPU, sinon utilise le CPU si indisponible."));
+                        "AUTO prÃƒÂ©fÃƒÂ¨re le GPU, sinon utilise le CPU si indisponible."));
 
         // --- Float Precision ---
         ComboBox<org.jscience.ComputeContext.FloatPrecision> floatBox = new ComboBox<>();
@@ -346,8 +346,8 @@ public class JScienceDashboard extends Application {
                 JScience.savePreferences();
             }
         });
-        VBox precInfo = createInfoBox(i18n.get("dashboard.computing.precision", "Précision décimale"),
-                i18n.get("dashboard.computing.desc.precision_digits", "Chiffres (0 = Illimité)"));
+        VBox precInfo = createInfoBox(i18n.get("dashboard.computing.precision", "PrÃƒÂ©cision dÃƒÂ©cimale"),
+                i18n.get("dashboard.computing.desc.precision_digits", "Chiffres (0 = IllimitÃƒÂ©)"));
 
         // --- MathContext Rounding ---
         ComboBox<java.math.RoundingMode> roundBox = new ComboBox<>();
@@ -360,7 +360,7 @@ public class JScienceDashboard extends Application {
             JScience.savePreferences();
         });
         VBox roundInfo = createInfoBox(i18n.get("dashboard.computing.rounding", "Mode d'arrondi"),
-                i18n.get("dashboard.computing.desc.rounding", "Stratégie d'arrondi"));
+                i18n.get("dashboard.computing.desc.rounding", "StratÃƒÂ©gie d'arrondi"));
 
         Label gpuVal = new Label(JScience.isGpuAvailable() ? i18n.get("dashboard.libraries.available", "Available")
                 : i18n.get("dashboard.libraries.not_available", "Not Available"));
@@ -407,9 +407,9 @@ public class JScienceDashboard extends Application {
 
         // --- HELP SECTION ---
         Label helpText = new Label(i18n.get("dashboard.libraries.explain.text",
-                "Ces bibliothèques sont listées pour les raisons suivantes :\n" +
-                        "1. Elles sont nécessaires au fonctionnement de JScience\n" +
-                        "2. Elles offrent des fonctionnalités étendues (GPU, Formats, etc.)"));
+                "Ces bibliothÃƒÂ¨ques sont listÃƒÂ©es pour les raisons suivantes :\n" +
+                        "1. Elles sont nÃƒÂ©cessaires au fonctionnement de JScience\n" +
+                        "2. Elles offrent des fonctionnalitÃƒÂ©s ÃƒÂ©tendues (GPU, Formats, etc.)"));
         helpText.setStyle("-fx-text-fill: black;");
         helpText.setWrapText(true);
         content.getChildren().add(helpText);
@@ -541,7 +541,7 @@ public class JScienceDashboard extends Application {
             accordion.setExpandedPane(accordion.getPanes().get(0));
         }
 
-        hint.setText(loaders.size() + " chargeurs trouvés");
+        hint.setText(loaders.size() + " chargeurs trouvÃƒÂ©s");
 
         content.getChildren().addAll(header, hint, accordion);
         return new Tab(i18n.get("dashboard.tab.loaders", "Loaders"), content);
@@ -634,63 +634,18 @@ public class JScienceDashboard extends Application {
         Label header = new Label(i18n.get("dashboard.apps.header", "Applications, Demos & Viewers"));
         header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        Label hint = new Label(i18n.get("dashboard.apps.discovering", "Discovering from classpath..."));
+        Label hint = new Label(i18n.get("dashboard.apps.discovering", "Discovering from SPI..."));
         hint.setStyle("-fx-font-style: italic; -fx-text-fill: #777;");
 
         Accordion accordion = new Accordion();
 
-        // Compute all available apps/demos
-        DashboardDiscovery discovery = DashboardDiscovery.getInstance();
-        List<DashboardDiscovery.ClassInfo> rawApps = discovery.findClasses("Application");
-        rawApps.addAll(discovery.findClasses("Demo"));
-        rawApps.addAll(discovery.findClasses("Viewer"));
+        // Use new SPI Discovery
+        Map<DashboardDiscovery.ProviderType, Map<String, List<ViewerProvider>>> grouped = DashboardDiscovery
+                .getInstance().getProvidersByType();
 
-        // Deduplicate by full name AND simple name
-        List<DashboardDiscovery.ClassInfo> allApps = new ArrayList<>();
-        java.util.Set<String> seen = new java.util.HashSet<>();
-        java.util.Set<String> seenSimple = new java.util.HashSet<>();
-
-        for (DashboardDiscovery.ClassInfo info : rawApps) {
-            boolean fullNew = seen.add(info.fullName);
-            boolean simpleNew = seenSimple.add(info.simpleName);
-
-            if (fullNew && simpleNew) {
-                allApps.add(info);
-            }
-        }
-
-        // Categorize discovered apps
-        List<AppEntry> apps = new ArrayList<>();
-        List<AppEntry> demos = new ArrayList<>();
-        List<AppEntry> viewers = new ArrayList<>();
-        List<AppEntry> others = new ArrayList<>();
-
-        for (DashboardDiscovery.ClassInfo info : allApps) {
-            // Filter: Ensure it is a valid JavaFX Application or DemoProvider
-            try {
-                Class<?> cls = Class.forName(info.fullName);
-                boolean isApp = Application.class.isAssignableFrom(cls);
-                boolean isDemo = DemoProvider.class.isAssignableFrom(cls);
-
-                if ((!isApp && !isDemo) || java.lang.reflect.Modifier.isAbstract(cls.getModifiers()))
-                    continue;
-            } catch (Throwable t) {
-                continue;
-            }
-
-            String desc = getAppDescription(info.fullName);
-            AppEntry entry = new AppEntry(info.simpleName, info.fullName, desc);
-
-            if (info.simpleName.endsWith("Viewer") || info.fullName.contains(".viewers.")) {
-                viewers.add(entry);
-            } else if (info.simpleName.endsWith("Demo") || info.fullName.contains(".demos.")) {
-                demos.add(entry);
-            } else if (info.simpleName.endsWith("App") || info.fullName.contains(".apps.")) {
-                apps.add(entry);
-            } else {
-                others.add(entry);
-            }
-        }
+        List<AppEntry> apps = flattenProviders(grouped.get(DashboardDiscovery.ProviderType.APP));
+        List<AppEntry> demos = flattenProviders(grouped.get(DashboardDiscovery.ProviderType.DEMO));
+        List<AppEntry> viewers = flattenProviders(grouped.get(DashboardDiscovery.ProviderType.VIEWER));
 
         // Create panes
         TitledPane appsPane = new TitledPane(
@@ -705,12 +660,6 @@ public class JScienceDashboard extends Application {
 
         accordion.getPanes().addAll(appsPane, demosPane, viewersPane);
 
-        if (!others.isEmpty()) {
-            TitledPane othersPane = new TitledPane("Autres / Others (" + others.size() + ")",
-                    createAppList(true, others.toArray(new AppEntry[0])));
-            accordion.getPanes().add(othersPane);
-        }
-
         if (!apps.isEmpty())
             appsPane.setExpanded(true);
         else if (!demos.isEmpty())
@@ -718,40 +667,26 @@ public class JScienceDashboard extends Application {
         else if (!viewers.isEmpty())
             viewersPane.setExpanded(true);
 
-        int validCount = apps.size() + demos.size() + viewers.size() + others.size();
+        int validCount = apps.size() + demos.size() + viewers.size();
         hint.setText(i18n.get("dashboard.apps.discovered", "Apps Found:") + " " + validCount);
 
         content.getChildren().addAll(header, hint, accordion);
-        // VBox.setVgrow(accordion, Priority.ALWAYS); // Removed to prevent empty space
         return new Tab(i18n.get("dashboard.tab.apps", "Apps"), content);
     }
 
-    private String getAppDescription(String className) {
-        try {
-            Class<?> cls = Class.forName(className);
-            if (DemoProvider.class.isAssignableFrom(cls)) {
-                DemoProvider dp = (DemoProvider) cls.getDeclaredConstructor().newInstance();
-                return dp.getDescription();
+    private List<AppEntry> flattenProviders(Map<String, List<ViewerProvider>> categoryMap) {
+        List<AppEntry> result = new ArrayList<>();
+        if (categoryMap == null)
+            return result;
+
+        for (List<ViewerProvider> list : categoryMap.values()) {
+            for (ViewerProvider p : list) {
+                result.add(new AppEntry(p.getName(), p.getClass().getName(), p.getDescription()));
             }
-        } catch (Exception e) {
-            // Ignore
         }
-        // Fallback: derive from package
-        if (className.contains(".physics."))
-            return "Physics simulation";
-        if (className.contains(".biology."))
-            return "Biology simulation";
-        if (className.contains(".chemistry."))
-            return "Chemistry visualization";
-        if (className.contains(".astronomy."))
-            return "Astronomy tool";
-        if (className.contains(".mathematics."))
-            return "Mathematics tool";
-        if (className.contains(".engineering."))
-            return "Engineering simulation";
-        if (className.contains(".sociology.") || className.contains(".economics."))
-            return "Social science";
-        return "JScience application";
+        // Sort by name
+        result.sort((e1, e2) -> e1.name.compareToIgnoreCase(e2.name));
+        return result;
     }
 
     private ListView<AppEntry> createAppList(boolean enableLaunch, AppEntry... entries) {
@@ -817,10 +752,10 @@ public class JScienceDashboard extends Application {
                 Stage stage = new Stage();
                 Application app = (Application) cls.getDeclaredConstructor().newInstance();
                 app.start(stage);
-            } else if (DemoProvider.class.isAssignableFrom(cls)) {
-                // Launch DemoProvider
+            } else if (ViewerProvider.class.isAssignableFrom(cls)) {
+                // Launch ViewerProvider
                 Stage stage = new Stage();
-                DemoProvider demo = (DemoProvider) cls.getDeclaredConstructor().newInstance();
+                ViewerProvider demo = (ViewerProvider) cls.getDeclaredConstructor().newInstance();
                 demo.show(stage);
             }
         } catch (Exception e) {
@@ -894,3 +829,5 @@ public class JScienceDashboard extends Application {
         launch(args);
     }
 }
+
+

@@ -37,7 +37,7 @@ public class BetaDistribution extends ContinuousDistribution {
 
     public BetaDistribution(Real alpha, Real beta) {
         if (alpha.compareTo(Real.ZERO) <= 0 || beta.compareTo(Real.ZERO) <= 0) {
-            throw new IllegalArgumentException("α, β must be positive");
+            throw new IllegalArgumentException("ÃŽÂ±, ÃŽÂ² must be positive");
         }
         this.alpha = alpha;
         this.beta = beta;
@@ -78,6 +78,7 @@ public class BetaDistribution extends ContinuousDistribution {
 
     @Override
     public String toString() {
-        return String.format("Beta(α=%.4f, β=%.4f)", alpha.doubleValue(), beta.doubleValue());
+        return String.format("Beta(ÃŽÂ±=%.4f, ÃŽÂ²=%.4f)", alpha.doubleValue(), beta.doubleValue());
     }
 }
+

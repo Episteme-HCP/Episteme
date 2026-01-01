@@ -84,3 +84,4 @@ public class FiniteSetsCategory implements Category<java.util.Set<?>, Function<O
                 "Generating hom-set for finite sets requires specialized FiniteSet type.");
     }
 }
+

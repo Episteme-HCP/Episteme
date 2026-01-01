@@ -64,3 +64,5 @@ public class CoordinatesTest {
         assertEquals(4.0, scaled.get(1).doubleValue(), DELTA);
     }
 }
+
+

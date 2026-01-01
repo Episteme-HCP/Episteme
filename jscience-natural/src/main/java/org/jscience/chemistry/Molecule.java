@@ -158,3 +158,5 @@ public class Molecule {
         return String.format("%s (%s, MW=%.2f u)", name, getFormula(), getMolecularWeight().getValue().doubleValue());
     }
 }
+
+

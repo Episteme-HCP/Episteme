@@ -33,10 +33,10 @@ import org.jscience.measure.quantity.Temperature;
  * Calculations for Electrochemistry using the Nernst Equation.
  * <p>
  * Based on: W. Nernst, "Die elektromotorische Wirksamkeit der Ionen",
- * Zeitschrift für physikalische Chemie, Vol. 4, pp. 129-181, 1889.
+ * Zeitschrift fÃƒÂ¼r physikalische Chemie, Vol. 4, pp. 129-181, 1889.
  * </p>
  * <p>
- * The Nernst equation E = E° - (RT/nF)·ln(Q) relates the reduction potential
+ * The Nernst equation E = EÃ‚Â° - (RT/nF)Ã‚Â·ln(Q) relates the reduction potential
  * of a half-cell to the standard electrode potential, temperature, and
  * reaction quotient.
  * </p>
@@ -47,7 +47,7 @@ import org.jscience.measure.quantity.Temperature;
  */
 public class NernstEquation {
 
-    public static final double R = 8.314462618; // J/(mol·K)
+    public static final double R = 8.314462618; // J/(molÃ‚Â·K)
     public static final double F = 96485.33212; // C/mol
 
     private NernstEquation() {
@@ -56,7 +56,7 @@ public class NernstEquation {
     /**
      * Calculates the cell potential under non-standard conditions.
      * 
-     * @param standardPotential E° (Volts)
+     * @param standardPotential EÃ‚Â° (Volts)
      * @param temperature       Temperature (Kelvin)
      * @param electrons         Number of electrons transferred (n)
      * @param reactionQuotient  Reaction Quotient (Q)
@@ -78,8 +78,8 @@ public class NernstEquation {
     }
 
     /**
-     * Simplified Nernst equation at 25°C (298.15 K).
-     * E = E° - (0.0592 / n) * log10(Q)
+     * Simplified Nernst equation at 25Ã‚Â°C (298.15 K).
+     * E = EÃ‚Â° - (0.0592 / n) * log10(Q)
      */
     public static Quantity<ElectricPotential> calculatePotentialAt25C(
             Quantity<ElectricPotential> standardPotential,
@@ -95,3 +95,5 @@ public class NernstEquation {
         return Quantities.create(E, Units.VOLT);
     }
 }
+
+

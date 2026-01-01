@@ -42,7 +42,7 @@ public class BodyMetrics {
     private BodyMetrics() {
     }
 
-    /** BMI = mass (kg) / height² (m²) */
+    /** BMI = mass (kg) / heightÃ‚Â² (mÃ‚Â²) */
     public static Real bmi(Quantity<Mass> mass, Quantity<Length> height) {
         Real m = mass.to(Units.KILOGRAM).getValue();
         Real h = height.to(Units.METER).getValue();
@@ -93,3 +93,5 @@ public class BodyMetrics {
         return Quantities.create(ibw, Units.KILOGRAM);
     }
 }
+
+

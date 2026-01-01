@@ -24,7 +24,7 @@
 package org.jscience.apps.sports;
 
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.AppProvider;
 
 /**
  * Demo Provider for Sports Results Management.
@@ -33,7 +33,12 @@ import org.jscience.ui.DemoProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class SportsResultsDemo implements DemoProvider {
+public class SportsResultsDemo implements AppProvider {
+
+    @Override
+    public boolean isDemo() {
+        return true;
+    }
 
     @Override
     public String getCategory() {
@@ -55,3 +60,5 @@ public class SportsResultsDemo implements DemoProvider {
         SportsResultsViewer.show(stage);
     }
 }
+
+

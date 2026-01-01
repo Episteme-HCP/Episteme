@@ -81,3 +81,4 @@ public class CudaBackend implements ComputeBackend {
         return 20; // Higher priority than OpenCL if available
     }
 }
+

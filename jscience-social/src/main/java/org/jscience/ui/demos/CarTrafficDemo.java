@@ -26,7 +26,7 @@ package org.jscience.ui.demos;
 import org.jscience.ui.architecture.traffic.CarTrafficViewer;
 
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.ViewerProvider;
 
 /**
  * Demo Provider for Car Traffic Simulation.
@@ -35,11 +35,11 @@ import org.jscience.ui.DemoProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CarTrafficDemo implements DemoProvider {
+public class CarTrafficDemo implements ViewerProvider {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.engineering");
+        return "Engineering";
     }
 
     @Override
@@ -57,3 +57,5 @@ public class CarTrafficDemo implements DemoProvider {
         CarTrafficViewer.show(stage);
     }
 }
+
+

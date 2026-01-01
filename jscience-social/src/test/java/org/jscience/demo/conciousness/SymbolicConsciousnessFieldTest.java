@@ -50,11 +50,11 @@ public class SymbolicConsciousnessFieldTest {
         Real phi0 = Real.of(2.0);
         SymbolicConsciousnessField field = new SymbolicConsciousnessField(lambda, phi0);
 
-        // At Φ = Φ₀, V should be 0 (ground state)
+        // At ÃŽÂ¦ = ÃŽÂ¦Ã¢â€šâ‚¬, V should be 0 (ground state)
         Real v1 = field.evaluatePotential(phi0);
         assertEquals(0.0, v1.doubleValue(), TOLERANCE);
 
-        // At Φ = 0, V = λ/4 * Φ₀⁴ = 1/4 * 16 = 4
+        // At ÃŽÂ¦ = 0, V = ÃŽÂ»/4 * ÃŽÂ¦Ã¢â€šâ‚¬Ã¢ÂÂ´ = 1/4 * 16 = 4
         Real v2 = field.evaluatePotential(Real.ZERO);
         assertEquals(4.0, v2.doubleValue(), TOLERANCE);
     }
@@ -65,11 +65,11 @@ public class SymbolicConsciousnessFieldTest {
         Real phi0 = Real.of(2.0);
         SymbolicConsciousnessField field = new SymbolicConsciousnessField(lambda, phi0);
 
-        // At Φ = Φ₀, derivative should be 0
+        // At ÃŽÂ¦ = ÃŽÂ¦Ã¢â€šâ‚¬, derivative should be 0
         Real dv1 = field.evaluateDerivative(phi0);
         assertEquals(0.0, dv1.doubleValue(), TOLERANCE);
 
-        // At Φ = 0, derivative should be 0 (unstable equilibrium)
+        // At ÃŽÂ¦ = 0, derivative should be 0 (unstable equilibrium)
         Real dv2 = field.evaluateDerivative(Real.ZERO);
         assertEquals(0.0, dv2.doubleValue(), TOLERANCE);
     }
@@ -80,11 +80,11 @@ public class SymbolicConsciousnessFieldTest {
         Real phi0 = Real.of(1.0);
         SymbolicConsciousnessField field = new SymbolicConsciousnessField(lambda, phi0);
 
-        // Ground states at Φ = ±Φ₀
+        // Ground states at ÃŽÂ¦ = Ã‚Â±ÃŽÂ¦Ã¢â€šâ‚¬
         assertEquals(0.0, field.evaluatePotential(Real.of(1.0)).doubleValue(), TOLERANCE);
         assertEquals(0.0, field.evaluatePotential(Real.of(-1.0)).doubleValue(), TOLERANCE);
 
-        // Symmetric state Φ=0 has higher potential (unstable)
+        // Symmetric state ÃŽÂ¦=0 has higher potential (unstable)
         Real vSymmetric = field.evaluatePotential(Real.ZERO);
         assertTrue(vSymmetric.doubleValue() > 0.0);
     }
@@ -95,13 +95,13 @@ public class SymbolicConsciousnessFieldTest {
         Real phi0 = Real.of(1.0);
         SymbolicConsciousnessField field = new SymbolicConsciousnessField(lambda, phi0);
 
-        // At Φ = 0, second derivative should be negative (local maximum)
+        // At ÃŽÂ¦ = 0, second derivative should be negative (local maximum)
         Real d2v = field.evaluateSecondDerivative(Real.ZERO);
-        assertTrue(d2v.doubleValue() < 0.0, "Second derivative at Φ=0 should be negative (unstable)");
+        assertTrue(d2v.doubleValue() < 0.0, "Second derivative at ÃŽÂ¦=0 should be negative (unstable)");
 
-        // At Φ = Φ₀, second derivative should be positive (local minimum)
+        // At ÃŽÂ¦ = ÃŽÂ¦Ã¢â€šâ‚¬, second derivative should be positive (local minimum)
         Real d2vGround = field.evaluateSecondDerivative(phi0);
-        assertTrue(d2vGround.doubleValue() > 0.0, "Second derivative at Φ=Φ₀ should be positive (stable)");
+        assertTrue(d2vGround.doubleValue() > 0.0, "Second derivative at ÃŽÂ¦=ÃŽÂ¦Ã¢â€šâ‚¬ should be positive (stable)");
     }
 
     @Test
@@ -115,7 +115,9 @@ public class SymbolicConsciousnessFieldTest {
 
         assertNotNull(potentialStr);
         assertNotNull(derivativeStr);
-        assertTrue(potentialStr.contains("Φ"));
-        assertTrue(derivativeStr.contains("Φ"));
+        assertTrue(potentialStr.contains("ÃŽÂ¦"));
+        assertTrue(derivativeStr.contains("ÃŽÂ¦"));
     }
 }
+
+

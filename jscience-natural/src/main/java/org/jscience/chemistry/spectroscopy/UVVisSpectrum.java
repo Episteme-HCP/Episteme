@@ -34,7 +34,7 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public class UVVisSpectrum {
 
-    /** Beer-Lambert Law: A = ε * c * l */
+    /** Beer-Lambert Law: A = ÃŽÂµ * c * l */
     public static Real calculateAbsorbance(Real epsilon, Real concentration, Real pathLength) {
         return epsilon.multiply(concentration).multiply(pathLength);
     }
@@ -44,8 +44,10 @@ public class UVVisSpectrum {
         return Real.of(10).pow(absorbance.negate());
     }
 
-    /** Wavelength (nm) to Energy (eV): E = 1239.8 / λ */
+    /** Wavelength (nm) to Energy (eV): E = 1239.8 / ÃŽÂ» */
     public static Real wavelengthToEnergy(Real wavelengthNm) {
         return Real.of(1239.8).divide(wavelengthNm);
     }
 }
+
+

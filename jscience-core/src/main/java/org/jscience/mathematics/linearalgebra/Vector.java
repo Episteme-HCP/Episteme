@@ -276,3 +276,4 @@ public interface Vector<E> extends Module<Vector<E>, E> {
         return t;
     }
 }
+

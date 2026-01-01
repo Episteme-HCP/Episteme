@@ -48,3 +48,4 @@ public interface Operation<T> {
      */
     T compute(ExecutionContext context);
 }
+

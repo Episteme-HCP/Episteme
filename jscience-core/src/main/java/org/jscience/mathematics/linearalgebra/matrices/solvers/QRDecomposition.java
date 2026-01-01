@@ -139,7 +139,7 @@ public class QRDecomposition {
     }
 
     /**
-     * Solves least squares problem: min ||Ax - b||₂
+     * Solves least squares problem: min ||Ax - b||Ã¢â€šâ€š
      */
     public Real[] solveLeastSquares(Real[] b) {
         int n = R.rows();
@@ -166,3 +166,4 @@ public class QRDecomposition {
         return x;
     }
 }
+

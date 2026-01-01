@@ -28,7 +28,7 @@ import org.jscience.mathematics.numbers.integers.Integer;
 import org.jscience.mathematics.structures.rings.FieldElement;
 
 /**
- * Represents a rational number (ℚ), defined as the quotient of two integers.
+ * Represents a rational number (Ã¢â€žÅ¡), defined as the quotient of two integers.
  * <p>
  * Rational numbers form a Field under addition and multiplication.
  * They are always stored in reduced form (gcd(numerator, denominator) = 1)
@@ -243,3 +243,5 @@ public final class Rational extends Number implements Comparable<Rational>, Fiel
         return (numerator.signum() < 0) ? negate() : this;
     }
 }
+
+

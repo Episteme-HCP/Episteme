@@ -117,3 +117,5 @@ public class SphericalMirror implements OpticalElement {
         return new LightRay(incoming.getWavelength(), incoming.getIntensity(), intersection, direction);
     }
 }
+
+

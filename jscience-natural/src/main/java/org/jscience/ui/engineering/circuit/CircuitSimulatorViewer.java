@@ -86,7 +86,7 @@ public class CircuitSimulatorViewer extends Application {
             switch (type) {
                 case RESISTOR -> {
                     value = 1000;
-                    unit = "Ω";
+                    unit = "ÃŽÂ©";
                 }
                 case BATTERY -> {
                     value = 9;
@@ -94,7 +94,7 @@ public class CircuitSimulatorViewer extends Application {
                 }
                 case CAPACITOR -> {
                     value = 10;
-                    unit = "µF";
+                    unit = "Ã‚ÂµF";
                 }
                 default -> {
                     value = 0;
@@ -355,3 +355,5 @@ public class CircuitSimulatorViewer extends Application {
         new CircuitSimulatorViewer().start(stage);
     }
 }
+
+

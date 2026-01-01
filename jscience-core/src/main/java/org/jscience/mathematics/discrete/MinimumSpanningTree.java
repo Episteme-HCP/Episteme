@@ -42,3 +42,5 @@ public interface MinimumSpanningTree<V, W> {
      */
     Set<WeightedEdge<V, W>> findMST(WeightedGraph<V, W> graph);
 }
+
+

@@ -21,11 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Physical constants, models, and simulations for various branches of physics.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.physics.classical.matter.plasma;
+
+

@@ -82,3 +82,5 @@ public class DenseVectorStorage<E> implements VectorStorage<E> {
         return new DenseVectorStorage<>(Arrays.copyOf(data, dimension));
     }
 }
+
+

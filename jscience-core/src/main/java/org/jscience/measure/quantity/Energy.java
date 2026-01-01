@@ -33,3 +33,4 @@ import org.jscience.measure.Quantity;
  */
 public interface Energy extends Quantity<Energy> {
 }
+

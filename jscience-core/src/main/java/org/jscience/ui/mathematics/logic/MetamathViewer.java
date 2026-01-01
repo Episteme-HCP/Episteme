@@ -139,35 +139,35 @@ public class MetamathViewer extends Application {
     private void initTheorems() {
         theorems.add(new Theorem(
                 "Disjunctive Syllogism",
-                "(p ∨ q) ∧ ¬p ⊢ q",
+                "(p Ã¢Ë†Â¨ q) Ã¢Ë†Â§ Ã‚Â¬p Ã¢Å Â¢ q",
                 new String[] {
-                        "1. (p ∨ q) ∧ ¬p [Hypothesis]",
-                        "2. (p ∨ q) [Simplification (1)]",
-                        "3. ¬p [Simplification (1)]",
-                        "4. p → q [Material Implication (2)]",
+                        "1. (p Ã¢Ë†Â¨ q) Ã¢Ë†Â§ Ã‚Â¬p [Hypothesis]",
+                        "2. (p Ã¢Ë†Â¨ q) [Simplification (1)]",
+                        "3. Ã‚Â¬p [Simplification (1)]",
+                        "4. p Ã¢â€ â€™ q [Material Implication (2)]",
                         "5. q [Modus Ponens (3, 4)]",
                         "Q.E.D."
                 }));
         theorems.add(new Theorem(
                 "Modus Tollens",
-                "(p → q) ∧ ¬q ⊢ ¬p",
+                "(p Ã¢â€ â€™ q) Ã¢Ë†Â§ Ã‚Â¬q Ã¢Å Â¢ Ã‚Â¬p",
                 new String[] {
-                        "1. (p → q) ∧ ¬q [Hypothesis]",
-                        "2. p → q [Simplification (1)]",
-                        "3. ¬q [Simplification (1)]",
-                        "4. ¬q → ¬p [Transposition (2)]",
-                        "5. ¬p [Modus Ponens (3, 4)]",
+                        "1. (p Ã¢â€ â€™ q) Ã¢Ë†Â§ Ã‚Â¬q [Hypothesis]",
+                        "2. p Ã¢â€ â€™ q [Simplification (1)]",
+                        "3. Ã‚Â¬q [Simplification (1)]",
+                        "4. Ã‚Â¬q Ã¢â€ â€™ Ã‚Â¬p [Transposition (2)]",
+                        "5. Ã‚Â¬p [Modus Ponens (3, 4)]",
                         "Q.E.D."
                 }));
         theorems.add(new Theorem(
                 "Double Negation",
-                "p ⊢ ¬¬p",
+                "p Ã¢Å Â¢ Ã‚Â¬Ã‚Â¬p",
                 new String[] {
                         "1. p [Hypothesis]",
-                        "2. p ∨ p [Addition]",
-                        "3. ¬p → p [Material Implication (2)]",
-                        "4. ¬¬p ∨ p [Material Implication]",
-                        "5. ¬¬p [Derived Step]",
+                        "2. p Ã¢Ë†Â¨ p [Addition]",
+                        "3. Ã‚Â¬p Ã¢â€ â€™ p [Material Implication (2)]",
+                        "4. Ã‚Â¬Ã‚Â¬p Ã¢Ë†Â¨ p [Material Implication]",
+                        "5. Ã‚Â¬Ã‚Â¬p [Derived Step]",
                         "Q.E.D."
                 }));
     }
@@ -199,3 +199,5 @@ public class MetamathViewer extends Application {
         new MetamathViewer().start(stage);
     }
 }
+
+

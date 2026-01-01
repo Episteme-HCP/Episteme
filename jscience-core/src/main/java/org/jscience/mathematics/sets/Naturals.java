@@ -29,10 +29,10 @@ import org.jscience.mathematics.numbers.integers.Natural;
 import java.util.stream.Stream;
 
 /**
- * The structure of natural numbers (ℕ = {0, 1, 2, 3, ...}).
+ * The structure of natural numbers (Ã¢â€žâ€¢ = {0, 1, 2, 3, ...}).
  * <p>
  * This class represents the <strong>structure</strong> of natural numbers,
- * not individual elements. It implements {@link Semiring} because ℕ forms
+ * not individual elements. It implements {@link Semiring} because Ã¢â€žâ€¢ forms
  * a commutative semiring with addition and multiplication, but lacks
  * additive inverses (so it's not a Ring).
  * </p>
@@ -115,7 +115,7 @@ public final class Naturals implements Semiring<Natural>, InfiniteSet<Natural> {
 
     @Override
     public boolean isCountable() {
-        return true; // ℕ is countably infinite
+        return true; // Ã¢â€žâ€¢ is countably infinite
     }
 
     @Override
@@ -125,12 +125,12 @@ public final class Naturals implements Semiring<Natural>, InfiniteSet<Natural> {
 
     @Override
     public boolean isEmpty() {
-        return false; // ℕ is infinite
+        return false; // Ã¢â€žâ€¢ is infinite
     }
 
     @Override
     public String description() {
-        return "ℕ (Natural Numbers)";
+        return "Ã¢â€žâ€¢ (Natural Numbers)";
     }
 
     // --- Additional Methods ---
@@ -138,7 +138,7 @@ public final class Naturals implements Semiring<Natural>, InfiniteSet<Natural> {
     /**
      * Returns a stream of the first n natural numbers.
      * <p>
-     * Since ℕ is infinite, we provide a way to get a finite stream.
+     * Since Ã¢â€žâ€¢ is infinite, we provide a way to get a finite stream.
      * </p>
      * 
      * @param count number of elements
@@ -151,6 +151,7 @@ public final class Naturals implements Semiring<Natural>, InfiniteSet<Natural> {
 
     @Override
     public String toString() {
-        return "Naturals(ℕ)";
+        return "Naturals(Ã¢â€žâ€¢)";
     }
 }
+

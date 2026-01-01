@@ -232,3 +232,4 @@ public class FunctionExpression<T extends Ring<T>> implements Expression<T> {
         return exponent;
     }
 }
+

@@ -210,3 +210,5 @@ public class PolynomialRing<E> implements Ring<PolynomialRing.Polynomial<E>> {
         return new Polynomial<>(coefficients, this);
     }
 }
+
+

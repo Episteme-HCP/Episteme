@@ -66,3 +66,4 @@ public class DiscreteTest {
         assertEquals("C", path.get(2));
     }
 }
+

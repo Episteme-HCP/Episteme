@@ -84,3 +84,5 @@ public class TrapezoidalIntegrator implements Integrator {
         return integrate(f, a, b);
     }
 }
+
+

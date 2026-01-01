@@ -92,3 +92,5 @@ public class DirectRealDoubleVectorStorage implements RealDoubleVectorStorage {
         return new DirectRealDoubleVectorStorage(newBuf);
     }
 }
+
+

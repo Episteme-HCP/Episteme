@@ -65,3 +65,5 @@ public interface LieAlgebra<E, S> extends Algebra<E, S> {
     // The Ring interface usually implies (R, +, *) is a ring.
     // For Lie Algebra, * is the bracket.
 }
+
+

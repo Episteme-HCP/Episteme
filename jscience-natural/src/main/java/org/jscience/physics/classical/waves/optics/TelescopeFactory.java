@@ -116,7 +116,7 @@ public class TelescopeFactory {
 
     /**
      * Calculates the light-gathering power relative to the human eye.
-     * LGP = (D_aperture / D_pupil)²
+     * LGP = (D_aperture / D_pupil)Ã‚Â²
      * 
      * @param apertureMeters Telescope aperture diameter in meters
      * @param pupilMeters    Human pupil diameter (typically 0.007m = 7mm)
@@ -126,3 +126,5 @@ public class TelescopeFactory {
         return apertureMeters.divide(pupilMeters).pow(2);
     }
 }
+
+

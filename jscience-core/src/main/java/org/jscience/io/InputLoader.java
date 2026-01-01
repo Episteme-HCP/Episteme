@@ -32,3 +32,5 @@ package org.jscience.io;
  */
 public interface InputLoader<T> extends ResourceLoader<T> {
 }
+
+

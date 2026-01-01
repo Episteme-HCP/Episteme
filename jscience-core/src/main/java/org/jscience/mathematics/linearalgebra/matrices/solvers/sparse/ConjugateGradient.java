@@ -30,7 +30,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * Conjugate Gradient solver.
  * <p>
  * Solves Ax = b where A is symmetric positive definite.
- * Efficient for large sparse matrices: O(n) memory vs O(n²) for direct methods.
+ * Efficient for large sparse matrices: O(n) memory vs O(nÃ‚Â²) for direct methods.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -130,3 +130,5 @@ public class ConjugateGradient {
         return sum;
     }
 }
+
+

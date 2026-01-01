@@ -36,7 +36,7 @@ public class Seismology {
 
     /**
      * Richter magnitude from seismogram amplitude.
-     * M_L = log10(A) - log10(A0(δ))
+     * M_L = log10(A) - log10(A0(ÃŽÂ´))
      */
     public static Real richterMagnitude(Real amplitude, Real distanceKm) {
         Real logA0 = Real.ONE.add(Real.of(0.00189).multiply(distanceKm)).subtract(Real.TWO);
@@ -59,7 +59,7 @@ public class Seismology {
         return Real.of(10).pow(Real.of(1.5).multiply(magnitude).add(Real.of(4.8)));
     }
 
-    /** P-wave velocity in Earth's crust. Vp ≈ 6 km/s */
+    /** P-wave velocity in Earth's crust. Vp Ã¢â€°Ë† 6 km/s */
     public static final Real VP_CRUST = Real.of(6.0);
 
     /** S-wave velocity (typically Vp/1.73). */
@@ -67,7 +67,7 @@ public class Seismology {
 
     /**
      * Estimates distance from P-S time difference.
-     * d = Δt / (1/Vs - 1/Vp)
+     * d = ÃŽâ€t / (1/Vs - 1/Vp)
      */
     public static Real distanceFromPSTime(Real deltaT_seconds) {
         return deltaT_seconds.divide(VS_CRUST.inverse().subtract(VP_CRUST.inverse()));
@@ -101,3 +101,5 @@ public class Seismology {
         return (int) Math.round(Math.max(1, Math.min(12, intensity.doubleValue())));
     }
 }
+
+

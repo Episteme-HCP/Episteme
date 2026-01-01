@@ -63,3 +63,5 @@ public interface TopologicalSpace<T> extends Set<T> {
      */
     boolean isClosed();
 }
+
+

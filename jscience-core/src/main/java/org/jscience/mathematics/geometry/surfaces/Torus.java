@@ -39,8 +39,8 @@ import java.util.Arrays;
  * where:
  * - R is the major radius (distance from center to tube center)
  * - r is the minor radius (tube radius)
- * - u ∈ [0,2π] is the angle around the major circle
- * - v ∈ [0,2π] is the angle around the minor circle
+ * - u Ã¢Ë†Ë† [0,2Ãâ‚¬] is the angle around the major circle
+ * - v Ã¢Ë†Ë† [0,2Ãâ‚¬] is the angle around the minor circle
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -109,7 +109,7 @@ public class Torus implements ParametricSurface {
     @Override
     public Vector<Real> partialU(Real u, Real v, Real h) {
         // Analytical derivative:
-        // ∂S/∂u = (-(R+r*cos(v))*sin(u), (R+r*cos(v))*cos(u), 0)
+        // Ã¢Ë†â€šS/Ã¢Ë†â€šu = (-(R+r*cos(v))*sin(u), (R+r*cos(v))*cos(u), 0)
 
         double uVal = u.doubleValue();
         double vVal = v.doubleValue();
@@ -130,7 +130,7 @@ public class Torus implements ParametricSurface {
     @Override
     public Vector<Real> partialV(Real u, Real v, Real h) {
         // Analytical derivative:
-        // ∂S/∂v = (-r*sin(v)*cos(u), -r*sin(v)*sin(u), r*cos(v))
+        // Ã¢Ë†â€šS/Ã¢Ë†â€šv = (-r*sin(v)*cos(u), -r*sin(v)*sin(u), r*cos(v))
 
         double uVal = u.doubleValue();
         double vVal = v.doubleValue();
@@ -163,7 +163,7 @@ public class Torus implements ParametricSurface {
     /**
      * Returns the surface area of the torus.
      * 
-     * @return 4π²Rr
+     * @return 4Ãâ‚¬Ã‚Â²Rr
      */
     public Real surfaceArea() {
         return majorRadius.multiply(minorRadius)
@@ -173,7 +173,7 @@ public class Torus implements ParametricSurface {
     /**
      * Returns the volume enclosed by the torus.
      * 
-     * @return 2π²Rr²
+     * @return 2Ãâ‚¬Ã‚Â²RrÃ‚Â²
      */
     public Real volume() {
         return majorRadius.multiply(minorRadius).multiply(minorRadius)
@@ -214,3 +214,5 @@ public class Torus implements ParametricSurface {
                 ", minorRadius=" + minorRadius + ")";
     }
 }
+
+

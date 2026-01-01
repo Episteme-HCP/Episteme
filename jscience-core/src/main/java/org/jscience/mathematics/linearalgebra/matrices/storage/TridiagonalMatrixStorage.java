@@ -104,3 +104,4 @@ public class TridiagonalMatrixStorage<E> implements MatrixStorage<E> {
         return new TridiagonalMatrixStorage<>(lower, main, upper, n, zero);
     }
 }
+

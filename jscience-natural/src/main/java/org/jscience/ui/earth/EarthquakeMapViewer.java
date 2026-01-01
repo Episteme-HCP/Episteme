@@ -235,7 +235,7 @@ public class EarthquakeMapViewer extends Application {
             double y = latToY(lat);
             gc.strokeLine(0, y, WIDTH, y);
             gc.setFill(Color.GRAY);
-            gc.fillText(lat + "°", 5, y - 2);
+            gc.fillText(lat + "Ã‚Â°", 5, y - 2);
         }
 
         // Longitude lines
@@ -243,7 +243,7 @@ public class EarthquakeMapViewer extends Application {
             double x = lonToX(lon);
             gc.strokeLine(x, 0, x, HEIGHT);
             gc.setFill(Color.GRAY);
-            gc.fillText(lon + "°", x + 2, HEIGHT - 5);
+            gc.fillText(lon + "Ã‚Â°", x + 2, HEIGHT - 5);
         }
 
         // Equator and Prime Meridian (highlighted)
@@ -307,3 +307,5 @@ public class EarthquakeMapViewer extends Application {
         new EarthquakeMapViewer().start(stage);
     }
 }
+
+

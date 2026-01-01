@@ -72,3 +72,4 @@ public interface FieldElement<E extends FieldElement<E>> extends RingElement<E> 
         return multiply(other.inverse());
     }
 }
+

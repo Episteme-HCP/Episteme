@@ -24,10 +24,8 @@
 package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.AppProvider;
 import org.jscience.ui.physics.astronomy.StarSystemViewer;
-
-import org.jscience.ui.i18n.I18n;
 
 /**
  * 
@@ -35,10 +33,15 @@ import org.jscience.ui.i18n.I18n;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class StarSystemDemo implements DemoProvider {
+public class StarSystemDemo implements AppProvider {
+    @Override
+    public boolean isDemo() {
+        return true;
+    }
+
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.physics");
+        return "Physics";
     }
 
     @Override
@@ -56,3 +59,5 @@ public class StarSystemDemo implements DemoProvider {
         new StarSystemViewer().start(stage);
     }
 }
+
+

@@ -86,3 +86,4 @@ public class BinomialDistribution extends DiscreteDistribution {
         return String.format("Bin(n=%d, p=%.4f)", n, p.doubleValue());
     }
 }
+

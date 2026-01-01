@@ -22,13 +22,6 @@
  */
 
 /**
- * Arts package - artworks, music, literature classification.
- * <p>
- * Key classes:
- * <ul>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * - artworks, music, literature classification.
  */
 package org.jscience.arts;

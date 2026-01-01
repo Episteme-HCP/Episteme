@@ -47,3 +47,5 @@ public class UiSmokeTest extends ApplicationTest {
         verifyThat(".button", (Node n) -> n.isVisible());
     }
 }
+
+

@@ -157,7 +157,7 @@ public class RegionBSPTree3D {
      * @return a new region representing the difference
      */
     public RegionBSPTree3D difference(RegionBSPTree3D other) {
-        // A - B = A ∩ ¬B
+        // A - B = A Ã¢Ë†Â© Ã‚Â¬B
         RegionBSPTree3D notOther = new RegionBSPTree3D();
         notOther.root = negateRec(other.root);
         return intersection(notOther);
@@ -171,3 +171,4 @@ public class RegionBSPTree3D {
         return new Node(node.cut.negate(), negateRec(node.minus), negateRec(node.plus));
     }
 }
+

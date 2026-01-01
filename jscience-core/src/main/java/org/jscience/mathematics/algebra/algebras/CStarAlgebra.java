@@ -27,7 +27,7 @@ package org.jscience.mathematics.algebra.algebras;
  * Represents a C*-algebra (C-star algebra).
  * <p>
  * A C*-algebra is a Banach algebra with an involution * satisfying:
- * ||x*x|| = ||x||²
+ * ||x*x|| = ||x||Ã‚Â²
  * </p>
  * <p>
  * C*-algebras are fundamental in quantum mechanics and functional analysis.
@@ -79,3 +79,5 @@ public interface CStarAlgebra<E, F> extends BanachAlgebra<E, F> {
      */
     double spectralRadius(E element);
 }
+
+

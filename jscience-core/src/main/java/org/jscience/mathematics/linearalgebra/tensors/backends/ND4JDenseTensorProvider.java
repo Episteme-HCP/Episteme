@@ -145,3 +145,4 @@ public class ND4JDenseTensorProvider implements TensorProvider {
         throw new UnsupportedOperationException("ND4J conversion not yet implemented");
     }
 }
+

@@ -46,3 +46,5 @@ public record BenchmarkResult(
                 benchmarkName, domain, averageTimePerOpMillis, operationsPerSecond, memoryUsedBytes / (1024 * 1024));
     }
 }
+
+

@@ -29,7 +29,7 @@ import org.jscience.mathematics.algebra.Algebra;
  * Represents a Banach algebra - a complete normed algebra.
  * <p>
  * A Banach algebra is an algebra that is also a Banach space,
- * where the norm satisfies: ||xy|| ≤ ||x|| ||y||
+ * where the norm satisfies: ||xy|| Ã¢â€°Â¤ ||x|| ||y||
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -58,3 +58,5 @@ public interface BanachAlgebra<E, F> extends Algebra<E, F> {
      */
     boolean isInvertible(E element);
 }
+
+

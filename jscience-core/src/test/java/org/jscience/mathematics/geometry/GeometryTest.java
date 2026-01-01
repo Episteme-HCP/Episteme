@@ -163,3 +163,5 @@ public class GeometryTest {
         assertEquals(8.0, clipped.getEnd().getX(), TOLERANCE);
     }
 }
+
+

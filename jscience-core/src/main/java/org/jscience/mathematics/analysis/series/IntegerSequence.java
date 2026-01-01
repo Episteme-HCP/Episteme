@@ -27,7 +27,7 @@ import org.jscience.mathematics.numbers.integers.Integer;
 import org.jscience.mathematics.numbers.integers.Natural;
 
 /**
- * A sequence of integers (ℤ).
+ * A sequence of integers (Ã¢â€žÂ¤).
  * <p>
  * Most OEIS sequences are integer sequences. This interface uses JScience
  *
@@ -64,3 +64,4 @@ public interface IntegerSequence extends Sequence<Integer> {
         return get(n).longValue();
     }
 }
+

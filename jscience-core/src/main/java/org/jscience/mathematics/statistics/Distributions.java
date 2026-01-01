@@ -47,7 +47,7 @@ public class Distributions {
 
     /**
      * Normal distribution PDF.
-     * f(x) = (1/σ√2π) * e^(-(x-μ)²/(2σ²))
+     * f(x) = (1/ÃÆ’Ã¢Ë†Å¡2Ãâ‚¬) * e^(-(x-ÃŽÂ¼)Ã‚Â²/(2ÃÆ’Ã‚Â²))
      */
     public static Real normalPdf(Real x, Real mean, Real stdDev) {
         Real z = x.subtract(mean).divide(stdDev);
@@ -56,7 +56,7 @@ public class Distributions {
     }
 
     /**
-     * Standard normal PDF (μ=0, σ=1).
+     * Standard normal PDF (ÃŽÂ¼=0, ÃÆ’=1).
      */
     public static Real standardNormalPdf(Real z) {
         return normalPdf(z, Real.ZERO, Real.ONE);
@@ -90,7 +90,7 @@ public class Distributions {
 
     /**
      * Poisson distribution PMF.
-     * P(X=k) = (λ^k * e^(-λ)) / k!
+     * P(X=k) = (ÃŽÂ»^k * e^(-ÃŽÂ»)) / k!
      */
     public static Real poissonPmf(int k, Real lambda) {
         if (k < 0)
@@ -114,7 +114,7 @@ public class Distributions {
 
     /**
      * Exponential distribution PDF.
-     * f(x) = λ * e^(-λx) for x ≥ 0
+     * f(x) = ÃŽÂ» * e^(-ÃŽÂ»x) for x Ã¢â€°Â¥ 0
      */
     public static Real exponentialPdf(Real x, Real lambda) {
         if (x.sign() < 0)
@@ -125,7 +125,7 @@ public class Distributions {
 
     /**
      * Exponential distribution CDF.
-     * F(x) = 1 - e^(-λx)
+     * F(x) = 1 - e^(-ÃŽÂ»x)
      */
     public static Real exponentialCdf(Real x, Real lambda) {
         if (x.sign() < 0)
@@ -195,7 +195,7 @@ public class Distributions {
 
     /**
      * Chi-squared distribution PDF.
-     * f(x) = (x^(k/2-1) * e^(-x/2)) / (2^(k/2) * Γ(k/2))
+     * f(x) = (x^(k/2-1) * e^(-x/2)) / (2^(k/2) * ÃŽâ€œ(k/2))
      */
     public static Real chiSquaredPdf(Real x, int k) {
         if (x.sign() < 0)
@@ -278,3 +278,4 @@ public class Distributions {
         return cov.divide(sx.multiply(sy));
     }
 }
+

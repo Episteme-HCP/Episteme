@@ -80,7 +80,7 @@ public class ConservationLaws {
 
     /**
      * Conservation of mass-energy (relativistic).
-     * E² = (pc)² + (m₀c²)²
+     * EÃ‚Â² = (pc)Ã‚Â² + (mÃ¢â€šâ‚¬cÃ‚Â²)Ã‚Â²
      * 
      * Total mass-energy is conserved in all reference frames.
      */
@@ -91,7 +91,7 @@ public class ConservationLaws {
     }
 
     /**
-     * Work-energy theorem: W = ΔKE
+     * Work-energy theorem: W = ÃŽâ€KE
      * Work done equals change in kinetic energy
      */
     public static Real workEnergyTheorem(Real initialKE, Real finalKE) {
@@ -99,7 +99,7 @@ public class ConservationLaws {
     }
 
     /**
-     * Impulse-momentum theorem: J = Δp
+     * Impulse-momentum theorem: J = ÃŽâ€p
      * Impulse equals change in momentum
      */
     public static Real impulseMomentumTheorem(Real initialP, Real finalP) {
@@ -112,7 +112,7 @@ public class ConservationLaws {
      */
     public static Real[] elasticCollision1D(Real m1, Real v1, Real m2, Real v2) {
         // Momentum: m1*v1 + m2*v2 = m1*v1' + m2*v2'
-        // Energy: ½m1*v1² + ½m2*v2² = ½m1*v1'² + ½m2*v2'²
+        // Energy: Ã‚Â½m1*v1Ã‚Â² + Ã‚Â½m2*v2Ã‚Â² = Ã‚Â½m1*v1'Ã‚Â² + Ã‚Â½m2*v2'Ã‚Â²
 
         Real m1m2 = m1.add(m2);
         Real m1m1 = m1.subtract(m2);
@@ -132,3 +132,5 @@ public class ConservationLaws {
         return v2Prime.subtract(v1Prime).divide(v1.subtract(v2)).abs();
     }
 }
+
+

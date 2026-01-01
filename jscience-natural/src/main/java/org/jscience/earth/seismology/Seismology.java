@@ -67,10 +67,10 @@ public class Seismology {
      * log10(M0) = 1.5 * ML + 16.1 (CGS units, dyne-cm)
      * 
      * @param localMagnitude ML (Richter scale)
-     * @return seismic moment in N·m
+     * @return seismic moment in NÃ‚Â·m
      */
     public static Real magnitudeToMoment(Real localMagnitude) {
-        // CGS to SI: 1 dyne-cm = 1e-7 N·m
+        // CGS to SI: 1 dyne-cm = 1e-7 NÃ‚Â·m
         Real log10M0_cgs = localMagnitude.multiply(Real.of(1.5)).add(Real.of(16.1));
         Real m0_cgs = Real.of(10).pow(log10M0_cgs);
         return m0_cgs.multiply(Real.of(1e-7));
@@ -78,7 +78,7 @@ public class Seismology {
 
     /**
      * Convert seismic moment to moment magnitude (Mw).
-     * Mw = (2/3) * log10(M0) - 10.7 (SI units, N·m)
+     * Mw = (2/3) * log10(M0) - 10.7 (SI units, NÃ‚Â·m)
      */
     public static Real momentToMagnitude(Real seismicMoment) {
         return seismicMoment.log10().multiply(Real.of(2.0).divide(Real.of(3.0)))
@@ -222,7 +222,7 @@ public class Seismology {
     /**
      * Estimate annual frequency of earthquakes at magnitude level.
      * Based on Gutenberg-Richter law: log10(N) = a - bM
-     * Using global average: a ≈ 8, b ≈ 1
+     * Using global average: a Ã¢â€°Ë† 8, b Ã¢â€°Ë† 1
      */
     public static Real annualFrequency(Real magnitude) {
         return Real.of(10).pow(Real.of(8).subtract(magnitude));
@@ -250,3 +250,5 @@ public class Seismology {
         return Quantities.create(slipM.doubleValue(), Units.METER);
     }
 }
+
+

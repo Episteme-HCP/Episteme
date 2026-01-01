@@ -80,3 +80,5 @@ public interface TruthValue<T> extends Comparable<TruthValue<T>> {
      */
     boolean isFalse();
 }
+
+

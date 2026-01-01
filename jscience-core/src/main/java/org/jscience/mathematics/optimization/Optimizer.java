@@ -39,7 +39,7 @@ import org.jscience.mathematics.numbers.real.Real;
 public class Optimizer {
 
     /**
-     * Gradient Descent: x_{n+1} = x_n - α∇f(x_n)
+     * Gradient Descent: x_{n+1} = x_n - ÃŽÂ±Ã¢Ë†â€¡f(x_n)
      * <p>
      * Finds local minimum iteratively.
      * </p>
@@ -47,7 +47,7 @@ public class Optimizer {
      * @param f             objective function (to minimize)
      * @param gradient      gradient of f
      * @param initialGuess  starting point
-     * @param learningRate  step size α
+     * @param learningRate  step size ÃŽÂ±
      * @param tolerance     convergence criterion
      * @param maxIterations max iterations
      * @return approximate minimum
@@ -71,7 +71,7 @@ public class Optimizer {
     }
 
     /**
-     * Newton's method for optimization: x_{n+1} = x_n - H^{-1}∇f(x_n)
+     * Newton's method for optimization: x_{n+1} = x_n - H^{-1}Ã¢Ë†â€¡f(x_n)
      * <p>
      * Uses second derivatives (Hessian). Quadratic convergence near minimum.
      * </p>
@@ -275,7 +275,7 @@ public class Optimizer {
     /**
      * Linear programming solver using Simplex method.
      * <p>
-     * Maximizes c·x subject to Ax ≤ b, x ≥ 0.
+     * Maximizes cÃ‚Â·x subject to Ax Ã¢â€°Â¤ b, x Ã¢â€°Â¥ 0.
      * </p>
      * 
      * @param c objective coefficients
@@ -508,3 +508,5 @@ public class Optimizer {
         return simplex[best];
     }
 }
+
+

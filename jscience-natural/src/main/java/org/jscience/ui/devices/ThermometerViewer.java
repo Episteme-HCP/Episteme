@@ -145,7 +145,7 @@ public class ThermometerViewer extends PhysicalMeasureInstrument<Temperature> {
             double y = tubeBottom - ((t - minTemp) / range) * (tubeBottom - tubeTop);
             gc.strokeLine(tubeX - 5, y, tubeX, y);
             gc.setFill(Color.BLACK);
-            gc.fillText(t + "°", tubeX - 8, y + 4);
+            gc.fillText(t + "Ã‚Â°", tubeX - 8, y + 4);
         }
 
         // Title
@@ -158,7 +158,9 @@ public class ThermometerViewer extends PhysicalMeasureInstrument<Temperature> {
         if (currentValue != null) {
             gc.setFont(Font.font("Arial", 11));
             gc.setFill(Color.BLACK);
-            gc.fillText(String.format("%.1f°C", temp), WIDTH / 2, HEIGHT - 10);
+            gc.fillText(String.format("%.1fÃ‚Â°C", temp), WIDTH / 2, HEIGHT - 10);
         }
     }
 }
+
+

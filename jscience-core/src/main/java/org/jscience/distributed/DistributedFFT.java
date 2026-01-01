@@ -140,3 +140,4 @@ public class DistributedFFT implements Serializable {
         return new Real[][] { outReal, outImag };
     }
 }
+

@@ -141,18 +141,19 @@ public class ExactVsApproximateDemo {
         // Approximate: limited precision
         Real approxHuge = Real.of(Long.MAX_VALUE);
         Real approxSquared = approxHuge.multiply(approxHuge);
-        System.out.println("   Approx: INT64_MAX^2 ≈ " + approxSquared);
+        System.out.println("   Approx: INT64_MAX^2 Ã¢â€°Ë† " + approxSquared);
         System.out.println("   (Approximate representation)\n");
 
         // ============================================================
         // Summary
         // ============================================================
         System.out.println("=== SUMMARY ===");
-        System.out.println("✓ Same algorithm works with both (Semiring<E> abstraction)");
-        System.out.println("✓ Type safety prevents accidental mixing");
-        System.out.println("✓ Performance vs Precision trade-off is explicit");
-        System.out.println("✓ Ergonomic instance methods for both");
+        System.out.println("Ã¢Å“â€œ Same algorithm works with both (Semiring<E> abstraction)");
+        System.out.println("Ã¢Å“â€œ Type safety prevents accidental mixing");
+        System.out.println("Ã¢Å“â€œ Performance vs Precision trade-off is explicit");
+        System.out.println("Ã¢Å“â€œ Ergonomic instance methods for both");
         System.out.println("\nUse Exact when: correctness matters (crypto, number theory)");
         System.out.println("Use Approximate when: speed matters (simulations, statistics)");
     }
 }
+

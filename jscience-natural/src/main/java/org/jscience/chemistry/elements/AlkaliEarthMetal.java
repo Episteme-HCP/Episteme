@@ -36,3 +36,5 @@ public final class AlkaliEarthMetal extends Element {
         super(name, symbol);
     }
 }
+
+

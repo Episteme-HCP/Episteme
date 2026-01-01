@@ -91,7 +91,7 @@ public interface AffineSpace<V> {
     /**
      * Computes a weighted average (barycentric combination) of points.
      * <p>
-     * Returns: w₁*p₁ + w₂*p₂ + ... + wₙ*pₙ where Σwᵢ = 1
+     * Returns: wÃ¢â€šÂ*pÃ¢â€šÂ + wÃ¢â€šâ€š*pÃ¢â€šâ€š + ... + wÃ¢â€šâ„¢*pÃ¢â€šâ„¢ where ÃŽÂ£wÃ¡ÂµÂ¢ = 1
      * </p>
      * 
      * @param points  the points
@@ -120,3 +120,5 @@ public interface AffineSpace<V> {
         return result;
     }
 }
+
+

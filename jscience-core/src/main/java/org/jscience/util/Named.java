@@ -33,3 +33,5 @@ package org.jscience.util;
 public interface Named {
     String getName();
 }
+
+

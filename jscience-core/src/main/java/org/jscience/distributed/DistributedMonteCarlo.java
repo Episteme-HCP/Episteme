@@ -44,11 +44,11 @@ public class DistributedMonteCarlo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Distributed Monte Carlo π estimation.
+     * Distributed Monte Carlo Ãâ‚¬ estimation.
      * 
      * @param totalSamples  Total number of random samples
      * @param numPartitions Number of parallel partitions
-     * @return Estimated value of π
+     * @return Estimated value of Ãâ‚¬
      */
     public static Real estimatePi(long totalSamples, int numPartitions) {
         long samplesPerPartition = totalSamples / numPartitions;
@@ -144,3 +144,4 @@ public class DistributedMonteCarlo implements Serializable {
         }
     }
 }
+

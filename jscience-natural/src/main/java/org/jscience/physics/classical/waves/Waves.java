@@ -34,29 +34,29 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public class Waves {
 
-    /** Wave equation: y(x,t) = A sin(kx - ωt + φ) */
+    /** Wave equation: y(x,t) = A sin(kx - Ãâ€°t + Ãâ€ ) */
     public static Real waveAmplitude(Real amplitude, Real wavenumber, Real angularFreq,
             Real position, Real time, Real phase) {
         Real arg = wavenumber.multiply(position).subtract(angularFreq.multiply(time)).add(phase);
         return amplitude.multiply(arg.sin());
     }
 
-    /** Wave speed: v = λf */
+    /** Wave speed: v = ÃŽÂ»f */
     public static Real waveSpeed(Real wavelength, Real frequency) {
         return wavelength.multiply(frequency);
     }
 
-    /** Angular frequency: ω = 2πf */
+    /** Angular frequency: Ãâ€° = 2Ãâ‚¬f */
     public static Real angularFrequency(Real frequency) {
         return Real.TWO_PI.multiply(frequency);
     }
 
-    /** Wavenumber: k = 2π/λ */
+    /** Wavenumber: k = 2Ãâ‚¬/ÃŽÂ» */
     public static Real wavenumber(Real wavelength) {
         return Real.TWO_PI.divide(wavelength);
     }
 
-    /** Standing wave: y(x,t) = 2A sin(kx) cos(ωt) */
+    /** Standing wave: y(x,t) = 2A sin(kx) cos(Ãâ€°t) */
     public static Real standingWave(Real amplitude, Real wavenumber, Real angularFreq,
             Real position, Real time) {
         Real spatial = wavenumber.multiply(position).sin();
@@ -64,17 +64,17 @@ public class Waves {
         return amplitude.multiply(Real.TWO).multiply(spatial).multiply(temporal);
     }
 
-    /** Group velocity: v_g = dω/dk */
+    /** Group velocity: v_g = dÃâ€°/dk */
     public static Real groupVelocity(Real omega1, Real omega2, Real k1, Real k2) {
         return omega2.subtract(omega1).divide(k2.subtract(k1));
     }
 
-    /** Phase velocity: v_p = ω/k */
+    /** Phase velocity: v_p = Ãâ€°/k */
     public static Real phaseVelocity(Real angularFreq, Real wavenumber) {
         return angularFreq.divide(wavenumber);
     }
 
-    /** Interference amplitude: A = √(A₁² + A₂² + 2A₁A₂cos(Δφ)) */
+    /** Interference amplitude: A = Ã¢Ë†Å¡(AÃ¢â€šÂÃ‚Â² + AÃ¢â€šâ€šÃ‚Â² + 2AÃ¢â€šÂAÃ¢â€šâ€šcos(ÃŽâ€Ãâ€ )) */
     public static Real interferenceAmplitude(Real amp1, Real amp2, Real phaseDiff) {
         Real a1sq = amp1.pow(2);
         Real a2sq = amp2.pow(2);
@@ -82,14 +82,16 @@ public class Waves {
         return a1sq.add(a2sq).add(crossTerm).sqrt();
     }
 
-    /** Wave energy density: u = ½ρω²A² */
+    /** Wave energy density: u = Ã‚Â½ÃÂÃâ€°Ã‚Â²AÃ‚Â² */
     public static Real waveEnergyDensity(Real density, Real angularFreq, Real amplitude) {
         return Real.of(0.5).multiply(density).multiply(angularFreq.pow(2)).multiply(amplitude.pow(2));
     }
 
-    /** Wave intensity: I = ½ρvω²A² */
+    /** Wave intensity: I = Ã‚Â½ÃÂvÃâ€°Ã‚Â²AÃ‚Â² */
     public static Real waveIntensity(Real density, Real velocity, Real angularFreq, Real amplitude) {
         return Real.of(0.5).multiply(density).multiply(velocity)
                 .multiply(angularFreq.pow(2)).multiply(amplitude.pow(2));
     }
 }
+
+

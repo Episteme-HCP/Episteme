@@ -58,3 +58,5 @@ public class ComplexMathTest {
         assertEquals(0.0, z.tanh().real(), 1e-9);
     }
 }
+
+

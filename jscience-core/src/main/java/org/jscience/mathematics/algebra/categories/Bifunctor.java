@@ -46,3 +46,5 @@ public interface Bifunctor<O1, M1, O2, M2, O3, M3> {
      */
     M3 applyMorphism(M1 mor1, M2 mor2);
 }
+
+

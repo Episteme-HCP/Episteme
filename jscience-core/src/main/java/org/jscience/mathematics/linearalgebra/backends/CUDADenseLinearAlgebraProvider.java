@@ -244,3 +244,5 @@ public class CUDADenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<
         return cpuProvider.scale(scalar, a);
     }
 }
+
+

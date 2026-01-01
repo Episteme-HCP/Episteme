@@ -109,3 +109,4 @@ public class PolynomialDivision {
         return new DivisionResult<>(quotient, remainder);
     }
 }
+

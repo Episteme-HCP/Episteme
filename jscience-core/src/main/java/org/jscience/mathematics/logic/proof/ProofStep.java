@@ -82,3 +82,4 @@ public class ProofStep {
         return formula.toString() + " [" + justification + "]";
     }
 }
+

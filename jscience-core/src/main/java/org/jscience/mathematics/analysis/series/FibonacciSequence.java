@@ -76,6 +76,7 @@ public class FibonacciSequence implements IntegerSequence {
 
     @Override
     public String getCodomain() {
-        return "ℤ";
+        return "Ã¢â€žÂ¤";
     }
 }
+

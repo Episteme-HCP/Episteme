@@ -21,15 +21,5 @@
  * SOFTWARE.
  */
 
-/**
- * Provides support for NetCDF (Network Common Data Form) files.
- * <p>
- * Specifically targets NetCDF-3 (Classic) format, commonly used in meteorology
- * and oceanography.
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.mathematics.loaders.netcdf;
+

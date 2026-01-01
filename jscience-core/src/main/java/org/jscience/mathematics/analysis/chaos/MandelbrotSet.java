@@ -28,17 +28,17 @@ import org.jscience.mathematics.numbers.complex.Complex;
 /**
  * The Mandelbrot Set as a proper mathematical set.
  * <p>
- * The Mandelbrot set M ⊂ ℂ is defined as:
- * M = { c ∈ ℂ : the sequence z₀ = 0, zₙ₊₁ = zₙ² + c remains bounded }
+ * The Mandelbrot set M Ã¢Å â€š Ã¢â€žâ€š is defined as:
+ * M = { c Ã¢Ë†Ë† Ã¢â€žâ€š : the sequence zÃ¢â€šâ‚¬ = 0, zÃ¢â€šâ„¢Ã¢â€šÅ Ã¢â€šÂ = zÃ¢â€šâ„¢Ã‚Â² + c remains bounded }
  * </p>
  *
  * <h2>References</h2>
  * <ul>
  * <li>Benoit B. Mandelbrot, "The Fractal Geometry of Nature",
  * W.H. Freeman and Company, 1982</li>
- * <li>Adrien Douady and John H. Hubbard, "Étude dynamique des polynômes
+ * <li>Adrien Douady and John H. Hubbard, "Ãƒâ€°tude dynamique des polynÃƒÂ´mes
  * complexes",
- * Publications Mathématiques d'Orsay, 1984-1985</li>
+ * Publications MathÃƒÂ©matiques d'Orsay, 1984-1985</li>
  * </ul>
  *
  * @author Silvere Martin-Michiellot
@@ -82,7 +82,7 @@ public class MandelbrotSet implements org.jscience.mathematics.structures.sets.S
 
     @Override
     public String description() {
-        return "Mandelbrot Set M = { c ∈ ℂ : z_{n+1} = z_n² + c, z_0 = 0 remains bounded }";
+        return "Mandelbrot Set M = { c Ã¢Ë†Ë† Ã¢â€žâ€š : z_{n+1} = z_nÃ‚Â² + c, z_0 = 0 remains bounded }";
     }
 
     public int escapeTime(Complex c) {
@@ -105,3 +105,4 @@ public class MandelbrotSet implements org.jscience.mathematics.structures.sets.S
         return maxIterations;
     }
 }
+

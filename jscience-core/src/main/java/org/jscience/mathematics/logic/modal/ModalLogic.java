@@ -32,17 +32,17 @@ import org.jscience.mathematics.logic.propositional.Proposition;
  * <p>
  * Modal logic extends classical logic with modal operators:
  * <ul>
- * <li>□ (Box/Necessarily) - true in all possible worlds</li>
- * <li>◇ (Diamond/Possibly) - true in at least one possible world</li>
+ * <li>Ã¢â€“Â¡ (Box/Necessarily) - true in all possible worlds</li>
+ * <li>Ã¢â€”â€¡ (Diamond/Possibly) - true in at least one possible world</li>
  * </ul>
  * </p>
  * <p>
  * Common modal logic systems:
  * <ul>
  * <li><strong>K</strong>: Basic modal logic</li>
- * <li><strong>T</strong>: K + reflexivity (□φ → φ)</li>
- * <li><strong>S4</strong>: T + transitivity (□φ → □□φ)</li>
- * <li><strong>S5</strong>: S4 + symmetry (◇φ → □◇φ)</li>
+ * <li><strong>T</strong>: K + reflexivity (Ã¢â€“Â¡Ãâ€  Ã¢â€ â€™ Ãâ€ )</li>
+ * <li><strong>S4</strong>: T + transitivity (Ã¢â€“Â¡Ãâ€  Ã¢â€ â€™ Ã¢â€“Â¡Ã¢â€“Â¡Ãâ€ )</li>
+ * <li><strong>S5</strong>: S4 + symmetry (Ã¢â€”â€¡Ãâ€  Ã¢â€ â€™ Ã¢â€“Â¡Ã¢â€”â€¡Ãâ€ )</li>
  * </ul>
  * </p>
  *
@@ -61,20 +61,20 @@ import org.jscience.mathematics.logic.propositional.Proposition;
 public interface ModalLogic<T> extends Logic<T> {
 
     /**
-     * Modal operator: □φ (Necessarily).
-     * True if φ is true in all accessible possible worlds.
+     * Modal operator: Ã¢â€“Â¡Ãâ€  (Necessarily).
+     * True if Ãâ€  is true in all accessible possible worlds.
      * 
      * @param proposition the proposition
-     * @return □φ
+     * @return Ã¢â€“Â¡Ãâ€ 
      */
     T necessarily(Proposition<T> proposition);
 
     /**
-     * Modal operator: ◇φ (Possibly).
-     * True if φ is true in at least one accessible possible world.
+     * Modal operator: Ã¢â€”â€¡Ãâ€  (Possibly).
+     * True if Ãâ€  is true in at least one accessible possible world.
      * 
      * @param proposition the proposition
-     * @return ◇φ
+     * @return Ã¢â€”â€¡Ãâ€ 
      */
     T possibly(Proposition<T> proposition);
 
@@ -87,3 +87,4 @@ public interface ModalLogic<T> extends Logic<T> {
         return "K"; // Basic modal logic
     }
 }
+

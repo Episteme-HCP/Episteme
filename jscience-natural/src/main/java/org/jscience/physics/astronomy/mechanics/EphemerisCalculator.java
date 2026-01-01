@@ -395,7 +395,7 @@ public class EphemerisCalculator {
     }
 
     /**
-     * Calculates Moon position (low precision, ~1° accuracy).
+     * Calculates Moon position (low precision, ~1Ã‚Â° accuracy).
      */
     public static double[] moonPosition(JulianDate jd) {
         double d = jd.getValue() - JulianDate.J2000;
@@ -431,3 +431,5 @@ public class EphemerisCalculator {
         return deg < 0 ? deg + 360.0 : deg;
     }
 }
+
+

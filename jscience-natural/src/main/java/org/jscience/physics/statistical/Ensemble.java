@@ -28,7 +28,7 @@ import org.jscience.mathematics.numbers.real.Real;
 /**
  * Represents an ensemble of particles in statistical mechanics.
  * <p>
- * Supports microcanonical (NVE), canonical (NVT), and grand canonical (μVT)
+ * Supports microcanonical (NVE), canonical (NVT), and grand canonical (ÃŽÂ¼VT)
  * ensembles.
  * </p>
  *
@@ -41,7 +41,7 @@ public class Ensemble {
     public enum Type {
         MICROCANONICAL, // Fixed N, V, E
         CANONICAL, // Fixed N, V, T
-        GRAND_CANONICAL // Fixed μ, V, T
+        GRAND_CANONICAL // Fixed ÃŽÂ¼, V, T
     }
 
     private final Type type;
@@ -49,7 +49,7 @@ public class Ensemble {
     private final Real volume; // V
     private final Real temperature; // T (if applicable)
     private final Real totalEnergy; // E (if applicable)
-    private final Real chemicalPotential; // μ (if applicable)
+    private final Real chemicalPotential; // ÃŽÂ¼ (if applicable)
 
     private Ensemble(Type type, int particleCount, Real volume, Real temperature,
             Real totalEnergy, Real chemicalPotential) {
@@ -98,3 +98,5 @@ public class Ensemble {
         return chemicalPotential;
     }
 }
+
+

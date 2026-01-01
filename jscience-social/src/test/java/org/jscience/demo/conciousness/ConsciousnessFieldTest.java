@@ -38,18 +38,18 @@ public class ConsciousnessFieldTest {
         Real phi0 = Real.of(2.0);
         ConsciousnessField field = new ConsciousnessField(lambda, phi0);
 
-        // V(Φ) = λ/4 (Φ² - Φ₀²)²
+        // V(ÃŽÂ¦) = ÃŽÂ»/4 (ÃŽÂ¦Ã‚Â² - ÃŽÂ¦Ã¢â€šâ‚¬Ã‚Â²)Ã‚Â²
 
-        // At Φ = Φ₀, V should be 0 (ground state)
+        // At ÃŽÂ¦ = ÃŽÂ¦Ã¢â€šâ‚¬, V should be 0 (ground state)
         assertEquals(0.0, field.potential(phi0).doubleValue(), TOLERANCE);
         assertEquals(0.0, field.potential(phi0.negate()).doubleValue(), TOLERANCE);
 
-        // At Φ = 0, V = λ/4 * (-Φ₀²)² = λ/4 * Φ₀⁴
+        // At ÃŽÂ¦ = 0, V = ÃŽÂ»/4 * (-ÃŽÂ¦Ã¢â€šâ‚¬Ã‚Â²)Ã‚Â² = ÃŽÂ»/4 * ÃŽÂ¦Ã¢â€šâ‚¬Ã¢ÂÂ´
         // 1/4 * 16 = 4
         assertEquals(4.0, field.potential(Real.ZERO).doubleValue(), TOLERANCE);
 
-        // At Φ = 3
-        // V = 1/4 * (9 - 4)² = 1/4 * 25 = 6.25
+        // At ÃŽÂ¦ = 3
+        // V = 1/4 * (9 - 4)Ã‚Â² = 1/4 * 25 = 6.25
         assertEquals(6.25, field.potential(Real.of(3.0)).doubleValue(), TOLERANCE);
     }
 
@@ -59,16 +59,16 @@ public class ConsciousnessFieldTest {
         Real phi0 = Real.of(2.0);
         ConsciousnessField field = new ConsciousnessField(lambda, phi0);
 
-        // dV/dΦ = λ * Φ * (Φ² - Φ₀²)
+        // dV/dÃŽÂ¦ = ÃŽÂ» * ÃŽÂ¦ * (ÃŽÂ¦Ã‚Â² - ÃŽÂ¦Ã¢â€šâ‚¬Ã‚Â²)
 
-        // At Φ = Φ₀, derivative should be 0
+        // At ÃŽÂ¦ = ÃŽÂ¦Ã¢â€šâ‚¬, derivative should be 0
         assertEquals(0.0, field.potentialDerivative(phi0).doubleValue(), TOLERANCE);
 
-        // At Φ = 0, derivative should be 0 (unstable equilibrium)
+        // At ÃŽÂ¦ = 0, derivative should be 0 (unstable equilibrium)
         assertEquals(0.0, field.potentialDerivative(Real.ZERO).doubleValue(), TOLERANCE);
 
-        // At Φ = 3
-        // dV/dΦ = 1 * 3 * (9 - 4) = 15
+        // At ÃŽÂ¦ = 3
+        // dV/dÃŽÂ¦ = 1 * 3 * (9 - 4) = 15
         assertEquals(15.0, field.potentialDerivative(Real.of(3.0)).doubleValue(), TOLERANCE);
     }
 
@@ -93,3 +93,5 @@ public class ConsciousnessFieldTest {
         });
     }
 }
+
+

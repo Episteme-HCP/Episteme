@@ -56,3 +56,5 @@ public class MillerIndices {
         return String.format("(%d %d %d)", h, k, l);
     }
 }
+
+

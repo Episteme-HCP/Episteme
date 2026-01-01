@@ -41,11 +41,11 @@ public class HeatTransfer {
 
     /**
      * Fourier's Law for heat conduction.
-     * Q = k * A * ΔT / d
+     * Q = k * A * ÃŽâ€T / d
      * 
-     * @param thermalConductivity   k (W/(m·K))
-     * @param area                  Cross-sectional area (m²)
-     * @param temperatureDifference ΔT (K)
+     * @param thermalConductivity   k (W/(mÃ‚Â·K))
+     * @param area                  Cross-sectional area (mÃ‚Â²)
+     * @param temperatureDifference ÃŽâ€T (K)
      * @param thickness             d (m)
      * @return Heat transfer rate (W)
      */
@@ -57,11 +57,11 @@ public class HeatTransfer {
 
     /**
      * Newton's Law of Cooling for convection.
-     * Q = h * A * ΔT
+     * Q = h * A * ÃŽâ€T
      * 
-     * @param convectionCoefficient h (W/(m²·K))
-     * @param area                  Surface area (m²)
-     * @param temperatureDifference ΔT (K)
+     * @param convectionCoefficient h (W/(mÃ‚Â²Ã‚Â·K))
+     * @param area                  Surface area (mÃ‚Â²)
+     * @param temperatureDifference ÃŽâ€T (K)
      * @return Heat transfer rate (W)
      */
     public static Quantity<Power> convection(double convectionCoefficient, double area,
@@ -72,10 +72,10 @@ public class HeatTransfer {
 
     /**
      * Stefan-Boltzmann Law for radiation.
-     * Q = ε * σ * A * (T⁴ - T_surr⁴)
+     * Q = ÃŽÂµ * ÃÆ’ * A * (TÃ¢ÂÂ´ - T_surrÃ¢ÂÂ´)
      * 
-     * @param emissivity      ε (0-1)
-     * @param area            Surface area (m²)
+     * @param emissivity      ÃŽÂµ (0-1)
+     * @param area            Surface area (mÃ‚Â²)
      * @param surfaceTemp     T (K)
      * @param surroundingTemp T_surr (K)
      * @return Heat transfer rate (W)
@@ -95,3 +95,5 @@ public class HeatTransfer {
         return thickness / (thermalConductivity * area);
     }
 }
+
+

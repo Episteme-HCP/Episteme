@@ -52,7 +52,7 @@ public class DigitalFilters {
      * Butterworth lowpass filter coefficients.
      * <p>
      * Maximally flat passband, smooth rolloff.
-     * H(s) = 1 / (1 + (s/ωc)^(2n))
+     * H(s) = 1 / (1 + (s/Ãâ€°c)^(2n))
      * </p>
      * 
      * @param order      filter order (higher = sharper cutoff)
@@ -92,7 +92,7 @@ public class DigitalFilters {
      * Applies IIR filter to signal.
      * <p>
      * Direct Form II implementation.
-     * y[n] = Σ b[i]*x[n-i] - Σ a[i]*y[n-i]
+     * y[n] = ÃŽÂ£ b[i]*x[n-i] - ÃŽÂ£ a[i]*y[n-i]
      * </p>
      * 
      * @param signal input signal
@@ -137,7 +137,7 @@ public class DigitalFilters {
     /**
      * FIR (Finite Impulse Response) filter using windowing method.
      * <p>
-     * h[n] = sin(ωc * n) / (π * n) * window[n]
+     * h[n] = sin(Ãâ€°c * n) / (Ãâ‚¬ * n) * window[n]
      * </p>
      * 
      * @param length     filter length (odd number recommended)
@@ -155,7 +155,7 @@ public class DigitalFilters {
             int m = n - center;
 
             if (m == 0) {
-                // Limit as m→0
+                // Limit as mÃ¢â€ â€™0
                 h[n] = omega.divide(Real.of(Math.PI));
             } else {
                 // sinc function
@@ -201,7 +201,7 @@ public class DigitalFilters {
     }
 
     /**
-     * Hamming window: w[n] = 0.54 - 0.46*cos(2πn/N)
+     * Hamming window: w[n] = 0.54 - 0.46*cos(2Ãâ‚¬n/N)
      */
     private static Real hammingWindow(int n, int N) {
         Real arg = Real.of(2 * Math.PI * n).divide(Real.of(N));
@@ -210,7 +210,7 @@ public class DigitalFilters {
     }
 
     /**
-     * Hanning window: w[n] = 0.5 - 0.5*cos(2πn/N)
+     * Hanning window: w[n] = 0.5 - 0.5*cos(2Ãâ‚¬n/N)
      */
     public static Real hanningWindow(int n, int N) {
         Real arg = Real.of(2 * Math.PI * n).divide(Real.of(N));
@@ -219,7 +219,7 @@ public class DigitalFilters {
     }
 
     /**
-     * Blackman window: w[n] = 0.42 - 0.5*cos(2πn/N) + 0.08*cos(4πn/N)
+     * Blackman window: w[n] = 0.42 - 0.5*cos(2Ãâ‚¬n/N) + 0.08*cos(4Ãâ‚¬n/N)
      */
     public static Real blackmanWindow(int n, int N) {
         Real arg1 = Real.of(2 * Math.PI * n).divide(Real.of(N));
@@ -232,3 +232,5 @@ public class DigitalFilters {
         return term1.subtract(term2).add(term3);
     }
 }
+
+

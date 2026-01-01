@@ -27,7 +27,7 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.linearalgebra.Vector;
 
 /**
- * Represents a vector field: F: ℝⁿ → ℝⁿ
+ * Represents a vector field: F: Ã¢â€žÂÃ¢ÂÂ¿ Ã¢â€ â€™ Ã¢â€žÂÃ¢ÂÂ¿
  * <p>
  * A vector field assigns a vector to each point in space.
  * </p>
@@ -100,3 +100,5 @@ public interface VectorField<V> extends Function<V, Vector<Real>> {
         };
     }
 }
+
+

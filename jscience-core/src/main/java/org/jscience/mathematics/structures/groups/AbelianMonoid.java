@@ -26,7 +26,7 @@ package org.jscience.mathematics.structures.groups;
 /**
  * An abelian monoid is a commutative monoid.
  * <p>
- * It satisfies all monoid axioms plus commutativity: a ∗ b = b ∗ a.
+ * It satisfies all monoid axioms plus commutativity: a Ã¢Ë†â€” b = b Ã¢Ë†â€” a.
  * </p>
  * <p>
  * <strong>Convention</strong>: Abelian monoids often use additive notation (+,
@@ -86,3 +86,4 @@ public interface AbelianMonoid<E> extends Monoid<E> {
         return zero();
     }
 }
+

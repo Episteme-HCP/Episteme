@@ -26,7 +26,7 @@ package org.jscience.mathematics.analysis;
 /**
  * Represents a binary relation between a domain D and a codomain C.
  * <p>
- * A relation is a set of ordered pairs (d, c) where d ∈ D and c ∈ C.
+ * A relation is a set of ordered pairs (d, c) where d Ã¢Ë†Ë† D and c Ã¢Ë†Ë† C.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -47,7 +47,7 @@ public interface Relation<D, C> {
     /**
      * Returns the domain description.
      * 
-     * @return domain name (e.g., "ℝ", "ℕ", "ℂ")
+     * @return domain name (e.g., "Ã¢â€žÂ", "Ã¢â€žâ€¢", "Ã¢â€žâ€š")
      */
     default String getDomain() {
         return "?";
@@ -62,3 +62,4 @@ public interface Relation<D, C> {
         return "?";
     }
 }
+

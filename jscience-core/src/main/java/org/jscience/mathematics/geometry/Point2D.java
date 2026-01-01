@@ -135,3 +135,4 @@ public final class Point2D implements GeometricObject<Point2D>, org.jscience.mat
         return "(" + x + ", " + y + ")";
     }
 }
+

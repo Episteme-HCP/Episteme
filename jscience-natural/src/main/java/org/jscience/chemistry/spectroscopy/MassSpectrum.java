@@ -58,3 +58,5 @@ public class MassSpectrum {
         return (massKg * velocity) / (chargeC * magneticFieldTesla);
     }
 }
+
+

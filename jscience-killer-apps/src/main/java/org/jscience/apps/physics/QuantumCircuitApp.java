@@ -96,12 +96,12 @@ public class QuantumCircuitApp extends KillerAppBase {
         }
 
         gateToolbar.getItems().add(new Separator());
-        Button runBtn = new Button("▶ " + i18n.get("quantum.button.run"));
+        Button runBtn = new Button("Ã¢â€“Â¶ " + i18n.get("quantum.button.run"));
         runBtn.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
         runBtn.setOnAction(e -> runSimulation());
         gateToolbar.getItems().add(runBtn);
 
-        Button clearBtn = new Button("🗑 " + i18n.get("quantum.button.clear"));
+        Button clearBtn = new Button("Ã°Å¸â€”â€˜ " + i18n.get("quantum.button.clear"));
         clearBtn.setOnAction(e -> clearCircuit());
         gateToolbar.getItems().add(clearBtn);
 
@@ -211,7 +211,7 @@ public class QuantumCircuitApp extends KillerAppBase {
         }
         for (int i = 0; i < 8; i++) {
             probs[i] /= sum;
-            String state = String.format("|%3s⟩", Integer.toBinaryString(i)).replace(' ', '0');
+            String state = String.format("|%3sÃ¢Å¸Â©", Integer.toBinaryString(i)).replace(' ', '0');
             series.getData().add(new XYChart.Data<>(state, probs[i]));
         }
         probChart.getData().add(series);
@@ -220,3 +220,5 @@ public class QuantumCircuitApp extends KillerAppBase {
 
     }
 }
+
+

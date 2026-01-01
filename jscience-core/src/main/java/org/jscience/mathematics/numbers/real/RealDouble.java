@@ -153,3 +153,4 @@ public final class RealDouble extends Real {
         return 0; // Real numbers have characteristic 0 (infinite field)
     }
 }
+

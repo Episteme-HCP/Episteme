@@ -22,13 +22,6 @@
  */
 
 /**
- * Sociology package - social structures, persons, and cultural modeling.
- * <p>
- * Key classes:
- * <ul>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * - social structures, persons, and cultural modeling.
  */
 package org.jscience.sociology;

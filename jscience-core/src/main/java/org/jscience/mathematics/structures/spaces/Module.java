@@ -36,7 +36,7 @@ import org.jscience.mathematics.structures.rings.Ring;
  * <ul>
  * <li>An abelian group (M, +)</li>
  * <li>A ring R</li>
- * <li>A scalar multiplication R × M → M satisfying:
+ * <li>A scalar multiplication R Ãƒâ€” M Ã¢â€ â€™ M satisfying:
  * <ul>
  * <li>r(x + y) = rx + ry</li>
  * <li>(r + s)x = rx + sx</li>
@@ -61,11 +61,12 @@ public interface Module<M, R> extends AbelianGroup<M> {
     Ring<R> getScalarRing();
 
     /**
-     * Scalar multiplication (r × m).
+     * Scalar multiplication (r Ãƒâ€” m).
      * 
-     * @param scalar        the scalar r ∈ R
-     * @param moduleElement the module element m ∈ M
-     * @return r × m
+     * @param scalar        the scalar r Ã¢Ë†Ë† R
+     * @param moduleElement the module element m Ã¢Ë†Ë† M
+     * @return r Ãƒâ€” m
      */
     M scale(R scalar, M moduleElement);
 }
+

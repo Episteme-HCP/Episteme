@@ -29,7 +29,7 @@ import org.jscience.mathematics.numbers.real.Real;
 /**
  * Ordinary Differential Equation (ODE) solvers.
  * <p>
- * Solves initial value problems dy/dt = f(t, y) with y(t₀) = y₀.
+ * Solves initial value problems dy/dt = f(t, y) with y(tÃ¢â€šâ‚¬) = yÃ¢â€šâ‚¬.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -39,7 +39,7 @@ import org.jscience.mathematics.numbers.real.Real;
 public class ODESolver {
 
     /**
-     * Euler's method: yₙ₊₁ = yₙ + h*f(tₙ, yₙ)
+     * Euler's method: yÃ¢â€šâ„¢Ã¢â€šÅ Ã¢â€šÂ = yÃ¢â€šâ„¢ + h*f(tÃ¢â€šâ„¢, yÃ¢â€šâ„¢)
      * <p>
      * First-order method. Simple but low accuracy O(h).
      * </p>
@@ -63,7 +63,7 @@ public class ODESolver {
     /**
      * Runge-Kutta 4th order (RK4): Classical method.
      * <p>
-     * Fourth-order accuracy O(h⁴). Industry standard for ODE solving.
+     * Fourth-order accuracy O(hÃ¢ÂÂ´). Industry standard for ODE solving.
      * </p>
      */
     public static Real[] rungeKutta4(Function<Real[], Real> f, Real t0, Real y0, Real tEnd, Real h) {
@@ -113,3 +113,5 @@ public class ODESolver {
         return solution;
     }
 }
+
+

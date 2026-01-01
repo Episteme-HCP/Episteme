@@ -32,19 +32,19 @@ import java.util.List;
 /**
  * Computes the Laplacian of a scalar field.
  * <p>
- * The Laplacian is the divergence of the gradient: ∇²f = ∇·(∇f)
+ * The Laplacian is the divergence of the gradient: Ã¢Ë†â€¡Ã‚Â²f = Ã¢Ë†â€¡Ã‚Â·(Ã¢Ë†â€¡f)
  * </p>
  * <p>
- * Definition: ∇²f = ∂²f/∂x₁² + ∂²f/∂x₂² + ... + ∂²f/∂xₙ²
+ * Definition: Ã¢Ë†â€¡Ã‚Â²f = Ã¢Ë†â€šÃ‚Â²f/Ã¢Ë†â€šxÃ¢â€šÂÃ‚Â² + Ã¢Ë†â€šÃ‚Â²f/Ã¢Ë†â€šxÃ¢â€šâ€šÃ‚Â² + ... + Ã¢Ë†â€šÃ‚Â²f/Ã¢Ë†â€šxÃ¢â€šâ„¢Ã‚Â²
  * </p>
  * <p>
  * Physical interpretation and applications:
- * - Heat equation: ∂T/∂t = α∇²T (heat diffusion)
- * - Wave equation: ∂²u/∂t² = c²∇²u (wave propagation)
- * - Laplace's equation: ∇²φ = 0 (electrostatics, gravity)
- * - Poisson's equation: ∇²φ = -ρ/ε₀ (electrostatics with charges)
- * - Schrödinger equation: iℏ∂ψ/∂t = -ℏ²/(2m)∇²ψ + Vψ
- * - Harmonic functions: functions where ∇²f = 0
+ * - Heat equation: Ã¢Ë†â€šT/Ã¢Ë†â€št = ÃŽÂ±Ã¢Ë†â€¡Ã‚Â²T (heat diffusion)
+ * - Wave equation: Ã¢Ë†â€šÃ‚Â²u/Ã¢Ë†â€štÃ‚Â² = cÃ‚Â²Ã¢Ë†â€¡Ã‚Â²u (wave propagation)
+ * - Laplace's equation: Ã¢Ë†â€¡Ã‚Â²Ãâ€  = 0 (electrostatics, gravity)
+ * - Poisson's equation: Ã¢Ë†â€¡Ã‚Â²Ãâ€  = -ÃÂ/ÃŽÂµÃ¢â€šâ‚¬ (electrostatics with charges)
+ * - SchrÃƒÂ¶dinger equation: iÃ¢â€žÂÃ¢Ë†â€šÃË†/Ã¢Ë†â€št = -Ã¢â€žÂÃ‚Â²/(2m)Ã¢Ë†â€¡Ã‚Â²ÃË† + VÃË†
+ * - Harmonic functions: functions where Ã¢Ë†â€¡Ã‚Â²f = 0
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -57,7 +57,7 @@ public class Laplacian {
      * Computes the Laplacian of a scalar field at a point.
      * <p>
      * Uses second-order central difference:
-     * ∂²f/∂xᵢ² ≈ (f(x + h*eᵢ) - 2f(x) + f(x - h*eᵢ)) / h²
+     * Ã¢Ë†â€šÃ‚Â²f/Ã¢Ë†â€šxÃ¡ÂµÂ¢Ã‚Â² Ã¢â€°Ë† (f(x + h*eÃ¡ÂµÂ¢) - 2f(x) + f(x - h*eÃ¡ÂµÂ¢)) / hÃ‚Â²
      * </p>
      * 
      * @param field the scalar field
@@ -81,7 +81,7 @@ public class Laplacian {
             Real fPlus = field.evaluate(pointPlus);
             Real fMinus = field.evaluate(pointMinus);
 
-            // Compute ∂²f/∂xᵢ² using three-point stencil
+            // Compute Ã¢Ë†â€šÃ‚Â²f/Ã¢Ë†â€šxÃ¡ÂµÂ¢Ã‚Â² using three-point stencil
             Real secondDerivative = fPlus.add(fMinus).subtract(fCenter.multiply(Real.of(2)))
                     .divide(hSquared);
 
@@ -108,10 +108,10 @@ public class Laplacian {
      * Computes the vector Laplacian of a vector field.
      * <p>
      * For a vector field F, the vector Laplacian is:
-     * ∇²F = (∇²F₁, ∇²F₂, ..., ∇²Fₙ)
+     * Ã¢Ë†â€¡Ã‚Â²F = (Ã¢Ë†â€¡Ã‚Â²FÃ¢â€šÂ, Ã¢Ë†â€¡Ã‚Â²FÃ¢â€šâ€š, ..., Ã¢Ë†â€¡Ã‚Â²FÃ¢â€šâ„¢)
      * </p>
      * <p>
-     * Note: In some contexts, ∇²F = ∇(∇·F) - ∇×(∇×F), but this is only
+     * Note: In some contexts, Ã¢Ë†â€¡Ã‚Â²F = Ã¢Ë†â€¡(Ã¢Ë†â€¡Ã‚Â·F) - Ã¢Ë†â€¡Ãƒâ€”(Ã¢Ë†â€¡Ãƒâ€”F), but this is only
      * equivalent in 3D and for certain coordinate systems.
      * </p>
      * 
@@ -160,3 +160,5 @@ public class Laplacian {
         return new PointND(newCoords);
     }
 }
+
+

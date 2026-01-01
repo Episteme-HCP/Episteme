@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Standard Electrode Potentials (E°) at 25°C.
+ * Standard Electrode Potentials (EÃ‚Â°) at 25Ã‚Â°C.
  * Relative to Standard Hydrogen Electrode (SHE).
  * Loads data from potentials.json.
  *
@@ -80,7 +80,7 @@ public class StandardPotentials {
      * Gets the standard potential for a given half-reaction representation.
      * 
      * @param halfReaction Key string (e.g., "Cu2+ + 2e- -> Cu")
-     * @return E° in Volts, or null if not found
+     * @return EÃ‚Â° in Volts, or null if not found
      */
     public static Double getPotential(String halfReaction) {
         return POTENTIALS.get(halfReaction);
@@ -93,3 +93,5 @@ public class StandardPotentials {
         return POTENTIALS.keySet();
     }
 }
+
+

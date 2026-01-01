@@ -52,3 +52,5 @@ public class Ray2D {
         return origin.add(direction.scale(t));
     }
 }
+
+

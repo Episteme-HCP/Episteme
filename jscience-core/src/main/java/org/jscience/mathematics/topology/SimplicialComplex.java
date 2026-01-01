@@ -33,8 +33,8 @@ import java.util.Set;
  * A simplicial complex is a set of simplices that satisfies the following
  * conditions:
  * 1. Every face of a simplex from the set is also in the set.
- * 2. The non-empty intersection of any two simplices σ1, σ2 is a face of both
- * σ1 and σ2.
+ * 2. The non-empty intersection of any two simplices ÃÆ’1, ÃÆ’2 is a face of both
+ * ÃÆ’1 and ÃÆ’2.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -84,3 +84,5 @@ public class SimplicialComplex {
         return Collections.unmodifiableSet(simplices);
     }
 }
+
+

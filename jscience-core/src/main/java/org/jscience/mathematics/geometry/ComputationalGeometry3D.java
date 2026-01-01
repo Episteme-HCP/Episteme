@@ -341,7 +341,7 @@ public class ComputationalGeometry3D {
 
     /**
      * Intersects a ray with a triangle.
-     * Uses Möller–Trumbore intersection algorithm.
+     * Uses MÃƒÂ¶llerÃ¢â‚¬â€œTrumbore intersection algorithm.
      * 
      * @param ray the ray
      * @param v0  first vertex of triangle
@@ -433,3 +433,4 @@ public class ComputationalGeometry3D {
         return null;
     }
 }
+

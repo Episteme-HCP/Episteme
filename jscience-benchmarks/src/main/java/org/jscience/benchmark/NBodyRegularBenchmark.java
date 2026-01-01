@@ -31,7 +31,7 @@ package org.jscience.benchmark;
  * </p>
  * <p>
  * Tests performance of direct N-body gravitational simulation
- * with O(N²) force calculations.
+ * with O(NÃ‚Â²) force calculations.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -40,7 +40,7 @@ package org.jscience.benchmark;
  */
 public class NBodyRegularBenchmark {
 
-    /** Gravitational constant (m³/(kg·s²)) */
+    /** Gravitational constant (mÃ‚Â³/(kgÃ‚Â·sÃ‚Â²)) */
     private static final double G = 6.67430e-11;
 
     /** Default time step (seconds) */
@@ -104,7 +104,7 @@ public class NBodyRegularBenchmark {
     }
 
     /**
-     * Calculate forces between all pairs (O(N²)).
+     * Calculate forces between all pairs (O(NÃ‚Â²)).
      */
     public void calculateForces() {
         // Reset forces
@@ -246,3 +246,4 @@ public class NBodyRegularBenchmark {
         }
     }
 }
+

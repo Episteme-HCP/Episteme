@@ -146,7 +146,7 @@ public enum Nucleotide {
 
     /**
      * Estimates melting temperature of short DNA (< 14 bp).
-     * Tm = 2(A+T) + 4(G+C) °C
+     * Tm = 2(A+T) + 4(G+C) Ã‚Â°C
      */
     public static double meltingTemperatureSimple(String sequence) {
         int at = 0, gc = 0;
@@ -197,3 +197,5 @@ public enum Nucleotide {
         return sb.toString();
     }
 }
+
+

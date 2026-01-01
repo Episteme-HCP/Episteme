@@ -26,7 +26,7 @@ package org.jscience.mathematics.analysis;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * Represents a scalar field: f: ℝⁿ → ℝ
+ * Represents a scalar field: f: Ã¢â€žÂÃ¢ÂÂ¿ Ã¢â€ â€™ Ã¢â€žÂ
  * <p>
  * A scalar field assigns a scalar value to each point in space.
  * </p>
@@ -35,8 +35,8 @@ import org.jscience.mathematics.numbers.real.Real;
  * - Temperature distribution: T(x,y,z)
  * - Potential energy: U(x,y,z)
  * - Pressure: P(x,y,z)
- * - Density: ρ(x,y,z)
- * - Electric potential: φ(x,y,z)
+ * - Density: ÃÂ(x,y,z)
+ * - Electric potential: Ãâ€ (x,y,z)
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -100,3 +100,5 @@ public interface ScalarField<V> extends Function<V, Real> {
         };
     }
 }
+
+

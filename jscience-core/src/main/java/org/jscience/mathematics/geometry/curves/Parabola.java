@@ -28,7 +28,7 @@ import org.jscience.mathematics.geometry.Point2D;
 /**
  * Represents a parabola in 2D space.
  * <p>
- * A parabola is defined by the equation: y = a(x-h)² + k
+ * A parabola is defined by the equation: y = a(x-h)Ã‚Â² + k
  * where (h,k) is the vertex and a determines the shape.
  * </p>
  *
@@ -172,3 +172,5 @@ public class Parabola {
         return String.format("Parabola[vertex=(%.2f,%.2f), a=%.4f]", vertexX, vertexY, a);
     }
 }
+
+

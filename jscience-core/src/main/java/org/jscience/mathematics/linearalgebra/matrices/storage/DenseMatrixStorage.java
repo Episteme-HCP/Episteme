@@ -103,3 +103,5 @@ public class DenseMatrixStorage<E> implements MatrixStorage<E> {
         return data;
     }
 }
+
+

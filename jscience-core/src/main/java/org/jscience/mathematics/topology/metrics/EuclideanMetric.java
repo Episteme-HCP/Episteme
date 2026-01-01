@@ -31,7 +31,7 @@ import org.jscience.mathematics.linearalgebra.Vector;
 /**
  * Euclidean metric (L2 norm).
  * <p>
- * d(x,y) = √(Σ(xi - yi)²)
+ * d(x,y) = Ã¢Ë†Å¡(ÃŽÂ£(xi - yi)Ã‚Â²)
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -55,3 +55,5 @@ public class EuclideanMetric implements Metric<Vector<Real>> {
         return sumSquares.sqrt();
     }
 }
+
+

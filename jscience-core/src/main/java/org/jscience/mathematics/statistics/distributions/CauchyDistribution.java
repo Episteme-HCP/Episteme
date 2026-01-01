@@ -28,15 +28,15 @@ import org.jscience.mathematics.statistics.ContinuousDistribution;
 
 /**
  * Cauchy distribution (also called Lorentz distribution).
- * PDF: f(x) = 1/(πγ[1 + ((x-x₀)/γ)²])
+ * PDF: f(x) = 1/(Ãâ‚¬ÃŽÂ³[1 + ((x-xÃ¢â€šâ‚¬)/ÃŽÂ³)Ã‚Â²])
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class CauchyDistribution extends ContinuousDistribution {
-    private final Real location; // x₀
-    private final Real scale; // γ
+    private final Real location; // xÃ¢â€šâ‚¬
+    private final Real scale; // ÃŽÂ³
 
     public CauchyDistribution() {
         this(Real.ZERO, Real.ONE);
@@ -74,6 +74,7 @@ public class CauchyDistribution extends ContinuousDistribution {
 
     @Override
     public String toString() {
-        return String.format("Cauchy(x₀=%.4f, γ=%.4f)", location.doubleValue(), scale.doubleValue());
+        return String.format("Cauchy(xÃ¢â€šâ‚¬=%.4f, ÃŽÂ³=%.4f)", location.doubleValue(), scale.doubleValue());
     }
 }
+

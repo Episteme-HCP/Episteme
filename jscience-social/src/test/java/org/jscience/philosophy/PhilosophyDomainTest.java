@@ -45,3 +45,5 @@ public class PhilosophyDomainTest {
         assertFalse(invalidArgument.isSound(), "Argument with false premise should not be sound");
     }
 }
+
+

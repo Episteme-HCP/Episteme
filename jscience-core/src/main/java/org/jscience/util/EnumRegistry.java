@@ -149,3 +149,5 @@ public class EnumRegistry<T extends ExtensibleEnum<T>> {
                 .toList();
     }
 }
+
+

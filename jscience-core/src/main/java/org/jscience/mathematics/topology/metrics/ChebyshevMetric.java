@@ -29,13 +29,13 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.linearalgebra.Vector;
 
 /**
- * Chebyshev metric (L∞ norm, maximum metric).
+ * Chebyshev metric (LÃ¢Ë†Å¾ norm, maximum metric).
  * <p>
- * d(x,y) = max|xᵢ - yᵢ|
+ * d(x,y) = max|xÃ¡ÂµÂ¢ - yÃ¡ÂµÂ¢|
  * </p>
  * <p>
  * Also known as:
- * - L∞ metric
+ * - LÃ¢Ë†Å¾ metric
  * - Maximum metric
  * - Supremum metric
  * - Chessboard distance (in 2D)
@@ -64,3 +64,5 @@ public class ChebyshevMetric implements Metric<Vector<Real>> {
         return maxDiff;
     }
 }
+
+

@@ -28,15 +28,15 @@ import java.util.*;
 /**
  * Pushdown Automaton (PDA).
  * <p>
- * A PDA is defined by M = (Q, Σ, Γ, δ, q₀, Z₀, F) where:
+ * A PDA is defined by M = (Q, ÃŽÂ£, ÃŽâ€œ, ÃŽÂ´, qÃ¢â€šâ‚¬, ZÃ¢â€šâ‚¬, F) where:
  * <ul>
  * <li>Q is a finite set of states</li>
- * <li>Σ is the input alphabet</li>
- * <li>Γ is the stack alphabet</li>
- * <li>δ: Q × (Σ ∪ {ε}) × Γ → P(Q × Γ*) is the transition function</li>
- * <li>q₀ ∈ Q is the initial state</li>
- * <li>Z₀ ∈ Γ is the initial stack symbol</li>
- * <li>F ⊆ Q is the set of accepting states</li>
+ * <li>ÃŽÂ£ is the input alphabet</li>
+ * <li>ÃŽâ€œ is the stack alphabet</li>
+ * <li>ÃŽÂ´: Q Ãƒâ€” (ÃŽÂ£ Ã¢Ë†Âª {ÃŽÂµ}) Ãƒâ€” ÃŽâ€œ Ã¢â€ â€™ P(Q Ãƒâ€” ÃŽâ€œ*) is the transition function</li>
+ * <li>qÃ¢â€šâ‚¬ Ã¢Ë†Ë† Q is the initial state</li>
+ * <li>ZÃ¢â€šâ‚¬ Ã¢Ë†Ë† ÃŽâ€œ is the initial stack symbol</li>
+ * <li>F Ã¢Å â€  Q is the set of accepting states</li>
  * </ul>
  * </p>
  *
@@ -172,3 +172,4 @@ public class PushdownAutomaton<S, A, G> {
         return false;
     }
 }
+

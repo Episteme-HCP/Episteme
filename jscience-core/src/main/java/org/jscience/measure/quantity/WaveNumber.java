@@ -27,7 +27,7 @@ import org.jscience.measure.Quantity;
 
 /**
  * Represents a wave number (inverse length).
- * The SI unit is reciprocal meter (m⁻¹).
+ * The SI unit is reciprocal meter (mÃ¢ÂÂ»Ã‚Â¹).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -35,4 +35,6 @@ import org.jscience.measure.Quantity;
  */
 public interface WaveNumber extends Quantity<WaveNumber> {
 }
+
+
 

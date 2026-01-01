@@ -64,13 +64,13 @@ public class IntegralExpression<T extends Ring<T>> implements Expression<T> {
 
     @Override
     public Expression<T> differentiate(Variable<T> v) {
-        // Fundamental Theorem of Calculus: d/dx ∫ f(t) dt
+        // Fundamental Theorem of Calculus: d/dx Ã¢Ë†Â« f(t) dt
         if (v.equals(this.variable)) {
             return integrand;
         }
         // If differentiating by another variable, assume independence or mixed
         // derivative
-        // d/dy ∫ f(x) dx = ∫ (d/dy f(x)) dx
+        // d/dy Ã¢Ë†Â« f(x) dx = Ã¢Ë†Â« (d/dy f(x)) dx
         return new IntegralExpression<>(integrand.differentiate(v), variable, ring);
     }
 
@@ -103,6 +103,8 @@ public class IntegralExpression<T extends Ring<T>> implements Expression<T> {
 
     @Override
     public String toString() {
-        return "∫(" + integrand + ") d" + variable;
+        return "Ã¢Ë†Â«(" + integrand + ") d" + variable;
     }
 }
+
+

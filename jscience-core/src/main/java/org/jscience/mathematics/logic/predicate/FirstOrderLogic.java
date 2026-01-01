@@ -36,7 +36,7 @@ import java.util.function.Predicate;
 public interface FirstOrderLogic<T> extends Logic<T> {
 
     /**
-     * Universal quantification (∀).
+     * Universal quantification (Ã¢Ë†â‚¬).
      * Returns true (or equivalent) if the predicate holds for all elements in the
      * domain.
      * 
@@ -47,7 +47,7 @@ public interface FirstOrderLogic<T> extends Logic<T> {
     T forAll(Iterable<T> domain, Predicate<T> predicate);
 
     /**
-     * Existential quantification (∃).
+     * Existential quantification (Ã¢Ë†Æ’).
      * Returns true (or equivalent) if the predicate holds for at least one element
      * in the domain.
      * 
@@ -57,3 +57,4 @@ public interface FirstOrderLogic<T> extends Logic<T> {
      */
     T exists(Iterable<T> domain, Predicate<T> predicate);
 }
+

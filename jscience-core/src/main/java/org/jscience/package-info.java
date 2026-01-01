@@ -21,13 +21,5 @@
  * SOFTWARE.
  */
 
-/**
- * The root package for the JScience library, containing core classes and
- * configuration.
- * <p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience;
+

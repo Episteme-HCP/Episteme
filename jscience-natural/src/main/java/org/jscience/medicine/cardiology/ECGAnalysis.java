@@ -107,3 +107,5 @@ public class ECGAnalysis {
         return peaks.stream().mapToInt(Integer::intValue).toArray();
     }
 }
+
+

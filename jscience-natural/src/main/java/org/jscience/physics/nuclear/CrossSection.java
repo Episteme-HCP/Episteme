@@ -28,7 +28,7 @@ import org.jscience.mathematics.numbers.real.Real;
 /**
  * Nuclear reaction cross-section models.
  * Cross-section measures probability of nuclear reactions.
- * Units: barns (1 barn = 10⁻²⁴ cm²)
+ * Units: barns (1 barn = 10Ã¢ÂÂ»Ã‚Â²Ã¢ÂÂ´ cmÃ‚Â²)
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -36,15 +36,15 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public class CrossSection {
 
-    /** 1 barn in m² */
+    /** 1 barn in mÃ‚Â² */
     public static final Real BARN = Real.of(1e-28);
 
     /**
      * Geometric cross-section for a nucleus.
-     * σ = π r² where r = r₀ A^(1/3)
+     * ÃÆ’ = Ãâ‚¬ rÃ‚Â² where r = rÃ¢â€šâ‚¬ A^(1/3)
      * 
      * @param massNumber A = Z + N
-     * @return Cross-section in m²
+     * @return Cross-section in mÃ‚Â²
      */
     public static Real geometric(int massNumber) {
         Real r0 = Real.of(1.2e-15); // fm in meters
@@ -54,12 +54,12 @@ public class CrossSection {
 
     /**
      * Breit-Wigner resonance cross-section for compound nucleus formation.
-     * σ(E) = σ₀ * (Γ/2)² / [(E - E₀)² + (Γ/2)²]
+     * ÃÆ’(E) = ÃÆ’Ã¢â€šâ‚¬ * (ÃŽâ€œ/2)Ã‚Â² / [(E - EÃ¢â€šâ‚¬)Ã‚Â² + (ÃŽâ€œ/2)Ã‚Â²]
      * 
      * @param energy           Incident energy
-     * @param resonanceEnergy  E₀ - Resonance peak energy
-     * @param width            Γ - Resonance width (FWHM)
-     * @param peakCrossSection σ₀ - Peak cross-section
+     * @param resonanceEnergy  EÃ¢â€šâ‚¬ - Resonance peak energy
+     * @param width            ÃŽâ€œ - Resonance width (FWHM)
+     * @param peakCrossSection ÃÆ’Ã¢â€šâ‚¬ - Peak cross-section
      * @return Cross-section at given energy
      */
     public static Real breitWigner(Real energy, Real resonanceEnergy, Real width,
@@ -73,9 +73,9 @@ public class CrossSection {
 
     /**
      * 1/v law for thermal neutron capture.
-     * σ(E) = σ₀ * sqrt(E₀/E)
+     * ÃÆ’(E) = ÃÆ’Ã¢â€šâ‚¬ * sqrt(EÃ¢â€šâ‚¬/E)
      * 
-     * @param thermalCrossSection σ₀ at thermal energy (E₀ = 0.0253 eV)
+     * @param thermalCrossSection ÃÆ’Ã¢â€šâ‚¬ at thermal energy (EÃ¢â€šâ‚¬ = 0.0253 eV)
      * @param energy              Neutron energy in eV
      * @return Cross-section at given energy
      */
@@ -86,10 +86,10 @@ public class CrossSection {
 
     /**
      * Calculates reaction rate per target nucleus.
-     * R = n * v * σ where n is projectile density, v is velocity
+     * R = n * v * ÃÆ’ where n is projectile density, v is velocity
      * 
-     * @param crossSection σ in m²
-     * @param flux         φ = n*v in particles/(m²·s)
+     * @param crossSection ÃÆ’ in mÃ‚Â²
+     * @param flux         Ãâ€  = n*v in particles/(mÃ‚Â²Ã‚Â·s)
      * @return Reaction rate per target nucleus per second
      */
     public static Real reactionRate(Real crossSection, Real flux) {
@@ -98,10 +98,10 @@ public class CrossSection {
 
     /**
      * Mean free path for neutron in material.
-     * λ = 1 / (n * σ) where n is number density of targets
+     * ÃŽÂ» = 1 / (n * ÃÆ’) where n is number density of targets
      * 
-     * @param crossSection  σ in m²
-     * @param numberDensity n in atoms/m³
+     * @param crossSection  ÃÆ’ in mÃ‚Â²
+     * @param numberDensity n in atoms/mÃ‚Â³
      * @return Mean free path in meters
      */
     public static Real meanFreePath(Real crossSection, Real numberDensity) {
@@ -110,18 +110,20 @@ public class CrossSection {
 
     // --- Common thermal neutron capture cross-sections (in barns) ---
 
-    /** Uranium-235 fission σ_f = 584 barns */
+    /** Uranium-235 fission ÃÆ’_f = 584 barns */
     public static final Real U235_FISSION = Real.of(584);
 
-    /** Uranium-238 capture σ_c = 2.68 barns */
+    /** Uranium-238 capture ÃÆ’_c = 2.68 barns */
     public static final Real U238_CAPTURE = Real.of(2.68);
 
-    /** Cadmium-113 capture σ_c = 20,600 barns */
+    /** Cadmium-113 capture ÃÆ’_c = 20,600 barns */
     public static final Real CD113_CAPTURE = Real.of(20600);
 
-    /** Boron-10 (n,α) σ = 3840 barns */
+    /** Boron-10 (n,ÃŽÂ±) ÃÆ’ = 3840 barns */
     public static final Real B10_ALPHA = Real.of(3840);
 
-    /** Hydrogen capture σ = 0.332 barns */
+    /** Hydrogen capture ÃÆ’ = 0.332 barns */
     public static final Real H1_CAPTURE = Real.of(0.332);
 }
+
+

@@ -30,8 +30,8 @@ import org.jscience.mathematics.algebra.Algebra;
  * into a direct sum of subspaces indexed by a grading group (typically
  * integers).
  * <p>
- * A graded algebra A = ⊕ᵢ Aᵢ where the multiplication respects the grading:
- * Aᵢ · Aⱼ ⊆ Aᵢ₊ⱼ
+ * A graded algebra A = Ã¢Å â€¢Ã¡ÂµÂ¢ AÃ¡ÂµÂ¢ where the multiplication respects the grading:
+ * AÃ¡ÂµÂ¢ Ã‚Â· AÃ¢Â±Â¼ Ã¢Å â€  AÃ¡ÂµÂ¢Ã¢â€šÅ Ã¢Â±Â¼
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -67,3 +67,5 @@ public interface GradedAlgebra<E, F> extends Algebra<E, F> {
         return 0;
     }
 }
+
+

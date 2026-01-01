@@ -29,7 +29,7 @@ import org.jscience.mathematics.structures.rings.Field;
 import org.jscience.mathematics.structures.rings.FieldElement;
 
 /**
- * Abstract base class for real numbers (ℝ).
+ * Abstract base class for real numbers (Ã¢â€žÂ).
  * <p>
  * Real numbers form a Field under addition and multiplication.
  * This class provides a smart factory that chooses the backing implementation
@@ -66,10 +66,10 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
     /** The real number 2 */
     public static final Real TWO = RealDouble.create(2.0);
 
-    /** 2π - commonly used in angular calculations */
+    /** 2Ãâ‚¬ - commonly used in angular calculations */
     public static final Real TWO_PI = RealDouble.create(2.0 * Math.PI);
 
-    /** π/2 - quarter turn in radians */
+    /** Ãâ‚¬/2 - quarter turn in radians */
     public static final Real HALF_PI = RealDouble.create(Math.PI / 2.0);
 
     /** Positive infinity */
@@ -276,7 +276,7 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
     /**
      * Returns the base-10 logarithm of this number.
      * 
-     * @return log₁₀(this)
+     * @return logÃ¢â€šÂÃ¢â€šâ‚¬(this)
      */
     public Real log10() {
         return Real.of(Math.log10(this.doubleValue()));
@@ -598,3 +598,4 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
     }
 
 }
+

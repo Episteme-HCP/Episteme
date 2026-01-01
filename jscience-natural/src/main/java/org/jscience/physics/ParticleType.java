@@ -45,7 +45,7 @@ public class ParticleType {
     /** Fine structure constant */
     public static final Real ALPHA = PhysicalConstants.alpha;
 
-    /** Weak mixing angle (sin²θ_W) */
+    /** Weak mixing angle (sinÃ‚Â²ÃŽÂ¸_W) */
     public static final Real SIN2_THETA_W = Real.of(0.23122);
 
     private static final Map<String, ParticleType> PARTICLES = new HashMap<>();
@@ -170,7 +170,7 @@ public class ParticleType {
 
     /**
      * Relativistic energy-momentum relation.
-     * E² = (pc)² + (mc²)²
+     * EÃ‚Â² = (pc)Ã‚Â² + (mcÃ‚Â²)Ã‚Â²
      */
     public static Real relativisticEnergy(Real momentum, Real massMeV) {
         Real pc = momentum; // in MeV/c
@@ -180,7 +180,7 @@ public class ParticleType {
 
     /**
      * Lorentz factor.
-     * γ = 1 / √(1 - v²/c²)
+     * ÃŽÂ³ = 1 / Ã¢Ë†Å¡(1 - vÃ‚Â²/cÃ‚Â²)
      */
     public static Real lorentzFactor(Real velocity) {
         Real beta = velocity.divide(C);
@@ -189,7 +189,7 @@ public class ParticleType {
 
     /**
      * Relativistic momentum.
-     * p = γmv
+     * p = ÃŽÂ³mv
      */
     public static Real relativisticMomentum(Real mass, Real velocity) {
         return lorentzFactor(velocity).multiply(mass).multiply(velocity);
@@ -197,7 +197,7 @@ public class ParticleType {
 
     /**
      * De Broglie wavelength.
-     * λ = h / p
+     * ÃŽÂ» = h / p
      */
     public static Real deBroglieWavelength(Real momentum) {
         Real h = Real.of(6.62607015e-34);
@@ -206,7 +206,7 @@ public class ParticleType {
 
     /**
      * Compton wavelength.
-     * λ_C = h / (mc)
+     * ÃŽÂ»_C = h / (mc)
      */
     public static Real comptonWavelength(Real mass) {
         Real h = Real.of(6.62607015e-34);
@@ -215,12 +215,12 @@ public class ParticleType {
 
     /**
      * Cross-section from decay width (Breit-Wigner).
-     * σ = (2J+1) * π * (ℏc/p)² * Γ_in * Γ_out / ((E-M)² + Γ²/4)
+     * ÃÆ’ = (2J+1) * Ãâ‚¬ * (Ã¢â€žÂc/p)Ã‚Â² * ÃŽâ€œ_in * ÃŽâ€œ_out / ((E-M)Ã‚Â² + ÃŽâ€œÃ‚Â²/4)
      */
     public static Real breitWignerCrossSection(Real E, Real M, Real totalWidth,
             Real partialWidthIn, Real partialWidthOut,
             Real spin) {
-        Real hbarc = Real.of(197.327); // MeV·fm
+        Real hbarc = Real.of(197.327); // MeVÃ‚Â·fm
         Real prefactor = spin.multiply(Real.of(2)).add(Real.ONE).multiply(PhysicalConstants.PI)
                 .multiply(hbarc.multiply(hbarc));
         Real numerator = partialWidthIn.multiply(partialWidthOut);
@@ -230,7 +230,7 @@ public class ParticleType {
 
     /**
      * QED running coupling constant at energy Q.
-     * α(Q²) ≈ α / (1 - (α/3π) * ln(Q²/m_e²))
+     * ÃŽÂ±(QÃ‚Â²) Ã¢â€°Ë† ÃŽÂ± / (1 - (ÃŽÂ±/3Ãâ‚¬) * ln(QÃ‚Â²/m_eÃ‚Â²))
      */
     public static Real runningAlpha(Real Q_MeV) {
         Real me = Real.of(0.511); // MeV
@@ -239,3 +239,5 @@ public class ParticleType {
                 .divide(Real.ONE.subtract(ALPHA.divide(Real.of(3).multiply(PhysicalConstants.PI)).multiply(lnQ)));
     }
 }
+
+

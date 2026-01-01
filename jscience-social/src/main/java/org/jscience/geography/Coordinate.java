@@ -192,12 +192,12 @@ public class Coordinate {
         double m = (absCoord - d) * 60;
         int mi = (int) m;
         double s = (m - mi) * 60;
-        return String.format("%d°%d'%.2f\"%c", d, mi, s, dir);
+        return String.format("%dÃ‚Â°%d'%.2f\"%c", d, mi, s, dir);
     }
 
     @Override
     public String toString() {
-        return String.format("(%.6f°, %.6f°)", getLatitudeDegrees(), getLongitudeDegrees());
+        return String.format("(%.6fÃ‚Â°, %.6fÃ‚Â°)", getLatitudeDegrees(), getLongitudeDegrees());
     }
 
     @Override
@@ -224,3 +224,5 @@ public class Coordinate {
     public static final Coordinate SOUTH_POLE = new Coordinate(-90.0, 0.0);
     public static final Coordinate EQUATOR_PRIME = new Coordinate(0.0, 0.0);
 }
+
+

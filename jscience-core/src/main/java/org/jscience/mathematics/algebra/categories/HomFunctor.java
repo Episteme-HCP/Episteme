@@ -38,3 +38,5 @@ public interface HomFunctor<O, M> extends Bifunctor<O, M, O, M, Object, Object> 
     // Marker interface for now, specific Hom logic usually requires
     // access to the set of morphisms between two objects
 }
+
+

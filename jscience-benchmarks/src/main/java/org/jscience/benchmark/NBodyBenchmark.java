@@ -47,7 +47,7 @@ import java.util.List;
  * @since 1.0
  */
 public class NBodyBenchmark implements RunnableBenchmark {
-    /** Gravitational constant (m³/(kg·s²)) */
+    /** Gravitational constant (mÃ‚Â³/(kgÃ‚Â·sÃ‚Â²)) */
     public static final Real G = Real.of(6.67430e-11);
 
     /** Real number field for vector operations */
@@ -154,7 +154,7 @@ public class NBodyBenchmark implements RunnableBenchmark {
 
     /**
      * Calculate gravitational forces between all pairs.
-     * Uses Newton's law of gravitation: F = G*m1*m2/r²
+     * Uses Newton's law of gravitation: F = G*m1*m2/rÃ‚Â²
      */
     public void calculateForces() {
         // Reset all forces
@@ -175,11 +175,11 @@ public class NBodyBenchmark implements RunnableBenchmark {
                 Real distSq = r.get(0).multiply(r.get(0))
                         .add(r.get(1).multiply(r.get(1)))
                         .add(r.get(2).multiply(r.get(2)));
-                Real softening = Real.of(1e18); // Prevent singularity (1e9 m)²
+                Real softening = Real.of(1e18); // Prevent singularity (1e9 m)Ã‚Â²
                 Real denominator = distSq.add(softening);
                 Real dist = Real.of(Math.sqrt(distSq.doubleValue()));
 
-                // Force magnitude: F = G * m1 * m2 / r²
+                // Force magnitude: F = G * m1 * m2 / rÃ‚Â²
                 Real forceMag = G.multiply(a.getMassKg()).multiply(b.getMassKg())
                         .divide(denominator);
 
@@ -366,3 +366,4 @@ public class NBodyBenchmark implements RunnableBenchmark {
         this.bodies.clear();
     }
 }
+

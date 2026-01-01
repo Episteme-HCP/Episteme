@@ -175,7 +175,7 @@ public class ChemicalReactionParser {
         }
 
         /**
-         * Returns the total count of each element (coefficient × subscripts).
+         * Returns the total count of each element (coefficient Ãƒâ€” subscripts).
          */
         public Map<String, Integer> getTotalElements() {
             Map<String, Integer> total = new LinkedHashMap<>();
@@ -224,7 +224,7 @@ public class ChemicalReactionParser {
 
         private void parse() {
             // Split by arrow
-            String[] sides = original.split("->|→|=|⟶");
+            String[] sides = original.split("->|Ã¢â€ â€™|=|Ã¢Å¸Â¶");
             if (sides.length != 2) {
                 throw new IllegalArgumentException("Invalid reaction format: " + original);
             }
@@ -304,8 +304,8 @@ public class ChemicalReactionParser {
             for (String elem : allElements) {
                 int l = left.getOrDefault(elem, 0);
                 int r = right.getOrDefault(elem, 0);
-                String status = l == r ? "✓" : "✗";
-                sb.append(String.format("%s: %d → %d %s\n", elem, l, r, status));
+                String status = l == r ? "Ã¢Å“â€œ" : "Ã¢Å“â€”";
+                sb.append(String.format("%s: %d Ã¢â€ â€™ %d %s\n", elem, l, r, status));
             }
             return sb.toString();
         }
@@ -318,7 +318,7 @@ public class ChemicalReactionParser {
                     sb.append(" + ");
                 sb.append(reactants.get(i));
             }
-            sb.append(" → ");
+            sb.append(" Ã¢â€ â€™ ");
             for (int i = 0; i < products.size(); i++) {
                 if (i > 0)
                     sb.append(" + ");
@@ -342,3 +342,5 @@ public class ChemicalReactionParser {
         return new Formula(formula);
     }
 }
+
+

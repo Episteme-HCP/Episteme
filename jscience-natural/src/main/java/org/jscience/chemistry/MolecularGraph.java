@@ -216,3 +216,5 @@ public class MolecularGraph implements Graph<Atom> {
         SINGLE, DOUBLE, TRIPLE, AROMATIC
     }
 }
+
+

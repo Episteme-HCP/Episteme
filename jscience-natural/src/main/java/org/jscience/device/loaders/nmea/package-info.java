@@ -21,11 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Provides support for NMEA 0183 standard signals (GPS).
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.device.loaders.nmea;
+
+

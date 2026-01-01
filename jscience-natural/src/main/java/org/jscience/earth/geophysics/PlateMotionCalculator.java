@@ -98,3 +98,5 @@ public class PlateMotionCalculator {
                                 start.getEastVelocity());
         }
 }
+
+

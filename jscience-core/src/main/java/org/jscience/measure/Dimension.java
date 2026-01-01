@@ -27,7 +27,7 @@ package org.jscience.measure;
  * Represents the physical dimension of a quantity.
  * <p>
  * A dimension is defined by the exponents of the seven SI base dimensions:
- * Length (L), Mass (M), Time (T), Electric Current (I), Temperature (Θ),
+ * Length (L), Mass (M), Time (T), Electric Current (I), Temperature (ÃŽËœ),
  * Amount of Substance (N), and Luminous Intensity (J).
  * </p>
  * <p>
@@ -36,9 +36,9 @@ package org.jscience.measure;
  * </p>
  *
  * <pre>
- * Force = Mass × Acceleration
- * [F] = [M] × [L][T]⁻²
- * [F] = [M¹L¹T⁻²]
+ * Force = Mass Ãƒâ€” Acceleration
+ * [F] = [M] Ãƒâ€” [L][T]Ã¢ÂÂ»Ã‚Â²
+ * [F] = [MÃ‚Â¹LÃ‚Â¹TÃ¢ÂÂ»Ã‚Â²]
  * </pre>
  * <p>
  * <b>Example Usage:</b>
@@ -83,7 +83,7 @@ public interface Dimension {
     Dimension ELECTRIC_CURRENT = of(0, 0, 0, 1, 0, 0, 0);
 
     /**
-     * Temperature dimension [Θ].
+     * Temperature dimension [ÃŽËœ].
      */
     Dimension TEMPERATURE = of(0, 0, 0, 0, 1, 0, 0);
 
@@ -126,7 +126,7 @@ public interface Dimension {
     int getElectricCurrentExponent();
 
     /**
-     * Returns the temperature exponent (Θ).
+     * Returns the temperature exponent (ÃŽËœ).
      * 
      * @return the temperature exponent
      */
@@ -206,7 +206,7 @@ public interface Dimension {
      * @param mass              mass exponent (M)
      * @param time              time exponent (T)
      * @param electricCurrent   electric current exponent (I)
-     * @param temperature       temperature exponent (Θ)
+     * @param temperature       temperature exponent (ÃŽËœ)
      * @param amountOfSubstance amount of substance exponent (N)
      * @param luminousIntensity luminous intensity exponent (J)
      * @return the dimension
@@ -217,3 +217,4 @@ public interface Dimension {
                 temperature, amountOfSubstance, luminousIntensity);
     }
 }
+

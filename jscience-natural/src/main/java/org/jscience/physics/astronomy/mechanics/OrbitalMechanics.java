@@ -43,13 +43,13 @@ import org.jscience.measure.quantity.Velocity;
  */
 public class OrbitalMechanics {
 
-    /** Gravitational constant (m³/(kg·s²)) */
+    /** Gravitational constant (mÃ‚Â³/(kgÃ‚Â·sÃ‚Â²)) */
     public static final double G = 6.67430e-11;
 
-    /** Standard gravitational parameter for Earth (m³/s²) */
+    /** Standard gravitational parameter for Earth (mÃ‚Â³/sÃ‚Â²) */
     public static final double MU_EARTH = 3.986004418e14;
 
-    /** Standard gravitational parameter for Sun (m³/s²) */
+    /** Standard gravitational parameter for Sun (mÃ‚Â³/sÃ‚Â²) */
     public static final double MU_SUN = 1.32712440018e20;
 
     private OrbitalMechanics() {
@@ -57,10 +57,10 @@ public class OrbitalMechanics {
 
     /**
      * Kepler's Third Law: Orbital period from semi-major axis.
-     * T = 2π√(a³/μ)
+     * T = 2Ãâ‚¬Ã¢Ë†Å¡(aÃ‚Â³/ÃŽÂ¼)
      * 
      * @param semiMajorAxis orbital semi-major axis in meters
-     * @param mu            gravitational parameter (m³/s²)
+     * @param mu            gravitational parameter (mÃ‚Â³/sÃ‚Â²)
      * @return orbital period
      */
     public static Quantity<Time> orbitalPeriod(double semiMajorAxis, double mu) {
@@ -80,7 +80,7 @@ public class OrbitalMechanics {
 
     /**
      * Vis-viva equation: Orbital velocity at distance r.
-     * v = √[μ(2/r - 1/a)]
+     * v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]
      * 
      * @param r             current distance from central body (m)
      * @param semiMajorAxis semi-major axis (m)
@@ -94,7 +94,7 @@ public class OrbitalMechanics {
 
     /**
      * Circular orbit velocity.
-     * v = √(μ/r)
+     * v = Ã¢Ë†Å¡(ÃŽÂ¼/r)
      */
     public static Quantity<Velocity> circularVelocity(double radius, double mu) {
         double v = Math.sqrt(mu / radius);
@@ -103,7 +103,7 @@ public class OrbitalMechanics {
 
     /**
      * Escape velocity from distance r.
-     * v_esc = √(2μ/r)
+     * v_esc = Ã¢Ë†Å¡(2ÃŽÂ¼/r)
      */
     public static Quantity<Velocity> escapeVelocity(double radius, double mu) {
         double v = Math.sqrt(2 * mu / radius);
@@ -147,7 +147,7 @@ public class OrbitalMechanics {
 
     /**
      * Specific orbital energy.
-     * ε = -μ/(2a) = v²/2 - μ/r
+     * ÃŽÂµ = -ÃŽÂ¼/(2a) = vÃ‚Â²/2 - ÃŽÂ¼/r
      */
     public static double specificOrbitalEnergy(double semiMajorAxis, double mu) {
         return -mu / (2 * semiMajorAxis);
@@ -177,7 +177,7 @@ public class OrbitalMechanics {
 
     /**
      * Hill sphere radius (sphere of gravitational influence).
-     * r_H ≈ a(m/3M)^(1/3)
+     * r_H Ã¢â€°Ë† a(m/3M)^(1/3)
      * 
      * @param semiMajorAxis orbit of smaller body around larger
      * @param smallerMass   mass of smaller body (kg)
@@ -221,7 +221,7 @@ public class OrbitalMechanics {
      * @param r1       Position vector 1 [x, y, z] in meters
      * @param r2       Position vector 2 [x, y, z] in meters
      * @param dt       Time of flight in seconds
-     * @param mu       Gravitational parameter (m³/s²)
+     * @param mu       Gravitational parameter (mÃ‚Â³/sÃ‚Â²)
      * @param prograde true for prograde (short way)
      * @return LambertResult containing v1, v2 and convergence status
      */
@@ -317,3 +317,5 @@ public class OrbitalMechanics {
         return new double[] { a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0] };
     }
 }
+
+

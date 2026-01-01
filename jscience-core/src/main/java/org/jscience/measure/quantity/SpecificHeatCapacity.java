@@ -27,7 +27,7 @@ import org.jscience.measure.Quantity;
 
 /**
  * Represents the heat capacity per unit mass.
- * The metric system unit for this quantity is "J/(kg·K)" (Joules per kilogram
+ * The metric system unit for this quantity is "J/(kgÃ‚Â·K)" (Joules per kilogram
  * per Kelvin).
  *
  * @author Silvere Martin-Michiellot
@@ -36,3 +36,5 @@ import org.jscience.measure.Quantity;
  */
 public interface SpecificHeatCapacity extends Quantity<SpecificHeatCapacity> {
 }
+
+

@@ -67,3 +67,4 @@ public interface ResourceCache {
         return FileResourceCache.getInstance();
     }
 }
+

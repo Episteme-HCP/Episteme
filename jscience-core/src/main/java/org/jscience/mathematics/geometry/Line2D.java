@@ -154,3 +154,4 @@ public final class Line2D implements GeometricObject<Point2D> {
                 y1.add(t.multiply(dy1)));
     }
 }
+

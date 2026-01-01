@@ -26,7 +26,7 @@ package org.jscience.mathematics.analysis;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * Univariate function (single variable: ℝ → ℝ).
+ * Univariate function (single variable: Ã¢â€žÂ Ã¢â€ â€™ Ã¢â€žÂ).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -46,3 +46,4 @@ public interface UnivariateFunction extends ScalarFunction<Real>, Differentiable
         throw new UnsupportedOperationException("Integration not yet implemented");
     }
 }
+

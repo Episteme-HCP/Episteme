@@ -28,8 +28,8 @@ import org.jscience.mathematics.numbers.real.Real;
 /**
  * Lagrangian mechanics - analytical mechanics using generalized coordinates.
  * <p>
- * Based on Hamilton's principle of least action: δS = δ∫L dt = 0
- * Euler-Lagrange equation: d/dt(∂L/∂q̇) - ∂L/∂q = 0
+ * Based on Hamilton's principle of least action: ÃŽÂ´S = ÃŽÂ´Ã¢Ë†Â«L dt = 0
+ * Euler-Lagrange equation: d/dt(Ã¢Ë†â€šL/Ã¢Ë†â€šqÃŒâ€¡) - Ã¢Ë†â€šL/Ã¢Ë†â€šq = 0
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -39,7 +39,7 @@ import org.jscience.mathematics.numbers.real.Real;
 public class LagrangianMechanics {
 
     /**
-     * Lagrangian for free particle: L = T = ½mv²
+     * Lagrangian for free particle: L = T = Ã‚Â½mvÃ‚Â²
      */
     public static Real lagrangianFreeParticle(Real mass, Real velocity) {
         return Real.of(0.5).multiply(mass).multiply(velocity).multiply(velocity);
@@ -51,17 +51,17 @@ public class LagrangianMechanics {
     }
 
     /**
-     * Lagrangian for particle in potential: L = T - V = ½mv² - V(x)
+     * Lagrangian for particle in potential: L = T - V = Ã‚Â½mvÃ‚Â² - V(x)
      */
     public static Real lagrangian(Real kineticEnergy, Real potentialEnergy) {
         return kineticEnergy.subtract(potentialEnergy);
     }
 
     /**
-     * Generalized momentum: p = ∂L/∂q̇
+     * Generalized momentum: p = Ã¢Ë†â€šL/Ã¢Ë†â€šqÃŒâ€¡
      */
     public static Real generalizedMomentum(Real mass, Real generalizedVelocity) {
-        // For simple case: p = m * q̇
+        // For simple case: p = m * qÃŒâ€¡
         return mass.multiply(generalizedVelocity);
     }
 
@@ -71,15 +71,15 @@ public class LagrangianMechanics {
     }
 
     /**
-     * Action integral: S = ∫₁² L dt
-     * (Simplified as L * Δt for constant Lagrangian)
+     * Action integral: S = Ã¢Ë†Â«Ã¢â€šÂÃ‚Â² L dt
+     * (Simplified as L * ÃŽâ€t for constant Lagrangian)
      */
     public static Real action(Real lagrangian, Real timeInterval) {
         return lagrangian.multiply(timeInterval);
     }
 
     /**
-     * Lagrangian for harmonic oscillator: L = ½mẋ² - ½kx²
+     * Lagrangian for harmonic oscillator: L = Ã‚Â½mÃ¡Âºâ€¹Ã‚Â² - Ã‚Â½kxÃ‚Â²
      */
     public static Real lagrangianHarmonicOscillator(Real mass, Real velocity, Real springConstant, Real position) {
         Real kinetic = Real.of(0.5).multiply(mass).multiply(velocity).multiply(velocity);
@@ -88,17 +88,17 @@ public class LagrangianMechanics {
     }
 
     /**
-     * Lagrangian for pendulum: L = ½ml²θ̇² + mgl cos(θ)
+     * Lagrangian for pendulum: L = Ã‚Â½mlÃ‚Â²ÃŽÂ¸ÃŒâ€¡Ã‚Â² + mgl cos(ÃŽÂ¸)
      */
     public static Real lagrangianPendulum(Real mass, Real length, Real angularVel, Real angle, Real g) {
         Real kinetic = Real.of(0.5).multiply(mass).multiply(length).multiply(length)
                 .multiply(angularVel).multiply(angularVel);
         Real potential = mass.multiply(g).multiply(length).multiply(angle.cos());
-        return kinetic.add(potential); // +mgl cos(θ) since we measure from bottom
+        return kinetic.add(potential); // +mgl cos(ÃŽÂ¸) since we measure from bottom
     }
 
     /**
-     * Lagrangian for particle in central force (2D polar): L = ½m(ṙ² + r²θ̇²) -
+     * Lagrangian for particle in central force (2D polar): L = Ã‚Â½m(Ã¡Â¹â„¢Ã‚Â² + rÃ‚Â²ÃŽÂ¸ÃŒâ€¡Ã‚Â²) -
      * V(r)
      */
     public static Real lagrangianCentralForce2D(Real mass, Real radialVel, Real radius,
@@ -109,3 +109,5 @@ public class LagrangianMechanics {
         return radialKE.add(angularKE).subtract(potential);
     }
 }
+
+

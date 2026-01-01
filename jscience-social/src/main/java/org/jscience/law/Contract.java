@@ -102,3 +102,5 @@ public class Contract implements Identifiable<String>, Temporal {
         return String.format("Contract: %s (%s)", title, date);
     }
 }
+
+

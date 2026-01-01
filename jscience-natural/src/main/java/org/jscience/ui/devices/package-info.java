@@ -22,15 +22,6 @@
  */
 
 /**
- * Instrument visualization viewers.
- * <p>
- * This package provides JavaFX-based visual representations of physical
- * measurement instruments like oscilloscopes, thermometers, and pressure
- * gauges.
- * These viewers extend
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Provides JavaFX-based visual representations of physical
  */
 package org.jscience.ui.devices;

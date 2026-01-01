@@ -35,8 +35,8 @@ import java.util.Arrays;
  * Represents a cylindrical surface.
  * <p>
  * A cylinder is a surface of revolution with constant radius.
- * Parametric form: S(θ, z) = (r·cos(θ), r·sin(θ), z)
- * where θ ∈ [0, 2π] and z ∈ [z_min, z_max]
+ * Parametric form: S(ÃŽÂ¸, z) = (rÃ‚Â·cos(ÃŽÂ¸), rÃ‚Â·sin(ÃŽÂ¸), z)
+ * where ÃŽÂ¸ Ã¢Ë†Ë† [0, 2Ãâ‚¬] and z Ã¢Ë†Ë† [z_min, z_max]
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -77,7 +77,7 @@ public class Cylinder implements ParametricSurface {
 
     @Override
     public PointND at(Real u, Real v) {
-        // u = θ ∈ [0, 2π], v = z ∈ [0, 1] (normalized)
+        // u = ÃŽÂ¸ Ã¢Ë†Ë† [0, 2Ãâ‚¬], v = z Ã¢Ë†Ë† [0, 1] (normalized)
         Real x = center.get(0).add(radius.multiply(Real.of(Math.cos(u.doubleValue()))));
         Real y = center.get(1).add(radius.multiply(Real.of(Math.sin(u.doubleValue()))));
         Real z = center.get(2).add(height.multiply(v));
@@ -86,7 +86,7 @@ public class Cylinder implements ParametricSurface {
 
     @Override
     public Vector<Real> partialU(Real u, Real v, Real h) {
-        // ∂S/∂θ = (-r·sin(θ), r·cos(θ), 0)
+        // Ã¢Ë†â€šS/Ã¢Ë†â€šÃŽÂ¸ = (-rÃ‚Â·sin(ÃŽÂ¸), rÃ‚Â·cos(ÃŽÂ¸), 0)
         Real dx = radius.multiply(Real.of(Math.sin(u.doubleValue()))).negate();
         Real dy = radius.multiply(Real.of(Math.cos(u.doubleValue())));
         Real dz = Real.ZERO;
@@ -95,14 +95,14 @@ public class Cylinder implements ParametricSurface {
 
     @Override
     public Vector<Real> partialV(Real u, Real v, Real h) {
-        // ∂S/∂z = (0, 0, h)
+        // Ã¢Ë†â€šS/Ã¢Ë†â€šz = (0, 0, h)
         return new DenseVector<>(Arrays.asList(Real.ZERO, Real.ZERO, height),
                 org.jscience.mathematics.sets.Reals.getInstance());
     }
 
     @Override
     public Vector<Real> normal(Real u, Real v, Real h) {
-        // Normal = (cos(θ), sin(θ), 0) (outward pointing)
+        // Normal = (cos(ÃŽÂ¸), sin(ÃŽÂ¸), 0) (outward pointing)
         Real nx = Real.of(Math.cos(u.doubleValue()));
         Real ny = Real.of(Math.sin(u.doubleValue()));
         Real nz = Real.ZERO;
@@ -144,7 +144,7 @@ public class Cylinder implements ParametricSurface {
 
     /**
      * Returns the lateral surface area (excluding top and bottom).
-     * A = 2πrh
+     * A = 2Ãâ‚¬rh
      * 
      * @return the lateral surface area
      */
@@ -154,7 +154,7 @@ public class Cylinder implements ParametricSurface {
 
     /**
      * Returns the total surface area (including top and bottom).
-     * A = 2πr(r + h)
+     * A = 2Ãâ‚¬r(r + h)
      * 
      * @return the total surface area
      */
@@ -164,7 +164,7 @@ public class Cylinder implements ParametricSurface {
 
     /**
      * Returns the volume of the cylinder.
-     * V = πr²h
+     * V = Ãâ‚¬rÃ‚Â²h
      * 
      * @return the volume
      */
@@ -172,3 +172,5 @@ public class Cylinder implements ParametricSurface {
         return Real.of(Math.PI).multiply(radius).multiply(radius).multiply(height);
     }
 }
+
+

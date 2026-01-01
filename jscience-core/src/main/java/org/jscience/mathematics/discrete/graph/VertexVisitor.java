@@ -46,3 +46,4 @@ public interface VertexVisitor<V> {
      */
     void visit(V vertex, int depth);
 }
+

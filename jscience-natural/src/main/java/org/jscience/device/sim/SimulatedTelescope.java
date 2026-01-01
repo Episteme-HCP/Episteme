@@ -299,7 +299,7 @@ public class SimulatedTelescope implements Telescope {
     }
 
     /**
-     * Formats Dec as +/-DD°MM'SS" string.
+     * Formats Dec as +/-DDÃ‚Â°MM'SS" string.
      */
     public static String formatDec(double dec) {
         char sign = dec >= 0 ? '+' : '-';
@@ -307,6 +307,8 @@ public class SimulatedTelescope implements Telescope {
         int degrees = (int) dec;
         int minutes = (int) ((dec - degrees) * 60);
         double seconds = ((dec - degrees) * 60 - minutes) * 60;
-        return String.format("%c%02d° %02d' %05.2f\"", sign, degrees, minutes, seconds);
+        return String.format("%c%02dÃ‚Â° %02d' %05.2f\"", sign, degrees, minutes, seconds);
     }
 }
+
+

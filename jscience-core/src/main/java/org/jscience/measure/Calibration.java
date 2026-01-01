@@ -34,3 +34,5 @@ import java.time.Instant;
  */
 public record Calibration(Instant date, String performedBy, String result, Instant nextDue) {
 }
+
+

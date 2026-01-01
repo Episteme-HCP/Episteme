@@ -21,11 +21,5 @@
  * SOFTWARE.
  */
 
-/**
- * Classes and interfaces for org.jscience.mathematics.random.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.mathematics.random;
+

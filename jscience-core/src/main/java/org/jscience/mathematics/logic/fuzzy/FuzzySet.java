@@ -88,3 +88,4 @@ public class FuzzySet<T> {
         return new FuzzySet<>(e -> Math.min(this.membership(e), other.membership(e)));
     }
 }
+

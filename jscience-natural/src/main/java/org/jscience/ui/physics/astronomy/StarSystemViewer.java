@@ -427,3 +427,5 @@ public class StarSystemViewer extends Application {
         launch(args);
     }
 }
+
+

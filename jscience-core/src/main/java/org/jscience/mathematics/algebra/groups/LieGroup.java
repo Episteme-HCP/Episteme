@@ -175,3 +175,4 @@ public class LieGroup implements Group<Matrix<Complex>> {
         return element != null && element.rows() == identity.rows() && element.cols() == identity.cols();
     }
 }
+

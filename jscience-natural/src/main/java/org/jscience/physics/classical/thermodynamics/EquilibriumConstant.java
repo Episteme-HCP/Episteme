@@ -34,20 +34,20 @@ public class EquilibriumConstant {
 
     /**
      * Calculates K_eq from Gibbs Free Energy change.
-     * K = exp(-ΔG° / RT)
+     * K = exp(-ÃŽâ€GÃ‚Â° / RT)
      * 
      * @param deltaG      Standard Gibbs free energy change (J/mol)
      * @param temperature Temperature (Kelvin)
      * @return Equilibrium constant (dimensionless)
      */
     public static double calculateK(double deltaG, double temperature) {
-        double R = 8.314462618; // Gas constant J/(mol·K)
+        double R = 8.314462618; // Gas constant J/(molÃ‚Â·K)
         return Math.exp(-deltaG / (R * temperature));
     }
 
     /**
      * Calculates Gibbs Free Energy from K_eq.
-     * ΔG° = -RT ln K
+     * ÃŽâ€GÃ‚Â° = -RT ln K
      */
     public static double calculateDeltaG(double K, double temperature) {
         double R = 8.314462618;
@@ -74,3 +74,5 @@ public class EquilibriumConstant {
         return den == 0 ? Double.POSITIVE_INFINITY : num / den;
     }
 }
+
+

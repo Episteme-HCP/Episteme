@@ -146,3 +146,5 @@ public class SimulatedOscilloscope extends SimulatedDevice implements Oscillosco
         return Real.ZERO;
     }
 }
+
+

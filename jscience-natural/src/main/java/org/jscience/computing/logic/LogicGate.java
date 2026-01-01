@@ -40,3 +40,5 @@ public abstract class LogicGate {
      */
     public abstract LogicState evaluate(LogicState... inputs);
 }
+
+

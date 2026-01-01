@@ -112,3 +112,5 @@ public class HilbertSpacesCategory implements Category<HilbertSpace<?, ?>, Matri
                 "Inner product delegation not yet implemented in HilbertSpace interface");
     }
 }
+
+

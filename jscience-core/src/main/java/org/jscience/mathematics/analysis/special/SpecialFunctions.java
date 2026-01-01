@@ -39,9 +39,9 @@ import org.jscience.mathematics.numbers.real.Real;
 public class SpecialFunctions {
 
     /**
-     * Gamma function Γ(x) - generalization of factorial to real numbers.
+     * Gamma function ÃŽâ€œ(x) - generalization of factorial to real numbers.
      * <p>
-     * Γ(n) = (n-1)! for positive integers
+     * ÃŽâ€œ(n) = (n-1)! for positive integers
      * Uses Lanczos approximation for accuracy.
      * </p>
      */
@@ -56,7 +56,7 @@ public class SpecialFunctions {
         double z = x.doubleValue();
 
         if (z < 0.5) {
-            // Reflection formula: Γ(1-z) * Γ(z) = π/sin(πz)
+            // Reflection formula: ÃŽâ€œ(1-z) * ÃŽâ€œ(z) = Ãâ‚¬/sin(Ãâ‚¬z)
             return Real.of(Math.PI).divide(
                     Real.of(Math.sin(Math.PI * z)).multiply(gamma(Real.ONE.subtract(x))));
         }
@@ -76,9 +76,9 @@ public class SpecialFunctions {
     }
 
     /**
-     * Natural logarithm of Gamma function: ln(Γ(x))
+     * Natural logarithm of Gamma function: ln(ÃŽâ€œ(x))
      * <p>
-     * More numerically stable than Γ(x) for large x.
+     * More numerically stable than ÃŽâ€œ(x) for large x.
      * </p>
      */
     public static Real logGamma(Real x) {
@@ -86,7 +86,7 @@ public class SpecialFunctions {
     }
 
     /**
-     * Beta function: B(x, y) = Γ(x)Γ(y) / Γ(x+y)
+     * Beta function: B(x, y) = ÃŽâ€œ(x)ÃŽâ€œ(y) / ÃŽâ€œ(x+y)
      * <p>
      * Used in probability distributions (Beta, Dirichlet).
      * </p>
@@ -96,9 +96,9 @@ public class SpecialFunctions {
     }
 
     /**
-     * Error function: erf(x) = (2/√π) ∫₀ˣ e^(-t²) dt
+     * Error function: erf(x) = (2/Ã¢Ë†Å¡Ãâ‚¬) Ã¢Ë†Â«Ã¢â€šâ‚¬Ã‹Â£ e^(-tÃ‚Â²) dt
      * <p>
-     * Probability: P(X ≤ x) for normal distribution = ½[1 + erf(x/√2)]
+     * Probability: P(X Ã¢â€°Â¤ x) for normal distribution = Ã‚Â½[1 + erf(x/Ã¢Ë†Å¡2)]
      * Uses Abramowitz & Stegun approximation.
      * </p>
      */
@@ -130,7 +130,7 @@ public class SpecialFunctions {
     }
 
     /**
-     * Bessel function of the first kind J₀(x).
+     * Bessel function of the first kind JÃ¢â€šâ‚¬(x).
      * <p>
      * Solutions to Bessel's differential equation.
      * Used in physics: wave propagation, heat conduction, vibrations.
@@ -165,7 +165,7 @@ public class SpecialFunctions {
     }
 
     /**
-     * Bessel function of the second kind Y₀(x).
+     * Bessel function of the second kind YÃ¢â€šâ‚¬(x).
      */
     public static Real besselY0(Real x) {
         double t = x.doubleValue();
@@ -201,7 +201,7 @@ public class SpecialFunctions {
     /**
      * Factorial function: n!
      * <p>
-     * For non-integers, uses Γ(n+1).
+     * For non-integers, uses ÃŽâ€œ(n+1).
      * </p>
      */
     public static Real factorial(Real n) {
@@ -318,9 +318,9 @@ public class SpecialFunctions {
     // ==================== Incomplete Special Functions ====================
 
     /**
-     * Incomplete gamma function: γ(a, x) = ∫₀ˣ t^(a-1) e^(-t) dt
+     * Incomplete gamma function: ÃŽÂ³(a, x) = Ã¢Ë†Â«Ã¢â€šâ‚¬Ã‹Â£ t^(a-1) e^(-t) dt
      * <p>
-     * Regularized: P(a, x) = γ(a, x) / Γ(a)
+     * Regularized: P(a, x) = ÃŽÂ³(a, x) / ÃŽâ€œ(a)
      * </p>
      * 
      * @param a Shape parameter (a > 0)
@@ -474,7 +474,7 @@ public class SpecialFunctions {
     /**
      * Airy function Ai(x).
      * <p>
-     * Solution to y'' - xy = 0 that decays as x → ∞.
+     * Solution to y'' - xy = 0 that decays as x Ã¢â€ â€™ Ã¢Ë†Å¾.
      * Used in quantum mechanics (wave functions near turning points).
      * </p>
      */
@@ -753,3 +753,5 @@ public class SpecialFunctions {
         }
     }
 }
+
+

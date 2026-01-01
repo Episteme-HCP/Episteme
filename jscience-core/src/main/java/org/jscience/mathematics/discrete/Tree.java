@@ -220,3 +220,4 @@ public interface Tree<V> extends Graph<V> {
         return false; // Trees are inherently undirected graphs
     }
 }
+

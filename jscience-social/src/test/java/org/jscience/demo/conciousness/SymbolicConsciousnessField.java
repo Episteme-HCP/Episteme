@@ -39,7 +39,7 @@ import java.util.HashMap;
  * </p>
  * <p>
  * <strong>Reference:</strong>
- * Strømme, M. (2025). "Universal consciousness as foundational field: A
+ * StrÃƒÂ¸mme, M. (2025). "Universal consciousness as foundational field: A
  * theoretical
  * bridge between quantum physics and non-dual philosophy." AIP Advances,
  * 15(11).
@@ -49,14 +49,14 @@ import java.util.HashMap;
  * The field potential is:
  *
  * <pre>
- * V(Φ) = λ/4 (Φ² - Φ₀²)²
+ * V(ÃŽÂ¦) = ÃŽÂ»/4 (ÃŽÂ¦Ã‚Â² - ÃŽÂ¦Ã¢â€šâ‚¬Ã‚Â²)Ã‚Â²
  * </pre>
  *
  * where:
  * <ul>
- * <li>Φ is the consciousness field variable</li>
- * <li>Φ₀ is a constant parameter (vacuum expectation value)</li>
- * <li>λ is a constant parameter (self-coupling)</li>
+ * <li>ÃŽÂ¦ is the consciousness field variable</li>
+ * <li>ÃŽÂ¦Ã¢â€šâ‚¬ is a constant parameter (vacuum expectation value)</li>
+ * <li>ÃŽÂ» is a constant parameter (self-coupling)</li>
  * </ul>
  * </p>
  *
@@ -86,35 +86,35 @@ public class SymbolicConsciousnessField {
         this.lambda = lambda;
         this.phi0 = phi0;
 
-        // Create symbolic variable Φ
-        this.phi = new Variable<>("Φ", Real.ZERO);
+        // Create symbolic variable ÃŽÂ¦
+        this.phi = new Variable<>("ÃŽÂ¦", Real.ZERO);
 
-        // Build V(Φ) = λ/4 (Φ² - Φ₀²)²
-        // First: Φ²
+        // Build V(ÃŽÂ¦) = ÃŽÂ»/4 (ÃŽÂ¦Ã‚Â² - ÃŽÂ¦Ã¢â€šâ‚¬Ã‚Â²)Ã‚Â²
+        // First: ÃŽÂ¦Ã‚Â²
         Expression<Real> phiSquared = PolynomialExpression.ofVariable(phi, Real.ZERO)
                 .multiply(PolynomialExpression.ofVariable(phi, Real.ZERO));
 
-        // Φ² - Φ₀²
+        // ÃŽÂ¦Ã‚Â² - ÃŽÂ¦Ã¢â€šâ‚¬Ã‚Â²
         Expression<Real> diff = phiSquared.add(PolynomialExpression.ofConstant(phi0.pow(2).negate(), Real.ZERO));
 
-        // (Φ² - Φ₀²)²
+        // (ÃŽÂ¦Ã‚Â² - ÃŽÂ¦Ã¢â€šâ‚¬Ã‚Â²)Ã‚Â²
         Expression<Real> diffSquared = diff.multiply(diff);
 
-        // λ/4 as constant
+        // ÃŽÂ»/4 as constant
         Real coefficient = lambda.divide(Real.of(4));
 
-        // V(Φ) = λ/4 (Φ² - Φ₀²)²
+        // V(ÃŽÂ¦) = ÃŽÂ»/4 (ÃŽÂ¦Ã‚Â² - ÃŽÂ¦Ã¢â€šâ‚¬Ã‚Â²)Ã‚Â²
         this.potential = PolynomialExpression.ofConstant(coefficient, Real.ZERO).multiply(diffSquared);
 
-        // dV/dΦ
+        // dV/dÃŽÂ¦
         this.derivative = potential.differentiate(phi);
 
-        // d²V/dΦ²
+        // dÃ‚Â²V/dÃŽÂ¦Ã‚Â²
         this.secondDerivative = derivative.differentiate(phi);
     }
 
     /**
-     * Gets the symbolic field variable Φ.
+     * Gets the symbolic field variable ÃŽÂ¦.
      * 
      * @return the field variable
      */
@@ -123,7 +123,7 @@ public class SymbolicConsciousnessField {
     }
 
     /**
-     * Gets the symbolic potential expression V(Φ).
+     * Gets the symbolic potential expression V(ÃŽÂ¦).
      * 
      * @return the potential expression
      */
@@ -132,7 +132,7 @@ public class SymbolicConsciousnessField {
     }
 
     /**
-     * Gets the symbolic derivative dV/dΦ.
+     * Gets the symbolic derivative dV/dÃŽÂ¦.
      * 
      * @return the derivative expression
      */
@@ -141,7 +141,7 @@ public class SymbolicConsciousnessField {
     }
 
     /**
-     * Gets the symbolic second derivative d²V/dΦ².
+     * Gets the symbolic second derivative dÃ‚Â²V/dÃŽÂ¦Ã‚Â².
      * 
      * @return the second derivative expression
      */
@@ -153,7 +153,7 @@ public class SymbolicConsciousnessField {
      * Evaluates the potential at a specific field value.
      * 
      * @param phiValue the field value
-     * @return V(Φ) evaluated at the given value
+     * @return V(ÃŽÂ¦) evaluated at the given value
      */
     public Real evaluatePotential(Real phiValue) {
         Map<Variable<Real>, Real> assignments = new HashMap<>();
@@ -165,7 +165,7 @@ public class SymbolicConsciousnessField {
      * Evaluates the derivative at a specific field value.
      * 
      * @param phiValue the field value
-     * @return dV/dΦ evaluated at the given value
+     * @return dV/dÃŽÂ¦ evaluated at the given value
      */
     public Real evaluateDerivative(Real phiValue) {
         Map<Variable<Real>, Real> assignments = new HashMap<>();
@@ -177,7 +177,7 @@ public class SymbolicConsciousnessField {
      * Evaluates the second derivative at a specific field value.
      * 
      * @param phiValue the field value
-     * @return d²V/dΦ² evaluated at the given value
+     * @return dÃ‚Â²V/dÃŽÂ¦Ã‚Â² evaluated at the given value
      */
     public Real evaluateSecondDerivative(Real phiValue) {
         Map<Variable<Real>, Real> assignments = new HashMap<>();
@@ -191,7 +191,7 @@ public class SymbolicConsciousnessField {
      * @return symbolic potential as string
      */
     public String potentialToString() {
-        return "V(Φ) = " + potential.toString();
+        return "V(ÃŽÂ¦) = " + potential.toString();
     }
 
     /**
@@ -200,7 +200,7 @@ public class SymbolicConsciousnessField {
      * @return symbolic derivative as string
      */
     public String derivativeToString() {
-        return "dV/dΦ = " + derivative.toString();
+        return "dV/dÃŽÂ¦ = " + derivative.toString();
     }
 
     /**
@@ -209,7 +209,7 @@ public class SymbolicConsciousnessField {
      * @return symbolic second derivative as string
      */
     public String secondDerivativeToString() {
-        return "d²V/dΦ² = " + secondDerivative.toString();
+        return "dÃ‚Â²V/dÃŽÂ¦Ã‚Â² = " + secondDerivative.toString();
     }
 
     public Real getLambda() {
@@ -220,3 +220,5 @@ public class SymbolicConsciousnessField {
         return phi0;
     }
 }
+
+

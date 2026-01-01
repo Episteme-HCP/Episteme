@@ -123,3 +123,5 @@ public final class LinearAlgebraRegistry {
         return TENSOR_PROVIDERS.isEmpty() ? DEFAULT_TENSOR_PROVIDER : TENSOR_PROVIDERS.get(0);
     }
 }
+
+

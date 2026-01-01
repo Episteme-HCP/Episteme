@@ -81,3 +81,5 @@ public class RayND {
         return new PointND(origin.toVector().add(direction.multiply(t).toVector()));
     }
 }
+
+

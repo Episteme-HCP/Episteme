@@ -38,7 +38,7 @@ import java.util.Optional;
  * <p>
  * <b>What it does</b>: Provides access to astronomical data for stars,
  * galaxies, and other objects.
- * Uses the CDS (Centre de Données astronomiques de Strasbourg) Sesame resolver.
+ * Uses the CDS (Centre de DonnÃƒÂ©es astronomiques de Strasbourg) Sesame resolver.
  * </p>
  *
  * <p>
@@ -122,3 +122,5 @@ public class SimbadCatalog {
     private SimbadCatalog() {
     }
 }
+
+

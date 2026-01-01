@@ -39,7 +39,7 @@ public class AberrationModel {
 
     /**
      * Approximates longitudinal spherical aberration for a simple lens.
-     * LSA ≈ k * h² / f
+     * LSA Ã¢â€°Ë† k * hÃ‚Â² / f
      * This is a simplified model.
      * 
      * @param rayHeight   Height of ray from optical axis (h)
@@ -69,10 +69,10 @@ public class AberrationModel {
     /**
      * Coma aberration estimate.
      * Coma produces comet-shaped blur for off-axis points.
-     * Sagittal coma ≈ 3 * k * h² * θ / f²
+     * Sagittal coma Ã¢â€°Ë† 3 * k * hÃ‚Â² * ÃŽÂ¸ / fÃ‚Â²
      * 
      * @param rayHeight   Height of ray from axis (h)
-     * @param fieldAngle  Off-axis field angle (θ in radians)
+     * @param fieldAngle  Off-axis field angle (ÃŽÂ¸ in radians)
      * @param focalLength Focal length (f)
      * @param shapeCoeff  Shape factor coefficient (depends on lens configuration)
      * @return Coma aberration estimate
@@ -87,9 +87,9 @@ public class AberrationModel {
     /**
      * Astigmatism aberration.
      * Causes different focal lengths for tangential vs sagittal rays.
-     * ΔS ≈ k * θ² * f
+     * ÃŽâ€S Ã¢â€°Ë† k * ÃŽÂ¸Ã‚Â² * f
      * 
-     * @param fieldAngle  Off-axis field angle (θ in radians)
+     * @param fieldAngle  Off-axis field angle (ÃŽÂ¸ in radians)
      * @param focalLength Focal length
      * @param astCoeff    Astigmatism coefficient
      * @return Astigmatic focus difference
@@ -101,7 +101,7 @@ public class AberrationModel {
     /**
      * Field curvature (Petzval curvature).
      * Image surface is curved rather than flat.
-     * Radius of curvature R_p = f / Σ(1/n_i)
+     * Radius of curvature R_p = f / ÃŽÂ£(1/n_i)
      * 
      * @param focalLength System focal length
      * @param sumInverseN Sum of 1/n for each lens element
@@ -113,7 +113,7 @@ public class AberrationModel {
 
     /**
      * Barrel/pincushion distortion.
-     * r' = r * (1 + k₁*r² + k₂*r⁴ + ...)
+     * r' = r * (1 + kÃ¢â€šÂ*rÃ‚Â² + kÃ¢â€šâ€š*rÃ¢ÂÂ´ + ...)
      * 
      * @param radialDistance Distance from optical center (r)
      * @param k1             Third-order distortion coefficient
@@ -140,3 +140,5 @@ public class AberrationModel {
         return nD.subtract(Real.ONE).divide(nF.subtract(nC));
     }
 }
+
+

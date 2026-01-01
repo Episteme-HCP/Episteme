@@ -53,12 +53,12 @@ public interface Category<O, M> {
     /**
      * Composes two morphisms.
      * <p>
-     * compose(f, g) corresponds to f ∘ g (f after g).
+     * compose(f, g) corresponds to f Ã¢Ë†Ëœ g (f after g).
      * </p>
      * 
      * @param f the second morphism to apply
      * @param g the first morphism to apply
-     * @return f ∘ g
+     * @return f Ã¢Ë†Ëœ g
      * @throws IllegalArgumentException if the domain of f does not match the
      *                                  codomain of g
      */
@@ -90,3 +90,5 @@ public interface Category<O, M> {
      */
     Set<M> hom(O source, O target);
 }
+
+

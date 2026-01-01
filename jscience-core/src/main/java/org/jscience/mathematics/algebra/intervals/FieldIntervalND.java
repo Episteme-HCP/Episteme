@@ -39,7 +39,7 @@ import java.util.function.Function;
  * <p>
  * A Field requires all Ring operations plus:
  * <ul>
- * <li>Division: (a / b) for b ≠ 0</li>
+ * <li>Division: (a / b) for b Ã¢â€°Â  0</li>
  * <li>Multiplicative inverse</li>
  * </ul>
  * </p>
@@ -208,3 +208,4 @@ public class FieldIntervalND<T extends Comparable<T>> extends RingIntervalND<T> 
                 adder, getSubtractor(), divider, fromInt);
     }
 }
+

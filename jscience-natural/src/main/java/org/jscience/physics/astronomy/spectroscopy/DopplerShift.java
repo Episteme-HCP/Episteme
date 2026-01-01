@@ -50,12 +50,12 @@ public class DopplerShift {
     private DopplerShift() {
     }
 
-    /** Radial velocity: v = c * (λ_obs - λ_rest) / λ_rest */
+    /** Radial velocity: v = c * (ÃŽÂ»_obs - ÃŽÂ»_rest) / ÃŽÂ»_rest */
     public static Real radialVelocity(Real observedWavelength, Real restWavelength) {
         return C_KM_S.multiply(observedWavelength.subtract(restWavelength)).divide(restWavelength);
     }
 
-    /** Redshift: z = (λ_obs - λ_rest) / λ_rest */
+    /** Redshift: z = (ÃŽÂ»_obs - ÃŽÂ»_rest) / ÃŽÂ»_rest */
     public static Real redshift(Real observedWavelength, Real restWavelength) {
         return observedWavelength.subtract(restWavelength).divide(restWavelength);
     }
@@ -89,3 +89,5 @@ public class DopplerShift {
         return C_KM_S.multiply(z).divide(H0);
     }
 }
+
+

@@ -37,3 +37,4 @@ import org.jscience.measure.Quantity;
  */
 public interface Frequency extends Quantity<Frequency> {
 }
+

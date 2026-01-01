@@ -62,3 +62,5 @@ public class RingSystem extends CelestialBody {
         this.outerRadius = outerRadius;
     }
 }
+
+

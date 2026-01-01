@@ -68,3 +68,5 @@ public class ArrheniusEquation {
         return Quantities.create(ea, Units.JOULE);
     }
 }
+
+

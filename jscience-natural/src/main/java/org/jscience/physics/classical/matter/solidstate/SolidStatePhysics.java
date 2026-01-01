@@ -34,7 +34,7 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public class SolidStatePhysics {
 
-    /** Planck constant (J·s) */
+    /** Planck constant (JÃ‚Â·s) */
     public static final Real H = Real.of(6.62607015e-34);
 
     /** Reduced Planck constant */
@@ -56,7 +56,7 @@ public class SolidStatePhysics {
 
     /**
      * Fermi energy for free electron gas.
-     * E_F = (ℏ²/2m) * (3π²n)^(2/3)
+     * E_F = (Ã¢â€žÂÃ‚Â²/2m) * (3Ãâ‚¬Ã‚Â²n)^(2/3)
      */
     public static Real fermiEnergy(Real electronDensity) {
         Real kF = Real.of(3).multiply(Real.PI.pow(2)).multiply(electronDensity).pow(ONE_THIRD);
@@ -65,7 +65,7 @@ public class SolidStatePhysics {
 
     /**
      * Fermi velocity.
-     * v_F = ℏk_F / m
+     * v_F = Ã¢â€žÂk_F / m
      */
     public static Real fermiVelocity(Real electronDensity) {
         Real kF = Real.of(3).multiply(Real.PI.pow(2)).multiply(electronDensity).pow(ONE_THIRD);
@@ -173,3 +173,5 @@ public class SolidStatePhysics {
     public static final Real BANDGAP_GAN = Real.of(3.4);
     public static final Real BANDGAP_INP = Real.of(1.35);
 }
+
+

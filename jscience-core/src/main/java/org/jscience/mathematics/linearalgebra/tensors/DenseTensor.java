@@ -545,3 +545,4 @@ public class DenseTensor<T> implements Tensor<T> {
         return "DenseTensor(shape=" + Arrays.toString(shape) + ", size=" + size + ")";
     }
 }
+

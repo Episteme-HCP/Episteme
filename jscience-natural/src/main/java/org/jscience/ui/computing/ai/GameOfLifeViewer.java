@@ -233,3 +233,5 @@ public class GameOfLifeViewer extends VBox implements ScientificViewer, Simulata
         draw();
     }
 }
+
+

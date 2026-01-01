@@ -134,3 +134,4 @@ public final class Octonions implements Field<Octonion>, InfiniteSet<Octonion> {
         return "Octonions(O)";
     }
 }
+

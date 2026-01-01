@@ -24,7 +24,7 @@
 package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.ViewerProvider;
 import org.jscience.ui.chemistry.ChemicalReactionViewer;
 
 /**
@@ -36,11 +36,11 @@ import org.jscience.ui.chemistry.ChemicalReactionViewer;
  */
 import org.jscience.ui.i18n.I18n;
 
-public class ChemicalReactionDemo implements DemoProvider {
+public class ChemicalReactionDemo implements ViewerProvider {
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.chemistry");
+        return "Chemistry";
     }
 
     @Override
@@ -58,3 +58,5 @@ public class ChemicalReactionDemo implements DemoProvider {
         ChemicalReactionViewer.show(stage);
     }
 }
+
+

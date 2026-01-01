@@ -47,7 +47,7 @@ import java.math.BigInteger;
  * Bell numbers satisfy several recurrence relations:
  *
  * <pre>
- * B(n+1) = Σ(k=0 to n) C(n,k) * B(k)
+ * B(n+1) = ÃŽÂ£(k=0 to n) C(n,k) * B(k)
  * </pre>
  *
  * where C(n,k) is the binomial coefficient "n choose k".
@@ -209,3 +209,4 @@ public class BellSequence implements IntegerSequence {
         return "BellSequence(A000110): 1, 1, 2, 5, 15, 52, 203, 877, 4140, ...";
     }
 }
+

@@ -96,3 +96,4 @@ public class StreamConverters {
         return stream.map(Real::doubleValue);
     }
 }
+

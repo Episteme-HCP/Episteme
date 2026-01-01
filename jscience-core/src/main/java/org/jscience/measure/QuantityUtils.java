@@ -164,3 +164,4 @@ public final class QuantityUtils {
         return Quantities.create(Real.of(value * 1000), SI.WATT);
     }
 }
+

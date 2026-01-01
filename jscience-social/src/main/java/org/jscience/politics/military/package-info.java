@@ -21,11 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Political systems, elections, and jurisdictional modeling.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.politics.military;
+
+

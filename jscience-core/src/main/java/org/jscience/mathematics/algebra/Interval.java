@@ -169,7 +169,8 @@ public interface Interval<T extends Comparable<T>> {
     /**
      * Returns the standard mathematical notation for this interval.
      * 
-     * @return interval notation string (e.g., "[0,1] × (2,3]")
+     * @return interval notation string (e.g., "[0,1] Ãƒâ€” (2,3]")
      */
     String notation();
 }
+

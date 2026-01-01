@@ -90,3 +90,4 @@ public final class DefaultWeightedEdge<V, W> implements WeightedEdge<V, W> {
         return source + " --(" + weight + ")--> " + target;
     }
 }
+

@@ -78,3 +78,5 @@ public class TaylorSeriesTest {
         assertEquals(Math.E, atOne.partialSum(10).doubleValue(), 1e-5);
     }
 }
+
+

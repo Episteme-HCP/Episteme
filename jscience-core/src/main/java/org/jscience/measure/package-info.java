@@ -22,22 +22,6 @@
  */
 
 /**
- * Provides units and measures for physical quantities with dimensional
- * analysis.
- * <p>
- * This package implements a comprehensive units framework enabling type-safe
- * dimensional analysis at compile time. It supports:
- * </p>
- * <ul>
- * <li><b>Type Safety</b> - Quantities are parameterized by their dimension</li>
- * <li><b>Unit Conversions</b> - Automatic conversion between compatible
- * units</li>
- * <li><b>Dimensional Analysis</b> - Compile-time checking of dimensional
- * consistency</li>
- * <li><b>Arbitrary Precision</b> - Uses
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Implements a comprehensive units framework enabling type-safe
  */
 package org.jscience.measure;

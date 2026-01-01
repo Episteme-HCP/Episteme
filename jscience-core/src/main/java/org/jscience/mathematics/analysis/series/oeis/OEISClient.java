@@ -143,7 +143,8 @@ public class OEISClient {
         }
 
         public String getDomain() {
-            return "ℕ (0 to " + (terms.size() - 1) + ")";
+            return "Ã¢â€žâ€¢ (0 to " + (terms.size() - 1) + ")";
         }
     }
 }
+

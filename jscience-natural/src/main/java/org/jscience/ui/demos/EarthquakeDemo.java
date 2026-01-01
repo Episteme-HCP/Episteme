@@ -24,7 +24,7 @@
 package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.AppProvider;
 import org.jscience.ui.earth.EarthquakeMapViewer;
 
 import org.jscience.ui.i18n.I18n;
@@ -35,10 +35,15 @@ import org.jscience.ui.i18n.I18n;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class EarthquakeDemo implements DemoProvider {
+public class EarthquakeDemo implements AppProvider {
+    @Override
+    public boolean isDemo() {
+        return true;
+    }
+
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.earth_sciences");
+        return "Earth Sciences";
     }
 
     @Override
@@ -56,3 +61,5 @@ public class EarthquakeDemo implements DemoProvider {
         EarthquakeMapViewer.show(stage);
     }
 }
+
+

@@ -73,3 +73,5 @@ public class GeometricSeries implements InfiniteSequence<Real> {
         return a.divide(Real.ONE.subtract(r));
     }
 }
+
+

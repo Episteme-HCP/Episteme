@@ -100,3 +100,4 @@ public class Interpolation3D {
         return trilinear(xd, yd, zd, v000, v100, v010, v110, v001, v101, v011, v111);
     }
 }
+

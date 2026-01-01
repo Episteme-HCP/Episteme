@@ -38,22 +38,22 @@ public class Pendulum {
     private Pendulum() {
     }
 
-    /** Simple pendulum period: T = 2π * sqrt(L/g) */
+    /** Simple pendulum period: T = 2Ãâ‚¬ * sqrt(L/g) */
     public static Real simplePendulumPeriod(Real lengthMeters) {
         return Real.TWO_PI.multiply(lengthMeters.divide(PhysicalConstants.g_n).sqrt());
     }
 
-    /** Angular frequency: ω = sqrt(g/L) */
+    /** Angular frequency: Ãâ€° = sqrt(g/L) */
     public static Real angularFrequency(Real lengthMeters) {
         return PhysicalConstants.g_n.divide(lengthMeters).sqrt();
     }
 
-    /** Position at time t: θ(t) = θ₀ * cos(ωt + φ) */
+    /** Position at time t: ÃŽÂ¸(t) = ÃŽÂ¸Ã¢â€šâ‚¬ * cos(Ãâ€°t + Ãâ€ ) */
     public static Real position(Real amplitude, Real omega, Real time, Real phase) {
         return amplitude.multiply(omega.multiply(time).add(phase).cos());
     }
 
-    /** Damped amplitude: A(t) = A₀ * exp(-γt) */
+    /** Damped amplitude: A(t) = AÃ¢â€šâ‚¬ * exp(-ÃŽÂ³t) */
     public static Real dampedAmplitude(Real initialAmplitude, Real dampingCoefficient, Real time) {
         return initialAmplitude.multiply(dampingCoefficient.negate().multiply(time).exp());
     }
@@ -68,14 +68,16 @@ public class Pendulum {
         return T0.multiply(correction);
     }
 
-    /** Potential energy: U = mgL(1 - cos(θ)) */
+    /** Potential energy: U = mgL(1 - cos(ÃŽÂ¸)) */
     public static Real potentialEnergy(Real mass, Real lengthMeters, Real angleRadians) {
         return mass.multiply(PhysicalConstants.g_n).multiply(lengthMeters)
                 .multiply(Real.ONE.subtract(angleRadians.cos()));
     }
 
-    /** Kinetic energy: KE = 0.5 * m * L² * ω² */
+    /** Kinetic energy: KE = 0.5 * m * LÃ‚Â² * Ãâ€°Ã‚Â² */
     public static Real kineticEnergy(Real mass, Real lengthMeters, Real angularVelocity) {
         return Real.of(0.5).multiply(mass).multiply(lengthMeters.pow(2)).multiply(angularVelocity.pow(2));
     }
 }
+
+

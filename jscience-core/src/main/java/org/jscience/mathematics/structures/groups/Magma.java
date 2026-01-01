@@ -34,31 +34,31 @@ import org.jscience.mathematics.structures.sets.Set;
  *
  * <h2>Mathematical Definition</h2>
  * <p>
- * A magma (S, ∗) consists of:
+ * A magma (S, Ã¢Ë†â€”) consists of:
  * <ul>
  * <li>A set S</li>
- * <li>A binary operation ∗ : S × S → S</li>
+ * <li>A binary operation Ã¢Ë†â€” : S Ãƒâ€” S Ã¢â€ â€™ S</li>
  * </ul>
- * The only requirement is closure: for all a, b ∈ S, a ∗ b ∈ S.
+ * The only requirement is closure: for all a, b Ã¢Ë†Ë† S, a Ã¢Ë†â€” b Ã¢Ë†Ë† S.
  * </p>
  *
  * <h2>Examples</h2>
  * <ul>
- * <li>(ℕ, −) - Natural numbers with subtraction (not a semigroup, not
+ * <li>(Ã¢â€žâ€¢, Ã¢Ë†â€™) - Natural numbers with subtraction (not a semigroup, not
  * associative)</li>
- * <li>(ℤ, ÷) - Integers with division (not closed, only a partial magma)</li>
- * <li>(ℝ, +) - Real numbers with addition (actually a group)</li>
+ * <li>(Ã¢â€žÂ¤, ÃƒÂ·) - Integers with division (not closed, only a partial magma)</li>
+ * <li>(Ã¢â€žÂ, +) - Real numbers with addition (actually a group)</li>
  * </ul>
  *
  * <h2>Hierarchy</h2>
  *
  * <pre>
  * Magma (closure)
- * ↓
+ * Ã¢â€ â€œ
  * Semigroup (+ associativity)
- * ↓
+ * Ã¢â€ â€œ
  * Monoid (+ identity)
- * ↓
+ * Ã¢â€ â€œ
  * Group (+ inverse)
  * </pre>
  *
@@ -83,7 +83,7 @@ public interface Magma<E> extends Set<E> {
      * 
      * @param a the first operand
      * @param b the second operand
-     * @return the result of a ∗ b
+     * @return the result of a Ã¢Ë†â€” b
      * @throws NullPointerException     if either operand is null
      * @throws IllegalArgumentException if either operand is not in this magma
      * 
@@ -95,9 +95,9 @@ public interface Magma<E> extends Set<E> {
     /**
      * Tests whether this magma's operation is associative.
      * <p>
-     * An operation ∗ is associative if for all a, b, c:
+     * An operation Ã¢Ë†â€” is associative if for all a, b, c:
      * <br>
-     * (a ∗ b) ∗ c = a ∗ (b ∗ c)
+     * (a Ã¢Ë†â€” b) Ã¢Ë†â€” c = a Ã¢Ë†â€” (b Ã¢Ë†â€” c)
      * </p>
      * <p>
      * If this returns {@code true}, this magma is actually a {@link Semigroup}.
@@ -114,9 +114,9 @@ public interface Magma<E> extends Set<E> {
     /**
      * Tests whether this magma's operation is commutative.
      * <p>
-     * An operation ∗ is commutative if for all a, b:
+     * An operation Ã¢Ë†â€” is commutative if for all a, b:
      * <br>
-     * a ∗ b = b ∗ a
+     * a Ã¢Ë†â€” b = b Ã¢Ë†â€” a
      * </p>
      * 
      * @return {@code true} if the operation is commutative
@@ -125,3 +125,4 @@ public interface Magma<E> extends Set<E> {
         return false; // Default: not required
     }
 }
+

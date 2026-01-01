@@ -72,7 +72,7 @@ public class ImageProcessing {
     };
 
     /**
-     * Gaussian blur kernel (3x3, σ ≈ 0.85).
+     * Gaussian blur kernel (3x3, ÃÆ’ Ã¢â€°Ë† 0.85).
      */
     public static final double[][] GAUSSIAN_3x3 = {
             { 1.0 / 16, 2.0 / 16, 1.0 / 16 },
@@ -304,3 +304,5 @@ public class ImageProcessing {
         return result;
     }
 }
+
+

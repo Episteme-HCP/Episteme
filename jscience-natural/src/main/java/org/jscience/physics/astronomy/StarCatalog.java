@@ -238,3 +238,5 @@ public class StarCatalog implements MiniCatalog<StarCatalog.Star> {
         }
     }
 }
+
+

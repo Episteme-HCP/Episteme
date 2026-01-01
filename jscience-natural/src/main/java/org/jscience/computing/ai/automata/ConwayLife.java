@@ -159,3 +159,5 @@ public class ConwayLife implements CellularAutomaton<Boolean> {
         return count;
     }
 }
+
+

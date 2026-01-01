@@ -35,7 +35,7 @@ public class PhaseEquilibria {
     /**
      * Clausius-Clapeyron equation.
      * Relates vapor pressure and temperature.
-     * ln(P2/P1) = (-ΔH_vap / R) * (1/T2 - 1/T1)
+     * ln(P2/P1) = (-ÃŽâ€H_vap / R) * (1/T2 - 1/T1)
      * 
      * @param p1        Pressure at T1 (Pa)
      * @param t1        Temperature 1 (K)
@@ -61,3 +61,5 @@ public class PhaseEquilibria {
         return components - phases + 2;
     }
 }
+
+

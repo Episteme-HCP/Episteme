@@ -44,3 +44,5 @@ public interface Actuator<C> extends Device {
      */
     void send(C command) throws IOException;
 }
+
+

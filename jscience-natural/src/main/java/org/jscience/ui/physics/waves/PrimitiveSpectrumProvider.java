@@ -90,3 +90,5 @@ public class PrimitiveSpectrumProvider implements SpectrumProvider {
         return "Primitive (double[])";
     }
 }
+
+

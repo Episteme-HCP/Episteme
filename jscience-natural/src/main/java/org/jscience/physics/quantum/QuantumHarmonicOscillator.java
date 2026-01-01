@@ -34,22 +34,22 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public class QuantumHarmonicOscillator {
 
-    public static final Real HBAR = Real.of(1.054571817e-34); // Reduced Planck constant (J·s)
+    public static final Real HBAR = Real.of(1.054571817e-34); // Reduced Planck constant (JÃ‚Â·s)
 
     private QuantumHarmonicOscillator() {
     }
 
-    /** Energy eigenvalues: E_n = ℏω(n + 1/2) */
+    /** Energy eigenvalues: E_n = Ã¢â€žÂÃâ€°(n + 1/2) */
     public static Real energyLevel(int n, Real omega) {
         return HBAR.multiply(omega).multiply(Real.of(n + 0.5));
     }
 
-    /** Angular frequency: ω = sqrt(k/m) */
+    /** Angular frequency: Ãâ€° = sqrt(k/m) */
     public static Real angularFrequency(Real springConstant, Real mass) {
         return springConstant.divide(mass).sqrt();
     }
 
-    /** Ground state energy: E_0 = ℏω/2 */
+    /** Ground state energy: E_0 = Ã¢â€žÂÃâ€°/2 */
     public static Real groundStateEnergy(Real omega) {
         return HBAR.multiply(omega).divide(Real.TWO);
     }
@@ -59,18 +59,20 @@ public class QuantumHarmonicOscillator {
         return energyLevel(n2, omega).subtract(energyLevel(n1, omega)).abs();
     }
 
-    /** Classical amplitude: A = sqrt(2E/(mω²)) */
+    /** Classical amplitude: A = sqrt(2E/(mÃâ€°Ã‚Â²)) */
     public static Real classicalAmplitude(Real energy, Real mass, Real omega) {
         return Real.TWO.multiply(energy).divide(mass.multiply(omega.pow(2))).sqrt();
     }
 
-    /** Probability density at x=0 for ground state: |ψ_0(0)|² = sqrt(mω/(πℏ)) */
+    /** Probability density at x=0 for ground state: |ÃË†_0(0)|Ã‚Â² = sqrt(mÃâ€°/(Ãâ‚¬Ã¢â€žÂ)) */
     public static Real groundStateProbabilityAt0(Real mass, Real omega) {
         return mass.multiply(omega).divide(Real.PI.multiply(HBAR)).sqrt();
     }
 
-    /** Zero-point motion: Δx_0 = sqrt(ℏ/(2mω)) */
+    /** Zero-point motion: ÃŽâ€x_0 = sqrt(Ã¢â€žÂ/(2mÃâ€°)) */
     public static Real zeroPointMotion(Real mass, Real omega) {
         return HBAR.divide(Real.TWO.multiply(mass).multiply(omega)).sqrt();
     }
 }
+
+

@@ -26,8 +26,8 @@ package org.jscience.physics.astronomy.coordinates;
 /**
  * Equatorial celestial coordinates (Right Ascension and Declination).
  *
- * RA is measured in hours (0-24h) or degrees (0-360°) along celestial equator.
- * Dec is measured in degrees (-90° to +90°) from celestial equator.
+ * RA is measured in hours (0-24h) or degrees (0-360Ã‚Â°) along celestial equator.
+ * Dec is measured in degrees (-90Ã‚Â° to +90Ã‚Â°) from celestial equator.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -102,7 +102,7 @@ public class EquatorialCoordinate {
     }
 
     /**
-     * Returns Dec as DMS string (e.g., "+45° 12' 34.5"").
+     * Returns Dec as DMS string (e.g., "+45Ã‚Â° 12' 34.5"").
      */
     public String getDecDms() {
         double absD = Math.abs(dec);
@@ -111,7 +111,7 @@ public class EquatorialCoordinate {
         int m = (int) minFrac;
         double s = (minFrac - m) * 60;
         char sign = dec >= 0 ? '+' : '-';
-        return String.format("%c%02d° %02d' %05.2f\"", sign, d, m, s);
+        return String.format("%c%02dÃ‚Â° %02d' %05.2f\"", sign, d, m, s);
     }
 
     /**
@@ -142,15 +142,17 @@ public class EquatorialCoordinate {
 
     // --- Well-known stars ---
 
-    /** Polaris (α UMi) */
+    /** Polaris (ÃŽÂ± UMi) */
     public static final EquatorialCoordinate POLARIS = fromHmsDms(2, 31, 49.09, 89, 15, 50.8);
 
-    /** Sirius (α CMa) */
+    /** Sirius (ÃŽÂ± CMa) */
     public static final EquatorialCoordinate SIRIUS = fromHmsDms(6, 45, 8.9, -16, 42, 58.0);
 
-    /** Vega (α Lyr) */
+    /** Vega (ÃŽÂ± Lyr) */
     public static final EquatorialCoordinate VEGA = fromHmsDms(18, 36, 56.3, 38, 47, 1.3);
 
-    /** Betelgeuse (α Ori) */
+    /** Betelgeuse (ÃŽÂ± Ori) */
     public static final EquatorialCoordinate BETELGEUSE = fromHmsDms(5, 55, 10.3, 7, 24, 25.4);
 }
+
+

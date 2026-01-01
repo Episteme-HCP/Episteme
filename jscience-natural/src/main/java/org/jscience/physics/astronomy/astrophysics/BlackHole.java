@@ -34,7 +34,7 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public class BlackHole {
 
-    /** Gravitational constant (m³/(kg·s²)) */
+    /** Gravitational constant (mÃ‚Â³/(kgÃ‚Â·sÃ‚Â²)) */
     public static final Real G = Real.of(6.67430e-11);
 
     /** Speed of light (m/s) */
@@ -51,7 +51,7 @@ public class BlackHole {
 
     /**
      * Schwarzschild radius (event horizon for non-rotating black hole).
-     * r_s = 2GM/c²
+     * r_s = 2GM/cÃ‚Â²
      */
     public static Real schwarzschildRadius(Real mass) {
         return Real.TWO.multiply(G).multiply(mass).divide(C.multiply(C));
@@ -59,7 +59,7 @@ public class BlackHole {
 
     /**
      * Schwarzschild radius in solar masses.
-     * r_s ≈ 2.95 km per solar mass
+     * r_s Ã¢â€°Ë† 2.95 km per solar mass
      */
     public static Real schwarzschildRadiusSolarMass(Real solarMasses) {
         return Real.of(2953).multiply(solarMasses);
@@ -99,7 +99,7 @@ public class BlackHole {
 
     /**
      * Hawking temperature.
-     * T = ℏc³ / (8πGMk_B)
+     * T = Ã¢â€žÂcÃ‚Â³ / (8Ãâ‚¬GMk_B)
      */
     public static Real hawkingTemperature(Real mass) {
         Real numerator = HBAR.multiply(C.pow(3));
@@ -149,3 +149,5 @@ public class BlackHole {
                 .divide(HBAR.multiply(C.pow(4)));
     }
 }
+
+

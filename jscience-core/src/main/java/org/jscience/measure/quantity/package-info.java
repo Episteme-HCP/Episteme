@@ -22,13 +22,6 @@
  */
 
 /**
- * Provides quantity types for the units and measures framework.
- * <p>
- * This package defines interfaces for physical quantities, organized by
- * dimension. Each quantity type is a marker interface extending
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Defines interfaces for physical quantities, organized by
  */
 package org.jscience.measure.quantity;

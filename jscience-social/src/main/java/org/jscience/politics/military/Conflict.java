@@ -105,3 +105,5 @@ public class Conflict implements Identifiable<String>, Locatable, Temporal {
         return String.format("%s (%s)", name, startDate.getYear());
     }
 }
+
+

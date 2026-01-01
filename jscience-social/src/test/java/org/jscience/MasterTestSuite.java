@@ -40,3 +40,4 @@ import org.junit.platform.suite.api.Suite;
 @SelectPackages("org.jscience")
 public class MasterTestSuite {
 }
+

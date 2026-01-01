@@ -16,16 +16,43 @@ service ComputeService {
   
   // Checking server health/status
   rpc GetStatus (Empty) returns (ServerStatus) {}
+
+  // Worker Interface
+  rpc RegisterWorker (WorkerRegistration) returns (WorkerRegistrationResponse) {}
+  rpc RequestTask (WorkerIdentifier) returns (TaskRequest) {} // Returns empty TaskRequest if no work
+  rpc SubmitResult (TaskResult) returns (Empty) {}
+}
+
+message WorkerRegistration {
+  string hostname = 1;
+  int32 cores = 2;
+  int64 memory = 3;
+}
+
+message WorkerRegistrationResponse {
+  string workerId = 1;
+  bool authorized = 2;
+}
+
+message WorkerIdentifier {
+  string workerId = 1;
 }
 
 message Empty {}
+
+enum Priority {
+  LOW = 0;
+  NORMAL = 1;
+  HIGH = 2;
+  CRITICAL = 3;
+}
 
 message TaskRequest {
   string taskId = 1;
   // Serialized Java object (Callable<T>)
   bytes serializedTask = 2;
-  // Priority (optional)
-  int32 priority = 3;
+  Priority priority = 3;
+  int64 timestamp = 4;
 }
 
 message TaskResponse {

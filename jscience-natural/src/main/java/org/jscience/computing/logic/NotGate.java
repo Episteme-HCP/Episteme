@@ -40,3 +40,5 @@ public class NotGate extends LogicGate {
         return inputs[0].not();
     }
 }
+
+

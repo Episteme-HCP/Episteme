@@ -198,7 +198,7 @@ public class RigidBody {
         // matrix operations not yet setup)
         // Real logic: angularVelocity += inverseInertiaWorld * torque * dt
 
-        // Angular acceleration: α = I^-1 * T (simplified Euler equation)
+        // Angular acceleration: ÃŽÂ± = I^-1 * T (simplified Euler equation)
         Vector<Real> angularAccel = multiplyMatrixVector(inverseInertiaTensor, torque);
         angularVelocity = angularVelocity.add(angularAccel.multiply(dt));
         angularVelocity = angularVelocity.multiply(angularDamping);
@@ -273,3 +273,5 @@ public class RigidBody {
         this.angularVelocity = angularVelocity;
     }
 }
+
+

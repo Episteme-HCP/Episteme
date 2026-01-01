@@ -80,3 +80,4 @@ public interface GraphTraversalStrategy<V> {
         traverse(graph, start, visitor);
     }
 }
+

@@ -40,7 +40,7 @@ public class FissionFusion {
     /** Speed of light (m/s) */
     private static final Real C = Real.of(299792458);
 
-    /** Speed of light squared (m²/s²) */
+    /** Speed of light squared (mÃ‚Â²/sÃ‚Â²) */
     @SuppressWarnings("unused")
     private static final Real C_SQUARED = C.pow(2);
 
@@ -65,26 +65,26 @@ public class FissionFusion {
 
     /**
      * Estimates critical mass for a spherical bare core.
-     * M_c ≈ (π / 3) * (ρ_c / (ν - 1)) * (1/Σ_f)³ * λ_tr
+     * M_c Ã¢â€°Ë† (Ãâ‚¬ / 3) * (ÃÂ_c / (ÃŽÂ½ - 1)) * (1/ÃŽÂ£_f)Ã‚Â³ * ÃŽÂ»_tr
      * 
      * This is a highly simplified model. Real critical mass depends on:
      * - Geometry, reflectors, enrichment, density
      * 
-     * @param density            Material density (kg/m³)
+     * @param density            Material density (kg/mÃ‚Â³)
      * @param macroFissionXS     Macroscopic fission cross-section (1/m)
-     * @param neutronsPerFission Average neutrons per fission (ν)
+     * @param neutronsPerFission Average neutrons per fission (ÃŽÂ½)
      * @return Approximate critical mass in kg
      */
     public static Real criticalMassEstimate(Real density, Real macroFissionXS,
             Real neutronsPerFission) {
         // Simplified: use critical radius formula
         // For U-235: bare sphere critical mass ~52 kg
-        // Formula: M = (4/3) π r_c³ ρ
+        // Formula: M = (4/3) Ãâ‚¬ r_cÃ‚Â³ ÃÂ
 
         Real nuMinusOne = neutronsPerFission.subtract(Real.ONE);
         Real diffusionLength = Real.of(0.03); // ~3 cm typical
 
-        // r_c ≈ π * L / sqrt(k - 1) where k = ν*σ_f/(σ_a)
+        // r_c Ã¢â€°Ë† Ãâ‚¬ * L / sqrt(k - 1) where k = ÃŽÂ½*ÃÆ’_f/(ÃÆ’_a)
         Real kEffMinusOne = nuMinusOne.multiply(Real.of(0.9)); // Simplified
         Real criticalRadius = Real.PI.multiply(diffusionLength)
                 .divide(kEffMinusOne.sqrt());
@@ -110,10 +110,10 @@ public class FissionFusion {
 
     // ==================== FUSION ====================
 
-    /** D-T fusion: D + T → He-4 + n + 17.6 MeV */
+    /** D-T fusion: D + T Ã¢â€ â€™ He-4 + n + 17.6 MeV */
     public static final Real DT_ENERGY_MEV = Real.of(17.6);
 
-    /** D-D fusion: D + D → He-3 + n + 3.27 MeV (50%) or T + p + 4.03 MeV (50%) */
+    /** D-D fusion: D + D Ã¢â€ â€™ He-3 + n + 3.27 MeV (50%) or T + p + 4.03 MeV (50%) */
     public static final Real DD_ENERGY_MEV_AVG = Real.of(3.65);
 
     /** p-p chain total energy: ~26.73 MeV (stellar fusion) */
@@ -132,12 +132,12 @@ public class FissionFusion {
 
     /**
      * Lawson criterion for fusion ignition.
-     * n * τ > L where n is density (m⁻³), τ is confinement time (s)
-     * For D-T: n*τ > 1.5 × 10²⁰ m⁻³·s at 10 keV
+     * n * Ãâ€ž > L where n is density (mÃ¢ÂÂ»Ã‚Â³), Ãâ€ž is confinement time (s)
+     * For D-T: n*Ãâ€ž > 1.5 Ãƒâ€” 10Ã‚Â²Ã¢ÂÂ° mÃ¢ÂÂ»Ã‚Â³Ã‚Â·s at 10 keV
      * 
-     * @param density         Plasma density (particles/m³)
+     * @param density         Plasma density (particles/mÃ‚Â³)
      * @param confinementTime Energy confinement time (s)
-     * @return n*τ product
+     * @return n*Ãâ€ž product
      */
     public static Real lawsonProduct(Real density, Real confinementTime) {
         return density.multiply(confinementTime);
@@ -148,10 +148,10 @@ public class FissionFusion {
 
     /**
      * Triple product criterion (improved Lawson).
-     * n * T * τ > threshold
-     * For D-T ignition: n*T*τ > 3 × 10²¹ keV·m⁻³·s
+     * n * T * Ãâ€ž > threshold
+     * For D-T ignition: n*T*Ãâ€ž > 3 Ãƒâ€” 10Ã‚Â²Ã‚Â¹ keVÃ‚Â·mÃ¢ÂÂ»Ã‚Â³Ã‚Â·s
      * 
-     * @param density         Plasma density (m⁻³)
+     * @param density         Plasma density (mÃ¢ÂÂ»Ã‚Â³)
      * @param temperature     Ion temperature (keV)
      * @param confinementTime Energy confinement time (s)
      * @return Triple product
@@ -165,7 +165,7 @@ public class FissionFusion {
 
     /**
      * Estimates energy gain Q = fusion power / input power.
-     * Q = 1 → breakeven, Q > 1 → net energy
+     * Q = 1 Ã¢â€ â€™ breakeven, Q > 1 Ã¢â€ â€™ net energy
      * 
      * @param fusionPower Power from fusion reactions
      * @param inputPower  Power used to heat/confine plasma
@@ -175,3 +175,5 @@ public class FissionFusion {
         return fusionPower.divide(inputPower);
     }
 }
+
+

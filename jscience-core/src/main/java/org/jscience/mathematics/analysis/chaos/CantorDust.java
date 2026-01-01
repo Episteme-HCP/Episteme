@@ -38,15 +38,15 @@ import java.util.List;
  *
  * <h2>Construction</h2>
  * <ol>
- * <li>Start with a unit square [0,1] × [0,1]</li>
- * <li>Divide into 9 equal squares (3×3 grid)</li>
+ * <li>Start with a unit square [0,1] Ãƒâ€” [0,1]</li>
+ * <li>Divide into 9 equal squares (3Ãƒâ€”3 grid)</li>
  * <li>Remove the center square</li>
  * <li>Repeat for each remaining square</li>
  * </ol>
  *
  * <h2>Properties</h2>
  * <ul>
- * <li>Hausdorff dimension: log(8)/log(3) ≈ 1.8928</li>
+ * <li>Hausdorff dimension: log(8)/log(3) Ã¢â€°Ë† 1.8928</li>
  * <li>Zero Lebesgue measure (area = 0)</li>
  * <li>Uncountable number of points</li>
  * <li>Self-similar fractal</li>
@@ -55,7 +55,7 @@ import java.util.List;
  *
  * <h2>References</h2>
  * <ul>
- * <li>Cantor, Georg (1883). "Über unendliche, lineare
+ * <li>Cantor, Georg (1883). "ÃƒÅ“ber unendliche, lineare
  * Punktmannigfaltigkeiten"</li>
  * <li>Mandelbrot, B. (1982). "The Fractal Geometry of Nature"</li>
  * </ul>
@@ -121,7 +121,7 @@ public class CantorDust {
     /**
      * Calculates the Hausdorff dimension of the Cantor dust.
      * 
-     * @return log(8)/log(3) ≈ 1.8928
+     * @return log(8)/log(3) Ã¢â€°Ë† 1.8928
      */
     public static double hausdorffDimension() {
         return Math.log(8) / Math.log(3);
@@ -129,7 +129,7 @@ public class CantorDust {
 
     /**
      * Calculates the total area of the dust at a given depth.
-     * This approaches 0 as depth → ∞.
+     * This approaches 0 as depth Ã¢â€ â€™ Ã¢Ë†Å¾.
      * 
      * @param depth recursion depth
      * @return total area = (8/9)^depth
@@ -213,3 +213,4 @@ public class CantorDust {
         cantorSet1DRecursive(start.add(third.multiply(Real.of(2))), end, depth - 1, intervals);
     }
 }
+

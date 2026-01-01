@@ -121,14 +121,14 @@ public class CircuitAnalysis {
     }
 
     /**
-     * Power from current and resistance. P = I²R
+     * Power from current and resistance. P = IÃ‚Â²R
      */
     public static Real powerFromCurrent(Real currentAmps, Real resistanceOhms) {
         return currentAmps.pow(2).multiply(resistanceOhms);
     }
 
     /**
-     * Power from voltage and resistance. P = V²/R
+     * Power from voltage and resistance. P = VÃ‚Â²/R
      */
     public static Real powerFromVoltage(Real voltageVolts, Real resistanceOhms) {
         return voltageVolts.pow(2).divide(resistanceOhms);
@@ -206,14 +206,14 @@ public class CircuitAnalysis {
     // === Time Constants ===
 
     /**
-     * RC time constant. τ = RC
+     * RC time constant. Ãâ€ž = RC
      */
     public static Real rcTimeConstant(Real resistanceOhms, Real capacitanceFarads) {
         return resistanceOhms.multiply(capacitanceFarads);
     }
 
     /**
-     * RL time constant. τ = L/R
+     * RL time constant. Ãâ€ž = L/R
      */
     public static Real rlTimeConstant(Real inductanceHenries, Real resistanceOhms) {
         return inductanceHenries.divide(resistanceOhms);
@@ -236,14 +236,14 @@ public class CircuitAnalysis {
     // === AC Impedance ===
 
     /**
-     * Capacitive reactance. Xc = 1 / (2πfC)
+     * Capacitive reactance. Xc = 1 / (2Ãâ‚¬fC)
      */
     public static Real capacitiveReactance(Real frequencyHz, Real capacitanceFarads) {
         return Real.ONE.divide(Real.TWO_PI.multiply(frequencyHz).multiply(capacitanceFarads));
     }
 
     /**
-     * Inductive reactance. Xl = 2πfL
+     * Inductive reactance. Xl = 2Ãâ‚¬fL
      */
     public static Real inductiveReactance(Real frequencyHz, Real inductanceHenries) {
         return Real.TWO_PI.multiply(frequencyHz).multiply(inductanceHenries);
@@ -272,3 +272,5 @@ public class CircuitAnalysis {
         return Real.ONE.divide(resistance).multiply(inductance.divide(capacitance).sqrt());
     }
 }
+
+

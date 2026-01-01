@@ -147,3 +147,5 @@ public class SimulatedSpectrometer extends SimulatedDevice implements Spectromet
         return Real.of(getIntensityAt(peak1));
     }
 }
+
+

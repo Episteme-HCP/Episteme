@@ -76,3 +76,5 @@ public class Trait {
         return String.format(java.util.Locale.US, "%s: %.2f", name, value.doubleValue());
     }
 }
+
+

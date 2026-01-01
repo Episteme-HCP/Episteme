@@ -26,11 +26,11 @@ package org.jscience.mathematics.structures.groups;
 /**
  * A monoid is a semigroup with an identity element.
  * <p>
- * A monoid (M, ∗, e) satisfies:
+ * A monoid (M, Ã¢Ë†â€”, e) satisfies:
  * <ul>
- * <li><strong>Closure</strong>: ∀ a, b ∈ M: a ∗ b ∈ M</li>
- * <li><strong>Associativity</strong>: (a ∗ b) ∗ c = a ∗ (b ∗ c)</li>
- * <li><strong>Identity</strong>: ∃ e ∈ M: a ∗ e = e ∗ a = a</li>
+ * <li><strong>Closure</strong>: Ã¢Ë†â‚¬ a, b Ã¢Ë†Ë† M: a Ã¢Ë†â€” b Ã¢Ë†Ë† M</li>
+ * <li><strong>Associativity</strong>: (a Ã¢Ë†â€” b) Ã¢Ë†â€” c = a Ã¢Ë†â€” (b Ã¢Ë†â€” c)</li>
+ * <li><strong>Identity</strong>: Ã¢Ë†Æ’ e Ã¢Ë†Ë† M: a Ã¢Ë†â€” e = e Ã¢Ë†â€” a = a</li>
  * </ul>
  * </p>
  *
@@ -43,7 +43,7 @@ public interface Monoid<E> extends Magma<E> {
     /**
      * Returns the identity element of this monoid.
      * <p>
-     * Satisfies: e ∗ a = a ∗ e = a for all a.
+     * Satisfies: e Ã¢Ë†â€” a = a Ã¢Ë†â€” e = a for all a.
      * </p>
      * 
      * @return the identity element
@@ -60,3 +60,4 @@ public interface Monoid<E> extends Magma<E> {
         return true;
     }
 }
+

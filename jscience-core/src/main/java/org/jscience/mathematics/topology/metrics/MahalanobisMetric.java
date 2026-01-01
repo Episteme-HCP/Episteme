@@ -43,7 +43,7 @@ import java.util.List;
  * </p>
  * <p>
  * For vectors x and y with covariance matrix S:
- * d(x, y) = √((x-y)ᵀ S⁻¹ (x-y))
+ * d(x, y) = Ã¢Ë†Å¡((x-y)Ã¡Âµâ‚¬ SÃ¢ÂÂ»Ã‚Â¹ (x-y))
  * </p>
  * <p>
  * When S is the identity matrix, this reduces to Euclidean distance.
@@ -196,3 +196,4 @@ public class MahalanobisMetric implements Metric<Vector<Real>> {
         return "MahalanobisMetric(dimension=" + dimension + ")";
     }
 }
+

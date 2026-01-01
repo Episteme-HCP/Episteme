@@ -216,3 +216,4 @@ public final class NaturalInterval {
         return singleton(Natural.of(value));
     }
 }
+

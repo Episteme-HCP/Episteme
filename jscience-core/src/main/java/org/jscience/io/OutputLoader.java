@@ -40,3 +40,5 @@ public interface OutputLoader<T> extends ResourceLoader<T> {
      */
     void save(T resource, String destination) throws Exception;
 }
+
+

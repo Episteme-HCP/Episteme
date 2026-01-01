@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package org.jscience.server.proto;
+
+option java_multiple_files = true;
+option java_package = "org.jscience.server.proto";
+option java_outer_classname = "CollaborationServiceProto";
+
+// Service for Real-Time Collaboration (Whiteboard, Chat, Shared State)
+service CollaborationService {
+  // Creates a new session and returns its ID
+  rpc CreateSession (CreateSessionRequest) returns (SessionResponse) {}
+  
+  // Joins an existing session and streams events (Server-Sent Events)
+  rpc JoinSession (SessionRequest) returns (stream SessionEvent) {}
+  
+  // Publishes an event to a session (Client-Sent)
+  rpc PublishEvent (SessionEvent) returns (PublishAck) {}
+}
+
+message CreateSessionRequest {
+  string ownerId = 1;
+}
+
+message SessionResponse {
+  string sessionId = 1;
+}
+
+message SessionRequest {
+  string sessionId = 1;
+  string userId = 2;
+}
+
+message SessionEvent {
+  string sessionId = 1;
+  string userId = 2;
+  // Event Type: "DRAW", "CHAT", "POINTER_MOVE", etc.
+  string eventType = 3;
+  // Payload: JSON or Serialized data depending on type
+  string payload = 4;
+  int64 timestamp = 5;
+}
+
+message PublishAck {
+    bool success = 1;
+}

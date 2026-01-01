@@ -83,3 +83,5 @@ public class OptimizerTest {
                 assertEquals(1.0, result[1].doubleValue(), 1e-2);
         }
 }
+
+

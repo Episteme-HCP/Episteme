@@ -34,16 +34,16 @@ import org.jscience.mathematics.structures.groups.AbelianGroup;
  *
  * <h2>Mathematical Definition</h2>
  * <p>
- * A ring (R, +, ×) consists of:
+ * A ring (R, +, Ãƒâ€”) consists of:
  * <ol>
  * <li>A set R</li>
  * <li>An addition operation + making (R, +) an abelian group</li>
- * <li>A multiplication operation × satisfying:
+ * <li>A multiplication operation Ãƒâ€” satisfying:
  * <ul>
- * <li><strong>Closure</strong>: ∀ a, b ∈ R: a × b ∈ R</li>
- * <li><strong>Associativity</strong>: (a × b) × c = a × (b × c)</li>
- * <li><strong>Distributivity</strong>: a × (b + c) = (a × b) + (a × c) and (a +
- * b) × c = (a × c) + (b × c)</li>
+ * <li><strong>Closure</strong>: Ã¢Ë†â‚¬ a, b Ã¢Ë†Ë† R: a Ãƒâ€” b Ã¢Ë†Ë† R</li>
+ * <li><strong>Associativity</strong>: (a Ãƒâ€” b) Ãƒâ€” c = a Ãƒâ€” (b Ãƒâ€” c)</li>
+ * <li><strong>Distributivity</strong>: a Ãƒâ€” (b + c) = (a Ãƒâ€” b) + (a Ãƒâ€” c) and (a +
+ * b) Ãƒâ€” c = (a Ãƒâ€” c) + (b Ãƒâ€” c)</li>
  * </ul>
  * </li>
  * </ol>
@@ -51,16 +51,16 @@ import org.jscience.mathematics.structures.groups.AbelianGroup;
  *
  * <h2>Examples</h2>
  * <ul>
- * <li>(ℤ, +, ×) - Integers (commutative ring with unity)</li>
- * <li>(ℝ, +, ×) - Real numbers (field, thus also a ring)</li>
- * <li>(M₂(ℝ), +, ×) - 2×2 real matrices (non-commutative ring)</li>
- * <li>(ℤ/nℤ, +, ×) - Integers modulo n</li>
- * <li>(ℝ[x], +, ×) - Polynomials with real coefficients</li>
+ * <li>(Ã¢â€žÂ¤, +, Ãƒâ€”) - Integers (commutative ring with unity)</li>
+ * <li>(Ã¢â€žÂ, +, Ãƒâ€”) - Real numbers (field, thus also a ring)</li>
+ * <li>(MÃ¢â€šâ€š(Ã¢â€žÂ), +, Ãƒâ€”) - 2Ãƒâ€”2 real matrices (non-commutative ring)</li>
+ * <li>(Ã¢â€žÂ¤/nÃ¢â€žÂ¤, +, Ãƒâ€”) - Integers modulo n</li>
+ * <li>(Ã¢â€žÂ[x], +, Ãƒâ€”) - Polynomials with real coefficients</li>
  * </ul>
  *
  * <h2>Special Types of Rings</h2>
  * <ul>
- * <li><strong>Commutative Ring</strong>: Multiplication commutes (a × b = b ×
+ * <li><strong>Commutative Ring</strong>: Multiplication commutes (a Ãƒâ€” b = b Ãƒâ€”
  * a)</li>
  * <li><strong>Ring with Unity</strong>: Has multiplicative identity (1)</li>
  * <li><strong>Integral Domain</strong>: Commutative ring with unity, no zero
@@ -94,3 +94,4 @@ public interface Ring<E> extends AbelianGroup<E>, Semiring<E> {
         return true;
     }
 }
+

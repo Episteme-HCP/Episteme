@@ -21,15 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Domain-Specific Language compiler infrastructure.
- * <p>
- * Provides building blocks for creating custom DSLs:
- * </p>
- * <ul>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.computing.compiler;
+
+

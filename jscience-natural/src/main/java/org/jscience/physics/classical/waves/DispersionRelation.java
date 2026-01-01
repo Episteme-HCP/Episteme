@@ -70,7 +70,7 @@ public class DispersionRelation {
     }
 
     /**
-     * Non-relativistic Schrödinger free particle: $\omega = \hbar k^2 / 2m$
+     * Non-relativistic SchrÃƒÂ¶dinger free particle: $\omega = \hbar k^2 / 2m$
      */
     public static Real schrodingerFree(Real k, Real mass) {
         Real hbar = Real.of(1.054571817e-34);
@@ -88,3 +88,5 @@ public class DispersionRelation {
         return omegaPlus.subtract(omegaMinus).divide(delta.multiply(Real.of(2.0)));
     }
 }
+
+

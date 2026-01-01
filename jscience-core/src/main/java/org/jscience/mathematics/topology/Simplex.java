@@ -135,3 +135,4 @@ public class Simplex {
         return vertices.toString();
     }
 }
+

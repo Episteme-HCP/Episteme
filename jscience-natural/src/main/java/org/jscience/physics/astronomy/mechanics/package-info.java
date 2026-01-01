@@ -21,14 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Orbital mechanics and astrodynamics calculations.
- * <p>
- * Includes Kepler's laws, transfer orbits, and gravitational calculations.
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.physics.astronomy.mechanics;
+
+

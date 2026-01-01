@@ -52,3 +52,5 @@ public interface Predicate<T> extends Proposition<T> {
      */
     List<Term> getTerms();
 }
+
+

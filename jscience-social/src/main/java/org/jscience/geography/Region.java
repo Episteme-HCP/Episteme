@@ -137,7 +137,7 @@ public class Region {
 
     @Override
     public String toString() {
-        return String.format("%s (%s): %.0f km², pop %d", name, type, areaSqKm.doubleValue(), population);
+        return String.format("%s (%s): %.0f kmÃ‚Â², pop %d", name, type, areaSqKm.doubleValue(), population);
     }
 
     // Factory methods for major regions
@@ -157,3 +157,5 @@ public class Region {
         return r;
     }
 }
+
+

@@ -21,15 +21,5 @@
  * SOFTWARE.
  */
 
-/**
- * Statistical distributions and analysis.
- * <p>
- * Provides probability distributions (Normal, Poisson, etc.) and descriptive
- * statistics.
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.mathematics.statistics;
+

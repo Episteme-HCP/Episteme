@@ -42,7 +42,7 @@ import java.util.List;
  *
  * <h2>Properties</h2>
  * <ul>
- * <li>Hausdorff dimension: log(4)/log(3) ≈ 1.2619</li>
+ * <li>Hausdorff dimension: log(4)/log(3) Ã¢â€°Ë† 1.2619</li>
  * <li>Infinite length in finite area</li>
  * <li>Continuous but nowhere differentiable</li>
  * <li>Self-similar at all scales</li>
@@ -95,7 +95,7 @@ public class KochCurve {
         Real p4y = p1.getY().add(dy.multiply(Real.of(2)).divide(Real.of(3)));
         Point2D p4 = Point2D.of(p4x, p4y);
 
-        // p3 = top of equilateral triangle (60° rotation)
+        // p3 = top of equilateral triangle (60Ã‚Â° rotation)
         Real midx = p2x.add(p4x).divide(Real.of(2));
         Real midy = p2y.add(p4y).divide(Real.of(2));
         Real dxSquared = dx.multiply(dx);
@@ -158,7 +158,7 @@ public class KochCurve {
     /**
      * Calculates the Hausdorff dimension of the Koch curve.
      * 
-     * @return log(4)/log(3) ≈ 1.2619
+     * @return log(4)/log(3) Ã¢â€°Ë† 1.2619
      */
     public static double hausdorffDimension() {
         return Math.log(4) / Math.log(3);
@@ -175,3 +175,4 @@ public class KochCurve {
         return initialLength * Math.pow(4.0 / 3.0, depth);
     }
 }
+

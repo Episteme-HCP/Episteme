@@ -270,7 +270,7 @@ public class VitalMonitorViewer extends BorderPane implements ScientificViewer, 
         VBox rrBox = createValueBox("Respiration", rrValueLabel, "bpm", RR_COLOR);
 
         tempValueLabel = new Label("--.-");
-        VBox tempBox = createValueBox("Temperature", tempValueLabel, "°F", TEMP_COLOR);
+        VBox tempBox = createValueBox("Temperature", tempValueLabel, "Ã‚Â°F", TEMP_COLOR);
 
         panel.getChildren().addAll(hrBox, bpBox, spo2Box, rrBox, tempBox);
         return panel;
@@ -366,3 +366,5 @@ public class VitalMonitorViewer extends BorderPane implements ScientificViewer, 
         tempValueLabel.setText(vitals.temperatureString());
     }
 }
+
+

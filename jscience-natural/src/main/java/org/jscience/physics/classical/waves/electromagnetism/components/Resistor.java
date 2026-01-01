@@ -70,3 +70,5 @@ public class Resistor extends CircuitElement implements CircuitComponent {
         current = getVoltageDiff() / resistance.doubleValue();
     }
 }
+
+

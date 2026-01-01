@@ -67,3 +67,5 @@ public class HarmonicSeries implements InfiniteSequence<Real> {
         throw new ArithmeticException("Harmonic series diverges to infinity");
     }
 }
+
+

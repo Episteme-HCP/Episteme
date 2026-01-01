@@ -116,3 +116,4 @@ public class VectorSpace3D implements VectorSpace<Vector<Real>, Real> {
         return 3;
     }
 }
+

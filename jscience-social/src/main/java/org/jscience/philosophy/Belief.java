@@ -50,3 +50,5 @@ public class Belief extends Concept {
         return Collections.unmodifiableList(relatedConcepts);
     }
 }
+
+

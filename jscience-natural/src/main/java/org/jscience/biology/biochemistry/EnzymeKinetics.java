@@ -71,3 +71,5 @@ public class EnzymeKinetics {
         return vMax.multiply(substrateConc).divide(apparentKm.add(substrateConc));
     }
 }
+
+

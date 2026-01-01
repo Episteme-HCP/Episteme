@@ -162,3 +162,4 @@ public interface VectorFunction<F extends Field<F>> extends DifferentiableFuncti
         };
     }
 }
+

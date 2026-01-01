@@ -128,3 +128,4 @@ public interface GraphWeightAdapter<W> extends Comparator<W> {
         }
     };
 }
+

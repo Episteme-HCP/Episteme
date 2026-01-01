@@ -129,22 +129,22 @@ public class MolecularGeometry {
      * Predicts hybridization from steric number.
      * 
      * @param stericNumber Total electron domains
-     * @return Hybridization string (sp, sp², sp³, etc.)
+     * @return Hybridization string (sp, spÃ‚Â², spÃ‚Â³, etc.)
      */
     public static String hybridization(int stericNumber) {
         switch (stericNumber) {
             case 2:
                 return "sp";
             case 3:
-                return "sp²";
+                return "spÃ‚Â²";
             case 4:
-                return "sp³";
+                return "spÃ‚Â³";
             case 5:
-                return "sp³d";
+                return "spÃ‚Â³d";
             case 6:
-                return "sp³d²";
+                return "spÃ‚Â³dÃ‚Â²";
             case 7:
-                return "sp³d³";
+                return "spÃ‚Â³dÃ‚Â³";
             default:
                 return "unknown";
         }
@@ -152,7 +152,7 @@ public class MolecularGeometry {
 
     /**
      * Estimates bond angle with lone pair compression.
-     * Each lone pair typically reduces angles by ~2.5°.
+     * Each lone pair typically reduces angles by ~2.5Ã‚Â°.
      * 
      * @param geometry  Base geometry
      * @param lonePairs Number of lone pairs
@@ -182,3 +182,5 @@ public class MolecularGeometry {
         }
     }
 }
+
+

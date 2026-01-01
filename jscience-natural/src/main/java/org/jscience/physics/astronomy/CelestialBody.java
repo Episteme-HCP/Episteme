@@ -126,7 +126,7 @@ public class CelestialBody extends Particle {
     }
 
     /**
-     * Surface gravity: g = GM/r²
+     * Surface gravity: g = GM/rÃ‚Â²
      */
     public Quantity<Acceleration> getSurfaceGravity() {
         double m = getMass().to(Units.KILOGRAM).getValue().doubleValue();
@@ -147,3 +147,5 @@ public class CelestialBody extends Particle {
         return String.format("%s (m=%s)", name, getMass());
     }
 }
+
+

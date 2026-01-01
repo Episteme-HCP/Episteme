@@ -137,7 +137,7 @@ public class WeatherInfo {
 
     @Override
     public String toString() {
-        return String.format("WeatherInfo{%s: %.1f°C (%s), humidity=%.0f%%, wind=%.1f m/s}",
+        return String.format("WeatherInfo{%s: %.1fÃ‚Â°C (%s), humidity=%.0f%%, wind=%.1f m/s}",
                 location, temperatureCelsius, description, humidityPercent, windSpeedMps);
     }
 
@@ -196,3 +196,5 @@ public class WeatherInfo {
         }
     }
 }
+
+

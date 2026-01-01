@@ -42,3 +42,5 @@ public interface Proposition<T> {
      */
     TruthValue<T> evaluate();
 }
+
+

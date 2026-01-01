@@ -217,7 +217,7 @@ public class PandemicForecasterApp extends KillerAppBase {
         }
 
         // Parameters section
-        Label paramLabel = new Label("🎛️ " + i18n.get("pandemic.panel.parameters"));
+        Label paramLabel = new Label("Ã°Å¸Å½â€ºÃ¯Â¸Â " + i18n.get("pandemic.panel.parameters"));
         paramLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
         // Beta (transmission rate)
@@ -500,3 +500,5 @@ public class PandemicForecasterApp extends KillerAppBase {
         launch(args);
     }
 }
+
+

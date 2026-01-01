@@ -279,3 +279,4 @@ final class IntegerLong extends Integer {
         return left.multiply(right);
     }
 }
+

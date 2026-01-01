@@ -42,7 +42,7 @@ public class SolidMechanics {
 
     /**
      * Hooke's law: stress-strain relation.
-     * σ = E * ε
+     * ÃÆ’ = E * ÃŽÂµ
      */
     public static Real hookesLaw(Real strain, Real youngsModulus) {
         return youngsModulus.multiply(strain);
@@ -50,7 +50,7 @@ public class SolidMechanics {
 
     /**
      * Strain from stress.
-     * ε = σ / E
+     * ÃŽÂµ = ÃÆ’ / E
      */
     public static Real strainFromStress(Real stress, Real youngsModulus) {
         return stress.divide(youngsModulus);
@@ -58,7 +58,7 @@ public class SolidMechanics {
 
     /**
      * Poisson's ratio relation.
-     * ε_transverse = -ν * ε_axial
+     * ÃŽÂµ_transverse = -ÃŽÂ½ * ÃŽÂµ_axial
      */
     public static Real transverseStrain(Real axialStrain, Real poissonsRatio) {
         return poissonsRatio.negate().multiply(axialStrain);
@@ -66,15 +66,15 @@ public class SolidMechanics {
 
     /**
      * Shear modulus from Young's modulus and Poisson's ratio.
-     * G = E / (2 * (1 + ν))
+     * G = E / (2 * (1 + ÃŽÂ½))
      */
     public static Real shearModulus(Real youngsModulus, Real poissonsRatio) {
         return youngsModulus.divide(Real.TWO.multiply(Real.ONE.add(poissonsRatio)));
     }
 
     /**
-     * Bulk modulus from E and ν.
-     * K = E / (3 * (1 - 2ν))
+     * Bulk modulus from E and ÃŽÂ½.
+     * K = E / (3 * (1 - 2ÃŽÂ½))
      */
     public static Real bulkModulus(Real youngsModulus, Real poissonsRatio) {
         return youngsModulus.divide(Real.of(3).multiply(Real.ONE.subtract(Real.TWO.multiply(poissonsRatio))));
@@ -82,7 +82,7 @@ public class SolidMechanics {
 
     /**
      * Thermal expansion.
-     * ΔL = L0 * α * ΔT
+     * ÃŽâ€L = L0 * ÃŽÂ± * ÃŽâ€T
      */
     public static Real thermalExpansion(Real length, Real alpha, Real deltaT) {
         return length.multiply(alpha).multiply(deltaT);
@@ -90,7 +90,7 @@ public class SolidMechanics {
 
     /**
      * Thermal stress (constrained expansion).
-     * σ = E * α * ΔT
+     * ÃÆ’ = E * ÃŽÂ± * ÃŽâ€T
      */
     public static Real thermalStress(Real youngsModulus, Real alpha, Real deltaT) {
         return youngsModulus.multiply(alpha).multiply(deltaT);
@@ -98,7 +98,7 @@ public class SolidMechanics {
 
     /**
      * Bending stress in a beam.
-     * σ = M * y / I
+     * ÃÆ’ = M * y / I
      */
     public static Real bendingStress(Real moment, Real y, Real momentOfInertia) {
         return moment.multiply(y).divide(momentOfInertia);
@@ -106,7 +106,7 @@ public class SolidMechanics {
 
     /**
      * Critical buckling load (Euler formula).
-     * P_cr = π² * E * I / L²
+     * P_cr = Ãâ‚¬Ã‚Â² * E * I / LÃ‚Â²
      */
     public static Real eulerBucklingLoad(Real youngsModulus, Real momentOfInertia, Real length) {
         return Real.PI.pow(2).multiply(youngsModulus).multiply(momentOfInertia)
@@ -120,3 +120,5 @@ public class SolidMechanics {
         return Real.of(100).subtract(Real.of(0.014).multiply(brinell.subtract(Real.of(100))));
     }
 }
+
+

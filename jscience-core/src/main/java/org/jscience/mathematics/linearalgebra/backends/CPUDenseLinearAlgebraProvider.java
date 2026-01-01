@@ -617,3 +617,5 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 new org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(resArray), this, field);
     }
 }
+
+

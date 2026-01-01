@@ -35,22 +35,22 @@ import org.jscience.physics.PhysicalConstants;
  */
 public class NuclearPhysics {
 
-    /** Radioactive decay: N(t) = N₀e^(-λt) */
+    /** Radioactive decay: N(t) = NÃ¢â€šâ‚¬e^(-ÃŽÂ»t) */
     public static Real radioactiveDecay(Real initialAmount, Real decayConstant, Real time) {
         return initialAmount.multiply(decayConstant.negate().multiply(time).exp());
     }
 
-    /** Half-life: t₁/₂ = ln(2)/λ */
+    /** Half-life: tÃ¢â€šÂ/Ã¢â€šâ€š = ln(2)/ÃŽÂ» */
     public static Real halfLife(Real decayConstant) {
         return Real.LN2.divide(decayConstant);
     }
 
-    /** Activity: A = λN */
+    /** Activity: A = ÃŽÂ»N */
     public static Real activity(Real decayConstant, Real numAtoms) {
         return decayConstant.multiply(numAtoms);
     }
 
-    /** Mass-energy: E = mc² */
+    /** Mass-energy: E = mcÃ‚Â² */
     public static Real massEnergy(Real mass) {
         return mass.multiply(PhysicalConstants.c.pow(2));
     }
@@ -68,7 +68,7 @@ public class NuclearPhysics {
         return Real.of(BE);
     }
 
-    /** Q-value: Q = (Σm_reactants - Σm_products)c² */
+    /** Q-value: Q = (ÃŽÂ£m_reactants - ÃŽÂ£m_products)cÃ‚Â² */
     public static Real qValue(Real reactantMass, Real productMass) {
         return reactantMass.subtract(productMass).multiply(PhysicalConstants.c.pow(2));
     }
@@ -111,3 +111,5 @@ public class NuclearPhysics {
         return density1.multiply(density2).multiply(sigmaV);
     }
 }
+
+

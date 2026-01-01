@@ -73,6 +73,7 @@ public class CatalanSequence implements IntegerSequence {
 
     @Override
     public String getCodomain() {
-        return "ℤ⁺";
+        return "Ã¢â€žÂ¤Ã¢ÂÂº";
     }
 }
+

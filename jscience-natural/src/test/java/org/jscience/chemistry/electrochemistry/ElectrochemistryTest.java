@@ -43,7 +43,7 @@ public class ElectrochemistryTest {
         GalvanicCell cell = new GalvanicCell(zinc, copper);
 
         Quantity<ElectricPotential> E0 = cell.getStandardPotential();
-        System.out.println("Daniell Cell E°: " + E0);
+        System.out.println("Daniell Cell EÃ‚Â°: " + E0);
 
         assertEquals(1.10, E0.to(Units.VOLT).getValue().doubleValue(), 1e-9);
     }
@@ -75,7 +75,7 @@ public class ElectrochemistryTest {
         int n = 2;
 
         Quantity<ElectricPotential> E = NernstEquation.calculatePotential(E0, T, n, Q);
-        System.out.println("Nernst Potential (100°C): " + E);
+        System.out.println("Nernst Potential (100Ã‚Â°C): " + E);
 
         // E = 1.10 - (R*T / nF) * ln(Q)
         // ln(0.1) = -2.302585
@@ -85,3 +85,5 @@ public class ElectrochemistryTest {
         assertTrue(E.to(Units.VOLT).getValue().doubleValue() > 1.10);
     }
 }
+
+

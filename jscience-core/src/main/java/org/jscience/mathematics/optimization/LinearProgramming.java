@@ -28,7 +28,7 @@ import org.jscience.mathematics.numbers.real.Real;
 /**
  * Linear programming using Simplex algorithm.
  * <p>
- * Solves: minimize c^T x subject to Ax ≤ b, x ≥ 0
+ * Solves: minimize c^T x subject to Ax Ã¢â€°Â¤ b, x Ã¢â€°Â¥ 0
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -40,11 +40,11 @@ public class LinearProgramming {
     /**
      * Simplex algorithm for linear programming.
      * <p>
-     * Standard form: min c^T x, Ax = b, x ≥ 0
+     * Standard form: min c^T x, Ax = b, x Ã¢â€°Â¥ 0
      * </p>
      * 
      * @param c objective coefficients (n)
-     * @param A constraint matrix (m × n)
+     * @param A constraint matrix (m Ãƒâ€” n)
      * @param b right-hand side (m)
      * @return optimal solution x, or null if infeasible/unbounded
      */
@@ -170,3 +170,5 @@ public class LinearProgramming {
         return simplex(c, A, b); // Simplified - full implementation needed
     }
 }
+
+

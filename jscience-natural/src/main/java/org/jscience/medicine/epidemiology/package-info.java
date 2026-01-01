@@ -21,14 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Epidemiological modeling package.
- * <p>
- * Provides compartmental models for infectious disease spread:
- * <ul>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.medicine.epidemiology;
+
+

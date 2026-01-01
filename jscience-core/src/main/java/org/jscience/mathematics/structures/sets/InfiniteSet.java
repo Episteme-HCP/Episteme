@@ -28,7 +28,7 @@ package org.jscience.mathematics.structures.sets;
  * <p>
  * Infinite sets cannot be iterated over completely and do not have a finite
  * size.
- * Examples include the set of natural numbers ℕ, real numbers ℝ, etc.
+ * Examples include the set of natural numbers Ã¢â€žâ€¢, real numbers Ã¢â€žÂ, etc.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -43,8 +43,8 @@ public interface InfiniteSet<E> extends Set<E> {
      * <p>
      * Examples:
      * <ul>
-     * <li>Countable: ℕ (Natural numbers), ℤ (Integers), ℚ (Rational numbers)</li>
-     * <li>Uncountable: ℝ (Real numbers), ℂ (Complex numbers)</li>
+     * <li>Countable: Ã¢â€žâ€¢ (Natural numbers), Ã¢â€žÂ¤ (Integers), Ã¢â€žÅ¡ (Rational numbers)</li>
+     * <li>Uncountable: Ã¢â€žÂ (Real numbers), Ã¢â€žâ€š (Complex numbers)</li>
      * </ul>
      * </p>
      * 
@@ -52,3 +52,4 @@ public interface InfiniteSet<E> extends Set<E> {
      */
     boolean isCountable();
 }
+

@@ -85,7 +85,7 @@ public class WeatherDataLoader implements org.jscience.io.InputLoader<List<Weath
 
         /** Calculate solar power factor (0-1) based on irradiance */
         public double getSolarPowerFactor() {
-            // Max irradiance ~1000 W/m²
+            // Max irradiance ~1000 W/mÃ‚Â²
             return Math.min(1.0, solarIrradianceWm2 / 1000.0);
         }
     }
@@ -118,3 +118,5 @@ public class WeatherDataLoader implements org.jscience.io.InputLoader<List<Weath
         return records;
     }
 }
+
+

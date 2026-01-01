@@ -112,3 +112,5 @@ public class SpikingNeuron {
         return membranePotential;
     }
 }
+
+

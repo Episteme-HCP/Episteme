@@ -72,6 +72,7 @@ public class GammaDistribution extends ContinuousDistribution {
 
     @Override
     public String toString() {
-        return String.format("Gamma(α=%.4f, β=%.4f)", shape.doubleValue(), rate.doubleValue());
+        return String.format("Gamma(ÃŽÂ±=%.4f, ÃŽÂ²=%.4f)", shape.doubleValue(), rate.doubleValue());
     }
 }
+

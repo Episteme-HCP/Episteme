@@ -56,3 +56,5 @@ public class PsychologyDomainTest {
         assertTrue(d.toString().contains("decided to Attack"));
     }
 }
+
+

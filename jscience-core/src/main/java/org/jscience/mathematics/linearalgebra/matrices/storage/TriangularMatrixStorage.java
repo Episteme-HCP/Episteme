@@ -123,3 +123,4 @@ public class TriangularMatrixStorage<E> implements MatrixStorage<E> {
         return new TriangularMatrixStorage<>(data, n, upper, zero);
     }
 }
+

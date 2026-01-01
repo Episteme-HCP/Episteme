@@ -37,7 +37,7 @@ import javafx.scene.layout.VBox;
 // import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.AppProvider;
 
 import java.util.*;
 
@@ -47,7 +47,7 @@ import java.util.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class PoliticsVotingDemo implements DemoProvider {
+public class PoliticsVotingDemo implements AppProvider {
 
     private enum VotingSystem {
         FPTP("pol.voting.sys.fptp", "pol.voting.desc.fptp"),
@@ -73,8 +73,13 @@ public class PoliticsVotingDemo implements DemoProvider {
     private BarChart<String, Number> chart;
 
     @Override
+    public boolean isDemo() {
+        return true;
+    }
+
+    @Override
     public String getCategory() {
-        return SocialI18n.getInstance().get("category.politics");
+        return "Politics";
     }
 
     @Override
@@ -226,3 +231,5 @@ public class PoliticsVotingDemo implements DemoProvider {
         chart.getData().add(series);
     }
 }
+
+

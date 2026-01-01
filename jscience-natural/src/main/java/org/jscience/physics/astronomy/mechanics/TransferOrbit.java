@@ -52,7 +52,7 @@ public class TransferOrbit {
         return dv1.add(dv2);
     }
 
-    /** Hohmann transfer time: t = π * √(a³ / μ) */
+    /** Hohmann transfer time: t = Ãâ‚¬ * Ã¢Ë†Å¡(aÃ‚Â³ / ÃŽÂ¼) */
     public static Real hohmannTransferTime(Real r1, Real r2, Real mu) {
         Real a_transfer = r1.add(r2).divide(Real.TWO);
         return Real.PI.multiply(a_transfer.pow(3).divide(mu).sqrt());
@@ -88,3 +88,5 @@ public class TransferOrbit {
         return synodicPeriod(periodEarth, periodTarget);
     }
 }
+
+

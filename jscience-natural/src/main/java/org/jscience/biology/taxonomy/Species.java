@@ -31,7 +31,7 @@ import java.util.Objects;
  * Represents a biological species with full taxonomic classification.
  * <p>
  * Uses Linnaean taxonomy with the standard ranks:
- * Kingdom → Phylum → Class → Order → Family → Genus → Species
+ * Kingdom Ã¢â€ â€™ Phylum Ã¢â€ â€™ Class Ã¢â€ â€™ Order Ã¢â€ â€™ Family Ã¢â€ â€™ Genus Ã¢â€ â€™ Species
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -232,3 +232,5 @@ public class Species {
         return Objects.hash(scientificName);
     }
 }
+
+

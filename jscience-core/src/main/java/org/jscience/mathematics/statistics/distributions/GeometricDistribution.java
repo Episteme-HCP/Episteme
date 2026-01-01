@@ -66,3 +66,4 @@ public class GeometricDistribution extends DiscreteDistribution {
         return String.format("Geometric(p=%.4f)", p.doubleValue());
     }
 }
+

@@ -44,3 +44,5 @@ public interface CircuitComponent {
      */
     Real getCurrent(Real voltage, Real dt);
 }
+
+

@@ -35,7 +35,7 @@ import org.jscience.mathematics.statistics.ContinuousDistribution;
  */
 public class WeibullDistribution extends ContinuousDistribution {
     private final Real shape; // k
-    private final Real scale; // λ
+    private final Real scale; // ÃŽÂ»
 
     public WeibullDistribution(Real shape, Real scale) {
         if (shape.compareTo(Real.ZERO) <= 0 || scale.compareTo(Real.ZERO) <= 0) {
@@ -80,6 +80,7 @@ public class WeibullDistribution extends ContinuousDistribution {
 
     @Override
     public String toString() {
-        return String.format("Weibull(k=%.4f, λ=%.4f)", shape.doubleValue(), scale.doubleValue());
+        return String.format("Weibull(k=%.4f, ÃŽÂ»=%.4f)", shape.doubleValue(), scale.doubleValue());
     }
 }
+

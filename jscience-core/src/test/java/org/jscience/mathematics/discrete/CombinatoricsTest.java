@@ -149,3 +149,4 @@ public class CombinatoricsTest {
         assertEquals(BigInteger.valueOf(14), Combinatorics.catalan(4));
     }
 }
+

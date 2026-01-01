@@ -33,7 +33,7 @@ public class PolynomialTest {
 
     @Test
     public void testPolynomialCreation() {
-        // p(x) = 2 + 3x + x²
+        // p(x) = 2 + 3x + xÃ‚Â²
         Polynomial<Real> p = Polynomial.of(Reals.getInstance(),
                 Real.of(2), Real.of(3), Real.ONE);
 
@@ -57,7 +57,7 @@ public class PolynomialTest {
 
     @Test
     public void testPolynomialMultiplication() {
-        // (1 + x) * (1 + x) = 1 + 2x + x²
+        // (1 + x) * (1 + x) = 1 + 2x + xÃ‚Â²
         Polynomial<Real> p = Polynomial.of(Reals.getInstance(), Real.ONE, Real.ONE);
 
         Polynomial<Real> square = p.multiply(p);
@@ -70,7 +70,7 @@ public class PolynomialTest {
 
     @Test
     public void testPolynomialEvaluation() {
-        // p(x) = 2 + 3x + x²
+        // p(x) = 2 + 3x + xÃ‚Â²
         // p(2) = 2 + 6 + 4 = 12
         Polynomial<Real> p = Polynomial.of(Reals.getInstance(),
                 Real.of(2), Real.of(3), Real.ONE);
@@ -80,3 +80,4 @@ public class PolynomialTest {
         assertEquals(Real.of(12), result);
     }
 }
+

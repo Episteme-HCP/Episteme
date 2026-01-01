@@ -31,13 +31,13 @@ import org.jscience.mathematics.linearalgebra.Vector;
 /**
  * Minkowski metric (Lp norm).
  * <p>
- * d(x,y) = (Σ|xᵢ - yᵢ|ᵖ)^(1/p)
+ * d(x,y) = (ÃŽÂ£|xÃ¡ÂµÂ¢ - yÃ¡ÂµÂ¢|Ã¡Âµâ€“)^(1/p)
  * </p>
  * <p>
  * Special cases:
  * - p = 1: Manhattan metric
  * - p = 2: Euclidean metric
- * - p = ∞: Chebyshev metric
+ * - p = Ã¢Ë†Å¾: Chebyshev metric
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -93,3 +93,5 @@ public class MinkowskiMetric implements Metric<Vector<Real>> {
         return p;
     }
 }
+
+

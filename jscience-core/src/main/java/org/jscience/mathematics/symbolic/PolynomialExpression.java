@@ -286,3 +286,4 @@ public class PolynomialExpression<T extends Ring<T>> implements Expression<T> {
                 .collect(Collectors.joining(" + "));
     }
 }
+

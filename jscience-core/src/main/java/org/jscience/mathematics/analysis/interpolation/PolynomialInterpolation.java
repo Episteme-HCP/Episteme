@@ -29,8 +29,8 @@ import java.util.List;
 /**
  * Polynomial interpolation methods.
  * <p>
- * Given points (x₀,y₀), (x₁,y₁), ..., (xₙ,yₙ), find polynomial P(x) such that
- * P(xᵢ) = yᵢ.
+ * Given points (xÃ¢â€šâ‚¬,yÃ¢â€šâ‚¬), (xÃ¢â€šÂ,yÃ¢â€šÂ), ..., (xÃ¢â€šâ„¢,yÃ¢â€šâ„¢), find polynomial P(x) such that
+ * P(xÃ¡ÂµÂ¢) = yÃ¡ÂµÂ¢.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -42,8 +42,8 @@ public class PolynomialInterpolation {
     /**
      * Lagrange interpolation polynomial.
      * <p>
-     * Constructs polynomial of degree ≤ n passing through n+1 points.
-     * Time complexity: O(n²) for evaluation.
+     * Constructs polynomial of degree Ã¢â€°Â¤ n passing through n+1 points.
+     * Time complexity: O(nÃ‚Â²) for evaluation.
      * </p>
      * 
      * @param xPoints x-coordinates
@@ -158,7 +158,7 @@ public class PolynomialInterpolation {
     /**
      * Cubic spline interpolation (natural boundary conditions).
      * <p>
-     * Produces smooth C² continuous curve through points.
+     * Produces smooth CÃ‚Â² continuous curve through points.
      * </p>
      */
     public static java.util.function.Function<Real, Real> cubicSpline(List<Real> xPoints, List<Real> yPoints) {
@@ -212,3 +212,5 @@ public class PolynomialInterpolation {
         };
     }
 }
+
+

@@ -232,3 +232,5 @@ public class Line3D implements GeometricObject<Point3D> {
                 .add(a.z().multiply(b.z()));
     }
 }
+
+

@@ -108,3 +108,4 @@ public class CoqImporter implements FormalSystemImporter {
         return new String[] { ".v", ".vo" };
     }
 }
+

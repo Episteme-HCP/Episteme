@@ -29,10 +29,10 @@ import org.jscience.mathematics.structures.rings.Ring;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * Represents a power series Σ aₙxⁿ.
+ * Represents a power series ÃŽÂ£ aÃ¢â€šâ„¢xÃ¢ÂÂ¿.
  * <p>
  * A power series is an infinite series of the form:
- * f(x) = a₀ + a₁x + a₂x² + a₃x³ + ...
+ * f(x) = aÃ¢â€šâ‚¬ + aÃ¢â€šÂx + aÃ¢â€šâ€šxÃ‚Â² + aÃ¢â€šÆ’xÃ‚Â³ + ...
  * </p>
  * <p>
  * This implementation supports:
@@ -48,16 +48,16 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public class Series<T extends Ring<T>> {
 
-    private final List<T> coefficients; // a₀, a₁, a₂, ...
-    private final T center; // Expansion point (x₀)
+    private final List<T> coefficients; // aÃ¢â€šâ‚¬, aÃ¢â€šÂ, aÃ¢â€šâ€š, ...
+    private final T center; // Expansion point (xÃ¢â€šâ‚¬)
     private final Ring<T> ring;
     private final Real convergenceRadius; // Radius of convergence (can be infinite)
 
     /**
      * Creates a power series with given coefficients.
      * 
-     * @param coefficients the series coefficients [a₀, a₁, a₂, ...]
-     * @param center       the expansion center (x₀)
+     * @param coefficients the series coefficients [aÃ¢â€šâ‚¬, aÃ¢â€šÂ, aÃ¢â€šâ€š, ...]
+     * @param center       the expansion center (xÃ¢â€šâ‚¬)
      * @param ring         the ring structure
      */
     public Series(List<T> coefficients, T center, Ring<T> ring) {
@@ -67,8 +67,8 @@ public class Series<T extends Ring<T>> {
     /**
      * Creates a power series with given coefficients and convergence radius.
      * 
-     * @param coefficients      the series coefficients [a₀, a₁, a₂, ...]
-     * @param center            the expansion center (x₀)
+     * @param coefficients      the series coefficients [aÃ¢â€šâ‚¬, aÃ¢â€šÂ, aÃ¢â€šâ€š, ...]
+     * @param center            the expansion center (xÃ¢â€šâ‚¬)
      * @param ring              the ring structure
      * @param convergenceRadius the radius of convergence
      */
@@ -80,7 +80,7 @@ public class Series<T extends Ring<T>> {
     }
 
     /**
-     * Creates a Maclaurin series (expansion around x₀ = 0).
+     * Creates a Maclaurin series (expansion around xÃ¢â€šâ‚¬ = 0).
      * 
      * @param <T>          the type
      * @param coefficients the series coefficients
@@ -92,7 +92,7 @@ public class Series<T extends Ring<T>> {
     }
 
     /**
-     * Creates a Taylor series for exp(x) = 1 + x + x²/2! + x³/3! + ...
+     * Creates a Taylor series for exp(x) = 1 + x + xÃ‚Â²/2! + xÃ‚Â³/3! + ...
      * 
      * @param order the number of terms
      * @return the Taylor series for exp(x)
@@ -112,7 +112,7 @@ public class Series<T extends Ring<T>> {
     }
 
     /**
-     * Creates a Taylor series for sin(x) = x - x³/3! + x⁵/5! - ...
+     * Creates a Taylor series for sin(x) = x - xÃ‚Â³/3! + xÃ¢ÂÂµ/5! - ...
      * 
      * @param order the number of terms
      * @return the Taylor series for sin(x)
@@ -139,7 +139,7 @@ public class Series<T extends Ring<T>> {
     }
 
     /**
-     * Creates a Taylor series for cos(x) = 1 - x²/2! + x⁴/4! - ...
+     * Creates a Taylor series for cos(x) = 1 - xÃ‚Â²/2! + xÃ¢ÂÂ´/4! - ...
      * 
      * @param order the number of terms
      * @return the Taylor series for cos(x)
@@ -167,7 +167,7 @@ public class Series<T extends Ring<T>> {
 
     /**
      * Creates a Taylor series for a differentiable function around a point a.
-     * f(x) = f(a) + f'(a)(x-a) + f''(a)(x-a)²/2! + ...
+     * f(x) = f(a) + f'(a)(x-a) + f''(a)(x-a)Ã‚Â²/2! + ...
      * 
      * @param f     the function to expand
      * @param a     the expansion point
@@ -311,7 +311,7 @@ public class Series<T extends Ring<T>> {
 
         List<T> result = new ArrayList<>();
         for (int n = 1; n < coefficients.size(); n++) {
-            // d/dx[aₙxⁿ] = n·aₙxⁿ⁻¹
+            // d/dx[aÃ¢â€šâ„¢xÃ¢ÂÂ¿] = nÃ‚Â·aÃ¢â€šâ„¢xÃ¢ÂÂ¿Ã¢ÂÂ»Ã‚Â¹
             T nCoeff = ring.multiply(coefficients.get(n), fromInt(n));
             result.add(nCoeff);
         }
@@ -329,7 +329,7 @@ public class Series<T extends Ring<T>> {
         result.add(ring.zero()); // Constant of integration
 
         for (int n = 0; n < coefficients.size(); n++) {
-            // ∫aₙxⁿdx = aₙ/(n+1)·xⁿ⁺¹
+            // Ã¢Ë†Â«aÃ¢â€šâ„¢xÃ¢ÂÂ¿dx = aÃ¢â€šâ„¢/(n+1)Ã‚Â·xÃ¢ÂÂ¿Ã¢ÂÂºÃ‚Â¹
             T coeff = ring.multiply(coefficients.get(n), fromInt(1)); // Simplified - division not available
             result.add(coeff);
         }
@@ -347,7 +347,7 @@ public class Series<T extends Ring<T>> {
     }
 
     /**
-     * Returns the coefficient of xⁿ.
+     * Returns the coefficient of xÃ¢ÂÂ¿.
      * 
      * @param n the power
      * @return the coefficient
@@ -392,7 +392,7 @@ public class Series<T extends Ring<T>> {
 
             sb.append(coeff);
             if (n > 0) {
-                sb.append("·x");
+                sb.append("Ã‚Â·x");
                 if (n > 1) {
                     sb.append("^").append(n);
                 }
@@ -414,3 +414,4 @@ public class Series<T extends Ring<T>> {
         return result;
     }
 }
+

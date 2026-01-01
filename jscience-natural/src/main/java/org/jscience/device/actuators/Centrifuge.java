@@ -67,3 +67,5 @@ public interface Centrifuge extends Actuator<Real> {
 
     boolean isRunning();
 }
+
+

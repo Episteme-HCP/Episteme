@@ -30,14 +30,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a Bézier curve.
+ * Represents a BÃƒÂ©zier curve.
  * <p>
- * A Bézier curve is defined by control points P₀, P₁, ..., Pₙ.
+ * A BÃƒÂ©zier curve is defined by control points PÃ¢â€šâ‚¬, PÃ¢â€šÂ, ..., PÃ¢â€šâ„¢.
  * The curve is computed using the Bernstein polynomial basis:
  * </p>
  * <p>
- * C(t) = Σᵢ Bᵢ,ₙ(t) * Pᵢ
- * where Bᵢ,ₙ(t) = C(n,i) * t^i * (1-t)^(n-i)
+ * C(t) = ÃŽÂ£Ã¡ÂµÂ¢ BÃ¡ÂµÂ¢,Ã¢â€šâ„¢(t) * PÃ¡ÂµÂ¢
+ * where BÃ¡ÂµÂ¢,Ã¢â€šâ„¢(t) = C(n,i) * t^i * (1-t)^(n-i)
  * </p>
  * <p>
  * Properties:
@@ -58,7 +58,7 @@ public class BezierCurve implements ParametricCurve {
     private final int dimension;
 
     /**
-     * Creates a Bézier curve from control points.
+     * Creates a BÃƒÂ©zier curve from control points.
      * 
      * @param controlPoints the control points (must have at least 2)
      */
@@ -92,7 +92,7 @@ public class BezierCurve implements ParametricCurve {
     }
 
     /**
-     * De Casteljau's algorithm for evaluating Bézier curves.
+     * De Casteljau's algorithm for evaluating BÃƒÂ©zier curves.
      * <p>
      * This is numerically stable and works by recursive linear interpolation.
      * </p>
@@ -131,7 +131,7 @@ public class BezierCurve implements ParametricCurve {
     }
 
     /**
-     * Returns the degree of the Bézier curve.
+     * Returns the degree of the BÃƒÂ©zier curve.
      * 
      * @return the degree (number of control points - 1)
      */
@@ -140,13 +140,13 @@ public class BezierCurve implements ParametricCurve {
     }
 
     /**
-     * Elevates the degree of the Bézier curve.
+     * Elevates the degree of the BÃƒÂ©zier curve.
      * <p>
      * Degree elevation adds a control point while keeping the curve shape
      * unchanged.
      * </p>
      * 
-     * @return a new Bézier curve with elevated degree
+     * @return a new BÃƒÂ©zier curve with elevated degree
      */
     public BezierCurve elevateDegree() {
         int n = degree;
@@ -169,13 +169,13 @@ public class BezierCurve implements ParametricCurve {
     }
 
     /**
-     * Subdivides the Bézier curve at parameter t.
+     * Subdivides the BÃƒÂ©zier curve at parameter t.
      * <p>
-     * Returns two Bézier curves that together form the original curve.
+     * Returns two BÃƒÂ©zier curves that together form the original curve.
      * </p>
      * 
      * @param t the parameter at which to subdivide
-     * @return array of two Bézier curves [left, right]
+     * @return array of two BÃƒÂ©zier curves [left, right]
      */
     public BezierCurve[] subdivide(Real t) {
         // Use De Casteljau's algorithm to get subdivision points
@@ -219,3 +219,5 @@ public class BezierCurve implements ParametricCurve {
         return "BezierCurve(degree=" + degree + ", points=" + controlPoints.size() + ")";
     }
 }
+
+

@@ -21,11 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Economic modeling, financial quantities, and market simulations.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.economics.loaders;
+
+

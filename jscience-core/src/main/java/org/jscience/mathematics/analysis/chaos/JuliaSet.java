@@ -28,14 +28,14 @@ import org.jscience.mathematics.numbers.complex.Complex;
 /**
  * Julia Set as a proper mathematical set.
  * <p>
- * For a given complex parameter c, the Julia set J_c ⊂ ℂ is defined as:
- * J_c = { z ∈ ℂ : the sequence z₀ = z, zₙ₊₁ = zₙ² + c remains bounded }
+ * For a given complex parameter c, the Julia set J_c Ã¢Å â€š Ã¢â€žâ€š is defined as:
+ * J_c = { z Ã¢Ë†Ë† Ã¢â€žâ€š : the sequence zÃ¢â€šâ‚¬ = z, zÃ¢â€šâ„¢Ã¢â€šÅ Ã¢â€šÂ = zÃ¢â€šâ„¢Ã‚Â² + c remains bounded }
  * </p>
  *
  * <h2>References</h2>
  * <ul>
- * <li>Gaston Julia, "Mémoire sur l'itération des fonctions rationnelles",
- * Journal de Mathématiques Pures et Appliquées, Vol. 8, 1918, pp. 47-245</li>
+ * <li>Gaston Julia, "MÃƒÂ©moire sur l'itÃƒÂ©ration des fonctions rationnelles",
+ * Journal de MathÃƒÂ©matiques Pures et AppliquÃƒÂ©es, Vol. 8, 1918, pp. 47-245</li>
  * <li>Benoit B. Mandelbrot, "The Fractal Geometry of Nature",
  * W.H. Freeman and Company, 1982 (popularized Julia sets)</li>
  * </ul>
@@ -110,3 +110,4 @@ public class JuliaSet implements org.jscience.mathematics.structures.sets.Set<Co
         return maxIterations;
     }
 }
+

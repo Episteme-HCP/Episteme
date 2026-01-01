@@ -22,18 +22,6 @@
  */
 
 /**
- * Provides user interface components and visualization tools.
- * <p>
- * Built on JavaFX, this package offers:
- * <ul>
- * <li>2D and 3D Plotting</li>
- * <li>Domain-specific viewers (Astronomy star maps, Molecule viewers)</li>
- * <li>Interactive editor components</li>
- * </ul>
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Offers:
  */
 package org.jscience.ui;

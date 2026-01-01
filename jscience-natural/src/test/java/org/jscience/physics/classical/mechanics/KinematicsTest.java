@@ -93,3 +93,5 @@ public class KinematicsTest {
         assertEquals(20.0, ke.to(Units.JOULE).getValue().doubleValue(), 1e-9);
     }
 }
+
+

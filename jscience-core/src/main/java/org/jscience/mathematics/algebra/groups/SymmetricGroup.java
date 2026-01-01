@@ -142,3 +142,5 @@ public class SymmetricGroup implements Group<SymmetricGroup.Permutation> {
         }
     }
 }
+
+

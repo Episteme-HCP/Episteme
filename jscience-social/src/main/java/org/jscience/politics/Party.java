@@ -120,3 +120,5 @@ public class Party {
         return String.format("%s (%s) - %s", name, abbreviation, ideology);
     }
 }
+
+

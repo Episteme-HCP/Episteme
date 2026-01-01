@@ -86,3 +86,5 @@ public class MacroModel {
         return economy.getGdp().multiply(Real.ONE.add(assumedGrowthRate).pow(Real.of(years)));
     }
 }
+
+

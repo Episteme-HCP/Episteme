@@ -126,3 +126,5 @@ public interface Plot2D {
     Plot2D addSeries(List<Real> xData, List<Real> yData, String label, SeriesStyle style);
 }
 
+
+

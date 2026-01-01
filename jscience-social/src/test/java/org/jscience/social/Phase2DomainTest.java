@@ -91,3 +91,5 @@ public class Phase2DomainTest {
         assertEquals(Behavior.Type.INSTINCTIVE, instinct.getType());
     }
 }
+
+

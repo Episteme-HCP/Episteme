@@ -26,7 +26,7 @@ package org.jscience.mathematics.structures.categories;
 /**
  * Represents a Natural Transformation between two functors.
  * <p>
- * A natural transformation η: F => G provides a way to transform one functor
+ * A natural transformation ÃŽÂ·: F => G provides a way to transform one functor
  * into another
  * while respecting the internal structure of the categories involved.
  * </p>
@@ -40,11 +40,11 @@ public interface NaturalTransformation<O1, M1, O2, M2> {
     /**
      * Returns the component of the natural transformation at a given object.
      * <p>
-     * For an object X in C, the component η_X is a morphism in D from F(X) to G(X).
+     * For an object X in C, the component ÃŽÂ·_X is a morphism in D from F(X) to G(X).
      * </p>
      * 
      * @param object the object X in C
-     * @return the morphism η_X: F(X) -> G(X) in D
+     * @return the morphism ÃŽÂ·_X: F(X) -> G(X) in D
      */
     M2 component(O1 object);
 
@@ -58,3 +58,4 @@ public interface NaturalTransformation<O1, M1, O2, M2> {
      */
     Functor<O1, M1, O2, M2> getTargetFunctor();
 }
+

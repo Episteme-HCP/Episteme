@@ -21,14 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Electrical engineering calculations.
- * <p>
- * Includes circuit analysis, power calculations, and AC/DC analysis.
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 package org.jscience.engineering.electrical;
+
+

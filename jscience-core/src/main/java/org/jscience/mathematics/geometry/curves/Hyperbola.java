@@ -28,7 +28,7 @@ import org.jscience.mathematics.geometry.Point2D;
 /**
  * Represents a hyperbola in 2D space.
  * <p>
- * A hyperbola is defined by the equation: (x-h)²/a² - (y-k)²/b² = 1
+ * A hyperbola is defined by the equation: (x-h)Ã‚Â²/aÃ‚Â² - (y-k)Ã‚Â²/bÃ‚Â² = 1
  * where (h,k) is the center, a is the semi-transverse axis, and b is the
  * semi-conjugate axis.
  * </p>
@@ -86,7 +86,7 @@ public class Hyperbola {
     }
 
     /**
-     * Returns the foci distance from center: c = sqrt(a² + b²).
+     * Returns the foci distance from center: c = sqrt(aÃ‚Â² + bÃ‚Â²).
      */
     public double getFocalDistance() {
         return Math.sqrt(a * a + b * b);
@@ -146,7 +146,7 @@ public class Hyperbola {
     }
 
     /**
-     * Returns the asymptote slopes: ±b/a
+     * Returns the asymptote slopes: Ã‚Â±b/a
      */
     public double[] getAsymptoteSlopes() {
         double slope = b / a;
@@ -175,3 +175,5 @@ public class Hyperbola {
                 centerX, centerY, a, b, getEccentricity());
     }
 }
+
+

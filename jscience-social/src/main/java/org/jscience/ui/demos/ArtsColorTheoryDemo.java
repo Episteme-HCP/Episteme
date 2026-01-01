@@ -34,7 +34,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.AppProvider;
 
 /**
  * 
@@ -42,11 +42,16 @@ import org.jscience.ui.DemoProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ArtsColorTheoryDemo implements DemoProvider {
+public class ArtsColorTheoryDemo implements AppProvider {
+
+    @Override
+    public boolean isDemo() {
+        return true;
+    }
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.arts");
+        return "Arts";
     }
 
     @Override
@@ -153,3 +158,5 @@ public class ArtsColorTheoryDemo implements DemoProvider {
                 (int) (c.getBlue() * 255));
     }
 }
+
+

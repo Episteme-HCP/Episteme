@@ -96,3 +96,5 @@ public class CorePojoTests {
         PojoTester.testPojo(org.jscience.mathematics.algebra.groups.U1Group.class);
     }
 }
+
+

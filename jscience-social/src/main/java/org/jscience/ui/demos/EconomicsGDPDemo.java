@@ -33,7 +33,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.jscience.ui.DemoProvider;
+import org.jscience.ui.AppProvider;
 
 /**
  * Economic Growth Model Demo.
@@ -43,11 +43,16 @@ import org.jscience.ui.DemoProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class EconomicsGDPDemo implements DemoProvider {
+public class EconomicsGDPDemo implements AppProvider {
+
+    @Override
+    public boolean isDemo() {
+        return true;
+    }
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.economics");
+        return "Economics";
     }
 
     @Override
@@ -77,8 +82,9 @@ public class EconomicsGDPDemo implements DemoProvider {
                 String.format(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.gdp.label.rate_fmt"), 2.0));
 
         rateSlider.valueProperty().addListener((obs, old, val) -> {
-            rateLabel.setText(String.format(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.gdp.label.rate_fmt"),
-                    val.doubleValue()));
+            rateLabel
+                    .setText(String.format(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.gdp.label.rate_fmt"),
+                            val.doubleValue()));
             updateChart(chart, val.doubleValue() / 100.0);
         });
 
@@ -112,3 +118,5 @@ public class EconomicsGDPDemo implements DemoProvider {
         chart.getData().add(series);
     }
 }
+
+

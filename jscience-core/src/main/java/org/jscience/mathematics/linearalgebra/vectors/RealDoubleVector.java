@@ -98,3 +98,5 @@ public class RealDoubleVector extends DenseVector<Real> {
         return "RealDoubleVector[" + dimension() + "]";
     }
 }
+
+

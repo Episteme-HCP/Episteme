@@ -61,6 +61,7 @@ public class TriangularSequence implements IntegerSequence {
 
     @Override
     public String getCodomain() {
-        return "ℤ⁺ ∪ {0}";
+        return "Ã¢â€žÂ¤Ã¢ÂÂº Ã¢Ë†Âª {0}";
     }
 }
+

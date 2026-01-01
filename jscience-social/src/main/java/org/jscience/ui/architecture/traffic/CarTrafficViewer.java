@@ -342,3 +342,5 @@ public class CarTrafficViewer extends Application {
         new CarTrafficViewer().start(stage);
     }
 }
+
+

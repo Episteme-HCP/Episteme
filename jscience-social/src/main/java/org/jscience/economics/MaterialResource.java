@@ -79,3 +79,5 @@ public class MaterialResource<Q extends org.jscience.measure.Quantity<Q>> extend
         return identification.hashCode();
     }
 }
+
+

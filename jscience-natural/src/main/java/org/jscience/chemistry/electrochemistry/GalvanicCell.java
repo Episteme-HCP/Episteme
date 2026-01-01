@@ -46,7 +46,7 @@ public class GalvanicCell {
 
     /**
      * Calculates the standard cell potential.
-     * E°cell = E°cathode - E°anode
+     * EÃ‚Â°cell = EÃ‚Â°cathode - EÃ‚Â°anode
      * 
      * @return standard cell potential
      */
@@ -66,6 +66,8 @@ public class GalvanicCell {
 
     @Override
     public String toString() {
-        return String.format("Anode: %s | Cathode: %s | E°cell = %s", anode, cathode, getStandardPotential());
+        return String.format("Anode: %s | Cathode: %s | EÃ‚Â°cell = %s", anode, cathode, getStandardPotential());
     }
 }
+
+

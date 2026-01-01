@@ -36,9 +36,9 @@ import org.jscience.mathematics.numbers.complex.Complex;
 public class Wave {
 
     private Real amplitude; // A
-    private Real waveNumber; // k = 2π/λ
-    private Real angularFrequency; // ω = 2πf
-    private Real phase; // φ
+    private Real waveNumber; // k = 2Ãâ‚¬/ÃŽÂ»
+    private Real angularFrequency; // Ãâ€° = 2Ãâ‚¬f
+    private Real phase; // Ãâ€ 
 
     public Wave(Real amplitude, Real waveNumber, Real angularFrequency, Real phase) {
         this.amplitude = amplitude;
@@ -99,7 +99,7 @@ public class Wave {
     // --- Superposition ---
 
     /**
-     * Superposition of two waves (same k, ω assumed for simplicity).
+     * Superposition of two waves (same k, Ãâ€° assumed for simplicity).
      */
     public static Wave superpose(Wave w1, Wave w2) {
         Real newAmplitude = w1.amplitude.add(w2.amplitude);
@@ -123,3 +123,5 @@ public class Wave {
         return phase;
     }
 }
+
+

@@ -50,7 +50,7 @@ import java.io.File;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class HumanBodyViewer extends Application implements org.jscience.ui.DemoProvider {
+public class HumanBodyViewer extends Application implements org.jscience.ui.ViewerProvider {
 
     @Override
     public String getCategory() {
@@ -65,11 +65,6 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.Demo
     @Override
     public String getDescription() {
         return "3D Interactive Human Anatomy with skeleton, muscles and organs.";
-    }
-
-    @Override
-    public boolean isViewer() {
-        return true;
     }
 
     @Override
@@ -932,3 +927,5 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.Demo
         launch(args);
     }
 }
+
+

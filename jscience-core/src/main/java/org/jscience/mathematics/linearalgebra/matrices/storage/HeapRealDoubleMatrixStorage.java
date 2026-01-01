@@ -90,3 +90,5 @@ public class HeapRealDoubleMatrixStorage implements RealDoubleMatrixStorage {
         return new HeapRealDoubleMatrixStorage(data.clone(), rows, cols);
     }
 }
+
+

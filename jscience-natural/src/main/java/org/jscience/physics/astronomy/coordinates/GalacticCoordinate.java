@@ -26,8 +26,8 @@ package org.jscience.physics.astronomy.coordinates;
 /**
  * Galactic coordinate system.
  *
- * l: Galactic longitude (0° toward Galactic center, increases counterclockwise)
- * b: Galactic latitude (0° = Galactic plane, +90° = North Galactic Pole)
+ * l: Galactic longitude (0Ã‚Â° toward Galactic center, increases counterclockwise)
+ * b: Galactic latitude (0Ã‚Â° = Galactic plane, +90Ã‚Â° = North Galactic Pole)
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -105,14 +105,14 @@ public class GalacticCoordinate {
     }
 
     /**
-     * Checks if coordinate is in the Galactic plane (|b| < 10°).
+     * Checks if coordinate is in the Galactic plane (|b| < 10Ã‚Â°).
      */
     public boolean isInGalacticPlane() {
         return Math.abs(b) < 10;
     }
 
     /**
-     * Checks if coordinate is toward the Galactic center (|l| < 30°).
+     * Checks if coordinate is toward the Galactic center (|l| < 30Ã‚Â°).
      */
     public boolean isTowardCenter() {
         return l < 30 || l > 330;
@@ -125,7 +125,7 @@ public class GalacticCoordinate {
 
     @Override
     public String toString() {
-        return String.format("l=%.2f°, b=%.2f°", l, b);
+        return String.format("l=%.2fÃ‚Â°, b=%.2fÃ‚Â°", l, b);
     }
 
     // --- Notable galactic coordinates ---
@@ -139,3 +139,5 @@ public class GalacticCoordinate {
     /** North Galactic Pole */
     public static final GalacticCoordinate NORTH_GALACTIC_POLE = new GalacticCoordinate(0.0, 90.0);
 }
+
+

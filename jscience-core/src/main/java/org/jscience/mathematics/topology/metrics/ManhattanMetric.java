@@ -31,7 +31,7 @@ import org.jscience.mathematics.linearalgebra.Vector;
 /**
  * Manhattan metric (L1 norm, taxicab metric).
  * <p>
- * d(x,y) = Σ|xi - yi|
+ * d(x,y) = ÃŽÂ£|xi - yi|
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -55,3 +55,5 @@ public class ManhattanMetric implements Metric<Vector<Real>> {
         return sum;
     }
 }
+
+

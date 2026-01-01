@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Modus Tollens inference rule.
  * <p>
- * From ¬B and A → B, infer ¬A.
+ * From Ã‚Â¬B and A Ã¢â€ â€™ B, infer Ã‚Â¬A.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -44,3 +44,4 @@ public class ModusTollens implements InferenceRule {
         return true;
     }
 }
+

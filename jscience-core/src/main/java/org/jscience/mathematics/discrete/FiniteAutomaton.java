@@ -28,13 +28,13 @@ import java.util.*;
 /**
  * Deterministic Finite Automaton (DFA).
  * <p>
- * A DFA is defined by M = (Q, Σ, δ, q₀, F) where:
+ * A DFA is defined by M = (Q, ÃŽÂ£, ÃŽÂ´, qÃ¢â€šâ‚¬, F) where:
  * <ul>
  * <li>Q is a finite set of states</li>
- * <li>Σ is the input alphabet</li>
- * <li>δ: Q × Σ → Q is the transition function</li>
- * <li>q₀ ∈ Q is the initial state</li>
- * <li>F ⊆ Q is the set of accepting states</li>
+ * <li>ÃŽÂ£ is the input alphabet</li>
+ * <li>ÃŽÂ´: Q Ãƒâ€” ÃŽÂ£ Ã¢â€ â€™ Q is the transition function</li>
+ * <li>qÃ¢â€šâ‚¬ Ã¢Ë†Ë† Q is the initial state</li>
+ * <li>F Ã¢Å â€  Q is the set of accepting states</li>
  * </ul>
  * </p>
  *
@@ -144,3 +144,4 @@ public class FiniteAutomaton<S, A> {
         return Collections.unmodifiableSet(acceptingStates);
     }
 }
+

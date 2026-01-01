@@ -34,16 +34,16 @@ package org.jscience.mathematics.structures.rings;
  *
  * <h2>Mathematical Definition</h2>
  * <p>
- * A division ring (D, +, ×) is a ring with unity (1 ≠ 0) such that:
+ * A division ring (D, +, Ãƒâ€”) is a ring with unity (1 Ã¢â€°Â  0) such that:
  * <ul>
- * <li>For every a ∈ D \ {0}, there exists a⁻¹ ∈ D such that a × a⁻¹ = a⁻¹ × a =
+ * <li>For every a Ã¢Ë†Ë† D \ {0}, there exists aÃ¢ÂÂ»Ã‚Â¹ Ã¢Ë†Ë† D such that a Ãƒâ€” aÃ¢ÂÂ»Ã‚Â¹ = aÃ¢ÂÂ»Ã‚Â¹ Ãƒâ€” a =
  * 1</li>
  * </ul>
  * </p>
  *
  * <h2>Examples</h2>
  * <ul>
- * <li>ℍ - Quaternions (non-commutative)</li>
+ * <li>Ã¢â€žÂ - Quaternions (non-commutative)</li>
  * <li>Field - Commutative division ring</li>
  * </ul>
  *
@@ -56,7 +56,7 @@ public interface DivisionRing<E> extends Ring<E> {
     /**
      * Returns the multiplicative inverse of a non-zero element.
      * <p>
-     * For element a ≠ 0, returns a⁻¹ such that: a × a⁻¹ = a⁻¹ × a = 1
+     * For element a Ã¢â€°Â  0, returns aÃ¢ÂÂ»Ã‚Â¹ such that: a Ãƒâ€” aÃ¢ÂÂ»Ã‚Â¹ = aÃ¢ÂÂ»Ã‚Â¹ Ãƒâ€” a = 1
      * </p>
      * 
      * @param element the element to invert (must be non-zero)
@@ -68,20 +68,21 @@ public interface DivisionRing<E> extends Ring<E> {
     /**
      * Returns the quotient of two elements (division).
      * <p>
-     * Defined as: a ÷ b = a × b⁻¹
+     * Defined as: a ÃƒÂ· b = a Ãƒâ€” bÃ¢ÂÂ»Ã‚Â¹
      * </p>
      * <p>
      * Note: In non-commutative rings, this is typically defined as right division.
-     * For left division (b⁻¹ × a), explicit multiplication by inverse is
+     * For left division (bÃ¢ÂÂ»Ã‚Â¹ Ãƒâ€” a), explicit multiplication by inverse is
      * recommended.
      * </p>
      * 
      * @param dividend the dividend (numerator)
      * @param divisor  the divisor (denominator, must be non-zero)
-     * @return dividend ÷ divisor
+     * @return dividend ÃƒÂ· divisor
      * @throws ArithmeticException if divisor is zero
      */
     default E divide(E dividend, E divisor) {
         return multiply(dividend, inverse(divisor));
     }
 }
+

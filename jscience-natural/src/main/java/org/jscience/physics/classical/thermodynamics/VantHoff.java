@@ -33,8 +33,8 @@ package org.jscience.physics.classical.thermodynamics;
 public class VantHoff {
 
     /**
-     * Calculates K at T2 given K at T1 and ΔH°.
-     * ln(K2/K1) = (-ΔH°/R) * (1/T2 - 1/T1)
+     * Calculates K at T2 given K at T1 and ÃŽâ€HÃ‚Â°.
+     * ln(K2/K1) = (-ÃŽâ€HÃ‚Â°/R) * (1/T2 - 1/T1)
      * 
      * @param k1     Equilibrium constant at T1
      * @param t1     Initial temperature (K)
@@ -48,3 +48,5 @@ public class VantHoff {
         return k1 * Math.exp(exponent);
     }
 }
+
+

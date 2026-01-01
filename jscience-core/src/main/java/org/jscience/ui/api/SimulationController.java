@@ -109,3 +109,5 @@ public class SimulationController {
     record StatusResponse(boolean running, int connectedClients) {
     }
 }
+
+

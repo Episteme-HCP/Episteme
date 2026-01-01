@@ -22,17 +22,6 @@
  */
 
 /**
- * Propositional logic - classical Boolean logic.
- * <p>
- * This package contains fundamental propositional logic components including
- * Boolean logic, propositions, and truth values.
- * </p>
- * <p>
- * <b>Core concepts:</b>
- * <ul>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Contains fundamental propositional logic components including
  */
 package org.jscience.mathematics.logic.propositional;

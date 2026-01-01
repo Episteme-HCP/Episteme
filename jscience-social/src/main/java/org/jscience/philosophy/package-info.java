@@ -22,10 +22,6 @@
  */
 
 /**
- * Philosophy package - philosophical concepts, traditions, and branches.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * - philosophical concepts, traditions, and branches.
  */
 package org.jscience.philosophy;

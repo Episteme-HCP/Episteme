@@ -36,12 +36,12 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public class HeatTransfer {
 
-    /** Stefan-Boltzmann constant (W/(m²·K⁴)) */
+    /** Stefan-Boltzmann constant (W/(mÃ‚Â²Ã‚Â·KÃ¢ÂÂ´)) */
     public static final Real STEFAN_BOLTZMANN = Real.of(5.670374419e-8);
 
     /**
      * Conductive heat transfer (Fourier's law).
-     * Q = k * A * ΔT / d
+     * Q = k * A * ÃŽâ€T / d
      */
     public static Real conduction(Real k, Real area, Real deltaT, Real thickness) {
         return k.multiply(area).multiply(deltaT).divide(thickness);
@@ -49,7 +49,7 @@ public class HeatTransfer {
 
     /**
      * Convective heat transfer (Newton's law of cooling).
-     * Q = h * A * (T_s - T_∞)
+     * Q = h * A * (T_s - T_Ã¢Ë†Å¾)
      */
     public static Real convection(Real h, Real area, Real deltaT) {
         return h.multiply(area).multiply(deltaT);
@@ -57,7 +57,7 @@ public class HeatTransfer {
 
     /**
      * Radiative heat transfer (Stefan-Boltzmann law).
-     * Q = ε * σ * A * (T₁⁴ - T₂⁴)
+     * Q = ÃŽÂµ * ÃÆ’ * A * (TÃ¢â€šÂÃ¢ÂÂ´ - TÃ¢â€šâ€šÃ¢ÂÂ´)
      */
     public static Real radiation(Real emissivity, Real area, Real T1, Real T2) {
         return emissivity.multiply(STEFAN_BOLTZMANN).multiply(area)
@@ -82,7 +82,7 @@ public class HeatTransfer {
 
     /**
      * Overall heat transfer coefficient for composite wall.
-     * 1/U = 1/h₁ + Σ(d_i/k_i) + 1/h₂
+     * 1/U = 1/hÃ¢â€šÂ + ÃŽÂ£(d_i/k_i) + 1/hÃ¢â€šâ€š
      */
     public static Real overallHeatTransferCoefficient(Real h1, Real h2,
             Vector<Real> thicknesses, Vector<Real> conductivities) {
@@ -137,7 +137,7 @@ public class HeatTransfer {
         return Real.of(0.023).multiply(Re.pow(Real.of(0.8))).multiply(Pr.pow(n));
     }
 
-    // --- Thermal conductivities (W/(m·K)) ---
+    // --- Thermal conductivities (W/(mÃ‚Â·K)) ---
     public static final Real K_COPPER = Real.of(401);
     public static final Real K_ALUMINUM = Real.of(237);
     public static final Real K_STEEL = Real.of(50);
@@ -147,3 +147,5 @@ public class HeatTransfer {
     public static final Real K_AIR = Real.of(0.026);
     public static final Real K_WATER = Real.of(0.6);
 }
+
+
