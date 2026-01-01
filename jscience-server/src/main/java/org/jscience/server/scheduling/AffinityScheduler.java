@@ -162,10 +162,14 @@ public class AffinityScheduler<T> {
         public int getRequiredGpus() {
             return requiredGpus;
         }
+
+        public boolean isGpuRequired() {
+            return gpuRequired;
+        }
     }
 
     /**
-     * Scheduling decision with score.
+     * Represents a scheduling decision.
      */
     public static class SchedulingDecision {
         private final String workerId;
@@ -336,5 +340,3 @@ public class AffinityScheduler<T> {
                 "workers", (long) workers.size());
     }
 }
-
-

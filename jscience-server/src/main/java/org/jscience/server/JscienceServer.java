@@ -27,20 +27,19 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 import org.jscience.server.proto.ComputeServiceGrpc;
-import org.jscience.server.proto.TaskRequest;
-import org.jscience.server.proto.TaskResponse;
-import org.jscience.server.proto.Status;
+import org.jscience.server.proto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-
+import java.util.concurrent.*;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Coordinator Server for Distributed JScience Computing.
+ * JScience Grid Compute Server.
+ * 
  * Receives tasks via gRPC and executes them (mimicking a cluster).
  *
  * @author Silvere Martin-Michiellot
@@ -66,10 +65,31 @@ public class JscienceServer extends ComputeServiceGrpc.ComputeServiceImplBase {
         try {
             this.jobRepository = new org.jscience.server.repository.JobRepository();
             this.userRepository = new org.jscience.server.repository.UserRepository();
-            // Create default admin for testing
-            if (userRepository.findByUsername("admin").isEmpty()) {
-                userRepository.save(new org.jscience.server.model.User("admin", "secret", "ADMIN"));
-                LOG.info("Created default admin user.");
+
+            // Create admin user from environment variables (secure configuration)
+            String adminUser = System.getenv("JSCIENCE_ADMIN_USER");
+            String adminPass = System.getenv("JSCIENCE_ADMIN_PASSWORD");
+
+            if (adminUser != null && adminPass != null) {
+                if (userRepository.findByUsername(adminUser).isEmpty()) {
+                    // Validate password strength
+                    if (adminPass.length() >= 12 &&
+                            !adminPass.equalsIgnoreCase("admin") &&
+                            !adminPass.equalsIgnoreCase("secret") &&
+                            !adminPass.equalsIgnoreCase("password")) {
+                        userRepository.save(new org.jscience.server.model.User(adminUser, adminPass, "ADMIN"));
+                        LOG.info("✓ Created admin user: {}", adminUser);
+                    } else {
+                        LOG.error("🔴 SECURITY: Admin password rejected - too weak or uses default value");
+                        LOG.error("Password requirements: 12+ characters, not 'admin', 'secret', or 'password'");
+                        throw new SecurityException("Strong admin password required for security");
+                    }
+                }
+            } else {
+                LOG.warn("⚠️  No admin credentials configured");
+                LOG.warn(
+                        "Set JSCIENCE_ADMIN_USER and JSCIENCE_ADMIN_PASSWORD environment variables to create admin user");
+                LOG.warn("Server will start without default admin - use OIDC or create users via API");
             }
         } catch (Exception e) {
             LOG.error("Failed to initialize database", e);
@@ -543,5 +563,3 @@ public class JscienceServer extends ComputeServiceGrpc.ComputeServiceImplBase {
         server.blockUntilShutdown();
     }
 }
-
-

@@ -36,22 +36,6 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Integration tests for AuthService gRPC endpoints.
- * Tests user registration, login, and token validation.
- */
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class AuthServiceIT {
-
-        private static Server server;
-        private static ManagedChannel channel;
-        private static AuthServiceGrpc.AuthServiceBlockingStub blockingStub;
-        private static final int TEST_PORT = 50098;
-        private static String validToken;
-
-        @BeforeAll
-        static void startServer() throws IOException {
-                // Start embedded gRPC server with AuthService
-                server = ServerBuilder.forPort(TEST_PORT)
                                 .addService(new AuthServiceImpl(new org.jscience.server.repository.UserRepository()))
                                 .build()
                                 .start();

@@ -267,6 +267,24 @@ public class PriorityQueueManager<T> {
     }
 
     /**
+     * Get the aging interval in milliseconds.
+     * 
+     * @return aging interval configuration
+     */
+    public long getAgingIntervalMs() {
+        return agingIntervalMs;
+    }
+
+    /**
+     * Get the starvation threshold in milliseconds.
+     * 
+     * @return starvation threshold configuration
+     */
+    public long getStarvationThresholdMs() {
+        return starvationThresholdMs;
+    }
+
+    /**
      * Shutdown the queue manager.
      */
     public void shutdown() {
@@ -274,5 +292,3 @@ public class PriorityQueueManager<T> {
         LOG.info("Priority queue manager shutdown");
     }
 }
-
-

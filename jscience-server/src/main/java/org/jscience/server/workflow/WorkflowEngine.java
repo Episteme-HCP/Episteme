@@ -308,13 +308,18 @@ public class WorkflowEngine {
                 lastError = e;
                 attempts++;
                 if (attempts <= step.retries) {
-                    LOG.warn("Ã¢Å¡Â Ã¯Â¸Â Retry {}/{} for step: {}", attempts, step.retries, step.getName());
+                    LOG.warn("⏱️ Retry {}/{} for step: {}", attempts, step.retries, step.getName());
                     Thread.sleep(1000L * attempts); // Backoff
                 }
             }
         }
 
-        throw lastError;
+        // Throw the last error if present, otherwise create a generic exception
+        if (lastError != null) {
+            throw lastError;
+        } else {
+            throw new RuntimeException("Step failed after " + step.retries + " retries with unknown error");
+        }
     }
 
     /**
@@ -341,5 +346,3 @@ public class WorkflowEngine {
         return new Step(id, name, action);
     }
 }
-
-

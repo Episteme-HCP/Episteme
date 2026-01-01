@@ -93,29 +93,38 @@ public class RetryExecutor {
         Exception lastException = null;
 
         while (attempt <= maxRetries) {
+            attempt++;
             try {
                 if (circuitBreaker != null) {
                     return circuitBreaker.execute(action);
                 }
                 return action.get();
             } catch (CircuitBreaker.CircuitBreakerOpenException e) {
-                // Don't retry if circuit breaker is open
-                throw e;
-            } catch (Exception e) {
                 lastException = e;
-                attempt++;
-
                 if (attempt > maxRetries) {
-                    LOG.error("Ã¢ Å’ All {} retries exhausted", maxRetries);
-                    if (lastException != null) {
-                        throw lastException;
-                    } else {
-                        throw new RuntimeException("Operation exhausted retries with unknown error");
-                    }
+                    LOG.error("✗ All {} retries exhausted (circuit breaker open)", maxRetries);
+                    throw lastException;
                 }
 
                 long delayMs = calculateDelay(attempt);
-                LOG.warn("Ã¢Å¡Â Ã¯Â¸  Attempt {} failed, retrying in {}ms: {}",
+                LOG.warn("⏳ Circuit breaker open, attempt {}/{}, retrying in {}ms",
+                        attempt, maxRetries, delayMs);
+
+                try {
+                    Thread.sleep(delayMs);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Retry interrupted", ie);
+                }
+            } catch (Exception e) {
+                lastException = e;
+                if (attempt > maxRetries) {
+                    LOG.error("✗ All {} retries exhausted", maxRetries);
+                    throw lastException;
+                }
+
+                long delayMs = calculateDelay(attempt);
+                LOG.warn("⏳ Attempt {} failed, retrying in {}ms: {}",
                         attempt, delayMs, e.getMessage());
 
                 try {
@@ -253,4 +262,3 @@ public class RetryExecutor {
         }
     }
 }
-

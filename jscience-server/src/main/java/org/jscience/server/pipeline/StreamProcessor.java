@@ -81,24 +81,6 @@ public class StreamProcessor<T> {
     /**
      * Add a map transformation.
      */
-    @SuppressWarnings("unchecked")
-    public <R> StreamProcessor<R> map(Function<T, R> mapper) {
-        stages.add((Stage<Object, Object>) input -> mapper.apply((T) input));
-        return (StreamProcessor<R>) this;
-    }
-
-    /**
-     * Add a filter operation.
-     */
-    public StreamProcessor<T> filter(java.util.function.Predicate<T> predicate) {
-        stages.add((Stage<Object, Object>) input -> predicate.test((T) input) ? input : null);
-        return this;
-    }
-
-    /**
-     * Add a flat map transformation.
-     */
-    @SuppressWarnings("unchecked")
     public <R> StreamProcessor<R> flatMap(Function<T, Collection<R>> mapper) {
         stages.add((Stage<Object, Object>) input -> mapper.apply((T) input));
         return (StreamProcessor<R>) this;
@@ -225,5 +207,3 @@ public class StreamProcessor<T> {
         return processor;
     }
 }
-
-

@@ -163,28 +163,46 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- GraalVM Native Image Plugin -->
-            <plugin>
-                <groupId>org.graalvm.buildtools</groupId>
-                <artifactId>native-maven-plugin</artifactId>
-                <version>0.9.28</version>
-                <executions>
-                    <execution>
-                        <id>build-native</id>
-                        <goals>
-                            <goal>compile-no-fork</goal>
-                        </goals>
-                        <phase>package</phase>
-                    </execution>
-                </executions>
-                <configuration>
-                    <imageName>jscience-server</imageName>
-                    <mainClass>org.jscience.server.JscienceServer</mainClass>
-                    <fallback>false</fallback>
-                    <verbose>true</verbose>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- GraalVM Native Image Profile (Optional) -->
+        <!-- Activate with: mvn package -Pnative -->
+        <!-- Or automatically if GraalVM JDK is detected -->
+        <profile>
+            <id>native</id>
+            <activation>
+                <!-- Auto-activate if GRAALVM_HOME is set -->
+                <property>
+                    <name>env.GRAALVM_HOME</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- GraalVM Native Image Plugin -->
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>0.9.28</version>
+                        <executions>
+                            <execution>
+                                <id>build-native</id>
+                                <goals>
+                                    <goal>compile-no-fork</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <imageName>jscience-server</imageName>
+                            <mainClass>org.jscience.server.JscienceServer</mainClass>
+                            <fallback>false</fallback>
+                            <verbose>true</verbose>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

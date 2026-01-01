@@ -27,7 +27,6 @@ import io.grpc.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -45,23 +44,15 @@ public class RbacInterceptor implements ServerInterceptor {
 
     private static final Logger LOG = LoggerFactory.getLogger(RbacInterceptor.class);
 
-    public static final Metadata.Key<String> AUTHORIZATION_KEY = Metadata.Key.of("authorization",
+    // Public methods that don't require authentication
+    private final Set<String> publicMethods = new HashSet<>();
+
+    // gRPC metadata and context keys
+    private static final Metadata.Key<String> AUTHORIZATION_KEY = Metadata.Key.of("authorization",
             Metadata.ASCII_STRING_MARSHALLER);
 
-    public static final Context.Key<String> USER_ID_KEY = Context.key("userId");
-    public static final Context.Key<String> USER_ROLE_KEY = Context.key("userRole");
-
-    private final JwtUtil jwtUtil;
-    private final Set<String> publicMethods;
-
-    public RbacInterceptor(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
-        this.publicMethods = new HashSet<>();
-        // Methods that don't require authentication
-        publicMethods.add("org.jscience.server.proto.AuthService/Login");
-        publicMethods.add("org.jscience.server.proto.AuthService/Register");
-        publicMethods.add("org.jscience.server.proto.ComputeService/GetStatus");
-    }
+    private static final Context.Key<String> USER_ID_KEY = Context.key("userId");
+    private static final Context.Key<String> USER_ROLE_KEY = Context.key("userRole");
 
     /**
      * Add a method path to the public (no auth required) list.
@@ -158,5 +149,3 @@ public class RbacInterceptor implements ServerInterceptor {
         return USER_ROLE_KEY.get();
     }
 }
-
-

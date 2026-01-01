@@ -27,11 +27,7 @@ import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.jscience.distributed.DistributedContext;
-import org.jscience.distributed.DistributedContext.Priority;
-import org.jscience.server.proto.ComputeServiceGrpc;
-import org.jscience.server.proto.TaskRequest;
-import org.jscience.server.proto.ServerStatus;
-import org.jscience.server.proto.Empty;
+import org.jscience.server.proto.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
@@ -214,5 +210,3 @@ public class GrpcDistributedContext implements DistributedContext {
         channel.shutdown();
     }
 }
-
-
