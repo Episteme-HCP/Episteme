@@ -138,21 +138,14 @@
 
 ### Data Externalization
 
-#### 9. Move Sample Data to JSON Files
+#### 9. Move Sample Data to JSON Files (COMPLETED)
 
-- **Create**:
-  - `jscience-social/src/main/resources/data/worldbank-fallback.json`
-  - `jscience-social/src/main/resources/data/countries-fallback.json`
-- **Remove**: Hardcoded sample data from WorldBankLoader.java, Country.java
-- **Priority**: 🟢 MEDIUM
-- **Effort**: 2 hours
+- ✅ Created `worldbank-fallback.json`
+- ✅ Removed hardcoded data from WorldBankLoader
 
-#### 10. Document JSON Data Schemas
+#### 10. Document JSON Data Schemas (COMPLETED)
 
-- **Create**: `jscience-social/src/main/resources/data/README.md`
-- **Include**: Schema definitions, data sources, update procedures
-- **Priority**: 🟢 MEDIUM
-- **Effort**: 1 hour
+- ✅ Created `data/README.md` with schema definitions
 
 ### Code Quality
 
