@@ -36,6 +36,27 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
+ * Integration tests for Authentication Service.
+ * 
+ * Tests user registration, login, token validation, and role management
+ * using gRPC client/server integration.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+class AuthServiceIT {
+
+        private static final int TEST_PORT = 50052;
+        private static Server server;
+        private static ManagedChannel channel;
+        private static AuthServiceGrpc.AuthServiceBlockingStub blockingStub;
+
+        @BeforeAll
+        static void startServer() throws IOException {
+                // Start gRPC server
+                server = ServerBuilder.forPort(TEST_PORT)
                                 .addService(new AuthServiceImpl(new org.jscience.server.repository.UserRepository()))
                                 .build()
                                 .start();
@@ -108,7 +129,7 @@ import static org.junit.jupiter.api.Assertions.*;
                 assertFalse(response.getToken().isEmpty());
 
                 // Save token for validation test
-                validToken = response.getToken();
+                // validToken = response.getToken(); // Field removed as unused
         }
 
         @Test
@@ -231,5 +252,3 @@ import static org.junit.jupiter.api.Assertions.*;
                 assertFalse(second.getSuccess());
         }
 }
-
-
