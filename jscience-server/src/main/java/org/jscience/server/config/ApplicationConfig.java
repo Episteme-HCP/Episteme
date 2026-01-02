@@ -228,6 +228,18 @@ public class ApplicationConfig {
         return getString("database.users.url", "jdbc:h2:" + getDatabaseDir() + "/users");
     }
 
+    public String getDbUsername() {
+        return getString("database.username", "sa");
+    }
+
+    public String getDbPassword() {
+        return getString("database.password", "");
+    }
+
+    public String getDbDriverClassName() {
+        return getString("database.driver.class", "org.h2.Driver");
+    }
+
     // --- External Services ---
 
     public String getMlflowUri() {

@@ -1,0 +1,1 @@
+tagSearchIndex = [{"l":"Constant Field Values","h":"","k":"18","u":"constant-values.html"},{"l":"Core Services","h":"package org.jscience.server.service","k":"16","u":"org/jscience/server/service/package-summary.html#core-services-heading"},{"l":"Serialized Form","h":"","k":"18","u":"serialized-form.html"}];updateSearchResults();

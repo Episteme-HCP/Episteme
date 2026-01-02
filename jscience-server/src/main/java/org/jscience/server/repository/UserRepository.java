@@ -24,43 +24,17 @@
 package org.jscience.server.repository;
 
 import org.jscience.server.model.User;
-import org.jscience.server.config.ApplicationConfig;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import java.util.Optional;
-import java.util.HashMap;
-import java.util.Map;
 
-public class UserRepository {
-    private final EntityManagerFactory emf;
+/**
+ * Spring Data JPA Repository for Users.
+ */
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    public UserRepository() {
-        Map<String, String> properties = new HashMap<>();
-        properties.put("jakarta.persistence.jdbc.url", ApplicationConfig.getInstance().getUsersDbUrl());
-        this.emf = Persistence.createEntityManagerFactory("jscience-pu", properties);
-    }
+    Optional<User> findByUsername(String username);
 
-    public Optional<User> findByUsername(String username) {
-        EntityManager em = emf.createEntityManager();
-        try {
-            return em.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class)
-                    .setParameter("username", username)
-                    .getResultStream()
-                    .findFirst();
-        } finally {
-            em.close();
-        }
-    }
-
-    public void save(User user) {
-        EntityManager em = emf.createEntityManager();
-        try {
-            em.getTransaction().begin();
-            em.persist(user);
-            em.getTransaction().commit();
-        } finally {
-            em.close();
-        }
-    }
+    boolean existsByUsername(String username);
 }

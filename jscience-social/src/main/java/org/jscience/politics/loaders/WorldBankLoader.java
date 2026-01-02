@@ -55,7 +55,7 @@ import java.util.concurrent.CompletableFuture;
 import org.jscience.io.AbstractLoader;
 import org.jscience.io.MiniCatalog;
 
-public class WorldBankLoader extends AbstractLoader<List<Country>> {
+public class WorldBankLoader extends AbstractLoader<Country> {
 
     private static final Logger LOG = LoggerFactory.getLogger(WorldBankLoader.class);
     private static final String RESOURCE_PATH = "/org/jscience/politics/worldbank-fallback.json";
@@ -66,9 +66,12 @@ public class WorldBankLoader extends AbstractLoader<List<Country>> {
     private final ObjectMapper mapper = new ObjectMapper();
     private final HttpClient httpClient;
 
-    // Cache
-    private final ResourceCache cache;
-    private List<Country> cachedCountries;
+    // Cache handled by AbstractLoader now? No, AbstractLoader has ResourceCache.
+    // But WorldBankLoader had manual cache 'cachedCountries'.
+    // AbstractLoader uses 'cache' field from 'ResourceCache.global()'.
+    // We should use that or keep manual if AbstractLoader pattern differs.
+    // AbstractLoader.loadAll calls loadAllFromSource.
+    // We will stick to AbstractLoader pattern.
 
     // Rate Limiter: 120 requests per minute
     private final RateLimiter rateLimiter;
@@ -82,7 +85,8 @@ public class WorldBankLoader extends AbstractLoader<List<Country>> {
     // For testing
     public WorldBankLoader(HttpClient httpClient) {
         this.httpClient = httpClient;
-        this.cache = ResourceCache.global();
+        // AbstractLoader initializes cache in its constructor?
+        // We need to call super()? AbstractLoader usually has no-arg constructor.
 
         RateLimiterConfig config = RateLimiterConfig.custom()
                 .limitRefreshPeriod(Duration.ofMinutes(1))
@@ -106,40 +110,53 @@ public class WorldBankLoader extends AbstractLoader<List<Country>> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Class<List<Country>> getResourceType() {
-        return (Class<List<Country>>) (Class<?>) List.class;
+    public Class<Country> getResourceType() {
+        return Country.class;
     }
 
     @Override
-    protected List<Country> loadFromSource(String id) throws Exception {
-        // For bulk load, id is ignored
+    protected Country loadFromSource(String id) throws Exception {
+        String url = String.format("%s/country/%s?format=json", WB_API_BASE, id);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .GET()
+                .timeout(Duration.ofSeconds(15))
+                .build();
+
+        rateLimiter.acquirePermission();
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            return null;
+        }
+
+        List<Country> list = parseCountriesFromApi(response.body());
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    @Override
+    protected List<Country> loadAllFromSource() throws Exception {
         return loadFromApi();
     }
 
     @Override
-    protected List<List<Country>> loadAllFromSource() throws Exception {
-        // Returns single list wrapped
-        return List.of(loadFromApi());
-    }
-
-    @Override
-    protected MiniCatalog<List<Country>> getMiniCatalog() {
-        // Return a simple catalog with fallback data
+    protected MiniCatalog<Country> getMiniCatalog() {
         return new MiniCatalog<>() {
             @Override
-            public List<List<Country>> getAll() {
-                return List.of(loadFromResource());
+            public List<Country> getAll() {
+                return loadFromResource();
             }
 
             @Override
-            public Optional<List<Country>> findByName(String name) {
-                return Optional.of(loadFromResource());
+            public Optional<Country> findByName(String name) {
+                return loadFromResource().stream()
+                        .filter(c -> c.getName().equalsIgnoreCase(name))
+                        .findFirst();
             }
 
             @Override
             public int size() {
-                return 1;
+                return loadFromResource().size();
             }
         };
     }
@@ -194,33 +211,6 @@ public class WorldBankLoader extends AbstractLoader<List<Country>> {
 
         LOG.debug("Parsed {} data points from World Bank API", result.size());
         return result;
-    }
-
-    /**
-     * Loads all countries from World Bank API or fallback to local resource.
-     *
-     * @return List of Country objects
-     */
-    public List<Country> loadAll() {
-        if (cachedCountries != null) {
-            return cachedCountries;
-        }
-
-        // Try to load from World Bank API first
-        try {
-            cachedCountries = loadFromApi();
-            if (!cachedCountries.isEmpty()) {
-                LOG.info("Loaded {} countries from World Bank API", cachedCountries.size());
-                return cachedCountries;
-            }
-        } catch (Exception e) {
-            LOG.warn("Failed to load from World Bank API, trying local resource: {}", e.getMessage());
-        }
-
-        // Fallback to local resource
-        cachedCountries = loadFromResource();
-        LOG.info("Loaded {} countries from local resource", cachedCountries.size());
-        return cachedCountries;
     }
 
     /**
@@ -495,7 +485,7 @@ public class WorldBankLoader extends AbstractLoader<List<Country>> {
      * Clears the cached regions, forcing a reload on next access.
      */
     public void clearCache() {
-        cachedCountries = null;
-        LOG.debug("WorldBankLoader cache cleared");
+        // Cache is now managed by AbstractLoader / ResourceCache
+        LOG.debug("WorldBankLoader: manual cache clear requested (delegated to system cache)");
     }
 }

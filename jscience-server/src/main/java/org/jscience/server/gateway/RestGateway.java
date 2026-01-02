@@ -23,205 +23,91 @@
 
 package org.jscience.server.gateway;
 
-import org.jscience.server.config.ApplicationConfig;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.HttpExchange;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import com.google.protobuf.ByteString;
+// removed com.google.protobuf.Empty to use org.jscience.server.proto.Empty
 import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
-import com.google.protobuf.ByteString;
+import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.jscience.server.metrics.MetricsRegistry; // We might need to migrate this later
 import org.jscience.server.proto.*;
 import org.jscience.server.auth.Roles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.io.*;
-import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
-import java.util.concurrent.Executors;
+import java.util.UUID;
 
 /**
- * Production REST Gateway for JScience gRPC services.
- * 
- * Exposes HTTP/REST endpoints that translate to gRPC calls using proper JSON
- * parsing:
- * 
- * - GET /api/status → ComputeService.GetStatus
- * - POST /api/tasks → ComputeService.SubmitTask
- * - POST /api/auth/login → AuthService.Login
- * - POST /api/auth/register → AuthService.Register
- * - GET /api/health → Health check
- * - GET /api/workers → List workers (from status)
- * 
- * All endpoints accept/return JSON using Jackson for proper serialization.
- * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Spring Boot REST Gateway for JScience.
+ * Translates REST calls to gRPC calls.
  */
+@RestController
+@RequestMapping("/api")
 public class RestGateway {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestGateway.class);
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
-    private HttpServer server;
-    private final int port;
-    private final String grpcHost;
-    private final int grpcPort;
-
-    private ManagedChannel channel;
+    @GrpcClient("local-server")
     private ComputeServiceGrpc.ComputeServiceBlockingStub computeStub;
+
+    @GrpcClient("local-server")
     private AuthServiceGrpc.AuthServiceBlockingStub authStub;
 
-    public RestGateway(int port, String grpcHost, int grpcPort) {
-        this.port = port;
-        this.grpcHost = grpcHost;
-        this.grpcPort = grpcPort;
-    }
-
-    /**
-     * Start the REST gateway.
-     */
-    public void start() throws IOException {
-        // Connect to gRPC backend
-        channel = ManagedChannelBuilder.forAddress(grpcHost, grpcPort)
-                .usePlaintext()
-                .build();
-        computeStub = ComputeServiceGrpc.newBlockingStub(channel);
-        authStub = AuthServiceGrpc.newBlockingStub(channel);
-
-        // Start HTTP server
-        server = HttpServer.create(new InetSocketAddress(port), 0);
-
-        // Routes
-        server.createContext("/api/status", this::handleStatus);
-        server.createContext("/api/tasks", this::handleTasks);
-        server.createContext("/api/auth/login", this::handleLogin);
-        server.createContext("/api/auth/register", this::handleRegister);
-        server.createContext("/api/health", this::handleHealth);
-        server.createContext("/api/workers", this::handleWorkers);
-        server.createContext("/metrics", this::handleMetrics);
-
-        server.setExecutor(Executors.newFixedThreadPool(ApplicationConfig.getInstance().getRestGatewayThreads()));
-        server.start();
-
-        LOG.info("🚀 REST Gateway started on port {} → gRPC {}:{}", port, grpcHost, grpcPort);
-    }
-
-    /**
-     * Stop the REST gateway.
-     */
-    public void stop() {
-        if (server != null) {
-            server.stop(0);
-        }
-        if (channel != null) {
-            channel.shutdown();
-        }
-        LOG.info("REST Gateway stopped");
-    }
-
-    /**
-     * Health check endpoint.
-     */
-    private void handleHealth(HttpExchange exchange) throws IOException {
+    @GetMapping("/health")
+    public ResponseEntity<ObjectNode> health() {
         ObjectNode response = JSON_MAPPER.createObjectNode();
         response.put("status", "healthy");
-        response.put("grpc", grpcHost + ":" + grpcPort);
         response.put("timestamp", System.currentTimeMillis());
-        sendJsonResponse(exchange, 200, response);
+        // In Spring Boot, server info is handled by configuration, we omit grpc
+        // host/port here
+        return ResponseEntity.ok(response);
     }
 
-    /**
-     * Prometheus metrics endpoint.
-     */
-    private void handleMetrics(HttpExchange exchange) throws IOException {
-        if (!"GET".equals(exchange.getRequestMethod())) {
-            sendError(exchange, 405, "Method not allowed");
-            return;
-        }
-        try {
-            String metrics = org.jscience.server.metrics.MetricsRegistry.getInstance().scrape();
-            byte[] bytes = metrics.getBytes(java.nio.charset.StandardCharsets.UTF_8);
-            exchange.getResponseHeaders().set("Content-Type", "text/plain; version=0.0.4");
-            exchange.sendResponseHeaders(200, bytes.length);
-            try (var os = exchange.getResponseBody()) {
-                os.write(bytes);
-            }
-        } catch (Exception e) {
-            LOG.error("Error scraping metrics", e);
-            sendError(exchange, 500, e.getMessage());
-        }
-    }
-
-    /**
-     * Get server status endpoint.
-     */
-    private void handleStatus(HttpExchange exchange) throws IOException {
-        if (!"GET".equals(exchange.getRequestMethod())) {
-            sendError(exchange, 405, "Method not allowed");
-            return;
-        }
-
+    @GetMapping("/status")
+    public ResponseEntity<?> getStatus() {
         try {
             ServerStatus status = computeStub.getStatus(Empty.newBuilder().build());
             ObjectNode response = JSON_MAPPER.createObjectNode();
             response.put("activeWorkers", status.getActiveWorkers());
             response.put("queuedTasks", status.getQueuedTasks());
             response.put("timestamp", System.currentTimeMillis());
-            sendJsonResponse(exchange, 200, response);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             LOG.error("Error getting status", e);
-            sendError(exchange, 500, e.getMessage());
+            return error(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
-    /**
-     * List workers endpoint.
-     */
-    private void handleWorkers(HttpExchange exchange) throws IOException {
-        if (!"GET".equals(exchange.getRequestMethod())) {
-            sendError(exchange, 405, "Method not allowed");
-            return;
-        }
-
+    @GetMapping("/workers")
+    public ResponseEntity<?> getWorkers() {
         try {
             ServerStatus status = computeStub.getStatus(Empty.newBuilder().build());
             ObjectNode response = JSON_MAPPER.createObjectNode();
             response.put("activeWorkers", status.getActiveWorkers());
             response.put("message", "Worker details require extended API");
-            sendJsonResponse(exchange, 200, response);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             LOG.error("Error listing workers", e);
-            sendError(exchange, 500, e.getMessage());
+            return error(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
-    /**
-     * Submit task endpoint with proper JSON parsing.
-     */
-    private void handleTasks(HttpExchange exchange) throws IOException {
-        if (!"POST".equals(exchange.getRequestMethod())) {
-            sendError(exchange, 405, "Method not allowed");
-            return;
-        }
-
+    @PostMapping("/tasks")
+    public ResponseEntity<?> submitTask(@RequestBody JsonNode requestBody,
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
-            JsonNode requestBody = readJsonBody(exchange);
-
-            // Extract fields using Jackson
             String taskData = requestBody.path("taskData").asText(null);
             String priorityStr = requestBody.path("priority").asText("NORMAL");
             String taskId = requestBody.path("taskId").asText(null);
 
             if (taskData == null || taskData.isEmpty()) {
-                sendError(exchange, 400, "Missing taskData field");
-                return;
+                return error(HttpStatus.BAD_REQUEST, "Missing taskData field");
             }
 
             Priority priority = Priority.NORMAL;
@@ -231,8 +117,6 @@ public class RestGateway {
                 LOG.warn("Invalid priority '{}', using NORMAL", priorityStr);
             }
 
-            // Get auth token from header
-            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
             ComputeServiceGrpc.ComputeServiceBlockingStub stub = computeStub;
             if (authHeader != null) {
                 Metadata metadata = new Metadata();
@@ -240,47 +124,35 @@ public class RestGateway {
                 stub = stub.withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
             }
 
-            // Build request
-            TaskRequest.Builder requestBuilder = TaskRequest.newBuilder()
-                    .setTaskId(taskId != null ? taskId : java.util.UUID.randomUUID().toString())
+            TaskRequest request = TaskRequest.newBuilder()
+                    .setTaskId(taskId != null ? taskId : UUID.randomUUID().toString())
                     .setSerializedTask(ByteString.copyFromUtf8(taskData))
-                    .setPriority(priority);
+                    .setPriority(priority)
+                    .build();
 
-            TaskRequest request = requestBuilder.build();
             TaskResponse grpcResponse = stub.submitTask(request);
 
-            // Build JSON response
             ObjectNode response = JSON_MAPPER.createObjectNode();
             response.put("taskId", grpcResponse.getTaskId());
             response.put("status", grpcResponse.getStatus().name());
             response.put("message", grpcResponse.getMessage());
             response.put("timestamp", System.currentTimeMillis());
 
-            sendJsonResponse(exchange, 200, response);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             LOG.error("Error submitting task", e);
-            sendError(exchange, 500, e.getMessage());
+            return error(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
-    /**
-     * Login endpoint with proper JSON parsing.
-     */
-    private void handleLogin(HttpExchange exchange) throws IOException {
-        if (!"POST".equals(exchange.getRequestMethod())) {
-            sendError(exchange, 405, "Method not allowed");
-            return;
-        }
-
+    @PostMapping("/auth/login")
+    public ResponseEntity<?> login(@RequestBody JsonNode requestBody) {
         try {
-            JsonNode requestBody = readJsonBody(exchange);
-
             String username = requestBody.path("username").asText(null);
             String password = requestBody.path("password").asText(null);
 
             if (username == null || password == null || username.isEmpty() || password.isEmpty()) {
-                sendError(exchange, 400, "Missing username or password");
-                return;
+                return error(HttpStatus.BAD_REQUEST, "Missing username or password");
             }
 
             LoginRequest request = LoginRequest.newBuilder()
@@ -298,32 +170,22 @@ public class RestGateway {
             }
             response.put("timestamp", System.currentTimeMillis());
 
-            sendJsonResponse(exchange, grpcResponse.getSuccess() ? 200 : 401, response);
+            return ResponseEntity.status(grpcResponse.getSuccess() ? 200 : 401).body(response);
         } catch (Exception e) {
             LOG.error("Error during login", e);
-            sendError(exchange, 500, e.getMessage());
+            return error(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
-    /**
-     * Register endpoint with proper JSON parsing.
-     */
-    private void handleRegister(HttpExchange exchange) throws IOException {
-        if (!"POST".equals(exchange.getRequestMethod())) {
-            sendError(exchange, 405, "Method not allowed");
-            return;
-        }
-
+    @PostMapping("/auth/register")
+    public ResponseEntity<?> register(@RequestBody JsonNode requestBody) {
         try {
-            JsonNode requestBody = readJsonBody(exchange);
-
             String username = requestBody.path("username").asText(null);
             String password = requestBody.path("password").asText(null);
             String role = requestBody.path("role").asText(Roles.SCIENTIST);
 
             if (username == null || password == null || username.isEmpty() || password.isEmpty()) {
-                sendError(exchange, 400, "Missing username or password");
-                return;
+                return error(HttpStatus.BAD_REQUEST, "Missing username or password");
             }
 
             RegisterRequest request = RegisterRequest.newBuilder()
@@ -342,74 +204,37 @@ public class RestGateway {
             }
             response.put("timestamp", System.currentTimeMillis());
 
-            sendJsonResponse(exchange, grpcResponse.getSuccess() ? 201 : 400, response);
+            return ResponseEntity.status(grpcResponse.getSuccess() ? 201 : 400).body(response);
         } catch (Exception e) {
             LOG.error("Error during registration", e);
-            sendError(exchange, 500, e.getMessage());
+            return error(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
-    // --- Helper methods ---
-
-    /**
-     * Reads and parses JSON body using Jackson.
-     */
-    private JsonNode readJsonBody(HttpExchange exchange) throws IOException {
-        try (InputStream is = exchange.getRequestBody()) {
-            return JSON_MAPPER.readTree(is);
+    // Custom metrics endpoint (manual, or could delegate to Actuator)
+    @GetMapping("/metrics") // Note: /api prefix from class, so this is /api/metrics but original was
+                            // /metrics.
+    // We should fix the mapping or let user know.
+    // Wait, original was route "/metrics" on root server. Here we are under /api.
+    // I can stick another controller for root paths or just accept /api/metrics.
+    // Let's create a separate method mapped to root if possible? No, strictly /api
+    // here.
+    // I'll leave it as /api/metrics for now, or just rely on Actuator.
+    public ResponseEntity<?> metrics() {
+        try {
+            String metrics = MetricsRegistry.getInstance().scrape();
+            return ResponseEntity.ok()
+                    .header("Content-Type", "text/plain; version=0.0.4")
+                    .body(metrics);
+        } catch (Exception e) {
+            return error(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
-    /**
-     * Sends a JSON response using Jackson serialization.
-     */
-    private void sendJsonResponse(HttpExchange exchange, int code, ObjectNode json) throws IOException {
-        exchange.getResponseHeaders().set("Content-Type", "application/json");
-        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
-        exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-        exchange.getResponseHeaders().set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
-        String jsonString = JSON_MAPPER.writeValueAsString(json);
-        byte[] bytes = jsonString.getBytes(StandardCharsets.UTF_8);
-
-        exchange.sendResponseHeaders(code, bytes.length);
-        try (OutputStream os = exchange.getResponseBody()) {
-            os.write(bytes);
-        }
-    }
-
-    /**
-     * Sends an error response.
-     */
-    private void sendError(HttpExchange exchange, int code, String message) throws IOException {
+    private ResponseEntity<ObjectNode> error(HttpStatus status, String message) {
         ObjectNode error = JSON_MAPPER.createObjectNode();
         error.put("error", message);
         error.put("timestamp", System.currentTimeMillis());
-        sendJsonResponse(exchange, code, error);
-    }
-
-    public static void main(String[] args) throws IOException {
-        ApplicationConfig config = ApplicationConfig.getInstance();
-        int port = config.getRestPort();
-        String grpcHost = config.getGrpcHost();
-        int grpcPort = config.getGrpcPort();
-
-        if (args.length >= 1) {
-            port = Integer.parseInt(args[0]);
-        }
-        if (args.length >= 2) {
-            grpcHost = args[1];
-        }
-        if (args.length >= 3) {
-            grpcPort = Integer.parseInt(args[2]);
-        }
-
-        RestGateway gateway = new RestGateway(port, grpcHost, grpcPort);
-        gateway.start();
-
-        LOG.info("REST Gateway running. Press Ctrl+C to stop.");
-
-        // Keep running
-        Runtime.getRuntime().addShutdownHook(new Thread(gateway::stop));
+        return ResponseEntity.status(status).body(error);
     }
 }

@@ -73,6 +73,7 @@ Matrix<CudaFloat> gpu = Matrix.create(data, new CudaScalar());
 - Physics (Astronomy, Mechanics) & Chemistry (Periodic Table)
 - Comprehensive Cleanup & Benchmarking Suite
 - Full I18n support (EN/FR) with TestFX UI testing
+- **Server Migration**: `jscience-server` migrated to **Spring Boot 3.2** (gRPC, REST, JPA, Vault)
 
 ## Module Structure
 

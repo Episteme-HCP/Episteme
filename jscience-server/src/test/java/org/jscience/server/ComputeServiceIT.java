@@ -40,24 +40,32 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ComputeServiceIT {
-
-    private static JscienceServer jscienceServer;
-    private static ManagedChannel channel;
-    private static ComputeServiceGrpc.ComputeServiceBlockingStub blockingStub;
+    private static io.grpc.Server grpcServer;
+    private static io.grpc.ManagedChannel channel;
+    private static org.jscience.server.proto.ComputeServiceGrpc.ComputeServiceBlockingStub blockingStub;
     private static final int TEST_PORT = 50099;
 
     @BeforeAll
     static void startServer() throws IOException {
-        // Start actual JScience Server
-        jscienceServer = new JscienceServer(TEST_PORT);
-        jscienceServer.start();
+        // Mock Repository
+        org.jscience.server.repository.JobRepository mockRepo = org.mockito.Mockito
+                .mock(org.jscience.server.repository.JobRepository.class);
+
+        // Start gRPC server with service instance
+        org.jscience.server.service.ComputeServiceImpl service = new org.jscience.server.service.ComputeServiceImpl(
+                mockRepo);
+
+        grpcServer = io.grpc.ServerBuilder.forPort(TEST_PORT)
+                .addService(service)
+                .build()
+                .start();
 
         // Create client channel
-        channel = ManagedChannelBuilder.forAddress("localhost", TEST_PORT)
+        channel = io.grpc.ManagedChannelBuilder.forAddress("localhost", TEST_PORT)
                 .usePlaintext()
                 .build();
 
-        blockingStub = ComputeServiceGrpc.newBlockingStub(channel);
+        blockingStub = org.jscience.server.proto.ComputeServiceGrpc.newBlockingStub(channel);
     }
 
     @AfterAll
@@ -65,8 +73,8 @@ public class ComputeServiceIT {
         if (channel != null) {
             channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
         }
-        if (jscienceServer != null) {
-            jscienceServer.stop();
+        if (grpcServer != null) {
+            grpcServer.shutdown().awaitTermination(5, TimeUnit.SECONDS);
         }
     }
 
@@ -196,4 +204,3 @@ public class ComputeServiceIT {
         }
     }
 }
-

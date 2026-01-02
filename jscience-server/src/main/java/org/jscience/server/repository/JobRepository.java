@@ -24,32 +24,13 @@
 package org.jscience.server.repository;
 
 import org.jscience.server.model.Job;
-import org.jscience.server.config.ApplicationConfig;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public class JobRepository {
-    private final EntityManagerFactory emf;
-
-    public JobRepository() {
-        Map<String, String> properties = new HashMap<>();
-        properties.put("jakarta.persistence.jdbc.url", ApplicationConfig.getInstance().getJobsDbUrl());
-        this.emf = Persistence.createEntityManagerFactory("jscience-pu", properties);
-    }
-
-    public void save(Job job) {
-        EntityManager em = emf.createEntityManager();
-        try {
-            em.getTransaction().begin();
-            em.persist(job);
-            em.getTransaction().commit();
-        } finally {
-            em.close();
-        }
-    }
-
-    // Additional methods (findById, findAll) would go here
+/**
+ * Spring Data JPA Repository for Jobs.
+ */
+@Repository
+public interface JobRepository extends JpaRepository<Job, String> {
+    // Custom query methods can be defined here if needed
 }

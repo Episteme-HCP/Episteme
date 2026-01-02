@@ -23,6 +23,7 @@
 
 package org.jscience.server;
 
+import org.jscience.server.service.AuthServiceImpl;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
@@ -56,8 +57,15 @@ class AuthServiceIT {
         @BeforeAll
         static void startServer() throws IOException {
                 // Start gRPC server
+                org.jscience.server.repository.UserRepository mockRepo = org.mockito.Mockito
+                                .mock(org.jscience.server.repository.UserRepository.class);
+
+                // Simple stubbing for happy path to avoid runtime NPEs during basic health
+                // checks if any
+                // Detailed stubbing belongs in specific tests or use @SpringBootTest
+
                 server = ServerBuilder.forPort(TEST_PORT)
-                                .addService(new AuthServiceImpl(new org.jscience.server.repository.UserRepository()))
+                                .addService(new AuthServiceImpl(mockRepo))
                                 .build()
                                 .start();
 

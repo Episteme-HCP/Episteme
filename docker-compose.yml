@@ -1,9 +1,42 @@
 # JScience Grid - Docker Compose Configuration
 # Spins up 1 Server + 5 Workers + Monitoring Stack (Prometheus/Grafana)
 
-version: '3.8'
+version: "3.8"
 
 services:
+  # ===== Database (PostgreSQL) =====
+  postgres:
+    image: postgres:16
+    container_name: jscience-postgres
+    environment:
+      POSTGRES_DB: jscience
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: SecureP@ssw0rd123!
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d jscience"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - jscience-grid
+
+  # ===== Secrets Management (Vault) =====
+  vault:
+    image: hashicorp/vault:1.13
+    container_name: jscience-vault
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: myroot
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - jscience-grid
+
   # ===== JScience Server =====
   server:
     build:
@@ -19,7 +52,7 @@ services:
     networks:
       - jscience-grid
     healthcheck:
-      test: [ "CMD", "nc", "-z", "localhost", "50051" ]
+      test: ["CMD", "nc", "-z", "localhost", "50051"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -105,8 +138,8 @@ services:
       - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
     networks:
       - jscience-grid
 
@@ -132,3 +165,4 @@ networks:
 volumes:
   prometheus-data:
   grafana-data:
+  postgres-data:
