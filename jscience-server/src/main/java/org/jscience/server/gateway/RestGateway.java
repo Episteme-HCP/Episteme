@@ -105,6 +105,7 @@ public class RestGateway {
         server.createContext("/api/auth/register", this::handleRegister);
         server.createContext("/api/health", this::handleHealth);
         server.createContext("/api/workers", this::handleWorkers);
+        server.createContext("/metrics", this::handleMetrics);
 
         server.setExecutor(Executors.newFixedThreadPool(ApplicationConfig.getInstance().getRestGatewayThreads()));
         server.start();
@@ -134,6 +135,28 @@ public class RestGateway {
         response.put("grpc", grpcHost + ":" + grpcPort);
         response.put("timestamp", System.currentTimeMillis());
         sendJsonResponse(exchange, 200, response);
+    }
+
+    /**
+     * Prometheus metrics endpoint.
+     */
+    private void handleMetrics(HttpExchange exchange) throws IOException {
+        if (!"GET".equals(exchange.getRequestMethod())) {
+            sendError(exchange, 405, "Method not allowed");
+            return;
+        }
+        try {
+            String metrics = org.jscience.server.metrics.MetricsRegistry.getInstance().scrape();
+            byte[] bytes = metrics.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().set("Content-Type", "text/plain; version=0.0.4");
+            exchange.sendResponseHeaders(200, bytes.length);
+            try (var os = exchange.getResponseBody()) {
+                os.write(bytes);
+            }
+        } catch (Exception e) {
+            LOG.error("Error scraping metrics", e);
+            sendError(exchange, 500, e.getMessage());
+        }
     }
 
     /**
@@ -366,9 +389,10 @@ public class RestGateway {
     }
 
     public static void main(String[] args) throws IOException {
-        int port = 8080;
-        String grpcHost = "localhost";
-        int grpcPort = 50051;
+        ApplicationConfig config = ApplicationConfig.getInstance();
+        int port = config.getRestPort();
+        String grpcHost = config.getGrpcHost();
+        int grpcPort = config.getGrpcPort();
 
         if (args.length >= 1) {
             port = Integer.parseInt(args[0]);

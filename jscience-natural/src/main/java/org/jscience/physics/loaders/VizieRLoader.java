@@ -23,29 +23,30 @@
 
 package org.jscience.physics.loaders;
 
+import org.jscience.io.AbstractLoader;
+import org.jscience.io.MiniCatalog;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
+ * VizieR astronomical catalog loader.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class VizieRLoader implements org.jscience.io.InputLoader<Map<String, String>> {
+public class VizieRLoader extends AbstractLoader<Map<String, String>> {
 
     private static final String API_URL = "https://vizier.cds.unistra.fr/viz-bin/votable";
 
     public VizieRLoader() {
-    }
-
-    @Override
-    public Map<String, String> load(String resourceId) throws Exception {
-        return queryByObject(resourceId, HIPPARCOS);
     }
 
     @Override
@@ -57,6 +58,31 @@ public class VizieRLoader implements org.jscience.io.InputLoader<Map<String, Str
     @SuppressWarnings("unchecked")
     public Class<Map<String, String>> getResourceType() {
         return (Class<Map<String, String>>) (Class<?>) Map.class;
+    }
+
+    @Override
+    protected Map<String, String> loadFromSource(String id) throws Exception {
+        return queryByObject(id, HIPPARCOS);
+    }
+
+    @Override
+    protected MiniCatalog<Map<String, String>> getMiniCatalog() {
+        return new MiniCatalog<>() {
+            @Override
+            public List<Map<String, String>> getAll() {
+                return List.of(Map.of());
+            }
+
+            @Override
+            public Optional<Map<String, String>> findByName(String name) {
+                return Optional.of(Map.of());
+            }
+
+            @Override
+            public int size() {
+                return 0;
+            }
+        };
     }
 
     /**
@@ -152,5 +178,3 @@ public class VizieRLoader implements org.jscience.io.InputLoader<Map<String, Str
         }
     }
 }
-
-

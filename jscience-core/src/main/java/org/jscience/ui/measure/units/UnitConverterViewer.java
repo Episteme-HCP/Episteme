@@ -36,6 +36,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import org.jscience.measure.Unit;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -149,11 +152,13 @@ public class UnitConverterViewer extends Application {
     private void doConvert() {
         try {
             double val = Double.parseDouble(inputField.getText());
-            Unit<?> from = fromUnitBox.getValue();
-            Unit<?> to = toUnitBox.getValue();
+            Unit from = fromUnitBox.getValue();
+            Unit to = toUnitBox.getValue();
 
-            double result = ((Unit) from).getConverterTo((Unit) to).convert(val);
-            outputField.setText(String.format("%.6g", result));
+            Quantity q = Quantities.create(val, from);
+            Quantity result = q.to(to);
+
+            outputField.setText(String.format("%.6g", result.getValue().doubleValue()));
         } catch (Exception e) {
             outputField.setText("Error");
         }
@@ -163,5 +168,3 @@ public class UnitConverterViewer extends Application {
         new UnitConverterViewer().start(stage);
     }
 }
-
-

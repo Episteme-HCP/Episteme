@@ -29,16 +29,20 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Interactive Electrical Circuit Schematic Designer.
+ * Interactive Electrical Circuit Schematic Designer using JScience Quantity
+ * types.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -74,8 +78,7 @@ public class CircuitSimulatorViewer extends Application {
     private static class Component {
         ComponentType type;
         double x1, y1, x2, y2;
-        double value;
-        String unit;
+        Quantity<?> value;
 
         Component(ComponentType type, double x1, double y1, double x2, double y2) {
             this.type = type;
@@ -84,22 +87,11 @@ public class CircuitSimulatorViewer extends Application {
             this.x2 = x2;
             this.y2 = y2;
             switch (type) {
-                case RESISTOR -> {
-                    value = 1000;
-                    unit = "ÃŽÂ©";
-                }
-                case BATTERY -> {
-                    value = 9;
-                    unit = "V";
-                }
-                case CAPACITOR -> {
-                    value = 10;
-                    unit = "Ã‚ÂµF";
-                }
-                default -> {
-                    value = 0;
-                    unit = "";
-                }
+                case RESISTOR -> value = Quantities.create(1000.0, Units.OHM);
+                case BATTERY -> value = Quantities.create(9.0, Units.VOLT);
+                case CAPACITOR -> value = Quantities.create(10e-6, Units.FARAD);
+                case INDUCTOR -> value = Quantities.create(1e-3, Units.HENRY);
+                default -> value = Quantities.create(0.0, Units.ONE);
             }
         }
     }
@@ -113,7 +105,6 @@ public class CircuitSimulatorViewer extends Application {
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
 
-        // Toolbar
         HBox toolbar = new HBox(10);
         toolbar.setPadding(new Insets(10));
         toolbar.getStyleClass().add("viewer-toolbar");
@@ -151,9 +142,8 @@ public class CircuitSimulatorViewer extends Application {
                 });
         root.setTop(toolbar);
 
-        // Canvas
         canvas = new Canvas(1000, 700);
-        draw(); // Initial grid
+        draw();
 
         canvas.setOnMousePressed(e -> {
             if (isSelectMode) {
@@ -186,13 +176,14 @@ public class CircuitSimulatorViewer extends Application {
 
         root.setCenter(new ScrollPane(canvas));
 
-        // Details panel
         VBox sidebar = new VBox(10);
         sidebar.setPadding(new Insets(10));
         sidebar.setPrefWidth(200);
         sidebar.getStyleClass().add("viewer-sidebar");
-        sidebar.getChildren().add(new Label("Click and drag on grid to place components."));
-        sidebar.getChildren().add(new Label("Components snap to 20px grid."));
+        sidebar.getChildren().addAll(
+                new Label("Click and drag on grid to place components."),
+                new Label("Components snap to 20px grid."),
+                new Label("JScience Quantities used for Electromagnetism."));
         root.setRight(sidebar);
 
         Scene scene = new Scene(root, 1200, 800);
@@ -219,17 +210,13 @@ public class CircuitSimulatorViewer extends Application {
     private ToggleButton createSelectButton(ToggleGroup group) {
         ToggleButton btn = new ToggleButton("Select");
         btn.setToggleGroup(group);
-        btn.setOnAction(e -> {
-            isSelectMode = true;
-            // selectedComponent = null; // Don't clear immediately, handy to keep selection
-        });
+        btn.setOnAction(e -> isSelectMode = true);
         return btn;
     }
 
     private void handleSelection(double x, double y) {
         selectedComponent = null;
         for (Component c : components) {
-            // Simple hit testing for line segment
             double dist = distancePointToSegment(x, y, c.x1, c.y1, c.x2, c.y2);
             if (dist < 10) {
                 selectedComponent = c;
@@ -244,15 +231,10 @@ public class CircuitSimulatorViewer extends Application {
         double B = y - y1;
         double C = x2 - x1;
         double D = y2 - y1;
-
         double dot = A * C + B * D;
         double len_sq = C * C + D * D;
-        double param = -1;
-        if (len_sq != 0) // in case of 0 length line
-            param = dot / len_sq;
-
+        double param = (len_sq != 0) ? dot / len_sq : -1;
         double xx, yy;
-
         if (param < 0) {
             xx = x1;
             yy = y1;
@@ -263,10 +245,7 @@ public class CircuitSimulatorViewer extends Application {
             xx = x1 + param * C;
             yy = y1 + param * D;
         }
-
-        double dx = x - xx;
-        double dy = y - yy;
-        return Math.sqrt(dx * dx + dy * dy);
+        return Math.sqrt(Math.pow(x - xx, 2) + Math.pow(y - yy, 2));
     }
 
     private double snap(double val) {
@@ -276,44 +255,35 @@ public class CircuitSimulatorViewer extends Application {
     private void draw() {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-
-        // Grid
         gc.setStroke(Color.web("#ddd"));
         gc.setLineWidth(1);
-        for (int x = 0; x < canvas.getWidth(); x += 20) {
+        for (int x = 0; x < canvas.getWidth(); x += 20)
             gc.strokeLine(x, 0, x, canvas.getHeight());
-        }
-        for (int y = 0; y < canvas.getHeight(); y += 20) {
+        for (int y = 0; y < canvas.getHeight(); y += 20)
             gc.strokeLine(0, y, canvas.getWidth(), y);
-        }
-
-        // Components
-        for (Component c : components) {
+        for (Component c : components)
             drawComponent(gc, c, c == selectedComponent);
-        }
     }
 
     private void drawComponent(GraphicsContext gc, Component c, boolean selected) {
         gc.setStroke(selected ? Color.RED : Color.BLACK);
         gc.setLineWidth(selected ? 3 : 2);
-
         double midX = (c.x1 + c.x2) / 2;
         double midY = (c.y1 + c.y2) / 2;
-
         switch (c.type) {
             case WIRE -> gc.strokeLine(c.x1, c.y1, c.x2, c.y2);
             case RESISTOR -> {
-                gc.strokeLine(c.x1, c.y1, midX - 10, midY); // Lead 1
-                gc.strokeLine(midX + 10, midY, c.x2, c.y2); // Lead 2
+                gc.strokeLine(c.x1, c.y1, midX - 10, midY);
+                gc.strokeLine(midX + 10, midY, c.x2, c.y2);
                 gc.strokeRect(midX - 10, midY - 5, 20, 10);
-                gc.fillText(c.value + c.unit, midX - 15, midY - 10);
+                gc.fillText(c.value.toString(), midX - 15, midY - 10);
             }
             case BATTERY -> {
                 gc.strokeLine(c.x1, c.y1, midX - 5, midY);
                 gc.strokeLine(midX + 5, midY, c.x2, c.y2);
-                gc.strokeLine(midX - 5, midY - 15, midX - 5, midY + 15); // Long bar (+)
-                gc.strokeLine(midX + 5, midY - 8, midX + 5, midY + 8); // Short bar (-)
-                gc.fillText(c.value + c.unit, midX - 10, midY - 20);
+                gc.strokeLine(midX - 5, midY - 15, midX - 5, midY + 15);
+                gc.strokeLine(midX + 5, midY - 8, midX + 5, midY + 8);
+                gc.fillText(c.value.toString(), midX - 10, midY - 20);
             }
             case CAPACITOR -> {
                 gc.strokeLine(c.x1, c.y1, midX - 5, midY);
@@ -337,7 +307,7 @@ public class CircuitSimulatorViewer extends Application {
                 gc.strokeLine(c.x1, c.y1, midX - 10, midY);
                 gc.strokeLine(midX + 10, midY, c.x2, c.y2);
                 gc.strokeOval(midX - 10, midY - 10, 20, 20);
-                gc.strokeLine(midX - 5, midY + 5, midX + 5, midY - 5); // Needle
+                gc.strokeLine(midX - 5, midY + 5, midX + 5, midY - 5);
             }
         }
     }
@@ -355,5 +325,3 @@ public class CircuitSimulatorViewer extends Application {
         new CircuitSimulatorViewer().start(stage);
     }
 }
-
-

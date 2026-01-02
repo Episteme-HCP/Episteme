@@ -296,8 +296,7 @@ public class JscienceServer extends ComputeServiceGrpc.ComputeServiceImplBase {
             // Async log
             new Thread(() -> {
                 try {
-                    org.jscience.server.integrations.MlflowClient client = new org.jscience.server.integrations.MlflowClient(
-                            "http://localhost:5000", "JScience");
+                    org.jscience.server.integrations.MlflowClient client = new org.jscience.server.integrations.MlflowClient();
                     String runId = client.startRun("Task-" + taskId).join();
                     client.logMetric(runId, "duration_ms", duration, System.currentTimeMillis());
                     client.logParam(runId, "worker_id", "unknown"); // We could extract this if we parsed the token
@@ -553,8 +552,9 @@ public class JscienceServer extends ComputeServiceGrpc.ComputeServiceImplBase {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        // Port priority: CLI arg > System Property > Default (50051)
-        int port = 50051;
+        // Port priority: CLI arg > System Property > Configuration > Default (50051)
+        int port = ApplicationConfig.getInstance().getGrpcPort();
+
         if (args.length > 0) {
             port = Integer.parseInt(args[0]);
         } else if (System.getProperty("port") != null) {

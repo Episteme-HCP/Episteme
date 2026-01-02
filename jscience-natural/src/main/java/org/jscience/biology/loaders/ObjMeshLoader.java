@@ -31,10 +31,14 @@ import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.shape.VertexFormat;
 
+import org.jscience.io.AbstractLoader;
+import org.jscience.io.MiniCatalog;
+
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Simple Wavefront OBJ loader for JavaFX 3D.
@@ -47,15 +51,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ObjMeshLoader implements org.jscience.io.InputLoader<javafx.scene.Group> {
-
-    @Override
-    public javafx.scene.Group load(String resourceId) throws IOException {
-        if (resourceId.startsWith("http") || resourceId.startsWith("file:")) {
-            return load(java.net.URI.create(resourceId).toURL());
-        }
-        return loadResource(resourceId);
-    }
+public class ObjMeshLoader extends AbstractLoader<Group> {
 
     @Override
     public String getResourcePath() {
@@ -63,16 +59,40 @@ public class ObjMeshLoader implements org.jscience.io.InputLoader<javafx.scene.G
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Class<javafx.scene.Group> getResourceType() {
-        return (Class<javafx.scene.Group>) (Class<?>) javafx.scene.Group.class;
+    public Class<Group> getResourceType() {
+        return Group.class;
+    }
+
+    @Override
+    protected Group loadFromSource(String id) throws Exception {
+        if (id.startsWith("http") || id.startsWith("file:")) {
+            return load(java.net.URI.create(id).toURL());
+        }
+        return loadResource(id);
+    }
+
+    @Override
+    protected MiniCatalog<Group> getMiniCatalog() {
+        return new MiniCatalog<>() {
+            @Override
+            public List<Group> getAll() {
+                return List.of(new Group());
+            }
+
+            @Override
+            public Optional<Group> findByName(String name) {
+                return Optional.of(new Group());
+            }
+
+            @Override
+            public int size() {
+                return 0;
+            }
+        };
     }
 
     /**
      * Loads an OBJ model from a file.
-     *
-     * @param file the OBJ file to load
-     * @return Group containing all mesh views from the model
      */
     public static Group load(File file) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -82,9 +102,6 @@ public class ObjMeshLoader implements org.jscience.io.InputLoader<javafx.scene.G
 
     /**
      * Loads an OBJ model from a URL (resource or http).
-     *
-     * @param url the URL to load
-     * @return Group containing all mesh views from the model
      */
     public static Group load(URL url) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
@@ -94,10 +111,6 @@ public class ObjMeshLoader implements org.jscience.io.InputLoader<javafx.scene.G
 
     /**
      * Loads an OBJ model from classpath resources.
-     *
-     * @param resourcePath the resource path (e.g.,
-     *                     "/org/jscience/medicine/anatomy/models/Skeleton.obj")
-     * @return Group containing all mesh views from the model
      */
     public static Group loadResource(String resourcePath) throws IOException {
         URL url = ObjMeshLoader.class.getResource(resourcePath);
@@ -109,10 +122,6 @@ public class ObjMeshLoader implements org.jscience.io.InputLoader<javafx.scene.G
 
     /**
      * Loads an OBJ model and applies a material color.
-     *
-     * @param file  the OBJ file
-     * @param color the material color to apply
-     * @return Group with colored meshes
      */
     public static Group load(File file, Color color) throws IOException {
         Group group = load(file);
@@ -122,10 +131,6 @@ public class ObjMeshLoader implements org.jscience.io.InputLoader<javafx.scene.G
 
     /**
      * Loads an OBJ resource and applies a material color.
-     *
-     * @param resourcePath the resource path
-     * @param color        the material color to apply
-     * @return Group with colored meshes
      */
     public static Group loadResource(String resourcePath, Color color) throws IOException {
         Group group = loadResource(resourcePath);
@@ -174,10 +179,8 @@ public class ObjMeshLoader implements org.jscience.io.InputLoader<javafx.scene.G
             }
         }
 
-        // Build TriangleMesh
         TriangleMesh mesh = new TriangleMesh(VertexFormat.POINT_TEXCOORD);
 
-        // Add vertices
         float[] points = new float[vertices.size() * 3];
         for (int i = 0; i < vertices.size(); i++) {
             points[i * 3] = vertices.get(i)[0];
@@ -186,7 +189,6 @@ public class ObjMeshLoader implements org.jscience.io.InputLoader<javafx.scene.G
         }
         mesh.getPoints().addAll(points);
 
-        // Add texture coordinates (use dummy if none)
         if (texCoords.isEmpty()) {
             mesh.getTexCoords().addAll(0f, 0f);
         } else {
@@ -198,7 +200,6 @@ public class ObjMeshLoader implements org.jscience.io.InputLoader<javafx.scene.G
             mesh.getTexCoords().addAll(texs);
         }
 
-        // Add faces
         int[] faceData = new int[faces.size() * 2];
         for (int i = 0; i < faces.size(); i++) {
             faceData[i * 2] = faces.get(i)[0];
@@ -215,13 +216,11 @@ public class ObjMeshLoader implements org.jscience.io.InputLoader<javafx.scene.G
     }
 
     private static void parseFace(String[] parts, List<int[]> faces) {
-        // Triangulate face (assuming convex polygon)
         int[] first = parseVertex(parts[1]);
         int[] prev = parseVertex(parts[2]);
 
         for (int i = 3; i < parts.length; i++) {
             int[] curr = parseVertex(parts[i]);
-            // Triangle: first, prev, curr
             faces.add(new int[] { first[0], first[1] });
             faces.add(new int[] { prev[0], prev[1] });
             faces.add(new int[] { curr[0], curr[1] });
@@ -231,7 +230,7 @@ public class ObjMeshLoader implements org.jscience.io.InputLoader<javafx.scene.G
 
     private static int[] parseVertex(String vertex) {
         String[] parts = vertex.split("/");
-        int v = Integer.parseInt(parts[0]) - 1; // OBJ is 1-indexed
+        int v = Integer.parseInt(parts[0]) - 1;
         int vt = 0;
         if (parts.length > 1 && !parts[1].isEmpty()) {
             vt = Integer.parseInt(parts[1]) - 1;
@@ -249,5 +248,3 @@ public class ObjMeshLoader implements org.jscience.io.InputLoader<javafx.scene.G
         }
     }
 }
-
-

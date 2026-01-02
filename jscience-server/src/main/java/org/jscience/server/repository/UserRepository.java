@@ -24,16 +24,21 @@
 package org.jscience.server.repository;
 
 import org.jscience.server.model.User;
+import org.jscience.server.config.ApplicationConfig;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UserRepository {
     private final EntityManagerFactory emf;
 
     public UserRepository() {
-        this.emf = Persistence.createEntityManagerFactory("jscience-pu");
+        Map<String, String> properties = new HashMap<>();
+        properties.put("jakarta.persistence.jdbc.url", ApplicationConfig.getInstance().getUsersDbUrl());
+        this.emf = Persistence.createEntityManagerFactory("jscience-pu", properties);
     }
 
     public Optional<User> findByUsername(String username) {
@@ -59,5 +64,3 @@ public class UserRepository {
         }
     }
 }
-
-

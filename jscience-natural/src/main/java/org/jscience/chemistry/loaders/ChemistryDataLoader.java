@@ -28,13 +28,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import org.jscience.chemistry.Element;
 import org.jscience.chemistry.PeriodicTable;
+import org.jscience.io.AbstractLoader;
+import org.jscience.io.MiniCatalog;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.MassDensity;
 
 import java.io.InputStream;
 import java.util.List;
-
+import java.util.Optional;
 import java.util.logging.Logger;
 
 /**
@@ -44,10 +46,20 @@ import java.util.logging.Logger;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ChemistryDataLoader implements org.jscience.io.InputLoader<Object> {
+public class ChemistryDataLoader extends AbstractLoader<Object> {
 
     @Override
-    public Object load(String id) throws Exception {
+    public String getResourcePath() {
+        return "/org/jscience/chemistry/";
+    }
+
+    @Override
+    public Class<Object> getResourceType() {
+        return Object.class;
+    }
+
+    @Override
+    protected Object loadFromSource(String id) throws Exception {
         if ("elements".equals(id)) {
             loadElements();
             return PeriodicTable.getElements();
@@ -59,13 +71,23 @@ public class ChemistryDataLoader implements org.jscience.io.InputLoader<Object> 
     }
 
     @Override
-    public String getResourcePath() {
-        return "/org/jscience/chemistry/";
-    }
+    protected MiniCatalog<Object> getMiniCatalog() {
+        return new MiniCatalog<>() {
+            @Override
+            public List<Object> getAll() {
+                return List.of();
+            }
 
-    @Override
-    public Class<Object> getResourceType() {
-        return Object.class;
+            @Override
+            public Optional<Object> findByName(String name) {
+                return Optional.empty();
+            }
+
+            @Override
+            public int size() {
+                return 0;
+            }
+        };
     }
 
     private static final Logger LOGGER = Logger.getLogger(ChemistryDataLoader.class.getName());
@@ -91,7 +113,6 @@ public class ChemistryDataLoader implements org.jscience.io.InputLoader<Object> 
 
         try (InputStream is = ChemistryDataLoader.class.getResourceAsStream("/org/jscience/chemistry/elements.json")) {
             if (is == null) {
-
                 LOGGER.warning("elements.json not found in /org/jscience/chemistry/");
                 return;
             }
@@ -99,17 +120,15 @@ public class ChemistryDataLoader implements org.jscience.io.InputLoader<Object> 
             ElementListWrapper wrapper = MAPPER.readValue(is, ElementListWrapper.class);
             List<ElementData> elements = wrapper.elements;
 
-            // Populate PeriodicTable
             for (ElementData data : elements) {
                 Element.ElementCategory cat = Element.ElementCategory.UNKNOWN;
                 String catStr = data.category.toUpperCase().replace(" ", "_").replace("-", "_");
                 if (catStr.contains("DIATOMIC") || catStr.contains("POLYATOMIC")) {
-                    catStr = "NONMETAL"; // Simplify
+                    catStr = "NONMETAL";
                 }
                 try {
                     cat = Element.ElementCategory.valueOf(catStr);
                 } catch (Exception e) {
-                    // Try primitive mapping
                     if (catStr.contains("NOBLE"))
                         cat = Element.ElementCategory.NOBLE_GAS;
                     else if (catStr.contains("ALKALI") && !catStr.contains("EARTH"))
@@ -132,8 +151,6 @@ public class ChemistryDataLoader implements org.jscience.io.InputLoader<Object> 
 
                 Element element = new Element(data.name, data.symbol);
                 element.setAtomicNumber(data.atomicNumber);
-                // Creating Mass Quantity using local Quantities factory
-                // data.atomicMass is in 'u' (Daltons). 1 u = 1.66053906660e-27 kg.
                 element.setAtomicMass(Quantities.create(data.atomicMass * 1.66053906660e-27, Units.KILOGRAM));
 
                 element.setGroup(data.group);
@@ -141,7 +158,6 @@ public class ChemistryDataLoader implements org.jscience.io.InputLoader<Object> 
                 element.setCategory(cat);
                 element.setElectronegativity(data.electronegativity);
 
-                // Melting/Boiling
                 if (data.melt != null) {
                     element.setMeltingPoint(Quantities.create(data.melt, Units.KELVIN));
                 }
@@ -153,14 +169,12 @@ public class ChemistryDataLoader implements org.jscience.io.InputLoader<Object> 
                             Units.GRAM.divide(Units.CENTIMETER.pow(3)).asType(MassDensity.class)));
                 }
 
-                // New Properties
                 element.setStandardState(data.standardState);
                 element.setElectronConfiguration(data.electronConfig);
                 element.setOxidationStates(data.oxidationStates);
                 element.setYearDiscovered(data.yearDiscovered);
 
                 if (data.atomicRadius != null) {
-                    // Atomic radius in picometers. Convert pm to m: 1 pm = 1e-12 m
                     element.setAtomicRadius(Quantities.create(data.atomicRadius * 1e-12, Units.METER));
                 }
                 if (data.ionization != null) {
@@ -174,11 +188,9 @@ public class ChemistryDataLoader implements org.jscience.io.InputLoader<Object> 
                 LOGGER.info("Registered element: " + data.symbol);
             }
 
-            // Load molecules after elements
             loadMolecules();
 
         } catch (Exception e) {
-
             e.printStackTrace();
             LOGGER.severe("Failed to load elements.json: " + e.getMessage());
         }
@@ -195,7 +207,6 @@ public class ChemistryDataLoader implements org.jscience.io.InputLoader<Object> 
             }
             MoleculeListWrapper wrapper = MAPPER.readValue(is, MoleculeListWrapper.class);
             for (MoleculeData md : wrapper.molecules) {
-                // Verify atoms exist before caching
                 boolean valid = true;
                 for (AtomData ad : md.atoms) {
                     if (PeriodicTable.bySymbol(ad.symbol) == null) {
@@ -210,15 +221,12 @@ public class ChemistryDataLoader implements org.jscience.io.InputLoader<Object> 
                 }
             }
         } catch (Exception e) {
-
             e.printStackTrace();
         }
     }
 
     /**
      * Gets a new instance (deep clone) of a loaded molecule.
-     * Reconstructs the molecule from cached data to ensure thread safety and
-     * mutability.
      */
     public static org.jscience.chemistry.Molecule getMolecule(String name) {
         MoleculeData md = MOLECULE_DATA_CACHE.get(name);
@@ -229,11 +237,10 @@ public class ChemistryDataLoader implements org.jscience.io.InputLoader<Object> 
 
     private static org.jscience.chemistry.Molecule createMoleculeFromData(MoleculeData md) {
         org.jscience.chemistry.Molecule mol = new org.jscience.chemistry.Molecule(md.name);
-        List<org.jscience.chemistry.Atom> createdAtoms = new java.util.ArrayList<>();
+        java.util.List<org.jscience.chemistry.Atom> createdAtoms = new java.util.ArrayList<>();
 
         for (AtomData ad : md.atoms) {
             Element el = PeriodicTable.bySymbol(ad.symbol);
-            // Coordinate conversion
             org.jscience.mathematics.linearalgebra.vectors.DenseVector<org.jscience.mathematics.numbers.real.Real> pos = org.jscience.mathematics.linearalgebra.vectors.DenseVector
                     .of(
                             java.util.Arrays.asList(
@@ -266,7 +273,6 @@ public class ChemistryDataLoader implements org.jscience.io.InputLoader<Object> 
         return mol;
     }
 
-    // DTO for JSON mapping
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ElementData {
         public String name;
@@ -280,13 +286,12 @@ public class ChemistryDataLoader implements org.jscience.io.InputLoader<Object> 
         public Double melt;
         public Double boil;
         public Double density;
-        // New fields
         public String standardState;
         public String electronConfig;
         public String oxidationStates;
-        public Double atomicRadius; // pm
-        public Double ionization; // eV
-        public Double affinity; // eV
+        public Double atomicRadius;
+        public Double ionization;
+        public Double affinity;
         public int yearDiscovered;
     }
 
@@ -316,5 +321,3 @@ public class ChemistryDataLoader implements org.jscience.io.InputLoader<Object> 
         public List<MoleculeData> molecules;
     }
 }
-
-

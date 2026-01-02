@@ -24,15 +24,20 @@
 package org.jscience.server.repository;
 
 import org.jscience.server.model.Job;
+import org.jscience.server.config.ApplicationConfig;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import java.util.HashMap;
+import java.util.Map;
 
 public class JobRepository {
     private final EntityManagerFactory emf;
 
     public JobRepository() {
-        this.emf = Persistence.createEntityManagerFactory("jscience-pu");
+        Map<String, String> properties = new HashMap<>();
+        properties.put("jakarta.persistence.jdbc.url", ApplicationConfig.getInstance().getJobsDbUrl());
+        this.emf = Persistence.createEntityManagerFactory("jscience-pu", properties);
     }
 
     public void save(Job job) {
@@ -48,5 +53,3 @@ public class JobRepository {
 
     // Additional methods (findById, findAll) would go here
 }
-
-

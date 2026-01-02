@@ -28,6 +28,7 @@ import org.jscience.mathematics.numbers.real.Real;
 /**
  * A 2D vector in Euclidean space.
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -150,5 +151,25 @@ public final class Vector2D extends org.jscience.mathematics.linearalgebra.vecto
     public String description() {
         return "Vector2D" + toString();
     }
-}
 
+    // Aliases for compatibility
+    public Vector2D plus(Vector2D other) {
+        return add(other);
+    }
+
+    public Vector2D times(Real scalar) {
+        return multiply(scalar);
+    }
+
+    public Vector2D minus(Vector2D other) {
+        return subtract(other);
+    }
+
+    public Vector2D direction() {
+        return normalize();
+    }
+
+    public Real normSquared() {
+        return this.dot(this);
+    }
+}

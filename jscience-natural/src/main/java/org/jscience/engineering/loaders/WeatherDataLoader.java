@@ -23,12 +23,16 @@
 
 package org.jscience.engineering.loaders;
 
+import org.jscience.io.AbstractLoader;
+import org.jscience.io.MiniCatalog;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Loads weather/solar data for SmartGrid simulations.
@@ -38,14 +42,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class WeatherDataLoader implements org.jscience.io.InputLoader<List<WeatherDataLoader.WeatherRecord>> {
-
-    @Override
-    public List<WeatherRecord> load(String resourceId) throws java.io.IOException {
-        try (InputStream is = getClass().getResourceAsStream(resourceId)) {
-            return loadCSV(is);
-        }
-    }
+public class WeatherDataLoader extends AbstractLoader<List<WeatherDataLoader.WeatherRecord>> {
 
     @Override
     public String getResourcePath() {
@@ -56,6 +53,33 @@ public class WeatherDataLoader implements org.jscience.io.InputLoader<List<Weath
     @SuppressWarnings("unchecked")
     public Class<List<WeatherDataLoader.WeatherRecord>> getResourceType() {
         return (Class<List<WeatherDataLoader.WeatherRecord>>) (Class<?>) List.class;
+    }
+
+    @Override
+    protected List<WeatherRecord> loadFromSource(String id) throws Exception {
+        try (InputStream is = getClass().getResourceAsStream(id)) {
+            return loadCSV(is);
+        }
+    }
+
+    @Override
+    protected MiniCatalog<List<WeatherRecord>> getMiniCatalog() {
+        return new MiniCatalog<>() {
+            @Override
+            public List<List<WeatherRecord>> getAll() {
+                return List.of(List.of());
+            }
+
+            @Override
+            public Optional<List<WeatherRecord>> findByName(String name) {
+                return Optional.of(List.of());
+            }
+
+            @Override
+            public int size() {
+                return 0;
+            }
+        };
     }
 
     public static class WeatherRecord {
@@ -73,7 +97,6 @@ public class WeatherDataLoader implements org.jscience.io.InputLoader<List<Weath
 
         /** Calculate wind power factor (0-1) based on typical turbine curve */
         public double getWindPowerFactor() {
-            // Cut-in at 3 m/s, rated at 12 m/s, cut-out at 25 m/s
             if (windSpeedMs < 3)
                 return 0;
             if (windSpeedMs > 25)
@@ -85,7 +108,6 @@ public class WeatherDataLoader implements org.jscience.io.InputLoader<List<Weath
 
         /** Calculate solar power factor (0-1) based on irradiance */
         public double getSolarPowerFactor() {
-            // Max irradiance ~1000 W/mÃ‚Â²
             return Math.min(1.0, solarIrradianceWm2 / 1000.0);
         }
     }
@@ -118,5 +140,3 @@ public class WeatherDataLoader implements org.jscience.io.InputLoader<List<Weath
         return records;
     }
 }
-
-

@@ -25,14 +25,17 @@ package org.jscience.history.loaders;
 
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.history.TimePoint;
-import org.jscience.io.InputLoader;
+import org.jscience.io.AbstractLoader;
+import org.jscience.io.MiniCatalog;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 /**
@@ -43,14 +46,9 @@ import java.util.TreeMap;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CSVTimeSeriesLoader implements InputLoader<Map<TimePoint, Real>> {
+public class CSVTimeSeriesLoader extends AbstractLoader<Map<TimePoint, Real>> {
 
     public CSVTimeSeriesLoader() {
-    }
-
-    @Override
-    public Map<TimePoint, Real> load(String resourceId) throws Exception {
-        return loadTimeSeries(resourceId);
     }
 
     @Override
@@ -62,6 +60,31 @@ public class CSVTimeSeriesLoader implements InputLoader<Map<TimePoint, Real>> {
     @SuppressWarnings("unchecked")
     public Class<Map<TimePoint, Real>> getResourceType() {
         return (Class<Map<TimePoint, Real>>) (Class<?>) Map.class;
+    }
+
+    @Override
+    protected Map<TimePoint, Real> loadFromSource(String id) throws Exception {
+        return loadTimeSeries(id);
+    }
+
+    @Override
+    protected MiniCatalog<Map<TimePoint, Real>> getMiniCatalog() {
+        return new MiniCatalog<>() {
+            @Override
+            public List<Map<TimePoint, Real>> getAll() {
+                return List.of(Collections.emptyMap());
+            }
+
+            @Override
+            public Optional<Map<TimePoint, Real>> findByName(String name) {
+                return Optional.of(Collections.emptyMap());
+            }
+
+            @Override
+            public int size() {
+                return 0;
+            }
+        };
     }
 
     /**
@@ -76,7 +99,6 @@ public class CSVTimeSeriesLoader implements InputLoader<Map<TimePoint, Real>> {
 
         try (InputStream is = CSVTimeSeriesLoader.class.getResourceAsStream(resourcePath)) {
             if (is == null) {
-                // Try file system or fallback
                 return Collections.emptyMap();
             }
 
@@ -93,7 +115,6 @@ public class CSVTimeSeriesLoader implements InputLoader<Map<TimePoint, Real>> {
                     if (parts.length >= 2) {
                         try {
                             String dateStr = parts[0].trim();
-                            // Handles standard ISO date
                             LocalDate date = LocalDate.parse(dateStr);
                             TimePoint tp = TimePoint.of(date);
 
@@ -111,5 +132,3 @@ public class CSVTimeSeriesLoader implements InputLoader<Map<TimePoint, Real>> {
         return series;
     }
 }
-
-

@@ -176,6 +176,92 @@ public class Country extends org.jscience.geography.Place implements org.jscienc
             "Tokyo", "Asia", 126_000_000L, 377_975.0);
     public static final Country BRAZIL = new Country("Brazil", "BR", "BRA", 76,
             "BrasÃƒÂ­lia", "South America", 212_000_000L, 8_515_767.0);
+    // Expanded fields from Factbook data
+    private double coastlineKm;
+    private String governmentType;
+    private int independenceYear;
+    private double populationGrowthRate;
+    private double lifeExpectancy;
+    private double birthRate;
+    private double deathRate;
+    private String currencyCode;
+    private java.util.List<String> majorIndustries = new java.util.ArrayList<>();
+    private java.util.List<String> naturalResources = new java.util.ArrayList<>();
+    private java.util.List<String> borderCountries = new java.util.ArrayList<>();
+
+    public double getCoastlineKm() {
+        return coastlineKm;
+    }
+
+    public void setCoastlineKm(double coastlineKm) {
+        this.coastlineKm = coastlineKm;
+    }
+
+    public String getGovernmentType() {
+        return governmentType;
+    }
+
+    public void setGovernmentType(String governmentType) {
+        this.governmentType = governmentType;
+    }
+
+    public int getIndependenceYear() {
+        return independenceYear;
+    }
+
+    public void setIndependenceYear(int independenceYear) {
+        this.independenceYear = independenceYear;
+    }
+
+    public double getPopulationGrowthRate() {
+        return populationGrowthRate;
+    }
+
+    public void setPopulationGrowthRate(double populationGrowthRate) {
+        this.populationGrowthRate = populationGrowthRate;
+    }
+
+    public double getLifeExpectancy() {
+        return lifeExpectancy;
+    }
+
+    public void setLifeExpectancy(double lifeExpectancy) {
+        this.lifeExpectancy = lifeExpectancy;
+    }
+
+    public double getBirthRate() {
+        return birthRate;
+    }
+
+    public void setBirthRate(double birthRate) {
+        this.birthRate = birthRate;
+    }
+
+    public double getDeathRate() {
+        return deathRate;
+    }
+
+    public void setDeathRate(double deathRate) {
+        this.deathRate = deathRate;
+    }
+
+    public String getCurrencyCode() {
+        return currencyCode;
+    }
+
+    public void setCurrencyCode(String currencyCode) {
+        this.currencyCode = currencyCode;
+    }
+
+    public java.util.List<String> getMajorIndustries() {
+        return majorIndustries;
+    }
+
+    public java.util.List<String> getNaturalResources() {
+        return naturalResources;
+    }
+
+    public java.util.List<String> getBorderCountries() {
+        return borderCountries;
+    }
 }
-
-

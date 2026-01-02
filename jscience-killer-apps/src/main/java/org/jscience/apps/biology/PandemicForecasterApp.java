@@ -31,22 +31,22 @@ import javafx.geometry.Orientation;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-
 import javafx.util.Duration;
-
-import org.jscience.apps.framework.ChartFactory;
-import org.jscience.apps.framework.KillerAppBase;
-import org.jscience.biology.ecology.PopulationDynamics;
-import org.jscience.geography.loaders.WorldBankLoader;
-import org.jscience.mathematics.numbers.real.Real;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.List;
+import org.jscience.apps.framework.ChartFactory;
+import org.jscience.apps.framework.KillerAppBase;
+import org.jscience.biology.ecology.PopulationDynamics;
+import org.jscience.politics.loaders.WorldBankLoader;
+import org.jscience.politics.Country;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Full-Featured Pandemic Forecaster Application.
@@ -62,7 +62,7 @@ import java.util.List;
 public class PandemicForecasterApp extends KillerAppBase {
 
     // UI Components
-    private ComboBox<org.jscience.geography.Region> countrySelector;
+    private ComboBox<Country> countrySelector;
     private Slider betaSlider, sigmaSlider, gammaSlider, muSlider, initialSlider, daysSlider;
     private LineChart<Number, Number> seirChart;
     private XYChart.Series<Number, Number> susSeriesS, expSeriesE, infSeriesI, recSeriesR, deaSeriesD;
@@ -76,7 +76,7 @@ public class PandemicForecasterApp extends KillerAppBase {
     private boolean isRunning = false;
 
     // Data
-    private List<org.jscience.geography.Region> countries;
+    private List<Country> countries;
 
     @Override
     protected String getAppTitle() {
@@ -89,7 +89,7 @@ public class PandemicForecasterApp extends KillerAppBase {
     }
 
     @Override
-    protected Region createMainContent() {
+    protected javafx.scene.layout.Region createMainContent() {
         // Initialize explicitly to empty list to avoid NPE in createControlPanel
         countries = new java.util.ArrayList<>();
 
@@ -199,9 +199,9 @@ public class PandemicForecasterApp extends KillerAppBase {
         countryLabel.setStyle("-fx-font-weight: bold;");
         countrySelector = new ComboBox<>();
         countrySelector.setItems(FXCollections.observableArrayList(countries));
-        countrySelector.setCellFactory(lv -> new ListCell<org.jscience.geography.Region>() {
+        countrySelector.setCellFactory(lv -> new ListCell<Country>() {
             @Override
-            protected void updateItem(org.jscience.geography.Region item, boolean empty) {
+            protected void updateItem(Country item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? ""
                         : item.getName() + " (Pop: " + formatNumber(item.getPopulation()) + ")");
@@ -299,7 +299,7 @@ public class PandemicForecasterApp extends KillerAppBase {
     }
 
     private void onCountrySelected() {
-        org.jscience.geography.Region selected = countrySelector.getValue();
+        Country selected = countrySelector.getValue();
         if (selected != null) {
             populationLabel.setText(
                     java.text.MessageFormat.format(i18n.get("pandemic.label.population"),
@@ -315,7 +315,7 @@ public class PandemicForecasterApp extends KillerAppBase {
         if (isRunning)
             return;
 
-        org.jscience.geography.Region country = countrySelector.getValue();
+        Country country = countrySelector.getValue();
         if (country == null) {
             showError(i18n.get("dialog.error.title"), i18n.get("pandemic.error.select"));
             return;
@@ -500,5 +500,3 @@ public class PandemicForecasterApp extends KillerAppBase {
         launch(args);
     }
 }
-
-

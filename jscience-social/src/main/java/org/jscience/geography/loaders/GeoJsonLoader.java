@@ -27,11 +27,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jscience.geography.Coordinate;
 import org.jscience.geography.Region;
+import org.jscience.io.AbstractLoader;
+import org.jscience.io.MiniCatalog;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Loads geographic data from GeoJSON format.
@@ -41,13 +44,12 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GeoJsonLoader implements org.jscience.io.InputLoader<List<org.jscience.geography.Region>> {
+public class GeoJsonLoader extends AbstractLoader<List<Region>> {
 
-    @Override
-    public List<org.jscience.geography.Region> load(String resourceId) throws java.io.IOException {
-        try (InputStream is = getClass().getResourceAsStream(resourceId)) {
-            return loadRegions(is);
-        }
+    private final ObjectMapper mapper;
+
+    public GeoJsonLoader() {
+        this.mapper = new ObjectMapper();
     }
 
     @Override
@@ -57,14 +59,38 @@ public class GeoJsonLoader implements org.jscience.io.InputLoader<List<org.jscie
 
     @Override
     @SuppressWarnings("unchecked")
-    public Class<List<org.jscience.geography.Region>> getResourceType() {
-        return (Class<List<org.jscience.geography.Region>>) (Class<?>) List.class;
+    public Class<List<Region>> getResourceType() {
+        return (Class<List<Region>>) (Class<?>) List.class;
     }
 
-    private final ObjectMapper mapper;
+    @Override
+    protected List<Region> loadFromSource(String id) throws Exception {
+        try (InputStream is = getClass().getResourceAsStream(id)) {
+            if (is == null) {
+                throw new Exception("Resource not found: " + id);
+            }
+            return loadRegions(is);
+        }
+    }
 
-    public GeoJsonLoader() {
-        this.mapper = new ObjectMapper();
+    @Override
+    protected MiniCatalog<List<Region>> getMiniCatalog() {
+        return new MiniCatalog<>() {
+            @Override
+            public List<List<Region>> getAll() {
+                return List.of(List.of());
+            }
+
+            @Override
+            public Optional<List<Region>> findByName(String name) {
+                return Optional.of(List.of());
+            }
+
+            @Override
+            public int size() {
+                return 0;
+            }
+        };
     }
 
     /**
@@ -109,7 +135,7 @@ public class GeoJsonLoader implements org.jscience.io.InputLoader<List<org.jscie
             name = "Unknown";
         }
 
-        Region.Type type = Region.Type.COUNTRY; // Default
+        Region.Type type = Region.Type.COUNTRY;
         String typeStr = properties.path("type").asText("");
         if (!typeStr.isEmpty()) {
             try {
@@ -121,12 +147,10 @@ public class GeoJsonLoader implements org.jscience.io.InputLoader<List<org.jscie
 
         Region region = new Region(name, type);
 
-        // Extract population if present
         if (properties.has("population")) {
             region.setPopulation(properties.path("population").asLong(0));
         }
 
-        // Extract center coordinate from geometry
         String geometryType = geometry.path("type").asText("");
         JsonNode coordinates = geometry.path("coordinates");
 
@@ -135,7 +159,6 @@ public class GeoJsonLoader implements org.jscience.io.InputLoader<List<org.jscie
             double lat = coordinates.get(1).asDouble();
             region.setCenter(new Coordinate(lat, lon));
         } else if ("Polygon".equals(geometryType) || "MultiPolygon".equals(geometryType)) {
-            // For polygons, compute centroid from first ring
             Coordinate centroid = computeCentroid(coordinates, geometryType);
             if (centroid != null) {
                 region.setCenter(centroid);
@@ -152,10 +175,8 @@ public class GeoJsonLoader implements org.jscience.io.InputLoader<List<org.jscie
         try {
             JsonNode ring;
             if ("MultiPolygon".equals(type)) {
-                // First polygon, first ring
                 ring = coordinates.get(0).get(0);
             } else {
-                // First ring
                 ring = coordinates.get(0);
             }
 
@@ -201,13 +222,11 @@ public class GeoJsonLoader implements org.jscience.io.InputLoader<List<org.jscie
 
     private void extractCoordinates(JsonNode node, List<Coordinate> coords) {
         if (node.isArray()) {
-            // Check if this is a coordinate pair [lon, lat]
             if (node.size() >= 2 && node.get(0).isNumber() && node.get(1).isNumber()) {
                 double lon = node.get(0).asDouble();
                 double lat = node.get(1).asDouble();
                 coords.add(new Coordinate(lat, lon));
             } else {
-                // Recurse into nested arrays
                 for (JsonNode child : node) {
                     extractCoordinates(child, coords);
                 }
@@ -221,5 +240,3 @@ public class GeoJsonLoader implements org.jscience.io.InputLoader<List<org.jscie
         }
     }
 }
-
-

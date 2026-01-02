@@ -35,10 +35,12 @@ public class ClimateModelTask implements Serializable {
     private final int latitudeBins;
     private final int longitudeBins;
     private double[][] temperature; // [lat][long] in Kelvin
-    private final double solarConstant = 1361.0; // W/m^2
-    private final double albedo = 0.3;
-    private final double epsilon = 0.6; // Emissivity
-    private final double sigma = 5.67e-8; // Stefan-Boltzmann
+
+    // Physical Constants
+    private static final double SOLAR_CONSTANT = 1361.0; // W/m^2
+    private static final double ALBEDO = 0.3;
+    private static final double EMISSIVITY = 0.6;
+    private static final double SIGMA = 5.67e-8; // Stefan-Boltzmann constant
 
     public ClimateModelTask(int latBins, int longBins) {
         this.latitudeBins = latBins;
@@ -59,33 +61,31 @@ public class ClimateModelTask implements Serializable {
 
     public void runStep(double dt) {
         double[][] nextTemp = new double[latitudeBins][longitudeBins];
+        double s0 = SOLAR_CONSTANT;
+        double a = ALBEDO;
+        double eps = EMISSIVITY;
 
         for (int i = 0; i < latitudeBins; i++) {
-            double lat = Math.PI * (i + 0.5) / latitudeBins - Math.PI / 2.0; // Latitude in radians
+            double lat = Math.PI * (i + 0.5) / latitudeBins - Math.PI / 2.0;
 
             for (int j = 0; j < longitudeBins; j++) {
                 // 1. Incoming Solar Radiation
-                // S = S0 * (1-a) * cos(lat) / 4 (Average)
-                // Added simplistic seasonal tilt or day/night here if desired
-                double insolation = solarConstant * (1 - albedo) * Math.cos(lat) / 4.0;
+                double insolation = s0 * (1 - a) * Math.cos(lat) / 4.0;
 
                 // 2. Outgoing Longwave Radiation
-                // OLR = epsilon * sigma * T^4
-                double olr = epsilon * sigma * Math.pow(temperature[i][j], 4);
+                double olr = eps * SIGMA * Math.pow(temperature[i][j], 4);
 
                 // 3. Diffusion (Heat transport)
-                // Simple diffusion between neighbors
                 double diffusion = 0.0;
-                // West-East (Periodic)
                 int west = (j - 1 + longitudeBins) % longitudeBins;
                 int east = (j + 1) % longitudeBins;
                 diffusion += temperature[i][west] - temperature[i][j];
                 diffusion += temperature[i][east] - temperature[i][j];
 
-                double flux = diffusion * 0.1; // Diffusion coefficient
+                double flux = diffusion * 0.1;
 
-                // Energy Balance: C * dT/dt = In - Out + Transport
-                double heatCapacity = 10e6; // J/m^2/K (Atmosphere column)
+                // Energy Balance
+                double heatCapacity = 10e6; // J/m^2/K
                 double rate = (insolation - olr + flux * 100) / heatCapacity;
 
                 nextTemp[i][j] = temperature[i][j] + rate * dt;
@@ -106,5 +106,3 @@ public class ClimateModelTask implements Serializable {
         return longitudeBins;
     }
 }
-
-

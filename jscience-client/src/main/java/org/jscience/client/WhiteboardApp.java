@@ -282,9 +282,9 @@ public class WhiteboardApp extends Application {
                     .setPayload(data)
                     .build();
 
-            asyncStub.publishEvent(event, new StreamObserver<PublishAck>() {
+            asyncStub.publishEvent(event, new StreamObserver<org.jscience.server.proto.PublishAck>() {
                 @Override
-                public void onNext(PublishAck value) {
+                public void onNext(org.jscience.server.proto.PublishAck value) {
                 }
 
                 @Override
@@ -321,5 +321,3 @@ public class WhiteboardApp extends Application {
         launch(args);
     }
 }
-
-

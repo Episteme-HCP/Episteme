@@ -23,20 +23,26 @@
 
 package org.jscience.biology.loaders;
 
+import org.jscience.io.AbstractLoader;
+import org.jscience.io.MiniCatalog;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
+ * Protein Data Bank (PDB) API loader.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class PDBLoader implements org.jscience.io.InputLoader<Map<String, String>> {
+public class PDBLoader extends AbstractLoader<Map<String, String>> {
 
     private static final String API_URL = "https://data.rcsb.org/rest/v1/core/entry/";
     private static PDBLoader instance;
@@ -51,11 +57,6 @@ public class PDBLoader implements org.jscience.io.InputLoader<Map<String, String
     }
 
     @Override
-    public Map<String, String> load(String resourceId) throws Exception {
-        return fetchById(resourceId);
-    }
-
-    @Override
     public String getResourcePath() {
         return API_URL;
     }
@@ -64,6 +65,31 @@ public class PDBLoader implements org.jscience.io.InputLoader<Map<String, String
     @SuppressWarnings("unchecked")
     public Class<Map<String, String>> getResourceType() {
         return (Class<Map<String, String>>) (Class<?>) Map.class;
+    }
+
+    @Override
+    protected Map<String, String> loadFromSource(String id) throws Exception {
+        return fetchById(id);
+    }
+
+    @Override
+    protected MiniCatalog<Map<String, String>> getMiniCatalog() {
+        return new MiniCatalog<>() {
+            @Override
+            public List<Map<String, String>> getAll() {
+                return List.of(Map.of());
+            }
+
+            @Override
+            public Optional<Map<String, String>> findByName(String name) {
+                return Optional.of(Map.of());
+            }
+
+            @Override
+            public int size() {
+                return 0;
+            }
+        };
     }
 
     /**
@@ -130,7 +156,6 @@ public class PDBLoader implements org.jscience.io.InputLoader<Map<String, String
         int idx = json.indexOf(pattern);
         if (idx > 0) {
             int start = idx + pattern.length();
-            // Handle string or number
             if (json.charAt(start) == '"') {
                 start++;
                 int end = json.indexOf("\"", start);
@@ -149,5 +174,3 @@ public class PDBLoader implements org.jscience.io.InputLoader<Map<String, String
         }
     }
 }
-
-

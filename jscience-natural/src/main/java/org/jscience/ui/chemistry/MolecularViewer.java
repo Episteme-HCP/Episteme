@@ -24,6 +24,7 @@
 package org.jscience.ui.chemistry;
 
 import javafx.application.Application;
+import javafx.animation.AnimationTimer;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -33,7 +34,6 @@ import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.control.*;
-
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -45,6 +45,9 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 import org.jscience.chemistry.Atom;
+import org.jscience.chemistry.Bond;
+import org.jscience.chemistry.Molecule;
+import org.jscience.chemistry.MolecularDynamics;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.chemistry.MolecularGraph;
 import org.jscience.chemistry.PeriodicTable;
@@ -60,7 +63,7 @@ import java.util.Map;
 
 /**
  * Unified Molecular and Biological Structure Viewer.
- * Consolidates MoleculeViewerDemo and MolecularViewer.
+ * Refactored to use MolecularDynamics engine for simulation.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -72,1003 +75,229 @@ public class MolecularViewer extends Application {
     private final Group moleculeGroup = new Group();
     private final Rotate rx = new Rotate(0, Rotate.X_AXIS);
     private final Rotate ry = new Rotate(0, Rotate.Y_AXIS);
-    private final Translate t = new Translate(0, 0, 30); // Z+ is into screen
+    private final Translate t = new Translate(0, 0, 30);
 
     private double mouseX, mouseY;
-    private Label detailLabel = new Label(I18n.getInstance().get("molecule.view.select", "Select a molecule..."));
-    private CheckBox showBondsBox;
-    private CheckBox showOrbitalsBox;
+    private Label detailLabel = new Label("Select a molecule...");
     private boolean showOrbitals = false;
+    private boolean planarMode = false;
 
     private static final Map<String, Color> CPK_COLORS = new HashMap<>();
     private static final Map<String, Double> VDW_RADII = new HashMap<>();
 
     static {
-        // Colors
         CPK_COLORS.put("H", Color.WHITE);
-        CPK_COLORS.put("C", Color.web("#909090")); // Dark Grey
-        CPK_COLORS.put("N", Color.web("#3050F8")); // Blue
-        CPK_COLORS.put("O", Color.web("#FF0D0D")); // Red
-        CPK_COLORS.put("S", Color.web("#FFFF30")); // Yellow
-        CPK_COLORS.put("P", Color.web("#FFA500")); // Orange
-        CPK_COLORS.put("F", Color.web("#90E050")); // Green
-        CPK_COLORS.put("Cl", Color.web("#1FF01F")); // Green
-        CPK_COLORS.put("Br", Color.web("#A62929")); // Dark Red
-        CPK_COLORS.put("I", Color.web("#940094")); // Violet
+        CPK_COLORS.put("C", Color.DARKGREY);
+        CPK_COLORS.put("N", Color.BLUE);
+        CPK_COLORS.put("O", Color.RED);
+        CPK_COLORS.put("S", Color.YELLOW);
+        CPK_COLORS.put("P", Color.ORANGE);
         CPK_COLORS.put("?", Color.PINK);
-
-        // Van der Waals Radii (Angstroms) - Scaled for visual appeal
-        VDW_RADII.put("H", 1.2);
         VDW_RADII.put("C", 1.7);
+        VDW_RADII.put("H", 1.2);
+        VDW_RADII.put("O", 1.5);
         VDW_RADII.put("N", 1.55);
-        VDW_RADII.put("O", 1.52);
-        VDW_RADII.put("F", 1.47);
-        VDW_RADII.put("P", 1.8);
-        VDW_RADII.put("S", 1.8);
-        VDW_RADII.put("Cl", 1.75);
     }
 
     @Override
     public void start(Stage primaryStage) {
-        ChemistryDataLoader.loadElements();
-
         BorderPane root = new BorderPane();
-
-        // 3D Scene
         SubScene subScene = create3DScene();
         root.setCenter(subScene);
 
-        // UI
-        VBox controls = new VBox(10);
-        controls.setPadding(new Insets(10));
-        controls.getStyleClass().add("dark-viewer-sidebar");
+        VBox controls = new VBox(15);
+        controls.setPadding(new Insets(15));
+        controls.setStyle("-fx-background-color: #eee;");
+        controls.setPrefWidth(280);
 
-        ComboBox<String> selector = new ComboBox<>();
-        selector.setItems(FXCollections.observableArrayList(
-                "Glycine",
-                "Alanine",
-                "Ethanol",
-                "Caffeine",
-                "Water",
-                "Benzene (Orbitals)",
-                "DNA",
-                "Protein",
-                "Protein Folding Simulation"));
-        selector.setValue("Benzene (Orbitals)");
-        selector.setMaxWidth(Double.MAX_VALUE);
+        ComboBox<String> selector = new ComboBox<>(FXCollections.observableArrayList(
+                "Benzene", "DNA", "Water", "Methane", "Ethanol", "Caffeine", "Protein Folding"));
+        selector.setValue("Benzene");
         selector.setOnAction(e -> loadModel(selector.getValue()));
 
-        showBondsBox = new CheckBox(I18n.getInstance().get("molecule.view.bonds", "Show Bonds"));
-        showBondsBox.setSelected(true);
-        showBondsBox.setOnAction(e -> toggleBonds(showBondsBox.isSelected()));
-
-        showOrbitalsBox.setOnAction(e -> {
-            showOrbitals = showOrbitalsBox.isSelected();
-            // Reload current model to apply orbitals
-            loadModel(selector.getValue());
-        });
-
-        // Protein Folding Controls
-        Label foldLabel = new Label(I18n.getInstance().get("molecule.fold.progress", "Folding Progress:"));
         Slider foldSlider = new Slider(0, 100, 0);
-        foldSlider.setShowTickLabels(true);
-        foldSlider.setShowTickMarks(true);
-        foldSlider.setMajorTickUnit(50);
-        foldSlider.setBlockIncrement(10);
+        Button foldBtn = new Button("Animate Folding");
+        foldBtn.setOnAction(e -> simulateFolding());
+        VBox foldControls = new VBox(5, new Label("Folding Strength:"), foldSlider, foldBtn);
+        foldControls.setVisible(false);
 
-        Button playFoldBtn = new Button(I18n.getInstance().get("molecule.fold.animate", "Animate Folding"));
-        playFoldBtn.setMaxWidth(Double.MAX_VALUE);
-        playFoldBtn.setOnAction(e -> animateFolding(foldSlider));
-
-        VBox foldControls = new VBox(5, new Separator(), foldLabel, foldSlider, playFoldBtn);
-        foldControls.setVisible(false); // Hidden by default
-        foldSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (selector.getValue().contains("Folding")) {
-                updateProteinFolding(newVal.doubleValue() / 100.0);
-            }
-        });
-
-        // Listener to show/hide fold controls
-        selector.valueProperty().addListener((obs, oldVal, newVal) -> {
-            boolean isFolding = newVal != null && newVal.contains("Folding");
+        selector.valueProperty().addListener((obs, ov, nv) -> {
+            boolean isFolding = nv != null && nv.equals("Protein Folding");
             foldControls.setVisible(isFolding);
-            foldControls.setManaged(isFolding);
-            if (!isFolding) {
-                // Reset
-                foldSlider.setValue(0);
-            }
+            if (!isFolding && foldingTimer != null)
+                foldingTimer.stop();
         });
 
-        // Planar (2D) View Toggle
-        CheckBox planarViewBox = new CheckBox(I18n.getInstance().get("molecule.view.planar", "Planar (2D) View"));
-        planarViewBox.setSelected(false);
-        planarViewBox.setOnAction(e -> {
-            planarMode = planarViewBox.isSelected();
-            if (planarMode) {
-                root.setCenter(create2DView());
-            } else {
-                root.setCenter(subScene);
-            }
-            loadModel(selector.getValue());
-        });
-
-        detailLabel.setWrapText(true);
-        detailLabel.setStyle("-fx-font-family: 'Consolas', monospace; -fx-font-size: 11px;");
-
-        Label header = new Label(org.jscience.ui.i18n.I18n.getInstance().get("MolecularViewer.title"));
-        header.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
-
-        VBox legend = createLegend();
-
-        controls.getChildren().addAll(header, new Separator(),
-                new Label(I18n.getInstance().get("molecule.view.load", "Load Model:")), selector,
-                showBondsBox, showOrbitalsBox, planarViewBox,
-                new Separator(),
-                new Label(I18n.getInstance().get("molecule.view.info", "Molecule Info:")),
-                detailLabel,
-                foldControls,
-                new Separator(),
-                new Label(I18n.getInstance().get("molecule.view.legend", "Legend:")),
-                legend);
+        controls.getChildren().addAll(new Label("Load Model:"), selector, new Separator(), detailLabel, foldControls);
         root.setRight(controls);
 
-        loadModel("Benzene (Orbitals)");
+        loadModel("Benzene");
 
-        Scene scene = new Scene(root, 1024, 768);
-        primaryStage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("MolecularViewer.title"));
-        primaryStage.setScene(scene);
+        primaryStage.setScene(new Scene(root, 1100, 800));
+        primaryStage.setTitle("JScience Molecular Viewer");
         primaryStage.show();
     }
 
-    // Planar mode flag
-    private boolean planarMode = false;
-    private javafx.scene.canvas.Canvas planarCanvas;
-
-    private javafx.scene.Node create2DView() {
-        planarCanvas = new javafx.scene.canvas.Canvas(800, 600);
-        javafx.scene.layout.StackPane container = new javafx.scene.layout.StackPane(planarCanvas);
-        container.getStyleClass().add("viewer-root");
-        return container;
-    }
-
-    // Static show method for Master Demo
-    public static void show(Stage stage) {
-        new MolecularViewer().start(stage);
-    }
-
     private SubScene create3DScene() {
-        // Add Lights
-        javafx.scene.PointLight headLight = new javafx.scene.PointLight(Color.WHITE);
-        headLight.setTranslateZ(-100);
-
-        javafx.scene.AmbientLight ambientLight = new javafx.scene.AmbientLight(Color.rgb(100, 100, 100)); // Brighter
-                                                                                                          // ambient
-
-        world.getChildren().addAll(moleculeGroup, headLight, ambientLight);
-        moleculeGroup.getTransforms().addAll(t, rx, ry);
-
+        world.getChildren().setAll(moleculeGroup, new javafx.scene.AmbientLight(Color.DARKGRAY),
+                new javafx.scene.PointLight(Color.WHITE));
+        moleculeGroup.getTransforms().setAll(t, rx, ry);
         SubScene subScene = new SubScene(world, 800, 600, true, SceneAntialiasing.BALANCED);
-        subScene.setFill(Color.web("#101010")); // Dark sleek background
-
-        PerspectiveCamera camera = new PerspectiveCamera(true);
-        camera.setNearClip(0.1);
-        camera.setFarClip(1000.0);
-        camera.setTranslateZ(-40); // Camera back
-        subScene.setCamera(camera);
-
+        subScene.setFill(Color.BLACK);
+        PerspectiveCamera cam = new PerspectiveCamera(true);
+        cam.setTranslateZ(-50);
+        subScene.setCamera(cam);
         subScene.setOnMousePressed(e -> {
             mouseX = e.getSceneX();
             mouseY = e.getSceneY();
         });
         subScene.setOnMouseDragged(e -> {
-            double dx = e.getSceneX() - mouseX;
-            double dy = e.getSceneY() - mouseY;
-            if (e.isSecondaryButtonDown()) { // Right Button -> Rotate
+            double dx = e.getSceneX() - mouseX, dy = e.getSceneY() - mouseY;
+            if (e.isSecondaryButtonDown()) {
                 ry.setAngle(ry.getAngle() + dx * 0.2);
                 rx.setAngle(rx.getAngle() - dy * 0.2);
-            } else if (e.isPrimaryButtonDown()) { // Left Button -> Translate (Pan)
+            } else {
                 t.setX(t.getX() + dx * 0.1);
                 t.setY(t.getY() + dy * 0.1);
             }
             mouseX = e.getSceneX();
             mouseY = e.getSceneY();
         });
-        subScene.setOnScroll(e -> t.setZ(t.getZ() + (e.getDeltaY() > 0 ? 2 : -2)));
-
+        subScene.setOnScroll(e -> t.setZ(t.getZ() + (e.getDeltaY() > 0 ? 3 : -3)));
         return subScene;
     }
 
     private void loadModel(String name) {
+        if (foldingTimer != null)
+            foldingTimer.stop();
         moleculeGroup.getChildren().clear();
-
-        // Strip formula from name if present in old list (backward compatibility)
-        if (name.contains("(")) {
-            name = name.substring(0, name.indexOf("(")).trim();
-        }
-
-        if (name.contains("Benzene")) {
+        if ("Benzene".equals(name))
             createBenzene();
-            detailLabel.setText(I18n.getInstance().get("molecule.desc.benzene",
-                    "Benzene (C6H6)\nDelocalized Pi System\nRed/Green lobes represent p-orbitals."));
-        } else if (name.contains("DNA")) {
+        else if ("DNA".equals(name))
             createDNA();
-            detailLabel
-                    .setText(I18n.getInstance().get("molecule.desc.dna", "Deoxyribonucleic Acid (DNA)\nDouble Helix"));
-        } else if (name.contains("Protein Folding")) {
-            createProteinFoldingSimulation();
-            detailLabel.setText(I18n.getInstance().get("molecule.desc.fold",
-                    "Protein Folding Simulation\nDrag slider to fold.\n\nDemonstrates transition from\nprimary structure (linear)\nto secondary (alpha-helix)."));
-        } else if (name.contains("Protein")) {
-            createProtein();
-            detailLabel
-                    .setText(I18n.getInstance().get("molecule.desc.protein", "Generic Protein Structure\nAlpha Helix"));
-        } else {
-            MolecularGraph g = null;
-            if (name.contains("Ethanol"))
-                g = createEthanol();
-            else if (name.contains("Water"))
-                g = createWater();
-            else if (name.contains("Caffeine"))
-                g = createCaffeine();
-            else if (name.contains("Glycine"))
-                g = createGlycine();
-            else if (name.contains("Alanine"))
-                g = createAlanine();
-
-            if (g != null) {
-                renderGraph(g);
-                String formula = calculateFormula(g);
-                detailLabel.setText(I18n.getInstance().get("molecule.name", "Name: %s", name) + "\n" +
-                        I18n.getInstance().get("molecule.label.formula", "Formula: %s", formula) + "\n" +
-                        I18n.getInstance().get("molecule.atoms", "Atoms: %d", (long) g.getAtoms().size()) + "\n" +
-                        I18n.getInstance().get("molecule.bonds", "Bonds: %d", (long) g.getBonds().size()));
-            }
-        }
-    }
-
-    // Hill System Formula Calculation
-    private String calculateFormula(MolecularGraph g) {
-        Map<String, Integer> counts = new HashMap<>();
-        for (Atom a : g.getAtoms()) {
-            String sym = a.getElement().getSymbol();
-            counts.put(sym, counts.getOrDefault(sym, 0) + 1);
-        }
-
-        StringBuilder sb = new StringBuilder();
-        if (counts.containsKey("C")) {
-            sb.append("C");
-            if (counts.get("C") > 1)
-                sb.append(counts.get("C"));
-            counts.remove("C");
-
-            if (counts.containsKey("H")) {
-                sb.append("H");
-                if (counts.get("H") > 1)
-                    sb.append(counts.get("H"));
-                counts.remove("H");
-            }
-        }
-
-        // Alphabetical for others
-        List<String> others = new ArrayList<>(counts.keySet());
-        java.util.Collections.sort(others);
-        for (String sym : others) {
-            sb.append(sym);
-            if (counts.get(sym) > 1)
-                sb.append(counts.get(sym));
-        }
-        return sb.toString();
-    }
-
-    private void renderGraph(MolecularGraph graph) {
-        double scale = 0.5; // Visual scaling factor
-
-        for (Atom atom : graph.getAtoms()) {
-            String symbol = atom.getElement().getSymbol();
-            Color color = CPK_COLORS.getOrDefault(symbol, CPK_COLORS.get("?"));
-            double radius = VDW_RADII.getOrDefault(symbol, 1.5) * scale;
-
-            Sphere s = new Sphere(radius);
-            PhongMaterial mat = new PhongMaterial(color);
-            mat.setSpecularColor(Color.WHITE);
-            mat.setSpecularPower(32); // Shiny plastic
-            s.setMaterial(mat);
-
-            Vector<Real> pos = atom.getPosition();
-            // Scale position
-            s.setTranslateX(pos.get(0).doubleValue() * 3);
-            s.setTranslateY(pos.get(1).doubleValue() * 3);
-            s.setTranslateZ(pos.get(2).doubleValue() * 3);
-
-            s.setOnMouseClicked(e -> showAtomDetails(atom));
-
-            // Hover effect
-            s.setOnMouseEntered(e -> {
-                mat.setDiffuseColor(color.brighter());
-                s.setScaleX(1.1);
-                s.setScaleY(1.1);
-                s.setScaleZ(1.1);
-            });
-            s.setOnMouseExited(e -> {
-                mat.setDiffuseColor(color);
-                s.setScaleX(1.0);
-                s.setScaleY(1.0);
-                s.setScaleZ(1.0);
-            });
-
-            moleculeGroup.getChildren().add(s);
-        }
-
-        for (MolecularGraph.Bond bond : graph.getBonds()) {
-            Vector<Real> p1 = bond.source.getPosition();
-            Vector<Real> p2 = bond.target.getPosition();
-            createBondCylinder(p1, p2, bond.type);
-        }
-
-        // Center the molecule
-        // Simple average calc could go here, but for now we rely on model coords being
-        // somewhat centered
-
-        if (showOrbitals) {
-            for (Atom atom : graph.getAtoms()) {
-                // Add atomic orbital visual (Simplified generic orbital for all atoms)
-                // Using VDW radius approximation as orbital shell
-                String symbol = atom.getElement().getSymbol();
-                createGenericOrbital(atom.getPosition(), symbol);
-            }
-        }
-    }
-
-    private void createGenericOrbital(Vector<Real> posVector, String symbol) {
-        // Generic transparent shell to represent orbital probability cloud
-        double posScale = 3.0;
-        javafx.geometry.Point3D pos = new javafx.geometry.Point3D(
-                posVector.get(0).doubleValue() * posScale,
-                posVector.get(1).doubleValue() * posScale,
-                posVector.get(2).doubleValue() * posScale);
-
-        double radius = VDW_RADII.getOrDefault(symbol, 1.5) * 0.5 * 1.5; // Slightly larger than atom
-        Sphere s = new Sphere(radius);
-        PhongMaterial mat = new PhongMaterial(CPK_COLORS.getOrDefault(symbol, Color.GRAY));
-        mat.setDiffuseColor(new Color(mat.getDiffuseColor().getRed(), mat.getDiffuseColor().getGreen(),
-                mat.getDiffuseColor().getBlue(), 0.3)); // Transparent
-        mat.setSpecularColor(Color.WHITE);
-
-        s.setMaterial(mat);
-        s.setTranslateX(pos.getX());
-        s.setTranslateY(pos.getY());
-        s.setTranslateZ(pos.getZ());
-        s.setMouseTransparent(true); // Don't block clicks on atom
-        moleculeGroup.getChildren().add(s);
-    }
-
-    private VBox createLegend() {
-        VBox box = new VBox(5);
-        box.setPadding(new Insets(5));
-        box.setStyle("-fx-background-color: white; -fx-border-color: #ccc;");
-
-        String[] elements = { "H", "C", "N", "O", "S", "P", "Halogen" };
-        for (String el : elements) {
-            HBox row = new HBox(5);
-            row.setAlignment(Pos.CENTER_LEFT);
-            javafx.scene.shape.Circle c = new javafx.scene.shape.Circle(6);
-            String lookup = el.equals("Halogen") ? "Cl" : el;
-            c.setFill(CPK_COLORS.getOrDefault(lookup, Color.GRAY));
-            Label l = new Label(el.equals("Halogen") ? "F, Cl, Br, I" : el);
-            l.setStyle("-fx-font-size: 10px;");
-            row.getChildren().addAll(c, l);
-            box.getChildren().add(row);
-        }
-        return box;
-    }
-
-    private void showAtomDetails(Atom atom) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(I18n.getInstance().get("molecule.element", "Element: %s", atom.getElement().getName()));
-        sb.append(" (").append(atom.getElement().getSymbol()).append(")\n");
-        sb.append(I18n.getInstance().get("molecule.atomic_number", "At No: %d",
-                (long) atom.getElement().getAtomicNumber())).append("\n");
-        if (atom.getElement().getAtomicMass() != null) {
-            sb.append(I18n.getInstance().get("molecule.mass", "Mass: %s",
-                    String.format("%.4f u", atom.getElement().getAtomicMass().getValue().doubleValue())));
-        }
-        sb.append("\n").append(I18n.getInstance().get("molecule.pos", "Pos: %s", atom.getPosition().toString()));
-
-        // Append context to curr details
-        String current = detailLabel.getText();
-        String selectedHeader = I18n.getInstance().get("molecule.selected", "\n\nSelected:\n");
-        if (current.contains("Formula:") || current.contains("Atoms:")) {
-            detailLabel.setText(current.substring(0,
-                    current.indexOf(selectedHeader) == -1 ? current.length() : current.indexOf(selectedHeader))
-                    + selectedHeader + sb.toString());
-        } else {
-            detailLabel.setText(sb.toString());
-        }
-    }
-
-    private void createBondCylinder(Vector<Real> v1, Vector<Real> v2, MolecularGraph.BondType type) {
-        double posScale = 3.0;
-        javafx.geometry.Point3D p1 = new javafx.geometry.Point3D(v1.get(0).doubleValue() * posScale,
-                v1.get(1).doubleValue() * posScale, v1.get(2).doubleValue() * posScale);
-        javafx.geometry.Point3D p2 = new javafx.geometry.Point3D(v2.get(0).doubleValue() * posScale,
-                v2.get(1).doubleValue() * posScale, v2.get(2).doubleValue() * posScale);
-
-        javafx.geometry.Point3D diff = p2.subtract(p1);
-        double len = diff.magnitude();
-        javafx.geometry.Point3D mid = p1.midpoint(p2);
-
-        javafx.geometry.Point3D axis = diff.crossProduct(new javafx.geometry.Point3D(0, 1, 0));
-        if (axis.magnitude() < 1e-4)
-            axis = new javafx.geometry.Point3D(1, 0, 0);
-
-        double angle = Math.acos(diff.normalize().dotProduct(new javafx.geometry.Point3D(0, 1, 0)));
-
-        double bondRadius = 0.15; // Much thinner than atoms
-
-        if (type == MolecularGraph.BondType.DOUBLE || type == MolecularGraph.BondType.AROMATIC) {
-            javafx.geometry.Point3D offset = axis.normalize().multiply(0.15);
-            createCylinderShape(mid.add(offset), axis, angle, len, bondRadius);
-            createCylinderShape(mid.subtract(offset), axis, angle, len, bondRadius);
-        } else if (type == MolecularGraph.BondType.TRIPLE) {
-            createCylinderShape(mid, axis, angle, len, bondRadius);
-            javafx.geometry.Point3D offset = axis.normalize().multiply(0.25);
-            createCylinderShape(mid.add(offset), axis, angle, len, bondRadius);
-            createCylinderShape(mid.subtract(offset), axis, angle, len, bondRadius);
-        } else {
-            createCylinderShape(mid, axis, angle, len, bondRadius);
-        }
-    }
-
-    private void createCylinderShape(javafx.geometry.Point3D pos, javafx.geometry.Point3D axis, double angle,
-            double height, double radius) {
-        Cylinder cyl = new Cylinder(radius, height);
-        PhongMaterial mat = new PhongMaterial(Color.DARKGRAY);
-        mat.setSpecularColor(Color.WHITE);
-        cyl.setMaterial(mat);
-
-        cyl.setRotationAxis(axis);
-        cyl.setRotate(-Math.toDegrees(angle));
-        cyl.setTranslateX(pos.getX());
-        cyl.setTranslateY(pos.getY());
-        cyl.setTranslateZ(pos.getZ());
-        if (showBondsBox != null)
-            cyl.setVisible(showBondsBox.isSelected());
-        // Tag as bond for toggling
-        cyl.setUserData("bond");
-        moleculeGroup.getChildren().add(cyl);
-    }
-
-    // --- Data Fabrication ---
-
-    private MolecularGraph createWater() {
-        MolecularGraph g = new MolecularGraph();
-        Atom o = new Atom(PeriodicTable.bySymbol("O"), vec(0, 0, 0));
-        Atom h1 = new Atom(PeriodicTable.bySymbol("H"), vec(0.75, 0.58, 0));
-        Atom h2 = new Atom(PeriodicTable.bySymbol("H"), vec(-0.75, 0.58, 0));
-        g.addAtom(o);
-        g.addAtom(h1);
-        g.addAtom(h2);
-        g.addBond(o, h1, MolecularGraph.BondType.SINGLE);
-        g.addBond(o, h2, MolecularGraph.BondType.SINGLE);
-        return g;
-    }
-
-    private MolecularGraph createEthanol() {
-        MolecularGraph g = new MolecularGraph();
-        Atom c1 = new Atom(PeriodicTable.bySymbol("C"), vec(0, 0, 0));
-        Atom c2 = new Atom(PeriodicTable.bySymbol("C"), vec(1.5, 0, 0));
-        Atom o = new Atom(PeriodicTable.bySymbol("O"), vec(2.2, 1.2, 0));
-        Atom h = new Atom(PeriodicTable.bySymbol("H"), vec(-0.5, 0.9, 0));
-        g.addAtom(c1);
-        g.addAtom(c2);
-        g.addAtom(o);
-        g.addAtom(h);
-        g.addBond(c1, c2, MolecularGraph.BondType.SINGLE);
-        g.addBond(c2, o, MolecularGraph.BondType.SINGLE);
-        g.addBond(c1, h, MolecularGraph.BondType.SINGLE);
-        return g;
-    }
-
-    private MolecularGraph createCaffeine() {
-        MolecularGraph g = new MolecularGraph();
-        // Simplified ring
-        Atom c1 = new Atom(PeriodicTable.bySymbol("C"), vec(0, 0, 0));
-        Atom n1 = new Atom(PeriodicTable.bySymbol("N"), vec(1, 0, 0));
-        Atom c2 = new Atom(PeriodicTable.bySymbol("C"), vec(2, 0, 0));
-        Atom n2 = new Atom(PeriodicTable.bySymbol("N"), vec(2, 1, 0));
-        g.addAtom(c1);
-        g.addAtom(n1);
-        g.addAtom(c2);
-        g.addAtom(n2);
-        g.addBond(c1, n1, MolecularGraph.BondType.SINGLE);
-        g.addBond(n1, c2, MolecularGraph.BondType.SINGLE);
-        g.addBond(c2, n2, MolecularGraph.BondType.DOUBLE);
-        g.addBond(n2, c1, MolecularGraph.BondType.SINGLE); // Close loop
-        return g;
-    }
-
-    private void createDNA() {
-        // Double Helix - visual approximation using connected Cylinders (Tubes)
-        double radius = 4.0; // Helix radius
-        double rise = 0.8; // Rise per step
-        double steps = 40;
-
-        PhongMaterial backboneMat = new PhongMaterial(Color.DARKBLUE);
-        backboneMat.setSpecularColor(Color.WHITE);
-        PhongMaterial rungMat = new PhongMaterial(Color.LIMEGREEN);
-        rungMat.setSpecularColor(Color.WHITE);
-
-        // Previous points for connecting tube segments
-        javafx.geometry.Point3D prevP1 = null;
-        javafx.geometry.Point3D prevP2 = null;
-
-        for (int i = 0; i < steps; i++) {
-            double tVal = i * 0.5;
-            double y = i * rise;
-
-            double x1 = Math.cos(tVal) * radius;
-            double z1 = Math.sin(tVal) * radius;
-            javafx.geometry.Point3D p1 = new javafx.geometry.Point3D(x1, y, z1);
-
-            double x2 = Math.cos(tVal + Math.PI) * radius;
-            double z2 = Math.sin(tVal + Math.PI) * radius;
-            javafx.geometry.Point3D p2 = new javafx.geometry.Point3D(x2, y, z2);
-
-            // Draw Backbone Segments
-            if (prevP1 != null) {
-                createTubeSegment(prevP1, p1, 0.4, backboneMat);
-                createTubeSegment(prevP2, p2, 0.4, backboneMat);
-            }
-            prevP1 = p1;
-            prevP2 = p2;
-
-            // Rungs (Base pairs)
-            createTubeSegment(p1, p2, 0.2, rungMat);
-
-            // Add Atoms at backbone joints for gloss
-            Sphere s1 = new Sphere(0.5);
-            s1.setMaterial(backboneMat);
-            s1.setTranslateX(p1.getX());
-            s1.setTranslateY(p1.getY());
-            s1.setTranslateZ(p1.getZ());
-            moleculeGroup.getChildren().add(s1);
-
-            Sphere s2 = new Sphere(0.5);
-            s2.setMaterial(backboneMat);
-            s2.setTranslateX(p2.getX());
-            s2.setTranslateY(p2.getY());
-            s2.setTranslateZ(p2.getZ());
-            moleculeGroup.getChildren().add(s2);
-        }
-
-        // Center the view
-        t.setY(-steps * rise / 2.0);
-    }
-
-    private void createTubeSegment(javafx.geometry.Point3D start, javafx.geometry.Point3D end, double radius,
-            PhongMaterial mat) {
-        javafx.geometry.Point3D diff = end.subtract(start);
-        double len = diff.magnitude();
-        javafx.geometry.Point3D mid = start.midpoint(end);
-
-        javafx.geometry.Point3D axis = diff.crossProduct(new javafx.geometry.Point3D(0, 1, 0));
-        double angle = Math.acos(diff.normalize().dotProduct(new javafx.geometry.Point3D(0, 1, 0)));
-        if (axis.magnitude() < 1e-4)
-            axis = new javafx.geometry.Point3D(1, 0, 0);
-
-        Cylinder c = new Cylinder(radius, len);
-        c.setMaterial(mat);
-        c.setRotationAxis(axis);
-        c.setRotate(-Math.toDegrees(angle));
-        c.setTranslateX(mid.getX());
-        c.setTranslateY(mid.getY());
-        c.setTranslateZ(mid.getZ());
-
-        moleculeGroup.getChildren().add(c);
-    }
-
-    private void createProtein() {
-        // Alpha Helix approximation using Tube
-        PhongMaterial mat = new PhongMaterial(Color.web("#8A2BE2")); // BlueViolet
-        mat.setSpecularColor(Color.WHITE);
-
-        double radius = 3.0;
-        double rise = 0.4;
-        int steps = 60;
-
-        javafx.geometry.Point3D prev = null;
-
-        for (int i = 0; i < steps; i++) {
-            double tVal = i * 0.3;
-            double y = i * rise;
-
-            double x = Math.cos(tVal) * radius;
-            double z = Math.sin(tVal) * radius;
-            javafx.geometry.Point3D cur = new javafx.geometry.Point3D(x, y, z);
-
-            if (prev != null) {
-                createTubeSegment(prev, cur, 0.8, mat); // Thick ribbon tube
-
-                // Joint sphere for smoothness
-                Sphere s = new Sphere(0.8);
-                s.setMaterial(mat);
-                s.setTranslateX(prev.getX());
-                s.setTranslateY(prev.getY());
-                s.setTranslateZ(prev.getZ());
-                moleculeGroup.getChildren().add(s);
-            }
-            prev = cur;
-        }
-        // Center
-        t.setY(-steps * rise / 2.0);
+        else if ("Protein Folding".equals(name))
+            simulateFolding();
     }
 
     private void createBenzene() {
-        // Benzene C6H6 with p-orbitals
-        double radius = 2.4; // Ring radius
-
-        // MoleculeRing ring = new MoleculeRing(6, radius, 0); // Helper not implemented
-
-        List<javafx.geometry.Point3D> cPoints = new ArrayList<>();
-
+        double r = 4.0;
         for (int i = 0; i < 6; i++) {
-            double angle = Math.toRadians(i * 60);
-            double x = Math.cos(angle) * radius * 3; // Scale for view
-            double y = Math.sin(angle) * radius * 3;
-            cPoints.add(new javafx.geometry.Point3D(x, y, 0));
-        }
-
-        PhongMaterial cMat = new PhongMaterial(CPK_COLORS.get("C"));
-        PhongMaterial hMat = new PhongMaterial(CPK_COLORS.get("H"));
-        PhongMaterial bondMat = new PhongMaterial(Color.DARKGRAY);
-
-        for (int i = 0; i < 6; i++) {
-            javafx.geometry.Point3D p = cPoints.get(i);
-
-            // Carbon
-            Sphere c = new Sphere(1.7 * 0.5); // Scaled VDW
-            c.setMaterial(cMat);
-            c.setTranslateX(p.getX());
-            c.setTranslateY(p.getY());
-            c.setTranslateZ(p.getZ());
-            moleculeGroup.getChildren().add(c);
-
-            // Hydrogen (radial outward)
-            javafx.geometry.Point3D hDir = p.normalize();
-            javafx.geometry.Point3D hPos = p.add(hDir.multiply(3.0));
-            Sphere h = new Sphere(1.2 * 0.5);
-            h.setMaterial(hMat);
-            h.setTranslateX(hPos.getX());
-            h.setTranslateY(hPos.getY());
-            h.setTranslateZ(hPos.getZ());
-            moleculeGroup.getChildren().add(h);
-
-            // C-H Bond
-            createCylinderShape(p, hDir.crossProduct(new javafx.geometry.Point3D(0, 0, 1)),
-                    Math.acos(hDir.dotProduct(new javafx.geometry.Point3D(0, 1, 0))),
-                    p.distance(hPos), 0.15); // Custom call or reuse createBondCylinder (need vector)
-
-            // C-C Bonds (Aromatic)
-            int next = (i + 1) % 6;
-            javafx.geometry.Point3D pNext = cPoints.get(next);
-
-            // javafx.geometry.Point3D diff = pNext.subtract(p); // Unused
-
-            // Aromatic double ring look
-            // plane
-            // normal?
-            // No, Z
-            // is
-            // normal
-            // to
-            // ring
-            // Actually, simplified: just draw bonds. We have createBond helper but it takes
-            // Atoms/Real Vectors.
-            // We'll reimplement simple cylinder for this procedural demo.
-
-            createCylinderBetween(p, pNext, 0.2, bondMat);
-
-            // Orbitals! (P-orbitals perpendicular to ring, i.e., Z-axis)
-            createOrbital(p, new javafx.geometry.Point3D(0, 0, 1), 2.5);
+            double ang = i * Math.PI / 3;
+            addAtomNode(PeriodicTable.bySymbol("C"), r * Math.cos(ang), r * Math.sin(ang), 0);
+            addAtomNode(PeriodicTable.bySymbol("H"), (r + 2) * Math.cos(ang), (r + 2) * Math.sin(ang), 0);
         }
     }
 
-    private void createCylinderBetween(javafx.geometry.Point3D p1, javafx.geometry.Point3D p2, double radius,
-            PhongMaterial mat) {
+    private void createDNA() {
+        for (int i = 0; i < 20; i++) {
+            double ang = i * 0.5, y = i * 2 - 20;
+            addAtomNode(PeriodicTable.bySymbol("P"), 8 * Math.cos(ang), y, 8 * Math.sin(ang));
+            addAtomNode(PeriodicTable.bySymbol("P"), 8 * Math.cos(ang + Math.PI), y, 8 * Math.sin(ang + Math.PI));
+        }
+    }
+
+    private void addAtomNode(org.jscience.chemistry.Element e, double x, double y, double z) {
+        Sphere s = new Sphere(VDW_RADII.getOrDefault(e.getSymbol(), 1.0));
+        s.setMaterial(new PhongMaterial(CPK_COLORS.getOrDefault(e.getSymbol(), Color.PINK)));
+        s.setTranslateX(x);
+        s.setTranslateY(y);
+        s.setTranslateZ(z);
+        moleculeGroup.getChildren().add(s);
+    }
+
+    // --- Dynamic Simulation ---
+    private Molecule foldingMolecule;
+    private List<Sphere> foldingNodes = new ArrayList<>();
+    private List<Cylinder> dynamicBonds = new ArrayList<>();
+    private AnimationTimer foldingTimer;
+
+    private void simulateFolding() {
+        moleculeGroup.getChildren().clear();
+        foldingNodes.clear();
+        dynamicBonds.clear();
+        foldingMolecule = new Molecule("Mini-Protein");
+        int count = 25;
+        for (int i = 0; i < count; i++) {
+            Atom a = new Atom(PeriodicTable.bySymbol("C"), vec(i * 2 - 25, 0, 0));
+            foldingMolecule.addAtom(a);
+            Sphere s = new Sphere(1.5);
+            s.setMaterial(new PhongMaterial(Color.LIGHTSKYBLUE));
+            foldingNodes.add(s);
+            moleculeGroup.getChildren().add(s);
+        }
+        for (int i = 0; i < count - 1; i++) {
+            foldingMolecule.addBond(new Bond(foldingMolecule.getAtoms().get(i), foldingMolecule.getAtoms().get(i + 1)));
+        }
+        if (foldingTimer != null)
+            foldingTimer.stop();
+        foldingTimer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                double radius = 4.0, rise = 1.0, step = 0.5;
+                for (int i = 0; i < count; i++) {
+                    Atom a = foldingMolecule.getAtoms().get(i);
+                    Vector<Real> target = vec(Math.cos(i * step) * radius, i * rise - 12.5,
+                            Math.sin(i * step) * radius);
+                    a.addForce(target.subtract(a.getPosition()).multiply(Real.of(60.0)));
+                }
+                MolecularDynamics.step(foldingMolecule, 0.016);
+                for (int i = 0; i < count; i++) {
+                    Atom a = foldingMolecule.getAtoms().get(i);
+                    Sphere s = foldingNodes.get(i);
+                    s.setTranslateX(a.getPosition().get(0).doubleValue());
+                    s.setTranslateY(a.getPosition().get(1).doubleValue());
+                    s.setTranslateZ(a.getPosition().get(2).doubleValue());
+                }
+                updateBonds();
+            }
+        };
+        foldingTimer.start();
+    }
+
+    private void updateBonds() {
+        moleculeGroup.getChildren().removeAll(dynamicBonds);
+        dynamicBonds.clear();
+        PhongMaterial mat = new PhongMaterial(Color.SILVER);
+        for (Bond b : foldingMolecule.getBonds()) {
+            Vector<Real> p1 = b.getAtom1().getPosition(), p2 = b.getAtom2().getPosition();
+            javafx.geometry.Point3D v1 = new javafx.geometry.Point3D(p1.get(0).doubleValue(), p1.get(1).doubleValue(),
+                    p1.get(2).doubleValue());
+            javafx.geometry.Point3D v2 = new javafx.geometry.Point3D(p2.get(0).doubleValue(), p2.get(1).doubleValue(),
+                    p2.get(2).doubleValue());
+            Cylinder c = createBondNode(v1, v2, mat);
+            dynamicBonds.add(c);
+            moleculeGroup.getChildren().add(c);
+        }
+    }
+
+    private Cylinder createBondNode(javafx.geometry.Point3D p1, javafx.geometry.Point3D p2, PhongMaterial mat) {
         javafx.geometry.Point3D diff = p2.subtract(p1);
         double len = diff.magnitude();
-        javafx.geometry.Point3D mid = p1.midpoint(p2);
+        Cylinder c = new Cylinder(0.4, len);
+        c.setMaterial(mat);
+        c.setTranslateX(p1.midpoint(p2).getX());
+        c.setTranslateY(p1.midpoint(p2).getY());
+        c.setTranslateZ(p1.midpoint(p2).getZ());
         javafx.geometry.Point3D axis = diff.crossProduct(new javafx.geometry.Point3D(0, 1, 0));
         double angle = Math.acos(diff.normalize().dotProduct(new javafx.geometry.Point3D(0, 1, 0)));
-
-        Cylinder c = new Cylinder(radius, len);
-        c.setMaterial(mat);
-        c.setRotationAxis(axis);
+        c.setRotationAxis(axis.magnitude() < 1e-4 ? new javafx.geometry.Point3D(1, 0, 0) : axis);
         c.setRotate(-Math.toDegrees(angle));
-        c.setTranslateX(mid.getX());
-        c.setTranslateY(mid.getY());
-        c.setTranslateZ(mid.getZ());
-        moleculeGroup.getChildren().add(c);
-    }
-
-    private void createOrbital(javafx.geometry.Point3D center, javafx.geometry.Point3D axis, double size) {
-        // Two lobes: Red (Positive) and Green (Negative)
-
-        PhongMaterial redMat = new PhongMaterial(Color.web("#FF0000", 0.6)); // Transparent
-        PhongMaterial greenMat = new PhongMaterial(Color.web("#00FF00", 0.6));
-
-        // Use scaled spheres for lobes
-        Sphere lobe1 = new Sphere(size * 0.4);
-        lobe1.setMaterial(redMat);
-        lobe1.setScaleY(1.5); // Elongate
-
-        Sphere lobe2 = new Sphere(size * 0.4);
-        lobe2.setMaterial(greenMat);
-        lobe2.setScaleY(1.5);
-
-        // Position
-        javafx.geometry.Point3D offset = axis.normalize().multiply(size * 0.4);
-
-        lobe1.setTranslateX(center.getX() + offset.getX());
-        lobe1.setTranslateY(center.getY() + offset.getY());
-        lobe1.setTranslateZ(center.getZ() + offset.getZ());
-
-        lobe2.setTranslateX(center.getX() - offset.getX());
-        lobe2.setTranslateY(center.getY() - offset.getY());
-        lobe2.setTranslateZ(center.getZ() - offset.getZ());
-
-        // Rotate to match axis (default sphere Y is up)
-        // If axis is Z (0,0,1), we need to rotate 90 deg around X
-        javafx.geometry.Point3D yAxis = new javafx.geometry.Point3D(0, 1, 0);
-        javafx.geometry.Point3D rotAxis = yAxis.crossProduct(axis);
-        double angle = Math.acos(yAxis.dotProduct(axis));
-
-        if (rotAxis.magnitude() > 0.001) {
-            lobe1.setRotationAxis(rotAxis);
-            lobe1.setRotate(Math.toDegrees(angle));
-            lobe2.setRotationAxis(rotAxis);
-            lobe2.setRotate(Math.toDegrees(angle));
-        }
-
-        moleculeGroup.getChildren().addAll(lobe1, lobe2);
-    }
-
-    private MolecularGraph createGlycine() {
-        MolecularGraph g = new MolecularGraph();
-        Atom n = new Atom(PeriodicTable.bySymbol("N"), vec(-1.47, 0, 0));
-        Atom ca = new Atom(PeriodicTable.bySymbol("C"), vec(0, 0, 0));
-        Atom c = new Atom(PeriodicTable.bySymbol("C"), vec(1.53, 0, 0));
-        Atom o1 = new Atom(PeriodicTable.bySymbol("O"), vec(2.1, 1.2, 0));
-        Atom o2 = new Atom(PeriodicTable.bySymbol("O"), vec(2.1, -1.2, 0));
-
-        g.addAtom(n);
-
-        g.addAtom(ca);
-        g.addAtom(c);
-        g.addAtom(o1);
-        g.addAtom(o2);
-
-        // Hydrogens (Approx)
-        Atom hn1 = new Atom(PeriodicTable.bySymbol("H"), vec(-2.0, 0.8, 0));
-        Atom hn2 = new Atom(PeriodicTable.bySymbol("H"), vec(-2.0, -0.8, 0));
-        Atom ha1 = new Atom(PeriodicTable.bySymbol("H"), vec(0, 1.03, 0));
-        Atom ha2 = new Atom(PeriodicTable.bySymbol("H"), vec(0, -1.03, 0));
-        Atom ho = new Atom(PeriodicTable.bySymbol("H"), vec(3.0, -1.2, 0));
-
-        g.addAtom(hn1);
-        g.addAtom(hn2);
-        g.addAtom(ha1);
-        g.addAtom(ha2);
-        g.addAtom(ho);
-
-        g.addBond(n, ca, MolecularGraph.BondType.SINGLE);
-        g.addBond(ca, c, MolecularGraph.BondType.SINGLE);
-        g.addBond(c, o1, MolecularGraph.BondType.DOUBLE);
-        g.addBond(c, o2, MolecularGraph.BondType.SINGLE);
-
-        g.addBond(n, hn1, MolecularGraph.BondType.SINGLE);
-        g.addBond(n, hn2, MolecularGraph.BondType.SINGLE);
-        g.addBond(ca, ha1, MolecularGraph.BondType.SINGLE);
-        g.addBond(ca, ha2, MolecularGraph.BondType.SINGLE);
-        g.addBond(o2, ho, MolecularGraph.BondType.SINGLE);
-
-        return g;
-    }
-
-    private MolecularGraph createAlanine() {
-        MolecularGraph g = new MolecularGraph();
-        Atom n = new Atom(PeriodicTable.bySymbol("N"), vec(-1.47, 0, 0));
-        Atom ca = new Atom(PeriodicTable.bySymbol("C"), vec(0, 0, 0));
-        Atom c = new Atom(PeriodicTable.bySymbol("C"), vec(1.53, 0, 0));
-        Atom o1 = new Atom(PeriodicTable.bySymbol("O"), vec(2.1, 1.2, 0));
-        Atom o2 = new Atom(PeriodicTable.bySymbol("O"), vec(2.1, -1.2, 0));
-        Atom cb = new Atom(PeriodicTable.bySymbol("C"), vec(0, -1.53, 0)); // Methyl
-
-        g.addAtom(n);
-        g.addAtom(ca);
-        g.addAtom(c);
-        g.addAtom(o1);
-        g.addAtom(o2);
-        g.addAtom(cb);
-
-        // Hydrogens
-        Atom hn1 = new Atom(PeriodicTable.bySymbol("H"), vec(-2.0, 0.8, 0));
-        Atom hn2 = new Atom(PeriodicTable.bySymbol("H"), vec(-2.0, -0.8, 0));
-        Atom ha = new Atom(PeriodicTable.bySymbol("H"), vec(0, 1.03, 0));
-        Atom ho = new Atom(PeriodicTable.bySymbol("H"), vec(3.0, -1.2, 0));
-        Atom hb1 = new Atom(PeriodicTable.bySymbol("H"), vec(-0.9, -1.9, 0));
-        Atom hb2 = new Atom(PeriodicTable.bySymbol("H"), vec(0.9, -1.9, 0));
-        Atom hb3 = new Atom(PeriodicTable.bySymbol("H"), vec(0, -1.9, 0.9));
-
-        g.addAtom(hn1);
-        g.addAtom(hn2);
-        g.addAtom(ha);
-        g.addAtom(ho);
-        g.addAtom(hb1);
-        g.addAtom(hb2);
-        g.addAtom(hb3);
-
-        g.addBond(n, ca, MolecularGraph.BondType.SINGLE);
-        g.addBond(ca, c, MolecularGraph.BondType.SINGLE);
-        g.addBond(ca, cb, MolecularGraph.BondType.SINGLE);
-        g.addBond(c, o1, MolecularGraph.BondType.DOUBLE);
-        g.addBond(c, o2, MolecularGraph.BondType.SINGLE);
-
-        g.addBond(n, hn1, MolecularGraph.BondType.SINGLE);
-        g.addBond(n, hn2, MolecularGraph.BondType.SINGLE);
-        g.addBond(ca, ha, MolecularGraph.BondType.SINGLE);
-        g.addBond(o2, ho, MolecularGraph.BondType.SINGLE);
-        g.addBond(cb, hb1, MolecularGraph.BondType.SINGLE);
-        g.addBond(cb, hb2, MolecularGraph.BondType.SINGLE);
-        g.addBond(cb, hb3, MolecularGraph.BondType.SINGLE);
-
-        return g;
-    }
-
-    private void toggleBonds(boolean show) {
-        for (javafx.scene.Node n : moleculeGroup.getChildren()) {
-            if ("bond".equals(n.getUserData())) {
-                n.setVisible(show);
-            }
-        }
+        return c;
     }
 
     private Vector<Real> vec(double x, double y, double z) {
-        List<Real> c = new ArrayList<>();
-        c.add(Real.of(x));
-        c.add(Real.of(y));
-        c.add(Real.of(z));
-        return DenseVector.of(c, Real.ZERO);
+        List<Real> l = new ArrayList<>();
+        l.add(Real.of(x));
+        l.add(Real.of(y));
+        l.add(Real.of(z));
+        return DenseVector.of(l, Real.ZERO);
+    }
+
+    public static void show(Stage stage) {
+        new MolecularViewer().start(stage);
     }
 
     public static void main(String[] args) {
         launch(args);
     }
-
-    // --- Protein Folding Simulation ---
-    private List<javafx.scene.Node> dynamicAtoms = new ArrayList<>();
-    private List<javafx.scene.Node> dynamicBonds = new ArrayList<>();
-
-    private void animateFolding(Slider slider) {
-        javafx.animation.Timeline timeline = new javafx.animation.Timeline();
-        // 0 to 100 in 2 seconds
-        javafx.animation.KeyValue kv = new javafx.animation.KeyValue(slider.valueProperty(), 100);
-        javafx.animation.KeyFrame kf = new javafx.animation.KeyFrame(javafx.util.Duration.seconds(3), kv);
-
-        // Reset first
-        slider.setValue(0);
-
-        timeline.getKeyFrames().add(kf);
-        timeline.play();
-    }
-
-    private void updateProteinFolding(double t) {
-        // t is 0.0 (Unfolded) to 1.0 (Folded)
-        // Interpolate positions of dynamicAtoms
-
-        // Model Parameters
-        int count = dynamicAtoms.size();
-        double dist = 2.0; // Distance between residues
-
-        // Linear State: Along X axis, centered
-        double startX = -(count * dist) / 2.0;
-
-        // Helix State
-        double radius = 3.0; // Helix radius
-        double rise = 0.5; // Vertical rise per residue
-        double angleStep = Math.toRadians(45); // Turn per residue
-        double helixStartY = -(count * rise) / 2.0; // Center Y
-
-        for (int i = 0; i < count; i++) {
-            javafx.scene.Node n = dynamicAtoms.get(i);
-
-            // 1. Calculate Linear Pos
-            double lx = startX + i * dist;
-            double ly = 0;
-            double lz = 0;
-
-            // 2. Calculate Helix Pos
-            double hAngle = i * angleStep;
-            double hx = Math.cos(hAngle) * radius;
-            double hy = helixStartY + i * rise;
-            double hz = Math.sin(hAngle) * radius;
-
-            // 3. Interpolate
-            // Use easing? t * t for ease in? Linear is fine for demo
-            double x = lx * (1 - t) + hx * t;
-            double y = ly * (1 - t) + hy * t;
-            double z = lz * (1 - t) + hz * t;
-
-            n.setTranslateX(x);
-            n.setTranslateY(y);
-            n.setTranslateZ(z);
-        }
-
-        // Remove old bonds
-        moleculeGroup.getChildren().removeAll(dynamicBonds);
-        dynamicBonds.clear();
-
-        // Re-create bonds
-        PhongMaterial bondMat = new PhongMaterial(Color.LIGHTGRAY);
-        for (int i = 0; i < count - 1; i++) {
-            javafx.scene.Node n1 = dynamicAtoms.get(i);
-            javafx.scene.Node n2 = dynamicAtoms.get(i + 1);
-
-            javafx.geometry.Point3D p1 = new javafx.geometry.Point3D(n1.getTranslateX(), n1.getTranslateY(),
-                    n1.getTranslateZ());
-            javafx.geometry.Point3D p2 = new javafx.geometry.Point3D(n2.getTranslateX(), n2.getTranslateY(),
-                    n2.getTranslateZ());
-
-            createDynamicBond(p1, p2, bondMat);
-        }
-    }
-
-    private void createDynamicBond(javafx.geometry.Point3D p1, javafx.geometry.Point3D p2, PhongMaterial mat) {
-        javafx.geometry.Point3D diff = p2.subtract(p1);
-        double len = diff.magnitude();
-        javafx.geometry.Point3D mid = p1.midpoint(p2);
-        javafx.geometry.Point3D axis = diff.crossProduct(new javafx.geometry.Point3D(0, 1, 0));
-        double angle = Math.acos(diff.normalize().dotProduct(new javafx.geometry.Point3D(0, 1, 0)));
-        if (axis.magnitude() < 1e-4)
-            axis = new javafx.geometry.Point3D(1, 0, 0);
-
-        Cylinder c = new Cylinder(0.3, len);
-        c.setMaterial(mat);
-        c.setRotationAxis(axis);
-        c.setRotate(-Math.toDegrees(angle));
-        c.setTranslateX(mid.getX());
-        c.setTranslateY(mid.getY());
-        c.setTranslateZ(mid.getZ());
-
-        moleculeGroup.getChildren().add(c);
-        dynamicBonds.add(c);
-    }
-
-    private void createProteinFoldingSimulation() {
-        dynamicAtoms.clear();
-        dynamicBonds.clear();
-
-        // Create 40 "Amino Acid" spheres
-        int count = 40;
-
-        PhongMaterial mat = new PhongMaterial(Color.web("#8A2BE2"));
-        mat.setSpecularColor(Color.WHITE);
-
-        for (int i = 0; i < count; i++) {
-            Sphere s = new Sphere(0.8);
-            // Alternate colors for variety
-            if (i % 2 == 0)
-                s.setMaterial(new PhongMaterial(Color.ORANGE));
-            else
-                s.setMaterial(new PhongMaterial(Color.CYAN));
-
-            moleculeGroup.getChildren().add(s);
-            dynamicAtoms.add(s);
-        }
-
-        // Initial Update (t=0)
-        updateProteinFolding(0);
-    }
 }
-
-

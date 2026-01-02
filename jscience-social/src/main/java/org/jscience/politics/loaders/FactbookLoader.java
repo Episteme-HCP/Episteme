@@ -33,6 +33,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jscience.io.AbstractLoader;
+import org.jscience.io.MiniCatalog;
+import java.util.Optional;
+
 /**
  * Production loader for the CIA World Factbook XML data.
  * 
@@ -48,22 +52,11 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class FactbookLoader implements InputLoader<List<Country>> {
+public class FactbookLoader extends AbstractLoader<List<Country>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(FactbookLoader.class);
 
     public FactbookLoader() {
-    }
-
-    @Override
-    public List<Country> load(String resourceId) throws Exception {
-        try (InputStream is = getClass().getResourceAsStream(resourceId)) {
-            if (is == null) {
-                LOG.warn("Factbook resource not found: {}, returning empty list", resourceId);
-                return new ArrayList<>();
-            }
-            return load(is);
-        }
     }
 
     @Override
@@ -75,6 +68,36 @@ public class FactbookLoader implements InputLoader<List<Country>> {
     @SuppressWarnings("unchecked")
     public Class<List<Country>> getResourceType() {
         return (Class<List<Country>>) (Class<?>) List.class;
+    }
+
+    @Override
+    protected List<Country> loadFromSource(String id) throws Exception {
+        try (InputStream is = getClass().getResourceAsStream(id)) {
+            if (is == null) {
+                throw new Exception("Resource not found: " + id);
+            }
+            return load(is);
+        }
+    }
+
+    @Override
+    protected MiniCatalog<List<Country>> getMiniCatalog() {
+        return new MiniCatalog<>() {
+            @Override
+            public List<List<Country>> getAll() {
+                return List.of(getSampleData());
+            }
+
+            @Override
+            public Optional<List<Country>> findByName(String name) {
+                return Optional.of(getSampleData());
+            }
+
+            @Override
+            public int size() {
+                return 1;
+            }
+        };
     }
 
     /**
@@ -204,6 +227,9 @@ public class FactbookLoader implements InputLoader<List<Country>> {
     /**
      * Parses optional country fields.
      */
+    /**
+     * Parses optional country fields.
+     */
     private void parseOptionalFields(Element elem, Country country) {
         // Capital city
         String capital = getTextValue(elem, "capital");
@@ -233,10 +259,10 @@ public class FactbookLoader implements InputLoader<List<Country>> {
             }
         }
 
-        // Government type - logged but not stored (no field on Country)
+        // Government type
         String government = getTextValue(elem, "government");
         if (government != null && !government.isEmpty()) {
-            LOG.debug("Country {} government: {}", country.getName(), government);
+            country.setGovernmentType(government);
         }
 
         // Region/Continent
@@ -244,6 +270,25 @@ public class FactbookLoader implements InputLoader<List<Country>> {
         if (region != null && !region.isEmpty()) {
             country.setContinent(region);
         }
+
+        // Independence
+        String independence = getTextValue(elem, "independence");
+        if (independence != null && !independence.isEmpty()) {
+            try {
+                // Simplistic parsing for year
+                String yearStr = independence.replaceAll("[^0-9]", "");
+                if (yearStr.length() >= 4) {
+                    country.setIndependenceYear(Integer.parseInt(yearStr.substring(0, 4)));
+                }
+            } catch (NumberFormatException e) {
+                LOG.debug("Could not parse independence year: {}", independence);
+            }
+        }
+
+        // Economy & Demographics (if available in XML)
+        String gdp = getTextValue(elem, "gdp");
+        // ... (Parsing other fields would go here, but XML structure is hypothetical.
+        // We will rely on sample data for full richness if XML is missing)
     }
 
     /**
@@ -271,5 +316,61 @@ public class FactbookLoader implements InputLoader<List<Country>> {
                 .replaceAll("km²", "")
                 .trim();
         return Double.parseDouble(cleaned);
+    }
+
+    private List<Country> getSampleData() {
+        List<Country> samples = new ArrayList<>();
+
+        // France
+        Country france = new Country("France", "FR", "FRA", 250, "Paris", "Europe", 67_750_000L, 643_801.0);
+        france.setGovernmentType("Semi-presidential republic");
+        france.setIndependenceYear(843);
+        france.setLifeExpectancy(82.5);
+        france.setPopulationGrowthRate(0.21);
+        france.setCurrencyCode("EUR");
+        france.getMajorIndustries().addAll(List.of("aerospace", "automotive", "pharmaceuticals", "tourism"));
+        france.getNaturalResources().addAll(List.of("coal", "iron ore", "bauxite", "zinc"));
+        france.getBorderCountries().addAll(List.of("BEL", "LUX", "DEU", "CHE", "ITA", "ESP", "AND", "MCO"));
+        samples.add(france);
+
+        // United States
+        Country usa = new Country("United States", "US", "USA", 840, "Washington, D.C.", "North America", 331_900_000L,
+                9_833_517.0);
+        usa.setGovernmentType("Federal presidential constitutional republic");
+        usa.setIndependenceYear(1776);
+        usa.setLifeExpectancy(78.5);
+        usa.setPopulationGrowthRate(0.4);
+        usa.setCurrencyCode("USD");
+        usa.getMajorIndustries().addAll(List.of("technology", "aerospace", "automotive", "healthcare"));
+        usa.getNaturalResources().addAll(List.of("coal", "copper", "lead", "uranium", "natural gas"));
+        usa.getBorderCountries().addAll(List.of("CAN", "MEX"));
+        samples.add(usa);
+
+        // China
+        Country china = new Country("China", "CN", "CHN", 156, "Beijing", "Asia", 1_411_750_000L, 9_596_960.0);
+        china.setGovernmentType("Communist party-led state");
+        china.setIndependenceYear(1949);
+        china.setLifeExpectancy(77.3);
+        china.setPopulationGrowthRate(0.03);
+        china.setCurrencyCode("CNY");
+        china.getMajorIndustries().addAll(List.of("manufacturing", "mining", "electronics", "textiles"));
+        china.getNaturalResources().addAll(List.of("coal", "iron ore", "rare earths", "tungsten"));
+        china.getBorderCountries().addAll(List.of("AFG", "BTN", "IND", "KAZ", "PRK", "KGZ", "LAO", "MNG"));
+        samples.add(china);
+
+        // Brazil
+        Country brazil = new Country("Brazil", "BR", "BRA", 76, "Brasília", "South America", 214_000_000L, 8_515_767.0);
+        brazil.setGovernmentType("Federal presidential constitutional republic");
+        brazil.setIndependenceYear(1822);
+        brazil.setLifeExpectancy(75.9);
+        brazil.setPopulationGrowthRate(0.52);
+        brazil.setCurrencyCode("BRL");
+        brazil.getMajorIndustries().addAll(List.of("agriculture", "mining", "manufacturing", "services"));
+        brazil.getNaturalResources().addAll(List.of("iron ore", "manganese", "bauxite", "gold", "timber"));
+        brazil.getBorderCountries()
+                .addAll(List.of("ARG", "BOL", "COL", "GUF", "GUY", "PRY", "PER", "SUR", "URY", "VEN"));
+        samples.add(brazil);
+
+        return samples;
     }
 }

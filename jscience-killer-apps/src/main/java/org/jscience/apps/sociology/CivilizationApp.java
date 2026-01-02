@@ -33,6 +33,10 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 import org.jscience.apps.framework.KillerAppBase;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.*;
 
 /**
  * Civilization Collapse Model.
@@ -48,9 +52,9 @@ import org.jscience.apps.framework.KillerAppBase;
 public class CivilizationApp extends KillerAppBase {
 
     // Model State (Stocks)
-    private double population = 1000.0;
-    private double resources = 100000.0;
-    private double pollution = 0.0;
+    private Quantity<Dimensionless> population = Quantities.create(1000.0, Units.ONE);
+    private Quantity<Mass> resources = Quantities.create(100000.0, Units.KILOGRAM);
+    private Quantity<Dimensionless> pollution = Quantities.create(0.0, Units.ONE);
 
     // Parameters
     private double birthRateBase = 0.05;
@@ -180,7 +184,7 @@ public class CivilizationApp extends KillerAppBase {
             @Override
             public void handle(long now) {
                 if (now - last > 50_000_000) { // 20 FPS
-                    if (running && population > 0) {
+                    if (running && population.getValue().doubleValue() > 0) {
                         step();
                     }
                     last = now;
@@ -193,17 +197,19 @@ public class CivilizationApp extends KillerAppBase {
     private void step() {
         time += 1.0;
 
-        // 1. Calculations
+        // 1. Calculations - Using Real and Quantity
         double efficiency = 1.0 + (innovationRate * time); // Tech improves efficiency
         double effectiveConsumption = consumptionPerCapita / efficiency;
 
         // Resource Scarcity Factor
-        double scarcity = Math.max(0, resources) / 10000.0;
+        double resValue = resources.getValue().doubleValue();
+        double scarcity = Math.max(0, resValue) / 10000.0;
         if (scarcity > 1.0)
             scarcity = 1.0;
 
         // Pollution Impact
-        double pollutionDeath = pollution * 0.001;
+        double polValue = pollution.getValue().doubleValue();
+        double pollutionDeath = polValue * 0.001;
 
         // Dynamics
         // Birth Rate decays with wealth (demographic transition) but drops with
@@ -214,27 +220,42 @@ public class CivilizationApp extends KillerAppBase {
         // Aggression increases base death rate (wars)
         double deathRate = 0.02 + pollutionDeath + (1.0 - scarcity) * 0.1 + (aggression * 0.05);
 
-        double dPop = population * (birthRate - deathRate);
-        double dRes = -(population * effectiveConsumption);
-        double dPol = (population * effectiveConsumption * pollutionFactor) - (pollution * 0.05); // Generation - Decay
+        double popValue = population.getValue().doubleValue();
+        double netRate = birthRate - deathRate;
 
-        // Update
-        population += dPop;
-        resources += dRes + (100 * regenerationRate); // Regeneration
-        pollution += dPol;
+        Quantity<Dimensionless> dPop = population.multiply(netRate);
 
-        if (population < 0)
-            population = 0;
-        if (resources < 0)
-            resources = 0;
-        if (pollution < 0)
-            pollution = 0;
+        // Resource consumption (Mass)
+        // Note: resources is Quantity<Mass>, population is Dimensionless.
+        // We need to subtract Mass.
+        Quantity<Mass> consumed = Quantities.create(popValue * effectiveConsumption, Units.KILOGRAM);
+
+        // Pollution generation rate
+        Quantity<Dimensionless> dPol = population.multiply(effectiveConsumption * pollutionFactor)
+                .subtract(pollution.multiply(0.05));
+
+        // Update stocks
+        population = population.add(dPop);
+
+        // Regeneration of resources
+        Quantity<Mass> regen = Quantities.create(100 * regenerationRate, Units.KILOGRAM);
+        resources = resources.subtract(consumed).add(regen);
+
+        pollution = pollution.add(dPol);
+
+        // Bounds check
+        if (population.getValue().doubleValue() < 0)
+            population = Quantities.create(0.0, Units.ONE);
+        if (resources.getValue().doubleValue() < 0)
+            resources = Quantities.create(0.0, Units.KILOGRAM);
+        if (pollution.getValue().doubleValue() < 0)
+            pollution = Quantities.create(0.0, Units.ONE);
 
         // Update Chart (downsample)
         if (time % 5 == 0) {
-            popSeries.getData().add(new XYChart.Data<>(time, population));
-            resSeries.getData().add(new XYChart.Data<>(time, resources));
-            polSeries.getData().add(new XYChart.Data<>(time, pollution));
+            popSeries.getData().add(new XYChart.Data<>(time, population.getValue().doubleValue()));
+            resSeries.getData().add(new XYChart.Data<>(time, resources.getValue().doubleValue()));
+            polSeries.getData().add(new XYChart.Data<>(time, pollution.getValue().doubleValue()));
 
             // Limit history
             if (popSeries.getData().size() > 200) {
@@ -244,11 +265,11 @@ public class CivilizationApp extends KillerAppBase {
             }
         }
 
-        updateStatus(dPop);
+        updateStatus(dPop.getValue().doubleValue());
     }
 
     private void updateStatus(double dPop) {
-        if (population <= 10) {
+        if (population.getValue().doubleValue() <= 10) {
             statusLabel.setText(i18n.get("civilization.status.extinct"));
             statusLabel.setTextFill(Color.BLACK);
         } else if (dPop < -10) {
@@ -264,9 +285,10 @@ public class CivilizationApp extends KillerAppBase {
     }
 
     private void reset() {
-        population = 1000;
-        resources = 100000;
-        pollution = 0;
+        population = Quantities.create(1000.0, Units.ONE);
+        resources = Quantities.create(100000.0, Units.KILOGRAM);
+        pollution = Quantities.create(0.0, Units.ONE);
+
         time = 0;
         popSeries.getData().clear();
         resSeries.getData().clear();
@@ -278,5 +300,3 @@ public class CivilizationApp extends KillerAppBase {
         launch(args);
     }
 }
-
-

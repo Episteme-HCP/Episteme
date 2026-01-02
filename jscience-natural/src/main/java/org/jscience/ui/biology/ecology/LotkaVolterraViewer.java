@@ -35,9 +35,15 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.jscience.ui.i18n.I18n;
+import org.jscience.mathematics.analysis.ode.DormandPrinceIntegrator;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Dimensionless;
 
 /**
- * Lotka-Volterra Predator-Prey Dynamics Simulation.
+ * Lotka-Volterra Predator-Prey Dynamics Simulation using JScience
+ * Dormand-Prince Integrator.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -46,13 +52,14 @@ import org.jscience.ui.i18n.I18n;
 public class LotkaVolterraViewer extends Application {
 
     // Parameters
-    private double alpha = 1.1; // Prey birth rate
-    private double beta = 0.4; // Predation rate
-    private double delta = 0.1; // Predator birth rate per prey
-    private double gamma = 0.4; // Predator death rate
+    private double alpha = 1.1;
+    private double beta = 0.4;
+    private double delta = 0.1;
+    private double gamma = 0.4;
 
-    private double x = 10.0; // Current Prey population
-    private double y = 5.0; // Current Predator population
+    // Stocks using JScience Quantities
+    private Quantity<Dimensionless> preyPop = Quantities.create(10.0, Units.ONE);
+    private Quantity<Dimensionless> predPop = Quantities.create(5.0, Units.ONE);
     private double time = 0;
 
     private XYChart.Series<Number, Number> preySeries = new XYChart.Series<>();
@@ -60,6 +67,7 @@ public class LotkaVolterraViewer extends Application {
     private XYChart.Series<Number, Number> phaseSeries = new XYChart.Series<>();
 
     private boolean running = false;
+    private final DormandPrinceIntegrator integrator = new DormandPrinceIntegrator();
 
     @SuppressWarnings("unchecked")
     @Override
@@ -68,10 +76,8 @@ public class LotkaVolterraViewer extends Application {
         root.setPadding(new Insets(10));
         root.getStyleClass().add("dark-viewer-root");
 
-        // Charts
         VBox chartsBox = new VBox(10);
 
-        // Time series chart
         NumberAxis xAxisTime = new NumberAxis();
         xAxisTime.setLabel(I18n.getInstance().get("lotka.axis.time"));
         NumberAxis yAxisPop = new NumberAxis();
@@ -82,21 +88,8 @@ public class LotkaVolterraViewer extends Application {
         timeChart.setCreateSymbols(false);
         preySeries.setName(I18n.getInstance().get("lotka.series.prey"));
         predSeries.setName(I18n.getInstance().get("lotka.series.pred"));
-
         timeChart.getData().addAll(preySeries, predSeries);
 
-        // Custom Colors
-        // Wait for node to be created
-        preySeries.nodeProperty().addListener((o, old, node) -> {
-            if (node != null)
-                node.setStyle("-fx-stroke: #2ecc71; -fx-stroke-width: 2px;");
-        });
-        predSeries.nodeProperty().addListener((o, old, node) -> {
-            if (node != null)
-                node.setStyle("-fx-stroke: #e74c3c; -fx-stroke-width: 2px;");
-        });
-
-        // Phase space chart
         NumberAxis xAxisPhase = new NumberAxis();
         xAxisPhase.setLabel(I18n.getInstance().get("lotka.axis.prey"));
         NumberAxis yAxisPhase = new NumberAxis();
@@ -111,17 +104,13 @@ public class LotkaVolterraViewer extends Application {
         chartsBox.getChildren().addAll(timeChart, phaseChart);
         root.setCenter(chartsBox);
 
-        // Sidebar Controls
         VBox sidebar = new VBox(15);
         sidebar.setPadding(new Insets(10));
         sidebar.setPrefWidth(250);
         sidebar.getStyleClass().add("dark-viewer-sidebar");
 
-        Label controlTitle = new Label(I18n.getInstance().get("lotka.header.params"));
-        controlTitle.getStyleClass().add("dark-header");
-
         sidebar.getChildren().addAll(
-                controlTitle,
+                new Label(I18n.getInstance().get("lotka.header.params")),
                 createSliderLabel(I18n.getInstance().get("lotka.label.alpha"), 0, 5, alpha, v -> alpha = v),
                 createSliderLabel(I18n.getInstance().get("lotka.label.beta"), 0, 5, beta, v -> beta = v),
                 createSliderLabel(I18n.getInstance().get("lotka.label.delta"), 0, 5, delta, v -> delta = v),
@@ -138,18 +127,15 @@ public class LotkaVolterraViewer extends Application {
         sidebar.getChildren().addAll(new Separator(), startBtn, resetBtn);
         root.setLeft(sidebar);
 
-        // Animation
         new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (running) {
+                if (running)
                     step();
-                }
             }
         }.start();
 
         Scene scene = new Scene(root, 1000, 800);
-        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
         stage.setTitle(I18n.getInstance().get("lotka.title"));
         stage.setScene(scene);
@@ -158,25 +144,26 @@ public class LotkaVolterraViewer extends Application {
 
     private void step() {
         double dt = 0.05;
+        double[] current = { preyPop.getValue().doubleValue(), predPop.getValue().doubleValue() };
 
-        // RK4 or simple Euler for demo
-        double dx = (alpha * x - beta * x * y) * dt;
-        double dy = (delta * x * y - gamma * y) * dt;
+        // Use Dormand-Prince from jscience-core
+        double[] next = integrator.integrate((t, y) -> {
+            double dy1 = alpha * y[0] - beta * y[0] * y[1];
+            double dy2 = delta * y[0] * y[1] - gamma * y[1];
+            return new double[] { dy1, dy2 };
+        }, time, current, time + dt);
 
-        x += dx;
-        y += dy;
+        preyPop = Quantities.create(Math.max(0, next[0]), Units.ONE);
+        predPop = Quantities.create(Math.max(0, next[1]), Units.ONE);
         time += dt;
 
-        if (x < 0)
-            x = 0;
-        if (y < 0)
-            y = 0;
+        double xVal = preyPop.getValue().doubleValue();
+        double yVal = predPop.getValue().doubleValue();
 
-        preySeries.getData().add(new XYChart.Data<>(time, x));
-        predSeries.getData().add(new XYChart.Data<>(time, y));
-        phaseSeries.getData().add(new XYChart.Data<>(x, y));
+        preySeries.getData().add(new XYChart.Data<>(time, xVal));
+        predSeries.getData().add(new XYChart.Data<>(time, yVal));
+        phaseSeries.getData().add(new XYChart.Data<>(xVal, yVal));
 
-        // Limit data points for performance
         if (preySeries.getData().size() > 500) {
             preySeries.getData().remove(0);
             predSeries.getData().remove(0);
@@ -188,8 +175,8 @@ public class LotkaVolterraViewer extends Application {
 
     private void reset() {
         time = 0;
-        x = 10.0;
-        y = 5.0;
+        preyPop = Quantities.create(10.0, Units.ONE);
+        predPop = Quantities.create(5.0, Units.ONE);
         preySeries.getData().clear();
         predSeries.getData().clear();
         phaseSeries.getData().clear();
@@ -210,5 +197,3 @@ public class LotkaVolterraViewer extends Application {
         new LotkaVolterraViewer().start(stage);
     }
 }
-
-

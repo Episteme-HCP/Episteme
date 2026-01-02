@@ -33,6 +33,11 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.jscience.ui.AppProvider;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.*;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * 
@@ -76,18 +81,19 @@ public class ArchitectureStabilityDemo implements AppProvider {
         status.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
 
         // State
+        // State using JScience Quantities
         class Block {
-            double offset;
-            double mass;
+            Quantity<Length> offset;
+            Quantity<Mass> mass;
 
-            public Block(double o, double m) {
+            public Block(Quantity<Length> o, Quantity<Mass> m) {
                 offset = o;
                 mass = m;
             }
         }
         class State {
             java.util.List<Block> blocks = new java.util.ArrayList<>();
-            double comX = 300; // Center of Mass X
+            Quantity<Length> comX = Quantities.create(300.0, Units.METER); // Using 1 pixel = 1 meter for simplicity
             boolean collapsed = false;
         }
         State s = new State();
@@ -104,14 +110,22 @@ public class ArchitectureStabilityDemo implements AppProvider {
             gc.fillRect(250, 500, 100, 50);
 
             double currentY = 500;
-            double totalMassX = 300 * 10; // Base mass (10) at 300
-            double totalMass = 10;
+
+            // Initial Moment: 300m * 10kg
+            Quantity<Mass> baseMass = Quantities.create(10.0, Units.KILOGRAM);
+            Quantity<Length> basePos = Quantities.create(300.0, Units.METER);
+
+            // Moment = Mass * Position
+            // Result is a Quantity<?> since Mass*Length is not a base quantity in our
+            // predefined set
+            Quantity<?> totalMoment = baseMass.multiply(basePos);
+            Quantity<Mass> totalMass = baseMass;
 
             for (Block b : s.blocks) {
                 currentY -= 50;
-                double bx = 250 + b.offset;
+                double bx = 250 + b.offset.getValue().doubleValue();
 
-                // Optimization: Don't draw if off-screen
+                // Drawing logic
                 if (currentY > -50 && currentY < 600) {
                     gc.setFill(s.collapsed ? Color.RED : Color.GRAY);
                     gc.setStroke(Color.BLACK);
@@ -120,43 +134,54 @@ public class ArchitectureStabilityDemo implements AppProvider {
                 }
 
                 if (!s.collapsed) {
-                    totalMassX += (bx + 50) * b.mass;
-                    totalMass += b.mass;
+                    // Position of block center: bx + 50
+                    Quantity<Length> blockX = Quantities.create(bx + 50, Units.METER);
+                    Quantity<?> moment = blockX.multiply(b.mass);
+                    @SuppressWarnings({ "unchecked", "rawtypes" })
+                    Quantity<?> newMoment = totalMoment.add((Quantity) moment);
+                    totalMoment = newMoment;
+                    totalMass = totalMass.add(b.mass);
                 }
             }
 
-            s.comX = totalMassX / totalMass;
+            // COM = totalMoment / totalMass
+            s.comX = totalMoment.divide(totalMass).asType(Length.class);
+            double comValue = s.comX.getValue().doubleValue();
 
             // Draw COM Line
-            gc.setStroke(Color.BLUE); // Changed to Blue for visibility
+            gc.setStroke(Color.BLUE);
             gc.setLineWidth(2);
-            gc.strokeLine(s.comX, 0, s.comX, 600);
+            gc.strokeLine(comValue, 0, comValue, 600);
 
             // Text
             gc.setFill(Color.BLACK);
             gc.fillText(
                     String.format(org.jscience.ui.i18n.SocialI18n.getInstance().get("arch.stability.label.com"),
-                            s.comX),
+                            comValue),
                     10, 20);
 
-            // Stability check (Simplified: if COM outside base [250, 350])
-            if (s.comX < 250 || s.comX > 350) {
+            // Stability check (COM outside base [250, 350])
+            if (comValue < 250 || comValue > 350) {
                 s.collapsed = true;
                 status.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("arch.stability.label.collapsed"));
                 status.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
             }
+
         };
 
         addBlockBtn.setOnAction(e -> {
             if (s.collapsed)
                 return;
-            s.blocks.add(new Block((Math.random() - 0.5) * 60, 1.0));
+            s.blocks.add(new Block(
+                    Quantities.create((Math.random() - 0.5) * 60, Units.METER),
+                    Quantities.create(1.0, Units.KILOGRAM)));
             draw.run();
         });
 
         resetBtn.setOnAction(e -> {
             s.blocks.clear();
             s.collapsed = false;
+            s.comX = Quantities.create(300.0, Units.METER);
             status.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("arch.stability.label.stable"));
             status.setStyle("-fx-text-fill: green;");
             draw.run();
@@ -175,5 +200,3 @@ public class ArchitectureStabilityDemo implements AppProvider {
         stage.show();
     }
 }
-
-

@@ -26,9 +26,14 @@ package org.jscience.biology.loaders;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 
+import org.jscience.io.AbstractLoader;
+import org.jscience.io.MiniCatalog;
+
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Loader for STL (Stereolithography) 3D mesh files.
@@ -41,15 +46,7 @@ import java.nio.ByteOrder;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class StlMeshLoader implements org.jscience.io.InputLoader<javafx.scene.shape.MeshView> {
-
-    @Override
-    public javafx.scene.shape.MeshView load(String resourceId) throws java.io.IOException {
-        if (resourceId.startsWith("http")) {
-            return loadFromUrl(resourceId);
-        }
-        return loadFromPath(resourceId);
-    }
+public class StlMeshLoader extends AbstractLoader<MeshView> {
 
     @Override
     public String getResourcePath() {
@@ -57,17 +54,40 @@ public class StlMeshLoader implements org.jscience.io.InputLoader<javafx.scene.s
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Class<javafx.scene.shape.MeshView> getResourceType() {
-        return (Class<javafx.scene.shape.MeshView>) (Class<?>) javafx.scene.shape.MeshView.class;
+    public Class<MeshView> getResourceType() {
+        return MeshView.class;
+    }
+
+    @Override
+    protected MeshView loadFromSource(String id) throws Exception {
+        if (id.startsWith("http")) {
+            return loadFromUrl(id);
+        }
+        return loadFromPath(id);
+    }
+
+    @Override
+    protected MiniCatalog<MeshView> getMiniCatalog() {
+        return new MiniCatalog<>() {
+            @Override
+            public List<MeshView> getAll() {
+                return List.of(new MeshView());
+            }
+
+            @Override
+            public Optional<MeshView> findByName(String name) {
+                return Optional.of(new MeshView());
+            }
+
+            @Override
+            public int size() {
+                return 0;
+            }
+        };
     }
 
     /**
      * Loads an STL mesh from a file path.
-     *
-     * @param filePath Path to the STL file
-     * @return MeshView containing the loaded geometry
-     * @throws IOException if file cannot be read
      */
     public static MeshView loadFromPath(String filePath) throws IOException {
         return load(new File(filePath));
@@ -75,10 +95,6 @@ public class StlMeshLoader implements org.jscience.io.InputLoader<javafx.scene.s
 
     /**
      * Loads an STL mesh from a File object.
-     *
-     * @param file The STL file
-     * @return MeshView containing the loaded geometry
-     * @throws IOException if file cannot be read
      */
     public static MeshView load(File file) throws IOException {
         try (InputStream is = new BufferedInputStream(new FileInputStream(file))) {
@@ -88,10 +104,6 @@ public class StlMeshLoader implements org.jscience.io.InputLoader<javafx.scene.s
 
     /**
      * Loads an STL mesh from a URL (for downloading from remote sources).
-     *
-     * @param url URL to the STL file
-     * @return MeshView containing the loaded geometry
-     * @throws IOException if URL cannot be accessed
      */
     public static MeshView loadFromUrl(String url) throws IOException {
         try (InputStream is = new BufferedInputStream(java.net.URI.create(url).toURL().openStream())) {
@@ -101,8 +113,6 @@ public class StlMeshLoader implements org.jscience.io.InputLoader<javafx.scene.s
 
     /**
      * Loads an STL mesh from an InputStream.
-     *
-     * @param in Input stream containing STL data
      */
     public static MeshView load(InputStream in) throws IOException {
         byte[] data = in.readAllBytes();
@@ -126,30 +136,24 @@ public class StlMeshLoader implements org.jscience.io.InputLoader<javafx.scene.s
         int fIdx = 0;
 
         for (int i = 0; i < triangleCount; i++) {
-            // Skip normal (3 floats) - JavaFX calculates face normals
             bb.getFloat();
             bb.getFloat();
             bb.getFloat();
 
-            // Vertex 1
             points[pIdx++] = bb.getFloat();
             points[pIdx++] = bb.getFloat();
             points[pIdx++] = bb.getFloat();
 
-            // Vertex 2
             points[pIdx++] = bb.getFloat();
             points[pIdx++] = bb.getFloat();
             points[pIdx++] = bb.getFloat();
 
-            // Vertex 3
             points[pIdx++] = bb.getFloat();
             points[pIdx++] = bb.getFloat();
             points[pIdx++] = bb.getFloat();
 
-            // Skip attribute byte count
             bb.getShort();
 
-            // Add face indices
             int baseV = (pIdx / 3) - 3;
             faces[fIdx++] = baseV;
             faces[fIdx++] = 0;
@@ -167,4 +171,3 @@ public class StlMeshLoader implements org.jscience.io.InputLoader<javafx.scene.s
         return new MeshView(mesh);
     }
 }
-

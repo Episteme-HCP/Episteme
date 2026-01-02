@@ -40,8 +40,11 @@ import org.jscience.ui.AppProvider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import org.jscience.mathematics.geometry.Vector2D;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
+ * Sociology Network Demo using JScience Vector2D types.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -70,15 +73,16 @@ public class SociologyNetworkDemo implements AppProvider {
     }
 
     private static class Node {
-        double x, y, vx, vy;
+        Vector2D pos;
+        Vector2D vel;
         Color color;
         String name;
         int age;
         String city;
 
         Node(double x, double y, Color c, String name, int age, String city) {
-            this.x = x;
-            this.y = y;
+            this.pos = Vector2D.of(x, y);
+            this.vel = Vector2D.of(0, 0);
             this.color = c;
             this.name = name;
             this.age = age;
@@ -139,9 +143,10 @@ public class SociologyNetworkDemo implements AppProvider {
             boolean found = false;
             double mx = e.getX();
             double my = e.getY();
+            Vector2D mousePos = Vector2D.of(mx, my);
             for (Node n : nodes) {
-                double dist = Math.sqrt(Math.pow(n.x - mx, 2) + Math.pow(n.y - my, 2));
-                if (dist < 10) { // Radius + margin
+                double dist = n.pos.minus(mousePos).norm().doubleValue();
+                if (dist < 10) {
                     details.setText("Name: " + n.name + "\nAge: " + n.age + "\nCity: " + n.city);
                     found = true;
                     break;
@@ -191,68 +196,70 @@ public class SociologyNetworkDemo implements AppProvider {
             String city = CITIES[r.nextInt(CITIES.length)];
             nodes.add(new Node(cx + r.nextDouble() * 100 - 50, cy + r.nextDouble() * 100 - 50, color, name, age, city));
             if (i > 0) {
-                // Connect to previous in cluster
                 edges.add(new Edge(nodes.get(startIdx + i), nodes.get(startIdx + r.nextInt(i))));
             }
         }
     }
 
     private void updatePhysics(List<Node> nodes, List<Edge> edges, double w, double h) {
-        // Simple Force Directed layout
-        double repulsion = 1000;
-        double springLength = 50;
-        double springK = 0.05;
+        Real repulsion = Real.of(1000.0);
+        Real springLength = Real.of(50.0);
+        Real springK = Real.of(0.05);
+        Vector2D center = Vector2D.of(w / 2, h / 2);
 
         for (int i = 0; i < nodes.size(); i++) {
             Node n1 = nodes.get(i);
-            // Repulsion
-            for (int j = i + 1; j < nodes.size(); j++) {
-                Node n2 = nodes.get(j);
-                double dx = n1.x - n2.x;
-                double dy = n1.y - n2.y;
-                double distSq = dx * dx + dy * dy + 0.1;
-                double force = repulsion / distSq;
-                double dist = Math.sqrt(distSq);
+            Vector2D totalForce = Vector2D.of(0, 0);
 
-                n1.vx += (dx / dist) * force;
-                n1.vy += (dy / dist) * force;
-                n2.vx -= (dx / dist) * force;
-                n2.vy -= (dy / dist) * force;
+            // Repulsion
+            for (int j = 0; j < nodes.size(); j++) {
+                if (i == j)
+                    continue;
+                Node n2 = nodes.get(j);
+                Vector2D diff = n1.pos.minus(n2.pos);
+                Real distSq = diff.normSquared().add(Real.of(0.1));
+                if (distSq.doubleValue() < 40000) { // Limit range
+                    Real forceMag = repulsion.divide(distSq);
+                    totalForce = totalForce.plus(diff.direction().times(forceMag));
+                }
             }
+
             // Center gravity
-            n1.vx += (w / 2 - n1.x) * 0.005;
-            n1.vy += (h / 2 - n1.y) * 0.005;
+            Vector2D toCenter = center.minus(n1.pos);
+            totalForce = totalForce.plus(toCenter.times(Real.of(0.005)));
+
+            n1.vel = n1.vel.plus(totalForce);
         }
 
         // Springs
         for (Edge e : edges) {
-            double dx = e.n2.x - e.n1.x;
-            double dy = e.n2.y - e.n1.y;
-            double dist = Math.sqrt(dx * dx + dy * dy);
-            double force = (dist - springLength) * springK;
+            Vector2D diff = e.n2.pos.minus(e.n1.pos);
+            Real dist = diff.norm();
+            Real forceMag = dist.subtract(springLength).multiply(springK);
+            Vector2D springForce = diff.direction().times(forceMag);
 
-            e.n1.vx += (dx / dist) * force;
-            e.n1.vy += (dy / dist) * force;
-            e.n2.vx -= (dx / dist) * force;
-            e.n2.vy -= (dy / dist) * force;
+            e.n1.vel = e.n1.vel.plus(springForce);
+            e.n2.vel = e.n2.vel.minus(springForce);
         }
 
         // Move
+        Real damping = Real.of(0.9);
         for (Node n : nodes) {
-            n.vx *= 0.9; // damping
-            n.vy *= 0.9;
-            n.x += n.vx;
-            n.y += n.vy;
+            n.vel = n.vel.times(damping);
+            n.pos = n.pos.plus(n.vel);
 
-            // Bounds
-            if (n.x < 0)
-                n.x = 0;
-            if (n.x > w)
-                n.x = w;
-            if (n.y < 0)
-                n.y = 0;
-            if (n.y > h)
-                n.y = h;
+            // Bounds (Simplified)
+            double x = n.pos.getX().doubleValue();
+            double y = n.pos.getY().doubleValue();
+            if (x < 0)
+                x = 0;
+            if (x > w)
+                x = w;
+            if (y < 0)
+                y = 0;
+            if (y > h)
+                y = h;
+            n.pos = Vector2D.of(x, y);
         }
     }
 
@@ -263,15 +270,17 @@ public class SociologyNetworkDemo implements AppProvider {
         gc.setStroke(Color.GRAY);
         gc.setLineWidth(1);
         for (Edge e : edges) {
-            gc.strokeLine(e.n1.x, e.n1.y, e.n2.x, e.n2.y);
+            gc.strokeLine(e.n1.pos.getX().doubleValue(), e.n1.pos.getY().doubleValue(),
+                    e.n2.pos.getX().doubleValue(), e.n2.pos.getY().doubleValue());
         }
 
         for (Node n : nodes) {
             gc.setFill(n.color);
-            gc.fillOval(n.x - 5, n.y - 5, 10, 10);
-            gc.strokeOval(n.x - 5, n.y - 5, 10, 10);
+            double x = n.pos.getX().doubleValue();
+            double y = n.pos.getY().doubleValue();
+            gc.fillOval(x - 5, y - 5, 10, 10);
+            gc.setStroke(Color.BLACK);
+            gc.strokeOval(x - 5, y - 5, 10, 10);
         }
     }
 }
-
-

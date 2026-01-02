@@ -25,7 +25,8 @@ package org.jscience.economics.loaders;
 
 import org.jscience.economics.Money;
 import org.jscience.history.TimePoint;
-import org.jscience.io.InputLoader;
+import org.jscience.io.AbstractLoader;
+import org.jscience.io.MiniCatalog;
 import org.jscience.mathematics.numbers.real.Real;
 
 import java.io.BufferedReader;
@@ -34,6 +35,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.time.LocalDate;
 
 /**
@@ -43,7 +45,7 @@ import java.time.LocalDate;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class FinancialMarketLoader implements InputLoader<List<FinancialMarketLoader.Candle>> {
+public class FinancialMarketLoader extends AbstractLoader<List<FinancialMarketLoader.Candle>> {
 
     private String currencyCode = "USD";
 
@@ -55,18 +57,6 @@ public class FinancialMarketLoader implements InputLoader<List<FinancialMarketLo
     }
 
     @Override
-    public List<Candle> load(String resourceId) throws Exception {
-        try (InputStream is = getClass().getResourceAsStream(resourceId)) {
-            if (is == null) {
-                try (InputStream fileIs = new java.io.FileInputStream(resourceId)) {
-                    return loadCSV(fileIs, currencyCode);
-                }
-            }
-            return loadCSV(is, currencyCode);
-        }
-    }
-
-    @Override
     public String getResourcePath() {
         return "/data/markets/";
     }
@@ -75,6 +65,38 @@ public class FinancialMarketLoader implements InputLoader<List<FinancialMarketLo
     @SuppressWarnings("unchecked")
     public Class<List<Candle>> getResourceType() {
         return (Class<List<FinancialMarketLoader.Candle>>) (Class<?>) List.class;
+    }
+
+    @Override
+    protected List<Candle> loadFromSource(String id) throws Exception {
+        try (InputStream is = getClass().getResourceAsStream(id)) {
+            if (is == null) {
+                try (InputStream fileIs = new java.io.FileInputStream(id)) {
+                    return loadCSV(fileIs, currencyCode);
+                }
+            }
+            return loadCSV(is, currencyCode);
+        }
+    }
+
+    @Override
+    protected MiniCatalog<List<Candle>> getMiniCatalog() {
+        return new MiniCatalog<>() {
+            @Override
+            public List<List<Candle>> getAll() {
+                return List.of(List.of());
+            }
+
+            @Override
+            public Optional<List<Candle>> findByName(String name) {
+                return Optional.of(List.of());
+            }
+
+            @Override
+            public int size() {
+                return 0;
+            }
+        };
     }
 
     public static class Candle {
@@ -106,11 +128,10 @@ public class FinancialMarketLoader implements InputLoader<List<FinancialMarketLo
             while ((line = br.readLine()) != null) {
                 if (header) {
                     header = false;
-                    continue; // Skip header
+                    continue;
                 }
                 String[] parts = line.split(",");
                 if (parts.length >= 6) {
-                    // Date,Open,High,Low,Close,Volume
                     LocalDate date = LocalDate.parse(parts[0]);
                     TimePoint time = TimePoint.of(date);
 
@@ -127,5 +148,3 @@ public class FinancialMarketLoader implements InputLoader<List<FinancialMarketLo
         return candles;
     }
 }
-
-

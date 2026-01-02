@@ -54,73 +54,110 @@ public class MlflowClient {
     private final String trackingUri;
     private final HttpClient httpClient;
     private final String experimentId;
+    private final Duration requestTimeout;
 
     /**
-     * Creates a new MLflow client.
-     * 
-     * @param trackingUri    MLflow tracking server URI (e.g.,
-     *                       http://localhost:5000)
-     * @param experimentName Name of the experiment to use/create
+     * Creates a new MLflow client using configuration from ApplicationConfig.
      */
-    public MlflowClient(String trackingUri, String experimentName) {
-        this.trackingUri = trackingUri.endsWith("/") ? trackingUri.substring(0, trackingUri.length() - 1) : trackingUri;
+    public MlflowClient() {
+        org.jscience.server.config.ApplicationConfig config = org.jscience.server.config.ApplicationConfig
+                .getInstance();
+        String uri = config.getMlflowUri();
+        this.trackingUri = uri.endsWith("/") ? uri.substring(0, uri.length() - 1) : uri;
+        this.requestTimeout = Duration.ofMillis(config.getHttpRequestTimeoutMs());
         this.httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(10))
+                .connectTimeout(Duration.ofMillis(config.getHttpConnectTimeoutMs()))
                 .build();
+
+        String experimentName = config.getMlflowExperimentName();
         this.experimentId = getOrCreateExperiment(experimentName);
         LOG.info("MLflow client initialized for experiment '{}' (ID: {}) at {}",
                 experimentName, experimentId, trackingUri);
     }
 
     /**
-     * Gets or creates an experiment by name.
+     * Logs a file artifact to the MLflow run.
+     * Uses the MLflow 2.0 artifact proxy API.
      * 
-     * @param name Experiment name
-     * @return Experiment ID
+     * @param runId        Run ID
+     * @param file         Path to the file to upload
+     * @param artifactPath Destination path within the artifact repository
+     *                     (optional)
      */
-    private String getOrCreateExperiment(String name) {
+    public void logArtifact(String runId, java.nio.file.Path file, String artifactPath) {
         try {
-            // Try to get existing experiment by name
+            String filename = file.getFileName().toString();
+            String path = (artifactPath != null && !artifactPath.isEmpty()) ? artifactPath + "/" + filename : filename;
+
+            // Construct URL: api/2.0/mlflow-artifacts/artifacts/{run_id}/{path}
+            // Note: Exact URL depends on MLflow server version, assuming standard proxy
+            String url = String.format("%s/api/2.0/mlflow-artifacts/artifacts/%s/%s", trackingUri, runId, path);
+
+            // Simple PUT with file body is supported by many proxied implementations for
+            // single files
+            // Alternatively, multipart POST might be required.
+            // Using PUT for simplicity as it's common for object storage proxies.
+
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(trackingUri + "/api/2.0/mlflow/experiments/get-by-name"))
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(
-                            String.format("{\"experiment_name\":\"%s\"}", name)))
+                    .uri(URI.create(url))
+                    .PUT(HttpRequest.BodyPublishers.ofFile(file))
+                    .header("Content-Type", "application/octet-stream")
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (response.statusCode() == 200) {
-                JsonNode json = JSON_MAPPER.readTree(response.body());
-                String expId = json.path("experiment").path("experiment_id").asText();
-                LOG.debug("Found existing MLflow experiment '{}' with ID: {}", name, expId);
-                return expId;
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                LOG.info("Uploaded artifact '{}' to run {}", filename, runId);
+            } else {
+                LOG.error("Failed to upload artifact: {} - {}", response.statusCode(), response.body());
             }
-
-            // Experiment doesn't exist, create it
-            request = HttpRequest.newBuilder()
-                    .uri(URI.create(trackingUri + "/api/2.0/mlflow/experiments/create"))
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(
-                            String.format("{\"name\":\"%s\"}", name)))
-                    .build();
-
-            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 200) {
-                JsonNode json = JSON_MAPPER.readTree(response.body());
-                String expId = json.path("experiment_id").asText();
-                LOG.info("Created new MLflow experiment '{}' with ID: {}", name, expId);
-                return expId;
-            }
-
-            LOG.warn("Failed to create MLflow experiment, using default (0)");
-            return "0";
 
         } catch (Exception e) {
-            LOG.warn("MLflow server unreachable, using default experiment ID: {}", e.getMessage());
-            return "0"; // Default experiment
+            LOG.error("Error uploading artifact", e);
         }
+    }
+
+    /**
+     * Gets or creates an experiment with the given name.
+     * Caches experiment IDs to avoid repeated API calls.
+     * 
+     * @param name Experiment name
+     * @return MLflow experiment ID
+     */
+    private String getOrCreateExperiment(String name) {
+        try {
+            // First, try to get existing experiment by name
+            String getUrl = trackingUri + "/api/2.0/mlflow/experiments/get-by-name?experiment_name=" +
+                    java.net.URLEncoder.encode(name, java.nio.charset.StandardCharsets.UTF_8);
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(getUrl))
+                    .GET()
+                    .timeout(this.requestTimeout)
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                JsonNode json = JSON_MAPPER.readTree(response.body());
+                return json.path("experiment").path("experiment_id").asText("0");
+            }
+
+            // If not found, create new experiment
+            String createBody = "{\"name\": \"" + escapeJson(name) + "\"}";
+            HttpRequest createRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(trackingUri + "/api/2.0/mlflow/experiments/create"))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(createBody))
+                    .timeout(this.requestTimeout)
+                    .build();
+            HttpResponse<String> createResponse = httpClient.send(createRequest, HttpResponse.BodyHandlers.ofString());
+            if (createResponse.statusCode() == 200) {
+                JsonNode json = JSON_MAPPER.readTree(createResponse.body());
+                return json.path("experiment_id").asText("0");
+            }
+        } catch (Exception e) {
+            LOG.warn("Failed to get/create experiment '{}': {}", name, e.getMessage());
+        }
+        return "0"; // Default experiment
     }
 
     /**
@@ -221,7 +258,7 @@ public class MlflowClient {
                 .uri(URI.create(trackingUri + path))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-                .timeout(Duration.ofSeconds(5))
+                .timeout(this.requestTimeout)
                 .build();
 
         return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())

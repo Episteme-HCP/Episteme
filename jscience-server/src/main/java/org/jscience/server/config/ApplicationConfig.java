@@ -350,6 +350,16 @@ public class ApplicationConfig {
         return getBoolean("features.tracing.enabled", false);
     }
 
+    // --- Offline Mode ---
+
+    public boolean isOfflineMode() {
+        return getBoolean("offline.mode", false);
+    }
+
+    public boolean isOfflineFallbackEnabled() {
+        return getBoolean("offline.fallback.enabled", true);
+    }
+
     // --- Utility Methods ---
 
     /**

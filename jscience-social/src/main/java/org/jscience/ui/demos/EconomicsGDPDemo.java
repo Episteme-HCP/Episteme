@@ -34,10 +34,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.jscience.ui.AppProvider;
+import org.jscience.economics.Money;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Economic Growth Model Demo.
- * Demonstrates GDP growth projection using simple exponential model.
+ * Demonstrates GDP growth projection using JScience Money and Real types.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -110,13 +112,15 @@ public class EconomicsGDPDemo implements AppProvider {
         chart.getData().clear();
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
         series.setName(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.gdp.chart.series"));
-        double gdp = 25.0; // Starting GDP in trillions
+
+        // Use JScience Money for GDP
+        Money gdp = Money.usd(25.0); // 25 Trillions
+        Real growthFactor = Real.of(1.0 + rate);
+
         for (int year = 0; year <= 50; year++) {
-            series.getData().add(new XYChart.Data<>(year, gdp));
-            gdp *= (1 + rate);
+            series.getData().add(new XYChart.Data<>(year, gdp.getAmount().doubleValue()));
+            gdp = gdp.multiply(growthFactor);
         }
         chart.getData().add(series);
     }
 }
-
-

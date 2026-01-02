@@ -25,17 +25,18 @@ package org.jscience.chemistry;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jscience.io.AbstractLoader;
+import org.jscience.io.MiniCatalog;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Quantity;
-
 import org.jscience.measure.Units;
-
 import org.jscience.measure.quantity.Mass;
 import org.jscience.measure.quantity.Temperature;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Loads chemical elements from JSON configuration.
@@ -44,12 +45,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class PeriodicTableLoader implements org.jscience.io.InputLoader<List<Element>> {
-
-    @Override
-    public List<Element> load(String resourceId) throws Exception {
-        return loadFromResource(resourceId);
-    }
+public class PeriodicTableLoader extends AbstractLoader<List<Element>> {
 
     @Override
     public String getResourcePath() {
@@ -60,6 +56,31 @@ public class PeriodicTableLoader implements org.jscience.io.InputLoader<List<Ele
     @SuppressWarnings("unchecked")
     public Class<List<Element>> getResourceType() {
         return (Class<List<Element>>) (Class<?>) List.class;
+    }
+
+    @Override
+    protected List<Element> loadFromSource(String id) throws Exception {
+        return loadFromResource(id);
+    }
+
+    @Override
+    protected MiniCatalog<List<Element>> getMiniCatalog() {
+        return new MiniCatalog<>() {
+            @Override
+            public List<List<Element>> getAll() {
+                return List.of(List.of());
+            }
+
+            @Override
+            public Optional<List<Element>> findByName(String name) {
+                return Optional.of(List.of());
+            }
+
+            @Override
+            public int size() {
+                return 0;
+            }
+        };
     }
 
     public static List<Element> loadFromResource(String resourcePath) {
@@ -93,14 +114,8 @@ public class PeriodicTableLoader implements org.jscience.io.InputLoader<List<Ele
         String symbol = node.get("symbol").asText();
         String name = node.get("name").asText();
 
-        // Units assumption based on standard scientific datasets (e.g. PubChem/NIST)
-        // Mass in u (atomic mass units). 1 u = 1.66053906660e-27 kg approx.
-        // For simplicity, we might store as Unified Atomic Mass Unit if defined,
-        // or convert to KG. Let's use generic Mass for now.
-        // JScience Units.GRAM might be easiest default for now if AMU missing.
         double atomicMassVal = node.get("atomicMass").asDouble();
         Quantity<Mass> atomicMass = Quantities.create(atomicMassVal, Units.GRAM.multiply(1.66053906660e-24));
-        // 1 amu = 1.66e-24 g.
 
         int group = node.has("group") ? node.get("group").asInt() : 0;
         int period = node.has("period") ? node.get("period").asInt() : 0;
@@ -139,5 +154,3 @@ public class PeriodicTableLoader implements org.jscience.io.InputLoader<List<Ele
         return e;
     }
 }
-
-

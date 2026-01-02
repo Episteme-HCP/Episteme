@@ -23,10 +23,14 @@
 
 package org.jscience.device.loaders.nmea;
 
-import java.io.InputStream;
-import java.util.Scanner;
+import org.jscience.io.AbstractLoader;
+import org.jscience.io.MiniCatalog;
 
-// ...
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Scanner;
 
 /**
  * A basic NMEA parser that acts as a Sensor for NMEA messages.
@@ -35,7 +39,7 @@ import java.util.Scanner;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class NMEALoader implements org.jscience.io.InputLoader<java.util.List<NMEAMessage>> {
+public class NMEALoader extends AbstractLoader<List<NMEAMessage>> {
 
     private Scanner scanner;
 
@@ -47,10 +51,20 @@ public class NMEALoader implements org.jscience.io.InputLoader<java.util.List<NM
     }
 
     @Override
-    public java.util.List<NMEAMessage> load(String resourceId) throws Exception {
-        // resourceId can be a file path or URL
-        java.util.List<NMEAMessage> messages = new java.util.ArrayList<>();
-        try (InputStream is = new java.io.FileInputStream(resourceId); Scanner sc = new Scanner(is)) {
+    public String getResourcePath() {
+        return null;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<List<NMEAMessage>> getResourceType() {
+        return (Class<List<NMEAMessage>>) (Class<?>) List.class;
+    }
+
+    @Override
+    protected List<NMEAMessage> loadFromSource(String id) throws Exception {
+        List<NMEAMessage> messages = new ArrayList<>();
+        try (InputStream is = new java.io.FileInputStream(id); Scanner sc = new Scanner(is)) {
             while (sc.hasNextLine()) {
                 String line = sc.nextLine().trim();
                 if (line.startsWith("$") && NMEAMessage.validateChecksum(line)) {
@@ -62,14 +76,23 @@ public class NMEALoader implements org.jscience.io.InputLoader<java.util.List<NM
     }
 
     @Override
-    public String getResourcePath() {
-        return null; // Local files usually
-    }
+    protected MiniCatalog<List<NMEAMessage>> getMiniCatalog() {
+        return new MiniCatalog<>() {
+            @Override
+            public List<List<NMEAMessage>> getAll() {
+                return List.of(List.of());
+            }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public Class<java.util.List<NMEAMessage>> getResourceType() {
-        return (Class<java.util.List<NMEAMessage>>) (Class<?>) java.util.List.class;
+            @Override
+            public Optional<List<NMEAMessage>> findByName(String name) {
+                return Optional.of(List.of());
+            }
+
+            @Override
+            public int size() {
+                return 0;
+            }
+        };
     }
 
     /**
@@ -96,5 +119,3 @@ public class NMEALoader implements org.jscience.io.InputLoader<java.util.List<NM
             scanner.close();
     }
 }
-
-

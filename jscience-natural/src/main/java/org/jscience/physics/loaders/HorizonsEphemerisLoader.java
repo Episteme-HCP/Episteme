@@ -23,48 +23,31 @@
 
 package org.jscience.physics.loaders;
 
+import org.jscience.io.AbstractLoader;
+import org.jscience.io.MiniCatalog;
 import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.sets.Reals;
 
 import java.time.Instant;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Loads ephemerides from JPL Horizons system (Text format).
  * <p>
  * Expected format: CSV-like or fixed width inside $$SOE and $$EOE markers.
- * Example Record:
- * 2460676.500000000, A.D. 2025-Jan-01 00:00:00.0000, 1.4709829123E+08,
- * 1.4709829123E+08, ...
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class HorizonsEphemerisLoader
-        implements org.jscience.io.InputLoader<List<HorizonsEphemerisLoader.EphemerisPoint>> {
-
-    @Override
-    public List<EphemerisPoint> load(String resourceId) throws Exception {
-        if (resourceId.startsWith("http")) {
-            try (InputStream is = new java.net.URI(resourceId).toURL().openStream()) {
-                return loadEphemeris(is);
-            }
-        }
-        try (InputStream is = getClass().getResourceAsStream(resourceId)) {
-            if (is == null)
-                throw new java.io.IOException("Horizons resource not found: " + resourceId);
-            return loadEphemeris(is);
-        }
-    }
+public class HorizonsEphemerisLoader extends AbstractLoader<List<HorizonsEphemerisLoader.EphemerisPoint>> {
 
     @Override
     public String getResourcePath() {
@@ -77,10 +60,44 @@ public class HorizonsEphemerisLoader
         return (Class<List<HorizonsEphemerisLoader.EphemerisPoint>>) (Class<?>) List.class;
     }
 
+    @Override
+    protected List<EphemerisPoint> loadFromSource(String id) throws Exception {
+        if (id.startsWith("http")) {
+            try (InputStream is = new java.net.URI(id).toURL().openStream()) {
+                return loadEphemeris(is);
+            }
+        }
+        try (InputStream is = getClass().getResourceAsStream(id)) {
+            if (is == null)
+                throw new java.io.IOException("Horizons resource not found: " + id);
+            return loadEphemeris(is);
+        }
+    }
+
+    @Override
+    protected MiniCatalog<List<EphemerisPoint>> getMiniCatalog() {
+        return new MiniCatalog<>() {
+            @Override
+            public List<List<EphemerisPoint>> getAll() {
+                return List.of(List.of());
+            }
+
+            @Override
+            public Optional<List<EphemerisPoint>> findByName(String name) {
+                return Optional.of(List.of());
+            }
+
+            @Override
+            public int size() {
+                return 0;
+            }
+        };
+    }
+
     public static class EphemerisPoint {
         public final Instant time;
-        public final DenseVector<Real> position; // (x, y, z) in km or AU
-        public final DenseVector<Real> velocity; // (vx, vy, vz) in km/s or AU/d
+        public final DenseVector<Real> position;
+        public final DenseVector<Real> velocity;
 
         public EphemerisPoint(Instant time, DenseVector<Real> pos, DenseVector<Real> vel) {
             this.time = time;
@@ -111,34 +128,23 @@ public class HorizonsEphemerisLoader
 
                 if (inData) {
                     try {
-                        // Horizons format varies widely based on request settings.
-                        // Assuming vectors: X, Y, Z, VX, VY, VZ
-                        // CSV format usually.
                         String[] parts = line.split(",");
                         if (parts.length >= 8) {
-                            // Part 0: JDTDB
-                            // Part 1: Date String "A.D. 2025-Jan-01 00:00:00.0000"
-
-                            // Parse positions (X,Y,Z)
                             double x = Double.parseDouble(parts[2].trim());
                             double y = Double.parseDouble(parts[3].trim());
                             double z = Double.parseDouble(parts[4].trim());
 
-                            // Parse velocities (VX,VY,VZ)
                             double vx = Double.parseDouble(parts[5].trim());
                             double vy = Double.parseDouble(parts[6].trim());
                             double vz = Double.parseDouble(parts[7].trim());
 
-                            // Create vectors
                             DenseVector<Real> pos = DenseVector.of(
                                     java.util.Arrays.asList(Real.of(x), Real.of(y), Real.of(z)), Reals.getInstance());
                             DenseVector<Real> vel = DenseVector.of(
                                     java.util.Arrays.asList(Real.of(vx), Real.of(vy), Real.of(vz)),
                                     Reals.getInstance());
 
-                            // Parse time from JDTDB (Julian Day Terrestrial Barycentric Dynamical Time)
                             double jd = Double.parseDouble(parts[0].trim());
-                            // Convert JD to Unix epoch: JD 2440587.5 = Unix epoch (1970-01-01 00:00:00 UTC)
                             double daysSinceUnixEpoch = jd - 2440587.5;
                             long millisSinceEpoch = (long) (daysSinceUnixEpoch * 86400000.0);
                             Instant tp = Instant.ofEpochMilli(millisSinceEpoch);
@@ -156,5 +162,3 @@ public class HorizonsEphemerisLoader
         return points;
     }
 }
-
-
