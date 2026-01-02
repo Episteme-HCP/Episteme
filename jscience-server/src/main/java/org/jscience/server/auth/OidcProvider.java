@@ -23,7 +23,6 @@
 
 package org.jscience.server.auth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.nimbusds.jose.JOSEException;
@@ -68,7 +67,6 @@ import java.util.concurrent.TimeUnit;
 public class OidcProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(OidcProvider.class);
-    private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
     // Cache for JWT Processors (Duration: 1h to allow key rotation)
     private static final Cache<String, ConfigurableJWTProcessor<SecurityContext>> processorCache = Caffeine.newBuilder()
@@ -157,6 +155,7 @@ public class OidcProvider {
         });
     }
 
+    @SuppressWarnings("deprecation")
     private static ConfigurableJWTProcessor<SecurityContext> createProcessor(String provider)
             throws MalformedURLException {
         String jwksUrl = PROVIDER_JWKS_URLS.get(provider.toLowerCase());

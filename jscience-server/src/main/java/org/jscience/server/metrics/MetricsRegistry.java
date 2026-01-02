@@ -76,6 +76,7 @@ public class MetricsRegistry {
     private final Timer oidcValidationLatency;
     private final Timer taskExecutionTime;
 
+    @SuppressWarnings("resource")
     private MetricsRegistry() {
         this.registry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
 

@@ -23,18 +23,12 @@
 
 package org.jscience.politics.loaders;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jscience.economics.Money;
 import org.jscience.politics.Country;
-import org.jscience.geography.Region;
-import org.jscience.io.InputLoader;
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import io.github.resilience4j.ratelimiter.RateLimiterConfig;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
-import org.jscience.io.cache.ResourceCache;
-import org.jscience.mathematics.numbers.real.Real;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -190,31 +184,7 @@ public class WorldBankLoader extends AbstractLoader<Country> {
     }
 
     /**
-     * Parses World Bank API response for indicator data.
-     */
-    private Map<String, Double> parseIndicatorResponse(String jsonResponse) throws Exception {
-        Map<String, Double> result = new LinkedHashMap<>();
-        JsonNode root = mapper.readTree(jsonResponse);
-
-        if (root.isArray() && root.size() > 1) {
-            JsonNode data = root.get(1);
-            if (data.isArray()) {
-                for (JsonNode entry : data) {
-                    String date = entry.path("date").asText();
-                    double value = entry.path("value").asDouble(Double.NaN);
-                    if (!Double.isNaN(value)) {
-                        result.put(date, value);
-                    }
-                }
-            }
-        }
-
-        LOG.debug("Parsed {} data points from World Bank API", result.size());
-        return result;
-    }
-
-    /**
-     * Loads countries from World Bank API.
+     * Parses countries from World Bank API.
      */
     private List<Country> loadFromApi() throws Exception {
         String url = String.format("%s/country?format=json&per_page=%d", WB_API_BASE, PER_PAGE);
@@ -341,24 +311,14 @@ public class WorldBankLoader extends AbstractLoader<Country> {
         Country country = new Country(name, code);
         country.setPopulation(node.path("population").asLong(0));
 
-        double gdpValue = node.path("gdp").asDouble(0.0);
         // GDP storage not standard in Country yet? Or maybe use generic attributes?
         // Country doesn't have GDP field in my previous edit.
-        // But for now let's just ignore it or log it, or if it was in Region...
-        // Region had 'setGdp'. Country extends Place.
-        // Let's assume Country inherits setGdp if Place has it.
-        // But Place usually doesn't have GDP.
-        // I should have checked if setGdp was available.
-        // Checking WorldBankLoader lines 317 in previous ViewFile: region.setGdp(...)
-        // So Region has setGdp. Country doesn't extend Region directly?
-        // Country.java says: public class Country extends org.jscience.geography.Place
-        // ...
-        // Does Place extend Region?
-        // I will comment out setGdp for safety unless sure.
-
-        // if (gdpValue > 0) {
-        // country.setGdp(new Money(Real.of(gdpValue), "USD"));
-        // }
+        /*
+         * double gdpValue = node.path("gdp").asDouble(0.0);
+         * if (gdpValue > 0) {
+         * // country.setGdp(new Money(Real.of(gdpValue), "USD"));
+         * }
+         */
 
         return country;
     }

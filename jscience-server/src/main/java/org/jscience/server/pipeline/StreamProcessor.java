@@ -81,6 +81,7 @@ public class StreamProcessor<T> {
     /**
      * Add a map transformation.
      */
+    @SuppressWarnings("unchecked")
     public <R> StreamProcessor<R> flatMap(Function<T, Collection<R>> mapper) {
         stages.add((Stage<Object, Object>) input -> mapper.apply((T) input));
         return (StreamProcessor<R>) this;

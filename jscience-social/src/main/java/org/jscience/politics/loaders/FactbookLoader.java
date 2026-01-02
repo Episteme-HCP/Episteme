@@ -24,7 +24,6 @@
 package org.jscience.politics.loaders;
 
 import org.jscience.politics.Country;
-import org.jscience.io.InputLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
@@ -286,7 +285,7 @@ public class FactbookLoader extends AbstractLoader<List<Country>> {
         }
 
         // Economy & Demographics (if available in XML)
-        String gdp = getTextValue(elem, "gdp");
+        // String gdp = getTextValue(elem, "gdp");
         // ... (Parsing other fields would go here, but XML structure is hypothetical.
         // We will rely on sample data for full richness if XML is missing)
     }

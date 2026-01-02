@@ -22,6 +22,7 @@ import static org.mockito.Mockito.*;
  * Unit tests for WorldBankLoader.
  */
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("unchecked")
 class WorldBankLoaderTest {
 
     @Mock
@@ -164,7 +165,6 @@ class WorldBankLoaderTest {
                 ]
                 """;
 
-        @SuppressWarnings("unchecked")
         HttpResponse<String> mockIndicatorResponse = mock(HttpResponse.class);
         when(mockIndicatorResponse.statusCode()).thenReturn(200);
         when(mockIndicatorResponse.body()).thenReturn(indicatorResponse);
@@ -193,7 +193,6 @@ class WorldBankLoaderTest {
                 ]
                 """;
 
-        @SuppressWarnings("unchecked")
         HttpResponse<String> mockIndicatorResponse = mock(HttpResponse.class);
         when(mockIndicatorResponse.statusCode()).thenReturn(200);
         when(mockIndicatorResponse.body()).thenReturn(indicatorResponse);

@@ -42,7 +42,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class ApplicationConfigTest {
 
     private ApplicationConfig config;
-    private String originalEnv;
 
     @BeforeEach
     void setUp() {

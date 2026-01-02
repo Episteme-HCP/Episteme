@@ -41,7 +41,6 @@ import javafx.stage.Stage;
 
 import org.jscience.mathematics.numbers.complex.Complex;
 import org.jscience.server.proto.TaskRequest;
-// import org.jscience.server.proto.Priority; // Removed to avoid conflict
 import org.jscience.server.proto.ComputeServiceGrpc;
 
 import java.util.concurrent.atomic.AtomicInteger;

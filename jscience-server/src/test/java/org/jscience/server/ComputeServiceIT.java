@@ -24,8 +24,6 @@
 package org.jscience.server;
 
 import com.google.protobuf.ByteString;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import org.jscience.server.proto.*;
 import org.junit.jupiter.api.*;
 
