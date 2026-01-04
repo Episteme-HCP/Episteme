@@ -37,7 +37,7 @@ import org.jscience.earth.climate.ClimateModelTask;
 import org.jscience.biology.structure.DnaFoldingTask;
 import org.jscience.biology.genome.CrisprTask;
 import org.jscience.biology.structure.ProteinFoldingTask;
-import org.jscience.physics.wave.WaveModelTask;
+import org.jscience.client.physics.wavesim.WaveSimTask;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -242,7 +242,7 @@ public class WorkerNode {
         int h = dis.readInt();
         double c = dis.readDouble();
         double damp = dis.readDouble();
-        WaveModelTask task = new WaveModelTask(w, h);
+        WaveSimTask task = new WaveSimTask(w, h);
         task.setC(c);
         task.setDamping(damp);
         double[][] u = new double[w][h];

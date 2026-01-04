@@ -25,7 +25,7 @@ package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
 import org.jscience.ui.ViewerProvider;
-import org.jscience.ui.mathematics.statistics.DistributionsViewer;
+import org.jscience.ui.viewers.mathematics.statistics.DistributionsViewer;
 
 /**
  * 

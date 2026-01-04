@@ -25,7 +25,7 @@ package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
 import org.jscience.ui.AppProvider;
-import org.jscience.ui.history.HistoryTimelineViewer;
+import org.jscience.ui.viewers.history.HistoryTimelineViewer;
 
 /**
  * 

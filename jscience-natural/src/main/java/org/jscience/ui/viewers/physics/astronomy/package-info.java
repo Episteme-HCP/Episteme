@@ -21,7 +21,6 @@
  * SOFTWARE.
  */
 
-/**
- * Provides classes and interfaces for org.jscience.physics.astronomy.demos.
- */
 package org.jscience.ui.viewers.physics.astronomy;
+
+

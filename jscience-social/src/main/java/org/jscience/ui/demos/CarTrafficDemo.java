@@ -23,7 +23,7 @@
 
 package org.jscience.ui.demos;
 
-import org.jscience.ui.architecture.traffic.CarTrafficViewer;
+import org.jscience.ui.viewers.architecture.traffic.CarTrafficViewer;
 
 import javafx.stage.Stage;
 import org.jscience.ui.ViewerProvider;

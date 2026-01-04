@@ -25,6 +25,7 @@ package org.jscience.ui.devices;
 
 import javafx.scene.control.Label;
 import org.jscience.device.sensors.PHMeter;
+import org.jscience.ui.AbstractDeviceViewer;
 
 /**
  * Viewer for PHMeter.
@@ -50,5 +51,3 @@ public class PHMeterViewer extends AbstractDeviceViewer<PHMeter> {
         phLabel.setText("pH 7.0");
     }
 }
-
-

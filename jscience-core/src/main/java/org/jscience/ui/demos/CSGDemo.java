@@ -25,7 +25,7 @@ package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
 import org.jscience.ui.ViewerProvider;
-import org.jscience.ui.mathematics.geometry.csg.CSGViewer;
+import org.jscience.ui.viewers.mathematics.geometry.csg.CSGViewer;
 
 import org.jscience.ui.i18n.I18n;
 

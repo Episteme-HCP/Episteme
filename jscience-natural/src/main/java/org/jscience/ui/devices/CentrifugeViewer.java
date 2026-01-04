@@ -27,6 +27,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import org.jscience.device.actuators.Centrifuge;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.ui.AbstractDeviceViewer;
 
 /**
  * Viewer for Centrifuge.
@@ -67,5 +68,3 @@ public class CentrifugeViewer extends AbstractDeviceViewer<Centrifuge> {
         // Update current RPM from device if needed
     }
 }
-
-

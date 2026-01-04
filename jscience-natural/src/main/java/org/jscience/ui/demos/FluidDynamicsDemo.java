@@ -25,7 +25,7 @@ package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
 import org.jscience.ui.AppProvider;
-import org.jscience.ui.physics.fluids.FluidDynamicsViewer;
+import org.jscience.ui.viewers.physics.classical.matter.fluids.FluidDynamicsViewer;
 import org.jscience.ui.i18n.I18n;
 
 /**

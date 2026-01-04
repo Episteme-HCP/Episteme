@@ -28,7 +28,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.i18n.I18n;
-import org.jscience.ui.physics.waves.SpectrographViewer;
+import org.jscience.ui.viewers.physics.classical.waves.SpectrographViewer;
 import org.jscience.device.sim.SimulatedOscilloscope;
 import org.jscience.ui.devices.OscilloscopeViewer;
 import org.jscience.ui.devices.VitalMonitorViewer;

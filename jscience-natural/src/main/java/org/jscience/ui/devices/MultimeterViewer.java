@@ -25,6 +25,7 @@ package org.jscience.ui.devices;
 
 import javafx.scene.control.Label;
 import org.jscience.device.sensors.Multimeter;
+import org.jscience.ui.AbstractDeviceViewer;
 
 /**
  * Viewer for Multimeter.
@@ -53,5 +54,3 @@ public class MultimeterViewer extends AbstractDeviceViewer<Multimeter> {
         valueLabel.setText("0.00 V"); // device.readValue() needs Exception handling
     }
 }
-
-

@@ -25,6 +25,7 @@ package org.jscience.ui.devices;
 
 import javafx.scene.control.Label;
 import org.jscience.device.sensors.Microscope;
+import org.jscience.ui.AbstractDeviceViewer;
 
 /**
  * Viewer for Microscope.
@@ -53,5 +54,3 @@ public class MicroscopeViewer extends AbstractDeviceViewer<Microscope> {
         }
     }
 }
-
-

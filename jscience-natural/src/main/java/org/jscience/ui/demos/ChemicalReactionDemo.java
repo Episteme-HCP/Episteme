@@ -25,7 +25,7 @@ package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
 import org.jscience.ui.ViewerProvider;
-import org.jscience.ui.chemistry.ChemicalReactionViewer;
+import org.jscience.ui.viewers.chemistry.ChemicalReactionViewer;
 
 /**
  * Demo provider for the Chemical Reaction Parser.

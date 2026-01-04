@@ -25,7 +25,7 @@ package org.jscience.ui.demos;
 
 import javafx.scene.Node;
 import org.jscience.ui.SimulationDemo;
-import org.jscience.ui.computing.ai.GameOfLifeViewer;
+import org.jscience.ui.viewers.computing.ai.GameOfLifeViewer;
 import org.jscience.ui.i18n.I18n;
 
 /**

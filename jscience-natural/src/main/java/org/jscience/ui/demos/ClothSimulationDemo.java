@@ -25,7 +25,7 @@ package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
 import org.jscience.ui.ViewerProvider;
-import org.jscience.ui.computing.simulation.ClothSimulationViewer;
+import org.jscience.ui.viewers.computing.simulation.ClothSimulationViewer;
 import org.jscience.ui.i18n.I18n;
 
 /**

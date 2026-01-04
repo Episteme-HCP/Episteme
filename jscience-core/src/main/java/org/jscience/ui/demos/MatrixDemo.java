@@ -37,7 +37,7 @@ import org.jscience.mathematics.linearalgebra.matrices.MatrixFactory;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.ui.AppProvider;
 import org.jscience.ui.i18n.I18n;
-import org.jscience.ui.mathematics.linearalgebra.MatrixViewer;
+import org.jscience.ui.viewers.mathematics.linearalgebra.MatrixViewer;
 // import org.jscience.ui.ThemeManager;
 
 /**

@@ -25,7 +25,7 @@ package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
 import org.jscience.ui.AppProvider;
-import org.jscience.ui.measure.units.UnitConverterViewer;
+import org.jscience.ui.viewers.measure.units.UnitConverterViewer;
 
 /**
  * 

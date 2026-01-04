@@ -25,7 +25,7 @@ package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
 import org.jscience.ui.ViewerProvider;
-import org.jscience.ui.biology.anatomy.BioMotionViewer;
+import org.jscience.ui.viewers.medicine.biomecanics.BioMotionViewer;
 
 /**
  * 
@@ -56,5 +56,3 @@ public class BioMotionDemoProvider implements ViewerProvider {
         BioMotionViewer.show(stage);
     }
 }
-
-

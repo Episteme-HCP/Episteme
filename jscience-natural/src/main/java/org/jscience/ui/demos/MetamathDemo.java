@@ -25,7 +25,7 @@ package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
 import org.jscience.ui.AppProvider;
-import org.jscience.ui.mathematics.logic.MetamathViewer;
+import org.jscience.ui.viewers.mathematics.logic.MetamathViewer;
 
 /**
  * 

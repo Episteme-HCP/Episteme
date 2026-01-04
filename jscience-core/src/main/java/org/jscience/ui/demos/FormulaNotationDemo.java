@@ -25,7 +25,7 @@ package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
 import org.jscience.ui.AppProvider;
-import org.jscience.ui.mathematics.FormulaNotationViewer;
+import org.jscience.ui.viewers.mathematics.symbolic.FormulaNotationViewer;
 
 import org.jscience.ui.i18n.I18n;
 
@@ -61,5 +61,3 @@ public class FormulaNotationDemo implements AppProvider {
         FormulaNotationViewer.show(stage);
     }
 }
-
-

@@ -25,7 +25,7 @@ package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
 import org.jscience.ui.AppProvider;
-import org.jscience.ui.biology.anatomy.HumanBodyViewer;
+import org.jscience.ui.viewers.medicine.anatomy.HumanBodyViewer;
 
 /**
  * Demo provider for the Human Body Anatomy Viewer.

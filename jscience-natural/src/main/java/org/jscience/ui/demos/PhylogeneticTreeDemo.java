@@ -25,7 +25,7 @@ package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
 import org.jscience.ui.AppProvider;
-import org.jscience.ui.biology.phylogeny.PhylogeneticTreeViewer;
+import org.jscience.ui.viewers.biology.phylogeny.PhylogeneticTreeViewer;
 
 import org.jscience.ui.i18n.I18n;
 

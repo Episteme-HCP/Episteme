@@ -27,6 +27,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import org.jscience.device.sensors.Spectrometer;
+import org.jscience.ui.AbstractDeviceViewer;
 
 /**
  * Viewer for Spectrometer.
@@ -65,5 +66,3 @@ public class SpectrometerViewer extends AbstractDeviceViewer<Spectrometer> {
         // dynamic update
     }
 }
-
-
