@@ -23,6 +23,8 @@
 
 package org.jscience.client.mathematics.montecarlopi;
 
+import org.jscience.mathematics.montecarlo.MonteCarloTask;
+
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;

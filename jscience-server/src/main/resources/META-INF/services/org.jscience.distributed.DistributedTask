@@ -1,0 +1,8 @@
+org.jscience.chemistry.MolecularDynamicsTask
+org.jscience.earth.climate.GeneralCirculationModelTask
+org.jscience.mathematics.mandelbrot.MandelbrotTask
+org.jscience.mathematics.mandelbrot.RealMandelbrotTask
+org.jscience.mathematics.montecarlo.MonteCarloTask
+org.jscience.physics.fluid.FluidSimTask
+org.jscience.physics.nbody.NBodyTask
+org.jscience.physics.wave.WaveSimTask

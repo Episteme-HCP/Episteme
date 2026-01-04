@@ -49,10 +49,12 @@ enum Priority {
 
 message TaskRequest {
   string taskId = 1;
-  // Serialized Java object (Callable<T>)
+  // Serialized Java object (DistributedTask or legacy Callable)
   bytes serializedTask = 2;
   Priority priority = 3;
   int64 timestamp = 4;
+  // Task type identifier for TaskRegistry lookup (e.g., "MANDELBROT", "N_BODY")
+  string taskType = 5;
 }
 
 message TaskResponse {

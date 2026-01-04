@@ -23,6 +23,8 @@
 
 package org.jscience.client.physics.wavesim;
 
+import org.jscience.physics.wave.WaveSimTask;
+
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -37,7 +39,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.jscience.client.physics.wavesim.WaveSimTask;
+import org.jscience.physics.wave.WaveSimTask;
 import org.jscience.server.proto.*;
 
 import java.io.*;

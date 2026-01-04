@@ -1,52 +1,18 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
+package org.jscience.chemistry;
 
-package org.jscience.client.chemistry.moleculardynamics;
-
+import org.jscience.distributed.DistributedTask;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Molecular Dynamics Simulation Task.
- * 
- * Simulates particle interactions using the Lennard-Jones 6-12 potential and
- * Velocity Verlet integration.
- * 
- * <p>
- * References:
- * <ul>
- * <li>Lennard-Jones, J. E. (1924). On the determination of molecular fields.
- * Proc. R. Soc. Lond. A, 106(738), 463-477.</li>
- * <li>Verlet, L. (1967). Computer "experiments" on classical fluids. I.
- * Thermodynamical properties of Lennard-Jones molecules. Physical Review,
- * 159(1), 98.</li>
- * <li>Frenkel, D., & Smit, B. (2001). Understanding molecular simulation: from
- * algorithms to applications. Elsevier.</li>
- * </ul>
- * </p>
  */
-public class MolecularDynamicsTask implements Serializable {
+public class MolecularDynamicsTask implements DistributedTask<MolecularDynamicsTask, MolecularDynamicsTask>, Serializable {
 
     private final int numAtoms;
     private final double timeStep;
@@ -65,28 +31,53 @@ public class MolecularDynamicsTask implements Serializable {
         this.atoms = new ArrayList<>(numAtoms);
         initialize();
     }
+    
+    // No-arg constructor for ServiceLoader/Reflective instantiation
+    public MolecularDynamicsTask() {
+        this(0, 0, 0, 0);
+    }
 
-    // Additional constructor for PDB loading convenience
     public MolecularDynamicsTask(List<? extends Object> particles, double boxSize) {
         this.numAtoms = particles.size();
         this.timeStep = 0.001;
         this.steps = 100;
         this.boxSize = boxSize;
         this.atoms = new ArrayList<>(numAtoms);
-        // Assuming conversion happening before or simplistic adaptation
-        // For now, re-initialize random if passed list is generic object
-        // NOTE: In real impl, we would convert Particle/Atom to AtomState
         initialize();
     }
 
     private void initialize() {
+        if (numAtoms == 0) return;
         for (int i = 0; i < numAtoms; i++) {
             atoms.add(new AtomState(
                     Math.random() * boxSize, Math.random() * boxSize, Math.random() * boxSize,
                     (Math.random() - 0.5), (Math.random() - 0.5), (Math.random() - 0.5),
-                    1.0 // Mass
+                    1.0
             ));
         }
+    }
+
+    @Override
+    public Class<MolecularDynamicsTask> getInputType() { return MolecularDynamicsTask.class; }
+    @Override
+    public Class<MolecularDynamicsTask> getOutputType() { return MolecularDynamicsTask.class; }
+
+    @Override
+    public MolecularDynamicsTask execute(MolecularDynamicsTask input) {
+        if (input != null && input.numAtoms > 0) {
+            input.run();
+            return input;
+        }
+        if (this.numAtoms > 0) {
+            this.run();
+            return this;
+        }
+        return null;
+    }
+
+    @Override
+    public String getTaskType() {
+        return "MOLECULAR_DYNAMICS";
     }
 
     public void run() {
@@ -112,12 +103,9 @@ public class MolecularDynamicsTask implements Serializable {
             a.x += a.vx * timeStep;
             a.y += a.vy * timeStep;
             a.z += a.vz * timeStep;
-            if (a.x < 0 || a.x > boxSize)
-                a.vx *= -1;
-            if (a.y < 0 || a.y > boxSize)
-                a.vy *= -1;
-            if (a.z < 0 || a.z > boxSize)
-                a.vz *= -1;
+            if (a.x < 0 || a.x > boxSize) a.vx *= -1;
+            if (a.y < 0 || a.y > boxSize) a.vy *= -1;
+            if (a.z < 0 || a.z > boxSize) a.vz *= -1;
             a.x = Math.max(0, Math.min(boxSize, a.x));
             a.y = Math.max(0, Math.min(boxSize, a.y));
             a.z = Math.max(0, Math.min(boxSize, a.z));
@@ -165,30 +153,12 @@ public class MolecularDynamicsTask implements Serializable {
         }
     }
 
-    public List<AtomState> getAtoms() {
-        return atoms;
-    }
-
-    public double getTotalEnergy() {
-        return totalEnergy;
-    }
-
-    public int getNumAtoms() {
-        return numAtoms;
-    }
-
-    public double getTimeStep() {
-        return timeStep;
-    }
-
-    public int getSteps() {
-        return steps;
-    }
-
-    public double getBoxSize() {
-        return boxSize;
-    }
-
+    public List<AtomState> getAtoms() { return atoms; }
+    public double getTotalEnergy() { return totalEnergy; }
+    public int getNumAtoms() { return numAtoms; }
+    public double getTimeStep() { return timeStep; }
+    public int getSteps() { return steps; }
+    public double getBoxSize() { return boxSize; }
     public void updateState(List<AtomState> newAtoms, double newEnergy) {
         this.atoms = newAtoms;
         this.totalEnergy = newEnergy;
@@ -200,12 +170,8 @@ public class MolecularDynamicsTask implements Serializable {
         public double mass;
 
         public AtomState(double x, double y, double z, double vx, double vy, double vz, double mass) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.vx = vx;
-            this.vy = vy;
-            this.vz = vz;
+            this.x = x; this.y = y; this.z = z;
+            this.vx = vx; this.vy = vy; this.vz = vz;
             this.mass = mass;
         }
     }

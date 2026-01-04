@@ -47,7 +47,7 @@ import org.jscience.biology.loaders.PDBLoader;
 import org.jscience.biology.Protein;
 import org.jscience.chemistry.Atom;
 import org.jscience.chemistry.PeriodicTable;
-import org.jscience.client.chemistry.moleculardynamics.MolecularDynamicsTask;
+import org.jscience.chemistry.MolecularDynamicsTask;
 import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.mathematics.sets.Reals;
 

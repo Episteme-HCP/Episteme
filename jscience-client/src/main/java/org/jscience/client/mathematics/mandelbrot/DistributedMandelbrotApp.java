@@ -23,6 +23,10 @@
 
 package org.jscience.client.mathematics.mandelbrot;
 
+import org.jscience.mathematics.mandelbrot.MandelbrotTask;
+import org.jscience.mathematics.mandelbrot.RealMandelbrotTask;
+import org.jscience.mathematics.numbers.real.Real;
+
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -77,7 +81,10 @@ public class DistributedMandelbrotApp extends Application {
     private Label statusLabel;
     private Label timeLabel;
     private Button computeBtn;
+
+
     private ToggleButton localModeToggle;
+    private CheckBox highPrecisionToggle;
 
     // Mandelbrot parameters
     private double minRe = -2.0;
@@ -188,8 +195,12 @@ public class DistributedMandelbrotApp extends Application {
             String taskId = "mandel-" + slice + "-" + System.currentTimeMillis();
             byte[] taskData = serializeSliceTask(startY, endY);
 
+            String type = (highPrecisionToggle != null && highPrecisionToggle.isSelected()) ? 
+                    "MANDELBROT_REAL" : "MANDELBROT";
+            
             TaskRequest request = TaskRequest.newBuilder()
                     .setTaskId(taskId)
+                    .setTaskType(type)
                     .setSerializedTask(ByteString.copyFrom(taskData))
                     .setPriority(org.jscience.server.proto.Priority.CRITICAL)
                     .setTimestamp(System.currentTimeMillis())
@@ -253,35 +264,54 @@ public class DistributedMandelbrotApp extends Application {
 
     private byte[] serializeSliceTask(int startY, int endY) {
         try {
+            int sliceHeight = endY - startY;
+            double imFactor = (maxIm - minIm) / (HEIGHT - 1);
+            // Calculate Y bounds for this slice (top is y=0 -> maxIm)
+            double sliceMaxIm = maxIm - startY * imFactor;
+            double sliceMinIm = maxIm - (endY - 1) * imFactor;
+            
+            MandelbrotTask task;
+            if (highPrecisionToggle != null && highPrecisionToggle.isSelected()) {
+                task = new RealMandelbrotTask(WIDTH, sliceHeight, 
+                        Real.of(minRe), Real.of(maxRe), 
+                        Real.of(sliceMinIm), Real.of(sliceMaxIm), 
+                        100);
+            } else {
+                task = new MandelbrotTask(WIDTH, sliceHeight, minRe, maxRe, sliceMinIm, sliceMaxIm);
+            }
+            
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            DataOutputStream dos = new DataOutputStream(bos);
-            dos.writeUTF("MANDELBROT");
-            dos.writeInt(startY);
-            dos.writeInt(endY);
-            dos.writeDouble(minRe);
-            dos.writeDouble(maxRe);
-            dos.writeDouble(minIm);
-            dos.writeDouble(maxIm);
-            dos.writeInt(MAX_ITER);
-            dos.writeInt(WIDTH);
-            dos.writeInt(HEIGHT);
-            dos.flush();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(task);
+            oos.flush();
             return bos.toByteArray();
         } catch (IOException e) {
+            e.printStackTrace();
             return new byte[0];
         }
     }
 
     private int[] deserializeSliceResult(byte[] data) {
         try {
-            DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
-            int size = dis.readInt();
-            int[] result = new int[size];
-            for (int i = 0; i < size; i++) {
-                result[i] = dis.readInt();
+            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
+            MandelbrotTask resultTask = (MandelbrotTask) ois.readObject();
+            // result is 2D array [width][height]
+            int[][] result2D = resultTask.getResult();
+            if (result2D == null) return new int[0];
+            
+            // Flatten to 1D for renderer (or update renderer to support 2D)
+            // Existing logic expected 1D flat array [rows * WIDTH]
+            int w = resultTask.getWidth();
+            int h = resultTask.getHeight();
+            int[] flat = new int[w * h];
+            for (int y = 0; y < h; y++) {
+                for (int x = 0; x < w; x++) {
+                    flat[y * w + x] = result2D[x][y];
+                }
             }
-            return result;
-        } catch (IOException e) {
+            return flat;
+        } catch (Exception e) {
+            e.printStackTrace();
             return new int[0];
         }
     }
@@ -356,6 +386,9 @@ public class DistributedMandelbrotApp extends Application {
             }
         });
 
+        highPrecisionToggle = new CheckBox("High Precision");
+        highPrecisionToggle.setStyle("-fx-text-fill: white;");
+
         computeBtn = new Button("⚡ Compute on Grid");
         computeBtn.setStyle("-fx-background-color: #e94560; -fx-text-fill: white;");
         computeBtn.setOnAction(e -> startDistributedComputation());
@@ -370,7 +403,7 @@ public class DistributedMandelbrotApp extends Application {
         Button loadCfgBtn = new Button("📂 Load Config");
         loadCfgBtn.setOnAction(e -> loadConfig((Stage) computeBtn.getScene().getWindow()));
 
-        header.getChildren().addAll(title, spacer, localModeToggle, computeBtn, saveImgBtn, saveCfgBtn, loadCfgBtn);
+        header.getChildren().addAll(title, spacer, localModeToggle, highPrecisionToggle, computeBtn, saveImgBtn, saveCfgBtn, loadCfgBtn);
         return header;
     }
 

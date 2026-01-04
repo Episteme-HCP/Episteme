@@ -23,6 +23,8 @@
 
 package org.jscience.client.physics.fluidsim;
 
+import org.jscience.physics.fluid.FluidSimTask;
+
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;

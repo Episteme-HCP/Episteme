@@ -23,6 +23,8 @@
 
 package org.jscience.client.physics.nbody;
 
+import org.jscience.physics.nbody.NBodyTask;
+
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;

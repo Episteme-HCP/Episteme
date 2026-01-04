@@ -21,6 +21,6 @@
  * SOFTWARE.
  */
 
-package org.jscience.ui.viewers.earth.seismology;
+package org.jscience.ui.viewers.earth;
 
 

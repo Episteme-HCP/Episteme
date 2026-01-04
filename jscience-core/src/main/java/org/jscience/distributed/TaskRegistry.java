@@ -174,12 +174,19 @@ public final class TaskRegistry {
 
     @SuppressWarnings("unchecked")
     private void discoverTasks() {
-        // ServiceLoader-based discovery
-        ServiceLoader<DistributedTask> loader = ServiceLoader.load(DistributedTask.class);
-        for (DistributedTask<?, ?> task : loader) {
+        // ServiceLoader-based discovery for Tasks
+        ServiceLoader<DistributedTask> taskLoader = ServiceLoader.load(DistributedTask.class);
+        for (DistributedTask<?, ?> task : taskLoader) {
             taskClasses.put(task.getTaskType().toUpperCase(),
                     (Class<? extends DistributedTask<?, ?>>) task.getClass());
             LOGGER.info("Discovered task via ServiceLoader: " + task.getTaskType());
+        }
+
+        // ServiceLoader-based discovery for Providers
+        ServiceLoader<TaskProvider> providerLoader = ServiceLoader.load(TaskProvider.class);
+        for (TaskProvider<?, ?> provider : providerLoader) {
+            taskProviders.put(provider.getTaskType().toUpperCase(), provider);
+            LOGGER.info("Discovered provider via ServiceLoader: " + provider.getTaskType() + " (" + provider.getClass().getSimpleName() + ")");
         }
     }
 
