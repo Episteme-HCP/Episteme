@@ -37,10 +37,16 @@ public interface LatticeBoltzmannProvider {
     /**
      * Performs one time step of the LBM simulation (Collision + Streaming).
      * 
-     * @param f        Distribution functions [width][height][9] (modified in-place
-     *                 or updated)
+     * @param f        Distribution functions
      * @param obstacle Boolean mask for obstacles [width][height]
      * @param omega    Relaxation parameter (1/tau)
+     */
+    /**
+     * Performs one time step of the LBM simulation using double primitives.
+     * 
+     * @param f        Distribution functions
+     * @param obstacle Boolean mask for obstacles
+     * @param omega    Relaxation parameter
      */
     void evolve(double[][][] f, boolean[][] obstacle, double omega);
 

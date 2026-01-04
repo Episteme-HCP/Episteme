@@ -40,7 +40,6 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import org.jscience.server.proto.*;
-import org.jscience.physics.classical.mechanics.VelocityVerlet;
 import org.jscience.physics.classical.mechanics.Particle;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.biology.loaders.PDBLoader;
@@ -81,7 +80,8 @@ public class DistributedMolecularDynamicsApp extends Application {
     // Distributed Logic
     private ManagedChannel channel;
     private ComputeServiceGrpc.ComputeServiceBlockingStub blockingStub;
-    private boolean distributed = true; // This variable is now controlled by localSimCheckBox
+    // private boolean distributed = true; // Unused // This variable is now
+    // controlled by localSimCheckBox
     private boolean serverAvailable = false;
     private long stepCount = 0;
 
@@ -210,18 +210,95 @@ public class DistributedMolecularDynamicsApp extends Application {
         }
     }
 
-    private VelocityVerlet localSolver;
+    private org.jscience.technical.backend.algorithms.MolecularDynamicsProvider localProvider;
     private List<Particle> localParticles = new ArrayList<>();
 
     private void runLocalStep() {
-        if (localSolver == null) {
+        if (localParticles.isEmpty()) {
             for (int i = 0; i < NUM_ATOMS; i++) {
                 localParticles.add(new Particle(Math.random() * BOX_SIZE, Math.random() * BOX_SIZE,
                         Math.random() * BOX_SIZE, 1.0));
             }
-            localSolver = new VelocityVerlet(localParticles, BOX_SIZE, 2.5);
         }
-        localSolver.step(0.01);
+
+        if (localProvider == null) {
+            localProvider = new org.jscience.technical.backend.algorithms.MulticoreMolecularDynamicsProvider();
+        }
+
+        // Pack data for Provider
+        int n = localParticles.size();
+        Real[] positions = new Real[n * 3];
+        Real[] velocities = new Real[n * 3];
+        Real[] forces = new Real[n * 3];
+        Real[] masses = new Real[n];
+
+        for (int i = 0; i < n; i++) {
+            Particle p = localParticles.get(i);
+            positions[i * 3] = Real.of(p.getX());
+            positions[i * 3 + 1] = Real.of(p.getY());
+            positions[i * 3 + 2] = Real.of(p.getZ());
+
+            // Assume Particle has velocity getter returning Vector<Double> or similar?
+            // Checking previous view: used p.getVelocity().get(0).doubleValue()
+            // So p.getVelocity() returns Vector<Real> or Vector<Double>?
+            // In init we saw: p.getVelocity().get(0).doubleValue().
+            // Only way is if Vector contains Number/Real.
+            // Let's assume Real.
+            // Wait, previous code: p.getVelocity().get(0).doubleValue()
+
+            // Actually, Particle in jscience-physics usually uses Real.
+            // Let's use Real.of(p.getWx()) if available or get vector.
+
+            // Checking previous code again:
+            // p.getVelocity().get(0).doubleValue()
+            // So it returns Vector with objects.
+
+            velocities[i * 3] = Real.of(p.getVelocity().get(0).doubleValue());
+            velocities[i * 3 + 1] = Real.of(p.getVelocity().get(1).doubleValue());
+            velocities[i * 3 + 2] = Real.of(p.getVelocity().get(2).doubleValue());
+
+            forces[i * 3] = Real.ZERO;
+            forces[i * 3 + 1] = Real.ZERO;
+            forces[i * 3 + 2] = Real.ZERO;
+
+            masses[i] = Real.of(p.getMass().to(org.jscience.measure.Units.KILOGRAM).getValue().doubleValue());
+        }
+
+        // Compute Forces (Lennard-Jones Gas)
+        // Mimic Task Logic
+        localProvider.calculateNonBondedForces(positions, forces, Real.ONE, Real.ONE, Real.of(2.5));
+
+        // Integrate
+        localProvider.integrate(positions, velocities, forces, masses, Real.of(0.01), Real.ONE);
+
+        // Unpack and Box Constraints
+        for (int i = 0; i < n; i++) {
+            Particle p = localParticles.get(i);
+            double x = positions[i * 3].doubleValue();
+            double y = positions[i * 3 + 1].doubleValue();
+            double z = positions[i * 3 + 2].doubleValue();
+            double vx = velocities[i * 3].doubleValue();
+            double vy = velocities[i * 3 + 1].doubleValue();
+            double vz = velocities[i * 3 + 2].doubleValue();
+
+            if (x < 0 || x > BOX_SIZE) {
+                vx *= -1;
+                x = Math.max(0, Math.min(BOX_SIZE, x));
+            }
+            if (y < 0 || y > BOX_SIZE) {
+                vy *= -1;
+                y = Math.max(0, Math.min(BOX_SIZE, y));
+            }
+            if (z < 0 || z > BOX_SIZE) {
+                vz *= -1;
+                z = Math.max(0, Math.min(BOX_SIZE, z));
+            }
+
+            p.setPosition(
+                    DenseVector.of(java.util.Arrays.asList(Real.of(x), Real.of(y), Real.of(z)), Reals.getInstance()));
+            p.setVelocity(DenseVector.of(java.util.Arrays.asList(Real.of(vx), Real.of(vy), Real.of(vz)),
+                    Reals.getInstance()));
+        }
 
         // Sync local to task.atoms for rendering
         List<MolecularDynamicsTask.AtomState> states = new ArrayList<>();
@@ -229,10 +306,11 @@ public class DistributedMolecularDynamicsApp extends Application {
             states.add(new MolecularDynamicsTask.AtomState(p.getX(), p.getY(), p.getZ(),
                     p.getVelocity().get(0).doubleValue(),
                     p.getVelocity().get(1).doubleValue(),
-                    p.getVelocity().get(2).doubleValue(), 1.0));
+                    p.getVelocity().get(2).doubleValue(),
+                    p.getMass().to(org.jscience.measure.Units.KILOGRAM).getValue().doubleValue()));
         }
         task.updateState(states, 0.0);
-        updateUI("Local LBM");
+        updateUI("Local Provider");
     }
 
     private void runDistributedStep() {

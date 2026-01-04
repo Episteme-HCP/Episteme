@@ -27,6 +27,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.distributed.PrecisionMode;
 
 /**
  * DNA Folding Simulation Task.
@@ -49,9 +51,11 @@ public class DnaFoldingTask implements Serializable {
     private final String sequence; // ACGT...
     private final int iterations;
     private final double temperature;
+    private PrecisionMode mode = PrecisionMode.PRIMITIVES;
 
     // Result
     private List<Point3D> foldedStructure;
+    private List<Point3DReal> foldedStructureReal;
     private double finalEnergy;
 
     public DnaFoldingTask(String sequence, int iterations, double temperature) {
@@ -60,7 +64,57 @@ public class DnaFoldingTask implements Serializable {
         this.temperature = temperature;
     }
 
+    public void setMode(PrecisionMode mode) {
+        this.mode = mode;
+    }
+
     public void run() {
+        if (mode == PrecisionMode.REALS) {
+            runReal();
+        } else {
+            runPrimitive();
+        }
+    }
+
+    private void runReal() {
+        List<Point3DReal> structure = new ArrayList<>();
+        Random rand = new Random();
+
+        if (foldedStructureReal == null) {
+            for (int i = 0; i < sequence.length(); i++) {
+                structure.add(new Point3DReal(Real.of(i * 3.4), Real.of(0), Real.of(0)));
+            }
+        } else {
+            structure.addAll(foldedStructureReal);
+        }
+
+        Real currentEnergy = calculateEnergyReal(structure);
+
+        for (int i = 0; i < iterations; i++) {
+            int idx = rand.nextInt(sequence.length());
+            Point3DReal originalPos = structure.get(idx);
+
+            Real dx = Real.of((rand.nextDouble() - 0.5) * 2.0);
+            Real dy = Real.of((rand.nextDouble() - 0.5) * 2.0);
+            Real dz = Real.of((rand.nextDouble() - 0.5) * 2.0);
+            Point3DReal newPos = new Point3DReal(originalPos.x.add(dx), originalPos.y.add(dy), originalPos.z.add(dz));
+
+            structure.set(idx, newPos);
+            Real newEnergy = calculateEnergyReal(structure);
+
+            if (newEnergy.doubleValue() < currentEnergy.doubleValue()
+                    || Math.exp(-(newEnergy.subtract(currentEnergy).doubleValue()) / temperature) > rand.nextDouble()) {
+                currentEnergy = newEnergy;
+            } else {
+                structure.set(idx, originalPos);
+            }
+        }
+
+        this.foldedStructureReal = structure;
+        this.finalEnergy = currentEnergy.doubleValue();
+    }
+
+    private void runPrimitive() {
         List<Point3D> structure = new ArrayList<>();
         Random rand = new Random();
 
@@ -96,6 +150,28 @@ public class DnaFoldingTask implements Serializable {
 
         this.foldedStructure = structure;
         this.finalEnergy = currentEnergy;
+    }
+
+    private Real calculateEnergyReal(List<Point3DReal> points) {
+        Real energy = Real.of(0);
+        Real idealDist = Real.of(3.4);
+        Real k = Real.of(10.0);
+
+        for (int i = 0; i < points.size() - 1; i++) {
+            Real dist = points.get(i).distance(points.get(i + 1));
+            energy = energy.add(k.multiply(dist.subtract(idealDist).pow(2)));
+        }
+
+        for (int i = 0; i < points.size(); i++) {
+            for (int j = i + 2; j < points.size(); j++) {
+                Real dist = points.get(i).distance(points.get(j));
+                if (dist.doubleValue() < 1.0)
+                    energy = energy.add(Real.of(1000));
+                else if (dist.doubleValue() < 6.0 && isPair(sequence.charAt(i), sequence.charAt(j)))
+                    energy = energy.subtract(Real.of(10.0).divide(dist));
+            }
+        }
+        return energy;
     }
 
     private double calculateEnergy(List<Point3D> points) {
@@ -148,6 +224,15 @@ public class DnaFoldingTask implements Serializable {
             double dy = y - other.y;
             double dz = z - other.z;
             return Math.sqrt(dx * dx + dy * dy + dz * dz);
+        }
+    }
+
+    public record Point3DReal(Real x, Real y, Real z) implements Serializable {
+        public Real distance(Point3DReal other) {
+            Real dx = x.subtract(other.x);
+            Real dy = y.subtract(other.y);
+            Real dz = z.subtract(other.z);
+            return dx.pow(2).add(dy.pow(2)).add(dz.pow(2)).sqrt();
         }
     }
 }

@@ -23,14 +23,8 @@
 
 package org.jscience.client.mathematics.montecarlopi;
 
-import org.jscience.mathematics.montecarlo.MonteCarloTask;
-
-import com.google.protobuf.ByteString;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -40,6 +34,9 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import com.google.protobuf.ByteString;
 import org.jscience.server.proto.*;
 
 import java.io.*;
@@ -239,31 +236,41 @@ public class DistributedMonteCarloPiApp extends Application {
     }
 
     private byte[] serializeSamplingTask(long numSamples) throws IOException {
+        // Use proper object serialization of the Task
+        org.jscience.mathematics.montecarlo.MonteCarloPiTask task = new org.jscience.mathematics.montecarlo.MonteCarloPiTask(
+                numSamples);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(bos);
-        dos.writeUTF("MONTECARLO_PI");
-        dos.writeLong(numSamples);
-        dos.flush();
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
+        oos.writeObject(task);
+        oos.flush();
         return bos.toByteArray();
     }
 
     private void applyDistributedResult(byte[] data) throws IOException {
-        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
-        long inside = dis.readLong();
-        long total = dis.readLong();
+        // Result is serialized Long (from Task.execute return value)
+        // WorkerNode serializes the result object.
+        try (ByteArrayInputStream bis = new ByteArrayInputStream(data);
+                ObjectInputStream ois = new ObjectInputStream(bis)) {
+            Long inside = (Long) ois.readObject();
 
-        insideCircle.addAndGet(inside);
-        totalSamples.addAndGet(total);
+            // We know the batch size (implicit via SAMPLES_PER_BATCH / NUM_WORKERS)
+            // But ideally the result should carry it or we track it.
+            // For now, assuming batch size is constant SAMPLES_PER_BATCH / NUM_WORKERS
+            long batchSize = SAMPLES_PER_BATCH / NUM_WORKERS;
+
+            insideCircle.addAndGet(inside);
+            totalSamples.addAndGet(batchSize);
+        } catch (ClassNotFoundException e) {
+            throw new IOException("Failed to deserialize result", e);
+        }
     }
 
     private void performLocalBatch(long batchSize) {
-        long inside = 0;
-        for (long i = 0; i < batchSize && totalSamples.get() < targetSamples; i++) {
-            double x = random.nextDouble() * 2 - 1;
-            double y = random.nextDouble() * 2 - 1;
-            if (x * x + y * y <= 1)
-                inside++;
-        }
+        // Use Provider for local fallback too
+        org.jscience.technical.backend.algorithms.MonteCarloPiProvider provider = new org.jscience.technical.backend.algorithms.MulticoreMonteCarloPiProvider();
+
+        long inside = provider.countPointsInside(batchSize);
+
         insideCircle.addAndGet(inside);
         totalSamples.addAndGet(batchSize);
     }

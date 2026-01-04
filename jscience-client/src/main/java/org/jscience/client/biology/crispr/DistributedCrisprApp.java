@@ -164,7 +164,9 @@ public class DistributedCrisprApp extends Application {
         TableColumn<CrisprTask.Target, Double> colScore = new TableColumn<>("Efficiency Score");
         colScore.setCellValueFactory(new PropertyValueFactory<>("score"));
 
-        resultsTable.getColumns().addAll(colPos, colSpacer, colPam, colScore);
+        @SuppressWarnings("unchecked")
+        TableColumn<CrisprTask.Target, ?>[] columns = new TableColumn[] { colPos, colSpacer, colPam, colScore };
+        resultsTable.getColumns().addAll(columns);
         VBox.setVgrow(resultsTable, javafx.scene.layout.Priority.ALWAYS);
 
         main.getChildren().add(resultsTable);

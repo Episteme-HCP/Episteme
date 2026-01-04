@@ -59,6 +59,34 @@ public interface MolecularDynamicsProvider {
             Real[] bondConstants);
 
     /**
+     * Calculates non-bonded forces (Lennard-Jones).
+     * 
+     * @param positions Flat array of positions
+     * @param forces    Flat array of forces (accumulated)
+     * @param epsilon   Depth of potential well
+     * @param sigma     Finite distance at which inter-particle potential is zero
+     * @param cutoff    Cutoff distance
+     */
+    void calculateNonBondedForces(Real[] positions, Real[] forces, Real epsilon, Real sigma, Real cutoff);
+
+    /**
+     * Integrates using double primitives.
+     */
+    void integrate(double[] positions, double[] velocities, double[] forces, double[] masses, double dt,
+            double damping);
+
+    /**
+     * Calculates bond forces using double primitives.
+     */
+    void calculateBondForces(double[] positions, double[] forces, int[] bondIndices, double[] bondLengths,
+            double[] bondConstants);
+
+    /**
+     * Calculates non-bonded forces using double primitives.
+     */
+    void calculateNonBondedForces(double[] positions, double[] forces, double epsilon, double sigma, double cutoff);
+
+    /**
      * Returns the name of this provider.
      * 
      * @return provider name

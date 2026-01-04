@@ -23,44 +23,22 @@
 
 package org.jscience.technical.backend.algorithms;
 
-import org.jscience.mathematics.numbers.real.Real;
-
 /**
- * Interface for Fast Fourier Transform providers.
+ * Interface for Monte Carlo Pi Estimation providers.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface FFTProvider {
+public interface MonteCarloPiProvider {
 
     /**
-     * Computes the forward FFT of complex data.
+     * Estimates Pi by counting points inside a unit circle.
      * 
-     * @param real Real components
-     * @param imag Imaginary components
-     * @return Transformed data [real, imag]
+     * @param numSamples Number of samples to generate
+     * @return Number of points inside the unit circle
      */
-    Real[][] transform(Real[] real, Real[] imag);
-
-    /**
-     * Computes the inverse FFT of complex data.
-     * 
-     * @param real Real components of the frequency domain
-     * @param imag Imaginary components of the frequency domain
-     * @return Transformed data [real, imag] in time domain
-     */
-    Real[][] inverseTransform(Real[] real, Real[] imag);
-
-    /**
-     * Computes forward FFT using double primitives.
-     */
-    double[][] transform(double[] real, double[] imag);
-
-    /**
-     * Computes inverse FFT using double primitives.
-     */
-    double[][] inverseTransform(double[] real, double[] imag);
+    long countPointsInside(long numSamples);
 
     /**
      * Returns the name of this provider.

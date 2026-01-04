@@ -72,6 +72,14 @@ public class OpenCLBackend implements ComputeBackend {
                     clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, numDevices, devices, null);
                     cl_device_id device = devices[0]; // Use first GPU
 
+                    // Get device name for logging
+                    long size[] = new long[1];
+                    clGetDeviceInfo(device, CL_DEVICE_NAME, 0, null, size);
+                    byte buffer[] = new byte[(int) size[0]];
+                    clGetDeviceInfo(device, CL_DEVICE_NAME, buffer.length, Pointer.to(buffer), null);
+                    String deviceName = new String(buffer, 0, buffer.length - 1);
+                    System.out.println("JScience: OpenCL initialized on device: " + deviceName);
+
                     context = clCreateContext(
                             contextProperties, 1, new cl_device_id[] { device },
                             null, null, null);
@@ -82,11 +90,13 @@ public class OpenCLBackend implements ComputeBackend {
 
                     available = true;
                 }
+            } else {
+                System.err.println("JScience: No OpenCL platform found. Fallback to CPU.");
             }
         } catch (Throwable t) {
             // OpenCL not available
             available = false;
-            // System.err.println("GPU Acceleration unavailable: " + t.getMessage());
+            System.err.println("JScience: GPU Acceleration unavailable (" + t.getMessage() + "). Fallback to CPU.");
         }
     }
 
@@ -118,4 +128,3 @@ public class OpenCLBackend implements ComputeBackend {
         return 10; // Higher priority than CPU
     }
 }
-

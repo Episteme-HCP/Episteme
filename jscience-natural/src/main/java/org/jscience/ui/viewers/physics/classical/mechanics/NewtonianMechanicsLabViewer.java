@@ -80,19 +80,24 @@ public class NewtonianMechanicsLabViewer {
         Canvas canvas = new Canvas(600, 500);
 
         final Quantity<Mass>[] mass = new Quantity[] { Quantities.create(2.0, Units.KILOGRAM) };
-        final double[] k = { 5.0 };
-        final double[] damping = { 0.1 };
-        final double[] pos = { 100.0 }; // m
-        final double[] vel = { 0.0 }; // m/s
+        final org.jscience.mathematics.numbers.real.Real[] k = { org.jscience.mathematics.numbers.real.Real.of(5.0) };
+        final org.jscience.mathematics.numbers.real.Real[] damping = {
+                org.jscience.mathematics.numbers.real.Real.of(0.1) };
+
+        // Physics state in Real
+        final org.jscience.mathematics.numbers.real.Real[] pos = {
+                org.jscience.mathematics.numbers.real.Real.of(100.0) };
+        final org.jscience.mathematics.numbers.real.Real[] vel = { org.jscience.mathematics.numbers.real.Real.ZERO };
 
         VBox controls = new VBox(15);
         controls.setPadding(new Insets(15));
         controls.setPrefWidth(280);
 
         Slider mSlider = labeledSlider("Mass (kg)", 0.5, 10, 2.0, v -> mass[0] = Quantities.create(v, Units.KILOGRAM));
-        Slider kSlider = labeledSlider("Spring k (N/m)", 1, 50, 5.0, v -> k[0] = v);
+        Slider kSlider = labeledSlider("Spring k (N/m)", 1, 50, 5.0,
+                v -> k[0] = org.jscience.mathematics.numbers.real.Real.of(v));
 
-        Label energyLabel = new Label("Energy: 0 J");
+        Label energyLabel = new Label("Energy: (Calculated in Real)");
         Canvas phaseCanvas = new Canvas(200, 200);
         List<Point2D> phaseTrail = new ArrayList<>();
 
@@ -108,21 +113,34 @@ public class NewtonianMechanicsLabViewer {
                     last = now;
                     return;
                 }
-                double dt = (now - last) / 1e9;
+                double dtVal = (now - last) / 1e9;
                 last = now;
 
-                // Verlet Step
-                double[][] result = VerletIntegrator.step(new double[] { pos[0] }, new double[] { vel[0] },
-                        p -> new double[] { (-k[0] * p[0] - damping[0] * vel[0]) / mass[0].getValue().doubleValue() },
-                        dt * 60);
+                org.jscience.mathematics.numbers.real.Real dt = org.jscience.mathematics.numbers.real.Real
+                        .of(dtVal * 60);
+                org.jscience.mathematics.numbers.real.Real massReal = org.jscience.mathematics.numbers.real.Real
+                        .of(mass[0].getValue().doubleValue());
+
+                org.jscience.mathematics.numbers.real.Real[][] result = VerletIntegrator.step(
+                        pos,
+                        vel,
+                        p -> new org.jscience.mathematics.numbers.real.Real[] {
+                                k[0].negate().multiply(p[0]).subtract(damping[0].multiply(vel[0])).divide(massReal)
+                        },
+                        dt);
+
                 pos[0] = result[0][0];
                 vel[0] = result[1][0];
 
-                drawSpring(canvas, pos[0], mass[0].getValue().doubleValue());
-                phaseTrail.add(new Point2D(pos[0], vel[0]));
+                // Convert to double only for rendering
+                double drawPos = pos[0].doubleValue();
+                double drawVel = vel[0].doubleValue();
+
+                drawSpring(canvas, drawPos, mass[0].getValue().doubleValue());
+                phaseTrail.add(new Point2D(drawPos, drawVel));
                 if (phaseTrail.size() > 200)
                     phaseTrail.remove(0);
-                drawPhaseplot(phaseCanvas, phaseTrail, pos[0], vel[0], 150, 10);
+                drawPhaseplot(phaseCanvas, phaseTrail, drawPos, drawVel, 150, 10);
             }
         }.start();
 
@@ -156,16 +174,19 @@ public class NewtonianMechanicsLabViewer {
         Tab tab = new Tab("Simple Pendulum");
         Canvas canvas = new Canvas(600, 500);
 
-        final double[] length = { 200.0 };
-        final double[] angle = { Math.PI / 4 };
-        final double[] angVel = { 0.0 };
-        final double g = 9.81;
+        final org.jscience.mathematics.numbers.real.Real[] length = {
+                org.jscience.mathematics.numbers.real.Real.of(200.0) };
+        final org.jscience.mathematics.numbers.real.Real[] angle = {
+                org.jscience.mathematics.numbers.real.Real.of(Math.PI / 4) };
+        final org.jscience.mathematics.numbers.real.Real[] angVel = { org.jscience.mathematics.numbers.real.Real.ZERO };
+        final org.jscience.mathematics.numbers.real.Real g = org.jscience.mathematics.numbers.real.Real.of(9.81);
 
         VBox controls = new VBox(15);
         controls.setPadding(new Insets(15));
-        Slider lSlider = labeledSlider("Length (m)", 1, 5, 2.0, v -> length[0] = v * 100);
+        Slider lSlider = labeledSlider("Length (m)", 1, 5, 2.0,
+                v -> length[0] = org.jscience.mathematics.numbers.real.Real.of(v * 100));
 
-        Label pLabel = new Label("Period: ");
+        Label pLabel = new Label("Period: (Real)");
         Canvas phaseCanvas = new Canvas(200, 200);
         List<Point2D> phaseTrail = new ArrayList<>();
 
@@ -178,20 +199,42 @@ public class NewtonianMechanicsLabViewer {
                     last = now;
                     return;
                 }
-                double dt = (now - last) / 1e9;
+                double dtVal = (now - last) / 1e9;
                 last = now;
+                org.jscience.mathematics.numbers.real.Real dt = org.jscience.mathematics.numbers.real.Real.of(dtVal);
 
-                double L = length[0] / 100.0;
-                double[][] res = VerletIntegrator.step(new double[] { angle[0] }, new double[] { angVel[0] },
-                        p -> new double[] { -(g / L) * Math.sin(p[0]) }, dt);
+                org.jscience.mathematics.numbers.real.Real L = length[0]
+                        .divide(org.jscience.mathematics.numbers.real.Real.of(100.0));
+
+                org.jscience.mathematics.numbers.real.Real[][] res = VerletIntegrator.step(
+                        angle,
+                        angVel,
+                        p -> {
+                            // -(g / L) * sin(p[0])
+                            // Note: Real doesn't have sin() convenience yet likely, fallback to double for
+                            // sin?
+                            // Or assuming MathContext used internally.
+                            // Since Real.of(double) is used, we can do:
+                            double val = p[0].doubleValue();
+                            double s = Math.sin(val);
+                            return new org.jscience.mathematics.numbers.real.Real[] {
+                                    g.negate().divide(L).multiply(org.jscience.mathematics.numbers.real.Real.of(s))
+                            };
+                        },
+                        dt);
+
                 angle[0] = res[0][0];
-                angVel[0] = res[1][0] * 0.999;
+                angVel[0] = res[1][0].multiply(org.jscience.mathematics.numbers.real.Real.of(0.999));
 
-                drawPendulum(canvas, length[0], angle[0]);
-                phaseTrail.add(new Point2D(angle[0], angVel[0]));
+                double drawLen = length[0].doubleValue();
+                double drawAng = angle[0].doubleValue();
+                double drawVel = angVel[0].doubleValue();
+
+                drawPendulum(canvas, drawLen, drawAng);
+                phaseTrail.add(new Point2D(drawAng, drawVel));
                 if (phaseTrail.size() > 200)
                     phaseTrail.remove(0);
-                drawPhaseplot(phaseCanvas, phaseTrail, angle[0], angVel[0], 1.5, 3.0);
+                drawPhaseplot(phaseCanvas, phaseTrail, drawAng, drawVel, 1.5, 3.0);
             }
         }.start();
 
@@ -218,15 +261,18 @@ public class NewtonianMechanicsLabViewer {
     private static Tab createGravityTab() {
         Tab tab = new Tab("Free Fall");
         Canvas canvas = new Canvas(600, 500);
-        final double[] y = { 50.0 }, vy = { 0.0 };
+
+        final org.jscience.mathematics.numbers.real.Real[] y = { org.jscience.mathematics.numbers.real.Real.of(50.0) };
+        final org.jscience.mathematics.numbers.real.Real[] vy = { org.jscience.mathematics.numbers.real.Real.ZERO };
+
         final boolean[] running = { false };
-        final double g = 9.81 * 30;
+        final org.jscience.mathematics.numbers.real.Real g = org.jscience.mathematics.numbers.real.Real.of(9.81 * 30);
 
         VBox controls = new VBox(15);
         Button drop = new Button("Drop");
         drop.setOnAction(e -> {
-            y[0] = 50;
-            vy[0] = 0;
+            y[0] = org.jscience.mathematics.numbers.real.Real.of(50.0);
+            vy[0] = org.jscience.mathematics.numbers.real.Real.ZERO;
             running[0] = true;
         });
         controls.getChildren().addAll(drop);
@@ -240,15 +286,20 @@ public class NewtonianMechanicsLabViewer {
                     last = now;
                     return;
                 }
-                double dt = (now - last) / 1e9;
+                double dtVal = (now - last) / 1e9;
                 last = now;
-                if (running[0] && y[0] < 420) {
-                    double[][] res = VerletIntegrator.step(new double[] { y[0] }, new double[] { vy[0] },
-                            p -> new double[] { g }, dt);
+                org.jscience.mathematics.numbers.real.Real dt = org.jscience.mathematics.numbers.real.Real.of(dtVal);
+
+                if (running[0] && y[0].doubleValue() < 420) {
+                    org.jscience.mathematics.numbers.real.Real[][] res = VerletIntegrator.step(
+                            y,
+                            vy,
+                            p -> new org.jscience.mathematics.numbers.real.Real[] { g },
+                            dt);
                     y[0] = res[0][0];
                     vy[0] = res[1][0];
                 }
-                drawGravity(canvas, y[0]);
+                drawGravity(canvas, y[0].doubleValue());
             }
         }.start();
 
@@ -269,7 +320,16 @@ public class NewtonianMechanicsLabViewer {
     private static Tab createCollisionTab() {
         Tab tab = new Tab("1D Collision");
         Canvas canvas = new Canvas(700, 300);
-        final double[] m1 = { 2.0 }, m2 = { 1.0 }, v1 = { 3.0 }, v2 = { -1.0 }, x1 = { 100 }, x2 = { 400 };
+
+        final org.jscience.mathematics.numbers.real.Real[] m1 = { org.jscience.mathematics.numbers.real.Real.of(2.0) };
+        final org.jscience.mathematics.numbers.real.Real[] m2 = { org.jscience.mathematics.numbers.real.Real.of(1.0) };
+        final org.jscience.mathematics.numbers.real.Real[] v1 = { org.jscience.mathematics.numbers.real.Real.of(3.0) };
+        final org.jscience.mathematics.numbers.real.Real[] v2 = { org.jscience.mathematics.numbers.real.Real.of(-1.0) };
+        final org.jscience.mathematics.numbers.real.Real[] x1 = {
+                org.jscience.mathematics.numbers.real.Real.of(100.0) };
+        final org.jscience.mathematics.numbers.real.Real[] x2 = {
+                org.jscience.mathematics.numbers.real.Real.of(400.0) };
+
         final boolean[] collided = { false };
 
         new AnimationTimer() {
@@ -281,20 +341,39 @@ public class NewtonianMechanicsLabViewer {
                     last = now;
                     return;
                 }
-                double dt = (now - last) / 1e9;
+                double dtVal = (now - last) / 1e9;
                 last = now;
-                x1[0] += v1[0] * dt * 50;
-                x2[0] += v2[0] * dt * 50;
-                double r1 = 20 + m1[0] * 5, r2 = 20 + m2[0] * 5;
-                if (!collided[0] && Math.abs(x1[0] - x2[0]) < (r1 + r2)) {
-                    double nv1 = ((m1[0] - m2[0]) * v1[0] + 2 * m2[0] * v2[0]) / (m1[0] + m2[0]);
-                    double nv2 = ((m2[0] - m1[0]) * v2[0] + 2 * m1[0] * v1[0]) / (m1[0] + m2[0]);
+                org.jscience.mathematics.numbers.real.Real dt = org.jscience.mathematics.numbers.real.Real
+                        .of(dtVal * 50);
+
+                x1[0] = x1[0].add(v1[0].multiply(dt));
+                x2[0] = x2[0].add(v2[0].multiply(dt));
+
+                double r1Val = 20 + m1[0].doubleValue() * 5;
+                double r2Val = 20 + m2[0].doubleValue() * 5;
+
+                double x1Val = x1[0].doubleValue();
+                double x2Val = x2[0].doubleValue();
+
+                if (!collided[0] && Math.abs(x1Val - x2Val) < (r1Val + r2Val)) {
+                    // nv1 = ((m1 - m2)v1 + 2m2v2) / (m1 + m2)
+                    org.jscience.mathematics.numbers.real.Real num1 = m1[0].subtract(m2[0]).multiply(v1[0])
+                            .add(m2[0].multiply(v2[0]).multiply(org.jscience.mathematics.numbers.real.Real.of(2.0)));
+                    org.jscience.mathematics.numbers.real.Real den = m1[0].add(m2[0]);
+                    org.jscience.mathematics.numbers.real.Real nv1 = num1.divide(den);
+
+                    // nv2 = ((m2 - m1)v2 + 2m1v1) / (m1 + m2)
+                    org.jscience.mathematics.numbers.real.Real num2 = m2[0].subtract(m1[0]).multiply(v2[0])
+                            .add(m1[0].multiply(v1[0]).multiply(org.jscience.mathematics.numbers.real.Real.of(2.0)));
+                    org.jscience.mathematics.numbers.real.Real nv2 = num2.divide(den);
+
                     v1[0] = nv1;
                     v2[0] = nv2;
                     collided[0] = true;
-                } else if (Math.abs(x1[0] - x2[0]) > (r1 + r2))
+                } else if (Math.abs(x1Val - x2Val) > (r1Val + r2Val))
                     collided[0] = false;
-                drawCollision(canvas, x1[0], x2[0], m1[0], m2[0]);
+
+                drawCollision(canvas, x1Val, x2Val, m1[0].doubleValue(), m2[0].doubleValue());
             }
         }.start();
 

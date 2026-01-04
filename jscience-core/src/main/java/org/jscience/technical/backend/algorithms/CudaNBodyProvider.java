@@ -24,7 +24,7 @@
 package org.jscience.technical.backend.algorithms;
 
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.technical.backend.cuda.CudaBackend;
+import org.jscience.technical.backend.cuda.CUDABackend;
 
 import java.util.logging.Logger;
 
@@ -41,22 +41,21 @@ import java.util.logging.Logger;
  * @since 1.0
  * @see OpenCLNBodyProvider
  */
-public class CudaNBodyProvider {
-
-    private static final Logger LOGGER = Logger.getLogger(CudaNBodyProvider.class.getName());
+public class CUDANBodyProvider implements NBodyProvider {
+    private static final Logger LOGGER = Logger.getLogger(CUDANBodyProvider.class.getName());
     private static final int GPU_THRESHOLD = 1000;
 
-    private final CudaBackend gpuBackend;
+    private final CUDABackend gpuBackend;
     private final boolean gpuAvailable;
 
     /**
      * Creates a new CUDA N-Body provider.
      */
-    public CudaNBodyProvider() {
-        CudaBackend backend = null;
+    public CUDANBodyProvider() {
+        CUDABackend backend = null;
         boolean available = false;
         try {
-            backend = new CudaBackend();
+            backend = new CUDABackend();
             available = backend.isAvailable();
             if (available) {
                 LOGGER.info("CUDA N-Body provider initialized with GPU support");
@@ -77,21 +76,14 @@ public class CudaNBodyProvider {
         return gpuAvailable;
     }
 
-    /**
-     * Computes gravitational forces between particles using CUDA if beneficial.
-     *
-     * @param positions particle positions [x0,y0,z0,x1,y1,z1,...]
-     * @param masses    particle masses
-     * @param forces    output array for forces
-     * @param G         gravitational constant
-     */
-    public void computeForces(double[] positions, double[] masses, double[] forces, double G) {
+    @Override
+    public void computeForces(double[] positions, double[] masses, double[] forces, double G, double softening) {
         int numParticles = masses.length;
 
         if (gpuAvailable && numParticles >= GPU_THRESHOLD) {
-            computeForcesCUDA(positions, masses, forces, G);
+            computeForcesCUDA(positions, masses, forces, G, softening);
         } else {
-            computeForcesCPU(positions, masses, forces, G);
+            computeForcesCPU(positions, masses, forces, G, softening);
         }
     }
 
@@ -103,7 +95,8 @@ public class CudaNBodyProvider {
      * @param forces    output forces as Real[]
      * @param G         gravitational constant as Real
      */
-    public void computeForces(Real[] positions, Real[] masses, Real[] forces, Real G) {
+    @Override
+    public void computeForces(Real[] positions, Real[] masses, Real[] forces, Real G, Real softening) {
         double[] posD = new double[positions.length];
         double[] massD = new double[masses.length];
         double[] forceD = new double[forces.length];
@@ -115,23 +108,23 @@ public class CudaNBodyProvider {
             massD[i] = masses[i].doubleValue();
         }
 
-        computeForces(posD, massD, forceD, G.doubleValue());
+        computeForces(posD, massD, forceD, G.doubleValue(), softening.doubleValue());
 
         for (int i = 0; i < forces.length; i++) {
             forces[i] = Real.of(forceD[i]);
         }
     }
 
-    private void computeForcesCUDA(double[] positions, double[] masses, double[] forces, double G) {
+    private void computeForcesCUDA(double[] positions, double[] masses, double[] forces, double G, double softening) {
         LOGGER.fine("Executing N-Body forces on CUDA for " + masses.length + " particles");
         // CUDA kernel execution via JCuda would go here
         // Fallback to CPU for now
-        computeForcesCPU(positions, masses, forces, G);
+        computeForcesCPU(positions, masses, forces, G, softening);
     }
 
-    private void computeForcesCPU(double[] positions, double[] masses, double[] forces, double G) {
+    private void computeForcesCPU(double[] positions, double[] masses, double[] forces, double G, double softening) {
         int numParticles = masses.length;
-        double softening = 1e-9;
+        // double softening = 1e-9;
 
         java.util.Arrays.fill(forces, 0);
 

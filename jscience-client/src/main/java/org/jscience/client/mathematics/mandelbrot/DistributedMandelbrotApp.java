@@ -44,6 +44,9 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import com.google.protobuf.ByteString;
 import org.jscience.mathematics.numbers.complex.Complex;
 import org.jscience.server.proto.*;
 
@@ -81,7 +84,6 @@ public class DistributedMandelbrotApp extends Application {
     private Label statusLabel;
     private Label timeLabel;
     private Button computeBtn;
-
 
     private ToggleButton localModeToggle;
     private CheckBox highPrecisionToggle;
@@ -165,7 +167,7 @@ public class DistributedMandelbrotApp extends Application {
 
     private void startLocalComputation(long startTime, AtomicInteger completed) {
         for (int slice = 0; slice < SLICES; slice++) {
-            final int sliceNum = slice;
+            // final int sliceNum = slice;
             final int startY = slice * ROWS_PER_SLICE;
             final int endY = Math.min(startY + ROWS_PER_SLICE, HEIGHT);
 
@@ -183,7 +185,7 @@ public class DistributedMandelbrotApp extends Application {
     }
 
     private void startGridComputation(long startTime, AtomicInteger completed) {
-        ConcurrentHashMap<String, int[]> results = new ConcurrentHashMap<>();
+        // ConcurrentHashMap<String, int[]> results = new ConcurrentHashMap<>();
         CountDownLatch latch = new CountDownLatch(SLICES);
 
         for (int slice = 0; slice < SLICES; slice++) {
@@ -195,9 +197,9 @@ public class DistributedMandelbrotApp extends Application {
             String taskId = "mandel-" + slice + "-" + System.currentTimeMillis();
             byte[] taskData = serializeSliceTask(startY, endY);
 
-            String type = (highPrecisionToggle != null && highPrecisionToggle.isSelected()) ? 
-                    "MANDELBROT_REAL" : "MANDELBROT";
-            
+            String type = (highPrecisionToggle != null && highPrecisionToggle.isSelected()) ? "MANDELBROT_REAL"
+                    : "MANDELBROT";
+
             TaskRequest request = TaskRequest.newBuilder()
                     .setTaskId(taskId)
                     .setTaskType(type)
@@ -269,17 +271,17 @@ public class DistributedMandelbrotApp extends Application {
             // Calculate Y bounds for this slice (top is y=0 -> maxIm)
             double sliceMaxIm = maxIm - startY * imFactor;
             double sliceMinIm = maxIm - (endY - 1) * imFactor;
-            
+
             MandelbrotTask task;
             if (highPrecisionToggle != null && highPrecisionToggle.isSelected()) {
-                task = new RealMandelbrotTask(WIDTH, sliceHeight, 
-                        Real.of(minRe), Real.of(maxRe), 
-                        Real.of(sliceMinIm), Real.of(sliceMaxIm), 
+                task = new RealMandelbrotTask(WIDTH, sliceHeight,
+                        Real.of(minRe), Real.of(maxRe),
+                        Real.of(sliceMinIm), Real.of(sliceMaxIm),
                         100);
             } else {
                 task = new MandelbrotTask(WIDTH, sliceHeight, minRe, maxRe, sliceMinIm, sliceMaxIm);
             }
-            
+
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(bos);
             oos.writeObject(task);
@@ -297,8 +299,9 @@ public class DistributedMandelbrotApp extends Application {
             MandelbrotTask resultTask = (MandelbrotTask) ois.readObject();
             // result is 2D array [width][height]
             int[][] result2D = resultTask.getResult();
-            if (result2D == null) return new int[0];
-            
+            if (result2D == null)
+                return new int[0];
+
             // Flatten to 1D for renderer (or update renderer to support 2D)
             // Existing logic expected 1D flat array [rows * WIDTH]
             int w = resultTask.getWidth();
@@ -403,7 +406,8 @@ public class DistributedMandelbrotApp extends Application {
         Button loadCfgBtn = new Button("📂 Load Config");
         loadCfgBtn.setOnAction(e -> loadConfig((Stage) computeBtn.getScene().getWindow()));
 
-        header.getChildren().addAll(title, spacer, localModeToggle, highPrecisionToggle, computeBtn, saveImgBtn, saveCfgBtn, loadCfgBtn);
+        header.getChildren().addAll(title, spacer, localModeToggle, highPrecisionToggle, computeBtn, saveImgBtn,
+                saveCfgBtn, loadCfgBtn);
         return header;
     }
 

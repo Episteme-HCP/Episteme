@@ -21,33 +21,41 @@
  * SOFTWARE.
  */
 
-package org.jscience.technical.backend.cuda;
+package org.jscience.technical.backend.algorithms;
 
-import org.jscience.technical.backend.ExecutionContext;
-import org.jscience.technical.backend.Operation;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.LongStream;
 
 /**
- * CUDA Execution Context.
- *
+ * Multicore implementation of MonteCarloPiProvider.
+ * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CudaExecutionContext implements ExecutionContext {
+public class MulticoreMonteCarloPiProvider implements MonteCarloPiProvider {
 
-    public CudaExecutionContext() {
-        // Initialize CUDA context if needed, or rely on JCuda's static context
-        // management
+    @Override
+    public long countPointsInside(long numSamples) {
+        // Use parallel stream for efficient multicore utility.
+        // ThreadLocalRandom is efficient for parallel streams.
+        // We chunk the stream? LongStream.range does split efficiently?
+        // Yes, but generating randoms in map is fine.
+
+        // Optimisation: avoid mapToObj. Use generic map or just filter count.
+        // filter(i -> inside).count()
+
+        return LongStream.range(0, numSamples).parallel()
+                .filter(i -> {
+                    double x = ThreadLocalRandom.current().nextDouble();
+                    double y = ThreadLocalRandom.current().nextDouble();
+                    return (x * x + y * y) <= 1.0;
+                })
+                .count();
     }
 
     @Override
-    public <T> T execute(Operation<T> operation) {
-        return operation.compute(this);
-    }
-
-    @Override
-    public void close() {
-        // Cleanup resources
+    public String getName() {
+        return "Multicore Monte Carlo";
     }
 }
-

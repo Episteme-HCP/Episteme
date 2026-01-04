@@ -23,7 +23,8 @@
 
 package org.jscience.technical.backend.algorithms;
 
-import org.jscience.technical.backend.cuda.CudaBackend;
+import org.jscience.technical.backend.cuda.CUDABackend;
+import org.jscience.mathematics.numbers.real.Real;
 
 import java.util.logging.Logger;
 
@@ -40,21 +41,22 @@ import java.util.logging.Logger;
  * @since 1.0
  * @see OpenCLFFTProvider
  */
-public class CudaFFTProvider {
+public class CUDAFFTProvider implements FFTProvider {
 
-    private static final Logger LOGGER = Logger.getLogger(CudaFFTProvider.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CUDAFFTProvider.class.getName());
     private static final int GPU_THRESHOLD = 4096;
 
     final boolean gpuAvailable;
+    private final CUDABackend gpuBackend;
 
     /**
      * Creates a new CUDA FFT provider.
      */
-    public CudaFFTProvider() {
+    public CUDAFFTProvider() {
+        this.gpuBackend = new CUDABackend();
         boolean available = false;
         try {
-            CudaBackend backend = new CudaBackend();
-            available = backend.isAvailable();
+            available = gpuBackend.isAvailable();
             if (available) {
                 LOGGER.info("CUDA FFT provider initialized with cuFFT support");
             }
@@ -73,8 +75,80 @@ public class CudaFFTProvider {
         return gpuAvailable;
     }
 
+    @Override
+    public Real[][] transform(Real[] real, Real[] imag) {
+        int n = real.length;
+        double[] r = new double[n];
+        double[] i = new double[n];
+        for (int k = 0; k < n; k++) {
+            r[k] = real[k].doubleValue();
+            i[k] = imag[k].doubleValue();
+        }
+
+        forward(r, i);
+
+        Real[] outR = new Real[n];
+        Real[] outI = new Real[n];
+        for (int k = 0; k < n; k++) {
+            outR[k] = Real.of(r[k]);
+            outI[k] = Real.of(i[k]);
+        }
+        return new Real[][] { outR, outI };
+    }
+
+    @Override
+    public Real[][] inverseTransform(Real[] real, Real[] imag) {
+        int n = real.length;
+        double[] r = new double[n];
+        double[] i = new double[n];
+        for (int k = 0; k < n; k++) {
+            r[k] = real[k].doubleValue();
+            i[k] = imag[k].doubleValue();
+        }
+
+        inverse(r, i);
+
+        Real[] outR = new Real[n];
+        Real[] outI = new Real[n];
+        for (int k = 0; k < n; k++) {
+            outR[k] = Real.of(r[k]);
+            outI[k] = Real.of(i[k]);
+        }
+        return new Real[][] { outR, outI };
+    }
+
+    @Override
+    public double[][] transform(double[] real, double[] imag) {
+        int n = real.length;
+
+        if (gpuAvailable && n >= GPU_THRESHOLD && isPowerOfTwo(n)) {
+            forwardCUDA(real, imag);
+        } else {
+            forwardCPU(real, imag);
+        }
+        return new double[][] { real, imag };
+    }
+
+    @Override
+    public double[][] inverseTransform(double[] real, double[] imag) {
+        int n = real.length;
+
+        for (int i = 0; i < n; i++) {
+            imag[i] = -imag[i];
+        }
+
+        transform(real, imag);
+
+        double scale = 1.0 / n;
+        for (int i = 0; i < n; i++) {
+            real[i] *= scale;
+            imag[i] = -imag[i] * scale;
+        }
+        return new double[][] { real, imag };
+    }
+
     /**
-     * Computes the forward FFT of complex data.
+     * Computes the forward FFT of complex data (primitive double API).
      *
      * @param real real parts of input/output
      * @param imag imaginary parts of input/output
@@ -90,25 +164,13 @@ public class CudaFFTProvider {
     }
 
     /**
-     * Computes the inverse FFT of complex data.
+     * Computes the inverse FFT of complex data (primitive double API).
      *
      * @param real real parts of input/output
      * @param imag imaginary parts of input/output
      */
     public void inverse(double[] real, double[] imag) {
-        int n = real.length;
-
-        for (int i = 0; i < n; i++) {
-            imag[i] = -imag[i];
-        }
-
-        forward(real, imag);
-
-        double scale = 1.0 / n;
-        for (int i = 0; i < n; i++) {
-            real[i] *= scale;
-            imag[i] = -imag[i] * scale;
-        }
+        inverseTransform(real, imag);
     }
 
     private void forwardCUDA(double[] real, double[] imag) {

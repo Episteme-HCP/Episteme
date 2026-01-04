@@ -97,6 +97,41 @@ public class MulticoreNBodyProvider implements NBodyProvider {
     }
 
     @Override
+    public void computeForces(double[] positions, double[] masses, double[] forces, double G, double softening) {
+        int n = masses.length;
+        double soft2 = softening * softening;
+
+        IntStream.range(0, n).parallel().forEach(i -> {
+            double fx = 0, fy = 0, fz = 0;
+            double xi = positions[i * 3];
+            double yi = positions[i * 3 + 1];
+            double zi = positions[i * 3 + 2];
+            double mi = masses[i];
+
+            for (int j = 0; j < n; j++) {
+                if (i == j)
+                    continue;
+
+                double dx = positions[j * 3] - xi;
+                double dy = positions[j * 3 + 1] - yi;
+                double dz = positions[j * 3 + 2] - zi;
+
+                double dist2 = dx * dx + dy * dy + dz * dz + soft2;
+                double dist = Math.sqrt(dist2);
+                double f = G * mi * masses[j] / (dist2 * dist);
+
+                fx += f * dx;
+                fy += f * dy;
+                fz += f * dz;
+            }
+
+            forces[i * 3] = fx;
+            forces[i * 3 + 1] = fy;
+            forces[i * 3 + 2] = fz;
+        });
+    }
+
+    @Override
     public String getName() {
         return "Multicore N-Body (CPU)";
     }

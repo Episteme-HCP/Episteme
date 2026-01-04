@@ -40,7 +40,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.jscience.earth.climate.GeneralCirculationModelTask;
-import org.jscience.client.earth.climatesim.ClimateDataLoader;
+
 import org.jscience.io.scientific.VTKLoader;
 import org.jscience.server.proto.*;
 

@@ -24,6 +24,8 @@
 package org.jscience.earth.climate;
 
 import java.io.Serializable;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.distributed.PrecisionMode;
 
 /**
  * Climate Model Simulation Task.
@@ -49,6 +51,8 @@ public class ClimateModelTask implements Serializable {
     private final int latitudeBins;
     private final int longitudeBins;
     private double[][] temperature; // [lat][long] in Kelvin
+    private Real[][] temperatureReal;
+    private PrecisionMode mode = PrecisionMode.PRIMITIVES;
 
     // Physical Constants
     private static final double SOLAR_CONSTANT = 1361.0; // W/m^2
@@ -60,7 +64,35 @@ public class ClimateModelTask implements Serializable {
         this.latitudeBins = latBins;
         this.longitudeBins = longBins;
         this.temperature = new double[latBins][longBins];
+        this.temperatureReal = new Real[latBins][longBins];
         initialize();
+    }
+
+    public void setMode(PrecisionMode mode) {
+        if (this.mode != mode) {
+            if (mode == PrecisionMode.REALS) {
+                syncToReal();
+            } else {
+                syncFromReal();
+            }
+            this.mode = mode;
+        }
+    }
+
+    private void syncToReal() {
+        for (int i = 0; i < latitudeBins; i++) {
+            for (int j = 0; j < longitudeBins; j++) {
+                temperatureReal[i][j] = Real.of(temperature[i][j]);
+            }
+        }
+    }
+
+    private void syncFromReal() {
+        for (int i = 0; i < latitudeBins; i++) {
+            for (int j = 0; j < longitudeBins; j++) {
+                temperature[i][j] = temperatureReal[i][j].doubleValue();
+            }
+        }
     }
 
     private void initialize() {
@@ -68,12 +100,59 @@ public class ClimateModelTask implements Serializable {
             for (int j = 0; j < longitudeBins; j++) {
                 // Initial guess: 288K with some gradient
                 double lat = Math.PI * (i - latitudeBins / 2.0) / latitudeBins;
-                temperature[i][j] = 288.0 - 50 * Math.abs(Math.sin(lat));
+                double val = 288.0 - 50 * Math.abs(Math.sin(lat));
+                temperature[i][j] = val;
+                temperatureReal[i][j] = Real.of(val);
             }
         }
     }
 
     public void runStep(double dt) {
+        if (mode == PrecisionMode.REALS) {
+            runStepReal(Real.of(dt));
+        } else {
+            runStepPrimitive(dt);
+        }
+    }
+
+    private void runStepReal(Real dt) {
+        Real[][] nextTemp = new Real[latitudeBins][longitudeBins];
+        Real s0 = Real.of(SOLAR_CONSTANT);
+        Real a = Real.of(ALBEDO);
+        Real eps = Real.of(EMISSIVITY);
+        Real sigma = Real.of(SIGMA);
+        Real kAlbedo = Real.of(1.0).subtract(a);
+        Real k4 = Real.of(4.0);
+        Real k100 = Real.of(100.0);
+        Real heatCap = Real.of(10e6);
+
+        for (int i = 0; i < latitudeBins; i++) {
+            double latVal = Math.PI * (i + 0.5) / latitudeBins - Math.PI / 2.0;
+            Real latCos = Real.of(Math.cos(latVal));
+
+            for (int j = 0; j < longitudeBins; j++) {
+                // 1. Insolation
+                Real insolation = s0.multiply(kAlbedo).multiply(latCos).divide(k4);
+
+                // 2. OLR
+                Real t = temperatureReal[i][j];
+                Real olr = eps.multiply(sigma).multiply(t.pow(4));
+
+                // 3. Diffusion
+                int west = (j - 1 + longitudeBins) % longitudeBins;
+                int east = (j + 1) % longitudeBins;
+                Real diff = temperatureReal[i][west].add(temperatureReal[i][east])
+                        .subtract(t.multiply(Real.of(2.0)));
+                Real flux = diff.multiply(Real.of(0.1));
+
+                Real rate = insolation.subtract(olr).add(flux.multiply(k100)).divide(heatCap);
+                nextTemp[i][j] = t.add(rate.multiply(dt));
+            }
+        }
+        temperatureReal = nextTemp;
+    }
+
+    private void runStepPrimitive(double dt) {
         double[][] nextTemp = new double[latitudeBins][longitudeBins];
         double s0 = SOLAR_CONSTANT;
         double a = ALBEDO;

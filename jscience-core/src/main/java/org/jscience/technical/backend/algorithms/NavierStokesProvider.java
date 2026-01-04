@@ -23,8 +23,11 @@
 
 package org.jscience.technical.backend.algorithms;
 
+import org.jscience.mathematics.numbers.real.Real;
+
 /**
- * Interface for Navier-Stokes Fluid Dynamics providers.
+ * Interface for Navier-Stokes Fluid Dynamics providers using High-Precision
+ * Real numbers.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -33,13 +36,28 @@ package org.jscience.technical.backend.algorithms;
 public interface NavierStokesProvider {
 
     /**
-     * Solves one time step of the Navier-Stokes equations used detailed arrays.
-     * All arrays are flattened 1D arrays of size width*height*depth.
+     * Solves one time step of the Navier-Stokes equations using Real arrays.
      * 
      * @param density   Density field (read/write)
      * @param u         Velocity X field (read/write)
      * @param v         Velocity Y field (read/write)
      * @param w         Velocity Z field (read/write)
+     * @param dt        Time step
+     * @param viscosity Viscosity
+     * @param width     Grid width
+     * @param height    Grid height
+     * @param depth     Grid depth
+     */
+    void solve(Real[] density, Real[] u, Real[] v, Real[] w, Real dt, Real viscosity, int width, int height,
+            int depth);
+
+    /**
+     * Solves one time step using double primitives.
+     * 
+     * @param density   Density field
+     * @param u         Velocity X field
+     * @param v         Velocity Y field
+     * @param w         Velocity Z field
      * @param dt        Time step
      * @param viscosity Viscosity
      * @param width     Grid width

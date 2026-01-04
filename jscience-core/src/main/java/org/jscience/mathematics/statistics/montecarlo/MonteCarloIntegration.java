@@ -26,7 +26,7 @@ package org.jscience.mathematics.statistics.montecarlo;
 import java.util.Random;
 import java.util.function.Function;
 import org.jscience.technical.backend.algorithms.MonteCarloProvider;
-import org.jscience.technical.backend.algorithms.ParallelMonteCarloProvider;
+import org.jscience.technical.backend.algorithms.MulticoreMonteCarloProvider;
 
 /**
  * Monte Carlo integration methods.
@@ -88,7 +88,8 @@ public class MonteCarloIntegration {
      */
     public double integrateND(Function<double[], Double> f, double[] lower, double[] upper, int samples) {
         if (provider == null) {
-            provider = new ParallelMonteCarloProvider();
+            // Default to multicore provider
+            provider = new org.jscience.technical.backend.algorithms.MulticoreMonteCarloProvider();
         }
 
         int dim = lower.length;

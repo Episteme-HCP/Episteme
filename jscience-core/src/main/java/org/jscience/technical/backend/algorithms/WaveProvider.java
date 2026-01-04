@@ -26,41 +26,37 @@ package org.jscience.technical.backend.algorithms;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * Interface for Fast Fourier Transform providers.
+ * Interface for Wave Equation providers using High-Precision Real numbers.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface FFTProvider {
+public interface WaveProvider {
 
     /**
-     * Computes the forward FFT of complex data.
+     * Solves one time step of the 2D Wave Equation.
      * 
-     * @param real Real components
-     * @param imag Imaginary components
-     * @return Transformed data [real, imag]
+     * @param u       Current wave height state (Real[][])
+     * @param uPrev   Previous wave height state (Real[][])
+     * @param width   Width of grid
+     * @param height  Height of grid
+     * @param c       Wave speed
+     * @param damping Damping factor
      */
-    Real[][] transform(Real[] real, Real[] imag);
+    void solve(Real[][] u, Real[][] uPrev, int width, int height, Real c, Real damping);
 
     /**
-     * Computes the inverse FFT of complex data.
+     * Solves one time step using double primitives.
      * 
-     * @param real Real components of the frequency domain
-     * @param imag Imaginary components of the frequency domain
-     * @return Transformed data [real, imag] in time domain
+     * @param u       Current wave height state
+     * @param uPrev   Previous wave height state
+     * @param width   Width of grid
+     * @param height  Height of grid
+     * @param c       Wave speed
+     * @param damping Damping factor
      */
-    Real[][] inverseTransform(Real[] real, Real[] imag);
-
-    /**
-     * Computes forward FFT using double primitives.
-     */
-    double[][] transform(double[] real, double[] imag);
-
-    /**
-     * Computes inverse FFT using double primitives.
-     */
-    double[][] inverseTransform(double[] real, double[] imag);
+    void solve(double[][] u, double[][] uPrev, int width, int height, double c, double damping);
 
     /**
      * Returns the name of this provider.

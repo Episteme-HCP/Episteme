@@ -345,7 +345,7 @@ public final class JScience {
      */
     public static boolean isCudaAvailable() {
         try {
-            return new org.jscience.technical.backend.cuda.CudaBackend().isAvailable();
+            return new org.jscience.technical.backend.cuda.CUDABackend().isAvailable();
         } catch (Throwable t) {
             return false;
         }

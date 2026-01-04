@@ -59,7 +59,7 @@ public class MulticoreFFTProvider implements FFTProvider {
         // 4. scale by 1/N
         // Or simply: transform(imag, real) then scale?
 
-        // Let's reuse logic from CudaFFTProvider for consistency:
+        // Let's reuse logic from CUDAFFTProvider for consistency:
         // imag = -imag
         // forward
         // scale
@@ -188,5 +188,109 @@ public class MulticoreFFTProvider implements FFTProvider {
         }
 
         return new Real[][] { outReal, outImag };
+    }
+
+    @Override
+    public double[][] transform(double[] real, double[] imag) {
+        return computeFFTPrimitive(real, imag, true);
+    }
+
+    @Override
+    public double[][] inverseTransform(double[] real, double[] imag) {
+        int n = real.length;
+        double[] negImag = new double[n];
+        for (int i = 0; i < n; i++) {
+            negImag[i] = -imag[i];
+        }
+
+        double[][] result = computeFFTPrimitive(real, negImag, true);
+        double[] resReal = result[0];
+        double[] resImag = result[1];
+
+        double scale = 1.0 / n;
+        for (int i = 0; i < n; i++) {
+            resReal[i] *= scale;
+            resImag[i] = -(resImag[i] * scale);
+        }
+
+        return new double[][] { resReal, resImag };
+    }
+
+    private double[][] computeFFTPrimitive(double[] real, double[] imag, boolean parallel) {
+        int n = real.length;
+        if (n <= 1024 || !parallel) {
+            return computeLocalFFTPrimitive(real, imag);
+        }
+
+        int half = n / 2;
+        double[] evenReal = new double[half];
+        double[] evenImag = new double[half];
+        double[] oddReal = new double[half];
+        double[] oddImag = new double[half];
+
+        for (int i = 0; i < half; i++) {
+            evenReal[i] = real[2 * i];
+            evenImag[i] = imag[2 * i];
+            oddReal[i] = real[2 * i + 1];
+            oddImag[i] = imag[2 * i + 1];
+        }
+
+        ForkJoinPool pool = ForkJoinPool.commonPool();
+        RecursiveTask<double[][]> evenTask = new RecursiveTask<>() {
+            @Override
+            protected double[][] compute() {
+                return new MulticoreFFTProvider().computeFFTPrimitive(evenReal, evenImag, evenReal.length > 1024);
+            }
+        };
+        RecursiveTask<double[][]> oddTask = new RecursiveTask<>() {
+            @Override
+            protected double[][] compute() {
+                return new MulticoreFFTProvider().computeFFTPrimitive(oddReal, oddImag, oddReal.length > 1024);
+            }
+        };
+
+        pool.execute(evenTask);
+        double[][] oddResult = oddTask.invoke();
+        double[][] evenResult = evenTask.join();
+
+        double[] resReal = new double[n];
+        double[] resImag = new double[n];
+
+        for (int k = 0; k < half; k++) {
+            double angle = -2 * Math.PI * k / n;
+            double cos = Math.cos(angle);
+            double sin = Math.sin(angle);
+
+            double oddR = oddResult[0][k];
+            double oddI = oddResult[1][k];
+
+            double tReal = cos * oddR - sin * oddI;
+            double tImag = sin * oddR + cos * oddI;
+
+            double evenR = evenResult[0][k];
+            double evenI = evenResult[1][k];
+
+            resReal[k] = evenR + tReal;
+            resImag[k] = evenI + tImag;
+            resReal[k + half] = evenR - tReal;
+            resImag[k + half] = evenI - tImag;
+        }
+
+        return new double[][] { resReal, resImag };
+    }
+
+    private double[][] computeLocalFFTPrimitive(double[] real, double[] imag) {
+        Complex[] data = new Complex[real.length];
+        for (int i = 0; i < real.length; i++) {
+            data[i] = Complex.of(real[i], imag[i]);
+        }
+        Complex[] transformed = DiscreteFourierTransform.transform(data);
+        double[] outReal = new double[transformed.length];
+        double[] outImag = new double[transformed.length];
+        for (int i = 0; i < transformed.length; i++) {
+            outReal[i] = transformed[i].real();
+            outImag[i] = transformed[i].imaginary();
+        }
+        return new double[][] { outReal, outImag };
     }
 }

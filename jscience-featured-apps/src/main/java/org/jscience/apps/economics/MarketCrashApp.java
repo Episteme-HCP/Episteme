@@ -43,8 +43,6 @@ import org.jscience.mathematics.numbers.real.Real;
 
 import java.util.ArrayList;
 import java.util.List;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.XYChart;
 
 public class MarketCrashApp extends FeaturedAppBase {
     private LineChart<Number, Number> priceChart;

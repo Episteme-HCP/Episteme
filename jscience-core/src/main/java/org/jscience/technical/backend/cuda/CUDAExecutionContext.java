@@ -23,62 +23,30 @@
 
 package org.jscience.technical.backend.cuda;
 
-import org.jscience.technical.backend.ComputeBackend;
 import org.jscience.technical.backend.ExecutionContext;
-import jcuda.driver.JCudaDriver;
+import org.jscience.technical.backend.Operation;
 
 /**
- * CUDA implementation of ComputeBackend for GPU acceleration.
- * <p>
- * Uses JCuda to execute computations on NVIDIA GPUs.
- * </p>
+ * CUDA Execution Context.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CudaBackend implements ComputeBackend {
+public class CUDAExecutionContext implements ExecutionContext {
 
-    private static boolean available;
-
-    static {
-        try {
-            // Check if JCuda is available
-            JCudaDriver.setExceptionsEnabled(false);
-            // Just accessing the class might throw if library not found
-            Class.forName("jcuda.driver.JCudaDriver");
-            available = true;
-        } catch (Throwable t) {
-            available = false;
-        }
+    public CUDAExecutionContext() {
+        // Initialize CUDA context if needed, or rely on JCuda's static context
+        // management
     }
 
     @Override
-    public String getName() {
-        return "GPU (CUDA)";
+    public <T> T execute(Operation<T> operation) {
+        return operation.compute(this);
     }
 
     @Override
-    public boolean isAvailable() {
-        return available;
-    }
-
-    @Override
-    public ExecutionContext createContext() {
-        if (!available) {
-            throw new IllegalStateException("CUDA backend is not available");
-        }
-        return new CudaExecutionContext();
-    }
-
-    @Override
-    public boolean supportsParallelOps() {
-        return true;
-    }
-
-    @Override
-    public int getPriority() {
-        return 20; // Higher priority than OpenCL if available
+    public void close() {
+        // Cleanup resources
     }
 }
-

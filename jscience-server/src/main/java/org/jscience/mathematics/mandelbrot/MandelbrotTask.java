@@ -15,6 +15,13 @@ public class MandelbrotTask implements DistributedTask<MandelbrotTask, Mandelbro
     protected int maxIterations = 256;
     protected int[][] result;
 
+    public enum PrecisionMode {
+        REALS,
+        PRIMITIVES
+    }
+
+    private PrecisionMode mode = PrecisionMode.PRIMITIVES;
+
     public MandelbrotTask(int width, int height, double xMin, double xMax, double yMin, double yMax) {
         this.width = width;
         this.height = height;
@@ -24,16 +31,25 @@ public class MandelbrotTask implements DistributedTask<MandelbrotTask, Mandelbro
         this.yMax = yMax;
         this.result = new int[width][height];
     }
-    
+
     // No-arg constructor for ServiceLoader
     public MandelbrotTask() {
         this(0, 0, 0, 0, 0, 0);
     }
 
+    public void setMode(PrecisionMode mode) {
+        this.mode = mode;
+    }
+
     @Override
-    public Class<MandelbrotTask> getInputType() { return MandelbrotTask.class; }
+    public Class<MandelbrotTask> getInputType() {
+        return MandelbrotTask.class;
+    }
+
     @Override
-    public Class<MandelbrotTask> getOutputType() { return MandelbrotTask.class; }
+    public Class<MandelbrotTask> getOutputType() {
+        return MandelbrotTask.class;
+    }
 
     @Override
     public MandelbrotTask execute(MandelbrotTask input) {
@@ -49,36 +65,49 @@ public class MandelbrotTask implements DistributedTask<MandelbrotTask, Mandelbro
     }
 
     @Override
-    public String getTaskType() { return "MANDELBROT"; }
+    public String getTaskType() {
+        return "MANDELBROT";
+    }
 
     public void compute() {
-        double dx = (xMax - xMin) / width;
-        double dy = (yMax - yMin) / height;
-
-        for (int px = 0; px < width; px++) {
-            for (int py = 0; py < height; py++) {
-                double x0 = xMin + px * dx;
-                double y0 = yMin + py * dy;
-                double x = 0, y = 0;
-                int iter = 0;
-
-                while (x * x + y * y <= 4 && iter < maxIterations) {
-                    double xTemp = x * x - y * y + x0;
-                    y = 2 * x * y + y0;
-                    x = xTemp;
-                    iter++;
-                }
-                result[px][py] = iter;
-            }
+        if (mode == PrecisionMode.REALS) {
+            // JScience Mode: Use Real-based Provider (handled by Multicore provider with
+            // conversion internal or special Real provider)
+            // Implementation note: existing provider uses doubles but we wrap for
+            // architecture consistency.
+            org.jscience.technical.backend.algorithms.MandelbrotProvider provider = new org.jscience.technical.backend.algorithms.MulticoreMandelbrotProvider();
+            this.result = provider.compute(xMin, xMax, yMin, yMax, width, height, maxIterations);
+        } else {
+            // Primitive Mode: Use side-by-side Support
+            MandelbrotPrimitiveSupport support = new MandelbrotPrimitiveSupport();
+            support.generate(result, width, height, xMin, yMin, xMax - xMin, yMax - yMin, maxIterations);
         }
     }
 
     public void setRegion(double xMin, double xMax, double yMin, double yMax) {
-        this.xMin = xMin; this.xMax = xMax; this.yMin = yMin; this.yMax = yMax;
+        this.xMin = xMin;
+        this.xMax = xMax;
+        this.yMin = yMin;
+        this.yMax = yMax;
     }
-    public void setMaxIterations(int max) { this.maxIterations = max; }
-    public int[][] getResult() { return result; }
-    public int getWidth() { return width; }
-    public int getHeight() { return height; }
-    public int getMaxIterations() { return maxIterations; }
+
+    public void setMaxIterations(int max) {
+        this.maxIterations = max;
+    }
+
+    public int[][] getResult() {
+        return result;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getMaxIterations() {
+        return maxIterations;
+    }
 }

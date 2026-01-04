@@ -85,23 +85,7 @@ public class OpenCLNBodyProvider implements NBodyProvider {
         return gpuAvailable;
     }
 
-    /**
-     * Computes gravitational forces between particles using GPU if beneficial.
-     * 
-     * @param positions particle positions [x0,y0,z0,x1,y1,z1,...]
-     * @param masses    particle masses
-     * @param forces    output array for forces [fx0,fy0,fz0,fx1,fy1,fz1,...]
-     * @param G         gravitational constant
-     */
-    /**
-     * Computes gravitational forces between particles using GPU if beneficial.
-     * 
-     * @param positions particle positions [x0,y0,z0,x1,y1,z1,...]
-     * @param masses    particle masses
-     * @param forces    output array for forces [fx0,fy0,fz0,fx1,fy1,fz1,...]
-     * @param G         gravitational constant
-     * @param softening softening parameter
-     */
+    @Override
     public void computeForces(double[] positions, double[] masses, double[] forces, double G, double softening) {
         int numParticles = masses.length;
 
@@ -112,23 +96,6 @@ public class OpenCLNBodyProvider implements NBodyProvider {
         }
     }
 
-    /**
-     * Computes forces using Real API with automatic GPU offloading.
-     *
-     * @param positions particle positions as Real[]
-     * @param masses    particle masses as Real[]
-     * @param forces    output forces as Real[]
-     * @param G         gravitational constant as Real
-     */
-    /**
-     * Computes forces using Real API with automatic GPU offloading.
-     *
-     * @param positions particle positions as Real[]
-     * @param masses    particle masses as Real[]
-     * @param forces    output forces as Real[]
-     * @param G         gravitational constant as Real
-     * @param softening softening parameter
-     */
     @Override
     public void computeForces(Real[] positions, Real[] masses, Real[] forces, Real G, Real softening) {
         // Convert to double arrays for GPU

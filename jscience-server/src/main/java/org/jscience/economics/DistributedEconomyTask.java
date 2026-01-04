@@ -25,6 +25,7 @@ package org.jscience.economics;
 
 import java.io.Serializable;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.distributed.PrecisionMode;
 
 /**
  * Distributed Economic Simulation Task.
@@ -38,13 +39,31 @@ public class DistributedEconomyTask implements Serializable {
     private String economyName;
     private Real gdp;
     private Real inflation;
+    private double gdpD;
+    private double inflationD;
     private double dt; // years
+    private PrecisionMode mode = PrecisionMode.REALS;
 
     public DistributedEconomyTask(String name, Real gdp, Real inflation) {
         this.economyName = name;
         this.gdp = gdp;
         this.inflation = inflation;
+        this.gdpD = gdp.doubleValue();
+        this.inflationD = inflation.doubleValue();
         this.dt = 1.0;
+    }
+
+    public void setMode(PrecisionMode mode) {
+        if (this.mode != mode) {
+            if (mode == PrecisionMode.PRIMITIVES) {
+                gdpD = gdp.doubleValue();
+                inflationD = inflation.doubleValue();
+            } else {
+                gdp = Real.of(gdpD);
+                inflation = Real.of(inflationD);
+            }
+            this.mode = mode;
+        }
     }
 
     public void run() {
@@ -52,22 +71,27 @@ public class DistributedEconomyTask implements Serializable {
         double growthRate = 0.02 + 0.05 * (Math.random() - 0.5);
         double inflationShock = 0.01 * (Math.random() - 0.5);
 
-        double gValue = gdp.doubleValue();
-        double iValue = inflation.doubleValue();
+        if (mode == PrecisionMode.REALS) {
+            double gValue = gdp.doubleValue();
+            double iValue = inflation.doubleValue();
 
-        gValue *= (1 + growthRate * dt);
-        iValue += inflationShock;
+            gValue *= (1 + growthRate * dt);
+            iValue += inflationShock;
 
-        this.gdp = Real.of(gValue);
-        this.inflation = Real.of(iValue);
+            this.gdp = Real.of(gValue);
+            this.inflation = Real.of(iValue);
+        } else {
+            gdpD *= (1 + growthRate * dt);
+            inflationD += inflationShock;
+        }
     }
 
     public Real getGdp() {
-        return gdp;
+        return mode == PrecisionMode.REALS ? gdp : Real.of(gdpD);
     }
 
     public Real getInflation() {
-        return inflation;
+        return mode == PrecisionMode.REALS ? inflation : Real.of(inflationD);
     }
 
     public String getEconomyName() {

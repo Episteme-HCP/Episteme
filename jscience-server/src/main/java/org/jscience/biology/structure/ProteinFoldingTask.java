@@ -27,6 +27,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.distributed.PrecisionMode;
 
 /**
  * Protein Folding Simulation Task using the HP (Hydrophobic-Polar) Model.
@@ -64,9 +66,11 @@ public class ProteinFoldingTask implements Serializable {
     private final List<ResidueType> sequence;
     private final int iterations;
     private final double temperature;
+    private PrecisionMode mode = PrecisionMode.PRIMITIVES;
 
     private List<Monomer> currentFold;
     private double energy;
+    private Real energyReal;
 
     public ProteinFoldingTask(String hpSequence, int iterations, double temperature) {
         this.sequence = new ArrayList<>();
@@ -77,6 +81,10 @@ public class ProteinFoldingTask implements Serializable {
         this.temperature = temperature;
     }
 
+    public void setMode(PrecisionMode mode) {
+        this.mode = mode;
+    }
+
     public void run() {
         if (currentFold == null)
             initializeLinear();
@@ -85,7 +93,13 @@ public class ProteinFoldingTask implements Serializable {
         for (int i = 0; i < iterations; i++) {
             attemptMove(rand);
         }
-        this.energy = calculateEnergy(currentFold);
+
+        if (mode == PrecisionMode.REALS) {
+            this.energyReal = calculateEnergyReal(currentFold);
+            this.energy = energyReal.doubleValue();
+        } else {
+            this.energy = calculateEnergy(currentFold);
+        }
     }
 
     private void initializeLinear() {
@@ -140,6 +154,23 @@ public class ProteinFoldingTask implements Serializable {
                 return false;
         }
         return true;
+    }
+
+    private Real calculateEnergyReal(List<Monomer> fold) {
+        Real e = Real.of(0);
+        // HP Model: -1 for each topological H-H contact (non-sequential neighbors)
+        for (int i = 0; i < fold.size(); i++) {
+            for (int j = i + 2; j < fold.size(); j++) {
+                Monomer m1 = fold.get(i);
+                Monomer m2 = fold.get(j);
+                if (m1.type == ResidueType.HYDROPHOBIC && m2.type == ResidueType.HYDROPHOBIC) {
+                    int dist = Math.abs(m1.x - m2.x) + Math.abs(m1.y - m2.y) + Math.abs(m1.z - m2.z);
+                    if (dist == 1)
+                        e = e.subtract(Real.of(1.0));
+                }
+            }
+        }
+        return e;
     }
 
     private double calculateEnergy(List<Monomer> fold) {

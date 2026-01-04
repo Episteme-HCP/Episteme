@@ -24,6 +24,7 @@
 package org.jscience.technical.backend.algorithms;
 
 import java.util.logging.Logger;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Multicore implementation of Navier-Stokes provider.
@@ -40,35 +41,33 @@ public class MulticoreNavierStokesProvider implements NavierStokesProvider {
     private static final Logger LOGGER = Logger.getLogger(MulticoreNavierStokesProvider.class.getName());
 
     @Override
-    public void solve(double[] density, double[] u, double[] v, double[] w, double dt, double viscosity, int width,
+    public void solve(Real[] density, Real[] u, Real[] v, Real[] w, Real dt, Real viscosity, int width,
             int height, int depth) {
+
+        // Placeholder for Real-based implementations
+        // Standard Structure:
         // 1. Velocity Step
         // diffuse(u, ...);
-        // diffuse(v, ...);
-        // diffuse(w, ...);
-
         // project(u, v, w, ...);
-
         // advect(u, ...);
-        // advect(v, ...);
-        // advect(w, ...);
-
         // project(u, v, w, ...);
 
         // 2. Density Step
         // diffuse(density, ...);
         // advect(density, ...);
 
-        // Placeholder for now as the original logic was also empty.
-        // Implementing a full 3D Stable Fluids solver here is out of scope for
-        // "Refactoring" if the original code didn't have it.
-        // We preserve the structure.
+        LOGGER.finest("Performing Real-based Navier-Stokes step on " + width + "x" + height + "x" + depth + " grid.");
+    }
 
-        LOGGER.finest("Performing Navier-Stokes step on " + width + "x" + height + "x" + depth + " grid.");
+    @Override
+    public void solve(double[] density, double[] u, double[] v, double[] w, double dt, double viscosity, int width,
+            int height, int depth) {
+        // Placeholder for double-based implementations
+        LOGGER.finest("Performing double-based Navier-Stokes step on " + width + "x" + height + "x" + depth + " grid.");
     }
 
     @Override
     public String getName() {
-        return "Multicore Navier-Stokes";
+        return "Multicore Navier-Stokes (Real)";
     }
 }

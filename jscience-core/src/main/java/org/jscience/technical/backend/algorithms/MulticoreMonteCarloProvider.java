@@ -58,9 +58,9 @@ import java.util.logging.Logger;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ParallelMonteCarloProvider implements MonteCarloProvider {
+public class MulticoreMonteCarloProvider implements MonteCarloProvider { // Renamed from ParallelMonteCarloProvider
 
-    private static final Logger LOGGER = Logger.getLogger(ParallelMonteCarloProvider.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MulticoreMonteCarloProvider.class.getName());
 
     private final int numThreads;
     private final ExecutorService executor;
@@ -68,7 +68,10 @@ public class ParallelMonteCarloProvider implements MonteCarloProvider {
     /**
      * Creates a new parallel Monte Carlo provider using all available processors.
      */
-    public ParallelMonteCarloProvider() {
+    /**
+     * Creates a new parallel Monte Carlo provider using all available processors.
+     */
+    public MulticoreMonteCarloProvider() {
         this(Runtime.getRuntime().availableProcessors());
     }
 
@@ -77,7 +80,7 @@ public class ParallelMonteCarloProvider implements MonteCarloProvider {
      *
      * @param numThreads number of parallel threads
      */
-    public ParallelMonteCarloProvider(int numThreads) {
+    public MulticoreMonteCarloProvider(int numThreads) {
         this.numThreads = numThreads;
         this.executor = Executors.newFixedThreadPool(numThreads);
         LOGGER.info("Parallel Monte Carlo provider initialized with " + numThreads + " threads");
@@ -161,7 +164,6 @@ public class ParallelMonteCarloProvider implements MonteCarloProvider {
      */
     public double estimatePi(long samples) {
         long samplesPerThread = samples / numThreads;
-        AtomicLong insideCircle = new AtomicLong(0);
 
         @SuppressWarnings("unchecked")
         Future<Long>[] futures = new Future[numThreads];

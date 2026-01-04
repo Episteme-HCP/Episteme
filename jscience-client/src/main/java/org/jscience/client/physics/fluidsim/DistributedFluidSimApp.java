@@ -23,8 +23,6 @@
 
 package org.jscience.client.physics.fluidsim;
 
-import org.jscience.physics.fluid.FluidSimTask;
-
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -35,6 +33,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
@@ -42,14 +41,12 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.jscience.physics.fluid.LatticeBoltzmann;
-import org.jscience.io.scientific.VTKLoader;
 import org.jscience.server.proto.*;
 
 import java.io.*;
 import java.util.concurrent.TimeUnit;
-import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.image.PixelReader;
+// import javafx.scene.image.Image;
+// import javafx.scene.image.PixelReader;
 
 /**
  * Lattice Boltzmann Fluid Simulation with distributed support.

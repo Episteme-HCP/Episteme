@@ -12,16 +12,23 @@ import java.util.List;
 /**
  * Molecular Dynamics Simulation Task.
  */
-public class MolecularDynamicsTask implements DistributedTask<MolecularDynamicsTask, MolecularDynamicsTask>, Serializable {
+public class MolecularDynamicsTask
+        implements DistributedTask<MolecularDynamicsTask, MolecularDynamicsTask>, Serializable {
 
     private final int numAtoms;
     private final double timeStep;
     private final int steps;
     private final double boxSize;
-
-    // State
     private List<AtomState> atoms;
     private double totalEnergy;
+
+    public enum PrecisionMode {
+        REALS,
+        PRIMITIVES
+    }
+
+    private PrecisionMode mode = PrecisionMode.PRIMITIVES;
+    private List<org.jscience.chemistry.Atom> jscienceAtoms;
 
     public MolecularDynamicsTask(int numAtoms, double timeStep, int steps, double boxSize) {
         this.numAtoms = numAtoms;
@@ -31,7 +38,7 @@ public class MolecularDynamicsTask implements DistributedTask<MolecularDynamicsT
         this.atoms = new ArrayList<>(numAtoms);
         initialize();
     }
-    
+
     // No-arg constructor for ServiceLoader/Reflective instantiation
     public MolecularDynamicsTask() {
         this(0, 0, 0, 0);
@@ -47,20 +54,67 @@ public class MolecularDynamicsTask implements DistributedTask<MolecularDynamicsT
     }
 
     private void initialize() {
-        if (numAtoms == 0) return;
+        if (numAtoms == 0)
+            return;
         for (int i = 0; i < numAtoms; i++) {
             atoms.add(new AtomState(
                     Math.random() * boxSize, Math.random() * boxSize, Math.random() * boxSize,
                     (Math.random() - 0.5), (Math.random() - 0.5), (Math.random() - 0.5),
-                    1.0
-            ));
+                    1.0));
         }
     }
 
+    public void setMode(PrecisionMode mode) {
+        this.mode = mode;
+        if (mode == PrecisionMode.REALS && jscienceAtoms == null) {
+            syncToJScience();
+        }
+    }
+
+    private void syncToJScience() {
+        jscienceAtoms = new ArrayList<>(numAtoms);
+        org.jscience.chemistry.Element hydrogen = new org.jscience.chemistry.Element("Hydrogen", "H");
+        for (AtomState a : atoms) {
+            org.jscience.mathematics.linearalgebra.Vector<org.jscience.mathematics.numbers.real.Real> pos = createVector(
+                    a.x, a.y, a.z);
+            org.jscience.chemistry.Atom atom = new org.jscience.chemistry.Atom(hydrogen, pos);
+            atom.setVelocity(createVector(a.vx, a.vy, a.vz));
+            jscienceAtoms.add(atom);
+        }
+    }
+
+    private void syncFromJScience() {
+        for (int i = 0; i < numAtoms; i++) {
+            org.jscience.chemistry.Atom atom = jscienceAtoms.get(i);
+            AtomState a = atoms.get(i);
+            a.x = atom.getPosition().get(0).doubleValue();
+            a.y = atom.getPosition().get(1).doubleValue();
+            a.z = atom.getPosition().get(2).doubleValue();
+            a.vx = atom.getVelocity().get(0).doubleValue();
+            a.vy = atom.getVelocity().get(1).doubleValue();
+            a.vz = atom.getVelocity().get(2).doubleValue();
+        }
+    }
+
+    private org.jscience.mathematics.linearalgebra.Vector<org.jscience.mathematics.numbers.real.Real> createVector(
+            double x, double y, double z) {
+        List<org.jscience.mathematics.numbers.real.Real> list = new ArrayList<>();
+        list.add(org.jscience.mathematics.numbers.real.Real.of(x));
+        list.add(org.jscience.mathematics.numbers.real.Real.of(y));
+        list.add(org.jscience.mathematics.numbers.real.Real.of(z));
+        return org.jscience.mathematics.linearalgebra.vectors.DenseVector.of(list,
+                org.jscience.mathematics.sets.Reals.getInstance());
+    }
+
     @Override
-    public Class<MolecularDynamicsTask> getInputType() { return MolecularDynamicsTask.class; }
+    public Class<MolecularDynamicsTask> getInputType() {
+        return MolecularDynamicsTask.class;
+    }
+
     @Override
-    public Class<MolecularDynamicsTask> getOutputType() { return MolecularDynamicsTask.class; }
+    public Class<MolecularDynamicsTask> getOutputType() {
+        return MolecularDynamicsTask.class;
+    }
 
     @Override
     public MolecularDynamicsTask execute(MolecularDynamicsTask input) {
@@ -82,68 +136,123 @@ public class MolecularDynamicsTask implements DistributedTask<MolecularDynamicsT
 
     public void run() {
         for (int s = 0; s < steps; s++) {
-            verletStep();
+            if (mode == PrecisionMode.REALS) {
+                jscienceStep();
+            } else {
+                primitiveStep();
+            }
         }
         calculateTotalEnergy();
     }
 
-    private void verletStep() {
-        double[][] forces = calculateForces();
-        for (int i = 0; i < numAtoms; i++) {
-            AtomState a = atoms.get(i);
-            double ax = forces[i][0] / a.mass;
-            double ay = forces[i][1] / a.mass;
-            double az = forces[i][2] / a.mass;
-            a.vx += ax * timeStep;
-            a.vy += ay * timeStep;
-            a.vz += az * timeStep;
-            a.x += a.vx * timeStep;
-            a.y += a.vy * timeStep;
-            a.z += a.vz * timeStep;
-            a.x += a.vx * timeStep;
-            a.y += a.vy * timeStep;
-            a.z += a.vz * timeStep;
-            if (a.x < 0 || a.x > boxSize) a.vx *= -1;
-            if (a.y < 0 || a.y > boxSize) a.vy *= -1;
-            if (a.z < 0 || a.z > boxSize) a.vz *= -1;
-            a.x = Math.max(0, Math.min(boxSize, a.x));
-            a.y = Math.max(0, Math.min(boxSize, a.y));
-            a.z = Math.max(0, Math.min(boxSize, a.z));
-        }
-    }
+    private void jscienceStep() {
+        org.jscience.technical.backend.algorithms.MolecularDynamicsProvider provider = new org.jscience.technical.backend.algorithms.MulticoreMolecularDynamicsProvider();
 
-    private double[][] calculateForces() {
-        double[][] forces = new double[numAtoms][3];
-        double epsilon = 1.0;
-        double sigma = 1.0;
-        double cutoff = 2.5 * sigma;
-        double cutoffSq = cutoff * cutoff;
-        for (int i = 0; i < numAtoms; i++) {
-            for (int j = i + 1; j < numAtoms; j++) {
-                AtomState a1 = atoms.get(i);
-                AtomState a2 = atoms.get(j);
-                double dx = a2.x - a1.x;
-                double dy = a2.y - a1.y;
-                double dz = a2.z - a1.z;
-                double distSq = dx * dx + dy * dy + dz * dz;
-                if (distSq < cutoffSq && distSq > 0.0001) {
-                    double invDist2 = 1.0 / distSq;
-                    double invDist6 = invDist2 * invDist2 * invDist2;
-                    double invDist12 = invDist6 * invDist6;
-                    double forceMag = 24 * epsilon * invDist2 * (2 * invDist12 - invDist6);
-                    double fx = forceMag * dx;
-                    double fy = forceMag * dy;
-                    double fz = forceMag * dz;
-                    forces[i][0] -= fx;
-                    forces[i][1] -= fy;
-                    forces[i][2] -= fz;
-                    forces[j][0] += fx;
-                    forces[j][1] += fy;
-                    forces[j][2] += fz;
-                }
+        int n = numAtoms;
+        org.jscience.mathematics.numbers.real.Real[] positions = new org.jscience.mathematics.numbers.real.Real[n * 3];
+        org.jscience.mathematics.numbers.real.Real[] velocities = new org.jscience.mathematics.numbers.real.Real[n * 3];
+        org.jscience.mathematics.numbers.real.Real[] forces = new org.jscience.mathematics.numbers.real.Real[n * 3];
+        org.jscience.mathematics.numbers.real.Real[] masses = new org.jscience.mathematics.numbers.real.Real[n];
+
+        for (int i = 0; i < n; i++) {
+            org.jscience.chemistry.Atom a = jscienceAtoms.get(i);
+            positions[i * 3] = a.getPosition().get(0);
+            positions[i * 3 + 1] = a.getPosition().get(1);
+            positions[i * 3 + 2] = a.getPosition().get(2);
+            velocities[i * 3] = a.getVelocity().get(0);
+            velocities[i * 3 + 1] = a.getVelocity().get(1);
+            velocities[i * 3 + 2] = a.getVelocity().get(2);
+            forces[i * 3] = org.jscience.mathematics.numbers.real.Real.ZERO;
+            forces[i * 3 + 1] = org.jscience.mathematics.numbers.real.Real.ZERO;
+            forces[i * 3 + 2] = org.jscience.mathematics.numbers.real.Real.ZERO;
+            masses[i] = org.jscience.mathematics.numbers.real.Real.of(a.getMass().getValue().doubleValue());
+        }
+
+        org.jscience.mathematics.numbers.real.Real epsilon = org.jscience.mathematics.numbers.real.Real.ONE;
+        org.jscience.mathematics.numbers.real.Real sigma = org.jscience.mathematics.numbers.real.Real.ONE;
+        org.jscience.mathematics.numbers.real.Real cutoff = org.jscience.mathematics.numbers.real.Real.of(2.5);
+
+        provider.calculateNonBondedForces(positions, forces, epsilon, sigma, cutoff);
+        provider.integrate(positions, velocities, forces, masses,
+                org.jscience.mathematics.numbers.real.Real.of(timeStep),
+                org.jscience.mathematics.numbers.real.Real.ONE);
+
+        for (int i = 0; i < n; i++) {
+            org.jscience.chemistry.Atom a = jscienceAtoms.get(i);
+            a.setPosition(positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]);
+            a.setVelocity(velocities[i * 3], velocities[i * 3 + 1], velocities[i * 3 + 2]);
+
+            double x = a.getX();
+            double y = a.getY();
+            double z = a.getZ();
+            boolean hit = false;
+            if (x < 0 || x > boxSize) {
+                hit = true;
+                x = Math.max(0, Math.min(boxSize, x));
+            }
+            if (y < 0 || y > boxSize) {
+                hit = true;
+                y = Math.max(0, Math.min(boxSize, y));
+            }
+            if (z < 0 || z > boxSize) {
+                hit = true;
+                z = Math.max(0, Math.min(boxSize, z));
+            }
+
+            if (hit) {
+                a.setPosition(org.jscience.mathematics.numbers.real.Real.of(x),
+                        org.jscience.mathematics.numbers.real.Real.of(y),
+                        org.jscience.mathematics.numbers.real.Real.of(z));
+                a.setVelocity(a.getVelocity().multiply(org.jscience.mathematics.numbers.real.Real.of(-1)));
             }
         }
-        return forces;
+        syncFromJScience();
+    }
+
+    private void primitiveStep() {
+        MolecularDynamicsPrimitiveSupport support = new MolecularDynamicsPrimitiveSupport();
+        int n = numAtoms;
+        double[] positions = new double[n * 3];
+        double[] velocities = new double[n * 3];
+        double[] forces = new double[n * 3];
+        double[] masses = new double[n];
+
+        for (int i = 0; i < n; i++) {
+            AtomState a = atoms.get(i);
+            positions[i * 3] = a.x;
+            positions[i * 3 + 1] = a.y;
+            positions[i * 3 + 2] = a.z;
+            velocities[i * 3] = a.vx;
+            velocities[i * 3 + 1] = a.vy;
+            velocities[i * 3 + 2] = a.vz;
+            masses[i] = a.mass;
+        }
+
+        support.calculateNonBondedForces(positions, forces, 1.0, 1.0, 2.5, n);
+        support.integrate(positions, velocities, forces, masses, timeStep, 1.0, n);
+
+        for (int i = 0; i < n; i++) {
+            AtomState a = atoms.get(i);
+            a.x = positions[i * 3];
+            a.y = positions[i * 3 + 1];
+            a.z = positions[i * 3 + 2];
+            a.vx = velocities[i * 3];
+            a.vy = velocities[i * 3 + 1];
+            a.vz = velocities[i * 3 + 2];
+
+            if (a.x < 0 || a.x > boxSize) {
+                a.vx *= -1;
+                a.x = Math.max(0, Math.min(boxSize, a.x));
+            }
+            if (a.y < 0 || a.y > boxSize) {
+                a.vy *= -1;
+                a.y = Math.max(0, Math.min(boxSize, a.y));
+            }
+            if (a.z < 0 || a.z > boxSize) {
+                a.vz *= -1;
+                a.z = Math.max(0, Math.min(boxSize, a.z));
+            }
+        }
     }
 
     private void calculateTotalEnergy() {
@@ -153,12 +262,30 @@ public class MolecularDynamicsTask implements DistributedTask<MolecularDynamicsT
         }
     }
 
-    public List<AtomState> getAtoms() { return atoms; }
-    public double getTotalEnergy() { return totalEnergy; }
-    public int getNumAtoms() { return numAtoms; }
-    public double getTimeStep() { return timeStep; }
-    public int getSteps() { return steps; }
-    public double getBoxSize() { return boxSize; }
+    public List<AtomState> getAtoms() {
+        return atoms;
+    }
+
+    public double getTotalEnergy() {
+        return totalEnergy;
+    }
+
+    public int getNumAtoms() {
+        return numAtoms;
+    }
+
+    public double getTimeStep() {
+        return timeStep;
+    }
+
+    public int getSteps() {
+        return steps;
+    }
+
+    public double getBoxSize() {
+        return boxSize;
+    }
+
     public void updateState(List<AtomState> newAtoms, double newEnergy) {
         this.atoms = newAtoms;
         this.totalEnergy = newEnergy;
@@ -170,8 +297,12 @@ public class MolecularDynamicsTask implements DistributedTask<MolecularDynamicsT
         public double mass;
 
         public AtomState(double x, double y, double z, double vx, double vy, double vz, double mass) {
-            this.x = x; this.y = y; this.z = z;
-            this.vx = vx; this.vy = vy; this.vz = vz;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.vx = vx;
+            this.vy = vy;
+            this.vz = vz;
             this.mass = mass;
         }
     }

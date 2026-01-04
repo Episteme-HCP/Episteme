@@ -26,7 +26,7 @@ package org.jscience.mathematics.linearalgebra.tensors.backends;
 import org.jscience.mathematics.linearalgebra.tensors.Tensor;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.technical.backend.ExecutionContext;
-import org.jscience.technical.backend.cuda.CudaExecutionContext;
+import org.jscience.technical.backend.cuda.CUDAExecutionContext;
 
 /**
  * ND4J-backed TensorProvider implementation.
@@ -66,7 +66,7 @@ public class ND4JDenseTensorProvider implements TensorProvider {
             throw new IllegalStateException("ND4J backend not available");
         }
         // ND4J manages its own context usually, but if we need a return
-        return new CudaExecutionContext();
+        return new CUDAExecutionContext();
     }
 
     @Override
@@ -145,4 +145,3 @@ public class ND4JDenseTensorProvider implements TensorProvider {
         throw new UnsupportedOperationException("ND4J conversion not yet implemented");
     }
 }
-

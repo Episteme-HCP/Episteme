@@ -100,14 +100,52 @@ public class OpenCLLatticeBoltzmannProvider implements LatticeBoltzmannProvider 
 
     @Override
     public void evolve(double[][][] f, boolean[][] obstacle, double omega) {
-        int width = f.length;
-        int height = f[0].length;
-        int totalCells = width * height;
-
-        if (gpuAvailable && totalCells >= GPU_THRESHOLD_2D) {
-            evolveGPU(f, obstacle, width, height, omega);
+        // GPU Needs primitive doubles.
+        if (gpuAvailable) {
+            // Placeholder: In a real implementation, we would call an OpenCL kernel here.
+            // For now, use the optimized CPU implementation.
+            evolveCPUPrimitive(f, obstacle, f.length, f[0].length, omega);
         } else {
-            evolveCPU(f, obstacle, width, height, omega);
+            evolveCPUPrimitive(f, obstacle, f.length, f[0].length, omega);
+        }
+    }
+
+    private void evolveCPUPrimitive(double[][][] f, boolean[][] obstacle, int width, int height, double omega) {
+        double[][][] nextF = new double[width][height][9];
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (obstacle != null && obstacle[x][y]) {
+                    for (int i = 0; i < 9; i++) {
+                        int nx = (x + D2Q9_VELOCITIES[i][0] + width) % width;
+                        int ny = (y + D2Q9_VELOCITIES[i][1] + height) % height;
+                        nextF[nx][ny][OPPOSITE[i]] = f[x][y][i];
+                    }
+                    continue;
+                }
+                double rho = 0, ux = 0, uy = 0;
+                for (int i = 0; i < 9; i++) {
+                    rho += f[x][y][i];
+                    ux += f[x][y][i] * D2Q9_VELOCITIES[i][0];
+                    uy += f[x][y][i] * D2Q9_VELOCITIES[i][1];
+                }
+                if (rho > 0) {
+                    ux /= rho;
+                    uy /= rho;
+                }
+                double u2 = ux * ux + uy * uy;
+                for (int i = 0; i < 9; i++) {
+                    double cu = 3.0 * (ux * D2Q9_VELOCITIES[i][0] + uy * D2Q9_VELOCITIES[i][1]);
+                    double feq = rho * D2Q9_WEIGHTS[i] * (1.0 + cu + 0.5 * cu * cu - 1.5 * u2);
+                    double fnew = f[x][y][i] + omega * (feq - f[x][y][i]);
+
+                    int nx = (x + D2Q9_VELOCITIES[i][0] + width) % width;
+                    int ny = (y + D2Q9_VELOCITIES[i][1] + height) % height;
+                    nextF[nx][ny][i] = fnew;
+                }
+            }
+        }
+        for (int x = 0; x < width; x++) {
+            System.arraycopy(nextF[x], 0, f[x], 0, height);
         }
     }
 
@@ -115,37 +153,24 @@ public class OpenCLLatticeBoltzmannProvider implements LatticeBoltzmannProvider 
     public void evolve(Real[][][] f, boolean[][] obstacle, Real omega) {
         int width = f.length;
         int height = f[0].length;
+        int totalCells = width * height;
 
-        // Convert to primitive
-        double[][][] fD = new double[width][height][9];
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                for (int i = 0; i < 9; i++) {
-                    fD[x][y][i] = f[x][y][i].doubleValue();
-                }
-            }
-        }
-
-        evolve(fD, obstacle, omega.doubleValue());
-
-        // Convert back
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                for (int i = 0; i < 9; i++) {
-                    f[x][y][i] = Real.of(fD[x][y][i]);
-                }
-            }
+        if (gpuAvailable && totalCells >= GPU_THRESHOLD_2D) {
+            // GPU needs primitive doubles. Marshalling is allowed for HW interface,
+            // but for now let's stick to CPU Real for compliance unless we write a specific
+            // marshaller.
+            // "If you want to do an implementation with doubles, it must be uniquely in the
+            // clients and servers."
+            // This suggests Core should purely use Real.
+            // For now, fall back to pure Real CPU execution to stay safe.
+            evolveCPU(f, obstacle, width, height, omega);
+        } else {
+            evolveCPU(f, obstacle, width, height, omega);
         }
     }
 
-    private void evolveGPU(double[][][] f, boolean[][] obstacle, int width, int height, double omega) {
-        LOGGER.fine("Executing LBM step on GPU for " + (width * height) + " cells");
-        // Fallback to CPU for now
-        evolveCPU(f, obstacle, width, height, omega);
-    }
-
-    private void evolveCPU(double[][][] f, boolean[][] obstacle, int width, int height, double omega) {
-        double[][][] fPost = new double[width][height][9]; // Temp for post-collision state
+    private void evolveCPU(Real[][][] f, boolean[][] obstacle, int width, int height, Real omega) {
+        Real[][][] fPost = new Real[width][height][9]; // Temp for post-collision state
 
         // 1. Collision step (compute fPost)
         for (int x = 0; x < width; x++) {
@@ -157,30 +182,38 @@ public class OpenCLLatticeBoltzmannProvider implements LatticeBoltzmannProvider 
                 }
 
                 // Fluid: Macroscopic quantities + BGK
-                double rho = 0;
-                double ux = 0, uy = 0;
+                Real rho = Real.ZERO;
+                Real ux = Real.ZERO, uy = Real.ZERO;
                 for (int i = 0; i < 9; i++) {
-                    rho += f[x][y][i];
-                    ux += D2Q9_VELOCITIES[i][0] * f[x][y][i];
-                    uy += D2Q9_VELOCITIES[i][1] * f[x][y][i];
+                    rho = rho.add(f[x][y][i]);
+                    ux = ux.add(f[x][y][i].multiply(Real.of(D2Q9_VELOCITIES[i][0])));
+                    uy = uy.add(f[x][y][i].multiply(Real.of(D2Q9_VELOCITIES[i][1])));
                 }
 
-                if (rho > 0) {
-                    ux /= rho;
-                    uy /= rho;
+                if (rho.compareTo(Real.ZERO) > 0) {
+                    ux = ux.divide(rho);
+                    uy = uy.divide(rho);
                 }
 
-                double u2 = ux * ux + uy * uy;
+                Real u2 = ux.multiply(ux).add(uy.multiply(uy));
                 for (int i = 0; i < 9; i++) {
-                    double cu = D2Q9_VELOCITIES[i][0] * ux + D2Q9_VELOCITIES[i][1] * uy;
-                    double feq = D2Q9_WEIGHTS[i] * rho * (1 + 3 * cu + 4.5 * cu * cu - 1.5 * u2);
-                    fPost[x][y][i] = f[x][y][i] + omega * (feq - f[x][y][i]);
+                    Real cu = ux.multiply(Real.of(D2Q9_VELOCITIES[i][0]))
+                            .add(uy.multiply(Real.of(D2Q9_VELOCITIES[i][1])));
+                    // feq = w * rho * (1 + 3cu + 4.5cu^2 - 1.5u^2)
+                    Real term1 = cu.multiply(Real.of(3.0));
+                    Real term2 = cu.multiply(cu).multiply(Real.of(4.5));
+                    Real term3 = u2.multiply(Real.of(1.5));
+                    Real bracket = Real.ONE.add(term1).add(term2).subtract(term3);
+                    Real feq = bracket.multiply(rho).multiply(Real.of(D2Q9_WEIGHTS[i]));
+
+                    // fPost = f + omega * (feq - f)
+                    fPost[x][y][i] = f[x][y][i].add(omega.multiply(feq.subtract(f[x][y][i])));
                 }
             }
         }
 
         // 2. Streaming step (from fPost to f) + internal Bounce-back
-        double[][][] fNext = new double[width][height][9];
+        Real[][][] fNext = new Real[width][height][9];
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {

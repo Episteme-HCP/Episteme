@@ -26,6 +26,8 @@ package org.jscience.politics;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.distributed.PrecisionMode;
 
 /**
  * Geopolitical Engine Distributed Task.
@@ -39,23 +41,61 @@ public class GeopoliticalEngineTask implements Serializable {
     public static class NationState implements Serializable {
         public String name;
         public double stability; // 0.0 to 1.0
+        public Real stabilityReal;
         public double militaryPower;
+        public Real militaryPowerReal;
         public List<String> allies = new ArrayList<>();
 
         public NationState(String name, double stability, double mil) {
             this.name = name;
             this.stability = stability;
+            this.stabilityReal = Real.of(stability);
             this.militaryPower = mil;
+            this.militaryPowerReal = Real.of(mil);
         }
     }
 
     private List<NationState> nations;
+    private PrecisionMode mode = PrecisionMode.PRIMITIVES;
 
     public GeopoliticalEngineTask(List<NationState> nations) {
         this.nations = nations;
     }
 
+    public void setMode(PrecisionMode mode) {
+        this.mode = mode;
+    }
+
     public void run() {
+        if (mode == PrecisionMode.REALS) {
+            runReal();
+        } else {
+            runPrimitive();
+        }
+    }
+
+    private void runReal() {
+        for (NationState n : nations) {
+            // Internal stability fluctuation
+            n.stabilityReal = n.stabilityReal.add(Real.of(0.1 * (Math.random() - 0.5)));
+            if (n.stabilityReal.doubleValue() < 0)
+                n.stabilityReal = Real.of(0.0);
+            if (n.stabilityReal.doubleValue() > 1)
+                n.stabilityReal = Real.of(1.0);
+
+            // Interaction: if stability is very low, chance of conflict
+            if (n.stabilityReal.doubleValue() < 0.2) {
+                for (NationState other : nations) {
+                    if (other != n && !n.allies.contains(other.name)) {
+                        // Potential tension
+                        militaryInteractionReal(n, other);
+                    }
+                }
+            }
+        }
+    }
+
+    private void runPrimitive() {
         for (NationState n : nations) {
             // Internal stability fluctuation
             n.stability += 0.1 * (Math.random() - 0.5);
@@ -70,6 +110,17 @@ public class GeopoliticalEngineTask implements Serializable {
                     }
                 }
             }
+        }
+    }
+
+    private void militaryInteractionReal(NationState a, NationState b) {
+        // Simple balance of power check
+        Real tension = a.militaryPowerReal.divide(b.militaryPowerReal.add(Real.of(1e-6)))
+                .multiply(Real.of(1.0).subtract(a.stabilityReal));
+        if (tension.doubleValue() > 2.0 && Math.random() > 0.95) {
+            // Conflict event reduce stability for both
+            a.stabilityReal = a.stabilityReal.subtract(Real.of(0.1));
+            b.stabilityReal = b.stabilityReal.subtract(Real.of(0.05));
         }
     }
 

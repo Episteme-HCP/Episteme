@@ -58,15 +58,15 @@ public class LatticeBoltzmannSolver {
 
     private final int width;
     private final int height;
-    private final double omega; // Relaxation parameter = 1/tau
+    private final org.jscience.mathematics.numbers.real.Real omega; // Relaxation parameter = 1/tau
 
     // Distribution functions
-    private double[][][] f; // f[x][y][direction]
+    private org.jscience.mathematics.numbers.real.Real[][][] f; // f[x][y][direction]
 
     // Macroscopic quantities
-    private double[][] rho; // Density
-    private double[][] ux; // X velocity
-    private double[][] uy; // Y velocity
+    private org.jscience.mathematics.numbers.real.Real[][] rho; // Density
+    private org.jscience.mathematics.numbers.real.Real[][] ux; // X velocity
+    private org.jscience.mathematics.numbers.real.Real[][] uy; // Y velocity
 
     // Obstacle mask
     private boolean[][] obstacle;
@@ -89,25 +89,30 @@ public class LatticeBoltzmannSolver {
         this.height = height;
 
         // tau = 3*viscosity + 0.5 (lattice units)
-        double tau = 3.0 * viscosity + 0.5;
-        this.omega = 1.0 / tau;
+        // omega = 1 / tau
+        org.jscience.mathematics.numbers.real.Real v = org.jscience.mathematics.numbers.real.Real.of(viscosity);
+        org.jscience.mathematics.numbers.real.Real tau = v.multiply(org.jscience.mathematics.numbers.real.Real.of(3.0))
+                .add(org.jscience.mathematics.numbers.real.Real.of(0.5));
+        this.omega = org.jscience.mathematics.numbers.real.Real.ONE.divide(tau);
 
         // Initialize arrays
-        f = new double[width][height][9];
-        // fEq, fTemp removed
-        rho = new double[width][height];
-        ux = new double[width][height];
-        uy = new double[width][height];
+        f = new org.jscience.mathematics.numbers.real.Real[width][height][9];
+        rho = new org.jscience.mathematics.numbers.real.Real[width][height];
+        ux = new org.jscience.mathematics.numbers.real.Real[width][height];
+        uy = new org.jscience.mathematics.numbers.real.Real[width][height];
         obstacle = new boolean[width][height];
+
+        org.jscience.mathematics.numbers.real.Real one = org.jscience.mathematics.numbers.real.Real.ONE;
+        org.jscience.mathematics.numbers.real.Real zero = org.jscience.mathematics.numbers.real.Real.ZERO;
 
         // Initialize to equilibrium at rest (rho=1, u=0)
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                rho[x][y] = 1.0;
-                ux[x][y] = 0.0;
-                uy[x][y] = 0.0;
+                rho[x][y] = one;
+                ux[x][y] = zero;
+                uy[x][y] = zero;
                 for (int i = 0; i < 9; i++) {
-                    f[x][y][i] = WEIGHTS_ALIGNED[i];
+                    f[x][y][i] = org.jscience.mathematics.numbers.real.Real.of(WEIGHTS_ALIGNED[i]);
                 }
             }
         }
@@ -124,9 +129,11 @@ public class LatticeBoltzmannSolver {
      * Sets inlet velocity (left boundary).
      */
     public void setInletVelocity(double ux0, double uy0) {
+        org.jscience.mathematics.numbers.real.Real rUx = org.jscience.mathematics.numbers.real.Real.of(ux0);
+        org.jscience.mathematics.numbers.real.Real rUy = org.jscience.mathematics.numbers.real.Real.of(uy0);
         for (int y = 1; y < height - 1; y++) {
-            ux[0][y] = ux0;
-            uy[0][y] = uy0;
+            ux[0][y] = rUx;
+            uy[0][y] = rUy;
         }
     }
 
@@ -142,55 +149,70 @@ public class LatticeBoltzmannSolver {
         provider.evolve(f, obstacle, omega);
 
         // 4. Compute macroscopic quantities (still needed for visualization/access)
-        // If provider computed them internally it discarded them. We recompute or ask
-        // provider.
-        // Current API recomputes.
         computeMacroscopic();
     }
 
     private void computeMacroscopic() {
+        org.jscience.mathematics.numbers.real.Real zero = org.jscience.mathematics.numbers.real.Real.ZERO;
+
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 if (obstacle[x][y]) {
-                    rho[x][y] = 0;
-                    ux[x][y] = 0;
-                    uy[x][y] = 0;
+                    rho[x][y] = zero;
+                    ux[x][y] = zero;
+                    uy[x][y] = zero;
                     continue;
                 }
 
-                double localRho = 0;
-                double localUx = 0;
-                double localUy = 0;
+                org.jscience.mathematics.numbers.real.Real localRho = zero;
+                org.jscience.mathematics.numbers.real.Real localUx = zero;
+                org.jscience.mathematics.numbers.real.Real localUy = zero;
 
                 for (int i = 0; i < 9; i++) {
-                    localRho += f[x][y][i];
-                    localUx += f[x][y][i] * VELOCITIES_ALIGNED[i][0];
-                    localUy += f[x][y][i] * VELOCITIES_ALIGNED[i][1];
+                    localRho = localRho.add(f[x][y][i]);
+                    // localUx += f * cx
+                    localUx = localUx.add(f[x][y][i]
+                            .multiply(org.jscience.mathematics.numbers.real.Real.of(VELOCITIES_ALIGNED[i][0])));
+                    // localUy += f * cy
+                    localUy = localUy.add(f[x][y][i]
+                            .multiply(org.jscience.mathematics.numbers.real.Real.of(VELOCITIES_ALIGNED[i][1])));
                 }
 
-                if (localRho > 0) {
-                    ux[x][y] = localUx / localRho;
-                    uy[x][y] = localUy / localRho;
+                if (localRho.compareTo(zero) > 0) {
+                    ux[x][y] = localUx.divide(localRho);
+                    uy[x][y] = localUy.divide(localRho);
                 } else {
-                    ux[x][y] = 0;
-                    uy[x][y] = 0;
+                    ux[x][y] = zero;
+                    uy[x][y] = zero;
                 }
                 rho[x][y] = localRho;
             }
         }
     }
 
-    // Accessors
+    // Accessors - converting to double for visualization compatibility
     public double[][] getDensity() {
-        return rho;
+        double[][] res = new double[width][height];
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+                res[x][y] = rho[x][y].doubleValue();
+        return res;
     }
 
     public double[][] getVelocityX() {
-        return ux;
+        double[][] res = new double[width][height];
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+                res[x][y] = ux[x][y].doubleValue();
+        return res;
     }
 
     public double[][] getVelocityY() {
-        return uy;
+        double[][] res = new double[width][height];
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+                res[x][y] = uy[x][y].doubleValue();
+        return res;
     }
 
     public int getWidth() {

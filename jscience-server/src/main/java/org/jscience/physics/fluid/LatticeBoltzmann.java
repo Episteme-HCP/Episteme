@@ -53,18 +53,27 @@ public class LatticeBoltzmann implements Serializable {
     private final boolean[][] obstacle;
 
     // D2Q9 Directions
-    private static final int[] CX = { 0, 1, 0, -1, 0, 1, -1, -1, 1 };
-    private static final int[] CY = { 0, 0, 1, 0, -1, 1, 1, -1, -1 };
+    // private static final int[] CX = { 0, 1, 0, -1, 0, 1, -1, -1, 1 };
+    // private static final int[] CY = { 0, 0, 1, 0, -1, 1, 1, -1, -1 };
     private static final double[] W = { 4.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 36.0, 1.0 / 36.0,
             1.0 / 36.0, 1.0 / 36.0 };
-    private static final int[] OPP = { 0, 3, 4, 1, 2, 7, 8, 5, 6 }; // Opposite directions
+    // private static final int[] OPP = { 0, 3, 4, 1, 2, 7, 8, 5, 6 }; // Opposite
+    // directions
+
+    private final org.jscience.technical.backend.algorithms.LatticeBoltzmannProvider provider;
+    private final org.jscience.mathematics.numbers.real.Real[][][] fReal;
+    private final org.jscience.mathematics.numbers.real.Real omega;
+    private final org.jscience.mathematics.numbers.real.Real zero = org.jscience.mathematics.numbers.real.Real.ZERO;
 
     public LatticeBoltzmann(int nx, int ny, double viscosity) {
         this.nx = nx;
         this.ny = ny;
         this.tau = 3.0 * viscosity + 0.5;
         this.f = new double[nx][ny][9];
+        this.fReal = new org.jscience.mathematics.numbers.real.Real[nx][ny][9];
         this.obstacle = new boolean[nx][ny];
+        this.provider = new org.jscience.technical.backend.algorithms.MulticoreLatticeBoltzmannProvider();
+        this.omega = org.jscience.mathematics.numbers.real.Real.of(1.0 / tau);
         initialize();
     }
 
@@ -73,6 +82,7 @@ public class LatticeBoltzmann implements Serializable {
             for (int y = 0; y < ny; y++) {
                 for (int i = 0; i < 9; i++) {
                     f[x][y][i] = W[i];
+                    fReal[x][y][i] = org.jscience.mathematics.numbers.real.Real.of(W[i]);
                 }
             }
         }
@@ -84,70 +94,34 @@ public class LatticeBoltzmann implements Serializable {
     }
 
     public void step() {
-        collide();
-        stream();
-    }
+        // Delegate to Provider (Multicore usually)
+        provider.evolve(fReal, obstacle, omega);
 
-    private void collide() {
-        for (int x = 0; x < nx; x++) {
-            for (int y = 0; y < ny; y++) {
-                if (obstacle[x][y])
-                    continue;
-
-                double rho = 0;
-                double ux = 0, uy = 0;
-                for (int i = 0; i < 9; i++) {
-                    rho += f[x][y][i];
-                    ux += f[x][y][i] * CX[i];
-                    uy += f[x][y][i] * CY[i];
-                }
-
-                if (rho > 0) {
-                    ux /= rho;
-                    uy /= rho;
-                }
-
-                for (int i = 0; i < 9; i++) {
-                    double cu = 3.0 * (CX[i] * ux + CY[i] * uy);
-                    double feq = rho * W[i] * (1.0 + cu + 0.5 * cu * cu - 1.5 * (ux * ux + uy * uy));
-                    f[x][y][i] += (feq - f[x][y][i]) / tau;
-                }
-            }
-        }
-    }
-
-    private void stream() {
-        double[][][] nextF = new double[nx][ny][9];
-        for (int x = 0; x < nx; x++) {
-            for (int y = 0; y < ny; y++) {
-                for (int i = 0; i < 9; i++) {
-                    int nextX = (x + CX[i] + nx) % nx;
-                    int nextY = (y + CY[i] + ny) % ny;
-
-                    if (obstacle[nextX][nextY]) {
-                        // Bounce-back
-                        nextF[x][y][OPP[i]] = f[x][y][i];
-                    } else {
-                        nextF[nextX][nextY][i] = f[x][y][i];
-                    }
-                }
-            }
-        }
-        for (int x = 0; x < nx; x++)
-            for (int y = 0; y < ny; y++)
-                System.arraycopy(nextF[x][y], 0, f[x][y], 0, 9);
+        // Sync back to double[][] f for legacy getters/renderers if needed
+        // Ideally we refactor App to use Real, but for minimal breakage we sync.
+        // Or we assume the App uses getDensity() which we can refactor.
     }
 
     public double[][][] getDistributions() {
+        // Sync from Real to double
+        for (int x = 0; x < nx; x++)
+            for (int y = 0; y < ny; y++)
+                for (int i = 0; i < 9; i++)
+                    f[x][y][i] = fReal[x][y][i].doubleValue();
         return f;
     }
 
     public double[][] getDensity() {
         double[][] rho = new double[nx][ny];
-        for (int x = 0; x < nx; x++)
-            for (int y = 0; y < ny; y++)
-                for (int i = 0; i < 9; i++)
-                    rho[x][y] += f[x][y][i];
+        for (int x = 0; x < nx; x++) {
+            for (int y = 0; y < ny; y++) {
+                org.jscience.mathematics.numbers.real.Real sum = zero;
+                for (int i = 0; i < 9; i++) {
+                    sum = sum.add(fReal[x][y][i]);
+                }
+                rho[x][y] = sum.doubleValue();
+            }
+        }
         return rho;
     }
 }

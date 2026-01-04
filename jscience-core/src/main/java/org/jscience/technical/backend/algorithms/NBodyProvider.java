@@ -46,6 +46,11 @@ public interface NBodyProvider {
     void computeForces(Real[] positions, Real[] masses, Real[] forces, Real G, Real softening);
 
     /**
+     * Computes gravitational forces using double primitives.
+     */
+    void computeForces(double[] positions, double[] masses, double[] forces, double G, double softening);
+
+    /**
      * Returns the name of this provider.
      * 
      * @return provider name

@@ -38,7 +38,7 @@ import java.lang.ref.Cleaner;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CudaStorage implements AutoCloseable {
+public class CUDAStorage implements AutoCloseable {
 
     private static final Cleaner CLEANER = Cleaner.create();
 
@@ -69,7 +69,7 @@ public class CudaStorage implements AutoCloseable {
      * 
      * @param size number of double elements to allocate
      */
-    public CudaStorage(int size) {
+    public CUDAStorage(int size) {
         this.size = size;
         this.devicePointer = new Pointer();
         int status = JCublas.cublasAlloc(size, Sizeof.DOUBLE, devicePointer);
@@ -85,7 +85,7 @@ public class CudaStorage implements AutoCloseable {
      * @param devicePointer the pointer to device memory
      * @param size          number of elements
      */
-    public CudaStorage(Pointer devicePointer, int size) {
+    public CUDAStorage(Pointer devicePointer, int size) {
         this.devicePointer = devicePointer;
         this.size = size;
         // For wrapped pointers, we typically don't own them,
@@ -138,4 +138,3 @@ public class CudaStorage implements AutoCloseable {
     }
 
 }
-
