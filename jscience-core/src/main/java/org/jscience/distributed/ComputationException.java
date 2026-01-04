@@ -21,22 +21,35 @@
  * SOFTWARE.
  */
 
+package org.jscience.distributed;
+
 /**
- * Distributed computing infrastructure for JScience.
- * 
- * <p>
- * Core abstractions:
- * </p>
- * <ul>
- * <li>{@link org.jscience.distributed.DistributedTask} - Task interface</li>
- * <li>{@link org.jscience.distributed.TaskRegistry} - Dynamic task
- * discovery</li>
- * <li>{@link org.jscience.distributed.TaskProvider} - Primitive/Real
- * abstraction</li>
- * </ul>
- * 
+ * Exception thrown when a distributed task computation fails.
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-package org.jscience.distributed;
+public class ComputationException extends Exception {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructs a new ComputationException with the specified message.
+     *
+     * @param message the error message
+     */
+    public ComputationException(String message) {
+        super(message);
+    }
+
+    /**
+     * Constructs a new ComputationException with the specified message and cause.
+     *
+     * @param message the error message
+     * @param cause   the underlying cause
+     */
+    public ComputationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}

@@ -22,21 +22,32 @@
  */
 
 /**
- * Distributed computing infrastructure for JScience.
+ * GPU-accelerated algorithm providers for non-linear-algebra operations.
  * 
  * <p>
- * Core abstractions:
- * </p>
+ * While linear algebra operations (matrix multiply, SVD, etc.) have extensive
+ * GPU support via {@link org.jscience.mathematics.linearalgebra.backends}, this
+ * package provides GPU acceleration for other algorithm families:
  * <ul>
- * <li>{@link org.jscience.distributed.DistributedTask} - Task interface</li>
- * <li>{@link org.jscience.distributed.TaskRegistry} - Dynamic task
- * discovery</li>
- * <li>{@link org.jscience.distributed.TaskProvider} - Primitive/Real
- * abstraction</li>
+ * <li>{@link org.jscience.technical.backend.algorithms.OpenCLNBodyProvider} -
+ * N-body gravitational simulation</li>
+ * <li>{@link org.jscience.technical.backend.algorithms.OpenCLLatticeBoltzmannProvider}
+ * - Fluid dynamics</li>
+ * <li>{@link org.jscience.technical.backend.algorithms.OpenCLFFTProvider} -
+ * Fast Fourier Transform</li>
+ * <li>{@link org.jscience.technical.backend.algorithms.ParallelMonteCarloProvider}
+ * - Monte Carlo integration</li>
  * </ul>
+ * </p>
  * 
+ * <p>
+ * All providers support both primitive double[] arrays and the Real API for
+ * seamless integration with the Primitive/Real task abstraction.
+ * </p>
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
+ * @see org.jscience.distributed.TaskProvider
  */
-package org.jscience.distributed;
+package org.jscience.technical.backend.algorithms;
