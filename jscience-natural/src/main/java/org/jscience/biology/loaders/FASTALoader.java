@@ -26,18 +26,23 @@ package org.jscience.biology.loaders;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import org.jscience.io.AbstractLoader;
+import org.jscience.io.OutputLoader;
 
 /**
- * Loads Biological Sequences from FASTA format.
+ * Loads and saves Biological Sequences from FASTA format.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class FASTALoader extends AbstractLoader<List<FASTALoader.Sequence>> {
+public class FASTALoader extends AbstractLoader<List<FASTALoader.Sequence>>
+        implements OutputLoader<List<FASTALoader.Sequence>> {
 
     @Override
     protected List<Sequence> loadFromSource(String resourceId) throws Exception {
@@ -62,6 +67,19 @@ public class FASTALoader extends AbstractLoader<List<FASTALoader.Sequence>> {
     @SuppressWarnings("unchecked")
     public Class<List<Sequence>> getResourceType() {
         return (Class<List<Sequence>>) (Class<?>) List.class;
+    }
+
+    @Override
+    public void save(List<Sequence> sequences, String destination) throws Exception {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(new File(destination)))) {
+            for (Sequence seq : sequences) {
+                pw.println(">" + seq.header);
+                String data = seq.data;
+                for (int i = 0; i < data.length(); i += 60) {
+                    pw.println(data.substring(i, Math.min(i + 60, data.length())));
+                }
+            }
+        }
     }
 
     public static class Sequence {
@@ -108,5 +126,3 @@ public class FASTALoader extends AbstractLoader<List<FASTALoader.Sequence>> {
         return sequences;
     }
 }
-
-

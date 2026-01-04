@@ -47,7 +47,7 @@ Statistics stats = dna.computeAlignmentStats();   // Mathematics layer
 ## Quick Start
 
 ```bash
-git clone https://github.com/silvere/jscience
+git clone https://github.com/silveremartin-dev/JScience
 cd jscience
 mvn clean install
 ```

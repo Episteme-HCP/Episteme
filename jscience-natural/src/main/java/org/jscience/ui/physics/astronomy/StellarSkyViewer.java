@@ -38,12 +38,11 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.physics.astronomy.coordinates.*;
-import org.jscience.physics.astronomy.loaders.StarLoader;
+import org.jscience.physics.loaders.*;
 import org.jscience.physics.astronomy.time.JulianDate;
 import org.jscience.physics.astronomy.time.SiderealTime;
 import org.jscience.ui.ThemeManager;
 import org.jscience.ui.i18n.I18n;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -1075,5 +1074,3 @@ public class StellarSkyViewer extends Application {
         new StellarSkyViewer().start(stage);
     }
 }
-
-

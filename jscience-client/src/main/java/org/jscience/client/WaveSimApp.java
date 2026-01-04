@@ -23,8 +23,12 @@
 
 package org.jscience.client;
 
+import com.google.protobuf.ByteString;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -33,35 +37,42 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.jscience.physics.wave.WaveModelTask;
+import org.jscience.server.proto.*;
+
+import java.io.*;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Wave Equation Solver with 2D wave propagation visualization.
+ * Wave Equation Solver with Distributed support.
  */
 public class WaveSimApp extends Application {
 
     private static final int WIDTH = 300;
     private static final int HEIGHT = 300;
     private static final int SCALE = 2;
-    
+
     private Canvas canvas;
     private GraphicsContext gc;
-    
-    private double[][] u;      // Current state
-    private double[][] uPrev;  // Previous state
-    private double[][] uNext;  // Next state
-    
-    private double c = 0.5;    // Wave speed
-    private double damping = 0.999;
+    private Label statusLabel;
+    private WaveModelTask task;
     private boolean running = false;
+    private boolean distributed = true;
+
+    // Distributed Logic
+    private ManagedChannel channel;
+    private ComputeServiceGrpc.ComputeServiceBlockingStub blockingStub;
+    private boolean serverAvailable = false;
+    private long stepCount = 0;
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle("Ã°Å¸Å’Å  Wave Equation Simulation - JScience");
+        stage.setTitle("🌊 Wave Equation - Distributed JScience");
 
         canvas = new Canvas(WIDTH * SCALE, HEIGHT * SCALE);
         gc = canvas.getGraphicsContext2D();
+        task = new WaveModelTask(WIDTH, HEIGHT);
 
-        // Controls
         VBox controls = new VBox(15);
         controls.setPadding(new Insets(20));
         controls.setStyle("-fx-background-color: #1a1a2e;");
@@ -70,169 +81,167 @@ public class WaveSimApp extends Application {
         Label title = new Label("Wave Equation");
         title.setStyle("-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #7c3aed;");
 
-        Slider speedSlider = new Slider(0.1, 0.9, c);
-        speedSlider.setShowTickLabels(true);
-        speedSlider.valueProperty().addListener((obs, old, val) -> c = val.doubleValue());
+        Slider speedSlider = new Slider(0.1, 0.9, 0.5);
+        speedSlider.valueProperty().addListener((obs, old, val) -> task.setC(val.doubleValue()));
 
-        Slider dampSlider = new Slider(0.9, 1.0, damping);
-        dampSlider.setShowTickLabels(true);
-        dampSlider.valueProperty().addListener((obs, old, val) -> damping = val.doubleValue());
+        Slider dampSlider = new Slider(0.9, 1.0, 0.999);
+        dampSlider.valueProperty().addListener((obs, old, val) -> task.setDamping(val.doubleValue()));
 
-        ComboBox<String> sourceType = new ComboBox<>();
-        sourceType.getItems().addAll("Click", "Continuous", "Two Sources");
-        sourceType.setValue("Click");
+        statusLabel = new Label("Status: Connected to Grid");
+        statusLabel.setStyle("-fx-text-fill: #aaa; -fx-font-size: 11;");
 
-        Button startBtn = new Button("Ã¢â€“Â¶ Start");
-        startBtn.setStyle("-fx-background-color: #7c3aed; -fx-text-fill: white;");
+        CheckBox distCheck = new CheckBox("Distributed Mode");
+        distCheck.setSelected(true);
+        distCheck.setStyle("-fx-text-fill: white;");
+        distCheck.setOnAction(e -> distributed = distCheck.isSelected());
+
+        Button startBtn = new Button("▶ Start");
+        startBtn.setStyle("-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-pref-width: 200;");
         startBtn.setOnAction(e -> {
             running = !running;
-            startBtn.setText(running ? "Ã¢ÂÂ¸ Pause" : "Ã¢â€“Â¶ Resume");
+            startBtn.setText(running ? "⏸ Pause" : "▶ Resume");
         });
 
-        Button resetBtn = new Button("Ã¢â€ Âº Reset");
-        resetBtn.setStyle("-fx-background-color: #444; -fx-text-fill: white;");
-        resetBtn.setOnAction(e -> initialize());
+        controls.getChildren().addAll(title, new Label("Speed:"), speedSlider, new Label("Damping:"), dampSlider,
+                new Separator(), distCheck, statusLabel, startBtn);
 
-        Button dropBtn = new Button("Ã°Å¸â€™Â§ Drop");
-        dropBtn.setOnAction(e -> createDrop(WIDTH/2, HEIGHT/2, 20, 1.0));
+        canvas.setOnMouseClicked(e -> createDrop((int) (e.getX() / SCALE), (int) (e.getY() / SCALE), 15));
+        HBox rootPanel = new HBox(canvas, controls);
+        rootPanel.setStyle("-fx-background-color: #0f0f1a;");
 
-        controls.getChildren().addAll(
-                title,
-                new Label("Wave Speed:"), speedSlider,
-                new Label("Damping:"), dampSlider,
-                new Label("Source Type:"), sourceType,
-                new Separator(),
-                startBtn, resetBtn, dropBtn
-        );
-        controls.getChildren().forEach(n -> {
-            if (n instanceof Label) ((Label) n).setStyle("-fx-text-fill: #aaa;");
-        });
-
-        HBox root = new HBox(canvas, controls);
-        root.setStyle("-fx-background-color: #0f0f1a;");
-
-        canvas.setOnMouseClicked(e -> {
-            int x = (int) (e.getX() / SCALE);
-            int y = (int) (e.getY() / SCALE);
-            createDrop(x, y, 15, 1.0);
-        });
-
-        canvas.setOnMouseDragged(e -> {
-            int x = (int) (e.getX() / SCALE);
-            int y = (int) (e.getY() / SCALE);
-            if (x > 1 && x < WIDTH-2 && y > 1 && y < HEIGHT-2) {
-                u[x][y] = 0.5;
-            }
-        });
-
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
+        stage.setScene(scene(rootPanel));
         stage.show();
 
-        initialize();
-        startSimulation(sourceType);
+        initGrpc();
+        startLoop();
     }
 
-    private void initialize() {
-        u = new double[WIDTH][HEIGHT];
-        uPrev = new double[WIDTH][HEIGHT];
-        uNext = new double[WIDTH][HEIGHT];
-        render();
+    private Scene scene(HBox root) {
+        return new Scene(root);
     }
 
-    private void createDrop(int cx, int cy, int radius, double amplitude) {
+    private void initGrpc() {
+        try {
+            channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
+            blockingStub = ComputeServiceGrpc.newBlockingStub(channel);
+            serverAvailable = true;
+        } catch (Exception e) {
+            serverAvailable = false;
+        }
+    }
+
+    private void startLoop() {
+        new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                if (!running)
+                    return;
+                stepCount++;
+                if (distributed && serverAvailable)
+                    runDistributedStep();
+                else {
+                    task.step();
+                    statusLabel.setText("Status: Local Performance");
+                    render();
+                }
+            }
+        }.start();
+    }
+
+    private void runDistributedStep() {
+        try {
+            byte[] waveData = serializeWave();
+            TaskRequest request = TaskRequest.newBuilder()
+                    .setTaskId("wave-" + stepCount)
+                    .setSerializedTask(ByteString.copyFrom(waveData))
+                    .setPriority(org.jscience.server.proto.Priority.HIGH)
+                    .build();
+
+            TaskResponse response = blockingStub.withDeadlineAfter(1, TimeUnit.SECONDS).submitTask(request);
+            if (response.getStatus() == Status.QUEUED) {
+                try {
+                    TaskResult result = blockingStub.withDeadlineAfter(50, TimeUnit.MILLISECONDS)
+                            .streamResults(TaskIdentifier.newBuilder().setTaskId(response.getTaskId()).build())
+                            .next();
+                    if (result.getStatus() == Status.COMPLETED) {
+                        applyWave(result.getSerializedData().toByteArray());
+                        statusLabel.setText("Status: Grid Computed ✅");
+                        render();
+                        return;
+                    }
+                } catch (Exception e) {
+                }
+            }
+            task.step();
+            render();
+            statusLabel.setText("Status: Grid Queued ⏳");
+        } catch (Exception e) {
+            task.step();
+            render();
+            statusLabel.setText("Status: Grid Offline ❌");
+        }
+    }
+
+    private byte[] serializeWave() throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(bos);
+        dos.writeUTF("WAVE_2D");
+        dos.writeInt(WIDTH);
+        dos.writeInt(HEIGHT);
+        dos.writeDouble(task.getC());
+        dos.writeDouble(task.getDamping());
+        double[][] u = task.getU();
+        double[][] up = task.getUPrev();
+        for (int x = 0; x < WIDTH; x++)
+            for (int y = 0; y < HEIGHT; y++) {
+                dos.writeDouble(u[x][y]);
+                dos.writeDouble(up[x][y]);
+            }
+        dos.flush();
+        return bos.toByteArray();
+    }
+
+    private void applyWave(byte[] data) throws IOException {
+        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
+        double[][] u = new double[WIDTH][HEIGHT];
+        double[][] up = new double[WIDTH][HEIGHT];
+        for (int x = 0; x < WIDTH; x++)
+            for (int y = 0; y < HEIGHT; y++) {
+                u[x][y] = dis.readDouble();
+                up[x][y] = dis.readDouble();
+            }
+        Platform.runLater(() -> task.updateState(u, up));
+    }
+
+    private void createDrop(int cx, int cy, int radius) {
+        double[][] u = task.getU();
         for (int x = Math.max(1, cx - radius); x < Math.min(WIDTH - 1, cx + radius); x++) {
             for (int y = Math.max(1, cy - radius); y < Math.min(HEIGHT - 1, cy + radius); y++) {
                 double dist = Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy));
-                if (dist < radius) {
-                    double factor = Math.cos(Math.PI * dist / radius / 2);
-                    u[x][y] += amplitude * factor * factor;
-                }
+                if (dist < radius)
+                    u[x][y] += Math.cos(Math.PI * dist / radius / 2);
             }
         }
-    }
-
-    private long frameCount = 0;
-    
-    private void step(String sourceType) {
-        frameCount++;
-        
-        // Continuous sources
-        if ("Continuous".equals(sourceType)) {
-            double freq = 0.1;
-            u[WIDTH/2][HEIGHT/2] = Math.sin(frameCount * freq);
-        } else if ("Two Sources".equals(sourceType)) {
-            double freq = 0.1;
-            u[WIDTH/3][HEIGHT/2] = Math.sin(frameCount * freq);
-            u[2*WIDTH/3][HEIGHT/2] = Math.sin(frameCount * freq);
-        }
-
-        // Wave equation: u_tt = c^2 * (u_xx + u_yy)
-        double c2 = c * c;
-        
-        for (int x = 1; x < WIDTH - 1; x++) {
-            for (int y = 1; y < HEIGHT - 1; y++) {
-                double laplacian = u[x+1][y] + u[x-1][y] + u[x][y+1] + u[x][y-1] - 4 * u[x][y];
-                uNext[x][y] = 2 * u[x][y] - uPrev[x][y] + c2 * laplacian;
-                uNext[x][y] *= damping;
-            }
-        }
-
-        // Swap buffers
-        double[][] temp = uPrev;
-        uPrev = u;
-        u = uNext;
-        uNext = temp;
     }
 
     private void render() {
-        for (int x = 0; x < WIDTH; x++) {
+        double[][] u = task.getU();
+        for (int x = 0; x < WIDTH; x++)
             for (int y = 0; y < HEIGHT; y++) {
-                double value = u[x][y];
-                
-                // Map to color
-                double normalized = (value + 1) / 2;  // [-1, 1] -> [0, 1]
-                normalized = Math.max(0, Math.min(1, normalized));
-                
-                // Blue-white-red colormap
-                Color c;
-                if (value < 0) {
-                    c = Color.rgb(
-                            (int) (50 + 100 * (1 + value)),
-                            (int) (50 + 100 * (1 + value)),
-                            (int) (150 + 105 * (1 + value))
-                    );
-                } else {
-                    c = Color.rgb(
-                            (int) (150 + 105 * value),
-                            (int) (50 + 100 * (1 - value)),
-                            (int) (50 + 100 * (1 - value))
-                    );
-                }
-                
-                gc.setFill(c);
+                double v = (u[x][y] + 1) / 2;
+                v = Math.max(0, Math.min(1, v));
+                gc.setFill(Color.rgb((int) (255 * v), (int) (100 * (1 - v)), (int) (255 * (1 - v))));
                 gc.fillRect(x * SCALE, y * SCALE, SCALE, SCALE);
             }
-        }
     }
 
-    private void startSimulation(ComboBox<String> sourceType) {
-        AnimationTimer timer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                if (!running) return;
-                for (int i = 0; i < 3; i++) {
-                    step(sourceType.getValue());
-                }
-                render();
-            }
-        };
-        timer.start();
+    @Override
+    public void stop() {
+        if (channel != null)
+            channel.shutdown();
     }
 
     public static void main(String[] args) {
         launch(args);
     }
 }
-
-

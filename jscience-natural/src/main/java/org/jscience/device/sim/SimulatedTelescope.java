@@ -23,7 +23,8 @@
 
 package org.jscience.device.sim;
 
-import org.jscience.device.sensors.Telescope;
+import org.jscience.device.transducers.Telescope;
+import org.jscience.mathematics.numbers.real.Real;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -309,6 +310,10 @@ public class SimulatedTelescope implements Telescope {
         double seconds = ((dec - degrees) * 60 - minutes) * 60;
         return String.format("%c%02dÃ‚Â° %02d' %05.2f\"", sign, degrees, minutes, seconds);
     }
+
+    @Override
+    public Real readValue() throws IOException {
+        // Return 0 for now as dummy sensor data
+        return Real.ZERO;
+    }
 }
-
-

@@ -1,25 +1,3 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
 
 package org.jscience.biology.loaders;
 
@@ -28,6 +6,7 @@ import java.net.http.*;
 import java.net.URI;
 import java.util.*;
 import com.fasterxml.jackson.databind.*;
+import org.jscience.biology.taxonomy.Species;
 
 /**
  * Loader for NCBI Taxonomy database.
@@ -59,36 +38,12 @@ public class NCBITaxonomyLoader {
     private final ObjectMapper mapper = new ObjectMapper();
 
     /**
-     * Represents a taxonomic entry from NCBI.
-     */
-    public static class TaxonEntry {
-        public final long taxId;
-        public final String scientificName;
-        public final String rank;
-        public final String lineage;
-        public final String division;
-
-        public TaxonEntry(long taxId, String scientificName, String rank, String lineage, String division) {
-            this.taxId = taxId;
-            this.scientificName = scientificName;
-            this.rank = rank;
-            this.lineage = lineage;
-            this.division = division;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%s (taxid:%d) [%s]", scientificName, taxId, rank);
-        }
-    }
-
-    /**
      * Fetches taxonomy by NCBI taxon ID.
      *
      * @param taxId the NCBI taxonomy ID
-     * @return the taxon entry, or empty if not found
+     * @return the species entry, or empty if not found
      */
-    public Optional<TaxonEntry> fetchByTaxId(long taxId) {
+    public Optional<org.jscience.biology.taxonomy.Species> fetchByTaxId(long taxId) {
         try {
             String url = BASE_URL + "?db=taxonomy&id=" + taxId + "&retmode=xml";
             HttpRequest request = HttpRequest.newBuilder()
@@ -138,7 +93,7 @@ public class NCBITaxonomyLoader {
         return ids;
     }
 
-    private Optional<TaxonEntry> parseXmlResponse(String xml, long taxId) {
+    private Optional<org.jscience.biology.taxonomy.Species> parseXmlResponse(String xml, long taxId) {
         // Simple XML parsing - extract key fields
         String scientificName = extractXmlValue(xml, "ScientificName");
         String rank = extractXmlValue(xml, "Rank");
@@ -146,7 +101,20 @@ public class NCBITaxonomyLoader {
         String division = extractXmlValue(xml, "Division");
 
         if (scientificName != null) {
-            return Optional.of(new TaxonEntry(taxId, scientificName, rank, lineage, division));
+            org.jscience.biology.taxonomy.Species s = new org.jscience.biology.taxonomy.Species(scientificName,
+                    scientificName);
+            // Map NCBI fields to Species attributes or specific fields
+            s.addAttribute("ncbi_taxid", String.valueOf(taxId));
+            if (rank != null)
+                s.addAttribute("rank", rank); // Species doesn't have generic rank field setter exposed as string
+                                              // easily, but has specific ones.
+            // Parse hierarchy from lineage if possible, but for now store as attribute
+            if (lineage != null)
+                s.addAttribute("lineage", lineage);
+            if (division != null)
+                s.addAttribute("division", division);
+
+            return Optional.of(s);
         }
         return Optional.empty();
     }
@@ -161,6 +129,77 @@ public class NCBITaxonomyLoader {
         }
         return null;
     }
+
+    /**
+     * Loads species from a specific resource path (JSON).
+     * 
+     * @param resourcePath Classpath to the JSON file.
+     * @return List of species found in the file.
+     */
+    public List<org.jscience.biology.taxonomy.Species> loadFromResource(String resourcePath) {
+        List<org.jscience.biology.taxonomy.Species> speciesList = new ArrayList<>();
+        try {
+            InputStream is = NCBITaxonomyLoader.class.getResourceAsStream(resourcePath);
+            if (is == null) {
+                is = NCBITaxonomyLoader.class.getClassLoader().getResourceAsStream(resourcePath);
+            }
+            if (is == null && !resourcePath.startsWith("/")) {
+                is = NCBITaxonomyLoader.class.getResourceAsStream("/" + resourcePath);
+            }
+
+            if (is == null) {
+                System.err.println("NCBITaxonomyLoader: Resource not found: " + resourcePath);
+                return speciesList;
+            }
+
+            JsonNode root = mapper.readTree(is);
+
+            if (root.isArray()) {
+                for (JsonNode node : root) {
+                    speciesList.add(parseSpeciesJson(node));
+                }
+            } else if (root.has("species")) {
+                for (JsonNode node : root.get("species")) {
+                    speciesList.add(parseSpeciesJson(node));
+                }
+            }
+
+            return speciesList;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return speciesList;
+        }
+    }
+
+    private org.jscience.biology.taxonomy.Species parseSpeciesJson(JsonNode node) {
+        String commonName = node.has("commonName") ? node.get("commonName").asText()
+                : (node.has("common_name") ? node.get("common_name").asText() : "");
+
+        String scientificName = node.has("scientificName") ? node.get("scientificName").asText()
+                : (node.has("scientific_name") ? node.get("scientific_name").asText() : "");
+
+        org.jscience.biology.taxonomy.Species s = new org.jscience.biology.taxonomy.Species(commonName, scientificName);
+
+        if (node.has("kingdom"))
+            s.setKingdom(node.get("kingdom").asText());
+        if (node.has("phylum"))
+            s.setPhylum(node.get("phylum").asText());
+        if (node.has("class"))
+            s.setTaxonomicClass(node.get("class").asText());
+        if (node.has("order"))
+            s.setOrder(node.get("order").asText());
+        if (node.has("family"))
+            s.setFamily(node.get("family").asText());
+        if (node.has("genus"))
+            s.setGenus(node.get("genus").asText());
+
+        if (node.has("attributes")) {
+            Iterator<String> fieldNames = node.get("attributes").fieldNames();
+            while (fieldNames.hasNext()) {
+                String key = fieldNames.next();
+                s.addAttribute(key, node.get("attributes").get(key).asText());
+            }
+        }
+        return s;
+    }
 }
-
-

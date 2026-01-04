@@ -118,7 +118,7 @@ public class Layer {
         // Apply Activation Function
         List<Real> activatedElements = new ArrayList<>();
         for (int i = 0; i < z.dimension(); i++) {
-            activatedElements.add(activationFunction.apply(z.get(i)));
+            activatedElements.add(Real.of(activationFunction.apply(z.get(i).doubleValue())));
         }
 
         return DenseVector.of(activatedElements, Real.ZERO);
@@ -132,5 +132,3 @@ public class Layer {
         return outputSize;
     }
 }
-
-

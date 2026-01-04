@@ -31,7 +31,15 @@ import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.physics.PhysicalConstants;
 
 /**
- * Barnes-Hut octree-based N-body simulation O(n log n).
+ * Barnes-Hut N-body gravitational simulation (O(N log N)).
+ * 
+ * <p>
+ * References:
+ * <ul>
+ * <li>Barnes, J., & Hut, P. (1986). A hierarchical O(N log N) force-calculation
+ * algorithm. Nature, 324(6096), 446-449.</li>
+ * </ul>
+ * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -75,14 +83,14 @@ public class BarnesHutSimulation {
 
         // Find bounds
         Particle p0 = particles.get(0);
-        Real minX = p0.getX(), minY = p0.getY(), minZ = p0.getZ();
+        Real minX = Real.of(p0.getX()), minY = Real.of(p0.getY()), minZ = Real.of(p0.getZ());
         Real maxX = minX, maxY = minY, maxZ = minZ;
 
         for (Particle p : particles) {
 
-            Real x = p.getX();
-            Real y = p.getY();
-            Real z = p.getZ();
+            Real x = Real.of(p.getX());
+            Real y = Real.of(p.getY());
+            Real z = Real.of(p.getZ());
             if (x.compareTo(minX) < 0)
                 minX = x;
             if (y.compareTo(minY) < 0)
@@ -125,9 +133,9 @@ public class BarnesHutSimulation {
         if (node.mass.equals(Real.ZERO) || node.particle == p)
             return;
 
-        Real dx = node.comX.subtract(p.getX());
-        Real dy = node.comY.subtract(p.getY());
-        Real dz = node.comZ.subtract(p.getZ());
+        Real dx = node.comX.subtract(Real.of(p.getX()));
+        Real dy = node.comY.subtract(Real.of(p.getY()));
+        Real dz = node.comZ.subtract(Real.of(p.getZ()));
 
         Real r2 = dx.pow(2).add(dy.pow(2)).add(dz.pow(2)).add(softening.pow(2));
         Real r = r2.sqrt();
@@ -208,11 +216,11 @@ public class BarnesHutSimulation {
 
         int octant(Particle p) {
             int o = 0;
-            if (p.getX().compareTo(centerX) > 0)
+            if (Real.of(p.getX()).compareTo(centerX) > 0)
                 o |= 1;
-            if (p.getY().compareTo(centerY) > 0)
+            if (Real.of(p.getY()).compareTo(centerY) > 0)
                 o |= 2;
-            if (p.getZ().compareTo(centerZ) > 0)
+            if (Real.of(p.getZ()).compareTo(centerZ) > 0)
                 o |= 4;
             return o;
         }
@@ -221,9 +229,9 @@ public class BarnesHutSimulation {
             if (mass.equals(Real.ZERO) && particle == null) {
                 particle = p;
                 mass = Real.of(p.getMass().getValue().doubleValue());
-                comX = p.getX();
-                comY = p.getY();
-                comZ = p.getZ();
+                comX = Real.of(p.getX());
+                comY = Real.of(p.getY());
+                comZ = Real.of(p.getZ());
             } else if (particle != null) {
                 Particle e = particle;
                 particle = null;
@@ -249,9 +257,9 @@ public class BarnesHutSimulation {
         void computeCenterOfMass() {
             if (particle != null) {
                 mass = Real.of(particle.getMass().getValue().doubleValue());
-                comX = particle.getX();
-                comY = particle.getY();
-                comZ = particle.getZ();
+                comX = Real.of(particle.getX());
+                comY = Real.of(particle.getY());
+                comZ = Real.of(particle.getZ());
             } else {
                 mass = Real.ZERO;
                 comX = Real.ZERO;
@@ -275,5 +283,3 @@ public class BarnesHutSimulation {
     }
 
 }
-
-

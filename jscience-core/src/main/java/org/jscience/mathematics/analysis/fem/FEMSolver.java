@@ -38,6 +38,17 @@ import org.jscience.mathematics.analysis.Function;
  * Currently supports solving the Poisson equation: -div(grad u) = f.
  * </p>
  *
+ * <p>
+ * References:
+ * <ul>
+ * <li>Courant, R. (1943). Variational methods for the solution of problems of
+ * equilibrium and vibrations. Bulletin of the American Mathematical Society,
+ * 49(1), 1-23.</li>
+ * <li>Zienkiewicz, O. C., & Taylor, R. L. (1967). The Finite Element Method in
+ * Engineering Science. McGraw-Hill.</li>
+ * </ul>
+ * </p>
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -53,7 +64,10 @@ public class FEMSolver {
      */
     public Vector<Real> solvePoisson(Mesh mesh, Function<Vector<Real>, Real> sourceTerm) {
         int nNodes = mesh.getNodes().size();
-        mesh.indexNodes(); // Ensure nodes are indexed
+        mesh.indexNodes(); // Ensure
+                           // nodes
+                           // are
+                           // indexed
 
         // Initialize global stiffness matrix K and load vector F
         // Using DenseMatrix for simplicity, but SparseMatrix would be better for large
@@ -154,7 +168,9 @@ public class FEMSolver {
         List<Node> nodes = element.getNodes();
         int n = nodes.size();
         if (n == 0)
-            return null; // Should not happen
+            return null; // Should
+                         // not
+                         // happen
 
         // We need to sum Ni(xi) * node_coords
         // Assuming Node has getCoordinates() returning Vector<Real>
@@ -206,4 +222,3 @@ public class FEMSolver {
         return sum;
     }
 }
-

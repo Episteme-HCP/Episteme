@@ -31,6 +31,8 @@ package org.jscience.io;
  * @since 1.0
  */
 public interface InputLoader<T> extends ResourceLoader<T> {
+    @Override
+    default boolean isInput() {
+        return true;
+    }
 }
-
-

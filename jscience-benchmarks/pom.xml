@@ -16,10 +16,11 @@
     <description>JScience Performance Benchmarks - Comparison with EJML, Colt, JBlas, Apache Commons Math</description>
 
     <dependencies>
-        <!-- JScience Core for benchmarking -->
+        <!-- Core JScience Module -->
         <dependency>
             <groupId>org.jscience</groupId>
             <artifactId>jscience-core</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
 

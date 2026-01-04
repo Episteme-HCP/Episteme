@@ -24,7 +24,8 @@
 package org.jscience.jni;
 
 /**
- * JNI Bridge for communicating with real hardware devices via C++/Rust native libraries.
+ * JNI Bridge for communicating with real hardware devices via C++/Rust native
+ * libraries.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -42,6 +43,7 @@ public class NativeDeviceBridge {
 
     /**
      * Connects to a physical device.
+     * 
      * @param deviceId The device identifier.
      * @return true if successful.
      */
@@ -49,16 +51,24 @@ public class NativeDeviceBridge {
 
     /**
      * Disconnects from a physical device.
+     * 
      * @param deviceId The device identifier.
      */
     public native void disconnectDevice(String deviceId);
 
     /**
      * Reads a double value from a sensor.
+     * 
      * @param deviceId The sensor identifier.
      * @return The measured value.
      */
     public native double readSensorValue(String deviceId);
+
+    /**
+     * Acquires a spectrum array from a spectrometer.
+     * 
+     * @param deviceId The device identifier.
+     * @return The spectrum data.
+     */
+    public native double[] acquireSpectrum(int deviceId);
 }
-
-

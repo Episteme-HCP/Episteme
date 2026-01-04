@@ -23,15 +23,11 @@
 
 package org.jscience.mathematics.analysis.pde;
 
+import java.util.function.DoubleUnaryOperator;
+
 /**
- * Finite Difference solver for 1D heat equation.
- * <p>
- * Solves: Ã¢Ë†â€šu/Ã¢Ë†â€št = ÃŽÂ± Ã¢Ë†â€šÃ‚Â²u/Ã¢Ë†â€šxÃ‚Â²
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * 1D Heat Equation Solver.
+ * Supports Explicit and Implicit integration schemas.
  */
 public class HeatEquationSolver {
 
@@ -48,11 +44,6 @@ public class HeatEquationSolver {
     private BoundaryType leftType = BoundaryType.DIRICHLET;
     private BoundaryType rightType = BoundaryType.DIRICHLET;
 
-    public enum BoundaryType {
-        DIRICHLET, // Fixed value
-        NEUMANN // Fixed derivative (flux)
-    }
-
     public HeatEquationSolver(int nx, double length, double alpha) {
         this.nx = nx;
         this.dx = length / (nx - 1);
@@ -64,7 +55,7 @@ public class HeatEquationSolver {
     /**
      * Set initial condition.
      */
-    public void setInitialCondition(java.util.function.DoubleUnaryOperator f) {
+    public void setInitialCondition(DoubleUnaryOperator f) {
         for (int i = 0; i < nx; i++) {
             u[i] = f.applyAsDouble(i * dx);
         }
@@ -82,7 +73,7 @@ public class HeatEquationSolver {
 
     /**
      * Explicit Euler time step (FTCS scheme).
-     * Stable if dt <= dxÃ‚Â²/(2ÃŽÂ±)
+     * Stable if dt <= dx^2/(2*alpha)
      */
     public void stepExplicit(double dt) {
         double r = alpha * dt / (dx * dx);
@@ -187,42 +178,7 @@ public class HeatEquationSolver {
         }
     }
 
-    /**
-     * Run simulation for given time.
-     */
-    public void solve(double totalTime, double dt, boolean implicit) {
-        int steps = (int) (totalTime / dt);
-        for (int i = 0; i < steps; i++) {
-            if (implicit) {
-                stepImplicit(dt);
-            } else {
-                stepExplicit(dt);
-            }
-        }
-    }
-
     public double[] getSolution() {
-        return u.clone();
-    }
-
-    public double getValue(int i) {
-        return u[i];
-    }
-
-    public int getSize() {
-        return nx;
-    }
-
-    public double getDx() {
-        return dx;
-    }
-
-    /**
-     * Get the spatial coordinate for index i.
-     */
-    public double getX(int i) {
-        return i * dx;
+        return u;
     }
 }
-
-

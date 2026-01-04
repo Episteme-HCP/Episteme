@@ -23,6 +23,11 @@
     <!-- Communication -->
     <dependency>
       <groupId>org.jscience</groupId>
+      <artifactId>jscience-natural</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jscience</groupId>
       <artifactId>jscience-server</artifactId>
       <version>${project.version}</version>
     </dependency>

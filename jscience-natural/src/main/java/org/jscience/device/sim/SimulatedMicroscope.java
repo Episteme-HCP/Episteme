@@ -110,6 +110,11 @@ public class SimulatedMicroscope extends SimulatedDevice implements Microscope {
     public void setLightingLevel(double level) {
         this.lightingLevel = Math.max(0, Math.min(1.0, level));
     }
+
+    @Override
+    public Real readValue() throws java.io.IOException {
+        // Return current magnification as the "value" for now, or could be image data
+        // in future
+        return currentMagnification;
+    }
 }
-
-

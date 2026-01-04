@@ -49,21 +49,10 @@ import java.util.logging.Logger;
 public abstract class AbstractLoader<T> implements InputLoader<T> {
 
     private static final Logger LOGGER = Logger.getLogger(AbstractLoader.class.getName());
-
     private final ConcurrentHashMap<String, T> localCache = new ConcurrentHashMap<>();
-    private boolean cacheEnabled = true;
     private boolean usingFallback = false;
+    private boolean cacheEnabled = true;
 
-    /**
-     * Returns the base path where this loader's resources are located.
-     */
-    @Override
-    public abstract String getResourcePath();
-
-    /**
-     * Returns the type of resource this loader produces.
-     */
-    @Override
     public abstract Class<T> getResourceType();
 
     /**
@@ -214,5 +203,3 @@ public abstract class AbstractLoader<T> implements InputLoader<T> {
         localCache.clear();
     }
 }
-
-

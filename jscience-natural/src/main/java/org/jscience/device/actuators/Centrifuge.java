@@ -35,20 +35,9 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public interface Centrifuge extends Actuator<Real> {
     enum RotorType {
-        FIXED_ANGLE("device.centrifuge.rotor.fixed"),
-        SWINGING_BUCKET("device.centrifuge.rotor.swinging"),
-        VERTICAL("device.centrifuge.rotor.vertical");
-
-        private final String i18nKey;
-
-        RotorType(String i18nKey) {
-            this.i18nKey = i18nKey;
-        }
-
-        @Override
-        public String toString() {
-            return org.jscience.ui.i18n.I18n.getInstance().get(i18nKey);
-        }
+        FIXED_ANGLE,
+        SWINGING_BUCKET,
+        VERTICAL;
     }
 
     void start(Real rpm);
@@ -67,5 +56,3 @@ public interface Centrifuge extends Actuator<Real> {
 
     boolean isRunning();
 }
-
-

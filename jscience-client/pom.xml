@@ -12,6 +12,12 @@
     <description>JavaFX client applications for the JScience Grid (Whiteboard, Monitor, Browser)</description>
 
     <dependencies>
+        <!-- Core JScience Module -->
+        <dependency>
+            <groupId>org.jscience</groupId>
+            <artifactId>jscience-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- JavaFX -->
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -52,6 +58,13 @@
         <dependency>
             <groupId>org.jscience</groupId>
             <artifactId>jscience-natural</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Social Science Module -->
+        <dependency>
+            <groupId>org.jscience</groupId>
+            <artifactId>jscience-social</artifactId>
             <version>${project.version}</version>
         </dependency>
 

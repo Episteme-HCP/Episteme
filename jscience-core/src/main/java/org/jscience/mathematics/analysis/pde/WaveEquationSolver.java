@@ -24,9 +24,19 @@
 package org.jscience.mathematics.analysis.pde;
 
 /**
- * 1D Wave equation solver: Ã¢Ë†â€šÃ‚Â²u/Ã¢Ë†â€štÃ‚Â² = cÃ‚Â² Ã¢Ë†â€šÃ‚Â²u/Ã¢Ë†â€šxÃ‚Â²
+ * 1D Wave equation solver: ∂²u/∂t² = c² ∂²u/∂x²
  * <p>
  * Uses explicit finite difference (leapfrog) scheme.
+ * </p>
+ *
+ * <p>
+ * References:
+ * <ul>
+ * <li>Courant, R., Friedrichs, K., & Lewy, H. (1928). Über die partiellen
+ * Differenzengleichungen der mathematischen Physik. Mathematische Annalen,
+ * 100(1), 32-74.</li>
+ * <li>Trefethen, L. N. (2000). Spectral Methods in MATLAB. SIAM.</li>
+ * </ul>
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -201,5 +211,3 @@ public class WaveEquationSolver {
         return solver;
     }
 }
-
-

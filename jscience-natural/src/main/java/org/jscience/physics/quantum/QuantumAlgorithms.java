@@ -32,6 +32,20 @@ import java.util.Arrays;
 /**
  * Quantum algorithms (Grover's search, Shor's period finding).
  *
+ * <p>
+ * References:
+ * <ul>
+ * <li>Grover, L. K. (1996). A fast quantum mechanical algorithm for database
+ * search. Proceedings of the 28th Annual ACM Symposium on Theory of Computing,
+ * 212-219.</li>
+ * <li>Shor, P. W. (1994). Algorithms for quantum computation: discrete
+ * logarithms and factoring. Proceedings of the 35th Annual Symposium on
+ * Foundations of Computer Science, 124-134.</li>
+ * <li>Nielsen, M. A., & Chuang, I. L. (2010). Quantum Computation and Quantum
+ * Information. Cambridge University Press.</li>
+ * </ul>
+ * </p>
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -40,8 +54,8 @@ public class QuantumAlgorithms {
 
     /**
      * Creates a Grover oracle for a specific marked state.
-     * Oracle flips the sign of the marked state: O|xÃ¢Å¸Â© = -|xÃ¢Å¸Â© if x = marked, else
-     * |xÃ¢Å¸Â©
+     * Oracle flips the sign of the marked state: O|x⟩ = -|x⟩ if x = marked, else
+     * |x⟩
      * 
      * @param numQubits   Number of qubits
      * @param markedState Index of the state to search for
@@ -198,5 +212,3 @@ public class QuantumAlgorithms {
         return new QuantumGate(new DenseMatrix<>(rowsList, Complex.ZERO));
     }
 }
-
-

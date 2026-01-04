@@ -23,7 +23,7 @@
 
 package org.jscience.device.sensors;
 
-import org.jscience.device.Device;
+import org.jscience.device.Sensor;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
@@ -33,25 +33,14 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface Microscope extends Device {
+public interface Microscope extends Sensor<Real> {
     enum Type {
-        OPTICAL("device.microscope.type.optical"),
-        ELECTRON_SCANNING("device.microscope.type.sem"),
-        ELECTRON_TRANSMISSION("device.microscope.type.tem"),
-        CONFOCAL("device.microscope.type.confocal"),
-        FLUORESCENCE("device.microscope.type.fluorescence"),
-        ATOMIC_FORCE("device.microscope.type.afm");
-
-        private final String i18nKey;
-
-        Type(String i18nKey) {
-            this.i18nKey = i18nKey;
-        }
-
-        @Override
-        public String toString() {
-            return org.jscience.ui.i18n.I18n.getInstance().get(i18nKey);
-        }
+        OPTICAL,
+        ELECTRON_SCANNING,
+        ELECTRON_TRANSMISSION,
+        CONFOCAL,
+        FLUORESCENCE,
+        ATOMIC_FORCE;
     }
 
     Type getType();
@@ -68,5 +57,3 @@ public interface Microscope extends Device {
 
     boolean isResolvable(Real featureSize);
 }
-
-

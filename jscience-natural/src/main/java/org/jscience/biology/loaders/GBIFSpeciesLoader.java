@@ -1,3 +1,4 @@
+
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
@@ -201,6 +202,37 @@ public class GBIFSpeciesLoader {
                 node.path("genus").asText(null),
                 node.path("species").asText(null)));
     }
+
+    /**
+     * Gets the media (images) for a species.
+     * 
+     * @param speciesKey the GBIF species key
+     * @return the first image URL found, or empty if not found
+     */
+    public Optional<String> getSpeciesMedia(long speciesKey) {
+        try {
+            String url = String.format("%s/%d/media", BASE_URL, speciesKey);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                JsonNode root = mapper.readTree(response.body());
+                JsonNode results = root.get("results");
+                if (results != null && results.isArray() && results.size() > 0) {
+                    for (JsonNode media : results) {
+                        if ("StillImage".equals(media.path("type").asText())) {
+                            return Optional.ofNullable(media.path("identifier").asText(null));
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("GBIF media fetch failed: " + e.getMessage());
+        }
+        return Optional.empty();
+    }
 }
-
-

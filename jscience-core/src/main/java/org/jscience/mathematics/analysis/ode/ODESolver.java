@@ -29,7 +29,17 @@ import org.jscience.mathematics.numbers.real.Real;
 /**
  * Ordinary Differential Equation (ODE) solvers.
  * <p>
- * Solves initial value problems dy/dt = f(t, y) with y(tÃ¢â€šâ‚¬) = yÃ¢â€šâ‚¬.
+ * Solves initial value problems dy/dt = f(t, y) with y(t₀) = y₀.
+ * </p>
+ *
+ * <p>
+ * References:
+ * <ul>
+ * <li>Hairer, E., Nørsett, S. P., & Wanner, G. (1993). Solving Ordinary
+ * Differential Equations I: Nonstiff Problems. Springer.</li>
+ * <li>Butcher, J. C. (2008). Numerical Methods for Ordinary Differential
+ * Equations. Wiley.</li>
+ * </ul>
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -37,9 +47,8 @@ import org.jscience.mathematics.numbers.real.Real;
  * @since 1.0
  */
 public class ODESolver {
-
     /**
-     * Euler's method: yÃ¢â€šâ„¢Ã¢â€šÅ Ã¢â€šÂ = yÃ¢â€šâ„¢ + h*f(tÃ¢â€šâ„¢, yÃ¢â€šâ„¢)
+     * Euler's method: y_{n+1} = y_n + h*f(t_n, y_n)
      * <p>
      * First-order method. Simple but low accuracy O(h).
      * </p>
@@ -63,7 +72,7 @@ public class ODESolver {
     /**
      * Runge-Kutta 4th order (RK4): Classical method.
      * <p>
-     * Fourth-order accuracy O(hÃ¢ÂÂ´). Industry standard for ODE solving.
+     * Fourth-order accuracy O(h⁴). Industry standard for ODE solving.
      * </p>
      */
     public static Real[] rungeKutta4(Function<Real[], Real> f, Real t0, Real y0, Real tEnd, Real h) {
@@ -81,8 +90,8 @@ public class ODESolver {
             Real k3 = f.evaluate(new Real[] { t.add(h.divide(Real.of(2))), y.add(h.multiply(k2).divide(Real.of(2))) });
             Real k4 = f.evaluate(new Real[] { t.add(h), y.add(h.multiply(k3)) });
 
-            Real increment = h.divide(Real.of(6)).multiply(
-                    k1.add(k2.multiply(Real.of(2))).add(k3.multiply(Real.of(2))).add(k4));
+            Real increment = h.divide(Real.of(6))
+                    .multiply(k1.add(k2.multiply(Real.of(2))).add(k3.multiply(Real.of(2))).add(k4));
 
             solution[i + 1] = y.add(increment);
             t = t.add(h);
@@ -113,5 +122,3 @@ public class ODESolver {
         return solution;
     }
 }
-
-

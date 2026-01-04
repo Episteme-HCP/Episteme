@@ -90,6 +90,42 @@ public interface ResourceLoader<T> {
     default String[] getExpectedResourceFiles() {
         return new String[0];
     }
+
+    /**
+     * Returns the human-readable name of this loader.
+     * Default: Class simple name.
+     */
+    default String getName() {
+        return this.getClass().getSimpleName();
+    }
+
+    /**
+     * Returns a description of what this loader does.
+     * Default: Empty string.
+     */
+    default String getDescription() {
+        return "";
+    }
+
+    /**
+     * Returns the category key for this loader (e.g., "category.physics").
+     * Default: "category.other".
+     */
+    default String getCategory() {
+        return "category.other";
+    }
+
+    /**
+     * Returns true if this is an input loader (importer).
+     */
+    default boolean isInput() {
+        return false;
+    }
+
+    /**
+     * Returns true if this is an output loader (exporter).
+     */
+    default boolean isOutput() {
+        return false;
+    }
 }
-
-

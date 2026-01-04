@@ -23,8 +23,12 @@
 
 package org.jscience.client;
 
+import com.google.protobuf.ByteString;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
@@ -35,32 +39,57 @@ import javafx.scene.shape.Box;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
-import org.jscience.chemistry.molecular.MolecularDynamicsTask;
+import org.jscience.server.proto.*;
+import org.jscience.physics.classical.mechanics.VelocityVerlet;
+import org.jscience.physics.classical.mechanics.Particle;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.biology.loaders.PDBLoader;
+import org.jscience.biology.Protein;
+import org.jscience.chemistry.Atom;
+import org.jscience.chemistry.PeriodicTable;
+import org.jscience.client.molecular.MolecularDynamicsTask;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.mathematics.sets.Reals;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import javafx.stage.FileChooser;
+import javafx.scene.control.Button;
+import javafx.scene.control.Alert;
+import javafx.scene.control.CheckBox;
+import javafx.scene.layout.HBox;
+import javafx.geometry.Pos;
 
 /**
- * 3D Visualization of Molecular Dynamics.
+ * 3D Visualization of Molecular Dynamics with Distributed Grid support.
  */
 public class MolecularDynamicsApp extends Application {
 
     private final Group atomGroup = new Group();
     private MolecularDynamicsTask task;
     private final List<Sphere> atomMeshes = new ArrayList<>();
+    private Label stats;
 
-    // Sim Settings
+    private CheckBox localSimCheckBox;
+    private Button loadPdbBtn;
+
     private final double BOX_SIZE = 50.0;
     private final int NUM_ATOMS = 100;
 
+    // Distributed Logic
+    private ManagedChannel channel;
+    private ComputeServiceGrpc.ComputeServiceBlockingStub blockingStub;
+    private boolean distributed = true; // This variable is now controlled by localSimCheckBox
+    private boolean serverAvailable = false;
+    private long stepCount = 0;
+
     @Override
     public void start(Stage stage) {
-        stage.setTitle("Ã°Å¸Â§Âª Molecular Dynamics - JScience");
+        stage.setTitle("🧪 Molecular Dynamics - Distributed JScience");
 
-        // 3D Scene
         Group root = new Group(atomGroup);
-
-        // Draw bounding box
         Box box = new Box(BOX_SIZE, BOX_SIZE, BOX_SIZE);
         box.setMaterial(new PhongMaterial(Color.web("#ffffff", 0.1)));
         box.setTranslateX(BOX_SIZE / 2);
@@ -72,23 +101,18 @@ public class MolecularDynamicsApp extends Application {
         Scene scene = new Scene(root, 1024, 768, true);
         scene.setFill(Color.rgb(20, 20, 30));
 
-        // Camera
         PerspectiveCamera camera = new PerspectiveCamera(true);
         camera.setTranslateZ(-150);
         camera.setTranslateX(BOX_SIZE / 2);
         camera.setTranslateY(BOX_SIZE / 2);
-        camera.setFarClip(1000.0);
+        camera.setFarClip(2000.0);
         scene.setCamera(camera);
 
-        // Interaction (Rotate scene)
         Group world = new Group(root);
         scene.setRoot(world);
-
         Rotate xRotate = new Rotate(0, Rotate.X_AXIS);
         Rotate yRotate = new Rotate(0, Rotate.Y_AXIS);
         world.getTransforms().addAll(xRotate, yRotate);
-
-        // Center rotation pivot
         xRotate.setPivotX(BOX_SIZE / 2);
         xRotate.setPivotY(BOX_SIZE / 2);
         xRotate.setPivotZ(BOX_SIZE / 2);
@@ -97,68 +121,274 @@ public class MolecularDynamicsApp extends Application {
         yRotate.setPivotZ(BOX_SIZE / 2);
 
         scene.setOnMouseDragged(event -> {
-            xRotate.setAngle(xRotate.getAngle() - event.getSceneY() / 100); // Simple sensitivity
+            xRotate.setAngle(xRotate.getAngle() - event.getSceneY() / 100);
             yRotate.setAngle(yRotate.getAngle() + event.getSceneX() / 100);
         });
 
-        // Initialize Simulation
-        task = new MolecularDynamicsTask(NUM_ATOMS, 0.05, 1, BOX_SIZE);
+        task = new MolecularDynamicsTask(NUM_ATOMS, 0.05, 5, BOX_SIZE);
 
-        // Initialize Meshes
-        PhongMaterial atomMat = new PhongMaterial(Color.CYAN);
-        atomMat.setSpecularColor(Color.WHITE);
-
-        for (int i = 0; i < task.getAtoms().size(); i++) {
+        for (int i = 0; i < NUM_ATOMS; i++) {
             Sphere s = new Sphere(1.5);
-            s.setMaterial(atomMat);
+            s.setMaterial(new PhongMaterial(Color.CYAN));
             atomMeshes.add(s);
             atomGroup.getChildren().add(s);
         }
 
+        stats = new Label("Initializing Grid...");
+        stats.setTextFill(Color.WHITE);
+        stats.setStyle("-fx-font-size: 16;");
+
+        localSimCheckBox = new CheckBox("Local Simulation");
+        localSimCheckBox.setSelected(true);
+        localSimCheckBox.setTextFill(Color.WHITE);
+
+        Button exportBtn = new Button("💾 Export PDB");
+        exportBtn.setOnAction(e -> exportToPdb());
+
+        loadPdbBtn = new Button("📂 Load PDB");
+        loadPdbBtn.setOnAction(e -> loadPdb(stage));
+        HBox overlay = new HBox(20, stats, localSimCheckBox, loadPdbBtn, exportBtn);
+        overlay.setAlignment(Pos.CENTER_LEFT);
+        overlay.setStyle("-fx-background-color: rgba(0,0,0,0.5); -fx-padding: 20;");
+        ((Group) scene.getRoot()).getChildren().add(overlay);
+
         stage.setScene(scene);
         stage.show();
 
-        // Label overlay
-        Label stats = new Label("Atoms: " + NUM_ATOMS);
-        stats.setTextFill(Color.WHITE);
-        stats.setStyle("-fx-font-size: 16; -fx-padding: 10;");
-        ((Group) scene.getRoot()).getChildren().add(stats);
+        initGrpc();
 
-        // Loop
         new AnimationTimer() {
             @Override
             public void handle(long now) {
-                // Simulate 5 steps per frame
-                for (int i = 0; i < 5; i++)
-                    task.run();
-
-                // Update visuals
-                List<MolecularDynamicsTask.AtomState> states = task.getAtoms();
-                for (int i = 0; i < NUM_ATOMS; i++) {
-                    MolecularDynamicsTask.AtomState state = states.get(i);
-                    Sphere mesh = atomMeshes.get(i);
-                    mesh.setTranslateX(state.x);
-                    mesh.setTranslateY(state.y);
-                    mesh.setTranslateZ(state.z);
-
-                    // Simple heat coloring
-                    double speed = Math.sqrt(state.vx * state.vx + state.vy * state.vy + state.vz * state.vz);
-                    if (speed > 1.5)
-                        ((PhongMaterial) mesh.getMaterial()).setDiffuseColor(Color.RED);
-                    else if (speed > 0.8)
-                        ((PhongMaterial) mesh.getMaterial()).setDiffuseColor(Color.ORANGE);
-                    else
-                        ((PhongMaterial) mesh.getMaterial()).setDiffuseColor(Color.CYAN);
+                stepCount++;
+                if (localSimCheckBox.isSelected()) {
+                    runLocalStep();
+                } else {
+                    runDistributedStep();
                 }
-
-                stats.setText(String.format("Kinetic Energy: %.2f", task.getTotalEnergy()));
             }
         }.start();
+    }
+
+    private void exportToPdb() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save PDB Export");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDB Files", "*.pdb"));
+        File file = fileChooser.showSaveDialog(null);
+        if (file != null) {
+            try {
+                Protein p = new Protein("MD-SIM");
+                Protein.Chain chain = new Protein.Chain("A");
+                Protein.Residue res = new Protein.Residue("UNK", 1);
+
+                for (MolecularDynamicsTask.AtomState state : task.getAtoms()) {
+                    DenseVector<Real> pos = DenseVector.of(
+                            java.util.Arrays.asList(Real.of(state.x), Real.of(state.y), Real.of(state.z)),
+                            Reals.getInstance());
+                    Atom atom = new Atom(PeriodicTable.getElement("Ar"), pos); // Assume Argon for MD gas
+                    res.addAtom(atom);
+                }
+                chain.addResidue(res);
+                p.addChain(chain);
+
+                new PDBLoader().save(p, file.getAbsolutePath());
+                new Alert(Alert.AlertType.INFORMATION, "Exported " + task.getNumAtoms() + " atoms to " + file.getName())
+                        .show();
+            } catch (Exception e) {
+                new Alert(Alert.AlertType.ERROR, "Export failed: " + e.getMessage()).show();
+            }
+        }
+    }
+
+    private void initGrpc() {
+        try {
+            channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
+            blockingStub = ComputeServiceGrpc.newBlockingStub(channel);
+            serverAvailable = true;
+        } catch (Exception e) {
+            serverAvailable = false;
+        }
+    }
+
+    private VelocityVerlet localSolver;
+    private List<Particle> localParticles = new ArrayList<>();
+
+    private void runLocalStep() {
+        if (localSolver == null) {
+            for (int i = 0; i < NUM_ATOMS; i++) {
+                localParticles.add(new Particle(Math.random() * BOX_SIZE, Math.random() * BOX_SIZE,
+                        Math.random() * BOX_SIZE, 1.0));
+            }
+            localSolver = new VelocityVerlet(localParticles, BOX_SIZE, 2.5);
+        }
+        localSolver.step(0.01);
+
+        // Sync local to task.atoms for rendering
+        List<MolecularDynamicsTask.AtomState> states = new ArrayList<>();
+        for (Particle p : localParticles) {
+            states.add(new MolecularDynamicsTask.AtomState(p.getX(), p.getY(), p.getZ(),
+                    p.getVelocity().get(0).doubleValue(),
+                    p.getVelocity().get(1).doubleValue(),
+                    p.getVelocity().get(2).doubleValue(), 1.0));
+        }
+        task.updateState(states, 0.0);
+        updateUI("Local LBM");
+    }
+
+    private void runDistributedStep() {
+        if (!serverAvailable) {
+            runLocalStep();
+            return;
+        }
+
+        // Run in background to avoid freezing UI
+        new Thread(() -> {
+            try {
+                byte[] taskData = serializeAtoms();
+                TaskRequest request = TaskRequest.newBuilder()
+                        .setTaskId("MD-" + stepCount)
+                        .setSerializedTask(ByteString.copyFrom(taskData))
+                        .setPriority(org.jscience.server.proto.Priority.HIGH)
+                        .build();
+
+                TaskResponse response = blockingStub.submitTask(request);
+
+                // For MD, we want to wait for the result immediately to render the next frame
+                // In a real app, this might be async with interpolated rendering
+                TaskResult result = blockingStub.withDeadlineAfter(5, TimeUnit.SECONDS)
+                        .streamResults(TaskIdentifier.newBuilder().setTaskId(response.getTaskId()).build())
+                        .next();
+
+                if (result.getStatus() == Status.COMPLETED) {
+                    applyAtoms(result.getSerializedData().toByteArray());
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> stats.setText("Grid Error: " + e.getMessage()));
+            }
+        }).start();
+    }
+
+    private byte[] serializeAtoms() throws IOException {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                DataOutputStream dos = new DataOutputStream(bos)) {
+            dos.writeUTF("MOLECULAR_DYNAMICS");
+            dos.writeInt(task.getNumAtoms());
+            dos.writeDouble(task.getTimeStep());
+            dos.writeInt(task.getSteps());
+            dos.writeDouble(task.getBoxSize());
+            for (MolecularDynamicsTask.AtomState a : task.getAtoms()) {
+                dos.writeDouble(a.x);
+                dos.writeDouble(a.y);
+                dos.writeDouble(a.z);
+                dos.writeDouble(a.vx);
+                dos.writeDouble(a.vy);
+                dos.writeDouble(a.vz);
+                dos.writeDouble(a.mass);
+            }
+            dos.flush();
+            return bos.toByteArray();
+        }
+    }
+
+    private void applyAtoms(byte[] data) throws IOException {
+        try (DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data))) {
+            double energy = dis.readDouble();
+            int count = dis.readInt();
+            List<MolecularDynamicsTask.AtomState> newAtoms = new ArrayList<>();
+            for (int i = 0; i < count; i++) {
+                newAtoms.add(new MolecularDynamicsTask.AtomState(
+                        dis.readDouble(), dis.readDouble(), dis.readDouble(),
+                        dis.readDouble(), dis.readDouble(), dis.readDouble(), 1.0));
+            }
+            Platform.runLater(() -> task.updateState(newAtoms, energy));
+        }
+    }
+
+    private void updateUI(String mode) {
+        List<MolecularDynamicsTask.AtomState> states = task.getAtoms();
+        for (int i = 0; i < NUM_ATOMS; i++) {
+            MolecularDynamicsTask.AtomState state = states.get(i);
+            Sphere mesh = atomMeshes.get(i);
+            mesh.setTranslateX(state.x);
+            mesh.setTranslateY(state.y);
+            mesh.setTranslateZ(state.z);
+            double speed = Math.sqrt(state.vx * state.vx + state.vy * state.vy + state.vz * state.vz);
+            Color color = speed > 1.5 ? Color.RED : (speed > 0.8 ? Color.ORANGE : Color.CYAN);
+            ((PhongMaterial) mesh.getMaterial()).setDiffuseColor(color);
+        }
+        stats.setText(String.format("Mode: %s | Energy: %.2f", mode, task.getTotalEnergy()));
+    }
+
+    @Override
+    public void stop() {
+        if (channel != null)
+            channel.shutdown();
     }
 
     public static void main(String[] args) {
         launch(args);
     }
+
+    private void loadPdb(Stage stage) {
+        File file = org.jscience.client.util.FileHelper.showOpenDialog(stage, "Load Protein PDB", "PDB Files", "*.pdb",
+                "*.ent");
+        if (file != null) {
+            try {
+                Protein protein = new PDBLoader().load(file.getAbsolutePath());
+                if (protein != null) {
+                    atomGroup.getChildren().clear();
+                    atomMeshes.clear();
+                    // Convert Protein atoms to Particle system for MD
+                    List<Particle> particles = new ArrayList<>();
+                    for (Protein.Chain chain : protein.getChains()) {
+                        for (Protein.Residue res : chain.getResidues()) {
+                            for (Atom atom : res.getAtoms()) {
+                                // Map chem atom to physics particle
+                                // Use atomic mass from element
+                                double mass = atom.getElement().getAtomicMass().to(org.jscience.measure.Units.KILOGRAM)
+                                        .getValue().doubleValue();
+                                // Position
+                                Particle p = new Particle(atom.getX(), atom.getY(), atom.getZ(), mass);
+                                particles.add(p);
+
+                                Sphere mesh = new Sphere(Math.max(0.5, mass / 20.0)); // Size based on mass
+                                Color color = getColorForElement(atom.getElement().getSymbol());
+                                mesh.setMaterial(new PhongMaterial(color));
+                                mesh.setTranslateX(atom.getX());
+                                mesh.setTranslateY(atom.getY());
+                                mesh.setTranslateZ(atom.getZ());
+
+                                atomGroup.getChildren().add(mesh);
+                                atomMeshes.add(mesh);
+                            }
+                        }
+                    }
+                    // Re-init task with new particles
+                    task = new MolecularDynamicsTask(particles, BOX_SIZE);
+                    stats.setText("Loaded: " + protein.getName() + " (" + particles.size() + " atoms)");
+                }
+            } catch (Exception e) {
+                new Alert(Alert.AlertType.ERROR, "Failed to load PDB: " + e.getMessage()).show();
+            }
+        }
+    }
+
+    private Color getColorForElement(String symbol) {
+        switch (symbol.toUpperCase()) {
+            case "H":
+                return Color.WHITE;
+            case "C":
+                return Color.GREY;
+            case "N":
+                return Color.BLUE;
+            case "O":
+                return Color.RED;
+            case "S":
+                return Color.YELLOW;
+            case "P":
+                return Color.ORANGE;
+            default:
+                return Color.PINK;
+        }
+    }
 }
-
-

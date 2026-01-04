@@ -33,7 +33,17 @@ import java.util.Random;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ *         <p>
+ *         References:
+ *         <ul>
+ *         <li>Holland, J. H. (1975). Adaptation in Natural and Artificial
+ *         Systems.
+ *         University of Michigan Press.</li>
+ *         <li>Goldberg, D. E. (1989). Genetic Algorithms in Search,
+ *         Optimization, and
+ *         Machine Learning. Addison-Wesley.</li>
+ *         </ul>
+ *         </p>
  */
 public class GeneticAlgorithm<T> {
 

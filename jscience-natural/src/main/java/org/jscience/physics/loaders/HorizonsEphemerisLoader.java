@@ -50,6 +50,12 @@ import java.util.Optional;
 public class HorizonsEphemerisLoader extends AbstractLoader<List<HorizonsEphemerisLoader.EphemerisPoint>> {
 
     @Override
+
+    public String getCategory() {
+        return "dashboard.loaders.category.physics";
+    }
+
+    @Override
     public String getResourcePath() {
         return "/";
     }

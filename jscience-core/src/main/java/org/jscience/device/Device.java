@@ -112,9 +112,7 @@ public interface Device extends AutoCloseable {
      * 
      * @return the instrument metadata, or null if not applicable/simulated.
      */
-    default org.jscience.measure.Instrument getInstrumentMetadata() {
+    default org.jscience.measure.MeasureInstrument getInstrumentMetadata() {
         return null;
     }
 }
-
-

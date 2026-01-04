@@ -19,12 +19,8 @@
         <!-- Internal modules -->
         <dependency>
             <groupId>org.jscience</groupId>
-            <artifactId>jscience-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jscience</groupId>
             <artifactId>jscience-natural</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
 

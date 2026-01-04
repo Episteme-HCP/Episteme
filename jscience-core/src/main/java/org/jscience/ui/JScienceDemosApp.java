@@ -143,7 +143,6 @@ public class JScienceDemosApp extends Application {
         if (cssResource != null) {
             scene.getStylesheets().add(cssResource.toExternalForm());
         }
-
         ThemeManager.getInstance().applyTheme(scene);
 
         primaryStage.setTitle(I18n.getInstance().get("app.header.title", "JScience Ecosystem"));
@@ -151,16 +150,14 @@ public class JScienceDemosApp extends Application {
     }
 
     private Map<String, List<ViewerProvider>> discoverAndSortProviders() {
-        Map<DashboardDiscovery.ProviderType, Map<String, List<ViewerProvider>>> discovery = DashboardDiscovery
+        Map<MasterControlDiscovery.ProviderType, Map<String, List<ViewerProvider>>> discovery = MasterControlDiscovery
                 .getInstance().getProvidersByType();
 
-        Map<String, List<ViewerProvider>> consolidated = new TreeMap<>(String.CASE_INSENSITIVE_ORDER); // Sort
-                                                                                                       // Categories
-                                                                                                       // Alphabetically
+        Map<String, List<ViewerProvider>> consolidated = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
-        // Add Apps and Demos (HIDE VIEWERS as requested)
-        mergeProviders(consolidated, discovery.get(DashboardDiscovery.ProviderType.APP));
-        mergeProviders(consolidated, discovery.get(DashboardDiscovery.ProviderType.DEMO));
+        // Add Apps and Demos
+        mergeProviders(consolidated, discovery.get(MasterControlDiscovery.ProviderType.APP));
+        mergeProviders(consolidated, discovery.get(MasterControlDiscovery.ProviderType.DEMO));
 
         // Deduplicate and Sort Items within Categories
         for (List<ViewerProvider> list : consolidated.values()) {
@@ -280,4 +277,3 @@ public class JScienceDemosApp extends Application {
         launch(args);
     }
 }
-

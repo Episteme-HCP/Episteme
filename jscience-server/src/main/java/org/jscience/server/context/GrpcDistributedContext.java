@@ -57,11 +57,11 @@ public class GrpcDistributedContext implements DistributedContext {
 
     @Override
     public <T extends Serializable> Future<T> submit(Callable<T> task) {
-        return submit(task, Priority.NORMAL);
+        return submit(task, DistributedContext.Priority.NORMAL);
     }
 
     @Override
-    public <T extends Serializable> Future<T> submit(Callable<T> task, Priority priority) {
+    public <T extends Serializable> Future<T> submit(Callable<T> task, DistributedContext.Priority priority) {
         // Map Priority
         org.jscience.server.proto.Priority protoPriority;
         switch (priority) {

@@ -33,23 +33,37 @@ public enum PlottingBackend {
     /**
      * XChart - Modern, lightweight (recommended).
      */
-    XCHART,
+    XCHART(true, false),
 
     /**
      * JavaFX - Built-in, always available (fallback).
      */
-    JAVAFX,
+    JAVAFX(true, true),
 
     /**
      * JFreeChart - Feature-rich, publication quality (heavy).
      */
-    JFREECHART,
+    JFREECHART(true, false),
 
     /**
-     * Auto-detect best available backend.
+     * Jzy3d - OpenGL-based 3D plotting.
      */
-    AUTO
+    JZY3D(false, true),
+    AUTO(true, true);
+
+    private final boolean support2D;
+    private final boolean support3D;
+
+    PlottingBackend(boolean support2D, boolean support3D) {
+        this.support2D = support2D;
+        this.support3D = support3D;
+    }
+
+    public boolean isSupported2D() {
+        return support2D;
+    }
+
+    public boolean isSupported3D() {
+        return support3D;
+    }
 }
-
-
-

@@ -23,64 +23,91 @@
 
 package org.jscience.computing.ai.neuralnetwork;
 
-import org.jscience.mathematics.numbers.real.Real;
-
 /**
- * Interface definition for neural network activation functions.
- *
+ * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface ActivationFunction {
+public enum ActivationFunction {
 
-    /**
-     * Applies the activation function to a value.
-     * 
-     * @param input the input value
-     * @return the activated value
-     */
-    Real apply(Real input);
-
-    /**
-     * Calculates the derivative of the activation function.
-     * 
-     * @param input the input value (often the output of the activation function
-     *              itself depending on implementation)
-     * @return the derivative
-     */
-    Real derivative(Real input);
-
-    /**
-     * Sigmoid activation function.
-     */
-    public static final ActivationFunction SIGMOID = new ActivationFunction() {
+    SIGMOID {
         @Override
-        public Real apply(Real input) {
-            return Real.ONE.divide(Real.ONE.add(input.negate().exp()));
+        public double apply(double x) {
+            return 1.0 / (1.0 + Math.exp(-x));
         }
 
         @Override
-        public Real derivative(Real input) {
-            Real sigmoid = apply(input);
-            return sigmoid.multiply(Real.ONE.subtract(sigmoid));
+        public double derivative(double y) {
+            // Derivative given output y = sigmoid(x)
+            return y * (1.0 - y);
+        }
+    },
+
+    TANH {
+        @Override
+        public double apply(double x) {
+            return Math.tanh(x);
+        }
+
+        @Override
+        public double derivative(double y) {
+            return 1.0 - y * y;
+        }
+    },
+
+    RELU {
+        @Override
+        public double apply(double x) {
+            return Math.max(0, x);
+        }
+
+        @Override
+        public double derivative(double y) {
+            return y > 0 ? 1.0 : 0.0;
+        }
+    },
+
+    LEAKY_RELU {
+        private static final double ALPHA = 0.01;
+
+        @Override
+        public double apply(double x) {
+            return x > 0 ? x : ALPHA * x;
+        }
+
+        @Override
+        public double derivative(double y) {
+            return y > 0 ? 1.0 : ALPHA;
+        }
+    },
+
+    SOFTPLUS {
+        @Override
+        public double apply(double x) {
+            return Math.log(1 + Math.exp(x));
+        }
+
+        @Override
+        public double derivative(double y) {
+            // d/dx softplus(x) = sigmoid(x) = 1 - exp(-y) for y = softplus(x)
+            return 1.0 - Math.exp(-y);
+        }
+    },
+
+    LINEAR {
+        @Override
+        public double apply(double x) {
+            return x;
+        }
+
+        @Override
+        public double derivative(double y) {
+            return 1.0;
         }
     };
 
-    /**
-     * ReLU activation function.
-     */
-    public static final ActivationFunction RELU = new ActivationFunction() {
-        @Override
-        public Real apply(Real input) {
-            return input.compareTo(Real.ZERO) > 0 ? input : Real.ZERO;
-        }
+    public abstract double apply(double x);
 
-        @Override
-        public Real derivative(Real input) {
-            return input.compareTo(Real.ZERO) > 0 ? Real.ONE : Real.ZERO;
-        }
-    };
+    public abstract double derivative(double output);
 }
-
-

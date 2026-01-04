@@ -21,6 +21,7 @@
  * SOFTWARE.
  */
 
+/**
+ * Provides classes and interfaces for org.jscience.device.sim.
+ */
 package org.jscience.device.sim;
-
-

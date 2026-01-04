@@ -29,12 +29,23 @@ import java.util.List;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.physics.PhysicalConstants;
-
 import org.jscience.measure.Units;
 
 /**
- * Direct N-body gravitational simulation (O(nÃ‚Â²)).
+ * Direct N-body gravitational simulation (O(n²)).
+ * 
+ * Simulates particle interactions using Newton's law of universal gravitation.
+ * For large-scale simulations, use {@link BarnesHutSimulation} for O(N log N)
+ * complexity.
+ * 
  * <p>
+ * References:
+ * <ul>
+ * <li>Newton, I. (1687). Philosophiae Naturalis Principia Mathematica.</li>
+ * <li>Aarseth, S. J. (2003). Gravitational N-body simulations: tools and
+ * algorithms. Cambridge University Press.</li>
+ * </ul>
+ * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -43,7 +54,7 @@ import org.jscience.measure.Units;
 public class NBodySimulation {
 
     private final List<Particle> particles;
-    private Real G = PhysicalConstants.G; // Use constant
+    private Real G = PhysicalConstants.G;
     private Real softening = Real.of(0.01);
 
     public NBodySimulation() {
@@ -73,9 +84,7 @@ public class NBodySimulation {
 
     public void computeForces() {
         int n = particles.size();
-        // Reset accelerations
         for (Particle p : particles) {
-            // Assuming 3D zero vector
             p.setAcceleration(Real.ZERO, Real.ZERO, Real.ZERO);
         }
 
@@ -92,9 +101,6 @@ public class NBodySimulation {
                 Real r = r2.sqrt();
                 Real r3 = r2.multiply(r);
 
-                // F = G * m1 * m2 / r^2
-                // a = F / m
-                // a_i += G * m_j * r_vec / r^3
                 Real factor = G.divide(r3);
 
                 Vector<Real> accPartI = rVec
@@ -170,5 +176,3 @@ public class NBodySimulation {
         return sim;
     }
 }
-
-

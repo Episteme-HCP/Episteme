@@ -430,13 +430,41 @@ public final class JScience {
      * 
      * @param args command line arguments
      */
+    // ================= PLOTTING BACKEND =================
+
+    private static org.jscience.ui.plotting.PlottingBackend plottingBackend2D = org.jscience.ui.plotting.PlottingBackend.XCHART;
+    private static org.jscience.ui.plotting.PlottingBackend plottingBackend3D = org.jscience.ui.plotting.PlottingBackend.JZY3D;
+
     /**
-     * Main entry point.
-     * <p>
-     * Tries to launch the JScience Dashboard (JavaFX) if available.
-     * Falls back to CLI report if the Dashboard class cannot be found (e.g.
-     * core-only classpath).
-     * </p>
+     * Gets the current 2D plotting backend.
+     */
+    public static org.jscience.ui.plotting.PlottingBackend getPlottingBackend2D() {
+        return plottingBackend2D;
+    }
+
+    /**
+     * Sets the current 2D plotting backend.
+     */
+    public static void setPlottingBackend2D(org.jscience.ui.plotting.PlottingBackend backend) {
+        plottingBackend2D = backend;
+    }
+
+    /**
+     * Gets the current 3D plotting backend.
+     */
+    public static org.jscience.ui.plotting.PlottingBackend getPlottingBackend3D() {
+        return plottingBackend3D;
+    }
+
+    /**
+     * Sets the current 3D plotting backend.
+     */
+    public static void setPlottingBackend3D(org.jscience.ui.plotting.PlottingBackend backend) {
+        plottingBackend3D = backend;
+    }
+
+    /**
+     * Main entry point for CLI usage and configuration verification.
      * 
      * @param args command line arguments
      */

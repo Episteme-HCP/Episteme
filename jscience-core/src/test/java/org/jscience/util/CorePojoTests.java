@@ -28,7 +28,7 @@ import org.jscience.mathematics.statistics.anova.ANOVA;
 import org.jscience.mathematics.statistics.distributions.*;
 import org.jscience.mathematics.statistics.fitting.*;
 import org.jscience.mathematics.statistics.timeseries.*;
-import org.jscience.mathematics.statistics.ml.*;
+// import org.jscience.computing.ai.neuralnetwork.*; // In jscience-natural
 import org.jscience.mathematics.ml.*;
 // import org.jscience.mathematics.algebra.groups.*;
 
@@ -71,8 +71,8 @@ public class CorePojoTests {
         PojoTester.testPojo(KMeans.class);
         PojoTester.testPojo(LogisticRegression.class);
         PojoTester.testPojo(PCA.class);
-        PojoTester.testPojo(NeuralNetwork.class);
-        PojoTester.testPojo(DataNormalization.class);
+        // PojoTester.testPojo(NeuralNetwork.class); // In jscience-natural
+
     }
 
     @Test
@@ -96,5 +96,3 @@ public class CorePojoTests {
         PojoTester.testPojo(org.jscience.mathematics.algebra.groups.U1Group.class);
     }
 }
-
-

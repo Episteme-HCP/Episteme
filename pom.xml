@@ -8,14 +8,14 @@
   <packaging>pom</packaging>
   <name>JScience Unifying Parent</name>
   <description>JScience - Unified Scientific Computing Framework (Parent POM)</description>
-  <url>https://github.com/silvere/unified-science</url>
+  <url>https://github.com/silveremartin-dev/JScience</url>
   <inceptionYear>2025</inceptionYear>
   <modules>
     <module>jscience-core</module>
     <module>jscience-natural</module>
     <module>jscience-social</module>
     <module>jscience-benchmarks</module>
-    <module>jscience-killer-apps</module>
+    <module>jscience-featured-apps</module>
     <module>jscience-jni</module>
     <module>jscience-server</module>
     <module>jscience-worker</module>

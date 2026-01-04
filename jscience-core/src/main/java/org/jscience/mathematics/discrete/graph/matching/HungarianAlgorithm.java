@@ -30,7 +30,18 @@ import org.jscience.mathematics.numbers.real.Real;
  * <p>
  * Finds minimum-cost perfect matching in weighted bipartite graph.
  * Used for: assignment problems, task allocation, resource optimization.
- * O(nÃ‚Â³) complexity.
+ * O(n³) complexity.
+ * </p>
+ *
+ * <p>
+ * References:
+ * <ul>
+ * <li>Kuhn, H. W. (1955). The Hungarian method for the assignment problem.
+ * Naval Research Logistics Quarterly, 2(1‐2), 83-97.</li>
+ * <li>Munkres, J. (1957). Algorithms for the assignment and transportation
+ * problems. Journal of the Society for Industrial and Applied Mathematics,
+ * 5(1), 32-38.</li>
+ * </ul>
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -287,5 +298,3 @@ public class HungarianAlgorithm {
         return total;
     }
 }
-
-

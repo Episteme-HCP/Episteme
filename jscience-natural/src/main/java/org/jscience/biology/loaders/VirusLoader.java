@@ -50,7 +50,7 @@ public class VirusLoader extends AbstractLoader<VirusSpecies> {
     private final Map<String, VirusSpecies> cache = new HashMap<>();
     private boolean loaded = false;
 
-    private VirusLoader() {
+    public VirusLoader() {
         // AbstractLoader has default constructor
     }
 
@@ -144,5 +144,3 @@ public class VirusLoader extends AbstractLoader<VirusSpecies> {
         public List<String> hostRange;
     }
 }
-
-

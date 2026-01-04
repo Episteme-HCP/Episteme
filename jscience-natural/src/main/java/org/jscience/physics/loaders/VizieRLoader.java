@@ -50,6 +50,11 @@ public class VizieRLoader extends AbstractLoader<Map<String, String>> {
     }
 
     @Override
+    public String getCategory() {
+        return "dashboard.loaders.category.physics";
+    }
+
+    @Override
     public String getResourcePath() {
         return API_URL;
     }

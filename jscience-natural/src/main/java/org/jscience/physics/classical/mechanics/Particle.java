@@ -27,6 +27,7 @@ import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.sets.Reals;
+import org.jscience.mathematics.structures.SpatialOctree;
 
 import org.jscience.measure.Quantity;
 import org.jscience.measure.quantity.Acceleration;
@@ -43,12 +44,17 @@ import java.util.List;
 /**
  * A particle in N-body simulation using Generic Linear Algebra.
  * Modernized to JScience.
+ * 
+ * <p>
+ * Implements {@link SpatialOctree.SpatialObject} for high-performance
+ * Barnes-Hut simulations.
+ * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Particle {
+public class Particle implements SpatialOctree.SpatialObject {
 
     private Vector<Real> position;
     private Vector<Real> velocity;
@@ -113,16 +119,25 @@ public class Particle {
         this.acceleration = acceleration;
     }
 
-    public Real getX() {
-        return position.get(0);
+    @Override
+    public double getX() {
+        return position.get(0).doubleValue();
     }
 
-    public Real getY() {
-        return position.get(1);
+    @Override
+    public double getY() {
+        return (position.dimension() > 1) ? position.get(1).doubleValue() : 0;
     }
 
-    public Real getZ() {
-        return (position.dimension() > 2) ? position.get(2) : Real.ZERO;
+    @Override
+    public double getZ() {
+        return (position.dimension() > 2) ? position.get(2).doubleValue() : 0;
+    }
+
+    @Override
+    public double getMassValue() { // Note: changed from getMass to avoid conflict with getMass() returning
+                                   // Quantity
+        return mass.to(Units.KILOGRAM).getValue().doubleValue();
     }
 
     public void setPosition(Real x, Real y, Real z) {
@@ -200,5 +215,3 @@ public class Particle {
         return "Particle(m=" + mass + ", pos=" + position + ")";
     }
 }
-
-

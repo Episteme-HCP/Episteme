@@ -31,6 +31,12 @@ package org.jscience.io;
  * @since 1.0
  */
 public interface OutputLoader<T> extends ResourceLoader<T> {
+
+    @Override
+    default boolean isOutput() {
+        return true;
+    }
+
     /**
      * Saves the resource.
      * 
@@ -40,5 +46,3 @@ public interface OutputLoader<T> extends ResourceLoader<T> {
      */
     void save(T resource, String destination) throws Exception;
 }
-
-

@@ -80,6 +80,7 @@ message ServerStatus {
   int32 activeWorkers = 1;
   int32 queuedTasks = 2;
   double systemLoad = 3;
+  int32 totalTasksCompleted = 4;
 }
 
 enum Status {

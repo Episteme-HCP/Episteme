@@ -69,6 +69,10 @@ public class ComputeServiceImpl extends ComputeServiceGrpc.ComputeServiceImplBas
     // Store authorized workers
     private final ConcurrentMap<String, String> authorizedWorkers = new ConcurrentHashMap<>();
 
+    // Performance Metrics
+    private final java.util.concurrent.atomic.AtomicInteger totalTasksCompleted = new java.util.concurrent.atomic.AtomicInteger(
+            0);
+
     @Autowired
     public ComputeServiceImpl(JobRepository jobRepository) {
         this.jobRepository = jobRepository;
@@ -79,8 +83,7 @@ public class ComputeServiceImpl extends ComputeServiceGrpc.ComputeServiceImplBas
         ServerStatus status = ServerStatus.newBuilder()
                 .setActiveWorkers(authorizedWorkers.size())
                 .setQueuedTasks(taskQueue.size())
-                // .setTotalTasksCompleted(0) // Removed: Field does not exist in ServerStatus
-                // proto
+                .setTotalTasksCompleted(totalTasksCompleted.get())
                 .build();
         responseObserver.onNext(status);
         responseObserver.onCompleted();
@@ -182,6 +185,7 @@ public class ComputeServiceImpl extends ComputeServiceGrpc.ComputeServiceImplBas
                     ObjectInputStream ois = new ObjectInputStream(bis);
                     Object result = ois.readObject();
                     future.complete(result);
+                    totalTasksCompleted.incrementAndGet();
                 } catch (Exception e) {
                     LOG.error("Failed to deserialize result from worker", e);
                     future.completeExceptionally(e);

@@ -25,6 +25,13 @@ package org.jscience.server;
 
 import com.google.protobuf.ByteString;
 import org.jscience.server.proto.*;
+import org.jscience.server.proto.ComputeServiceGrpc;
+import org.jscience.server.proto.Status;
+import org.jscience.server.proto.Priority;
+import org.jscience.server.proto.TaskRequest;
+import org.jscience.server.proto.TaskResponse;
+import org.jscience.server.proto.TaskResult;
+import org.jscience.server.proto.TaskIdentifier;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -192,7 +199,7 @@ public class ComputeServiceIT {
             TaskRequest request = TaskRequest.newBuilder()
                     .setTaskId("concurrent-task-" + i + "-" + System.currentTimeMillis())
                     .setSerializedTask(ByteString.copyFromUtf8("BATCH_TASK_" + i))
-                    .setPriority(Priority.NORMAL)
+                    .setPriority(org.jscience.server.proto.Priority.NORMAL)
                     .setTimestamp(System.currentTimeMillis())
                     .build();
 

@@ -27,6 +27,16 @@ package org.jscience.physics.classical.matter.fluids;
  * 2D Lattice Boltzmann Method (LBM) solver for incompressible fluid flow.
  * Uses D2Q9 lattice (2D, 9 velocity directions).
  *
+ * <p>
+ * References:
+ * <ul>
+ * <li>Succi, S. (2001). The Lattice Boltzmann Equation: For Fluid Dynamics and
+ * Beyond. Oxford University Press.</li>
+ * <li>Chen, S., & Doolen, G. D. (1998). Lattice Boltzmann method for fluid
+ * flows. Annual Review of Fluid Mechanics, 30(1), 329-364.</li>
+ * </ul>
+ * </p>
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -35,14 +45,12 @@ public class LatticeBoltzmannSolver {
 
     // D2Q9 lattice velocities
     private static final int[][] VELOCITIES = {
-            { 0, 0 }, // Rest
             { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 }, // Cardinal
             { 1, 1 }, { -1, 1 }, { -1, -1 }, { 1, -1 } // Diagonal
     };
 
     // D2Q9 weights
-    private static final double[] WEIGHTS = {
-            4.0 / 9.0, // Rest
+    private static final double[] WEIGHTS = { 4.0 / 9.0, // Rest
             1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, // Cardinal
             1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0 // Diagonal
     };
@@ -251,5 +259,3 @@ public class LatticeBoltzmannSolver {
         return height;
     }
 }
-
-

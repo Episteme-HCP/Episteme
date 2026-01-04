@@ -23,221 +23,261 @@
 
 package org.jscience.client;
 
+import com.google.protobuf.ByteString;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.scene.Group;
-import javafx.scene.PerspectiveCamera;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.application.Platform;
+import javafx.scene.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.Sphere;
+import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
+import org.jscience.biology.Protein;
+import org.jscience.biology.loaders.PDBLoader;
+import org.jscience.biology.ProteinSequence;
+import org.jscience.biology.RNAFolding;
 import org.jscience.biology.structure.DnaFoldingTask;
+import org.jscience.chemistry.Atom;
+import org.jscience.chemistry.PeriodicTable;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
+import org.jscience.mathematics.sets.Reals;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.server.proto.*;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import javafx.stage.FileChooser;
+import javafx.scene.control.Button;
+import javafx.scene.control.Alert;
 
 /**
- * 3D Visualization of DNA Folding.
+ * DNA Folding Simulation 3D Visualization with JScience Grid support.
  */
 public class DnaFoldingApp extends Application {
 
-    private Group moleculeGroup;
+    private final Group moleculeGroup = new Group();
     private DnaFoldingTask task;
     private Label energyLabel;
-    private boolean playing = false;
-    private final double rotateSpeed = 0.5;
+    private Label statusLabel;
+    private CheckBox distCheck;
+
+    private ManagedChannel channel;
+    private ComputeServiceGrpc.ComputeServiceBlockingStub blockingStub;
+    private boolean serverAvailable = false;
+    private long stepCount = 0;
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle("Ã°Å¸Â§Â¬ DNA Folding Simulation - JScience");
+        stage.setTitle("🧬 DNA Folding - Distributed JScience");
 
-        // 3D Scene
-        moleculeGroup = new Group();
-        Group root3D = new Group(moleculeGroup);
-        SubScene3D subScene = new SubScene3D(root3D, 800, 600, true, Color.rgb(20, 20, 30));
+        EnergyView energyView = new EnergyView();
+        energyLabel = energyView.label;
+        statusLabel = energyView.status;
+        distCheck = energyView.checkbox;
 
-        // UI Controls
-        VBox controls = new VBox(15);
-        controls.setPadding(new Insets(20));
-        controls.setStyle("-fx-background-color: #1a1a2e;");
-        controls.setPrefWidth(250);
+        energyView.exportBtn.setOnAction(e -> exportToPdb());
 
-        Label title = new Label("DNA Folding");
-        title.setStyle("-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #4ecca3;");
+        Scene scene = new Scene(new Group(moleculeGroup), 1024, 768, true);
+        scene.setFill(Color.rgb(10, 10, 15));
 
-        TextField seqField = new TextField("AGCTAGCTAGCTAGCTAGCTAGCT");
-        seqField.setPromptText("DNA Sequence");
+        PerspectiveCamera camera = new PerspectiveCamera(true);
+        camera.setTranslateZ(-150);
+        camera.setFarClip(2000.0);
+        scene.setCamera(camera);
 
-        Slider tempSlider = new Slider(0.1, 10.0, 1.0);
-        tempSlider.setShowTickLabels(true);
-        tempSlider.setShowTickMarks(true);
+        Rotate xRotate = new Rotate(0, Rotate.X_AXIS);
+        Rotate yRotate = new Rotate(0, Rotate.Y_AXIS);
+        moleculeGroup.getTransforms().addAll(xRotate, yRotate);
 
-        energyLabel = new Label("Energy: 0.0");
-        energyLabel.setStyle("-fx-font-size: 14; -fx-text-fill: #aaa;");
-
-        Button foldBtn = new Button("Ã°Å¸Â§Â¬ Fold on Grid");
-        foldBtn.setStyle("-fx-background-color: #4ecca3; -fx-text-fill: #1a1a2e; -fx-font-weight: bold;");
-        foldBtn.setOnAction(e -> startFolding(seqField.getText(), tempSlider.getValue()));
-
-        CheckBox rotateCheck = new CheckBox("Auto Rotate");
-        rotateCheck.setSelected(true);
-        rotateCheck.setStyle("-fx-text-fill: #aaa;");
-
-        controls.getChildren().addAll(
-                title,
-                new Label("Sequence:"), seqField,
-                new Label("Temperature:"), tempSlider,
-                energyLabel,
-                new Separator(),
-                foldBtn,
-                rotateCheck);
-        controls.getChildren().forEach(n -> {
-            if (n instanceof Label && n != title && n != energyLabel)
-                ((Label) n).setStyle("-fx-text-fill: #aaa;");
+        scene.setOnMouseDragged(e -> {
+            xRotate.setAngle(xRotate.getAngle() - e.getSceneY() / 100);
+            yRotate.setAngle(yRotate.getAngle() + e.getSceneX() / 100);
         });
 
-        BorderPane root = new BorderPane();
-        root.setCenter(subScene.getSubScene());
-        root.setRight(controls);
+        task = new DnaFoldingTask("ATGCATGCATGCATGC", 200, 300.0);
+        ((Group) scene.getRoot()).getChildren().add(energyView.pane);
 
-        Scene scene = new Scene(root, 1050, 600);
         stage.setScene(scene);
         stage.show();
 
-        // Initial molecule
-        updateVisualization(createLinearHelix(20));
+        initGrpc();
 
-        // Animation Loop
         new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (rotateCheck.isSelected()) {
-                    moleculeGroup.setRotate(moleculeGroup.getRotate() + rotateSpeed);
-                }
-
-                if (playing && task != null) {
-                    // Simulate one step of "receiving updates from grid"
-                    task.run(); // In reality this would be correctAsync
-                    updateVisualization(task.getFoldedStructure());
-                    energyLabel.setText(String.format("Energy: %.2f", task.getFinalEnergy()));
+                stepCount++;
+                if (distCheck.isSelected() && serverAvailable)
+                    runDistributedFolding();
+                else {
+                    task.run();
+                    renderMolecule();
+                    statusLabel.setText("Status: Local Performance");
                 }
             }
         }.start();
     }
 
-    private void startFolding(String sequence, double temp) {
-        task = new DnaFoldingTask(sequence, 1, temp); // 1 iteration per frame for anim
-        task.run(); // Initial state
-        playing = true;
-    }
-
-    private List<DnaFoldingTask.Point3D> createLinearHelix(int length) {
-        List<DnaFoldingTask.Point3D> points = new ArrayList<>();
-        for (int i = 0; i < length; i++) {
-            points.add(new DnaFoldingTask.Point3D(i * 3.4, Math.sin(i) * 2, Math.cos(i) * 2));
+    private void exportToPdb() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save PDB Export");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDB Files", "*.pdb"));
+        File file = fileChooser.showSaveDialog(null);
+        if (file != null) {
+            try {
+                Protein p = new Protein("DNA-FOLD");
+                Protein.Chain chain = new Protein.Chain("A");
+                int resIdx = 1;
+                for (DnaFoldingTask.Point3D pt : task.getFoldedStructure()) {
+                    Protein.Residue res = new Protein.Residue("NUC", resIdx++);
+                    DenseVector<Real> pos = DenseVector.of(
+                            java.util.Arrays.asList(Real.of(pt.x()), Real.of(pt.y()), Real.of(pt.z())),
+                            Reals.getInstance());
+                    Atom atom = new Atom(PeriodicTable.getElement("P"), pos);
+                    res.addAtom(atom);
+                    chain.addResidue(res);
+                }
+                p.addChain(chain);
+                new PDBLoader().save(p, file.getAbsolutePath());
+                new Alert(Alert.AlertType.INFORMATION, "PDB Export successful").show();
+            } catch (Exception ex) {
+                new Alert(Alert.AlertType.ERROR, "Export failed: " + ex.getMessage()).show();
+            }
         }
-        return points;
     }
 
-    private void updateVisualization(List<DnaFoldingTask.Point3D> points) {
+    private void initGrpc() {
+        try {
+            channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
+            blockingStub = ComputeServiceGrpc.newBlockingStub(channel);
+            serverAvailable = true;
+        } catch (Exception e) {
+            serverAvailable = false;
+        }
+    }
+
+    private void runDistributedFolding() {
+        try {
+            byte[] foldingData = serializeFoldingTask();
+            TaskRequest request = TaskRequest.newBuilder()
+                    .setTaskId("dna-fold-" + stepCount)
+                    .setSerializedTask(ByteString.copyFrom(foldingData))
+                    .setPriority(org.jscience.server.proto.Priority.HIGH)
+                    .setTimestamp(System.currentTimeMillis())
+                    .build();
+
+            TaskResponse response = blockingStub.withDeadlineAfter(2, TimeUnit.SECONDS).submitTask(request);
+            if (response.getStatus() == Status.QUEUED) {
+                try {
+                    TaskResult result = blockingStub.withDeadlineAfter(100, TimeUnit.MILLISECONDS)
+                            .streamResults(TaskIdentifier.newBuilder().setTaskId(response.getTaskId()).build())
+                            .next();
+                    if (result.getStatus() == Status.COMPLETED) {
+                        applyFoldingResults(result.getSerializedData().toByteArray());
+                        renderMolecule();
+                        statusLabel.setText("Status: Grid Computed ✅");
+                        return;
+                    }
+                } catch (Exception e) {
+                }
+            }
+            task.run();
+            renderMolecule();
+            statusLabel.setText("Status: Grid Pending ⏳");
+        } catch (Exception e) {
+            task.run();
+            renderMolecule();
+            statusLabel.setText("Status: Grid Error ❌");
+        }
+    }
+
+    private byte[] serializeFoldingTask() throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(bos);
+        dos.writeUTF("DNA_FOLDING");
+        dos.writeUTF(task.getSequence());
+        dos.writeDouble(300.0);
+        List<DnaFoldingTask.Point3D> points = task.getFoldedStructure();
+        dos.writeInt(points.size());
+        for (DnaFoldingTask.Point3D p : points) {
+            dos.writeDouble(p.x());
+            dos.writeDouble(p.y());
+            dos.writeDouble(p.z());
+        }
+        dos.flush();
+        return bos.toByteArray();
+    }
+
+    private void applyFoldingResults(byte[] data) throws IOException {
+        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
+        double energy = dis.readDouble();
+        int count = dis.readInt();
+        List<DnaFoldingTask.Point3D> points = new ArrayList<>();
+        for (int i = 0; i < count; i++)
+            points.add(new DnaFoldingTask.Point3D(dis.readDouble(), dis.readDouble(), dis.readDouble()));
+        Platform.runLater(() -> task.updateState(points, energy));
+    }
+
+    private void renderMolecule() {
         moleculeGroup.getChildren().clear();
-
-        if (points == null || points.isEmpty())
-            return;
-
-        // Draw Backbone
-        PhongMaterial backboneMat = new PhongMaterial(Color.LIGHTGREY);
-        PhongMaterial baseMat = new PhongMaterial();
-
+        List<DnaFoldingTask.Point3D> points = task.getFoldedStructure();
         for (int i = 0; i < points.size(); i++) {
             DnaFoldingTask.Point3D p = points.get(i);
-
-            // Atom
-            Sphere atom = new Sphere(1.0);
-            atom.setTranslateX(p.x());
-            atom.setTranslateY(p.y());
-            atom.setTranslateZ(p.z());
-
-            // Color based on base (pseudo)
-            switch (i % 4) {
-                case 0:
-                    baseMat.setDiffuseColor(Color.RED);
-                    break; // A
-                case 1:
-                    baseMat.setDiffuseColor(Color.BLUE);
-                    break; // T
-                case 2:
-                    baseMat.setDiffuseColor(Color.GREEN);
-                    break; // C
-                case 3:
-                    baseMat.setDiffuseColor(Color.YELLOW);
-                    break; // G
+            Sphere s = new Sphere(2.0);
+            s.setTranslateX(p.x());
+            s.setTranslateY(p.y());
+            s.setTranslateZ(p.z());
+            PhongMaterial mat = new PhongMaterial(task.getSequence().charAt(i) == 'A' ? Color.RED : Color.BLUE);
+            s.setMaterial(mat);
+            moleculeGroup.getChildren().add(s);
+            if (i > 0) {
+                moleculeGroup.getChildren().add(createBond(points.get(i - 1), p));
             }
-            atom.setMaterial(baseMat);
-            moleculeGroup.getChildren().add(atom);
+        }
+        energyLabel.setText(String.format("Energy: %.2f kcal/mol", task.getFinalEnergy()));
+    }
 
-            // Bond to next
-            if (i < points.size() - 1) {
-                DnaFoldingTask.Point3D next = points.get(i + 1);
-                Cylinder bond = createBond(p, next);
-                bond.setMaterial(backboneMat);
-                moleculeGroup.getChildren().add(bond);
-            }
+    private Node createBond(DnaFoldingTask.Point3D p1, DnaFoldingTask.Point3D p2) {
+        Cylinder c = new Cylinder(0.5, p1.distance(p2));
+        c.setMaterial(new PhongMaterial(Color.SILVER));
+        c.setTranslateX((p1.x() + p2.x()) / 2);
+        c.setTranslateY((p1.y() + p2.y()) / 2);
+        c.setTranslateZ((p1.z() + p2.z()) / 2);
+        return c;
+    }
+
+    static class EnergyView {
+        VBox pane = new VBox(10);
+        Label label = new Label();
+        Label status = new Label();
+        CheckBox checkbox = new CheckBox("Distributed Mode");
+        Button exportBtn = new Button("💾 Export PDB");
+
+        EnergyView() {
+            pane.setStyle("-fx-background-color: rgba(30,30,50,0.8); -fx-padding: 20;");
+            label.setStyle("-fx-text-fill: #4ecca3; -fx-font-size: 16;");
+            status.setStyle("-fx-text-fill: white; -fx-font-size: 12;");
+            checkbox.setStyle("-fx-text-fill: white;");
+            checkbox.setSelected(true);
+            pane.getChildren().addAll(label, checkbox, exportBtn, status);
         }
     }
 
-    private Cylinder createBond(DnaFoldingTask.Point3D p1, DnaFoldingTask.Point3D p2) {
-        DnaFoldingTask.Point3D diff = new DnaFoldingTask.Point3D(p2.x() - p1.x(), p2.y() - p1.y(), p2.z() - p1.z());
-        double height = Math.sqrt(diff.x() * diff.x() + diff.y() * diff.y() + diff.z() * diff.z());
-
-        Cylinder cylinder = new Cylinder(0.3, height);
-
-        // Midpoint
-        cylinder.setTranslateX(p1.x() + diff.x() / 2);
-        cylinder.setTranslateY(p1.y() + diff.y() / 2);
-        cylinder.setTranslateZ(p1.z() + diff.z() / 2);
-
-        // Orientation (simplified for 3D alignment)
-        // Correct 3D cylinder rotation is complex, this is approximate for demo
-
-        // Note: Correct 3D cylinder rotation is complex, this is approximate for demo
-
-        return cylinder;
-    }
-
-    /**
-     * Helper for JavaFX 3D setup.
-     */
-    private static class SubScene3D {
-        private final javafx.scene.SubScene subScene;
-        private final PerspectiveCamera camera;
-
-        public SubScene3D(Group root, double width, double height, boolean depthBuffer, Color fill) {
-            this.subScene = new javafx.scene.SubScene(root, width, height, depthBuffer,
-                    javafx.scene.SceneAntialiasing.BALANCED);
-            this.subScene.setFill(fill);
-
-            this.camera = new PerspectiveCamera(true);
-            camera.setTranslateZ(-100);
-            camera.setNearClip(0.1);
-            camera.setFarClip(1000.0);
-
-            subScene.setCamera(camera);
-        }
-
-        public javafx.scene.SubScene getSubScene() {
-            return subScene;
-        }
+    @Override
+    public void stop() {
+        if (channel != null)
+            channel.shutdown();
     }
 
     public static void main(String[] args) {
         launch(args);
     }
 }
-
-

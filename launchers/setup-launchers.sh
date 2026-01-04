@@ -4,7 +4,7 @@
 echo "Setting up launcher dependencies..."
 echo "This script will download required JARs to the 'lib' directory."
 
-cd ../jscience-killer-apps
+cd ../jscience-featured-apps
 mvn dependency:copy-dependencies "-DoutputDirectory=../launchers/lib" "-DincludeScope=runtime"
 cd ../launchers
 

@@ -42,8 +42,15 @@ public class PlotFactory {
     /**
      * Sets default backend for future plots.
      */
-    public static void setDefaultBackend(PlottingBackend backend) {
+    public static void setBackend(PlottingBackend backend) {
         defaultBackend = backend;
+    }
+
+    /**
+     * Returns the current default backend.
+     */
+    public static PlottingBackend getBackend() {
+        return defaultBackend;
     }
 
     /**
@@ -83,9 +90,29 @@ public class PlotFactory {
      * Creates 3D plot with specified backend.
      */
     public static Plot3D create3D(String title, PlottingBackend backend) {
-        // For now, 3D defaults to JavaFX
-        // JZY3D support can be added here later
-        return new org.jscience.ui.plotting.backends.JavaFXPlot3D(title);
+        if (backend == PlottingBackend.AUTO) {
+            // Prefer Jzy3d for 3D if available
+            if (isClassAvailable("org.jzy3d.chart.Chart")) {
+                backend = PlottingBackend.JZY3D;
+            } else {
+                backend = PlottingBackend.JAVAFX;
+            }
+        }
+
+        switch (backend) {
+            case JZY3D:
+                try {
+                    // Use reflection to avoid hard dependency at compile time if library missing
+                    Class<?> clazz = Class.forName("org.jscience.ui.plotting.backends.Jzy3dPlot3D");
+                    return (Plot3D) clazz.getConstructor(String.class).newInstance(title);
+                } catch (Exception e) {
+                    System.err.println("Jzy3d backend failed, falling back to JavaFX: " + e.getMessage());
+                    return new org.jscience.ui.plotting.backends.JavaFXPlot3D(title);
+                }
+            case JAVAFX:
+            default:
+                return new org.jscience.ui.plotting.backends.JavaFXPlot3D(title);
+        }
     }
 
     /**
@@ -138,5 +165,3 @@ public class PlotFactory {
         }
     }
 }
-
-

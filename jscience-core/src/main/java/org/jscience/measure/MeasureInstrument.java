@@ -23,46 +23,60 @@
 
 package org.jscience.measure;
 
+import org.jscience.device.Device;
 import org.jscience.mathematics.numbers.real.Real;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Base class for physical measurement instruments.
+ * Integrates device capabilities with measurement logic.
  * <p>
  * Provides common functionality for scientific instruments including:
  * <ul>
- * <li>Instrument identification and location</li>
+ * <li>Instrument identification and location (Device)</li>
  * <li>Measurement capabilities and ranges</li>
  * <li>Calibration tracking</li>
  * <li>Measurement history</li>
  * </ul>
  * </p>
- * <p>
- * Inspired by jscience-old-v1 MeasureInstrument design.
- * </p>
  *
+ * @param <Q> The type of quantity measured by this instrument.
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public abstract class MeasureInstrument {
+public abstract class MeasureInstrument<Q extends Quantity<Q>> implements Device {
 
-    /** Instrument status */
+    /**
+     * Instrument status
+     */
     public enum Status {
-        OPERATIONAL, CALIBRATING, NEEDS_CALIBRATION, ERROR, OFFLINE
+        OPERATIONAL, CALIBRATING, NEEDS_CALIBRATION, ERROR, OFFLINE, DISCONNECTED
     }
 
     private final String name;
-    private final String identifier;
+    private final String identifier; // Acts as ID/Serial Number
     private final String manufacturer;
     private final String model;
-    private Status status = Status.OPERATIONAL;
+    private String locationDescription;
+
+    private Status status = Status.DISCONNECTED;
     private Instant lastCalibration;
+    private final List<Calibration> calibrationHistory = new ArrayList<>();
+
     private Real accuracy; // Dimensionless (percentage or ratio)
     private Real resolution;
-    private final List<MeasurementRecord> history = new ArrayList<>();
+
+    // Measurement State
+    private Quantity<Q> currentValue;
+    private Quantity<Q> minRange;
+    private Quantity<Q> maxRange;
+
+    private final List<MeasurementRecord<Q>> history = new ArrayList<>();
     private final Map<String, String> metadata = new HashMap<>();
 
     /**
@@ -72,60 +86,126 @@ public abstract class MeasureInstrument {
      * @param identifier unique identifier
      */
     protected MeasureInstrument(String name, String identifier) {
-        this.name = Objects.requireNonNull(name, "Instrument name required");
-        this.identifier = Objects.requireNonNull(identifier, "Identifier required");
-        this.manufacturer = "Unknown";
-        this.model = "Unknown";
+        this(name, identifier, "Unknown", "Unknown");
     }
 
     /**
      * Creates a new measurement instrument with full details.
      */
     protected MeasureInstrument(String name, String identifier, String manufacturer, String model) {
-        this.name = Objects.requireNonNull(name);
-        this.identifier = Objects.requireNonNull(identifier);
+        this.name = Objects.requireNonNull(name, "Instrument name required");
+        this.identifier = Objects.requireNonNull(identifier, "Identifier required");
         this.manufacturer = manufacturer != null ? manufacturer : "Unknown";
         this.model = model != null ? model : "Unknown";
     }
 
-    // ========== Abstract Methods ==========
+    // ========== Device Implementation ==========
+
+    @Override
+    public void connect() throws IOException {
+        if (this.status != Status.OFFLINE && this.status != Status.DISCONNECTED) {
+            return; // Already connected
+        }
+        // Simulate connection
+        this.status = Status.OPERATIONAL;
+    }
+
+    @Override
+    public void disconnect() throws IOException {
+        this.status = Status.DISCONNECTED;
+    }
+
+    @Override
+    public boolean isConnected() {
+        return this.status != Status.DISCONNECTED && this.status != Status.OFFLINE;
+    }
+
+    @Override
+    public void close() throws Exception {
+        disconnect();
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getId() {
+        return identifier;
+    }
+
+    @Override
+    public String getManufacturer() {
+        return manufacturer;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    // ========== Measurement Logic ==========
 
     /**
      * Returns the types of quantities this instrument can measure.
+     * Usually just Q, but some instruments are multi-modal.
      */
     public abstract List<Class<? extends Quantity<?>>> getMeasurableQuantities();
 
-    /**
-     * Returns the minimum value this instrument can measure.
-     */
-    public abstract Real getMinRange();
+    public Quantity<Q> getMinRange() {
+        return minRange;
+    }
 
-    /**
-     * Returns the maximum value this instrument can measure.
-     */
-    public abstract Real getMaxRange();
+    public void setMinRange(Quantity<Q> minRange) {
+        this.minRange = minRange;
+    }
 
-    // ========== Measurement ==========
+    public Quantity<Q> getMaxRange() {
+        return maxRange;
+    }
+
+    public void setMaxRange(Quantity<Q> maxRange) {
+        this.maxRange = maxRange;
+    }
+
+    public Quantity<Q> getValue() {
+        return currentValue;
+    }
 
     /**
      * Takes a measurement.
+     * Subclasses should implement the hardware read logic here.
      *
-     * @param <Q> quantity type
      * @return the measured value
      */
-    public abstract <Q extends Quantity<Q>> Quantity<Q> measure();
+    public Quantity<Q> measure() {
+        if (!isConnected()) {
+            throw new IllegalStateException("Instrument not connected");
+        }
+        // Logic to read from internal sensor or simulation
+        // For simple update:
+        return currentValue;
+    }
+
+    /**
+     * Updates the current value (e.g. from a push update or internal loop).
+     */
+    public void setCurrentValue(Quantity<Q> value) {
+        this.currentValue = value;
+        recordMeasurement(value);
+    }
 
     /**
      * Records a measurement in history.
      */
-    protected void recordMeasurement(Quantity<?> value) {
-        history.add(new MeasurementRecord(Instant.now(), value));
+    protected void recordMeasurement(Quantity<Q> value) {
+        history.add(new MeasurementRecord<>(Instant.now(), value));
     }
 
     /**
      * Returns measurement history.
      */
-    public List<MeasurementRecord> getHistory() {
+    public List<MeasurementRecord<Q>> getHistory() {
         return Collections.unmodifiableList(history);
     }
 
@@ -143,26 +223,27 @@ public abstract class MeasureInstrument {
      *
      * @param reference known reference value
      */
-    public void calibrate(Quantity<?> reference) {
+    public void calibrate(Quantity<Q> reference) {
+        Status oldStatus = status;
         status = Status.CALIBRATING;
-        // Subclasses implement actual calibration
-        performCalibration(reference);
-        lastCalibration = Instant.now();
-        status = Status.OPERATIONAL;
+        try {
+            performCalibration(reference);
+            lastCalibration = Instant.now();
+            calibrationHistory.add(new Calibration(lastCalibration, "Routine Calibration", "Auto",
+                    lastCalibration.plus(365, ChronoUnit.DAYS)));
+            status = Status.OPERATIONAL;
+        } catch (Exception e) {
+            status = Status.ERROR;
+        }
     }
 
     /**
      * Override to implement actual calibration logic.
      */
-    protected void performCalibration(Quantity<?> reference) {
+    protected void performCalibration(Quantity<Q> reference) {
         // Default no-op
     }
 
-    /**
-     * Checks if calibration is needed based on time threshold.
-     *
-     * @param maxAgeHours maximum hours since last calibration
-     */
     public boolean needsCalibration(int maxAgeHours) {
         if (lastCalibration == null)
             return true;
@@ -170,22 +251,18 @@ public abstract class MeasureInstrument {
         return lastCalibration.isBefore(threshold);
     }
 
-    // ========== Accessors ==========
-
-    public String getName() {
-        return name;
+    public List<Calibration> getCalibrationHistory() {
+        return Collections.unmodifiableList(calibrationHistory);
     }
 
-    public String getIdentifier() {
-        return identifier;
+    // ========== Metadata & Accessories ==========
+
+    public String getLocationDescription() {
+        return locationDescription;
     }
 
-    public String getManufacturer() {
-        return manufacturer;
-    }
-
-    public String getModel() {
-        return model;
+    public void setLocationDescription(String locationDescription) {
+        this.locationDescription = locationDescription;
     }
 
     public Status getStatus() {
@@ -233,8 +310,6 @@ public abstract class MeasureInstrument {
     /**
      * Record of a single measurement.
      */
-    public record MeasurementRecord(Instant timestamp, Quantity<?> value) {
+    public record MeasurementRecord<Q extends Quantity<Q>>(Instant timestamp, Quantity<Q> value) {
     }
 }
-
-
