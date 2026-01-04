@@ -24,7 +24,6 @@
 package org.jscience.technical.backend.algorithms;
 
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.technical.backend.ComputeBackend;
 import org.jscience.technical.backend.opencl.OpenCLBackend;
 
 import java.util.logging.Logger;
@@ -50,7 +49,7 @@ import java.util.logging.Logger;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class OpenCLNBodyProvider {
+public class OpenCLNBodyProvider implements NBodyProvider {
 
     private static final Logger LOGGER = Logger.getLogger(OpenCLNBodyProvider.class.getName());
     private static final int GPU_THRESHOLD = 1000; // Minimum particles for GPU offload
@@ -94,13 +93,22 @@ public class OpenCLNBodyProvider {
      * @param forces    output array for forces [fx0,fy0,fz0,fx1,fy1,fz1,...]
      * @param G         gravitational constant
      */
-    public void computeForces(double[] positions, double[] masses, double[] forces, double G) {
+    /**
+     * Computes gravitational forces between particles using GPU if beneficial.
+     * 
+     * @param positions particle positions [x0,y0,z0,x1,y1,z1,...]
+     * @param masses    particle masses
+     * @param forces    output array for forces [fx0,fy0,fz0,fx1,fy1,fz1,...]
+     * @param G         gravitational constant
+     * @param softening softening parameter
+     */
+    public void computeForces(double[] positions, double[] masses, double[] forces, double G, double softening) {
         int numParticles = masses.length;
 
         if (gpuAvailable && numParticles >= GPU_THRESHOLD) {
-            computeForcesGPU(positions, masses, forces, G);
+            computeForcesGPU(positions, masses, forces, G, softening);
         } else {
-            computeForcesCPU(positions, masses, forces, G);
+            computeForcesCPU(positions, masses, forces, G, softening);
         }
     }
 
@@ -112,7 +120,17 @@ public class OpenCLNBodyProvider {
      * @param forces    output forces as Real[]
      * @param G         gravitational constant as Real
      */
-    public void computeForces(Real[] positions, Real[] masses, Real[] forces, Real G) {
+    /**
+     * Computes forces using Real API with automatic GPU offloading.
+     *
+     * @param positions particle positions as Real[]
+     * @param masses    particle masses as Real[]
+     * @param forces    output forces as Real[]
+     * @param G         gravitational constant as Real
+     * @param softening softening parameter
+     */
+    @Override
+    public void computeForces(Real[] positions, Real[] masses, Real[] forces, Real G, Real softening) {
         // Convert to double arrays for GPU
         double[] posD = new double[positions.length];
         double[] massD = new double[masses.length];
@@ -125,7 +143,7 @@ public class OpenCLNBodyProvider {
             massD[i] = masses[i].doubleValue();
         }
 
-        computeForces(posD, massD, forceD, G.doubleValue());
+        computeForces(posD, massD, forceD, G.doubleValue(), softening.doubleValue());
 
         // Convert back to Real
         for (int i = 0; i < forces.length; i++) {
@@ -133,7 +151,7 @@ public class OpenCLNBodyProvider {
         }
     }
 
-    private void computeForcesGPU(double[] positions, double[] masses, double[] forces, double G) {
+    private void computeForcesGPU(double[] positions, double[] masses, double[] forces, double G, double softening) {
         // OpenCL kernel source for direct N-body force calculation
         String kernelSource = """
                 __kernel void computeForces(
@@ -173,17 +191,17 @@ public class OpenCLNBodyProvider {
             LOGGER.fine("Executing N-Body forces on GPU for " + masses.length + " particles");
 
             // Fallback to CPU for now (full JOCL implementation would go here)
-            computeForcesCPU(positions, masses, forces, G);
+            computeForcesCPU(positions, masses, forces, G, softening);
 
         } catch (Exception e) {
             LOGGER.warning("GPU execution failed, falling back to CPU: " + e.getMessage());
-            computeForcesCPU(positions, masses, forces, G);
+            computeForcesCPU(positions, masses, forces, G, softening);
         }
     }
 
-    private void computeForcesCPU(double[] positions, double[] masses, double[] forces, double G) {
+    private void computeForcesCPU(double[] positions, double[] masses, double[] forces, double G, double softening) {
         int numParticles = masses.length;
-        double softening = 1e-9;
+        // double softening = 1e-9; // Removed hardcoded value
 
         // Reset forces
         java.util.Arrays.fill(forces, 0);

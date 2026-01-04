@@ -131,6 +131,24 @@ public class FluidField {
     public Tensor<Real> getVelocityZ() {
         return velocityZ;
     }
+
+    public void setDensity(Tensor<Real> density) {
+        this.density = density;
+    }
+
+    public void setPressure(Tensor<Real> pressure) {
+        this.pressure = pressure;
+    }
+
+    public void setVelocityX(Tensor<Real> velocityX) {
+        this.velocityX = velocityX;
+    }
+
+    public void setVelocityY(Tensor<Real> velocityY) {
+        this.velocityY = velocityY;
+    }
+
+    public void setVelocityZ(Tensor<Real> velocityZ) {
+        this.velocityZ = velocityZ;
+    }
 }
-
-

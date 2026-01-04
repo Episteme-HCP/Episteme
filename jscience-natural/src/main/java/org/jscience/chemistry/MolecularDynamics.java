@@ -24,8 +24,12 @@
 package org.jscience.chemistry;
 
 import org.jscience.mathematics.linearalgebra.Vector;
-import org.jscience.measure.Units;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.Units;
+import org.jscience.technical.backend.algorithms.MolecularDynamicsProvider;
+import org.jscience.technical.backend.algorithms.MulticoreMolecularDynamicsProvider;
+import java.util.Arrays;
 
 /**
  * A simple molecular dynamics engine using a spring-mass model.
@@ -35,6 +39,12 @@ import org.jscience.mathematics.numbers.real.Real;
  * @since 1.0
  */
 public class MolecularDynamics {
+
+    private static MolecularDynamicsProvider provider = new MulticoreMolecularDynamicsProvider();
+
+    public static void setProvider(MolecularDynamicsProvider p) {
+        provider = p;
+    }
 
     private static final Real K_STRETCH = Real.of(500.0); // Spring constant (N/m) approx for standard bond
     // Note: Realistic K is much higher (~100-500 N/m or sometimes measured in
@@ -50,10 +60,76 @@ public class MolecularDynamics {
      * @param dt       Time step in seconds
      */
     public static void step(Molecule molecule, Real dt) {
-        clearForces(molecule);
-        calculateBondForces(molecule);
-        // calculateNonBondedForces(molecule); // Optional: Lennard-Jones
-        integrate(molecule, dt);
+        // 1. Pack data
+        java.util.List<Atom> atoms = molecule.getAtoms();
+        int numAtoms = atoms.size();
+        Real[] positions = new Real[numAtoms * 3];
+        Real[] velocities = new Real[numAtoms * 3];
+        Real[] forces = new Real[numAtoms * 3];
+        Real[] masses = new Real[numAtoms];
+
+        for (int i = 0; i < numAtoms; i++) {
+            Atom a = atoms.get(i);
+            Vector<Real> pos = a.getPosition();
+            Vector<Real> vel = a.getVelocity();
+
+            positions[i * 3] = pos.get(0);
+            positions[i * 3 + 1] = pos.get(1);
+            positions[i * 3 + 2] = pos.get(2);
+
+            velocities[i * 3] = vel.get(0);
+            velocities[i * 3 + 1] = vel.get(1);
+            velocities[i * 3 + 2] = vel.get(2);
+
+            forces[i * 3] = Real.ZERO;
+            forces[i * 3 + 1] = Real.ZERO;
+            forces[i * 3 + 2] = Real.ZERO;
+
+            masses[i] = a.getMass().to(Units.KILOGRAM).getValue();
+        }
+
+        // 2. Bonds
+        java.util.List<Bond> bonds = molecule.getBonds();
+        int numBonds = bonds.size();
+        int[] bondIndices = new int[numBonds * 2];
+        Real[] bondLengths = new Real[numBonds];
+        Real[] bondConstants = new Real[numBonds];
+
+        for (int i = 0; i < numBonds; i++) {
+            Bond b = bonds.get(i);
+            int idx1 = atoms.indexOf(b.getAtom1());
+            int idx2 = atoms.indexOf(b.getAtom2());
+            bondIndices[i * 2] = idx1;
+            bondIndices[i * 2 + 1] = idx2;
+
+            // Calc r0 logic
+            double r1Val = b.getAtom1().getElement().getAtomicRadius().to(Units.METER).getValue().doubleValue();
+            double r2Val = b.getAtom2().getElement().getAtomicRadius().to(Units.METER).getValue().doubleValue();
+            double r0Val = r1Val + r2Val;
+            if (r0Val == 0)
+                r0Val = 1.5e-10;
+            bondLengths[i] = Real.of(r0Val);
+            bondConstants[i] = K_STRETCH;
+        }
+
+        // 3. Delegate to Provider
+        provider.calculateBondForces(positions, forces, bondIndices, bondLengths, bondConstants);
+        provider.integrate(positions, velocities, forces, masses, dt, DAMPING);
+
+        // 4. Unpack
+        for (int i = 0; i < numAtoms; i++) {
+            Atom a = atoms.get(i);
+            a.setPosition(DenseVector.of(Arrays.asList(
+                    positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]), Real.ZERO));
+
+            a.setVelocity(DenseVector.of(Arrays.asList(
+                    velocities[i * 3], velocities[i * 3 + 1], velocities[i * 3 + 2]), Real.ZERO));
+
+            // Forces might be useful to update too for visualization
+            a.clearForce();
+            a.addForce(DenseVector.of(Arrays.asList(
+                    forces[i * 3], forces[i * 3 + 1], forces[i * 3 + 2]), Real.ZERO));
+        }
     }
 
     /**
@@ -62,81 +138,4 @@ public class MolecularDynamics {
     public static void step(Molecule molecule, double dt) {
         step(molecule, Real.of(dt));
     }
-
-    private static void clearForces(Molecule molecule) {
-        for (Atom atom : molecule.getAtoms()) {
-            atom.clearForce();
-        }
-    }
-
-    private static void calculateBondForces(Molecule molecule) {
-        for (Bond bond : molecule.getBonds()) {
-            Atom a1 = bond.getAtom1();
-            Atom a2 = bond.getAtom2();
-
-            Vector<Real> p1 = a1.getPosition();
-            Vector<Real> p2 = a2.getPosition();
-
-            // Distance vector
-            Vector<Real> delta = p2.subtract(p1);
-            Real dist = delta.norm();
-
-            // Equilibrium length (ideal).
-            // Simplified: Use the initial bond length or estimating from radii?
-            // For now, let's assume standard 1.54 Angstrom (1.54e-10 m) if not defined,
-            // OR define target length based on atom radii sum.
-            double r1Val = a1.getElement().getAtomicRadius().to(Units.METER).getValue().doubleValue();
-            double r2Val = a2.getElement().getAtomicRadius().to(Units.METER).getValue().doubleValue();
-            Real r0 = Real.of(r1Val + r2Val);
-
-            // Element radii are usually in pm (picometers). 120 pm = 1.2e-10 m.
-            // Let's assume a default if 0.
-            if (r0.isZero())
-                r0 = Real.of(1.5e-10);
-
-            // Hooke's Law: F = -k * (r - r0)
-            Real displacement = dist.subtract(r0);
-            Real forceMag = K_STRETCH.multiply(displacement);
-
-            // Force direction: along delta.
-            // If dist > r0 (stretched), force pulls them together.
-            // On a1: direction towards a2 (delta).
-            // F_a1 = k * (dist - r0) * (delta / dist)
-            // Use multiply(inverse) instead of divide
-            Vector<Real> forceDir = delta.multiply(dist.inverse());
-            Vector<Real> f1 = forceDir.multiply(forceMag);
-            Vector<Real> f2 = f1.multiply(Real.ONE.multiply(Real.of(-1.0)));
-
-            a1.addForce(f1);
-            a2.addForce(f2);
-        }
-    }
-
-    private static void integrate(Molecule molecule, Real dt) {
-        // Symplectic Euler or Verlet
-
-        for (Atom atom : molecule.getAtoms()) {
-            // F = ma -> a = F/m
-            double massKg = atom.getMass().to(Units.KILOGRAM).getValue().doubleValue();
-            if (massKg == 0)
-                massKg = 1.66e-27; // Safety
-
-            Real massReal = Real.of(massKg);
-            Vector<Real> accel = atom.getForce().multiply(massReal.inverse());
-
-            // v = v + a*dt
-            Vector<Real> vel = atom.getVelocity().add(accel.multiply(dt));
-
-            // Damping
-            vel = vel.multiply(DAMPING);
-
-            atom.setVelocity(vel);
-
-            // x = x + v*dt
-            Vector<Real> pos = atom.getPosition().add(vel.multiply(dt));
-            atom.setPosition(pos);
-        }
-    }
 }
-
-

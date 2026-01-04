@@ -23,7 +23,6 @@
 
 package org.jscience.technical.backend.algorithms;
 
-import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.technical.backend.cuda.CudaBackend;
 
 import java.util.logging.Logger;
@@ -46,17 +45,15 @@ public class CudaFFTProvider {
     private static final Logger LOGGER = Logger.getLogger(CudaFFTProvider.class.getName());
     private static final int GPU_THRESHOLD = 4096;
 
-    private final CudaBackend gpuBackend;
-    private final boolean gpuAvailable;
+    final boolean gpuAvailable;
 
     /**
      * Creates a new CUDA FFT provider.
      */
     public CudaFFTProvider() {
-        CudaBackend backend = null;
         boolean available = false;
         try {
-            backend = new CudaBackend();
+            CudaBackend backend = new CudaBackend();
             available = backend.isAvailable();
             if (available) {
                 LOGGER.info("CUDA FFT provider initialized with cuFFT support");
@@ -64,7 +61,6 @@ public class CudaFFTProvider {
         } catch (Exception e) {
             LOGGER.warning("CUDA initialization failed: " + e.getMessage());
         }
-        this.gpuBackend = backend;
         this.gpuAvailable = available;
     }
 

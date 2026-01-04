@@ -23,6 +23,9 @@
 
 package org.jscience.physics.classical.matter.fluids;
 
+import org.jscience.technical.backend.algorithms.LatticeBoltzmannProvider;
+import org.jscience.technical.backend.algorithms.OpenCLLatticeBoltzmannProvider;
+
 /**
  * 2D Lattice Boltzmann Method (LBM) solver for incompressible fluid flow.
  * Uses D2Q9 lattice (2D, 9 velocity directions).
@@ -43,20 +46,15 @@ package org.jscience.physics.classical.matter.fluids;
  */
 public class LatticeBoltzmannSolver {
 
-    // D2Q9 lattice velocities
-    private static final int[][] VELOCITIES = {
-            { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 }, // Cardinal
-            { 1, 1 }, { -1, 1 }, { -1, -1 }, { 1, -1 } // Diagonal
+    private static final int[][] VELOCITIES_ALIGNED = {
+            { 0, 0 }, { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 },
+            { 1, 1 }, { -1, 1 }, { -1, -1 }, { 1, -1 }
     };
 
-    // D2Q9 weights
-    private static final double[] WEIGHTS = { 4.0 / 9.0, // Rest
-            1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, // Cardinal
-            1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0 // Diagonal
+    private static final double[] WEIGHTS_ALIGNED = {
+            4.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0,
+            1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0
     };
-
-    // Opposite direction indices for bounce-back
-    private static final int[] OPPOSITE = { 0, 3, 4, 1, 2, 7, 8, 5, 6 };
 
     private final int width;
     private final int height;
@@ -64,8 +62,6 @@ public class LatticeBoltzmannSolver {
 
     // Distribution functions
     private double[][][] f; // f[x][y][direction]
-    private double[][][] fEq; // Equilibrium distributions
-    private double[][][] fTemp; // Temporary for streaming
 
     // Macroscopic quantities
     private double[][] rho; // Density
@@ -74,6 +70,12 @@ public class LatticeBoltzmannSolver {
 
     // Obstacle mask
     private boolean[][] obstacle;
+
+    private LatticeBoltzmannProvider provider;
+
+    public void setProvider(LatticeBoltzmannProvider p) {
+        this.provider = p;
+    }
 
     /**
      * Creates an LBM solver.
@@ -92,8 +94,7 @@ public class LatticeBoltzmannSolver {
 
         // Initialize arrays
         f = new double[width][height][9];
-        fEq = new double[width][height][9];
-        fTemp = new double[width][height][9];
+        // fEq, fTemp removed
         rho = new double[width][height];
         ux = new double[width][height];
         uy = new double[width][height];
@@ -106,7 +107,7 @@ public class LatticeBoltzmannSolver {
                 ux[x][y] = 0.0;
                 uy[x][y] = 0.0;
                 for (int i = 0; i < 9; i++) {
-                    f[x][y][i] = WEIGHTS[i];
+                    f[x][y][i] = WEIGHTS_ALIGNED[i];
                 }
             }
         }
@@ -130,85 +131,21 @@ public class LatticeBoltzmannSolver {
     }
 
     /**
-     * Performs one LBM time step.
+     * Performs one LBM time step using the provider.
      */
     public void step() {
-        // 1. Collision step
-        collision();
+        if (provider == null) {
+            provider = new OpenCLLatticeBoltzmannProvider();
+        }
 
-        // 2. Streaming step
-        streaming();
+        // Evolve using provider (Collision + Streaming + BCs)
+        provider.evolve(f, obstacle, omega);
 
-        // 3. Boundary conditions
-        boundaryConditions();
-
-        // 4. Compute macroscopic quantities
+        // 4. Compute macroscopic quantities (still needed for visualization/access)
+        // If provider computed them internally it discarded them. We recompute or ask
+        // provider.
+        // Current API recomputes.
         computeMacroscopic();
-    }
-
-    private void collision() {
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                if (obstacle[x][y])
-                    continue;
-
-                double localRho = rho[x][y];
-                double localUx = ux[x][y];
-                double localUy = uy[x][y];
-                double u2 = localUx * localUx + localUy * localUy;
-
-                for (int i = 0; i < 9; i++) {
-                    double cu = VELOCITIES[i][0] * localUx + VELOCITIES[i][1] * localUy;
-
-                    // Equilibrium distribution
-                    fEq[x][y][i] = WEIGHTS[i] * localRho * (1.0 + 3.0 * cu + 4.5 * cu * cu - 1.5 * u2);
-
-                    // BGK collision
-                    f[x][y][i] = f[x][y][i] + omega * (fEq[x][y][i] - f[x][y][i]);
-                }
-            }
-        }
-    }
-
-    private void streaming() {
-        // Copy to temp first
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                System.arraycopy(f[x][y], 0, fTemp[x][y], 0, 9);
-            }
-        }
-
-        // Stream
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                for (int i = 0; i < 9; i++) {
-                    int xn = (x + VELOCITIES[i][0] + width) % width;
-                    int yn = (y + VELOCITIES[i][1] + height) % height;
-                    f[xn][yn][i] = fTemp[x][y][i];
-                }
-            }
-        }
-    }
-
-    private void boundaryConditions() {
-        // Bounce-back for obstacles
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                if (obstacle[x][y]) {
-                    for (int i = 0; i < 9; i++) {
-                        f[x][y][i] = fTemp[x][y][OPPOSITE[i]];
-                    }
-                }
-            }
-        }
-
-        // Top/bottom walls - bounce back
-        for (int x = 0; x < width; x++) {
-            for (int i = 0; i < 9; i++) {
-                f[x][0][i] = fTemp[x][0][OPPOSITE[i]];
-                f[x][height - 1][i] = fTemp[x][height - 1][OPPOSITE[i]];
-            }
-        }
     }
 
     private void computeMacroscopic() {
@@ -227,13 +164,18 @@ public class LatticeBoltzmannSolver {
 
                 for (int i = 0; i < 9; i++) {
                     localRho += f[x][y][i];
-                    localUx += f[x][y][i] * VELOCITIES[i][0];
-                    localUy += f[x][y][i] * VELOCITIES[i][1];
+                    localUx += f[x][y][i] * VELOCITIES_ALIGNED[i][0];
+                    localUy += f[x][y][i] * VELOCITIES_ALIGNED[i][1];
                 }
 
+                if (localRho > 0) {
+                    ux[x][y] = localUx / localRho;
+                    uy[x][y] = localUy / localRho;
+                } else {
+                    ux[x][y] = 0;
+                    uy[x][y] = 0;
+                }
                 rho[x][y] = localRho;
-                ux[x][y] = localUx / localRho;
-                uy[x][y] = localUy / localRho;
             }
         }
     }

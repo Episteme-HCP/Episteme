@@ -31,6 +31,9 @@ import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.physics.PhysicalConstants;
 import org.jscience.measure.Units;
 
+import org.jscience.technical.backend.algorithms.NBodyProvider;
+import org.jscience.technical.backend.algorithms.MulticoreNBodyProvider;
+
 /**
  * Direct N-body gravitational simulation (O(n²)).
  * 
@@ -56,6 +59,11 @@ public class NBodySimulation {
     private final List<Particle> particles;
     private Real G = PhysicalConstants.G;
     private Real softening = Real.of(0.01);
+    private NBodyProvider provider;
+
+    public void setProvider(NBodyProvider p) {
+        this.provider = p;
+    }
 
     public NBodySimulation() {
         this.particles = new ArrayList<>();
@@ -83,34 +91,49 @@ public class NBodySimulation {
     }
 
     public void computeForces() {
-        int n = particles.size();
-        for (Particle p : particles) {
-            p.setAcceleration(Real.ZERO, Real.ZERO, Real.ZERO);
+        if (provider == null) {
+            provider = new MulticoreNBodyProvider();
         }
 
+        int n = particles.size();
+        Real[] positions = new Real[n * 3];
+        Real[] masses = new Real[n];
+        Real[] forces = new Real[n * 3];
+
+        // Pack data
         for (int i = 0; i < n; i++) {
-            Particle pi = particles.get(i);
-            Vector<Real> posI = pi.getPosition();
+            Particle p = particles.get(i);
+            Vector<Real> pos = p.getPosition();
+            // Assuming Vector<Real> usually has 3 components for 3D simulation
+            // We need to access components. Vector abstraction might make this tricky if
+            // not careful.
+            // Let's assume get(i) works or similar. Actually, Particle usually stores x,y,z
+            // or Vector.
+            // In typical JScience Vector usage:
+            positions[i * 3] = pos.get(0);
+            positions[i * 3 + 1] = pos.get(1);
+            positions[i * 3 + 2] = pos.get(2);
 
-            for (int j = i + 1; j < n; j++) {
-                Particle pj = particles.get(j);
-                Vector<Real> posJ = pj.getPosition();
+            masses[i] = Real.of(p.getMass().to(Units.KILOGRAM).getValue().doubleValue());
+        }
 
-                Vector<Real> rVec = posJ.subtract(posI);
-                Real r2 = rVec.norm().pow(2).add(softening.pow(2));
-                Real r = r2.sqrt();
-                Real r3 = r2.multiply(r);
+        // Compute
+        provider.computeForces(positions, masses, forces, G, softening);
 
-                Real factor = G.divide(r3);
+        // Unpack and update acceleration (a = F/m)
+        for (int i = 0; i < n; i++) {
+            Particle p = particles.get(i);
+            Real mx = forces[i * 3];
+            Real my = forces[i * 3 + 1];
+            Real mz = forces[i * 3 + 2];
+            Real mass = masses[i];
 
-                Vector<Real> accPartI = rVec
-                        .multiply(factor.multiply(Real.of(pj.getMass().to(Units.KILOGRAM).getValue().doubleValue())));
-                Vector<Real> accPartJ = rVec
-                        .multiply(factor.multiply(Real.of(pi.getMass().to(Units.KILOGRAM).getValue().doubleValue())));
+            // a = F / m
+            Real ax = mx.divide(mass);
+            Real ay = my.divide(mass);
+            Real az = mz.divide(mass);
 
-                pi.setAcceleration(pi.getAcceleration().add(accPartI));
-                pj.setAcceleration(pj.getAcceleration().subtract(accPartJ));
-            }
+            p.setAcceleration(ax, ay, az);
         }
     }
 

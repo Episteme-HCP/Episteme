@@ -50,11 +50,11 @@ import java.util.logging.Logger;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class OpenCLLatticeBoltzmannProvider {
+public class OpenCLLatticeBoltzmannProvider implements LatticeBoltzmannProvider {
 
     private static final Logger LOGGER = Logger.getLogger(OpenCLLatticeBoltzmannProvider.class.getName());
     private static final int GPU_THRESHOLD_2D = 256 * 256; // 65K cells
-    private static final int GPU_THRESHOLD_3D = 64 * 64 * 64; // 256K cells
+    // 256K cells
 
     // D2Q9 velocity directions
     private static final int[][] D2Q9_VELOCITIES = {
@@ -68,17 +68,17 @@ public class OpenCLLatticeBoltzmannProvider {
             1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0
     };
 
-    private final OpenCLBackend gpuBackend;
+    private static final int[] OPPOSITE = { 0, 3, 4, 1, 2, 7, 8, 5, 6 };
+
     private final boolean gpuAvailable;
 
     /**
      * Creates a new OpenCL Lattice Boltzmann provider.
      */
     public OpenCLLatticeBoltzmannProvider() {
-        OpenCLBackend backend = null;
         boolean available = false;
         try {
-            backend = new OpenCLBackend();
+            OpenCLBackend backend = new OpenCLBackend();
             available = backend.isAvailable();
             if (available) {
                 LOGGER.info("OpenCL Lattice Boltzmann provider initialized with GPU support");
@@ -86,7 +86,6 @@ public class OpenCLLatticeBoltzmannProvider {
         } catch (Exception e) {
             LOGGER.warning("OpenCL initialization failed: " + e.getMessage());
         }
-        this.gpuBackend = backend;
         this.gpuAvailable = available;
     }
 
@@ -99,34 +98,25 @@ public class OpenCLLatticeBoltzmannProvider {
         return gpuAvailable;
     }
 
-    /**
-     * Performs one LBM step (collision + streaming) on a 2D D2Q9 lattice.
-     *
-     * @param f      distribution functions [width][height][9]
-     * @param width  grid width
-     * @param height grid height
-     * @param omega  relaxation parameter (1/tau)
-     */
-    public void step2D(double[][][] f, int width, int height, double omega) {
+    @Override
+    public void evolve(double[][][] f, boolean[][] obstacle, double omega) {
+        int width = f.length;
+        int height = f[0].length;
         int totalCells = width * height;
 
         if (gpuAvailable && totalCells >= GPU_THRESHOLD_2D) {
-            step2DGPU(f, width, height, omega);
+            evolveGPU(f, obstacle, width, height, omega);
         } else {
-            step2DCPU(f, width, height, omega);
+            evolveCPU(f, obstacle, width, height, omega);
         }
     }
 
-    /**
-     * Performs LBM step using Real API.
-     *
-     * @param f      distribution functions as Real[][][]
-     * @param width  grid width
-     * @param height grid height
-     * @param omega  relaxation parameter
-     */
-    public void step2D(Real[][][] f, int width, int height, Real omega) {
-        // Convert to primitive for GPU execution
+    @Override
+    public void evolve(Real[][][] f, boolean[][] obstacle, Real omega) {
+        int width = f.length;
+        int height = f[0].length;
+
+        // Convert to primitive
         double[][][] fD = new double[width][height][9];
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -136,7 +126,7 @@ public class OpenCLLatticeBoltzmannProvider {
             }
         }
 
-        step2D(fD, width, height, omega.doubleValue());
+        evolve(fD, obstacle, omega.doubleValue());
 
         // Convert back
         for (int x = 0; x < width; x++) {
@@ -148,20 +138,25 @@ public class OpenCLLatticeBoltzmannProvider {
         }
     }
 
-    private void step2DGPU(double[][][] f, int width, int height, double omega) {
+    private void evolveGPU(double[][][] f, boolean[][] obstacle, int width, int height, double omega) {
         LOGGER.fine("Executing LBM step on GPU for " + (width * height) + " cells");
-        // GPU implementation would use JOCL here
         // Fallback to CPU for now
-        step2DCPU(f, width, height, omega);
+        evolveCPU(f, obstacle, width, height, omega);
     }
 
-    private void step2DCPU(double[][][] f, int width, int height, double omega) {
-        double[][][] fNew = new double[width][height][9];
+    private void evolveCPU(double[][][] f, boolean[][] obstacle, int width, int height, double omega) {
+        double[][][] fPost = new double[width][height][9]; // Temp for post-collision state
 
-        // Collision + Streaming
+        // 1. Collision step (compute fPost)
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                // Compute macroscopic quantities
+                if (obstacle != null && obstacle[x][y]) {
+                    // Obstacle: no collision, just copy state
+                    System.arraycopy(f[x][y], 0, fPost[x][y], 0, 9);
+                    continue;
+                }
+
+                // Fluid: Macroscopic quantities + BGK
                 double rho = 0;
                 double ux = 0, uy = 0;
                 for (int i = 0; i < 9; i++) {
@@ -169,27 +164,50 @@ public class OpenCLLatticeBoltzmannProvider {
                     ux += D2Q9_VELOCITIES[i][0] * f[x][y][i];
                     uy += D2Q9_VELOCITIES[i][1] * f[x][y][i];
                 }
-                ux /= rho;
-                uy /= rho;
 
-                // Collision (BGK)
+                if (rho > 0) {
+                    ux /= rho;
+                    uy /= rho;
+                }
+
                 double u2 = ux * ux + uy * uy;
                 for (int i = 0; i < 9; i++) {
                     double cu = D2Q9_VELOCITIES[i][0] * ux + D2Q9_VELOCITIES[i][1] * uy;
                     double feq = D2Q9_WEIGHTS[i] * rho * (1 + 3 * cu + 4.5 * cu * cu - 1.5 * u2);
-
-                    // Streaming with collision
-                    int xNew = (x + D2Q9_VELOCITIES[i][0] + width) % width;
-                    int yNew = (y + D2Q9_VELOCITIES[i][1] + height) % height;
-                    fNew[xNew][yNew][i] = f[x][y][i] + omega * (feq - f[x][y][i]);
+                    fPost[x][y][i] = f[x][y][i] + omega * (feq - f[x][y][i]);
                 }
             }
         }
 
-        // Copy back
+        // 2. Streaming step (from fPost to f) + internal Bounce-back
+        double[][][] fNext = new double[width][height][9];
+
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                System.arraycopy(fNew[x][y], 0, f[x][y], 0, 9);
+                for (int i = 0; i < 9; i++) {
+                    int xn = (x + D2Q9_VELOCITIES[i][0] + width) % width;
+                    int yn = (y + D2Q9_VELOCITIES[i][1] + height) % height;
+                    fNext[xn][yn][i] = fPost[x][y][i];
+                }
+            }
+        }
+
+        // 3. Boundary Conditions (Obstacles & Walls)
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (obstacle != null && obstacle[x][y]) {
+                    // Bounce-back: take post-collision (flux) and reflect it
+                    for (int i = 0; i < 9; i++) {
+                        fNext[x][y][i] = fPost[x][y][OPPOSITE[i]];
+                    }
+                }
+            }
+        }
+
+        // Copy fNext back to f
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                System.arraycopy(fNext[x][y], 0, f[x][y], 0, 9);
             }
         }
     }

@@ -23,6 +23,9 @@
 
 package org.jscience.mathematics.analysis.transform;
 
+import org.jscience.technical.backend.algorithms.FFTProvider;
+import org.jscience.technical.backend.algorithms.MulticoreFFTProvider;
+
 /**
  * Fast Fourier Transform (FFT) implementation.
  * <p>
@@ -41,62 +44,27 @@ public class FFT {
      * @param real Real part (modified in place)
      * @param imag Imaginary part (modified in place)
      */
+    private static FFTProvider provider = new MulticoreFFTProvider();
+
+    public static void setProvider(FFTProvider p) {
+        provider = p;
+    }
+
+    /**
+     * Compute forward FFT of complex data.
+     * 
+     * @param real Real part (modified in place)
+     * @param imag Imaginary part (modified in place)
+     */
     public static void fft(org.jscience.mathematics.numbers.real.Real[] real,
             org.jscience.mathematics.numbers.real.Real[] imag) {
-        int n = real.length;
-        if ((n & (n - 1)) != 0) {
-            throw new IllegalArgumentException("Array length must be power of 2");
-        }
-
-        // Bit reversal permutation
-        int bits = Integer.numberOfTrailingZeros(n);
-        for (int i = 0; i < n; i++) {
-            int j = Integer.reverse(i) >>> (32 - bits);
-            if (i < j) {
-                org.jscience.mathematics.numbers.real.Real temp = real[i];
-                real[i] = real[j];
-                real[j] = temp;
-                temp = imag[i];
-                imag[i] = imag[j];
-                imag[j] = temp;
-            }
-        }
-
-        // Cooley-Tukey iterative FFT
-        for (int size = 2; size <= n; size *= 2) {
-            int halfSize = size / 2;
-            // double angle = -2 * Math.PI / size;
-            org.jscience.mathematics.numbers.real.Real angle = org.jscience.mathematics.numbers.real.Real.PI
-                    .multiply(org.jscience.mathematics.numbers.real.Real.of(-2))
-                    .divide(org.jscience.mathematics.numbers.real.Real.of(size));
-
-            for (int i = 0; i < n; i += size) {
-                for (int j = 0; j < halfSize; j++) {
-                    // double wReal = Math.cos(angle * j);
-                    // double wImag = Math.sin(angle * j);
-                    org.jscience.mathematics.numbers.real.Real theta = angle
-                            .multiply(org.jscience.mathematics.numbers.real.Real.of(j));
-                    org.jscience.mathematics.numbers.real.Real wReal = theta.cos();
-                    org.jscience.mathematics.numbers.real.Real wImag = theta.sin();
-
-                    int evenIdx = i + j;
-                    int oddIdx = i + j + halfSize;
-
-                    // Complex multiplication: w * x[oddIdx]
-                    // double tReal = wReal * real[oddIdx] - wImag * imag[oddIdx];
-                    // double tImag = wReal * imag[oddIdx] + wImag * real[oddIdx];
-                    org.jscience.mathematics.numbers.real.Real tReal = wReal.multiply(real[oddIdx])
-                            .subtract(wImag.multiply(imag[oddIdx]));
-                    org.jscience.mathematics.numbers.real.Real tImag = wReal.multiply(imag[oddIdx])
-                            .add(wImag.multiply(real[oddIdx]));
-
-                    // Butterfly
-                    real[oddIdx] = real[evenIdx].subtract(tReal);
-                    imag[oddIdx] = imag[evenIdx].subtract(tImag);
-                    real[evenIdx] = real[evenIdx].add(tReal);
-                    imag[evenIdx] = imag[evenIdx].add(tImag);
-                }
-            }
+        if (provider != null) {
+            org.jscience.mathematics.numbers.real.Real[][] res = provider.transform(real, imag);
+            // API expects in-place modification, so copy back.
+            System.arraycopy(res[0], 0, real, 0, real.length);
+            System.arraycopy(res[1], 0, imag, 0, imag.length);
+        } else {
+            new MulticoreFFTProvider().transform(real, imag);
         }
     }
 
@@ -105,21 +73,10 @@ public class FFT {
      */
     public static void ifft(org.jscience.mathematics.numbers.real.Real[] real,
             org.jscience.mathematics.numbers.real.Real[] imag) {
-        int n = real.length;
-
-        // Conjugate
-        for (int i = 0; i < n; i++) {
-            imag[i] = imag[i].negate();
-        }
-
-        // Forward FFT
-        fft(real, imag);
-
-        // Conjugate and scale
-        org.jscience.mathematics.numbers.real.Real nReal = org.jscience.mathematics.numbers.real.Real.of(n);
-        for (int i = 0; i < n; i++) {
-            real[i] = real[i].divide(nReal);
-            imag[i] = imag[i].negate().divide(nReal);
+        if (provider != null) {
+            org.jscience.mathematics.numbers.real.Real[][] res = provider.inverseTransform(real, imag);
+            System.arraycopy(res[0], 0, real, 0, real.length);
+            System.arraycopy(res[1], 0, imag, 0, imag.length);
         }
     }
 
@@ -245,5 +202,3 @@ public class FFT {
         return convolve(a, bRev);
     }
 }
-
-

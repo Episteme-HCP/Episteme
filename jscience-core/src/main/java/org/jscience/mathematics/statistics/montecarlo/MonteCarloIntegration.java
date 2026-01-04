@@ -25,6 +25,8 @@ package org.jscience.mathematics.statistics.montecarlo;
 
 import java.util.Random;
 import java.util.function.Function;
+import org.jscience.technical.backend.algorithms.MonteCarloProvider;
+import org.jscience.technical.backend.algorithms.ParallelMonteCarloProvider;
 
 /**
  * Monte Carlo integration methods.
@@ -40,6 +42,11 @@ import java.util.function.Function;
 public class MonteCarloIntegration {
 
     private final Random random;
+    private MonteCarloProvider provider;
+
+    public void setProvider(MonteCarloProvider p) {
+        this.provider = p;
+    }
 
     public MonteCarloIntegration() {
         this.random = new Random();
@@ -80,23 +87,33 @@ public class MonteCarloIntegration {
      * @return Estimated integral value
      */
     public double integrateND(Function<double[], Double> f, double[] lower, double[] upper, int samples) {
+        if (provider == null) {
+            provider = new ParallelMonteCarloProvider();
+        }
+
         int dim = lower.length;
         double volume = 1.0;
         for (int i = 0; i < dim; i++) {
             volume *= (upper[i] - lower[i]);
         }
+        final double finalVolume = volume;
 
-        double sum = 0;
-        double[] point = new double[dim];
+        // Scale bounds from [0,1] back to [lower, upper] required by provider ?
+        // Actually, MonteCarloProvider interface doc says: "Estimates the integral of a
+        // function over a hypercube [0,1]^d."
+        // So we must wrap 'f' to accept [0,1] inputs and map them to [lower, upper].
 
-        for (int i = 0; i < samples; i++) {
-            for (int d = 0; d < dim; d++) {
-                point[d] = lower[d] + random.nextDouble() * (upper[d] - lower[d]);
+        Function<double[], Double> scaledF = (point01) -> {
+            double[] point = new double[dim];
+            for (int i = 0; i < dim; i++) {
+                point[i] = lower[i] + point01[i] * (upper[i] - lower[i]);
             }
-            sum += f.apply(point);
-        }
+            return f.apply(point);
+        };
 
-        return (sum / samples) * volume;
+        double integral01 = provider.integrate(scaledF, dim, samples);
+        // Integral over [a,b] is Vol * Integral over [0,1] of transformed function
+        return integral01 * finalVolume;
     }
 
     /**
@@ -157,5 +174,3 @@ public class MonteCarloIntegration {
         return new double[] { estimate, stdError };
     }
 }
-
-

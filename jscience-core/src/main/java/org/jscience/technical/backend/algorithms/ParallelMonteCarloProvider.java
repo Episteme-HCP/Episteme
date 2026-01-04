@@ -58,7 +58,7 @@ import java.util.logging.Logger;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ParallelMonteCarloProvider {
+public class ParallelMonteCarloProvider implements MonteCarloProvider {
 
     private static final Logger LOGGER = Logger.getLogger(ParallelMonteCarloProvider.class.getName());
 
@@ -92,6 +92,7 @@ public class ParallelMonteCarloProvider {
      * @param samples    total number of samples
      * @return estimated integral value
      */
+    @Override
     public double integrate(Function<double[], Double> f, int dimensions, long samples) {
         long samplesPerThread = samples / numThreads;
         @SuppressWarnings("unchecked")
@@ -135,6 +136,7 @@ public class ParallelMonteCarloProvider {
      * @param samples    total number of samples
      * @return estimated integral value as Real
      */
+    @Override
     public Real integrateReal(Function<Real[], Real> f, int dimensions, long samples) {
         // Wrapper that converts to/from Real
         Function<double[], Double> wrapper = point -> {
@@ -206,6 +208,7 @@ public class ParallelMonteCarloProvider {
      *
      * @return provider name
      */
+    @Override
     public String getName() {
         return "Monte Carlo (Parallel " + numThreads + " threads)";
     }

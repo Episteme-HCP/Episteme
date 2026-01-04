@@ -24,29 +24,50 @@
 package org.jscience.physics.classical.waves.electromagnetism.fields;
 
 import org.jscience.mathematics.geometry.Vector4D;
+import org.jscience.mathematics.linearalgebra.tensors.DenseTensor;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.technical.backend.algorithms.MaxwellProvider;
+import org.jscience.technical.backend.algorithms.MulticoreMaxwellProvider;
 
 /**
- * Interface for solvers of Maxwell's equations.
+ * Solver for Maxwell's equations.
  * <p>
  * $\partial_\mu F^{\mu\nu} = \mu_0 J^\nu$
  * </p>
+ * Delegates to {@link MaxwellProvider}.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface MaxwellSolver {
+public class MaxwellSolver {
+
+    private MaxwellProvider provider;
+
+    public MaxwellSolver() {
+        this.provider = new MulticoreMaxwellProvider();
+    }
+
+    public void setProvider(MaxwellProvider provider) {
+        this.provider = provider;
+    }
 
     /**
-     * Computes the electromagnetic field at a given point in spacetime given a
-     * source.
+     * Computes the electromagnetic field at a given point in spacetime.
      * 
      * @param point Spacetime coordinate to evaluate field at
      * @return ElectromagneticTensor at that point
      */
-    ElectromagneticTensor solve(Vector4D point);
+    public ElectromagneticTensor solve(Vector4D point) {
+        double[][] raw = provider.computeTensor(point);
 
-    // Future: solve(Vector4D[] grid, CurrentDensitySource source)
+        Real[] flats = new Real[16];
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                flats[i * 4 + j] = Real.of(raw[i][j]);
+            }
+        }
+
+        return new ElectromagneticTensor(new DenseTensor<>(flats, 4, 4));
+    }
 }
-
-

@@ -142,27 +142,7 @@
             <artifactId>nd4j-native</artifactId>
         </dependency>
 
-        <!-- gRPC / Protobuf -->
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-netty-shaded</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-stub</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-protobuf</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-        </dependency>
+
 
         <!-- JSON -->
         <dependency>
@@ -177,6 +157,22 @@
             <version>6.0.0</version>
         </dependency>
 
+        <!-- MPJ Express (MPI) -->
+        <dependency>
+            <groupId>org.mpjexpress</groupId>
+            <artifactId>mpi</artifactId>
+            <version>0.44</version>
+            <!-- Scope provided because runtime is handled by mpjboot or included in Uber-JAR if needed, 
+                 but typically MPJ programs run with mpjrun which provides the classpath. -->
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mpjexpress</groupId>
+            <artifactId>mpj</artifactId>
+            <version>0.44</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Apache Spark -->
         <dependency>
             <groupId>org.apache.spark</groupId>
@@ -189,6 +185,8 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+
     </dependencies>
 
 
@@ -248,23 +246,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.xolstice.maven.plugins</groupId>
-                <artifactId>protobuf-maven-plugin</artifactId>
-                <configuration>
-                    <protocArtifact>com.google.protobuf:protoc:3.25.1:exe:${os.detected.classifier}</protocArtifact>
-                    <pluginId>grpc-java</pluginId>
-                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.60.0:exe:${os.detected.classifier}</pluginArtifact>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compile</goal>
-                            <goal>compile-custom</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+
         </plugins>
     </build>
 </project>
