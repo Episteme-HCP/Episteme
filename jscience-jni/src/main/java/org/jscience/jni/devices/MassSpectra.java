@@ -24,7 +24,7 @@
 package org.jscience.jni.devices;
 
 import org.jscience.device.sensors.Spectrometer;
-import org.jscience.device.sensors.SpectroscopyType;
+
 import org.jscience.jni.NativeDeviceBridge;
 import org.jscience.mathematics.numbers.real.Real;
 

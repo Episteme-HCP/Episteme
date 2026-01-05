@@ -55,17 +55,15 @@ public class OpenCLFFTProvider {
     private static final Logger LOGGER = Logger.getLogger(OpenCLFFTProvider.class.getName());
     private static final int GPU_THRESHOLD = 4096; // Minimum size for GPU offload
 
-    private final OpenCLBackend gpuBackend;
     private final boolean gpuAvailable;
 
     /**
      * Creates a new OpenCL FFT provider.
      */
     public OpenCLFFTProvider() {
-        OpenCLBackend backend = null;
         boolean available = false;
         try {
-            backend = new OpenCLBackend();
+            OpenCLBackend backend = new OpenCLBackend();
             available = backend.isAvailable();
             if (available) {
                 LOGGER.info("OpenCL FFT provider initialized with GPU support");
@@ -73,7 +71,6 @@ public class OpenCLFFTProvider {
         } catch (Exception e) {
             LOGGER.warning("OpenCL initialization failed: " + e.getMessage());
         }
-        this.gpuBackend = backend;
         this.gpuAvailable = available;
     }
 

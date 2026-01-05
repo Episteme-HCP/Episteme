@@ -44,9 +44,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
-import com.google.protobuf.ByteString;
 import org.jscience.mathematics.numbers.complex.Complex;
 import org.jscience.server.proto.*;
 
@@ -74,7 +71,6 @@ public class DistributedMandelbrotApp extends Application {
 
     private ManagedChannel channel;
     private ComputeServiceGrpc.ComputeServiceBlockingStub blockingStub;
-    private ComputeServiceGrpc.ComputeServiceStub asyncStub;
     private boolean serverAvailable = false;
 
     private Canvas canvas;
@@ -105,7 +101,6 @@ public class DistributedMandelbrotApp extends Application {
                 .usePlaintext()
                 .build();
         blockingStub = ComputeServiceGrpc.newBlockingStub(channel);
-        asyncStub = ComputeServiceGrpc.newStub(channel);
 
         // Check server availability
         checkServerAvailability();

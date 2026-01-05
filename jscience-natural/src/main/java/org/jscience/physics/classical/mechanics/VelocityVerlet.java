@@ -69,6 +69,7 @@ public class VelocityVerlet implements Serializable {
     private final int numCells;
     private final List<Particle>[][] cells;
 
+    @SuppressWarnings("unchecked")
     public VelocityVerlet(List<Particle> particles, double boxSize, double cutoff) {
         this.particles = particles;
         this.boxSize = boxSize;

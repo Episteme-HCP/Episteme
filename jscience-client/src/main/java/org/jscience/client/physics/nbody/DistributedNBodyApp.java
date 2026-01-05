@@ -23,8 +23,6 @@
 
 package org.jscience.client.physics.nbody;
 
-import org.jscience.physics.nbody.NBodyTask;
-
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -54,7 +52,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**

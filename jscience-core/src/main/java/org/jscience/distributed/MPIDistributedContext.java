@@ -184,7 +184,6 @@ public class MPIDistributedContext implements DistributedContext {
     private static class MpiStrategy implements DistributedContext {
         // Tags for MPI messages
         private static final int TAG_TASK = 1;
-        private static final int TAG_RESULT = 2;
 
         private final int rank;
         private final int size;

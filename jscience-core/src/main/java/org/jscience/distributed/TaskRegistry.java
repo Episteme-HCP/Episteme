@@ -23,7 +23,6 @@
 
 package org.jscience.distributed;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -85,7 +84,6 @@ public final class TaskRegistry {
      * @param taskType  the task type identifier (e.g., "MANDELBROT")
      * @param taskClass the task implementation class
      */
-    @SuppressWarnings("unchecked")
     public static void register(String taskType, Class<? extends DistributedTask<?, ?>> taskClass) {
         INSTANCE.taskClasses.put(taskType.toUpperCase(), taskClass);
         LOGGER.info("Registered task: " + taskType);
@@ -175,7 +173,8 @@ public final class TaskRegistry {
     @SuppressWarnings("unchecked")
     private void discoverTasks() {
         // ServiceLoader-based discovery for Tasks
-        ServiceLoader<DistributedTask> taskLoader = ServiceLoader.load(DistributedTask.class);
+        ServiceLoader<DistributedTask<?, ?>> taskLoader = (ServiceLoader<DistributedTask<?, ?>>) (Object) ServiceLoader
+                .load(DistributedTask.class);
         for (DistributedTask<?, ?> task : taskLoader) {
             taskClasses.put(task.getTaskType().toUpperCase(),
                     (Class<? extends DistributedTask<?, ?>>) task.getClass());
@@ -183,10 +182,12 @@ public final class TaskRegistry {
         }
 
         // ServiceLoader-based discovery for Providers
-        ServiceLoader<TaskProvider> providerLoader = ServiceLoader.load(TaskProvider.class);
+        ServiceLoader<TaskProvider<?, ?>> providerLoader = (ServiceLoader<TaskProvider<?, ?>>) (Object) ServiceLoader
+                .load(TaskProvider.class);
         for (TaskProvider<?, ?> provider : providerLoader) {
             taskProviders.put(provider.getTaskType().toUpperCase(), provider);
-            LOGGER.info("Discovered provider via ServiceLoader: " + provider.getTaskType() + " (" + provider.getClass().getSimpleName() + ")");
+            LOGGER.info("Discovered provider via ServiceLoader: " + provider.getTaskType() + " ("
+                    + provider.getClass().getSimpleName() + ")");
         }
     }
 

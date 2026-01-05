@@ -13,7 +13,7 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.technical.backend.algorithms.NBodyProvider;
 import org.jscience.technical.backend.algorithms.MulticoreNBodyProvider;
 
-public class NBodyTask implements DistributedTask<NBodyTask, NBodyTask>, Serializable {
+public class NBodyTask implements DistributedTask<NBodyTask, NBodyTask> {
 
     public static class Body implements Serializable {
         public double x, y, z;

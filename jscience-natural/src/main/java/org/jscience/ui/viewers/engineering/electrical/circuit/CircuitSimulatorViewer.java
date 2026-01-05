@@ -35,7 +35,6 @@ import javafx.stage.Stage;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
-import org.jscience.measure.quantity.*;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -13,7 +13,7 @@ import java.util.List;
  * Molecular Dynamics Simulation Task.
  */
 public class MolecularDynamicsTask
-        implements DistributedTask<MolecularDynamicsTask, MolecularDynamicsTask>, Serializable {
+        implements DistributedTask<MolecularDynamicsTask, MolecularDynamicsTask> {
 
     private final int numAtoms;
     private final double timeStep;

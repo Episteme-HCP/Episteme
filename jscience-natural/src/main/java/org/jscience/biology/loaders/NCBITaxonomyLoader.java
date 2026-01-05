@@ -1,12 +1,18 @@
 
 package org.jscience.biology.loaders;
 
-import java.io.*;
-import java.net.http.*;
+import java.io.InputStream;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.net.URI;
-import java.util.*;
-import com.fasterxml.jackson.databind.*;
-import org.jscience.biology.taxonomy.Species;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Loader for NCBI Taxonomy database.

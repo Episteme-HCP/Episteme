@@ -212,9 +212,9 @@ public class DistributedProteinFoldingApp extends Application {
         }
 
         // Center the molecule
-        double avgX = monomers.stream().mapToDouble(Monomer::x).average().orElse(0);
-        double avgY = monomers.stream().mapToDouble(Monomer::y).average().orElse(0);
-        double avgZ = monomers.stream().mapToDouble(Monomer::z).average().orElse(0);
+        double avgX = monomers.stream().mapToDouble(m -> (double) m.x()).average().orElse(0);
+        double avgY = monomers.stream().mapToDouble(m -> (double) m.y()).average().orElse(0);
+        double avgZ = monomers.stream().mapToDouble(m -> (double) m.z()).average().orElse(0);
 
         for (int i = 0; i < monomers.size(); i++) {
             Monomer m = monomers.get(i);

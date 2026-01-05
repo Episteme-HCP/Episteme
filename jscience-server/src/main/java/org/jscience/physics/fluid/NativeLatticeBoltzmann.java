@@ -1,9 +1,5 @@
 package org.jscience.physics.fluid;
 
-import org.jscience.technical.backend.opencl.OpenCLBackend;
-import org.jocl.*;
-import static org.jocl.CL.*;
-
 /**
  * Native (double-based) implementation of Lattice Boltzmann Method for
  * Server/Worker usage.
@@ -23,12 +19,8 @@ public class NativeLatticeBoltzmann {
 
     private static final int[] OPPOSITE = { 0, 3, 4, 1, 2, 7, 8, 5, 6 };
 
-    private final boolean gpuAvailable;
-    private OpenCLBackend backend;
-
     public NativeLatticeBoltzmann() {
-        this.backend = new OpenCLBackend();
-        this.gpuAvailable = backend.isAvailable();
+
     }
 
     public void evolve(double[][][] f, boolean[][] obstacle, double omega) {

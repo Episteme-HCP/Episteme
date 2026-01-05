@@ -5,9 +5,8 @@
 package org.jscience.mathematics.mandelbrot;
 
 import org.jscience.distributed.DistributedTask;
-import java.io.Serializable;
 
-public class MandelbrotTask implements DistributedTask<MandelbrotTask, MandelbrotTask>, Serializable {
+public class MandelbrotTask implements DistributedTask<MandelbrotTask, MandelbrotTask> {
 
     protected final int width;
     protected final int height;

@@ -45,7 +45,6 @@ public class CUDANBodyProvider implements NBodyProvider {
     private static final Logger LOGGER = Logger.getLogger(CUDANBodyProvider.class.getName());
     private static final int GPU_THRESHOLD = 1000;
 
-    private final CUDABackend gpuBackend;
     private final boolean gpuAvailable;
 
     /**
@@ -63,7 +62,6 @@ public class CUDANBodyProvider implements NBodyProvider {
         } catch (Exception e) {
             LOGGER.warning("CUDA initialization failed: " + e.getMessage());
         }
-        this.gpuBackend = backend;
         this.gpuAvailable = available;
     }
 

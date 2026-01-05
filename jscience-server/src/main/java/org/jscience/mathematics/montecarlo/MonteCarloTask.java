@@ -5,10 +5,10 @@
 package org.jscience.mathematics.montecarlo;
 
 import org.jscience.distributed.DistributedTask;
-import java.io.Serializable;
+
 import java.util.Random;
 
-public class MonteCarloTask implements DistributedTask<MonteCarloTask, MonteCarloTask>, Serializable {
+public class MonteCarloTask implements DistributedTask<MonteCarloTask, MonteCarloTask> {
 
     private final long samples;
     private long insideCircle;
@@ -17,15 +17,20 @@ public class MonteCarloTask implements DistributedTask<MonteCarloTask, MonteCarl
     public MonteCarloTask(long samples) {
         this.samples = samples;
     }
-    
+
     public MonteCarloTask() {
         this(0);
     }
 
     @Override
-    public Class<MonteCarloTask> getInputType() { return MonteCarloTask.class; }
+    public Class<MonteCarloTask> getInputType() {
+        return MonteCarloTask.class;
+    }
+
     @Override
-    public Class<MonteCarloTask> getOutputType() { return MonteCarloTask.class; }
+    public Class<MonteCarloTask> getOutputType() {
+        return MonteCarloTask.class;
+    }
 
     @Override
     public MonteCarloTask execute(MonteCarloTask input) {
@@ -41,7 +46,9 @@ public class MonteCarloTask implements DistributedTask<MonteCarloTask, MonteCarl
     }
 
     @Override
-    public String getTaskType() { return "MONTE_CARLO_PI"; }
+    public String getTaskType() {
+        return "MONTE_CARLO_PI";
+    }
 
     public void compute() {
         Random rand = new Random();
@@ -56,7 +63,15 @@ public class MonteCarloTask implements DistributedTask<MonteCarloTask, MonteCarl
         estimatedPi = 4.0 * insideCircle / samples;
     }
 
-    public long getSamples() { return samples; }
-    public long getInsideCircle() { return insideCircle; }
-    public double getEstimatedPi() { return estimatedPi; }
+    public long getSamples() {
+        return samples;
+    }
+
+    public long getInsideCircle() {
+        return insideCircle;
+    }
+
+    public double getEstimatedPi() {
+        return estimatedPi;
+    }
 }

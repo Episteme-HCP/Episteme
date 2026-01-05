@@ -37,7 +37,6 @@ import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.*;
-import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * 

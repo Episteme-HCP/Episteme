@@ -41,8 +41,6 @@ import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import org.jscience.biology.Protein;
 import org.jscience.biology.loaders.PDBLoader;
-import org.jscience.biology.ProteinSequence;
-import org.jscience.biology.RNAFolding;
 import org.jscience.biology.structure.DnaFoldingTask;
 import org.jscience.chemistry.Atom;
 import org.jscience.chemistry.PeriodicTable;

@@ -224,7 +224,6 @@ public abstract class MeasureInstrument<Q extends Quantity<Q>> implements Device
      * @param reference known reference value
      */
     public void calibrate(Quantity<Q> reference) {
-        Status oldStatus = status;
         status = Status.CALIBRATING;
         try {
             performCalibration(reference);

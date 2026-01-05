@@ -184,7 +184,7 @@ public class CarTrafficViewer extends Application {
 
     private void perturbFirstCar() {
         if (!cars.isEmpty()) {
-            cars.get(0).velocity = (Quantity<Velocity>) cars.get(0).velocity.multiply(0.1);
+            cars.get(0).velocity = cars.get(0).velocity.multiply(0.1).asType(Velocity.class);
         }
     }
 
@@ -211,12 +211,13 @@ public class CarTrafficViewer extends Application {
             double term1 = Math.pow(vRatio, delta);
 
             // sStar = s0 + vT + (v*dv)/(2*sqrt(a*b))
+            // sStar = s0 + vT + (v*dv)/(2*sqrt(a*b))
             Quantity<?> moment = car.velocity.multiply(dv);
             Quantity<?> sqrtAB = maxAccel.multiply(breakingDecel).sqrt();
-            Quantity<?> velocityComponent = car.velocity.multiply(timeGap);
-            Quantity<?> breakComponent = moment.divide(sqrtAB.multiply(2.0));
-            Quantity<?> totalGap = ((Quantity) minGap).add(velocityComponent).add(breakComponent);
-            Quantity<Length> sStar = (Quantity<Length>) totalGap.asType(Length.class);
+            Quantity<Length> velocityComponent = car.velocity.multiply(timeGap).asType(Length.class);
+            Quantity<Length> breakComponent = moment.divide(sqrtAB.multiply(2.0)).asType(Length.class);
+            Quantity<Length> totalGap = minGap.add(velocityComponent).add(breakComponent).asType(Length.class);
+            Quantity<Length> sStar = totalGap;
 
             // term2 = (sStar/dx)^2
             double sRatio = sStar.divide(dx).getValue().doubleValue();
@@ -230,13 +231,13 @@ public class CarTrafficViewer extends Application {
 
         for (int i = 0; i < n; i++) {
             Car car = cars.get(i);
-            Quantity<?> velocityChange = accels.get(i).multiply(dt);
-            car.velocity = car.velocity.add((Quantity<Velocity>) velocityChange.asType(Velocity.class));
+            Quantity<Velocity> velocityChange = accels.get(i).multiply(dt).asType(Velocity.class);
+            car.velocity = car.velocity.add(velocityChange);
             if (car.velocity.getValue().doubleValue() < 0)
                 car.velocity = Quantities.create(0.0, Units.METER_PER_SECOND);
 
-            Quantity<?> distanceChange = car.velocity.multiply(dt);
-            car.position = car.position.add((Quantity<Length>) distanceChange.asType(Length.class));
+            Quantity<Length> distanceChange = car.velocity.multiply(dt).asType(Length.class);
+            car.position = car.position.add(distanceChange);
             if (car.position.getValue().doubleValue() > TRACK_LENGTH.getValue().doubleValue()) {
                 car.position = car.position.subtract(TRACK_LENGTH).asType(Length.class);
             }

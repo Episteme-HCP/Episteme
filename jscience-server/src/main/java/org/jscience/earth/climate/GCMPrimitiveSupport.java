@@ -11,8 +11,6 @@ package org.jscience.earth.climate;
  */
 public class GCMPrimitiveSupport {
 
-    private static final double CP = 1004.0; // J/kg/K (Air heat capacity)
-    private static final double L = 2.5e6; // J/kg (Latent heat of vaporization)
     private static final double SIGMA = 5.67e-8;
 
     /**

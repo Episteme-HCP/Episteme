@@ -80,7 +80,7 @@ public class FactbookLoader extends AbstractLoader<List<Country>> {
     }
 
     @Override
-    protected MiniCatalog<List<Country>> getMiniCatalog() {
+    public MiniCatalog<List<Country>> getMiniCatalog() {
         return new MiniCatalog<>() {
             @Override
             public List<List<Country>> getAll() {

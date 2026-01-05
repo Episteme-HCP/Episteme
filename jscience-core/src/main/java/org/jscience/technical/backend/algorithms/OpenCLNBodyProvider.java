@@ -54,17 +54,15 @@ public class OpenCLNBodyProvider implements NBodyProvider {
     private static final Logger LOGGER = Logger.getLogger(OpenCLNBodyProvider.class.getName());
     private static final int GPU_THRESHOLD = 1000; // Minimum particles for GPU offload
 
-    private final OpenCLBackend gpuBackend;
     private final boolean gpuAvailable;
 
     /**
      * Creates a new OpenCL N-Body provider.
      */
     public OpenCLNBodyProvider() {
-        OpenCLBackend backend = null;
         boolean available = false;
         try {
-            backend = new OpenCLBackend();
+            OpenCLBackend backend = new OpenCLBackend();
             available = backend.isAvailable();
             if (available) {
                 LOGGER.info("OpenCL N-Body provider initialized with GPU support");
@@ -72,7 +70,6 @@ public class OpenCLNBodyProvider implements NBodyProvider {
         } catch (Exception e) {
             LOGGER.warning("OpenCL initialization failed: " + e.getMessage());
         }
-        this.gpuBackend = backend;
         this.gpuAvailable = available;
     }
 
@@ -119,40 +116,6 @@ public class OpenCLNBodyProvider implements NBodyProvider {
     }
 
     private void computeForcesGPU(double[] positions, double[] masses, double[] forces, double G, double softening) {
-        // OpenCL kernel source for direct N-body force calculation
-        String kernelSource = """
-                __kernel void computeForces(
-                    __global const double* positions,
-                    __global const double* masses,
-                    __global double* forces,
-                    const int numParticles,
-                    const double G,
-                    const double softening
-                ) {
-                    int i = get_global_id(0);
-                    if (i >= numParticles) return;
-
-                    double3 pos_i = (double3)(positions[i*3], positions[i*3+1], positions[i*3+2]);
-                    double3 force = (double3)(0.0, 0.0, 0.0);
-                    double mass_i = masses[i];
-
-                    for (int j = 0; j < numParticles; j++) {
-                        if (i == j) continue;
-
-                        double3 pos_j = (double3)(positions[j*3], positions[j*3+1], positions[j*3+2]);
-                        double3 r = pos_j - pos_i;
-                        double dist2 = dot(r, r) + softening * softening;
-                        double dist = sqrt(dist2);
-                        double f = G * mass_i * masses[j] / (dist2 * dist);
-                        force += f * r;
-                    }
-
-                    forces[i*3] = force.x;
-                    forces[i*3+1] = force.y;
-                    forces[i*3+2] = force.z;
-                }
-                """;
-
         try {
             // Execute on GPU (simplified - actual implementation would use JOCL)
             LOGGER.fine("Executing N-Body forces on GPU for " + masses.length + " particles");

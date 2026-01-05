@@ -5,13 +5,12 @@
 package org.jscience.earth.climate;
 
 import org.jscience.distributed.DistributedTask;
-import java.io.Serializable;
 
 /**
  * Advanced General Circulation Model (GCM) Task.
  */
 public class GeneralCirculationModelTask
-        implements DistributedTask<GeneralCirculationModelTask, GeneralCirculationModelTask>, Serializable {
+        implements DistributedTask<GeneralCirculationModelTask, GeneralCirculationModelTask> {
 
     private final int latBins;
     private final int longBins;
@@ -19,12 +18,6 @@ public class GeneralCirculationModelTask
     // Layers: 0 = Surface, 1 = Troposphere, 2 = Stratosphere
     private double[][][] temperature; // [layer][lat][long]
     private double[][] specificHumidity; // [lat][long]
-    private double[][] precipitation; // [lat][long] (cumulative)
-
-    // Constants
-    private static final double CP = 1004.0; // J/kg/K (Air heat capacity)
-    private static final double L = 2.5e6; // J/kg (Latent heat of vaporization)
-    private static final double SIGMA = 5.67e-8;
 
     // Velocity fields for GCM (Winds)
     private double[][][] u; // Zonal wind [layer][lat][long]
@@ -45,7 +38,6 @@ public class GeneralCirculationModelTask
         this.longBins = longBins;
         this.temperature = new double[3][latBins][longBins];
         this.specificHumidity = new double[latBins][longBins];
-        this.precipitation = new double[latBins][longBins];
         this.u = new double[3][latBins][longBins];
         this.v = new double[3][latBins][longBins];
         this.w = new double[3][latBins][longBins];

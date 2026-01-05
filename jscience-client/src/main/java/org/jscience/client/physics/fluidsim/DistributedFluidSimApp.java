@@ -116,15 +116,11 @@ public class DistributedFluidSimApp extends Application {
             }
     }
 
-    private boolean serverAvailable = false;
-
     private void initGrpc() {
         try {
             channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
             blockingStub = ComputeServiceGrpc.newBlockingStub(channel);
-            serverAvailable = true;
         } catch (Exception e) {
-            serverAvailable = false;
         }
     }
 

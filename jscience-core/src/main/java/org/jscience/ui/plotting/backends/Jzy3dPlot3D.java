@@ -25,11 +25,9 @@ import java.util.List;
  */
 public class Jzy3dPlot3D implements Plot3D {
 
-    private final String title;
     private final Chart chart;
 
     public Jzy3dPlot3D(String title) {
-        this.title = title;
         // Jzy3d 1.0.0 compatible factory
         this.chart = AWTChartComponentFactory.chart(Quality.Advanced, "newt");
     }

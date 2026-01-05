@@ -9,9 +9,7 @@ import org.jscience.distributed.TaskRegistry.PrecisionMode;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.technical.backend.algorithms.LatticeBoltzmannProvider;
 
-import java.io.Serializable;
-
-public class FluidSimTask implements DistributedTask<FluidSimTask, FluidSimTask>, Serializable {
+public class FluidSimTask implements DistributedTask<FluidSimTask, FluidSimTask> {
 
     private final int width;
     private final int height;

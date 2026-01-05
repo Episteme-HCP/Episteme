@@ -37,7 +37,7 @@ import javafx.stage.Stage;
 import org.jscience.economics.DistributedEconomyTask;
 import org.jscience.politics.loaders.WorldBankLoader;
 import org.jscience.politics.GeopoliticalEngineTask;
-import org.jscience.politics.FactbookLoader;
+import org.jscience.politics.loaders.FactbookLoader;
 import org.jscience.server.proto.*;
 
 import java.io.*;
@@ -90,10 +90,20 @@ public class DistributedGeopoliticsApp extends Application {
                 Real.of(inflation));
 
         List<GeopoliticalEngineTask.NationState> nations = new ArrayList<>();
-        // Mock nations for now as FactbookLoader might need similar update or is fine
-        for (FactbookLoader.NationStats stats : FactbookLoader.getFullDataset().values()) {
+        // Load nations from FactbookLoader
+        FactbookLoader loader = new FactbookLoader();
+        List<org.jscience.politics.Country> countries = loader.getMiniCatalog().getAll().get(0);
+
+        for (org.jscience.politics.Country c : countries) {
+            double stability = 0.5;
+            if (c.getGovernmentType() != null && c.getGovernmentType().toLowerCase().contains("republic")) {
+                stability = 0.8;
+            }
+            // Estimate military as fraction of population * GDP proxy
+            double military = c.getPopulationLong() * 500.0;
+
             nations.add(
-                    new GeopoliticalEngineTask.NationState(stats.name(), stats.stability(), stats.militarySpending()));
+                    new GeopoliticalEngineTask.NationState(c.getName(), stability, military));
         }
         politicsTask = new GeopoliticalEngineTask(nations);
 

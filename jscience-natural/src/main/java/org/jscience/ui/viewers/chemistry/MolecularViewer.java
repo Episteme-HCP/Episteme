@@ -27,7 +27,7 @@ import javafx.application.Application;
 import javafx.animation.AnimationTimer;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
@@ -35,7 +35,7 @@ import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
+
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -48,10 +48,8 @@ import org.jscience.chemistry.Atom;
 import org.jscience.chemistry.Bond;
 import org.jscience.chemistry.Molecule;
 import org.jscience.chemistry.MolecularDynamics;
-import org.jscience.ui.i18n.I18n;
-import org.jscience.chemistry.MolecularGraph;
 import org.jscience.chemistry.PeriodicTable;
-import org.jscience.chemistry.loaders.ChemistryDataLoader;
+
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.mathematics.numbers.real.Real;
@@ -79,8 +77,6 @@ public class MolecularViewer extends Application {
 
     private double mouseX, mouseY;
     private Label detailLabel = new Label("Select a molecule...");
-    private boolean showOrbitals = false;
-    private boolean planarMode = false;
 
     private static final Map<String, Color> CPK_COLORS = new HashMap<>();
     private static final Map<String, Double> VDW_RADII = new HashMap<>();

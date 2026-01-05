@@ -25,8 +25,6 @@ package org.jscience.device.sim;
 
 import org.jscience.device.instruments.WeatherStation;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 /**

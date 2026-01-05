@@ -5,9 +5,6 @@
 package org.jscience.technical.backend.algorithms;
 
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.mathematics.context.MathContext;
-
-import java.math.RoundingMode;
 import java.util.stream.IntStream;
 
 /**

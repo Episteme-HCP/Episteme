@@ -29,14 +29,11 @@ import org.jscience.ui.plotting.Plot2D;
 import org.jscience.ui.plotting.PlotFormat;
 import org.jscience.ui.plotting.PlottingBackend;
 // import org.knowm.xchart.BitmapEncoder; // Disabled for build stability
-import org.knowm.xchart.QuickChart;
 import org.knowm.xchart.SwingWrapper;
 import org.knowm.xchart.XYChart;
 import org.knowm.xchart.XYChartBuilder;
-import org.knowm.xchart.XYSeries;
 import org.knowm.xchart.style.Styler;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,10 +47,8 @@ import java.util.List;
 public class XChartPlot2D implements Plot2D {
 
     private final XYChart chart;
-    private final String title;
 
     public XChartPlot2D(String title) {
-        this.title = title;
         this.chart = new XYChartBuilder()
                 .width(800)
                 .height(600)
@@ -112,7 +107,7 @@ public class XChartPlot2D implements Plot2D {
         for (Real r : yData)
             y.add(r.doubleValue());
 
-        XYSeries series = chart.addSeries(label, x, y);
+        chart.addSeries(label, x, y);
         // Map rudimentary styles if necessary
         return this;
     }

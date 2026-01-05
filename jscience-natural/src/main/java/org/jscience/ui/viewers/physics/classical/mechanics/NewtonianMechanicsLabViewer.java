@@ -26,7 +26,7 @@ package org.jscience.ui.viewers.physics.classical.mechanics;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
-import javafx.geometry.Pos;
+
 import java.util.ArrayList;
 import java.util.List;
 import javafx.scene.Scene;
@@ -35,8 +35,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import org.jscience.ui.ThemeManager;
 import org.jscience.ui.i18n.I18n;
@@ -79,6 +77,7 @@ public class NewtonianMechanicsLabViewer {
         Tab tab = new Tab("Spring Oscillator");
         Canvas canvas = new Canvas(600, 500);
 
+        @SuppressWarnings("unchecked")
         final Quantity<Mass>[] mass = new Quantity[] { Quantities.create(2.0, Units.KILOGRAM) };
         final org.jscience.mathematics.numbers.real.Real[] k = { org.jscience.mathematics.numbers.real.Real.of(5.0) };
         final org.jscience.mathematics.numbers.real.Real[] damping = {

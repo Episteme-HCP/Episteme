@@ -5,14 +5,13 @@
 package org.jscience.physics.wave;
 
 import org.jscience.distributed.DistributedTask;
-import java.io.Serializable;
 
 import org.jscience.distributed.PrecisionMode;
 
 /**
  * Wave Equation Simulation Task.
  */
-public class WaveSimTask implements DistributedTask<WaveSimTask, WaveSimTask>, Serializable {
+public class WaveSimTask implements DistributedTask<WaveSimTask, WaveSimTask> {
 
     private final int width;
     private final int height;
