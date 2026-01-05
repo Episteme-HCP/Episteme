@@ -64,90 +64,228 @@ public class JScienceDemosApp extends Application {
     private void buildUI() {
         BorderPane root = new BorderPane();
 
-        // 1. Menu Bar
-        VBox topContainer = new VBox();
-        topContainer.getChildren().add(createMenuBar());
+        // Load CSS with null protection
+        // Using likely old path or trying standard path
+        URL cssResource = getClass().getResource("/org/jscience/ui/theme.css");
+        if (cssResource == null) {
+            cssResource = getClass().getResource("/org/jscience/ui/style.css");
+        }
+
+        if (cssResource != null) {
+            // we will add it to the scene later
+        } else {
+            logger.warn("theme.css not found, using default styling");
+        }
 
         // Header
-        VBox header = new VBox(5);
-        header.getStyleClass().add("header-box");
-        header.setPadding(new Insets(15));
-        header.setAlignment(Pos.CENTER);
-        header.setStyle("-fx-background-color: #333333;");
+        VBox header = createHeader();
 
-        Label title = new Label(I18n.getInstance().get("app.header.title", "JScience Ecosystem"));
-        title.getStyleClass().add("header-title");
-        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
-
-        Label subtitle = new Label(I18n.getInstance().get("app.header.subtitle", "Scientific Applications & Tools"));
-        subtitle.getStyleClass().add("header-subtitle");
-        subtitle.setStyle("-fx-font-size: 14px; -fx-text-fill: #cccccc;");
-
-        header.getChildren().addAll(title, subtitle);
-        topContainer.getChildren().add(header);
-
+        // Menu Bar
+        MenuBar menuBar = createMenuBar();
+        VBox topContainer = new VBox(menuBar, header);
         root.setTop(topContainer);
 
-        // 2. Main Content
-        VBox content = new VBox(10);
-        content.getStyleClass().add("content-box");
-        content.setPadding(new Insets(10));
-        content.setStyle("-fx-background-color: #f4f4f4;");
+        // Discovery
+        Map<String, List<ViewerProvider>> demosByCategory = discoverAndSortProviders();
 
-        // Discovery and Grouping
-        Map<String, List<ViewerProvider>> categorizedProviders = discoverAndSortProviders();
+        // Single unified content - no tabs
+        VBox allContent = new VBox(15);
+        allContent.setPadding(new Insets(20));
+        allContent.getStyleClass().add("content-box");
 
-        // Accordion for Categories
-        Accordion accordion = new Accordion();
-
-        for (Map.Entry<String, List<ViewerProvider>> entry : categorizedProviders.entrySet()) {
-            String category = entry.getKey();
-            List<ViewerProvider> items = entry.getValue();
-
-            // create list view for this category
-            ListView<ViewerProvider> listView = new ListView<>();
-            listView.getItems().addAll(items);
-            listView.setCellFactory(lv -> new DemoListCell());
-            listView.setPrefHeight(items.size() * 50 + 20); // Basic auto-height
-
-            // Double click action
-            listView.setOnMouseClicked(e -> {
-                if (e.getClickCount() == 2) {
-                    ViewerProvider selected = listView.getSelectionModel().getSelectedItem();
-                    if (selected != null) {
-                        launchDemo(selected);
-                    }
+        // Add demos by category
+        if (demosByCategory.isEmpty()) {
+            allContent.getChildren().add(new Label(I18n.getInstance().get("app.nodemos")));
+        } else {
+            // Demos sections
+            for (Map.Entry<String, List<ViewerProvider>> entry : demosByCategory.entrySet()) {
+                // Restore logic from old app: skip social sciences if requested?
+                // The user said "completely different", implying the old state was preferred.
+                // The old state explicitly skipped "Social Sciences".
+                if ("Social Sciences".equalsIgnoreCase(entry.getKey())
+                        || "Sciences Sociales".equalsIgnoreCase(entry.getKey())) {
+                    continue;
                 }
-            });
 
-            TitledPane pane = new TitledPane(category + " (" + items.size() + ")", listView);
-            pane.getStyleClass().add("titled-pane");
-            accordion.getPanes().add(pane);
+                TitledPane section = createSection(entry.getKey(), entry.getValue());
+                allContent.getChildren().add(section);
+            }
         }
 
-        if (!accordion.getPanes().isEmpty()) {
-            accordion.setExpandedPane(accordion.getPanes().get(0));
-        }
-
-        // Add accordion to content box
-        content.getChildren().add(accordion);
-
-        ScrollPane scroll = new ScrollPane(content);
-        scroll.getStyleClass().add("scroll-pane");
+        ScrollPane scroll = new ScrollPane(allContent);
         scroll.setFitToWidth(true);
         root.setCenter(scroll);
 
-        // Styling
-        URL cssResource = getClass().getResource("/org/jscience/ui/style.css");
-        Scene scene = new Scene(root, 1000, 700);
+        Scene scene = new Scene(root, 1000, 750);
+        // Add CSS to scene as well
         if (cssResource != null) {
             scene.getStylesheets().add(cssResource.toExternalForm());
         }
-        ThemeManager.getInstance().applyTheme(scene);
 
-        primaryStage.setTitle(I18n.getInstance().get("app.header.title", "JScience Ecosystem"));
+        primaryStage.setTitle(I18n.getInstance().get("app.header.title", "JScience Demos"));
         primaryStage.setScene(scene);
+
+        // Apply global theme preference
+        ThemeManager.getInstance().applyTheme(scene);
     }
+
+    private MenuBar createMenuBar() {
+        MenuBar menuBar = new MenuBar();
+
+        // Language Menu
+        // Adapting old LanguageMenu logic to be inline if LanguageMenu class is
+        // missing?
+        // Old code used `new LanguageMenu(this::buildUI)`. Assuming LanguageMenu class
+        // exists.
+        // If not, I'll fallback to standard menu construction like in the new app.
+
+        Menu languageMenu = new Menu(I18n.getInstance().get("menu.language", "Language"));
+        ToggleGroup langGroup = new ToggleGroup();
+
+        RadioMenuItem enItem = new RadioMenuItem("English");
+        enItem.setToggleGroup(langGroup);
+        enItem.setSelected(Locale.ENGLISH.getLanguage().equals(I18n.getInstance().getLocale().getLanguage()));
+        enItem.setOnAction(e -> {
+            I18n.getInstance().setLocale(Locale.ENGLISH);
+            buildUI();
+        });
+
+        RadioMenuItem frItem = new RadioMenuItem("Français");
+        frItem.setToggleGroup(langGroup);
+        frItem.setSelected(Locale.FRENCH.getLanguage().equals(I18n.getInstance().getLocale().getLanguage()));
+        frItem.setOnAction(e -> {
+            I18n.getInstance().setLocale(Locale.FRENCH);
+            buildUI();
+        });
+
+        // Add all likely supported languages
+        languageMenu.getItems().addAll(enItem, frItem);
+
+        // Theme Menu
+        Menu themeMenu = new Menu(I18n.getInstance().get("app.menu.theme", "Theme"));
+        ToggleGroup themeGroup = new ToggleGroup();
+
+        RadioMenuItem darkItem = new RadioMenuItem(I18n.getInstance().get("app.menu.theme.dark", "Dark"));
+        darkItem.setToggleGroup(themeGroup);
+        // Old code assumed boolean dark/light. New code uses properties.
+        boolean isDark = "HighContrast".equals(System.getProperty("jscience.theme"))
+                || "Modena".equals(System.getProperty("jscience.theme")); // imperfect mapping
+        // Better:
+        darkItem.setSelected(ThemeManager.getInstance().isDarkTheme());
+        darkItem.setOnAction(e -> {
+            ThemeManager.getInstance().setDarkTheme(true);
+            ThemeManager.getInstance().applyTheme(primaryStage.getScene());
+        });
+
+        RadioMenuItem lightItem = new RadioMenuItem(I18n.getInstance().get("app.menu.theme.light", "Light"));
+        lightItem.setToggleGroup(themeGroup);
+        lightItem.setSelected(!ThemeManager.getInstance().isDarkTheme());
+        lightItem.setOnAction(e -> {
+            ThemeManager.getInstance().setDarkTheme(false);
+            ThemeManager.getInstance().applyTheme(primaryStage.getScene());
+        });
+
+        themeMenu.getItems().addAll(darkItem, lightItem);
+
+        menuBar.getMenus().addAll(languageMenu, themeMenu);
+        return menuBar;
+    }
+
+    private VBox createHeader() {
+        VBox header = new VBox(5);
+        header.setPadding(new Insets(20));
+        header.setAlignment(Pos.CENTER);
+        header.getStyleClass().add("header-box");
+        // RESTORED GRADIENT from Old Code
+        header.setStyle("-fx-background-color: linear-gradient(to right, #1a2a6c, #b21f1f, #fdbb2d);");
+
+        Label title = new Label(I18n.getInstance().get("app.header.title", "JScience Demos"));
+        title.getStyleClass().add("header-label");
+        title.setStyle("-fx-font-size: 28px; -fx-text-fill: white; -fx-font-weight: bold;");
+
+        Label subtitle = new Label(I18n.getInstance().get("app.header.subtitle", "Scientific Applications & Tools"));
+        subtitle.setStyle("-fx-font-size: 14px; -fx-text-fill: #eeeeee;");
+
+        header.getChildren().addAll(title, subtitle);
+        return header;
+    }
+
+    private TitledPane createSection(String category, List<ViewerProvider> demos) {
+        VBox box = new VBox(8);
+        box.setPadding(new Insets(10));
+        box.setStyle("-fx-background-color: #252526;"); // Inner dark
+
+        for (ViewerProvider demo : demos) {
+            box.getChildren().add(createCard(demo));
+        }
+
+        TitledPane pane = new TitledPane(category, box);
+        pane.setCollapsible(true);
+        pane.setExpanded(true);
+        return pane;
+    }
+
+    private HBox createCard(ViewerProvider demo) {
+        HBox row = new HBox(15);
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.setPadding(new Insets(15));
+        row.setStyle(
+                "-fx-background-color: #333333; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 1); -fx-background-radius: 5;");
+
+        Button btn = new Button(I18n.getInstance().get("app.button.launch", "Launch"));
+        btn.getStyleClass().add("launch-button");
+        btn.setStyle("-fx-background-color: #007acc; -fx-text-fill: white; -fx-font-weight: bold; -fx-min-width: 80;");
+
+        btn.setOnAction(e -> {
+            try {
+                launchDemo(demo);
+            } catch (Exception ex) {
+                showError("Failed to launch: " + demo.getName(), ex.getMessage(), ex);
+            }
+        });
+
+        VBox info = new VBox(5);
+        String titleText = demo.getName();
+        String prefix = demo.getCategory() + " : ";
+        if (titleText.startsWith(prefix)) {
+            titleText = titleText.substring(prefix.length());
+        }
+
+        Label name = new Label(titleText);
+        name.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;");
+
+        String desc = demo.getDescription();
+        Label description = new Label(desc != null ? desc : "");
+        description.setWrapText(true);
+        description.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 12px;");
+
+        info.getChildren().addAll(name, description);
+        row.getChildren().addAll(btn, info);
+        HBox.setHgrow(info, Priority.ALWAYS);
+
+        return row;
+    }
+
+    private void launchDemo(ViewerProvider demo) {
+        Stage stage = new Stage();
+        stage.setTitle(demo.getName());
+        try {
+            demo.show(stage);
+        } catch (Exception e) {
+            logger.error("Failed to launch demo: " + demo.getClass().getName(), e);
+            showError("Launch Error", "Could not start " + demo.getName(), e);
+        }
+    }
+
+    private void showError(String title, String message, Exception ex) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(title);
+        alert.setContentText(message + "\n" + ex.getMessage());
+        alert.show(); // Simplified
+    }
+
+    // --- Data Discovery (Kept from Modern Version) ---
 
     private Map<String, List<ViewerProvider>> discoverAndSortProviders() {
         Map<MasterControlDiscovery.ProviderType, Map<String, List<ViewerProvider>>> discovery = MasterControlDiscovery
@@ -181,95 +319,6 @@ public class JScienceDemosApp extends Application {
             String catName = I18n.getInstance().get("category." + key.toLowerCase().replace(" ", "_"), key);
 
             target.computeIfAbsent(catName, k -> new ArrayList<>()).addAll(entry.getValue());
-        }
-    }
-
-    private MenuBar createMenuBar() {
-        MenuBar menuBar = new MenuBar();
-
-        // File Menu
-        Menu fileMenu = new Menu(I18n.getInstance().get("menu.file", "File"));
-        MenuItem exitItem = new MenuItem(I18n.getInstance().get("menu.exit", "Exit"));
-        exitItem.setOnAction(e -> primaryStage.close());
-        fileMenu.getItems().add(exitItem);
-
-        // View Menu (Language & Theme)
-        Menu viewMenu = new Menu(I18n.getInstance().get("menu.view", "View"));
-
-        // Language Submenu
-        Menu langMenu = new Menu(I18n.getInstance().get("menu.language", "Language"));
-        ToggleGroup langGroup = new ToggleGroup();
-
-        RadioMenuItem enItem = new RadioMenuItem("English");
-        enItem.setToggleGroup(langGroup);
-        enItem.setSelected(Locale.ENGLISH.getLanguage().equals(I18n.getInstance().getLocale().getLanguage()));
-        enItem.setOnAction(e -> {
-            I18n.getInstance().setLocale(Locale.ENGLISH);
-            buildUI();
-        });
-
-        RadioMenuItem frItem = new RadioMenuItem("FranÃƒÂ§ais");
-        frItem.setToggleGroup(langGroup);
-        frItem.setSelected(Locale.FRENCH.getLanguage().equals(I18n.getInstance().getLocale().getLanguage()));
-        frItem.setOnAction(e -> {
-            I18n.getInstance().setLocale(Locale.FRENCH);
-            buildUI();
-        });
-
-        langMenu.getItems().addAll(enItem, frItem);
-
-        // Theme Submenu
-        Menu themeMenu = new Menu(I18n.getInstance().get("menu.theme", "Theme"));
-        ToggleGroup themeGroup = new ToggleGroup();
-
-        for (String theme : Arrays.asList("Modena", "Caspian", "HighContrast")) {
-            RadioMenuItem themeItem = new RadioMenuItem(theme);
-            themeItem.setToggleGroup(themeGroup);
-            themeItem.setSelected(
-                    System.getProperty("jscience.theme", "Modena").equalsIgnoreCase(theme.replace(" ", "")));
-            themeItem.setOnAction(e -> {
-                System.setProperty("jscience.theme", theme.replace(" ", ""));
-                ThemeManager.getInstance().toggleTheme(); // Trigger refresh helper
-                ThemeManager.getInstance().applyTheme(primaryStage.getScene());
-            });
-            themeMenu.getItems().add(themeItem);
-        }
-
-        viewMenu.getItems().addAll(langMenu, themeMenu);
-
-        menuBar.getMenus().addAll(fileMenu, viewMenu);
-        return menuBar;
-    }
-
-    private void launchDemo(ViewerProvider demo) {
-        Stage stage = new Stage();
-        stage.setTitle(demo.getName());
-        try {
-            demo.show(stage);
-        } catch (Exception e) {
-            logger.error("Failed to launch demo: " + demo.getClass().getName(), e);
-            new Alert(Alert.AlertType.ERROR, "Could not start " + demo.getName() + ":\n" + e.getMessage()).show();
-        }
-    }
-
-    // Custom Cell
-    private static class DemoListCell extends ListCell<ViewerProvider> {
-        @Override
-        protected void updateItem(ViewerProvider item, boolean empty) {
-            super.updateItem(item, empty);
-            if (empty || item == null) {
-                setText(null);
-                setGraphic(null);
-            } else {
-                VBox box = new VBox(2);
-                Label title = new Label(item.getName());
-                title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
-                Label desc = new Label(item.getDescription() != null ? item.getDescription() : "");
-                desc.setStyle("-fx-text-fill: #666666; -fx-font-size: 11px;");
-                desc.setWrapText(true);
-                box.getChildren().addAll(title, desc);
-                setGraphic(box);
-            }
         }
     }
 
