@@ -23,7 +23,7 @@
 
 package org.jscience.physics.loaders;
 
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
 import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.mathematics.numbers.real.Real;
@@ -47,7 +47,7 @@ import java.util.Optional;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class HorizonsEphemerisLoader extends AbstractLoader<List<HorizonsEphemerisLoader.EphemerisPoint>> {
+public class HorizonsEphemerisLoader extends AbstractResourceReader<List<HorizonsEphemerisLoader.EphemerisPoint>> {
 
     @Override
 

@@ -23,7 +23,7 @@
 
 package org.jscience.physics.loaders;
 
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -57,7 +57,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class NasaExoplanets extends AbstractLoader<ExoplanetInfo> {
+public class NasaExoplanets extends AbstractResourceReader<ExoplanetInfo> {
 
     private static final String API_BASE = org.jscience.io.Configuration.get("api.nasa.exoplanets",
             "https://exoplanetarchive.ipac.caltech.edu/TAP/sync");

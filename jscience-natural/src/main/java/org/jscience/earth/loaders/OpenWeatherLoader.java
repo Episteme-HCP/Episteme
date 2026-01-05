@@ -29,7 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 import java.util.LinkedHashMap;
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 
 /**
  * OpenWeather API loader for meteorological data.
@@ -38,7 +38,7 @@ import org.jscience.io.AbstractLoader;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class OpenWeatherLoader extends AbstractLoader<Map<String, String>> {
+public class OpenWeatherLoader extends AbstractResourceReader<Map<String, String>> {
 
     private static final String API_URL = "https://api.openweathermap.org/data/2.5/weather";
     private String apiKey;

@@ -25,7 +25,7 @@ package org.jscience.economics.loaders;
 
 import org.jscience.economics.Money;
 import org.jscience.history.TimePoint;
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
 import org.jscience.mathematics.numbers.real.Real;
 
@@ -45,7 +45,7 @@ import java.time.LocalDate;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class FinancialMarketLoader extends AbstractLoader<List<FinancialMarketLoader.Candle>> {
+public class FinancialMarketLoader extends AbstractResourceReader<List<FinancialMarketLoader.Candle>> {
 
     private String currencyCode = "USD";
 

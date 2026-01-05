@@ -42,7 +42,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class OpenMathReader implements Deserializer<Object>, org.jscience.io.InputLoader<Object> {
+public class OpenMathReader implements Deserializer<Object>, org.jscience.io.ResourceReader<Object> {
 
     @Override
     public Object load(String resourceId) throws Exception {
@@ -131,4 +131,3 @@ public class OpenMathReader implements Deserializer<Object>, org.jscience.io.Inp
         }
     }
 }
-

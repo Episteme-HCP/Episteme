@@ -42,13 +42,7 @@ import org.jscience.mathematics.numbers.complex.Complex;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class OpenMathWriter implements Serializer<Object>, org.jscience.io.OutputLoader<Object> {
-
-    @Override
-    public Object load(String resourceId) throws Exception {
-        // Writers aren't typically used for loading, but we satisfy the interface
-        return null;
-    }
+public class OpenMathWriter implements Serializer<Object>, org.jscience.io.ResourceWriter<Object> {
 
     @Override
     public void save(Object resource, String destination) throws Exception {
@@ -155,4 +149,3 @@ public class OpenMathWriter implements Serializer<Object>, org.jscience.io.Outpu
         writer.writeEndElement(); // OMA
     }
 }
-

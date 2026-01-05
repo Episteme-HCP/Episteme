@@ -250,10 +250,10 @@ public class MarketCrashPredictor {
             TimePoint time = TimePoint.of(date);
             Candle candle = new Candle(
                     time,
-                    new Money(Real.of(open), "USD"),
-                    new Money(Real.of(high), "USD"),
-                    new Money(Real.of(low), "USD"),
-                    new Money(Real.of(close), "USD"),
+                    Money.usd(open),
+                    Money.usd(high),
+                    Money.usd(low),
+                    Money.usd(close),
                     Real.of(volume));
             candles.add(candle);
 

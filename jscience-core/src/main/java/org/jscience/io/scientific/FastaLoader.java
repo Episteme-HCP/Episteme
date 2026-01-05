@@ -26,12 +26,30 @@ package org.jscience.io.scientific;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.jscience.io.AbstractResourceReader;
+import org.jscience.io.ResourceWriter;
 
 /**
  * Loader for FASTA format files.
  * Used for DNA/Protein sequence input/output.
  */
-public class FastaLoader {
+public class FastaLoader extends AbstractResourceReader<List<FastaLoader.SequenceRecord>>
+        implements ResourceWriter<List<FastaLoader.SequenceRecord>> {
+
+    @Override
+    public Class<List<SequenceRecord>> getResourceType() {
+        return (Class) List.class;
+    }
+
+    @Override
+    public String getResourcePath() {
+        return null;
+    }
+
+    @Override
+    protected List<SequenceRecord> loadFromSource(String id) throws Exception {
+        return load(id);
+    }
 
     public record SequenceRecord(String header, String sequence) {
     }

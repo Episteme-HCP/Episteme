@@ -37,7 +37,7 @@ import org.jscience.mathematics.loaders.Deserializer;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class MathMLReader implements Deserializer<Object>, org.jscience.io.InputLoader<Object> {
+public class MathMLReader implements Deserializer<Object>, org.jscience.io.ResourceReader<Object> {
 
     private final XMLInputFactory factory;
 
@@ -56,7 +56,8 @@ public class MathMLReader implements Deserializer<Object>, org.jscience.io.Input
             }
         }
         try (InputStream is = getClass().getResourceAsStream(resourceId)) {
-            if (is == null) throw new java.io.IOException("MathML resource not found: " + resourceId);
+            if (is == null)
+                throw new java.io.IOException("MathML resource not found: " + resourceId);
             return read(is);
         }
     }
@@ -95,4 +96,3 @@ public class MathMLReader implements Deserializer<Object>, org.jscience.io.Input
         return null;
     }
 }
-

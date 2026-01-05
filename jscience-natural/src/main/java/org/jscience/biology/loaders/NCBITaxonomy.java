@@ -27,7 +27,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 
 /**
  * Connector to the National Center for Biotechnology Information (NCBI)
@@ -49,7 +49,7 @@ import org.jscience.io.AbstractLoader;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class NCBITaxonomy extends AbstractLoader<String> {
+public class NCBITaxonomy extends AbstractResourceReader<String> {
 
     @Override
     protected String loadFromSource(String resourceId) throws Exception {
@@ -119,5 +119,3 @@ public class NCBITaxonomy extends AbstractLoader<String> {
     public NCBITaxonomy() {
     }
 }
-
-

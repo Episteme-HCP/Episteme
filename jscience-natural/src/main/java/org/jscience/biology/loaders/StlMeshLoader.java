@@ -26,7 +26,7 @@ package org.jscience.biology.loaders;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
 
 import java.io.*;
@@ -46,7 +46,7 @@ import java.util.Optional;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class StlMeshLoader extends AbstractLoader<MeshView> {
+public class StlMeshLoader extends AbstractResourceReader<MeshView> {
 
     @Override
     public String getResourcePath() {

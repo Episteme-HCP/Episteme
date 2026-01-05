@@ -23,7 +23,7 @@
 
 package org.jscience.physics.loaders;
 
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 
 import java.io.*;
 import java.net.http.*;
@@ -42,7 +42,7 @@ import com.fasterxml.jackson.databind.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class SimbadLoader extends AbstractLoader<SimbadLoader.AstronomicalObject> {
+public class SimbadLoader extends AbstractResourceReader<SimbadLoader.AstronomicalObject> {
 
     @Override
     protected AstronomicalObject loadFromSource(String id) throws Exception {

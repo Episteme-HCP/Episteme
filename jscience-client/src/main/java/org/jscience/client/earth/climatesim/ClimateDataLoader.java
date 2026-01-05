@@ -24,16 +24,16 @@
 package org.jscience.client.earth.climatesim;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jscience.io.AbstractLoader;
-import org.jscience.io.OutputLoader;
+import org.jscience.io.AbstractResourceReader;
+import org.jscience.io.ResourceWriter;
 
 import java.io.File;
 
 /**
  * Loader for Climate Model Data (JSON Format).
  */
-public class ClimateDataLoader extends AbstractLoader<ClimateDataLoader.ClimateState>
-        implements OutputLoader<ClimateDataLoader.ClimateState> {
+public class ClimateDataLoader extends AbstractResourceReader<ClimateDataLoader.ClimateState>
+        implements ResourceWriter<ClimateDataLoader.ClimateState> {
 
     private final ObjectMapper mapper = new ObjectMapper();
 

@@ -29,7 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 import java.util.LinkedHashMap;
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 
 /**
  * Loader for UniProt protein database.
@@ -38,7 +38,7 @@ import org.jscience.io.AbstractLoader;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class UniProtLoader extends AbstractLoader<Map<String, String>> {
+public class UniProtLoader extends AbstractResourceReader<Map<String, String>> {
 
     private static final String API_URL = "https://rest.uniprot.org/uniprotkb/";
     private static final String SEARCH_URL = "https://rest.uniprot.org/uniprotkb/search?query=";

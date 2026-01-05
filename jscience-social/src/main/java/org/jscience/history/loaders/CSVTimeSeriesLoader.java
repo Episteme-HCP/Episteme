@@ -25,7 +25,7 @@ package org.jscience.history.loaders;
 
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.history.TimePoint;
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
 
 import java.io.BufferedReader;
@@ -46,7 +46,7 @@ import java.util.TreeMap;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CSVTimeSeriesLoader extends AbstractLoader<Map<TimePoint, Real>> {
+public class CSVTimeSeriesLoader extends AbstractResourceReader<Map<TimePoint, Real>> {
 
     public CSVTimeSeriesLoader() {
     }

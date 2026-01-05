@@ -31,8 +31,8 @@ import java.io.PrintWriter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import org.jscience.io.AbstractLoader;
-import org.jscience.io.OutputLoader;
+import org.jscience.io.AbstractResourceReader;
+import org.jscience.io.ResourceWriter;
 
 /**
  * Loads and saves Biological Sequences from FASTA format.
@@ -41,8 +41,8 @@ import org.jscience.io.OutputLoader;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class FASTALoader extends AbstractLoader<List<FASTALoader.Sequence>>
-        implements OutputLoader<List<FASTALoader.Sequence>> {
+public class FASTALoader extends AbstractResourceReader<List<FASTALoader.Sequence>>
+        implements ResourceWriter<List<FASTALoader.Sequence>> {
 
     @Override
     protected List<Sequence> loadFromSource(String resourceId) throws Exception {

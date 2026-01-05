@@ -25,7 +25,7 @@ package org.jscience.biology.loaders;
 
 import org.jscience.biology.VirusSpecies;
 import org.jscience.biology.Virus;
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -43,7 +43,7 @@ import java.util.Map;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class VirusLoader extends AbstractLoader<VirusSpecies> {
+public class VirusLoader extends AbstractResourceReader<VirusSpecies> {
 
     private static final String RESOURCE_PATH = "/org/jscience/biology/viruses.json";
     private static VirusLoader instance;
@@ -51,7 +51,7 @@ public class VirusLoader extends AbstractLoader<VirusSpecies> {
     private boolean loaded = false;
 
     public VirusLoader() {
-        // AbstractLoader has default constructor
+        // AbstractResourceReader has default constructor
     }
 
     public static synchronized VirusLoader getInstance() {

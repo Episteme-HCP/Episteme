@@ -29,7 +29,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 
 /**
  * Loads Star Catalog Data (CSV).
@@ -38,7 +38,7 @@ import org.jscience.io.AbstractLoader;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class StarLoader extends AbstractLoader<List<StarLoader.Star>> {
+public class StarLoader extends AbstractResourceReader<List<StarLoader.Star>> {
 
     @Override
     protected List<Star> loadFromSource(String id) throws Exception {

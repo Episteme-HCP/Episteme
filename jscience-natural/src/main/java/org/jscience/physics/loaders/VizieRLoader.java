@@ -23,7 +23,7 @@
 
 package org.jscience.physics.loaders;
 
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
 
 import java.io.BufferedReader;
@@ -42,7 +42,7 @@ import java.util.Optional;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class VizieRLoader extends AbstractLoader<Map<String, String>> {
+public class VizieRLoader extends AbstractResourceReader<Map<String, String>> {
 
     private static final String API_URL = "https://vizier.cds.unistra.fr/viz-bin/votable";
 

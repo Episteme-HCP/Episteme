@@ -31,7 +31,7 @@ import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.shape.VertexFormat;
 
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
 
 import java.io.*;
@@ -51,7 +51,7 @@ import java.util.Optional;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ObjMeshLoader extends AbstractLoader<Group> {
+public class ObjMeshLoader extends AbstractResourceReader<Group> {
 
     @Override
     public String getResourcePath() {

@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jscience.geography.Coordinate;
 import org.jscience.geography.Region;
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
 
 import java.io.IOException;
@@ -44,7 +44,7 @@ import java.util.Optional;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GeoJsonLoader extends AbstractLoader<List<Region>> {
+public class GeoJsonLoader extends AbstractResourceReader<List<Region>> {
 
     private final ObjectMapper mapper;
 

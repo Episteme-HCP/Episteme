@@ -32,7 +32,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
 import java.util.Optional;
 
@@ -51,7 +51,7 @@ import java.util.Optional;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class FactbookLoader extends AbstractLoader<List<Country>> {
+public class FactbookLoader extends AbstractResourceReader<List<Country>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(FactbookLoader.class);
 

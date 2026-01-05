@@ -47,6 +47,7 @@ import org.jscience.biology.ecology.PopulationDynamics;
 import org.jscience.politics.loaders.WorldBankLoader;
 import org.jscience.politics.Country;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.io.AbstractResourceReader;
 
 /**
  * Pandemic Propagation Forecaster.
@@ -120,7 +121,7 @@ public class PandemicForecasterApp extends FeaturedAppBase {
 
     private void loadCountryData() {
         WorldBankLoader loader = WorldBankLoader.getInstance();
-        countries = loader.loadAll();
+        countries = ((AbstractResourceReader<Country>) loader).loadAll();
         log("Loaded " + countries.size() + " countries from WorldBankLoader");
     }
 

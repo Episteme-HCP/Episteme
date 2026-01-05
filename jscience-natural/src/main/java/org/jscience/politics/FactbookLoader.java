@@ -23,7 +23,7 @@
 
 package org.jscience.politics;
 
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +37,7 @@ import java.util.Map;
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  */
-public class FactbookLoader extends AbstractLoader<FactbookLoader.NationStats> {
+public class FactbookLoader extends AbstractResourceReader<FactbookLoader.NationStats> {
 
     public record NationStats(String code, String name, double stability, double militarySpending)
             implements Serializable {

@@ -1,4 +1,4 @@
-org.jscience.apps.biology.CrisprDesignApp
+
 org.jscience.apps.biology.PandemicForecasterApp
 org.jscience.apps.chemistry.CrystalStructureApp
 org.jscience.apps.chemistry.TitrationApp
@@ -6,4 +6,4 @@ org.jscience.apps.engineering.SmartGridApp
 org.jscience.apps.physics.QuantumCircuitApp
 org.jscience.apps.sociology.CivilizationApp
 org.jscience.apps.economics.MarketCrashApp
-org.jscience.apps.sports.SportsResultsDemo
+

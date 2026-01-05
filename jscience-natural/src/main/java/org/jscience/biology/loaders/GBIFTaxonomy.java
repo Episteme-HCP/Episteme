@@ -24,7 +24,7 @@
 package org.jscience.biology.loaders;
 
 import org.jscience.io.cache.ResourceCache;
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -52,7 +52,7 @@ import java.util.Optional;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GBIFTaxonomy extends AbstractLoader<String> {
+public class GBIFTaxonomy extends AbstractResourceReader<String> {
 
     @Override
     protected String loadFromSource(String resourceId) throws Exception {
@@ -149,5 +149,3 @@ public class GBIFTaxonomy extends AbstractLoader<String> {
     public GBIFTaxonomy() {
     }
 }
-
-

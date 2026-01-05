@@ -33,7 +33,7 @@ import javafx.stage.Stage;
 import org.jscience.JScience;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.ui.plotting.PlottingBackend;
-import org.jscience.io.ResourceLoader;
+import org.jscience.io.ResourceIO;
 
 import java.io.File;
 import java.util.Locale;
@@ -607,17 +607,17 @@ public class JScienceMasterControl extends Application {
         List<MasterControlDiscovery.ClassInfo> loaders = MasterControlDiscovery.getInstance().findClasses("Loader");
 
         // Instantiate and Group by Category
-        Map<String, List<ResourceLoader<?>>> grouped = new TreeMap<>(); // Sorted categories (by key)
+        Map<String, List<ResourceIO<?>>> grouped = new TreeMap<>(); // Sorted categories (by key)
 
         for (MasterControlDiscovery.ClassInfo info : loaders) {
             try {
                 Class<?> clazz = Class.forName(info.fullName);
-                // Ensure it's a ResourceLoader and has a no-arg constructor
-                if (ResourceLoader.class.isAssignableFrom(clazz)) {
+                // Ensure it's a ResourceIO and has a no-arg constructor
+                if (ResourceIO.class.isAssignableFrom(clazz)) {
                     // Try to instantiate
-                    ResourceLoader<?> loader;
+                    ResourceIO<?> loader;
                     try {
-                        loader = (ResourceLoader<?>) clazz.getDeclaredConstructor().newInstance();
+                        loader = (ResourceIO<?>) clazz.getDeclaredConstructor().newInstance();
                     } catch (NoSuchMethodException e) {
                         // Fallback for loaders without public no-arg constructor?
                         // Just skip or wrap? Use default metadata.
@@ -650,8 +650,8 @@ public class JScienceMasterControl extends Application {
         }
 
         // Create UI
-        for (Map.Entry<String, List<ResourceLoader<?>>> entry : grouped.entrySet()) {
-            List<ResourceLoader<?>> categoryLoaders = entry.getValue();
+        for (Map.Entry<String, List<ResourceIO<?>>> entry : grouped.entrySet()) {
+            List<ResourceIO<?>> categoryLoaders = entry.getValue();
 
             // Sort by Name (Internationalized?)
             // We'll sort by the raw name first, or translated name?
@@ -666,7 +666,7 @@ public class JScienceMasterControl extends Application {
             });
 
             List<AppEntry> entries = new ArrayList<>();
-            for (ResourceLoader<?> loader : categoryLoaders) {
+            for (ResourceIO<?> loader : categoryLoaders) {
                 String nameKey = loader.getName();
                 String displayName = i18n.get(nameKey, nameKey);
 

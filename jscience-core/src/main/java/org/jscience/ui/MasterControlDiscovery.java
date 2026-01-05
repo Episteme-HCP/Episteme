@@ -158,7 +158,7 @@ public class MasterControlDiscovery {
                             }
 
                             if ("Loader".equals(suffix)) {
-                                if (!org.jscience.io.ResourceLoader.class.isAssignableFrom(cls)) {
+                                if (!org.jscience.io.ResourceIO.class.isAssignableFrom(cls)) {
                                     continue;
                                 }
                             }
@@ -212,7 +212,7 @@ public class MasterControlDiscovery {
                                 }
 
                                 if ("Loader".equals(suffix)) {
-                                    if (!org.jscience.io.ResourceLoader.class.isAssignableFrom(cls)) {
+                                    if (!org.jscience.io.ResourceIO.class.isAssignableFrom(cls)) {
                                         continue;
                                     }
                                 }

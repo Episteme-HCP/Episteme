@@ -46,7 +46,7 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 import org.jscience.mathematics.analysis.series.IntegerSequence;
 import org.jscience.mathematics.numbers.integers.Integer;
 import org.jscience.mathematics.numbers.integers.Natural;
@@ -59,7 +59,7 @@ import org.jscience.mathematics.numbers.integers.Natural;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class OEISLoader extends AbstractLoader<IntegerSequence> {
+public class OEISLoader extends AbstractResourceReader<IntegerSequence> {
 
     @Override
     public Class<IntegerSequence> getResourceType() {

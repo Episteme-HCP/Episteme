@@ -25,7 +25,7 @@ package org.jscience.chemistry;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Quantity;
@@ -45,7 +45,7 @@ import java.util.Optional;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class PeriodicTableLoader extends AbstractLoader<List<Element>> {
+public class PeriodicTableLoader extends AbstractResourceReader<List<Element>> {
 
     @Override
     public String getResourcePath() {

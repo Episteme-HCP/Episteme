@@ -44,7 +44,7 @@ import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class NetCDFFile extends AbstractDataFile implements org.jscience.io.InputLoader<NetCDFFile> {
+public class NetCDFFile extends AbstractDataFile implements org.jscience.io.ResourceReader<NetCDFFile> {
 
     @Override
     public NetCDFFile load(String resourceId) throws Exception {
@@ -403,4 +403,3 @@ public class NetCDFFile extends AbstractDataFile implements org.jscience.io.Inpu
         return (total + 3) & ~3;
     }
 }
-

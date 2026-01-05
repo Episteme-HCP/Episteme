@@ -46,10 +46,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
 
-public class WorldBankLoader extends AbstractLoader<Country> {
+public class WorldBankLoader extends AbstractResourceReader<Country> {
 
     private static final Logger LOG = LoggerFactory.getLogger(WorldBankLoader.class);
     private static final String RESOURCE_PATH = "/org/jscience/politics/worldbank-fallback.json";
@@ -60,12 +60,12 @@ public class WorldBankLoader extends AbstractLoader<Country> {
     private final ObjectMapper mapper = new ObjectMapper();
     private final HttpClient httpClient;
 
-    // Cache handled by AbstractLoader now? No, AbstractLoader has ResourceCache.
+    // Cache handled by AbstractResourceReader now? No, AbstractResourceReader has ResourceCache.
     // But WorldBankLoader had manual cache 'cachedCountries'.
-    // AbstractLoader uses 'cache' field from 'ResourceCache.global()'.
-    // We should use that or keep manual if AbstractLoader pattern differs.
-    // AbstractLoader.loadAll calls loadAllFromSource.
-    // We will stick to AbstractLoader pattern.
+    // AbstractResourceReader uses 'cache' field from 'ResourceCache.global()'.
+    // We should use that or keep manual if AbstractResourceReader pattern differs.
+    // AbstractResourceReader.loadAll calls loadAllFromSource.
+    // We will stick to AbstractResourceReader pattern.
 
     // Rate Limiter: 120 requests per minute
     private final RateLimiter rateLimiter;
@@ -79,8 +79,8 @@ public class WorldBankLoader extends AbstractLoader<Country> {
     // For testing
     public WorldBankLoader(HttpClient httpClient) {
         this.httpClient = httpClient;
-        // AbstractLoader initializes cache in its constructor?
-        // We need to call super()? AbstractLoader usually has no-arg constructor.
+        // AbstractResourceReader initializes cache in its constructor?
+        // We need to call super()? AbstractResourceReader usually has no-arg constructor.
 
         RateLimiterConfig config = RateLimiterConfig.custom()
                 .limitRefreshPeriod(Duration.ofMinutes(1))
@@ -445,7 +445,7 @@ public class WorldBankLoader extends AbstractLoader<Country> {
      * Clears the cached regions, forcing a reload on next access.
      */
     public void clearCache() {
-        // Cache is now managed by AbstractLoader / ResourceCache
+        // Cache is now managed by AbstractResourceReader / ResourceCache
         LOG.debug("WorldBankLoader: manual cache clear requested (delegated to system cache)");
     }
 }

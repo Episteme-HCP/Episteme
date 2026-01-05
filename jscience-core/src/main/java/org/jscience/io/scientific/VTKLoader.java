@@ -26,6 +26,7 @@ package org.jscience.io.scientific;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import org.jscience.io.AbstractResourceWriter;
 
 /**
  * Simple loader/saver for VTK (Visualization Toolkit) files.
@@ -35,7 +36,17 @@ import java.io.IOException;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class VTKLoader {
+public class VTKLoader extends AbstractResourceWriter<double[][]> {
+
+    @Override
+    public Class<double[][]> getResourceType() {
+        return double[][].class;
+    }
+
+    @Override
+    public String getResourcePath() {
+        return null;
+    }
 
     public VTKLoader() {
     }

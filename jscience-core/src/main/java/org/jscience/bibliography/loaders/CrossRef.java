@@ -24,7 +24,7 @@
 package org.jscience.bibliography.loaders;
 
 import org.jscience.io.cache.ResourceCache;
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -50,7 +50,7 @@ import java.util.Optional;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CrossRef extends AbstractLoader<CitationInfo> {
+public class CrossRef extends AbstractResourceReader<CitationInfo> {
 
     @Override
     protected CitationInfo loadFromSource(String resourceId) throws Exception {
@@ -282,4 +282,3 @@ public class CrossRef extends AbstractLoader<CitationInfo> {
     public CrossRef() {
     }
 }
-

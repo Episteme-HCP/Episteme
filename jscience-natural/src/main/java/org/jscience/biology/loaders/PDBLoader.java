@@ -25,8 +25,8 @@ package org.jscience.biology.loaders;
 
 import org.jscience.biology.Protein;
 import org.jscience.chemistry.Atom;
-import org.jscience.io.AbstractLoader;
-import org.jscience.io.OutputLoader;
+import org.jscience.io.AbstractResourceReader;
+import org.jscience.io.ResourceWriter;
 
 import java.io.*;
 import java.util.Locale;
@@ -39,7 +39,7 @@ import java.util.Locale;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class PDBLoader extends AbstractLoader<Protein> implements OutputLoader<Protein> {
+public class PDBLoader extends AbstractResourceReader<Protein> implements ResourceWriter<Protein> {
 
     @Override
     public String getResourcePath() {

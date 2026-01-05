@@ -23,7 +23,7 @@
 
 package org.jscience.device.loaders.nmea;
 
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
 
 import java.io.InputStream;
@@ -39,7 +39,7 @@ import java.util.Scanner;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class NMEALoader extends AbstractLoader<List<NMEAMessage>> {
+public class NMEALoader extends AbstractResourceReader<List<NMEAMessage>> {
 
     private Scanner scanner;
 

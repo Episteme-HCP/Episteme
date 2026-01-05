@@ -24,7 +24,7 @@
 package org.jscience.biology.loaders;
 
 import org.jscience.biology.genetics.BioSequence;
-import org.jscience.io.AbstractLoader;
+import org.jscience.io.AbstractResourceReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +39,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class FASTAParser extends AbstractLoader<List<BioSequence>> {
+public class FASTAParser extends AbstractResourceReader<List<BioSequence>> {
 
     @Override
     protected List<BioSequence> loadFromSource(String resourceId) throws Exception {
@@ -133,5 +133,3 @@ public class FASTAParser extends AbstractLoader<List<BioSequence>> {
         return BioSequence.Type.DNA;
     }
 }
-
-
