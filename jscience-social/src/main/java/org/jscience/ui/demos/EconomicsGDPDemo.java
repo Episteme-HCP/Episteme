@@ -54,7 +54,7 @@ public class EconomicsGDPDemo implements AppProvider {
 
     @Override
     public String getCategory() {
-        return "Economics";
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.economics", "Economics");
     }
 
     @Override

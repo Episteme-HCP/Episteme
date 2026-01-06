@@ -37,8 +37,8 @@ import javafx.util.Duration;
 import org.jscience.apps.framework.ChartFactory;
 import org.jscience.apps.framework.FeaturedAppBase;
 import org.jscience.economics.analysis.TechnicalIndicators;
-import org.jscience.economics.loaders.FinancialMarketLoader;
-import org.jscience.economics.loaders.FinancialMarketLoader.Candle;
+import org.jscience.economics.loaders.FinancialMarketReader;
+import org.jscience.economics.loaders.FinancialMarketReader.Candle;
 import org.jscience.mathematics.numbers.real.Real;
 
 import java.util.ArrayList;
@@ -210,8 +210,8 @@ public class MarketCrashApp extends FeaturedAppBase {
         // Load Real Data (S&P 500 Sample)
         try (var is = getClass().getResourceAsStream("data/SP500_Sample.csv")) {
             if (is != null) {
-                marketData = FinancialMarketLoader.loadCSV(is, "USD");
-                marketData = FinancialMarketLoader.loadCSV(is, "USD");
+                marketData = FinancialMarketReader.loadCSV(is, "USD");
+                marketData = FinancialMarketReader.loadCSV(is, "USD");
                 log(java.text.MessageFormat.format(i18n.get("market.log.loaded"), marketData.size()));
             } else {
                 log(i18n.get("market.error.data_not_found"));

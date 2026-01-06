@@ -58,6 +58,8 @@ public class FunctionExplorerViewer {
     private static final String DEFAULT_3D_FUNC = "sin(sqrt(x^2+y^2))";
 
     public static void show(Stage stage) {
+        I18n i18n = I18n.getInstance();
+
         TabPane tabPane = new TabPane();
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
@@ -70,7 +72,7 @@ public class FunctionExplorerViewer {
 
         Scene scene = new Scene(root, 1100, 750);
         ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(I18n.getInstance().get("viewer.plotting"));
+        stage.setTitle(i18n.get("viewer.plotting", "Function Explorer"));
         stage.setScene(scene);
         stage.show();
     }
@@ -79,7 +81,8 @@ public class FunctionExplorerViewer {
     // 2D FUNCTION EXPLORER
     // ==========================================
     private static Tab create2DTab() {
-        Tab tab = new Tab("2D Explorer");
+        I18n i18n = I18n.getInstance();
+        Tab tab = new Tab(i18n.get("funcexplorer.tab.2d", "2D Explorer"));
         SplitPane splitPane = new SplitPane();
 
         // --- Sidebar ---
@@ -92,15 +95,15 @@ public class FunctionExplorerViewer {
         // Input Section
         Label fLabel = new Label("f(x) =");
         TextField fInput = new TextField(DEFAULT_FX);
-        Label gLabel = new Label("g(x) ="); // Second function support
+        Label gLabel = new Label("g(x) =");
         TextField gInput = new TextField(DEFAULT_GX);
 
-        Label opLabel = new Label("Plot Operation:");
+        Label opLabel = new Label(i18n.get("funcexplorer.plotop", "Plot Operation:"));
         ComboBox<String> opCombo = new ComboBox<>(FXCollections.observableArrayList(
                 "f(x)", "g(x)", "f(x) + g(x)", "f(x) * g(x)"));
         opCombo.setValue("f(x)");
 
-        Label rangeLabel = new Label("Range [Min, Max]");
+        Label rangeLabel = new Label(i18n.get("funcexplorer.range", "Range [Min, Max]"));
         HBox rangeBox = new HBox(5);
         TextField xMinField = new TextField("-10");
         TextField xMaxField = new TextField("10");
@@ -108,24 +111,24 @@ public class FunctionExplorerViewer {
         xMaxField.setPrefWidth(60);
         rangeBox.getChildren().addAll(xMinField, xMaxField);
 
-        Button plotBtn = new Button("Plot Function");
+        Button plotBtn = new Button(i18n.get("funcexplorer.btn.plot", "Plot Function"));
         plotBtn.setMaxWidth(Double.MAX_VALUE);
         plotBtn.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold;");
 
         // Analysis
         Separator sep1 = new Separator();
-        Label analysisLabel = new Label("Analysis (Click Chart)");
+        Label analysisLabel = new Label(i18n.get("funcexplorer.analysis", "Analysis (Click Chart)"));
         analysisLabel.setStyle("-fx-font-weight: bold;");
 
-        Label cursorVal = new Label("Cursor: -");
+        Label cursorVal = new Label(i18n.get("funcexplorer.cursor", "Cursor:") + " -");
 
-        Label symTitle = new Label("Symbolic Derivative:");
-        TextArea symResult = new TextArea(); // For potentially long formulas
+        Label symTitle = new Label(i18n.get("funcexplorer.symderiv", "Symbolic Derivative:"));
+        TextArea symResult = new TextArea();
         symResult.setPrefRowCount(2);
         symResult.setEditable(false);
         symResult.setWrapText(true);
 
-        Button symbBtn = new Button("Calculate Derivative (Symbolic)");
+        Button symbBtn = new Button(i18n.get("funcexplorer.btn.deriv", "Calculate Derivative (Symbolic)"));
         symbBtn.setMaxWidth(Double.MAX_VALUE);
 
         sidebar.getChildren().addAll(
@@ -140,7 +143,7 @@ public class FunctionExplorerViewer {
         // --- Main Area (Chart) ---
         StackPane chartContainer = new StackPane();
         chartContainer.setStyle("-fx-background-color: white;");
-        Label placeholder = new Label("Enter function and click Plot");
+        Label placeholder = new Label(i18n.get("funcexplorer.placeholder", "Enter function and click Plot"));
         chartContainer.getChildren().add(placeholder);
 
         // Logic
@@ -157,8 +160,6 @@ public class FunctionExplorerViewer {
                 plot.setLegend(true);
                 plot.setXRange(Real.of(min), Real.of(max));
 
-                // Parse Logic for combined functions
-                // We'll create lambdas that use the parser
                 SimpleExpressionParser pF = new SimpleExpressionParser(fStr);
                 SimpleExpressionParser pG = new SimpleExpressionParser(gStr);
 
@@ -178,26 +179,13 @@ public class FunctionExplorerViewer {
                     return Real.ZERO;
                 }, Real.of(min), Real.of(max), op);
 
-                // For comparison, maybe plot individual components lightly if combined?
-                // For now keep simple.
-
-                // Embed
                 if (plot instanceof JavaFXPlot2D) {
                     LineChart<Number, Number> node = ((JavaFXPlot2D) plot).getNode();
-                    node.setCreateSymbols(true); // Allow symbols for clicking? No, too many points.
-                    // To handle click on chart background to get value
-                    // We can listen to chart mouse events.
+                    node.setCreateSymbols(true);
 
                     node.setOnMouseClicked(me -> {
-                        // Conversion from scene to axis coordinates is available in Axis
-                        // But axis are protected in standard chart, exposed in JavaFXPlot2D if we
-                        // extended or modified it.
-                        // Actually, JavaFXPlot2D does not expose Axis publically.
-                        // However, we can use the relative position if we access axes from node lookup.
-                        // Or just simplistic "approx" based on bounds.
-                        // Better: The chart displays tooltips usually, or we can just report the pixel
-                        // pos.
-                        cursorVal.setText(String.format("Click at: (%.1f, %.1f) [Screen]", me.getX(), me.getY()));
+                        cursorVal.setText(String.format(i18n.get("funcexplorer.cursor", "Cursor:") + " (%.1f, %.1f)",
+                                me.getX(), me.getY()));
                     });
 
                     chartContainer.getChildren().setAll(node);
@@ -224,7 +212,7 @@ public class FunctionExplorerViewer {
             else if (op.equals("f(x) + g(x)")) {
                 res = SymbolicUtil.differentiate(fStr) + " + " + SymbolicUtil.differentiate(gStr);
             } else {
-                res = "Symbolic product/complex operations not supported in demo.";
+                res = i18n.get("funcexplorer.error.complex", "Complex operations not supported in demo.");
             }
             symResult.setText(res);
         });
@@ -247,7 +235,8 @@ public class FunctionExplorerViewer {
     // 3D FUNCTION EXPLORER
     // ==========================================
     private static Tab create3DTab() {
-        Tab tab = new Tab("3D Explorer");
+        I18n i18n = I18n.getInstance();
+        Tab tab = new Tab(i18n.get("funcexplorer.tab.3d", "3D Explorer"));
         SplitPane splitPane = new SplitPane();
 
         VBox sidebar = new VBox(15);
@@ -259,25 +248,25 @@ public class FunctionExplorerViewer {
         Label funcLabel = new Label("z = f(x, y) =");
         TextField funcInput = new TextField(DEFAULT_3D_FUNC);
 
-        Label rangeLabel = new Label("Range [Ã‚Â±X, Ã‚Â±Y]");
+        Label rangeLabel = new Label(i18n.get("funcexplorer.range3d", "Range [\u00B1X, \u00B1Y]"));
         TextField rangeField = new TextField("10");
 
-        CheckBox gridChk = new CheckBox("Show Grid/Axes");
+        CheckBox gridChk = new CheckBox(i18n.get("funcexplorer.grid", "Show Grid/Axes"));
         gridChk.setSelected(true);
 
-        Button plotBtn = new Button("Plot 3D Surface");
+        Button plotBtn = new Button(i18n.get("funcexplorer.btn.plot3d", "Plot 3D Surface"));
         plotBtn.setMaxWidth(Double.MAX_VALUE);
         plotBtn.setStyle("-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-weight: bold;");
 
         // Analysis 3D
         Separator sep = new Separator();
-        Label analysisLabel = new Label("Analysis");
+        Label analysisLabel = new Label(i18n.get("funcexplorer.analysis3d", "Analysis"));
         TextField xEval = new TextField("0");
         xEval.setPromptText("x");
         TextField yEval = new TextField("0");
         yEval.setPromptText("y");
         Label zRes = new Label("z = -");
-        Button calcBtn = new Button("Calculate Point");
+        Button calcBtn = new Button(i18n.get("funcexplorer.btn.calcpt", "Calculate Point"));
 
         calcBtn.setOnAction(e -> {
             try {
@@ -293,8 +282,8 @@ public class FunctionExplorerViewer {
                 sep, analysisLabel, new HBox(5, xEval, yEval), calcBtn, zRes);
 
         StackPane chartContainer = new StackPane();
-        chartContainer.setStyle("-fx-background-color: #222;"); // Dark background for 3D
-        Label placeholder = new Label("Enter function and click Plot");
+        chartContainer.setStyle("-fx-background-color: #222;");
+        Label placeholder = new Label(i18n.get("funcexplorer.placeholder", "Enter function and click Plot"));
         placeholder.setTextFill(javafx.scene.paint.Color.WHITE);
         chartContainer.getChildren().add(placeholder);
 
@@ -306,7 +295,6 @@ public class FunctionExplorerViewer {
 
                 JavaFXPlot3D plot = new JavaFXPlot3D("3D Surface");
                 plot.setInteractive(true);
-                // Grid handling could be added to JavaFXPlot3D API, assuming defaults for now.
 
                 plot.addSurface(args -> {
                     try {
@@ -347,5 +335,3 @@ public class FunctionExplorerViewer {
         return parser.parse(vars);
     }
 }
-
-

@@ -35,7 +35,6 @@ import org.jscience.ui.i18n.I18n;
 import org.jscience.ui.plotting.PlottingBackend;
 import org.jscience.io.ResourceIO;
 
-import java.io.File;
 import java.util.Locale;
 import java.util.ArrayList;
 import java.util.List;
@@ -272,29 +271,23 @@ public class JScienceMasterControl extends Application {
         // Default languages
         items.add(new LocaleItem(i18n.get("dashboard.lang.en", "English"), Locale.ENGLISH));
 
-        List<String> resources = MasterControlDiscovery.getInstance().findResources("messages_core_");
-        for (String res : resources) {
-            try {
-                // messages_core_fr.properties -> fr
-                String filename = new File(res).getName();
-                String code = filename.substring("messages_core_".length(), filename.indexOf('.'));
-                Locale loc = Locale.of(code);
-                String displayName = loc.getDisplayLanguage(loc);
-                // Capitalize first letter
-                if (displayName.length() > 0)
-                    displayName = displayName.substring(0, 1).toUpperCase() + displayName.substring(1);
-
-                boolean exists = false;
-                for (LocaleItem item : items) {
-                    if (item.locale.getLanguage().equals(loc.getLanguage()))
-                        exists = true;
+        for (Locale locale : i18n.getSupportedLocales()) {
+            String displayName = locale.getDisplayLanguage(locale);
+            if (displayName.length() > 0) {
+                displayName = displayName.substring(0, 1).toUpperCase() + displayName.substring(1);
+            }
+            // Avoid duplicates if English was added manually above (it was, lines 273)
+            // Actually, best to clear items and rebuild from getSupportedLocales
+            boolean exists = false;
+            for (LocaleItem item : items) {
+                if (item.locale.getLanguage().equals(locale.getLanguage())) {
+                    exists = true;
+                    break;
                 }
+            }
 
-                if (!exists) {
-                    items.add(new LocaleItem(displayName + " (" + code + ")", loc));
-                }
-            } catch (Exception e) {
-                // ignore invalid filenames
+            if (!exists) {
+                items.add(new LocaleItem(displayName + " (" + locale.getLanguage() + ")", locale));
             }
         }
 
@@ -343,9 +336,9 @@ public class JScienceMasterControl extends Application {
             JScience.savePreferences();
             refreshUI(); // Update UI to reflect mode change
         });
-        VBox modeInfo = createInfoBox(i18n.get("mastercontrol.computing.mode", "Mode de calcul"),
+        VBox modeInfo = createInfoBox(i18n.get("mastercontrol.computing.mode", "Compute Mode"),
                 i18n.get("mastercontrol.computing.desc.mode",
-                        "AUTO prÃ©fÃ¨re le GPU, sinon utilise le CPU si indisponible."));
+                        "AUTO prefers GPU, otherwise uses CPU if unavailable."));
 
         // --- Float Precision ---
         ComboBox<org.jscience.ComputeContext.FloatPrecision> floatBox = new ComboBox<>();
@@ -386,8 +379,8 @@ public class JScienceMasterControl extends Application {
                 JScience.savePreferences();
             }
         });
-        VBox precInfo = createInfoBox(i18n.get("mastercontrol.computing.precision", "PrÃ©cision dÃ©cimale"),
-                i18n.get("mastercontrol.computing.desc.precision_digits", "Chiffres (0 = IllimitÃ©)"));
+        VBox precInfo = createInfoBox(i18n.get("mastercontrol.computing.precision", "Decimal Precision"),
+                i18n.get("mastercontrol.computing.desc.precision_digits", "Digits (0 = Unlimited)"));
 
         // --- MathContext Rounding ---
         ComboBox<java.math.RoundingMode> roundBox = new ComboBox<>();
@@ -399,8 +392,8 @@ public class JScienceMasterControl extends Application {
             JScience.setMathContext(new java.math.MathContext(old.getPrecision(), roundBox.getValue()));
             JScience.savePreferences();
         });
-        VBox roundInfo = createInfoBox(i18n.get("mastercontrol.computing.rounding", "Mode d'arrondi"),
-                i18n.get("mastercontrol.computing.desc.rounding", "StratÃƒÂ©gie d'arrondi"));
+        VBox roundInfo = createInfoBox(i18n.get("mastercontrol.computing.rounding", "Rounding Mode"),
+                i18n.get("mastercontrol.computing.desc.rounding", "Rounding strategy"));
 
         Label gpuVal = new Label(JScience.isGpuAvailable() ? i18n.get("mastercontrol.libraries.available", "Available")
                 : i18n.get("mastercontrol.libraries.not_available", "Not Available"));

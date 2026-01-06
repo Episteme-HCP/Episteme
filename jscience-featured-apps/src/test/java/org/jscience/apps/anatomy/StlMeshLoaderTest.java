@@ -23,7 +23,7 @@
 
 package org.jscience.apps.anatomy;
 
-import org.jscience.biology.loaders.StlMeshLoader;
+import org.jscience.biology.loaders.StlMeshReader;
 
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
@@ -87,7 +87,7 @@ public class StlMeshLoaderTest {
         ByteArrayInputStream in = new ByteArrayInputStream(bb.array());
 
         // Load
-        MeshView view = StlMeshLoader.load(in);
+        MeshView view = StlMeshReader.load(in);
         assertNotNull(view);
         assertTrue(view.getMesh() instanceof TriangleMesh);
 
@@ -96,5 +96,3 @@ public class StlMeshLoaderTest {
         assertEquals(1, mesh.getFaces().size() / 6); // 1 face * 6 indices
     }
 }
-
-

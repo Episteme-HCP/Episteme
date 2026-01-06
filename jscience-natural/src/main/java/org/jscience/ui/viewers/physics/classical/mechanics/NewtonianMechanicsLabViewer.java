@@ -74,7 +74,7 @@ public class NewtonianMechanicsLabViewer {
 
     // ==== TAB 1: Spring Oscillator ====
     private static Tab createSpringTab() {
-        Tab tab = new Tab("Spring Oscillator");
+        Tab tab = new Tab(I18n.getInstance().get("mechanics.spring.tab"));
         Canvas canvas = new Canvas(600, 500);
 
         @SuppressWarnings("unchecked")
@@ -96,11 +96,12 @@ public class NewtonianMechanicsLabViewer {
         Slider kSlider = labeledSlider("Spring k (N/m)", 1, 50, 5.0,
                 v -> k[0] = org.jscience.mathematics.numbers.real.Real.of(v));
 
-        Label energyLabel = new Label("Energy: (Calculated in Real)");
+        Label energyLabel = new Label(I18n.getInstance().get("mechanics.energy.label"));
         Canvas phaseCanvas = new Canvas(200, 200);
         List<Point2D> phaseTrail = new ArrayList<>();
 
-        controls.getChildren().addAll(new Label("Spring Controls"), new Separator(), mSlider.getParent(),
+        controls.getChildren().addAll(new Label(I18n.getInstance().get("mechanics.spring.controls")), new Separator(),
+                mSlider.getParent(),
                 kSlider.getParent(), energyLabel, new Separator(), phaseCanvas);
 
         new AnimationTimer() {
@@ -170,7 +171,7 @@ public class NewtonianMechanicsLabViewer {
 
     // ==== TAB 2: Simple Pendulum ====
     private static Tab createPendulumTab() {
-        Tab tab = new Tab("Simple Pendulum");
+        Tab tab = new Tab(I18n.getInstance().get("mechanics.pendulum.tab"));
         Canvas canvas = new Canvas(600, 500);
 
         final org.jscience.mathematics.numbers.real.Real[] length = {
@@ -185,7 +186,7 @@ public class NewtonianMechanicsLabViewer {
         Slider lSlider = labeledSlider("Length (m)", 1, 5, 2.0,
                 v -> length[0] = org.jscience.mathematics.numbers.real.Real.of(v * 100));
 
-        Label pLabel = new Label("Period: (Real)");
+        Label pLabel = new Label(I18n.getInstance().get("mechanics.period.label"));
         Canvas phaseCanvas = new Canvas(200, 200);
         List<Point2D> phaseTrail = new ArrayList<>();
 
@@ -237,7 +238,8 @@ public class NewtonianMechanicsLabViewer {
             }
         }.start();
 
-        controls.getChildren().addAll(new Label("Pendulum Controls"), new Separator(), lSlider.getParent(), pLabel,
+        controls.getChildren().addAll(new Label(I18n.getInstance().get("mechanics.pendulum.controls")), new Separator(),
+                lSlider.getParent(), pLabel,
                 phaseCanvas);
         tab.setContent(new HBox(20, canvas, controls));
         return tab;
@@ -258,7 +260,7 @@ public class NewtonianMechanicsLabViewer {
 
     // ==== TAB 3: Free Fall ====
     private static Tab createGravityTab() {
-        Tab tab = new Tab("Free Fall");
+        Tab tab = new Tab(I18n.getInstance().get("mechanics.gravity.tab"));
         Canvas canvas = new Canvas(600, 500);
 
         final org.jscience.mathematics.numbers.real.Real[] y = { org.jscience.mathematics.numbers.real.Real.of(50.0) };
@@ -268,7 +270,7 @@ public class NewtonianMechanicsLabViewer {
         final org.jscience.mathematics.numbers.real.Real g = org.jscience.mathematics.numbers.real.Real.of(9.81 * 30);
 
         VBox controls = new VBox(15);
-        Button drop = new Button("Drop");
+        Button drop = new Button(I18n.getInstance().get("mechanics.drop"));
         drop.setOnAction(e -> {
             y[0] = org.jscience.mathematics.numbers.real.Real.of(50.0);
             vy[0] = org.jscience.mathematics.numbers.real.Real.ZERO;
@@ -317,7 +319,7 @@ public class NewtonianMechanicsLabViewer {
 
     // ==== TAB 4: 1D Collision ====
     private static Tab createCollisionTab() {
-        Tab tab = new Tab("1D Collision");
+        Tab tab = new Tab(I18n.getInstance().get("mechanics.collision.tab"));
         Canvas canvas = new Canvas(700, 300);
 
         final org.jscience.mathematics.numbers.real.Real[] m1 = { org.jscience.mathematics.numbers.real.Real.of(2.0) };

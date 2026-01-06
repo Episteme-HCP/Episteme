@@ -7,7 +7,7 @@
 }
 
 .dashboard-description {
-    -fx-text-fill: #333333;
+    -fx-text-fill: black;
     -fx-font-style: italic;
     -fx-wrap-text: true;
 }

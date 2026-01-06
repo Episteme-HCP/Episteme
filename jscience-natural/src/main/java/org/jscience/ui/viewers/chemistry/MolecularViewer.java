@@ -76,7 +76,7 @@ public class MolecularViewer extends Application {
     private final Translate t = new Translate(0, 0, 30);
 
     private double mouseX, mouseY;
-    private Label detailLabel = new Label("Select a molecule...");
+    private Label detailLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("molecule.select"));
 
     private static final Map<String, Color> CPK_COLORS = new HashMap<>();
     private static final Map<String, Double> VDW_RADII = new HashMap<>();
@@ -112,9 +112,10 @@ public class MolecularViewer extends Application {
         selector.setOnAction(e -> loadModel(selector.getValue()));
 
         Slider foldSlider = new Slider(0, 100, 0);
-        Button foldBtn = new Button("Animate Folding");
+        Button foldBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("molecule.btn.animate"));
         foldBtn.setOnAction(e -> simulateFolding());
-        VBox foldControls = new VBox(5, new Label("Folding Strength:"), foldSlider, foldBtn);
+        VBox foldControls = new VBox(5,
+                new Label(org.jscience.ui.i18n.I18n.getInstance().get("molecule.label.strength")), foldSlider, foldBtn);
         foldControls.setVisible(false);
 
         selector.valueProperty().addListener((obs, ov, nv) -> {
@@ -124,13 +125,14 @@ public class MolecularViewer extends Application {
                 foldingTimer.stop();
         });
 
-        controls.getChildren().addAll(new Label("Load Model:"), selector, new Separator(), detailLabel, foldControls);
+        controls.getChildren().addAll(new Label(org.jscience.ui.i18n.I18n.getInstance().get("molecule.label.load")),
+                selector, new Separator(), detailLabel, foldControls);
         root.setRight(controls);
 
         loadModel("Benzene");
 
         primaryStage.setScene(new Scene(root, 1100, 800));
-        primaryStage.setTitle("JScience Molecular Viewer");
+        primaryStage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("molecule.window.title"));
         primaryStage.show();
     }
 

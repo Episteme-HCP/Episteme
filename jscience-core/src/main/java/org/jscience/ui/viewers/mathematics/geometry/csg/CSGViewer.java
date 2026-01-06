@@ -34,6 +34,7 @@ import javafx.scene.shape.Box;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
+import org.jscience.ui.i18n.I18n;
 
 /**
  * CSG (Constructive Solid Geometry) Visualization.
@@ -69,7 +70,7 @@ public class CSGViewer extends Application {
         sidebar.setPadding(new Insets(20));
         sidebar.setStyle("-fx-background-color: #333; -fx-text-fill: white;");
 
-        Label title = new Label("CSG Operations");
+        Label title = new Label(I18n.getInstance().get("csg.title"));
         title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         ComboBox<String> opBox = new ComboBox<>();
@@ -78,13 +79,14 @@ public class CSGViewer extends Application {
         opBox.setOnAction(e -> updateCSG(opBox.getValue()));
 
         Slider offsetSlider = new Slider(0, 10, 5);
-        Label offsetLbl = new Label("Shape Offset: 5.0");
+        Label offsetLbl = new Label(I18n.getInstance().get("csg.offset") + " 5.0");
         offsetSlider.valueProperty().addListener((o, ov, nv) -> {
             sphere.setTranslateX(nv.doubleValue());
-            offsetLbl.setText("Shape Offset: " + String.format("%.2f", nv.doubleValue()));
+            offsetLbl.setText(I18n.getInstance().get("csg.offset") + " " + String.format("%.2f", nv.doubleValue()));
         });
 
-        sidebar.getChildren().addAll(title, new Separator(), new Label("Operation:"), opBox, offsetLbl, offsetSlider);
+        sidebar.getChildren().addAll(title, new Separator(), new Label(I18n.getInstance().get("csg.operation")), opBox,
+                offsetLbl, offsetSlider);
         root.setRight(sidebar);
         root.setCenter(subScene);
 
@@ -99,7 +101,7 @@ public class CSGViewer extends Application {
         });
 
         Scene scene = new Scene(root, 1100, 700);
-        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.csg"));
+        stage.setTitle(I18n.getInstance().get("viewer.csg"));
         stage.setScene(scene);
         stage.show();
     }
@@ -153,5 +155,3 @@ public class CSGViewer extends Application {
         new CSGViewer().start(stage);
     }
 }
-
-

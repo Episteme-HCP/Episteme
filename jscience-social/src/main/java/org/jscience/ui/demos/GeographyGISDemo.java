@@ -70,7 +70,7 @@ public class GeographyGISDemo implements AppProvider {
 
     @Override
     public String getCategory() {
-        return "Geography";
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.geography", "Geography");
     }
 
     @Override
@@ -112,7 +112,8 @@ public class GeographyGISDemo implements AppProvider {
         popChk.setSelected(false);
         popChk.setOnAction(e -> draw());
 
-        Button regenBtn = new Button("Regenerate Terrain");
+        Button regenBtn = new Button(
+                org.jscience.ui.i18n.SocialI18n.getInstance().get("geo.gis.btn.regenerate", "Regenerate Terrain"));
         regenBtn.setMaxWidth(Double.MAX_VALUE);
         regenBtn.setOnAction(e -> generateWorld());
 

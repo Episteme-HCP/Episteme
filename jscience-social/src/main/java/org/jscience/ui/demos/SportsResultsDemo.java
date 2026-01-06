@@ -43,12 +43,12 @@ public class SportsResultsDemo implements AppProvider {
 
     @Override
     public String getCategory() {
-        return "Sociology";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.sociology", "Sociology");
     }
 
     @Override
     public String getName() {
-        return "Sports League Manager";
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.sports.results.title", "Sports League Manager");
     }
 
     @Override

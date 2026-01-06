@@ -24,7 +24,7 @@
 package org.jscience.apps.economics;
 
 import org.jscience.economics.analysis.TechnicalIndicators;
-import org.jscience.economics.loaders.FinancialMarketLoader.Candle;
+import org.jscience.economics.loaders.FinancialMarketReader.Candle;
 import org.jscience.economics.Money;
 import org.jscience.history.TimePoint;
 import org.jscience.mathematics.numbers.real.Real;
@@ -65,19 +65,22 @@ public class MarketCrashPredictor {
         }
     }
 
+    private static final I18nManager i18n = I18nManager.getInstance();
+
     public static void main(String[] args) {
         System.out.println(
-                "Ã¢â€¢â€Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢â€”");
-        System.out.println("Ã¢â€¢â€˜     JScience Market Crash Predictor          Ã¢â€¢â€˜");
-        System.out.println("Ã¢â€¢â€˜     Technical Analysis & Risk Assessment     Ã¢â€¢â€˜");
+                "╔═════════════════════════════════════════════╗");
+        System.out.println("║     " + i18n.get("market.console.title") + "          ║");
+        System.out.println("║     " + i18n.get("market.console.subtitle") + "     ║");
         System.out.println(
-                "Ã¢â€¢Å¡Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â");
+                "╚═════════════════════════════════════════════╝");
         System.out.println();
 
         // Generate sample market data (simulating historical prices)
         List<Candle> marketData = generateSampleData();
 
-        System.out.println("Ã°Å¸â€œÅ  Analyzing " + marketData.size() + " trading days of data...");
+        System.out.println(
+                "📊 " + java.text.MessageFormat.format(i18n.get("market.console.analyzing"), marketData.size()));
         System.out.println();
 
         // Calculate Technical Indicators
@@ -87,70 +90,80 @@ public class MarketCrashPredictor {
     private static void analyzeMarket(List<Candle> candles) {
         // Current price
         double currentPrice = candles.get(candles.size() - 1).close.getAmount().doubleValue();
-        System.out.printf("Current Price: $%.2f%n", currentPrice);
+        System.out.println(java.text.MessageFormat.format(i18n.get("market.console.current_price"),
+                String.format("%.2f", currentPrice)));
         System.out.println();
 
         // SMA Analysis
-        System.out.println("Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â MOVING AVERAGE ANALYSIS Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â");
+        System.out.println("═══ " + i18n.get("market.console.sma_analysis") + " ═══");
         Real sma20 = TechnicalIndicators.sma(candles, 20);
         Real sma50 = TechnicalIndicators.sma(candles, 50);
         Real sma200 = TechnicalIndicators.sma(candles, 200);
 
         if (sma20 != null)
-            System.out.printf("  20-day SMA:  $%.2f%n", sma20.doubleValue());
+            System.out.println("  " + java.text.MessageFormat.format(i18n.get("market.console.sma_val"), 20,
+                    String.format("%.2f", sma20.doubleValue())));
         if (sma50 != null)
-            System.out.printf("  50-day SMA:  $%.2f%n", sma50.doubleValue());
+            System.out.println("  " + java.text.MessageFormat.format(i18n.get("market.console.sma_val"), 50,
+                    String.format("%.2f", sma50.doubleValue())));
         if (sma200 != null)
-            System.out.printf("  200-day SMA: $%.2f%n", sma200.doubleValue());
+            System.out.println("  " + java.text.MessageFormat.format(i18n.get("market.console.sma_val"), 200,
+                    String.format("%.2f", sma200.doubleValue())));
 
         boolean belowSMA200 = TechnicalIndicators.isBelowSMA(candles, 200, 0.05);
         if (belowSMA200) {
-            System.out.println("  Ã¢Å¡Â Ã¯Â¸Â  WARNING: Price >5% below 200-day SMA (bearish)");
+            System.out.println("  ⚠️   " + i18n.get("market.console.warning.sma200"));
         }
         System.out.println();
 
         // RSI Analysis
-        System.out.println("Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â RSI ANALYSIS Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â");
+        System.out.println("═══ " + i18n.get("market.console.rsi_analysis") + " ═══");
         Real rsi = TechnicalIndicators.rsi(candles, 14);
         if (rsi != null) {
             double rsiVal = rsi.doubleValue();
-            System.out.printf("  14-day RSI: %.1f%n", rsiVal);
+            System.out.println("  " + java.text.MessageFormat.format(i18n.get("market.console.rsi_val"),
+                    String.format("%.1f", rsiVal)));
             if (rsiVal < 30) {
-                System.out.println("  Ã°Å¸â€œâ€° OVERSOLD condition detected");
+                System.out.println("  📉 " + i18n.get("market.console.oversold"));
             } else if (rsiVal > 70) {
-                System.out.println("  Ã°Å¸â€œË† OVERBOUGHT condition detected");
+                System.out.println("  📈 " + i18n.get("market.console.overbought"));
             } else {
-                System.out.println("  Ã¢Å“â€œ RSI in neutral zone");
+                System.out.println("  ✅ " + i18n.get("market.console.rsi_neutral"));
             }
         }
         System.out.println();
 
         // Volatility Analysis
-        System.out.println("Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â VOLATILITY ANALYSIS Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â");
+        System.out.println("═══ " + i18n.get("market.console.vol_analysis") + " ═══");
         Real vol20 = TechnicalIndicators.volatility(candles, 20);
         Real vol50 = TechnicalIndicators.volatility(candles, 50);
         if (vol20 != null && vol50 != null) {
             double shortVol = vol20.doubleValue() * 100;
             double longVol = vol50.doubleValue() * 100;
-            System.out.printf("  20-day Volatility: %.2f%%%n", shortVol);
-            System.out.printf("  50-day Volatility: %.2f%%%n", longVol);
+            System.out.println("  " + java.text.MessageFormat.format(i18n.get("market.console.vol_val"), 20,
+                    String.format("%.2f", shortVol)));
+            System.out.println("  " + java.text.MessageFormat.format(i18n.get("market.console.vol_val"), 50,
+                    String.format("%.2f", longVol)));
 
             if (shortVol > longVol * 2) {
-                System.out.println("  Ã¢Å¡Â Ã¯Â¸Â  VOLATILITY SPIKE: Short-term vol >2x long-term");
+                System.out.println("  ⚠️   " + i18n.get("market.console.vol_spike"));
             }
         }
         System.out.println();
 
         // Bollinger Bands
-        System.out.println("Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â BOLLINGER BANDS (20, 2ÃÆ’) Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â");
+        System.out.println("═══ " + i18n.get("market.console.bb_analysis") + " ═══");
         Real[] bb = TechnicalIndicators.bollingerBands(candles, 20, 2.0);
         if (bb != null) {
-            System.out.printf("  Lower Band:  $%.2f%n", bb[0].doubleValue());
-            System.out.printf("  Middle Band: $%.2f%n", bb[1].doubleValue());
-            System.out.printf("  Upper Band:  $%.2f%n", bb[2].doubleValue());
+            System.out.println("  " + java.text.MessageFormat.format(i18n.get("market.console.bb_lower"),
+                    String.format("%.2f", bb[0].doubleValue())));
+            System.out.println("  " + java.text.MessageFormat.format(i18n.get("market.console.bb_mid"),
+                    String.format("%.2f", bb[1].doubleValue())));
+            System.out.println("  " + java.text.MessageFormat.format(i18n.get("market.console.bb_upper"),
+                    String.format("%.2f", bb[2].doubleValue())));
 
             if (currentPrice < bb[0].doubleValue()) {
-                System.out.println("  Ã¢Å¡Â Ã¯Â¸Â  Price BELOW lower Bollinger Band");
+                System.out.println("  ⚠️   " + i18n.get("market.console.warning.bb"));
             }
         }
         System.out.println();
@@ -158,13 +171,13 @@ public class MarketCrashPredictor {
         // Overall Risk Assessment
         RiskLevel risk = calculateRiskLevel(candles, rsi, vol20, vol50, belowSMA200, bb, currentPrice);
         System.out.println(
-                "Ã¢â€¢â€Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢â€”");
-        System.out.println("Ã¢â€¢â€˜           RISK ASSESSMENT                    Ã¢â€¢â€˜");
+                "╔═════════════════════════════════════════════╗");
+        System.out.println("║           " + i18n.get("market.console.risk_assessment") + "                    ║");
         System.out.println(
-                "Ã¢â€¢Â Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â£");
-        System.out.printf("Ã¢â€¢â€˜  %s%n", risk);
+                "╠═════════════════════════════════════════════╣");
+        System.out.printf("║  %s%n", risk);
         System.out.println(
-                "Ã¢â€¢Å¡Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â");
+                "╚═════════════════════════════════════════════╝");
     }
 
     private static RiskLevel calculateRiskLevel(List<Candle> candles, Real rsi,

@@ -110,13 +110,7 @@ public class FluidDynamicsViewer extends Application {
         titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
         // Info text
-        Label infoLabel = new Label(
-                "Visualization of fluid flow patterns.\n\n" +
-                        "This demonstrates flow field\n" +
-                        "visualization with particle\n" +
-                        "advection.\n\n" +
-                        "Click and drag to add flow\n" +
-                        "disturbance.");
+        Label infoLabel = new Label(I18n.getInstance().get("fluid.info"));
         infoLabel.setWrapText(true);
         // infoLabel.getStyleClass().add("dark-label-muted");
 
@@ -152,7 +146,7 @@ public class FluidDynamicsViewer extends Application {
         // Solver Switch
         Label engineLabel = new Label(I18n.getInstance().get("fluid.label.engine"));
         // engineLabel.getStyleClass().add("dark-label");
-        ToggleButton engineSwitch = new ToggleButton("Mode: Primitive");
+        ToggleButton engineSwitch = new ToggleButton(I18n.getInstance().get("fluid.mode.primitive"));
         engineSwitch.setMaxWidth(Double.MAX_VALUE);
         engineSwitch.setOnAction(e -> {
             if (engineSwitch.isSelected()) {
@@ -173,11 +167,11 @@ public class FluidDynamicsViewer extends Application {
         });
 
         // Display toggles
-        CheckBox fieldCheck = new CheckBox("Show Flow Field");
+        CheckBox fieldCheck = new CheckBox(I18n.getInstance().get("fluid.check.field"));
         fieldCheck.setSelected(true);
         fieldCheck.setOnAction(e -> showField = fieldCheck.isSelected());
 
-        CheckBox particleCheck = new CheckBox("Show Particles");
+        CheckBox particleCheck = new CheckBox(I18n.getInstance().get("fluid.check.particles"));
         particleCheck.setSelected(true);
         particleCheck.setOnAction(e -> showParticles = particleCheck.isSelected());
 
@@ -214,7 +208,7 @@ public class FluidDynamicsViewer extends Application {
         displayStack.getChildren().add(canvas);
 
         // Start Button Overlay
-        Button startBtn = new Button("CLICK TO START SIMULATION");
+        Button startBtn = new Button(I18n.getInstance().get("fluid.btn.start"));
         startBtn.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-base: #4CAF50;");
         startBtn.setPadding(new Insets(20));
 
@@ -331,7 +325,8 @@ public class FluidDynamicsViewer extends Application {
         gc.setFill(Color.BLACK); // Changed to BLACK to be visible on non-dark background if flow is light
         // gc.fillText("Particles: " + particles.size(), 10, 20); // Removed as
         // redundant with sidebar? Or Keep? Keep.
-        gc.fillText("Particles: " + particles.size(), 10, 20);
+        gc.fillText(java.text.MessageFormat.format(I18n.getInstance().get("fluid.particles.count"), particles.size()),
+                10, 20);
     }
 
     private Color getFlowColor(double magnitude) {
@@ -392,5 +387,3 @@ public class FluidDynamicsViewer extends Application {
         launch(args);
     }
 }
-
-

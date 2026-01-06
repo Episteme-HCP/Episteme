@@ -56,6 +56,8 @@ public class SocialI18n {
     public String get(String key) {
         return org.jscience.ui.i18n.I18n.getInstance().get(key);
     }
+
+    public String get(String key, String defaultValue) {
+        return org.jscience.ui.i18n.I18n.getInstance().get(key, defaultValue);
+    }
 }
-
-

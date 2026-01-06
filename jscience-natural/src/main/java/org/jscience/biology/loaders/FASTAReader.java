@@ -23,61 +23,88 @@
 
 package org.jscience.biology.loaders;
 
-import org.jscience.biology.genetics.BioSequence;
-
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import org.jscience.io.AbstractResourceReader;
 
 /**
- * Reader for FASTA format sequences.
+ * Loads and saves Biological Sequences from FASTA format.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class FASTAReader {
+public class FASTAReader extends AbstractResourceReader<List<FASTAReader.Sequence>> {
 
-    /**
-     * Reads sequences from a FASTA stream.
-     * 
-     * @param inputStream the input stream
-     * @param type        the expected type of sequence (DNA, RNA, Protein)
-     * @return list of loaded bio sequences
-     * @throws IOException on error
-     */
-    public static List<BioSequence> read(InputStream inputStream, BioSequence.Type type) throws IOException {
-        List<BioSequence> sequences = new ArrayList<>();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
-        String line;
-        StringBuilder currentSeq = new StringBuilder();
-
-        while ((line = reader.readLine()) != null) {
-            line = line.trim();
-            if (line.isEmpty())
-                continue;
-
-            if (line.startsWith(">")) {
-                if (currentSeq.length() > 0) {
-                    sequences.add(new BioSequence(currentSeq.toString(), type));
-                    currentSeq.setLength(0);
-                }
-            } else {
-                currentSeq.append(line);
+    @Override
+    protected List<Sequence> loadFromSource(String resourceId) throws Exception {
+        if (resourceId.startsWith("http")) {
+            try (InputStream is = new java.net.URI(resourceId).toURL().openStream()) {
+                return load(is);
             }
         }
-
-        if (currentSeq.length() > 0) {
-            sequences.add(new BioSequence(currentSeq.toString(), type));
+        try (InputStream is = getClass().getResourceAsStream(resourceId)) {
+            if (is == null)
+                throw new java.io.IOException("FASTA resource not found: " + resourceId);
+            return load(is);
         }
+    }
 
-        return Collections.unmodifiableList(sequences);
+    @Override
+    public String getResourcePath() {
+        return "/";
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<List<Sequence>> getResourceType() {
+        return (Class<List<Sequence>>) (Class<?>) List.class;
+    }
+
+    public static class Sequence {
+        public String header;
+        public String data; // Nucleotides or Amino Acids
+
+        public Sequence(String header, String data) {
+            this.header = header;
+            this.data = data;
+        }
+    }
+
+    public static List<Sequence> load(InputStream is) {
+        List<Sequence> sequences = new ArrayList<>();
+        if (is == null)
+            return sequences;
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+            String line;
+            String currentHeader = null;
+            StringBuilder currentData = new StringBuilder();
+
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty())
+                    continue;
+
+                if (line.startsWith(">")) {
+                    if (currentHeader != null) {
+                        sequences.add(new Sequence(currentHeader, currentData.toString()));
+                    }
+                    currentHeader = line.substring(1).trim();
+                    currentData = new StringBuilder();
+                } else {
+                    currentData.append(line);
+                }
+            }
+            if (currentHeader != null) {
+                sequences.add(new Sequence(currentHeader, currentData.toString()));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sequences;
     }
 }
-
-

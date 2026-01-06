@@ -79,7 +79,7 @@ public class PoliticsVotingDemo implements AppProvider {
 
     @Override
     public String getCategory() {
-        return "Politics";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.politics", "Politics");
     }
 
     @Override
@@ -205,7 +205,8 @@ public class PoliticsVotingDemo implements AppProvider {
                         approval += 20;
                     results.put(p, approval); // Not seats, but score
                 }
-                chart.getYAxis().setLabel("Approval Rating");
+                chart.getYAxis().setLabel(
+                        org.jscience.ui.i18n.I18n.getInstance().get("pol.voting.axis.approval", "Approval Rating"));
             }
             case BORDA -> {
                 // Weighted ranking.
@@ -215,12 +216,13 @@ public class PoliticsVotingDemo implements AppProvider {
                         score += 2000; // Party D strong 2nd choice?
                     results.put(p, score / 100); // Scale down
                 }
-                chart.getYAxis().setLabel("Borda Score");
+                chart.getYAxis()
+                        .setLabel(org.jscience.ui.i18n.I18n.getInstance().get("pol.voting.axis.borda", "Borda Score"));
             }
         }
 
         if (system == VotingSystem.FPTP || system == VotingSystem.PR) {
-            chart.getYAxis().setLabel("Seats");
+            chart.getYAxis().setLabel(org.jscience.ui.i18n.I18n.getInstance().get("pol.voting.series.seats", "Seats"));
         }
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
@@ -231,5 +233,3 @@ public class PoliticsVotingDemo implements AppProvider {
         chart.getData().add(series);
     }
 }
-
-

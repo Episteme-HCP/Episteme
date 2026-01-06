@@ -32,7 +32,7 @@ import org.jscience.measure.Units;
 
 import org.jscience.measure.quantity.AmountOfSubstance;
 
-import org.jscience.chemistry.loaders.ChemistryDataLoader;
+import org.jscience.chemistry.loaders.ChemistryDataReader;
 
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
@@ -103,7 +103,7 @@ public class ChemicalModelTest {
     @Test
     public void testDataLoading() {
         // Load elements from JSON (should register/overwrite)
-        ChemistryDataLoader.loadElements();
+        ChemistryDataReader.loadElements();
 
         // Check if data is accessible via PeriodicTable
         // The sample JSON had Hydrogen, Helium, Carbon, Oxygen.
@@ -111,5 +111,3 @@ public class ChemicalModelTest {
         assertNotNull(PeriodicTable.bySymbol("He"));
     }
 }
-
-

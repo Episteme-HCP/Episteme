@@ -142,50 +142,66 @@ public class JScienceDemosApp extends Application {
         Menu languageMenu = new Menu(I18n.getInstance().get("menu.language", "Language"));
         ToggleGroup langGroup = new ToggleGroup();
 
-        RadioMenuItem enItem = new RadioMenuItem("English");
-        enItem.setToggleGroup(langGroup);
-        enItem.setSelected(Locale.ENGLISH.getLanguage().equals(I18n.getInstance().getLocale().getLanguage()));
-        enItem.setOnAction(e -> {
-            I18n.getInstance().setLocale(Locale.ENGLISH);
-            buildUI();
-        });
+        for (Locale locale : I18n.getInstance().getSupportedLocales()) {
+            String label = locale.getDisplayLanguage(locale);
+            if (label.length() > 0) {
+                label = label.substring(0, 1).toUpperCase() + label.substring(1);
+            }
 
-        RadioMenuItem frItem = new RadioMenuItem("Français");
-        frItem.setToggleGroup(langGroup);
-        frItem.setSelected(Locale.FRENCH.getLanguage().equals(I18n.getInstance().getLocale().getLanguage()));
-        frItem.setOnAction(e -> {
-            I18n.getInstance().setLocale(Locale.FRENCH);
-            buildUI();
-        });
+            RadioMenuItem item = new RadioMenuItem(label);
+            item.setToggleGroup(langGroup);
+            item.setSelected(locale.getLanguage().equals(I18n.getInstance().getLocale().getLanguage()));
+            item.setOnAction(e -> {
+                I18n.getInstance().setLocale(locale);
+                buildUI();
+            });
+            languageMenu.getItems().add(item);
+        }
 
-        // Add all likely supported languages
-        languageMenu.getItems().addAll(enItem, frItem);
-
-        // Theme Menu
+        // Theme Menu (3 themes like MasterControl)
         Menu themeMenu = new Menu(I18n.getInstance().get("app.menu.theme", "Theme"));
         ToggleGroup themeGroup = new ToggleGroup();
+        String currentTheme = System.getProperty("jscience.theme", "Modena");
 
-        RadioMenuItem darkItem = new RadioMenuItem(I18n.getInstance().get("app.menu.theme.dark", "Dark"));
-        darkItem.setToggleGroup(themeGroup);
-        // Old code assumed boolean dark/light. New code uses properties.
-        boolean isDark = "HighContrast".equals(System.getProperty("jscience.theme"))
-                || "Modena".equals(System.getProperty("jscience.theme")); // imperfect mapping
-        // Better:
-        darkItem.setSelected(ThemeManager.getInstance().isDarkTheme());
-        darkItem.setOnAction(e -> {
-            ThemeManager.getInstance().setDarkTheme(true);
-            ThemeManager.getInstance().applyTheme(primaryStage.getScene());
-        });
-
-        RadioMenuItem lightItem = new RadioMenuItem(I18n.getInstance().get("app.menu.theme.light", "Light"));
-        lightItem.setToggleGroup(themeGroup);
-        lightItem.setSelected(!ThemeManager.getInstance().isDarkTheme());
-        lightItem.setOnAction(e -> {
+        RadioMenuItem modenaItem = new RadioMenuItem(I18n.getInstance().get("app.menu.theme.modena", "Modena (Light)"));
+        modenaItem.setToggleGroup(themeGroup);
+        modenaItem.setSelected("Modena".equalsIgnoreCase(currentTheme));
+        modenaItem.setOnAction(e -> {
+            System.setProperty("jscience.theme", "Modena");
+            Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
             ThemeManager.getInstance().setDarkTheme(false);
             ThemeManager.getInstance().applyTheme(primaryStage.getScene());
         });
 
-        themeMenu.getItems().addAll(darkItem, lightItem);
+        RadioMenuItem caspianItem = new RadioMenuItem(I18n.getInstance().get("app.menu.theme.caspian", "Caspian"));
+        caspianItem.setToggleGroup(themeGroup);
+        caspianItem.setSelected("Caspian".equalsIgnoreCase(currentTheme));
+        caspianItem.setOnAction(e -> {
+            System.setProperty("jscience.theme", "Caspian");
+            Application.setUserAgentStylesheet(Application.STYLESHEET_CASPIAN);
+            ThemeManager.getInstance().setDarkTheme(false);
+            ThemeManager.getInstance().applyTheme(primaryStage.getScene());
+        });
+
+        RadioMenuItem highContrastItem = new RadioMenuItem(
+                I18n.getInstance().get("app.menu.theme.highcontrast", "High Contrast"));
+        highContrastItem.setToggleGroup(themeGroup);
+        highContrastItem.setSelected("HighContrast".equalsIgnoreCase(currentTheme));
+        highContrastItem.setOnAction(e -> {
+            System.setProperty("jscience.theme", "HighContrast");
+            Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+            ThemeManager.getInstance().setDarkTheme(true);
+            ThemeManager.getInstance().applyTheme(primaryStage.getScene());
+            // Add high-contrast stylesheet if exists
+            try {
+                primaryStage.getScene().getStylesheets().add(
+                        getClass().getResource("/org/jscience/ui/high-contrast.css").toExternalForm());
+            } catch (Exception ex) {
+                // High contrast CSS not found, ignore
+            }
+        });
+
+        themeMenu.getItems().addAll(modenaItem, caspianItem, highContrastItem);
 
         menuBar.getMenus().addAll(languageMenu, themeMenu);
         return menuBar;

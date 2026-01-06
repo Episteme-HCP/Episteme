@@ -2,8 +2,8 @@ package org.jscience.server.service;
 
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
-import org.jscience.io.scientific.FastaLoader;
-import org.jscience.physics.loaders.VizieRLoader;
+import org.jscience.biology.loaders.FASTAReader;
+import org.jscience.physics.loaders.VizieRReader;
 import org.jscience.server.proto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,8 +105,8 @@ public class DataServiceImpl extends DataServiceGrpc.DataServiceImplBase {
                     Math.abs(maxDec - minDec) * 60 / 2.0);
 
             // Query VizieR with Hipparcos catalog
-            Map<String, String> result = VizieRLoader.queryByCoordinates(
-                    centerRa, centerDec, radiusArcmin, VizieRLoader.HIPPARCOS);
+            Map<String, String> result = VizieRReader.queryByCoordinates(
+                    centerRa, centerDec, radiusArcmin, VizieRReader.HIPPARCOS);
 
             List<StarObject> stars = new ArrayList<>();
 
@@ -153,9 +153,9 @@ public class DataServiceImpl extends DataServiceGrpc.DataServiceImplBase {
 
             if (fastaFiles != null && fastaFiles.length > 0) {
                 try (InputStream is = new FileInputStream(fastaFiles[0])) {
-                    List<FastaLoader.SequenceRecord> sequences = FastaLoader.load(is);
+                    List<FASTAReader.Sequence> sequences = FASTAReader.load(is);
                     if (!sequences.isEmpty()) {
-                        String data = sequences.get(0).sequence();
+                        String data = sequences.get(0).data;
                         genomeCache.put(chromosome, data);
                         LOG.info("Loaded {} bases for chromosome {} from {}",
                                 data.length(), chromosome, fastaFiles[0].getName());
@@ -177,9 +177,9 @@ public class DataServiceImpl extends DataServiceGrpc.DataServiceImplBase {
         for (String path : resourcePaths) {
             try (InputStream is = getClass().getResourceAsStream(path)) {
                 if (is != null) {
-                    List<FastaLoader.SequenceRecord> sequences = FastaLoader.load(is);
+                    List<FASTAReader.Sequence> sequences = FASTAReader.load(is);
                     if (!sequences.isEmpty()) {
-                        String data = sequences.get(0).sequence();
+                        String data = sequences.get(0).data;
                         genomeCache.put(chromosome, data);
                         LOG.info("Loaded {} bases for chromosome {} from resource {}",
                                 data.length(), chromosome, path);

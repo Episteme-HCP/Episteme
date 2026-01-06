@@ -97,7 +97,7 @@ public class KurzweilDemo implements AppProvider {
 
     @Override
     public String getCategory() {
-        return "Economics";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.economics", "Economics");
     }
 
     @Override
@@ -311,7 +311,10 @@ public class KurzweilDemo implements AppProvider {
         gc.setFont(Font.font("System", 10));
         for (int year : List.of(-100000, -10000, 0, 1000, 1900, 2000, 2050)) {
             double x = 30 + (year - minYear) / (maxYear - minYear) * (w - 60);
-            gc.fillText(year > 0 ? String.valueOf(year) : year + " BCE", x - 20, y + 25);
+            gc.fillText(
+                    year > 0 ? String.valueOf(year)
+                            : year + " " + org.jscience.ui.i18n.I18n.getInstance().get("hist.era.bce", "BCE"),
+                    x - 20, y + 25);
         }
     }
 
@@ -360,5 +363,3 @@ public class KurzweilDemo implements AppProvider {
     private static record Milestone(int year, String label) {
     }
 }
-
-

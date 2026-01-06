@@ -36,7 +36,7 @@ import java.util.ResourceBundle;
  */
 public final class I18nManager {
 
-    private static final String BUNDLE_BASE = "org.jscience.apps.i18n.messages";
+    private static final String BUNDLE_BASE = "org.jscience.apps.i18n.messages_apps";
     private static I18nManager instance;
     private ResourceBundle bundle;
     private Locale currentLocale;

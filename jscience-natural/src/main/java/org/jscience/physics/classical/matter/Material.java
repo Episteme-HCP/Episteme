@@ -29,7 +29,7 @@ import org.jscience.measure.quantity.MassDensity;
 import org.jscience.measure.quantity.Pressure;
 import org.jscience.measure.quantity.ThermalConductivity;
 
-import org.jscience.io.properties.PropertiesLoader;
+import org.jscience.io.properties.PropertiesReader;
 import org.jscience.io.properties.PropertyKey;
 import org.jscience.io.properties.PropertySet;
 
@@ -74,7 +74,7 @@ public class Material {
      */
     public Material(String name) {
         this.name = name;
-        this.properties = PropertiesLoader.load("/org/jscience/physics/classical/matter/materials.json", name);
+        this.properties = PropertiesReader.load("/org/jscience/physics/classical/matter/materials.json", name);
     }
 
     /**
@@ -124,5 +124,3 @@ public class Material {
     public static final Material AIR = new Material("Air");
 }
 // IDE re-indexing touch
-
-

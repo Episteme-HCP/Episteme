@@ -29,6 +29,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import org.jscience.ui.i18n.I18n;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +71,7 @@ public class MetamathViewer extends Application {
         root.setPadding(new Insets(10));
 
         // Header
-        Label header = new Label("Metamath Proof Explorer");
+        Label header = new Label(I18n.getInstance().get("metamath.title"));
         header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
         root.setTop(header);
 
@@ -93,7 +94,7 @@ public class MetamathViewer extends Application {
             }
         });
 
-        selectorBox.getChildren().addAll(new Label("Select Theorem:"), theoremSelector);
+        selectorBox.getChildren().addAll(new Label(I18n.getInstance().get("metamath.select")), theoremSelector);
 
         theoremLabel = new Label();
         theoremLabel.setStyle(
@@ -105,7 +106,8 @@ public class MetamathViewer extends Application {
         scroll.setFitToWidth(true);
         scroll.setPrefHeight(400);
 
-        center.getChildren().addAll(selectorBox, theoremLabel, new Label("Step-by-step proof:"), scroll);
+        center.getChildren().addAll(selectorBox, theoremLabel, new Label(I18n.getInstance().get("metamath.proof")),
+                scroll);
         root.setCenter(center);
 
         // Sidebar
@@ -114,15 +116,15 @@ public class MetamathViewer extends Application {
         sidebar.setPrefWidth(200);
         sidebar.setStyle("-fx-background-color: #f5f5f5;");
 
-        Button nextStepBtn = new Button("Apply Next Tactic");
+        Button nextStepBtn = new Button(I18n.getInstance().get("metamath.btn.next"));
         nextStepBtn.setMaxWidth(Double.MAX_VALUE);
         nextStepBtn.setOnAction(e -> applyTactic());
 
-        Button resetBtn = new Button("Reset Proof");
+        Button resetBtn = new Button(I18n.getInstance().get("metamath.btn.reset"));
         resetBtn.setMaxWidth(Double.MAX_VALUE);
         resetBtn.setOnAction(e -> loadTheorem(currentTheorem));
 
-        sidebar.getChildren().addAll(new Label("Logic Tactics"), nextStepBtn, resetBtn);
+        sidebar.getChildren().addAll(new Label(I18n.getInstance().get("metamath.tactics")), nextStepBtn, resetBtn);
         root.setRight(sidebar);
 
         // Load initial
@@ -131,7 +133,7 @@ public class MetamathViewer extends Application {
         }
 
         Scene scene = new Scene(root, 900, 600);
-        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.metamath"));
+        stage.setTitle(I18n.getInstance().get("viewer.metamath"));
         stage.setScene(scene);
         stage.show();
     }
@@ -139,35 +141,35 @@ public class MetamathViewer extends Application {
     private void initTheorems() {
         theorems.add(new Theorem(
                 "Disjunctive Syllogism",
-                "(p Ã¢Ë†Â¨ q) Ã¢Ë†Â§ Ã‚Â¬p Ã¢Å Â¢ q",
+                "(p \u2228 q) \u2227 \u00ACp \u22A2 q",
                 new String[] {
-                        "1. (p Ã¢Ë†Â¨ q) Ã¢Ë†Â§ Ã‚Â¬p [Hypothesis]",
-                        "2. (p Ã¢Ë†Â¨ q) [Simplification (1)]",
-                        "3. Ã‚Â¬p [Simplification (1)]",
-                        "4. p Ã¢â€ â€™ q [Material Implication (2)]",
+                        "1. (p \u2228 q) \u2227 \u00ACp [Hypothesis]",
+                        "2. (p \u2228 q) [Simplification (1)]",
+                        "3. \u00ACp [Simplification (1)]",
+                        "4. p \u2192 q [Material Implication (2)]",
                         "5. q [Modus Ponens (3, 4)]",
                         "Q.E.D."
                 }));
         theorems.add(new Theorem(
                 "Modus Tollens",
-                "(p Ã¢â€ â€™ q) Ã¢Ë†Â§ Ã‚Â¬q Ã¢Å Â¢ Ã‚Â¬p",
+                "(p \u2192 q) \u2227 \u00ACq \u22A2 \u00ACp",
                 new String[] {
-                        "1. (p Ã¢â€ â€™ q) Ã¢Ë†Â§ Ã‚Â¬q [Hypothesis]",
-                        "2. p Ã¢â€ â€™ q [Simplification (1)]",
-                        "3. Ã‚Â¬q [Simplification (1)]",
-                        "4. Ã‚Â¬q Ã¢â€ â€™ Ã‚Â¬p [Transposition (2)]",
-                        "5. Ã‚Â¬p [Modus Ponens (3, 4)]",
+                        "1. (p \u2192 q) \u2227 \u00ACq [Hypothesis]",
+                        "2. p \u2192 q [Simplification (1)]",
+                        "3. \u00ACq [Simplification (1)]",
+                        "4. \u00ACq \u2192 \u00ACp [Transposition (2)]",
+                        "5. \u00ACp [Modus Ponens (3, 4)]",
                         "Q.E.D."
                 }));
         theorems.add(new Theorem(
                 "Double Negation",
-                "p Ã¢Å Â¢ Ã‚Â¬Ã‚Â¬p",
+                "p \u22A2 \u00AC\u00ACp",
                 new String[] {
                         "1. p [Hypothesis]",
-                        "2. p Ã¢Ë†Â¨ p [Addition]",
-                        "3. Ã‚Â¬p Ã¢â€ â€™ p [Material Implication (2)]",
-                        "4. Ã‚Â¬Ã‚Â¬p Ã¢Ë†Â¨ p [Material Implication]",
-                        "5. Ã‚Â¬Ã‚Â¬p [Derived Step]",
+                        "2. p \u2228 p [Addition]",
+                        "3. \u00ACp \u2192 p [Material Implication (2)]",
+                        "4. \u00AC\u00ACp \u2228 p [Material Implication]",
+                        "5. \u00AC\u00ACp [Derived Step]",
                         "Q.E.D."
                 }));
     }
@@ -199,5 +201,3 @@ public class MetamathViewer extends Application {
         new MetamathViewer().start(stage);
     }
 }
-
-

@@ -222,12 +222,13 @@ public class DigitalLogicDemo extends AbstractDemo {
         toolbar.setAlignment(Pos.TOP_LEFT);
 
         // Mode Toggle
-        ToggleButton modeBtn = new ToggleButton("Simulation Mode");
+        ToggleButton modeBtn = new ToggleButton(I18n.getInstance().get("digital.mode.simulation", "Simulation Mode"));
         modeBtn.setSelected(true);
         modeBtn.setMaxWidth(Double.MAX_VALUE);
         modeBtn.setOnAction(e -> {
             simulationMode = modeBtn.isSelected();
-            modeBtn.setText(simulationMode ? "Simulation Mode" : "Design Mode");
+            modeBtn.setText(simulationMode ? I18n.getInstance().get("digital.mode.simulation", "Simulation Mode")
+                    : I18n.getInstance().get("digital.mode.design", "Design Mode"));
             if (simulationMode) {
                 selectedGate = null;
                 selectedWire = null;
@@ -266,7 +267,7 @@ public class DigitalLogicDemo extends AbstractDemo {
         btnOut.setOnAction(e -> addGate(new Gate(GateType.OUTPUT, 300, 100)));
 
         // Actions
-        Label actionLabel = new Label("Actions");
+        Label actionLabel = new Label(I18n.getInstance().get("digital.actions", "Actions"));
         actionLabel.setStyle("-fx-font-weight: bold; -fx-padding: 10 0 0 0;");
 
         Button clear = new Button(I18n.getInstance().get("digital.clear", "Clear All"));
@@ -282,7 +283,7 @@ public class DigitalLogicDemo extends AbstractDemo {
         // We can access 'stage' if we store it? AbstractDemo doesn't expose primary
         // stage easily unless we override start.
         // Or we can just use the scene window.
-        Button saveBtn = new Button("Save Circuit");
+        Button saveBtn = new Button(I18n.getInstance().get("digital.btn.save", "Save Circuit"));
         saveBtn.setMaxWidth(Double.MAX_VALUE);
         saveBtn.setOnAction(e -> {
             if (canvas.getScene() != null && canvas.getScene().getWindow() instanceof Stage s) {
@@ -290,7 +291,7 @@ public class DigitalLogicDemo extends AbstractDemo {
             }
         });
 
-        Button loadBtn = new Button("Load Circuit");
+        Button loadBtn = new Button(I18n.getInstance().get("digital.btn.load", "Load Circuit"));
         loadBtn.setMaxWidth(Double.MAX_VALUE);
         loadBtn.setOnAction(e -> {
             if (canvas.getScene() != null && canvas.getScene().getWindow() instanceof Stage s) {
@@ -298,7 +299,7 @@ public class DigitalLogicDemo extends AbstractDemo {
             }
         });
 
-        statusLabel = new Label("Ready");
+        statusLabel = new Label(I18n.getInstance().get("digital.status.ready", "Ready"));
         statusLabel.setWrapText(true);
         statusLabel.setStyle("-fx-text-fill: #555; -fx-font-size: 10px;");
 
@@ -319,9 +320,11 @@ public class DigitalLogicDemo extends AbstractDemo {
         if (statusLabel == null)
             return;
         if (simulationMode) {
-            statusLabel.setText("Simulation: Click Inputs to toggle.");
+            statusLabel.setText(
+                    I18n.getInstance().get("digital.status.simulation", "Simulation: Click Inputs to toggle."));
         } else {
-            statusLabel.setText("Design: Drag gates/wires. Select & Delete to remove.");
+            statusLabel.setText(I18n.getInstance().get("digital.status.design",
+                    "Design: Drag gates/wires. Select & Delete to remove."));
         }
     }
 
@@ -658,5 +661,3 @@ public class DigitalLogicDemo extends AbstractDemo {
         }
     }
 }
-
-

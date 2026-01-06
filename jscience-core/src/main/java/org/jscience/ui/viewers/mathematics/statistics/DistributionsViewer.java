@@ -35,6 +35,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.jscience.ui.ThemeManager;
+import org.jscience.ui.i18n.I18n;
 
 /**
  * Visualization of Statistical Distributions.
@@ -55,7 +56,7 @@ public class DistributionsViewer extends Application {
         root.getStyleClass().add("dark-viewer-root");
 
         // Header
-        Label header = new Label("Statistical Distributions");
+        Label header = new Label(I18n.getInstance().get("distributions.title"));
         header.setStyle("-fx-font-size: 24px; -fx-padding: 15; -fx-font-weight: bold;");
         root.setTop(header);
 
@@ -71,7 +72,7 @@ public class DistributionsViewer extends Application {
 
         Scene scene = new Scene(root, 900, 600);
         ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle("JScience - Distributions");
+        stage.setTitle(I18n.getInstance().get("distributions.title"));
         stage.setScene(scene);
         stage.show();
     }
@@ -86,30 +87,33 @@ public class DistributionsViewer extends Application {
         controls.setStyle("-fx-background-color: #f4f4f4; -fx-padding: 10;");
 
         Slider meanSlider = new Slider(-5, 5, 0);
-        Label meanLabel = new Label("Mean (ÃŽÂ¼): 0.0");
+        Label meanLabel = new Label(I18n.getInstance().get("distributions.mean") + ": 0.0");
         meanSlider.valueProperty()
-                .addListener((o, ov, nv) -> meanLabel.setText(String.format("Mean (ÃŽÂ¼): %.1f", nv.doubleValue())));
+                .addListener((o, ov, nv) -> meanLabel.setText(
+                        String.format(I18n.getInstance().get("distributions.mean") + ": %.1f", nv.doubleValue())));
 
         Slider stdSlider = new Slider(0.1, 3, 1.0);
-        Label stdLabel = new Label("Std Dev (ÃÆ’): 1.0");
+        Label stdLabel = new Label(I18n.getInstance().get("distributions.std") + ": 1.0");
         stdSlider.valueProperty()
-                .addListener((o, ov, nv) -> stdLabel.setText(String.format("Std Dev (ÃÆ’): %.1f", nv.doubleValue())));
+                .addListener((o, ov, nv) -> stdLabel.setText(
+                        String.format(I18n.getInstance().get("distributions.std") + ": %.1f", nv.doubleValue())));
 
-        controls.getChildren().addAll(new Label("Parameters"), new Separator(), meanLabel, meanSlider, stdLabel,
+        controls.getChildren().addAll(new Label(I18n.getInstance().get("distributions.params")), new Separator(),
+                meanLabel, meanSlider, stdLabel,
                 stdSlider);
 
         // Chart
         NumberAxis xAxis = new NumberAxis(-5, 5, 0.5);
-        xAxis.setLabel("Value (x)");
+        xAxis.setLabel(I18n.getInstance().get("distributions.axis.value"));
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("Probability Density (PDF)");
+        yAxis.setLabel(I18n.getInstance().get("distributions.axis.pdf"));
 
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Normal Distribution (Gaussian)");
+        chart.setTitle(I18n.getInstance().get("distributions.chart.normal"));
         chart.setCreateSymbols(false);
 
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
-        series.setName("N(ÃŽÂ¼, ÃÆ’Ã‚Â²)");
+        series.setName("N(\u03BC, \u03C3\u00B2)");
         chart.getData().add(series);
 
         // Update logic
@@ -136,7 +140,7 @@ public class DistributionsViewer extends Application {
 
         pane.setCenter(chart);
         pane.setRight(controls);
-        return new Tab("Normal", pane);
+        return new Tab(I18n.getInstance().get("distributions.tab.normal"), pane);
     }
 
     private Tab createPoissonTab() {
@@ -148,23 +152,25 @@ public class DistributionsViewer extends Application {
         controls.setStyle("-fx-background-color: #f4f4f4; -fx-padding: 10;");
 
         Slider lambdaSlider = new Slider(0.1, 20, 5);
-        Label lambdaLabel = new Label("Lambda (ÃŽÂ»): 5.0");
+        Label lambdaLabel = new Label(I18n.getInstance().get("distributions.lambda") + ": 5.0");
         lambdaSlider.valueProperty()
-                .addListener((o, ov, nv) -> lambdaLabel.setText(String.format("Lambda (ÃŽÂ»): %.1f", nv.doubleValue())));
+                .addListener((o, ov, nv) -> lambdaLabel.setText(
+                        String.format(I18n.getInstance().get("distributions.lambda") + ": %.1f", nv.doubleValue())));
 
-        controls.getChildren().addAll(new Label("Parameters"), new Separator(), lambdaLabel, lambdaSlider);
+        controls.getChildren().addAll(new Label(I18n.getInstance().get("distributions.params")), new Separator(),
+                lambdaLabel, lambdaSlider);
 
         CategoryAxis xAxis = new CategoryAxis();
-        xAxis.setLabel("k (Occurrences)");
+        xAxis.setLabel(I18n.getInstance().get("distributions.axis.k_occ"));
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("Probability Mass (PMF)");
+        yAxis.setLabel(I18n.getInstance().get("distributions.axis.pmf"));
 
         BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
-        chart.setTitle("Poisson Distribution");
+        chart.setTitle(I18n.getInstance().get("distributions.chart.poisson"));
         chart.setAnimated(false);
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("P(k; ÃŽÂ»)");
+        series.setName("P(k; \u03BB)");
         chart.getData().add(series);
 
         Runnable update = () -> {
@@ -184,7 +190,7 @@ public class DistributionsViewer extends Application {
 
         pane.setCenter(chart);
         pane.setRight(controls);
-        return new Tab("Poisson", pane);
+        return new Tab(I18n.getInstance().get("distributions.tab.poisson"), pane);
     }
 
     private Tab createBinomialTab() {
@@ -196,24 +202,27 @@ public class DistributionsViewer extends Application {
         controls.setStyle("-fx-background-color: #f4f4f4; -fx-padding: 10;");
 
         Slider nSlider = new Slider(1, 40, 10);
-        Label nLabel = new Label("Trials (n): 10");
+        Label nLabel = new Label(I18n.getInstance().get("distributions.trials") + ": 10");
         nSlider.valueProperty()
-                .addListener((o, ov, nv) -> nLabel.setText(String.format("Trials (n): %d", nv.intValue())));
+                .addListener((o, ov, nv) -> nLabel.setText(
+                        String.format(I18n.getInstance().get("distributions.trials") + ": %d", nv.intValue())));
 
         Slider pSlider = new Slider(0, 1, 0.5);
-        Label pLabel = new Label("Probability (p): 0.5");
+        Label pLabel = new Label(I18n.getInstance().get("distributions.prob") + ": 0.5");
         pSlider.valueProperty()
-                .addListener((o, ov, nv) -> pLabel.setText(String.format("Probability (p): %.2f", nv.doubleValue())));
+                .addListener((o, ov, nv) -> pLabel.setText(
+                        String.format(I18n.getInstance().get("distributions.prob") + ": %.2f", nv.doubleValue())));
 
-        controls.getChildren().addAll(new Label("Parameters"), new Separator(), nLabel, nSlider, pLabel, pSlider);
+        controls.getChildren().addAll(new Label(I18n.getInstance().get("distributions.params")), new Separator(),
+                nLabel, nSlider, pLabel, pSlider);
 
         CategoryAxis xAxis = new CategoryAxis();
-        xAxis.setLabel("k (Successes)");
+        xAxis.setLabel(I18n.getInstance().get("distributions.axis.k_suc"));
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("Probability Mass (PMF)");
+        yAxis.setLabel(I18n.getInstance().get("distributions.axis.pmf"));
 
         BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
-        chart.setTitle("Binomial Distribution");
+        chart.setTitle(I18n.getInstance().get("distributions.chart.binomial"));
         chart.setAnimated(false);
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
@@ -237,7 +246,7 @@ public class DistributionsViewer extends Application {
 
         pane.setCenter(chart);
         pane.setRight(controls);
-        return new Tab("Binomial", pane);
+        return new Tab(I18n.getInstance().get("distributions.tab.binomial"), pane);
     }
 
     private long factorial(int n) {
@@ -272,5 +281,3 @@ public class DistributionsViewer extends Application {
         launch(args);
     }
 }
-
-

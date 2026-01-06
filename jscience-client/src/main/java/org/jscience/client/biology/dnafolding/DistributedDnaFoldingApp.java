@@ -40,7 +40,8 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import org.jscience.biology.Protein;
-import org.jscience.biology.loaders.PDBLoader;
+
+import org.jscience.biology.loaders.PDBWriter;
 import org.jscience.biology.structure.DnaFoldingTask;
 import org.jscience.chemistry.Atom;
 import org.jscience.chemistry.PeriodicTable;
@@ -144,7 +145,7 @@ public class DistributedDnaFoldingApp extends Application {
                     chain.addResidue(res);
                 }
                 p.addChain(chain);
-                new PDBLoader().save(p, file.getAbsolutePath());
+                new PDBWriter().save(p, file.getAbsolutePath());
                 new Alert(Alert.AlertType.INFORMATION, "PDB Export successful").show();
             } catch (Exception ex) {
                 new Alert(Alert.AlertType.ERROR, "Export failed: " + ex.getMessage()).show();

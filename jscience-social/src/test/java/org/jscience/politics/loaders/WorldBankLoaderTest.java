@@ -19,11 +19,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for WorldBankLoader.
+ * Unit tests for WorldBankReader.
  */
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("unchecked")
-class WorldBankLoaderTest {
+class WorldBankReaderTest {
 
     @Mock
     private HttpClient mockHttpClient;
@@ -31,11 +31,11 @@ class WorldBankLoaderTest {
     @Mock
     private HttpResponse<String> mockResponse;
 
-    private WorldBankLoader loader;
+    private WorldBankReader loader;
 
     @BeforeEach
     void setUp() {
-        loader = new WorldBankLoader(mockHttpClient);
+        loader = new WorldBankReader(mockHttpClient);
     }
 
     @Test
@@ -244,8 +244,8 @@ class WorldBankLoaderTest {
 
     @Test
     void testGetInstance_Singleton() {
-        WorldBankLoader instance1 = WorldBankLoader.getInstance();
-        WorldBankLoader instance2 = WorldBankLoader.getInstance();
+        WorldBankReader instance1 = WorldBankReader.getInstance();
+        WorldBankReader instance2 = WorldBankReader.getInstance();
         assertSame(instance1, instance2);
     }
 

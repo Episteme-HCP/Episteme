@@ -27,13 +27,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.jscience.chemistry.loaders.ChemistryDataLoader;
+import org.jscience.chemistry.loaders.ChemistryDataReader;
 
 public class PeriodicTableTest {
 
     @BeforeAll
     public static void setup() {
-        ChemistryDataLoader.loadElements();
+        ChemistryDataReader.loadElements();
     }
 
     @Test
@@ -62,5 +62,3 @@ public class PeriodicTableTest {
         assertEquals("Helium", he.getName());
     }
 }
-
-

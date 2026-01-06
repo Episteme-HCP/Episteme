@@ -35,8 +35,8 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.jscience.biology.loaders.ObjMeshLoader;
-import org.jscience.biology.loaders.StlMeshLoader;
+import org.jscience.biology.loaders.ObjMeshReader;
+import org.jscience.biology.loaders.StlMeshReader;
 import org.jscience.ui.i18n.I18n;
 
 import java.io.File;
@@ -295,7 +295,7 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
         File file = fc.showOpenDialog(null);
         if (file != null) {
             try {
-                MeshView mesh = StlMeshLoader.load(file);
+                MeshView mesh = StlMeshReader.load(file);
                 PhongMaterial material = new PhongMaterial(Color.BEIGE);
                 material.setSpecularColor(Color.WHITE);
                 mesh.setMaterial(material);
@@ -352,7 +352,7 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
             if (url == null) {
                 return false;
             }
-            Group model = ObjMeshLoader.load(url);
+            Group model = ObjMeshReader.load(url);
             if (model.getChildren().isEmpty()) {
                 return false;
             }

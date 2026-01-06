@@ -42,7 +42,7 @@ public class HistoryTimelineDemo implements AppProvider {
 
     @Override
     public String getCategory() {
-        return "History";
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.history", "History");
     }
 
     @Override
@@ -61,5 +61,3 @@ public class HistoryTimelineDemo implements AppProvider {
     }
 
 }
-
-

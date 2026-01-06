@@ -202,7 +202,7 @@ public class RigidBodyViewer extends Application {
         vb.bounciness = bouncinessVal;
 
         bodies.add(vb);
-        countLabel.setText("Bodies: " + bodies.size());
+        countLabel.setText(java.text.MessageFormat.format(I18n.getInstance().get("rigid.count.fmt"), bodies.size()));
     }
 
     private Vector<Real> toVector(double x, double y, double z) {
@@ -354,5 +354,3 @@ public class RigidBodyViewer extends Application {
         new RigidBodyViewer().start(stage);
     }
 }
-
-

@@ -31,6 +31,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.ui.i18n.I18n;
 import org.jscience.ui.plotting.Plot2D;
 import org.jscience.ui.plotting.PlotFactory;
 
@@ -58,7 +59,7 @@ public class PlottingViewer extends Application {
         root.setStyle("-fx-background-color: #1a1a2e;");
 
         // Header
-        Label header = new Label("JScience 2D Function Plotter");
+        Label header = new Label(I18n.getInstance().get("plottingviewer.header"));
         header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
         HBox headerBox = new HBox(header);
         headerBox.setPadding(new Insets(10));
@@ -74,19 +75,19 @@ public class PlottingViewer extends Application {
         leftPanel.setStyle("-fx-background-color: #16213e;");
 
         // Function selector
-        Label funcLabel = new Label("Add Function:");
+        Label funcLabel = new Label(I18n.getInstance().get("plottingviewer.add_func"));
         funcLabel.setStyle("-fx-text-fill: #aaa;");
         functionSelector = new ComboBox<>();
         functionSelector.getItems().addAll(
                 "sin(x)", "cos(x)", "tan(x)",
-                "xÃ‚Â²", "xÃ‚Â³", "Ã¢Ë†Å¡x",
+                "x\u00B2", "x\u00B3", "\u221Ax",
                 "e^x", "ln(x)", "1/x",
-                "sin(x)/x", "xÃ‚Â·sin(x)");
+                "sin(x)/x", "x\u00B7sin(x)");
         functionSelector.setValue("sin(x)");
         functionSelector.setMaxWidth(Double.MAX_VALUE);
 
         // Range inputs
-        Label rangeLabel = new Label("X Range:");
+        Label rangeLabel = new Label(I18n.getInstance().get("plottingviewer.xrange"));
         rangeLabel.setStyle("-fx-text-fill: #aaa;");
         HBox rangeBox = new HBox(5);
         xMinField = new TextField("-10");
@@ -96,24 +97,24 @@ public class PlottingViewer extends Application {
         rangeBox.getChildren().addAll(new Label("Min:"), xMinField, new Label("Max:"), xMaxField);
 
         // Add button
-        Button addBtn = new Button("Add to Plot");
+        Button addBtn = new Button(I18n.getInstance().get("plottingviewer.btn.add"));
         addBtn.setMaxWidth(Double.MAX_VALUE);
         addBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
         addBtn.setOnAction(e -> addFunction());
 
         // Options
-        gridCheck = new CheckBox("Show Grid");
+        gridCheck = new CheckBox(I18n.getInstance().get("plottingviewer.grid"));
         gridCheck.setSelected(true);
-        legendCheck = new CheckBox("Show Legend");
+        legendCheck = new CheckBox(I18n.getInstance().get("plottingviewer.legend"));
         legendCheck.setSelected(true);
 
         // Active series list
-        Label seriesLabel = new Label("Active Series:");
+        Label seriesLabel = new Label(I18n.getInstance().get("plottingviewer.series"));
         seriesListBox = new VBox(5);
         seriesListBox.setStyle("-fx-background-color: #0f3460; -fx-padding: 5;");
 
         // Clear all button
-        Button clearBtn = new Button("Clear All");
+        Button clearBtn = new Button(I18n.getInstance().get("plottingviewer.btn.clear"));
         clearBtn.setMaxWidth(Double.MAX_VALUE);
         clearBtn.setOnAction(e -> {
             activeSeries.clear();
@@ -121,7 +122,7 @@ public class PlottingViewer extends Application {
         });
 
         // Plot button
-        Button plotBtn = new Button("Generate Plot");
+        Button plotBtn = new Button(I18n.getInstance().get("plottingviewer.btn.generate"));
         plotBtn.setMaxWidth(Double.MAX_VALUE);
         plotBtn.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold;");
         plotBtn.setOnAction(e -> generatePlot());
@@ -146,25 +147,17 @@ public class PlottingViewer extends Application {
         centerBox.setAlignment(Pos.CENTER);
         centerBox.setPadding(new Insets(40));
 
-        Label instructLabel = new Label("Add functions and click 'Generate Plot'");
+        Label instructLabel = new Label(I18n.getInstance().get("plottingviewer.instruct"));
         instructLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #aaa;");
 
-        Label tipLabel = new Label(
-                "Tips:\n" +
-                        "Ã¢â‚¬Â¢ Add multiple functions to compare\n" +
-                        "Ã¢â‚¬Â¢ Adjust X range for different views\n" +
-                        "Ã¢â‚¬Â¢ Toggle grid and legend options\n" +
-                        "Ã¢â‚¬Â¢ Plot opens in new window");
-        tipLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #888;");
-
-        centerBox.getChildren().addAll(instructLabel, tipLabel);
+        centerBox.getChildren().addAll(instructLabel);
         root.setCenter(centerBox);
 
         // Add default sin(x)
         addFunction();
 
         Scene scene = new Scene(root, 800, 500);
-        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.plotting"));
+        stage.setTitle(I18n.getInstance().get("viewer.plotting"));
         stage.setScene(scene);
         stage.show();
     }
@@ -187,7 +180,7 @@ public class PlottingViewer extends Application {
         HBox seriesRow = new HBox(5);
         seriesRow.setAlignment(Pos.CENTER_LEFT);
         Label lbl = new Label(funcName + " [" + xMin + ", " + xMax + "]");
-        Button removeBtn = new Button("Ãƒâ€”");
+        Button removeBtn = new Button("\u2716");
         removeBtn.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-padding: 0 5;");
         removeBtn.setOnAction(e -> {
             activeSeries.remove(series);
@@ -230,14 +223,14 @@ public class PlottingViewer extends Application {
             case "sin(x)" -> Math.sin(x);
             case "cos(x)" -> Math.cos(x);
             case "tan(x)" -> Math.tan(x);
-            case "xÃ‚Â²" -> x * x;
-            case "xÃ‚Â³" -> x * x * x;
-            case "Ã¢Ë†Å¡x" -> Math.sqrt(x);
+            case "x\u00B2" -> x * x;
+            case "x\u00B3" -> x * x * x;
+            case "\u221Ax" -> Math.sqrt(x);
             case "e^x" -> Math.exp(x);
             case "ln(x)" -> Math.log(x);
             case "1/x" -> 1.0 / x;
             case "sin(x)/x" -> x == 0 ? 1 : Math.sin(x) / x;
-            case "xÃ‚Â·sin(x)" -> x * Math.sin(x);
+            case "x\u00B7sin(x)" -> x * Math.sin(x);
             default -> 0;
         };
     }
@@ -257,5 +250,3 @@ public class PlottingViewer extends Application {
         new PlottingViewer().start(stage);
     }
 }
-
-

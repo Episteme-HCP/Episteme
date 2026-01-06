@@ -112,7 +112,7 @@ public class SmartGridApp extends FeaturedAppBase {
         VBox box = new VBox(10);
         box.setPadding(new Insets(10));
 
-        Label title = new Label("Ã°Å¸Ââ„¢Ã¯Â¸Â " + i18n.get("grid.viz.title"));
+        Label title = new Label("Ã°Å¸Â â„¢Ã¯Â¸Â  " + i18n.get("grid.viz.title"));
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
         gridCanvas = new Canvas(300, 500);
@@ -145,7 +145,7 @@ public class SmartGridApp extends FeaturedAppBase {
         HBox statusBox = new HBox(20);
         statusBox.setAlignment(javafx.geometry.Pos.CENTER);
 
-        frequencyLabel = new Label("50.00 Hz");
+        frequencyLabel = new Label(java.text.MessageFormat.format(i18n.get("grid.label.freq"), 50.00));
         frequencyLabel.setStyle("-fx-font-size: 24px; -fx-font-family: monospace; -fx-font-weight: bold;");
 
         statusLabel = new Label(i18n.get("grid.status.stable"));
@@ -329,7 +329,7 @@ public class SmartGridApp extends FeaturedAppBase {
     }
 
     private void updateStatus() {
-        frequencyLabel.setText(MessageFormat.format(i18n.get("grid.label.freq"), gridFrequency));
+        frequencyLabel.setText(java.text.MessageFormat.format(i18n.get("grid.label.freq"), gridFrequency));
         frequencyLabel.setTextFill(Math.abs(gridFrequency - 50) < 0.2 ? Color.BLACK : Color.RED);
 
         if (Math.abs(gridFrequency - 50) < 0.5) {

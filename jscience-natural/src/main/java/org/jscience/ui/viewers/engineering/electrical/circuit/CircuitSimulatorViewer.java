@@ -110,16 +110,16 @@ public class CircuitSimulatorViewer extends Application {
 
         ToggleGroup group = new ToggleGroup();
         toolbar.getChildren().addAll(
-                createToolButton("Wire", ComponentType.WIRE, group),
-                createToolButton("Resistor", ComponentType.RESISTOR, group),
-                createToolButton("Battery", ComponentType.BATTERY, group),
-                createToolButton("Capacitor", ComponentType.CAPACITOR, group),
-                createToolButton("Inductor", ComponentType.INDUCTOR, group),
-                createToolButton("Ground", ComponentType.GROUND, group),
-                createToolButton("Meter", ComponentType.METER, group),
+                createToolButton(ComponentType.WIRE, group),
+                createToolButton(ComponentType.RESISTOR, group),
+                createToolButton(ComponentType.BATTERY, group),
+                createToolButton(ComponentType.CAPACITOR, group),
+                createToolButton(ComponentType.INDUCTOR, group),
+                createToolButton(ComponentType.GROUND, group),
+                createToolButton(ComponentType.METER, group),
                 new Separator(),
                 createSelectButton(group),
-                new Button("Delete") {
+                new Button(org.jscience.ui.i18n.I18n.getInstance().get("circuit.btn.delete")) {
                     {
                         setOnAction(e -> {
                             if (selectedComponent != null) {
@@ -130,7 +130,7 @@ public class CircuitSimulatorViewer extends Application {
                         });
                     }
                 },
-                new Button("Clear") {
+                new Button(org.jscience.ui.i18n.I18n.getInstance().get("circuit.btn.clear")) {
                     {
                         setOnAction(e -> {
                             components.clear();
@@ -180,9 +180,9 @@ public class CircuitSimulatorViewer extends Application {
         sidebar.setPrefWidth(200);
         sidebar.getStyleClass().add("viewer-sidebar");
         sidebar.getChildren().addAll(
-                new Label("Click and drag on grid to place components."),
-                new Label("Components snap to 20px grid."),
-                new Label("JScience Quantities used for Electromagnetism."));
+                new Label(org.jscience.ui.i18n.I18n.getInstance().get("circuit.hint.click")),
+                new Label(org.jscience.ui.i18n.I18n.getInstance().get("circuit.hint.snap")),
+                new Label(org.jscience.ui.i18n.I18n.getInstance().get("circuit.hint.jscience")));
         root.setRight(sidebar);
 
         Scene scene = new Scene(root, 1200, 800);
@@ -192,8 +192,8 @@ public class CircuitSimulatorViewer extends Application {
         stage.show();
     }
 
-    private ToggleButton createToolButton(String name, ComponentType type, ToggleGroup group) {
-        ToggleButton btn = new ToggleButton(name);
+    private ToggleButton createToolButton(ComponentType type, ToggleGroup group) {
+        ToggleButton btn = new ToggleButton(type.toString());
         btn.setToggleGroup(group);
         btn.setOnAction(e -> {
             selectedType = type;
@@ -207,7 +207,7 @@ public class CircuitSimulatorViewer extends Application {
     }
 
     private ToggleButton createSelectButton(ToggleGroup group) {
-        ToggleButton btn = new ToggleButton("Select");
+        ToggleButton btn = new ToggleButton(org.jscience.ui.i18n.I18n.getInstance().get("circuit.btn.select"));
         btn.setToggleGroup(group);
         btn.setOnAction(e -> isSelectMode = true);
         return btn;

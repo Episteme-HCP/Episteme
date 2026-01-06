@@ -35,9 +35,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.jscience.economics.DistributedEconomyTask;
-import org.jscience.politics.loaders.WorldBankLoader;
+import org.jscience.politics.loaders.WorldBankReader;
 import org.jscience.politics.GeopoliticalEngineTask;
-import org.jscience.politics.loaders.FactbookLoader;
+import org.jscience.politics.loaders.FactbookReader;
 import org.jscience.server.proto.*;
 
 import java.io.*;
@@ -72,12 +72,12 @@ public class DistributedGeopoliticsApp extends Application {
         double gdp = 23000000000000.0; // Fallback
         double inflation = 0.03;
         try {
-            Map<String, Double> gdpData = WorldBankLoader.getInstance().fetchIndicatorData("USA", "NY.GDP.MKTP.CD")
+            Map<String, Double> gdpData = WorldBankReader.getInstance().fetchIndicatorData("USA", "NY.GDP.MKTP.CD")
                     .join();
             if (!gdpData.isEmpty())
                 gdp = gdpData.values().iterator().next();
 
-            Map<String, Double> inflData = WorldBankLoader.getInstance().fetchIndicatorData("USA", "FP.CPI.TOTL.ZG")
+            Map<String, Double> inflData = WorldBankReader.getInstance().fetchIndicatorData("USA", "FP.CPI.TOTL.ZG")
                     .join();
             if (!inflData.isEmpty())
                 inflation = inflData.values().iterator().next() / 100.0;
@@ -90,8 +90,8 @@ public class DistributedGeopoliticsApp extends Application {
                 Real.of(inflation));
 
         List<GeopoliticalEngineTask.NationState> nations = new ArrayList<>();
-        // Load nations from FactbookLoader
-        FactbookLoader loader = new FactbookLoader();
+        // Load nations from FactbookReader
+        FactbookReader loader = new FactbookReader();
         List<org.jscience.politics.Country> countries = loader.getMiniCatalog().getAll().get(0);
 
         for (org.jscience.politics.Country c : countries) {

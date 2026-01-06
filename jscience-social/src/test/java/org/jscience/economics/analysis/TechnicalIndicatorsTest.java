@@ -26,7 +26,7 @@ package org.jscience.economics.analysis;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.jscience.economics.loaders.FinancialMarketLoader;
+import org.jscience.economics.loaders.FinancialMarketReader;
 import org.jscience.economics.Money;
 import org.jscience.economics.Currency;
 import org.jscience.mathematics.numbers.real.Real;
@@ -37,8 +37,8 @@ import java.util.List;
 
 public class TechnicalIndicatorsTest {
 
-    private List<FinancialMarketLoader.Candle> createCandles(double... prices) {
-        List<FinancialMarketLoader.Candle> candles = new ArrayList<>();
+    private List<FinancialMarketReader.Candle> createCandles(double... prices) {
+        List<FinancialMarketReader.Candle> candles = new ArrayList<>();
         Currency usd = Currency.USD;
         for (double p : prices) {
             Money open = new Money(Real.of(p), usd);
@@ -47,14 +47,14 @@ public class TechnicalIndicatorsTest {
             Money low = new Money(Real.of(p), usd);
             Real vol = Real.of(100.0); // Volume as Real
 
-            candles.add(new FinancialMarketLoader.Candle(TimePoint.now(), open, high, low, close, vol));
+            candles.add(new FinancialMarketReader.Candle(TimePoint.now(), open, high, low, close, vol));
         }
         return candles;
     }
 
     @Test
     public void testSMA() {
-        List<FinancialMarketLoader.Candle> candles = createCandles(10, 20, 30, 40, 50);
+        List<FinancialMarketReader.Candle> candles = createCandles(10, 20, 30, 40, 50);
         Real sma = TechnicalIndicators.sma(candles, 3);
         assertNotNull(sma);
         // Average of last 3: 30, 40, 50 -> 40
@@ -67,13 +67,13 @@ public class TechnicalIndicatorsTest {
     @Test
     public void testVolatility() {
         // Constant price -> 0 volatility
-        List<FinancialMarketLoader.Candle> candles = createCandles(10, 10, 10, 10, 10);
+        List<FinancialMarketReader.Candle> candles = createCandles(10, 10, 10, 10, 10);
         Real vol = TechnicalIndicators.volatility(candles, 4);
         assertNotNull(vol);
         assertEquals(0.0, vol.doubleValue(), 0.001);
 
         // Volatile
-        List<FinancialMarketLoader.Candle> volatileCandles = createCandles(10, 20, 10, 20);
+        List<FinancialMarketReader.Candle> volatileCandles = createCandles(10, 20, 10, 20);
         Real vol2 = TechnicalIndicators.volatility(volatileCandles, 3);
         assertNotNull(vol2);
         assertTrue(vol2.doubleValue() > 0);
@@ -82,13 +82,13 @@ public class TechnicalIndicatorsTest {
     @Test
     public void testRSI() {
         // Always up -> RSI 100
-        List<FinancialMarketLoader.Candle> bull = createCandles(10, 20, 30, 40, 50, 60, 70, 80);
+        List<FinancialMarketReader.Candle> bull = createCandles(10, 20, 30, 40, 50, 60, 70, 80);
         Real rsi = TechnicalIndicators.rsi(bull, 5);
         assertNotNull(rsi);
         assertEquals(100.0, rsi.doubleValue(), 0.001);
 
         // Mixed
-        List<FinancialMarketLoader.Candle> mixed = createCandles(10, 20, 15, 25, 20, 30);
+        List<FinancialMarketReader.Candle> mixed = createCandles(10, 20, 15, 25, 20, 30);
         Real rsiMixed = TechnicalIndicators.rsi(mixed, 4);
         assertNotNull(rsiMixed);
         assertTrue(rsiMixed.doubleValue() > 0 && rsiMixed.doubleValue() < 100);
@@ -96,7 +96,7 @@ public class TechnicalIndicatorsTest {
 
     @Test
     public void testBollingerBands() {
-        List<FinancialMarketLoader.Candle> candles = createCandles(10, 12, 10, 12, 10, 12, 10, 12);
+        List<FinancialMarketReader.Candle> candles = createCandles(10, 12, 10, 12, 10, 12, 10, 12);
         Real[] bands = TechnicalIndicators.bollingerBands(candles, 4, 2.0);
         assertNotNull(bands);
         assertEquals(3, bands.length);
@@ -111,7 +111,7 @@ public class TechnicalIndicatorsTest {
 
     @Test
     public void testPercentChange() {
-        List<FinancialMarketLoader.Candle> candles = createCandles(100, 105, 110, 120);
+        List<FinancialMarketReader.Candle> candles = createCandles(100, 105, 110, 120);
         Real change = TechnicalIndicators.percentChange(candles);
         assertNotNull(change);
         // (120 - 100) / 100 * 100 = 20%
@@ -120,16 +120,14 @@ public class TechnicalIndicatorsTest {
 
     @Test
     public void testIsBelowSMA() {
-        List<FinancialMarketLoader.Candle> candles = createCandles(100, 100, 100, 50); // Crash at end
+        List<FinancialMarketReader.Candle> candles = createCandles(100, 100, 100, 50); // Crash at end
         // SMA(3) of 100, 100, 50 -> 83.33
         // Current 50.
         // Threshold 10% (.10). SMA * 0.9 = 75.
         // 50 < 75 -> True
         assertTrue(TechnicalIndicators.isBelowSMA(candles, 3, 0.10));
 
-        List<FinancialMarketLoader.Candle> bull = createCandles(10, 20, 30, 40);
+        List<FinancialMarketReader.Candle> bull = createCandles(10, 20, 30, 40);
         assertFalse(TechnicalIndicators.isBelowSMA(bull, 3, 0.10));
     }
 }
-
-

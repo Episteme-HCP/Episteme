@@ -41,7 +41,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.jscience.earth.climate.GeneralCirculationModelTask;
 
-import org.jscience.io.scientific.VTKLoader;
+import org.jscience.mathematics.loaders.VTKWriter;
 import org.jscience.server.proto.*;
 
 import java.io.*;
@@ -180,7 +180,7 @@ public class DistributedClimateSimApp extends Application {
         File file = org.jscience.client.util.FileHelper.showSaveDialog(stage, "Save VTK Export", "VTK Files", "*.vtk");
         if (file != null) {
             try {
-                new VTKLoader().save(task.getSurfaceTemperature(), file.getAbsolutePath());
+                new VTKWriter().save(task.getSurfaceTemperature(), file.getAbsolutePath());
                 new Alert(Alert.AlertType.INFORMATION, "Export successful: " + file.getName()).show();
             } catch (Exception e) {
                 new Alert(Alert.AlertType.ERROR, "Export failed: " + e.getMessage()).show();
@@ -198,8 +198,8 @@ public class DistributedClimateSimApp extends Application {
                         task.getAirTemperature(),
                         new double[60][120]
                 };
-                new ClimateDataLoader().save(
-                        new ClimateDataLoader.ClimateState(temps, task.getHumidity()),
+                new ClimateDataWriter().save(
+                        new ClimateDataReader.ClimateState(temps, task.getHumidity()),
                         file.getAbsolutePath());
                 new Alert(Alert.AlertType.INFORMATION, "Export successful: " + file.getName()).show();
             } catch (Exception e) {
@@ -213,7 +213,7 @@ public class DistributedClimateSimApp extends Application {
                 "*.json");
         if (file != null) {
             try {
-                ClimateDataLoader.ClimateState state = new ClimateDataLoader()
+                ClimateDataReader.ClimateState state = new ClimateDataReader()
                         .load(file.getAbsolutePath());
                 task.updateState(state.temperature, state.humidity);
                 render();

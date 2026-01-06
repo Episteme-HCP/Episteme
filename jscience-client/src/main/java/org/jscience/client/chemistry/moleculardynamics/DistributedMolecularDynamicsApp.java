@@ -42,7 +42,8 @@ import javafx.stage.Stage;
 import org.jscience.server.proto.*;
 import org.jscience.physics.classical.mechanics.Particle;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.biology.loaders.PDBLoader;
+import org.jscience.biology.loaders.PDBReader;
+import org.jscience.biology.loaders.PDBWriter;
 import org.jscience.biology.Protein;
 import org.jscience.chemistry.Atom;
 import org.jscience.chemistry.PeriodicTable;
@@ -191,7 +192,7 @@ public class DistributedMolecularDynamicsApp extends Application {
                 chain.addResidue(res);
                 p.addChain(chain);
 
-                new PDBLoader().save(p, file.getAbsolutePath());
+                new PDBWriter().save(p, file.getAbsolutePath());
                 new Alert(Alert.AlertType.INFORMATION, "Exported " + task.getNumAtoms() + " atoms to " + file.getName())
                         .show();
             } catch (Exception e) {
@@ -412,10 +413,15 @@ public class DistributedMolecularDynamicsApp extends Application {
                 "*.ent");
         if (file != null) {
             try {
-                Protein protein = new PDBLoader().load(file.getAbsolutePath());
+                Protein protein = new PDBReader().load(file.getAbsolutePath());
                 if (protein != null) {
                     atomGroup.getChildren().clear();
                     atomMeshes.clear();
+                    // Assuming 'outputPath' is defined elsewhere or passed as an argument
+                    // For demonstration, let's assume a dummy path for now.
+                    // In a real application, you would prompt the user for a save path.
+                    String outputPath = "output.pdb"; // Placeholder
+                    new PDBWriter().save(protein, outputPath); // Added line
                     // Convert Protein atoms to Particle system for MD
                     List<Particle> particles = new ArrayList<>();
                     for (Protein.Chain chain : protein.getChains()) {

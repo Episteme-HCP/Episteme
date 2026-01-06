@@ -23,7 +23,7 @@
 
 package org.jscience.economics.analysis;
 
-import org.jscience.economics.loaders.FinancialMarketLoader.Candle;
+import org.jscience.economics.loaders.FinancialMarketReader.Candle;
 import org.jscience.mathematics.numbers.real.Real;
 
 import java.util.List;

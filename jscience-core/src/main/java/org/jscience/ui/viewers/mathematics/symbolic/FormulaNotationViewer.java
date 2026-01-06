@@ -50,15 +50,19 @@ public class FormulaNotationViewer extends Application {
         root.setPadding(new Insets(30));
         root.setStyle("-fx-background-color: white;");
 
-        Label title = new Label("Mathematical Formula Renderer");
+        Label title = new Label(
+                org.jscience.ui.i18n.I18n.getInstance().get("formula.title", "Mathematical Formula Renderer"));
         title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1a237e;");
 
         VBox formulaList = new VBox(40);
+        org.jscience.ui.i18n.I18n i18n = org.jscience.ui.i18n.I18n.getInstance();
         formulaList.getChildren().addAll(
-                createFormulaBox("Euler's Identity", createEulerIdentity()),
-                createFormulaBox("Quadratic Formula", createQuadraticFormula()),
-                createFormulaBox("SchrÃƒÂ¶dinger Equation", createSchrodingerEquation()),
-                createFormulaBox("Newton's Law of Gravitation", createGravitationLaw()));
+                createFormulaBox(i18n.get("formula.euler", "Euler's Identity"), createEulerIdentity()),
+                createFormulaBox(i18n.get("formula.quadratic", "Quadratic Formula"), createQuadraticFormula()),
+                createFormulaBox(i18n.get("formula.schrodinger", "Schr\u00F6dinger Equation"),
+                        createSchrodingerEquation()),
+                createFormulaBox(i18n.get("formula.gravitation", "Newton's Law of Gravitation"),
+                        createGravitationLaw()));
 
         root.getChildren().addAll(title, new Separator(), new ScrollPane(formulaList) {
             {
@@ -75,7 +79,7 @@ public class FormulaNotationViewer extends Application {
     private VBox createFormulaBox(String name, Region formula) {
         VBox box = new VBox(10);
         Label lbl = new Label(name);
-        lbl.setStyle("-fx-font-style: italic; -fx-text-fill: #666;");
+        lbl.setStyle("-fx-font-style: italic; -fx-text-fill: black;");
 
         StackPane frame = new StackPane(formula);
         frame.setPadding(new Insets(20));
@@ -92,7 +96,7 @@ public class FormulaNotationViewer extends Application {
         hbox.setAlignment(javafx.geometry.Pos.CENTER);
         Text base = new Text("e");
         base.setFont(Font.font("Serif", 36));
-        Text expo = new Text("iÃâ‚¬");
+        Text expo = new Text("i\u03C0");
         expo.setFont(Font.font("Serif", 20));
         VBox vExponent = new VBox(expo);
         vExponent.setPadding(new Insets(-20, 0, 0, 0));
@@ -113,12 +117,12 @@ public class FormulaNotationViewer extends Application {
 
         HBox numerator = new HBox(2);
         numerator.setAlignment(javafx.geometry.Pos.CENTER);
-        Text b = new Text("-b Ã‚Â± ");
+        Text b = new Text("-b \u00B1 ");
         b.setFont(Font.font("Serif", 24));
 
         HBox sqrt = new HBox(0);
         sqrt.setAlignment(javafx.geometry.Pos.BOTTOM_LEFT);
-        Text rootSym = new Text("Ã¢Ë†Å¡");
+        Text rootSym = new Text("\u221A");
         rootSym.setFont(Font.font("Serif", 30));
         VBox underRoot = new VBox(2);
         underRoot.setStyle("-fx-border-color: black; -fx-border-width: 1 0 0 0;");
@@ -153,21 +157,21 @@ public class FormulaNotationViewer extends Application {
     private HBox createSchrodingerEquation() {
         HBox hbox = new HBox(5);
         hbox.setAlignment(javafx.geometry.Pos.CENTER);
-        Text prefix = new Text("iÃ„Â§");
+        Text prefix = new Text("i\u210F");
         prefix.setFont(Font.font("Serif", 36));
 
         VBox partial = new VBox(0);
         partial.setAlignment(javafx.geometry.Pos.CENTER);
-        Text pTop = new Text("Ã¢Ë†â€šÃË†");
+        Text pTop = new Text("\u2202\u03A8");
         pTop.setFont(Font.font("Serif", 18));
         Region l = new Region();
         l.setPrefHeight(1);
         l.setStyle("-fx-background-color: black;");
-        Text pBot = new Text("Ã¢Ë†â€št");
+        Text pBot = new Text("\u2202t");
         pBot.setFont(Font.font("Serif", 18));
         partial.getChildren().addAll(pTop, l, pBot);
 
-        Text eq = new Text(" = Ã„Â¤ÃË†");
+        Text eq = new Text(" = \u0124\u03A8");
         eq.setFont(Font.font("Serif", 36));
         hbox.getChildren().addAll(prefix, partial, eq);
         return hbox;

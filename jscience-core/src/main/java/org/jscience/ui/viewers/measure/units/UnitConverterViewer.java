@@ -69,7 +69,8 @@ public class UnitConverterViewer extends Application {
 
             setupUnits();
 
-            Label title = new Label("Universal Measure Converter");
+            Label title = new Label(
+                    org.jscience.ui.i18n.I18n.getInstance().get("converter.title", "Universal Measure Converter"));
             title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
             // Category
@@ -77,8 +78,21 @@ public class UnitConverterViewer extends Application {
             categoryBox = new ComboBox<>();
             categoryBox.getItems().addAll(unitsByCategory.keySet());
             categoryBox.setValue("Length");
+            categoryBox.setConverter(new javafx.util.StringConverter<String>() {
+                @Override
+                public String toString(String object) {
+                    return org.jscience.ui.i18n.I18n.getInstance().get("converter.cat." + object, object);
+                }
+
+                @Override
+                public String fromString(String string) {
+                    return string; // Not editable
+                }
+            });
             categoryBox.setOnAction(e -> updateUnitLists());
-            catRow.getChildren().addAll(new Label("Category:"), categoryBox);
+            catRow.getChildren().addAll(
+                    new Label(org.jscience.ui.i18n.I18n.getInstance().get("converter.category", "Category:")),
+                    categoryBox);
 
             // Conversion grid
             GridPane grid = new GridPane();
@@ -93,17 +107,17 @@ public class UnitConverterViewer extends Application {
             fromUnitBox = new ComboBox<>();
             toUnitBox = new ComboBox<>();
 
-            grid.add(new Label("From:"), 0, 0);
+            grid.add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("converter.from", "From:")), 0, 0);
             grid.add(inputField, 1, 0);
             grid.add(fromUnitBox, 2, 0);
 
-            grid.add(new Label("To:"), 0, 1);
+            grid.add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("converter.to", "To:")), 0, 1);
             grid.add(outputField, 1, 1);
             grid.add(toUnitBox, 2, 1);
 
             updateUnitLists();
 
-            Button convertBtn = new Button("Convert");
+            Button convertBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("converter.convert", "Convert"));
             convertBtn.setMaxWidth(Double.MAX_VALUE);
             convertBtn.setOnAction(e -> doConvert());
 
@@ -120,7 +134,8 @@ public class UnitConverterViewer extends Application {
         } catch (Exception e) {
             VBox errRoot = new VBox(20);
             errRoot.setPadding(new Insets(20));
-            errRoot.getChildren().add(new Label("Error launching Unit Converter:\n" + e.getMessage()));
+            errRoot.getChildren().add(new Label(String.format(org.jscience.ui.i18n.I18n.getInstance()
+                    .get("converter.error.launch", "Error launching Unit Converter:\n%s"), e.getMessage())));
             Scene errScene = new Scene(errRoot, 400, 200);
             stage.setScene(errScene);
             stage.show();
@@ -160,7 +175,7 @@ public class UnitConverterViewer extends Application {
 
             outputField.setText(String.format("%.6g", result.getValue().doubleValue()));
         } catch (Exception e) {
-            outputField.setText("Error");
+            outputField.setText(org.jscience.ui.i18n.I18n.getInstance().get("converter.error", "Error"));
         }
     }
 

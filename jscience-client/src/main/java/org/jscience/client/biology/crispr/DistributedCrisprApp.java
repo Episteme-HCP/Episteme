@@ -36,7 +36,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.jscience.biology.genome.CrisprTask;
-import org.jscience.io.scientific.FastaLoader;
+import org.jscience.biology.loaders.FASTAReader;
 import org.jscience.server.proto.*;
 
 import java.io.*;
@@ -109,15 +109,15 @@ public class DistributedCrisprApp extends Application {
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
             try {
-                List<FastaLoader.SequenceRecord> sequences = new ArrayList<>();
+                List<FASTAReader.Sequence> sequences = new ArrayList<>();
                 // Create a FASTA sequence from the results
                 int i = 1;
                 for (CrisprTask.Target target : resultsTable.getItems()) {
-                    sequences.add(new FastaLoader.SequenceRecord("CrISPR_Target_" + i + "_Pos_" + target.position(),
+                    sequences.add(new FASTAReader.Sequence("CrISPR_Target_" + i + "_Pos_" + target.position(),
                             target.spacer()));
                     i++;
                 }
-                new FastaLoader().save(sequences, file.getAbsolutePath());
+                new org.jscience.biology.loaders.FASTAWriter().save(sequences, file.getAbsolutePath());
                 new Alert(Alert.AlertType.INFORMATION, "Exported " + sequences.size() + " targets to " + file.getName())
                         .show();
             } catch (Exception e) {
@@ -131,10 +131,10 @@ public class DistributedCrisprApp extends Application {
                 "*.fa");
         if (file != null) {
             try {
-                List<FastaLoader.SequenceRecord> seqs = new FastaLoader().load(file.getAbsolutePath());
+                List<FASTAReader.Sequence> seqs = new FASTAReader().load(file.getAbsolutePath());
                 StringBuilder sb = new StringBuilder();
-                for (FastaLoader.SequenceRecord s : seqs) {
-                    sb.append(s.sequence());
+                for (FASTAReader.Sequence s : seqs) {
+                    sb.append(s.data);
                 }
                 genomeArea.setText(sb.toString());
                 statusLabel.setText("Loaded " + seqs.size() + " sequences from " + file.getName());

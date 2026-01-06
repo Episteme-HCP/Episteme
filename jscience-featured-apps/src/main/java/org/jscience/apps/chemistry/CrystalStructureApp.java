@@ -243,7 +243,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
 
     private void loadCifStructure(java.io.InputStream is) {
         try {
-            org.jscience.chemistry.loaders.CIFLoader.CrystalStructure cif = org.jscience.chemistry.loaders.CIFLoader
+            org.jscience.chemistry.loaders.CIFReader.CrystalStructure cif = org.jscience.chemistry.loaders.CIFReader
                     .load(is);
 
             if (cif == null)
@@ -268,7 +268,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
             for (int i = 0; i < repeat; i++) {
                 for (int j = 0; j < repeat; j++) {
                     for (int k = 0; k < repeat; k++) {
-                        for (org.jscience.chemistry.loaders.CIFLoader.AtomSite site : cif.atoms) {
+                        for (org.jscience.chemistry.loaders.CIFReader.AtomSite site : cif.atoms) {
                             double x = (site.x + i);
                             double y = (site.y + j);
                             double z = (site.z + k);

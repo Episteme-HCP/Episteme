@@ -35,9 +35,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 import org.jscience.physics.astronomy.CelestialBody;
 import org.jscience.physics.astronomy.Planet;
-import org.jscience.physics.astronomy.SolarSystemLoader;
+import org.jscience.physics.astronomy.SolarSystemReader;
 import org.jscience.physics.astronomy.StarSystem;
-import org.jscience.physics.loaders.HorizonsEphemerisLoader;
+import org.jscience.physics.loaders.HorizonsEphemerisReader;
 import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.i18n.I18n;
 
@@ -114,11 +114,11 @@ public class InterplanetaryTrajectoryDemo extends AbstractDemo {
     }
 
     private void loadData() {
-        solarSystem = SolarSystemLoader.load("org/jscience/physics/astronomy/solarsystem.json");
+        solarSystem = SolarSystemReader.load("org/jscience/physics/astronomy/solarsystem.json");
 
         try (var is = getClass().getResourceAsStream("data/mars_horizons.txt")) {
             if (is != null) {
-                HorizonsEphemerisLoader.loadEphemeris(is);
+                HorizonsEphemerisReader.loadEphemeris(is);
             }
         } catch (Exception e) {
             // Log or handle the exception if necessary, but realEphemerisPoints is unused.

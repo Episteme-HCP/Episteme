@@ -44,7 +44,7 @@ import java.util.List;
 import org.jscience.apps.framework.ChartFactory;
 import org.jscience.apps.framework.FeaturedAppBase;
 import org.jscience.biology.ecology.PopulationDynamics;
-import org.jscience.politics.loaders.WorldBankLoader;
+import org.jscience.politics.loaders.WorldBankReader;
 import org.jscience.politics.Country;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.io.AbstractResourceReader;
@@ -120,9 +120,9 @@ public class PandemicForecasterApp extends FeaturedAppBase {
     }
 
     private void loadCountryData() {
-        WorldBankLoader loader = WorldBankLoader.getInstance();
+        WorldBankReader loader = WorldBankReader.getInstance();
         countries = ((AbstractResourceReader<Country>) loader).loadAll();
-        log("Loaded " + countries.size() + " countries from WorldBankLoader");
+        log("Loaded " + countries.size() + " countries from WorldBankReader");
     }
 
     private VBox createChartArea() {

@@ -59,7 +59,7 @@ public class SociologyNetworkDemo implements AppProvider {
 
     @Override
     public String getCategory() {
-        return "Sociology";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.sociology", "Sociology");
     }
 
     @Override
@@ -125,10 +125,12 @@ public class SociologyNetworkDemo implements AppProvider {
 
         Separator sep = new Separator();
 
-        Label detailsTitle = new Label("Person Details");
+        Label detailsTitle = new Label(
+                org.jscience.ui.i18n.I18n.getInstance().get("demo.sociology.details.title", "Person Details"));
         detailsTitle.setStyle("-fx-font-weight: bold;");
 
-        Label details = new Label("Click on a person node to view details.");
+        Label details = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.sociology.details.hint",
+                "Click on a person node to view details."));
         details.setWrapText(true);
 
         sidebar.getChildren().addAll(title, desc, sep, detailsTitle, details);
@@ -147,13 +149,17 @@ public class SociologyNetworkDemo implements AppProvider {
             for (Node n : nodes) {
                 double dist = n.pos.minus(mousePos).norm().doubleValue();
                 if (dist < 10) {
-                    details.setText("Name: " + n.name + "\nAge: " + n.age + "\nCity: " + n.city);
+                    org.jscience.ui.i18n.I18n i18n = org.jscience.ui.i18n.I18n.getInstance();
+                    details.setText(i18n.get("demo.sociology.details.name", "Name:") + " " + n.name + "\n" +
+                            i18n.get("demo.sociology.details.age", "Age:") + " " + n.age + "\n" +
+                            i18n.get("demo.sociology.details.city", "City:") + " " + n.city);
                     found = true;
                     break;
                 }
             }
             if (!found) {
-                details.setText("Click on a person node to view details.");
+                details.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.sociology.details.hint",
+                        "Click on a person node to view details."));
             }
         });
 

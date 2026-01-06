@@ -53,10 +53,10 @@ public class ResourceAuditTest {
             // Chemistry
             new LoaderResourceMapping("ChemistryDataLoader", "/org/jscience/chemistry/elements.json"),
             new LoaderResourceMapping("ChemistryDataLoader", "/org/jscience/chemistry/molecules.json"),
-            new LoaderResourceMapping("PeriodicTableLoader", "/org/jscience/chemistry/elements.json"),
+            new LoaderResourceMapping("PeriodicTableReader", "/org/jscience/chemistry/elements.json"),
 
             // Astronomy
-            new LoaderResourceMapping("SolarSystemLoader", "/org/jscience/ui/astronomy/solar_system.json"),
+            new LoaderResourceMapping("SolarSystemReader", "/org/jscience/ui/astronomy/solar_system.json"),
 
             // Physics
             new LoaderResourceMapping("ParticleLoader", "/org/jscience/physics/particles.json"),
@@ -65,7 +65,7 @@ public class ResourceAuditTest {
             new LoaderResourceMapping("TaxonomyLoader", "/org/jscience/biology/taxonomy/species.json"),
 
             // Social
-            new LoaderResourceMapping("FactbookLoader", "/org/jscience/politics/countries.json"),
+            new LoaderResourceMapping("FactbookReader", "/org/jscience/politics/countries.json"),
 
             // Earth
             new LoaderResourceMapping("OpenWeatherLoader", null) // API-based, no file

@@ -32,6 +32,7 @@ import org.jscience.biology.taxonomy.Species;
  * Provides factory methods for frequently used species in biology.
  * </p>
  * * @author Silvere Martin-Michiellot
+ * 
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -41,7 +42,7 @@ public final class CommonSpecies {
     } // Utility class
 
     private static Species get(String name) {
-        return org.jscience.biology.taxonomy.TaxonomyLoader.getSpecies(name);
+        return org.jscience.biology.taxonomy.TaxonomyReader.getSpecies(name);
     }
 
     // ========== Model Organisms ==========
@@ -102,5 +103,3 @@ public final class CommonSpecies {
                 danioRerio());
     }
 }
-
-

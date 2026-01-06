@@ -71,7 +71,7 @@ public class StellarSkyViewer extends Application {
     private static final int HEIGHT = 800;
 
     // Data
-    private List<StarLoader.Star> stars;
+    private List<StarReader.Star> stars;
     private List<ConstellationLine> constellations = new ArrayList<>();
     private List<PlanetData> planets = new ArrayList<>();
     private List<MoonData> moons = new ArrayList<>();
@@ -95,8 +95,8 @@ public class StellarSkyViewer extends Application {
 
     // Interaction
     private double lastMouseX;
-    private StarLoader.Star hoveredStar;
-    private StarLoader.Star selectedStar;
+    private StarReader.Star hoveredStar;
+    private StarReader.Star selectedStar;
     private PlanetData hoveredPlanet;
     private PlanetData selectedPlanet;
     private ConstellationLine hoveredConstellation;
@@ -115,7 +115,7 @@ public class StellarSkyViewer extends Application {
 
     private void loadData() {
         InputStream isStar = getClass().getResourceAsStream("/org/jscience/physics/astronomy/data/stars.csv");
-        stars = (isStar != null) ? StarLoader.loadCSV(isStar) : new ArrayList<>();
+        stars = (isStar != null) ? StarReader.loadCSV(isStar) : new ArrayList<>();
 
         try (InputStream isConst = getClass()
                 .getResourceAsStream("/org/jscience/physics/astronomy/data/constellations.csv")) {
@@ -483,7 +483,7 @@ public class StellarSkyViewer extends Application {
             double cy = h / 2;
             double radius = Math.min(w, h) / 2 - 20;
 
-            for (StarLoader.Star s : stars) {
+            for (StarReader.Star s : stars) {
                 double[] pos = calculateProjectedPosition(s, cx, cy, radius);
                 if (pos != null)
                     starPos.put(s.name, pos);
@@ -518,9 +518,9 @@ public class StellarSkyViewer extends Application {
         drawSky();
     }
 
-    private StarLoader.Star findStarAt(double mx, double my) {
+    private StarReader.Star findStarAt(double mx, double my) {
         double closest = 10.0;
-        StarLoader.Star found = null;
+        StarReader.Star found = null;
 
         // Optimize: verify logic matches drawSky
         // Need to replicate projection logic
@@ -530,7 +530,7 @@ public class StellarSkyViewer extends Application {
         double cy = h / 2;
         double radius = Math.min(w, h) / 2 - 20;
 
-        for (StarLoader.Star s : stars) {
+        for (StarReader.Star s : stars) {
             double[] pos = calculateProjectedPosition(s, cx, cy, radius);
             if (pos != null) {
                 double dist = Math.hypot(mx - pos[0], my - pos[1]);
@@ -628,7 +628,7 @@ public class StellarSkyViewer extends Application {
         }
     }
 
-    private double[] calculateProjectedPosition(StarLoader.Star star, double cx, double cy, double radius) {
+    private double[] calculateProjectedPosition(StarReader.Star star, double cx, double cy, double radius) {
         double days = getDaysSinceJ2000();
         double[] eq = Precession.apply(star.ra, star.dec, days / 365.25);
 
@@ -941,7 +941,7 @@ public class StellarSkyViewer extends Application {
 
         // Stars
         Map<String, double[]> starPos = new HashMap<>(); // For constellations
-        for (StarLoader.Star s : stars) {
+        for (StarReader.Star s : stars) {
             double[] pos = calculateProjectedPosition(s, cx, cy, radius);
             if (pos != null) {
                 starPos.put(s.name, pos);

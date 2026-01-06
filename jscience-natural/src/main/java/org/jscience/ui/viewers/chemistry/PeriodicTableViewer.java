@@ -55,7 +55,7 @@ import javafx.stage.Stage;
 
 import org.jscience.chemistry.Element;
 import org.jscience.chemistry.PeriodicTable;
-import org.jscience.chemistry.loaders.ChemistryDataLoader;
+import org.jscience.chemistry.loaders.ChemistryDataReader;
 
 /**
  * Interactive periodic table viewer using JavaFX.
@@ -103,7 +103,7 @@ public class PeriodicTableViewer extends Application {
     @Override
     public void start(Stage primaryStage) {
         // Load element data
-        ChemistryDataLoader.loadElements();
+        ChemistryDataReader.loadElements();
 
         BorderPane root = new BorderPane();
         root.getStyleClass().add("dark-viewer-root");
@@ -816,5 +816,3 @@ public class PeriodicTableViewer extends Application {
         launch(args);
     }
 }
-
-

@@ -50,13 +50,13 @@ public class I18n {
         // Try to load natural and social bundles (they may not be on classpath)
         tryAddBundle("org.jscience.ui.i18n.messages_natural");
         tryAddBundle("org.jscience.ui.i18n.messages_social");
-        tryAddBundle("org.jscience.ui.i18n.messages_apps");
+        tryAddBundle("org.jscience.apps.i18n.messages_apps");
         tryAddBundle("org.jscience.apps.i18n.messages");
     }
 
     private void tryAddBundle(String bundleBase) {
         try {
-            ResourceBundle.getBundle(bundleBase, currentLocale);
+            ResourceBundle.getBundle(bundleBase, currentLocale, new Utf8Control());
             addBundle(bundleBase);
         } catch (MissingResourceException e) {
             // Bundle not available, skip
@@ -101,6 +101,16 @@ public class I18n {
      * 
      * @return current locale
      */
+    public Locale[] getSupportedLocales() {
+        return new Locale[] {
+                Locale.ENGLISH,
+                Locale.FRENCH,
+                Locale.GERMAN,
+                Locale.of("es"),
+                Locale.CHINESE
+        };
+    }
+
     public Locale getLocale() {
         return currentLocale;
     }
@@ -202,7 +212,7 @@ public class I18n {
 
     private void loadBundle(String bundleBase) {
         try {
-            ResourceBundle bundle = ResourceBundle.getBundle(bundleBase, currentLocale);
+            ResourceBundle bundle = ResourceBundle.getBundle(bundleBase, currentLocale, new Utf8Control());
             bundles.put(bundleBase, bundle);
         } catch (MissingResourceException e) {
             // Ignore (already logged or handled)
@@ -216,6 +226,38 @@ public class I18n {
         }
         return key;
     }
+
+    /**
+     * Custom ResourceBundle.Control to enforce UTF-8 encoding.
+     */
+    private static class Utf8Control extends ResourceBundle.Control {
+        @Override
+        public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader,
+                boolean reload)
+                throws IllegalAccessException, InstantiationException, java.io.IOException {
+            String bundleName = toBundleName(baseName, locale);
+            String resourceName = toResourceName(bundleName, "properties");
+            ResourceBundle bundle = null;
+            java.io.InputStream stream = null;
+            if (reload) {
+                java.net.URL url = loader.getResource(resourceName);
+                if (url != null) {
+                    java.net.URLConnection connection = url.openConnection();
+                    if (connection != null) {
+                        connection.setUseCaches(false);
+                        stream = connection.getInputStream();
+                    }
+                }
+            } else {
+                stream = loader.getResourceAsStream(resourceName);
+            }
+            if (stream != null) {
+                try (java.io.InputStreamReader reader = new java.io.InputStreamReader(stream,
+                        java.nio.charset.StandardCharsets.UTF_8)) {
+                    bundle = new PropertyResourceBundle(reader);
+                }
+            }
+            return bundle;
+        }
+    }
 }
-
-
