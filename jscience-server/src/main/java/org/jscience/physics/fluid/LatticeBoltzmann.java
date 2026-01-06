@@ -60,7 +60,7 @@ public class LatticeBoltzmann implements Serializable {
     // private static final int[] OPP = { 0, 3, 4, 1, 2, 7, 8, 5, 6 }; // Opposite
     // directions
 
-    private final org.jscience.technical.backend.algorithms.LatticeBoltzmannProvider provider;
+    private org.jscience.technical.backend.algorithms.LatticeBoltzmannProvider provider;
     private final org.jscience.mathematics.numbers.real.Real[][][] fReal;
     private final org.jscience.mathematics.numbers.real.Real omega;
     private final org.jscience.mathematics.numbers.real.Real zero = org.jscience.mathematics.numbers.real.Real.ZERO;
@@ -75,6 +75,10 @@ public class LatticeBoltzmann implements Serializable {
         this.provider = new org.jscience.technical.backend.algorithms.MulticoreLatticeBoltzmannProvider();
         this.omega = org.jscience.mathematics.numbers.real.Real.of(1.0 / tau);
         initialize();
+    }
+
+    public void setProvider(org.jscience.technical.backend.algorithms.LatticeBoltzmannProvider provider) {
+        this.provider = provider;
     }
 
     private void initialize() {
