@@ -135,6 +135,11 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
                 }
             }
 
+            // Update Status Bar text
+            if (statusLabel != null) {
+                statusLabel.setText(i18n.get("status.ready"));
+            }
+
             // Allow subclasses to update their content
             updateLocalizedUI();
         });
@@ -498,10 +503,7 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
     // ===== Preferences =====
 
     public void onLanguageChanged(Locale locale) {
-        // Rebuild menus with new locale
-        Alert info = new Alert(Alert.AlertType.INFORMATION);
-        info.setContentText("Language changed. Restart application to apply.");
-        info.showAndWait();
+        // UI updates are handled by the listener
     }
 
     public void onRestoreDefaults() {
@@ -531,7 +533,7 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
     public void onShowDocumentation() {
         HelpDialog dialog = new HelpDialog(i18n.get("menu.help.documentation"));
         dialog.addTopic("General", i18n.get("menu.help.documentation"),
-                "Documentation for " + getAppTitle() + ".\n\n(No specific documentation provided for this app yet.)",
+                i18n.get("help.documentation.content"),
                 null);
         addAppHelpTopics(dialog);
         dialog.showAndWait();
@@ -539,8 +541,8 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
 
     public void onShowTutorials() {
         HelpDialog dialog = new HelpDialog(i18n.get("menu.help.tutorials"));
-        dialog.addTopic("General", "Getting Started",
-                "Welcome to " + getAppTitle() + "!\n\nUse the toolbar to control the simulation.", null);
+        dialog.addTopic("General", i18n.get("menu.help.tutorials"),
+                i18n.get("help.tutorials.content"), null);
         addAppTutorials(dialog);
         dialog.showAndWait();
     }
@@ -557,8 +559,8 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
         Alert about = new Alert(Alert.AlertType.INFORMATION);
         about.setTitle(i18n.get("menu.help.about"));
         about.setHeaderText(getAppTitle());
-        about.setContentText("JScience Killer Apps\nVersion " + i18n.get("app.version") +
-                "\n\nÃ‚Â© 2025 Silvere Martin-Michiellot\nPowered by Gemini AI");
+        about.setContentText("JScience Featured Apps\nVersion " + i18n.get("app.version") +
+                "\n\n\u00A9 2025 Silvere Martin-Michiellot\nPowered by Gemini AI");
         about.showAndWait();
     }
 

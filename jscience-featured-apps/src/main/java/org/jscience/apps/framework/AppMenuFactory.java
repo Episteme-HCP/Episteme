@@ -218,7 +218,11 @@ public class AppMenuFactory {
         Menu langMenu = new Menu(i18n.get("menu.preferences.language"), org.jscience.ui.IconLoader.getIcon("globe"));
         ToggleGroup langGroup = new ToggleGroup();
         for (Locale locale : I18nManager.getSupportedLocales()) {
-            RadioMenuItem langItem = new RadioMenuItem(locale.getDisplayLanguage(locale));
+            String name = locale.getDisplayLanguage(locale);
+            if (name.length() > 1) {
+                name = name.substring(0, 1).toUpperCase(locale) + name.substring(1);
+            }
+            RadioMenuItem langItem = new RadioMenuItem(name);
             langItem.setToggleGroup(langGroup);
             langItem.setSelected(locale.equals(i18n.getCurrentLocale()));
             langItem.setOnAction(e -> {

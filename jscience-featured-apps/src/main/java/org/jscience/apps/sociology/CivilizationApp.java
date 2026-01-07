@@ -191,17 +191,7 @@ public class CivilizationApp extends FeaturedAppBase {
                 .add(createSlider(i18n.get("civilization.label.aggression"), 0.0, 1.0, 0.0, v -> aggression = v,
                         "Aggression"));
 
-        HBox buttons = new HBox(10);
-        Button btnReset = new Button(i18n.get("civilization.button.reset"));
-        btnReset.setOnAction(e -> reset());
-
-        ToggleButton btnPause = new ToggleButton(i18n.get("civilization.button.run"));
-        btnPause.setSelected(false);
-        btnPause.selectedProperty().addListener((o, ov, nv) -> running = nv);
-
-        buttons.getChildren().addAll(btnReset, btnPause);
-
-        box.getChildren().addAll(new Label(i18n.get("civilization.label.params")), sliders, buttons);
+        box.getChildren().addAll(new Label(i18n.get("civilization.label.params")), sliders);
         return box;
     }
 

@@ -193,9 +193,6 @@ public class TitrationApp extends FeaturedAppBase {
             valveOpen = flowRate > 0;
         });
 
-        Button resetButton = new Button(i18n.get("toolbar.reset"));
-        resetButton.setOnAction(e -> reset());
-
         // Acid type selector for multi-protic acids
         acidSelector = new ComboBox<>();
         acidSelector.getItems().addAll(AcidType.values());
@@ -213,18 +210,17 @@ public class TitrationApp extends FeaturedAppBase {
         indicatorSelector.setMaxWidth(Double.MAX_VALUE);
 
         box.getChildren().addAll(
-                new Label("Ã°Å¸Â§Âª " + i18n.get("titration.panel.setup")),
-                new Label("Ã¢Å¡â€”Ã¯Â¸Â " + i18n.get("titration.label.acidtype")),
+                new Label(i18n.get("titration.panel.setup")),
+                new Label(i18n.get("titration.label.acidtype")),
                 acidSelector,
                 phChart,
                 phLabel, volumeLabel,
                 new Separator(),
-                new Label("Ã°Å¸Å½Â¨ " + i18n.get("titration.label.indicator")),
+                new Label(i18n.get("titration.label.indicator")),
                 indicatorSelector,
                 new Separator(),
-                new Label("Ã°Å¸Å¡Â° " + i18n.get("titration.label.titrant")),
-                valveSlider,
-                resetButton);
+                new Label(i18n.get("titration.label.titrant")),
+                valveSlider);
         VBox.setVgrow(phChart, Priority.ALWAYS);
         return box;
     }
@@ -410,6 +406,11 @@ public class TitrationApp extends FeaturedAppBase {
     }
 
     @Override
+    public void onReset() {
+        reset();
+    }
+
+    @Override
     protected void doNew() {
         reset();
     }
@@ -418,13 +419,13 @@ public class TitrationApp extends FeaturedAppBase {
     protected void addAppHelpTopics(org.jscience.apps.framework.HelpDialog dialog) {
         dialog.addTopic("Chemistry", "Acid-Base Titration",
                 "Simulate titration experiments:\n\n" +
-                        "Ã¢â‚¬Â¢ **Titration**: Determining concentration of an acid by neutralizing it with a base of known concentration.\n"
+                        "\u2022 **Titration**: Determining concentration of an acid by neutralizing it with a base of known concentration.\n"
                         +
-                        "Ã¢â‚¬Â¢ **Equivalence Point**: Where moles of acid equals moles of base (adjusted for stoichiometry).\n"
+                        "\u2022 **Equivalence Point**: Where moles of acid equals moles of base (adjusted for stoichiometry).\n"
                         +
-                        "Ã¢â‚¬Â¢ **Indicators**: Change color at specific pH ranges to visually signal the end point.\n"
+                        "\u2022 **Indicators**: Change color at specific pH ranges to visually signal the end point.\n"
                         +
-                        "Ã¢â‚¬Â¢ **pH Curve**: Shows the change in pH as titrant is added.",
+                        "\u2022 **pH Curve**: Shows the change in pH as titrant is added.",
                 null);
     }
 
