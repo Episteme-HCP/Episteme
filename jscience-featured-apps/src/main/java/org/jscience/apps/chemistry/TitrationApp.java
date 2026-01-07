@@ -127,6 +127,11 @@ public class TitrationApp extends FeaturedAppBase {
     }
 
     @Override
+    public boolean hasEditMenu() {
+        return false;
+    }
+
+    @Override
     protected Region createMainContent() {
         SplitPane split = new SplitPane();
         split.setOrientation(Orientation.HORIZONTAL);

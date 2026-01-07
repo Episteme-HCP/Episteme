@@ -85,6 +85,11 @@ public class CivilizationApp extends FeaturedAppBase {
     }
 
     @Override
+    public boolean hasEditMenu() {
+        return false;
+    }
+
+    @Override
     protected void onAppReady() {
         super.onAppReady();
         // Set running state default
@@ -423,6 +428,43 @@ public class CivilizationApp extends FeaturedAppBase {
         resSeries.getData().clear();
         polSeries.getData().clear();
         statusLabel.setText(i18n.get("civilization.status.stable"));
+    }
+
+    @Override
+    protected void updateLocalizedUI() {
+        // 1. Update Status Label
+        // Force refresh based on current state?
+        // Just let the loop handle it.
+
+        // 2. Update Controls (Rebuild to get new labels)
+        // Access the main layout
+        Region center = (Region) rootPane.getCenter();
+        if (center instanceof javafx.scene.layout.StackPane) {
+            javafx.scene.layout.StackPane stack = (javafx.scene.layout.StackPane) center;
+            if (!stack.getChildren().isEmpty() && stack.getChildren().get(0) instanceof BorderPane) {
+                BorderPane appRoot = (BorderPane) stack.getChildren().get(0);
+
+                // Rebuild controls
+                VBox newControls = createControls();
+                appRoot.setBottom(newControls);
+
+                // Update Chart
+                if (appRoot.getCenter() instanceof LineChart) {
+                    @SuppressWarnings("unchecked")
+                    LineChart<Number, Number> chart = (LineChart<Number, Number>) appRoot.getCenter();
+                    chart.setTitle(i18n.get("civilization.chart.title"));
+                    chart.getXAxis().setLabel(i18n.get("civilization.label.years"));
+                    chart.getYAxis().setLabel(i18n.get("civilization.label.value"));
+
+                    if (popSeries != null)
+                        popSeries.setName(i18n.get("civilization.label.population"));
+                    if (resSeries != null)
+                        resSeries.setName(i18n.get("civilization.label.resources"));
+                    if (polSeries != null)
+                        polSeries.setName(i18n.get("civilization.series.pollution"));
+                }
+            }
+        }
     }
 
     public static void main(String[] args) {

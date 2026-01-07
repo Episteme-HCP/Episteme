@@ -86,6 +86,11 @@ public class PandemicForecasterApp extends FeaturedAppBase {
     }
 
     @Override
+    public boolean hasEditMenu() {
+        return false;
+    }
+
+    @Override
     protected javafx.scene.layout.Region createMainContent() {
         // Initialize explicitly to empty list to avoid NPE in createControlPanel
         countries = new java.util.ArrayList<>();

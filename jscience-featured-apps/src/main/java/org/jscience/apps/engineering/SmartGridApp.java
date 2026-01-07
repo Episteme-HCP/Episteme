@@ -89,6 +89,11 @@ public class SmartGridApp extends FeaturedAppBase {
     }
 
     @Override
+    public boolean hasEditMenu() {
+        return false;
+    }
+
+    @Override
     protected Region createMainContent() {
         SplitPane mainSplit = new SplitPane();
         mainSplit.setOrientation(Orientation.HORIZONTAL);

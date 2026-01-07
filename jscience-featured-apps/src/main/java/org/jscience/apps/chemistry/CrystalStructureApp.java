@@ -106,6 +106,11 @@ public class CrystalStructureApp extends FeaturedAppBase {
     }
 
     @Override
+    public boolean hasEditMenu() {
+        return false;
+    }
+
+    @Override
     protected Region createMainContent() {
         SplitPane split = new SplitPane();
 

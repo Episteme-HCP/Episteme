@@ -46,7 +46,50 @@ public class CivilizationAppTest {
 
     @Test
     public void testMenuPresence(FxRobot robot) {
-        // Verify "Run" button exists (standard from FeaturedAppBase)
+        I18nManager i18n = I18nManager.getInstance();
+
+        // Verify "Run" button exists (localized)
+        String runText = i18n.get("civilization.button.run");
+        verifyThat(".toggle-button", hasText(runText));
+
+        // Verify File menu exists (localized)
+        String fileMenuText = i18n.get("menu.file");
+        org.hamcrest.MatcherAssert.assertThat(
+                "File menu should be visible",
+                robot.lookup(hasText(fileMenuText)).tryQuery().isPresent(),
+                org.hamcrest.Matchers.is(true));
+
+        // Verify Edit menu is ABSENT (localized)
+        String editMenuText = i18n.get("menu.edit");
+        org.hamcrest.MatcherAssert.assertThat(
+                "Edit menu should be hidden",
+                robot.lookup(hasText(editMenuText)).tryQuery().isPresent(),
+                org.hamcrest.Matchers.is(false));
+    }
+
+    @Test
+    public void testDynamicLanguageSwitch(FxRobot robot) throws InterruptedException {
+        I18nManager i18n = I18nManager.getInstance();
+
+        // 1. Switch to French
+        // Note: runLater is used by listener, but we are in test thread?
+        // setLocale triggers listener which does runLater.
+        // We need to wait for FX thread.
+        robot.interact(() -> i18n.setLocale(java.util.Locale.FRENCH));
+        // Allow UI to refresh
+        Thread.sleep(500);
+
+        // Verify Chart Title in French
+        // "Dynamique de Population"
+        verifyThat(".chart-title", hasText("Dynamique de Population"));
+        verifyThat(".toggle-button", hasText("Lancer"));
+
+        // 2. Switch to English
+        robot.interact(() -> i18n.setLocale(java.util.Locale.ENGLISH));
+        Thread.sleep(500);
+
+        // Verify Chart Title in English
+        verifyThat(".chart-title", hasText("Population Dynamics"));
         verifyThat(".toggle-button", hasText("Run"));
     }
 }

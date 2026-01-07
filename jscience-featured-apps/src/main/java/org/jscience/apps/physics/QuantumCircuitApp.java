@@ -58,6 +58,11 @@ public class QuantumCircuitApp extends FeaturedAppBase {
     }
 
     @Override
+    public boolean hasEditMenu() {
+        return false;
+    }
+
+    @Override
     protected Region createMainContent() {
         BorderPane pane = new BorderPane();
         pane.setPadding(new Insets(10));

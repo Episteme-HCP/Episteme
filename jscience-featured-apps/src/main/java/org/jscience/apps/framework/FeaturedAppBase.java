@@ -40,11 +40,10 @@ import java.util.prefs.Preferences;
 
 import org.jscience.ui.AppProvider;
 import org.jscience.ui.ThemeManager;
-// import org.jscience.ui.i18n.I18n; // Removed unused import
+import org.jscience.ui.IconLoader;
 
 /**
  * Abstract base class for all JScience Killer Apps.
- * Provides standard application framework with menus, toolbars, status bar,
  * Provides standard application framework with menus, toolbars, status bar,
  */
 public abstract class FeaturedAppBase extends Application implements AppProvider {
@@ -82,10 +81,11 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
         // Build UI
         rootPane = new BorderPane();
 
-        // Menu Bar
+        // Menu Bar and Toolbar
         AppMenuFactory menuFactory = new AppMenuFactory(this);
         menuBar = menuFactory.createMenuBar();
-        rootPane.setTop(new VBox(menuBar, createToolBar()));
+        VBox topContainer = new VBox(menuBar, createToolBar());
+        rootPane.setTop(topContainer);
 
         // Main content (subclass provides this)
         rootPane.setCenter(createMainContent());
@@ -108,6 +108,43 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
 
         // Post-init
         onAppReady();
+
+        // Listen for locale changes
+        I18nManager.getInstance().addListener(this::handleLocaleChange);
+    }
+
+    private void handleLocaleChange(java.util.Locale locale) {
+        javafx.application.Platform.runLater(() -> {
+            // Update Title
+            if (primaryStage != null) {
+                primaryStage.setTitle(getAppTitle());
+            }
+
+            // Rebuild Menu and Toolbar
+            AppMenuFactory factory = new AppMenuFactory(this);
+            menuBar = factory.createMenuBar();
+
+            // Update top container
+            VBox top = (VBox) rootPane.getTop();
+            if (top != null) {
+                if (!top.getChildren().isEmpty()) {
+                    top.getChildren().set(0, menuBar);
+                }
+                if (top.getChildren().size() > 1) {
+                    top.getChildren().set(1, createToolBar());
+                }
+            }
+
+            // Allow subclasses to update their content
+            updateLocalizedUI();
+        });
+    }
+
+    /**
+     * Override this to update UI elements when language changes.
+     */
+    protected void updateLocalizedUI() {
+        // Default impl does nothing
     }
 
     // ===== AppProvider Implementation =====
@@ -150,29 +187,62 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
 
     /** Default window width. */
     protected double getDefaultWidth() {
-        return 1200;
+        return 1024;
     }
 
     /** Default window height. */
     protected double getDefaultHeight() {
-        return 800;
+        return 768;
     }
+
+    // Menu Capability Flags
+    public boolean hasFileMenu() {
+        return true;
+    }
+
+    public boolean hasEditMenu() {
+        return true;
+    }
+
+    public boolean hasViewMenu() {
+        return true;
+    }
+
+    public boolean hasToolsMenu() {
+        return true;
+    }
+
+    public boolean hasPreferencesMenu() {
+        return true;
+    }
+
+    public boolean hasHelpMenu() {
+        return true;
+    }
+
+    /**
+     * Entry point for launching logic.
+     */
 
     // ===== Toolbar =====
 
     protected ToolBar createToolBar() {
         toolBar = new ToolBar();
 
-        Button runBtn = new Button("Ã¢â€“Â¶ " + i18n.get("toolbar.run"));
+        Button runBtn = new Button(i18n.get("toolbar.run"), IconLoader.getIcon("play"));
+        runBtn.setContentDisplay(ContentDisplay.LEFT);
         runBtn.setOnAction(e -> onRun());
 
-        Button pauseBtn = new Button("Ã¢ÂÂ¸ " + i18n.get("toolbar.pause"));
+        Button pauseBtn = new Button(i18n.get("toolbar.pause"), IconLoader.getIcon("pause"));
+        pauseBtn.setContentDisplay(ContentDisplay.LEFT);
         pauseBtn.setOnAction(e -> onPause());
 
-        Button stopBtn = new Button("Ã¢ÂÂ¹ " + i18n.get("toolbar.stop"));
+        Button stopBtn = new Button(i18n.get("toolbar.stop"), IconLoader.getIcon("square"));
+        stopBtn.setContentDisplay(ContentDisplay.LEFT);
         stopBtn.setOnAction(e -> onStop());
 
-        Button resetBtn = new Button("Ã¢â€ Âº " + i18n.get("toolbar.reset"));
+        Button resetBtn = new Button(i18n.get("toolbar.reset"), IconLoader.getIcon("rotate-ccw"));
+        resetBtn.setContentDisplay(ContentDisplay.LEFT);
         resetBtn.setOnAction(e -> onReset());
 
         toolBar.getItems().addAll(runBtn, pauseBtn, stopBtn, new Separator(), resetBtn);
