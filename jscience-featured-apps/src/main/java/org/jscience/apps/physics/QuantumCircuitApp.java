@@ -207,4 +207,86 @@ public class QuantumCircuitApp extends FeaturedAppBase {
                 .setText(i18n.get("quantum.label.statevector") + ": " + i18n.get("quantum.status.superposition"));
 
     }
+
+    @Override
+    protected void doNew() {
+        clearCircuit();
+    }
+
+    @Override
+    protected void addAppHelpTopics(org.jscience.apps.framework.HelpDialog dialog) {
+        dialog.addTopic("Physics", "Quantum Computing",
+                "Learn about quantum circuits:\n\n" +
+                        "Ã¢â‚¬Â¢ **Qubit**: Quantum bit, exists in superposition of |0> and |1>.\n" +
+                        "Ã¢â‚¬Â¢ **H Gate (Hadamard)**: Puts a qubit into superposition (50/50 probability).\n" +
+                        "Ã¢â‚¬Â¢ **X Gate**: Quantum NOT gate, flips |0> to |1> and vice versa.\n" +
+                        "Ã¢â‚¬Â¢ **CNOT**: Conditional NOT, entangles two qubits.\n" +
+                        "Ã¢â‚¬Â¢ **Measurement**: Collapses the quantum state to a classical bit.",
+                null);
+    }
+
+    @Override
+    protected void addAppTutorials(org.jscience.apps.framework.HelpDialog dialog) {
+        dialog.addTopic("Tutorial", "Building a Circuit",
+                "1. **Select Qubit**: Click a qubit line (e.g., q0) to select it.\n" +
+                        "2. **Add Gate**: Click a gate button (H, X, etc.) to add it to the selected line.\n" +
+                        "3. **Run**: Click the Run button to simulate measurement outcome probabilities.\n" +
+                        "4. **Clear**: Use Clear to reset the circuit.\n" +
+                        "5. **Bell State**: Try H on q0, then CNOT on q0-q1 (not fully supported in visual editor yet) to create entanglement.",
+                null);
+    }
+
+    @Override
+    protected byte[] serializeState() {
+        java.util.Properties props = new java.util.Properties();
+        for (int i = 0; i < qubitLines.size(); i++) {
+            HBox line = qubitLines.get(i);
+            StringBuilder sb = new StringBuilder();
+            // Start from index 1 to skip the ToggleButton (Qubit Label)
+            for (int j = 1; j < line.getChildren().size(); j++) {
+                javafx.scene.Node node = line.getChildren().get(j);
+                if (node instanceof Button) {
+                    sb.append(((Button) node).getText()).append(",");
+                }
+            }
+            props.setProperty("line." + i, sb.toString());
+        }
+
+        java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+        try {
+            props.store(baos, "Quantum State");
+            return baos.toByteArray();
+        } catch (java.io.IOException e) {
+            return null;
+        }
+    }
+
+    @Override
+    protected void deserializeState(byte[] data) {
+        java.util.Properties props = new java.util.Properties();
+        try {
+            props.load(new java.io.ByteArrayInputStream(data));
+            clearCircuit();
+            for (int i = 0; i < NUM_QUBITS; i++) {
+                String lineData = props.getProperty("line." + i);
+                if (lineData != null && !lineData.isEmpty()) {
+                    String[] gates = lineData.split(",");
+                    selectedQubitIndex = i;
+                    for (String g : gates) {
+                        if (!g.trim().isEmpty()) {
+                            addGateToSelectedLine(g.trim());
+                        }
+                    }
+                }
+            }
+            selectedQubitIndex = -1;
+            updateQubitSelection();
+        } catch (Exception e) {
+            showError("Load Error", "Failed to restore state: " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 }

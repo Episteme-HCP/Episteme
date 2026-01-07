@@ -40,7 +40,7 @@ import java.util.prefs.Preferences;
 
 import org.jscience.ui.AppProvider;
 import org.jscience.ui.ThemeManager;
-import org.jscience.ui.i18n.I18n;
+// import org.jscience.ui.i18n.I18n; // Removed unused import
 
 /**
  * Abstract base class for all JScience Killer Apps.
@@ -63,12 +63,18 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
     protected File currentFile;
     protected boolean isDirty = false;
 
+    protected UndoManager undoManager = new UndoManager();
+    protected javafx.beans.property.BooleanProperty simulationControlsVisible = new javafx.beans.property.SimpleBooleanProperty(
+            true);
     private String currentTheme = "light";
 
     @Override
     public void start(Stage stage) throws Exception {
         this.primaryStage = stage;
         this.prefs = Preferences.userNodeForPackage(getClass());
+
+        // Initialize I18n
+        I18nManager.getInstance().addBundle("org.jscience.apps.i18n.messages_apps");
 
         // Load saved preferences
         loadPreferences();
@@ -113,7 +119,7 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.killer_apps");
+        return I18nManager.getInstance().get("category.featured_apps");
     }
 
     @Override
@@ -170,6 +176,16 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
         resetBtn.setOnAction(e -> onReset());
 
         toolBar.getItems().addAll(runBtn, pauseBtn, stopBtn, new Separator(), resetBtn);
+
+        // Bind visibility of simulation controls
+        runBtn.visibleProperty().bind(simulationControlsVisible);
+        runBtn.managedProperty().bind(runBtn.visibleProperty());
+        pauseBtn.visibleProperty().bind(simulationControlsVisible);
+        pauseBtn.managedProperty().bind(pauseBtn.visibleProperty());
+        stopBtn.visibleProperty().bind(simulationControlsVisible);
+        stopBtn.managedProperty().bind(stopBtn.visibleProperty());
+        resetBtn.visibleProperty().bind(simulationControlsVisible);
+        resetBtn.managedProperty().bind(resetBtn.visibleProperty());
 
         // Subclasses can add more items
         customizeToolBar(toolBar);
@@ -259,7 +275,13 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
     }
 
     protected void doOpen(File file) {
-        // Subclasses override
+        try {
+            byte[] data = java.nio.file.Files.readAllBytes(file.toPath());
+            deserializeState(data);
+            setStatus(i18n.get("status.opened"));
+        } catch (java.io.IOException e) {
+            showError(i18n.get("dialog.error.title"), "Error opening file: " + e.getMessage());
+        }
     }
 
     public void onSave() {
@@ -284,11 +306,28 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
     }
 
     protected void doSave(File file) {
-        // Subclasses override
+        byte[] data = serializeState();
+        if (data != null) {
+            try (java.io.FileOutputStream fos = new java.io.FileOutputStream(file)) {
+                fos.write(data);
+                setStatus(i18n.get("status.saved"));
+            } catch (java.io.IOException e) {
+                showError(i18n.get("dialog.error.title"), "Error saving file: " + e.getMessage());
+            }
+        }
+    }
+
+    /** Override to provide binary state for saving. */
+    protected byte[] serializeState() {
+        return null;
+    }
+
+    /** Override to restore state from binary data. */
+    protected void deserializeState(byte[] data) {
     }
 
     protected void configureFileChooser(FileChooser chooser) {
-        // Subclasses can add extensions
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JScience App Data", "*.jsand"));
     }
 
     public void onExport(String format) {
@@ -338,9 +377,11 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
     // ===== Edit Operations =====
 
     public void onUndo() {
+        undoManager.undo();
     }
 
     public void onRedo() {
+        undoManager.redo();
     }
 
     public void onFind() {
@@ -418,9 +459,28 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
     // ===== Help =====
 
     public void onShowDocumentation() {
+        HelpDialog dialog = new HelpDialog(i18n.get("menu.help.documentation"));
+        dialog.addTopic("General", i18n.get("menu.help.documentation"),
+                "Documentation for " + getAppTitle() + ".\n\n(No specific documentation provided for this app yet.)",
+                null);
+        addAppHelpTopics(dialog);
+        dialog.showAndWait();
     }
 
     public void onShowTutorials() {
+        HelpDialog dialog = new HelpDialog(i18n.get("menu.help.tutorials"));
+        dialog.addTopic("General", "Getting Started",
+                "Welcome to " + getAppTitle() + "!\n\nUse the toolbar to control the simulation.", null);
+        addAppTutorials(dialog);
+        dialog.showAndWait();
+    }
+
+    protected void addAppHelpTopics(HelpDialog dialog) {
+        // Subclasses override
+    }
+
+    protected void addAppTutorials(HelpDialog dialog) {
+        // Subclasses override
     }
 
     public void onShowAbout() {
@@ -450,5 +510,9 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
         alert.setTitle(title);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    protected void setSimulationControlsVisible(boolean visible) {
+        this.simulationControlsVisible.set(visible);
     }
 }

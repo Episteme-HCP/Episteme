@@ -422,6 +422,83 @@ public class SmartGridApp extends FeaturedAppBase {
             loop.stop();
     }
 
+    @Override
+    protected void doNew() {
+        onRun(); // Resets simulation logic
+    }
+
+    @Override
+    protected void addAppHelpTopics(org.jscience.apps.framework.HelpDialog dialog) {
+        dialog.addTopic("Engineering", "Smart Grid Concepts",
+                "Understand the power grid:\n\n" +
+                        "Ã¢â‚¬Â¢ **Supply vs Demand**: Grid frequency deviates when supply != demand.\n" +
+                        "Ã¢â‚¬Â¢ **Frequency**: Must stay near 50Hz. <48Hz risks blackout.\n" +
+                        "Ã¢â‚¬Â¢ **Renewables**: Intermittent power sources (Wind/Solar) require backup or storage.\n" +
+                        "Ã¢â‚¬Â¢ **Battery Storage**: Absorbs excess power and releases it during deficits.",
+                null);
+    }
+
+    @Override
+    protected void addAppTutorials(org.jscience.apps.framework.HelpDialog dialog) {
+        dialog.addTopic("Tutorial", "Balancing the Grid",
+                "1. **Monitor Frequency**: Keep the frequency gauge near 50Hz (Green Zone).\n" +
+                        "2. **Adjust Supply**: Use sliders to increase Coal, Wind, or Solar output to match Demand.\n" +
+                        "3. **Watch Batteries**: Batteries buffer small fluctuations but have limited capacity.\n" +
+                        "4. **Avoid Blackouts**: If frequency drops below 48Hz or spikes above 52Hz, the grid trips.\n"
+                        +
+                        "5. **Reset**: Use the Reset button to restart after a blackout.",
+                null);
+    }
+
+    @Override
+    protected byte[] serializeState() {
+        java.util.Properties props = new java.util.Properties();
+        props.setProperty("time", String.valueOf(time));
+        props.setProperty("coal", String.valueOf(coalOutputSlider.getValue()));
+        props.setProperty("wind", String.valueOf(windCapacitySlider.getValue()));
+        props.setProperty("solar", String.valueOf(solarCapacitySlider.getValue()));
+        props.setProperty("demand", String.valueOf(demandScaleSlider.getValue()));
+        props.setProperty("batteryCharge", String.valueOf(batteryCharge));
+        props.setProperty("frequency", String.valueOf(gridFrequency));
+        props.setProperty("blackout", String.valueOf(blackout));
+
+        java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+        try {
+            props.store(baos, "Smart Grid State");
+            return baos.toByteArray();
+        } catch (java.io.IOException e) {
+            return null;
+        }
+    }
+
+    @Override
+    protected void deserializeState(byte[] data) {
+        java.util.Properties props = new java.util.Properties();
+        try {
+            props.load(new java.io.ByteArrayInputStream(data));
+
+            time = Double.parseDouble(props.getProperty("time", "0"));
+            coalOutputSlider.setValue(Double.parseDouble(props.getProperty("coal", "500")));
+            windCapacitySlider.setValue(Double.parseDouble(props.getProperty("wind", "100")));
+            solarCapacitySlider.setValue(Double.parseDouble(props.getProperty("solar", "100")));
+            demandScaleSlider.setValue(Double.parseDouble(props.getProperty("demand", "100")));
+            batteryCharge = Double.parseDouble(props.getProperty("batteryCharge", "100"));
+            gridFrequency = Double.parseDouble(props.getProperty("frequency", "50"));
+            blackout = Boolean.parseBoolean(props.getProperty("blackout", "false"));
+
+            // Refresh UI
+            supplySeries.getData().clear();
+            demandSeries.getData().clear();
+            if (!blackout) {
+                onRun();
+            } else {
+                triggerBlackout("Restored from file");
+            }
+        } catch (Exception e) {
+            showError("Load Error", "Failed to restore state: " + e.getMessage());
+        }
+    }
+
     public static void main(String[] args) {
         launch(args);
     }

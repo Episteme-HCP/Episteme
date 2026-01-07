@@ -565,6 +565,84 @@ public class CrystalStructureApp extends FeaturedAppBase {
         return line;
     }
 
+    @Override
+    protected void doNew() {
+        if (latticeCombo != null) {
+            latticeCombo.setValue(LatticeType.DIAMOND);
+        }
+        if (root3D != null) {
+            loadStructure(LatticeType.DIAMOND);
+        }
+    }
+
+    @Override
+    protected void addAppHelpTopics(org.jscience.apps.framework.HelpDialog dialog) {
+        dialog.addTopic("Structures", "Lattice Types",
+                "Explore various crystal lattice structures:\n\n" +
+                        "Ã¢â‚¬Â¢ **Simple Cubic (SC)**: Simplest repeating unit (e.g. Polonium).\n" +
+                        "Ã¢â‚¬Â¢ **Body-Centered Cubic (BCC)**: Atoms at corners and center (e.g. Iron).\n" +
+                        "Ã¢â‚¬Â¢ **Face-Centered Cubic (FCC)**: Atoms at corners and faces (e.g. Copper).\n" +
+                        "Ã¢â‚¬Â¢ **Diamond**: Tetrahedral coordination (e.g. Carbon).\n" +
+                        "Ã¢â‚¬Â¢ **NaCl**: Rock salt structure.\n" +
+                        "Ã¢â‚¬Â¢ **CsCl**: Cesium Chloride structure.",
+                null);
+    }
+
+    @Override
+    protected void addAppTutorials(org.jscience.apps.framework.HelpDialog dialog) {
+        dialog.addTopic("Tutorial", "Navigating 3D Space",
+                "1. **Rotate**: Drag with the mouse to rotate the crystal structure.\n" +
+                        "2. **Zoom**: Use the scroll wheel to zoom in and out.\n" +
+                        "3. **Select Structure**: Use the dropdown menu to switch between lattice types.\n" +
+                        "4. **Toggles**: Show/Hide Atoms, Bonds, or Unit Cell outlines.\n" +
+                        "5. **Load CIF**: Import custom .cif files for advanced visualization.",
+                null);
+    }
+
+    @Override
+    protected byte[] serializeState() {
+        java.util.Properties props = new java.util.Properties();
+        if (latticeCombo.getValue() != null) {
+            props.setProperty("lattice", latticeCombo.getValue().name());
+        }
+        props.setProperty("showAtoms", String.valueOf(showAtoms.isSelected()));
+        props.setProperty("showBonds", String.valueOf(showBonds.isSelected()));
+        props.setProperty("showUnitCell", String.valueOf(showUnitCell.isSelected()));
+        props.setProperty("rotateX", String.valueOf(rotateXSlider.getValue()));
+        props.setProperty("rotateY", String.valueOf(rotateYSlider.getValue()));
+
+        java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+        try {
+            props.store(baos, "Crystal State");
+            return baos.toByteArray();
+        } catch (java.io.IOException e) {
+            return null;
+        }
+    }
+
+    @Override
+    protected void deserializeState(byte[] data) {
+        java.util.Properties props = new java.util.Properties();
+        try {
+            props.load(new java.io.ByteArrayInputStream(data));
+
+            String latticeName = props.getProperty("lattice");
+            if (latticeName != null) {
+                latticeCombo.setValue(LatticeType.valueOf(latticeName));
+            }
+
+            showAtoms.setSelected(Boolean.parseBoolean(props.getProperty("showAtoms", "true")));
+            showBonds.setSelected(Boolean.parseBoolean(props.getProperty("showBonds", "true")));
+            showUnitCell.setSelected(Boolean.parseBoolean(props.getProperty("showUnitCell", "true")));
+            rotateXSlider.setValue(Double.parseDouble(props.getProperty("rotateX", "0")));
+            rotateYSlider.setValue(Double.parseDouble(props.getProperty("rotateY", "0")));
+
+            loadStructure(latticeCombo.getValue());
+        } catch (Exception e) {
+            showError("Load Error", "Failed to restore state: " + e.getMessage());
+        }
+    }
+
     public static void main(String[] args) {
         launch(args);
     }

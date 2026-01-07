@@ -83,6 +83,7 @@ public class TitrationApp extends FeaturedAppBase {
     private Label volumeLabel;
     private Slider valveSlider;
     private ComboBox<Indicator> indicatorSelector;
+    private ComboBox<AcidType> acidSelector;
     private Color indicatorColor = Color.TRANSPARENT;
 
     // Indicators with their pH ranges and colors
@@ -191,7 +192,7 @@ public class TitrationApp extends FeaturedAppBase {
         resetButton.setOnAction(e -> reset());
 
         // Acid type selector for multi-protic acids
-        ComboBox<AcidType> acidSelector = new ComboBox<>();
+        acidSelector = new ComboBox<>();
         acidSelector.getItems().addAll(AcidType.values());
         acidSelector.setValue(AcidType.HCL);
         acidSelector.setMaxWidth(Double.MAX_VALUE);
@@ -401,6 +402,86 @@ public class TitrationApp extends FeaturedAppBase {
         phSeries.getData().clear();
         calculatePH();
         valveSlider.setValue(0);
+    }
+
+    @Override
+    protected void doNew() {
+        reset();
+    }
+
+    @Override
+    protected void addAppHelpTopics(org.jscience.apps.framework.HelpDialog dialog) {
+        dialog.addTopic("Chemistry", "Acid-Base Titration",
+                "Simulate titration experiments:\n\n" +
+                        "Ã¢â‚¬Â¢ **Titration**: Determining concentration of an acid by neutralizing it with a base of known concentration.\n"
+                        +
+                        "Ã¢â‚¬Â¢ **Equivalence Point**: Where moles of acid equals moles of base (adjusted for stoichiometry).\n"
+                        +
+                        "Ã¢â‚¬Â¢ **Indicators**: Change color at specific pH ranges to visually signal the end point.\n"
+                        +
+                        "Ã¢â‚¬Â¢ **pH Curve**: Shows the change in pH as titrant is added.",
+                null);
+    }
+
+    @Override
+    protected void addAppTutorials(org.jscience.apps.framework.HelpDialog dialog) {
+        dialog.addTopic("Tutorial", "Performing a Titration",
+                "1. **Select Acid**: Choose the acid type (e.g., HCl, H2SO4).\n" +
+                        "2. **Select Indicator**: Choose an appropriate indicator for the expected pH change.\n" +
+                        "3. **Open Valve**: Move the slider to start adding the base titrant.\n" +
+                        "4. **Observe**: Watch the beaker color and the pH curve.\n" +
+                        "5. **Stop**: Close the valve when the color changes permanently.",
+                null);
+    }
+
+    @Override
+    protected byte[] serializeState() {
+        java.util.Properties props = new java.util.Properties();
+        props.setProperty("volumeBaseAdded", String.valueOf(volumeBaseAdded));
+        if (selectedAcid != null) {
+            props.setProperty("acid", selectedAcid.name());
+        }
+        if (indicatorSelector.getValue() != null) {
+            props.setProperty("indicator", indicatorSelector.getValue().name());
+        }
+        props.setProperty("valve", String.valueOf(valveSlider.getValue()));
+
+        java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+        try {
+            props.store(baos, "Titration State");
+            return baos.toByteArray();
+        } catch (java.io.IOException e) {
+            return null;
+        }
+    }
+
+    @Override
+    protected void deserializeState(byte[] data) {
+        java.util.Properties props = new java.util.Properties();
+        try {
+            props.load(new java.io.ByteArrayInputStream(data));
+
+            volumeBaseAdded = Double.parseDouble(props.getProperty("volumeBaseAdded", "0"));
+
+            String acidName = props.getProperty("acid");
+            if (acidName != null) {
+                acidSelector.setValue(AcidType.valueOf(acidName));
+                selectedAcid = acidSelector.getValue();
+            }
+
+            String indName = props.getProperty("indicator");
+            if (indName != null) {
+                indicatorSelector.setValue(Indicator.valueOf(indName));
+            }
+
+            valveSlider.setValue(Double.parseDouble(props.getProperty("valve", "0")));
+
+            // Refresh plot
+            phSeries.getData().clear();
+            calculatePH();
+        } catch (Exception e) {
+            showError("Load Error", "Failed to restore state: " + e.getMessage());
+        }
     }
 
     public static void main(String[] args) {

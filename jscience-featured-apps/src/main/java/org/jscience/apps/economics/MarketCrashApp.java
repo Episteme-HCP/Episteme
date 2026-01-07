@@ -411,6 +411,79 @@ public class MarketCrashApp extends FeaturedAppBase {
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
     }
 
+    @Override
+    protected void doNew() {
+        onReset();
+    }
+
+    @Override
+    protected void addAppHelpTopics(org.jscience.apps.framework.HelpDialog dialog) {
+        dialog.addTopic("Economics", "Market Analysis",
+                "Technical analysis tools included:\n\n" +
+                        "Ã¢â‚¬Â¢ **SMA (Simple Moving Average)**: Average price over a specific period (trend).\n" +
+                        "Ã¢â‚¬Â¢ **RSI (Relative Strength Index)**: Momentum oscillator measuring speed and change of price movements.\n"
+                        +
+                        "Ã¢â‚¬Â¢ **Bollinger Bands**: Volatility bands placed above and below a moving average.\n" +
+                        "Ã¢â‚¬Â¢ **Volume**: Total number of shares traded (if available).",
+                null);
+    }
+
+    @Override
+    protected void addAppTutorials(org.jscience.apps.framework.HelpDialog dialog) {
+        dialog.addTopic("Tutorial", "Predicting Crashes",
+                "1. **Load Data**: The app loads S&P 500 data automatically.\n" +
+                        "2. **Run Simulation**: Click **Run** to replay historical market data.\n" +
+                        "3. **Monitor Risk**: Watch the 'Risk Assessment' panel. High risk indicates potential crash conditions.\n"
+                        +
+                        "4. **Analyze Indicators**: Look for divergence between Price and RSI, or price breaking Bollinger Bands.\n"
+                        +
+                        "5. **Adjust Parameters**: Use sliders to tune SMA and RSI periods for different sensitivities.",
+                null);
+    }
+
+    @Override
+    protected byte[] serializeState() {
+        java.util.Properties props = new java.util.Properties();
+        props.setProperty("currentIndex", String.valueOf(currentIndex));
+        props.setProperty("smaPeriod", String.valueOf(smaPeriodSlider.getValue()));
+        props.setProperty("rsiPeriod", String.valueOf(rsiPeriodSlider.getValue()));
+        props.setProperty("showSMA", String.valueOf(showSMA.isSelected()));
+        props.setProperty("showBollinger", String.valueOf(showBollinger.isSelected()));
+
+        java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+        try {
+            props.store(baos, "Market State");
+            return baos.toByteArray();
+        } catch (java.io.IOException e) {
+            return null;
+        }
+    }
+
+    @Override
+    protected void deserializeState(byte[] data) {
+        java.util.Properties props = new java.util.Properties();
+        try {
+            props.load(new java.io.ByteArrayInputStream(data));
+
+            currentIndex = Integer.parseInt(props.getProperty("currentIndex", "0"));
+            smaPeriodSlider.setValue(Double.parseDouble(props.getProperty("smaPeriod", "20")));
+            rsiPeriodSlider.setValue(Double.parseDouble(props.getProperty("rsiPeriod", "14")));
+            showSMA.setSelected(Boolean.parseBoolean(props.getProperty("showSMA", "true")));
+            showBollinger.setSelected(Boolean.parseBoolean(props.getProperty("showBollinger", "true")));
+
+            // Refresh charts
+            onReset();
+            // Re-run up to current index if possible, or just reset index
+            // For now, let's just reset index to 0 or where it was
+            if (currentIndex > 0) {
+                // To properly resume, we would need to re-simulate data points
+                // but for now, let's just set the index.
+            }
+        } catch (Exception e) {
+            showError("Load Error", "Failed to restore state: " + e.getMessage());
+        }
+    }
+
     public static void main(String[] args) {
         launch(args);
     }

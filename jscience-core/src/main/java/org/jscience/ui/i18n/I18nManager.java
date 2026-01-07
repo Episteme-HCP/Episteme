@@ -26,6 +26,8 @@ package org.jscience.ui.i18n;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.jscience.ui.ThemeManager;
+
 /**
  * Internationalization Manager for JScience Killer Apps.
  * Provides multi-language support via ResourceBundle.
@@ -36,12 +38,16 @@ import java.util.ResourceBundle;
  */
 public final class I18nManager {
 
-    private static final String BUNDLE_BASE = "org.jscience.apps.i18n.messages_apps";
     private static I18nManager instance;
-    private ResourceBundle bundle;
+    // List to store multiple bundles (Core, Apps, etc.) - newer added first for
+    // override priority
+    private final java.util.List<ResourceBundle> bundles = new java.util.ArrayList<>();
+    private final java.util.List<String> bundleNames = new java.util.ArrayList<>();
     private Locale currentLocale;
 
     private I18nManager() {
+        // Always load core bundle first
+        addBundle("org.jscience.ui.i18n.messages_core");
         setLocale(Locale.getDefault());
     }
 
@@ -53,20 +59,38 @@ public final class I18nManager {
     }
 
     /**
-     * Sets the current locale and reloads the resource bundle.
+     * Registers a new resource bundle base name.
+     */
+    public void addBundle(String baseName) {
+        if (!bundleNames.contains(baseName)) {
+            bundleNames.add(0, baseName); // Add to front for priority
+            reloadBundles();
+        }
+    }
+
+    /**
+     * Sets the current locale and reloads all resource bundles.
      */
     public void setLocale(Locale locale) {
         this.currentLocale = locale;
-        try {
-            this.bundle = ResourceBundle.getBundle(BUNDLE_BASE, locale);
-        } catch (Exception e) {
-            // Fallback to English
+        ThemeManager.getInstance().notifyLocaleChange(locale); // Notify theme/UI if needed
+        reloadBundles();
+    }
+
+    private void reloadBundles() {
+        bundles.clear();
+        for (String baseName : bundleNames) {
             try {
-                this.bundle = ResourceBundle.getBundle(BUNDLE_BASE, Locale.ENGLISH);
-            } catch (Exception ex) {
-                // If even English fails, we might mock it or leave bundle null (bad practice
-                // but avoids crash loop?)
-                // Ideally we should have a dummy bundle
+                ResourceBundle rb = ResourceBundle.getBundle(baseName, currentLocale);
+                bundles.add(rb);
+            } catch (Exception e) {
+                // Fallback to English
+                try {
+                    ResourceBundle rb = ResourceBundle.getBundle(baseName, Locale.ENGLISH);
+                    bundles.add(rb);
+                } catch (Exception ex) {
+                    System.err.println("Could not load bundle: " + baseName);
+                }
             }
         }
     }
@@ -75,13 +99,12 @@ public final class I18nManager {
      * Gets a localized string by key.
      */
     public String get(String key) {
-        if (bundle == null)
-            return "!" + key + "!";
-        try {
-            return bundle.getString(key);
-        } catch (Exception e) {
-            return "!" + key + "!"; // Missing translation marker
+        for (ResourceBundle bundle : bundles) {
+            if (bundle.containsKey(key)) {
+                return bundle.getString(key);
+            }
         }
+        return "!" + key + "!";
     }
 
     /**

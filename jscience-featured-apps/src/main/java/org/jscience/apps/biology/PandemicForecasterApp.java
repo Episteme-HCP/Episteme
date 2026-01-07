@@ -493,6 +493,91 @@ public class PandemicForecasterApp extends FeaturedAppBase {
         return String.valueOf(num);
     }
 
+    @Override
+    protected void doNew() {
+        onReset();
+    }
+
+    @Override
+    protected void addAppHelpTopics(org.jscience.apps.framework.HelpDialog dialog) {
+        dialog.addTopic("Scientific Model", "SEIR Model",
+                "This application uses the **SEIR** compartmental model:\n\n" +
+                        "Ã¢â‚¬Â¢ **S**usceptible: Individuals who can catch the disease.\n" +
+                        "Ã¢â‚¬Â¢ **E**xposed: Infected but not yet infectious (incubation).\n" +
+                        "Ã¢â‚¬Â¢ **I**nfectious: Can spread the disease to Susceptibles.\n" +
+                        "Ã¢â‚¬Â¢ **R**ecovered: Immune or recovered.\n" +
+                        "Ã¢â‚¬Â¢ **D**eceased: Died from the disease.\n\n" +
+                        "Parameters:\n" +
+                        "Ã¢â‚¬Â¢ **Beta**: Transmission rate.\n" +
+                        "Ã¢â‚¬Â¢ **Sigma**: Incubation rate (1/incubation period).\n" +
+                        "Ã¢â‚¬Â¢ **Gamma**: Recovery rate (1/infectious period).\n" +
+                        "Ã¢â‚¬Â¢ **Mu**: Mortality rate.",
+                null);
+    }
+
+    @Override
+    protected void addAppTutorials(org.jscience.apps.framework.HelpDialog dialog) {
+        dialog.addTopic("Tutorial", "Running a Simulation",
+                "1. Select a **Country** from the dropdown.\n" +
+                        "2. Adjust the parameters (Transmission, Incubation, etc.) to match the disease characteristics.\n"
+                        +
+                        "3. Click **Run** in the toolbar to start.\n" +
+                        "4. Use **Pause** to freeze the simulation.\n" +
+                        "5. **Export** the data to CSV via the File menu for further analysis.",
+                null);
+    }
+
+    @Override
+    protected byte[] serializeState() {
+        java.util.Properties props = new java.util.Properties();
+        if (countrySelector.getValue() != null) {
+            props.setProperty("country", countrySelector.getValue().getName()); // Use name as ID for simplicity
+        }
+        props.setProperty("beta", String.valueOf(betaSlider.getValue()));
+        props.setProperty("sigma", String.valueOf(sigmaSlider.getValue()));
+        props.setProperty("gamma", String.valueOf(gammaSlider.getValue()));
+        props.setProperty("mu", String.valueOf(muSlider.getValue()));
+        props.setProperty("initial", String.valueOf(initialSlider.getValue()));
+        props.setProperty("days", String.valueOf(daysSlider.getValue()));
+
+        java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+        try {
+            props.store(baos, "Pandemic State");
+            return baos.toByteArray();
+        } catch (java.io.IOException e) {
+            return null;
+        }
+    }
+
+    @Override
+    protected void deserializeState(byte[] data) {
+        java.util.Properties props = new java.util.Properties();
+        try {
+            props.load(new java.io.ByteArrayInputStream(data));
+
+            String countryName = props.getProperty("country");
+            if (countryName != null) {
+                for (Country c : countrySelector.getItems()) {
+                    if (c.getName().equals(countryName)) {
+                        countrySelector.setValue(c);
+                        break;
+                    }
+                }
+            }
+
+            betaSlider.setValue(Double.parseDouble(props.getProperty("beta", "0.5")));
+            sigmaSlider.setValue(Double.parseDouble(props.getProperty("sigma", "0.2")));
+            gammaSlider.setValue(Double.parseDouble(props.getProperty("gamma", "0.1")));
+            muSlider.setValue(Double.parseDouble(props.getProperty("mu", "0.01")));
+            initialSlider.setValue(Double.parseDouble(props.getProperty("initial", "1")));
+            daysSlider.setValue(Double.parseDouble(props.getProperty("days", "180")));
+
+            onReset(); // Prepare for new run with these params
+        } catch (Exception e) {
+            showError("Load Error", "Failed to restore state: " + e.getMessage());
+        }
+    }
+
     public static void main(String[] args) {
         launch(args);
     }

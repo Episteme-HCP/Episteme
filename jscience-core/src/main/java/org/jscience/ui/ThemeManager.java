@@ -96,6 +96,11 @@ public class ThemeManager {
             scene.getRoot().setStyle("");
         }
     }
+
+    /**
+     * Called when the locale changes.
+     */
+    public void notifyLocaleChange(java.util.Locale locale) {
+        // Implementation can be added if locale affects theme (e.g. text direction)
+    }
 }
-
-
