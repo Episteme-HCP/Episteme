@@ -33,6 +33,8 @@ import javafx.stage.Stage;
 import org.jscience.JScience;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.ui.plotting.PlottingBackend;
+import org.jscience.technical.backend.BackendDiscovery;
+import org.jscience.technical.backend.BackendProvider;
 import org.jscience.io.ResourceIO;
 
 import java.util.Locale;
@@ -508,23 +510,17 @@ public class JScienceMasterControl extends Application {
                 new LibInfo("jsr385", true),
                 new LibInfo("indriya", isClassAvailable("tech.units.indriya.format.SimpleUnitFormat"))), i18n));
 
-        content.getChildren().add(createLibCategory(i18n, "math", List.of(
-                new LibInfo("commonsmath", isClassAvailable("org.apache.commons.math3.util.Precision")),
-                new LibInfo("ejml", isClassAvailable("org.ejml.EjmlParameters")),
-                new LibInfo("colt", isClassAvailable("cern.colt.Version")),
-                new LibInfo("jblas", isClassAvailable("org.jblas.NativeBlas")),
-                new LibInfo("jsci_core", true)), i18n));
+        // Mathematics & Algorithms - uses SPI
+        content.getChildren().add(createMathCategory(i18n));
 
-        content.getChildren().add(createLibCategory(i18n, "hardware", List.of(
-                new LibInfo("jcuda", JScience.isCudaAvailable()),
-                new LibInfo("jocl", JScience.isOpenCLAvailable()),
-                new LibInfo("nd4j", JScience.isND4JAvailable())), i18n));
+        // Hardware Acceleration & Tensors - uses SPI
+        content.getChildren().add(createTensorCategory(i18n));
 
-        content.getChildren().add(createLibCategory(i18n, "vis", List.of(
-                new LibInfo("xchart", isClassAvailable("org.knowm.xchart.XYChart")),
-                new LibInfo("jzy3d", isClassAvailable("org.jzy3d.chart.Chart")), // Added Jzy3d
-                new LibInfo("jfreechart", isClassAvailable("org.jfree.chart.JFreeChart")),
-                new LibInfo("javafx", isClassAvailable("javafx.application.Application"))), i18n));
+        // Visualization & Plotting - uses SPI discovery
+        content.getChildren().add(createPlottingCategory(i18n));
+
+        // Molecular Viewing - uses SPI discovery
+        content.getChildren().add(createMolecularCategory(i18n));
 
         content.getChildren().add(createLibCategory(i18n, "framework", List.of(
                 new LibInfo("javalin", isClassAvailable("io.javalin.Javalin")),
@@ -583,6 +579,91 @@ public class JScienceMasterControl extends Application {
 
         grid.addRow(row, nameLabel, statusLabel, descLabel);
     }
+
+    private VBox createMathCategory(I18n i18n) {
+        return createBackendCategory(i18n, BackendDiscovery.TYPE_MATH,
+                i18n.get("mastercontrol.libraries.cat.math", "Mathematics & Algorithms"),
+                i18n.get("mastercontrol.libraries.cat.math.desc", "Mathematical engines and algorithm providers."));
+    }
+
+    private VBox createTensorCategory(I18n i18n) {
+        return createBackendCategory(i18n, BackendDiscovery.TYPE_TENSOR,
+                i18n.get("mastercontrol.libraries.cat.hardware", "Hardware Acceleration & Tensors"),
+                i18n.get("mastercontrol.libraries.cat.hardware.desc",
+                        "GPU and hardware-accelerated tensor computation backends."));
+    }
+
+    /**
+     * Creates the Visualization & Plotting category using SPI discovery.
+     */
+    private VBox createPlottingCategory(I18n i18n) {
+        return createBackendCategory(i18n, BackendDiscovery.TYPE_PLOTTING,
+                i18n.get("mastercontrol.libraries.cat.vis", "Visualization & Plotting"),
+                i18n.get("mastercontrol.libraries.cat.vis.desc", "Graphics, charting and plotting backends."));
+    }
+
+    /**
+     * Creates the Molecular Viewing category using SPI discovery.
+     */
+    private VBox createMolecularCategory(I18n i18n) {
+        return createBackendCategory(i18n, BackendDiscovery.TYPE_MOLECULAR,
+                i18n.get("mastercontrol.libraries.cat.molecular", "Molecular Viewing"),
+                i18n.get("mastercontrol.libraries.cat.molecular.desc",
+                        "3D molecular visualization backends for chemistry applications."));
+    }
+
+    /**
+     * Reusable method to create a category from discovered SPI backends.
+     */
+    private VBox createBackendCategory(I18n i18n, String type, String title, String description) {
+        VBox box = new VBox(12);
+        Label header = new Label(title);
+        header.getStyleClass().add("header-title");
+
+        Label desc = new Label(description);
+        desc.getStyleClass().add("mastercontrol-description");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(35);
+        grid.setVgap(12);
+
+        List<BackendProvider> providers = BackendDiscovery.getInstance().getProvidersByType(type);
+
+        int r = 0;
+        for (BackendProvider provider : providers) {
+            String name = i18n.get("lib." + provider.getId() + ".name", provider.getName());
+            String providerDesc = i18n.get("lib." + provider.getId() + ".desc", provider.getDescription());
+            boolean available = provider.isAvailable();
+
+            Label nameLabel = new Label(name);
+            nameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: black;");
+
+            Label descLabel = new Label(providerDesc);
+            descLabel.getStyleClass().add("mastercontrol-description");
+            descLabel.setWrapText(true);
+            descLabel.setMaxWidth(500);
+
+            Label statusLabel = new Label(available
+                    ? i18n.get("mastercontrol.libraries.available", "Available")
+                    : i18n.get("mastercontrol.libraries.not_available", "Not Available"));
+            statusLabel.setStyle("-fx-text-fill: " + (available ? "#27ae60" : "#c0392b") + "; -fx-font-weight: bold;");
+
+            grid.addRow(r++, nameLabel, statusLabel, descLabel);
+        }
+
+        if (providers.isEmpty()) {
+            Label noProviders = new Label("No " + type + " backends discovered.");
+            noProviders.setStyle("-fx-font-style: italic;");
+            grid.add(noProviders, 0, 0);
+        }
+
+        box.getChildren().addAll(header, desc, grid, new Separator());
+        return box;
+    }
+
+    /**
+     * Creates the Molecular Viewing category using SPI discovery.
+     */
 
     private Tab createLoadersTab(I18n i18n) {
         VBox content = new VBox(20);

@@ -1,0 +1,19 @@
+# Plotting Backend Providers
+org.jscience.ui.plotting.backends.JavaFXPlot2DBackendProvider
+org.jscience.ui.plotting.backends.JavaFXPlot3DBackendProvider
+org.jscience.ui.plotting.backends.XChartPlot2DBackendProvider
+org.jscience.ui.plotting.backends.JFreeChartPlot2DBackendProvider
+org.jscience.ui.plotting.backends.Jzy3dPlot3DBackendProvider
+
+# Unified Technical Backend (Math & Tensors)
+org.jscience.technical.backend.JScienceMathBackendProvider
+org.jscience.technical.backend.EJMLBackendProvider
+org.jscience.technical.backend.JBlasBackendProvider
+org.jscience.technical.backend.CommonsMathBackendProvider
+org.jscience.technical.backend.ColtBackendProvider
+org.jscience.technical.backend.ND4JBackendProvider
+
+# High-Performance Compute Backends (Implementing BackendProvider directly)
+org.jscience.technical.backend.cpu.CPUBackend
+org.jscience.technical.backend.cuda.CUDABackend
+org.jscience.technical.backend.opencl.OpenCLBackend

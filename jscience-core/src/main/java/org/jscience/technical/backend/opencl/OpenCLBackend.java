@@ -101,8 +101,18 @@ public class OpenCLBackend implements ComputeBackend {
     }
 
     @Override
+    public String getId() {
+        return "opencl";
+    }
+
+    @Override
     public String getName() {
         return "GPU (OpenCL)";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Cross-platform hardware acceleration via OpenCL for heterogeneous computing.";
     }
 
     @Override

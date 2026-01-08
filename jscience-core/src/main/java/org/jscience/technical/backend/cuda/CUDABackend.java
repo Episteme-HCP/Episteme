@@ -54,8 +54,18 @@ public class CUDABackend implements ComputeBackend {
     }
 
     @Override
+    public String getId() {
+        return "cuda";
+    }
+
+    @Override
     public String getName() {
         return "GPU (CUDA)";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Hardware acceleration via NVIDIA CUDA cores for high-performance computing.";
     }
 
     @Override

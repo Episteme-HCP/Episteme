@@ -1,0 +1,5 @@
+# Molecular Backend Providers
+org.jscience.ui.viewers.chemistry.backend.JavaFXMolecularBackendProvider
+org.jscience.ui.viewers.chemistry.backend.JmolMolecularBackendProvider
+org.jscience.ui.viewers.chemistry.backend.PyMOLMolecularBackendProvider
+org.jscience.ui.viewers.chemistry.backend.VMDMolecularBackendProvider
