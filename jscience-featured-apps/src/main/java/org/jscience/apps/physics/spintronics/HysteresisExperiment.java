@@ -27,8 +27,6 @@ public class HysteresisExperiment {
         // We use a simplified Stoner-Wohlfarth model for hysteresis here
         // or just solve LLG equilibrium at each step
 
-        FerromagneticLayer free = valve.getFreeLayer();
-
         // Forward Sweep
         for (double h = hMin; h <= hMax; h += step) {
             Real r = solveEquilibriumResistance(valve, h);

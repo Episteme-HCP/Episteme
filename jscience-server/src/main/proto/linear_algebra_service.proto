@@ -7,12 +7,39 @@ option java_package = "org.jscience.server.proto";
 option java_outer_classname = "LinearAlgebraServiceProto";
 
 service MatrixService {
+  // Matrix operations
   rpc MatrixMultiply (MatrixRequest) returns (MatrixResponse);
+  rpc MatrixAdd (MatrixRequest) returns (MatrixResponse);
+  rpc MatrixSubtract (MatrixRequest) returns (MatrixResponse);
+  rpc MatrixTranspose (SingleMatrixRequest) returns (MatrixResponse);
+  rpc MatrixInverse (SingleMatrixRequest) returns (MatrixResponse);
+  rpc MatrixScale (ScaleRequest) returns (MatrixResponse);
+  rpc MatrixDeterminant (SingleMatrixRequest) returns (ScalarResponse);
+  
+  // Vector operations
+  rpc VectorAdd (VectorRequest) returns (VectorResponse);
+  rpc VectorSubtract (VectorRequest) returns (VectorResponse);
+  rpc VectorScale (VectorScaleRequest) returns (VectorResponse);
+  rpc VectorDot (VectorRequest) returns (ScalarResponse);
+  rpc VectorNorm (SingleVectorRequest) returns (ScalarResponse);
+  
+  // Matrix-Vector operations
+  rpc MatrixVectorMultiply (MatrixVectorRequest) returns (VectorResponse);
+  rpc LinearSolve (MatrixVectorRequest) returns (VectorResponse);
 }
 
 message MatrixRequest {
   MatrixData matrix_a = 1;
   MatrixData matrix_b = 2;
+}
+
+message SingleMatrixRequest {
+  MatrixData matrix = 1;
+}
+
+message ScaleRequest {
+  double scalar = 1;
+  MatrixData matrix = 2;
 }
 
 message MatrixResponse {
@@ -23,4 +50,36 @@ message MatrixData {
   int32 rows = 1;
   int32 cols = 2;
   repeated double data = 3; // Row-major order
+}
+
+message VectorRequest {
+  VectorData vector_a = 1;
+  VectorData vector_b = 2;
+}
+
+message SingleVectorRequest {
+  VectorData vector = 1;
+}
+
+message VectorScaleRequest {
+  VectorData vector = 1;
+  double scalar = 2;
+}
+
+message VectorResponse {
+  VectorData result = 1;
+}
+
+message VectorData {
+  int32 size = 1;
+  repeated double data = 2;
+}
+
+message MatrixVectorRequest {
+  MatrixData matrix = 1;
+  VectorData vector = 2;
+}
+
+message ScalarResponse {
+  double value = 1;
 }
