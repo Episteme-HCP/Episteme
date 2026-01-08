@@ -42,7 +42,7 @@ public class Spintronic3DRenderer {
         subScene.setCamera(camera);
 
         setupLights();
-        createLayers();
+        // Initial empty structure, wait for update
     }
 
     private void setupLights() {
@@ -54,28 +54,63 @@ public class Spintronic3DRenderer {
     }
 
     private void createLayers() {
-        pinnedBox = new Box(200, 40, 200);
-        pinnedBox.setTranslateY(-60);
-        pinnedBox.setMaterial(new PhongMaterial(Color.web("#34495e")));
+        // Group for layers to easily swap them
+        Group layerGroup = new Group();
+        root.getChildren().add(layerGroup);
+    }
 
+    public void rebuildStructure(SpinValve valve) {
+        root.getChildren().clear();
+        setupLights();
+
+        // --- Bottom Structure (Pinned / SAF) ---
+        if (valve.isSafEnabled()) {
+            // SAF Bottom (Pinned 1)
+            Box safari1 = new Box(200, 30, 200);
+            safari1.setTranslateY(-90);
+            safari1.setMaterial(new PhongMaterial(Color.web("#2c3e50"))); // Dark Blue
+
+            // SAF Spacer (Ru)
+            Box safariSpacer = new Box(200, 10, 200);
+            safariSpacer.setTranslateY(-70);
+            safariSpacer.setMaterial(new PhongMaterial(Color.web("#95a5a6"))); // Grey
+
+            // SAF Top (Pinned 2 - Reference)
+            Box safari2 = new Box(200, 30, 200);
+            safari2.setTranslateY(-50);
+            safari2.setMaterial(new PhongMaterial(Color.web("#34495e"))); // Blue
+
+            root.getChildren().addAll(safari1, safariSpacer, safari2);
+            pinnedBox = safari2; // For reference
+        } else {
+            // Simple Pinned
+            pinnedBox = new Box(200, 40, 200);
+            pinnedBox.setTranslateY(-60);
+            pinnedBox.setMaterial(new PhongMaterial(Color.web("#34495e")));
+            root.getChildren().add(pinnedBox);
+        }
+
+        // --- Main Spacer ---
         spacerBox = new Box(200, 20, 200);
-        spacerBox.setMaterial(new PhongMaterial(Color.web("#e67e22")));
+        spacerBox.setMaterial(new PhongMaterial(Color.web("#e67e22"))); // Copper color
 
+        // --- Free Layer ---
         freeBox = new Box(200, 40, 200);
         freeBox.setTranslateY(60);
-        freeBox.setMaterial(new PhongMaterial(Color.web("#c0392b")));
+        freeBox.setMaterial(new PhongMaterial(Color.web("#c0392b"))); // Red
 
+        // --- Arrows ---
         pinnedArrow = createArrow(Color.WHITE);
-        pinnedArrow.setTranslateY(-60);
+        pinnedArrow.setTranslateY(valve.isSafEnabled() ? -50 : -60);
         pinnedArrow.setTranslateZ(-110);
 
         freeArrow = createArrow(Color.YELLOW);
         freeArrow.setTranslateY(60);
         freeArrow.setTranslateZ(-110);
 
-        root.getChildren().addAll(pinnedBox, spacerBox, freeBox, pinnedArrow, freeArrow);
+        root.getChildren().addAll(spacerBox, freeBox, pinnedArrow, freeArrow);
 
-        // Interaction: Auto-rotate the whole structure slightly
+        // Interaction
         root.setRotationAxis(Rotate.Y_AXIS);
         root.setRotate(20);
     }

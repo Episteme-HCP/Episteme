@@ -15,8 +15,6 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import org.jscience.apps.framework.FeaturedAppBase;
 import org.jscience.mathematics.numbers.real.Real;
 
@@ -30,6 +28,10 @@ public class SpinValveApp extends FeaturedAppBase {
     private ComboBox<SpintronicMaterial> freeMaterialCombo;
     private Slider freeThicknessSlider;
     private Slider freeAngleSlider;
+    private Slider temperatureSlider;
+    private CheckBox safCheckBox;
+
+    private Canvas visualizationCanvas; // Still kept for 2D fallback or removed if full replacement
 
     private Canvas visualizationCanvas;
     private Label resistanceValueLabel;
@@ -44,6 +46,14 @@ public class SpinValveApp extends FeaturedAppBase {
     private Real gamma = Real.of(1.76e11); // Gyromagnetic ratio
     private LineChart<Number, Number> resistanceChart;
     private XYChart.Series<Number, Number> resistanceSeries;
+    
+    // STNO / RF Spectrum
+    private STNOAnalyzer stnoAnalyzer;
+    private LineChart<Number, Number> spectrumChart;
+    private XYChart.Series<Number, Number> spectrumSeries;
+    private Label peakFreqLabel;
+    private int frameCount = 0;
+    private static final int SPECTRUM_UPDATE_INTERVAL = 64; // Update spectrum every N frames
 
     @Override
     protected String getAppTitle() {
@@ -78,6 +88,31 @@ public class SpinValveApp extends FeaturedAppBase {
         chartTab.setContent(resistanceChart);
         tabPane.getTabs().add(chartTab);
 
+        // Tab 3: RF Spectrum (STNO Mode)
+        Tab spectrumTab = new Tab("RF Spectrum");
+        spectrumTab.setClosable(false);
+        VBox spectrumBox = new VBox(10);
+        spectrumBox.setPadding(new Insets(10));
+        
+        NumberAxis freqAxis = new NumberAxis(0, 20, 2); // 0-20 GHz
+        freqAxis.setLabel("Frequency (GHz)");
+        NumberAxis powerAxis = new NumberAxis();
+        powerAxis.setLabel("Power (a.u.)");
+        spectrumChart = new LineChart<>(freqAxis, powerAxis);
+        spectrumChart.setTitle("Magnetization RF Spectrum");
+        spectrumChart.setCreateSymbols(false);
+        spectrumChart.setAnimated(false);
+        spectrumSeries = new XYChart.Series<>();
+        spectrumSeries.setName("PSD");
+        spectrumChart.getData().add(spectrumSeries);
+        
+        peakFreqLabel = new Label("Peak: -- GHz");
+        peakFreqLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        
+        spectrumBox.getChildren().addAll(spectrumChart, peakFreqLabel);
+        spectrumTab.setContent(spectrumBox);
+        tabPane.getTabs().add(spectrumTab);
+
         centerPanel.getChildren().add(tabPane);
 
         VBox resultsBox = createResultsBox();
@@ -92,6 +127,10 @@ public class SpinValveApp extends FeaturedAppBase {
         FerromagneticLayer pinned = new FerromagneticLayer(SpintronicMaterial.COBALT, Real.of(5e-9), true);
         FerromagneticLayer free = new FerromagneticLayer(SpintronicMaterial.PERMALLOY, Real.of(5e-9), false);
         spinValve = new SpinValve(pinned, SpintronicMaterial.COPPER, Real.of(3e-9), free);
+        
+        // Initialize STNO Analyzer
+        // Buffer size 2048, sample rate = 1/dt = 1e12 Hz
+        stnoAnalyzer = new STNOAnalyzer(2048, currentStep.doubleValue());
     }
 
     private VBox createConfigPanel() {
@@ -124,14 +163,55 @@ public class SpinValveApp extends FeaturedAppBase {
         freeThicknessSlider.valueProperty().addListener((o, ov, nv) -> updateModel());
         freeAngleSlider.valueProperty().addListener((o, ov, nv) -> updateModel());
 
+        temperatureSlider = new Slider(0, 400, 300); // 0K to 400K, default 300K
+        temperatureSlider.setShowTickLabels(true);
+        temperatureSlider.setShowTickMarks(true);
+        temperatureSlider.valueProperty().addListener((o, ov, nv) -> updateModel()); // Add listener for temperature
+
+        safCheckBox = new CheckBox("Enable SAF (Co/Ru/Co)");
+        safCheckBox.setOnAction(e -> {
+            updateModelStructure(); // Full rebuild needed
+            updateModel();
+        });
+
+        Button hysteresisBtn = new Button("Run Hysteresis Loop");
+        hysteresisBtn.setMaxWidth(Double.MAX_VALUE);
+        hysteresisBtn.setOnAction(e -> runHysteresis());
+
         panel.getChildren().addAll(
                 new Label(i18n.get("spintronics.label.pinned_layer")), pinnedMaterialCombo, pinnedThicknessSlider,
+                safCheckBox,
                 new Separator(),
                 new Label(i18n.get("spintronics.label.spacer_layer")), spacerMaterialCombo, spacerThicknessSlider,
                 new Separator(),
                 new Label(i18n.get("spintronics.label.free_layer")), freeMaterialCombo, freeThicknessSlider,
-                new Label(i18n.get("spintronics.label.angle")), freeAngleSlider);
+                new Label(i18n.get("spintronics.label.angle")), freeAngleSlider,
+                new Separator(),
+                new Label("Temperature (K)"), temperatureSlider,
+                new Separator(),
+                hysteresisBtn);
         return panel;
+    }
+
+    // Split init into structure creation and parameter update
+    private void updateModelStructure() {
+        FerromagneticLayer pinned = new FerromagneticLayer(pinnedMaterialCombo.getValue(),
+                Real.of(pinnedThicknessSlider.getValue() * 1e-9), true);
+        FerromagneticLayer free = new FerromagneticLayer(freeMaterialCombo.getValue(),
+                Real.of(freeThicknessSlider.getValue() * 1e-9), false);
+
+        if (safCheckBox.isSelected()) {
+            // Create SAF: Pinned1 / Ru / Pinned2
+            FerromagneticLayer pinned1 = new FerromagneticLayer(SpintronicMaterial.COBALT, Real.of(2e-9), true);
+            // Pinned2 is the reference one defined by UI
+            spinValve = new SpinValve(pinned1, pinned, SpintronicMaterial.RUTHENIUM, Real.of(0.8e-9),
+                    spacerMaterialCombo.getValue(), Real.of(spacerThicknessSlider.getValue() * 1e-9), free);
+        } else {
+            spinValve = new SpinValve(pinned, spacerMaterialCombo.getValue(),
+                    Real.of(spacerThicknessSlider.getValue() * 1e-9), free);
+        }
+
+        renderer3D.rebuildStructure(spinValve);
     }
 
     private VBox createResultsBox() {
@@ -160,23 +240,43 @@ public class SpinValveApp extends FeaturedAppBase {
     }
 
     private void updateModel() {
-        Real thicknessP = Real.of(pinnedThicknessSlider.getValue() * 1e-9);
-        Real thicknessS = Real.of(spacerThicknessSlider.getValue() * 1e-9);
-        Real thicknessF = Real.of(freeThicknessSlider.getValue() * 1e-9);
+        // Real thicknessP = Real.of(pinnedThicknessSlider.getValue() * 1e-9);
+        // Real thicknessS = Real.of(spacerThicknessSlider.getValue() * 1e-9);
+        // Real thicknessF = Real.of(freeThicknessSlider.getValue() * 1e-9);
         Real angleRad = Real.of(Math.toRadians(freeAngleSlider.getValue()));
 
-        FerromagneticLayer pinned = new FerromagneticLayer(pinnedMaterialCombo.getValue(), thicknessP, true);
-        FerromagneticLayer free = new FerromagneticLayer(freeMaterialCombo.getValue(), thicknessF, false);
-        free.setMagnetization(angleRad.cos(), angleRad.sin(), Real.ZERO);
+        // FerromagneticLayer pinned = new
+        // FerromagneticLayer(pinnedMaterialCombo.getValue(), thicknessP, true);
+        // FerromagneticLayer free = new
+        // FerromagneticLayer(freeMaterialCombo.getValue(), thicknessF, false);
+        // free.setMagnetization(angleRad.cos(), angleRad.sin(), Real.ZERO);
 
-        spinValve = new SpinValve(pinned, spacerMaterialCombo.getValue(), thicknessS, free);
+        // spinValve = new SpinValve(pinned, spacerMaterialCombo.getValue(), thicknessS,
+        // free);
+
+        // Ensure model structure is up-to-date
+        if (spinValve == null ||
+                (safCheckBox.isSelected() != spinValve.isSafEnabled())) {
+            updateModelStructure();
+        } else {
+            // Update existing layers' properties if structure is the same
+            spinValve.getPinnedLayer().setMaterial(pinnedMaterialCombo.getValue());
+            spinValve.getPinnedLayer().setThickness(Real.of(pinnedThicknessSlider.getValue() * 1e-9));
+            spinValve.getFreeLayer().setMaterial(freeMaterialCombo.getValue());
+            spinValve.getFreeLayer().setThickness(Real.of(freeThicknessSlider.getValue() * 1e-9));
+            spinValve.getFreeLayer().setMagnetization(angleRad.cos(), angleRad.sin(), Real.ZERO);
+            spinValve.setSpacerMaterial(spacerMaterialCombo.getValue());
+            spinValve.setSpacerThickness(Real.of(spacerThicknessSlider.getValue() * 1e-9));
+        }
 
         // Physics Calculation
         Real r = GMREffect.valetFertResistance(spinValve);
         Real rap = GMREffect.valetFertResistance(
-                new SpinValve(pinned, spacerMaterialCombo.getValue(), thicknessS, createFL(free, Real.PI))); // Sim AP
+                new SpinValve(spinValve.getPinnedLayer(), spinValve.getSpacerMaterial(), spinValve.getSpacerThickness(),
+                        createFL(spinValve.getFreeLayer(), Real.PI))); // Sim AP
         Real rp = GMREffect.valetFertResistance(
-                new SpinValve(pinned, spacerMaterialCombo.getValue(), thicknessS, createFL(free, Real.ZERO))); // Sim P
+                new SpinValve(spinValve.getPinnedLayer(), spinValve.getSpacerMaterial(), spinValve.getSpacerThickness(),
+                        createFL(spinValve.getFreeLayer(), Real.ZERO))); // Sim P
         Real gmr = rap.subtract(rp).divide(rp);
 
         resistanceValueLabel.setText(String.format("%.2f \u03A9\u00B7nm\u00B2", r.doubleValue() * 1e18)); // AR product
@@ -184,7 +284,7 @@ public class SpinValveApp extends FeaturedAppBase {
 
         // Torque Calculation (J = 10^11 A/m²)
         Real j = Real.of(1e11);
-        Real[] stt = SpinTransport.calculateSTT(j, free, pinned);
+        Real[] stt = SpinTransport.calculateSTT(j, spinValve.getFreeLayer(), spinValve.getPinnedLayer());
         sttLabel.setText(String.format("[%.1e, %.1e]", stt[0].doubleValue(), stt[1].doubleValue()));
 
         updateChart();
@@ -193,6 +293,14 @@ public class SpinValveApp extends FeaturedAppBase {
         if (simulationTimer == null) {
             setupSimulation();
         }
+        // Stochastic update if simulation is running
+    }
+
+    private void runHysteresis() {
+        resistanceChart.getData().clear();
+        java.util.List<XYChart.Series<Number, Number>> results = HysteresisExperiment.runSweep(spinValve, -10000, 10000,
+                200);
+        resistanceChart.getData().addAll(results);
     }
 
     private void setupSimulation() {
@@ -213,12 +321,45 @@ public class SpinValveApp extends FeaturedAppBase {
         FerromagneticLayer free = spinValve.getFreeLayer();
         Real[] hEff = { Real.of(5000), Real.ZERO, Real.ZERO }; // H_eff simplified
 
-        Real[] newM = SpinTransport.stepLLG(free, hEff, currentStep, alpha, gamma);
+        Real temp = Real.of(temperatureSlider.getValue());
+        // Volume hardcoded for demonstration, should depend on thickness * area
+        Real vol = Real.of(free.getThickness().doubleValue() * 100e-9 * 100e-9); // 100x100 nm area
+
+        Real[] newM = SpinTransport.stepLLGWithThermalNoise(free, hEff, currentStep, alpha, gamma,
+                temp, vol, free.getMaterial().getSaturationMagnetization());
         free.setMagnetization(newM[0], newM[1], newM[2]);
 
         renderer3D.update(spinValve);
         resistanceValueLabel.setText(String.format("%.2f \u03A9\u00B7nm\u00B2",
                 GMREffect.valetFertResistance(spinValve).doubleValue() * 1e18));
+        
+        // Record sample for STNO analyzer
+        stnoAnalyzer.recordSample(newM[0]); // Record M_x
+        
+        // Update spectrum periodically
+        frameCount++;
+        if (stnoAnalyzer.isReady() && frameCount % SPECTRUM_UPDATE_INTERVAL == 0) {
+            updateSpectrum();
+        }
+    }
+    
+    private void updateSpectrum() {
+        Real[] psd = stnoAnalyzer.computePowerSpectrum();
+        double[] freq = stnoAnalyzer.getFrequencyAxis();
+        
+        spectrumSeries.getData().clear();
+        
+        // Only plot up to 20 GHz (or Nyquist/2)
+        int maxIndex = Math.min(freq.length, (int)(20e9 / (stnoAnalyzer.getSampleRate() / stnoAnalyzer.getBufferSize())));
+        
+        for (int i = 1; i < maxIndex; i++) { // Skip DC
+            double freqGHz = freq[i] / 1e9;
+            spectrumSeries.getData().add(new XYChart.Data<>(freqGHz, psd[i].doubleValue()));
+        }
+        
+        // Update peak frequency label
+        double peakGHz = stnoAnalyzer.getPeakFrequency() / 1e9;
+        peakFreqLabel.setText(String.format("Peak: %.2f GHz", peakGHz));
     }
 
     @Override
