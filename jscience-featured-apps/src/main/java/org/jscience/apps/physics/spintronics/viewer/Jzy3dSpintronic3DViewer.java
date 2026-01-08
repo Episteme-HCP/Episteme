@@ -103,4 +103,88 @@ public class Jzy3dSpintronic3DViewer implements Spintronic3DViewer {
         java.awt.Color c = java.awt.Color.decode(hex);
         return new Color(c.getRed(), c.getGreen(), c.getBlue());
     }
+
+    // ========== PHASE 3: 2D Spin Field Visualization ==========
+
+    /**
+     * Renders a 2D micromagnetic spin field as arrow scatter.
+     * @param sim Micromagnetics2D simulation
+     * @param scale Arrow length scaling factor
+     */
+    public void addSpinField2D(org.jscience.apps.physics.spintronics.Micromagnetics2D sim, float scale) {
+        int nx = sim.getNx();
+        int ny = sim.getNy();
+        float cellSize = (float)(sim.getCellSize().doubleValue() * 1e9); // nm
+        
+        Coord3d[] bases = new Coord3d[nx * ny];
+        Coord3d[] tips = new Coord3d[nx * ny];
+        Color[] colors = new Color[nx * ny];
+        
+        for (int i = 0; i < nx; i++) {
+            for (int j = 0; j < ny; j++) {
+                int idx = i * ny + j;
+                float x = i * cellSize;
+                float z = j * cellSize;
+                
+                org.jscience.mathematics.numbers.real.Real[] m = sim.getMagnetization(i, j);
+                float mx = (float) m[0].doubleValue();
+                float my = (float) m[1].doubleValue();
+                float mz = (float) m[2].doubleValue();
+                
+                bases[idx] = new Coord3d(x, 0, z);
+                tips[idx] = new Coord3d(x + mx * scale, my * scale, z + mz * scale);
+                
+                // Color by m_z: up = blue, down = red
+                float r = (1 - mz) / 2;
+                float b = (1 + mz) / 2;
+                colors[idx] = new Color(r, 0.2f, b);
+            }
+        }
+        
+        // Add base points
+        Scatter baseScatter = new Scatter(bases, Color.GRAY, 2f);
+        chart.getScene().add(baseScatter);
+        
+        // Add tip points (showing direction)
+        Scatter tipScatter = new Scatter(tips, colors);
+        tipScatter.setWidth(4f);
+        chart.getScene().add(tipScatter);
+    }
+
+    /**
+     * Highlights skyrmion regions with topological density coloring.
+     * @param sim Micromagnetics2D simulation
+     */
+    public void addSkyrmionTopology(org.jscience.apps.physics.spintronics.Micromagnetics2D sim) {
+        int nx = sim.getNx();
+        int ny = sim.getNy();
+        float cellSize = (float)(sim.getCellSize().doubleValue() * 1e9);
+        
+        java.util.List<Coord3d> skyrmionPoints = new java.util.ArrayList<>();
+        
+        for (int i = 1; i < nx - 1; i++) {
+            for (int j = 1; j < ny - 1; j++) {
+                org.jscience.mathematics.numbers.real.Real[] m = sim.getMagnetization(i, j);
+                
+                // Simple skyrmion detection: m_z < -0.5 (core pointing down)
+                if (m[2].doubleValue() < -0.5) {
+                    skyrmionPoints.add(new Coord3d(i * cellSize, 5, j * cellSize));
+                }
+            }
+        }
+        
+        if (!skyrmionPoints.isEmpty()) {
+            Coord3d[] points = skyrmionPoints.toArray(new Coord3d[0]);
+            Scatter skyrmionScatter = new Scatter(points, Color.MAGENTA, 10f);
+            chart.getScene().add(skyrmionScatter);
+        }
+    }
+
+    /**
+     * Updates spin field visualization in real-time.
+     */
+    public void updateSpinField2D(org.jscience.apps.physics.spintronics.Micromagnetics2D sim, float scale) {
+        clear();
+        addSpinField2D(sim, scale);
+    }
 }
