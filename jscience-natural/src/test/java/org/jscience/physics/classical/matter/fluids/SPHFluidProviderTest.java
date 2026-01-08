@@ -15,6 +15,7 @@ public class SPHFluidProviderTest {
 
         // Initial state check
         double initialY = fluid.getPositions()[1]; // First particle Y
+        assertFalse(Double.isNaN(initialY), "Initial Y should be valid");
 
         // Run one step
         fluid.step(0.01);

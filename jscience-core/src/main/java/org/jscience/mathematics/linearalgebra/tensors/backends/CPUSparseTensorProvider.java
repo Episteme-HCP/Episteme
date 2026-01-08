@@ -24,7 +24,7 @@
 package org.jscience.mathematics.linearalgebra.tensors.backends;
 
 import org.jscience.mathematics.linearalgebra.tensors.Tensor;
-import org.jscience.mathematics.linearalgebra.tensors.SparseTensor;
+
 import org.jscience.technical.backend.ExecutionContext;
 
 /**

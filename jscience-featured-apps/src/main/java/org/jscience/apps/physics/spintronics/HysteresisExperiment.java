@@ -28,7 +28,6 @@ public class HysteresisExperiment {
         // or just solve LLG equilibrium at each step
 
         FerromagneticLayer free = valve.getFreeLayer();
-        Real originalAngle = Real.of(free.getMagnetizationAngle()); // Assuming 2D for initial MVP state restore
 
         // Forward Sweep
         for (double h = hMin; h <= hMax; h += step) {

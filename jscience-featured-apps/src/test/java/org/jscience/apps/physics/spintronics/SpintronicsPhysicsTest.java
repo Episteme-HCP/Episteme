@@ -171,6 +171,7 @@ class SpintronicsPhysicsTest {
 
         int[] result = net.anneal(1000, 0.1, 10.0);
         double energy = net.getEnergy();
+        assertNotNull(result, "Anneal should return a result");
 
         // Ferromagnetic ground state: all aligned → E = -4
         assertTrue(energy <= -2.0, "Annealing should find low energy state, got: " + energy);

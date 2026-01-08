@@ -17,6 +17,7 @@ public class DataExporter {
     /**
      * Exports XYChart series to CSV format.
      */
+    @SafeVarargs
     public static void exportToCSV(String filename, XYChart.Series<Number, Number>... seriesList) throws IOException {
         try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
             // Header

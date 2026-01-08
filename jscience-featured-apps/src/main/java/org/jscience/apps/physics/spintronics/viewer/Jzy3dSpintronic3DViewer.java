@@ -11,7 +11,7 @@ import org.jzy3d.chart.factories.AWTChartComponentFactory;
 import org.jzy3d.colors.Color;
 import org.jzy3d.maths.Coord3d;
 import org.jzy3d.plot3d.primitives.Scatter;
-import org.jzy3d.plot3d.primitives.Shape;
+
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 
 import java.util.HashMap;

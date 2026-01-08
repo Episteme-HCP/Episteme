@@ -678,6 +678,7 @@ public class JScienceMasterControl extends Application {
     /**
      * Creates the Molecular Viewing category using SPI discovery.
      */
+    @SuppressWarnings("unused") // Reserved for future layout options
     private VBox createMolecularCategory(I18n i18n) {
         return createBackendCategory(i18n, BackendDiscovery.TYPE_MOLECULAR,
                 i18n.get("mastercontrol.libraries.cat.molecular", "Molecular Viewing"),

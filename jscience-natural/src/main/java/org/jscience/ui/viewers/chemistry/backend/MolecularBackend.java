@@ -34,4 +34,12 @@ public enum MolecularBackend {
         this.support3D = support3D;
         this.supportInteractive = supportInteractive;
     }
+
+    public boolean isSupport3D() {
+        return support3D;
+    }
+
+    public boolean isSupportInteractive() {
+        return supportInteractive;
+    }
 }

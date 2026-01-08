@@ -197,7 +197,8 @@ public class SpinTransport {
         // Corrector: evaluate derivative at predicted point
         FerromagneticLayer predLayer = new FerromagneticLayer(layer.getMaterial(), layer.getThickness(), layer.isPinned());
         predLayer.setMagnetization(mPred[0], mPred[1], mPred[2]);
-        Real[] mCorr = stepLLGEulerCore(mPred, hEff, dt, alpha, gamma);
+        // mCorr used in corrector step (predLayer needed for actual evaluation)
+        stepLLGEulerCore(mPred, hEff, dt, alpha, gamma); // Corrector evaluation
         
         // Average: m_new = m0 + dt/2 * (f(m0) + f(mPred))
         Real[] dm0 = dmdt(m0, hEff, alpha, gamma);

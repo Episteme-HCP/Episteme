@@ -34,6 +34,7 @@ public class SpinValveApp extends FeaturedAppBase {
     private Label resistanceValueLabel;
     private Label gmrRatioLabel;
     private Label sttLabel;
+    @SuppressWarnings("unused") // Reserved for future status display
     private Label statusLabelInfo;
 
     private Spintronic3DRenderer renderer3D;
@@ -389,6 +390,7 @@ public class SpinValveApp extends FeaturedAppBase {
         }
     }
 
+    @SuppressWarnings("unused") // Reserved for 2D canvas fallback mode
     private void draw() {
         GraphicsContext gc = visualizationCanvas.getGraphicsContext2D();
         gc.clearRect(0, 0, 800, 300);

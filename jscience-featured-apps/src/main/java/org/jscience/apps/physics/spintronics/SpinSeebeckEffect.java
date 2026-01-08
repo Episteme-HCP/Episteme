@@ -45,6 +45,11 @@ public class SpinSeebeckEffect {
         this.detectorWidth = detectorWidth;
     }
 
+    /** Returns the detector thickness in meters. */
+    public Real getDetectorThickness() {
+        return detectorThickness;
+    }
+
     /**
      * Calculates spin current density from temperature gradient.
      * @param temperatureGradient ∇T (K/m)

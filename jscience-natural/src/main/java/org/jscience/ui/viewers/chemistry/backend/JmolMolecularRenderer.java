@@ -144,7 +144,6 @@ public class JmolMolecularRenderer implements MolecularRenderer {
             return;
 
         // Build Jmol script to add atom
-        String symbol = atom.getElement().getSymbol();
         double x = atom.getPosition().get(0).doubleValue();
         double y = atom.getPosition().get(1).doubleValue();
         double z = atom.getPosition().get(2).doubleValue();
