@@ -82,7 +82,7 @@ public class ND4JSparseTensorProvider implements TensorProvider {
 
     @Override
     public String getDescription() {
-        return "ND4JSparseTensorProvider";
+        return "ND4J Sparse Tensor Backend Provider";
     }
 }
 

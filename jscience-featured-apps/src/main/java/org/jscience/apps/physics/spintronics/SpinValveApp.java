@@ -37,6 +37,7 @@ public class SpinValveApp extends FeaturedAppBase {
     private Label statusLabelInfo;
 
     private Spintronic3DRenderer renderer3D;
+    private Canvas visualizationCanvas = new Canvas(800, 600);
     private javafx.animation.AnimationTimer simulationTimer;
     private Real currentStep = Real.of(1e-12); // 1 ps
     private Real alpha = Real.of(0.01); // Damping factor

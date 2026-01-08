@@ -6,7 +6,6 @@ package org.jscience.io;
 
 import java.io.BufferedOutputStream;
 import java.io.OutputStream;
-import java.util.logging.Logger;
 
 /**
  * Abstract base for resource writers.

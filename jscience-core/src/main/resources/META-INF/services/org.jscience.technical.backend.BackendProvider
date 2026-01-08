@@ -6,12 +6,12 @@ org.jscience.ui.plotting.backends.JFreeChartPlot2DBackendProvider
 org.jscience.ui.plotting.backends.Jzy3dPlot3DBackendProvider
 
 # Unified Technical Backend (Math & Tensors)
-org.jscience.technical.backend.JScienceMathBackendProvider
-org.jscience.technical.backend.EJMLBackendProvider
-org.jscience.technical.backend.JBlasBackendProvider
-org.jscience.technical.backend.CommonsMathBackendProvider
-org.jscience.technical.backend.ColtBackendProvider
-org.jscience.technical.backend.ND4JBackendProvider
+org.jscience.technical.backend.math.JScienceMathBackendProvider
+org.jscience.technical.backend.math.EJMLBackendProvider
+org.jscience.technical.backend.math.JBlasBackendProvider
+org.jscience.technical.backend.math.CommonsMathBackendProvider
+org.jscience.technical.backend.math.ColtBackendProvider
+org.jscience.technical.backend.math.ND4JBackendProvider
 
 # High-Performance Compute Backends (Implementing BackendProvider directly)
 org.jscience.technical.backend.cpu.CPUBackend
