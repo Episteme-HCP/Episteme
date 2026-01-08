@@ -24,6 +24,16 @@ public interface ComputeBackend extends BackendProvider {
     }
 
     @Override
+    default String getId() {
+        return getClass().getSimpleName().toLowerCase().replace("provider", "");
+    }
+
+    @Override
+    default String getDescription() {
+        return getName() + " compute backend";
+    }
+
+    @Override
     default Object createBackend() {
         return this; // ComputeBackend IS the backend instance
     }

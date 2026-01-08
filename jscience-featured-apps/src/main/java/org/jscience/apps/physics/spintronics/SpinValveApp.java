@@ -31,8 +31,6 @@ public class SpinValveApp extends FeaturedAppBase {
     private Slider temperatureSlider;
     private CheckBox safCheckBox;
 
-    private Canvas visualizationCanvas; // Still kept for 2D fallback or removed if full replacement
-
     private Canvas visualizationCanvas;
     private Label resistanceValueLabel;
     private Label gmrRatioLabel;
