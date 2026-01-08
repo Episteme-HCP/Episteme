@@ -145,4 +145,176 @@ public class SpinOrbitTorque {
 
     public HeavyMetal getMetal() { return metal; }
     public Real getThickness() { return thickness; }
+
+    // ========== PHASE 2 ADDITIONS ==========
+
+    /**
+     * Materials exhibiting Orbital Hall Effect (OHE).
+     * OHE generates orbital angular momentum current without requiring heavy elements.
+     * 
+     * @see <a href="https://doi.org/10.1038/s41563-021-01151-2">OHE in light metals, Nature Materials 2022</a>
+     */
+    public static class OrbitalHallMaterial {
+        public final String name;
+        public final Real orbitalHallAngle;  // θ_OH (dimensionless)
+        public final Real spinOrbitConversion; // η_SO (orbital-to-spin conversion)
+        public final Real resistivity;
+
+        public OrbitalHallMaterial(String name, Real oha, Real soc, Real rho) {
+            this.name = name;
+            this.orbitalHallAngle = oha;
+            this.spinOrbitConversion = soc;
+            this.resistivity = rho;
+        }
+
+        public static final OrbitalHallMaterial COPPER = new OrbitalHallMaterial("Cu", Real.of(0.02), Real.of(0.1), Real.of(17e-9));
+        public static final OrbitalHallMaterial TITANIUM = new OrbitalHallMaterial("Ti", Real.of(0.05), Real.of(0.15), Real.of(420e-9));
+        public static final OrbitalHallMaterial MANGANESE = new OrbitalHallMaterial("Mn", Real.of(0.08), Real.of(0.2), Real.of(1440e-9));
+        public static final OrbitalHallMaterial CHROMIUM = new OrbitalHallMaterial("Cr", Real.of(0.06), Real.of(0.12), Real.of(125e-9));
+    }
+
+    /**
+     * Rashba-induced field-like torque at the interface.
+     * $$ \tau_{Rashba} = \frac{\alpha_R m_e}{\hbar e} J_c (\mathbf{m} \times \hat{y}) $$
+     * 
+     * @param currentDensity Charge current in x-direction
+     * @param layer Target ferromagnetic layer
+     * @param rashbaParameter α_R (eV·Å) - typically 0.1-1.0
+     */
+    public Real[] calculateRashbaTorque(Real currentDensity, FerromagneticLayer layer, Real rashbaParameter) {
+        Real[] m = layer.getMagnetization();
+        Real[] yAxis = {Real.ZERO, Real.ONE, Real.ZERO};
+
+        // Convert Rashba parameter from eV·Å to SI
+        Real alphaR_SI = rashbaParameter.multiply(Real.of(1.602e-19 * 1e-10)); // eV·Å to J·m
+        Real me = Real.of(9.109e-31);
+        Real hbar = Real.of(1.054571817e-34);
+        Real e = Real.of(1.602176634e-19);
+        Real ms = layer.getMaterial().getSaturationMagnetization();
+        Real tFM = layer.getThickness();
+
+        // τ_R = (α_R * m_e) / (ℏ * e * M_s * t) * J_c
+        Real prefactor = alphaR_SI.multiply(me)
+                .divide(hbar.multiply(e).multiply(ms).multiply(tFM))
+                .multiply(currentDensity);
+
+        Real[] torque = crossProduct(m, yAxis);
+        return new Real[] {
+            torque[0].multiply(prefactor),
+            torque[1].multiply(prefactor),
+            torque[2].multiply(prefactor)
+        };
+    }
+
+    /**
+     * Orbital Hall Effect (OHE) torque.
+     * Similar structure to SHE but with orbital-to-spin conversion at interface.
+     */
+    public static Real[] calculateOrbitalTorque(Real currentDensity, FerromagneticLayer layer, 
+                                                 OrbitalHallMaterial oheMaterial, Real oheThickness,
+                                                 Real[] currentDirection) {
+        Real[] sigma = { Real.ZERO.subtract(currentDirection[1]), currentDirection[0], Real.ZERO };
+        Real[] m = layer.getMagnetization();
+
+        Real hbar = Real.of(1.054571817e-34);
+        Real e = Real.of(1.602176634e-19);
+        Real ms = layer.getMaterial().getSaturationMagnetization();
+        Real tFM = layer.getThickness();
+
+        // Effective angle = θ_OH * η_SO (orbital-to-spin conversion efficiency)
+        Real effectiveAngle = oheMaterial.orbitalHallAngle.multiply(oheMaterial.spinOrbitConversion);
+
+        Real tau0 = hbar.divide(Real.TWO.multiply(e))
+                .multiply(effectiveAngle)
+                .multiply(currentDensity)
+                .divide(ms.multiply(tFM));
+
+        Real[] sigmaCrossM = crossProduct(sigma, m);
+        Real[] torque = crossProduct(m, sigmaCrossM);
+
+        return new Real[] {
+            torque[0].multiply(tau0),
+            torque[1].multiply(tau0),
+            torque[2].multiply(tau0)
+        };
+    }
+
+    /**
+     * Combined SOT + Exchange Bias for field-free switching.
+     * Uses effective field from AFM layer to break symmetry.
+     * 
+     * @param currentDensity Charge current density
+     * @param layer FM layer
+     * @param currentDirection Current direction
+     * @param afm Antiferromagnetic material providing exchange bias
+     * @param biasDirection Direction of exchange bias field
+     * @return Total effective field including SOT equivalent + bias
+     */
+    public Real[] calculateFieldFreeTorque(Real currentDensity, FerromagneticLayer layer, 
+                                           Real[] currentDirection,
+                                           AntiferromagneticMaterial afm, Real[] biasDirection) {
+        // Regular SOT components
+        Real[] tauDL = calculateDampingLikeTorque(currentDensity, layer, currentDirection);
+        Real[] tauFL = calculateFieldLikeTorque(currentDensity, layer, currentDirection);
+
+        // Exchange bias contribution
+        Real hEB = afm.getExchangeBiasField();
+        Real[] hBias = {
+            biasDirection[0].multiply(hEB),
+            biasDirection[1].multiply(hEB),
+            biasDirection[2].multiply(hEB)
+        };
+
+        // Total torque = SOT + m × H_bias
+        Real[] m = layer.getMagnetization();
+        Real[] biasTorque = crossProduct(m, hBias);
+
+        return new Real[] {
+            tauDL[0].add(tauFL[0]).add(biasTorque[0]),
+            tauDL[1].add(tauFL[1]).add(biasTorque[1]),
+            tauDL[2].add(tauFL[2]).add(biasTorque[2])
+        };
+    }
+
+    /**
+     * SOT switching probability for a given pulse.
+     * Uses Néel-Brown thermal activation model.
+     * 
+     * @param currentDensity Current density
+     * @param pulseDuration Pulse duration (s)
+     * @param temperature Temperature (K)
+     * @param layer Target layer
+     * @param attemptFrequency f_0, typically 1e9-1e10 Hz
+     * @return Switching probability [0, 1]
+     */
+    public double calculateSwitchingProbability(Real currentDensity, Real pulseDuration, 
+                                                 Real temperature, FerromagneticLayer layer,
+                                                 Real attemptFrequency) {
+        // Energy barrier reduction by SOT: ΔE = E_0 * (1 - J/J_c)^2
+        Real jC = Real.of(5e11); // Critical current density (simplified)
+        Real ratio = currentDensity.divide(jC);
+        
+        if (ratio.compareTo(Real.ONE) >= 0) {
+            return 1.0; // Deterministic switching above J_c
+        }
+
+        // E_0 = K_u * V (anisotropy energy barrier)
+        Real ku = Real.of(5e5); // Anisotropy constant J/m³
+        Real volume = layer.getThickness().multiply(Real.of(100e-9 * 100e-9)); // 100x100 nm pillar
+        Real E0 = ku.multiply(volume);
+
+        // Reduced barrier
+        Real oneMinusRatio = Real.ONE.subtract(ratio);
+        Real deltaE = E0.multiply(oneMinusRatio.pow(2));
+
+        // Thermal stability factor
+        Real kB = Real.of(1.380649e-23);
+        Real thermalFactor = deltaE.divide(kB.multiply(temperature));
+
+        // Switching probability: P = 1 - exp(-f_0 * t * exp(-ΔE/kT))
+        double exponent = -attemptFrequency.doubleValue() * pulseDuration.doubleValue() 
+                          * Math.exp(-thermalFactor.doubleValue());
+        
+        return 1.0 - Math.exp(exponent);
+    }
 }
