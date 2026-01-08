@@ -17,7 +17,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * <h3>Physics</h3>
  * <p>
  * Spin current from FMR-driven precession:
- * $$ J_s = \frac{\hbar}{4\pi} g^{\uparrow\downarrow}_{eff} \mathbf{m} \times \frac{d\mathbf{m}}{dt} $$
+ * J_s = (hbar/4pi) * g_eff * (m x dm/dt)
  * </p>
  * 
  * <h3>References</h3>
@@ -32,7 +32,7 @@ import org.jscience.mathematics.numbers.real.Real;
  */
 public class SpinPumping {
 
-    private final Real spinMixingConductance; // g↑↓ (1/m²)
+    private final Real spinMixingConductance; // g_updown (1/m^2)
     private final Real fmThickness;           // FM thickness (m)
     private final Real nmThickness;           // NM thickness (m)
     private final SpinOrbitTorque.HeavyMetal nmMaterial;
@@ -50,10 +50,10 @@ public class SpinPumping {
      * Calculates pumped spin current from magnetization precession.
      * @param m Current magnetization (unit vector)
      * @param dmdt Time derivative of magnetization
-     * @return Spin current density (A/m²)
+     * @return Spin current density (A/m^2)
      */
     public Real[] calculateSpinCurrent(Real[] m, Real[] dmdt) {
-        // J_s = (ℏ/4π) * g↑↓ * (m × dm/dt)
+        // J_s = (hbar/4pi) * g_updown * (m x dm/dt)
         Real[] cross = crossProduct(m, dmdt);
         Real prefactor = HBAR.divide(Real.of(4 * Math.PI)).multiply(spinMixingConductance);
         
@@ -66,7 +66,7 @@ public class SpinPumping {
 
     /**
      * Calculates additional Gilbert damping from spin pumping.
-     * $$ \Delta\alpha = \frac{g \mu_B g^{\uparrow\downarrow}}{4\pi M_s t_{FM}} $$
+     * Delta_alpha = g * mu_B * g_updown / (4pi * M_s * t_FM)
      */
     public Real calculateDampingEnhancement(Real ms, Real gFactor) {
         Real muB = Real.of(9.274e-24); // Bohr magneton
@@ -84,15 +84,12 @@ public class SpinPumping {
      * @return DC voltage (V)
      */
     public Real calculateFMRVoltage(Real rfField, Real frequency, Real linewidth, Real ms) {
-        // Simplified Lorentzian lineshape * ISHE conversion
-        // V_DC ∝ θ_SH * λ * J_s * w
-        
         // Estimate precession cone angle from RF field
         Real omega = frequency.multiply(Real.of(2 * Math.PI));
         Real gamma = Real.of(1.76e11);
-        Real coneAngle = rfField.divide(linewidth.multiply(gamma)); // rad
+        Real coneAngle = rfField.divide(linewidth.multiply(gamma));
         
-        // dmdt amplitude ∝ ω * sin(cone)
+        // dmdt amplitude ~ omega * sin(cone)
         Real dmdtMag = omega.multiply(coneAngle);
         
         // Spin current
@@ -118,7 +115,7 @@ public class SpinPumping {
     // Factory
     public static SpinPumping createNiFePt() {
         return new SpinPumping(
-            Real.of(3e19),   // g↑↓ ~ 3×10^19 m⁻²
+            Real.of(3e19),   // g_updown ~ 3e19 /m^2
             Real.of(10e-9),  // 10 nm NiFe
             Real.of(10e-9),  // 10 nm Pt
             SpinOrbitTorque.HeavyMetal.PLATINUM
