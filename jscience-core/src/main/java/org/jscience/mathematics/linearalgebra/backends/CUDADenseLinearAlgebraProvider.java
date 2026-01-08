@@ -36,24 +36,35 @@ public class CUDADenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<
         this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(field);
     }
 
+    private static boolean checkAvailability() {
+        try {
+            Class.forName("jcuda.jcublas.JCublas");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        } catch (UnsatisfiedLinkError e) {
+            return false;
+        }
+    }
+
     @Override
     public String getName() { 
-        return "CUDA Dense"; 
+        return "CUDA (Dense)"; 
     }
 
     @Override
     public boolean isAvailable() { 
-        return false; 
+        return checkAvailability(); 
     }
 
     @Override
     public ExecutionContext createContext() { 
-        return null; 
+        return cpuProvider.createContext(); 
     }
     
     @Override
     public int getPriority() {
-        return 0;
+        return isAvailable() ? 100 : 0;
     }
 
     @Override

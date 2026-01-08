@@ -37,7 +37,14 @@ public class CUDASparseLinearAlgebraProvider<E> implements LinearAlgebraProvider
     }
 
     private static boolean checkAvailability() {
-        return false;
+        try {
+            Class.forName("jcuda.jcusparse.JCusparse");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        } catch (UnsatisfiedLinkError e) {
+            return false;
+        }
     }
 
     @Override
@@ -52,12 +59,14 @@ public class CUDASparseLinearAlgebraProvider<E> implements LinearAlgebraProvider
 
     @Override
     public ExecutionContext createContext() {
-        return null; // TODO: Implement CUDA context
+        // CUDA context would require native initialization
+        // For now, delegate to CPU provider's context when available
+        return cpuProvider.createContext();
     }
 
     @Override
     public int getPriority() {
-        return 0;
+        return isAvailable() ? 100 : 0;
     }
 
     @Override
