@@ -3,7 +3,7 @@ package org.jscience.ui.viewers.chemistry.backend;
 import org.jscience.chemistry.Atom;
 import org.jscience.chemistry.Bond;
 import javafx.scene.paint.Color;
-import java.util.List;
+
 
 /**
  * Abstraction for molecular rendering engines.

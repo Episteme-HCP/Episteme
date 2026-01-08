@@ -11,9 +11,14 @@ org.jscience.technical.backend.math.EJMLBackendProvider
 org.jscience.technical.backend.math.JBlasBackendProvider
 org.jscience.technical.backend.math.CommonsMathBackendProvider
 org.jscience.technical.backend.math.ColtBackendProvider
-org.jscience.technical.backend.math.ND4JBackendProvider
 
 # High-Performance Compute Backends (Implementing BackendProvider directly)
 org.jscience.technical.backend.cpu.CPUBackend
 org.jscience.technical.backend.cuda.CUDABackend
 org.jscience.technical.backend.opencl.OpenCLBackend
+
+# Linear Algebra Implementation Providers
+org.jscience.mathematics.linearalgebra.backends.OpenCLDenseLinearAlgebraProvider
+org.jscience.mathematics.linearalgebra.backends.OpenCLSparseLinearAlgebraProvider
+org.jscience.mathematics.linearalgebra.backends.ColtLinearAlgebraProvider
+org.jscience.mathematics.linearalgebra.backends.EJMLLinearAlgebraProvider

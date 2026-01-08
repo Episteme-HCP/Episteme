@@ -72,6 +72,22 @@ public class FerromagneticLayer {
         this.thickness = t;
     }
 
+    public Real getCoercivity() {
+        return coercivity;
+    }
+
+    public void setCoercivity(Real coercivity) {
+        this.coercivity = coercivity;
+    }
+
+    public Real getAnisotropyField() {
+        return anisotropyField;
+    }
+
+    public void setAnisotropyField(Real anisotropyField) {
+        this.anisotropyField = anisotropyField;
+    }
+
     public boolean isPinned() {
         return pinned;
     }

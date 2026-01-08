@@ -16,7 +16,7 @@ import org.jscience.chemistry.PeriodicTable;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
-import org.jscience.ui.viewers.chemistry.MolecularFactory;
+
 import org.jscience.ui.viewers.chemistry.backend.MolecularRenderer;
 import org.jscience.ui.viewers.chemistry.backend.RenderStyle;
 

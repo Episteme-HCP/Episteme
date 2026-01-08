@@ -53,7 +53,7 @@ import org.jscience.mathematics.context.MathContext.RealPrecision;
 import org.jscience.mathematics.context.MathContext.OverflowMode;
 import org.jscience.mathematics.linearalgebra.tensors.backends.TensorProvider;
 import org.jscience.mathematics.linearalgebra.tensors.backends.CPUDenseTensorProvider;
-import org.jscience.mathematics.linearalgebra.tensors.backends.ND4JDenseTensorProvider;
+
 import org.jscience.mathematics.linearalgebra.backends.LinearAlgebraProvider;
 import org.jscience.mathematics.linearalgebra.backends.CPUDenseLinearAlgebraProvider;
 import org.jscience.mathematics.linearalgebra.backends.CPUSparseLinearAlgebraProvider;
@@ -61,6 +61,8 @@ import org.jscience.mathematics.linearalgebra.backends.CUDADenseLinearAlgebraPro
 import org.jscience.mathematics.linearalgebra.backends.CUDASparseLinearAlgebraProvider;
 import org.jscience.mathematics.linearalgebra.backends.OpenCLDenseLinearAlgebraProvider;
 import org.jscience.mathematics.linearalgebra.backends.OpenCLSparseLinearAlgebraProvider;
+import org.jscience.mathematics.linearalgebra.backends.ColtLinearAlgebraProvider;
+import org.jscience.mathematics.linearalgebra.backends.EJMLLinearAlgebraProvider;
 
 /**
  * Compute context for configuring linear algebra and numerical computation
@@ -118,7 +120,11 @@ public class ComputeContext {
         /** CUDA GPU implementation */
         CUDA_GPU,
         /** Native BLAS library (future) */
-        NATIVE_BLAS
+        NATIVE_BLAS,
+        /** Colt Library */
+        COLT,
+        /** EJML Library */
+        EJML
     }
 
     private static final ThreadLocal<ComputeContext> CURRENT = ThreadLocal.withInitial(ComputeContext::new);
@@ -351,14 +357,25 @@ public class ComputeContext {
             case OPENCL_GPU:
                 if (canUseGpu) {
                     try {
-                        // Directly instantiate for now, or look up if we implement caching later
                         return new OpenCLDenseLinearAlgebraProvider<>(field);
-                    } catch (UnsupportedOperationException | LinkageError e) {
-                        throw e;
                     } catch (Throwable t) {
-                        throw new RuntimeException("Failed to initialize OpenCL backend", t);
+                        // Fallback to CPU
+                        return new CPUDenseLinearAlgebraProvider<>(field);
                     }
-                } else {
+                }
+                // Fallthrough
+
+            case COLT:
+                try {
+                    return new ColtLinearAlgebraProvider<>(field);
+                } catch (Throwable t) {
+                    return new CPUDenseLinearAlgebraProvider<>(field);
+                }
+
+            case EJML:
+                try {
+                    return new EJMLLinearAlgebraProvider<>(field);
+                } catch (Throwable t) {
                     return new CPUDenseLinearAlgebraProvider<>(field);
                 }
 
@@ -379,16 +396,12 @@ public class ComputeContext {
             case OPENCL_GPU:
                 // OpenCL tensor support pending
                 break;
+            case COLT:
+            case EJML:
             case NATIVE_BLAS:
             case CUDA_GPU:
                 // Native BLAS tensor support pending
-                if (ND4JDenseTensorProvider.isND4JAvailable()) {
-                    try {
-                        return new ND4JDenseTensorProvider();
-                    } catch (Throwable t) {
-                        // Fallback
-                    }
-                }
+                // ND4J provider removed due to corruption.
                 break;
         }
         // Default

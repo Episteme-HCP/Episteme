@@ -79,4 +79,20 @@ public class SpinValve {
     public FerromagneticLayer getFreeLayer() {
         return freeLayer;
     }
+
+    public FerromagneticLayer getSafPinnedLayer1() {
+        return safPinnedLayer1;
+    }
+
+    public FerromagneticLayer getSafPinnedLayer2() {
+        return safPinnedLayer2;
+    }
+
+    public SpintronicMaterial getSafSpacer() {
+        return safSpacer;
+    }
+
+    public Real getSafSpacerThickness() {
+        return safSpacerThickness;
+    }
 }

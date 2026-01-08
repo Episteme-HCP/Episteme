@@ -278,7 +278,7 @@ public class TitrationApp extends FeaturedAppBase {
         // Calculate equivalence point for multi-protic acids
         // Each equivalence point occurs at n * molesAcidInitial moles of base
         double molesPerProton = molesAcidInitial;
-        double equivalencePointTotal = molesAcidInitial * protonCount;
+
 
         if (pKa[0] < 0) {
             // Strong acid - complete dissociation

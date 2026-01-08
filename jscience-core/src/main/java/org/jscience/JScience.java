@@ -486,6 +486,24 @@ public final class JScience {
         // ComputeContext.current().setLinearAlgebraProvider(id);
     }
 
+    // ================= MOLECULAR BACKEND =================
+
+    private static String molecularBackendId = null; // Default (AUTO)
+
+    /**
+     * Gets the ID of the current Molecular Backend.
+     */
+    public static String getMolecularBackendId() {
+        return molecularBackendId;
+    }
+
+    /**
+     * Sets the Molecular Backend by ID.
+     */
+    public static void setMolecularBackendId(String id) {
+        molecularBackendId = id;
+    }
+
     /**
      * Main entry point for CLI usage and configuration verification.
      * 

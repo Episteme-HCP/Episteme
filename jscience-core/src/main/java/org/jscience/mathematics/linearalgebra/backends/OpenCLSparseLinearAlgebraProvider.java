@@ -1,4 +1,4 @@
-﻿/*
+/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -27,51 +27,35 @@ import org.jscience.mathematics.structures.rings.Field;
 import org.jscience.mathematics.linearalgebra.Matrix;
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.technical.backend.ExecutionContext;
-import org.jscience.technical.backend.opencl.OpenCLBackend;
 
-/**
- * OpenCL Linear Algebra Provider (Sparse).
- * <p>
- * Placeholder for sparse OpenCL implementation.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 public class OpenCLSparseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
-    private final CPUSparseLinearAlgebraProvider<E> cpuProvider;
-    private static final OpenCLBackend backend = new OpenCLBackend();
+     private final CPUSparseLinearAlgebraProvider<E> cpuProvider;
 
     public OpenCLSparseLinearAlgebraProvider(Field<E> field) {
         this.cpuProvider = new CPUSparseLinearAlgebraProvider<>(field);
-        if (isAvailable()) {
-            java.util.logging.Logger.getLogger(getClass().getName()).info(
-                    "OpenCLSparseLinearAlgebraProvider initialized (Warning: Sparse GPU ops delegated to CPU in this version)");
-        }
     }
-
-    @Override
-    public boolean isAvailable() {
-        return backend.isAvailable();
-    }
-
+    
     @Override
     public String getName() {
         return "OpenCL (Sparse)";
     }
 
     @Override
+    public boolean isAvailable() {
+        return false;
+    }
+
+    @Override
     public ExecutionContext createContext() {
-        return backend.createContext();
+         return null;
     }
 
     @Override
     public int getPriority() {
-        return 10;
+        return 0;
     }
 
-    // Delegate to CPU Sparse for now
     @Override
     public Vector<E> add(Vector<E> a, Vector<E> b) {
         return cpuProvider.add(a, b);
@@ -119,12 +103,12 @@ public class OpenCLSparseLinearAlgebraProvider<E> implements LinearAlgebraProvid
 
     @Override
     public E determinant(Matrix<E> a) {
-        return cpuProvider.determinant(a);
+       return cpuProvider.determinant(a);
     }
 
     @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        return cpuProvider.solve(a, b); // Sparse solver?
+        return cpuProvider.solve(a, b);
     }
 
     @Override
@@ -138,6 +122,11 @@ public class OpenCLSparseLinearAlgebraProvider<E> implements LinearAlgebraProvid
     }
 
     @Override
+    public E norm(Vector<E> a) {
+        return cpuProvider.norm(a);
+    }
+
+     @Override
     public String getId() {
         return "openclsparse";
     }
@@ -147,6 +136,3 @@ public class OpenCLSparseLinearAlgebraProvider<E> implements LinearAlgebraProvid
         return "OpenCLSparseLinearAlgebraProvider";
     }
 }
-
-
-

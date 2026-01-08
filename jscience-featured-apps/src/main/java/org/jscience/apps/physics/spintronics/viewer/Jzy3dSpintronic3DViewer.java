@@ -25,6 +25,7 @@ public class Jzy3dSpintronic3DViewer implements Spintronic3DViewer {
 
     private Chart chart;
     private final Map<String, Scatter> arrows = new HashMap<>();
+    private final Map<String, Coord3d> arrowBases = new HashMap<>();
 
     public Jzy3dSpintronic3DViewer() {
         chart = AWTChartComponentFactory.chart(Quality.Advanced, "newt");
@@ -55,20 +56,27 @@ public class Jzy3dSpintronic3DViewer implements Spintronic3DViewer {
         );
         Scatter arrow = new Scatter(new Coord3d[]{base, tip}, Color.YELLOW, 8f);
         arrows.put(id, arrow);
+        arrowBases.put(id, base);
         chart.getScene().add(arrow);
     }
 
     @Override
     public void updateMagnetizationArrow(String id, Real mx, Real my, Real mz) {
         Scatter old = arrows.get(id);
-        if (old != null) {
-            Coord3d base = old.getCoordinates()[0];
+        Coord3d base = arrowBases.get(id);
+
+        if (old != null && base != null) {
+            chart.getScene().remove(old);
+
             Coord3d tip = new Coord3d(
                 base.x + (float)(mx.doubleValue() * 30),
                 base.y + (float)(my.doubleValue() * 30),
                 base.z + (float)(mz.doubleValue() * 30)
             );
-            old.setCoordinates(new Coord3d[]{base, tip});
+            Scatter arrow = new Scatter(new Coord3d[]{base, tip}, Color.YELLOW, 8f);
+
+            arrows.put(id, arrow);
+            chart.getScene().add(arrow);
         }
     }
 
@@ -87,6 +95,7 @@ public class Jzy3dSpintronic3DViewer implements Spintronic3DViewer {
     public void clear() {
         chart.getScene().getGraph().getAll().clear();
         arrows.clear();
+        arrowBases.clear();
     }
 
     @Override

@@ -549,8 +549,9 @@ public class JScienceMasterControl extends Application {
         content.getChildren().add(createPlottingCategory(i18n));
 
         // Molecular Viewing - uses SPI discovery
-        content.getChildren().add(createMolecularCategory(i18n));
-
+        // Molecular Viewing - uses SPI discovery
+        content.getChildren().add(createChemistryCategory(i18n));
+        
         content.getChildren().add(createLibCategory(i18n, "framework", List.of(
                 new LibInfo("javalin", isClassAvailable("io.javalin.Javalin")),
                 new LibInfo("jackson", isClassAvailable("com.fasterxml.jackson.databind.ObjectMapper")),
@@ -558,6 +559,49 @@ public class JScienceMasterControl extends Application {
                 new LibInfo("grpc", isClassAvailable("io.grpc.ManagedChannel"))), i18n));
 
         return new Tab(i18n.get("mastercontrol.tab.libraries", "Libraries"), scroll);
+    }
+
+    private VBox createChemistryCategory(I18n i18n) {
+        VBox box = new VBox(12);
+        Label header = new Label(i18n.get("mastercontrol.chemistry.title", "Chemistry & Biology"));
+        header.getStyleClass().add("header-title");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(20);
+        grid.setVgap(15);
+        grid.setPadding(new Insets(10, 0, 10, 0));
+
+        // Molecular Rendering Backend
+        ComboBox<String> backendBox = new ComboBox<>();
+        // Fetch available molecular backends via SPI
+        java.util.List<org.jscience.technical.backend.BackendProvider> providers = 
+            org.jscience.technical.backend.BackendDiscovery.getInstance()
+                .getProvidersByType(org.jscience.technical.backend.BackendDiscovery.TYPE_MOLECULAR);
+
+        backendBox.getItems().add("AUTO"); // Default option
+        for (org.jscience.technical.backend.BackendProvider p : providers) {
+            backendBox.getItems().add(p.getId());
+        }
+
+        String current = JScience.getMolecularBackendId();
+        backendBox.setValue(current == null ? "AUTO" : current);
+
+        backendBox.setOnAction(e -> {
+            String val = backendBox.getValue();
+            JScience.setMolecularBackendId("AUTO".equals(val) ? null : val);
+            JScience.savePreferences();
+        });
+
+        VBox backendInfo = createInfoBox("Molecular Renderer", 
+            "Select the engine used to render 3D molecular structures.\n" +
+            "Requires restart of the viewer window to take effect.");
+
+        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.chemistry.backend", "Molecular Renderer")),
+                backendBox,
+                backendInfo);
+
+        box.getChildren().addAll(header, grid, new Separator());
+        return box;
     }
 
     private static class LibInfo {
@@ -836,11 +880,6 @@ public class JScienceMasterControl extends Application {
         return "category.other";
     }
 
-    private Label createHeaderLabel(String text) {
-        Label l = new Label(text + ":");
-        l.getStyleClass().add("form-label"); // Use CSS
-        return l;
-    }
 
     private boolean isClassAvailable(String className) {
         try {

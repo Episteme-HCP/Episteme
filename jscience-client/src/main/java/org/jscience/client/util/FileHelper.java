@@ -25,25 +25,42 @@ package org.jscience.client.util;
 
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
 import java.io.File;
 
 /**
- * Utility helper for common File I/O UI operations.
+ * Utility class for file operations in JavaFX applications.
  */
 public class FileHelper {
 
-    public static File showSaveDialog(Stage stage, String title, String description, String... extensions) {
+    /**
+     * Shows an open file dialog.
+     *
+     * @param stage             the parent stage.
+     * @param title             the dialog title.
+     * @param filterDescription the description of the file filter.
+     * @param extensions        the file extensions to filter (e.g., "*.txt", "*.params").
+     * @return the selected File, or null if no file was selected.
+     */
+    public static File showOpenDialog(Stage stage, String title, String filterDescription, String... extensions) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(title);
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(description, extensions));
-        return fileChooser.showSaveDialog(stage);
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(filterDescription, extensions));
+        return fileChooser.showOpenDialog(stage);
     }
 
-    public static File showOpenDialog(Stage stage, String title, String description, String... extensions) {
+    /**
+     * Shows a save file dialog.
+     *
+     * @param stage             the parent stage.
+     * @param title             the dialog title.
+     * @param filterDescription the description of the file filter.
+     * @param extensions        the file extensions to filter.
+     * @return the selected File, or null if no file was selected.
+     */
+    public static File showSaveDialog(Stage stage, String title, String filterDescription, String... extensions) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(title);
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(description, extensions));
-        return fileChooser.showOpenDialog(stage);
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(filterDescription, extensions));
+        return fileChooser.showSaveDialog(stage);
     }
 }

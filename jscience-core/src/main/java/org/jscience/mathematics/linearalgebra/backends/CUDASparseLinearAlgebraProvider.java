@@ -1,4 +1,4 @@
-﻿/*
+/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -26,38 +26,18 @@ package org.jscience.mathematics.linearalgebra.backends;
 import org.jscience.mathematics.structures.rings.Field;
 import org.jscience.mathematics.linearalgebra.Matrix;
 import org.jscience.mathematics.linearalgebra.Vector;
-
 import org.jscience.technical.backend.ExecutionContext;
 
-/**
- * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 public class CUDASparseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
     private final CPUSparseLinearAlgebraProvider<E> cpuProvider;
 
     public CUDASparseLinearAlgebraProvider(Field<E> field) {
-        // this.field = field; // Unused
         this.cpuProvider = new CPUSparseLinearAlgebraProvider<>(field);
-        if (checkAvailability()) {
-            java.util.logging.Logger.getLogger(getClass().getName()).info(
-                    "CUDASparseLinearAlgebraProvider initialized (Warning: Sparse GPU ops delegated to CPU in this version)");
-        }
     }
 
-    // Check if JCusparse is available? Usually assuming if JCuda matches.
     private static boolean checkAvailability() {
-        try {
-            Class.forName("jcuda.jcusparse.JCusparse");
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        } catch (UnsatisfiedLinkError e) {
-            return false;
-        }
+        return false;
     }
 
     @Override
@@ -72,12 +52,12 @@ public class CUDASparseLinearAlgebraProvider<E> implements LinearAlgebraProvider
 
     @Override
     public ExecutionContext createContext() {
-        return null;
+        return null; // TODO: Implement CUDA context
     }
 
     @Override
     public int getPriority() {
-        return isAvailable() ? 100 : 0;
+        return 0;
     }
 
     @Override
@@ -146,6 +126,11 @@ public class CUDASparseLinearAlgebraProvider<E> implements LinearAlgebraProvider
     }
 
     @Override
+    public E norm(Vector<E> a) {
+        return cpuProvider.norm(a);
+    }
+
+    @Override
     public String getId() {
         return "cudasparse";
     }
@@ -155,6 +140,3 @@ public class CUDASparseLinearAlgebraProvider<E> implements LinearAlgebraProvider
         return "CUDASparseLinearAlgebraProvider";
     }
 }
-
-
-

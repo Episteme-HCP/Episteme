@@ -53,11 +53,7 @@ public class Spintronic3DRenderer {
         root.getChildren().addAll(ambient, point);
     }
 
-    private void createLayers() {
-        // Group for layers to easily swap them
-        Group layerGroup = new Group();
-        root.getChildren().add(layerGroup);
-    }
+
 
     public void rebuildStructure(SpinValve valve) {
         root.getChildren().clear();
@@ -139,6 +135,7 @@ public class Spintronic3DRenderer {
     }
 
     private void updateArrowRotation(Group arrow, Real[] m) {
+        if (arrow == null) return;
         // Simple 2D-to-3D projection of the arrow for this demo
         double angle = Math.toDegrees(Math.atan2(m[1].doubleValue(), m[0].doubleValue()));
         arrow.setRotate(angle + 90);

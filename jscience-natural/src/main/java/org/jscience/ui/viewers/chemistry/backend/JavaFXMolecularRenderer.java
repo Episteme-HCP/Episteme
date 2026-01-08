@@ -1,7 +1,6 @@
 package org.jscience.ui.viewers.chemistry.backend;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;

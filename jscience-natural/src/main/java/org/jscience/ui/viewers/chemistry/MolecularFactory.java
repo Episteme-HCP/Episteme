@@ -7,7 +7,7 @@ package org.jscience.ui.viewers.chemistry;
 
 import org.jscience.technical.backend.BackendDiscovery;
 import org.jscience.technical.backend.BackendProvider;
-import org.jscience.ui.viewers.chemistry.backend.MolecularBackend;
+
 import org.jscience.ui.viewers.chemistry.backend.MolecularRenderer;
 import org.jscience.ui.viewers.chemistry.backend.JavaFXMolecularRenderer;
 
@@ -20,22 +20,27 @@ import java.util.Optional;
  */
 public class MolecularFactory {
 
-    private static String selectedBackendId = null; // null = AUTO
+    // private static String selectedBackendId = null; // Delegated to JScience.java
 
     /**
      * Sets the preferred backend by ID.
      * 
      * @param backendId Backend ID (e.g., "javafx", "jmol") or null for AUTO
      */
+    /**
+     * Sets the preferred backend by ID.
+     * 
+     * @param backendId Backend ID (e.g., "javafx", "jmol") or null for AUTO
+     */
     public static void setBackend(String backendId) {
-        selectedBackendId = backendId;
+        org.jscience.JScience.setMolecularBackendId(backendId);
     }
 
     /**
      * Gets the currently selected backend ID.
      */
     public static String getSelectedBackendId() {
-        return selectedBackendId;
+        return org.jscience.JScience.getMolecularBackendId();
     }
 
     /**
@@ -43,6 +48,7 @@ public class MolecularFactory {
      */
     public static MolecularRenderer createRenderer() {
         BackendProvider provider;
+        String selectedBackendId = getSelectedBackendId();
 
         if (selectedBackendId != null) {
             // Use specifically selected backend
