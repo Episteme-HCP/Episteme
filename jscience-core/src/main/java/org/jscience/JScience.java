@@ -459,8 +459,31 @@ public final class JScience {
     /**
      * Sets the current 3D plotting backend.
      */
+    /**
+     * Sets the current 3D plotting backend.
+     */
     public static void setPlottingBackend3D(org.jscience.ui.plotting.PlottingBackend backend) {
         plottingBackend3D = backend;
+    }
+
+    // ================= LINEAR ALGEBRA BACKEND =================
+
+    private static String linearAlgebraProviderId = "cpu-dense"; // Default
+
+    /**
+     * Gets the ID of the current Linear Algebra Provider.
+     */
+    public static String getLinearAlgebraProviderId() {
+        return linearAlgebraProviderId;
+    }
+
+    /**
+     * Sets the Linear Algebra Provider by ID.
+     */
+    public static void setLinearAlgebraProviderId(String id) {
+        linearAlgebraProviderId = id;
+        // Ideally, we would also update the active ComputeContext here if it supports hot-swapping
+        // ComputeContext.current().setLinearAlgebraProvider(id);
     }
 
     /**

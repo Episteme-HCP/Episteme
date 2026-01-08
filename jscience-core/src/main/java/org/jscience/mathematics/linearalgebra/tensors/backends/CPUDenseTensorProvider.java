@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -170,5 +170,16 @@ public class CPUDenseTensorProvider implements TensorProvider {
     public boolean isAvailable() {
         return true;
     }
+
+    @Override
+    public String getId() {
+        return "cpudense";
+    }
+
+    @Override
+    public String getDescription() {
+        return "CPUDenseTensorProvider";
+    }
 }
+
 

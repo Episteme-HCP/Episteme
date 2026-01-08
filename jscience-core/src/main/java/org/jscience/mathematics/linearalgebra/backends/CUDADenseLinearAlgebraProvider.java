@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -243,6 +243,17 @@ public class CUDADenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<
     public Matrix<E> scale(E scalar, Matrix<E> a) {
         return cpuProvider.scale(scalar, a);
     }
+
+    @Override
+    public String getId() {
+        return "cudadense";
+    }
+
+    @Override
+    public String getDescription() {
+        return "CUDADenseLinearAlgebraProvider";
+    }
 }
+
 
 

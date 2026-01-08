@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -420,6 +420,17 @@ public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvide
     public Matrix<E> scale(E scalar, Matrix<E> a) {
         return cpuProvider.scale(scalar, a);
     }
+
+    @Override
+    public String getId() {
+        return "opencldense";
+    }
+
+    @Override
+    public String getDescription() {
+        return "OpenCLDenseLinearAlgebraProvider";
+    }
 }
+
 
 

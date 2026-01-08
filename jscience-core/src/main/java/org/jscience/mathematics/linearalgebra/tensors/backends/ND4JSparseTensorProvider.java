@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -74,6 +74,17 @@ public class ND4JSparseTensorProvider implements TensorProvider {
     public boolean isAvailable() {
         return false; // Not available yet
     }
+
+    @Override
+    public String getId() {
+        return "nd4jsparse";
+    }
+
+    @Override
+    public String getDescription() {
+        return "ND4JSparseTensorProvider";
+    }
 }
+
 
 

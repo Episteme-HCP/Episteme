@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -144,4 +144,15 @@ public class ND4JDenseTensorProvider implements TensorProvider {
         }
         throw new UnsupportedOperationException("ND4J conversion not yet implemented");
     }
+
+    @Override
+    public String getId() {
+        return "nd4jdense";
+    }
+
+    @Override
+    public String getDescription() {
+        return "ND4JDenseTensorProvider";
+    }
 }
+

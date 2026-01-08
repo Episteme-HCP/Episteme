@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -136,6 +136,17 @@ public class OpenCLSparseLinearAlgebraProvider<E> implements LinearAlgebraProvid
     public Matrix<E> scale(E scalar, Matrix<E> a) {
         return cpuProvider.scale(scalar, a);
     }
+
+    @Override
+    public String getId() {
+        return "openclsparse";
+    }
+
+    @Override
+    public String getDescription() {
+        return "OpenCLSparseLinearAlgebraProvider";
+    }
 }
+
 
 

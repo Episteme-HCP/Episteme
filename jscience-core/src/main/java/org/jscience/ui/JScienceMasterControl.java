@@ -402,6 +402,27 @@ public class JScienceMasterControl extends Application {
         gpuVal.setStyle(JScience.isGpuAvailable() ? "-fx-text-fill: #27ae60; -fx-font-weight: bold;"
                 : "-fx-text-fill: #c0392b;");
 
+        // --- Linear Algebra Provider ---
+        ComboBox<String> linAlgBox = new ComboBox<>();
+        // Get available Linear Algebra providers
+        java.util.List<BackendProvider> linAlgProviders = BackendDiscovery.getInstance().getAvailableProvidersByType(BackendDiscovery.TYPE_LINEAR_ALGEBRA);
+        
+        linAlgBox.getItems().addAll(linAlgProviders.stream().map(BackendProvider::getId).collect(java.util.stream.Collectors.toList()));
+        
+        // Add default/fallback if empty or not found
+        if (!linAlgBox.getItems().contains(JScience.getLinearAlgebraProviderId())) {
+             linAlgBox.getItems().add(JScience.getLinearAlgebraProviderId());
+        }
+        
+        linAlgBox.setValue(JScience.getLinearAlgebraProviderId());
+        linAlgBox.setOnAction(e -> {
+            JScience.setLinearAlgebraProviderId(linAlgBox.getValue());
+            JScience.savePreferences();
+        });
+        
+        VBox linAlgInfo = createInfoBox(i18n.get("mastercontrol.computing.linalg", "Linear Algebra Provider"),
+                i18n.get("mastercontrol.computing.desc.linalg", "Select the backend for dense matrix operations (CPU, GPU, Native)."));
+
         grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.computing.mode", "Compute Mode")), modeBox, modeInfo);
         grid.addRow(1, createHeaderLabel(i18n.get("mastercontrol.computing.float_precision", "Float Precision")),
                 floatBox,
@@ -415,9 +436,17 @@ public class JScienceMasterControl extends Application {
                 precInfo);
         grid.addRow(5, createHeaderLabel(i18n.get("mastercontrol.computing.rounding", "Rounding Mode")), roundBox,
                 roundInfo);
+        grid.addRow(6, createHeaderLabel(i18n.get("mastercontrol.computing.linalg", "Linear Algebra")), linAlgBox,
+                linAlgInfo);
 
         content.getChildren().addAll(header, grid);
         return new Tab(i18n.get("mastercontrol.tab.computing", "Computing"), content);
+    }
+
+    private Label createHeaderLabel(String text) {
+        Label l = new Label(text);
+        l.setStyle("-fx-font-weight: bold;");
+        return l;
     }
 
     private Tab createPlottingTab(I18n i18n) {

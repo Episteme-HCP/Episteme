@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -616,6 +616,17 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         return new GenericVector<>(
                 new org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(resArray), this, field);
     }
+
+    @Override
+    public String getId() {
+        return "cpudense";
+    }
+
+    @Override
+    public String getDescription() {
+        return "CPUDenseLinearAlgebraProvider";
+    }
 }
+
 
 
