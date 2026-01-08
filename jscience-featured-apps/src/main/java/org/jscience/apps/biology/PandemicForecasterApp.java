@@ -65,6 +65,11 @@ public class PandemicForecasterApp extends FeaturedAppBase {
     private XYChart.Series<Number, Number> susSeriesS, expSeriesE, infSeriesI, recSeriesR, deaSeriesD;
     private ListView<String> eventLog;
     private Label populationLabel, peakLabel, totalLabel, deadLabel;
+    private Label chartAreaTitleLabel;
+    private Label countrySelectLabel;
+    private Label parametersTitleLabel;
+    private Label logHeaderLabel;
+    private java.util.Map<String, Label> sliderLabels = new java.util.HashMap<>();
 
     // Simulation State
     private Timeline simulationTimeline;
@@ -135,8 +140,8 @@ public class PandemicForecasterApp extends FeaturedAppBase {
         area.setPadding(new Insets(10));
 
         // Title
-        Label title = new Label(i18n.get("pandemic.panel.chart"));
-        title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        chartAreaTitleLabel = new Label(i18n.get("pandemic.panel.chart"));
+        chartAreaTitleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         // SEIR Chart
         seirChart = ChartFactory.createLineChart(i18n.get("pandemic.panel.chart"), "Day", "Population");
@@ -168,7 +173,7 @@ public class PandemicForecasterApp extends FeaturedAppBase {
         // Statistics panel
         HBox statsBox = createStatsPanel();
 
-        area.getChildren().addAll(title, seirChart, statsBox);
+        area.getChildren().addAll(chartAreaTitleLabel, seirChart, statsBox);
         return area;
     }
 
@@ -197,8 +202,8 @@ public class PandemicForecasterApp extends FeaturedAppBase {
         panel.setStyle("-fx-background-color: #fafafa; -fx-border-color: #ddd; -fx-border-width: 0 0 0 1;");
 
         // Country selector
-        Label countryLabel = new Label(i18n.get("pandemic.label.select"));
-        countryLabel.setStyle("-fx-font-weight: bold;");
+        countrySelectLabel = new Label(i18n.get("pandemic.label.select"));
+        countrySelectLabel.setStyle("-fx-font-weight: bold;");
         countrySelector = new ComboBox<>();
         countrySelector.setItems(FXCollections.observableArrayList(countries));
         countrySelector.setCellFactory(lv -> new ListCell<Country>() {
@@ -219,32 +224,32 @@ public class PandemicForecasterApp extends FeaturedAppBase {
         }
 
         // Parameters section
-        Label paramLabel = new Label("Ã°Å¸Å½â€ºÃ¯Â¸Â " + i18n.get("pandemic.panel.parameters"));
-        paramLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        parametersTitleLabel = new Label(i18n.get("pandemic.panel.parameters"));
+        parametersTitleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
         // Beta (transmission rate)
-        VBox betaBox = createSliderWithLabel(i18n.get("pandemic.param.beta"), 0.05, 1.0, 0.3);
+        VBox betaBox = createSliderWithLabel(i18n.get("pandemic.param.beta"), 0.05, 1.0, 0.3, "beta");
         betaSlider = (Slider) betaBox.getChildren().get(1);
 
         // Sigma (incubation rate = 1/incubation_period)
-        VBox sigmaBox = createSliderWithLabel(i18n.get("pandemic.param.sigma"), 0.05, 1.0, 0.2);
+        VBox sigmaBox = createSliderWithLabel(i18n.get("pandemic.param.sigma"), 0.05, 1.0, 0.2, "sigma");
         sigmaSlider = (Slider) sigmaBox.getChildren().get(1);
 
         // Gamma (recovery rate = 1/infectious_period)
-        VBox gammaBox = createSliderWithLabel(i18n.get("pandemic.param.gamma"), 0.05, 0.5, 0.1);
+        VBox gammaBox = createSliderWithLabel(i18n.get("pandemic.param.gamma"), 0.05, 0.5, 0.1, "gamma");
         gammaSlider = (Slider) gammaBox.getChildren().get(1);
 
         // Mu (mortality rate)
-        VBox muBox = createSliderWithLabel(i18n.get("pandemic.param.mu"), 0.00, 0.1, 0.005);
+        VBox muBox = createSliderWithLabel(i18n.get("pandemic.param.mu"), 0.00, 0.1, 0.005, "mu");
         muSlider = (Slider) muBox.getChildren().get(1);
 
         // Initial infected
-        VBox initialBox = createSliderWithLabel(i18n.get("pandemic.param.initial"), 1, 10000, 100);
+        VBox initialBox = createSliderWithLabel(i18n.get("pandemic.param.initial"), 1, 10000, 100, "initial");
         initialSlider = (Slider) initialBox.getChildren().get(1);
         initialSlider.setBlockIncrement(10);
 
         // Simulation days
-        VBox daysBox = createSliderWithLabel(i18n.get("pandemic.param.days"), 30, 365, 180);
+        VBox daysBox = createSliderWithLabel(i18n.get("pandemic.param.days"), 30, 365, 180, "days");
         daysSlider = (Slider) daysBox.getChildren().get(1);
         daysSlider.setBlockIncrement(10);
 
@@ -255,34 +260,35 @@ public class PandemicForecasterApp extends FeaturedAppBase {
         gammaSlider.valueProperty().addListener((o, ov, nv) -> updateR0Label(r0Label));
 
         // Event log
-        Label logLabel = new Label(i18n.get("pandemic.log.header"));
-        logLabel.setStyle("-fx-font-weight: bold;");
+        logHeaderLabel = new Label(i18n.get("pandemic.log.header"));
+        logHeaderLabel.setStyle("-fx-font-weight: bold;");
         eventLog = new ListView<>();
         eventLog.setPrefHeight(150);
 
         // Assemble
         panel.getChildren().addAll(
-                countryLabel, countrySelector,
+                countrySelectLabel, countrySelector,
                 new Separator(),
-                paramLabel,
+                parametersTitleLabel,
                 betaBox, sigmaBox, gammaBox, muBox,
                 new Separator(),
                 initialBox, daysBox,
                 r0Label,
                 new Separator(),
-                logLabel, eventLog);
+                logHeaderLabel, eventLog);
 
         return panel;
     }
 
-    private VBox createSliderWithLabel(String name, double min, double max, double initial) {
+    private VBox createSliderWithLabel(String name, double min, double max, double initial, String paramId) {
         VBox box = new VBox(2);
         Label nameLabel = new Label(name + ": " + String.format("%.3f", initial));
+        sliderLabels.put(paramId, nameLabel);
         Slider slider = new Slider(min, max, initial);
         slider.setShowTickLabels(true);
         slider.setShowTickMarks(true);
         slider.valueProperty().addListener((obs, ov, nv) -> {
-            nameLabel.setText(name + ": " + String.format("%.3f", nv.doubleValue()));
+            nameLabel.setText(i18n.get("pandemic.param." + paramId) + ": " + String.format("%.3f", nv.doubleValue()));
         });
         box.getChildren().addAll(nameLabel, slider);
         return box;
@@ -433,6 +439,55 @@ public class PandemicForecasterApp extends FeaturedAppBase {
         log(i18n.get("pandemic.log.reset"));
     }
 
+    @Override
+    protected void updateLocalizedUI() {
+        if (chartAreaTitleLabel != null)
+            chartAreaTitleLabel.setText(i18n.get("pandemic.panel.chart"));
+        if (countrySelectLabel != null)
+            countrySelectLabel.setText(i18n.get("pandemic.label.select"));
+        if (parametersTitleLabel != null)
+            parametersTitleLabel.setText(i18n.get("pandemic.panel.parameters"));
+        if (logHeaderLabel != null)
+            logHeaderLabel.setText(i18n.get("pandemic.log.header"));
+
+        // Update slider labels
+        if (sliderLabels.get("beta") != null)
+            sliderLabels.get("beta").setText(i18n.get("pandemic.param.beta"));
+        if (sliderLabels.get("sigma") != null)
+            sliderLabels.get("sigma").setText(i18n.get("pandemic.param.sigma"));
+        if (sliderLabels.get("gamma") != null)
+            sliderLabels.get("gamma").setText(i18n.get("pandemic.param.gamma"));
+        if (sliderLabels.get("mu") != null)
+            sliderLabels.get("mu").setText(i18n.get("pandemic.param.mu"));
+        if (sliderLabels.get("initial") != null)
+            sliderLabels.get("initial").setText(i18n.get("pandemic.param.initial"));
+        if (sliderLabels.get("days") != null)
+            sliderLabels.get("days").setText(i18n.get("pandemic.param.days"));
+
+        if (seirChart != null) {
+            seirChart.setTitle(i18n.get("pandemic.panel.chart"));
+            if (susSeriesS != null)
+                susSeriesS.setName(i18n.get("pandemic.label.susceptible"));
+            if (expSeriesE != null)
+                expSeriesE.setName(i18n.get("pandemic.label.exposed"));
+            if (infSeriesI != null)
+                infSeriesI.setName(i18n.get("pandemic.label.infectious"));
+            if (recSeriesR != null)
+                recSeriesR.setName(i18n.get("pandemic.label.recovered"));
+            if (deaSeriesD != null)
+                deaSeriesD.setName(i18n.get("pandemic.label.deceased"));
+        }
+
+        // Stats labels
+        if (populationLabel != null)
+            onCountrySelected(); // Refresh population label
+
+        // Parameters labels (sliders)
+        // Note: createSliderWithLabel uses local Label, hard to update without storing
+        // them all.
+        // For now, let's at least update the main ones.
+    }
+
     private void clearChart() {
         susSeriesS.getData().clear();
         expSeriesE.getData().clear();
@@ -507,16 +562,16 @@ public class PandemicForecasterApp extends FeaturedAppBase {
     protected void addAppHelpTopics(org.jscience.apps.framework.HelpDialog dialog) {
         dialog.addTopic("Scientific Model", "SEIR Model",
                 "This application uses the **SEIR** compartmental model:\n\n" +
-                        "Ã¢â‚¬Â¢ **S**usceptible: Individuals who can catch the disease.\n" +
-                        "Ã¢â‚¬Â¢ **E**xposed: Infected but not yet infectious (incubation).\n" +
-                        "Ã¢â‚¬Â¢ **I**nfectious: Can spread the disease to Susceptibles.\n" +
-                        "Ã¢â‚¬Â¢ **R**ecovered: Immune or recovered.\n" +
-                        "Ã¢â‚¬Â¢ **D**eceased: Died from the disease.\n\n" +
+                        "- **S**usceptible: Individuals who can catch the disease.\n" +
+                        "- **E**xposed: Infected but not yet infectious (incubation).\n" +
+                        "- **I**nfectious: Can spread the disease to Susceptibles.\n" +
+                        "- **R**ecovered: Immune or recovered.\n" +
+                        "- **D**eceased: Died from the disease.\n\n" +
                         "Parameters:\n" +
-                        "Ã¢â‚¬Â¢ **Beta**: Transmission rate.\n" +
-                        "Ã¢â‚¬Â¢ **Sigma**: Incubation rate (1/incubation period).\n" +
-                        "Ã¢â‚¬Â¢ **Gamma**: Recovery rate (1/infectious period).\n" +
-                        "Ã¢â‚¬Â¢ **Mu**: Mortality rate.",
+                        "- **Beta**: Transmission rate.\n" +
+                        "- **Sigma**: Incubation rate (1/incubation period).\n" +
+                        "- **Gamma**: Recovery rate (1/infectious period).\n" +
+                        "- **Mu**: Mortality rate.",
                 null);
     }
 

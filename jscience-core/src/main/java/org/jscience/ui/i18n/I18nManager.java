@@ -198,11 +198,13 @@ public final class I18nManager {
                             .listFiles((dir, name) -> name.startsWith(filePrefix) && name.endsWith(".properties"));
                     if (files != null) {
                         for (java.io.File f : files) {
-                            String name = f.getName(); // e.g. messages_apps_fr.properties
-                            // Parse locale
-                            // Remove prefix and suffix
+                            String name = f.getName();
+                            // Precise match: filePrefix + optional _locale + .properties
+                            // This prevents "messages" matching "messages_apps_en"
                             String suffix = name.substring(filePrefix.length(), name.length() - ".properties".length());
-                            if (suffix.startsWith("_")) {
+                            if (suffix.isEmpty()) {
+                                locales.add(Locale.ENGLISH); // Default bundle
+                            } else if (suffix.matches("^_[a-z]{2}(_[A-Z]{2})?(_[A-Za-z]+)?$")) {
                                 String langTag = suffix.substring(1).replace('_', '-');
                                 locales.add(Locale.forLanguageTag(langTag));
                             }

@@ -59,6 +59,15 @@ public class CrystalStructureApp extends FeaturedAppBase {
     private Slider rotateXSlider;
     private Slider rotateYSlider;
 
+    // Localization Fields
+    private Label viewTitleLabel;
+    private Label controlsTitleLabel;
+    private Label rotationLabel; // fixed name to rotationLabel
+    private Label axisXLabel;
+    private Label axisYLabel;
+    private Button loadCifBtn;
+    private Button sampleBtn;
+
     // Data
     private static class AtomRecord {
         double x, y, z;
@@ -175,9 +184,8 @@ public class CrystalStructureApp extends FeaturedAppBase {
         VBox box = new VBox(15);
         box.setStyle("-fx-padding: 15; -fx-background-color: #f4f4f4;");
 
-        Label title = new Label(i18n.get("crystal.panel.view")); // "3D View" or better "Crystal Explorer"
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-        title.setText("Ã°Å¸â€™Å½ " + i18n.get("crystal.title"));
+        viewTitleLabel = new Label("💎 " + i18n.get("crystal.title"));
+        viewTitleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         // Structure Selection
         latticeCombo = new ComboBox<>();
@@ -192,11 +200,11 @@ public class CrystalStructureApp extends FeaturedAppBase {
         });
         latticeCombo.setMaxWidth(Double.MAX_VALUE);
 
-        Button loadCifBtn = new Button(i18n.get("crystal.button.loadcif"));
+        loadCifBtn = new Button(i18n.get("crystal.button.loadcif"));
         loadCifBtn.setOnAction(e -> loadCif());
         loadCifBtn.setMaxWidth(Double.MAX_VALUE);
 
-        Button sampleBtn = new Button(
+        sampleBtn = new Button(
                 MessageFormat.format(i18n.get("crystal.button.loadsample"), LatticeType.DIAMOND.toString()));
         sampleBtn.setOnAction(e -> loadSample());
         sampleBtn.setMaxWidth(Double.MAX_VALUE);
@@ -229,21 +237,59 @@ public class CrystalStructureApp extends FeaturedAppBase {
         rotateYSlider.setShowTickLabels(true);
         rotateYSlider.valueProperty().addListener((obs, oldVal, newVal) -> ry.setAngle(newVal.doubleValue()));
 
+        controlsTitleLabel = new Label(i18n.get("crystal.panel.controls"));
+        rotationLabel = new Label(i18n.get("crystal.label.rotation"));
+        axisXLabel = new Label(i18n.get("crystal.axis.x"));
+        axisYLabel = new Label(i18n.get("crystal.axis.y"));
+
         box.getChildren().addAll(
-                title,
-                new Label(i18n.get("crystal.panel.controls")),
+                viewTitleLabel,
+                controlsTitleLabel,
                 latticeCombo,
                 loadCifBtn,
                 sampleBtn,
                 new Separator(),
-                new Label(i18n.get("crystal.label.rotation")),
-                new Label(i18n.get("crystal.axis.x")), rotateXSlider,
-                new Label(i18n.get("crystal.axis.y")), rotateYSlider,
+                rotationLabel,
+                axisXLabel, rotateXSlider,
+                axisYLabel, rotateYSlider,
                 new Separator(),
                 toggles,
                 new Separator(),
                 infoLabel);
         return box;
+    }
+
+    @Override
+    protected void updateLocalizedUI() {
+        if (viewTitleLabel != null)
+            viewTitleLabel.setText("💎 " + i18n.get("crystal.title"));
+        if (controlsTitleLabel != null)
+            controlsTitleLabel.setText(i18n.get("crystal.panel.controls"));
+        if (loadCifBtn != null)
+            loadCifBtn.setText(i18n.get("crystal.button.loadcif"));
+        if (sampleBtn != null)
+            sampleBtn.setText(
+                    MessageFormat.format(i18n.get("crystal.button.loadsample"), LatticeType.DIAMOND.toString()));
+        if (showAtoms != null)
+            showAtoms.setText(i18n.get("crystal.check.atoms"));
+        if (showBonds != null)
+            showBonds.setText(i18n.get("crystal.check.bonds"));
+        if (showUnitCell != null)
+            showUnitCell.setText(i18n.get("crystal.check.unitcell"));
+        if (rotationLabel != null)
+            rotationLabel.setText(i18n.get("crystal.label.rotation"));
+        if (axisXLabel != null)
+            axisXLabel.setText(i18n.get("crystal.axis.x"));
+        if (axisYLabel != null)
+            axisYLabel.setText(i18n.get("crystal.axis.y"));
+
+        if (latticeCombo != null) {
+            LatticeType selected = latticeCombo.getValue();
+            List<LatticeType> items = new ArrayList<>(latticeCombo.getItems());
+            latticeCombo.getItems().clear();
+            latticeCombo.getItems().addAll(items);
+            latticeCombo.setValue(selected);
+        }
     }
 
     private void loadCifStructure(java.io.InputStream is) {
@@ -255,7 +301,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
                 return;
 
             root3D.getChildren().clear();
-            infoLabel.setText("Formula: " + cif.chemicalFormula + "\n" +
+            infoLabel.setText(MessageFormat.format(i18n.get("crystal.details.formula"), cif.chemicalFormula) + "\n" +
                     "a=" + cif.a + ", b=" + cif.b + ", c=" + cif.c + "\n" +
                     "alpha=" + cif.alpha + ", beta=" + cif.beta + ", gamma=" + cif.gamma);
 
@@ -342,7 +388,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
             }
 
         } catch (Exception e) {
-            infoLabel.setText("Error loading CIF: " + e.getMessage());
+            infoLabel.setText(i18n.get("crystal.error.load") + ": " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -365,7 +411,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
             if (is != null) {
                 loadCifStructure(is);
             } else {
-                infoLabel.setText("Sample diamond.cif not found.");
+                infoLabel.setText(i18n.get("crystal.error.sample"));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -376,37 +422,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
         if (latticeCombo.getValue() != null && latticeCombo.getValue() != LatticeType.CIF) {
             loadStructure(latticeCombo.getValue());
         } else if (latticeCombo.getValue() == LatticeType.CIF) {
-            // If CIF is selected, we need to re-load the CIF to redraw based on toggles
-            // This might be slow for large CIFs, but ensures consistency.
-            // A better approach would be to store the loaded CIF data and redraw from it.
-            // For now, we'll just reload the last loaded CIF if possible.
-            // This requires storing the last loaded CIF's InputStream or path.
-            // For simplicity, we'll just clear and do nothing if CIF is selected and not
-            // reloaded.
-            // Or, if we want to re-draw the *current* CIF, we need to store its data.
-            // For now, let's assume CIFs are loaded via loadCifStructure directly.
-            // If the user toggles, and CIF was the last loaded, we need to re-render it.
-            // This implies loadCifStructure should also respect showAtoms/showBonds.
-            // The current loadCifStructure already respects showAtoms/showBonds.
-            // So, if CIF was loaded, toggling will re-render it correctly.
-            // However, drawStructure() is called by the combo box, which means
-            // if CIF is selected, it should trigger a re-draw of the *last loaded* CIF.
-            // This is a gap in the current logic. For now, we'll just do nothing
-            // if CIF is selected and drawStructure is called, as loadCif() would open a
-            // file dialog.
-            // A more robust solution would be to store the CIF data in a field.
-            // For the purpose of this refactor, we'll assume loadCifStructure handles the
-            // drawing.
-            // The current implementation of loadCifStructure already respects
-            // showAtoms/showBonds.
-            // So, if a CIF is loaded, and then toggles are changed, the next
-            // loadCifStructure call
-            // (e.g., by re-selecting the CIF type or loading a new CIF) will apply the
-            // toggles.
-            // To make toggles work for *already loaded* CIFs, we need to store the CIF
-            // data.
-            // For this specific refactor, we'll leave it as is, as the instruction focuses
-            // on loadStructure.
+            // See previous discussion on re-drawing CIF
         }
     }
 
@@ -421,14 +437,14 @@ public class CrystalStructureApp extends FeaturedAppBase {
 
         if (type == LatticeType.SC) {
             // Simple Cubic
-            infoLabel.setText("Simple Cubic (Po)\na=1.0");
+            infoLabel.setText(i18n.get("crystal.details.sc"));
             for (int i = 0; i < 2; i++)
                 for (int j = 0; j < 2; j++)
                     for (int k = 0; k < 2; k++)
                         atoms.add(new AtomRecord(i, j, k, "Po"));
         } else if (type == LatticeType.BCC) {
             // BCC
-            infoLabel.setText("Body-Centered Cubic (Fe)\na=2.87 A");
+            infoLabel.setText(i18n.get("crystal.details.bcc"));
             // corners
             for (int i = 0; i < 2; i++)
                 for (int j = 0; j < 2; j++)
@@ -440,7 +456,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
                     }
         } else if (type == LatticeType.FCC) {
             // FCC
-            infoLabel.setText("Face-Centered Cubic (Cu)\na=3.61 A");
+            infoLabel.setText(i18n.get("crystal.details.fcc"));
             for (int i = 0; i < 2; i++)
                 for (int j = 0; j < 2; j++)
                     for (int k = 0; k < 2; k++) {
@@ -452,13 +468,19 @@ public class CrystalStructureApp extends FeaturedAppBase {
                         }
                     }
         } else if (type == LatticeType.NACL) {
-            infoLabel.setText("Sodium Chloride (NaCl)\na=5.64 A\nInterpenetrating FCC");
-            addNaClUnit(atoms, 0, 0, 0);
+            infoLabel.setText(i18n.get("crystal.details.nacl"));
+            for (int i = 0; i < 2; i++)
+                for (int j = 0; j < 2; j++)
+                    for (int k = 0; k < 2; k++)
+                        addNaClUnit(atoms, i, j, k);
         } else if (type == LatticeType.DIAMOND) {
-            infoLabel.setText("Diamond (C)\na=3.57 A\nTetrahedral coordination");
-            addDiamondUnit(atoms, 0, 0, 0, "C");
+            infoLabel.setText(i18n.get("crystal.details.diamond"));
+            for (int i = 0; i < 2; i++)
+                for (int j = 0; j < 2; j++)
+                    for (int k = 0; k < 2; k++)
+                        addDiamondUnit(atoms, i, j, k, "C");
         } else if (type == LatticeType.CSCL) {
-            infoLabel.setText("Cesium Chloride (CsCl)\nSimple Cubic Basis");
+            infoLabel.setText(i18n.get("crystal.details.cscl"));
             atoms.add(new AtomRecord(0, 0, 0, "Cl"));
             atoms.add(new AtomRecord(0.5, 0.5, 0.5, "Cs"));
         }
@@ -563,7 +585,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
         double angle = Math.acos(diff.normalize().dotProduct(yAxis));
         Rotate rotateAroundCenter = new Rotate(-Math.toDegrees(angle), axisOfRotation);
 
-        Cylinder line = new Cylinder(0.1, height);
+        Cylinder line = new Cylinder(0.03, height);
         line.getTransforms().addAll(moveToMidpoint, rotateAroundCenter);
         line.setMaterial(new PhongMaterial(Color.LIGHTGRAY));
 

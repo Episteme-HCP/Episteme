@@ -29,6 +29,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -85,6 +86,13 @@ public class TitrationApp extends FeaturedAppBase {
     private ComboBox<Indicator> indicatorSelector;
     private ComboBox<AcidType> acidSelector;
     private Color indicatorColor = Color.TRANSPARENT;
+
+    // UI references for localization
+    private Label setupTitleLabel;
+    private Label acidTypeLabel;
+    private Label indicatorLabel;
+    private Label titrantLabel;
+    private LineChart<Number, Number> phChart;
 
     // Indicators with their pH ranges and colors
     private enum Indicator {
@@ -168,7 +176,7 @@ public class TitrationApp extends FeaturedAppBase {
         box.setPadding(new Insets(15));
 
         // Chart
-        LineChart<Number, Number> phChart = ChartFactory.createLineChart(i18n.get("titration.panel.chart"),
+        phChart = ChartFactory.createLineChart(i18n.get("titration.panel.chart"),
                 i18n.get("titration.label.volume"), i18n.get("titration.label.ph_axis"));
         phSeries = new XYChart.Series<>();
         phSeries.setName(i18n.get("titration.series.ph"));
@@ -180,10 +188,10 @@ public class TitrationApp extends FeaturedAppBase {
         grid.setHgap(10);
         grid.setVgap(10);
 
-        phLabel = new Label(MessageFormat.format(i18n.get("titration.label.ph"), "1.00"));
+        phLabel = new Label();
         phLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
-        volumeLabel = new Label(MessageFormat.format(i18n.get("titration.label.voladded"), "0.00"));
+        volumeLabel = new Label();
 
         valveSlider = new Slider(0, 1.0, 0);
         valveSlider.setShowTickLabels(true);
@@ -208,20 +216,30 @@ public class TitrationApp extends FeaturedAppBase {
         indicatorSelector.getItems().addAll(Indicator.values());
         indicatorSelector.setValue(Indicator.PHENOLPHTHALEIN);
         indicatorSelector.setMaxWidth(Double.MAX_VALUE);
+        indicatorSelector.setOnAction(e -> calculatePH()); // Update color immediately
+
+        setupTitleLabel = new Label(i18n.get("titration.panel.setup"));
+        setupTitleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        acidTypeLabel = new Label(i18n.get("titration.label.acidtype"));
+        indicatorLabel = new Label(i18n.get("titration.label.indicator"));
+        titrantLabel = new Label(i18n.get("titration.label.titrant"));
 
         box.getChildren().addAll(
-                new Label(i18n.get("titration.panel.setup")),
-                new Label(i18n.get("titration.label.acidtype")),
+                setupTitleLabel,
+                acidTypeLabel,
                 acidSelector,
                 phChart,
                 phLabel, volumeLabel,
                 new Separator(),
-                new Label(i18n.get("titration.label.indicator")),
+                indicatorLabel,
                 indicatorSelector,
                 new Separator(),
-                new Label(i18n.get("titration.label.titrant")),
+                titrantLabel,
                 valveSlider);
         VBox.setVgrow(phChart, Priority.ALWAYS);
+
+        // Initial update
+        calculatePH();
         return box;
     }
 
@@ -267,10 +285,14 @@ public class TitrationApp extends FeaturedAppBase {
             if (molesAcidInitial > molesBaseAdded) {
                 double concH = (molesAcidInitial - molesBaseAdded) / totalVolL;
                 ph = -Math.log10(Math.max(1e-14, concH));
-            } else if (molesBaseAdded > equivalencePointTotal) {
-                double concOH = (molesBaseAdded - equivalencePointTotal) / totalVolL;
-                double pOH = -Math.log10(Math.max(1e-14, concOH));
+                if (ph > 6.9)
+                    ph = 6.9; // Avoid jumping too high before equivalence
+            } else if (molesBaseAdded > molesAcidInitial * protonCount + 1e-9) {
+                double concOH = (molesBaseAdded - molesAcidInitial * protonCount) / totalVolL;
+                double pOH = -Math.log10(Math.max(1e-7, concOH));
                 ph = 14.0 - pOH;
+                if (ph < 7.1)
+                    ph = 7.1; // Ensure it stays basic
             } else {
                 ph = 7.0;
             }
@@ -285,7 +307,11 @@ public class TitrationApp extends FeaturedAppBase {
                 // Past final equivalence point - excess base
                 double excessBase = molesBaseAdded - molesAcidInitial * protonCount;
                 double concOH = excessBase / totalVolL;
-                ph = 14.0 + Math.log10(Math.max(1e-14, concOH));
+                ph = 14.0 + Math.log10(Math.max(1e-7, concOH));
+                if (ph < 7.1 && molesRatio > protonCount)
+                    ph = 7.1;
+                else if (molesRatio == protonCount)
+                    ph = 8.5; // Approximation for weak acid eq. point
             } else {
                 // Between start and final equivalence point
                 int step = (int) molesRatio; // Which dissociation step
@@ -340,6 +366,32 @@ public class TitrationApp extends FeaturedAppBase {
                         - volumeBaseAdded) > 0.5) {
             phSeries.getData().add(new XYChart.Data<>(volumeBaseAdded, ph));
         }
+    }
+
+    @Override
+    protected void updateLocalizedUI() {
+        if (setupTitleLabel != null)
+            setupTitleLabel.setText(i18n.get("titration.panel.setup"));
+        if (acidTypeLabel != null)
+            acidTypeLabel.setText(i18n.get("titration.label.acidtype"));
+        if (indicatorLabel != null)
+            indicatorLabel.setText(i18n.get("titration.label.indicator"));
+        if (titrantLabel != null)
+            titrantLabel.setText(i18n.get("titration.label.titrant"));
+
+        if (phChart != null) {
+            phChart.setTitle(i18n.get("titration.panel.chart"));
+            if (phChart.getXAxis() instanceof NumberAxis) {
+                ((NumberAxis) phChart.getXAxis()).setLabel(i18n.get("titration.label.volume"));
+            }
+            if (phChart.getYAxis() instanceof NumberAxis) {
+                ((NumberAxis) phChart.getYAxis()).setLabel(i18n.get("titration.label.ph_axis"));
+            }
+            if (!phChart.getData().isEmpty()) {
+                phChart.getData().get(0).setName(i18n.get("titration.series.ph"));
+            }
+        }
+        calculatePH(); // Refresh labels
     }
 
     private void drawLab() {

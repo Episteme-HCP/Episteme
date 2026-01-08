@@ -58,6 +58,13 @@ public class SmartGridApp extends FeaturedAppBase {
     private Slider windCapacitySlider;
     private Slider solarCapacitySlider;
     private Slider demandScaleSlider;
+    private Label vizTitleLabel;
+    private Label controlRoomTitleLabel;
+    private Label coalLabel;
+    private Label windLabel;
+    private Label solarLabel;
+    private Label demandLabel;
+    private Label batteryTitleLabel;
 
     // Simulation State
     private double currentSupply = 0;
@@ -117,12 +124,12 @@ public class SmartGridApp extends FeaturedAppBase {
         VBox box = new VBox(10);
         box.setPadding(new Insets(10));
 
-        Label title = new Label("Ã°Å¸Â â„¢Ã¯Â¸Â  " + i18n.get("grid.viz.title"));
-        title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        vizTitleLabel = new Label(i18n.get("grid.viz.title"));
+        vizTitleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
         gridCanvas = new Canvas(300, 500);
 
-        box.getChildren().addAll(title, gridCanvas);
+        box.getChildren().addAll(vizTitleLabel, gridCanvas);
         VBox.setVgrow(gridCanvas, Priority.ALWAYS);
 
         return box;
@@ -132,7 +139,8 @@ public class SmartGridApp extends FeaturedAppBase {
         VBox box = new VBox(10);
         box.setPadding(new Insets(10));
 
-        loadChart = ChartFactory.createAreaChart(i18n.get("grid.chart.title"), "Time", "Power (MW)");
+        loadChart = ChartFactory.createAreaChart(i18n.get("grid.chart.title"), i18n.get("grid.label.time"),
+                i18n.get("grid.label.power"));
         loadChart.setAnimated(false);
         loadChart.setCreateSymbols(false);
 
@@ -171,35 +179,36 @@ public class SmartGridApp extends FeaturedAppBase {
     private VBox createControlRoom() {
         VBox box = new VBox(15);
         box.setPadding(new Insets(15));
-        box.setStyle("-fx-background-color: #f5f5f5;"); // Light
-                                                        // control
-                                                        // panel
-                                                        // theme
+        box.setStyle("-fx-background-color: #f5f5f5;"); // Light control panel theme
 
-        Label title = new Label(i18n.get("grid.panel.control"));
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        controlRoomTitleLabel = new Label(i18n.get("grid.panel.control"));
+        controlRoomTitleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         // Coal
-        VBox coalBox = createControlGroup(i18n.get("grid.control.coal"), 0, 1000, 500, Color.ORANGE);
+        coalLabel = new Label(i18n.get("grid.control.coal"));
+        VBox coalBox = createControlGroup(coalLabel, 0, 1000, 500, Color.ORANGE);
         coalOutputSlider = (Slider) coalBox.getChildren().get(1);
 
         // Wind
-        VBox windBox = createControlGroup(i18n.get("grid.control.wind"), 0, 500, 100, Color.CYAN);
+        windLabel = new Label(i18n.get("grid.control.wind"));
+        VBox windBox = createControlGroup(windLabel, 0, 500, 100, Color.CYAN);
         windCapacitySlider = (Slider) windBox.getChildren().get(1);
 
         // Solar
-        VBox solarBox = createControlGroup(i18n.get("grid.control.solar"), 0, 500, 100, Color.YELLOW);
+        solarLabel = new Label(i18n.get("grid.control.solar"));
+        VBox solarBox = createControlGroup(solarLabel, 0, 500, 100, Color.YELLOW);
         solarCapacitySlider = (Slider) solarBox.getChildren().get(1);
 
         // Demand
-        VBox demandBox = createControlGroup(i18n.get("grid.control.demand"), 50, 200, 100, Color.MAGENTA);
+        demandLabel = new Label(i18n.get("grid.control.demand"));
+        VBox demandBox = createControlGroup(demandLabel, 50, 200, 100, Color.MAGENTA);
         demandScaleSlider = (Slider) demandBox.getChildren().get(1);
 
         // Battery Status
         VBox batteryBox = new VBox(5);
-        Label batteryTitle = new Label(i18n.get("grid.label.battery_title"));
-        batteryTitle.setTextFill(Color.DARKGREEN);
-        batteryTitle.setStyle("-fx-font-weight: bold;");
+        batteryTitleLabel = new Label(i18n.get("grid.label.battery_title"));
+        batteryTitleLabel.setTextFill(Color.DARKGREEN);
+        batteryTitleLabel.setStyle("-fx-font-weight: bold;");
 
         batteryBar = new ProgressBar(0.5);
         batteryBar.setMaxWidth(Double.MAX_VALUE);
@@ -209,19 +218,15 @@ public class SmartGridApp extends FeaturedAppBase {
                 MessageFormat.format(i18n.get("grid.label.battery_charge"), batteryCharge, batteryCapacity));
         batteryLabel.setTextFill(Color.DARKGRAY);
 
-        batteryBox.getChildren().addAll(batteryTitle, batteryBar, batteryLabel);
+        batteryBox.getChildren().addAll(batteryTitleLabel, batteryBar, batteryLabel);
 
-        Button tripReset = new Button(i18n.get("grid.button.reset"));
-        tripReset.setMaxWidth(Double.MAX_VALUE);
-        tripReset.setOnAction(e -> resetSimulation());
-
-        box.getChildren().addAll(title, coalBox, windBox, solarBox, new Separator(), demandBox, batteryBox, tripReset);
+        box.getChildren().addAll(controlRoomTitleLabel, coalBox, windBox, solarBox, new Separator(), demandBox,
+                batteryBox);
         return box;
     }
 
-    private VBox createControlGroup(String title, double min, double max, double val, Color color) {
+    private VBox createControlGroup(Label lbl, double min, double max, double val, Color color) {
         VBox box = new VBox(5);
-        Label lbl = new Label(title);
         lbl.setTextFill(color);
         lbl.setStyle("-fx-font-weight: bold;");
 
@@ -404,13 +409,14 @@ public class SmartGridApp extends FeaturedAppBase {
         statusLabel.setText(i18n.get("grid.status.blackout"));
         statusLabel.setStyle(
                 "-fx-font-size: 18px; -fx-background-color: #000000; -fx-text-fill: red; -fx-padding: 5 10 5 10; -fx-background-radius: 4;");
-        log("Ã°Å¸â€™Â¥ " + MessageFormat.format(i18n.get("grid.log.blackout"), reason));
+        log(MessageFormat.format(i18n.get("grid.log.blackout"), reason));
         loop.stop();
     }
 
     private void resetSimulation() {
         gridFrequency = 50.0;
         time = 0;
+        batteryCharge = 100.0;
         supplySeries.getData().clear();
         demandSeries.getData().clear();
         onRun();
@@ -422,9 +428,22 @@ public class SmartGridApp extends FeaturedAppBase {
     }
 
     @Override
+    public void onPause() {
+        if (loop != null)
+            loop.pause();
+        setStatus(i18n.get("status.paused"));
+    }
+
+    @Override
     public void onStop() {
         if (loop != null)
             loop.stop();
+        setStatus(i18n.get("status.complete"));
+    }
+
+    @Override
+    public void onReset() {
+        resetSimulation();
     }
 
     @Override
@@ -436,10 +455,10 @@ public class SmartGridApp extends FeaturedAppBase {
     protected void addAppHelpTopics(org.jscience.apps.framework.HelpDialog dialog) {
         dialog.addTopic("Engineering", "Smart Grid Concepts",
                 "Understand the power grid:\n\n" +
-                        "Ã¢â‚¬Â¢ **Supply vs Demand**: Grid frequency deviates when supply != demand.\n" +
-                        "Ã¢â‚¬Â¢ **Frequency**: Must stay near 50Hz. <48Hz risks blackout.\n" +
-                        "Ã¢â‚¬Â¢ **Renewables**: Intermittent power sources (Wind/Solar) require backup or storage.\n" +
-                        "Ã¢â‚¬Â¢ **Battery Storage**: Absorbs excess power and releases it during deficits.",
+                        "- **Supply vs Demand**: Grid frequency deviates when supply != demand.\n" +
+                        "- **Frequency**: Must stay near 50Hz. <48Hz risks blackout.\n" +
+                        "- **Renewables**: Intermittent power sources (Wind/Solar) require backup or storage.\n" +
+                        "- **Battery Storage**: Absorbs excess power and releases it during deficits.",
                 null);
     }
 
@@ -502,6 +521,36 @@ public class SmartGridApp extends FeaturedAppBase {
         } catch (Exception e) {
             showError("Load Error", "Failed to restore state: " + e.getMessage());
         }
+    }
+
+    @Override
+    protected void updateLocalizedUI() {
+        if (vizTitleLabel != null)
+            vizTitleLabel.setText(i18n.get("grid.viz.title"));
+        if (controlRoomTitleLabel != null)
+            controlRoomTitleLabel.setText(i18n.get("grid.panel.control"));
+        if (coalLabel != null)
+            coalLabel.setText(i18n.get("grid.control.coal"));
+        if (windLabel != null)
+            windLabel.setText(i18n.get("grid.control.wind"));
+        if (solarLabel != null)
+            solarLabel.setText(i18n.get("grid.control.solar"));
+        if (demandLabel != null)
+            demandLabel.setText(i18n.get("grid.control.demand"));
+        if (batteryTitleLabel != null)
+            batteryTitleLabel.setText(i18n.get("grid.label.battery_title"));
+
+        if (loadChart != null) {
+            loadChart.setTitle(i18n.get("grid.chart.title"));
+            loadChart.getXAxis().setLabel(i18n.get("grid.label.time"));
+            loadChart.getYAxis().setLabel(i18n.get("grid.label.power"));
+            if (supplySeries != null)
+                supplySeries.setName(i18n.get("grid.series.supply"));
+            if (demandSeries != null)
+                demandSeries.setName(i18n.get("grid.series.demand"));
+        }
+
+        updateStatus();
     }
 
     public static void main(String[] args) {

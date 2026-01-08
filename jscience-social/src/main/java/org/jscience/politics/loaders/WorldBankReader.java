@@ -60,7 +60,8 @@ public class WorldBankReader extends AbstractResourceReader<Country> {
     private final ObjectMapper mapper = new ObjectMapper();
     private final HttpClient httpClient;
 
-    // Cache handled by AbstractResourceReader now? No, AbstractResourceReader has ResourceCache.
+    // Cache handled by AbstractResourceReader now? No, AbstractResourceReader has
+    // ResourceCache.
     // But WorldBankReader had manual cache 'cachedCountries'.
     // AbstractResourceReader uses 'cache' field from 'ResourceCache.global()'.
     // We should use that or keep manual if AbstractResourceReader pattern differs.
@@ -80,7 +81,8 @@ public class WorldBankReader extends AbstractResourceReader<Country> {
     public WorldBankReader(HttpClient httpClient) {
         this.httpClient = httpClient;
         // AbstractResourceReader initializes cache in its constructor?
-        // We need to call super()? AbstractResourceReader usually has no-arg constructor.
+        // We need to call super()? AbstractResourceReader usually has no-arg
+        // constructor.
 
         RateLimiterConfig config = RateLimiterConfig.custom()
                 .limitRefreshPeriod(Duration.ofMinutes(1))
@@ -184,7 +186,7 @@ public class WorldBankReader extends AbstractResourceReader<Country> {
     }
 
     /**
-     * Parses countries from World Bank API.
+     * Parses countries from World Bank API and enriches with population data.
      */
     private List<Country> loadFromApi() throws Exception {
         String url = String.format("%s/country?format=json&per_page=%d", WB_API_BASE, PER_PAGE);
@@ -203,7 +205,24 @@ public class WorldBankReader extends AbstractResourceReader<Country> {
             throw new RuntimeException("World Bank API returned status: " + response.statusCode());
         }
 
-        return parseCountriesFromApi(response.body());
+        List<Country> countries = parseCountriesFromApi(response.body());
+
+        // Enrich with population data (SP.POP.TOTL)
+        try {
+            Map<String, Double> populations = fetchIndicator("all", "SP.POP.TOTL");
+            for (Country c : countries) {
+                // Try alpha3 first, then alpha2
+                if (populations.containsKey(c.getAlpha3())) {
+                    c.setPopulation(populations.get(c.getAlpha3()).longValue());
+                } else if (populations.containsKey(c.getAlpha2())) {
+                    c.setPopulation(populations.get(c.getAlpha2()).longValue());
+                }
+            }
+        } catch (Exception e) {
+            LOG.warn("Failed to fetch population data to enrich countries: " + e.getMessage());
+        }
+
+        return countries;
     }
 
     /**
@@ -449,4 +468,3 @@ public class WorldBankReader extends AbstractResourceReader<Country> {
         LOG.debug("WorldBankReader: manual cache clear requested (delegated to system cache)");
     }
 }
-

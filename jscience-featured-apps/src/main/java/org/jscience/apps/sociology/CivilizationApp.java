@@ -72,7 +72,10 @@ public class CivilizationApp extends FeaturedAppBase {
     private XYChart.Series<Number, Number> resSeries;
     private XYChart.Series<Number, Number> polSeries;
     private Label statusLabel;
+    private Label paramsTitleLabel;
     private java.util.Map<String, Slider> parameterSliders = new java.util.HashMap<>();
+    private java.util.Map<String, Label> sliderLabels = new java.util.HashMap<>();
+    private LineChart<Number, Number> mainChart;
 
     @Override
     protected String getAppTitle() {
@@ -122,9 +125,8 @@ public class CivilizationApp extends FeaturedAppBase {
     protected Region createMainContent() {
         BorderPane root = new BorderPane();
 
-        // Charts
-        LineChart<Number, Number> chart = createChart();
-        root.setCenter(chart);
+        // Chart
+        root.setCenter(createChart());
 
         // Controls
         VBox controls = createControls();
@@ -165,6 +167,7 @@ public class CivilizationApp extends FeaturedAppBase {
         polSeries.setName(i18n.get("civilization.series.pollution"));
 
         lc.getData().addAll(popSeries, resSeries, polSeries);
+        mainChart = lc;
         return lc;
     }
 
@@ -191,7 +194,9 @@ public class CivilizationApp extends FeaturedAppBase {
                 .add(createSlider(i18n.get("civilization.label.aggression"), 0.0, 1.0, 0.0, v -> aggression = v,
                         "Aggression"));
 
-        box.getChildren().addAll(new Label(i18n.get("civilization.label.params")), sliders);
+        paramsTitleLabel = new Label(i18n.get("civilization.label.params"));
+        paramsTitleLabel.setStyle("-fx-font-weight: bold;");
+        box.getChildren().addAll(paramsTitleLabel, sliders);
         return box;
     }
 
@@ -199,6 +204,7 @@ public class CivilizationApp extends FeaturedAppBase {
             java.util.function.DoubleConsumer consumer, String paramName) {
         VBox vb = new VBox(5);
         Label l = new Label(name);
+        sliderLabels.put(paramName, l);
         Slider s = new Slider(min, max, val);
         s.setShowTickLabels(true);
         s.setShowTickMarks(true);
@@ -239,6 +245,22 @@ public class CivilizationApp extends FeaturedAppBase {
         parameterSliders.put(paramName, s);
         vb.getChildren().addAll(l, s);
         return vb;
+    }
+
+    private void updateStatusLabel() {
+        if (population.getValue().doubleValue() <= 0) {
+            statusLabel.setText(i18n.get("civilization.status.extinct"));
+            statusLabel.setTextFill(Color.BLACK);
+        } else if (population.getValue().doubleValue() < 500) {
+            statusLabel.setText(i18n.get("civilization.status.collapse"));
+            statusLabel.setTextFill(Color.RED);
+        } else if (birthRateBase < 0.03) {
+            statusLabel.setText(i18n.get("civilization.status.declining"));
+            statusLabel.setTextFill(Color.ORANGE);
+        } else {
+            statusLabel.setText(i18n.get("civilization.status.thriving"));
+            statusLabel.setTextFill(Color.GREEN);
+        }
     }
 
     @Override
@@ -408,6 +430,26 @@ public class CivilizationApp extends FeaturedAppBase {
         }
     }
 
+    @Override
+    public void onRun() {
+        running = true;
+    }
+
+    @Override
+    public void onPause() {
+        running = false;
+    }
+
+    @Override
+    public void onStop() {
+        running = false;
+    }
+
+    @Override
+    public void onReset() {
+        reset();
+    }
+
     private void reset() {
         population = Quantities.create(1000.0, Units.ONE);
         resources = Quantities.create(100000.0, Units.KILOGRAM);
@@ -422,39 +464,38 @@ public class CivilizationApp extends FeaturedAppBase {
 
     @Override
     protected void updateLocalizedUI() {
-        // 1. Update Status Label
-        // Force refresh based on current state?
-        // Just let the loop handle it.
-
-        // 2. Update Controls (Rebuild to get new labels)
-        // Access the main layout
-        Region center = (Region) rootPane.getCenter();
-        if (center instanceof javafx.scene.layout.StackPane) {
-            javafx.scene.layout.StackPane stack = (javafx.scene.layout.StackPane) center;
-            if (!stack.getChildren().isEmpty() && stack.getChildren().get(0) instanceof BorderPane) {
-                BorderPane appRoot = (BorderPane) stack.getChildren().get(0);
-
-                // Rebuild controls
-                VBox newControls = createControls();
-                appRoot.setBottom(newControls);
-
-                // Update Chart
-                if (appRoot.getCenter() instanceof LineChart) {
-                    @SuppressWarnings("unchecked")
-                    LineChart<Number, Number> chart = (LineChart<Number, Number>) appRoot.getCenter();
-                    chart.setTitle(i18n.get("civilization.chart.title"));
-                    chart.getXAxis().setLabel(i18n.get("civilization.label.years"));
-                    chart.getYAxis().setLabel(i18n.get("civilization.label.value"));
-
-                    if (popSeries != null)
-                        popSeries.setName(i18n.get("civilization.label.population"));
-                    if (resSeries != null)
-                        resSeries.setName(i18n.get("civilization.label.resources"));
-                    if (polSeries != null)
-                        polSeries.setName(i18n.get("civilization.series.pollution"));
-                }
+        if (paramsTitleLabel != null)
+            paramsTitleLabel.setText(i18n.get("civilization.label.params"));
+        if (statusLabel != null) {
+            // Refresh status text based on current state
+            updateStatusLabel();
+        }
+        if (mainChart != null) {
+            mainChart.setTitle(i18n.get("civilization.chart.title"));
+            if (mainChart.getXAxis() instanceof NumberAxis) {
+                ((NumberAxis) mainChart.getXAxis()).setLabel(i18n.get("civilization.label.years"));
+            }
+            if (mainChart.getYAxis() instanceof NumberAxis) {
+                ((NumberAxis) mainChart.getYAxis()).setLabel(i18n.get("civilization.label.value"));
+            }
+            if (!mainChart.getData().isEmpty()) {
+                popSeries.setName(i18n.get("civilization.label.population"));
+                resSeries.setName(i18n.get("civilization.label.resources"));
+                polSeries.setName(i18n.get("civilization.series.pollution"));
             }
         }
+
+        // Update slider labels
+        if (sliderLabels.get("Consumption") != null)
+            sliderLabels.get("Consumption").setText(i18n.get("civilization.label.consumption"));
+        if (sliderLabels.get("Birth Rate") != null)
+            sliderLabels.get("Birth Rate").setText(i18n.get("civilization.label.birth"));
+        if (sliderLabels.get("Innovation") != null)
+            sliderLabels.get("Innovation").setText(i18n.get("civilization.label.innovation"));
+        if (sliderLabels.get("Regeneration") != null)
+            sliderLabels.get("Regeneration").setText(i18n.get("civilization.label.regen"));
+        if (sliderLabels.get("Aggression") != null)
+            sliderLabels.get("Aggression").setText(i18n.get("civilization.label.aggression"));
     }
 
     public static void main(String[] args) {

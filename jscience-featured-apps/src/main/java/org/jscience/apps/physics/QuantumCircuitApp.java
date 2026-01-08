@@ -47,6 +47,15 @@ public class QuantumCircuitApp extends FeaturedAppBase {
     private List<HBox> qubitLines = new ArrayList<>();
     private int selectedQubitIndex = -1;
 
+    // UI references for localization
+    private Label mainTitleLabel;
+    private Label resultsTitleLabel;
+    private Label gateToolbarLabel;
+    private Button runBtn;
+    private Button clearBtn;
+    private CategoryAxis xAxis;
+    private NumberAxis yAxis;
+
     @Override
     protected String getAppTitle() {
         return i18n.get("quantum.title");
@@ -63,22 +72,28 @@ public class QuantumCircuitApp extends FeaturedAppBase {
     }
 
     @Override
+    public boolean hasToolBar() {
+        return false;
+    }
+
+    @Override
     protected Region createMainContent() {
         BorderPane pane = new BorderPane();
         pane.setPadding(new Insets(10));
 
         // Header
-        Label title = new Label(i18n.get("quantum.title"));
-        title.setFont(Font.font(24));
-        pane.setTop(title);
-        BorderPane.setAlignment(title, Pos.CENTER);
+        mainTitleLabel = new Label(i18n.get("quantum.title"));
+        mainTitleLabel.setFont(Font.font(24));
+        pane.setTop(mainTitleLabel);
+        BorderPane.setAlignment(mainTitleLabel, Pos.CENTER);
 
         // Center Content
         VBox centerBox = new VBox(15);
 
         // Gate Toolbar
         ToolBar gateToolbar = new ToolBar();
-        gateToolbar.getItems().add(new Label(i18n.get("quantum.toolbar.gates")));
+        gateToolbarLabel = new Label(i18n.get("quantum.toolbar.gates"));
+        gateToolbar.getItems().add(gateToolbarLabel);
 
         String[] gates = { "H", "X", "Y", "Z", "CNOT", "M" };
         for (String g : gates) {
@@ -89,12 +104,12 @@ public class QuantumCircuitApp extends FeaturedAppBase {
         }
 
         gateToolbar.getItems().add(new Separator());
-        Button runBtn = new Button("Ã¢â€“Â¶ " + i18n.get("quantum.button.run"));
+        runBtn = new Button(i18n.get("quantum.button.run"));
         runBtn.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
         runBtn.setOnAction(e -> runSimulation());
         gateToolbar.getItems().add(runBtn);
 
-        Button clearBtn = new Button("Ã°Å¸â€”â€˜ " + i18n.get("quantum.button.clear"));
+        clearBtn = new Button(i18n.get("quantum.button.clear"));
         clearBtn.setOnAction(e -> clearCircuit());
         gateToolbar.getItems().add(clearBtn);
 
@@ -108,21 +123,20 @@ public class QuantumCircuitApp extends FeaturedAppBase {
         // Results
         VBox resultPane = new VBox(5);
         resultPane.setPadding(new Insets(10));
-        Label resTitle = new Label(i18n.get("quantum.label.results"));
-        resTitle.setFont(Font.font(16));
+        resultsTitleLabel = new Label(i18n.get("quantum.label.results"));
+        resultsTitleLabel.setFont(Font.font(16));
 
-        stateVectorLabel = new Label(i18n.get("quantum.label.statevector") + ": |0...0>");
-        stateVectorLabel.setWrapText(true);
+        stateVectorLabel = new Label();
         stateVectorLabel.setFont(Font.font("Monospaced", 12));
 
-        CategoryAxis xAxis = new CategoryAxis();
-        NumberAxis yAxis = new NumberAxis();
+        xAxis = new CategoryAxis();
+        yAxis = new NumberAxis();
         probChart = new BarChart<>(xAxis, yAxis);
         probChart.setTitle(i18n.get("quantum.chart.probabilities"));
         probChart.setAnimated(false);
         probChart.setMinHeight(200);
 
-        resultPane.getChildren().addAll(resTitle, stateVectorLabel, probChart);
+        resultPane.getChildren().addAll(resultsTitleLabel, stateVectorLabel, probChart);
 
         centerBox.getChildren().addAll(gateToolbar, circuitPane, new Separator(), resultPane);
         pane.setCenter(centerBox);
@@ -204,13 +218,48 @@ public class QuantumCircuitApp extends FeaturedAppBase {
         }
         for (int i = 0; i < 8; i++) {
             probs[i] /= sum;
-            String state = String.format("|%3sÃ¢Å¸Â©", Integer.toBinaryString(i)).replace(' ', '0');
+            String state = String.format("|%3s>", Integer.toBinaryString(i)).replace(' ', '0');
             series.getData().add(new XYChart.Data<>(state, probs[i]));
         }
         probChart.getData().add(series);
         stateVectorLabel
                 .setText(i18n.get("quantum.label.statevector") + ": " + i18n.get("quantum.status.superposition"));
 
+    }
+
+    @Override
+    protected void updateLocalizedUI() {
+        if (mainTitleLabel != null)
+            mainTitleLabel.setText(i18n.get("quantum.title"));
+        if (gateToolbarLabel != null)
+            gateToolbarLabel.setText(i18n.get("quantum.toolbar.gates"));
+        if (runBtn != null)
+            runBtn.setText(i18n.get("quantum.button.run"));
+        if (clearBtn != null)
+            clearBtn.setText(i18n.get("quantum.button.clear"));
+        if (resultsTitleLabel != null)
+            resultsTitleLabel.setText(i18n.get("quantum.label.results"));
+        if (stateVectorLabel != null && !probChart.getData().isEmpty()) {
+            stateVectorLabel
+                    .setText(i18n.get("quantum.label.statevector") + ": " + i18n.get("quantum.status.superposition"));
+        } else if (stateVectorLabel != null) {
+            stateVectorLabel.setText(i18n.get("quantum.label.statevector") + ": |0...0>");
+        }
+
+        if (probChart != null) {
+            probChart.setTitle(i18n.get("quantum.chart.probabilities"));
+            if (!probChart.getData().isEmpty()) {
+                probChart.getData().get(0).setName(i18n.get("quantum.series.probabilities"));
+            }
+        }
+
+        // Qubit labels
+        for (int i = 0; i < qubitLines.size(); i++) {
+            HBox line = qubitLines.get(i);
+            if (!line.getChildren().isEmpty() && line.getChildren().get(0) instanceof ToggleButton) {
+                ((ToggleButton) line.getChildren().get(0)).setText(i18n.get("quantum.label.qubit_title", i));
+            }
+        }
     }
 
     @Override
@@ -222,11 +271,11 @@ public class QuantumCircuitApp extends FeaturedAppBase {
     protected void addAppHelpTopics(org.jscience.apps.framework.HelpDialog dialog) {
         dialog.addTopic("Physics", "Quantum Computing",
                 "Learn about quantum circuits:\n\n" +
-                        "Ã¢â‚¬Â¢ **Qubit**: Quantum bit, exists in superposition of |0> and |1>.\n" +
-                        "Ã¢â‚¬Â¢ **H Gate (Hadamard)**: Puts a qubit into superposition (50/50 probability).\n" +
-                        "Ã¢â‚¬Â¢ **X Gate**: Quantum NOT gate, flips |0> to |1> and vice versa.\n" +
-                        "Ã¢â‚¬Â¢ **CNOT**: Conditional NOT, entangles two qubits.\n" +
-                        "Ã¢â‚¬Â¢ **Measurement**: Collapses the quantum state to a classical bit.",
+                        "- **Qubit**: Quantum bit, exists in superposition of |0> and |1>.\n" +
+                        "- **H Gate (Hadamard)**: Puts a qubit into superposition (50/50 probability).\n" +
+                        "- **X Gate**: Quantum NOT gate, flips |0> to |1> and vice versa.\n" +
+                        "- **CNOT**: Conditional NOT, entangles two qubits.\n" +
+                        "- **Measurement**: Collapses the quantum state to a classical bit.",
                 null);
     }
 

@@ -84,7 +84,10 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
         // Menu Bar and Toolbar
         AppMenuFactory menuFactory = new AppMenuFactory(this);
         menuBar = menuFactory.createMenuBar();
-        VBox topContainer = new VBox(menuBar, createToolBar());
+        VBox topContainer = new VBox(menuBar);
+        if (hasToolBar()) {
+            topContainer.getChildren().add(createToolBar());
+        }
         rootPane.setTop(topContainer);
 
         // Main content (subclass provides this)
@@ -222,6 +225,10 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
     }
 
     public boolean hasHelpMenu() {
+        return true;
+    }
+
+    public boolean hasToolBar() {
         return true;
     }
 
