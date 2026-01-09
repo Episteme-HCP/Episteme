@@ -136,9 +136,37 @@ public class Spintronic3DRenderer {
 
     private void updateArrowRotation(Group arrow, Real[] m) {
         if (arrow == null) return;
-        // Simple 2D-to-3D projection of the arrow for this demo
-        double angle = Math.toDegrees(Math.atan2(m[1].doubleValue(), m[0].doubleValue()));
-        arrow.setRotate(angle + 90);
+        
+        // Magnetization vector M = (mx, my, mz)
+        double mx = m[0].doubleValue();
+        double my = m[1].doubleValue();
+        double mz = m[2].doubleValue();
+        
+        // Arrow points UP by default (Y-axis in JavaFX cylinder), but usually M along X is 0 angle.
+        // Let's align arrow along X axis by default or rotate it properly.
+        // Standard JavaFX Cylinder axis is Y. Rotation needed to align with M.
+        
+        // Spherical coordinates
+        double r = Math.sqrt(mx*mx + my*my + mz*mz);
+        if (r < 1e-6) return;
+        
+        // Angle in XY plane (Azimuth)
+        double phi = Math.atan2(my, mx);
+        // Angle from Z axis (Inclination) - but here Y is Up/Down structure stack.
+        // Let's assume M is mostly in plane (XZ plane relative to user view? or XY?).
+        // In the app, layers are stacked on Y. magnetization is in plane (XZ).
+        
+        // Let's just rotate around Y axis (Azimuth).
+        double angleDeg = Math.toDegrees(phi);
+        
+        // Reset transforms
+        arrow.getTransforms().clear();
+        
+        // Rotate to match direction. 
+        // Initial arrow is Y-aligned. Rotate -90 on Z to make it X-aligned.
+        arrow.getTransforms().add(new Rotate(-90, Rotate.Z_AXIS)); 
+        // Then rotate around Y (vertical axis of stack) by phi
+        arrow.getTransforms().add(new Rotate(-angleDeg, Rotate.Y_AXIS));
     }
 
     public SubScene getSubScene() {
