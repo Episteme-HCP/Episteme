@@ -25,8 +25,14 @@ public class FerromagneticLayer {
     private Real thickness;
     private final boolean pinned;
     private Real[] magnetization = { Real.ONE, Real.ZERO, Real.ZERO }; // Vector (mx, my, mz)
-    private Real coercivity; // Hc (A/m)
-    private Real anisotropyField; // Hk (A/m)
+    private Real damping = Real.of(0.01); 
+    private Real temperature = Real.of(300); // K
+    private Real pmaEnergy = Real.ZERO; // J/m3 (Ku)
+    private boolean perpendicularAnisotropy = false;
+    private Real spinHallAngle = Real.ZERO; // SOT Efficiency
+    private Real sotCurrentDensity = Real.ZERO; // J_SOT (A/m2)
+    private Real coercivity = Real.of(1000); // Hc (A/m)
+    private Real anisotropyField = Real.of(5000); // Hk (A/m)
     private Real[] easyAxis = { Real.ONE, Real.ZERO, Real.ZERO };
 
     public FerromagneticLayer(SpintronicMaterial material, Real thickness, boolean pinned) {
@@ -80,12 +86,59 @@ public class FerromagneticLayer {
         this.coercivity = coercivity;
     }
 
-    public Real getAnisotropyField() {
-        return anisotropyField;
-    }
+    public Real getDamping() { return damping; }
+    public void setDamping(Real damping) { this.damping = damping; }
 
-    public void setAnisotropyField(Real anisotropyField) {
-        this.anisotropyField = anisotropyField;
+    public Real getTemperature() { return temperature; }
+    public void setTemperature(Real temperature) { this.temperature = temperature; }
+
+    public Real getPmaEnergy() { return pmaEnergy; }
+    public void setPmaEnergy(Real pmaEnergy) { this.pmaEnergy = pmaEnergy; }
+
+    public boolean isPerpendicularAnisotropy() { return perpendicularAnisotropy; }
+    public void setPerpendicularAnisotropy(boolean perpendicularAnisotropy) { this.perpendicularAnisotropy = perpendicularAnisotropy; }
+
+    public Real getSpinHallAngle() { return spinHallAngle; }
+    public void setSpinHallAngle(Real angle) { this.spinHallAngle = angle; }
+
+    public Real getSotCurrentDensity() { return sotCurrentDensity; }
+    public void setSotCurrentDensity(Real j) { this.sotCurrentDensity = j; }
+
+    /**
+     * Calculates the effective magnetic field (A/m) for this layer.
+     * Includes Anisotropy (In-plane or Perpendicular) and Demagnetization.
+     */
+    public Real[] calculateEffectiveField() {
+        Real ms = material.getSaturationMagnetization();
+        if (ms.doubleValue() < 1e-6) return new Real[]{Real.ZERO, Real.ZERO, Real.ZERO};
+
+        Real[] field = new Real[3];
+        
+        // --- 1. Shape/Crystal Anisotropy (Hk) ---
+        // H_ani = Hk * (m . easyAxis) * easyAxis
+        Real dotEasy = magnetization[0].multiply(easyAxis[0])
+                      .add(magnetization[1].multiply(easyAxis[1]))
+                      .add(magnetization[2].multiply(easyAxis[2]));
+        
+        field[0] = anisotropyField.multiply(dotEasy).multiply(easyAxis[0]);
+        field[1] = anisotropyField.multiply(dotEasy).multiply(easyAxis[1]);
+        field[2] = anisotropyField.multiply(dotEasy).multiply(easyAxis[2]);
+
+        // --- 2. Perpendicular Anisotropy (PMA) ---
+        // Effective PMA field along Y (stack axis)
+        if (perpendicularAnisotropy) {
+            // H_k_pma = 2*Ku / (mu0 * Ms)
+            double mu0 = 4.0 * Math.PI * 1e-7;
+            Real hPma = pmaEnergy.multiply(Real.TWO).divide(Real.of(mu0).multiply(ms));
+            field[1] = field[1].add(hPma.multiply(magnetization[1]));
+        }
+
+        // --- 3. Demagnetizing Field (simplified) ---
+        // For a thin film stacked on Y: Nx=Nz=0, Ny=1 (SI)
+        // H_demag = -Ms * my * j_vec
+        field[1] = field[1].subtract(ms.multiply(magnetization[1]));
+
+        return field;
     }
 
     public boolean isPinned() {

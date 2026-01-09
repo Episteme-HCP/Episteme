@@ -53,8 +53,14 @@ public class SpintronicCircuitSimulator {
 
     private final SpintronicNetlist netlist;
     private final int numNodes;
+    private final Map<String, SpinValve> physicsModels = new HashMap<>();
+    private final Map<String, List<Real[]>> magnetizationHistory = new HashMap<>();
     private final List<Double> timePoints = new ArrayList<>();
     private final List<Vector<Real>> solutions = new ArrayList<>();
+
+    // MNA Augmented
+    private int augmentedSize; 
+    private int numVoltageSources;
     
     // JScience Linear Algebra Objects
     private DenseMatrix<Real> C_matrix; // Capacitance matrix (Constant topology)
@@ -80,6 +86,17 @@ public class SpintronicCircuitSimulator {
 
     public void registerPhysicsModel(String componentName, SpinValve model) {
         physicsModels.put(componentName, model);
+        magnetizationHistory.put(componentName, new ArrayList<>());
+    }
+
+    private void countVoltageSources() {
+        numVoltageSources = 0;
+        for (SpintronicNetlist.NetlistComponent comp : netlist.getComponents()) {
+            if (comp instanceof SpintronicNetlist.VoltageSourceComponent) {
+                numVoltageSources++;
+            }
+        }
+        augmentedSize = numNodes + numVoltageSources;
     }
 
     /**
@@ -87,12 +104,10 @@ public class SpintronicCircuitSimulator {
      * Must be called before stepping.
      */
     public void initialize() {
+        countVoltageSources();
         initializeFixedElements();
-        // Set initial state
-        int size = numNodes;
-        Real[] state = new Real[size];
-        Arrays.fill(state, Real.ZERO);
-        // TODO: Perform DC Operating Point Analysis here potentially
+        // Solve for DC Operating Point
+        Vector<Real> dcState = solveDCOperatingPoint();
         
         // Add initial state to history
         timePoints.clear();
@@ -100,7 +115,7 @@ public class SpintronicCircuitSimulator {
         
         // Initial condition
         timePoints.add(0.0);
-        solutions.add(new DenseVector<Real>(Arrays.asList(state), REAL_FIELD));
+        solutions.add(dcState);
     }
 
     /**
@@ -153,63 +168,105 @@ public class SpintronicCircuitSimulator {
                 // Better: I = V / R_total
                 
                 // Re-evaluate resistance based on CURRENT magnetization (before update)
-                // This creates a symplectic delay but is stable enough for small dt
                 Real r = GMREffect.valetFertResistance(model);
+                Real vNode1 = (n1 > 0) ? vDrop.add(Real.ZERO) : Real.ZERO; // Placeholder
+                // Current = V / R
                 Real current = vDrop.divide(r);
                 
-                // Update LLG
-                // J = I / Area
-                // Area assumed 100x100 nm for now if not in model
-                // Let's assume SpinValve model layers have dimensions.
-                // Using generic 1e-14 m2 (100nm x 100nm) if not specified
-                Real area = Real.of(100e-9 * 100e-9); 
-                Real J = current.divide(area);
-                
-                // Apply STT and Thermal Noise
                 FerromagneticLayer free = model.getFreeLayer();
                 FerromagneticLayer pinned = model.getPinnedLayer();
                 
-                // Calculate STT torque
-                // Currently SpinTransport.stepLLGWithThermalNoise doesn't take STT directly,
-                // it takes Heff. 
-                // We need to augment Heff with STT 'effective field' or modify stepLLG.
-                // SpinTransport has calculateSTT.
-                
-                Real[] stt = SpinTransport.calculateSTT(J, free, pinned);
-                
-                // Convert STT torque to effective field (approximate) or add to LLG
-                // dM/dt = -gamma constant * (M x H) ... + STT
-                // STT term is directly dM/dt contribution.
-                // Easiest integration: Add effective field H_stt such that -gamma(M x H_stt) = STT
-                // H_stt = (M x STT) / (gamma * |M|^2) ? 
-                // Too complex. Let's just pass 0 field + thermal for now and assume logic inside SpinTransport updates properly,
-                // BUT SpinTransport.stepLLGWithThermalNoise only does H_eff logic.
-                // We need to ADD STT to the step.
-                
-                // Improvised Integration:
-                Real alpha = Real.of(0.01);
+                Real area = model.getArea(); 
+                Real volume = area.multiply(free.getThickness());
+                Real ms = free.getMaterial().getSaturationMagnetization();
                 Real gamma = Real.of(1.76e11);
-                Real temp = Real.of(300); 
-                Real vol = area.multiply(free.getThickness());
                 
-                // Base H_eff (Anisotropy etc) - simplified along X
-                Real[] hEff = { Real.of(0), Real.ZERO, Real.ZERO }; 
+                // 1. Calculate STT torque
+                Real J_stt = current.divide(area);
+                Real[] t_stt = SpinTransport.calculateSTT(J_stt, free, pinned);
                 
-                // Step Physics
-                Real[] newM = SpinTransport.stepLLGWithThermalNoise(free, hEff, Real.of(dt), alpha, gamma, temp, vol, free.getMaterial().getSaturationMagnetization());
+                // 2. Calculate SOT torque
+                Real[] t_sot = SpinTransport.calculateSOT(free, free.getSotCurrentDensity(), free.getSpinHallAngle());
                 
-                // ADD STT manually to M (Euler integration of Torque)
-                // M_new = M_new_LLG + STT * dt
-                // Note: STT vector from calculateSTT is torque term (dM/dt)_stt
-                newM[0] = newM[0].add(stt[0].multiply(Real.of(dt)));
-                newM[1] = newM[1].add(stt[1].multiply(Real.of(dt)));
-                newM[2] = newM[2].add(stt[2].multiply(Real.of(dt)));
+                // 3. Calculate Internal Effective Field (Anisotropy + Demag)
+                Real[] hEff = free.calculateEffectiveField();
+                
+                // 4. Step Physics
+                Real[] newM = SpinTransport.stepLLGWithThermalNoise(
+                    free, 
+                    hEff, 
+                    Real.of(dt), 
+                    free.getDamping(), 
+                    gamma, 
+                    free.getTemperature(), 
+                    volume, 
+                    ms
+                );
+                
+                // 5. Add STT and SOT manually to M
+                newM[0] = newM[0].add(t_stt[0].add(t_sot[0]).multiply(Real.of(dt)));
+                newM[1] = newM[1].add(t_stt[1].add(t_sot[1]).multiply(Real.of(dt)));
+                newM[2] = newM[2].add(t_stt[2].add(t_sot[2]).multiply(Real.of(dt)));
                 
                 // Renormalize
-                Real norm = newM[0].pow(2).add(newM[1].pow(2)).add(newM[2].pow(2)).sqrt();
-                free.setMagnetization(newM[0].divide(norm), newM[1].divide(norm), newM[2].divide(norm));
+                Real mNorm = newM[0].pow(2).add(newM[1].pow(2)).add(newM[2].pow(2)).sqrt();
+                free.setMagnetization(newM[0].divide(mNorm), newM[1].divide(mNorm), newM[2].divide(mNorm));
+
+                // History (M history)
+                if (magnetizationHistory.containsKey(entry.getKey())) {
+                    magnetizationHistory.get(entry.getKey()).add(newM);
+                }
             }
         }
+    }
+
+    public List<Real[]> getMagnetizationHistory(String componentName) {
+        return magnetizationHistory.getOrDefault(componentName, new ArrayList<>());
+    }
+
+    private Vector<Real> solveDCOperatingPoint() {
+        int size = augmentedSize;
+        Real[] zeroArr = new Real[size];
+        Arrays.fill(zeroArr, Real.ZERO);
+        Vector<Real> v_guess = new DenseVector<Real>(Arrays.asList(zeroArr), REAL_FIELD);
+        
+        for (int iter = 0; iter < MAX_NEWTON_ITER; iter++) {
+            Real[][] gData = new Real[size][size];
+            for (Real[] row : gData) Arrays.fill(row, Real.ZERO);
+            Real[] rhsSource = new Real[size];
+            Arrays.fill(rhsSource, Real.ZERO);
+
+            int vsIdx = 0;
+            for (SpintronicNetlist.NetlistComponent comp : netlist.getComponents()) {
+                if (comp instanceof SpintronicNetlist.ResistorComponent) {
+                    SpintronicNetlist.ResistorComponent r = (SpintronicNetlist.ResistorComponent) comp;
+                    Real g = Real.ONE.divide(Real.of(r.getValue()));
+                    stampMatrix(gData, r.getNodes()[0], r.getNodes()[1], g);
+                } else if (comp instanceof SpintronicNetlist.VoltageSourceComponent) {
+                    SpintronicNetlist.VoltageSourceComponent vs = (SpintronicNetlist.VoltageSourceComponent) comp;
+                    stampVoltageSource(gData, rhsSource, vs.getNodes()[0], vs.getNodes()[1], Real.of(vs.getValue()), vsIdx++);
+                } else if (comp instanceof SpintronicNetlist.CurrentSourceComponent) {
+                    SpintronicNetlist.CurrentSourceComponent cs = (SpintronicNetlist.CurrentSourceComponent) comp;
+                    stampVector(rhsSource, cs.getNodes()[0], cs.getNodes()[1], Real.of(cs.getValue()));
+                } else if (comp instanceof SpintronicNetlist.MTJComponent) {
+                    stampMTJ(gData, (SpintronicNetlist.MTJComponent) comp, v_guess);
+                }
+            }
+            
+            Matrix<Real> J = new DenseMatrix<>(gData, REAL_FIELD);
+            Vector<Real> rhs = new DenseVector<Real>(Arrays.asList(rhsSource), REAL_FIELD);
+            Vector<Real> F = J.multiply(v_guess).subtract(rhs);
+            
+            if (F.dimension() == 0) return v_guess;
+
+            double sumSq = 0;
+            for (int i=0; i < F.dimension(); i++) sumSq += Math.pow(F.get(i).doubleValue(), 2);
+            if (Math.sqrt(sumSq) < NEWTON_TOL) break;
+
+            Vector<Real> dv = J.inverse().multiply(F);
+            v_guess = v_guess.subtract(dv);
+        }
+        return v_guess;
     }
     
     /**
@@ -227,7 +284,7 @@ public class SpintronicCircuitSimulator {
 
     private void initializeFixedElements() {
         // Initialize C matrix (assumed constant for now)
-        int size = numNodes;
+        int size = augmentedSize;
         Real[][] cData = new Real[size][size];
         for (Real[] row : cData) Arrays.fill(row, Real.ZERO);
         
@@ -252,16 +309,26 @@ public class SpintronicCircuitSimulator {
         }
     }
     
+    private void stampVoltageSource(Real[][] matrix, Real[] vector, int n1, int n2, Real val, int vsIdx) {
+        int k = numNodes + vsIdx;
+        if (n1 > 0) {
+            matrix[n1-1][k] = matrix[n1-1][k].add(Real.ONE);
+            matrix[k][n1-1] = matrix[k][n1-1].add(Real.ONE);
+        }
+        if (n2 > 0) {
+            matrix[n2-1][k] = matrix[n2-1][k].subtract(Real.ONE);
+            matrix[k][n2-1] = matrix[k][n2-1].subtract(Real.ONE);
+        }
+        vector[k] = val;
+    }
+    
     private void stampVector(Real[] vector, int n1, int n2, Real val) {
-        // Current leaving n1, entering n2 => -val at n1, +val at n2 for RHS=I
-        // BUT MNA is G*v = I_stim. 
-        // Current Source I from n1 to n2: Leaves n1 (-), Enters n2 (+). 
         if (n1 > 0) vector[n1-1] = vector[n1-1].subtract(val);
         if (n2 > 0) vector[n2-1] = vector[n2-1].add(val);
     }
 
     private Vector<Real> getInitialState() {
-        Real[] state = new Real[numNodes];
+        Real[] state = new Real[augmentedSize];
         Arrays.fill(state, Real.ZERO);
         return new DenseVector<Real>(Arrays.asList(state), REAL_FIELD);
     }
@@ -285,14 +352,14 @@ public class SpintronicCircuitSimulator {
             // For linear R, I_G = G*v. For non-linear, I_G depends on model.
             // Here we rebuild the linearized G matrix at v_new.
             
-            int size = numNodes;
+            int size = augmentedSize;
             Real[][] gData = new Real[size][size];
             for (Real[] row : gData) Arrays.fill(row, Real.ZERO);
             
             Real[] rhsSource = new Real[size];
             Arrays.fill(rhsSource, Real.ZERO);
             
-            // Stamp components
+            int vsIdx = 0;
             for (SpintronicNetlist.NetlistComponent comp : netlist.getComponents()) {
                 if (comp instanceof SpintronicNetlist.ResistorComponent) {
                     SpintronicNetlist.ResistorComponent r = (SpintronicNetlist.ResistorComponent) comp;
@@ -306,7 +373,10 @@ public class SpintronicCircuitSimulator {
                     SpintronicNetlist.CurrentSourceComponent isrc = (SpintronicNetlist.CurrentSourceComponent) comp;
                     stampVector(rhsSource, isrc.getNodes()[0], isrc.getNodes()[1], Real.of(isrc.getValue()));
                 }
-                // TODO: Voltage sources check
+                else if (comp instanceof SpintronicNetlist.VoltageSourceComponent) {
+                    SpintronicNetlist.VoltageSourceComponent vs = (SpintronicNetlist.VoltageSourceComponent) comp;
+                    stampVoltageSource(gData, rhsSource, vs.getNodes()[0], vs.getNodes()[1], Real.of(vs.getValue()), vsIdx++);
+                }
             }
             
             DenseMatrix<Real> G = new DenseMatrix<>(gData, REAL_FIELD);
@@ -394,6 +464,11 @@ public class SpintronicCircuitSimulator {
      * @param nodeName Name of the node
      * @return List of voltage values corresponding to simulation time points
      */
+    public Vector<Real> getLastVoltage() {
+        if (solutions.isEmpty()) return null;
+        return solutions.get(solutions.size() - 1);
+    }
+
     public List<Double> getNodeVoltage(String nodeName) {
         // Need node map from netlist, but it's private there. 
         // For now return empty.

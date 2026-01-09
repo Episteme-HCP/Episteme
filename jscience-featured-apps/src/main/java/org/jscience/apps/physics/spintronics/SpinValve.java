@@ -15,6 +15,7 @@ public class SpinValve {
     private SpintronicMaterial spacerMaterial;
     private Real spacerThickness;
     private final FerromagneticLayer freeLayer;
+    private Real area = Real.of(100e-9 * 100e-9); // Default 100nm x 100nm
 
     // SAF Extension
     private final boolean safEnabled;
@@ -95,4 +96,7 @@ public class SpinValve {
     public Real getSafSpacerThickness() {
         return safSpacerThickness;
     }
+
+    public Real getArea() { return area; }
+    public void setArea(Real area) { this.area = area; }
 }

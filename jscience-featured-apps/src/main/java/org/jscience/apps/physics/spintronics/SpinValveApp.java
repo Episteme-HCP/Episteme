@@ -29,6 +29,12 @@ public class SpinValveApp extends FeaturedAppBase {
     private Slider freeThicknessSlider;
     private Slider freeAngleSlider;
     private Slider temperatureSlider;
+    private Slider dampingSlider;
+    private Slider pmaSlider;
+    private Slider sotCurrentSlider;
+    private Slider sotHallSlider;
+    private Slider areaSlider;
+    private CheckBox pmaCheckBox;
     private CheckBox safCheckBox;
 
     private Label resistanceValueLabel;
@@ -138,17 +144,18 @@ public class SpinValveApp extends FeaturedAppBase {
         panel.setPrefWidth(280);
 
         pinnedMaterialCombo = new ComboBox<>();
-        pinnedMaterialCombo.getItems().addAll(SpintronicMaterial.COBALT, SpintronicMaterial.PERMALLOY);
+        pinnedMaterialCombo.getItems().addAll(SpintronicMaterial.COBALT, SpintronicMaterial.PERMALLOY, SpintronicMaterial.IRON, SpintronicMaterial.NICKEL);
         pinnedMaterialCombo.setValue(SpintronicMaterial.COBALT);
 
         pinnedThicknessSlider = new Slider(1, 20, 5);
         spacerMaterialCombo = new ComboBox<>();
-        spacerMaterialCombo.getItems().addAll(SpintronicMaterial.COPPER);
+        spacerMaterialCombo.getItems().addAll(SpintronicMaterial.COPPER, SpintronicMaterial.SILVER, SpintronicMaterial.ALUMINUM, SpintronicMaterial.RUTHENIUM,
+                SpintronicMaterial.PLATINUM, SpintronicMaterial.TANTALUM, SpintronicMaterial.TUNGSTEN);
         spacerMaterialCombo.setValue(SpintronicMaterial.COPPER);
 
         spacerThicknessSlider = new Slider(1, 10, 3);
         freeMaterialCombo = new ComboBox<>();
-        freeMaterialCombo.getItems().addAll(SpintronicMaterial.PERMALLOY, SpintronicMaterial.COBALT);
+        freeMaterialCombo.getItems().addAll(SpintronicMaterial.PERMALLOY, SpintronicMaterial.COBALT, SpintronicMaterial.IRON, SpintronicMaterial.NICKEL);
         freeMaterialCombo.setValue(SpintronicMaterial.PERMALLOY);
 
         freeThicknessSlider = new Slider(1, 20, 5);
@@ -162,20 +169,44 @@ public class SpinValveApp extends FeaturedAppBase {
         freeThicknessSlider.valueProperty().addListener((o, ov, nv) -> updateModel());
         freeAngleSlider.valueProperty().addListener((o, ov, nv) -> updateModel());
 
-        temperatureSlider = new Slider(0, 400, 300); // 0K to 400K, default 300K
-        temperatureSlider.setShowTickLabels(true);
-        temperatureSlider.setShowTickMarks(true);
-        temperatureSlider.valueProperty().addListener((o, ov, nv) -> updateModel()); // Add listener for temperature
+        dampingSlider = new Slider(0.001, 0.5, 0.01);
+        dampingSlider.setShowTickLabels(true);
+
+        pmaSlider = new Slider(0, 2e6, 0); // up to 2 MJ/m3
+        pmaSlider.setShowTickLabels(true);
+        pmaCheckBox = new CheckBox("Enable PMA (Perpendicular)");
+        
+        dampingSlider.valueProperty().addListener((o, ov, nv) -> updateModel());
+        pmaSlider.valueProperty().addListener((o, ov, nv) -> updateModel());
+        pmaCheckBox.setOnAction(e -> updateModel());
+
+        temperatureSlider.valueProperty().addListener((o, ov, nv) -> updateModel()); 
+
+        sotCurrentSlider = new Slider(0, 1e12, 0); // up to 10^12 A/m2
+        sotCurrentSlider.setShowTickLabels(true);
+        sotHallSlider = new Slider(-0.5, 0.5, 0.1); // Spin Hall Angle
+        sotHallSlider.setShowTickLabels(true);
+        sotCurrentSlider.valueProperty().addListener((o, ov, nv) -> updateModel());
+        sotHallSlider.valueProperty().addListener((o, ov, nv) -> updateModel());
+
+        areaSlider = new Slider(20, 500, 100); // 20nm to 500nm
+        areaSlider.setShowTickLabels(true);
+        areaSlider.valueProperty().addListener((o, ov, nv) -> updateModel());
 
         safCheckBox = new CheckBox("Enable SAF (Co/Ru/Co)");
         safCheckBox.setOnAction(e -> {
-            updateModelStructure(); // Full rebuild needed
+            updateModelStructure(); 
             updateModel();
         });
 
         Button hysteresisBtn = new Button("Run Hysteresis Loop");
         hysteresisBtn.setMaxWidth(Double.MAX_VALUE);
         hysteresisBtn.setOnAction(e -> runHysteresis());
+
+        Button exportBtn = new Button("Export Trace (CSV)");
+        exportBtn.getStyleClass().add("button-secondary");
+        exportBtn.setMaxWidth(Double.MAX_VALUE);
+        exportBtn.setOnAction(e -> exportHistoryToCSV());
 
         panel.getChildren().addAll(
                 new Label(i18n.get("spintronics.label.pinned_layer")), pinnedMaterialCombo, pinnedThicknessSlider,
@@ -185,10 +216,20 @@ public class SpinValveApp extends FeaturedAppBase {
                 new Separator(),
                 new Label(i18n.get("spintronics.label.free_layer")), freeMaterialCombo, freeThicknessSlider,
                 new Label(i18n.get("spintronics.label.angle")), freeAngleSlider,
+                new HBox(10, new Label("Damping (\u03B1)"), dampingSlider),
+                new HBox(10, pmaCheckBox, pmaSlider),
+                new Separator(),
+                new Label("SOT Physics (SHE)"),
+                new HBox(10, new Label("J_SOT"), sotCurrentSlider),
+                new HBox(10, new Label("\u03B8_SH"), sotHallSlider),
+                new Separator(),
+                new Label("Geometry"),
+                new HBox(10, new Label("Area (nm)"), areaSlider),
                 new Separator(),
                 new Label("Temperature (K)"), temperatureSlider,
                 new Separator(),
-                hysteresisBtn);
+                hysteresisBtn,
+                exportBtn);
         return panel;
     }
 
@@ -202,13 +243,15 @@ public class SpinValveApp extends FeaturedAppBase {
         if (safCheckBox.isSelected()) {
             // Create SAF: Pinned1 / Ru / Pinned2
             FerromagneticLayer pinned1 = new FerromagneticLayer(SpintronicMaterial.COBALT, Real.of(2e-9), true);
-            // Pinned2 is the reference one defined by UI
             spinValve = new SpinValve(pinned1, pinned, SpintronicMaterial.RUTHENIUM, Real.of(0.8e-9),
                     spacerMaterialCombo.getValue(), Real.of(spacerThicknessSlider.getValue() * 1e-9), free);
         } else {
             spinValve = new SpinValve(pinned, spacerMaterialCombo.getValue(),
                     Real.of(spacerThicknessSlider.getValue() * 1e-9), free);
         }
+        
+        // Sync parameters to layers
+        updateModelParameters(spinValve);
 
         // --- Create Netlist and Initialize Simulator ---
         StringBuilder sb = new StringBuilder();
@@ -282,6 +325,8 @@ public class SpinValveApp extends FeaturedAppBase {
             spinValve.setSpacerThickness(Real.of(spacerThicknessSlider.getValue() * 1e-9));
         }
 
+        updateModelParameters(spinValve);
+
         // Physics Calculation
         Real r = GMREffect.valetFertResistance(spinValve);
         Real rap = GMREffect.valetFertResistance(
@@ -306,7 +351,46 @@ public class SpinValveApp extends FeaturedAppBase {
         if (simulationTimer == null) {
             setupSimulation();
         }
-        // Stochastic update if simulation is running
+    }
+
+    private void updateModelParameters(SpinValve valve) {
+        FerromagneticLayer free = valve.getFreeLayer();
+        free.setDamping(Real.of(dampingSlider.getValue()));
+        free.setTemperature(Real.of(temperatureSlider.getValue()));
+        free.setPmaEnergy(Real.of(pmaSlider.getValue()));
+        free.setPerpendicularAnisotropy(pmaCheckBox.isSelected());
+        
+        // SOT Params
+        free.setSotCurrentDensity(Real.of(sotCurrentSlider.getValue()));
+        free.setSpinHallAngle(Real.of(sotHallSlider.getValue()));
+        
+        // Geometry - use square area for now
+        double side = areaSlider.getValue() * 1e-9;
+        valve.setArea(Real.of(side * side));
+
+        if (valve.isSafEnabled()) {
+             valve.getSafPinnedLayer1().setTemperature(Real.of(temperatureSlider.getValue()));
+             valve.getSafPinnedLayer2().setTemperature(Real.of(temperatureSlider.getValue()));
+        } else {
+             valve.getPinnedLayer().setTemperature(Real.of(temperatureSlider.getValue()));
+        }
+    }
+
+    private java.util.List<double[]> historyM = new java.util.ArrayList<>();
+    
+    private void exportHistoryToCSV() {
+        java.io.File file = new java.io.File("spintronics_trace.csv");
+        try (java.io.PrintWriter pw = new java.io.PrintWriter(file)) {
+            pw.println("Sample,mx,my,mz");
+            for (int i=0; i < historyM.size(); i++) {
+                double[] m = historyM.get(i);
+                pw.println(String.format("%d,%.6f,%.6f,%.6f", i, m[0], m[1], m[2]));
+            }
+            pw.flush();
+            statusLabelInfo.setText("Exported " + historyM.size() + " samples to " + file.getName());
+        } catch (Exception e) {
+            statusLabelInfo.setText("Export failed: " + e.getMessage());
+        }
     }
 
     private void runHysteresis() {
@@ -338,30 +422,34 @@ public class SpinValveApp extends FeaturedAppBase {
 
     private void runPhysicsStep() {
         if (simulator == null) {
-            // Build temporary Netlist if not present (should be done in updateModelStructure)
             updateModelStructure();
         }
     
         // Sim Step
         simulator.step(currentStep.doubleValue());
         
-        // Update UI from Physics Model (which is updated inside simulator)
+        // Update UI 
         FerromagneticLayer free = spinValve.getFreeLayer();
         Real[] m = free.getMagnetization();
         
-        // Compute Resistance for UI (Simulator computed it internally, but we recompute for display)
         Real r = GMREffect.valetFertResistance(spinValve);
-        resistanceValueLabel.setText(String.format("%.2f Ω·nm²", r.doubleValue() * 1e18));
-        
-        // Calculate STT for Display
-        // Real j = ... hard to get from here without extracting V from simulator state.
-        // Simplified: use last known state if accessible, or just V/R
-        // For efficiency, we trust the simulator managed the physics step.
+        resistanceValueLabel.setText(String.format("%.2f Ohms", r.doubleValue() * 1e18));
 
-        renderer3D.update(spinValve);
+        // Compute Current for Visual Glow
+        double currentVal = 0;
+        Vector<Real> vLast = simulator.getLastVoltage();
+        if (vLast != null && vLast.dimension() >= 2) {
+             double v2 = vLast.get(1).doubleValue(); // Node 2 voltage
+             currentVal = v2 / r.doubleValue();
+        }
+
+        renderer3D.update(spinValve, currentVal);
         
-        // STNO Analyze
+        // STNO Analyze & History
         stnoAnalyzer.recordSample(m[0]);
+        if (historyM.size() < 10000) {
+            historyM.add(new double[]{m[0].doubleValue(), m[1].doubleValue(), m[2].doubleValue()});
+        }
         
         // Update spectrum periodically
         frameCount++;
@@ -387,6 +475,15 @@ public class SpinValveApp extends FeaturedAppBase {
         // Update peak frequency label
         double peakGHz = stnoAnalyzer.getPeakFrequency() / 1e9;
         peakFreqLabel.setText(String.format("Peak: %.2f GHz", peakGHz));
+        
+        // WOW: Color peak label based on freq (Red: low, Blue: high)
+        double hue = Math.max(0, Math.min(240, (peakGHz / 20.0) * 240));
+        peakFreqLabel.setTextFill(Color.hsb(hue, 0.8, 0.9));
+        
+        // Apply styling to serie
+        if (spectrumSeries.getNode() != null) {
+            spectrumSeries.getNode().setStyle("-fx-stroke: hsb(" + hue + ", 80%, 90%); -fx-stroke-width: 3px;");
+        }
     }
 
     @Override

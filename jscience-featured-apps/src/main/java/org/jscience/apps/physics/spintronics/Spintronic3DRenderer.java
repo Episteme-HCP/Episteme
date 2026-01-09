@@ -10,11 +10,13 @@ import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.paint.Color;
+import javafx.scene.effect.Glow;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.transform.Rotate;
 import org.jscience.mathematics.numbers.real.Real;
+import javafx.scene.effect.Bloom;
 
 /**
  * 3D Renderer for Spintronics structures using JavaFX 3D.
@@ -28,12 +30,22 @@ public class Spintronic3DRenderer {
     private Box pinnedBox;
     private Box spacerBox;
     private Box freeBox;
+    private Box heavyMetalElectrode;
     private Group pinnedArrow;
     private Group freeArrow;
 
+    private double mousePosX;
+    private double mousePosY;
+    private double mouseOldX;
+    private double mouseOldY;
+    private final Rotate rotateX = new Rotate(0, Rotate.X_AXIS);
+    private final Rotate rotateY = new Rotate(0, Rotate.Y_AXIS);
+    private final Group world = new Group();
+
     public Spintronic3DRenderer(double width, double height) {
-        subScene = new SubScene(root, width, height, true, SceneAntialiasing.BALANCED);
+        subScene = new SubScene(world, width, height, true, SceneAntialiasing.BALANCED);
         subScene.setFill(Color.web("#2c3e50"));
+        world.getChildren().add(root);
 
         PerspectiveCamera camera = new PerspectiveCamera(true);
         camera.setTranslateZ(-500);
@@ -41,8 +53,40 @@ public class Spintronic3DRenderer {
         camera.setFarClip(2000.0);
         subScene.setCamera(camera);
 
+        root.getTransforms().addAll(rotateX, rotateY);
+        rotateX.setAngle(-20);
+        rotateY.setAngle(20);
+
         setupLights();
-        // Initial empty structure, wait for update
+        setupMouseControls();
+    }
+
+    private void setupMouseControls() {
+        subScene.setOnMousePressed(event -> {
+            mousePosX = event.getSceneX();
+            mousePosY = event.getSceneY();
+            mouseOldX = event.getSceneX();
+            mouseOldY = event.getSceneY();
+        });
+
+        subScene.setOnMouseDragged(event -> {
+            mouseOldX = mousePosX;
+            mouseOldY = mousePosY;
+            mousePosX = event.getSceneX();
+            mousePosY = event.getSceneY();
+            double mouseDeltaX = (mousePosX - mouseOldX);
+            double mouseDeltaY = (mousePosY - mouseOldY);
+
+            if (event.isPrimaryButtonDown()) {
+                rotateY.setAngle(rotateY.getAngle() + mouseDeltaX * 0.2);
+                rotateX.setAngle(rotateX.getAngle() - mouseDeltaY * 0.2);
+            }
+        });
+
+        subScene.setOnScroll(event -> {
+            double delta = event.getDeltaY();
+            subScene.getCamera().setTranslateZ(subScene.getCamera().getTranslateZ() + delta);
+        });
     }
 
     private void setupLights() {
@@ -90,9 +134,23 @@ public class Spintronic3DRenderer {
         spacerBox = new Box(200, 20, 200);
         spacerBox.setMaterial(new PhongMaterial(Color.web("#e67e22"))); // Copper color
 
-        // --- Free Layer ---
-        freeBox = new Box(200, 40, 200);
-        freeBox.setTranslateY(60);
+        // --- Heavy Metal Electrode (SOT) ---
+        heavyMetalElectrode = new Box(500, 10, 200);
+        heavyMetalElectrode.setTranslateY(100);
+        heavyMetalElectrode.setMaterial(new PhongMaterial(Color.web("#7f8c8d"))); // Platinum Grey
+        root.getChildren().add(heavyMetalElectrode);
+
+        // --- Free Layer (Now closer to electrode if needed, but let's keep stack order) ---
+        // Let's assume electrode is at the bottom of the stack
+        // Stack Y: Pinned -> Spacer -> Free -> Electrode
+        // We need to shift everything.
+        
+        // Electrode at Y=80
+        heavyMetalElectrode.setTranslateY(80);
+        
+        // Free Layer at Y=50
+        freeBox = new Box(200, 30, 200);
+        freeBox.setTranslateY(60); 
         freeBox.setMaterial(new PhongMaterial(Color.web("#c0392b"))); // Red
 
         // --- Arrows ---
@@ -106,9 +164,6 @@ public class Spintronic3DRenderer {
 
         root.getChildren().addAll(spacerBox, freeBox, pinnedArrow, freeArrow);
 
-        // Interaction
-        root.setRotationAxis(Rotate.Y_AXIS);
-        root.setRotate(20);
     }
 
     private Group createArrow(Color color) {
@@ -125,13 +180,34 @@ public class Spintronic3DRenderer {
         return arrow;
     }
 
-    public void update(SpinValve valve) {
+    public void update(SpinValve valve, double current) {
         // Update rotations based on magnetization vectors
         Real[] mP = valve.getPinnedLayer().getMagnetization();
         Real[] mF = valve.getFreeLayer().getMagnetization();
 
+        if (valve.isSafEnabled()) {
+             mP = valve.getSafPinnedLayer2().getMagnetization();
+        }
+
         updateArrowRotation(pinnedArrow, mP);
         updateArrowRotation(freeArrow, mF);
+        
+        applyGlowEffect(current);
+    }
+    
+    private void applyGlowEffect(double current) {
+        if (freeBox == null) return;
+        
+        // Normalize current (typical max 1-10mA for these devices)
+        double absI = Math.abs(current);
+        double intensity = Math.min(1.0, absI * 1000.0); // 1mA = 1.0 glow intensity
+        
+        PhongMaterial mat = (PhongMaterial) freeBox.getMaterial();
+        Color baseColor = Color.web("#c0392b"); // Red
+        
+        // Increase brightness and specularity with current
+        mat.setDiffuseColor(baseColor.deriveColor(0, 1.0, 1.0 + intensity, 1.0));
+        mat.setSpecularColor(Color.WHITE.deriveColor(0, 1.0, 1.0, intensity));
     }
 
     private void updateArrowRotation(Group arrow, Real[] m) {

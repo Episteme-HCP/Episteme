@@ -84,6 +84,52 @@ public class SpinTransport {
     }
 
     /**
+     * Calculates the Spin-Orbit Torque (SOT) vector.
+     * Includes Damping-like torque (T_DL) and Field-like torque (T_FL).
+     * $$ \tau_{SOT} = \tau_{DL} [\mathbf{m} \times (\mathbf{\sigma} \times \mathbf{m})] + \tau_{FL} [\mathbf{m} \times \mathbf{\sigma}] $$
+     * where \sigma is the spin polarization vector from SHE.
+     * 
+     * @param layer The layer receiving SOT
+     * @param j_c Current density in heavy metal (A/m2)
+     * @param theta_sh Spin Hall Angle
+     * @return Torque vector components
+     */
+    public static Real[] calculateSOT(FerromagneticLayer layer, Real j_c, Real theta_sh) {
+        Real hbar = PhysicalConstants.h_bar;
+        Real e = PhysicalConstants.e;
+        Real ms = layer.getMaterial().getSaturationMagnetization();
+        Real t = layer.getThickness();
+        
+        if (ms.doubleValue() < 1e-6 || t.doubleValue() < 1e-12) return new Real[]{Real.ZERO, Real.ZERO, Real.ZERO};
+
+        // Polarization vector sigma = z_hat x j_c_hat. 
+        // For current along X and stack along Y, sigma is along Z.
+        Real[] sigma = { Real.ZERO, Real.ZERO, Real.ONE }; 
+        
+        // Coefficient = (hbar / 2e) * (theta_sh * j_c) / (Ms * t)
+        Real coeff = hbar.divide(Real.TWO.multiply(e)).multiply(theta_sh).multiply(j_c)
+                    .divide(ms.multiply(t));
+        
+        Real[] m = layer.getMagnetization();
+        
+        // --- 1. Damping-like Torque: m x (sigma x m) ---
+        Real[] sigmaCrossM = crossProduct(sigma, m);
+        Real[] t_dl = crossProduct(m, sigmaCrossM);
+        
+        // --- 2. Field-like Torque: m x sigma ---
+        Real[] t_fl = crossProduct(m, sigma);
+        
+        // Usually t_fl is smaller (10-20% of t_dl). Let's assume ratio beta = 0.1
+        Real beta = Real.of(0.1);
+
+        return new Real[] {
+                t_dl[0].add(t_fl[0].multiply(beta)).multiply(coeff),
+                t_dl[1].add(t_fl[1].multiply(beta)).multiply(coeff),
+                t_dl[2].add(t_fl[2].multiply(beta)).multiply(coeff)
+        };
+    }
+
+    /**
      * Spin accumulation at the interface.
      * $$ \Delta\mu = 2 P \rho \lambda_{sf} J $$
      */

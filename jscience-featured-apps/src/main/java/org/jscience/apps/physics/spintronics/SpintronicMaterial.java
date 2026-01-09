@@ -105,4 +105,14 @@ public class SpintronicMaterial {
 
     public static final SpintronicMaterial RUTHENIUM = new SpintronicMaterial(
             "Ruthenium", Real.ZERO, Real.of(10e-9), Real.of(10e-9), Real.of(71e-9), false, Real.ZERO, Real.ZERO);
+
+    // Heavy Metals for SOT
+    public static final SpintronicMaterial PLATINUM = new SpintronicMaterial(
+            "Platinum", Real.of(0.1), Real.of(2e-9), Real.of(5e-9), Real.of(106e-9), false, Real.ZERO, Real.ZERO);
+
+    public static final SpintronicMaterial TANTALUM = new SpintronicMaterial(
+            "Tantalum", Real.of(-0.15), Real.of(1.5e-9), Real.of(2e-9), Real.of(190e-9), false, Real.ZERO, Real.ZERO);
+
+    public static final SpintronicMaterial TUNGSTEN = new SpintronicMaterial(
+            "Tungsten (\u03B2-W)", Real.of(-0.3), Real.of(2e-9), Real.of(3e-9), Real.of(150e-9), false, Real.ZERO, Real.ZERO);
 }
