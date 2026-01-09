@@ -16,7 +16,11 @@ import org.jscience.technical.backend.ExecutionContext;
  */
 public class ColtLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
-     private final CPUDenseLinearAlgebraProvider<E> cpuProvider;
+    private CPUDenseLinearAlgebraProvider<E> cpuProvider;
+
+    public ColtLinearAlgebraProvider() {
+        this.cpuProvider = null;
+    }
 
     public ColtLinearAlgebraProvider(Field<E> field) {
         this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(field);

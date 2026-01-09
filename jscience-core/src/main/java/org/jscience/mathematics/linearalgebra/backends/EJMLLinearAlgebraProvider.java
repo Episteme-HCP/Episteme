@@ -16,7 +16,11 @@ import org.jscience.technical.backend.ExecutionContext;
  */
 public class EJMLLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
-     private final CPUDenseLinearAlgebraProvider<E> cpuProvider;
+    private CPUDenseLinearAlgebraProvider<E> cpuProvider;
+
+    public EJMLLinearAlgebraProvider() {
+        this.cpuProvider = null;
+    }
 
     public EJMLLinearAlgebraProvider(Field<E> field) {
         this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(field);
