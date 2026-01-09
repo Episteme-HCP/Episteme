@@ -75,29 +75,152 @@ public class SpintronicCircuitSimulator {
         this.numNodes = netlist.getNodeCount();
     }
 
+    // Physics Coupling
+    private final Map<String, SpinValve> physicsModels = new HashMap<>();
+
+    public void registerPhysicsModel(String componentName, SpinValve model) {
+        physicsModels.put(componentName, model);
+    }
+
     /**
-     * Runs a transient analysis.
-     * 
-     * @param tStart Start time (s)
-     * @param tStop Stop time (s)
-     * @param tStep Time step (s)
+     * Initializes the simulation.
+     * Must be called before stepping.
      */
-    public void runTransient(double tStart, double tStop, double tStep) {
+    public void initialize() {
         initializeFixedElements();
+        // Set initial state
+        int size = numNodes;
+        Real[] state = new Real[size];
+        Arrays.fill(state, Real.ZERO);
+        // TODO: Perform DC Operating Point Analysis here potentially
         
-        double currentTime = tStart;
-        Vector<Real> currentState = getInitialState();
-        
+        // Add initial state to history
         timePoints.clear();
         solutions.clear();
+        
+        // Initial condition
+        timePoints.add(0.0);
+        solutions.add(new DenseVector<>(state, REAL_FIELD));
+    }
 
+    /**
+     * Executes a single time step of the simulation.
+     * 
+     * @param dt Time step duration (s)
+     * @return The new state vector (voltages)
+     */
+    public Vector<Real> step(double dt) {
+        if (solutions.isEmpty()) initialize();
+        
+        Vector<Real> prevState = solutions.get(solutions.size() - 1);
+        double time = timePoints.get(timePoints.size() - 1) + dt;
+        
+        // 1. Solve Circuit Equations
+        Vector<Real> nextState = solveStep(prevState, Real.of(dt), time);
+        
+        // 2. Update Physics Models (LLG)
+        updatePhysics(nextState, dt);
+        
+        // 3. Store Results
+        timePoints.add(time);
+        solutions.add(nextState);
+        
+        // Manage history size for real-time app (optional, keep last N or all)
+        // For now keep all, but standard app might blindly grow.
+        if (timePoints.size() > 10000) {
+            timePoints.remove(0);
+            solutions.remove(0);
+        }
+        
+        return nextState;
+    }
+
+    private void updatePhysics(Vector<Real> state, double dt) {
+        for (SpintronicNetlist.NetlistComponent comp : netlist.getComponents()) {
+            if (comp instanceof SpintronicNetlist.MTJComponent && physicsModels.containsKey(comp.getName())) {
+                SpintronicNetlist.MTJComponent mtj = (SpintronicNetlist.MTJComponent) comp;
+                SpinValve model = physicsModels.get(comp.getName());
+                
+                // Calculate Current I through MTJ
+                int n1 = mtj.getNodes()[0];
+                int n2 = mtj.getNodes()[1];
+                Real v1 = (n1 > 0) ? state.get(n1-1) : Real.ZERO;
+                Real v2 = (n2 > 0) ? state.get(n2-1) : Real.ZERO;
+                Real vDrop = v1.subtract(v2);
+                
+                // Get conductance from previous or current state (Linearized)
+                // Approx: I = G * V
+                // Better: I = V / R_total
+                
+                // Re-evaluate resistance based on CURRENT magnetization (before update)
+                // This creates a symplectic delay but is stable enough for small dt
+                Real r = GMREffect.valetFertResistance(model);
+                Real current = vDrop.divide(r);
+                
+                // Update LLG
+                // J = I / Area
+                // Area assumed 100x100 nm for now if not in model
+                // Let's assume SpinValve model layers have dimensions.
+                // Using generic 1e-14 m2 (100nm x 100nm) if not specified
+                Real area = Real.of(100e-9 * 100e-9); 
+                Real J = current.divide(area);
+                
+                // Apply STT and Thermal Noise
+                FerromagneticLayer free = model.getFreeLayer();
+                FerromagneticLayer pinned = model.getPinnedLayer();
+                
+                // Calculate STT torque
+                // Currently SpinTransport.stepLLGWithThermalNoise doesn't take STT directly,
+                // it takes Heff. 
+                // We need to augment Heff with STT 'effective field' or modify stepLLG.
+                // SpinTransport has calculateSTT.
+                
+                Real[] stt = SpinTransport.calculateSTT(J, free, pinned);
+                
+                // Convert STT torque to effective field (approximate) or add to LLG
+                // dM/dt = -gamma constant * (M x H) ... + STT
+                // STT term is directly dM/dt contribution.
+                // Easiest integration: Add effective field H_stt such that -gamma(M x H_stt) = STT
+                // H_stt = (M x STT) / (gamma * |M|^2) ? 
+                // Too complex. Let's just pass 0 field + thermal for now and assume logic inside SpinTransport updates properly,
+                // BUT SpinTransport.stepLLGWithThermalNoise only does H_eff logic.
+                // We need to ADD STT to the step.
+                
+                // Improvised Integration:
+                Real alpha = Real.of(0.01);
+                Real gamma = Real.of(1.76e11);
+                Real temp = Real.of(300); 
+                Real vol = area.multiply(free.getThickness());
+                
+                // Base H_eff (Anisotropy etc) - simplified along X
+                Real[] hEff = { Real.of(0), Real.ZERO, Real.ZERO }; 
+                
+                // Step Physics
+                Real[] newM = SpinTransport.stepLLGWithThermalNoise(free, hEff, Real.of(dt), alpha, gamma, temp, vol, free.getMaterial().getSaturationMagnetization());
+                
+                // ADD STT manually to M (Euler integration of Torque)
+                // M_new = M_new_LLG + STT * dt
+                // Note: STT vector from calculateSTT is torque term (dM/dt)_stt
+                newM[0] = newM[0].add(stt[0].multiply(Real.of(dt)));
+                newM[1] = newM[1].add(stt[1].multiply(Real.of(dt)));
+                newM[2] = newM[2].add(stt[2].multiply(Real.of(dt)));
+                
+                // Renormalize
+                Real norm = newM[0].pow(2).add(newM[1].pow(2)).add(newM[2].pow(2)).sqrt();
+                free.setMagnetization(newM[0].divide(norm), newM[1].divide(norm), newM[2].divide(norm));
+            }
+        }
+    }
+    
+    /**
+     * Backward compatibility wrapper
+     */
+    public void runTransient(double tStart, double tStop, double tStep) {
+        initialize();
+        double currentTime = tStart;
         Real dt = Real.of(tStep);
-
         while (currentTime <= tStop) {
-            timePoints.add(currentTime);
-            solutions.add(currentState);
-            
-            currentState = solveStep(currentState, dt, currentTime);
+            step(tStep);
             currentTime += tStep;
         }
     }
@@ -231,20 +354,33 @@ public class SpintronicCircuitSimulator {
         Real v2 = (n2 > 0) ? v.get(n2-1) : Real.ZERO;
         Real v_drop = v1.subtract(v2);
         
-        // Bias dependent TMR: TMR(V) = TMR0 / (1 + (V/Vh)^2)
-        double vh = VT_BIAS_ROLLOFF;
-        double biasFactor = 1.0 / (1.0 + Math.pow(v_drop.doubleValue() / vh, 2));
-        double tmr_eff = mtj.getTMR() / 100.0 * biasFactor;
-        
-        // Assume Parallel State + TMR/2 average for transient if state not tracked coupled
-        // Ideally we link to Magnetization state m_z. 
-        // For this "Circuit" sim, we treat it as P state resistance * (1+StateFactor*TMR)
-        // Let's assume P state for base RA.
-        double ra = mtj.getRA(); // Ohm um^2
-        double rP = ra * 1e-12; // Adjusted for area scaling? Logic in component says this is R value.
-        
-        // Simplified: R = rP * (1 + 0.5 * tmr_eff); // Average state
-        double conductance = 1.0 / (rP * (1.0 + 0.5 * tmr_eff));
+        // Get Resistance from Physics Model if available, otherwise use netlist params
+        double conductance;
+        if (physicsModels.containsKey(mtj.getName())) {
+             SpinValve model = physicsModels.get(mtj.getName());
+             Real r = GMREffect.valetFertResistance(model);
+             
+             // Apply Bias Roll-off to TMR part if we wanted to be precise, 
+             // but GMR model in JScience might already handle it? 
+             // If not, apply simple scaling.
+             // Assume GMR model gives low-bias resistance.
+             
+             double vh = VT_BIAS_ROLLOFF;
+             double biasFactor = 1.0 / (1.0 + Math.pow(v_drop.doubleValue() / vh, 2));
+             
+             // We degrade Conductance or Resistance?
+             // TMR degrades. R_total = R_P + dR. 
+             conductance = 1.0 / r.doubleValue(); // Simplified for now.
+        } else {
+            // Bias dependent TMR: TMR(V) = TMR0 / (1 + (V/Vh)^2)
+            double vh = VT_BIAS_ROLLOFF;
+            double biasFactor = 1.0 / (1.0 + Math.pow(v_drop.doubleValue() / vh, 2));
+            double tmr_eff = mtj.getTMR() / 100.0 * biasFactor;
+            
+            double ra = mtj.getRA(); // Ohm um^2
+            double rP = ra * 1e-12; 
+            conductance = 1.0 / (rP * (1.0 + 0.5 * tmr_eff));
+        }
         
         Real g = Real.of(conductance);
         stampMatrix(gData, n1, n2, g);

@@ -302,12 +302,19 @@ public class SpinValveApp extends FeaturedAppBase {
         resistanceChart.getData().addAll(results);
     }
 
+    private SpintronicCircuitSimulator simulator;
+    
+    // ...
+
     private void setupSimulation() {
+        // Initialize Circuit and Physics
+        updateModelStructure(); // Ensure SpinValve and Netlist are in sync
+        
         simulationTimer = new javafx.animation.AnimationTimer() {
             @Override
             public void handle(long now) {
                 // Placeholder for simulation controls visibility
-                boolean simulationControlsVisible = true; // Assume always visible for now
+                boolean simulationControlsVisible = true; 
                 if (simulationControlsVisible) {
                     runPhysicsStep();
                 }
@@ -316,30 +323,92 @@ public class SpinValveApp extends FeaturedAppBase {
     }
 
     private void runPhysicsStep() {
-        // Simple precession around easy axis + STT
+        if (simulator == null) {
+            // Build temporary Netlist if not present (should be done in updateModelStructure)
+            updateModelStructure();
+        }
+    
+        // Sim Step
+        simulator.step(currentStep.doubleValue());
+        
+        // Update UI from Physics Model (which is updated inside simulator)
         FerromagneticLayer free = spinValve.getFreeLayer();
-        Real[] hEff = { Real.of(5000), Real.ZERO, Real.ZERO }; // H_eff simplified
-
-        Real temp = Real.of(temperatureSlider.getValue());
-        // Volume hardcoded for demonstration, should depend on thickness * area
-        Real vol = Real.of(free.getThickness().doubleValue() * 100e-9 * 100e-9); // 100x100 nm area
-
-        Real[] newM = SpinTransport.stepLLGWithThermalNoise(free, hEff, currentStep, alpha, gamma,
-                temp, vol, free.getMaterial().getSaturationMagnetization());
-        free.setMagnetization(newM[0], newM[1], newM[2]);
+        Real[] m = free.getMagnetization();
+        
+        // Compute Resistance for UI (Simulator computed it internally, but we recompute for display)
+        Real r = GMREffect.valetFertResistance(spinValve);
+        resistanceValueLabel.setText(String.format("%.2f Ω·nm²", r.doubleValue() * 1e18));
+        
+        // Calculate STT for Display
+        // Real j = ... hard to get from here without extracting V from simulator state.
+        // Simplified: use last known state if accessible, or just V/R
+        // For efficiency, we trust the simulator managed the physics step.
 
         renderer3D.update(spinValve);
-        resistanceValueLabel.setText(String.format("%.2f \u03A9\u00B7nm\u00B2",
-                GMREffect.valetFertResistance(spinValve).doubleValue() * 1e18));
         
-        // Record sample for STNO analyzer
-        stnoAnalyzer.recordSample(newM[0]); // Record M_x
+        // STNO Analyze
+        stnoAnalyzer.recordSample(m[0]);
         
         // Update spectrum periodically
         frameCount++;
         if (stnoAnalyzer.isReady() && frameCount % SPECTRUM_UPDATE_INTERVAL == 0) {
             updateSpectrum();
         }
+    }
+    
+    // Update Structure override
+    private void updateModelStructure() {
+         FerromagneticLayer pinned = new FerromagneticLayer(pinnedMaterialCombo.getValue(),
+                Real.of(pinnedThicknessSlider.getValue() * 1e-9), true);
+         
+         FerromagneticLayer free = new FerromagneticLayer(freeMaterialCombo.getValue(),
+                Real.of(freeThicknessSlider.getValue() * 1e-9), false);
+         // Restore angle
+         Real angleRad = Real.of(Math.toRadians(freeAngleSlider.getValue()));
+         free.setMagnetization(angleRad.cos(), angleRad.sin(), Real.ZERO);
+
+        SpinValve valve;
+        if (safCheckBox.isSelected()) {
+            FerromagneticLayer pinned1 = new FerromagneticLayer(SpintronicMaterial.COBALT, Real.of(2e-9), true);
+            valve = new SpinValve(pinned1, pinned, SpintronicMaterial.RUTHENIUM, Real.of(0.8e-9),
+                    spacerMaterialCombo.getValue(), Real.of(spacerThicknessSlider.getValue() * 1e-9), free);
+        } else {
+            valve = new SpinValve(pinned, spacerMaterialCombo.getValue(),
+                    Real.of(spacerThicknessSlider.getValue() * 1e-9), free);
+        }
+        
+        this.spinValve = valve;
+        
+        // --- Create Netlist ---
+        SpintronicNetlist netlist = new SpintronicNetlist();
+        // Vcc -- R -- MTJ -- Gnd
+        // V1 vcc 0 1.0 (DC)
+        // R1 vcc bit 500 (Source resistance)
+        // MTJ1 bit gnd 0 (Ref)
+        
+        // Programmatic Netlist Construction (using internal parser or direct component add if exposed)
+        // Let's use parse which is robust
+        StringBuilder sb = new StringBuilder();
+        sb.append("* Spin Valve App Circuit\n");
+        sb.append("V1 1 0 0.5 DC\n"); // 500mV bias
+        sb.append("R1 1 2 50\n");     // 50 Ohm source impedance
+        sb.append("MTJ1 2 0 0\n");    // MTJ from node 2 to ground. Ref node 0.
+        sb.append(".TRAN 0 10n 1p\n"); 
+        sb.append(".END\n");
+        
+        SpintronicNetlist parsedNetlist = SpintronicNetlist.parse(sb.toString());
+        
+        // Initialize Simulator
+        simulator = new SpintronicCircuitSimulator(parsedNetlist);
+        
+        // Bind Physics Model
+        // "MTJ1" matches the netlist name
+        simulator.registerPhysicsModel("MTJ1", spinValve);
+        
+        // Init
+        simulator.initialize();
+
+        renderer3D.rebuildStructure(spinValve);
     }
     
     private void updateSpectrum() {
