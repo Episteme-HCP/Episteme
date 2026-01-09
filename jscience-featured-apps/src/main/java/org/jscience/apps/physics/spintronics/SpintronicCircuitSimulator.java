@@ -100,7 +100,7 @@ public class SpintronicCircuitSimulator {
         
         // Initial condition
         timePoints.add(0.0);
-        solutions.add(new DenseVector<>(state, REAL_FIELD));
+        solutions.add(new DenseVector<Real>(Arrays.asList(state), REAL_FIELD));
     }
 
     /**
@@ -263,7 +263,7 @@ public class SpintronicCircuitSimulator {
     private Vector<Real> getInitialState() {
         Real[] state = new Real[numNodes];
         Arrays.fill(state, Real.ZERO);
-        return new DenseVector<>(state, REAL_FIELD);
+        return new DenseVector<Real>(Arrays.asList(state), REAL_FIELD);
     }
 
     private Vector<Real> solveStep(Vector<Real> prevSol, Real dt, double time) {
@@ -310,12 +310,11 @@ public class SpintronicCircuitSimulator {
             }
             
             DenseMatrix<Real> G = new DenseMatrix<>(gData, REAL_FIELD);
-            DenseVector<Real> I_source = new DenseVector<>(rhsSource, REAL_FIELD);
+            DenseVector<Real> I_source = new DenseVector<Real>(Arrays.asList(rhsSource), REAL_FIELD);
             
             // F = G * v_new + C/dt * v_new - (C/dt*v_old + I_source)
             // Jacobian J = G + C/dt (Approximate G_tan ~ G for simple bias dep)
-            
-            Matrix<Real> C_div_dt = C_matrix.divide(dt);
+            Matrix<Real> C_div_dt = C_matrix.scale(dt.inverse(), C_matrix);
             Matrix<Real> J = G.add(C_div_dt);
             
             // RHS_eff = C/dt * v_old + I_source
@@ -328,18 +327,21 @@ public class SpintronicCircuitSimulator {
             // If G depends on v_new, this is Fixed Point Iteration. 
             // For MatrixSolver, we do: v_next = J^-1 * rhs_eff
             
-            Vector<Real> v_next = J.solve(rhs_eff);
+            Vector<Real> v_next = J.inverse().multiply(rhs_eff);
             
             // Convergence Check
             Vector<Real> diff = v_next.subtract(v_new);
-            Real error = Real.ZERO;
-            for(int i=0; i<diff.getDimension(); i++) error = error.add(diff.get(i).abs());
-            
-            v_new = v_next;
-            
-            if (error.doubleValue() < NEWTON_TOL) {
+                double sumSq = 0.0;
+                for (int i = 0; i < diff.dimension(); i++) {
+                    double val = diff.get(i).doubleValue();
+                    sumSq += val * val;
+                }
+            // Using sumSq as error metric for convergence
+            if (Math.sqrt(sumSq) < NEWTON_TOL) { // Assuming NEWTON_TOL is for L2 norm
                 break;
             }
+            
+            v_new = v_next;
         }
         
         return v_new;
@@ -418,5 +420,9 @@ public class SpintronicCircuitSimulator {
         // Optional methods
         @Override public boolean isMultiplicationCommutative() { return true; }
         @Override public boolean hasUnity() { return true; }
+        @Override public Real operate(Real a, Real b) { return a.add(b); }
+        @Override public String description() { return "Real Field"; }
+        @Override public boolean contains(Real element) { return true; }
+        @Override public boolean isEmpty() { return false; }
     };
 }

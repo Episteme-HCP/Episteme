@@ -210,6 +210,20 @@ public class SpinValveApp extends FeaturedAppBase {
                     Real.of(spacerThicknessSlider.getValue() * 1e-9), free);
         }
 
+        // --- Create Netlist and Initialize Simulator ---
+        StringBuilder sb = new StringBuilder();
+        sb.append("* Spin Valve App Circuit\n");
+        sb.append("V1 1 0 0.5 DC\n"); // 500mV bias
+        sb.append("R1 1 2 50\n");     // 50 Ohm source impedance
+        sb.append("MTJ1 2 0 0\n");    // MTJ from node 2 to ground
+        sb.append(".TRAN 0 10n 1p\n");
+        sb.append(".END\n");
+        
+        SpintronicNetlist parsedNetlist = SpintronicNetlist.parse(sb.toString());
+        simulator = new SpintronicCircuitSimulator(parsedNetlist);
+        simulator.registerPhysicsModel("MTJ1", spinValve);
+        simulator.initialize();
+
         renderer3D.rebuildStructure(spinValve);
     }
 
@@ -354,61 +368,6 @@ public class SpinValveApp extends FeaturedAppBase {
         if (stnoAnalyzer.isReady() && frameCount % SPECTRUM_UPDATE_INTERVAL == 0) {
             updateSpectrum();
         }
-    }
-    
-    // Update Structure override
-    private void updateModelStructure() {
-         FerromagneticLayer pinned = new FerromagneticLayer(pinnedMaterialCombo.getValue(),
-                Real.of(pinnedThicknessSlider.getValue() * 1e-9), true);
-         
-         FerromagneticLayer free = new FerromagneticLayer(freeMaterialCombo.getValue(),
-                Real.of(freeThicknessSlider.getValue() * 1e-9), false);
-         // Restore angle
-         Real angleRad = Real.of(Math.toRadians(freeAngleSlider.getValue()));
-         free.setMagnetization(angleRad.cos(), angleRad.sin(), Real.ZERO);
-
-        SpinValve valve;
-        if (safCheckBox.isSelected()) {
-            FerromagneticLayer pinned1 = new FerromagneticLayer(SpintronicMaterial.COBALT, Real.of(2e-9), true);
-            valve = new SpinValve(pinned1, pinned, SpintronicMaterial.RUTHENIUM, Real.of(0.8e-9),
-                    spacerMaterialCombo.getValue(), Real.of(spacerThicknessSlider.getValue() * 1e-9), free);
-        } else {
-            valve = new SpinValve(pinned, spacerMaterialCombo.getValue(),
-                    Real.of(spacerThicknessSlider.getValue() * 1e-9), free);
-        }
-        
-        this.spinValve = valve;
-        
-        // --- Create Netlist ---
-        SpintronicNetlist netlist = new SpintronicNetlist();
-        // Vcc -- R -- MTJ -- Gnd
-        // V1 vcc 0 1.0 (DC)
-        // R1 vcc bit 500 (Source resistance)
-        // MTJ1 bit gnd 0 (Ref)
-        
-        // Programmatic Netlist Construction (using internal parser or direct component add if exposed)
-        // Let's use parse which is robust
-        StringBuilder sb = new StringBuilder();
-        sb.append("* Spin Valve App Circuit\n");
-        sb.append("V1 1 0 0.5 DC\n"); // 500mV bias
-        sb.append("R1 1 2 50\n");     // 50 Ohm source impedance
-        sb.append("MTJ1 2 0 0\n");    // MTJ from node 2 to ground. Ref node 0.
-        sb.append(".TRAN 0 10n 1p\n"); 
-        sb.append(".END\n");
-        
-        SpintronicNetlist parsedNetlist = SpintronicNetlist.parse(sb.toString());
-        
-        // Initialize Simulator
-        simulator = new SpintronicCircuitSimulator(parsedNetlist);
-        
-        // Bind Physics Model
-        // "MTJ1" matches the netlist name
-        simulator.registerPhysicsModel("MTJ1", spinValve);
-        
-        // Init
-        simulator.initialize();
-
-        renderer3D.rebuildStructure(spinValve);
     }
     
     private void updateSpectrum() {
