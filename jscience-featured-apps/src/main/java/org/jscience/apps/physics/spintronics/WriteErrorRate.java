@@ -54,7 +54,7 @@ import java.util.Random;
  */
 public class WriteErrorRate {
 
-    private final Real energyBarrier;        // Eb = Ku * V (J)
+    // private final Real energyBarrier;        // Eb = Ku * V (J)
     private final Real thermalStability;     // Δ = Eb / kT
     private final Real criticalCurrent;      // Ic0 (A)
     private final Real attemptFrequency;     // f0 ~ 1 GHz
@@ -65,7 +65,7 @@ public class WriteErrorRate {
     
     // Physical constants
     private static final double KB = 1.380649e-23;
-    private static final double HBAR = 1.054571817e-34;
+    // private static final double HBAR = 1.054571817e-34;
 
     /**
      * Creates a WER Monte Carlo simulator.
@@ -81,7 +81,7 @@ public class WriteErrorRate {
         this.temperature = temperature;
         this.criticalCurrent = criticalCurrent;
         this.deviceVariability = deviceVariability;
-        this.energyBarrier = thermalStability.multiply(Real.of(KB)).multiply(temperature);
+        // this.energyBarrier = thermalStability.multiply(Real.of(KB)).multiply(temperature);
         this.attemptFrequency = Real.of(1e9); // 1 GHz
     }
 

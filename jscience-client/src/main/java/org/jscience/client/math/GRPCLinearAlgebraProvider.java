@@ -334,8 +334,8 @@ public class GRPCLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
     private MatrixData toProtoMatrix(Matrix<E> matrix) {
         MatrixData.Builder builder = MatrixData.newBuilder();
-        int rows = matrix.getRowCount();
-        int cols = matrix.getColumnCount();
+        int rows = matrix.rows();
+        int cols = matrix.cols();
         builder.setRows(rows);
         builder.setCols(cols);
 
@@ -371,7 +371,7 @@ public class GRPCLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
     private VectorData toProtoVector(Vector<E> vector) {
         VectorData.Builder builder = VectorData.newBuilder();
-        int size = vector.size();
+        int size = vector.dimension();
         builder.setSize(size);
 
         for (int i = 0; i < size; i++) {
@@ -380,7 +380,7 @@ public class GRPCLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
         }
         return builder.build();
     }
-
+    
     @SuppressWarnings("unchecked")
     private Vector<E> fromProtoVector(VectorData data) {
         List<Double> raw = data.getDataList();
@@ -408,8 +408,9 @@ public class GRPCLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
         @Override
         public <T> T execute(Operation<T> operation) {
             // Remote execution context - operations are executed on the server
-            return operation.execute();
+            return operation.compute(this);
         }
+
 
         @Override
         public void close() {

@@ -26,16 +26,16 @@ package org.jscience.apps.physics.spintronics.viewer;
 import org.jzy3d.chart.Chart;
 import org.jzy3d.chart.factories.AWTChartComponentFactory;
 import org.jzy3d.colors.Color;
-import org.jzy3d.colors.ColorMapper;
-import org.jzy3d.colors.colormaps.ColorMapRainbow;
+// import org.jzy3d.colors.ColorMapper;
+// import org.jzy3d.colors.colormaps.ColorMapRainbow;
 import org.jzy3d.maths.Coord3d;
 import org.jzy3d.plot3d.primitives.LineStrip;
 import org.jzy3d.plot3d.primitives.Point;
-import org.jzy3d.plot3d.primitives.Shape;
+// import org.jzy3d.plot3d.primitives.Shape;
 // import org.jzy3d.plot3d.primitives.Surface;
 import org.jzy3d.plot3d.builder.Mapper;
-import org.jzy3d.plot3d.builder.Builder;
-import org.jzy3d.plot3d.builder.concrete.OrthonormalGrid;
+// import org.jzy3d.plot3d.builder.Builder;
+// import org.jzy3d.plot3d.builder.concrete.OrthonormalGrid;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 
 import java.util.ArrayList;
@@ -64,12 +64,12 @@ public class SpinField2DViewer {
     private final int height;
     
     // Data buffer
-    private float[][][] magnetization; // [x][y][component: 0=x, 1=y, 2=z]
+    // private float[][][] magnetization; // [x][y][component: 0=x, 1=y, 2=z]
 
     public SpinField2DViewer(int width, int height) {
         this.width = width;
         this.height = height;
-        this.magnetization = new float[width][height][3];
+        // this.magnetization = new float[width][height][3];
         
         // Initialize Jzy3d chart
         this.chart = AWTChartComponentFactory.chart(Quality.Advanced, "awt");
@@ -122,29 +122,9 @@ public class SpinField2DViewer {
         // updateTopologicalDensity(mx, my, mz);
     }
     
-    private void updateTopologicalDensity(double[][] mx, double[][] my, double[][] mz) {
-        // Calculate topological charge density q(x,y)
-        // q = (1/4π) * M · (∂xM × ∂yM)
-        
-        // Create or update mapper
-        Mapper mapper = new Mapper() {
-            @Override
-            public double f(double x, double y) {
-                int ix = (int) x;
-                int iy = (int) y;
-                if (ix < 0 || ix >= width - 1 || iy < 0 || iy >= height - 1) return 0;
-                
-                // Approximate derivatives
-                // ... (simplified calculation for visualization height/color)
-                return mz[ix][iy] * 10; // Simple Z-height for now
-            }
-        };
-
-        // If surface definition doesn't change, we might just update colors/data
-        // But Jzy3d surfaces are often static meshes. Rebuilding might be heavy.
-        // For 'Real-time', arrows are faster. 
-        // Let's keep surface optional or low-res.
-    }
+    // private void updateTopologicalDensity(double[][] mx, double[][] my, double[][] mz) {
+    //     // Unused implementation
+    // }
 
     public Chart getChart() {
         return chart;

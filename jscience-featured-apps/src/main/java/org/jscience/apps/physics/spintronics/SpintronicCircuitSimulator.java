@@ -24,9 +24,9 @@
 package org.jscience.apps.physics.spintronics;
 
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.mathematics.linearalgebra.Matrix;
+// import org.jscience.mathematics.linearalgebra.Matrix;
 import org.jscience.mathematics.linearalgebra.Vector;
-import org.jscience.mathematics.linearalgebra.matrices.DenseMatrix;
+// import org.jscience.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 
 import java.util.*;
@@ -59,7 +59,7 @@ public class SpintronicCircuitSimulator {
     // MNA Matrices
     private double[][] G; // Conductance matrix
     private double[][] C; // Capacitance/Inductance matrix
-    private double[] rhs; // Right-hand side vector
+    // private double[] rhs; // Right-hand side vector
     
     // State variables
     private double currentTime = 0;

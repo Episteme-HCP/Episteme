@@ -365,7 +365,7 @@ public class SpintronicNetlist {
         public String toSpice() {
             // Model as variable resistor for SPICE compatibility
             double rP = ra * 1e-12; // Convert to Ω (assuming 1μm² area)
-            double rAP = rP * (1 + tmr / 100);
+            // double rAP = rP * (1 + tmr / 100);
             return String.format("* MTJ %s: %s, RA=%.1f Ω·μm², TMR=%.0f%%\nR%s %d %d %.3e", 
                     name, material, ra, tmr, name, nodes[0], nodes[1], rP);
         }

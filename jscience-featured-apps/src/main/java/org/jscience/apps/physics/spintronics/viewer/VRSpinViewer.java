@@ -47,7 +47,7 @@ package org.jscience.apps.physics.spintronics.viewer;
 public class VRSpinViewer {
 
     private boolean vrEnabled = false;
-    private long sessionHandle = 0;
+    // private long sessionHandle = 0;
 
     /**
      * Initializes the OpenXR runtime.

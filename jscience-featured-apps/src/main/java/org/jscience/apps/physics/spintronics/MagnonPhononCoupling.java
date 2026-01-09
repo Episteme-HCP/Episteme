@@ -63,9 +63,9 @@ public class MagnonPhononCoupling {
 
     // Material parameters
     private final Real magnetoelasticB1;    // First magnetoelastic constant (J/m³)
-    private final Real magnetoelasticB2;    // Second magnetoelastic constant (J/m³)
+    // private final Real magnetoelasticB2;    // Second magnetoelastic constant (J/m³)
     private final Real elasticC11;          // Elastic stiffness (Pa)
-    private final Real elasticC44;          // Shear modulus (Pa)
+    // private final Real elasticC44;          // Shear modulus (Pa)
     private final Real massDensity;         // Mass density (kg/m³)
     private final Real saturationMag;       // Saturation magnetization (A/m)
     private final Real exchangeStiffness;   // Exchange stiffness (J/m)
@@ -97,9 +97,9 @@ public class MagnonPhononCoupling {
     public MagnonPhononCoupling(Real b1, Real b2, Real c11, Real c44, 
                                  Real density, Real ms, Real aEx, int numModes) {
         this.magnetoelasticB1 = b1;
-        this.magnetoelasticB2 = b2;
+        // this.magnetoelasticB2 = b2;
         this.elasticC11 = c11;
-        this.elasticC44 = c44;
+        // this.elasticC44 = c44;
         this.massDensity = density;
         this.saturationMag = ms;
         this.exchangeStiffness = aEx;
@@ -285,7 +285,7 @@ public class MagnonPhononCoupling {
         double g = couplingMatrix[modeIndex][modeIndex];
         
         double delta = omegaM - omegaP;
-        double mixing = g / Math.sqrt(delta * delta + g * g);
+        // double mixing = g / Math.sqrt(delta * delta + g * g);
         
         return Real.of(0.5 * (1 - delta / Math.sqrt(delta * delta + g * g)));
     }

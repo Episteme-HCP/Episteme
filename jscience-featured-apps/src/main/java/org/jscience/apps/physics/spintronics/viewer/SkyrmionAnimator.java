@@ -23,12 +23,12 @@
 
 package org.jscience.apps.physics.spintronics.viewer;
 
-import javafx.animation.AnimationTimer;
+// import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import org.jscience.apps.physics.spintronics.Micromagnetics2D; // Assuming exists or similar
-import org.jscience.mathematics.numbers.real.Real;
+// import org.jscience.apps.physics.spintronics.Micromagnetics2D; // Assuming exists or similar
+// import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Animator for Skyrmion dynamics with color-coded topological density.
