@@ -51,7 +51,7 @@ public class NBodyBenchmark implements RunnableBenchmark {
     public static final Real G = Real.of(6.67430e-11);
 
     /** Real number field for vector operations */
-    private static final Field<Real> REAL_FIELD = Real.ZERO;
+    private static final Field<Real> REAL_FIELD = org.jscience.mathematics.sets.Reals.INSTANCE;
 
     private final List<Body> bodies;
 

@@ -181,6 +181,8 @@ public class SpinValveApp extends FeaturedAppBase {
         pmaSlider.valueProperty().addListener((o, ov, nv) -> updateModel());
         pmaCheckBox.setOnAction(e -> updateModel());
 
+        temperatureSlider = new Slider(0, 500, 300); // 0 to 500 K
+        temperatureSlider.setShowTickLabels(true);
         temperatureSlider.valueProperty().addListener((o, ov, nv) -> updateModel()); 
 
         sotCurrentSlider = new Slider(0, 1e12, 0); // up to 10^12 A/m2
