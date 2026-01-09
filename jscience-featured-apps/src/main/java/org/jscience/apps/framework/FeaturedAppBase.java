@@ -67,13 +67,15 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
             true);
     private String currentTheme = "light";
 
+    protected FeaturedAppBase() {
+        // Register bundle in constructor so getName() / getCategory() work for launchers
+        I18nManager.getInstance().addBundle("org.jscience.apps.i18n.messages_apps");
+    }
+
     @Override
     public void start(Stage stage) throws Exception {
         this.primaryStage = stage;
         this.prefs = Preferences.userNodeForPackage(getClass());
-
-        // Initialize I18n
-        I18nManager.getInstance().addBundle("org.jscience.apps.i18n.messages_apps");
 
         // Load saved preferences
         loadPreferences();
@@ -169,7 +171,12 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
 
     @Override
     public String getName() {
-        return getAppTitle().replace(" - JScience", "");
+        String title = getAppTitle();
+        if (title.startsWith("!") && title.endsWith("!")) {
+            // Fallback to class name if translation is missing
+            return getClass().getSimpleName().replace("App", "");
+        }
+        return title.replace(" - JScience", "");
     }
 
     @Override

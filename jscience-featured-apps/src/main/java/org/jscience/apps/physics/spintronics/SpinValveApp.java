@@ -48,7 +48,9 @@ public class SpinValveApp extends FeaturedAppBase {
     private Canvas visualizationCanvas = new Canvas(800, 600);
     private javafx.animation.AnimationTimer simulationTimer;
     private Real currentStep = Real.of(1e-12); // 1 ps
+    @SuppressWarnings("unused") // Reserved for future LLG integration
     private Real alpha = Real.of(0.01); // Damping factor
+    @SuppressWarnings("unused") // Reserved for future LLG integration 
     private Real gamma = Real.of(1.76e11); // Gyromagnetic ratio
     private LineChart<Number, Number> resistanceChart;
     private XYChart.Series<Number, Number> resistanceSeries;

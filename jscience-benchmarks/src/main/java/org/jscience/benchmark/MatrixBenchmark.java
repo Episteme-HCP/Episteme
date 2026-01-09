@@ -25,7 +25,6 @@ package org.jscience.benchmark;
 
 import org.openjdk.jmh.annotations.*;
 import org.jscience.mathematics.linearalgebra.Matrix;
-import org.jscience.mathematics.sets.Reals;
 import org.jscience.mathematics.numbers.real.Real;
 import java.util.concurrent.TimeUnit;
 import java.util.Random;

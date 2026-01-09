@@ -64,7 +64,7 @@ public class WriteErrorRate {
     private final Random random = new Random();
     
     // Physical constants
-    private static final double KB = 1.380649e-23;
+    // private static final double KB = 1.380649e-23; // Boltzmann constant (thermal stability Δ used directly)
     // private static final double HBAR = 1.054571817e-34;
 
     /**

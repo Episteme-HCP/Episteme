@@ -167,7 +167,7 @@ public class SpintronicCircuitSimulator {
                 
                 // Re-evaluate resistance based on CURRENT magnetization (before update)
                 Real r = GMREffect.valetFertResistance(model);
-                Real vNode1 = (n1 > 0) ? vDrop.add(Real.ZERO) : Real.ZERO; // Placeholder
+                // vNode1 unused - placeholder for future reference
                 // Current = V / R
                 Real current = vDrop.divide(r);
                 
@@ -273,7 +273,7 @@ public class SpintronicCircuitSimulator {
     public void runTransient(double tStart, double tStop, double tStep) {
         initialize();
         double currentTime = tStart;
-        Real dt = Real.of(tStep);
+        // dt is defined in while loop via step() call
         while (currentTime <= tStop) {
             step(tStep);
             currentTime += tStep;
@@ -325,6 +325,8 @@ public class SpintronicCircuitSimulator {
         if (n2 > 0) vector[n2-1] = vector[n2-1].add(val);
     }
 
+    // getInitialState() unused - DC operating point used instead
+    @SuppressWarnings("unused")
     private Vector<Real> getInitialState() {
         Real[] state = new Real[augmentedSize];
         Arrays.fill(state, Real.ZERO);
@@ -339,7 +341,8 @@ public class SpintronicCircuitSimulator {
         // Initial guess: v_new = v_old
         Vector<Real> v_new = prevSol;
         
-        Vector<Real> v_old_div_dt = prevSol.multiply(Real.ONE.divide(dt)); // v_old / dt
+        // v_old_div_dt unused - direct iteration used
+        // Vector<Real> v_old_div_dt = prevSol.multiply(Real.ONE.divide(dt)); // v_old / dt
         
         for (int iter = 0; iter < MAX_NEWTON_ITER; iter++) {
             // Build Jacobian J and Residual F
@@ -435,7 +438,9 @@ public class SpintronicCircuitSimulator {
              // If not, apply simple scaling.
              // Assume GMR model gives low-bias resistance.
              
+             // biasFactor available for future TMR roll-off implementation
              double vh = VT_BIAS_ROLLOFF;
+             @SuppressWarnings("unused")
              double biasFactor = 1.0 / (1.0 + Math.pow(v_drop.doubleValue() / vh, 2));
              
              // We degrade Conductance or Resistance?

@@ -10,13 +10,11 @@ import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.paint.Color;
-import javafx.scene.effect.Glow;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.transform.Rotate;
 import org.jscience.mathematics.numbers.real.Real;
-import javafx.scene.effect.Bloom;
 
 /**
  * 3D Renderer for Spintronics structures using JavaFX 3D.

@@ -43,6 +43,9 @@ public class Launcher extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        // Register the apps bundle to ensure launcher strings are found
+        I18nManager.getInstance().addBundle("org.jscience.apps.i18n.messages_apps");
+        
         String title = I18nManager.getInstance().get("launcher.title");
         Label label = new Label(title);
         label.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");

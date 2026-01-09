@@ -33,7 +33,7 @@ import org.jzy3d.plot3d.primitives.LineStrip;
 import org.jzy3d.plot3d.primitives.Point;
 // import org.jzy3d.plot3d.primitives.Shape;
 // import org.jzy3d.plot3d.primitives.Surface;
-import org.jzy3d.plot3d.builder.Mapper;
+import org.jzy3d.plot3d.builder.Mapper; // Mapper retained for potential future surface visualizations
 // import org.jzy3d.plot3d.builder.Builder;
 // import org.jzy3d.plot3d.builder.concrete.OrthonormalGrid;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
