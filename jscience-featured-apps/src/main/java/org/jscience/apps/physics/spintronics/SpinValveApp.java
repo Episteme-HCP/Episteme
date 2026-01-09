@@ -17,6 +17,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.jscience.apps.framework.FeaturedAppBase;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
 
 public class SpinValveApp extends FeaturedAppBase {
 
@@ -346,7 +347,7 @@ public class SpinValveApp extends FeaturedAppBase {
         sttLabel.setText(String.format("[%.1e, %.1e]", stt[0].doubleValue(), stt[1].doubleValue()));
 
         updateChart();
-        renderer3D.update(spinValve);
+        renderer3D.update(spinValve, 0.0);
 
         if (simulationTimer == null) {
             setupSimulation();

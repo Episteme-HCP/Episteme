@@ -29,6 +29,7 @@ import java.util.List;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.physics.PhysicalConstants;
+import org.jscience.mathematics.structures.SpatialOctree;
 
 /**
  * Barnes-Hut N-body gravitational simulation (O(N log N)).
@@ -51,7 +52,7 @@ public class BarnesHutSimulation {
     private Real G = PhysicalConstants.G;
     private Real theta = Real.of(0.5);
     private Real softening = Real.of(0.01);
-    private OctreeNode root;
+    private SpatialOctree<Particle> tree;
 
     public BarnesHutSimulation() {
     }
@@ -110,27 +111,27 @@ public class BarnesHutSimulation {
         size = size.max(maxY.subtract(minY));
         size = size.max(maxZ.subtract(minZ));
 
-        Real cx = maxX.add(minX).divide(Real.of(2));
-        Real cy = maxY.add(minY).divide(Real.of(2));
-        Real cz = maxZ.add(minZ).divide(Real.of(2));
+        Real cx = maxX.add(minX).divide(Real.TWO);
+        Real cy = maxY.add(minY).divide(Real.TWO);
+        Real cz = maxZ.add(minZ).divide(Real.TWO);
 
-        root = new OctreeNode(cx, cy, cz, size.multiply(Real.of(1.1)));
+        tree = new SpatialOctree<>(cx, cy, cz, size.multiply(Real.of(1.1)));
         for (Particle p : particles)
-            root.insert(p);
-        root.computeCenterOfMass();
+            tree.insert(p);
+        tree.computeCenterOfMass();
     }
 
     public void computeForces() {
         buildTree();
         for (Particle p : particles) {
             p.setAcceleration(Real.ZERO, Real.ZERO, Real.ZERO);
-            if (root != null)
-                computeForce(p, root);
+            if (tree != null)
+                computeForce(p, tree.getRoot());
         }
     }
 
-    private void computeForce(Particle p, OctreeNode node) {
-        if (node.mass.equals(Real.ZERO) || node.particle == p)
+    private void computeForce(Particle p, SpatialOctree.Node<Particle> node) {
+        if (node.mass.equals(Real.ZERO) || node.object == p)
             return;
 
         Real dx = node.comX.subtract(Real.of(p.getX()));
@@ -160,7 +161,7 @@ public class BarnesHutSimulation {
 
             p.setAcceleration(ax, ay, az);
         } else {
-            for (OctreeNode c : node.children)
+            for (SpatialOctree.Node<Particle> c : node.children)
                 if (c != null)
                     computeForce(p, c);
         }
@@ -186,100 +187,6 @@ public class BarnesHutSimulation {
         computeForces();
         for (int i = 0; i < steps; i++)
             step(dt);
-    }
-
-    private static class OctreeNode {
-        Real centerX, centerY, centerZ;
-        Real size;
-        Real mass;
-        Real comX, comY, comZ;
-        Particle particle;
-        OctreeNode[] children = new OctreeNode[8];
-
-        OctreeNode(Real x, Real y, Real z, Real s) {
-            centerX = x;
-            centerY = y;
-            centerZ = z;
-            size = s;
-            mass = Real.ZERO;
-            comX = Real.ZERO;
-            comY = Real.ZERO;
-            comZ = Real.ZERO;
-        }
-
-        boolean isLeaf() {
-            for (var ch : children)
-                if (ch != null)
-                    return false;
-            return true;
-        }
-
-        int octant(Particle p) {
-            int o = 0;
-            if (Real.of(p.getX()).compareTo(centerX) > 0)
-                o |= 1;
-            if (Real.of(p.getY()).compareTo(centerY) > 0)
-                o |= 2;
-            if (Real.of(p.getZ()).compareTo(centerZ) > 0)
-                o |= 4;
-            return o;
-        }
-
-        void insert(Particle p) {
-            if (mass.equals(Real.ZERO) && particle == null) {
-                particle = p;
-                mass = Real.of(p.getMass().getValue().doubleValue());
-                comX = Real.of(p.getX());
-                comY = Real.of(p.getY());
-                comZ = Real.of(p.getZ());
-            } else if (particle != null) {
-                Particle e = particle;
-                particle = null;
-                insertChild(e);
-                insertChild(p);
-            } else
-                insertChild(p);
-        }
-
-        void insertChild(Particle p) {
-            int o = octant(p);
-            if (children[o] == null) {
-                Real h = size.divide(Real.of(2));
-                Real offset = h.divide(Real.of(2));
-                Real nx = centerX.add(((o & 1) != 0) ? offset : offset.negate());
-                Real ny = centerY.add(((o & 2) != 0) ? offset : offset.negate());
-                Real nz = centerZ.add(((o & 4) != 0) ? offset : offset.negate());
-                children[o] = new OctreeNode(nx, ny, nz, h);
-            }
-            children[o].insert(p);
-        }
-
-        void computeCenterOfMass() {
-            if (particle != null) {
-                mass = Real.of(particle.getMass().getValue().doubleValue());
-                comX = Real.of(particle.getX());
-                comY = Real.of(particle.getY());
-                comZ = Real.of(particle.getZ());
-            } else {
-                mass = Real.ZERO;
-                comX = Real.ZERO;
-                comY = Real.ZERO;
-                comZ = Real.ZERO;
-                for (var ch : children)
-                    if (ch != null) {
-                        ch.computeCenterOfMass();
-                        mass = mass.add(ch.mass);
-                        comX = comX.add(ch.mass.multiply(ch.comX));
-                        comY = comY.add(ch.mass.multiply(ch.comY));
-                        comZ = comZ.add(ch.mass.multiply(ch.comZ));
-                    }
-                if (mass.compareTo(Real.ZERO) > 0) {
-                    comX = comX.divide(mass);
-                    comY = comY.divide(mass);
-                    comZ = comZ.divide(mass);
-                }
-            }
-        }
     }
 
 }

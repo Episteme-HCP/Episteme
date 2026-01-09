@@ -82,8 +82,6 @@ public class SpintronicCircuitSimulator {
     }
 
     // Physics Coupling
-    private final Map<String, SpinValve> physicsModels = new HashMap<>();
-
     public void registerPhysicsModel(String componentName, SpinValve model) {
         physicsModels.put(componentName, model);
         magnetizationHistory.put(componentName, new ArrayList<>());
@@ -213,8 +211,8 @@ public class SpintronicCircuitSimulator {
                 free.setMagnetization(newM[0].divide(mNorm), newM[1].divide(mNorm), newM[2].divide(mNorm));
 
                 // History (M history)
-                if (magnetizationHistory.containsKey(entry.getKey())) {
-                    magnetizationHistory.get(entry.getKey()).add(newM);
+                if (magnetizationHistory.containsKey(comp.getName())) {
+                    magnetizationHistory.get(comp.getName()).add(newM);
                 }
             }
         }
@@ -228,7 +226,7 @@ public class SpintronicCircuitSimulator {
         int size = augmentedSize;
         Real[] zeroArr = new Real[size];
         Arrays.fill(zeroArr, Real.ZERO);
-        Vector<Real> v_guess = new DenseVector<Real>(Arrays.asList(zeroArr), REAL_FIELD);
+        Vector<Real> v_guess = new DenseVector<Real>(Arrays.asList(zeroArr), org.jscience.mathematics.sets.Reals.INSTANCE);
         
         for (int iter = 0; iter < MAX_NEWTON_ITER; iter++) {
             Real[][] gData = new Real[size][size];
@@ -253,8 +251,8 @@ public class SpintronicCircuitSimulator {
                 }
             }
             
-            Matrix<Real> J = new DenseMatrix<>(gData, REAL_FIELD);
-            Vector<Real> rhs = new DenseVector<Real>(Arrays.asList(rhsSource), REAL_FIELD);
+            Matrix<Real> J = new DenseMatrix<>(gData, org.jscience.mathematics.sets.Reals.INSTANCE);
+            Vector<Real> rhs = new DenseVector<Real>(Arrays.asList(rhsSource), org.jscience.mathematics.sets.Reals.INSTANCE);
             Vector<Real> F = J.multiply(v_guess).subtract(rhs);
             
             if (F.dimension() == 0) return v_guess;
@@ -297,7 +295,7 @@ public class SpintronicCircuitSimulator {
                  stampMatrix(cData, n1, n2, val);
              }
         }
-        C_matrix = new DenseMatrix<>(cData, REAL_FIELD);
+        C_matrix = new DenseMatrix<>(cData, org.jscience.mathematics.sets.Reals.INSTANCE);
     }
 
     private void stampMatrix(Real[][] matrix, int n1, int n2, Real val) {
@@ -330,7 +328,7 @@ public class SpintronicCircuitSimulator {
     private Vector<Real> getInitialState() {
         Real[] state = new Real[augmentedSize];
         Arrays.fill(state, Real.ZERO);
-        return new DenseVector<Real>(Arrays.asList(state), REAL_FIELD);
+        return new DenseVector<Real>(Arrays.asList(state), org.jscience.mathematics.sets.Reals.INSTANCE);
     }
 
     private Vector<Real> solveStep(Vector<Real> prevSol, Real dt, double time) {
@@ -379,8 +377,8 @@ public class SpintronicCircuitSimulator {
                 }
             }
             
-            DenseMatrix<Real> G = new DenseMatrix<>(gData, REAL_FIELD);
-            DenseVector<Real> I_source = new DenseVector<Real>(Arrays.asList(rhsSource), REAL_FIELD);
+            DenseMatrix<Real> G = new DenseMatrix<>(gData, org.jscience.mathematics.sets.Reals.INSTANCE);
+            DenseVector<Real> I_source = new DenseVector<Real>(Arrays.asList(rhsSource), org.jscience.mathematics.sets.Reals.INSTANCE);
             
             // F = G * v_new + C/dt * v_new - (C/dt*v_old + I_source)
             // Jacobian J = G + C/dt (Approximate G_tan ~ G for simple bias dep)
@@ -478,26 +476,4 @@ public class SpintronicCircuitSimulator {
     public List<Double> getTimePoints() {
          return timePoints;
     }
-    
-    // --- Local Implementation of Field<Real> ---
-    // Since we cannot locate the standard RealField, we define it here to satisfy DenseMatrix.
-    
-    public static final org.jscience.mathematics.structures.rings.Field<Real> REAL_FIELD = new org.jscience.mathematics.structures.rings.Field<Real>() {
-        @Override public Real zero() { return Real.ZERO; }
-        @Override public Real one() { return Real.ONE; }
-        @Override public boolean isCommutative() { return true; }
-        @Override public Real add(Real a, Real b) { return a.add(b); }
-        @Override public Real multiply(Real a, Real b) { return a.multiply(b); }
-        @Override public Real inverse(Real a) { return a.inverse(); }
-        @Override public Real negate(Real a) { return a.negate(); }
-        @Override public int characteristic() { return 0; }
-        
-        // Optional methods
-        @Override public boolean isMultiplicationCommutative() { return true; }
-        @Override public boolean hasUnity() { return true; }
-        @Override public Real operate(Real a, Real b) { return a.add(b); }
-        @Override public String description() { return "Real Field"; }
-        @Override public boolean contains(Real element) { return true; }
-        @Override public boolean isEmpty() { return false; }
-    };
 }
