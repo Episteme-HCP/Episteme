@@ -30,9 +30,6 @@ import org.jscience.technical.backend.ExecutionContext;
 
 /**
  * Native (pure Java) tensor provider.
- * <p>
- * Features:
- * <ul>
  * <li>Small to medium tensors</li>
  * <li>Type-safe operations with Field&lt;T&gt;</li>
  * <li>CPU-only environments</li>
@@ -60,6 +57,7 @@ public class CPUDenseTensorProvider implements TensorProvider {
             data = (T[]) new Object[size];
         }
 
+        // Initialize with zero() from ring/field
         try {
             if (org.jscience.mathematics.structures.rings.Ring.class.isAssignableFrom(elementType)) {
                 org.jscience.mathematics.structures.rings.Ring<?> ringElem = (org.jscience.mathematics.structures.rings.Ring<?>) elementType
@@ -73,13 +71,22 @@ public class CPUDenseTensorProvider implements TensorProvider {
                     data[i] = (T) Real.ZERO;
                 }
             } else {
-                // Generic fallback
+                // Try default constructor generic fallback
+
+                // Check if it has zero method via reflection?
+                // For now, only Ring supported or types with explicit support.
             }
         } catch (Exception e) {
+            // Fallback for types without default constructor
             if (Real.class.equals(elementType)) {
                 for (int i = 0; i < size; i++) {
                     data[i] = (T) Real.ZERO;
                 }
+            } else {
+                // throw new IllegalArgumentException("Cannot create zero for type: " +
+                // elementType, e);
+                // Just return null-filled array if we can't determine zero?
+                // Or throw.
             }
         }
 
@@ -101,6 +108,7 @@ public class CPUDenseTensorProvider implements TensorProvider {
             data = (T[]) new Object[size];
         }
 
+        // Initialize with one() from ring/field
         try {
             if (org.jscience.mathematics.structures.rings.Ring.class.isAssignableFrom(elementType)) {
                 org.jscience.mathematics.structures.rings.Ring<?> ringElem = (org.jscience.mathematics.structures.rings.Ring<?>) elementType
@@ -144,11 +152,12 @@ public class CPUDenseTensorProvider implements TensorProvider {
 
     @Override
     public int getPriority() {
-        return 50; 
+        return 50; // Default priority
     }
 
     @Override
     public ExecutionContext createContext() {
+        // CPU default execution context
         return null;
     }
 
@@ -172,3 +181,5 @@ public class CPUDenseTensorProvider implements TensorProvider {
         return "CPUDenseTensorProvider";
     }
 }
+
+

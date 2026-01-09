@@ -26,16 +26,29 @@ package org.jscience.mathematics.linearalgebra.backends;
 import org.jscience.mathematics.structures.rings.Field;
 import org.jscience.mathematics.linearalgebra.Matrix;
 import org.jscience.mathematics.linearalgebra.Vector;
+
 import org.jscience.technical.backend.ExecutionContext;
 
+/**
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
 public class CUDASparseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
     private final CPUSparseLinearAlgebraProvider<E> cpuProvider;
 
     public CUDASparseLinearAlgebraProvider(Field<E> field) {
+        // this.field = field; // Unused
         this.cpuProvider = new CPUSparseLinearAlgebraProvider<>(field);
+        if (checkAvailability()) {
+            java.util.logging.Logger.getLogger(getClass().getName()).info(
+                    "CUDASparseLinearAlgebraProvider initialized (Warning: Sparse GPU ops delegated to CPU in this version)");
+        }
     }
 
+    // Check if JCusparse is available? Usually assuming if JCuda matches.
     private static boolean checkAvailability() {
         try {
             Class.forName("jcuda.jcusparse.JCusparse");
@@ -59,9 +72,7 @@ public class CUDASparseLinearAlgebraProvider<E> implements LinearAlgebraProvider
 
     @Override
     public ExecutionContext createContext() {
-        // CUDA context would require native initialization
-        // For now, delegate to CPU provider's context when available
-        return cpuProvider.createContext();
+        return null;
     }
 
     @Override
@@ -135,11 +146,6 @@ public class CUDASparseLinearAlgebraProvider<E> implements LinearAlgebraProvider
     }
 
     @Override
-    public E norm(Vector<E> a) {
-        return cpuProvider.norm(a);
-    }
-
-    @Override
     public String getId() {
         return "cudasparse";
     }
@@ -149,3 +155,6 @@ public class CUDASparseLinearAlgebraProvider<E> implements LinearAlgebraProvider
         return "CUDASparseLinearAlgebraProvider";
     }
 }
+
+
+
