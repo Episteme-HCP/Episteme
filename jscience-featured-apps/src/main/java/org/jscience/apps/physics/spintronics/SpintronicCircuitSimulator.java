@@ -224,6 +224,10 @@ public class SpintronicCircuitSimulator {
 
     private Vector<Real> solveDCOperatingPoint() {
         int size = augmentedSize;
+        if (size == 0) {
+            return new DenseVector<Real>(java.util.Collections.emptyList(), org.jscience.mathematics.sets.Reals.INSTANCE);
+        }
+        
         Real[] zeroArr = new Real[size];
         Arrays.fill(zeroArr, Real.ZERO);
         Vector<Real> v_guess = new DenseVector<Real>(Arrays.asList(zeroArr), org.jscience.mathematics.sets.Reals.INSTANCE);
@@ -251,6 +255,12 @@ public class SpintronicCircuitSimulator {
                 }
             }
             
+            // Add small diagonal regularization to prevent singularity
+            Real epsilon = Real.of(1e-12);
+            for (int i = 0; i < size; i++) {
+                gData[i][i] = gData[i][i].add(epsilon);
+            }
+            
             Matrix<Real> J = new DenseMatrix<>(gData, org.jscience.mathematics.sets.Reals.INSTANCE);
             Vector<Real> rhs = new DenseVector<Real>(Arrays.asList(rhsSource), org.jscience.mathematics.sets.Reals.INSTANCE);
             Vector<Real> F = J.multiply(v_guess).subtract(rhs);
@@ -261,8 +271,14 @@ public class SpintronicCircuitSimulator {
             for (int i=0; i < F.dimension(); i++) sumSq += Math.pow(F.get(i).doubleValue(), 2);
             if (Math.sqrt(sumSq) < NEWTON_TOL) break;
 
-            Vector<Real> dv = J.inverse().multiply(F);
-            v_guess = v_guess.subtract(dv);
+            try {
+                Vector<Real> dv = J.inverse().multiply(F);
+                v_guess = v_guess.subtract(dv);
+            } catch (ArithmeticException e) {
+                // Matrix is still singular despite regularization, return current guess
+                System.err.println("Warning: Matrix singular in DC operating point, using zero initial state");
+                return new DenseVector<Real>(Arrays.asList(zeroArr), org.jscience.mathematics.sets.Reals.INSTANCE);
+            }
         }
         return v_guess;
     }
@@ -398,7 +414,14 @@ public class SpintronicCircuitSimulator {
             // If G depends on v_new, this is Fixed Point Iteration. 
             // For MatrixSolver, we do: v_next = J^-1 * rhs_eff
             
-            Vector<Real> v_next = J.inverse().multiply(rhs_eff);
+            Vector<Real> v_next;
+            try {
+                v_next = J.inverse().multiply(rhs_eff);
+            } catch (ArithmeticException e) {
+                // Matrix is singular, return previous solution
+                System.err.println("Warning: Matrix singular in solveStep, using previous state");
+                return prevSol;
+            }
             
             // Convergence Check
             Vector<Real> diff = v_next.subtract(v_new);
