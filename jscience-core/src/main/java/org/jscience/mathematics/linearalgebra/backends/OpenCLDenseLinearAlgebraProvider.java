@@ -16,7 +16,11 @@ import org.jscience.technical.backend.ExecutionContext;
  */
 public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
-     private final CPUDenseLinearAlgebraProvider<E> cpuProvider;
+    private CPUDenseLinearAlgebraProvider<E> cpuProvider;
+
+    public OpenCLDenseLinearAlgebraProvider() {
+        this.cpuProvider = null;
+    }
 
     public OpenCLDenseLinearAlgebraProvider(Field<E> field) {
         this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(field);

@@ -30,7 +30,11 @@ import org.jscience.technical.backend.ExecutionContext;
 
 public class OpenCLSparseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
-     private final CPUSparseLinearAlgebraProvider<E> cpuProvider;
+     private CPUSparseLinearAlgebraProvider<E> cpuProvider;
+
+    public OpenCLSparseLinearAlgebraProvider() {
+        this.cpuProvider = null;
+    }
 
     public OpenCLSparseLinearAlgebraProvider(Field<E> field) {
         this.cpuProvider = new CPUSparseLinearAlgebraProvider<>(field);
