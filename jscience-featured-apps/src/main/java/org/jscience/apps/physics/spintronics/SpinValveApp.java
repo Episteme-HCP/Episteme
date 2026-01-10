@@ -177,6 +177,7 @@ public class SpinValveApp extends FeaturedAppBase {
 
         pmaSlider = new Slider(0, 2e6, 0); // up to 2 MJ/m3
         pmaSlider.setShowTickLabels(true);
+        pmaSlider.setMajorTickUnit(5e5); // 500kJ/m3 increments
         pmaCheckBox = new CheckBox("Enable PMA (Perpendicular)");
         
         dampingSlider.valueProperty().addListener((o, ov, nv) -> updateModel());
@@ -189,6 +190,7 @@ public class SpinValveApp extends FeaturedAppBase {
 
         sotCurrentSlider = new Slider(0, 1e12, 0); // up to 10^12 A/m2
         sotCurrentSlider.setShowTickLabels(true);
+        sotCurrentSlider.setMajorTickUnit(2.5e11); // 250 GA/m2 increments
         sotHallSlider = new Slider(-0.5, 0.5, 0.1); // Spin Hall Angle
         sotHallSlider.setShowTickLabels(true);
         sotCurrentSlider.valueProperty().addListener((o, ov, nv) -> updateModel());
