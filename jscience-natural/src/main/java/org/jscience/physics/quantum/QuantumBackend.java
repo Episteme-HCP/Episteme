@@ -1,4 +1,4 @@
-package org.jscience.quantum;
+package org.jscience.physics.quantum;
 
 import java.util.Map;
 

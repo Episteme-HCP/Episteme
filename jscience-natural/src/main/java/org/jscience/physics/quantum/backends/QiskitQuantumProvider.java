@@ -1,7 +1,7 @@
-package org.jscience.quantum.backends;
+package org.jscience.physics.quantum.backends;
 
-import org.jscience.quantum.QuantumBackend;
-import org.jscience.quantum.QuantumContext;
+import org.jscience.physics.quantum.QuantumBackend;
+import org.jscience.physics.quantum.QuantumContext;
 
 import java.io.BufferedReader;
 import java.io.File;
