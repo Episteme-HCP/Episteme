@@ -237,7 +237,6 @@ public class JBlasLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public E determinant(Matrix<E> a) {
         if (!canUseJBlas()) {
             return cpuProvider.determinant(a);

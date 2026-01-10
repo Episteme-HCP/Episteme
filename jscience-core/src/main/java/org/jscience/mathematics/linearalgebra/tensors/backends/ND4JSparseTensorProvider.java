@@ -24,7 +24,7 @@
 package org.jscience.mathematics.linearalgebra.tensors.backends;
 
 import org.jscience.mathematics.linearalgebra.tensors.Tensor;
-import org.jscience.mathematics.linearalgebra.tensors.SparseTensor;
+
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.technical.backend.ExecutionContext;
 import org.jscience.technical.backend.cuda.CUDAExecutionContext;
@@ -60,7 +60,6 @@ public class ND4JSparseTensorProvider implements TensorProvider {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> Tensor<T> zeros(Class<T> elementType, int... shape) {
         if (!isAvailable) {
             return fallback.zeros(elementType, shape);
@@ -75,7 +74,6 @@ public class ND4JSparseTensorProvider implements TensorProvider {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> Tensor<T> ones(Class<T> elementType, int... shape) {
         if (!isAvailable) {
             return fallback.ones(elementType, shape);
@@ -86,7 +84,6 @@ public class ND4JSparseTensorProvider implements TensorProvider {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> Tensor<T> create(T[] data, int... shape) {
         if (!isAvailable) {
             return fallback.create(data, shape);

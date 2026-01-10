@@ -38,7 +38,7 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import org.jscience.apps.framework.FeaturedAppBase;
-import org.jscience.ui.i18n.I18nManager;
+import org.jscience.ui.i18n.I18n;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -99,7 +99,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
 
         @Override
         public String toString() {
-            return I18nManager.getInstance().get(key);
+            return I18n.getInstance().get(key);
         }
 
     }

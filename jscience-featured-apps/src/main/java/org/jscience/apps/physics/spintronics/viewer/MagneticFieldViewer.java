@@ -12,16 +12,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Box;
 import javafx.scene.shape.Cylinder;
-import javafx.scene.shape.MeshView;
-import javafx.scene.shape.TriangleMesh;
 import javafx.scene.transform.Rotate;
-import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 3D Viewer for Magnetic Fields in Spintronics.
@@ -34,9 +27,6 @@ public class MagneticFieldViewer extends Application {
     private double mouseOldX, mouseOldY;
     private final Rotate rotateX = new Rotate(20, Rotate.X_AXIS);
     private final Rotate rotateY = new Rotate(-45, Rotate.Y_AXIS);
-
-    private static final double SCALE = 50.0; // Pixels per unit
-    private static final double ARROW_LEN_FACTOR = 0.8;
 
     public javafx.scene.Parent createContent() {
         BorderPane pane = new BorderPane();

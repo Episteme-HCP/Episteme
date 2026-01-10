@@ -27,15 +27,9 @@ import org.jzy3d.chart.Chart;
 import org.jzy3d.chart.factories.AWTChartComponentFactory;
 import org.jzy3d.colors.Color;
 // import org.jzy3d.colors.ColorMapper;
-// import org.jzy3d.colors.colormaps.ColorMapRainbow;
 import org.jzy3d.maths.Coord3d;
 import org.jzy3d.plot3d.primitives.LineStrip;
 import org.jzy3d.plot3d.primitives.Point;
-// import org.jzy3d.plot3d.primitives.Shape;
-// import org.jzy3d.plot3d.primitives.Surface;
-import org.jzy3d.plot3d.builder.Mapper; // Mapper retained for potential future surface visualizations
-// import org.jzy3d.plot3d.builder.Builder;
-// import org.jzy3d.plot3d.builder.concrete.OrthonormalGrid;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 
 import java.util.ArrayList;

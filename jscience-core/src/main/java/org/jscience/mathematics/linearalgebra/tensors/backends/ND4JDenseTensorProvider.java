@@ -249,7 +249,6 @@ public class ND4JDenseTensorProvider implements TensorProvider {
      * @param indArray the ND4J array to convert
      * @return the JScience Tensor representation
      */
-    @SuppressWarnings("unchecked")
     public Tensor<Real> fromINDArray(org.nd4j.linalg.api.ndarray.INDArray indArray) {
         if (!isAvailable) {
             throw new UnsupportedOperationException("ND4J is not available");
