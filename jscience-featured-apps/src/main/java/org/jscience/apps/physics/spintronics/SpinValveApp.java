@@ -120,6 +120,12 @@ public class SpinValveApp extends FeaturedAppBase {
         spectrumBox.getChildren().addAll(spectrumChart, peakFreqLabel);
         spectrumTab.setContent(spectrumBox);
         tabPane.getTabs().add(spectrumTab);
+        
+        // Tab 4: Magnetic Field Vector View
+        Tab magTab = new Tab(i18n.get("spintronics.tab.visualization") + " (Field)");
+        magTab.setClosable(false);
+        magTab.setContent(new org.jscience.apps.physics.spintronics.viewer.MagneticFieldViewer().createContent());
+        tabPane.getTabs().add(magTab);
 
         centerPanel.getChildren().add(tabPane);
 

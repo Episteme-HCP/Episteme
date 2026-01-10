@@ -142,7 +142,29 @@
             <artifactId>nd4j-native</artifactId>
         </dependency>
 
+        <!-- Colt (scientific computing) -->
+        <dependency>
+            <groupId>colt</groupId>
+            <artifactId>colt</artifactId>
+        </dependency>
 
+        <!-- EJML (Efficient Java Matrix Library) -->
+        <dependency>
+            <groupId>org.ejml</groupId>
+            <artifactId>ejml-all</artifactId>
+        </dependency>
+
+        <!-- JBlas (native BLAS) -->
+        <dependency>
+            <groupId>org.jblas</groupId>
+            <artifactId>jblas</artifactId>
+        </dependency>
+
+        <!-- Apache Commons Math -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+        </dependency>
 
         <!-- JSON -->
         <dependency>

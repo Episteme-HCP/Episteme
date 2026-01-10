@@ -24,6 +24,7 @@
 package org.jscience.mathematics.linearalgebra.tensors.backends;
 
 import org.jscience.mathematics.linearalgebra.tensors.Tensor;
+import org.jscience.mathematics.linearalgebra.tensors.DenseTensor;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.technical.backend.ExecutionContext;
 import org.jscience.technical.backend.cuda.CUDAExecutionContext;
@@ -49,8 +50,13 @@ public class ND4JDenseTensorProvider implements TensorProvider {
         try {
             // Try to load ND4J classes
             Class.forName("org.nd4j.linalg.factory.Nd4j");
+            Class.forName("org.nd4j.linalg.api.ndarray.INDArray");
             isAvailable = true;
         } catch (ClassNotFoundException e) {
+            isAvailable = false;
+        } catch (NoClassDefFoundError e) {
+            isAvailable = false;
+        } catch (UnsatisfiedLinkError e) {
             isAvailable = false;
         }
     }
@@ -95,54 +101,181 @@ public class ND4JDenseTensorProvider implements TensorProvider {
 
     @Override
     public boolean supportsGPU() {
-        return isAvailable;
+        if (!isAvailable) {
+            return false;
+        }
+        try {
+            // Check if CUDA backend is available
+            Class.forName("org.nd4j.jita.allocator.impl.AtomicAllocator");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> Tensor<T> zeros(Class<T> elementType, int... shape) {
-        if (!isAvailable || !Real.class.isAssignableFrom(elementType)) {
+        if (!isAvailable) {
             return fallback.zeros(elementType, shape);
         }
-        // ND4J implementation would go here
-        return fallback.zeros(elementType, shape);
+        
+        if (!Real.class.isAssignableFrom(elementType)) {
+            return fallback.zeros(elementType, shape);
+        }
+        
+        try {
+            // Create ND4J zeros array
+            long[] longShape = new long[shape.length];
+            for (int i = 0; i < shape.length; i++) {
+                longShape[i] = shape[i];
+            }
+            
+            org.nd4j.linalg.api.ndarray.INDArray ndArray = 
+                org.nd4j.linalg.factory.Nd4j.zeros(longShape);
+            
+            // Convert to JScience Tensor
+            return (Tensor<T>) fromINDArray(ndArray);
+        } catch (Exception e) {
+            return fallback.zeros(elementType, shape);
+        }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> Tensor<T> ones(Class<T> elementType, int... shape) {
-        if (!isAvailable || !Real.class.isAssignableFrom(elementType)) {
+        if (!isAvailable) {
             return fallback.ones(elementType, shape);
         }
-        // ND4J implementation would go here
-        return fallback.ones(elementType, shape);
+        
+        if (!Real.class.isAssignableFrom(elementType)) {
+            return fallback.ones(elementType, shape);
+        }
+        
+        try {
+            // Create ND4J ones array
+            long[] longShape = new long[shape.length];
+            for (int i = 0; i < shape.length; i++) {
+                longShape[i] = shape[i];
+            }
+            
+            org.nd4j.linalg.api.ndarray.INDArray ndArray = 
+                org.nd4j.linalg.factory.Nd4j.ones(longShape);
+            
+            // Convert to JScience Tensor
+            return (Tensor<T>) fromINDArray(ndArray);
+        } catch (Exception e) {
+            return fallback.ones(elementType, shape);
+        }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> Tensor<T> create(T[] data, int... shape) {
         if (!isAvailable) {
             return fallback.create(data, shape);
         }
-        // ND4J implementation would go here
-        return fallback.create(data, shape);
+        
+        if (data.length == 0 || !(data[0] instanceof Real)) {
+            return fallback.create(data, shape);
+        }
+        
+        try {
+            // Convert data to double array
+            double[] doubleData = new double[data.length];
+            for (int i = 0; i < data.length; i++) {
+                doubleData[i] = ((Real) data[i]).doubleValue();
+            }
+            
+            // Create ND4J array with shape
+            long[] longShape = new long[shape.length];
+            for (int i = 0; i < shape.length; i++) {
+                longShape[i] = shape[i];
+            }
+            
+            org.nd4j.linalg.api.ndarray.INDArray ndArray = 
+                org.nd4j.linalg.factory.Nd4j.create(doubleData, longShape);
+            
+            // Convert to JScience Tensor
+            return (Tensor<T>) fromINDArray(ndArray);
+        } catch (Exception e) {
+            return fallback.create(data, shape);
+        }
     }
 
     /**
      * Converts a JScience Tensor to an ND4J INDArray (when ND4J is available).
+     * 
+     * @param tensor the tensor to convert
+     * @return the ND4J INDArray representation
      */
-    public Object toINDArray(Tensor<Real> tensor) {
+    public org.nd4j.linalg.api.ndarray.INDArray toINDArray(Tensor<Real> tensor) {
         if (!isAvailable) {
             throw new UnsupportedOperationException("ND4J is not available");
         }
-        throw new UnsupportedOperationException("ND4J conversion not yet implemented");
+        
+        int[] shape = tensor.shape();
+        long[] longShape = new long[shape.length];
+        for (int i = 0; i < shape.length; i++) {
+            longShape[i] = shape[i];
+        }
+        
+        // Calculate total size
+        int totalSize = 1;
+        for (int dim : shape) {
+            totalSize *= dim;
+        }
+        
+        // Extract data as flat array
+        double[] data = new double[totalSize];
+        int[] indices = new int[shape.length];
+        
+        for (int i = 0; i < totalSize; i++) {
+            // Calculate indices for this position
+            int remaining = i;
+            for (int d = shape.length - 1; d >= 0; d--) {
+                indices[d] = remaining % shape[d];
+                remaining /= shape[d];
+            }
+            data[i] = tensor.get(indices).doubleValue();
+        }
+        
+        return org.nd4j.linalg.factory.Nd4j.create(data, longShape);
     }
 
     /**
      * Creates a JScience Tensor from an ND4J INDArray.
+     * 
+     * @param indArray the ND4J array to convert
+     * @return the JScience Tensor representation
      */
-    public Tensor<Real> fromINDArray(Object indArray) {
+    @SuppressWarnings("unchecked")
+    public Tensor<Real> fromINDArray(org.nd4j.linalg.api.ndarray.INDArray indArray) {
         if (!isAvailable) {
             throw new UnsupportedOperationException("ND4J is not available");
         }
-        throw new UnsupportedOperationException("ND4J conversion not yet implemented");
+        
+        long[] longShape = indArray.shape();
+        int[] shape = new int[longShape.length];
+        for (int i = 0; i < longShape.length; i++) {
+            shape[i] = (int) longShape[i];
+        }
+        
+        // Calculate total size
+        int totalSize = 1;
+        for (int dim : shape) {
+            totalSize *= dim;
+        }
+        
+        // Extract data
+        Real[] data = new Real[totalSize];
+        double[] ndData = indArray.data().asDouble();
+        
+        for (int i = 0; i < totalSize; i++) {
+            data[i] = Real.of(ndData[i]);
+        }
+        
+        return new DenseTensor<>(data, shape);
     }
 
     @Override
@@ -152,7 +285,6 @@ public class ND4JDenseTensorProvider implements TensorProvider {
 
     @Override
     public String getDescription() {
-        return "ND4JDenseTensorProvider";
+        return "ND4J Dense Tensor Provider - GPU-accelerated N-dimensional arrays";
     }
 }
-

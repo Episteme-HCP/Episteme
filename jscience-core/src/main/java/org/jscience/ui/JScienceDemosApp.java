@@ -139,7 +139,7 @@ public class JScienceDemosApp extends Application {
         // exists.
         // If not, I'll fallback to standard menu construction like in the new app.
 
-        Menu languageMenu = new Menu(I18n.getInstance().get("menu.language", "Language"));
+        Menu languageMenu = new Menu(I18n.getInstance().get("menu.preferences.language", "Language"));
         ToggleGroup langGroup = new ToggleGroup();
 
         for (Locale locale : I18n.getInstance().getSupportedLocales()) {
@@ -163,9 +163,16 @@ public class JScienceDemosApp extends Application {
         ToggleGroup themeGroup = new ToggleGroup();
         String currentTheme = System.getProperty("jscience.theme", "Modena");
 
+        // Initialize state from ThemeManager
+        boolean isDark = ThemeManager.getInstance().isDarkTheme();
+        // If property is not set, deduce from ThemeManager
+        if (System.getProperty("jscience.theme") == null) {
+             currentTheme = isDark ? "HighContrast" : "Modena";
+        }
+
         RadioMenuItem modenaItem = new RadioMenuItem(I18n.getInstance().get("app.menu.theme.modena", "Modena (Light)"));
         modenaItem.setToggleGroup(themeGroup);
-        modenaItem.setSelected("Modena".equalsIgnoreCase(currentTheme));
+        modenaItem.setSelected("Modena".equalsIgnoreCase(currentTheme) && !isDark);
         modenaItem.setOnAction(e -> {
             System.setProperty("jscience.theme", "Modena");
             Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
@@ -175,7 +182,7 @@ public class JScienceDemosApp extends Application {
 
         RadioMenuItem caspianItem = new RadioMenuItem(I18n.getInstance().get("app.menu.theme.caspian", "Caspian"));
         caspianItem.setToggleGroup(themeGroup);
-        caspianItem.setSelected("Caspian".equalsIgnoreCase(currentTheme));
+        caspianItem.setSelected("Caspian".equalsIgnoreCase(currentTheme) && !isDark);
         caspianItem.setOnAction(e -> {
             System.setProperty("jscience.theme", "Caspian");
             Application.setUserAgentStylesheet(Application.STYLESHEET_CASPIAN);
@@ -186,7 +193,7 @@ public class JScienceDemosApp extends Application {
         RadioMenuItem highContrastItem = new RadioMenuItem(
                 I18n.getInstance().get("app.menu.theme.highcontrast", "High Contrast"));
         highContrastItem.setToggleGroup(themeGroup);
-        highContrastItem.setSelected("HighContrast".equalsIgnoreCase(currentTheme));
+        highContrastItem.setSelected("HighContrast".equalsIgnoreCase(currentTheme) || isDark);
         highContrastItem.setOnAction(e -> {
             System.setProperty("jscience.theme", "HighContrast");
             Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
@@ -212,15 +219,14 @@ public class JScienceDemosApp extends Application {
         header.setPadding(new Insets(20));
         header.setAlignment(Pos.CENTER);
         header.getStyleClass().add("header-box");
-        // RESTORED GRADIENT from Old Code
-        header.setStyle("-fx-background-color: linear-gradient(to right, #1a2a6c, #b21f1f, #fdbb2d);");
+        // Style moved to theme.css (.header-box)
 
         Label title = new Label(I18n.getInstance().get("app.header.title", "JScience Demos"));
         title.getStyleClass().add("header-label");
-        title.setStyle("-fx-font-size: 28px; -fx-text-fill: white; -fx-font-weight: bold;");
+        // Inline style removed
 
         Label subtitle = new Label(I18n.getInstance().get("app.header.subtitle", "Scientific Applications & Tools"));
-        subtitle.setStyle("-fx-font-size: 14px; -fx-text-fill: #eeeeee;");
+        subtitle.getStyleClass().add("header-subtitle");
 
         header.getChildren().addAll(title, subtitle);
         return header;
@@ -229,7 +235,7 @@ public class JScienceDemosApp extends Application {
     private TitledPane createSection(String category, List<ViewerProvider> demos) {
         VBox box = new VBox(8);
         box.setPadding(new Insets(10));
-        box.setStyle("-fx-background-color: #252526;"); // Inner dark
+        box.getStyleClass().add("section-box"); // Styled in CSS
 
         for (ViewerProvider demo : demos) {
             box.getChildren().add(createCard(demo));
@@ -245,8 +251,7 @@ public class JScienceDemosApp extends Application {
         HBox row = new HBox(15);
         row.setAlignment(Pos.CENTER_LEFT);
         row.setPadding(new Insets(15));
-        row.setStyle(
-                "-fx-background-color: #333333; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 1); -fx-background-radius: 5;");
+        row.getStyleClass().add("demo-card");
 
         Button btn = new Button(I18n.getInstance().get("app.button.launch", "Launch"));
         btn.getStyleClass().add("launch-button");
@@ -268,12 +273,12 @@ public class JScienceDemosApp extends Application {
         }
 
         Label name = new Label(titleText);
-        name.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;");
+        name.getStyleClass().add("card-title");
 
         String desc = demo.getDescription();
         Label description = new Label(desc != null ? desc : "");
         description.setWrapText(true);
-        description.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 12px;");
+        description.getStyleClass().add("description-label");
 
         info.getChildren().addAll(name, description);
         row.getChildren().addAll(btn, info);

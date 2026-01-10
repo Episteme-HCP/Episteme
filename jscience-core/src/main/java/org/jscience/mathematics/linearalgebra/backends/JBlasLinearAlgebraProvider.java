@@ -38,10 +38,10 @@ import org.jscience.technical.backend.ExecutionContext;
 import org.jscience.technical.backend.cpu.CPUExecutionContext;
 
 /**
- * EJML Linear Algebra Provider.
+ * JBlas Linear Algebra Provider.
  * <p>
- * Uses EJML (Efficient Java Matrix Library) for high-performance linear algebra
- * operations. Falls back to CPU provider for non-Real types or when EJML
+ * Uses JBlas (native BLAS/LAPACK) for maximum performance linear algebra
+ * operations. Falls back to CPU provider for non-Real types or when JBlas
  * is not available.
  * </p>
  *
@@ -49,40 +49,43 @@ import org.jscience.technical.backend.cpu.CPUExecutionContext;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class EJMLLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
+public class JBlasLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
-    private static boolean ejmlAvailable = false;
+    private static boolean jblasAvailable = false;
     private final Field<E> field;
     private final CPUDenseLinearAlgebraProvider<E> cpuProvider;
 
     static {
         try {
-            Class.forName("org.ejml.simple.SimpleMatrix");
-            Class.forName("org.ejml.dense.row.CommonOps_DDRM");
-            ejmlAvailable = true;
+            Class.forName("org.jblas.DoubleMatrix");
+            Class.forName("org.jblas.Solve");
+            jblasAvailable = true;
         } catch (ClassNotFoundException e) {
-            ejmlAvailable = false;
+            jblasAvailable = false;
+        } catch (UnsatisfiedLinkError e) {
+            // Native library not found
+            jblasAvailable = false;
         }
     }
 
-    public EJMLLinearAlgebraProvider() {
+    public JBlasLinearAlgebraProvider() {
         this.field = null;
         this.cpuProvider = null;
     }
 
-    public EJMLLinearAlgebraProvider(Field<E> field) {
+    public JBlasLinearAlgebraProvider(Field<E> field) {
         this.field = field;
         this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(field);
     }
 
     @Override
     public String getName() {
-        return "EJML";
+        return "JBlas";
     }
 
     @Override
     public boolean isAvailable() {
-        return ejmlAvailable;
+        return jblasAvailable;
     }
 
     @Override
@@ -92,203 +95,204 @@ public class EJMLLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
     @Override
     public int getPriority() {
-        return ejmlAvailable ? 80 : 0;
+        return jblasAvailable ? 90 : 0; // Highest priority due to native performance
     }
 
-    private boolean canUseEJML() {
-        return ejmlAvailable && field != null && 
+    private boolean canUseJBlas() {
+        return jblasAvailable && field != null && 
                (field instanceof org.jscience.mathematics.sets.Reals ||
                 Real.class.isAssignableFrom(field.zero().getClass()));
     }
 
     // Conversion helpers
-    private org.ejml.simple.SimpleMatrix toEjmlMatrix(Matrix<E> m) {
-        org.ejml.simple.SimpleMatrix ejml = new org.ejml.simple.SimpleMatrix(m.rows(), m.cols());
+    private org.jblas.DoubleMatrix toJBlasMatrix(Matrix<E> m) {
+        double[][] data = new double[m.rows()][m.cols()];
         for (int i = 0; i < m.rows(); i++) {
             for (int j = 0; j < m.cols(); j++) {
-                ejml.set(i, j, ((Real) m.get(i, j)).doubleValue());
+                data[i][j] = ((Real) m.get(i, j)).doubleValue();
             }
         }
-        return ejml;
+        return new org.jblas.DoubleMatrix(data);
     }
 
     @SuppressWarnings("unchecked")
-    private Matrix<E> fromEjmlMatrix(org.ejml.simple.SimpleMatrix ejml) {
-        int rows = ejml.getNumRows();
-        int cols = ejml.getNumCols();
+    private Matrix<E> fromJBlasMatrix(org.jblas.DoubleMatrix jm) {
+        int rows = jm.rows;
+        int cols = jm.columns;
         DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(rows, cols, (E) Real.ZERO);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                storage.set(i, j, (E) Real.of(ejml.get(i, j)));
+                storage.set(i, j, (E) Real.of(jm.get(i, j)));
             }
         }
         return new GenericMatrix<>(storage, this, field);
     }
 
-    private org.ejml.simple.SimpleMatrix toEjmlVector(Vector<E> v) {
-        org.ejml.simple.SimpleMatrix ejml = new org.ejml.simple.SimpleMatrix(v.dimension(), 1);
+    private org.jblas.DoubleMatrix toJBlasVector(Vector<E> v) {
+        double[] data = new double[v.dimension()];
         for (int i = 0; i < v.dimension(); i++) {
-            ejml.set(i, 0, ((Real) v.get(i)).doubleValue());
+            data[i] = ((Real) v.get(i)).doubleValue();
         }
-        return ejml;
+        return new org.jblas.DoubleMatrix(data);
     }
 
     @SuppressWarnings("unchecked")
-    private Vector<E> fromEjmlVector(org.ejml.simple.SimpleMatrix ejml) {
-        int size = ejml.getNumRows();
+    private Vector<E> fromJBlasVector(org.jblas.DoubleMatrix jv) {
+        int size = jv.length;
         List<E> data = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            data.add((E) Real.of(ejml.get(i, 0)));
+            data.add((E) Real.of(jv.get(i)));
         }
         return new GenericVector<>(new DenseVectorStorage<>(data), this, field);
     }
 
     @Override
     public Vector<E> add(Vector<E> a, Vector<E> b) {
-        if (!canUseEJML()) {
+        if (!canUseJBlas()) {
             return cpuProvider.add(a, b);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlVector(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlVector(b);
-        return fromEjmlVector(ea.plus(eb));
+        org.jblas.DoubleMatrix ja = toJBlasVector(a);
+        org.jblas.DoubleMatrix jb = toJBlasVector(b);
+        return fromJBlasVector(ja.add(jb));
     }
 
     @Override
     public Vector<E> subtract(Vector<E> a, Vector<E> b) {
-        if (!canUseEJML()) {
+        if (!canUseJBlas()) {
             return cpuProvider.subtract(a, b);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlVector(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlVector(b);
-        return fromEjmlVector(ea.minus(eb));
+        org.jblas.DoubleMatrix ja = toJBlasVector(a);
+        org.jblas.DoubleMatrix jb = toJBlasVector(b);
+        return fromJBlasVector(ja.sub(jb));
     }
 
     @Override
     public Vector<E> multiply(Vector<E> vector, E scalar) {
-        if (!canUseEJML()) {
+        if (!canUseJBlas()) {
             return cpuProvider.multiply(vector, scalar);
         }
-        org.ejml.simple.SimpleMatrix ev = toEjmlVector(vector);
+        org.jblas.DoubleMatrix jv = toJBlasVector(vector);
         double s = ((Real) scalar).doubleValue();
-        return fromEjmlVector(ev.scale(s));
+        return fromJBlasVector(jv.mul(s));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public E dot(Vector<E> a, Vector<E> b) {
-        if (!canUseEJML()) {
+        if (!canUseJBlas()) {
             return cpuProvider.dot(a, b);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlVector(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlVector(b);
-        return (E) Real.of(ea.transpose().mult(eb).get(0, 0));
+        org.jblas.DoubleMatrix ja = toJBlasVector(a);
+        org.jblas.DoubleMatrix jb = toJBlasVector(b);
+        return (E) Real.of(ja.dot(jb));
     }
 
     @Override
     public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
-        if (!canUseEJML()) {
+        if (!canUseJBlas()) {
             return cpuProvider.add(a, b);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlMatrix(b);
-        return fromEjmlMatrix(ea.plus(eb));
+        org.jblas.DoubleMatrix ja = toJBlasMatrix(a);
+        org.jblas.DoubleMatrix jb = toJBlasMatrix(b);
+        return fromJBlasMatrix(ja.add(jb));
     }
 
     @Override
     public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
-        if (!canUseEJML()) {
+        if (!canUseJBlas()) {
             return cpuProvider.subtract(a, b);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlMatrix(b);
-        return fromEjmlMatrix(ea.minus(eb));
+        org.jblas.DoubleMatrix ja = toJBlasMatrix(a);
+        org.jblas.DoubleMatrix jb = toJBlasMatrix(b);
+        return fromJBlasMatrix(ja.sub(jb));
     }
 
     @Override
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
-        if (!canUseEJML()) {
+        if (!canUseJBlas()) {
             return cpuProvider.multiply(a, b);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlMatrix(b);
-        return fromEjmlMatrix(ea.mult(eb));
+        org.jblas.DoubleMatrix ja = toJBlasMatrix(a);
+        org.jblas.DoubleMatrix jb = toJBlasMatrix(b);
+        return fromJBlasMatrix(ja.mmul(jb));
     }
 
     @Override
     public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
-        if (!canUseEJML()) {
+        if (!canUseJBlas()) {
             return cpuProvider.multiply(a, b);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlVector(b);
-        return fromEjmlVector(ea.mult(eb));
+        org.jblas.DoubleMatrix ja = toJBlasMatrix(a);
+        org.jblas.DoubleMatrix jb = toJBlasVector(b);
+        return fromJBlasVector(ja.mmul(jb));
     }
 
     @Override
     public Matrix<E> inverse(Matrix<E> a) {
-        if (!canUseEJML()) {
+        if (!canUseJBlas()) {
             return cpuProvider.inverse(a);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        return fromEjmlMatrix(ea.invert());
+        org.jblas.DoubleMatrix ja = toJBlasMatrix(a);
+        return fromJBlasMatrix(org.jblas.Solve.pinv(ja));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public E determinant(Matrix<E> a) {
-        if (!canUseEJML()) {
+        if (!canUseJBlas()) {
             return cpuProvider.determinant(a);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        return (E) Real.of(ea.determinant());
+        // JBlas doesn't have built-in determinant, use LU decomposition
+        // Fall back to CPU for determinant
+        return cpuProvider.determinant(a);
     }
 
     @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        if (!canUseEJML()) {
+        if (!canUseJBlas()) {
             return cpuProvider.solve(a, b);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlVector(b);
-        return fromEjmlVector(ea.solve(eb));
+        org.jblas.DoubleMatrix ja = toJBlasMatrix(a);
+        org.jblas.DoubleMatrix jb = toJBlasVector(b);
+        return fromJBlasVector(org.jblas.Solve.solve(ja, jb));
     }
 
     @Override
     public Matrix<E> transpose(Matrix<E> a) {
-        if (!canUseEJML()) {
+        if (!canUseJBlas()) {
             return cpuProvider.transpose(a);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        return fromEjmlMatrix(ea.transpose());
+        org.jblas.DoubleMatrix ja = toJBlasMatrix(a);
+        return fromJBlasMatrix(ja.transpose());
     }
 
     @Override
     public Matrix<E> scale(E scalar, Matrix<E> a) {
-        if (!canUseEJML()) {
+        if (!canUseJBlas()) {
             return cpuProvider.scale(scalar, a);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
+        org.jblas.DoubleMatrix ja = toJBlasMatrix(a);
         double s = ((Real) scalar).doubleValue();
-        return fromEjmlMatrix(ea.scale(s));
+        return fromJBlasMatrix(ja.mul(s));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public E norm(Vector<E> a) {
-        if (!canUseEJML()) {
+        if (!canUseJBlas()) {
             return cpuProvider.norm(a);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlVector(a);
-        return (E) Real.of(ea.normF());
+        org.jblas.DoubleMatrix ja = toJBlasVector(a);
+        return (E) Real.of(ja.norm2());
     }
 
     @Override
     public String getId() {
-        return "ejml";
+        return "jblas";
     }
 
     @Override
     public String getDescription() {
-        return "EJML Linear Algebra Provider - High-performance matrix library";
+        return "JBlas Linear Algebra Provider - Native BLAS/LAPACK acceleration";
     }
 }

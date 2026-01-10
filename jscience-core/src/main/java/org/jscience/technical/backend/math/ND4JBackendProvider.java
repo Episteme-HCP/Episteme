@@ -49,6 +49,9 @@ public class ND4JBackendProvider implements BackendProvider {
 
     @Override
     public Object createBackend() {
+        if (isAvailable()) {
+            return new org.jscience.mathematics.linearalgebra.tensors.backends.ND4JDenseTensorProvider();
+        }
         return null;
     }
 }

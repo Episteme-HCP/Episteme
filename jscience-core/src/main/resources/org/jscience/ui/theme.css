@@ -109,12 +109,6 @@
     /* Sky must be dark, override carefully if wanted */
 }
 
-/* But user said "default theme has to be clear". 
-   For Sky Viewer, a light theme implies inverted star map? 
-   No, usually sky maps are dark. 
-   I will make the CONTROLS light, but the CANVAS remains black (it's space).
-*/
-
 /* Demo-specific panels and controls */
 .demo-tab-pane {
     -fx-background-color: #fdfbf7;
@@ -197,4 +191,44 @@
     -fx-border-radius: 4;
     -fx-background-radius: 4;
     -fx-padding: 10;
+}
+
+/* Dashboard Semantic Styles (Light Theme Default) */
+.header-box {
+    -fx-background-color: linear-gradient(to right, #ff8c00, #e65100);
+}
+
+.header-label {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.header-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #fdfbf7;
+}
+
+.section-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #eeeeee;
+}
+
+.demo-card {
+    -fx-background-color: #fdfbf7;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);
+    -fx-background-radius: 5;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 5;
+}
+
+.launch-button {
+    -fx-background-color: #ff9800;
+    -fx-text-fill: white;
+}
+
+.card-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c2c2c; /* Variable depending on card bg */
 }

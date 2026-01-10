@@ -38,10 +38,10 @@ import org.jscience.technical.backend.ExecutionContext;
 import org.jscience.technical.backend.cpu.CPUExecutionContext;
 
 /**
- * EJML Linear Algebra Provider.
+ * Apache Commons Math Linear Algebra Provider.
  * <p>
- * Uses EJML (Efficient Java Matrix Library) for high-performance linear algebra
- * operations. Falls back to CPU provider for non-Real types or when EJML
+ * Uses Apache Commons Math library for linear algebra operations.
+ * Falls back to CPU provider for non-Real types or when Commons Math
  * is not available.
  * </p>
  *
@@ -49,40 +49,40 @@ import org.jscience.technical.backend.cpu.CPUExecutionContext;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class EJMLLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
+public class CommonsMathLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
-    private static boolean ejmlAvailable = false;
+    private static boolean commonsMathAvailable = false;
     private final Field<E> field;
     private final CPUDenseLinearAlgebraProvider<E> cpuProvider;
 
     static {
         try {
-            Class.forName("org.ejml.simple.SimpleMatrix");
-            Class.forName("org.ejml.dense.row.CommonOps_DDRM");
-            ejmlAvailable = true;
+            Class.forName("org.apache.commons.math3.linear.RealMatrix");
+            Class.forName("org.apache.commons.math3.linear.LUDecomposition");
+            commonsMathAvailable = true;
         } catch (ClassNotFoundException e) {
-            ejmlAvailable = false;
+            commonsMathAvailable = false;
         }
     }
 
-    public EJMLLinearAlgebraProvider() {
+    public CommonsMathLinearAlgebraProvider() {
         this.field = null;
         this.cpuProvider = null;
     }
 
-    public EJMLLinearAlgebraProvider(Field<E> field) {
+    public CommonsMathLinearAlgebraProvider(Field<E> field) {
         this.field = field;
         this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(field);
     }
 
     @Override
     public String getName() {
-        return "EJML";
+        return "Commons Math";
     }
 
     @Override
     public boolean isAvailable() {
-        return ejmlAvailable;
+        return commonsMathAvailable;
     }
 
     @Override
@@ -92,203 +92,209 @@ public class EJMLLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
     @Override
     public int getPriority() {
-        return ejmlAvailable ? 80 : 0;
+        return commonsMathAvailable ? 50 : 0;
     }
 
-    private boolean canUseEJML() {
-        return ejmlAvailable && field != null && 
+    private boolean canUseCommonsMath() {
+        return commonsMathAvailable && field != null && 
                (field instanceof org.jscience.mathematics.sets.Reals ||
                 Real.class.isAssignableFrom(field.zero().getClass()));
     }
 
     // Conversion helpers
-    private org.ejml.simple.SimpleMatrix toEjmlMatrix(Matrix<E> m) {
-        org.ejml.simple.SimpleMatrix ejml = new org.ejml.simple.SimpleMatrix(m.rows(), m.cols());
+    private org.apache.commons.math3.linear.RealMatrix toCommonsMatrix(Matrix<E> m) {
+        double[][] data = new double[m.rows()][m.cols()];
         for (int i = 0; i < m.rows(); i++) {
             for (int j = 0; j < m.cols(); j++) {
-                ejml.set(i, j, ((Real) m.get(i, j)).doubleValue());
+                data[i][j] = ((Real) m.get(i, j)).doubleValue();
             }
         }
-        return ejml;
+        return org.apache.commons.math3.linear.MatrixUtils.createRealMatrix(data);
     }
 
     @SuppressWarnings("unchecked")
-    private Matrix<E> fromEjmlMatrix(org.ejml.simple.SimpleMatrix ejml) {
-        int rows = ejml.getNumRows();
-        int cols = ejml.getNumCols();
+    private Matrix<E> fromCommonsMatrix(org.apache.commons.math3.linear.RealMatrix cm) {
+        int rows = cm.getRowDimension();
+        int cols = cm.getColumnDimension();
         DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(rows, cols, (E) Real.ZERO);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                storage.set(i, j, (E) Real.of(ejml.get(i, j)));
+                storage.set(i, j, (E) Real.of(cm.getEntry(i, j)));
             }
         }
         return new GenericMatrix<>(storage, this, field);
     }
 
-    private org.ejml.simple.SimpleMatrix toEjmlVector(Vector<E> v) {
-        org.ejml.simple.SimpleMatrix ejml = new org.ejml.simple.SimpleMatrix(v.dimension(), 1);
+    private org.apache.commons.math3.linear.RealVector toCommonsVector(Vector<E> v) {
+        double[] data = new double[v.dimension()];
         for (int i = 0; i < v.dimension(); i++) {
-            ejml.set(i, 0, ((Real) v.get(i)).doubleValue());
+            data[i] = ((Real) v.get(i)).doubleValue();
         }
-        return ejml;
+        return org.apache.commons.math3.linear.MatrixUtils.createRealVector(data);
     }
 
     @SuppressWarnings("unchecked")
-    private Vector<E> fromEjmlVector(org.ejml.simple.SimpleMatrix ejml) {
-        int size = ejml.getNumRows();
+    private Vector<E> fromCommonsVector(org.apache.commons.math3.linear.RealVector cv) {
+        int size = cv.getDimension();
         List<E> data = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            data.add((E) Real.of(ejml.get(i, 0)));
+            data.add((E) Real.of(cv.getEntry(i)));
         }
         return new GenericVector<>(new DenseVectorStorage<>(data), this, field);
     }
 
     @Override
     public Vector<E> add(Vector<E> a, Vector<E> b) {
-        if (!canUseEJML()) {
+        if (!canUseCommonsMath()) {
             return cpuProvider.add(a, b);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlVector(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlVector(b);
-        return fromEjmlVector(ea.plus(eb));
+        org.apache.commons.math3.linear.RealVector ca = toCommonsVector(a);
+        org.apache.commons.math3.linear.RealVector cb = toCommonsVector(b);
+        return fromCommonsVector(ca.add(cb));
     }
 
     @Override
     public Vector<E> subtract(Vector<E> a, Vector<E> b) {
-        if (!canUseEJML()) {
+        if (!canUseCommonsMath()) {
             return cpuProvider.subtract(a, b);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlVector(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlVector(b);
-        return fromEjmlVector(ea.minus(eb));
+        org.apache.commons.math3.linear.RealVector ca = toCommonsVector(a);
+        org.apache.commons.math3.linear.RealVector cb = toCommonsVector(b);
+        return fromCommonsVector(ca.subtract(cb));
     }
 
     @Override
     public Vector<E> multiply(Vector<E> vector, E scalar) {
-        if (!canUseEJML()) {
+        if (!canUseCommonsMath()) {
             return cpuProvider.multiply(vector, scalar);
         }
-        org.ejml.simple.SimpleMatrix ev = toEjmlVector(vector);
+        org.apache.commons.math3.linear.RealVector cv = toCommonsVector(vector);
         double s = ((Real) scalar).doubleValue();
-        return fromEjmlVector(ev.scale(s));
+        return fromCommonsVector(cv.mapMultiply(s));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public E dot(Vector<E> a, Vector<E> b) {
-        if (!canUseEJML()) {
+        if (!canUseCommonsMath()) {
             return cpuProvider.dot(a, b);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlVector(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlVector(b);
-        return (E) Real.of(ea.transpose().mult(eb).get(0, 0));
+        org.apache.commons.math3.linear.RealVector ca = toCommonsVector(a);
+        org.apache.commons.math3.linear.RealVector cb = toCommonsVector(b);
+        return (E) Real.of(ca.dotProduct(cb));
     }
 
     @Override
     public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
-        if (!canUseEJML()) {
+        if (!canUseCommonsMath()) {
             return cpuProvider.add(a, b);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlMatrix(b);
-        return fromEjmlMatrix(ea.plus(eb));
+        org.apache.commons.math3.linear.RealMatrix ca = toCommonsMatrix(a);
+        org.apache.commons.math3.linear.RealMatrix cb = toCommonsMatrix(b);
+        return fromCommonsMatrix(ca.add(cb));
     }
 
     @Override
     public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
-        if (!canUseEJML()) {
+        if (!canUseCommonsMath()) {
             return cpuProvider.subtract(a, b);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlMatrix(b);
-        return fromEjmlMatrix(ea.minus(eb));
+        org.apache.commons.math3.linear.RealMatrix ca = toCommonsMatrix(a);
+        org.apache.commons.math3.linear.RealMatrix cb = toCommonsMatrix(b);
+        return fromCommonsMatrix(ca.subtract(cb));
     }
 
     @Override
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
-        if (!canUseEJML()) {
+        if (!canUseCommonsMath()) {
             return cpuProvider.multiply(a, b);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlMatrix(b);
-        return fromEjmlMatrix(ea.mult(eb));
+        org.apache.commons.math3.linear.RealMatrix ca = toCommonsMatrix(a);
+        org.apache.commons.math3.linear.RealMatrix cb = toCommonsMatrix(b);
+        return fromCommonsMatrix(ca.multiply(cb));
     }
 
     @Override
     public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
-        if (!canUseEJML()) {
+        if (!canUseCommonsMath()) {
             return cpuProvider.multiply(a, b);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlVector(b);
-        return fromEjmlVector(ea.mult(eb));
+        org.apache.commons.math3.linear.RealMatrix ca = toCommonsMatrix(a);
+        org.apache.commons.math3.linear.RealVector cb = toCommonsVector(b);
+        return fromCommonsVector(ca.operate(cb));
     }
 
     @Override
     public Matrix<E> inverse(Matrix<E> a) {
-        if (!canUseEJML()) {
+        if (!canUseCommonsMath()) {
             return cpuProvider.inverse(a);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        return fromEjmlMatrix(ea.invert());
+        org.apache.commons.math3.linear.RealMatrix ca = toCommonsMatrix(a);
+        org.apache.commons.math3.linear.LUDecomposition lu = 
+            new org.apache.commons.math3.linear.LUDecomposition(ca);
+        return fromCommonsMatrix(lu.getSolver().getInverse());
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public E determinant(Matrix<E> a) {
-        if (!canUseEJML()) {
+        if (!canUseCommonsMath()) {
             return cpuProvider.determinant(a);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        return (E) Real.of(ea.determinant());
+        org.apache.commons.math3.linear.RealMatrix ca = toCommonsMatrix(a);
+        org.apache.commons.math3.linear.LUDecomposition lu = 
+            new org.apache.commons.math3.linear.LUDecomposition(ca);
+        return (E) Real.of(lu.getDeterminant());
     }
 
     @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        if (!canUseEJML()) {
+        if (!canUseCommonsMath()) {
             return cpuProvider.solve(a, b);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlVector(b);
-        return fromEjmlVector(ea.solve(eb));
+        org.apache.commons.math3.linear.RealMatrix ca = toCommonsMatrix(a);
+        org.apache.commons.math3.linear.RealVector cb = toCommonsVector(b);
+        org.apache.commons.math3.linear.LUDecomposition lu = 
+            new org.apache.commons.math3.linear.LUDecomposition(ca);
+        return fromCommonsVector(lu.getSolver().solve(cb));
     }
 
     @Override
     public Matrix<E> transpose(Matrix<E> a) {
-        if (!canUseEJML()) {
+        if (!canUseCommonsMath()) {
             return cpuProvider.transpose(a);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        return fromEjmlMatrix(ea.transpose());
+        org.apache.commons.math3.linear.RealMatrix ca = toCommonsMatrix(a);
+        return fromCommonsMatrix(ca.transpose());
     }
 
     @Override
     public Matrix<E> scale(E scalar, Matrix<E> a) {
-        if (!canUseEJML()) {
+        if (!canUseCommonsMath()) {
             return cpuProvider.scale(scalar, a);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
+        org.apache.commons.math3.linear.RealMatrix ca = toCommonsMatrix(a);
         double s = ((Real) scalar).doubleValue();
-        return fromEjmlMatrix(ea.scale(s));
+        return fromCommonsMatrix(ca.scalarMultiply(s));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public E norm(Vector<E> a) {
-        if (!canUseEJML()) {
+        if (!canUseCommonsMath()) {
             return cpuProvider.norm(a);
         }
-        org.ejml.simple.SimpleMatrix ea = toEjmlVector(a);
-        return (E) Real.of(ea.normF());
+        org.apache.commons.math3.linear.RealVector ca = toCommonsVector(a);
+        return (E) Real.of(ca.getNorm());
     }
 
     @Override
     public String getId() {
-        return "ejml";
+        return "commonsmath";
     }
 
     @Override
     public String getDescription() {
-        return "EJML Linear Algebra Provider - High-performance matrix library";
+        return "Commons Math Linear Algebra Provider - General purpose mathematics library";
     }
 }

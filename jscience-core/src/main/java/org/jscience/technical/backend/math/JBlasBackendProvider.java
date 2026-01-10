@@ -49,6 +49,9 @@ public class JBlasBackendProvider implements BackendProvider {
 
     @Override
     public Object createBackend() {
+        if (isAvailable()) {
+            return new org.jscience.mathematics.linearalgebra.backends.JBlasLinearAlgebraProvider<>();
+        }
         return null;
     }
 }

@@ -1,6 +1,10 @@
 org.jscience.ui.demos.FormulaNotationDemo
 org.jscience.ui.demos.MatrixDemo
 org.jscience.ui.demos.PlottingDemo
-
 org.jscience.ui.demos.DistributionsDemo
+org.jscience.ui.demos.CSGDemo
+org.jscience.ui.demos.MandelbrotDemo
+org.jscience.ui.demos.LorenzDemo
+org.jscience.ui.demos.GaltonBoardDemo
+
 
