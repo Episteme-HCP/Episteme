@@ -70,6 +70,16 @@ public class MarketCrashApp extends FeaturedAppBase {
     private Timeline animationTimeline;
     private int currentIndex = 0;
 
+    public MarketCrashApp() {
+        super();
+        try {
+            // No complex field initializations to move, but ensuring constructor exists for SPI safety
+        } catch (Throwable t) {
+            System.err.println("CRITICAL: Failed to initialize MarketCrashApp: " + t.getMessage());
+            t.printStackTrace();
+        }
+    }
+
     @Override
     protected String getAppTitle() {
         return i18n.get("market.title");

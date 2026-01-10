@@ -69,13 +69,27 @@ public class PandemicForecasterApp extends FeaturedAppBase {
     private Label countrySelectLabel;
     private Label parametersTitleLabel;
     private Label logHeaderLabel;
-    private java.util.Map<String, Label> sliderLabels = new java.util.HashMap<>();
+    private java.util.Map<String, Label> sliderLabels;
 
     // Simulation State
     private Timeline simulationTimeline;
     private Real[][] simulationResults;
     private int currentDay = 0;
     private boolean isRunning = false;
+
+    public PandemicForecasterApp() {
+        super();
+        try {
+            this.sliderLabels = new java.util.HashMap<>();
+            // Initializing primitive/simple types here as well for consistency if needed, 
+            // but currentDay = 0 is safe inline. 
+            // However, to follow the pattern strictly:
+            this.countries = new java.util.ArrayList<>();
+        } catch (Throwable t) {
+            System.err.println("CRITICAL: Failed to initialize PandemicForecasterApp: " + t.getMessage());
+            t.printStackTrace();
+        }
+    }
 
     // Data
     private List<Country> countries;
@@ -98,7 +112,7 @@ public class PandemicForecasterApp extends FeaturedAppBase {
     @Override
     protected javafx.scene.layout.Region createMainContent() {
         // Initialize explicitly to empty list to avoid NPE in createControlPanel
-        countries = new java.util.ArrayList<>();
+        if (countries == null) countries = new java.util.ArrayList<>();
 
         // Main split pane: Chart | Parameters
         SplitPane mainSplit = new SplitPane();

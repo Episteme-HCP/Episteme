@@ -45,13 +45,13 @@ public class SpinValveApp extends FeaturedAppBase {
     private Label statusLabelInfo;
 
     private Spintronic3DRenderer renderer3D;
-    private Canvas visualizationCanvas = new Canvas(800, 600);
+    private Canvas visualizationCanvas;
     private javafx.animation.AnimationTimer simulationTimer;
-    private Real currentStep = Real.of(1e-12); // 1 ps
+    private Real currentStep;
     @SuppressWarnings("unused") // Reserved for future LLG integration
-    private Real alpha = Real.of(0.01); // Damping factor
+    private Real alpha; // Damping factor
     @SuppressWarnings("unused") // Reserved for future LLG integration 
-    private Real gamma = Real.of(1.76e11); // Gyromagnetic ratio
+    private Real gamma; // Gyromagnetic ratio
     private LineChart<Number, Number> resistanceChart;
     private XYChart.Series<Number, Number> resistanceSeries;
     
@@ -62,6 +62,19 @@ public class SpinValveApp extends FeaturedAppBase {
     private Label peakFreqLabel;
     private int frameCount = 0;
     private static final int SPECTRUM_UPDATE_INTERVAL = 64; // Update spectrum every N frames
+
+    public SpinValveApp() {
+        super();
+        try {
+            this.visualizationCanvas = new Canvas(800, 600);
+            this.currentStep = Real.of(1e-12); // 1 ps
+            this.alpha = Real.of(0.01);
+            this.gamma = Real.of(1.76e11);
+        } catch (Throwable t) {
+            System.err.println("CRITICAL: Failed to initialize SpinValveApp: " + t.getMessage());
+            t.printStackTrace();
+        }
+    }
 
     @Override
     protected String getAppTitle() {

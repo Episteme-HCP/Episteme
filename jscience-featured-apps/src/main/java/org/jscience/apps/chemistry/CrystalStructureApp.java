@@ -81,6 +81,16 @@ public class CrystalStructureApp extends FeaturedAppBase {
         }
     }
 
+    public CrystalStructureApp() {
+        super();
+        try {
+            // No complex field initializations to move, but ensuring constructor exists for SPI safety
+        } catch (Throwable t) {
+            System.err.println("CRITICAL: Failed to initialize CrystalStructureApp: " + t.getMessage());
+            t.printStackTrace();
+        }
+    }
+
     private enum LatticeType {
         SC("crystal.info.sc"),
         BCC("crystal.info.bcc"),

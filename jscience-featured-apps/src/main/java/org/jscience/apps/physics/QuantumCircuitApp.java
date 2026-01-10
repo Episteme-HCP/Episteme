@@ -44,8 +44,18 @@ public class QuantumCircuitApp extends FeaturedAppBase {
     private VBox circuitPane;
     private Label stateVectorLabel;
     private BarChart<String, Number> probChart;
-    private List<HBox> qubitLines = new ArrayList<>();
+    private List<HBox> qubitLines;
     private int selectedQubitIndex = -1;
+
+    public QuantumCircuitApp() {
+        super();
+        try {
+            this.qubitLines = new ArrayList<>();
+        } catch (Throwable t) {
+            System.err.println("CRITICAL: Failed to initialize QuantumCircuitApp: " + t.getMessage());
+            t.printStackTrace();
+        }
+    }
 
     // UI references for localization
     private Label mainTitleLabel;

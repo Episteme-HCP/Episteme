@@ -47,9 +47,21 @@ public class TitrationApp extends FeaturedAppBase {
     private double concAcid = 0.1; // M
     private double concBase = 0.1; // M
 
-    private boolean valveOpen = false;
-    private double flowRate = 0.0; // mL per tick
-    private AcidType selectedAcid = AcidType.HCL;
+    private boolean valveOpen;
+    private double flowRate;
+    private AcidType selectedAcid;
+
+    public TitrationApp() {
+        super();
+        try {
+            this.valveOpen = false;
+            this.flowRate = 0.0;
+            this.selectedAcid = AcidType.HCL;
+        } catch (Throwable t) {
+            System.err.println("CRITICAL: Failed to initialize TitrationApp: " + t.getMessage());
+            t.printStackTrace();
+        }
+    }
 
     // Multi-protic acid types with pKa values
     private enum AcidType {

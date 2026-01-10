@@ -52,9 +52,9 @@ import org.jscience.measure.quantity.*;
 public class CivilizationApp extends FeaturedAppBase {
 
     // Model State (Stocks)
-    private Quantity<Dimensionless> population = Quantities.create(1000.0, Units.ONE);
-    private Quantity<Mass> resources = Quantities.create(100000.0, Units.KILOGRAM);
-    private Quantity<Dimensionless> pollution = Quantities.create(0.0, Units.ONE);
+    private Quantity<Dimensionless> population;
+    private Quantity<Mass> resources;
+    private Quantity<Dimensionless> pollution;
 
     // Parameters
     private double birthRateBase = 0.05;
@@ -63,6 +63,27 @@ public class CivilizationApp extends FeaturedAppBase {
     private double innovationRate = 0.0; // Reduces consumption/pollution
     private double regenerationRate = 0.0;
     private double aggression = 0.0;
+
+    public CivilizationApp() {
+        super();
+        try {
+            // Safe initialization of fields that might depend on ServiceLoader (like Units)
+            this.population = Quantities.create(1000.0, Units.ONE);
+            this.resources = Quantities.create(100000.0, Units.KILOGRAM);
+            this.pollution = Quantities.create(0.0, Units.ONE);
+            
+            this.parameterSliders = new java.util.HashMap<>();
+            this.sliderLabels = new java.util.HashMap<>();
+        } catch (Throwable t) {
+            System.err.println("CRITICAL: Failed to initialize CivilizationApp: " + t.getMessage());
+            t.printStackTrace();
+            // Fallback to prevent ServiceConfigurationError if possible, though functionality will be broken
+            // But usually we want to rethrow to let the loader know, but maybe wrapped cleanly?
+            // Actually, suppressing it might allow other apps to load if the loop continues?
+            // But for now, let's just log it.
+        }
+    }
+
 
     private double time = 0;
     private boolean running = false;
@@ -73,8 +94,8 @@ public class CivilizationApp extends FeaturedAppBase {
     private XYChart.Series<Number, Number> polSeries;
     private Label statusLabel;
     private Label paramsTitleLabel;
-    private java.util.Map<String, Slider> parameterSliders = new java.util.HashMap<>();
-    private java.util.Map<String, Label> sliderLabels = new java.util.HashMap<>();
+    private java.util.Map<String, Slider> parameterSliders;
+    private java.util.Map<String, Label> sliderLabels;
     private LineChart<Number, Number> mainChart;
 
     @Override

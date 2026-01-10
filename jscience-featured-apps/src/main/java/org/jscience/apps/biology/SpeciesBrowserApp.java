@@ -16,6 +16,16 @@ import javafx.scene.layout.VBox;
  */
 public class SpeciesBrowserApp extends FeaturedAppBase {
 
+    public SpeciesBrowserApp() {
+        super();
+        try {
+            // No complex field initializations, but ensuring constructor exists for SPI safety
+        } catch (Throwable t) {
+            System.err.println("CRITICAL: Failed to initialize SpeciesBrowserApp: " + t.getMessage());
+            t.printStackTrace();
+        }
+    }
+
     @Override
     protected String getAppTitle() {
         // Key uses space: "Species Browser.title" (escaped in properties file)

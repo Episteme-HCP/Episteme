@@ -81,9 +81,19 @@ public class SmartGridApp extends FeaturedAppBase {
     private ProgressBar batteryBar;
 
     // Grid Simulation
-    private final Random rand = new Random();
+    private Random rand;
     private Timeline loop;
     private Canvas gridCanvas;
+
+    public SmartGridApp() {
+        super();
+        try {
+            this.rand = new Random();
+        } catch (Throwable t) {
+            System.err.println("CRITICAL: Failed to initialize SmartGridApp: " + t.getMessage());
+            t.printStackTrace();
+        }
+    }
 
     @Override
     protected String getAppTitle() {
