@@ -99,6 +99,14 @@ public final class JScience {
             java.math.MathContext mc = getMathContext();
             prefs.put("math.precision", String.valueOf(mc.getPrecision()));
             prefs.put("math.rounding", mc.getRoundingMode().name());
+            
+            // Persist Backends
+            if (plottingBackend2D != null) prefs.put("plotting.backend.2d", plottingBackend2D.name());
+            if (plottingBackend3D != null) prefs.put("plotting.backend.3d", plottingBackend3D.name());
+            if (molecularBackendId != null) prefs.put("molecular.backend", molecularBackendId);
+            if (linearAlgebraProviderId != null) prefs.put("linear.algebra.backend", linearAlgebraProviderId);
+            if (quantumBackendId != null) prefs.put("quantum.backend", quantumBackendId);
+            
             prefs.flush();
         } catch (Exception e) {
             System.err.println("Failed to save preferences: " + e.getMessage());
@@ -134,6 +142,27 @@ public final class JScience {
                 setMathContext(new java.math.MathContext(prec, rm));
             } catch (Exception e) {
                 // Ignore math context errors
+            }
+
+            // Load Backends
+            try {
+                String pb2d = prefs.get("plotting.backend.2d", null);
+                if (pb2d != null) plottingBackend2D = org.jscience.ui.plotting.PlottingBackend.valueOf(pb2d);
+                
+                String pb3d = prefs.get("plotting.backend.3d", null);
+                if (pb3d != null) plottingBackend3D = org.jscience.ui.plotting.PlottingBackend.valueOf(pb3d);
+                
+                String mol = prefs.get("molecular.backend", null);
+                if (mol != null) molecularBackendId = mol;
+                
+                String lin = prefs.get("linear.algebra.backend", null);
+                if (lin != null) linearAlgebraProviderId = lin;
+                
+                String q = prefs.get("quantum.backend", null);
+                if (q != null) quantumBackendId = q;
+                
+            } catch (Exception e) {
+                // Ignore backend loading errors
             }
         } catch (Exception e) {
             // Ignore - use defaults
@@ -464,6 +493,24 @@ public final class JScience {
      */
     public static void setPlottingBackend3D(org.jscience.ui.plotting.PlottingBackend backend) {
         plottingBackend3D = backend;
+    }
+    
+    // ================= QUANTUM BACKEND =================
+    
+    private static String quantumBackendId = null; // Default
+
+    /**
+     * Gets the ID of the current Quantum Backend.
+     */
+    public static String getQuantumBackendId() {
+        return quantumBackendId;
+    }
+
+    /**
+     * Sets the Quantum Backend by ID.
+     */
+    public static void setQuantumBackendId(String id) {
+        quantumBackendId = id;
     }
 
     // ================= LINEAR ALGEBRA BACKEND =================

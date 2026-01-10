@@ -49,6 +49,13 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
         super(field);
     }
 
+    /**
+     * Public no-arg constructor required by ServiceLoader.
+     */
+    public CPUSparseLinearAlgebraProvider() {
+        super(null);
+    }
+
     private static final int PARALLEL_THRESHOLD = 500; // Lower threshold for sparse logic overhead
 
     @Override

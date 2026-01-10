@@ -399,6 +399,14 @@ public class SpintronicCircuitSimulator {
             DenseMatrix<Real> G = new DenseMatrix<>(gData, org.jscience.mathematics.sets.Reals.INSTANCE);
             DenseVector<Real> I_source = new DenseVector<Real>(Arrays.asList(rhsSource), org.jscience.mathematics.sets.Reals.INSTANCE);
             
+            // Add regularization to avoid singular matrix (same as in DC solver)
+            Real epsilon = Real.of(1e-12);
+            for (int i = 0; i < augmentedSize; i++) {
+                gData[i][i] = gData[i][i].add(epsilon);
+            }
+            // Re-create G with regularization
+            G = new DenseMatrix<>(gData, org.jscience.mathematics.sets.Reals.INSTANCE);
+            
             // F = G * v_new + C/dt * v_new - (C/dt*v_old + I_source)
             // Jacobian J = G + C/dt (Approximate G_tan ~ G for simple bias dep)
             Matrix<Real> C_div_dt = C_matrix.scale(dt.inverse(), C_matrix);

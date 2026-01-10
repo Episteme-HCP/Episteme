@@ -43,6 +43,13 @@ public class OpenCLSparseLinearAlgebraProvider<E> implements LinearAlgebraProvid
     private final CPUSparseLinearAlgebraProvider<E> cpuProvider;
     private static final OpenCLBackend backend = new OpenCLBackend();
 
+    /**
+     * Public no-arg constructor required by ServiceLoader.
+     */
+    public OpenCLSparseLinearAlgebraProvider() {
+        this.cpuProvider = null;
+    }
+
     public OpenCLSparseLinearAlgebraProvider(Field<E> field) {
         this.cpuProvider = new CPUSparseLinearAlgebraProvider<>(field);
         if (isAvailable()) {

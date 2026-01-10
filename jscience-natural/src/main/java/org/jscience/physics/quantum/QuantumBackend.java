@@ -6,7 +6,7 @@ import java.util.Map;
  * Interface for Quantum Execution Backends.
  * Implementations provide access to simulators (like Qiskit) or real hardware.
  */
-public interface QuantumBackend {
+public interface QuantumBackend extends org.jscience.technical.backend.BackendProvider {
     
     /**
      * Executes a quantum circuit defined by the context.
@@ -15,9 +15,13 @@ public interface QuantumBackend {
      */
     Map<String, Integer> execute(QuantumContext context);
 
-    /**
-     * Checks if this backend is available (e.g., Python/Qiskit is installed).
-     * @return true if available.
-     */
-    boolean isAvailable();
+    @Override
+    default String getType() {
+        return "quantum";
+    }
+
+    @Override
+    default Object createBackend() {
+        return this;
+    }
 }

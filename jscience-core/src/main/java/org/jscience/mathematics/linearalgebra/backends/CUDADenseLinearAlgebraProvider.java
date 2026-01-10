@@ -46,6 +46,13 @@ public class CUDADenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<
         this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(field);
     }
 
+    /**
+     * Public no-arg constructor required by ServiceLoader.
+     */
+    public CUDADenseLinearAlgebraProvider() {
+        this(null);
+    }
+
     private static boolean checkAvailability() {
         try {
             Class.forName("jcuda.jcublas.JCublas");

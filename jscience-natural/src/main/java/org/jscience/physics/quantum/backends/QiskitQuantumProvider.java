@@ -17,6 +17,26 @@ import java.util.Map;
 public class QiskitQuantumProvider implements QuantumBackend {
 
     @Override
+    public String getId() {
+        return "qiskit";
+    }
+
+    @Override
+    public String getName() {
+        return "Qiskit (Python)";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Executes quantum circuits via Python/Qiskit bridge.";
+    }
+
+    @Override
+    public int getPriority() {
+        return 100; // High priority if Python is available
+    }
+
+    @Override
     public boolean isAvailable() {
         try {
             Process p = new ProcessBuilder("python", "--version").start();

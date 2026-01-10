@@ -39,6 +39,29 @@
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
         </dependency>
+
+        <!-- Quantum Computing: Strange -->
+        <dependency>
+            <groupId>org.redfx</groupId>
+            <artifactId>strange</artifactId>
+            <version>0.2.0</version>
+        </dependency>
+
+        <!-- Quantum Computing: Quantum4J -->
+        <!-- Dependency not in central, placeholders used
+        <dependency>
+            <groupId>io.quantum4j</groupId>
+            <artifactId>quantum4j-core</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+        -->
+
+        <!-- Quantum Computing: Amazon Braket -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>braket</artifactId>
+            <version>2.35.5</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -23,6 +23,7 @@ public class BackendDiscovery {
     public static final String TYPE_MATH = "math";
     public static final String TYPE_TENSOR = "tensor";
     public static final String TYPE_LINEAR_ALGEBRA = "linear-algebra";
+    public static final String TYPE_QUANTUM = "quantum";
 
     private static final BackendDiscovery INSTANCE = new BackendDiscovery();
 

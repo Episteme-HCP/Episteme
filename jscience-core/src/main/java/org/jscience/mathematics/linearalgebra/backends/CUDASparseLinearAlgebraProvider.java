@@ -48,6 +48,13 @@ public class CUDASparseLinearAlgebraProvider<E> implements LinearAlgebraProvider
         }
     }
 
+    /**
+     * Public no-arg constructor required by ServiceLoader.
+     */
+    public CUDASparseLinearAlgebraProvider() {
+        this(null);
+    }
+
     // Check if JCusparse is available? Usually assuming if JCuda matches.
     private static boolean checkAvailability() {
         try {

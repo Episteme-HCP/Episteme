@@ -552,6 +552,9 @@ public class JScienceMasterControl extends Application {
         // Molecular Viewing - uses SPI discovery
         content.getChildren().add(createChemistryCategory(i18n));
         
+        // Quantum Computing - uses SPI discovery
+        content.getChildren().add(createQuantumCategory(i18n));
+        
         content.getChildren().add(createLibCategory(i18n, "framework", List.of(
                 new LibInfo("javalin", isClassAvailable("io.javalin.Javalin")),
                 new LibInfo("jackson", isClassAvailable("com.fasterxml.jackson.databind.ObjectMapper")),
@@ -597,6 +600,49 @@ public class JScienceMasterControl extends Application {
             "Requires restart of the viewer window to take effect.");
 
         grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.chemistry.backend", "Molecular Renderer")),
+                backendBox,
+                backendInfo);
+
+        box.getChildren().addAll(header, grid, new Separator());
+        return box;
+    }
+    
+    private VBox createQuantumCategory(I18n i18n) {
+        VBox box = new VBox(12);
+        Label header = new Label(i18n.get("mastercontrol.quantum.title", "Quantum Computing"));
+        header.getStyleClass().add("header-title");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(20);
+        grid.setVgap(15);
+        grid.setPadding(new Insets(10, 0, 10, 0));
+
+        // Quantum Backend
+        ComboBox<String> backendBox = new ComboBox<>();
+        // Fetch available quantum backends via SPI
+        java.util.List<org.jscience.technical.backend.BackendProvider> providers = 
+            org.jscience.technical.backend.BackendDiscovery.getInstance()
+                .getProvidersByType(org.jscience.technical.backend.BackendDiscovery.TYPE_QUANTUM);
+
+        backendBox.getItems().add("AUTO"); // Default option
+        for (org.jscience.technical.backend.BackendProvider p : providers) {
+            backendBox.getItems().add(p.getId());
+        }
+
+        String current = JScience.getQuantumBackendId();
+        backendBox.setValue(current == null ? "AUTO" : current);
+
+        backendBox.setOnAction(e -> {
+            String val = backendBox.getValue();
+            JScience.setQuantumBackendId("AUTO".equals(val) ? null : val);
+            JScience.savePreferences();
+        });
+
+        VBox backendInfo = createInfoBox("Quantum Provider", 
+            "Select the quantum simulation backend (e.g., Strange, Quantum4J, Braket).\n" +
+            "Determines execution environment for quantum circuits.");
+
+        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.quantum.backend", "Quantum Provider")),
                 backendBox,
                 backendInfo);
 

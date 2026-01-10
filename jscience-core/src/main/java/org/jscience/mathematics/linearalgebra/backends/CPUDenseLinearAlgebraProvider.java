@@ -53,6 +53,13 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         this.field = field;
     }
 
+    /**
+     * Public no-arg constructor required by ServiceLoader.
+     */
+    public CPUDenseLinearAlgebraProvider() {
+        this(null);
+    }
+
     @Override
     public String getName() {
         return "Java CPU (Dense)";

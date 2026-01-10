@@ -49,6 +49,14 @@ public class OpenCLDenseLinearAlgebraProvider<E> implements LinearAlgebraProvide
         this.field = field;
         this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(field);
     }
+    
+    /**
+     * Public no-arg constructor required by ServiceLoader.
+     */
+    public OpenCLDenseLinearAlgebraProvider() {
+        this.field = null;
+        this.cpuProvider = null;
+    }
 
     @Override
     public boolean isAvailable() {
