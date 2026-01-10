@@ -105,7 +105,7 @@ public class ND4JSparseTensorProvider implements TensorProvider {
         double sparsity = (double) nonZeroCount / data.length;
         if (sparsity > 0.3) {
             // Too dense, fall back to dense provider
-            return new ND4JDenseTensorProvider().create(data, shape);
+            return new ND4JNativeTensorProvider().create(data, shape);
         }
         
         return fallback.create(data, shape);

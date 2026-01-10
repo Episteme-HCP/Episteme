@@ -1,38 +1,15 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.jscience.mathematics.linearalgebra.backends;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Constructor;
 
 import org.jscience.mathematics.structures.rings.Field;
 import org.jscience.mathematics.linearalgebra.Matrix;
 import org.jscience.mathematics.linearalgebra.Vector;
-import org.jscience.mathematics.linearalgebra.matrices.GenericMatrix;
-import org.jscience.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
-import org.jscience.mathematics.linearalgebra.vectors.GenericVector;
-import org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.technical.backend.ExecutionContext;
 import org.jscience.technical.backend.cpu.CPUExecutionContext;
@@ -54,11 +31,13 @@ public class EJMLLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
     private static boolean ejmlAvailable = false;
     private final Field<E> field;
     private final CPUDenseLinearAlgebraProvider<E> cpuProvider;
+    private LinearAlgebraProvider<E> ejmlImpl;
 
     static {
         try {
             Class.forName("org.ejml.simple.SimpleMatrix");
             Class.forName("org.ejml.dense.row.CommonOps_DDRM");
+            Class.forName("org.jscience.mathematics.linearalgebra.backends.EJMLSupport");
             ejmlAvailable = true;
         } catch (ClassNotFoundException e) {
             ejmlAvailable = false;
@@ -66,13 +45,24 @@ public class EJMLLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
     }
 
     public EJMLLinearAlgebraProvider() {
-        this.field = null;
-        this.cpuProvider = null;
+        this(null);
     }
 
     public EJMLLinearAlgebraProvider(Field<E> field) {
         this.field = field;
         this.cpuProvider = new CPUDenseLinearAlgebraProvider<>(field);
+        
+        if (ejmlAvailable && field != null) {
+            try {
+                Class<?> clazz = Class.forName("org.jscience.mathematics.linearalgebra.backends.EJMLSupport");
+                @SuppressWarnings("unchecked")
+                Constructor<LinearAlgebraProvider<E>> ctor = (Constructor<LinearAlgebraProvider<E>>) clazz.getConstructor(Field.class);
+                this.ejmlImpl = ctor.newInstance(field);
+            } catch (Throwable t) {
+                // Creation failed, fallback
+                this.ejmlImpl = null;
+            }
+        }
     }
 
     @Override
@@ -96,199 +86,92 @@ public class EJMLLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
     }
 
     private boolean canUseEJML() {
-        return ejmlAvailable && field != null && 
+        return ejmlImpl != null && field != null && 
                (field instanceof org.jscience.mathematics.sets.Reals ||
                 Real.class.isAssignableFrom(field.zero().getClass()));
     }
 
-    // Conversion helpers
-    private org.ejml.simple.SimpleMatrix toEjmlMatrix(Matrix<E> m) {
-        org.ejml.simple.SimpleMatrix ejml = new org.ejml.simple.SimpleMatrix(m.rows(), m.cols());
-        for (int i = 0; i < m.rows(); i++) {
-            for (int j = 0; j < m.cols(); j++) {
-                ejml.set(i, j, ((Real) m.get(i, j)).doubleValue());
-            }
-        }
-        return ejml;
-    }
-
-    @SuppressWarnings("unchecked")
-    private Matrix<E> fromEjmlMatrix(org.ejml.simple.SimpleMatrix ejml) {
-        int rows = ejml.getNumRows();
-        int cols = ejml.getNumCols();
-        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(rows, cols, (E) Real.ZERO);
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                storage.set(i, j, (E) Real.of(ejml.get(i, j)));
-            }
-        }
-        return new GenericMatrix<>(storage, this, field);
-    }
-
-    private org.ejml.simple.SimpleMatrix toEjmlVector(Vector<E> v) {
-        org.ejml.simple.SimpleMatrix ejml = new org.ejml.simple.SimpleMatrix(v.dimension(), 1);
-        for (int i = 0; i < v.dimension(); i++) {
-            ejml.set(i, 0, ((Real) v.get(i)).doubleValue());
-        }
-        return ejml;
-    }
-
-    @SuppressWarnings("unchecked")
-    private Vector<E> fromEjmlVector(org.ejml.simple.SimpleMatrix ejml) {
-        int size = ejml.getNumRows();
-        List<E> data = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            data.add((E) Real.of(ejml.get(i, 0)));
-        }
-        return new GenericVector<>(new DenseVectorStorage<>(data), this, field);
-    }
-
     @Override
     public Vector<E> add(Vector<E> a, Vector<E> b) {
-        if (!canUseEJML()) {
-            return cpuProvider.add(a, b);
-        }
-        org.ejml.simple.SimpleMatrix ea = toEjmlVector(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlVector(b);
-        return fromEjmlVector(ea.plus(eb));
+        if (!canUseEJML()) return cpuProvider.add(a, b);
+        return ejmlImpl.add(a, b);
     }
 
     @Override
     public Vector<E> subtract(Vector<E> a, Vector<E> b) {
-        if (!canUseEJML()) {
-            return cpuProvider.subtract(a, b);
-        }
-        org.ejml.simple.SimpleMatrix ea = toEjmlVector(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlVector(b);
-        return fromEjmlVector(ea.minus(eb));
+        if (!canUseEJML()) return cpuProvider.subtract(a, b);
+        return ejmlImpl.subtract(a, b);
     }
 
     @Override
     public Vector<E> multiply(Vector<E> vector, E scalar) {
-        if (!canUseEJML()) {
-            return cpuProvider.multiply(vector, scalar);
-        }
-        org.ejml.simple.SimpleMatrix ev = toEjmlVector(vector);
-        double s = ((Real) scalar).doubleValue();
-        return fromEjmlVector(ev.scale(s));
+        if (!canUseEJML()) return cpuProvider.multiply(vector, scalar);
+        return ejmlImpl.multiply(vector, scalar);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public E dot(Vector<E> a, Vector<E> b) {
-        if (!canUseEJML()) {
-            return cpuProvider.dot(a, b);
-        }
-        org.ejml.simple.SimpleMatrix ea = toEjmlVector(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlVector(b);
-        return (E) Real.of(ea.transpose().mult(eb).get(0, 0));
+        if (!canUseEJML()) return cpuProvider.dot(a, b);
+        return ejmlImpl.dot(a, b);
     }
 
     @Override
     public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
-        if (!canUseEJML()) {
-            return cpuProvider.add(a, b);
-        }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlMatrix(b);
-        return fromEjmlMatrix(ea.plus(eb));
+        if (!canUseEJML()) return cpuProvider.add(a, b);
+        return ejmlImpl.add(a, b);
     }
 
     @Override
     public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
-        if (!canUseEJML()) {
-            return cpuProvider.subtract(a, b);
-        }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlMatrix(b);
-        return fromEjmlMatrix(ea.minus(eb));
+        if (!canUseEJML()) return cpuProvider.subtract(a, b);
+        return ejmlImpl.subtract(a, b);
     }
 
     @Override
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
-        if (!canUseEJML()) {
-            return cpuProvider.multiply(a, b);
-        }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlMatrix(b);
-        return fromEjmlMatrix(ea.mult(eb));
+        if (!canUseEJML()) return cpuProvider.multiply(a, b);
+        return ejmlImpl.multiply(a, b);
     }
 
     @Override
     public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
-        if (!canUseEJML()) {
-            return cpuProvider.multiply(a, b);
-        }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlVector(b);
-        return fromEjmlVector(ea.mult(eb));
+        if (!canUseEJML()) return cpuProvider.multiply(a, b);
+        return ejmlImpl.multiply(a, b);
     }
 
     @Override
     public Matrix<E> inverse(Matrix<E> a) {
-        if (!canUseEJML()) {
-            return cpuProvider.inverse(a);
-        }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        return fromEjmlMatrix(ea.invert());
+        if (!canUseEJML()) return cpuProvider.inverse(a);
+        return ejmlImpl.inverse(a);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public E determinant(Matrix<E> a) {
-        if (!canUseEJML()) {
-            return cpuProvider.determinant(a);
-        }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        return (E) Real.of(ea.determinant());
+        if (!canUseEJML()) return cpuProvider.determinant(a);
+        return ejmlImpl.determinant(a);
     }
 
     @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        if (!canUseEJML()) {
-            return cpuProvider.solve(a, b);
-        }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        org.ejml.simple.SimpleMatrix eb = toEjmlVector(b);
-        return fromEjmlVector(ea.solve(eb));
+        if (!canUseEJML()) return cpuProvider.solve(a, b);
+        return ejmlImpl.solve(a, b);
     }
 
     @Override
     public Matrix<E> transpose(Matrix<E> a) {
-        if (!canUseEJML()) {
-            return cpuProvider.transpose(a);
-        }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        return fromEjmlMatrix(ea.transpose());
+        if (!canUseEJML()) return cpuProvider.transpose(a);
+        return ejmlImpl.transpose(a);
     }
 
     @Override
     public Matrix<E> scale(E scalar, Matrix<E> a) {
-        if (!canUseEJML()) {
-            return cpuProvider.scale(scalar, a);
-        }
-        org.ejml.simple.SimpleMatrix ea = toEjmlMatrix(a);
-        double s = ((Real) scalar).doubleValue();
-        return fromEjmlMatrix(ea.scale(s));
+        if (!canUseEJML()) return cpuProvider.scale(scalar, a);
+        return ejmlImpl.scale(scalar, a);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public E norm(Vector<E> a) {
-        if (!canUseEJML()) {
-            return cpuProvider.norm(a);
-        }
-        org.ejml.simple.SimpleMatrix ea = toEjmlVector(a);
-        return (E) Real.of(ea.normF());
-    }
-
-    @Override
-    public String getId() {
-        return "ejml";
-    }
-
-    @Override
-    public String getDescription() {
-        return "EJML Linear Algebra Provider - High-performance matrix library";
+        if (!canUseEJML()) return cpuProvider.norm(a);
+        return ejmlImpl.norm(a);
     }
 }

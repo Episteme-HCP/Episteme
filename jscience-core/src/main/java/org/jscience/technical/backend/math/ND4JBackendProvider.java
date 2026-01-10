@@ -50,9 +50,28 @@ public class ND4JBackendProvider implements BackendProvider {
     @Override
     public Object createBackend() {
         if (isAvailable()) {
-            return new org.jscience.mathematics.linearalgebra.tensors.backends.ND4JDenseTensorProvider();
+            // Prefer CUDA if available, otherwise Native
+            // Since we split the providers, we can check them directly or just try to instantiate CUDA first
+            // Note: The providers themselves check availability.
+            try {
+                // Try CUDA first
+                Class<?> cudaClass = Class.forName("org.jscience.mathematics.linearalgebra.tensors.backends.ND4JCUDATensorProvider");
+                Object cudaProvider = cudaClass.getDeclaredConstructor().newInstance();
+                if ((boolean) cudaClass.getMethod("isAvailable").invoke(cudaProvider)) {
+                    return cudaProvider;
+                }
+            } catch (Exception e) {
+                // Ignore
+            }
+            
+            try {
+                // Fallback to Native
+                Class<?> nativeClass = Class.forName("org.jscience.mathematics.linearalgebra.tensors.backends.ND4JNativeTensorProvider");
+                return nativeClass.getDeclaredConstructor().newInstance();
+            } catch (Exception e) {
+                return null;
+            }
         }
         return null;
     }
 }
-
