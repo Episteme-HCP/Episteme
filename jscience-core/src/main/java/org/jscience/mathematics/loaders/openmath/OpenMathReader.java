@@ -59,6 +59,21 @@ public class OpenMathReader implements Deserializer<Object>, org.jscience.io.Res
     }
 
     @Override
+    public String getName() {
+        return "loader.openmath.name";
+    }
+
+    @Override
+    public String getCategory() {
+        return "category.mathematics";
+    }
+
+    @Override
+    public String getDescription() {
+        return "loader.openmath.desc";
+    }
+
+    @Override
     public String getResourcePath() {
         return "/";
     }

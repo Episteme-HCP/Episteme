@@ -50,6 +50,21 @@ public class OEISReader extends AbstractResourceReader<IntegerSequence> {
     }
 
     @Override
+    public String getName() {
+        return "loader.oeis.name";
+    }
+
+    @Override
+    public String getCategory() {
+        return "category.mathematics";
+    }
+
+    @Override
+    public String getDescription() {
+        return "loader.oeis.desc";
+    }
+
+    @Override
     public String getResourcePath() {
         return "https://oeis.org/";
     }

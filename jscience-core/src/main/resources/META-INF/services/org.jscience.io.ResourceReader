@@ -1,5 +1,5 @@
 org.jscience.mathematics.loaders.openmath.OpenMathReader
 org.jscience.mathematics.loaders.oeis.OEISReader
 org.jscience.mathematics.loaders.mathml.MathMLReader
-org.jscience.io.properties.PropertiesReader
+
 org.jscience.bibliography.loaders.CrossRef

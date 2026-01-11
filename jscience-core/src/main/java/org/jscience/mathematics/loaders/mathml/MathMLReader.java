@@ -63,6 +63,21 @@ public class MathMLReader implements Deserializer<Object>, org.jscience.io.Resou
     }
 
     @Override
+    public String getName() {
+        return "loader.mathml.name";
+    }
+
+    @Override
+    public String getCategory() {
+        return "category.mathematics";
+    }
+
+    @Override
+    public String getDescription() {
+        return "loader.mathml.desc";
+    }
+
+    @Override
     public String getResourcePath() {
         return "/";
     }

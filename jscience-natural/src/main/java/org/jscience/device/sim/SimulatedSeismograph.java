@@ -44,7 +44,7 @@ public class SimulatedSeismograph extends SimulatedDevice implements Seismograph
     }
 
     public SimulatedSeismograph() {
-        this("Simulated Seismograph");
+        this("Seismograph");
     }
 
     @Override

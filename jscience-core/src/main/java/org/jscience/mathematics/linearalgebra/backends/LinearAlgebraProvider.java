@@ -27,6 +27,7 @@ import org.jscience.mathematics.linearalgebra.Matrix;
 import org.jscience.mathematics.linearalgebra.Vector;
 
 import org.jscience.technical.backend.ComputeBackend;
+import org.jscience.technical.backend.BackendDiscovery;
 
 /**
  * Service provider interface for linear algebra operations.
@@ -41,6 +42,11 @@ import org.jscience.technical.backend.ComputeBackend;
  * @since 1.0
  */
 public interface LinearAlgebraProvider<E> extends ComputeBackend {
+
+    @Override
+    default String getType() {
+        return BackendDiscovery.TYPE_LINEAR_ALGEBRA;
+    }
 
     // --- Vector Operations ---
 

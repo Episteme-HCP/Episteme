@@ -462,11 +462,14 @@ public class JScienceMasterControl extends Application {
                 new LibInfo("jsr385", true),
                 new LibInfo("indriya", isClassAvailable("tech.units.indriya.format.SimpleUnitFormat"))), i18n));
 
+        // Hardware Acceleration (Compute Drivers) - moved above Math
+        content.getChildren().add(createHardwareCategory(i18n));
+
         // Mathematics & Algorithms - uses SPI
         content.getChildren().add(createMathCategory(i18n));
 
-        // Hardware Acceleration & Tensors - uses SPI
-        content.getChildren().add(createTensorCategory(i18n));
+        // Tensors (Deep Learning) - uses SPI
+        content.getChildren().add(createTensorsCategory(i18n));
 
         // Visualization & Plotting - uses SPI discovery + Config
         content.getChildren().add(createPlottingCategory(i18n));
@@ -485,6 +488,10 @@ public class JScienceMasterControl extends Application {
         VBox box = new VBox(12);
         Label header = new Label(i18n.get("mastercontrol.chemistry.title", "Chemistry & Biology"));
         header.getStyleClass().add("header-title");
+
+        Label desc = new Label(i18n.get("mastercontrol.libraries.cat.chemistry.desc", ""));
+        desc.getStyleClass().add("mastercontrol-description");
+        box.getChildren().add(desc);
 
         GridPane grid = new GridPane();
         grid.setHgap(20);
@@ -547,6 +554,10 @@ public class JScienceMasterControl extends Application {
         VBox box = new VBox(12);
         Label header = new Label(i18n.get("mastercontrol.quantum.title", "Quantum Computing"));
         header.getStyleClass().add("header-title");
+
+        Label desc = new Label(i18n.get("mastercontrol.libraries.cat.quantum.desc", ""));
+        desc.getStyleClass().add("mastercontrol-description");
+        box.getChildren().add(desc);
 
         GridPane grid = new GridPane();
         grid.setHgap(20);
@@ -658,6 +669,10 @@ public class JScienceMasterControl extends Application {
         Label header = new Label(i18n.get("mastercontrol.libraries.cat.math", "Mathematics & Algorithms"));
         header.getStyleClass().add("header-title");
 
+        Label desc = new Label(i18n.get("mastercontrol.libraries.cat.math.desc", ""));
+        desc.getStyleClass().add("mastercontrol-description");
+        box.getChildren().add(desc);
+
         GridPane grid = new GridPane();
         grid.setHgap(20);
         grid.setVgap(15);
@@ -705,34 +720,96 @@ public class JScienceMasterControl extends Application {
         // Append list
         box.getChildren().add(createBackendCategory(i18n, BackendDiscovery.TYPE_MATH, "", ""));
         
+        // Linear Algebra providers hidden as per user request (internal details)
+        
         box.getChildren().add(new Separator());
         return box;
     }
 
-    private VBox createTensorCategory(I18n i18n) {
+    private VBox createHardwareCategory(I18n i18n) {
         VBox box = new VBox(12);
-        Label header = new Label(i18n.get("mastercontrol.libraries.cat.hardware", "Hardware Acceleration & Tensors"));
+        Label header = new Label(i18n.get("mastercontrol.libraries.cat.hardware", "Hardware Acceleration"));
         header.getStyleClass().add("header-title");
 
+        Label desc = new Label(i18n.get("mastercontrol.libraries.cat.hardware.desc", ""));
+        desc.getStyleClass().add("mastercontrol-description");
+        box.getChildren().add(desc);
+
         GridPane grid = new GridPane();
-        grid.setHgap(20);
-        grid.setVgap(15);
+        grid.setHgap(35); grid.setVgap(12);
+        grid.setPadding(new Insets(10, 0, 10, 0));
+
+        // Compute Mode Combo (Copy from computing tab)
+        ComboBox<org.jscience.mathematics.context.ComputeMode> modeBox = new ComboBox<>();
+        modeBox.getItems().addAll(org.jscience.mathematics.context.ComputeMode.values());
+        modeBox.setValue(JScience.getComputeMode());
+        modeBox.setOnAction(e -> {
+            JScience.setComputeMode(modeBox.getValue());
+            JScience.savePreferences();
+        });
+        
+        VBox modeInfo = createInfoBox(
+            i18n.get("mastercontrol.computing.mode", "Compute Mode"), 
+            i18n.get("mastercontrol.computing.mode.desc", "Determines where calculations are performed."));
+
+        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.computing.mode", "Compute Mode")), modeBox, modeInfo);
+        
+        box.getChildren().addAll(header, grid);
+
+        // Drivers List (CPU, CUDA, OpenCL)
+        GridPane listGrid = new GridPane();
+        listGrid.setHgap(35); listGrid.setVgap(12);
+        
+        List<BackendProvider> all = BackendDiscovery.getInstance().getProvidersByType(BackendDiscovery.TYPE_TENSOR);
+        java.util.function.Function<String, Integer> getWeight = (id) -> {
+            id = id.toLowerCase();
+            if (id.contains("cpu")) return 1;
+            if (id.contains("cuda") || id.contains("jcuda")) return 2;
+            if (id.contains("opencl") || id.contains("jocl")) return 3;
+            return 10;
+        };
+
+        List<BackendProvider> drivers = all.stream()
+            .filter(p -> getWeight.apply(p.getId()) < 10)
+            .sorted(java.util.Comparator.comparingInt(p -> getWeight.apply(p.getId())))
+            .collect(java.util.stream.Collectors.toList());
+
+        int r = 0;
+        for (BackendProvider p : drivers) {
+            addBackendRow(listGrid, r++, p, i18n);
+        }
+        
+        box.getChildren().add(listGrid);
+        box.getChildren().add(new Separator());
+        return box;
+    }
+
+    private VBox createTensorsCategory(I18n i18n) {
+        VBox box = new VBox(12);
+        Label header = new Label(i18n.get("mastercontrol.libraries.cat.tensors", "Tensors"));
+        header.getStyleClass().add("header-title");
+
+        Label desc = new Label(i18n.get("mastercontrol.libraries.cat.tensors.desc", ""));
+        desc.getStyleClass().add("mastercontrol-description");
+        box.getChildren().add(desc);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(35); grid.setVgap(12);
         grid.setPadding(new Insets(10, 0, 10, 0));
 
         // Tensor Backend
         ComboBox<String> backendBox = new ComboBox<>();
         java.util.List<org.jscience.technical.backend.BackendProvider> providers = 
             org.jscience.technical.backend.BackendDiscovery.getInstance()
-                .getProvidersByType(org.jscience.technical.backend.BackendDiscovery.TYPE_TENSOR)
-                .stream()
-                .filter(p -> !p.getId().toLowerCase().contains("colt") && !p.getId().toLowerCase().contains("ejml") && !p.getId().toLowerCase().contains("commons"))
-                .collect(java.util.stream.Collectors.toList());
+                .getProvidersByType(org.jscience.technical.backend.BackendDiscovery.TYPE_TENSOR);
 
         // Map names to IDs for lookup
         java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
         nameToId.put("AUTO", null);
         for (org.jscience.technical.backend.BackendProvider p : providers) {
-            nameToId.put(p.getName(), p.getId());
+            if (!isDriverId(p.getId())) {
+                nameToId.put(p.getName(), p.getId());
+            }
         }
         backendBox.getItems().addAll(nameToId.keySet());
         
@@ -761,11 +838,27 @@ public class JScienceMasterControl extends Application {
         
         box.getChildren().addAll(header, grid);
 
-        // Append list
-        box.getChildren().add(createBackendCategory(i18n, BackendDiscovery.TYPE_TENSOR, "", ""));
+        // Tensors List
+        GridPane listGrid = new GridPane();
+        listGrid.setHgap(35); listGrid.setVgap(12);
+        
+        List<BackendProvider> tensors = providers.stream()
+            .filter(p -> !isDriverId(p.getId()))
+            .collect(java.util.stream.Collectors.toList());
 
+        int r = 0;
+        for (BackendProvider p : tensors) {
+            addBackendRow(listGrid, r++, p, i18n);
+        }
+        
+        box.getChildren().add(listGrid);
         box.getChildren().add(new Separator());
         return box;
+    }
+
+    private boolean isDriverId(String id) {
+        id = id.toLowerCase();
+        return id.contains("cpu") || id.contains("cuda") || id.contains("jcuda") || id.contains("opencl") || id.contains("jocl");
     }
 
     /**
@@ -776,10 +869,16 @@ public class JScienceMasterControl extends Application {
         Label header = new Label(i18n.get("mastercontrol.libraries.cat.vis", "Visualization & Plotting"));
         header.getStyleClass().add("header-title");
 
+        Label desc = new Label(i18n.get("mastercontrol.libraries.cat.vis.desc", ""));
+        desc.getStyleClass().add("mastercontrol-description");
+        box.getChildren().add(desc);
+
         GridPane grid = new GridPane();
         // --- 2D Section ---
         VBox box2D = new VBox(12);
-        box2D.getChildren().add(createHeaderLabel(i18n.get("mastercontrol.libraries.cat.vis_2d", "Visualization and Plotting 2D")));
+        Label header2D = new Label(i18n.get("mastercontrol.libraries.cat.vis_2d", "Visualization and Plotting 2D"));
+        header2D.getStyleClass().add("header-title");
+        box2D.getChildren().add(header2D);
         
         GridPane grid2DControl = new GridPane();
         grid2DControl.setHgap(30); grid2DControl.setVgap(15);
@@ -790,6 +889,22 @@ public class JScienceMasterControl extends Application {
         backendBox.getItems().addAll(java.util.Arrays.stream(PlottingBackend.values())
                 .filter(PlottingBackend::isSupported2D)
                 .collect(java.util.stream.Collectors.toList()));
+        backendBox.setConverter(new javafx.util.StringConverter<PlottingBackend>() {
+            @Override
+            public String toString(PlottingBackend object) {
+                if (object == null) return "";
+                switch (object) {
+                    case AUTO: return "Auto";
+                    case XCHART: return "XChart";
+                    case JAVAFX: return "JavaFX";
+                    case JFREECHART: return "JFreeChart";
+                    case JZY3D: return "Jzy3D";
+                    default: return object.name();
+                }
+            }
+            @Override
+            public PlottingBackend fromString(String string) { return null; }
+        });
         backendBox.setValue(JScience.getPlottingBackend2D());
         backendBox.setOnAction(e -> {
             JScience.setPlottingBackend2D(backendBox.getValue());
@@ -811,8 +926,10 @@ public class JScienceMasterControl extends Application {
              
         int r2 = 0;
         for (org.jscience.technical.backend.BackendProvider p : allPlotProviders) {
-             if (p.getId().toLowerCase().contains("chart") || p.getId().toLowerCase().contains("javafx")) {
-                 addBackendRow(grid2DList, r2++, p, i18n);
+             String id = p.getId().toLowerCase();
+             if (id.contains("javafx")) continue; // Removed as per user request
+             if (id.contains("chart")) {
+                  addBackendRow(grid2DList, r2++, p, i18n);
              }
         }
         box2D.getChildren().add(grid2DList);
@@ -822,7 +939,9 @@ public class JScienceMasterControl extends Application {
 
         // --- 3D Section ---
         VBox box3D = new VBox(12);
-        box3D.getChildren().add(createHeaderLabel(i18n.get("mastercontrol.libraries.cat.vis_3d", "Visualization and Plotting 3D")));
+        Label header3D = new Label(i18n.get("mastercontrol.libraries.cat.vis_3d", "Visualization and Plotting 3D"));
+        header3D.getStyleClass().add("header-title");
+        box3D.getChildren().add(header3D);
         
         GridPane grid3DControl = new GridPane();
         grid3DControl.setHgap(30); grid3DControl.setVgap(15);
@@ -833,6 +952,7 @@ public class JScienceMasterControl extends Application {
         backend3DBox.getItems().addAll(java.util.Arrays.stream(PlottingBackend.values())
                 .filter(PlottingBackend::isSupported3D)
                 .collect(java.util.stream.Collectors.toList()));
+        backend3DBox.setConverter(backendBox.getConverter());
         backend3DBox.setValue(JScience.getPlottingBackend3D());
         backend3DBox.setOnAction(e -> {
             JScience.setPlottingBackend3D(backend3DBox.getValue());
@@ -851,8 +971,10 @@ public class JScienceMasterControl extends Application {
         grid3DList.setHgap(35); grid3DList.setVgap(12);
         int r3 = 0;
         for (org.jscience.technical.backend.BackendProvider p : allPlotProviders) {
-             if (!p.getId().toLowerCase().contains("chart") && !p.getId().toLowerCase().contains("javafx")) {
-                 addBackendRow(grid3DList, r3++, p, i18n);
+             String id = p.getId().toLowerCase();
+             if (id.contains("javafx")) continue; // Removed as per user request
+             if (!id.contains("chart")) {
+                  addBackendRow(grid3DList, r3++, p, i18n);
              }
         }
         box3D.getChildren().add(grid3DList);
@@ -1019,8 +1141,17 @@ public class JScienceMasterControl extends Application {
 
     private Accordion createLoaderAccordion(Map<String, List<ResourceIO<?>>> categories, I18n i18n) {
         Accordion accordion = new Accordion();
-        for (Map.Entry<String, List<ResourceIO<?>>> entry : categories.entrySet()) {
-            List<ResourceIO<?>> categoryLoaders = entry.getValue();
+        
+        // Sort categories by localized name
+        List<String> sortedKeys = new ArrayList<>(categories.keySet());
+        sortedKeys.sort((k1, k2) -> {
+            String n1 = i18n.get(k1, k1);
+            String n2 = i18n.get(k2, k2);
+            return n1.compareToIgnoreCase(n2);
+        });
+
+        for (String categoryKey : sortedKeys) {
+            List<ResourceIO<?>> categoryLoaders = categories.get(categoryKey);
             categoryLoaders.sort((l1, l2) -> {
                 String n1 = i18n.get(l1.getName(), l1.getName());
                 String n2 = i18n.get(l2.getName(), l2.getName());
@@ -1029,19 +1160,14 @@ public class JScienceMasterControl extends Application {
 
             List<AppEntry> entries = new ArrayList<>();
             for (ResourceIO<?> loader : categoryLoaders) {
-                String nameKey = loader.getName();
+                String nameKey = loader.getName(); // Should be a key like "loader.crossref.name"
                 String displayName = i18n.get(nameKey, nameKey);
-                String descKey = loader.getDescription();
+                String descKey = loader.getDescription(); // Should be a key like "loader.crossref.desc"
                 String displayDesc = i18n.get(descKey, descKey);
                 
-                // Add tag within description to indicate if it supports the OTHER direction too?
-                // E.g. in Reader list, if it's also a Writer.
-                StringBuilder tags = new StringBuilder();
-               
                 entries.add(new AppEntry(displayName, loader.getClass().getName(), displayDesc));
             }
 
-            String categoryKey = entry.getKey();
             String categoryName = i18n.get(categoryKey, categoryKey);
             TitledPane pane = new TitledPane(categoryName + " (" + entries.size() + ")",
                     createAppList(false, entries.toArray(new AppEntry[0])));

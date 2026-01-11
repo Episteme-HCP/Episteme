@@ -36,7 +36,13 @@ import java.util.List;
 /**
  * Reads financial market data from various formats.
  */
-public class FinancialMarketReader {
+public class FinancialMarketReader extends org.jscience.io.AbstractResourceReader<List<FinancialMarketReader.Candle>> {
+
+    private static final FinancialMarketReader INSTANCE = new FinancialMarketReader();
+
+    public static FinancialMarketReader getInstance() {
+        return INSTANCE;
+    }
 
     public static class Candle {
         public final TimePoint time;
@@ -54,6 +60,51 @@ public class FinancialMarketReader {
             this.close = close;
             this.volume = volume;
         }
+
+        @Override
+        public String toString() {
+            return String.format("%s [O:%s H:%s L:%s C:%s V:%s]", time, open, high, low, close, volume);
+        }
+    }
+
+    @Override
+    protected List<Candle> loadFromSource(String id) throws Exception {
+        // Assume id is a classpath resource
+        try (InputStream is = getClass().getResourceAsStream(id)) {
+            if (is == null) {
+                // Try context loader
+                InputStream ctxIs = Thread.currentThread().getContextClassLoader().getResourceAsStream(id);
+                if (ctxIs == null)
+                     throw new java.io.IOException("Resource not found: " + id);
+                return loadCSV(ctxIs, "USD"); // Default currency
+            }
+            return loadCSV(is, "USD"); // Default currency
+        }
+    }
+
+    @Override
+    public Class getResourceType() {
+        return List.class;
+    }
+
+    @Override
+    public String getName() {
+        return "loader.financial.name";
+    }
+
+    @Override
+    public String getCategory() {
+        return "category.economics";
+    }
+
+    @Override
+    public String getDescription() {
+        return "loader.financial.desc";
+    }
+
+    @Override
+    public String getResourcePath() {
+        return "financial_market_data.csv";
     }
 
     public static List<Candle> loadCSV(InputStream is, String currencyCode) {
@@ -72,19 +123,23 @@ public class FinancialMarketReader {
                 String[] parts = line.split(",");
                 if (parts.length >= 6) {
                     // Date, Open, High, Low, Close, Volume
-                    double openVal = Double.parseDouble(parts[1]);
-                    double highVal = Double.parseDouble(parts[2]);
-                    double lowVal = Double.parseDouble(parts[3]);
-                    double closeVal = Double.parseDouble(parts[4]);
-                    double volVal = Double.parseDouble(parts[5]);
+                    try {
+                        double openVal = Double.parseDouble(parts[1]);
+                        double highVal = Double.parseDouble(parts[2]);
+                        double lowVal = Double.parseDouble(parts[3]);
+                        double closeVal = Double.parseDouble(parts[4]);
+                        double volVal = Double.parseDouble(parts[5]);
 
-                    candles.add(new Candle(
-                            TimePoint.now(),
-                            new Money(Real.of(openVal), currencyCode),
-                            new Money(Real.of(highVal), currencyCode),
-                            new Money(Real.of(lowVal), currencyCode),
-                            new Money(Real.of(closeVal), currencyCode),
-                            Real.of(volVal)));
+                        candles.add(new Candle(
+                                TimePoint.now(), // Placeholder time as parsing wasn't in original
+                                new Money(Real.of(openVal), currencyCode),
+                                new Money(Real.of(highVal), currencyCode),
+                                new Money(Real.of(lowVal), currencyCode),
+                                new Money(Real.of(closeVal), currencyCode),
+                                Real.of(volVal)));
+                    } catch (NumberFormatException e) {
+                        // Skip malformed
+                    }
                 }
             }
         } catch (Exception e) {

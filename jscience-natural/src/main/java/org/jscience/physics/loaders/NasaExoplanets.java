@@ -93,6 +93,21 @@ public class NasaExoplanets extends AbstractResourceReader<ExoplanetInfo> {
     }
 
     @Override
+    public String getName() {
+        return "loader.nasa.name";
+    }
+
+    @Override
+    public String getCategory() {
+        return "category.physics"; // Or category.astronomy if available, but users asked for Physics fixes
+    }
+
+    @Override
+    public String getDescription() {
+        return "loader.nasa.desc";
+    }
+
+    @Override
     public String getResourcePath() {
         return API_BASE; // API-based, not file-based
     }
@@ -221,7 +236,7 @@ public class NasaExoplanets extends AbstractResourceReader<ExoplanetInfo> {
         return results;
     }
 
-    private NasaExoplanets() {
+    public NasaExoplanets() {
         // API-based loader, no backup path needed
     }
 }

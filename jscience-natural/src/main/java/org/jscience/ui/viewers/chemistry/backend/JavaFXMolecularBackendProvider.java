@@ -20,17 +20,17 @@ public class JavaFXMolecularBackendProvider implements BackendProvider {
 
     @Override
     public String getId() {
-        return "javafx";
+        return "javafx_mol";
     }
 
     @Override
     public String getName() {
-        return "JavaFX 3D";
+        return "JavaFX Molecular";
     }
 
     @Override
     public String getDescription() {
-        return "Native JavaFX 3D molecular rendering, always available.";
+        return "Integrated JavaFX 3D molecular visualization engine.";
     }
 
     @Override

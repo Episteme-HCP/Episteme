@@ -59,6 +59,21 @@ public class CrossRef extends AbstractResourceReader<CitationInfo> {
     }
 
     @Override
+    public String getName() {
+        return "loader.crossref.name";
+    }
+
+    @Override
+    public String getCategory() {
+        return "category.bibliography";
+    }
+
+    @Override
+    public String getDescription() {
+        return "loader.crossref.desc";
+    }
+
+    @Override
     public String getResourcePath() {
         return "https://api.crossref.org/works/";
     }

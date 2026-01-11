@@ -2,4 +2,5 @@ org.jscience.politics.loaders.FactbookReader
 org.jscience.politics.loaders.WorldBankReader
 org.jscience.history.loaders.CSVTimeSeriesReader
 org.jscience.geography.loaders.GeoJsonReader
+
 org.jscience.economics.loaders.FinancialMarketReader
