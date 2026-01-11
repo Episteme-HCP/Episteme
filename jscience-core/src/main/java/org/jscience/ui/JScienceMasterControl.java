@@ -1167,4 +1167,8 @@ public class JScienceMasterControl extends Application {
         content.getChildren().addAll(header, split);
         return new Tab(i18n.get("mastercontrol.tab.devices", "Devices"), content);
     }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 }
