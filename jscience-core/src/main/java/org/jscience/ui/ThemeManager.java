@@ -44,7 +44,7 @@ public class ThemeManager {
 
     private ThemeManager() {
         prefs = Preferences.userNodeForPackage(ThemeManager.class);
-        currentTheme = prefs.get(PREF_THEME, "light");
+        currentTheme = prefs.get(PREF_THEME, "Modena");
     }
 
     public static synchronized ThemeManager getInstance() {
@@ -64,15 +64,7 @@ public class ThemeManager {
     }
 
     public boolean isDarkTheme() {
-        return "dark".equalsIgnoreCase(currentTheme);
-    }
-
-    public void setDarkTheme(boolean dark) {
-        setTheme(dark ? "dark" : "light");
-    }
-
-    public void toggleTheme() {
-        setDarkTheme(!isDarkTheme());
+        return "Dark".equalsIgnoreCase(currentTheme);
     }
 
     /**
@@ -82,17 +74,36 @@ public class ThemeManager {
         if (scene == null)
             return;
 
-        // Remove old theme styles if any (simplistic approach, ideally we toggle
-        // classes)
-        // But here we rely on the root style as used in KillerAppBase
+        scene.getStylesheets().clear();
+        // Always load main.css as base if available
+        java.net.URL mainCss = ThemeManager.class.getResource("/org/jscience/ui/main.css");
+        if (mainCss != null) {
+            scene.getStylesheets().add(mainCss.toExternalForm());
+        }
 
-        if ("dark".equals(currentTheme)) {
-            scene.getRoot().setStyle(
+        if ("Caspian".equalsIgnoreCase(currentTheme)) {
+            javafx.application.Application.setUserAgentStylesheet(javafx.application.Application.STYLESHEET_CASPIAN);
+        } else if ("HighContrast".equalsIgnoreCase(currentTheme) || "High Contrast".equalsIgnoreCase(currentTheme)) {
+            javafx.application.Application.setUserAgentStylesheet(javafx.application.Application.STYLESHEET_MODENA);
+             java.net.URL hcCss = ThemeManager.class.getResource("/org/jscience/ui/high-contrast.css");
+             if (hcCss != null) {
+                 scene.getStylesheets().add(hcCss.toExternalForm());
+             }
+        } else if ("Dark".equalsIgnoreCase(currentTheme)) {
+             javafx.application.Application.setUserAgentStylesheet(javafx.application.Application.STYLESHEET_MODENA);
+             scene.getRoot().setStyle(
                     "-fx-base: #2b2b2b; " +
                             "-fx-background: #1e1e1e; " +
                             "-fx-control-inner-background: #3c3c3c; " +
                             "-fx-text-fill: #e0e0e0;");
+             return; // Avoid clearing style below
         } else {
+            // Default Modena
+            javafx.application.Application.setUserAgentStylesheet(javafx.application.Application.STYLESHEET_MODENA);
+        }
+        
+        // Clear manual dark mode styles if not in Dark mode
+        if (!"Dark".equalsIgnoreCase(currentTheme)) {
             scene.getRoot().setStyle("");
         }
     }

@@ -5,8 +5,7 @@
 
 package org.jscience.mathematics.linearalgebra.backends;
 
-import java.util.ArrayList;
-import java.util.List;
+
 
 import org.jscience.mathematics.structures.rings.Field;
 import org.jscience.mathematics.linearalgebra.Matrix;

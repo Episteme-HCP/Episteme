@@ -5,8 +5,7 @@
 
 package org.jscience.mathematics.linearalgebra.backends;
 
-import java.util.ArrayList;
-import java.util.List;
+
 
 import org.jscience.mathematics.structures.rings.Field;
 import org.jscience.mathematics.linearalgebra.Matrix;
@@ -64,7 +63,7 @@ public class JBlasSupport<E> implements LinearAlgebraProvider<E> {
         return new DoubleMatrix(data);
     }
 
-    @SuppressWarnings("unchecked")
+
     private Matrix<E> fromJBlasMatrix(DoubleMatrix jm) {
         int rows = jm.rows;
         int cols = jm.columns;

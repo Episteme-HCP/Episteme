@@ -80,11 +80,12 @@ public class JScienceMasterControl extends Application {
     public void start(Stage stage) {
         try {
             // Load persistent settings
+            // Load persistent settings
             String lang = PREFS.get("language", Locale.getDefault().getLanguage());
             I18n.getInstance().setLocale(Locale.of(lang));
 
-            String theme = PREFS.get("theme", "Modena");
-            System.setProperty("jscience.theme", theme);
+            // Theme is handled by ThemeManager
+            ThemeManager.getInstance().applyTheme(stage.getScene());
 
             this.primaryStage = stage;
             refreshUI();
@@ -167,18 +168,7 @@ public class JScienceMasterControl extends Application {
     }
 
     private void applyCurrentTheme(Scene scene) {
-        String currentTheme = System.getProperty("jscience.theme", "Modena");
-        scene.getStylesheets().clear();
-        scene.getStylesheets().add(getClass().getResource("/org/jscience/ui/main.css").toExternalForm());
-
-        if ("Caspian".equalsIgnoreCase(currentTheme)) {
-            Application.setUserAgentStylesheet(Application.STYLESHEET_CASPIAN);
-        } else if ("HighContrast".equalsIgnoreCase(currentTheme)) {
-            Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
-            scene.getStylesheets().add(getClass().getResource("/org/jscience/ui/high-contrast.css").toExternalForm());
-        } else {
-            Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
-        }
+        ThemeManager.getInstance().applyTheme(scene);
     }
 
     private Tab createGeneralTab(I18n i18n) {
@@ -950,10 +940,9 @@ public class JScienceMasterControl extends Application {
         comboLabel.setStyle("-fx-font-weight: bold;");
 
         ComboBox<String> themeCombo = new ComboBox<>();
-        themeCombo.getItems().addAll("Modena", "Caspian", "High Contrast");
-        String currentTheme = System.getProperty("jscience.theme", "Modena");
-        if ("HighContrast".equals(currentTheme))
-            currentTheme = "High Contrast";
+        themeCombo.getItems().addAll("Modena", "Caspian", "High Contrast", "Dark");
+        String currentTheme = ThemeManager.getInstance().getCurrentTheme();
+        if ("HighContrast".equals(currentTheme)) currentTheme = "High Contrast";
         themeCombo.setValue(currentTheme);
         themeCombo.setPrefWidth(250);
 
@@ -978,8 +967,7 @@ public class JScienceMasterControl extends Application {
     }
 
     private void applyDashboardTheme(String theme) {
-        System.setProperty("jscience.theme", theme);
-        PREFS.put("theme", theme); // Save persistence
+        ThemeManager.getInstance().setTheme(theme);
         refreshUI();
     }
 

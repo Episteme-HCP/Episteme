@@ -31,7 +31,7 @@ import org.jscience.physics.quantum.QuantumContext;
 import org.jscience.physics.quantum.QuantumGate;
 import org.jscience.physics.quantum.QuantumGateType;
 import org.redfx.strange.Program;
-import org.redfx.strange.Qubit;
+
 import org.redfx.strange.Result;
 import org.redfx.strange.Step;
 import org.redfx.strange.Gate;
@@ -40,7 +40,6 @@ import org.redfx.strange.gate.X;
 import org.redfx.strange.gate.Y;
 import org.redfx.strange.gate.Z;
 import org.redfx.strange.gate.Cnot;
-import org.redfx.strange.gate.Measurement;
 import org.redfx.strange.local.SimpleQuantumExecutionEnvironment;
 
 /**
@@ -106,18 +105,34 @@ public class StrangeQuantumProvider implements QuantumBackend {
             SimpleQuantumExecutionEnvironment sqee = new SimpleQuantumExecutionEnvironment();
             Result res = sqee.runProgram(p);
             
-            // Convert results. Strange returns probabilities or complex numbers.
-            // Result.getMeasurements() ? 
-            // Strange doesn't return counts like Qiskit unless repeated run.
-            // This simple provider will just return 1024 shots simulation.
-            
-            // Since Strange 0.2.0 is simple, let's just return a dummy map or 
-            // if we can extract probabilities, we simulate counts.
+            // Result.getProbability() returns Complex[] representing the state vector.
+            // We calculate |amplitude|^2 for each state to get the probability.
+            org.redfx.strange.Complex[] probabilities = res.getProbability();
             
             Map<String, Integer> counts = new HashMap<>();
-            // TODO: Implement proper count simulation from probabilities
-            // For now, just logging execution success.
-            counts.put("000", 1024); // Placeholder
+            int shots = 1024;
+            java.util.Random rand = new java.util.Random();
+            
+            for (int i = 0; i < shots; i++) {
+                double r = rand.nextDouble();
+                double cumulativeProbability = 0.0;
+                for (int j = 0; j < probabilities.length; j++) {
+                    cumulativeProbability += probabilities[j].abssqr();
+                    if (r <= cumulativeProbability) {
+                        String binaryString = Integer.toBinaryString(j);
+                        // Pad with leading zeros to match numQubits
+                        int len = binaryString.length();
+                        if (len < numQubits) {
+                             StringBuilder sb = new StringBuilder();
+                             for (int k = 0; k < numQubits - len; k++) sb.append('0');
+                             sb.append(binaryString);
+                             binaryString = sb.toString();
+                        }
+                        counts.put(binaryString, counts.getOrDefault(binaryString, 0) + 1);
+                        break;
+                    }
+                }
+            }
             
             return counts;
             

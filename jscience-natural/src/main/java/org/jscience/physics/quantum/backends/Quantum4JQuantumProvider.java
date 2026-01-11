@@ -7,7 +7,7 @@ package org.jscience.physics.quantum.backends;
 
 import org.jscience.physics.quantum.QuantumBackend;
 import org.jscience.physics.quantum.QuantumContext;
-import org.jscience.physics.quantum.QuantumGate;
+
 
 import java.util.HashMap;
 import java.util.Map;

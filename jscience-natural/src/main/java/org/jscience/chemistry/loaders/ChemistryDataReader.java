@@ -185,7 +185,7 @@ public class ChemistryDataReader extends AbstractResourceReader<Object> {
                 }
 
                 PeriodicTable.registerElement(element);
-                LOGGER.info("Registered element: " + data.symbol);
+                LOGGER.fine("Registered element: " + data.symbol);
             }
 
             loadMolecules();
@@ -217,7 +217,7 @@ public class ChemistryDataReader extends AbstractResourceReader<Object> {
                 }
                 if (valid) {
                     MOLECULE_DATA_CACHE.put(md.name, md);
-                    LOGGER.info("Registered molecule data: " + md.name);
+                    LOGGER.fine("Registered molecule data: " + md.name);
                 }
             }
         } catch (Exception e) {

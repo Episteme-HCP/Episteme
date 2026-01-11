@@ -53,7 +53,7 @@ public class SportsResultsDemo implements AppProvider {
 
     @Override
     public String getDescription() {
-        return "Manage match results and view automatically calculated league standings.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.sports.results.desc", "Manage match results and view automatically calculated league standings.");
     }
 
     @Override

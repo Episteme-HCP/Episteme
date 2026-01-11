@@ -24,6 +24,8 @@
 package org.jscience.ui.i18n;
 
 import java.util.*;
+import java.util.function.Consumer;
+import org.jscience.ui.ThemeManager;
 
 /**
  * Internationalization helper for JScience UI.
@@ -43,6 +45,7 @@ public class I18n {
     private Locale currentLocale = Locale.getDefault();
     private final List<String> bundleBases = new ArrayList<>();
     private final Map<String, ResourceBundle> bundles = new HashMap<>();
+    private final List<Consumer<Locale>> listeners = new ArrayList<>();
 
     private I18n() {
         // Auto-register all known bundles
@@ -93,6 +96,26 @@ public class I18n {
         bundles.clear();
         for (String base : bundleBases) {
             loadBundle(base);
+        }
+        ThemeManager.getInstance().notifyLocaleChange(locale);
+        notifyListeners(locale);
+    }
+
+    public void addListener(Consumer<Locale> listener) {
+        listeners.add(listener);
+    }
+
+    public void removeListener(Consumer<Locale> listener) {
+        listeners.remove(listener);
+    }
+
+    private void notifyListeners(Locale locale) {
+        for (Consumer<Locale> listener : listeners) {
+            try {
+                listener.accept(locale);
+            } catch (Exception e) {
+                System.err.println("Error in locale listener: " + e.getMessage());
+            }
         }
     }
 

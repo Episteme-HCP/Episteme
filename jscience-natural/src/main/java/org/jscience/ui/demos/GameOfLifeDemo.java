@@ -47,7 +47,7 @@ public class GameOfLifeDemo extends SimulationDemo {
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("life.short_desc", "Conway's Game of Life");
+        return I18n.getInstance().get("life.desc", "Conway's Game of Life");
     }
 
     @Override

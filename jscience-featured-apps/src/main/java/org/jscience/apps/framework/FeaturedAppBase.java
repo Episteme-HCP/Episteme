@@ -65,7 +65,7 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
     protected UndoManager undoManager = new UndoManager();
     protected javafx.beans.property.BooleanProperty simulationControlsVisible = new javafx.beans.property.SimpleBooleanProperty(
             true);
-    private String currentTheme = "light";
+    private String currentTheme;
 
     protected FeaturedAppBase() {
         // Register bundle in constructor so getName() / getCategory() work for launchers
@@ -177,6 +177,12 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
             return getClass().getSimpleName().replace("App", "");
         }
         return title.replace(" - JScience", "");
+    }
+
+    @Override
+    public String getDescription() {
+        // Standardized key based on class name, e.g., "CrystalStructureApp.desc"
+        return i18n.get(getClass().getSimpleName() + ".desc");
     }
 
     @Override
@@ -318,13 +324,10 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
     // ===== Theme =====
 
     protected void applyTheme(Scene scene) {
-        ThemeManager.getInstance().setTheme(currentTheme); // Ensure manager knows current (if local preference was
-                                                           // loaded)
-        // OR better: use manager as source of truth.
-        // But KillerAppBase loads its own prefs in start().
-        // Let's assume ThemeManager prevails for global consistency.
+        if (currentTheme == null) {
+            currentTheme = ThemeManager.getInstance().getCurrentTheme();
+        }
         ThemeManager.getInstance().applyTheme(scene);
-        this.currentTheme = ThemeManager.getInstance().getCurrentTheme();
     }
 
     public void setTheme(String theme) {
@@ -534,12 +537,14 @@ public abstract class FeaturedAppBase extends Application implements AppProvider
     protected void loadPreferences() {
         String lang = prefs.get("language", Locale.getDefault().getLanguage());
         i18n.setLocale(Locale.of(lang));
-        currentTheme = prefs.get("theme", "light");
+        // Theme is global, managed by ThemeManager
+        currentTheme = ThemeManager.getInstance().getCurrentTheme();
     }
 
     protected void savePreferences() {
         prefs.put("language", i18n.getCurrentLocale().getLanguage());
-        prefs.put("theme", currentTheme);
+        prefs.put("language", i18n.getCurrentLocale().getLanguage());
+        // Theme is global, saved by ThemeManager
     }
 
     // ===== Help =====

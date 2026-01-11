@@ -25,6 +25,7 @@ package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
 import org.jscience.ui.AppProvider;
+import org.jscience.ui.i18n.I18n;
 import org.jscience.ui.viewers.biology.ecology.SpeciesBrowserViewer;
 
 /**
@@ -42,17 +43,17 @@ public class SpeciesBrowserDemo implements AppProvider {
 
     @Override
     public String getCategory() {
-        return "Biology";
+        return I18n.getInstance().get("category.biology", "Biology");
     }
 
     @Override
     public String getName() {
-        return "Species Browser";
+        return I18n.getInstance().get("SpeciesBrowser.title", "Species Browser");
     }
 
     @Override
     public String getDescription() {
-        return "Explore biological species data using the Global Biodiversity Information Facility (GBIF) API.";
+        return I18n.getInstance().get("SpeciesBrowser.desc", "Explore biological species data using the Global Biodiversity Information Facility (GBIF) API.");
     }
 
     @Override
@@ -60,5 +61,3 @@ public class SpeciesBrowserDemo implements AppProvider {
         SpeciesBrowserViewer.show(stage);
     }
 }
-
-

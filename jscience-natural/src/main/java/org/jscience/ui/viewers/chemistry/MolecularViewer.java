@@ -4,7 +4,7 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.Parent;
+
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -43,7 +43,7 @@ public class MolecularViewer extends Application {
     @Override
     public void start(Stage primaryStage) {
         BorderPane root = new BorderPane();
-        root.setCenter((Parent) renderer.getViewComponent());
+        root.setCenter((javafx.scene.Node) renderer.getViewComponent());
 
         VBox controls = new VBox(15);
         controls.setPadding(new Insets(15));
@@ -77,6 +77,11 @@ public class MolecularViewer extends Application {
 
         primaryStage.setScene(new Scene(root, 1100, 800));
         primaryStage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("molecule.window.title"));
+        primaryStage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("molecule.window.title"));
+        
+        // Apply Global Theme
+        org.jscience.ui.ThemeManager.getInstance().applyTheme(primaryStage.getScene());
+        
         primaryStage.show();
     }
 

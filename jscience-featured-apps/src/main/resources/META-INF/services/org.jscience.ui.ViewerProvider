@@ -7,6 +7,6 @@ org.jscience.apps.sociology.CivilizationApp
 org.jscience.apps.economics.MarketCrashApp
 org.jscience.apps.physics.spintronics.SpinValveApp
 org.jscience.apps.biology.PandemicForecasterApp
-org.jscience.apps.biology.SpeciesBrowserApp
+
 org.jscience.ui.demos.MagneticFieldDemo
 
