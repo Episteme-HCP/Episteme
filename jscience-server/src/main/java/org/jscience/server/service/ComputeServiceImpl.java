@@ -96,12 +96,11 @@ public class ComputeServiceImpl extends ComputeServiceGrpc.ComputeServiceImplBas
 
         // Persist Job
         try {
-            // Context/Auth logic can be added here if needed, usually handled by
-            // Interceptors
-            // For now, simpler Job creation without explicit user ID if not available in
-            // thread context (Spring Security context)
-            String userId = "anonymous";
-            // TODO: Integrate Spring Security Context for gRPC
+            // Get authenticated user from gRPC context (set by RbacInterceptor)
+            String userId = org.jscience.server.auth.RbacInterceptor.getCurrentUserId();
+            if (userId == null || userId.isEmpty()) {
+                userId = "anonymous";
+            }
 
             Job job = new Job(
                     taskId,

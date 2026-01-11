@@ -61,7 +61,7 @@ import org.jscience.mathematics.context.MathContext;
  * 
  * <pre>{@code
  * // Configure for high-performance GPU computing
- * JScience.setComputeMode(ComputeMode.GPU);
+ * JScience.setComputeMode(ComputeMode.CUDA);
  * 
  * // Configure floating-point precision
  * JScience.setFloatPrecision(); // 32-bit float - faster
@@ -106,6 +106,8 @@ public final class JScience {
             if (molecularBackendId != null) prefs.put("molecular.backend", molecularBackendId);
             if (linearAlgebraProviderId != null) prefs.put("linear.algebra.backend", linearAlgebraProviderId);
             if (quantumBackendId != null) prefs.put("quantum.backend", quantumBackendId);
+            if (mathBackendId != null) prefs.put("math.backend", mathBackendId);
+            if (tensorBackendId != null) prefs.put("tensor.backend", tensorBackendId);
             
             prefs.flush();
         } catch (Exception e) {
@@ -161,6 +163,12 @@ public final class JScience {
                 String q = prefs.get("quantum.backend", null);
                 if (q != null) quantumBackendId = q;
                 
+                String m = prefs.get("math.backend", null);
+                if (m != null) mathBackendId = m;
+                
+                String t = prefs.get("tensor.backend", null);
+                if (t != null) tensorBackendId = t;
+                
             } catch (Exception e) {
                 // Ignore backend loading errors
             }
@@ -180,8 +188,11 @@ public final class JScience {
         MathContext.setCurrent(MathContext.getCurrent().withComputeMode(mode));
         // Also update ComputeContext backend
         switch (mode) {
-            case GPU:
+            case OPENCL:
                 ComputeContext.current().setBackend(ComputeContext.Backend.OPENCL_GPU);
+                break;
+            case CUDA:
+                ComputeContext.current().setBackend(ComputeContext.Backend.CUDA_GPU);
                 break;
             case CPU:
                 ComputeContext.current().setBackend(ComputeContext.Backend.JAVA_CPU);
@@ -531,6 +542,30 @@ public final class JScience {
         linearAlgebraProviderId = id;
         // Ideally, we would also update the active ComputeContext here if it supports hot-swapping
         // ComputeContext.current().setLinearAlgebraProvider(id);
+    }
+
+    // ================= MATH BACKEND =================
+
+    private static String mathBackendId = null; 
+
+    public static String getMathBackendId() {
+        return mathBackendId;
+    }
+
+    public static void setMathBackendId(String id) {
+        mathBackendId = id;
+    }
+
+    // ================= TENSOR BACKEND =================
+
+    private static String tensorBackendId = null;
+
+    public static String getTensorBackendId() {
+        return tensorBackendId;
+    }
+
+    public static void setTensorBackendId(String id) {
+        tensorBackendId = id;
     }
 
     // ================= MOLECULAR BACKEND =================

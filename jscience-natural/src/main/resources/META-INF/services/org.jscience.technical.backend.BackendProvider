@@ -3,3 +3,9 @@ org.jscience.ui.viewers.chemistry.backend.JavaFXMolecularBackendProvider
 org.jscience.ui.viewers.chemistry.backend.JmolMolecularBackendProvider
 org.jscience.ui.viewers.chemistry.backend.PyMOLMolecularBackendProvider
 org.jscience.ui.viewers.chemistry.backend.VMDMolecularBackendProvider
+
+# Quantum Backend Providers
+org.jscience.physics.quantum.backends.StrangeQuantumProvider
+org.jscience.physics.quantum.backends.Quantum4JQuantumProvider
+org.jscience.physics.quantum.backends.QiskitQuantumProvider
+org.jscience.physics.quantum.backends.AmazonBraketQuantumProvider

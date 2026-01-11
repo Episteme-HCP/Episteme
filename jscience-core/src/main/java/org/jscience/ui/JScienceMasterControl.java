@@ -117,7 +117,6 @@ public class JScienceMasterControl extends Application {
                 createI18nTab(i18n),
                 createThemesTab(i18n),
                 createComputingTab(i18n),
-                createPlottingTab(i18n), // Added Plotting Tab
                 createLibrariesTab(i18n),
                 createLoadersTab(i18n),
                 createAppsTab(i18n),
@@ -127,11 +126,10 @@ public class JScienceMasterControl extends Application {
         tabPane.getTabs().get(1).setId("tab-i18n");
         tabPane.getTabs().get(2).setId("tab-themes");
         tabPane.getTabs().get(3).setId("tab-computing");
-        tabPane.getTabs().get(4).setId("tab-plotting");
-        tabPane.getTabs().get(5).setId("tab-libraries");
-        tabPane.getTabs().get(6).setId("tab-loaders");
-        tabPane.getTabs().get(7).setId("tab-apps");
-        tabPane.getTabs().get(8).setId("tab-devices");
+        tabPane.getTabs().get(4).setId("tab-libraries");
+        tabPane.getTabs().get(5).setId("tab-loaders");
+        tabPane.getTabs().get(6).setId("tab-apps");
+        tabPane.getTabs().get(7).setId("tab-devices");
 
         // Restore selected tab from preferences if not preserving current state
         if (selectedIndex == 0) {
@@ -392,27 +390,6 @@ public class JScienceMasterControl extends Application {
         gpuVal.setStyle(JScience.isGpuAvailable() ? "-fx-text-fill: #27ae60; -fx-font-weight: bold;"
                 : "-fx-text-fill: #c0392b;");
 
-        // --- Linear Algebra Provider ---
-        ComboBox<String> linAlgBox = new ComboBox<>();
-        // Get available Linear Algebra providers
-        java.util.List<BackendProvider> linAlgProviders = BackendDiscovery.getInstance().getAvailableProvidersByType(BackendDiscovery.TYPE_LINEAR_ALGEBRA);
-        
-        linAlgBox.getItems().addAll(linAlgProviders.stream().map(BackendProvider::getId).collect(java.util.stream.Collectors.toList()));
-        
-        // Add default/fallback if empty or not found
-        if (!linAlgBox.getItems().contains(JScience.getLinearAlgebraProviderId())) {
-             linAlgBox.getItems().add(JScience.getLinearAlgebraProviderId());
-        }
-        
-        linAlgBox.setValue(JScience.getLinearAlgebraProviderId());
-        linAlgBox.setOnAction(e -> {
-            JScience.setLinearAlgebraProviderId(linAlgBox.getValue());
-            JScience.savePreferences();
-        });
-        
-        VBox linAlgInfo = createInfoBox(i18n.get("mastercontrol.computing.linalg", "Linear Algebra Provider"),
-                i18n.get("mastercontrol.computing.desc.linalg", "Select the backend for dense matrix operations (CPU, GPU, Native)."));
-
         grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.computing.mode", "Compute Mode")), modeBox, modeInfo);
         grid.addRow(1, createHeaderLabel(i18n.get("mastercontrol.computing.float_precision", "Float Precision")),
                 floatBox,
@@ -426,9 +403,9 @@ public class JScienceMasterControl extends Application {
                 precInfo);
         grid.addRow(5, createHeaderLabel(i18n.get("mastercontrol.computing.rounding", "Rounding Mode")), roundBox,
                 roundInfo);
-        grid.addRow(6, createHeaderLabel(i18n.get("mastercontrol.computing.linalg", "Linear Algebra")), linAlgBox,
-                linAlgInfo);
-
+        
+        // Linear Algebra provider selection is handled transparently by Factory/ComputeMode
+        
         content.getChildren().addAll(header, grid);
         return new Tab(i18n.get("mastercontrol.tab.computing", "Computing"), content);
     }
@@ -439,60 +416,7 @@ public class JScienceMasterControl extends Application {
         return l;
     }
 
-    private Tab createPlottingTab(I18n i18n) {
-        VBox content = new VBox(20);
-        content.setPadding(new Insets(20));
 
-        Label header = new Label(i18n.get("mastercontrol.plotting.header", "Plotting Configuration"));
-        header.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
-
-        GridPane grid = new GridPane();
-        grid.setHgap(30);
-        grid.setVgap(25);
-
-        // --- Backend Selection ---
-        // --- Backend Selection ---
-        ComboBox<PlottingBackend> backendBox = new ComboBox<>();
-        backendBox.getItems().addAll(java.util.Arrays.stream(PlottingBackend.values())
-                .filter(PlottingBackend::isSupported2D)
-                .collect(java.util.stream.Collectors.toList()));
-        backendBox.setValue(JScience.getPlottingBackend2D());
-        backendBox.setOnAction(e -> {
-            JScience.setPlottingBackend2D(backendBox.getValue());
-            JScience.savePreferences(); // Save persistence
-        });
-
-        VBox backendInfo = createInfoBox("2D Plotting Backend",
-                "Choose the library used for rendering 2D charts.\n" +
-                        "XCHART: Modern, lightweight.\n" +
-                        "JFREECHART: Feature-rich, traditional.\n" +
-                        "JAVAFX: Native JavaFX charts.");
-
-        // --- 3D Backend Selection ---
-        ComboBox<PlottingBackend> backend3DBox = new ComboBox<>();
-        backend3DBox.getItems().addAll(java.util.Arrays.stream(PlottingBackend.values())
-                .filter(PlottingBackend::isSupported3D)
-                .collect(java.util.stream.Collectors.toList()));
-        backend3DBox.setValue(JScience.getPlottingBackend3D());
-        backend3DBox.setOnAction(e -> {
-            JScience.setPlottingBackend3D(backend3DBox.getValue());
-            JScience.savePreferences(); // Save persistence
-        });
-
-        VBox backend3DInfo = createInfoBox("3D Plotting Backend",
-                "Choose the library used for rendering 3D charts.\n" +
-                        "JZY3D: High performance OpenGL 3D charts.");
-
-        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.plotting.active_backend", "Active 2D Backend")),
-                backendBox,
-                backendInfo);
-        grid.addRow(1, createHeaderLabel(i18n.get("mastercontrol.plotting.active_backend_3d", "Active 3D Backend")),
-                backend3DBox,
-                backend3DInfo);
-
-        content.getChildren().addAll(header, grid);
-        return new Tab(i18n.get("mastercontrol.tab.plotting", "Plotting"), content);
-    }
 
     private VBox createInfoBox(String title, String tooltipText) {
         VBox box = new VBox();
@@ -525,6 +449,15 @@ public class JScienceMasterControl extends Application {
         helpText.setWrapText(true);
         content.getChildren().add(helpText);
 
+        // --- Framework Libraries ---
+        content.getChildren().add(new Separator());
+        content.getChildren().add(createLibCategory(i18n, "framework", List.of(
+                new LibInfo("javalin", isClassAvailable("io.javalin.Javalin")),
+                new LibInfo("jackson", isClassAvailable("com.fasterxml.jackson.databind.ObjectMapper")),
+                new LibInfo("slf4j", isClassAvailable("org.slf4j.LoggerFactory")),
+                new LibInfo("grpc", isClassAvailable("io.grpc.ManagedChannel"))), i18n));
+
+        // --- Standard Libraries ---
         content.getChildren().add(createLibCategory(i18n, "standards", List.of(
                 new LibInfo("jsr385", true),
                 new LibInfo("indriya", isClassAvailable("tech.units.indriya.format.SimpleUnitFormat"))), i18n));
@@ -535,21 +468,15 @@ public class JScienceMasterControl extends Application {
         // Hardware Acceleration & Tensors - uses SPI
         content.getChildren().add(createTensorCategory(i18n));
 
-        // Visualization & Plotting - uses SPI discovery
+        // Visualization & Plotting - uses SPI discovery + Config
         content.getChildren().add(createPlottingCategory(i18n));
 
         // Molecular Viewing - uses SPI discovery
-        // Molecular Viewing - uses SPI discovery
+        content.getChildren().add(new Separator());
         content.getChildren().add(createChemistryCategory(i18n));
         
         // Quantum Computing - uses SPI discovery
         content.getChildren().add(createQuantumCategory(i18n));
-        
-        content.getChildren().add(createLibCategory(i18n, "framework", List.of(
-                new LibInfo("javalin", isClassAvailable("io.javalin.Javalin")),
-                new LibInfo("jackson", isClassAvailable("com.fasterxml.jackson.databind.ObjectMapper")),
-                new LibInfo("slf4j", isClassAvailable("org.slf4j.LoggerFactory")),
-                new LibInfo("grpc", isClassAvailable("io.grpc.ManagedChannel"))), i18n));
 
         return new Tab(i18n.get("mastercontrol.tab.libraries", "Libraries"), scroll);
     }
@@ -571,29 +498,48 @@ public class JScienceMasterControl extends Application {
             org.jscience.technical.backend.BackendDiscovery.getInstance()
                 .getProvidersByType(org.jscience.technical.backend.BackendDiscovery.TYPE_MOLECULAR);
 
-        backendBox.getItems().add("AUTO"); // Default option
+        // Map names to IDs for lookup
+        java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
+        nameToId.put("AUTO", null);
         for (org.jscience.technical.backend.BackendProvider p : providers) {
-            backendBox.getItems().add(p.getId());
+            nameToId.put(p.getName(), p.getId());
         }
-
-        String current = JScience.getMolecularBackendId();
-        backendBox.setValue(current == null ? "AUTO" : current);
-
+        backendBox.getItems().addAll(nameToId.keySet());
+        
+        String currentId = JScience.getMolecularBackendId();
+        String currentName = "AUTO";
+        for (var entry : nameToId.entrySet()) {
+            if (java.util.Objects.equals(entry.getValue(), currentId)) {
+                currentName = entry.getKey();
+                break;
+            }
+        }
+        backendBox.setValue(currentName);
         backendBox.setOnAction(e -> {
-            String val = backendBox.getValue();
-            JScience.setMolecularBackendId("AUTO".equals(val) ? null : val);
+            String name = backendBox.getValue();
+            JScience.setMolecularBackendId(nameToId.get(name));
             JScience.savePreferences();
         });
 
-        VBox backendInfo = createInfoBox("Molecular Renderer", 
-            "Select the engine used to render 3D molecular structures.\n" +
-            "Requires restart of the viewer window to take effect.");
+        VBox backendInfo = createInfoBox(
+            i18n.get("mastercontrol.chemistry.backend", "Molecular Renderer"), 
+            i18n.get("mastercontrol.chemistry.backend.desc", 
+                "Select the engine used to render 3D molecular structures.\n" +
+                "Requires restart of the viewer window to take effect."));
 
         grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.chemistry.backend", "Molecular Renderer")),
                 backendBox,
                 backendInfo);
 
-        box.getChildren().addAll(header, grid, new Separator());
+        box.getChildren().addAll(header, grid);
+
+        // Append available libraries list (No header)
+        box.getChildren().add(createBackendCategory(i18n, 
+            org.jscience.technical.backend.BackendDiscovery.TYPE_MOLECULAR,
+            "", // No visible header
+            ""));
+
+        box.getChildren().add(new Separator());
         return box;
     }
     
@@ -614,29 +560,47 @@ public class JScienceMasterControl extends Application {
             org.jscience.technical.backend.BackendDiscovery.getInstance()
                 .getProvidersByType(org.jscience.technical.backend.BackendDiscovery.TYPE_QUANTUM);
 
-        backendBox.getItems().add("AUTO"); // Default option
+        // Map names to IDs for lookup
+        java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
+        nameToId.put("AUTO", null);
         for (org.jscience.technical.backend.BackendProvider p : providers) {
-            backendBox.getItems().add(p.getId());
+            nameToId.put(p.getName(), p.getId());
         }
-
-        String current = JScience.getQuantumBackendId();
-        backendBox.setValue(current == null ? "AUTO" : current);
-
+        backendBox.getItems().addAll(nameToId.keySet());
+        
+        String currentId = JScience.getQuantumBackendId();
+        String currentName = "AUTO";
+        for (var entry : nameToId.entrySet()) {
+            if (java.util.Objects.equals(entry.getValue(), currentId)) {
+                currentName = entry.getKey();
+                break;
+            }
+        }
+        backendBox.setValue(currentName);
         backendBox.setOnAction(e -> {
-            String val = backendBox.getValue();
-            JScience.setQuantumBackendId("AUTO".equals(val) ? null : val);
+            String name = backendBox.getValue();
+            JScience.setQuantumBackendId(nameToId.get(name));
             JScience.savePreferences();
         });
 
-        VBox backendInfo = createInfoBox("Quantum Provider", 
-            "Select the quantum simulation backend (e.g., Strange, Quantum4J, Braket).\n" +
-            "Determines execution environment for quantum circuits.");
+        VBox backendInfo = createInfoBox(
+            i18n.get("mastercontrol.quantum.backend", "Quantum Provider"), 
+            i18n.get("mastercontrol.quantum.backend.desc",
+                "Select the quantum simulation backend (e.g., Strange, Quantum4J, Braket).\n" +
+                "Determines execution environment for quantum circuits."));
 
         grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.quantum.backend", "Quantum Provider")),
                 backendBox,
                 backendInfo);
 
-        box.getChildren().addAll(header, grid, new Separator());
+        box.getChildren().addAll(header, grid);
+
+        // Append available libraries list
+        box.getChildren().add(createBackendCategory(i18n, 
+            org.jscience.technical.backend.BackendDiscovery.TYPE_QUANTUM,
+            "", ""));
+
+        box.getChildren().add(new Separator());
         return box;
     }
 
@@ -690,25 +654,211 @@ public class JScienceMasterControl extends Application {
     }
 
     private VBox createMathCategory(I18n i18n) {
-        return createBackendCategory(i18n, BackendDiscovery.TYPE_MATH,
-                i18n.get("mastercontrol.libraries.cat.math", "Mathematics & Algorithms"),
-                i18n.get("mastercontrol.libraries.cat.math.desc", "Mathematical engines and algorithm providers."));
+        VBox box = new VBox(12);
+        Label header = new Label(i18n.get("mastercontrol.libraries.cat.math", "Mathematics & Algorithms"));
+        header.getStyleClass().add("header-title");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(20);
+        grid.setVgap(15);
+        grid.setPadding(new Insets(10, 0, 10, 0));
+
+        // Math Backend
+        ComboBox<String> backendBox = new ComboBox<>();
+        java.util.List<org.jscience.technical.backend.BackendProvider> providers = 
+            org.jscience.technical.backend.BackendDiscovery.getInstance()
+                .getProvidersByType(org.jscience.technical.backend.BackendDiscovery.TYPE_MATH);
+        
+        // Map names to IDs for lookup
+        java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
+        nameToId.put("AUTO", null);
+        for (org.jscience.technical.backend.BackendProvider p : providers) {
+            nameToId.put(p.getName(), p.getId());
+        }
+        backendBox.getItems().addAll(nameToId.keySet());
+        
+        String currentId = JScience.getMathBackendId();
+        String currentName = "AUTO";
+        for (var entry : nameToId.entrySet()) {
+            if (java.util.Objects.equals(entry.getValue(), currentId)) {
+                currentName = entry.getKey();
+                break;
+            }
+        }
+        backendBox.setValue(currentName);
+        backendBox.setOnAction(e -> {
+            String name = backendBox.getValue();
+            JScience.setMathBackendId(nameToId.get(name));
+            JScience.savePreferences();
+        });
+
+        VBox backendInfo = createInfoBox(
+            i18n.get("mastercontrol.math.backend", "Math Engine"), 
+            i18n.get("mastercontrol.math.backend.desc",
+                "Select the primary mathematics engine (e.g., Apache Commons Math, JScience Native).\n" +
+                "Affects algorithm precision and performance."));
+            
+        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.math.backend", "Math Engine")), backendBox, backendInfo);
+        
+        box.getChildren().addAll(header, grid); 
+        
+        // Append list
+        box.getChildren().add(createBackendCategory(i18n, BackendDiscovery.TYPE_MATH, "", ""));
+        
+        box.getChildren().add(new Separator());
+        return box;
     }
 
     private VBox createTensorCategory(I18n i18n) {
-        return createBackendCategory(i18n, BackendDiscovery.TYPE_TENSOR,
-                i18n.get("mastercontrol.libraries.cat.hardware", "Hardware Acceleration & Tensors"),
-                i18n.get("mastercontrol.libraries.cat.hardware.desc",
-                        "GPU and hardware-accelerated tensor computation backends."));
+        VBox box = new VBox(12);
+        Label header = new Label(i18n.get("mastercontrol.libraries.cat.hardware", "Hardware Acceleration & Tensors"));
+        header.getStyleClass().add("header-title");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(20);
+        grid.setVgap(15);
+        grid.setPadding(new Insets(10, 0, 10, 0));
+
+        // Tensor Backend
+        ComboBox<String> backendBox = new ComboBox<>();
+        java.util.List<org.jscience.technical.backend.BackendProvider> providers = 
+            org.jscience.technical.backend.BackendDiscovery.getInstance()
+                .getProvidersByType(org.jscience.technical.backend.BackendDiscovery.TYPE_TENSOR)
+                .stream()
+                .filter(p -> !p.getId().toLowerCase().contains("colt") && !p.getId().toLowerCase().contains("ejml") && !p.getId().toLowerCase().contains("commons"))
+                .collect(java.util.stream.Collectors.toList());
+
+        // Map names to IDs for lookup
+        java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
+        nameToId.put("AUTO", null);
+        for (org.jscience.technical.backend.BackendProvider p : providers) {
+            nameToId.put(p.getName(), p.getId());
+        }
+        backendBox.getItems().addAll(nameToId.keySet());
+        
+        String currentId = JScience.getTensorBackendId();
+        String currentName = "AUTO";
+        for (var entry : nameToId.entrySet()) {
+            if (java.util.Objects.equals(entry.getValue(), currentId)) {
+                currentName = entry.getKey();
+                break;
+            }
+        }
+        backendBox.setValue(currentName);
+        backendBox.setOnAction(e -> {
+            String name = backendBox.getValue();
+            JScience.setTensorBackendId(nameToId.get(name));
+            JScience.savePreferences();
+        });
+
+        VBox backendInfo = createInfoBox(
+            i18n.get("mastercontrol.tensor.backend", "Tensor Backend"), 
+            i18n.get("mastercontrol.tensor.backend.desc",
+                "Select the tensor computation backend (e.g., ND4J, DJL, JScience Tensors).\n" +
+                "Determines GPU utilization for deep learning."));
+
+        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.tensor.backend", "Tensor Backend")), backendBox, backendInfo);
+        
+        box.getChildren().addAll(header, grid);
+
+        // Append list
+        box.getChildren().add(createBackendCategory(i18n, BackendDiscovery.TYPE_TENSOR, "", ""));
+
+        box.getChildren().add(new Separator());
+        return box;
     }
 
     /**
      * Creates the Visualization & Plotting category using SPI discovery.
      */
     private VBox createPlottingCategory(I18n i18n) {
-        return createBackendCategory(i18n, BackendDiscovery.TYPE_PLOTTING,
-                i18n.get("mastercontrol.libraries.cat.vis", "Visualization & Plotting"),
-                i18n.get("mastercontrol.libraries.cat.vis.desc", "Graphics, charting and plotting backends."));
+        VBox box = new VBox(12);
+        Label header = new Label(i18n.get("mastercontrol.libraries.cat.vis", "Visualization & Plotting"));
+        header.getStyleClass().add("header-title");
+
+        GridPane grid = new GridPane();
+        // --- 2D Section ---
+        VBox box2D = new VBox(12);
+        box2D.getChildren().add(createHeaderLabel(i18n.get("mastercontrol.libraries.cat.vis_2d", "Visualization and Plotting 2D")));
+        
+        GridPane grid2DControl = new GridPane();
+        grid2DControl.setHgap(30); grid2DControl.setVgap(15);
+        grid2DControl.setPadding(new Insets(10, 0, 10, 0));
+        
+        // 2D Combo
+        ComboBox<PlottingBackend> backendBox = new ComboBox<>();
+        backendBox.getItems().addAll(java.util.Arrays.stream(PlottingBackend.values())
+                .filter(PlottingBackend::isSupported2D)
+                .collect(java.util.stream.Collectors.toList()));
+        backendBox.setValue(JScience.getPlottingBackend2D());
+        backendBox.setOnAction(e -> {
+            JScience.setPlottingBackend2D(backendBox.getValue());
+            JScience.savePreferences();
+        });
+        
+        VBox backendInfo = createInfoBox(
+             i18n.get("mastercontrol.plotting.backend_2d", "2D Backend"),
+             i18n.get("mastercontrol.plotting.backend_2d.desc", "Choose the library used for rendering 2D charts."));
+             
+        grid2DControl.addRow(0, createHeaderLabel(i18n.get("mastercontrol.plotting.backend_2d", "2D Backend")), backendBox, backendInfo);
+        box2D.getChildren().add(grid2DControl);
+
+        // 2D List
+        GridPane grid2DList = new GridPane();
+        grid2DList.setHgap(35); grid2DList.setVgap(12);
+        java.util.List<org.jscience.technical.backend.BackendProvider> allPlotProviders = 
+             BackendDiscovery.getInstance().getProvidersByType(BackendDiscovery.TYPE_PLOTTING);
+             
+        int r2 = 0;
+        for (org.jscience.technical.backend.BackendProvider p : allPlotProviders) {
+             if (p.getId().toLowerCase().contains("chart") || p.getId().toLowerCase().contains("javafx")) {
+                 addBackendRow(grid2DList, r2++, p, i18n);
+             }
+        }
+        box2D.getChildren().add(grid2DList);
+        box.getChildren().add(box2D);
+
+        box.getChildren().add(new Separator());
+
+        // --- 3D Section ---
+        VBox box3D = new VBox(12);
+        box3D.getChildren().add(createHeaderLabel(i18n.get("mastercontrol.libraries.cat.vis_3d", "Visualization and Plotting 3D")));
+        
+        GridPane grid3DControl = new GridPane();
+        grid3DControl.setHgap(30); grid3DControl.setVgap(15);
+        grid3DControl.setPadding(new Insets(10, 0, 10, 0));
+        
+        // 3D Combo
+        ComboBox<PlottingBackend> backend3DBox = new ComboBox<>();
+        backend3DBox.getItems().addAll(java.util.Arrays.stream(PlottingBackend.values())
+                .filter(PlottingBackend::isSupported3D)
+                .collect(java.util.stream.Collectors.toList()));
+        backend3DBox.setValue(JScience.getPlottingBackend3D());
+        backend3DBox.setOnAction(e -> {
+            JScience.setPlottingBackend3D(backend3DBox.getValue());
+            JScience.savePreferences();
+        });
+        
+        VBox backend3DInfo = createInfoBox(
+            i18n.get("mastercontrol.plotting.backend_3d", "3D Backend"),
+            i18n.get("mastercontrol.plotting.backend_3d.desc", "Choose the library used for rendering 3D charts."));
+            
+        grid3DControl.addRow(0, createHeaderLabel(i18n.get("mastercontrol.plotting.backend_3d", "3D Backend")), backend3DBox, backend3DInfo);
+        box3D.getChildren().add(grid3DControl);
+
+        // 3D List
+        GridPane grid3DList = new GridPane();
+        grid3DList.setHgap(35); grid3DList.setVgap(12);
+        int r3 = 0;
+        for (org.jscience.technical.backend.BackendProvider p : allPlotProviders) {
+             if (!p.getId().toLowerCase().contains("chart") && !p.getId().toLowerCase().contains("javafx")) {
+                 addBackendRow(grid3DList, r3++, p, i18n);
+             }
+        }
+        box3D.getChildren().add(grid3DList);
+        box.getChildren().add(box3D);
+        
+        return box;
     }
 
     /**
@@ -726,12 +876,20 @@ public class JScienceMasterControl extends Application {
      * Reusable method to create a category from discovered SPI backends.
      */
     private VBox createBackendCategory(I18n i18n, String type, String title, String description) {
-        VBox box = new VBox(12);
-        Label header = new Label(title);
-        header.getStyleClass().add("header-title");
 
-        Label desc = new Label(description);
-        desc.getStyleClass().add("mastercontrol-description");
+        VBox box = new VBox(12);
+        
+        if (title != null && !title.isEmpty()) {
+            Label header = new Label(title);
+            header.getStyleClass().add("header-title");
+            box.getChildren().add(header);
+        }
+
+        if (description != null && !description.isEmpty()) {
+            Label desc = new Label(description);
+            desc.getStyleClass().add("mastercontrol-description");
+            box.getChildren().add(desc);
+        }
 
         GridPane grid = new GridPane();
         grid.setHgap(35);
@@ -767,7 +925,11 @@ public class JScienceMasterControl extends Application {
             grid.add(noProviders, 0, 0);
         }
 
-        box.getChildren().addAll(header, desc, grid, new Separator());
+        
+        box.getChildren().add(grid);
+        if (title != null && !title.isEmpty()) {
+             box.getChildren().add(new Separator());
+        }
         return box;
     }
 
@@ -778,74 +940,90 @@ public class JScienceMasterControl extends Application {
     private Tab createLoadersTab(I18n i18n) {
         VBox content = new VBox(20);
         content.setPadding(new Insets(20));
+        
+        ScrollPane scroll = new ScrollPane(content);
+        scroll.setFitToWidth(true);
+        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
 
         Label header = new Label(i18n.get("mastercontrol.loaders.header", "Known Data Loaders & Formats"));
         header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        Label hint = new Label(i18n.get("mastercontrol.loaders.discovering", "Searching for loaders..."));
-        hint.setStyle("-fx-font-style: italic; -fx-text-fill: #777;");
+        // Discover loaders via ServiceLoader for ResourceReader and ResourceWriter
+        List<ResourceIO<?>> allLoaders = new ArrayList<>();
+        
+        // Load readers
+        java.util.ServiceLoader<org.jscience.io.ResourceReader> readerLoader = 
+            java.util.ServiceLoader.load(org.jscience.io.ResourceReader.class);
+        for (org.jscience.io.ResourceReader<?> reader : readerLoader) {
+            allLoaders.add(reader);
+        }
+        
+        // Load writers  
+        java.util.ServiceLoader<org.jscience.io.ResourceWriter> writerLoader = 
+            java.util.ServiceLoader.load(org.jscience.io.ResourceWriter.class);
+        for (org.jscience.io.ResourceWriter<?> writer : writerLoader) {
+            allLoaders.add(writer);
+        }
+        
+        // Group into Readers and Writers
+        Map<String, List<ResourceIO<?>>> readerCategories = new TreeMap<>();
+        Map<String, List<ResourceIO<?>>> writerCategories = new TreeMap<>();
+        int readerCount = 0;
+        int writerCount = 0;
 
-        Accordion accordion = new Accordion();
-
-        // Discover loaders dynamically
-        List<MasterControlDiscovery.ClassInfo> loaders = MasterControlDiscovery.getInstance().findClasses("Loader");
-
-        // Instantiate and Group by Category
-        Map<String, List<ResourceIO<?>>> grouped = new TreeMap<>(); // Sorted categories (by key)
-
-        for (MasterControlDiscovery.ClassInfo info : loaders) {
+        for (ResourceIO<?> loader : allLoaders) {
             try {
-                Class<?> clazz = Class.forName(info.fullName);
-                // Ensure it's a ResourceIO and has a no-arg constructor
-                if (ResourceIO.class.isAssignableFrom(clazz)) {
-                    // Try to instantiate
-                    ResourceIO<?> loader;
-                    try {
-                        loader = (ResourceIO<?>) clazz.getDeclaredConstructor().newInstance();
-                    } catch (NoSuchMethodException e) {
-                        // Fallback for loaders without public no-arg constructor?
-                        // Just skip or wrap? Use default metadata.
-                        continue;
-                    }
-
-                    // Get metadata
-                    String category = loader.getCategory();
-
-                    // Fallback to package heuristic if category is "category.other" (default)
-                    // and we want to preserve previous logic for existing loaders that don't
-                    // override it yet?
-                    // User asked to USE the loader category.
-                    // But currently all loaders use the default "category.other".
-                    // So I should probably keep the heuristic AS THE DEFAULT implementation in
-                    // ResourceLoader?
-                    // No, I can't modify all 40 loaders now.
-                    // So I will apply the heuristic HERE if the loader returns "category.other".
-
-                    if ("category.other".equals(category)) {
-                        category = getCategoryFromPackage(info.fullName);
-                    }
-
-                    grouped.computeIfAbsent(category, k -> new ArrayList<>()).add(loader);
+                String category = loader.getCategory();
+                if ("category.other".equals(category)) {
+                    category = getCategoryFromPackage(loader.getClass().getName());
+                }
+                
+                if (loader.isInput()) {
+                    readerCategories.computeIfAbsent(category, k -> new ArrayList<>()).add(loader);
+                    readerCount++;
+                }
+                if (loader.isOutput()) {
+                    writerCategories.computeIfAbsent(category, k -> new ArrayList<>()).add(loader);
+                    writerCount++;
                 }
             } catch (Exception e) {
                 // Log and continue
-                e.printStackTrace();
             }
         }
+        
+        Label hint = new Label(java.text.MessageFormat.format(
+                i18n.get("mastercontrol.loaders.count", "{0} loaders found ({1} Readers, {2} Writers)"), 
+                allLoaders.size(), readerCount, writerCount));
+        hint.setStyle("-fx-font-style: italic; -fx-text-fill: #777;");
 
-        // Create UI
-        for (Map.Entry<String, List<ResourceIO<?>>> entry : grouped.entrySet()) {
+        content.getChildren().addAll(header, hint);
+
+        // --- READERS SECTION ---
+        if (!readerCategories.isEmpty()) {
+            Label readersHeader = new Label(i18n.get("mastercontrol.loaders.readers", "Readers (Input)"));
+            readersHeader.getStyleClass().add("header-title");
+            content.getChildren().add(readersHeader);
+            content.getChildren().add(createLoaderAccordion(readerCategories, i18n));
+        }
+
+        // --- WRITERS SECTION ---
+        if (!writerCategories.isEmpty()) {
+            Label writersHeader = new Label(i18n.get("mastercontrol.loaders.writers", "Writers (Output)"));
+            writersHeader.getStyleClass().add("header-title");
+            content.getChildren().add(writersHeader);
+            content.getChildren().add(createLoaderAccordion(writerCategories, i18n));
+        }
+
+        return new Tab(i18n.get("mastercontrol.tab.loaders", "Loaders"), scroll);
+    }
+
+    private Accordion createLoaderAccordion(Map<String, List<ResourceIO<?>>> categories, I18n i18n) {
+        Accordion accordion = new Accordion();
+        for (Map.Entry<String, List<ResourceIO<?>>> entry : categories.entrySet()) {
             List<ResourceIO<?>> categoryLoaders = entry.getValue();
-
-            // Sort by Name (Internationalized?)
-            // We'll sort by the raw name first, or translated name?
-            // User said "triés par ordre alphabétique".
-            // Let's sort by the display name.
             categoryLoaders.sort((l1, l2) -> {
-                String n1 = l1.getName();
-                n1 = i18n.get(n1, n1);
-                String n2 = l2.getName();
-                n2 = i18n.get(n2, n2);
+                String n1 = i18n.get(l1.getName(), l1.getName());
+                String n2 = i18n.get(l2.getName(), l2.getName());
                 return n1.compareToIgnoreCase(n2);
             });
 
@@ -853,22 +1031,14 @@ public class JScienceMasterControl extends Application {
             for (ResourceIO<?> loader : categoryLoaders) {
                 String nameKey = loader.getName();
                 String displayName = i18n.get(nameKey, nameKey);
-
                 String descKey = loader.getDescription();
                 String displayDesc = i18n.get(descKey, descKey);
-
-                // Add Input/Output tags if requested?
-                // User said "rajouter ... input et en output".
-                // Maybe as part of description or name?
-                StringBuilder fullDesc = new StringBuilder(displayDesc);
-                if (loader.isInput())
-                    fullDesc.append(" [Import]");
-                if (loader.isOutput())
-                    fullDesc.append(" [Export]");
-
-                // We need package for the icon generation/grouping logic in AppEntry if used?
-                // AppEntry takes (name, className, package).
-                entries.add(new AppEntry(displayName, loader.getClass().getName(), loader.getClass().getPackageName()));
+                
+                // Add tag within description to indicate if it supports the OTHER direction too?
+                // E.g. in Reader list, if it's also a Writer.
+                StringBuilder tags = new StringBuilder();
+               
+                entries.add(new AppEntry(displayName, loader.getClass().getName(), displayDesc));
             }
 
             String categoryKey = entry.getKey();
@@ -877,13 +1047,7 @@ public class JScienceMasterControl extends Application {
                     createAppList(false, entries.toArray(new AppEntry[0])));
             accordion.getPanes().add(pane);
         }
-
-        String countMsg = java.text.MessageFormat.format(
-                i18n.get("mastercontrol.loaders.count", "{0} loaders found"), loaders.size());
-        hint.setText(countMsg);
-
-        content.getChildren().addAll(header, hint, accordion);
-        return new Tab(i18n.get("mastercontrol.tab.loaders", "Loaders"), content);
+        return accordion;
     }
 
     private String getCategoryFromPackage(String fullName) {
@@ -1170,5 +1334,25 @@ public class JScienceMasterControl extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+    private void addBackendRow(GridPane grid, int row, org.jscience.technical.backend.BackendProvider provider, I18n i18n) {
+        String name = i18n.get("lib." + provider.getId() + ".name", provider.getName());
+        String providerDesc = i18n.get("lib." + provider.getId() + ".desc", provider.getDescription());
+        boolean available = provider.isAvailable();
+
+        Label nameLabel = new Label(name);
+        nameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: black;");
+
+        Label descLabel = new Label(providerDesc);
+        descLabel.getStyleClass().add("mastercontrol-description");
+        descLabel.setWrapText(true);
+        descLabel.setMaxWidth(500);
+
+        Label statusLabel = new Label(available
+                ? i18n.get("mastercontrol.libraries.available", "Available")
+                : i18n.get("mastercontrol.libraries.not_available", "Not Available"));
+        statusLabel.setStyle("-fx-text-fill: " + (available ? "#27ae60" : "#c0392b") + "; -fx-font-weight: bold;");
+
+        grid.addRow(row, nameLabel, statusLabel, descLabel);
     }
 }

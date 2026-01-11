@@ -97,6 +97,22 @@ public class MasterControlDiscovery {
         String[] paths = classpath.split(java.io.File.pathSeparator);
 
         for (String path : paths) {
+            // Handle wildcard classpath (e.g. "lib/*")
+            if (path.endsWith("*")) {
+                java.io.File dir = new java.io.File(path.substring(0, path.length() - 1));
+                if (dir.isDirectory()) {
+                    java.io.File[] files = dir.listFiles((d, name) -> name.toLowerCase().endsWith(".jar"));
+                    if (files != null) {
+                        for (java.io.File jar : files) {
+                            if (!isSystemJar(jar.getName())) {
+                                scanJar(jar, suffix, results, processed);
+                            }
+                        }
+                    }
+                }
+                continue;
+            }
+
             java.io.File file = new java.io.File(path);
             if (file.isDirectory()) {
                 scanDirectory(file, "", suffix, results, processed);

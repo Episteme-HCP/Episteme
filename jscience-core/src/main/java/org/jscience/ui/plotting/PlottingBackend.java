@@ -30,6 +30,8 @@ package org.jscience.ui.plotting;
  * @since 1.0
  */
 public enum PlottingBackend {
+    AUTO(true, true),
+
     /**
      * XChart - Modern, lightweight (recommended).
      */
@@ -48,8 +50,7 @@ public enum PlottingBackend {
     /**
      * Jzy3d - OpenGL-based 3D plotting.
      */
-    JZY3D(false, true),
-    AUTO(true, true);
+    JZY3D(false, true);
 
     private final boolean support2D;
     private final boolean support3D;

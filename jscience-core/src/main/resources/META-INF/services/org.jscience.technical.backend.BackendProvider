@@ -11,6 +11,7 @@ org.jscience.technical.backend.math.EJMLBackendProvider
 org.jscience.technical.backend.math.JBlasBackendProvider
 org.jscience.technical.backend.math.CommonsMathBackendProvider
 org.jscience.technical.backend.math.ColtBackendProvider
+org.jscience.technical.backend.math.ND4JBackendProvider
 
 # High-Performance Compute Backends (Implementing BackendProvider directly)
 org.jscience.technical.backend.cpu.CPUBackend

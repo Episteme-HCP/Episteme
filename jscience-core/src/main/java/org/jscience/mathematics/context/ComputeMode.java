@@ -43,10 +43,12 @@ public enum ComputeMode {
     CPU,
 
     /**
-     * Force execution on the GPU (Graphics Processing Unit).
-     * Throws an exception if GPU is unavailable.
+     * Force execution using OpenCL (Cross-platform).
      */
-    GPU
+    OPENCL,
+
+    /**
+     * Force execution using CUDA (NVIDIA only).
+     */
+    CUDA
 }
-
-
