@@ -49,7 +49,7 @@ public class QuantumContext {
 
     private String gateToQASM(QuantumGate gate) {
         int[] q = gate.getTargetQubits();
-        String qreg = "q"; // Assuming single register for simplicity or name mapping needed?
+
         // Ideally we need to map qubit index to register name.
         // For simplicity, let's assume the first register is used or flattened.
         // Or specific logic.

@@ -64,6 +64,7 @@ public class JBlasSupport<E> implements LinearAlgebraProvider<E> {
     }
 
 
+    @SuppressWarnings("unchecked")
     private Matrix<E> fromJBlasMatrix(DoubleMatrix jm) {
         int rows = jm.rows;
         int cols = jm.columns;
@@ -158,7 +159,6 @@ public class JBlasSupport<E> implements LinearAlgebraProvider<E> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public E determinant(Matrix<E> a) {
         // JBlas does not provide determinant directly on DoubleMatrix easily without decomposition
         // We will throw UnsupportedOperation here and let delegate handle it, or implement if simple.

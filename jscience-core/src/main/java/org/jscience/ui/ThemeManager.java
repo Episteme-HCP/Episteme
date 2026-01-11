@@ -81,6 +81,12 @@ public class ThemeManager {
             scene.getStylesheets().add(mainCss.toExternalForm());
         }
 
+        // Load theme.css (Custom styles including the Orange Banner)
+        java.net.URL themeCss = ThemeManager.class.getResource("/org/jscience/ui/theme.css");
+        if (themeCss != null) {
+            scene.getStylesheets().add(themeCss.toExternalForm());
+        }
+
         if ("Caspian".equalsIgnoreCase(currentTheme)) {
             javafx.application.Application.setUserAgentStylesheet(javafx.application.Application.STYLESHEET_CASPIAN);
         } else if ("HighContrast".equalsIgnoreCase(currentTheme) || "High Contrast".equalsIgnoreCase(currentTheme)) {

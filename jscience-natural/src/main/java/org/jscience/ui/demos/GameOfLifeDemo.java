@@ -52,10 +52,11 @@ public class GameOfLifeDemo extends SimulationDemo {
 
     @Override
     protected String getLongDescription() {
-        return "Conway's Game of Life is a cellular automaton that demonstrates how complex patterns " +
+        return I18n.getInstance().get("life.long_desc",
+                "Conway's Game of Life is a cellular automaton that demonstrates how complex patterns " +
                 "can emerge from simple rules. Each cell follows three rules based on its neighbors: " +
                 "survival, birth, or death by isolation or overpopulation. This interactive visualization " +
-                "allows you to explore different starting densities and colors.";
+                "allows you to explore different starting densities and colors.");
     }
 
     @Override
