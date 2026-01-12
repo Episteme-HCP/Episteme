@@ -62,6 +62,16 @@ public class VirusReader extends AbstractResourceReader<VirusSpecies> {
     }
 
     @Override
+    public String getCategory() {
+        return "Biology";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Virus Species Reader (JSON).";
+    }
+
+    @Override
     public String getResourcePath() {
         return RESOURCE_PATH;
     }

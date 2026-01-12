@@ -49,6 +49,16 @@ import java.util.logging.Logger;
 public class ChemistryDataReader extends AbstractResourceReader<Object> {
 
     @Override
+    public String getCategory() {
+        return "Chemistry";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Generic Chemistry Data Reader (JSON).";
+    }
+
+    @Override
     public String getResourcePath() {
         return "/org/jscience/chemistry/";
     }

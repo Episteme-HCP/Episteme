@@ -48,6 +48,16 @@ import java.util.Optional;
 public class PeriodicTableReader extends AbstractResourceReader<List<Element>> {
 
     @Override
+    public String getCategory() {
+        return "Chemistry";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Periodic Table of Elements Loader.";
+    }
+
+    @Override
     public String getResourcePath() {
         return "/";
     }

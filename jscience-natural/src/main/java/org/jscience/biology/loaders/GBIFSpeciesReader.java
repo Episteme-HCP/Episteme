@@ -42,6 +42,14 @@ import com.fasterxml.jackson.databind.*;
  */
 public class GBIFSpeciesReader {
 
+    public static String getCategory() {
+        return "Biology";
+    }
+
+    public static String getDescription() {
+        return "GBIF Species API Reader.";
+    }
+
     private static final String BASE_URL;
 
     static {

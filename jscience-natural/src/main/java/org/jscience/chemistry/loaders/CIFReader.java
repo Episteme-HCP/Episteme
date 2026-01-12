@@ -41,6 +41,14 @@ import java.util.List;
  */
 public class CIFReader {
 
+    public static String getCategory() {
+        return "Chemistry";
+    }
+
+    public static String getDescription() {
+        return "Crystal Structure Reader (CIF).";
+    }
+
     public static class CrystalStructure {
         public String chemicalFormula;
         public double a, b, c; // Cell lengths (Angstrom)

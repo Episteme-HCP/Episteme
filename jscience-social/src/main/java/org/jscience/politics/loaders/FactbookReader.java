@@ -59,6 +59,16 @@ public class FactbookReader extends AbstractResourceReader<List<Country>> {
     }
 
     @Override
+    public String getCategory() {
+        return "Politics";
+    }
+
+    @Override
+    public String getDescription() {
+        return "CIA World Factbook Reader (XML).";
+    }
+
+    @Override
     public String getResourcePath() {
         return "/data/politics/";
     }
@@ -327,6 +337,8 @@ public class FactbookReader extends AbstractResourceReader<List<Country>> {
         france.setLifeExpectancy(82.5);
         france.setPopulationGrowthRate(0.21);
         france.setCurrencyCode("EUR");
+        france.setStability(0.92);
+        france.setMilitarySpending(50.0);
         france.getMajorIndustries().addAll(List.of("aerospace", "automotive", "pharmaceuticals", "tourism"));
         france.getNaturalResources().addAll(List.of("coal", "iron ore", "bauxite", "zinc"));
         france.getBorderCountries().addAll(List.of("BEL", "LUX", "DEU", "CHE", "ITA", "ESP", "AND", "MCO"));
@@ -340,6 +352,8 @@ public class FactbookReader extends AbstractResourceReader<List<Country>> {
         usa.setLifeExpectancy(78.5);
         usa.setPopulationGrowthRate(0.4);
         usa.setCurrencyCode("USD");
+        usa.setStability(0.95);
+        usa.setMilitarySpending(850.0);
         usa.getMajorIndustries().addAll(List.of("technology", "aerospace", "automotive", "healthcare"));
         usa.getNaturalResources().addAll(List.of("coal", "copper", "lead", "uranium", "natural gas"));
         usa.getBorderCountries().addAll(List.of("CAN", "MEX"));
@@ -352,23 +366,48 @@ public class FactbookReader extends AbstractResourceReader<List<Country>> {
         china.setLifeExpectancy(77.3);
         china.setPopulationGrowthRate(0.03);
         china.setCurrencyCode("CNY");
+        china.setStability(0.90);
+        china.setMilitarySpending(230.0);
         china.getMajorIndustries().addAll(List.of("manufacturing", "mining", "electronics", "textiles"));
         china.getNaturalResources().addAll(List.of("coal", "iron ore", "rare earths", "tungsten"));
         china.getBorderCountries().addAll(List.of("AFG", "BTN", "IND", "KAZ", "PRK", "KGZ", "LAO", "MNG"));
         samples.add(china);
 
         // Brazil
-        Country brazil = new Country("Brazil", "BR", "BRA", 76, "BrasÃ­lia", "South America", 214_000_000L, 8_515_767.0);
+        Country brazil = new Country("Brazil", "BR", "BRA", 76, "Brasília", "South America", 214_000_000L, 8_515_767.0);
         brazil.setGovernmentType("Federal presidential constitutional republic");
         brazil.setIndependenceYear(1822);
         brazil.setLifeExpectancy(75.9);
         brazil.setPopulationGrowthRate(0.52);
         brazil.setCurrencyCode("BRL");
+        brazil.setStability(0.70);
+        brazil.setMilitarySpending(20.0);
         brazil.getMajorIndustries().addAll(List.of("agriculture", "mining", "manufacturing", "services"));
         brazil.getNaturalResources().addAll(List.of("iron ore", "manganese", "bauxite", "gold", "timber"));
         brazil.getBorderCountries()
                 .addAll(List.of("ARG", "BOL", "COL", "GUF", "GUY", "PRY", "PER", "SUR", "URY", "VEN"));
         samples.add(brazil);
+        
+        // Russia (Merged)
+        Country russia = new Country("Russia", "RU", "RUS", 643, "Moscow", "Europe", 144_100_000L, 17_098_242.0);
+        russia.setGovernmentType("Semi-presidential federation");
+        russia.setStability(0.40);
+        russia.setMilitarySpending(100.0);
+        samples.add(russia);
+        
+        // India (Merged)
+        Country india = new Country("India", "IN", "IND", 356, "New Delhi", "Asia", 1_380_000_000L, 3_287_263.0);
+        india.setGovernmentType("Federal parliamentary republic");
+        india.setStability(0.85);
+        india.setMilitarySpending(75.0);
+        samples.add(india);
+        
+        // Canada (Merged)
+        Country canada = new Country("Canada", "CA", "CAN", 124, "Ottawa", "North America", 38_000_000L, 9_984_670.0);
+        canada.setGovernmentType("Federal parliamentary constitutional monarchy");
+        canada.setStability(0.99);
+        canada.setMilitarySpending(25.0);
+        samples.add(canada);
 
         return samples;
     }

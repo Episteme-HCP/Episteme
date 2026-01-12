@@ -51,6 +51,16 @@ public class NMEAReader extends AbstractResourceReader<List<NMEAMessage>> {
     }
 
     @Override
+    public String getCategory() {
+        return "Device";
+    }
+
+    @Override
+    public String getDescription() {
+        return "NMEA GPS/Sensor Data Reader.";
+    }
+
+    @Override
     public String getResourcePath() {
         return null;
     }

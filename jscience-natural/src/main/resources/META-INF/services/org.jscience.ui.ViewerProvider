@@ -1,8 +1,8 @@
-org.jscience.ui.demos.GeneticAlgorithmDemo
+
 org.jscience.ui.demos.UnitConverterDemo
 org.jscience.ui.demos.SequenceAlignmentDemo
 org.jscience.ui.demos.SpeciesBrowserDemo
-org.jscience.ui.demos.BioMotionDemoProvider
+org.jscience.ui.demos.BioMotionDemo
 org.jscience.ui.demos.GeometryBoardDemo
 org.jscience.ui.demos.RigidBodyDemo
 org.jscience.ui.demos.MetamathDemo
@@ -33,4 +33,5 @@ org.jscience.ui.demos.StarSystemDemo
 org.jscience.ui.demos.StellarSkyDemo
 org.jscience.ui.demos.ThermodynamicsDemo
 org.jscience.ui.demos.VitalMonitorDemo
-org.jscience.ui.viewers.physics.astronomy.InterplanetaryTrajectoryDemo
+org.jscience.ui.demos.InterplanetaryTrajectoryDemo
+org.jscience.ui.demos.AudioViewerDemo

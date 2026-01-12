@@ -54,6 +54,16 @@ public class UniProtReader extends AbstractResourceReader<Map<String, String>> {
     }
 
     @Override
+    public String getCategory() {
+        return "Biology";
+    }
+
+    @Override
+    public String getDescription() {
+        return "UniProt Protein Database Reader.";
+    }
+
+    @Override
     public String getResourcePath() {
         return API_URL;
     }

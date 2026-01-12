@@ -45,6 +45,16 @@ import java.util.Optional;
 public class WeatherDataReader extends AbstractResourceReader<List<WeatherDataReader.WeatherRecord>> {
 
     @Override
+    public String getCategory() {
+        return "Engineering";
+    }
+
+    @Override
+    public String getDescription() {
+        return "SmartGrid Weather/Solar Data Reader.";
+    }
+
+    @Override
     public String getResourcePath() {
         return "/data/weather/";
     }

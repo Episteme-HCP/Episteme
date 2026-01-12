@@ -56,6 +56,14 @@ public class USGSEarthquakesReader {
     private static final String API_BASE = org.jscience.io.Configuration.get("api.usgs.earthquakes.base",
             "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary");
 
+    public static String getCategory() {
+        return "Earth";
+    }
+
+    public static String getDescription() {
+        return "USGS Earthquakes API Reader.";
+    }
+
     /**
      * Gets significant earthquakes from the past 30 days.
      * 

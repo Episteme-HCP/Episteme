@@ -26,6 +26,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class NCBITaxonomyReader {
 
+    public static String getCategory() {
+        return "Biology";
+    }
+
+    public static String getDescription() {
+        return "NCBI Taxonomy Reader.";
+    }
+
     private static final String BASE_URL;
     private static final String SEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
 

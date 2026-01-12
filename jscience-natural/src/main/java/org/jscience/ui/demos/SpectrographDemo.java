@@ -25,7 +25,7 @@ package org.jscience.ui.demos;
 
 import javafx.scene.Node;
 import org.jscience.ui.SimulationDemo;
-import org.jscience.ui.viewers.physics.classical.waves.SpectrographViewer;
+import org.jscience.ui.viewers.physics.classical.waves.AudioViewer;
 import org.jscience.ui.i18n.I18n;
 
 /**
@@ -63,7 +63,7 @@ public class SpectrographDemo extends SimulationDemo {
 
     @Override
     protected Node createViewerNode() {
-        SpectrographViewer sv = new SpectrographViewer();
+        AudioViewer sv = new AudioViewer();
         sv.play(); // Start by default
         return sv;
     }

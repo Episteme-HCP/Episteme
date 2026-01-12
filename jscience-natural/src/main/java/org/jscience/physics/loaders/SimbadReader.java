@@ -59,6 +59,16 @@ public class SimbadReader extends AbstractResourceReader<SimbadReader.Astronomic
         return AstronomicalObject.class;
     }
 
+    @Override
+    public String getCategory() {
+        return "Physics";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Access to the SIMBAD astronomical database.";
+    }
+
     private static final String BASE_URL;
     private static final String TAP_URL = "http://simbad.u-strasbg.fr/simbad/sim-tap/sync";
 

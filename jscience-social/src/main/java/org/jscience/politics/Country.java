@@ -188,6 +188,26 @@ public class Country extends org.jscience.geography.Place implements org.jscienc
     private java.util.List<String> majorIndustries = new java.util.ArrayList<>();
     private java.util.List<String> naturalResources = new java.util.ArrayList<>();
     private java.util.List<String> borderCountries = new java.util.ArrayList<>();
+    
+    // Merged from jscience-natural
+    private double stability; // 0.0 - 1.0
+    private double militarySpending; // Billions USD
+
+    public double getStability() {
+        return stability;
+    }
+
+    public void setStability(double stability) {
+        this.stability = stability;
+    }
+
+    public double getMilitarySpending() {
+        return militarySpending;
+    }
+
+    public void setMilitarySpending(double militarySpending) {
+        this.militarySpending = militarySpending;
+    }
 
     public double getCoastlineKm() {
         return coastlineKm;

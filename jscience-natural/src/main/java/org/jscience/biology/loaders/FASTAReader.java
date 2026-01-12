@@ -54,6 +54,16 @@ public class FASTAReader extends AbstractResourceReader<List<FASTAReader.Sequenc
     }
 
     @Override
+    public String getCategory() {
+        return "Biology";
+    }
+
+    @Override
+    public String getDescription() {
+        return "FASTA Sequence Reader.";
+    }
+
+    @Override
     public String getResourcePath() {
         return "/";
     }

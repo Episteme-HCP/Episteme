@@ -62,6 +62,16 @@ public class OpenWeatherReader extends AbstractResourceReader<Map<String, String
     }
 
     @Override
+    public String getCategory() {
+        return "Earth";
+    }
+
+    @Override
+    public String getDescription() {
+        return "OpenWeather Map API Reader.";
+    }
+
+    @Override
     public String getResourcePath() {
         return API_URL;
     }

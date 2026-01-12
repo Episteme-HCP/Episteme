@@ -43,6 +43,14 @@ public class ChEBIReader {
     private ChEBIReader() {
     }
 
+    public static String getCategory() {
+        return "Chemistry";
+    }
+
+    public static String getDescription() {
+        return "ChEBI Database Reader.";
+    }
+
     /**
      * Search ChEBI for a compound by name.
      * Returns simplified metadata.

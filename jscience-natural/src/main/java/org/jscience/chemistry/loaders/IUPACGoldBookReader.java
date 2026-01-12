@@ -44,6 +44,14 @@ public class IUPACGoldBookReader {
     private IUPACGoldBookReader() {
     }
 
+    public static String getCategory() {
+        return "Chemistry";
+    }
+
+    public static String getDescription() {
+        return "IUPAC Gold Book Reader.";
+    }
+
     /**
      * Search for a term in the IUPAC Gold Book.
      */

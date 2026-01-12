@@ -40,6 +40,14 @@ import java.util.List;
  */
 public class AcidBaseReader {
 
+    public static String getCategory() {
+        return "Chemistry";
+    }
+
+    public static String getDescription() {
+        return "Acid-Base Data Reader.";
+    }
+
     public static class Acid {
         public String name;
         public String formula;

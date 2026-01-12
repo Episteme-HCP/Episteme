@@ -49,10 +49,14 @@ import java.util.Optional;
  */
 public class HorizonsEphemerisReader extends AbstractResourceReader<List<HorizonsEphemerisReader.EphemerisPoint>> {
 
-    @Override
 
     public String getCategory() {
-        return "dashboard.loaders.category.physics";
+        return "Physics";
+    }
+
+    @Override
+    public String getDescription() {
+        return "JPL Horizons Ephemeris Reader.";
     }
 
     @Override

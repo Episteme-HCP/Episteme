@@ -94,12 +94,12 @@ public class FinancialMarketReader extends org.jscience.io.AbstractResourceReade
 
     @Override
     public String getCategory() {
-        return "category.economics";
+        return "Economics";
     }
 
     @Override
     public String getDescription() {
-        return "loader.financial.desc";
+        return "Financial Market Data Reader.";
     }
 
     @Override

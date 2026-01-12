@@ -49,6 +49,16 @@ import java.util.Optional;
 public class StlMeshReader extends AbstractResourceReader<MeshView> {
 
     @Override
+    public String getCategory() {
+        return "Biology";
+    }
+
+    @Override
+    public String getDescription() {
+        return "STL 3D Mesh Reader.";
+    }
+
+    @Override
     public String getResourcePath() {
         return "/";
     }

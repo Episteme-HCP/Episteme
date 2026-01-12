@@ -1,6 +1,6 @@
 org.jscience.chemistry.PeriodicTableReader
 org.jscience.chemistry.loaders.ChemistryDataReader
-org.jscience.politics.FactbookReader
+
 org.jscience.physics.loaders.VizieRReader
 org.jscience.physics.loaders.StarReader
 org.jscience.physics.loaders.SimbadReader

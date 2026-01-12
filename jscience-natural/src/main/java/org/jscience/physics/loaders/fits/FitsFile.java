@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Path;
-import org.jscience.mathematics.loaders.AbstractDataFile;
+import org.jscience.io.AbstractDataFile;
 import org.jscience.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 
 /**

@@ -53,6 +53,16 @@ public class GeoJsonReader extends AbstractResourceReader<List<Region>> {
     }
 
     @Override
+    public String getCategory() {
+        return "Geography";
+    }
+
+    @Override
+    public String getDescription() {
+        return "GeoJSON Geographic Data Reader.";
+    }
+
+    @Override
     public String getResourcePath() {
         return "/";
     }

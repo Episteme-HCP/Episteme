@@ -51,7 +51,12 @@ public class VizieRReader extends AbstractResourceReader<Map<String, String>> {
 
     @Override
     public String getCategory() {
-        return "dashboard.loaders.category.physics";
+        return "Physics";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Access to VizieR astronomical catalogs.";
     }
 
     @Override

@@ -189,7 +189,7 @@ public class FbxMeshReader extends AbstractResourceReader<Group> {
             
             ModelData md = new ModelData();
             md.id = id;
-            md.name = (String) m.getProperty(1).getData();
+            md.name = sanitizeID((String) m.getProperty(1).getData());
             
             // Parse Properties70 
             FBXNode props = m.getChildByName("Properties70");
@@ -367,16 +367,25 @@ public class FbxMeshReader extends AbstractResourceReader<Group> {
             
             if (md != null && geomNode != null) {
                 // Load Mesh with Raw Scale (1.0) and Raw Coordinates
-                // Create a NEW MeshView for each connection (support instancing)
-                MeshView mv = parseGeometry(geomNode, 1.0, 0, 0, 0); 
+                // Create MeshView
+                MeshView mv = parseGeometry(geomNode, 1.0, 0, 0, 0); // Scale handled by Model Transform
                 if (mv != null) {
+                    // Set ID to Model Name (Crucial for linking with Definitions)
+                    String modelName = md.name;
+                    // Sanitize name if needed (e.g. remove "Model::")
+                    if (modelName.startsWith("Model::")) modelName = modelName.substring(7);
+                    mv.setId(modelName);
+                    
                     // Apply GEOMETRIC Transforms to the MeshView (or a wrapper)
                     // These are offsets applied to the mesh vertices relative to the node origin
-                    if (md.transform.gtx != 0 || md.transform.gty != 0 || md.transform.gtz != 0 ||
-                        md.transform.grx != 0 || md.transform.gry != 0 || md.transform.grz != 0 ||
-                        md.transform.gsx != 1 || md.transform.gsy != 1 || md.transform.gsz != 1) {
-                        
+                    boolean hasGeoTransform = md.transform.gtx != 0 || md.transform.gty != 0 || md.transform.gtz != 0 ||
+                                              md.transform.grx != 0 || md.transform.gry != 0 || md.transform.grz != 0 ||
+                                              md.transform.gsx != 1 || md.transform.gsy != 1 || md.transform.gsz != 1;
+                    
+                    // Add to Model Group
+                    if (hasGeoTransform) {
                         Group meshWrapper = new Group(mv);
+                        meshWrapper.setId(modelName + "_Wrapper"); // Optional
                         meshWrapper.setTranslateX(md.transform.gtx);
                         meshWrapper.setTranslateY(md.transform.gty);
                         meshWrapper.setTranslateZ(md.transform.gtz);
@@ -496,5 +505,22 @@ public class FbxMeshReader extends AbstractResourceReader<Group> {
         meshView.setMaterial(material);
         
         return meshView;
+    }
+    private static String sanitizeID(String raw) {
+        if (raw == null) return "Unknown";
+        
+        // Remove "Model::" prefix standard in FBX
+        if (raw.startsWith("Model::")) {
+            raw = raw.substring(7);
+        }
+        
+        // Split by non-printable characters or null bytes to strip garbage suffixes
+        // The FBX parser sometimes reads past the string into the next field (e.g. "Model" type)
+        String[] parts = raw.split("[^\\x20-\\x7E]+");
+        if (parts.length > 0) {
+            raw = parts[0];
+        }
+        
+        return raw.trim();
     }
 }

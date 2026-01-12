@@ -44,6 +44,14 @@ public class GeoJSONReader {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
+    public static String getCategory() {
+        return "Earth";
+    }
+
+    public static String getDescription() {
+        return "GeoJSON Point Reader.";
+    }
+
     /**
      * Reads a GeoJSON FeatureCollection and extracts Point geometries as
      * GeodeticCoordinates.

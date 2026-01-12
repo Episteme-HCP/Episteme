@@ -39,6 +39,16 @@ import java.io.*;
 public class PDBReader extends AbstractResourceReader<Protein> {
 
     @Override
+    public String getCategory() {
+        return "Biology";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Protein Data Bank (PDB) Reader.";
+    }
+
+    @Override
     public String getResourcePath() {
         return "https://files.rcsb.org/download/";
     }

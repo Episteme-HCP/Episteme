@@ -56,6 +56,14 @@ public class PubChemReader {
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
 
+    public String getCategory() {
+        return "Chemistry";
+    }
+
+    public String getDescription() {
+        return "PubChem Chemical Compound Reader.";
+    }
+
     /**
      * Represents a chemical compound from PubChem.
      */

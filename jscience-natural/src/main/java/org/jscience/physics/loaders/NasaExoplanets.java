@@ -99,12 +99,12 @@ public class NasaExoplanets extends AbstractResourceReader<ExoplanetInfo> {
 
     @Override
     public String getCategory() {
-        return "category.physics"; // Or category.astronomy if available, but users asked for Physics fixes
+        return "Physics";
     }
 
     @Override
     public String getDescription() {
-        return "loader.nasa.desc";
+        return "Access to NASA Exoplanet Archive.";
     }
 
     @Override

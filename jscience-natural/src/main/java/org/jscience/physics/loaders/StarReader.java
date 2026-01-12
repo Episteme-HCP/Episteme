@@ -57,6 +57,16 @@ public class StarReader extends AbstractResourceReader<List<StarReader.Star>> {
         return (Class<List<Star>>) (Class<?>) List.class;
     }
 
+    @Override
+    public String getCategory() {
+        return "Physics";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Generic Star Catalog Reader (CSV).";
+    }
+
     public List<Star> loadResource(String path) throws Exception {
         try (InputStream is = getClass().getResourceAsStream(path)) {
             if (is == null)

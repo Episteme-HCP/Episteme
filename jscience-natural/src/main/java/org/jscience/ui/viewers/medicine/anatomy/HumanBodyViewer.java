@@ -24,28 +24,32 @@
 package org.jscience.ui.viewers.medicine.anatomy;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.*;
+import javafx.scene.shape.MeshView;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.jscience.biology.loaders.ObjMeshReader;
-import org.jscience.biology.loaders.StlMeshReader;
 import org.jscience.biology.loaders.FbxMeshReader;
-import org.jscience.ui.i18n.I18n;
 
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
 /**
  * 3D Human Body Anatomy Viewer.
- * Displays anatomical layers (skeleton, muscles, organs, skin) with visibility
- * controls.
+ * Displays anatomical layers (skeleton, muscles, organs, skin) with Z-Anatomy features:
+ * Selection, Centering, Descriptions, and Advanced Camera Controls.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -60,890 +64,355 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
 
     @Override
     public String getName() {
-        return "Human Body Anatomy";
+        return "Human Body Viewer (JavaFX)";
     }
 
     @Override
-    public String getDescription() {
-        return "3D Interactive Human Anatomy with skeleton, muscles and organs.";
-    }
-
-    @Override
-    public void show(javafx.stage.Stage stage) {
-        start(stage);
-    }
-
-    private final Group world = new Group();
-    private final Group bodyGroup = new Group();
-
-    // Anatomical layers
-    private final Group skeletonLayer = new Group();
-    private final Group muscleLayer = new Group();
-    private final Group organLayer = new Group();
-    private final Group skinLayer = new Group();
-    private final Group nervousLayer = new Group();
-    private final Group circulatoryLayer = new Group();
-
-    // Camera controls
-    private final Rotate cameraX = new Rotate(-10, Rotate.X_AXIS);
-    private final Rotate cameraY = new Rotate(0, Rotate.Y_AXIS);
-    private final Translate cameraZ = new Translate(0, 0, -500);
-    private double mouseX, mouseY;
-
-    // Info display
-    private Label infoLabel;
-
-    public static void launchMain(javafx.stage.Stage stage) {
-        new HumanBodyViewer().start(stage);
-    }
-
-    @Override
-    public void start(javafx.stage.Stage stage) {
-        BorderPane root = new BorderPane();
-        root.getStyleClass().add("dark-viewer-root");
-
-        // Build 3D scene
-        build3DBody();
-
-        SubScene subScene = create3DSubScene();
-        root.setCenter(subScene);
-
-        // Control Panel
-        VBox controls = createControlPanel();
-        root.setRight(controls);
-
-        Scene scene = new Scene(root, 1200, 800);
-        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbody"));
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    private SubScene create3DSubScene() {
-        // Lights
-        PointLight mainLight = new PointLight(Color.WHITE);
-        mainLight.setTranslateZ(-300);
-        mainLight.setTranslateY(-200);
-
-        AmbientLight ambient = new AmbientLight(Color.rgb(60, 60, 80));
-
-        // Camera
-        PerspectiveCamera camera = new PerspectiveCamera(true);
-        camera.setNearClip(0.1);
-        camera.setFarClip(2000.0);
-        camera.setFieldOfView(45);
-
-        Group cameraGroup = new Group(camera);
-        cameraGroup.getTransforms().addAll(cameraY, cameraX, cameraZ);
-
-        world.getChildren().addAll(bodyGroup, mainLight, ambient, cameraGroup);
-        bodyGroup.getChildren().addAll(skeletonLayer, muscleLayer, organLayer,
-                nervousLayer, circulatoryLayer, skinLayer);
-
-        SubScene subScene = new SubScene(world, 900, 800, true, SceneAntialiasing.BALANCED);
-        subScene.setFill(Color.web("#0a0a15"));
-        subScene.setCamera(camera);
-
-        // Mouse controls
-        subScene.setOnMousePressed(e -> {
-            mouseX = e.getSceneX();
-            mouseY = e.getSceneY();
-        });
-
-        subScene.setOnMouseDragged(e -> {
-            double dx = e.getSceneX() - mouseX;
-            double dy = e.getSceneY() - mouseY;
-            if (e.isPrimaryButtonDown()) {
-                cameraY.setAngle(cameraY.getAngle() + dx * 0.3);
-                cameraX.setAngle(cameraX.getAngle() - dy * 0.3);
-            }
-            mouseX = e.getSceneX();
-            mouseY = e.getSceneY();
-        });
-
-        subScene.setOnScroll(e -> {
-            cameraZ.setZ(cameraZ.getZ() + e.getDeltaY());
-        });
-
-        return subScene;
-    }
-
-    private VBox createControlPanel() {
-        VBox controls = new VBox(15);
-        controls.setPadding(new Insets(20));
-        controls.getStyleClass().add("dark-viewer-sidebar");
-        controls.setPrefWidth(280);
-
-        // Title
-        Label title = new Label(I18n.getInstance().get("humanbody.layers"));
-        title.getStyleClass().add("dark-label-accent");
-
-        // Layer checkboxes
-        CheckBox skeletonCheck = createLayerCheckbox(I18n.getInstance().get("humanbody.skeleton"), skeletonLayer,
-                Color.IVORY, true);
-        CheckBox muscleCheck = createLayerCheckbox(I18n.getInstance().get("humanbody.muscle"), muscleLayer,
-                Color.INDIANRED, false);
-        CheckBox organCheck = createLayerCheckbox(I18n.getInstance().get("humanbody.organs"), organLayer, Color.CORAL,
-                false);
-        CheckBox nervousCheck = createLayerCheckbox(I18n.getInstance().get("humanbody.nervous"), nervousLayer,
-                Color.YELLOW, false);
-        CheckBox circulatoryCheck = createLayerCheckbox(I18n.getInstance().get("humanbody.circulatory"),
-                circulatoryLayer, Color.DARKRED, false);
-        CheckBox skinCheck = createLayerCheckbox(I18n.getInstance().get("humanbody.skin"), skinLayer, Color.PEACHPUFF,
-                false);
-
-        // Preset buttons
-        Label presetsLabel = new Label(I18n.getInstance().get("humanbody.presets"));
-        presetsLabel.getStyleClass().add("dark-label");
-
-        Button skeletonOnlyBtn = new Button(I18n.getInstance().get("humanbody.preset.skeleton"));
-        skeletonOnlyBtn.setMaxWidth(Double.MAX_VALUE);
-        skeletonOnlyBtn.setOnAction(e -> {
-            skeletonCheck.setSelected(true);
-            muscleCheck.setSelected(false);
-            organCheck.setSelected(false);
-            nervousCheck.setSelected(false);
-            circulatoryCheck.setSelected(false);
-            skinCheck.setSelected(false);
-            updateLayerVisibility();
-        });
-
-        Button muscularBtn = new Button(I18n.getInstance().get("humanbody.preset.muscle"));
-        muscularBtn.setMaxWidth(Double.MAX_VALUE);
-        muscularBtn.setOnAction(e -> {
-            skeletonCheck.setSelected(true);
-            muscleCheck.setSelected(true);
-            organCheck.setSelected(false);
-            nervousCheck.setSelected(false);
-            circulatoryCheck.setSelected(false);
-            skinCheck.setSelected(false);
-            updateLayerVisibility();
-        });
-
-        Button fullBodyBtn = new Button(I18n.getInstance().get("humanbody.preset.full"));
-        fullBodyBtn.setMaxWidth(Double.MAX_VALUE);
-        fullBodyBtn.setOnAction(e -> {
-            skeletonCheck.setSelected(true);
-            muscleCheck.setSelected(true);
-            organCheck.setSelected(true);
-            nervousCheck.setSelected(true);
-            circulatoryCheck.setSelected(true);
-            skinCheck.setSelected(true);
-            updateLayerVisibility();
-        });
-
-        // Info panel
-        Label infoTitle = new Label(I18n.getInstance().get("humanbody.info"));
-        infoTitle.getStyleClass().add("dark-label");
-
-        infoLabel = new Label(I18n.getInstance().get("humanbody.clickinfo"));
-        infoLabel.setWrapText(true);
-        infoLabel.setStyle("-fx-text-fill: #cccccc;");
-
-        // Instructions
-        Label instructLabel = new Label(I18n.getInstance().get("humanbody.controls"));
-        instructLabel.setStyle("-fx-text-fill: #cccccc; -fx-font-size: 11px;");
-
-        // Load STL Model section
-        Label loadTitle = new Label(I18n.getInstance().get("humanbody.loadmodel"));
-        loadTitle.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
-
-        Button loadStlBtn = new Button(I18n.getInstance().get("humanbody.loadstl"));
-        loadStlBtn.setMaxWidth(Double.MAX_VALUE);
-        loadStlBtn.setStyle("-fx-background-color: #4a9eff; -fx-text-fill: white;");
-        loadStlBtn.setOnAction(e -> loadStlModel());
-
-        controls.getChildren().addAll(
-                title, new Separator(),
-                skeletonCheck, muscleCheck, organCheck,
-                nervousCheck, circulatoryCheck, skinCheck,
-                new Separator(),
-                presetsLabel, skeletonOnlyBtn, muscularBtn, fullBodyBtn,
-                new Separator(),
-                loadTitle, loadStlBtn,
-                new Separator(),
-                infoTitle, infoLabel,
-                new Separator(),
-                instructLabel);
-
-        return controls;
-    }
-
-    private CheckBox createLayerCheckbox(String name, Group layer, Color indicatorColor, boolean selected) {
-        CheckBox cb = new CheckBox(name);
-        cb.setSelected(selected);
-        cb.setStyle("-fx-text-fill: white;");
-        layer.setVisible(selected);
-
-        cb.setOnAction(e -> layer.setVisible(cb.isSelected()));
-
-        return cb;
-    }
-
-    private void updateLayerVisibility() {
-        // Called after preset buttons
-    }
-
-    /**
-     * Opens a file chooser to load an external STL anatomical model.
-     */
-    private void loadStlModel() {
-        FileChooser fc = new FileChooser();
-        fc.setTitle(I18n.getInstance().get("humanbody.loadstl.title"));
-        fc.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("STL Files", "*.stl"));
-
-        File file = fc.showOpenDialog(null);
-        if (file != null) {
-            try {
-                MeshView mesh = StlMeshReader.load(file);
-                PhongMaterial material = new PhongMaterial(Color.BEIGE);
-                material.setSpecularColor(Color.WHITE);
-                mesh.setMaterial(material);
-                mesh.setDrawMode(DrawMode.FILL);
-                mesh.setId(file.getName());
-
-                // Add to skeleton layer for visibility control
-                skeletonLayer.getChildren().add(mesh);
-
-                infoLabel.setText(I18n.getInstance().get("humanbody.loaded") + ": " + file.getName());
-            } catch (Exception e) {
-                infoLabel.setText(I18n.getInstance().get("humanbody.loaderror") + ": " + e.getMessage());
-            }
+    public void show(Stage stage) {
+        try {
+            start(stage);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    private void build3DBody() {
-        // Try loading Z-Anatomy FBX models asynchronously
-        // Skeleton
-        loadFbxModelAsync("/org/jscience/medicine/anatomy/models/SkeletalSystem100.fbx", skeletonLayer, Color.IVORY, 
-            () -> buildSkeleton()); // Fallback if FBX fails
+    // 3D Scene Components
+    private Group root3D;
+    private SubScene subScene;
+    private CameraController cameraController;
+    private SelectionManager selectionManager;
 
-        // Muscles
-        loadFbxModelAsync("/org/jscience/medicine/anatomy/models/MuscularSystem100.fbx", muscleLayer, Color.INDIANRED, 
-            () -> buildMuscles());
+    // Layers
+    private Group skinLayer = new Group();
+    private Group muscleLayer = new Group();
+    private Group skeletonLayer = new Group();
+    private Group organLayer = new Group();
+    private Group nervousLayer = new Group();
+    private Group circulatoryLayer = new Group();
 
-        // Organs
-        loadFbxModelAsync("/org/jscience/medicine/anatomy/models/VisceralSystem100.fbx", organLayer, Color.CORAL, 
-            () -> buildOrgans());
+    // UI Components
+    private Label titleLabel;
+    private TextArea descriptionArea;
+    private Label loadingLabel;
+    private ComboBox<String> searchField;
+    private java.util.Set<String> knownParts = new java.util.HashSet<>();
 
-        // Nervous System
-        loadFbxModelAsync("/org/jscience/medicine/anatomy/models/NervousSystem100.fbx", nervousLayer, Color.GOLD, 
-            () -> buildNervousSystem());
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("JScience - Human Body Viewer");
 
-        // Circulatory System
-        loadFbxModelAsync("/org/jscience/medicine/anatomy/models/CardioVascular41.fbx", circulatoryLayer, Color.DARKRED, 
-            () -> buildCirculatorySystem());
+        // --- 3D SETUP ---
+        root3D = new Group();
+        root3D.getChildren().addAll(skeletonLayer, muscleLayer, organLayer, nervousLayer, circulatoryLayer, skinLayer);
 
-        // Skin is always procedural (semi-transparent)
-        buildSkin();
+        PerspectiveCamera camera = new PerspectiveCamera(true);
+        camera.setNearClip(0.1);
+        camera.setFarClip(10000.0);
+        camera.setTranslateZ(-500);
+
+        // Camera Controller handles rotation/zoom/pan
+        Group cameraGroup = new Group();
+        cameraGroup.getChildren().add(camera);
+        root3D.getChildren().add(cameraGroup);
+        
+        cameraController = new CameraController(camera, cameraGroup);
+        selectionManager = new SelectionManager();
+
+        subScene = new SubScene(root3D, 1024, 768, true, SceneAntialiasing.BALANCED);
+        subScene.setFill(Color.rgb(30, 30, 30));
+        subScene.setCamera(camera);
+
+        // --- EVENT HANDLING ---
+        cameraController.handleMouseEvents(subScene);
+        
+        // Picking Logic
+        subScene.setOnMouseClicked(e -> {
+            if (e.isStillSincePress()) {
+                javafx.scene.Node picked = e.getPickResult().getIntersectedNode();
+                // Find nearest MeshView parent if picked specific geometry
+                while (picked != null && !(picked instanceof MeshView) && picked != root3D) {
+                     picked = picked.getParent();
+                }
+                
+                if (picked instanceof MeshView) {
+                    selectionManager.select(picked);
+                } else {
+                    selectionManager.clearSelection();
+                }
+            }
+        });
+
+        // Update UI on selection
+        selectionManager.setOnSelectionChanged(() -> {
+            MeshView mesh = selectionManager.getSelectedMesh();
+            if (mesh != null) {
+                String id = mesh.getId();
+                if (id != null) {
+                    titleLabel.setText(id);
+                    loadDefinition(id);
+                } else {
+                    titleLabel.setText("Unknown Part");
+                    descriptionArea.setText("No ID found for this mesh.");
+                }
+            } else {
+                titleLabel.setText("Human Body");
+                descriptionArea.setText("Select a part to see its description.");
+            }
+        });
+
+        // --- UI LAYOUT ---
+        BorderPane root = new BorderPane();
+        
+        // CENTER: 3D View + Overlay
+        StackPane centerPane = new StackPane();
+        centerPane.getChildren().add(subScene);
+        subScene.widthProperty().bind(centerPane.widthProperty());
+        subScene.heightProperty().bind(centerPane.heightProperty());
+        
+        loadingLabel = new Label("Loading Anatomy...");
+        loadingLabel.setStyle("-fx-text-fill: white; -fx-background-color: rgba(0,0,0,0.5); -fx-padding: 10; -fx-background-radius: 5;");
+        loadingLabel.setVisible(false); // Managed by async loader
+        StackPane.setAlignment(loadingLabel, Pos.TOP_RIGHT);
+        StackPane.setMargin(loadingLabel, new Insets(10));
+        centerPane.getChildren().add(loadingLabel);
+        
+        // Attribution Label (Bottom Right)
+        Label attributionLabel = new Label("Models: Z-Anatomy (CC BY-SA 4.0)");
+        attributionLabel.setStyle("-fx-text-fill: rgba(255,255,255,0.7); -fx-background-color: rgba(0,0,0,0.3); -fx-padding: 5; -fx-font-size: 10px;");
+        StackPane.setAlignment(attributionLabel, Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(attributionLabel, new Insets(10));
+        centerPane.getChildren().add(attributionLabel);
+        
+        root.setCenter(centerPane);
+
+        // LEFT: Toolbar (Layers + Actions)
+        VBox leftToolbar = new VBox(10);
+        leftToolbar.setPadding(new Insets(10));
+        leftToolbar.setStyle("-fx-background-color: #2b2b2b; -fx-border-color: #3f3f3f; -fx-border-width: 0 1 0 0;");
+        leftToolbar.setPrefWidth(200);
+
+        Label layersHeader = new Label("SYSTEMS");
+        layersHeader.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
+        
+        leftToolbar.getChildren().addAll(
+                layersHeader,
+                createLayerWithLoading("Skin", skinLayer, "/org/jscience/medicine/anatomy/models/Regions of human body100.fbx", Color.rgb(255, 218, 185, 0.4)),
+                createLayerWithLoading("Muscles", muscleLayer, "/org/jscience/medicine/anatomy/models/MuscularSystem100.fbx", Color.INDIANRED),
+                createLayerWithLoading("Skeleton", skeletonLayer, "/org/jscience/medicine/anatomy/models/SkeletalSystem100.fbx", Color.IVORY),
+                createLayerWithLoading("Organs", organLayer, "/org/jscience/medicine/anatomy/models/VisceralSystem100.fbx", Color.CORAL),
+                createLayerWithLoading("Nervous", nervousLayer, "/org/jscience/medicine/anatomy/models/NervousSystem100.fbx", Color.GOLD),
+                createLayerWithLoading("Circulatory", circulatoryLayer, "/org/jscience/medicine/anatomy/models/CardioVascular41.fbx", Color.DARKRED),
+                new Separator(),
+                new Label("ACTIONS"),
+                createButton("Center View", () -> {
+                   if (selectionManager.getSelectedMesh() != null) {
+                       // Center on selection
+                       MeshView mesh = selectionManager.getSelectedMesh();
+                       javafx.geometry.Bounds b = mesh.localToScene(mesh.getBoundsInLocal());
+                       javafx.geometry.Point3D center = new javafx.geometry.Point3D(
+                           b.getMinX() + b.getWidth() / 2,
+                           b.getMinY() + b.getHeight() / 2,
+                           b.getMinZ() + b.getDepth() / 2
+                       );
+                       cameraController.centerOn(center);
+                       System.out.println("Centering on " + mesh.getId() + " at " + center);
+                   } else {
+                       cameraController.reset();
+                   }
+                }),
+                createButton("Reset Camera", () -> cameraController.reset())
+        );
+        root.setLeft(leftToolbar);
+
+        // RIGHT: Description Panel
+        VBox rightPanel = new VBox(10);
+        rightPanel.setPadding(new Insets(10));
+        rightPanel.setStyle("-fx-background-color: #2b2b2b; -fx-border-color: #3f3f3f; -fx-border-width: 0 0 0 1;");
+        rightPanel.setPrefWidth(300);
+
+        searchField = new ComboBox<>();
+        searchField.setEditable(true);
+        searchField.setPromptText("Search...");
+        searchField.setMaxWidth(Double.MAX_VALUE);
+        searchField.setStyle("-fx-background-color: #3f3f3f; -fx-text-fill: white;");
+        
+        // Search Logic
+        // Search Logic
+        searchField.getEditor().textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal == null || newVal.isEmpty()) {
+                searchField.getItems().clear();
+                searchField.hide();
+                return;
+            }
+            
+            // Filter knownParts
+            java.util.List<String> suggestions = knownParts.stream()
+                .filter(s -> s.toLowerCase().contains(newVal.toLowerCase()))
+                .sorted()
+                .limit(10)
+                .collect(Collectors.toList());
+                
+            Platform.runLater(() -> {
+                if (!suggestions.isEmpty()) {
+                    searchField.getItems().setAll(suggestions);
+                    if (!searchField.isShowing()) {
+                        searchField.show();
+                    }
+                } else {
+                    searchField.getItems().clear();
+                    searchField.hide();
+                }
+            });
+        });
+        
+        searchField.setOnAction(e -> {
+            String selected = searchField.getValue();
+            if (selected == null && !searchField.getEditor().getText().isEmpty()) {
+                selected = searchField.getEditor().getText();
+            }
+            
+            if (selected != null) {
+                // Find mesh with this ID
+                // We don't have a direct map, we have to search the scene graph or maintain a map
+                // For now, let's assume we can search recursivly or we find it in knownParts logic
+                // Better: Map<String, MeshView> partMap?
+                
+                Node found = findNodeById(root3D, selected);
+                if (found instanceof MeshView) {
+                    selectionManager.select(found);
+                    // Center?
+                    MeshView mesh = (MeshView) found;
+                    javafx.geometry.Bounds b = mesh.localToScene(mesh.getBoundsInLocal());
+                    javafx.geometry.Point3D center = new javafx.geometry.Point3D(
+                        b.getMinX() + b.getWidth() / 2,
+                        b.getMinY() + b.getHeight() / 2,
+                        b.getMinZ() + b.getDepth() / 2
+                    );
+                    cameraController.centerOn(center);
+                }
+            }
+        });
+        
+        titleLabel = new Label("Human Body");
+        titleLabel.setStyle("-fx-text-fill: #e0e0e0; -fx-font-size: 18px; -fx-font-weight: bold; -fx-wrap-text: true;");
+        
+        descriptionArea = new TextArea("Select a part to view details.");
+        descriptionArea.setWrapText(true);
+        descriptionArea.setEditable(false);
+        descriptionArea.setStyle("-fx-control-inner-background: #2b2b2b; -fx-text-fill: #b0b0b0; -fx-background-color: transparent;");
+        VBox.setVgrow(descriptionArea, Priority.ALWAYS);
+
+        rightPanel.getChildren().addAll(searchField, new Separator(), titleLabel, descriptionArea);
+        root.setRight(rightPanel);
+
+        // --- SCENE SETUP ---
+        Scene scene = new Scene(root, 1280, 800);
+        scene.getStylesheets().add(HumanBodyViewer.class.getResource("/org/jscience/ui/theme.css").toExternalForm()); // Ensure we have a dark theme
+        
+        primaryStage.setScene(scene);
+        primaryStage.show();
+
+        // --- START LOADING ---
+        build3DBody();
     }
 
-    /**
-     * Loads an FBX model asynchronously.
-     * Use this to allow the UI to remain responsive while heavy models are parsing.
-     */
-    private void loadFbxModelAsync(String resourcePath, Group layer, Color color, Runnable fallback) {
+    private Node createLayerWithLoading(String name, Group group, String fbxPath, Color fallbackColor) {
+        HBox container = new HBox(5);
+        container.setAlignment(Pos.CENTER_LEFT);
+        
+        CheckBox cb = new CheckBox(name);
+        cb.setTextFill(Color.WHITE);
+        cb.setSelected(false); // Start unchecked
+        cb.setDisable(true); // Start disabled
+        cb.selectedProperty().addListener((obs, old, val) -> group.setVisible(val));
+        
+        ProgressIndicator pi = new ProgressIndicator();
+        pi.setMaxSize(16, 16);
+        
+        container.getChildren().addAll(cb, pi);
+        
+        // Trigger load
+        loadFbxModelAsync(fbxPath, group, fallbackColor, 
+            () -> { // On Success
+                cb.setDisable(false);
+                cb.setSelected(true); // Check when loaded
+                container.getChildren().remove(pi);
+            },
+            () -> { // On Error
+                container.getChildren().remove(pi);
+                cb.setDisable(true);
+                cb.setText(name + " (Error)");
+                logError(fbxPath);
+            }
+        );
+        
+        return container;
+    }
+    
+    // Kept generic simple one if needed elsewhere
+    private CheckBox createLayerToggle(String name, Group group) {
+        CheckBox cb = new CheckBox(name);
+        cb.setSelected(true);
+        cb.setTextFill(Color.WHITE);
+        cb.selectedProperty().addListener((obs, old, val) -> group.setVisible(val));
+        return cb;
+    }
+    
+    private Button createButton(String text, Runnable action) {
+        Button btn = new Button(text);
+        btn.setMaxWidth(Double.MAX_VALUE);
+        btn.setOnAction(e -> action.run());
+        return btn;
+    }
+
+    private void build3DBody() {
+        // Loading is now triggered by the UI creation
+        loadingLabel.setVisible(true); // Global loading status could still be used or removed
+    }
+
+    private void loadFbxModelAsync(String resourcePath, Group targetGroup, Color fallbackColor, Runnable onSuccess, Runnable onError) {
         Thread thread = new Thread(() -> {
             try {
-                java.net.URL url = getClass().getResource(resourcePath);
-                if (url == null) {
-                    throw new java.io.FileNotFoundException("Resource not found: " + resourcePath);
-                }
+                // FbxMeshReader handles scaling, pivots, ID assignment
+                Group model = FbxMeshReader.loadResource(resourcePath);
                 
-                // Heavy parsing happens here, off the JavaFX thread
-                Group model = FbxMeshReader.load(url);
-                if (model.getChildren().isEmpty()) {
-                   throw new Exception("Empty model loaded");
-                }
-                
-                // Apply materials (recursive)
-                PhongMaterial mat = new PhongMaterial(color);
-                mat.setSpecularColor(Color.WHITE);
-                applyMaterialRecursive(model, mat);
+                // Helper to apply materials if FBX has none
+                applyMaterialRecursive(model, new PhongMaterial(fallbackColor));
 
-                // Update UI on JavaFX thread
-                javafx.application.Platform.runLater(() -> {
-                    layer.getChildren().add(model);
-                    infoLabel.setText(I18n.getInstance().get("humanbody.loaded") + ": " + resourcePath);
+                Platform.runLater(() -> {
+                    targetGroup.getChildren().add(model);
+                    loadingLabel.setText(loadingLabel.getText().replace("...", ".") + ".");
+                    
+                    // Index parts
+                    indexPartsRecursive(model);
+                    
+                    if (onSuccess != null) onSuccess.run();
                 });
-                
-                System.out.println("Loaded Async FBX: " + resourcePath);
-                
             } catch (Exception e) {
-                System.err.println("Async FBX Load Failed [" + resourcePath + "]: " + e.getMessage());
-                // Fallback to OBJ or Procedural on failure
-                javafx.application.Platform.runLater(() -> {
-                    // Try OBJ Async? Or just failover to procedural?
-                    // For simplicity, failing over to simple procedural fallback provided.
-                    if (fallback != null) fallback.run();
+                System.err.println("Async Load Failed: " + resourcePath);
+                e.printStackTrace();
+                Platform.runLater(() -> {
+                    if (onError != null) onError.run();
                 });
             }
         });
         thread.setDaemon(true);
         thread.start();
     }
-
-    // Removed synchronous tryLoadFbxModel and tryLoadObjModel methods as they are now superseded by async logic logic above.
-
-
-    private void buildSkeleton() {
-        PhongMaterial boneMat = new PhongMaterial(Color.IVORY);
-        boneMat.setSpecularColor(Color.WHITE);
-
-        PhongMaterial boneDark = new PhongMaterial(Color.ANTIQUEWHITE);
-        boneDark.setSpecularColor(Color.LIGHTGRAY);
-
-        // ===== SKULL =====
-        Sphere skull = new Sphere(25);
-        skull.setMaterial(boneMat);
-        skull.setTranslateY(-150);
-        skull.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.skull.name"),
-                I18n.getInstance().get("humanbody.skeleton.skull.desc")));
-
-        // Mandible (jaw)
-        Box mandible = new Box(30, 8, 15);
-        mandible.setMaterial(boneDark);
-        mandible.setTranslateY(-130);
-        mandible.setTranslateZ(10);
-        mandible.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.mandible.name"),
-                I18n.getInstance().get("humanbody.skeleton.mandible.desc")));
-
-        // ===== SPINE =====
-        Group spine = new Group();
-        // Cervical (7), Thoracic (12), Lumbar (5), Sacral (5 fused)
-        String[] regions = { "Cervical", "Cervical", "Cervical", "Cervical", "Cervical", "Cervical", "Cervical",
-                "Thoracic", "Thoracic", "Thoracic", "Thoracic", "Thoracic", "Thoracic",
-                "Thoracic", "Thoracic", "Thoracic", "Thoracic", "Thoracic", "Thoracic",
-                "Lumbar", "Lumbar", "Lumbar", "Lumbar", "Lumbar" };
-        for (int i = 0; i < 24; i++) {
-            double radius = i < 7 ? 6 : (i < 19 ? 8 : 10);
-            Cylinder vertebra = new Cylinder(radius, 5);
-            vertebra.setMaterial((i % 2 == 0) ? boneMat : boneDark);
-            vertebra.setTranslateY(-120 + i * 7);
-            int idx = i;
-            vertebra.setOnMouseClicked(e -> showInfo(
-                    I18n.getInstance().get("humanbody.skeleton.vertebra.name", regions[idx]),
-                    I18n.getInstance().get("humanbody.skeleton.vertebra.desc", regions[idx].toLowerCase(),
-                            (idx < 7 ? "C" + (idx + 1) : (idx < 19 ? "T" + (idx - 6) : "L" + (idx - 18))))));
-            spine.getChildren().add(vertebra);
-        }
-
-        // Sacrum
-        Box sacrum = new Box(35, 25, 15);
-        sacrum.setMaterial(boneDark);
-        sacrum.setTranslateY(55);
-        sacrum.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.sacrum.name"),
-                I18n.getInstance().get("humanbody.skeleton.sacrum.desc")));
-
-        // Coccyx (tailbone)
-        Sphere coccyx = new Sphere(6);
-        coccyx.setMaterial(boneDark);
-        coccyx.setTranslateY(72);
-        coccyx.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.coccyx.name"),
-                I18n.getInstance().get("humanbody.skeleton.coccyx.desc")));
-
-        // ===== SHOULDER GIRDLE =====
-        // Clavicles
-        Cylinder clavicleL = new Cylinder(3, 55);
-        clavicleL.setMaterial(boneMat);
-        clavicleL.setTranslateX(-30);
-        clavicleL.setTranslateY(-115);
-        clavicleL.setRotationAxis(Rotate.Z_AXIS);
-        clavicleL.setRotate(85);
-        clavicleL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.clavicle.name"),
-                I18n.getInstance().get("humanbody.skeleton.clavicle.desc")));
-
-        Cylinder clavicleR = new Cylinder(3, 55);
-        clavicleR.setMaterial(boneMat);
-        clavicleR.setTranslateX(30);
-        clavicleR.setTranslateY(-115);
-        clavicleR.setRotationAxis(Rotate.Z_AXIS);
-        clavicleR.setRotate(-85);
-
-        // Scapulae (shoulder blades)
-        Box scapulaL = new Box(25, 35, 5);
-        scapulaL.setMaterial(boneDark);
-        scapulaL.setTranslateX(-45);
-        scapulaL.setTranslateY(-95);
-        scapulaL.setTranslateZ(-15);
-        scapulaL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.scapula.name"),
-                I18n.getInstance().get("humanbody.skeleton.scapula.desc")));
-
-        Box scapulaR = new Box(25, 35, 5);
-        scapulaR.setMaterial(boneDark);
-        scapulaR.setTranslateX(45);
-        scapulaR.setTranslateY(-95);
-        scapulaR.setTranslateZ(-15);
-
-        // ===== RIBCAGE =====
-        Group ribcage = new Group();
-        // True ribs (1-7), False ribs (8-10), Floating ribs (11-12)
-        for (int i = 0; i < 12; i++) {
-            double length = 55 - i * 2;
-            double angle = 50 + i * 3;
-
-            Cylinder ribL = new Cylinder(2, length);
-            ribL.setMaterial((i < 7) ? boneMat : boneDark);
-            ribL.setTranslateX(-35);
-            ribL.setTranslateY(-100 + i * 7);
-            ribL.setRotationAxis(Rotate.Z_AXIS);
-            ribL.setRotate(angle);
-            int ribNum = i + 1;
-            ribL.setOnMouseClicked(e -> {
-                String type = ribNum <= 7 ? I18n.getInstance().get("humanbody.skeleton.rib.true")
-                        : ribNum <= 10 ? I18n.getInstance().get("humanbody.skeleton.rib.false")
-                                : I18n.getInstance().get("humanbody.skeleton.rib.floating");
-                String desc = ribNum <= 7 ? I18n.getInstance().get("humanbody.skeleton.rib.desc.true")
-                        : ribNum <= 10 ? I18n.getInstance().get("humanbody.skeleton.rib.desc.false")
-                                : I18n.getInstance().get("humanbody.skeleton.rib.desc.floating");
-                showInfo(I18n.getInstance().get("humanbody.skeleton.rib.name", (long) ribNum, type), desc);
-            });
-            ribcage.getChildren().add(ribL);
-
-            Cylinder ribR = new Cylinder(2, length);
-            ribR.setMaterial((i < 7) ? boneMat : boneDark);
-            ribR.setTranslateX(35);
-            ribR.setTranslateY(-100 + i * 7);
-            ribR.setRotationAxis(Rotate.Z_AXIS);
-            ribR.setRotate(-angle);
-            ribcage.getChildren().add(ribR);
-        }
-
-        // Sternum (breastbone)
-        Cylinder sternum = new Cylinder(8, 60);
-        sternum.setMaterial(boneMat);
-        sternum.setTranslateY(-75);
-        sternum.setTranslateZ(25);
-        sternum.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.sternum.name"),
-                I18n.getInstance().get("humanbody.skeleton.sternum.desc")));
-        ribcage.getChildren().add(sternum);
-
-        // ===== PELVIS =====
-        // Hip bones (Ilium, Ischium, Pubis)
-        Box hipL = new Box(35, 40, 20);
-        hipL.setMaterial(boneMat);
-        hipL.setTranslateX(-25);
-        hipL.setTranslateY(75);
-        hipL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.hip.name"),
-                I18n.getInstance().get("humanbody.skeleton.hip.desc")));
-
-        Box hipR = new Box(35, 40, 20);
-        hipR.setMaterial(boneMat);
-        hipR.setTranslateX(25);
-        hipR.setTranslateY(75);
-
-        // ===== ARMS =====
-        // Humerus (upper arm)
-        Cylinder humerusL = new Cylinder(6, 80);
-        humerusL.setMaterial(boneMat);
-        humerusL.setTranslateX(-60);
-        humerusL.setTranslateY(-55);
-        humerusL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.humerus.name"),
-                I18n.getInstance().get("humanbody.skeleton.humerus.desc")));
-
-        Cylinder humerusR = new Cylinder(6, 80);
-        humerusR.setMaterial(boneMat);
-        humerusR.setTranslateX(60);
-        humerusR.setTranslateY(-55);
-
-        // Radius and Ulna (forearm)
-        Cylinder radiusL = new Cylinder(4, 70);
-        radiusL.setMaterial(boneDark);
-        radiusL.setTranslateX(-58);
-        radiusL.setTranslateY(15);
-        Cylinder ulnaL = new Cylinder(4, 75);
-        ulnaL.setMaterial(boneMat);
-        ulnaL.setTranslateX(-62);
-        ulnaL.setTranslateY(15);
-
-        Cylinder radiusR = new Cylinder(4, 70);
-        radiusR.setMaterial(boneDark);
-        radiusR.setTranslateX(58);
-        radiusR.setTranslateY(15);
-        Cylinder ulnaR = new Cylinder(4, 75);
-        ulnaR.setMaterial(boneMat);
-        ulnaR.setTranslateX(62);
-        ulnaR.setTranslateY(15);
-
-        // ===== HANDS =====
-        Group handL = buildHand(boneMat, boneDark, -60, 60);
-        Group handR = buildHand(boneMat, boneDark, 60, 60);
-
-        // ===== LEGS =====
-        // Femur (thigh)
-        Cylinder femurL = new Cylinder(9, 120);
-        femurL.setMaterial(boneMat);
-        femurL.setTranslateX(-25);
-        femurL.setTranslateY(150);
-        femurL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.femur.name"),
-                I18n.getInstance().get("humanbody.skeleton.femur.desc")));
-
-        Cylinder femurR = new Cylinder(9, 120);
-        femurR.setMaterial(boneMat);
-        femurR.setTranslateX(25);
-        femurR.setTranslateY(150);
-
-        // Patella (kneecap)
-        Sphere patellaL = new Sphere(8);
-        patellaL.setMaterial(boneDark);
-        patellaL.setTranslateX(-25);
-        patellaL.setTranslateY(215);
-        patellaL.setTranslateZ(10);
-        patellaL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.patella.name"),
-                I18n.getInstance().get("humanbody.skeleton.patella.desc")));
-
-        Sphere patellaR = new Sphere(8);
-        patellaR.setMaterial(boneDark);
-        patellaR.setTranslateX(25);
-        patellaR.setTranslateY(215);
-        patellaR.setTranslateZ(10);
-
-        // Tibia and Fibula (lower leg)
-        Cylinder tibiaL = new Cylinder(7, 100);
-        tibiaL.setMaterial(boneMat);
-        tibiaL.setTranslateX(-22);
-        tibiaL.setTranslateY(275);
-        tibiaL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.tibia.name"),
-                I18n.getInstance().get("humanbody.skeleton.tibia.desc")));
-
-        Cylinder fibulaL = new Cylinder(4, 95);
-        fibulaL.setMaterial(boneDark);
-        fibulaL.setTranslateX(-30);
-        fibulaL.setTranslateY(275);
-
-        Cylinder tibiaR = new Cylinder(7, 100);
-        tibiaR.setMaterial(boneMat);
-        tibiaR.setTranslateX(22);
-        tibiaR.setTranslateY(275);
-
-        Cylinder fibulaR = new Cylinder(4, 95);
-        fibulaR.setMaterial(boneDark);
-        fibulaR.setTranslateX(30);
-        fibulaR.setTranslateY(275);
-
-        // ===== FEET =====
-        Group footL = buildFoot(boneMat, boneDark, -25, 330);
-        Group footR = buildFoot(boneMat, boneDark, 25, 330);
-
-        skeletonLayer.getChildren().addAll(
-                skull, mandible,
-                spine, sacrum, coccyx,
-                clavicleL, clavicleR, scapulaL, scapulaR,
-                ribcage,
-                hipL, hipR,
-                humerusL, humerusR, radiusL, ulnaL, radiusR, ulnaR,
-                handL, handR,
-                femurL, femurR, patellaL, patellaR,
-                tibiaL, fibulaL, tibiaR, fibulaR,
-                footL, footR);
-    }
-
-    private Group buildHand(PhongMaterial boneMat, PhongMaterial boneDark, double x, double y) {
-        Group hand = new Group();
-        // Carpals (wrist - 8 bones)
-        Box carpals = new Box(18, 10, 8);
-        carpals.setMaterial(boneDark);
-        carpals.setTranslateX(x);
-        carpals.setTranslateY(y);
-        carpals.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.carpals.name"),
-                I18n.getInstance().get("humanbody.skeleton.carpals.desc")));
-
-        // Metacarpals and Phalanges
-        for (int f = 0; f < 5; f++) {
-            double fingerX = x + (f - 2) * 4;
-            double length = f == 0 ? 12 : 20; // thumb shorter
-
-            Cylinder metacarpal = new Cylinder(2, length);
-            metacarpal.setMaterial(boneMat);
-            metacarpal.setTranslateX(fingerX);
-            metacarpal.setTranslateY(y + 12);
-            hand.getChildren().add(metacarpal);
-
-            Cylinder phalanx = new Cylinder(1.5, length * 0.8);
-            phalanx.setMaterial(boneDark);
-            phalanx.setTranslateX(fingerX);
-            phalanx.setTranslateY(y + 25);
-            hand.getChildren().add(phalanx);
-        }
-        hand.getChildren().add(carpals);
-        return hand;
-    }
-
-    private Group buildFoot(PhongMaterial boneMat, PhongMaterial boneDark, double x, double y) {
-        Group foot = new Group();
-        // Tarsals (ankle - 7 bones)
-        Box tarsals = new Box(25, 15, 12);
-        tarsals.setMaterial(boneDark);
-        tarsals.setTranslateX(x);
-        tarsals.setTranslateY(y);
-        tarsals.setTranslateZ(8);
-        tarsals.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.skeleton.tarsals.name"),
-                I18n.getInstance().get("humanbody.skeleton.tarsals.desc")));
-
-        // Metatarsals
-        for (int t = 0; t < 5; t++) {
-            double toeX = x + (t - 2) * 5;
-            Cylinder metatarsal = new Cylinder(2, 18);
-            metatarsal.setMaterial(boneMat);
-            metatarsal.setTranslateX(toeX);
-            metatarsal.setTranslateY(y + 15);
-            metatarsal.setTranslateZ(15);
-            metatarsal.setRotationAxis(Rotate.X_AXIS);
-            metatarsal.setRotate(70);
-            foot.getChildren().add(metatarsal);
-        }
-        foot.getChildren().add(tarsals);
-        return foot;
-    }
-
-    private void buildMuscles() {
-        PhongMaterial muscleMat = new PhongMaterial(Color.INDIANRED);
-        muscleMat.setSpecularColor(Color.PINK);
-
-        // Pectorals
-        Box pectoralL = new Box(30, 40, 15);
-        pectoralL.setMaterial(muscleMat);
-        pectoralL.setTranslateX(-25);
-        pectoralL.setTranslateY(-80);
-        pectoralL.setTranslateZ(15);
-        pectoralL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.muscle.pectoral.name"),
-                I18n.getInstance().get("humanbody.muscle.pectoral.desc")));
-
-        Box pectoralR = new Box(30, 40, 15);
-        pectoralR.setMaterial(muscleMat);
-        pectoralR.setTranslateX(25);
-        pectoralR.setTranslateY(-80);
-        pectoralR.setTranslateZ(15);
-
-        // Biceps
-        Cylinder bicepL = new Cylinder(8, 50);
-        bicepL.setMaterial(muscleMat);
-        bicepL.setTranslateX(-60);
-        bicepL.setTranslateY(-50);
-        bicepL.setTranslateZ(8);
-        bicepL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.muscle.bicep.name"),
-                I18n.getInstance().get("humanbody.muscle.bicep.desc")));
-
-        Cylinder bicepR = new Cylinder(8, 50);
-        bicepR.setMaterial(muscleMat);
-        bicepR.setTranslateX(60);
-        bicepR.setTranslateY(-50);
-        bicepR.setTranslateZ(8);
-
-        // Quadriceps
-        Cylinder quadL = new Cylinder(15, 100);
-        quadL.setMaterial(muscleMat);
-        quadL.setTranslateX(-25);
-        quadL.setTranslateY(130);
-        quadL.setTranslateZ(10);
-        quadL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.muscle.quad.name"),
-                I18n.getInstance().get("humanbody.muscle.quad.desc")));
-
-        Cylinder quadR = new Cylinder(15, 100);
-        quadR.setMaterial(muscleMat);
-        quadR.setTranslateX(25);
-        quadR.setTranslateY(130);
-        quadR.setTranslateZ(10);
-
-        // Abs
-        for (int i = 0; i < 4; i++) {
-            Box absL = new Box(15, 12, 8);
-            absL.setMaterial(muscleMat);
-            absL.setTranslateX(-10);
-            absL.setTranslateY(-20 + i * 18);
-            absL.setTranslateZ(20);
-
-            Box absR = new Box(15, 12, 8);
-            absR.setMaterial(muscleMat);
-            absR.setTranslateX(10);
-            absR.setTranslateY(-20 + i * 18);
-            absR.setTranslateZ(20);
-
-            muscleLayer.getChildren().addAll(absL, absR);
-        }
-
-        muscleLayer.getChildren().addAll(pectoralL, pectoralR, bicepL, bicepR, quadL, quadR);
-    }
-
-    private void buildOrgans() {
-        // Heart
-        PhongMaterial heartMat = new PhongMaterial(Color.DARKRED);
-        Sphere heart = new Sphere(15);
-        heart.setMaterial(heartMat);
-        heart.setTranslateX(-10);
-        heart.setTranslateY(-75);
-        heart.setTranslateZ(5);
-        heart.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.organ.heart.name"),
-                I18n.getInstance().get("humanbody.organ.heart.desc")));
-
-        // Lungs
-        PhongMaterial lungMat = new PhongMaterial(Color.LIGHTPINK);
-        Sphere lungL = new Sphere(25);
-        lungL.setMaterial(lungMat);
-        lungL.setTranslateX(-35);
-        lungL.setTranslateY(-75);
-        lungL.setScaleY(1.3);
-        lungL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.organ.lungs.name"),
-                I18n.getInstance().get("humanbody.organ.lungs.desc")));
-
-        Sphere lungR = new Sphere(30);
-        lungR.setMaterial(lungMat);
-        lungR.setTranslateX(30);
-        lungR.setTranslateY(-75);
-        lungR.setScaleY(1.3);
-
-        // Liver
-        PhongMaterial liverMat = new PhongMaterial(Color.BROWN);
-        Box liver = new Box(50, 25, 20);
-        liver.setMaterial(liverMat);
-        liver.setTranslateX(15);
-        liver.setTranslateY(-30);
-        liver.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.organ.liver.name"),
-                I18n.getInstance().get("humanbody.organ.liver.desc")));
-
-        // Stomach
-        PhongMaterial stomachMat = new PhongMaterial(Color.SANDYBROWN);
-        Sphere stomach = new Sphere(20);
-        stomach.setMaterial(stomachMat);
-        stomach.setTranslateX(-20);
-        stomach.setTranslateY(-20);
-        stomach.setScaleX(0.8);
-        stomach.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.organ.stomach.name"),
-                I18n.getInstance().get("humanbody.organ.stomach.desc")));
-
-        // Kidneys
-        PhongMaterial kidneyMat = new PhongMaterial(Color.INDIANRED);
-        Sphere kidneyL = new Sphere(10);
-        kidneyL.setMaterial(kidneyMat);
-        kidneyL.setTranslateX(-35);
-        kidneyL.setTranslateY(10);
-        kidneyL.setScaleY(1.5);
-
-        Sphere kidneyR = new Sphere(10);
-        kidneyR.setMaterial(kidneyMat);
-        kidneyR.setTranslateX(35);
-        kidneyR.setTranslateY(10);
-        kidneyR.setScaleY(1.5);
-        kidneyL.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.organ.kidneys.name"),
-                I18n.getInstance().get("humanbody.organ.kidneys.desc")));
-
-        organLayer.getChildren().addAll(heart, lungL, lungR, liver, stomach, kidneyL, kidneyR);
-    }
-
-    private void buildNervousSystem() {
-        PhongMaterial nerveMat = new PhongMaterial(Color.YELLOW);
-
-        // Brain
-        Sphere brain = new Sphere(22);
-        brain.setMaterial(nerveMat);
-        brain.setTranslateY(-150);
-        brain.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.nerve.brain.name"),
-                I18n.getInstance().get("humanbody.nerve.brain.desc")));
-
-        // Spinal cord
-        Cylinder spinalCord = new Cylinder(3, 180);
-        spinalCord.setMaterial(nerveMat);
-        spinalCord.setTranslateY(-30);
-        spinalCord.setOnMouseClicked(e -> showInfo(I18n.getInstance().get("humanbody.nerve.spinalcord.name"),
-                I18n.getInstance().get("humanbody.nerve.spinalcord.desc")));
-
-        // Main nerve branches
-        for (int i = 0; i < 8; i++) {
-            Cylinder nerveL = new Cylinder(1, 40);
-            nerveL.setMaterial(nerveMat);
-            nerveL.setTranslateX(-25);
-            nerveL.setTranslateY(-100 + i * 25);
-            nerveL.setRotationAxis(Rotate.Z_AXIS);
-            nerveL.setRotate(90);
-
-            Cylinder nerveR = new Cylinder(1, 40);
-            nerveR.setMaterial(nerveMat);
-            nerveR.setTranslateX(25);
-            nerveR.setTranslateY(-100 + i * 25);
-            nerveR.setRotationAxis(Rotate.Z_AXIS);
-            nerveR.setRotate(90);
-
-            nervousLayer.getChildren().addAll(nerveL, nerveR);
-        }
-
-        nervousLayer.getChildren().addAll(brain, spinalCord);
-    }
-
-    private void buildCirculatorySystem() {
-        PhongMaterial arteryMat = new PhongMaterial(Color.DARKRED);
-        PhongMaterial veinMat = new PhongMaterial(Color.DARKBLUE);
-
-        // Aorta
-        Cylinder aorta = new Cylinder(5, 100);
-        aorta.setMaterial(arteryMat);
-        aorta.setTranslateX(5);
-        aorta.setTranslateY(-20);
-        aorta.setOnMouseClicked(e -> showInfo("Aorta", I18n.getInstance().get("humanbody.aorta.desc",
-                "Largest artery. Carries oxygenated blood from heart.")));
-
-        // Vena cava
-        Cylinder venaCava = new Cylinder(5, 100);
-        venaCava.setMaterial(veinMat);
-        venaCava.setTranslateX(-5);
-        venaCava.setTranslateY(-20);
-        venaCava.setOnMouseClicked(e -> showInfo("Vena Cava", I18n.getInstance().get("humanbody.venacava.desc",
-                "Largest vein. Returns deoxygenated blood to heart.")));
-
-        // Leg vessels
-        Cylinder femArtL = new Cylinder(3, 140);
-        femArtL.setMaterial(arteryMat);
-        femArtL.setTranslateX(-20);
-        femArtL.setTranslateY(150);
-
-        Cylinder femArtR = new Cylinder(3, 140);
-        femArtR.setMaterial(arteryMat);
-        femArtR.setTranslateX(20);
-        femArtR.setTranslateY(150);
-
-        circulatoryLayer.getChildren().addAll(aorta, venaCava, femArtL, femArtR);
-    }
-
-    private void buildSkin() {
-        // Try loading FBX skin model asynchronously
-        loadFbxModelAsync("/org/jscience/medicine/anatomy/models/Regions of human body100.fbx", skinLayer, Color.rgb(255, 218, 185, 0.4), () -> {
-            // Fallback: Simple cylindrical body shell with transparency
-            javafx.application.Platform.runLater(() -> {
-                PhongMaterial skinMat = new PhongMaterial(Color.PEACHPUFF);
-                skinMat.setSpecularColor(Color.WHITE);
-
-                Cylinder torso = new Cylinder(55, 180);
-                torso.setMaterial(skinMat);
-                torso.setTranslateY(-20);
-                torso.setOpacity(0.3);
-
-                // Head
-                Sphere head = new Sphere(30);
-                head.setMaterial(skinMat);
-                head.setTranslateY(-150);
-                head.setOpacity(0.3);
-
-                skinLayer.getChildren().addAll(torso, head);
-            });
-        });
-    }
-
-    private void showInfo(String title, String description) {
-        if (infoLabel != null) {
-            infoLabel.setText(title + "\n\n" + description);
+    
+    private void indexPartsRecursive(Node node) {
+        if (node instanceof MeshView) {
+            String id = node.getId();
+            if (id != null && !id.isEmpty()) {
+                knownParts.add(id);
+            }
+        } else if (node instanceof Parent) {
+            for (Node child : ((Parent) node).getChildrenUnmodifiable()) {
+                indexPartsRecursive(child);
+            }
         }
     }
 
-    public static void launch(Stage stage) {
-        new HumanBodyViewer().start(stage);
-    }
-
-    public static void main(String[] args) {
-        launch(args);
-    }
-    /**
-     * Recursively applies material to all MeshView nodes
-     */
     private void applyMaterialRecursive(javafx.scene.Node node, PhongMaterial material) {
         if (node instanceof MeshView) {
             ((MeshView) node).setMaterial(material);
@@ -953,7 +422,58 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
             }
         }
     }
+    
+    private Node findNodeById(Node node, String id) {
+        if (id.equals(node.getId())) return node;
+        
+        if (node instanceof Parent) {
+            for (Node child : ((Parent) node).getChildrenUnmodifiable()) {
+                Node found = findNodeById(child, id);
+                if (found != null) return found;
+            }
+        }
+        return null;
+    }
 
+    private void loadDefinition(String id) {
+        // Try to find the text file
+        // ID might be "Femur", "Humerus", etc.
+        // File: /org/jscience/medicine/anatomy/definitions/<ID>.txt
+        String safeId = id.trim();
+        String path = "/org/jscience/medicine/anatomy/definitions/" + safeId + ".txt";
+        
+        try (InputStream is = getClass().getResourceAsStream(path)) {
+            if (is != null) {
+                String text = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
+                        .lines().collect(Collectors.joining("\n"));
+                descriptionArea.setText(text);
+            } else {
+                descriptionArea.setText("No description available for " + safeId);
+                // System.out.println("Missing definition: " + path);
+            }
+        } catch (Exception e) {
+            descriptionArea.setText("Error loading description.");
+            e.printStackTrace();
+        }
+    }
+    
+    private void logError(String model) {
+        Platform.runLater(() -> System.err.println("Failed to load: " + model));
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+    
+    public static void launch(Stage stage) {
+        try {
+            new HumanBodyViewer().start(stage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static void launchMain(Stage stage) {
+        launch(stage);
+    }
 }
-
-

@@ -101,6 +101,16 @@ public class WorldBankReader extends AbstractResourceReader<Country> {
     }
 
     @Override
+    public String getCategory() {
+        return "Politics";
+    }
+
+    @Override
+    public String getDescription() {
+        return "World Bank Data (Indicators & Countries).";
+    }
+
+    @Override
     public String getResourcePath() {
         return RESOURCE_PATH;
     }
