@@ -23,7 +23,7 @@
 
 package org.jscience.benchmark;
 
-import org.jscience.mathematics.analysis.transform.FastFourierTransform;
+import org.jscience.mathematics.analysis.transform.AlgebraicFFT;
 import org.jscience.mathematics.numbers.complex.Complex;
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
@@ -66,7 +66,7 @@ public class FFTBenchmark {
         Vector<Complex> vector = new DenseVector<Complex>(java.util.Arrays.asList(input), Complexes.getInstance());
 
         SimpleBenchmarkRunner.run(I18n.getInstance().get("benchmark.fft.jscience", size), () -> {
-            FastFourierTransform.transform(vector);
+            AlgebraicFFT.transform(vector);
         });
     }
 

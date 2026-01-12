@@ -23,7 +23,7 @@
 
 package org.jscience.mathematics.analysis.signal;
 
-import org.jscience.mathematics.analysis.transform.FFT;
+import org.jscience.mathematics.analysis.transform.SignalFFT;
 
 /**
  * Digital signal processing utilities.
@@ -54,7 +54,7 @@ public class SignalProcessing {
             padded[i] = zero;
         System.arraycopy(signal, 0, padded, 0, signal.length);
 
-        org.jscience.mathematics.numbers.real.Real[][] spectrum = FFT.fftReal(padded);
+        org.jscience.mathematics.numbers.real.Real[][] spectrum = SignalFFT.fftReal(padded);
         org.jscience.mathematics.numbers.real.Real[] real = spectrum[0];
         org.jscience.mathematics.numbers.real.Real[] imag = spectrum[1];
 
@@ -73,7 +73,7 @@ public class SignalProcessing {
             imag[i] = zero;
         }
 
-        FFT.ifft(real, imag);
+        SignalFFT.ifft(real, imag);
 
         org.jscience.mathematics.numbers.real.Real[] result = new org.jscience.mathematics.numbers.real.Real[signal.length];
         System.arraycopy(real, 0, result, 0, signal.length);
@@ -93,7 +93,7 @@ public class SignalProcessing {
             padded[i] = zero;
         System.arraycopy(signal, 0, padded, 0, signal.length);
 
-        org.jscience.mathematics.numbers.real.Real[][] spectrum = FFT.fftReal(padded);
+        org.jscience.mathematics.numbers.real.Real[][] spectrum = SignalFFT.fftReal(padded);
         org.jscience.mathematics.numbers.real.Real[] real = spectrum[0];
         org.jscience.mathematics.numbers.real.Real[] imag = spectrum[1];
 
@@ -114,7 +114,7 @@ public class SignalProcessing {
             }
         }
 
-        FFT.ifft(real, imag);
+        SignalFFT.ifft(real, imag);
 
         org.jscience.mathematics.numbers.real.Real[] result = new org.jscience.mathematics.numbers.real.Real[signal.length];
         System.arraycopy(real, 0, result, 0, signal.length);
@@ -284,7 +284,7 @@ public class SignalProcessing {
      */
     public static org.jscience.mathematics.numbers.real.Real[][] fft(
             org.jscience.mathematics.numbers.real.Real[] signal) {
-        return FFT.fftReal(signal);
+        return SignalFFT.fftReal(signal);
     }
 
     /**
@@ -294,7 +294,7 @@ public class SignalProcessing {
             org.jscience.mathematics.numbers.real.Real[] imag) {
         org.jscience.mathematics.numbers.real.Real[] r = real.clone();
         org.jscience.mathematics.numbers.real.Real[] i = imag.clone();
-        FFT.ifft(r, i);
+        SignalFFT.ifft(r, i);
         return r;
     }
 
@@ -315,7 +315,7 @@ public class SignalProcessing {
      */
     public static org.jscience.mathematics.numbers.real.Real[] powerSpectralDensity(
             org.jscience.mathematics.numbers.real.Real[] signal) {
-        return FFT.powerSpectrum(signal);
+        return SignalFFT.powerSpectrum(signal);
     }
 
     /**

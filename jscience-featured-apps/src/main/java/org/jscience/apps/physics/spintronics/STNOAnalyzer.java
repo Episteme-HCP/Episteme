@@ -5,7 +5,7 @@
 
 package org.jscience.apps.physics.spintronics;
 
-import org.jscience.mathematics.analysis.transform.FFT;
+import org.jscience.mathematics.analysis.transform.SignalFFT;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
@@ -95,7 +95,7 @@ public class STNOAnalyzer {
         }
 
         // Use JScience FFT
-        return FFT.powerSpectrum(data);
+        return SignalFFT.powerSpectrum(data);
     }
 
     /**

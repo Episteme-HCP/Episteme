@@ -37,6 +37,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.jscience.biology.loaders.ObjMeshReader;
 import org.jscience.biology.loaders.StlMeshReader;
+import org.jscience.biology.loaders.FbxMeshReader;
 import org.jscience.ui.i18n.I18n;
 
 import java.io.File;
@@ -313,69 +314,78 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
     }
 
     private void build3DBody() {
-        // Try loading Z-Anatomy OBJ models first, fallback to procedural geometry
-        if (!tryLoadObjModel("/org/jscience/medicine/anatomy/models/SkeletalSystem100.obj", skeletonLayer,
-                Color.IVORY)) {
-            buildSkeleton();
-        }
+        // Try loading Z-Anatomy FBX models asynchronously
+        // Skeleton
+        loadFbxModelAsync("/org/jscience/medicine/anatomy/models/SkeletalSystem100.fbx", skeletonLayer, Color.IVORY, 
+            () -> buildSkeleton()); // Fallback if FBX fails
 
-        if (!tryLoadObjModel("/org/jscience/medicine/anatomy/models/MuscularSystem100.obj", muscleLayer,
-                Color.INDIANRED)) {
-            buildMuscles();
-        }
+        // Muscles
+        loadFbxModelAsync("/org/jscience/medicine/anatomy/models/MuscularSystem100.fbx", muscleLayer, Color.INDIANRED, 
+            () -> buildMuscles());
 
-        if (!tryLoadObjModel("/org/jscience/medicine/anatomy/models/VisceralSystem100.obj", organLayer, Color.CORAL)) {
-            buildOrgans();
-        }
+        // Organs
+        loadFbxModelAsync("/org/jscience/medicine/anatomy/models/VisceralSystem100.fbx", organLayer, Color.CORAL, 
+            () -> buildOrgans());
 
-        if (!tryLoadObjModel("/org/jscience/medicine/anatomy/models/NervousSystem100.obj", nervousLayer, Color.GOLD)) {
-            buildNervousSystem();
-        }
+        // Nervous System
+        loadFbxModelAsync("/org/jscience/medicine/anatomy/models/NervousSystem100.fbx", nervousLayer, Color.GOLD, 
+            () -> buildNervousSystem());
 
-        if (!tryLoadObjModel("/org/jscience/medicine/anatomy/models/CardioVascular41.obj", circulatoryLayer,
-                Color.DARKRED)) {
-            buildCirculatorySystem();
-        }
+        // Circulatory System
+        loadFbxModelAsync("/org/jscience/medicine/anatomy/models/CardioVascular41.fbx", circulatoryLayer, Color.DARKRED, 
+            () -> buildCirculatorySystem());
 
         // Skin is always procedural (semi-transparent)
         buildSkin();
     }
 
     /**
-     * Attempts to load an OBJ model from resources into the specified layer.
-     * 
-     * @return true if successful, false if model not found
+     * Loads an FBX model asynchronously.
+     * Use this to allow the UI to remain responsive while heavy models are parsing.
      */
-    private boolean tryLoadObjModel(String resourcePath, Group layer, Color color) {
-        try {
-            java.net.URL url = getClass().getResource(resourcePath);
-            if (url == null) {
-                return false;
-            }
-            Group model = ObjMeshReader.load(url);
-            if (model.getChildren().isEmpty()) {
-                return false;
-            }
-            // Apply material color
-            PhongMaterial mat = new PhongMaterial(color);
-            mat.setSpecularColor(Color.WHITE);
-            for (javafx.scene.Node node : model.getChildren()) {
-                if (node instanceof MeshView) {
-                    ((MeshView) node).setMaterial(mat);
+    private void loadFbxModelAsync(String resourcePath, Group layer, Color color, Runnable fallback) {
+        Thread thread = new Thread(() -> {
+            try {
+                java.net.URL url = getClass().getResource(resourcePath);
+                if (url == null) {
+                    throw new java.io.FileNotFoundException("Resource not found: " + resourcePath);
                 }
+                
+                // Heavy parsing happens here, off the JavaFX thread
+                Group model = FbxMeshReader.load(url);
+                if (model.getChildren().isEmpty()) {
+                   throw new Exception("Empty model loaded");
+                }
+                
+                // Apply materials (recursive)
+                PhongMaterial mat = new PhongMaterial(color);
+                mat.setSpecularColor(Color.WHITE);
+                applyMaterialRecursive(model, mat);
+
+                // Update UI on JavaFX thread
+                javafx.application.Platform.runLater(() -> {
+                    layer.getChildren().add(model);
+                    infoLabel.setText(I18n.getInstance().get("humanbody.loaded") + ": " + resourcePath);
+                });
+                
+                System.out.println("Loaded Async FBX: " + resourcePath);
+                
+            } catch (Exception e) {
+                System.err.println("Async FBX Load Failed [" + resourcePath + "]: " + e.getMessage());
+                // Fallback to OBJ or Procedural on failure
+                javafx.application.Platform.runLater(() -> {
+                    // Try OBJ Async? Or just failover to procedural?
+                    // For simplicity, failing over to simple procedural fallback provided.
+                    if (fallback != null) fallback.run();
+                });
             }
-            // Scale and center the model
-            model.setScaleX(0.5);
-            model.setScaleY(0.5);
-            model.setScaleZ(0.5);
-            layer.getChildren().add(model);
-            System.out.println("Loaded Z-Anatomy model: " + resourcePath);
-            return true;
-        } catch (Exception e) {
-            System.err.println("Failed to load OBJ model " + resourcePath + ": " + e.getMessage());
-            return false;
-        }
+        });
+        thread.setDaemon(true);
+        thread.start();
     }
+
+    // Removed synchronous tryLoadFbxModel and tryLoadObjModel methods as they are now superseded by async logic logic above.
+
 
     private void buildSkeleton() {
         PhongMaterial boneMat = new PhongMaterial(Color.IVORY);
@@ -895,22 +905,27 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
     }
 
     private void buildSkin() {
-        PhongMaterial skinMat = new PhongMaterial(Color.PEACHPUFF);
-        skinMat.setSpecularColor(Color.WHITE);
+        // Try loading FBX skin model asynchronously
+        loadFbxModelAsync("/org/jscience/medicine/anatomy/models/Regions of human body100.fbx", skinLayer, Color.rgb(255, 218, 185, 0.4), () -> {
+            // Fallback: Simple cylindrical body shell with transparency
+            javafx.application.Platform.runLater(() -> {
+                PhongMaterial skinMat = new PhongMaterial(Color.PEACHPUFF);
+                skinMat.setSpecularColor(Color.WHITE);
 
-        // Simple cylindrical body shell with transparency
-        Cylinder torso = new Cylinder(55, 180);
-        torso.setMaterial(skinMat);
-        torso.setTranslateY(-20);
-        torso.setOpacity(0.3);
+                Cylinder torso = new Cylinder(55, 180);
+                torso.setMaterial(skinMat);
+                torso.setTranslateY(-20);
+                torso.setOpacity(0.3);
 
-        // Head
-        Sphere head = new Sphere(30);
-        head.setMaterial(skinMat);
-        head.setTranslateY(-150);
-        head.setOpacity(0.3);
+                // Head
+                Sphere head = new Sphere(30);
+                head.setMaterial(skinMat);
+                head.setTranslateY(-150);
+                head.setOpacity(0.3);
 
-        skinLayer.getChildren().addAll(torso, head);
+                skinLayer.getChildren().addAll(torso, head);
+            });
+        });
     }
 
     private void showInfo(String title, String description) {
@@ -926,6 +941,19 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
     public static void main(String[] args) {
         launch(args);
     }
+    /**
+     * Recursively applies material to all MeshView nodes
+     */
+    private void applyMaterialRecursive(javafx.scene.Node node, PhongMaterial material) {
+        if (node instanceof MeshView) {
+            ((MeshView) node).setMaterial(material);
+        } else if (node instanceof Group) {
+            for (javafx.scene.Node child : ((Group) node).getChildren()) {
+                applyMaterialRecursive(child, material);
+            }
+        }
+    }
+
 }
 
 
