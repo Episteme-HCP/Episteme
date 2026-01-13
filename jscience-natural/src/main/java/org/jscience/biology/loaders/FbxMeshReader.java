@@ -24,13 +24,12 @@
 package org.jscience.biology.loaders;
 
 import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.paint.Color;
+
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.shape.VertexFormat;
-import javafx.scene.transform.Rotate;
+
 
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;

@@ -3,11 +3,9 @@ package org.jscience.ui.viewers.medicine.anatomy;
 import javafx.geometry.Point3D;
 import javafx.scene.Camera;
 import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.Scene;
+
 import javafx.scene.SubScene;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
+
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 

@@ -57,6 +57,7 @@ public class CSVTimeSeriesReader extends AbstractResourceReader<Map<TimePoint, R
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Class<Map<TimePoint, Real>> getResourceType() {
         return (Class<Map<TimePoint, Real>>) (Class<?>) Map.class;
     }

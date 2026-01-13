@@ -83,7 +83,7 @@ public class FinancialMarketReader extends org.jscience.io.AbstractResourceReade
     }
 
     @Override
-    public Class getResourceType() {
+    public Class<?> getResourceType() {
         return List.class;
     }
 

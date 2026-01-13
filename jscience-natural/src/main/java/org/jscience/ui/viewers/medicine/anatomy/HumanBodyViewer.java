@@ -45,6 +45,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.Stack;
+
+import java.util.regex.Pattern;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import java.util.regex.Pattern;
+
 
 /**
  * 3D Human Body Anatomy Viewer.
@@ -94,8 +103,10 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
     private Label titleLabel;
     private TextArea descriptionArea;
     private Label loadingLabel;
-    private ComboBox<String> searchField;
+    private TreeView<String> hierarchyTree;
     private java.util.Set<String> knownParts = new java.util.HashSet<>();
+    private Map<String, TreeItem<String>> idToTreeItem = new ConcurrentHashMap<>();
+
 
     @Override
     public void start(Stage primaryStage) {
@@ -150,6 +161,16 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
                 if (id != null) {
                     titleLabel.setText(id);
                     loadDefinition(id);
+                    
+                    // Sync Tree (3D -> Tree)
+                    TreeItem<String> item = idToTreeItem.get(id);
+                    // Try fallback
+                    if (item == null) item = idToTreeItem.get(id.replace("_", " "));
+                    if (item == null) item = idToTreeItem.get(sanitizeIdFor3D(id)); // Try sanitized version of itself?
+
+                    if (item != null) {
+                        expandAndSelect(item);
+                    }
                 } else {
                     titleLabel.setText("Unknown Part");
                     descriptionArea.setText("No ID found for this mesh.");
@@ -157,6 +178,7 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
             } else {
                 titleLabel.setText("Human Body");
                 descriptionArea.setText("Select a part to see its description.");
+                hierarchyTree.getSelectionModel().clearSelection();
             }
         });
 
@@ -245,11 +267,12 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
                 return;
             }
             
-            // Filter knownParts
-            java.util.List<String> suggestions = knownParts.stream()
+            // Filter knownParts AND hierarchy items
+            java.util.List<String> suggestions = Stream.concat(knownParts.stream(), idToTreeItem.keySet().stream())
+                .distinct()
                 .filter(s -> s.toLowerCase().contains(newVal.toLowerCase()))
                 .sorted()
-                .limit(10)
+                .limit(20)
                 .collect(Collectors.toList());
                 
             Platform.runLater(() -> {
@@ -280,7 +303,7 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
                 Node found = findNodeById(root3D, selected);
                 if (found instanceof MeshView) {
                     selectionManager.select(found);
-                    // Center?
+                    // Center
                     MeshView mesh = (MeshView) found;
                     javafx.geometry.Bounds b = mesh.localToScene(mesh.getBoundsInLocal());
                     javafx.geometry.Point3D center = new javafx.geometry.Point3D(
@@ -289,6 +312,13 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
                         b.getMinZ() + b.getDepth() / 2
                     );
                     cameraController.centerOn(center);
+                } else {
+                    // Try Tree Item
+                    TreeItem<String> item = idToTreeItem.get(selected);
+                    if (item != null) {
+                        expandAndSelect(item);
+                        // This will trigger tree listener -> which will try to select 3D part via sanitizeId
+                    }
                 }
             }
         });
@@ -302,7 +332,37 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
         descriptionArea.setStyle("-fx-control-inner-background: #2b2b2b; -fx-text-fill: #b0b0b0; -fx-background-color: transparent;");
         VBox.setVgrow(descriptionArea, Priority.ALWAYS);
 
-        rightPanel.getChildren().addAll(searchField, new Separator(), titleLabel, descriptionArea);
+        
+        hierarchyTree = new TreeView<>();
+        hierarchyTree.setShowRoot(false);
+        hierarchyTree.setStyle("-fx-background-color: #2b2b2b; -fx-control-inner-background: #2b2b2b; -fx-text-fill: white;");
+        VBox.setVgrow(hierarchyTree, Priority.ALWAYS);
+        
+        // Tree Selection Listener
+        hierarchyTree.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                String selected = newVal.getValue();
+                titleLabel.setText(selected);
+                loadDefinition(selected);
+                
+                // Try to select in 3D
+                String meshId = sanitizeIdFor3D(selected);
+                Node found = findNodeById(root3D, meshId);
+                // Also try exact match
+                if (found == null) found = findNodeById(root3D, selected);
+                
+                if (found instanceof MeshView) {
+                    selectionManager.select(found);
+                    // build3DBody(); // No, don't rebuild. 
+                    
+                    // Auto-center? Maybe optional.
+                    // MeshView mesh = (MeshView) found;
+                    // ... centering logic ...
+                }
+            }
+        });
+
+        rightPanel.getChildren().addAll(searchField, new Separator(), hierarchyTree, new Separator(), titleLabel, descriptionArea);
         root.setRight(rightPanel);
 
         // --- SCENE SETUP ---
@@ -314,6 +374,7 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
 
         // --- START LOADING ---
         build3DBody();
+        loadHierarchy();
     }
 
     private Node createLayerWithLoading(String name, Group group, String fbxPath, Color fallbackColor) {
@@ -435,30 +496,229 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
         return null;
     }
 
-    private void loadDefinition(String id) {
-        // Try to find the text file
-        // ID might be "Femur", "Humerus", etc.
-        // File: /org/jscience/medicine/anatomy/definitions/<ID>.txt
-        String safeId = id.trim();
-        String path = "/org/jscience/medicine/anatomy/definitions/" + safeId + ".txt";
-        
-        try (InputStream is = getClass().getResourceAsStream(path)) {
-            if (is != null) {
-                String text = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
-                        .lines().collect(Collectors.joining("\n"));
-                descriptionArea.setText(text);
-            } else {
-                descriptionArea.setText("No description available for " + safeId);
-                // System.out.println("Missing definition: " + path);
+    /**
+     * Parses the hierarchy.txt file and populates the TreeView.
+     * Format: Name.suffix;index
+     * Logic: Index determines relationship (0=Child, >0=Sibling).
+     */
+    private void loadHierarchy() {
+        Thread thread = new Thread(() -> {
+            try {
+                InputStream is = getClass().getResourceAsStream("/z-anatomy/hierarchy.txt");
+                if (is == null) {
+                    System.err.println("Hierarchy file not found!");
+                    return;
+                }
+                
+                TreeItem<String> rootItem = new TreeItem<>("Root");
+                Stack<TreeItem<String>> stack = new Stack<>();
+                stack.push(rootItem);
+                
+                // Helper to track index of items in the stack
+                Stack<Integer> indexStack = new Stack<>();
+                indexStack.push(-1); // Root has no index really
+                
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+                String line;
+                int lineCount = 0;
+                
+                while ((line = reader.readLine()) != null) {
+                    line = line.trim();
+                    if (line.isEmpty()) continue;
+                    
+                    // Parse "Name;Index"
+                    int semi = line.lastIndexOf(';');
+                    if (semi == -1) continue;
+                    
+                    String name = line.substring(0, semi);
+                    int index = Integer.parseInt(line.substring(semi + 1));
+                    
+                    TreeItem<String> newItem = new TreeItem<>(name);
+                    // Populate Map
+                    idToTreeItem.put(name, newItem);
+                    idToTreeItem.put(sanitizeIdFor3D(name), newItem);
+                    
+                    // Logic:
+                    // If index == 0, it's a child of the current stack top.
+                    if (index == 0) {
+                        TreeItem<String> parent = stack.peek();
+                        Platform.runLater(() -> parent.getChildren().add(newItem));
+                        stack.push(newItem);
+                        indexStack.push(index);
+                    } else {
+                        // Sibling or Uncle.
+                        // We must pop until we find the predecessor (index - 1).
+                        // Note: The stack contains the path. The top is the "previous sibling" if we are at the same level.
+                        
+                        // We need to find `index - 1` in the `indexStack`? 
+                        // Actually, if we are valid, the stack top should satisfy some condition.
+                        // Simplified Logic based on Z-Anatomy structure:
+                        // The stack represents the active branch.
+                        // We pop items that are "finished".
+                        // A item is finished if the next item is its sibling (index == self.index + 1) NO, 
+                        // If next item is sibling, the PREVIOUS item (on top of stack) is finished.
+                        
+                        while (!indexStack.isEmpty() && indexStack.peek() >= index) {
+                            stack.pop();
+                            indexStack.pop();
+                        }
+                        
+                        // If logic holds, now stack.peek() is the PARENT for this new index?
+                        // No, if I popped the previous sibling (index-1), stack.peek() is the PARENT.
+                        // Wait.
+                        // Seq: A(0), B(1).
+                        // Stack: A(0). Next B(1).
+                        // A(0) < 1. Loop doesn't run? 
+                        // IF A(0) < 1, we DON'T pop? That means B(1) becomes child of A(0)? WRONG. Sibling.
+                        
+                        // Correct Logic:
+                        // We need to pop until the stack top is the PARENT.
+                        // The parent is the one whose last child had index = index - 1.
+                        // But we don't store that.
+                        
+                        // Let's use the property: Sibling replaces Sibling on Stack.
+                        // If index > 0:
+                        //   Pop the previous sibling (which should have index = index - 1).
+                        //   Add new item to the *new* stack top (which is the parent).
+                        //   Push new item.
+                        
+                        // Robustness: What if we jump levels?
+                        // We pop until we satisfy the structure.
+                        
+                        // Re-evaluating:
+                        // A(0). Stack [Root, A(0)].
+                        // B(1). B is sibling of A.
+                        // We need to Pop A. Stack [Root]. Add B to Root. Push B. Stack [Root, B(1)].
+                        // C(0). C is child of B. Add C to B. Push C. Stack [Root, B, C(0)].
+                        // D(0). D is child of C? No, usually indices restart at 0 for new level.
+                        
+                        // My loop `while (peek >= index)`:
+                        // A(0) vs 1. 0 < 1. False.
+                        // So I need `while (peek >= index - 1)` ?
+                        // A(0) vs 0. True. Pop A. Stack [Root]. OK.
+                        
+                        // Let's try:
+                        // A(0) -> [Root, A(0)]
+                        // B(1). Need to pop A(0).
+                        // Condition `lastIndex == index - 1`.
+                        // If `peek() == index - 1`, we pop it, then add to the *next* peek (parent).
+                        
+                        while (!stack.isEmpty() && !indexStack.isEmpty()) {
+                             int topIndex = indexStack.peek();
+                             if (topIndex == index - 1) {
+                                  // Found the sibling. Pop it to get to parent.
+                                  stack.pop();
+                                  indexStack.pop();
+                                  break; 
+                             } else if (topIndex >= index) {
+                                  // We are too deep (maybe returning from a deep branch).
+                                  stack.pop();
+                                  indexStack.pop();
+                             } else {
+                                  // topIndex < index - 1. This implies a gap? Or we looked too far?
+                                  // Usually topIndex should match index-1 eventually.
+                                  // Unless index is 0. But we handled index 0.
+                                  break; 
+                             }
+                        }
+                        
+                        if (!stack.isEmpty()) {
+                             TreeItem<String> parent = stack.peek();
+                             Platform.runLater(() -> parent.getChildren().add(newItem));
+                             stack.push(newItem);
+                             indexStack.push(index);
+                        }
+                    }
+                }
+                
+                Platform.runLater(() -> {
+                     hierarchyTree.setRoot(rootItem);
+                     rootItem.setExpanded(true);
+                     // loadingLabel.setVisible(false);
+                });
+                
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            descriptionArea.setText("Error loading description.");
-            e.printStackTrace();
+        });
+        thread.setDaemon(true);
+        thread.start();
+    }
+    
+    // Attempt to sanitize hierarchy name to match Fbx Node IDs
+    private String sanitizeIdFor3D(String name) {
+        // e.g. "Parietal bone.l" -> "Parietal_bone_l" or "ParietalBone_L"
+        // This depends heavily on the FBX file.
+        // For now, simple replacement
+        return name.replace(" ", "_");
+        // We will refine this as we validat against the actual IDs.
+    }
+
+    private void loadDefinition(String id) {
+        // ID might be "Parietal bone.l". 
+        // Definition might be "(Parietal bone)-FR.txt".
+        
+        // Strategy:
+        // 1. Exact Name: "Parietal bone.l" -> "/.../Parietal bone.l.txt" (unlikely)
+        // 2. Base name: "Parietal bone" -> "/.../Parietal bone-FR.txt"
+        // 3. Parentheses: "(Parietal bone)-FR.txt"
+        
+        String cleanName = id;
+        // Remove suffixes .l, .r, .g, etc. if they exist and are preceded by dot
+        if (cleanName.matches(".*\\.[a-z]+$")) {
+             cleanName = cleanName.substring(0, cleanName.lastIndexOf('.'));
+        }
+        
+        String descFolder = "/z-anatomy/descriptions/";
+        
+        // Try variants
+        String[] variants = {
+            id + "-FR.txt",
+            cleanName + "-FR.txt",
+            "(" + cleanName + ")-FR.txt",
+            cleanName + ".txt"
+        };
+        
+        String foundText = null;
+        
+        for (String v : variants) {
+            String path = descFolder + v;
+            try (InputStream is = getClass().getResourceAsStream(path)) {
+                 if (is != null) {
+                      foundText = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
+                                  .lines().collect(Collectors.joining("\n"));
+                      break;
+                 }
+            } catch (Exception e) { e.printStackTrace(); }
+        }
+
+        if (foundText != null) {
+             descriptionArea.setText(foundText);
+        } else {
+             descriptionArea.setText("No description found for: " + cleanName);
         }
     }
     
     private void logError(String model) {
         Platform.runLater(() -> System.err.println("Failed to load: " + model));
+    }
+
+    private void expandAndSelect(TreeItem<String> item) {
+        if (item == null) return;
+        
+        // Expand parents
+        TreeItem<String> parent = item.getParent();
+        while (parent != null) {
+            parent.setExpanded(true);
+            parent = parent.getParent();
+        }
+        
+        // Select and try to scroll
+        hierarchyTree.getSelectionModel().select(item);
+        int row = hierarchyTree.getRow(item);
+        if (row >= 0) {
+            hierarchyTree.scrollTo(row);
+        }
     }
 
     public static void main(String[] args) {

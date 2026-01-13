@@ -64,7 +64,7 @@ public class SpectrographDemo extends SimulationDemo {
     @Override
     protected Node createViewerNode() {
         AudioViewer sv = new AudioViewer();
-        sv.play(); // Start by default
+        // sv.play(); // Start by default
         return sv;
     }
 }

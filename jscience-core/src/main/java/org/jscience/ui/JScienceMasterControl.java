@@ -873,7 +873,7 @@ public class JScienceMasterControl extends Application {
         desc.getStyleClass().add("mastercontrol-description");
         box.getChildren().add(desc);
 
-        GridPane grid = new GridPane();
+
         // --- 2D Section ---
         VBox box2D = new VBox(12);
         Label header2D = new Label(i18n.get("mastercontrol.libraries.cat.vis_2d", "Visualization and Plotting 2D"));
