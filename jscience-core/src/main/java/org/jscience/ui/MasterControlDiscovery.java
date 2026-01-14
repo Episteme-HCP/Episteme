@@ -54,8 +54,13 @@ public class MasterControlDiscovery {
         List<Viewer> results = new ArrayList<>();
         try {
             ServiceLoader<Viewer> loader = ServiceLoader.load(Viewer.class);
-            for (Viewer provider : loader) {
-                results.add(provider);
+            Iterator<Viewer> iterator = loader.iterator();
+            while (iterator.hasNext()) {
+                try {
+                    results.add(iterator.next());
+                } catch (ServiceConfigurationError e) {
+                    logger.warn("Could not load Viewer provider: {}", e.getMessage());
+                }
             }
         } catch (Throwable e) {
             logger.error("Error loading providers via SPI", e);

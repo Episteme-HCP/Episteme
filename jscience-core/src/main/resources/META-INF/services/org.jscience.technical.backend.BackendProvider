@@ -26,3 +26,5 @@ org.jscience.mathematics.linearalgebra.backends.EJMLLinearAlgebraProvider
 
 # Network Backend Providers
 org.jscience.ui.viewers.mathematics.discrete.backend.JavaFXNetworkBackendProvider
+org.jscience.ui.viewers.mathematics.discrete.backend.JGraphTBackendProvider
+org.jscience.ui.viewers.mathematics.discrete.backend.GraphStreamBackendProvider

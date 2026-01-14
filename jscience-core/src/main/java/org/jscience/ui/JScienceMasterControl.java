@@ -1214,16 +1214,26 @@ public class JScienceMasterControl extends Application {
         @SuppressWarnings("rawtypes")
         java.util.ServiceLoader<org.jscience.io.ResourceReader> readerLoader = 
             java.util.ServiceLoader.load(org.jscience.io.ResourceReader.class);
-        for (org.jscience.io.ResourceReader<?> reader : readerLoader) {
-            allLoaders.add(reader);
+        java.util.Iterator<org.jscience.io.ResourceReader> readerIter = readerLoader.iterator();
+        while (readerIter.hasNext()) {
+            try {
+                allLoaders.add(readerIter.next());
+            } catch (java.util.ServiceConfigurationError e) {
+                System.err.println("Warning: Could not load ResourceReader: " + e.getMessage());
+            }
         }
         
         // Load writers  
         @SuppressWarnings("rawtypes")
         java.util.ServiceLoader<org.jscience.io.ResourceWriter> writerLoader = 
             java.util.ServiceLoader.load(org.jscience.io.ResourceWriter.class);
-        for (org.jscience.io.ResourceWriter<?> writer : writerLoader) {
-            allLoaders.add(writer);
+        java.util.Iterator<org.jscience.io.ResourceWriter> writerIter = writerLoader.iterator();
+        while (writerIter.hasNext()) {
+            try {
+                allLoaders.add(writerIter.next());
+            } catch (java.util.ServiceConfigurationError e) {
+                System.err.println("Warning: Could not load ResourceWriter: " + e.getMessage());
+            }
         }
         
         // Group into Readers and Writers
