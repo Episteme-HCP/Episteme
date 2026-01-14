@@ -489,7 +489,7 @@ public class HumanBodyViewer extends AbstractViewer {
     private void loadHierarchy() {
         Thread thread = new Thread(() -> {
             try {
-                InputStream is = HumanBodyViewer.class.getResourceAsStream("/z-anatomy/hierarchy.txt");
+                InputStream is = HumanBodyViewer.class.getResourceAsStream("/org/jscience/medicine/anatomy/z-anatomy/hierarchy.txt");
                 if (is == null) {
                     System.err.println("Hierarchy file not found!");
                     return;

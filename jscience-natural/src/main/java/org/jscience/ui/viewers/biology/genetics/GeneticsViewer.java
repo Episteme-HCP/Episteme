@@ -1,32 +1,12 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.jscience.ui.viewers.biology.genetics;
 
-import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
@@ -36,7 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.Stage;
+import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.i18n.I18n;
 
 import java.util.HashMap;
@@ -45,17 +25,14 @@ import java.util.Random;
 
 /**
  * Enhanced Genetics Viewer.
- * Features:
- * 1. Population Genetics (Drift Simulation)
- * 2. Mendelian Inheritance (Punnett Square Calculator)
+ * Features: Population Genetics (Drift Simulation) and Mendelian Inheritance.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GeneticsViewer extends Application {
+public class GeneticsViewer extends AbstractViewer {
 
-    // --- Genetic Drift State ---
     private int popSize = 100;
     private int generations = 200;
     private double initialFreq = 0.5;
@@ -63,44 +40,42 @@ public class GeneticsViewer extends Application {
     private Canvas driftCanvas;
     private Label driftStatusLabel;
 
-    // --- Mendelian State ---
     private Canvas mendelCanvas;
     private TextField parent1Field;
     private TextField parent2Field;
     private Label mendelResultsLabel;
 
     @Override
-    public void start(Stage stage) {
+    public String getName() { return I18n.getInstance().get("viewer.genetics", "Genetics"); }
+    
+    @Override
+    public String getCategory() { return "Biology"; }
+
+    public GeneticsViewer() {
+        initUI();
+    }
+
+    private void initUI() {
         TabPane tabPane = new TabPane();
         tabPane.getStyleClass().add("dark-tab-pane");
 
-        Tab driftTab = new Tab(I18n.getInstance().get("genetics.tab.drift"));
+        Tab driftTab = new Tab(I18n.getInstance().get("genetics.tab.drift", "Genetic Drift"));
         driftTab.setContent(createDriftTab());
         driftTab.setClosable(false);
 
-        Tab mendelTab = new Tab(I18n.getInstance().get("genetics.tab.mendel"));
+        Tab mendelTab = new Tab(I18n.getInstance().get("genetics.tab.mendel", "Mendelian"));
         mendelTab.setContent(createMendelTab());
         mendelTab.setClosable(false);
 
         tabPane.getTabs().addAll(driftTab, mendelTab);
-
-        Scene scene = new Scene(tabPane, 950, 600);
-        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(I18n.getInstance().get("viewer.genetics"));
-        stage.setScene(scene);
-        stage.show();
+        this.setCenter(tabPane);
     }
-
-    // ============================================================================================
-    // TAB 1: Genetic Drift
-    // ============================================================================================
 
     private BorderPane createDriftTab() {
         driftCanvas = new Canvas(700, 400);
         history = new double[generations];
 
-        // Controls
-        Button runBtn = new Button(I18n.getInstance().get("genetics.run"));
+        Button runBtn = new Button(I18n.getInstance().get("genetics.run", "Run Simulation"));
         runBtn.setOnAction(e -> runDriftSimulation());
 
         Spinner<Integer> popSpinner = new Spinner<>(10, 1000, 100, 10);
@@ -120,32 +95,29 @@ public class GeneticsViewer extends Application {
         freqSlider.valueProperty().addListener((o, old, val) -> initialFreq = val.doubleValue());
 
         HBox controls = new HBox(15,
-                new Label(I18n.getInstance().get("genetics.popsize")), popSpinner,
-                new Label(I18n.getInstance().get("genetics.generations")), genSpinner,
-                new Label(I18n.getInstance().get("genetics.initialfreq")), freqSlider,
+                new Label(I18n.getInstance().get("genetics.popsize", "Pop Size")), popSpinner,
+                new Label(I18n.getInstance().get("genetics.generations", "Generations")), genSpinner,
+                new Label(I18n.getInstance().get("genetics.initialfreq", "Initial Freq")), freqSlider,
                 runBtn);
         controls.setPadding(new Insets(10));
         controls.setAlignment(Pos.CENTER_LEFT);
-        controls.getStyleClass().add("dark-viewer-sidebar"); // Reuse sidebar style for bottom bar color
 
-        // Info Panel
         VBox infoPanel = new VBox(10);
         infoPanel.setPadding(new Insets(10));
         infoPanel.getStyleClass().add("dark-viewer-sidebar");
         infoPanel.setPrefWidth(200);
 
-        Label titleLabel = new Label(I18n.getInstance().get("genetics.subtitle"));
+        Label titleLabel = new Label(I18n.getInstance().get("genetics.subtitle", "Genetic Drift"));
         titleLabel.getStyleClass().add("dark-header");
 
-        Label explanationLabel = new Label(I18n.getInstance().get("genetics.explanation"));
+        Label explanationLabel = new Label(I18n.getInstance().get("genetics.explanation", "Simulates allele frequency changes in a population over generations due to random sampling."));
         explanationLabel.setWrapText(true);
-        explanationLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #333333;");
+        explanationLabel.setStyle("-fx-font-size: 11px;");
 
-        driftStatusLabel = new Label(I18n.getInstance().get("genetics.status.start"));
-        driftStatusLabel.setStyle("-fx-font-style: italic; -fx-text-fill: #333333;");
+        driftStatusLabel = new Label(I18n.getInstance().get("genetics.status.start", "Click Run to start"));
+        driftStatusLabel.setStyle("-fx-font-style: italic;");
 
-        infoPanel.getChildren().addAll(titleLabel, new Separator(), explanationLabel, new Separator(),
-                driftStatusLabel);
+        infoPanel.getChildren().addAll(titleLabel, new Separator(), explanationLabel, new Separator(), driftStatusLabel);
 
         BorderPane root = new BorderPane();
         root.setCenter(driftCanvas);
@@ -153,9 +125,7 @@ public class GeneticsViewer extends Application {
         root.setRight(infoPanel);
         root.getStyleClass().add("dark-viewer-root");
 
-        // Initial draw
         drawDriftAxes();
-
         return root;
     }
 
@@ -167,15 +137,14 @@ public class GeneticsViewer extends Application {
             history[gen] = freq;
             int count = 0;
             for (int i = 0; i < popSize; i++) {
-                if (rand.nextDouble() < freq)
-                    count++;
+                if (rand.nextDouble() < freq) count++;
             }
             freq = (double) count / popSize;
         }
 
-        String outcome = freq >= 0.99 ? I18n.getInstance().get("genetics.outcome.fixed")
-                : freq <= 0.01 ? I18n.getInstance().get("genetics.outcome.lost") : String.format("%.3f", freq);
-        driftStatusLabel.setText(String.format(I18n.getInstance().get("genetics.frequency"), outcome));
+        String outcome = freq >= 0.99 ? I18n.getInstance().get("genetics.outcome.fixed", "Fixed")
+                : freq <= 0.01 ? I18n.getInstance().get("genetics.outcome.lost", "Lost") : String.format("%.3f", freq);
+        driftStatusLabel.setText(String.format(I18n.getInstance().get("genetics.frequency", "Final Freq: %s"), outcome));
 
         drawDriftAxes();
         drawDriftHistory();
@@ -185,19 +154,16 @@ public class GeneticsViewer extends Application {
         GraphicsContext gc = driftCanvas.getGraphicsContext2D();
         gc.clearRect(0, 0, driftCanvas.getWidth(), driftCanvas.getHeight());
 
-        // Axes
-        gc.setStroke(Color.web("#444444")); // Darker grey for axes
+        gc.setStroke(Color.web("#444444"));
         gc.setLineWidth(1.5);
-        gc.strokeLine(50, 350, 680, 350); // X axis
-        gc.strokeLine(50, 50, 50, 350); // Y axis
+        gc.strokeLine(50, 350, 680, 350);
+        gc.strokeLine(50, 50, 50, 350);
 
-        // Labels
-        gc.setFill(Color.web("#222222")); // Almost black for text
-        gc.fillText(I18n.getInstance().get("genetics.axis.generation"), 350, 385);
-        gc.fillText(I18n.getInstance().get("genetics.axis.allele"), 5, 180);
-        gc.fillText(I18n.getInstance().get("genetics.axis.frequency"), 5, 195);
+        gc.setFill(Color.web("#222222"));
+        gc.fillText(I18n.getInstance().get("genetics.axis.generation", "Generation"), 350, 385);
+        gc.fillText(I18n.getInstance().get("genetics.axis.allele", "Allele"), 5, 180);
+        gc.fillText(I18n.getInstance().get("genetics.axis.frequency", "Frequency"), 5, 195);
 
-        // Y-axis ticks
         gc.setStroke(Color.web("#888888"));
         gc.setLineWidth(0.5);
         for (double f = 0; f <= 1.0; f += 0.25) {
@@ -216,35 +182,28 @@ public class GeneticsViewer extends Application {
         for (int i = 0; i < generations; i++) {
             double x = 50 + (i * 630.0 / generations);
             double y = 350 - (history[i] * 300);
-            if (i == 0)
-                gc.moveTo(x, y);
-            else
-                gc.lineTo(x, y);
+            if (i == 0) gc.moveTo(x, y);
+            else gc.lineTo(x, y);
         }
         gc.stroke();
     }
 
-    // ============================================================================================
-    // TAB 2: Mendelian Inheritance (Punnett Square)
-    // ============================================================================================
-
     private BorderPane createMendelTab() {
         mendelCanvas = new Canvas(600, 400);
 
-        // Input Panel
         VBox inputPanel = new VBox(15);
         inputPanel.setPadding(new Insets(20));
         inputPanel.setPrefWidth(300);
         inputPanel.getStyleClass().add("dark-viewer-sidebar");
         inputPanel.setAlignment(Pos.TOP_LEFT);
 
-        Label title = new Label(I18n.getInstance().get("genetics.tab.mendel"));
+        Label title = new Label(I18n.getInstance().get("genetics.tab.mendel", "Mendelian Inheritance"));
         title.getStyleClass().add("dark-header");
 
         parent1Field = new TextField("Aa");
         parent2Field = new TextField("Aa");
 
-        Button calcBtn = new Button(I18n.getInstance().get("genetics.mendel.calculate"));
+        Button calcBtn = new Button(I18n.getInstance().get("genetics.mendel.calculate", "Calculate"));
         calcBtn.setMaxWidth(Double.MAX_VALUE);
         calcBtn.setOnAction(e -> calculatePunnettSquare());
 
@@ -254,21 +213,16 @@ public class GeneticsViewer extends Application {
 
         inputPanel.getChildren().addAll(
                 title, new Separator(),
-                new Label(I18n.getInstance().get("genetics.mendel.parent1")), parent1Field,
-                new Label(I18n.getInstance().get("genetics.mendel.parent2")), parent2Field,
-                new Separator(),
-                calcBtn,
-                new Separator(),
-                mendelResultsLabel);
+                new Label(I18n.getInstance().get("genetics.mendel.parent1", "Parent 1 Genotype")), parent1Field,
+                new Label(I18n.getInstance().get("genetics.mendel.parent2", "Parent 2 Genotype")), parent2Field,
+                new Separator(), calcBtn, new Separator(), mendelResultsLabel);
 
         BorderPane root = new BorderPane();
         root.setLeft(inputPanel);
         root.setCenter(mendelCanvas);
         root.getStyleClass().add("dark-viewer-root");
 
-        // Calculate default on load
         calculatePunnettSquare();
-
         return root;
     }
 
@@ -277,43 +231,37 @@ public class GeneticsViewer extends Application {
         String p2 = parent2Field.getText().trim();
 
         if (p1.length() != 2 || p2.length() != 2) {
-            mendelResultsLabel.setText(I18n.getInstance().get("genetics.mendel.error"));
+            mendelResultsLabel.setText(I18n.getInstance().get("genetics.mendel.error", "Enter 2-character genotypes"));
             return;
         }
 
-        // Parent Alleles
         char[] g1 = p1.toCharArray();
         char[] g2 = p2.toCharArray();
 
-        // 4 Offspring Combinations
         String[] offspring = new String[4];
         offspring[0] = sortAlleles(g1[0], g2[0]);
         offspring[1] = sortAlleles(g1[0], g2[1]);
         offspring[2] = sortAlleles(g1[1], g2[0]);
         offspring[3] = sortAlleles(g1[1], g2[1]);
 
-        // Calculate Ratios
         Map<String, Integer> counts = new HashMap<>();
         for (String s : offspring) {
             counts.put(s, counts.getOrDefault(s, 0) + 1);
         }
 
-        StringBuilder results = new StringBuilder(I18n.getInstance().get("genetics.mendel.ratios") + "\n");
+        StringBuilder results = new StringBuilder(I18n.getInstance().get("genetics.mendel.ratios", "Ratios:") + "\n");
         for (Map.Entry<String, Integer> entry : counts.entrySet()) {
             double percent = (entry.getValue() / 4.0) * 100;
             results.append(String.format("  %s : %.0f%%\n", entry.getKey(), percent));
         }
 
         mendelResultsLabel.setText(results.toString());
-
         drawPunnettSquare(g1, g2, offspring);
     }
 
     private String sortAlleles(char a, char b) {
-        if (Character.isUpperCase(a) && Character.isLowerCase(b))
-            return "" + a + b;
-        if (Character.isLowerCase(a) && Character.isUpperCase(b))
-            return "" + b + a;
+        if (Character.isUpperCase(a) && Character.isLowerCase(b)) return "" + a + b;
+        if (Character.isLowerCase(a) && Character.isUpperCase(b)) return "" + b + a;
         return (a < b) ? "" + a + b : "" + b + a;
     }
 
@@ -332,29 +280,20 @@ public class GeneticsViewer extends Application {
         gc.setFill(Color.BLACK);
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 24));
 
-        // Draw Matrix Grid
         gc.strokeRect(startX, startY, size, size);
         gc.strokeLine(startX + size / 2, startY, startX + size / 2, startY + size);
         gc.strokeLine(startX, startY + size / 2, startX + size, startY + size / 2);
 
-        // Draw Labels (Parent 1 on Top)
         gc.setFill(Color.BLACK);
         gc.fillText("" + p1[0], startX + size / 4 - 8, startY - 20);
         gc.fillText("" + p1[1], startX + 3 * size / 4 - 8, startY - 20);
-
-        // Draw Labels (Parent 2 on Left)
         gc.fillText("" + p2[0], startX - 30, startY + size / 4 + 8);
         gc.fillText("" + p2[1], startX - 30, startY + 3 * size / 4 + 8);
 
-        // Draw Offspring
         gc.setFill(Color.BLUE);
         gc.fillText(offspring[0], startX + size / 4 - 15, startY + size / 4 + 8);
         gc.fillText(offspring[1], startX + 3 * size / 4 - 15, startY + size / 4 + 8);
         gc.fillText(offspring[2], startX + size / 4 - 15, startY + 3 * size / 4 + 8);
         gc.fillText(offspring[3], startX + 3 * size / 4 - 15, startY + 3 * size / 4 + 8);
-    }
-
-    public static void show(Stage stage) {
-        new GeneticsViewer().start(stage);
     }
 }
