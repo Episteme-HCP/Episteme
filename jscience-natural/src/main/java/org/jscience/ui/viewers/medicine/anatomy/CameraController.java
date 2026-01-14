@@ -12,6 +12,7 @@ import javafx.scene.transform.Translate;
 /**
  * Manages 3D camera navigation: Orbit, Zoom, Pan, and Framing.
  */
+@SuppressWarnings("unused")
 public class CameraController {
 
     private final Camera camera;

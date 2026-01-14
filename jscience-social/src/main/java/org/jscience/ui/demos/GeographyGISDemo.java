@@ -23,12 +23,6 @@
 
 package org.jscience.ui.demos;
 
-import javafx.geometry.Point2D;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.control.*;
-import javafx.scene.image.WritableImage;
-import java.util.ArrayList;
-import java.util.List;
 import org.jscience.ui.AbstractDemo;
 
 /**

@@ -187,7 +187,7 @@ public class StellarSkyViewer extends AbstractViewer {
             this.name=name; this.color=color; this.N=N; this.i=i; this.w=w; this.a=a; this.e=e; this.M=M; this.nN=nN; this.ni=ni; this.nw=nw; this.na=na; this.ne=ne; this.nM=nM;
         }
     }
-    private static class DeepSkyObject { String name, type; double ra, dec; DeepSkyObject(String n, String t, double r, double d, double m) { name=n; type=t; ra=r; dec=d; } }
+    private static class DeepSkyObject { String name; double ra, dec; DeepSkyObject(String n, String t, double r, double d, double m) { name=n; ra=r; dec=d; } }
 
     private void initPlanets() {
         planets.add(new PlanetData("Mercury", Color.LIGHTGRAY, 48.331, 7.005, 29.124, 0.3871, 0.2056, 168.656, 3.24587e-5, 3.2e-7, 1.014e-5, 0, 0, 4.0923344));

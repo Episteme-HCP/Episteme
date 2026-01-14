@@ -37,6 +37,7 @@ public class AudioViewer extends AbstractViewer implements Simulatable {
     private final Canvas spectrogramCanvas;
     private final ScrollPane scrollPane;
     private final VBox contentBox;
+    @SuppressWarnings("unused")
     private File currentFile;
 
     public AudioViewer() {

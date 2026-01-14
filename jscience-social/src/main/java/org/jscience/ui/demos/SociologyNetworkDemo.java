@@ -23,8 +23,6 @@
 
 package org.jscience.ui.demos;
 
-import org.jscience.mathematics.geometry.Vector2D;
-import javafx.scene.paint.Color;
 import org.jscience.ui.AbstractDemo;
 
 /**

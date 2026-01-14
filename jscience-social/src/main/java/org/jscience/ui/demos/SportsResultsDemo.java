@@ -80,8 +80,8 @@ public class SportsResultsDemo extends AbstractDemo {
         TableColumn<Team, String> avgCol = new TableColumn<>("Trend (SMA)");
         avgCol.setCellValueFactory(cell -> cell.getValue().trend);
 
-        @SuppressWarnings("unchecked")
-        boolean added = table.getColumns().addAll(rankCol, nameCol, playedCol, pointsCol, avgCol);
+        @SuppressWarnings({"unchecked", "unused"})
+        var unused = table.getColumns().addAll(rankCol, nameCol, playedCol, pointsCol, avgCol);
 
         VBox centerBox = new VBox(10, new Label("League Standings"), table);
         centerBox.setPadding(new Insets(20));

@@ -161,7 +161,7 @@ public class ArchitectureStabilityDemo extends AbstractSimulationDemo {
                 Quantity<Length> blockX = Quantities.create(bx + 50, Units.METER);
                 @SuppressWarnings("unchecked")
                 Quantity<?> moment = blockX.multiply(b.mass);
-                @SuppressWarnings("unchecked")
+                @SuppressWarnings({"unchecked", "rawtypes"})
                 Quantity<?> tm = totalMoment.add((Quantity) moment);
                 totalMoment = tm;
                 totalMass = totalMass.add(b.mass);
