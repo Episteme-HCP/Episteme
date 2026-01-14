@@ -519,7 +519,7 @@ public class JScienceMasterControl extends Application {
         }
         backendBox.getItems().addAll(nameToId.keySet());
         
-        String currentId = JScience.getMolecularBackendId();
+        String currentId = org.jscience.io.UserPreferences.getInstance().getPreferredBackend("molecular");
         String currentName = "AUTO";
         for (var entry : nameToId.entrySet()) {
             if (java.util.Objects.equals(entry.getValue(), currentId)) {
@@ -530,8 +530,7 @@ public class JScienceMasterControl extends Application {
         backendBox.setValue(currentName);
         backendBox.setOnAction(e -> {
             String name = backendBox.getValue();
-            JScience.setMolecularBackendId(nameToId.get(name));
-            JScience.savePreferences();
+            org.jscience.io.UserPreferences.getInstance().setPreferredBackend("molecular", nameToId.get(name));
         });
 
         VBox backendInfo = createInfoBox(
@@ -585,7 +584,7 @@ public class JScienceMasterControl extends Application {
         }
         backendBox.getItems().addAll(nameToId.keySet());
         
-        String currentId = JScience.getQuantumBackendId();
+        String currentId = org.jscience.io.UserPreferences.getInstance().getPreferredBackend("quantum");
         String currentName = "AUTO";
         for (var entry : nameToId.entrySet()) {
             if (java.util.Objects.equals(entry.getValue(), currentId)) {
@@ -596,8 +595,7 @@ public class JScienceMasterControl extends Application {
         backendBox.setValue(currentName);
         backendBox.setOnAction(e -> {
             String name = backendBox.getValue();
-            JScience.setQuantumBackendId(nameToId.get(name));
-            JScience.savePreferences();
+            org.jscience.io.UserPreferences.getInstance().setPreferredBackend("quantum", nameToId.get(name));
         });
 
         VBox backendInfo = createInfoBox(
@@ -650,7 +648,7 @@ public class JScienceMasterControl extends Application {
         }
         backendBox.getItems().addAll(nameToId.keySet());
         
-        String currentId = JScience.getMapBackendId();
+        String currentId = org.jscience.io.UserPreferences.getInstance().getPreferredBackend("map");
         String currentName = "AUTO";
         for (var entry : nameToId.entrySet()) {
             if (java.util.Objects.equals(entry.getValue(), currentId)) {
@@ -661,8 +659,7 @@ public class JScienceMasterControl extends Application {
         backendBox.setValue(currentName);
         backendBox.setOnAction(e -> {
             String name = backendBox.getValue();
-            JScience.setMapBackendId(nameToId.get(name));
-            JScience.savePreferences();
+            org.jscience.io.UserPreferences.getInstance().setPreferredBackend("map", nameToId.get(name));
         });
 
         VBox backendInfo = createInfoBox(
@@ -716,7 +713,7 @@ public class JScienceMasterControl extends Application {
         }
         backendBox.getItems().addAll(nameToId.keySet());
         
-        String currentId = JScience.getNetworkBackendId();
+        String currentId = org.jscience.io.UserPreferences.getInstance().getPreferredBackend("network");
         String currentName = "AUTO";
         for (var entry : nameToId.entrySet()) {
             if (java.util.Objects.equals(entry.getValue(), currentId)) {
@@ -727,8 +724,7 @@ public class JScienceMasterControl extends Application {
         backendBox.setValue(currentName);
         backendBox.setOnAction(e -> {
             String name = backendBox.getValue();
-            JScience.setNetworkBackendId(nameToId.get(name));
-            JScience.savePreferences();
+            org.jscience.io.UserPreferences.getInstance().setPreferredBackend("network", nameToId.get(name));
         });
 
         VBox backendInfo = createInfoBox(

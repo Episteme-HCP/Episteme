@@ -37,9 +37,6 @@ import java.util.Properties;
  */
 public class UserPreferences {
 
-    private static final String PREFS_DIR = ".jscience";
-    private static final String PREFS_FILE = "preferences.properties";
-    
     // Backend preference keys
     public static final String KEY_MAP_BACKEND = "backend.map";
     public static final String KEY_NETWORK_BACKEND = "backend.network";
@@ -70,13 +67,27 @@ public class UserPreferences {
 
     private UserPreferences() {
         properties = new Properties();
-        Path userHome = Paths.get(System.getProperty("user.home"));
-        Path prefsDir = userHome.resolve(PREFS_DIR);
-        prefsPath = prefsDir.resolve(PREFS_FILE);
         
-        // Create directory if needed
+        // Load path directly from Configuration
+        String rawPath = Configuration.get("jscience.preferences.file");
+        if (rawPath == null) {
+             // Fallback if jscience.properties not loaded properly
+            rawPath = "${user.home}/.jscience/preferences.properties";
+        }
+        
+        // Simple variable expansion
+        String userHome = System.getProperty("user.home");
+        String expandedPath = rawPath.replace("${user.home}", userHome)
+                                     .replace("\\", File.separator)
+                                     .replace("/", File.separator);
+                                     
+        prefsPath = Paths.get(expandedPath);
+        
+        // Create parent directory if needed
         try {
-            Files.createDirectories(prefsDir);
+            if (prefsPath.getParent() != null) {
+                Files.createDirectories(prefsPath.getParent());
+            }
         } catch (IOException e) {
             System.err.println("Could not create preferences directory: " + e.getMessage());
         }
