@@ -26,7 +26,7 @@ package org.jscience;
 /**
  * Provides version, author, and build information for the JScience library.
  * <p>
- * Version information is loaded from {@code version.properties} if available,
+ * Version information is loaded from {@code jscience.properties} if available,
  * otherwise defaults are used.
  * </p>
  * 
@@ -51,12 +51,12 @@ public final class JScienceVersion {
     static {
         String v = "5.0.0-SNAPSHOT";
         String d = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());
-        try (java.io.InputStream is = JScienceVersion.class.getResourceAsStream("version.properties")) {
+        try (java.io.InputStream is = JScienceVersion.class.getResourceAsStream("/jscience.properties")) {
             if (is != null) {
                 java.util.Properties p = new java.util.Properties();
                 p.load(is);
-                v = p.getProperty("version", v);
-                d = p.getProperty("build.date", d);
+                v = p.getProperty("jscience.version", v);
+                d = p.getProperty("jscience.build.date", d);
             }
         } catch (Exception e) {
             // Ignore - use defaults

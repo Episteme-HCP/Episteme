@@ -52,6 +52,18 @@ public class UserPreferences {
     public static final String KEY_LANGUAGE = "ui.language";
     public static final String KEY_THEME = "ui.theme";
     
+    // Compute preference keys
+    public static final String KEY_COMPUTE_BACKEND = "compute.backend";
+    public static final String KEY_COMPUTE_THREADS = "compute.threads";
+    public static final String KEY_COMPUTE_GPU_ENABLED = "compute.gpu.enabled";
+    public static final String KEY_COMPUTE_OPENCL_DEVICE = "compute.opencl.device";
+    public static final String KEY_COMPUTE_CUDA_DEVICE = "compute.cuda.device";
+    
+    // Default values
+    public static final String DEFAULT_LANGUAGE = "en";
+    public static final String DEFAULT_THEME = "dark";
+    public static final String DEFAULT_COMPUTE_BACKEND = "cpu";
+    
     private static UserPreferences instance;
     private final Properties properties;
     private final Path prefsPath;
@@ -144,5 +156,63 @@ public class UserPreferences {
      */
     public Path getPreferencesPath() {
         return prefsPath;
+    }
+
+    // === Convenience methods for common preferences ===
+
+    /** Gets the UI language (default: en). */
+    public String getLanguage() {
+        return get(KEY_LANGUAGE, DEFAULT_LANGUAGE);
+    }
+
+    /** Sets the UI language. */
+    public void setLanguage(String language) {
+        set(KEY_LANGUAGE, language);
+    }
+
+    /** Gets the UI theme (default: dark). */
+    public String getTheme() {
+        return get(KEY_THEME, DEFAULT_THEME);
+    }
+
+    /** Sets the UI theme. */
+    public void setTheme(String theme) {
+        set(KEY_THEME, theme);
+    }
+
+    /** Gets the compute backend (cpu, opencl, cuda). */
+    public String getComputeBackend() {
+        return get(KEY_COMPUTE_BACKEND, DEFAULT_COMPUTE_BACKEND);
+    }
+
+    /** Sets the compute backend. */
+    public void setComputeBackend(String backend) {
+        set(KEY_COMPUTE_BACKEND, backend);
+    }
+
+    /** Gets the number of compute threads. */
+    public int getComputeThreads() {
+        String val = get(KEY_COMPUTE_THREADS);
+        if (val == null) return Runtime.getRuntime().availableProcessors();
+        try {
+            return Integer.parseInt(val);
+        } catch (NumberFormatException e) {
+            return Runtime.getRuntime().availableProcessors();
+        }
+    }
+
+    /** Sets the number of compute threads. */
+    public void setComputeThreads(int threads) {
+        set(KEY_COMPUTE_THREADS, String.valueOf(threads));
+    }
+
+    /** Gets whether GPU compute is enabled. */
+    public boolean isGpuEnabled() {
+        return "true".equalsIgnoreCase(get(KEY_COMPUTE_GPU_ENABLED, "false"));
+    }
+
+    /** Sets whether GPU compute is enabled. */
+    public void setGpuEnabled(boolean enabled) {
+        set(KEY_COMPUTE_GPU_ENABLED, String.valueOf(enabled));
     }
 }
