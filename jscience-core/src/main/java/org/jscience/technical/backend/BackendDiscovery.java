@@ -88,4 +88,26 @@ public class BackendDiscovery {
     public Optional<BackendProvider> getBestProvider(String type) {
         return getAvailableProvidersByType(type).stream().findFirst();
     }
+
+    /**
+     * Returns the preferred provider for a type, considering user preferences.
+     * Falls back to best available if no preference is set.
+     */
+    public Optional<BackendProvider> getPreferredProvider(String type) {
+        String preferredId = org.jscience.io.UserPreferences.getInstance().getPreferredBackend(type);
+        if (preferredId != null && !preferredId.isEmpty()) {
+            Optional<BackendProvider> preferred = getProvider(type, preferredId);
+            if (preferred.isPresent() && preferred.get().isAvailable()) {
+                return preferred;
+            }
+        }
+        return getBestProvider(type);
+    }
+
+    /**
+     * Sets the preferred provider for a type (persists to user preferences).
+     */
+    public void setPreferredProvider(String type, String providerId) {
+        org.jscience.io.UserPreferences.getInstance().setPreferredBackend(type, providerId);
+    }
 }
