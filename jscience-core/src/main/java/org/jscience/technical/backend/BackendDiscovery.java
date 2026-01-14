@@ -24,6 +24,8 @@ public class BackendDiscovery {
     public static final String TYPE_TENSOR = "tensor";
     public static final String TYPE_LINEAR_ALGEBRA = "linear-algebra";
     public static final String TYPE_QUANTUM = "quantum";
+    public static final String TYPE_MAP = "map";
+    public static final String TYPE_NETWORK = "network";
 
     private static final BackendDiscovery INSTANCE = new BackendDiscovery();
 

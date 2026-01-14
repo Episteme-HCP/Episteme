@@ -23,3 +23,6 @@ org.jscience.mathematics.linearalgebra.backends.OpenCLDenseLinearAlgebraProvider
 org.jscience.mathematics.linearalgebra.backends.OpenCLSparseLinearAlgebraProvider
 org.jscience.mathematics.linearalgebra.backends.ColtLinearAlgebraProvider
 org.jscience.mathematics.linearalgebra.backends.EJMLLinearAlgebraProvider
+
+# Network Backend Providers
+org.jscience.ui.viewers.mathematics.discrete.backend.JavaFXNetworkBackendProvider

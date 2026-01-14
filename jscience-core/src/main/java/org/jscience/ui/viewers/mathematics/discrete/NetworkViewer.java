@@ -19,10 +19,37 @@ import org.jscience.ui.AbstractViewer;
 public class NetworkViewer extends AbstractViewer {
 
     public NetworkViewer() {
-        Pane container = new Pane();
-        container.setStyle("-fx-background-color: white; -fx-border-color: #ccc;");
-        container.getChildren().add(new Label("Generic Network Viewer (Placeholder)"));
-        getChildren().add(container);
+        // Discover backend
+        String backendId = org.jscience.JScience.getNetworkBackendId();
+        java.util.Optional<org.jscience.technical.backend.BackendProvider> provider;
+        
+        if (backendId == null) {
+            provider = org.jscience.technical.backend.BackendDiscovery.getInstance()
+                .getBestProvider(org.jscience.technical.backend.BackendDiscovery.TYPE_NETWORK);
+        } else {
+            provider = org.jscience.technical.backend.BackendDiscovery.getInstance()
+                .getProvider(org.jscience.technical.backend.BackendDiscovery.TYPE_NETWORK, backendId);
+        }
+        
+        if (provider.isPresent()) {
+            Object backend = provider.get().createBackend();
+            if (backend instanceof org.jscience.ui.viewers.mathematics.discrete.backend.JavaFXNetworkRenderer) {
+                getChildren().add(((org.jscience.ui.viewers.mathematics.discrete.backend.JavaFXNetworkRenderer)backend).getCanvas());
+            } else {
+                javafx.scene.layout.VBox info = new javafx.scene.layout.VBox(10);
+                info.setAlignment(javafx.geometry.Pos.CENTER);
+                info.getChildren().addAll(
+                    new Label("Active Network Backend: " + provider.get().getName()),
+                    new Label(provider.get().getDescription())
+                );
+                getChildren().add(info);
+            }
+        } else {
+            Pane container = new Pane();
+            container.setStyle("-fx-background-color: white; -fx-border-color: #ccc;");
+            container.getChildren().add(new Label("No Network Backend Available (Install GraphStream, JUNG, etc.)"));
+            getChildren().add(container);
+        }
     }
 
     @Override

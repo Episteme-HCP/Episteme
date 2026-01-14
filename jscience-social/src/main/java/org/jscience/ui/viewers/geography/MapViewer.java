@@ -5,6 +5,7 @@
 package org.jscience.ui.viewers.geography;
 
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
 import org.jscience.ui.AbstractViewer;
 
@@ -20,7 +21,35 @@ public class MapViewer extends StackPane implements org.jscience.ui.Viewer {
 
     public MapViewer() {
         this.setStyle("-fx-background-color: #e0f0ff;");
-        this.getChildren().add(new Label("Generic Map Viewer (Placeholder)"));
+        
+        // Discover backend
+        String backendId = org.jscience.JScience.getMapBackendId();
+        java.util.Optional<org.jscience.technical.backend.BackendProvider> provider;
+        
+        if (backendId == null) {
+            provider = org.jscience.technical.backend.BackendDiscovery.getInstance()
+                .getBestProvider(org.jscience.technical.backend.BackendDiscovery.TYPE_MAP);
+        } else {
+            provider = org.jscience.technical.backend.BackendDiscovery.getInstance()
+                .getProvider(org.jscience.technical.backend.BackendDiscovery.TYPE_MAP, backendId);
+        }
+        
+        if (provider.isPresent()) {
+            Object backend = provider.get().createBackend();
+            if (backend instanceof org.jscience.ui.viewers.geography.backend.JavaFXMapRenderer) {
+                this.getChildren().add(((org.jscience.ui.viewers.geography.backend.JavaFXMapRenderer)backend).getCanvas());
+            } else {
+                VBox info = new VBox(10);
+                info.setAlignment(javafx.geometry.Pos.CENTER);
+                info.getChildren().addAll(
+                    new Label("Active Map Backend: " + provider.get().getName()),
+                    new Label(provider.get().getDescription())
+                );
+                this.getChildren().add(info);
+            }
+        } else {
+            this.getChildren().add(new Label("No Map Backend Available (Install Unfolding, GeoTools, etc.)"));
+        }
     }
 
     @Override

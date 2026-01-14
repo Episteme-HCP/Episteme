@@ -108,6 +108,8 @@ public final class JScience {
             if (quantumBackendId != null) prefs.put("quantum.backend", quantumBackendId);
             if (mathBackendId != null) prefs.put("math.backend", mathBackendId);
             if (tensorBackendId != null) prefs.put("tensor.backend", tensorBackendId);
+            if (mapBackendId != null) prefs.put("map.backend", mapBackendId);
+            if (networkBackendId != null) prefs.put("network.backend", networkBackendId);
             
             prefs.flush();
         } catch (Exception e) {
@@ -168,6 +170,12 @@ public final class JScience {
                 
                 String t = prefs.get("tensor.backend", null);
                 if (t != null) tensorBackendId = t;
+
+                String map = prefs.get("map.backend", null);
+                if (map != null) mapBackendId = map;
+
+                String net = prefs.get("network.backend", null);
+                if (net != null) networkBackendId = net;
                 
             } catch (Exception e) {
                 // Ignore backend loading errors
@@ -584,6 +592,42 @@ public final class JScience {
      */
     public static void setMolecularBackendId(String id) {
         molecularBackendId = id;
+    }
+
+    // ================= MAP BACKEND =================
+
+    private static String mapBackendId = null; // Default (AUTO)
+
+    /**
+     * Gets the ID of the current Map Backend.
+     */
+    public static String getMapBackendId() {
+        return mapBackendId;
+    }
+
+    /**
+     * Sets the Map Backend by ID.
+     */
+    public static void setMapBackendId(String id) {
+        mapBackendId = id;
+    }
+
+    // ================= NETWORK BACKEND =================
+
+    private static String networkBackendId = null; // Default (AUTO)
+
+    /**
+     * Gets the ID of the current Network Backend.
+     */
+    public static String getNetworkBackendId() {
+        return networkBackendId;
+    }
+
+    /**
+     * Sets the Network Backend by ID.
+     */
+    public static void setNetworkBackendId(String id) {
+        networkBackendId = id;
     }
 
     /**

@@ -481,6 +481,12 @@ public class JScienceMasterControl extends Application {
         // Quantum Computing - uses SPI discovery
         content.getChildren().add(createQuantumCategory(i18n));
 
+        // Geography & GIS - uses SPI discovery
+        content.getChildren().add(createGeographyCategory(i18n));
+
+        // Network & Graph Analysis - uses SPI discovery
+        content.getChildren().add(createNetworkCategory(i18n));
+
         return new Tab(i18n.get("mastercontrol.tab.libraries", "Libraries"), scroll);
     }
 
@@ -614,6 +620,134 @@ public class JScienceMasterControl extends Application {
         box.getChildren().add(new Separator());
         return box;
     }
+
+    private VBox createGeographyCategory(I18n i18n) {
+        VBox box = new VBox(12);
+        Label header = new Label(i18n.get("mastercontrol.geography.title", "Geography & GIS"));
+        header.getStyleClass().add("header-title");
+
+        Label desc = new Label(i18n.get("mastercontrol.libraries.cat.geography.desc", ""));
+        desc.getStyleClass().add("mastercontrol-description");
+        box.getChildren().add(desc);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(20);
+        grid.setVgap(15);
+        grid.setPadding(new Insets(10, 0, 10, 0));
+
+        // Map Rendering Backend
+        ComboBox<String> backendBox = new ComboBox<>();
+        // Fetch available map backends via SPI
+        java.util.List<org.jscience.technical.backend.BackendProvider> providers = 
+            org.jscience.technical.backend.BackendDiscovery.getInstance()
+                .getProvidersByType(org.jscience.technical.backend.BackendDiscovery.TYPE_MAP);
+
+        // Map names to IDs for lookup
+        java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
+        nameToId.put("AUTO", null);
+        for (org.jscience.technical.backend.BackendProvider p : providers) {
+            nameToId.put(p.getName(), p.getId());
+        }
+        backendBox.getItems().addAll(nameToId.keySet());
+        
+        String currentId = JScience.getMapBackendId();
+        String currentName = "AUTO";
+        for (var entry : nameToId.entrySet()) {
+            if (java.util.Objects.equals(entry.getValue(), currentId)) {
+                currentName = entry.getKey();
+                break;
+            }
+        }
+        backendBox.setValue(currentName);
+        backendBox.setOnAction(e -> {
+            String name = backendBox.getValue();
+            JScience.setMapBackendId(nameToId.get(name));
+            JScience.savePreferences();
+        });
+
+        VBox backendInfo = createInfoBox(
+            i18n.get("mastercontrol.geography.backend", "Map Renderer"), 
+            i18n.get("mastercontrol.geography.backend.desc", 
+                "Select the engine used to render geographic maps.\n" +
+                "Requires restart of the viewer window to take effect."));
+
+        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.geography.backend", "Map Renderer")),
+                backendBox,
+                backendInfo);
+
+        box.getChildren().addAll(header, grid);
+
+        // Append available libraries list (No header)
+        box.getChildren().add(createBackendCategory(i18n, 
+            org.jscience.technical.backend.BackendDiscovery.TYPE_MAP,
+            "", // No visible header
+            ""));
+
+        box.getChildren().add(new Separator());
+        return box;
+    }
+
+    private VBox createNetworkCategory(I18n i18n) {
+        VBox box = new VBox(12);
+        Label header = new Label(i18n.get("mastercontrol.network.title", "Network & Graph Analysis"));
+        header.getStyleClass().add("header-title");
+
+        Label desc = new Label(i18n.get("mastercontrol.libraries.cat.network.desc", ""));
+        desc.getStyleClass().add("mastercontrol-description");
+        box.getChildren().add(desc);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(20);
+        grid.setVgap(15);
+        grid.setPadding(new Insets(10, 0, 10, 0));
+
+        // Network Rendering Backend
+        ComboBox<String> backendBox = new ComboBox<>();
+        // Fetch available network backends via SPI
+        java.util.List<org.jscience.technical.backend.BackendProvider> providers = 
+            org.jscience.technical.backend.BackendDiscovery.getInstance()
+                .getProvidersByType(org.jscience.technical.backend.BackendDiscovery.TYPE_NETWORK);
+
+        // Map names to IDs for lookup
+        java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
+        nameToId.put("AUTO", null);
+        for (org.jscience.technical.backend.BackendProvider p : providers) {
+            nameToId.put(p.getName(), p.getId());
+        }
+        backendBox.getItems().addAll(nameToId.keySet());
+        
+        String currentId = JScience.getNetworkBackendId();
+        String currentName = "AUTO";
+        for (var entry : nameToId.entrySet()) {
+            if (java.util.Objects.equals(entry.getValue(), currentId)) {
+                currentName = entry.getKey();
+                break;
+            }
+        }
+        backendBox.setValue(currentName);
+        backendBox.setOnAction(e -> {
+            String name = backendBox.getValue();
+            JScience.setNetworkBackendId(nameToId.get(name));
+            JScience.savePreferences();
+        });
+
+        VBox backendInfo = createInfoBox(
+            i18n.get("mastercontrol.network.backend", "Network Renderer"), 
+            i18n.get("mastercontrol.network.backend.desc", 
+                "Select the engine used to render complex network graphs.\n" +
+                "Determines layout algorithms and visualization style."));
+
+        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.network.backend", "Network Renderer")),
+                backendBox,
+                backendInfo);
+
+        box.getChildren().addAll(header, grid);
+
+        // Append available libraries list (No header)
+        box.getChildren().add(createBackendCategory(i18n, 
+            org.jscience.technical.backend.BackendDiscovery.TYPE_NETWORK,
+            "", // No visible header
+            ""));
 
     private static class LibInfo {
         final String key;
