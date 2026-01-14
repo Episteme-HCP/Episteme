@@ -23,8 +23,8 @@
 
 package org.jscience.ui.demos;
 
-import javafx.stage.Stage;
-import org.jscience.ui.AppProvider;
+import javafx.scene.Node;
+import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.viewers.chemistry.MolecularViewer;
 
 /**
@@ -33,30 +33,11 @@ import org.jscience.ui.viewers.chemistry.MolecularViewer;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class MolecularViewerDemo implements AppProvider {
-    @Override
-    public boolean isDemo() {
-        return true;
-    }
+public class MolecularViewerDemo extends AbstractDemo {
 
     @Override
-    public String getCategory() {
-        return "Chemistry";
-    }
-
-    @Override
-    public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("MolecularViewer.title");
-    }
-
-    @Override
-    public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("MolecularViewer.desc");
-    }
-
-    @Override
-    public void show(Stage stage) {
-        MolecularViewer.show(stage);
+    public Node createViewerNode() {
+        return new MolecularViewer();
     }
 }
 

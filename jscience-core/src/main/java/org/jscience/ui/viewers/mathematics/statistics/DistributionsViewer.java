@@ -23,9 +23,11 @@
 
 package org.jscience.ui.viewers.mathematics.statistics;
 
-import javafx.application.Application;
+import org.jscience.ui.AbstractViewer;
+import org.jscience.ui.Parameter;
+import java.util.List;
+import java.util.ArrayList;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
@@ -33,8 +35,6 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
-import org.jscience.ui.ThemeManager;
 import org.jscience.ui.i18n.I18n;
 
 /**
@@ -46,19 +46,33 @@ import org.jscience.ui.i18n.I18n;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class DistributionsViewer extends Application {
+public class DistributionsViewer extends AbstractViewer {
+
+    @Override
+    public String getCategory() {
+        return "Mathematics";
+    }
+
+    @Override
+    public String getName() {
+        return I18n.getInstance().get("distributions.title", "Statistical Distributions");
+    }
+
+    @Override
+    public List<Parameter<?>> getViewerParameters() {
+        return new ArrayList<>();
+    }
 
     private TabPane tabPane;
 
-    @Override
-    public void start(Stage stage) {
-        BorderPane root = new BorderPane();
-        root.getStyleClass().add("dark-viewer-root");
+    public DistributionsViewer() {
+        BorderPane layout = new BorderPane();
+        layout.getStyleClass().add("dark-viewer-root");
 
         // Header
         Label header = new Label(I18n.getInstance().get("distributions.title"));
         header.setStyle("-fx-font-size: 24px; -fx-padding: 15; -fx-font-weight: bold;");
-        root.setTop(header);
+        layout.setTop(header);
 
         tabPane = new TabPane();
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -68,13 +82,8 @@ public class DistributionsViewer extends Application {
                 createPoissonTab(),
                 createBinomialTab());
 
-        root.setCenter(tabPane);
-
-        Scene scene = new Scene(root, 900, 600);
-        ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(I18n.getInstance().get("distributions.title"));
-        stage.setScene(scene);
-        stage.show();
+        layout.setCenter(tabPane);
+        getChildren().add(layout);
     }
 
     private Tab createNormalTab() {
@@ -273,11 +282,4 @@ public class DistributionsViewer extends Application {
         return res;
     }
 
-    public static void show(Stage stage) {
-        new DistributionsViewer().start(stage);
-    }
-
-    public static void main(String[] args) {
-        launch(args);
-    }
 }

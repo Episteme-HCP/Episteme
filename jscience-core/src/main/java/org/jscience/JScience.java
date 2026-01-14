@@ -149,10 +149,10 @@ public final class JScience {
             // Load Backends
             try {
                 String pb2d = prefs.get("plotting.backend.2d", null);
-                if (pb2d != null) plottingBackend2D = org.jscience.ui.plotting.PlottingBackend.valueOf(pb2d);
+                if (pb2d != null) plottingBackend2D = org.jscience.ui.viewers.mathematics.analysis.plotting.PlottingBackend.valueOf(pb2d);
                 
                 String pb3d = prefs.get("plotting.backend.3d", null);
-                if (pb3d != null) plottingBackend3D = org.jscience.ui.plotting.PlottingBackend.valueOf(pb3d);
+                if (pb3d != null) plottingBackend3D = org.jscience.ui.viewers.mathematics.analysis.plotting.PlottingBackend.valueOf(pb3d);
                 
                 String mol = prefs.get("molecular.backend", null);
                 if (mol != null) molecularBackendId = mol;
@@ -472,27 +472,27 @@ public final class JScience {
      */
     // ================= PLOTTING BACKEND =================
 
-    private static org.jscience.ui.plotting.PlottingBackend plottingBackend2D = org.jscience.ui.plotting.PlottingBackend.XCHART;
-    private static org.jscience.ui.plotting.PlottingBackend plottingBackend3D = org.jscience.ui.plotting.PlottingBackend.JZY3D;
+    private static org.jscience.ui.viewers.mathematics.analysis.plotting.PlottingBackend plottingBackend2D = org.jscience.ui.viewers.mathematics.analysis.plotting.PlottingBackend.XCHART;
+    private static org.jscience.ui.viewers.mathematics.analysis.plotting.PlottingBackend plottingBackend3D = org.jscience.ui.viewers.mathematics.analysis.plotting.PlottingBackend.JZY3D;
 
     /**
      * Gets the current 2D plotting backend.
      */
-    public static org.jscience.ui.plotting.PlottingBackend getPlottingBackend2D() {
+    public static org.jscience.ui.viewers.mathematics.analysis.plotting.PlottingBackend getPlottingBackend2D() {
         return plottingBackend2D;
     }
 
     /**
      * Sets the current 2D plotting backend.
      */
-    public static void setPlottingBackend2D(org.jscience.ui.plotting.PlottingBackend backend) {
+    public static void setPlottingBackend2D(org.jscience.ui.viewers.mathematics.analysis.plotting.PlottingBackend backend) {
         plottingBackend2D = backend;
     }
 
     /**
      * Gets the current 3D plotting backend.
      */
-    public static org.jscience.ui.plotting.PlottingBackend getPlottingBackend3D() {
+    public static org.jscience.ui.viewers.mathematics.analysis.plotting.PlottingBackend getPlottingBackend3D() {
         return plottingBackend3D;
     }
 
@@ -502,7 +502,7 @@ public final class JScience {
     /**
      * Sets the current 3D plotting backend.
      */
-    public static void setPlottingBackend3D(org.jscience.ui.plotting.PlottingBackend backend) {
+    public static void setPlottingBackend3D(org.jscience.ui.viewers.mathematics.analysis.plotting.PlottingBackend backend) {
         plottingBackend3D = backend;
     }
     

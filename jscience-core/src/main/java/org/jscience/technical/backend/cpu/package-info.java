@@ -22,6 +22,7 @@
  */
 
 /**
- * Provides the default CPU backend using pure Java.
+ * Provides the default CPU backend using pure Java.
+
  */
 package org.jscience.technical.backend.cpu;

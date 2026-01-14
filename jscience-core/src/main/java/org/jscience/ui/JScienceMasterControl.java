@@ -32,7 +32,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.jscience.JScience;
 import org.jscience.ui.i18n.I18n;
-import org.jscience.ui.plotting.PlottingBackend;
+import org.jscience.ui.viewers.mathematics.analysis.plotting.PlottingBackend;
 import org.jscience.technical.backend.BackendDiscovery;
 import org.jscience.technical.backend.BackendProvider;
 import org.jscience.io.ResourceIO;
@@ -1274,7 +1274,7 @@ public class JScienceMasterControl extends Application {
         Accordion accordion = new Accordion();
 
         // Use new SPI Discovery
-        Map<MasterControlDiscovery.ProviderType, Map<String, List<ViewerProvider>>> grouped = MasterControlDiscovery
+        Map<MasterControlDiscovery.ProviderType, Map<String, List<Viewer>>> grouped = MasterControlDiscovery
                 .getInstance().getProvidersByType();
 
         List<AppEntry> apps = flattenProviders(grouped.get(MasterControlDiscovery.ProviderType.APP));
@@ -1308,13 +1308,13 @@ public class JScienceMasterControl extends Application {
         return new Tab(i18n.get("mastercontrol.tab.apps", "Apps"), content);
     }
 
-    private List<AppEntry> flattenProviders(Map<String, List<ViewerProvider>> categoryMap) {
+    private List<AppEntry> flattenProviders(Map<String, List<Viewer>> categoryMap) {
         List<AppEntry> result = new ArrayList<>();
         if (categoryMap == null)
             return result;
 
-        for (List<ViewerProvider> list : categoryMap.values()) {
-            for (ViewerProvider p : list) {
+        for (List<Viewer> list : categoryMap.values()) {
+            for (Viewer p : list) {
                 result.add(new AppEntry(p.getName(), p.getClass().getName(), p.getDescription()));
             }
         }
@@ -1386,10 +1386,10 @@ public class JScienceMasterControl extends Application {
                 Stage stage = new Stage();
                 Application app = (Application) cls.getDeclaredConstructor().newInstance();
                 app.start(stage);
-            } else if (ViewerProvider.class.isAssignableFrom(cls)) {
-                // Launch ViewerProvider
+            } else if (Viewer.class.isAssignableFrom(cls)) {
+                // Launch Viewer
                 Stage stage = new Stage();
-                ViewerProvider demo = (ViewerProvider) cls.getDeclaredConstructor().newInstance();
+                Viewer demo = (Viewer) cls.getDeclaredConstructor().newInstance();
                 demo.show(stage);
             }
         } catch (Exception e) {

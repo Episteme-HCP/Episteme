@@ -1,44 +1,91 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ */
+
 package org.jscience.ui.viewers.physics.classical.waves;
 
-
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
+import org.jscience.ui.AbstractViewer;
+import org.jscience.ui.Simulatable;
+import org.jscience.ui.i18n.I18n;
 
 import java.io.File;
-
 import java.util.List;
 
 /**
  * A JavaFX component that displays an audio waveform and its spectrogram.
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
-public class AudioViewer extends VBox {
+public class AudioViewer extends AbstractViewer implements Simulatable {
 
     private final Canvas waveformCanvas;
     private final Canvas spectrogramCanvas;
     private final ScrollPane scrollPane;
     private final VBox contentBox;
+    private File currentFile;
 
     public AudioViewer() {
-        this.setSpacing(5);
-        
         waveformCanvas = new Canvas(800, 150);
         spectrogramCanvas = new Canvas(800, 250);
         
         contentBox = new VBox(5, waveformCanvas, spectrogramCanvas);
+        contentBox.setStyle("-fx-background-color: #f0f0f0;");
         
         scrollPane = new ScrollPane(contentBox);
         scrollPane.setFitToHeight(true);
         scrollPane.setPannable(true);
         
-        this.getChildren().add(scrollPane);
+        setCenter(scrollPane);
+        setRight(createSidebar());
+    }
+    
+    private VBox createSidebar() {
+        VBox box = new VBox(10);
+        box.setPadding(new Insets(10));
+        box.setPrefWidth(200);
+        box.getStyleClass().add("dark-viewer-sidebar");
+        
+        Label title = new Label(I18n.getInstance().get("audio.control", "Audio Control"));
+        title.getStyleClass().add("dark-header");
+        
+        Button openBtn = new Button(I18n.getInstance().get("audio.open", "Open File"));
+        openBtn.setMaxWidth(Double.MAX_VALUE);
+        openBtn.setOnAction(e -> openFile());
+
+        box.getChildren().addAll(title, new Separator(), openBtn);
+        return box;
+    }
+    
+    private void openFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Audio File");
+        fileChooser.getExtensionFilters().add(
+            new FileChooser.ExtensionFilter("Audio Files", "*.wav", "*.aif", "*.au", "*.snd")
+        );
+        File file = fileChooser.showOpenDialog(getScene().getWindow());
+        if (file != null) {
+            loadAudio(file);
+        }
     }
 
     public void loadAudio(File file) {
+        this.currentFile = file;
         try {
             AudioAnalyzer analyzer = new AudioAnalyzer(file);
             double[] samples = analyzer.getAudioData();
@@ -58,8 +105,6 @@ public class AudioViewer extends VBox {
     }
 
     private void renderWaveform(double[] samples) {
-        // Limit width to JavaFX texture limits (approx 8192 or 16384)
-        // 8000 is safe.
         double computedWidth = Math.max(800, samples.length / 50.0); 
         double width = Math.min(computedWidth, 8000.0);
         
@@ -77,7 +122,7 @@ public class AudioViewer extends VBox {
         double yScale = waveformCanvas.getHeight() / 2 * 0.9;
 
         gc.beginPath();
-        int step = (int) Math.max(1, samples.length / width); // Simple decimation
+        int step = (int) Math.max(1, samples.length / width); 
         
         for (int i = 0; i < samples.length; i+=step) {
             double x = (double) i / samples.length * width;
@@ -95,11 +140,8 @@ public class AudioViewer extends VBox {
         int timeSteps = spectrogram.size();
         int bins = spectrogram.get(0).length;
 
-        double width = waveformCanvas.getWidth(); // Match waveform width
+        double width = waveformCanvas.getWidth(); 
         spectrogramCanvas.setWidth(width);
-        spectrogramCanvas.setHeight(bins); // 1 pixel per bin? or scale height
-        
-        // Let's fix height to 250 and scale
         double height = 250;
         spectrogramCanvas.setHeight(height);
 
@@ -107,43 +149,41 @@ public class AudioViewer extends VBox {
         PixelWriter pw = image.getPixelWriter();
 
         for (int x = 0; x < width; x++) {
-            // Map x coordinate to spectrogram time index
             int tIndex = (int) ((double)x / width * timeSteps);
             if (tIndex >= timeSteps) break;
 
             double[] spectrum = spectrogram.get(tIndex);
             
             for (int y = 0; y < height; y++) {
-                // Map y coordinate to frequency bin (low freq at bottom)
-                // y=0 is top, y=height is bottom. We want low freq at bottom.
                 int binIndex = (int) (((height - 1 - y) / height) * (bins)); 
                 
                 if (binIndex < 0) binIndex = 0;
                 if (binIndex >= bins) binIndex = bins - 1;
 
                 double magnitude = spectrum[binIndex];
-                
-                // Color mapping: Log scale usually looks better
                 double intensity = Math.log10(magnitude + 1e-6); 
-                // Normalize intensity roughly [-6 to 0] range maybe?
-                // Just naive normalization for now
                 double norm = (intensity + 5) / 5.0; 
                 norm = Math.max(0, Math.min(1, norm));
 
                 pw.setColor(x, y, getColor(norm));
             }
         }
-        
         GraphicsContext gc = spectrogramCanvas.getGraphicsContext2D();
         gc.drawImage(image, 0, 0);
     }
     
     private Color getColor(double intensity) {
-        // Simple distinct 'magma' or 'fire' style
-        // 0.0 -> Black
-        // 0.5 -> Red/Orange
-        // 1.0 -> Yellow/White
-        return Color.hsb(intensity * 60, 1.0, intensity); // Red-Yellow HSB
-        // Or create a look-up table for 'inferno' style
+        return Color.hsb(intensity * 60, 1.0, intensity);
     }
+
+    // --- Simulatable ---
+    @Override public void play() { /* Implement playback if needed */ }
+    @Override public void pause() { /* Pause playback */ }
+    @Override public void stop() { /* Stop playback */ }
+    @Override public void step() { }
+    @Override public void setSpeed(double speed) { }
+    @Override public boolean isPlaying() { return false; }
+    
+    @Override public String getName() { return "Audio Viewer"; }
+    @Override public String getCategory() { return "Physics"; }
 }

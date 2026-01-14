@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class PrimitiveGalaxySimulator implements GalaxySimulator {
 
-    private List<GalaxyViewer.StarParticle> stars;
+    private List<StarParticle> stars;
 
     // Internal state for cores if needed, but Viewer manages G2 pos currently.
     // Interface asks update to take G2 pos.
@@ -61,7 +61,7 @@ public class PrimitiveGalaxySimulator implements GalaxySimulator {
     private double g2vx, g2vy;
 
     @Override
-    public void init(List<GalaxyViewer.StarParticle> stars) {
+    public void init(List<StarParticle> stars) {
         this.stars = stars;
     }
 
@@ -96,7 +96,7 @@ public class PrimitiveGalaxySimulator implements GalaxySimulator {
             g2y += g2vy;
 
             // Perturb stars
-            for (GalaxyViewer.StarParticle s : stars) {
+            for (StarParticle s : stars) {
                 // Attractor 1 (0,0)
                 double d1 = Math.sqrt(s.x * s.x + s.y * s.y);
                 double f1 = 500.0 / (d1 * d1 + 100);
@@ -116,7 +116,7 @@ public class PrimitiveGalaxySimulator implements GalaxySimulator {
             }
         } else {
             // Static Rotation (Visual only)
-            for (GalaxyViewer.StarParticle s : stars) {
+            for (StarParticle s : stars) {
                 // Rotate around 0,0
                 double x = s.x;
                 double y = s.y;

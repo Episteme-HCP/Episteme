@@ -22,6 +22,7 @@
  */
 
 /**
- * Provides a Service Provider Interface (SPI) for implementing
+ * Provides a Service Provider Interface (SPI) for implementing
+
  */
 package org.jscience.technical.backend;

@@ -23,28 +23,29 @@
 
 package org.jscience.ui.demos;
 
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-import org.jscience.ui.AppProvider;
+import org.jscience.ui.AbstractSimulationDemo;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
-import org.jscience.measure.quantity.*;
+import org.jscience.measure.quantity.Length;
+import org.jscience.measure.quantity.Mass;
+import org.jscience.ui.i18n.SocialI18n;
 
-/**
- * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
-public class ArchitectureStabilityDemo implements AppProvider {
+import java.util.ArrayList;
+import java.util.List;
+
+public class ArchitectureStabilityDemo extends AbstractSimulationDemo {
 
     @Override
     public boolean isDemo() {
@@ -66,136 +67,127 @@ public class ArchitectureStabilityDemo implements AppProvider {
         return org.jscience.ui.i18n.SocialI18n.getInstance().get("ArchitectureStability.desc");
     }
 
+    private Canvas canvas;
+    private GraphicsContext gc;
+    private Label statusLabel;
+    private List<Block> blocks = new ArrayList<>();
+    private Quantity<Length> comX = Quantities.create(300.0, Units.METER);
+    private boolean collapsed = false;
+
+    private static class Block {
+        Quantity<Length> offset;
+        Quantity<Mass> mass;
+        public Block(Quantity<Length> o, Quantity<Mass> m) {
+            this.offset = o;
+            this.mass = m;
+        }
+    }
+
     @Override
-    public void show(Stage stage) {
+    protected Node createViewerNode() {
         BorderPane root = new BorderPane();
-        Canvas canvas = new Canvas(600, 600);
+        canvas = new Canvas(600, 600);
+        gc = canvas.getGraphicsContext2D();
         root.setCenter(canvas);
+        draw();
+        return root;
+    }
 
-        GraphicsContext gc = canvas.getGraphicsContext2D();
+    @Override
+    protected VBox createControlPanel() {
+        SocialI18n i18n = SocialI18n.getInstance();
+        VBox panel = new VBox(15);
+        panel.setPadding(new Insets(20));
+        panel.setPrefWidth(280);
 
-        Button addBlockBtn = new Button(org.jscience.ui.i18n.SocialI18n.getInstance().get("arch.stability.btn.add"));
-        Button resetBtn = new Button(org.jscience.ui.i18n.SocialI18n.getInstance().get("arch.stability.btn.reset"));
-        Label status = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("arch.stability.label.stable"));
-        status.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
-
-        // State
-        // State using JScience Quantities
-        class Block {
-            Quantity<Length> offset;
-            Quantity<Mass> mass;
-
-            public Block(Quantity<Length> o, Quantity<Mass> m) {
-                offset = o;
-                mass = m;
-            }
-        }
-        class State {
-            java.util.List<Block> blocks = new java.util.ArrayList<>();
-            Quantity<Length> comX = Quantities.create(300.0, Units.METER); // Using 1 pixel = 1 meter for simplicity
-            boolean collapsed = false;
-        }
-        State s = new State();
-
-        Runnable draw = () -> {
-            gc.clearRect(0, 0, 600, 600);
-
-            // Ground
-            gc.setFill(Color.LIGHTGREEN);
-            gc.fillRect(0, 550, 600, 50);
-
-            // Base (Table) - Changed Color
-            gc.setFill(Color.SADDLEBROWN);
-            gc.fillRect(250, 500, 100, 50);
-
-            double currentY = 500;
-
-            // Initial Moment: 300m * 10kg
-            Quantity<Mass> baseMass = Quantities.create(10.0, Units.KILOGRAM);
-            Quantity<Length> basePos = Quantities.create(300.0, Units.METER);
-
-            // Moment = Mass * Position
-            // Result is a Quantity<?> since Mass*Length is not a base quantity in our
-            // predefined set
-            Quantity<?> totalMoment = baseMass.multiply(basePos);
-            Quantity<Mass> totalMass = baseMass;
-
-            for (Block b : s.blocks) {
-                currentY -= 50;
-                double bx = 250 + b.offset.getValue().doubleValue();
-
-                // Drawing logic
-                if (currentY > -50 && currentY < 600) {
-                    gc.setFill(s.collapsed ? Color.RED : Color.GRAY);
-                    gc.setStroke(Color.BLACK);
-                    gc.fillRect(bx, currentY, 100, 50);
-                    gc.strokeRect(bx, currentY, 100, 50);
-                }
-
-                if (!s.collapsed) {
-                    // Position of block center: bx + 50
-                    Quantity<Length> blockX = Quantities.create(bx + 50, Units.METER);
-                    Quantity<?> moment = blockX.multiply(b.mass);
-                    @SuppressWarnings({ "unchecked", "rawtypes" })
-                    Quantity<?> newMoment = totalMoment.add((Quantity) moment);
-                    totalMoment = newMoment;
-                    totalMass = totalMass.add(b.mass);
-                }
-            }
-
-            // COM = totalMoment / totalMass
-            s.comX = totalMoment.divide(totalMass).asType(Length.class);
-            double comValue = s.comX.getValue().doubleValue();
-
-            // Draw COM Line
-            gc.setStroke(Color.BLUE);
-            gc.setLineWidth(2);
-            gc.strokeLine(comValue, 0, comValue, 600);
-
-            // Text
-            gc.setFill(Color.BLACK);
-            gc.fillText(
-                    String.format(org.jscience.ui.i18n.SocialI18n.getInstance().get("arch.stability.label.com"),
-                            comValue),
-                    10, 20);
-
-            // Stability check (COM outside base [250, 350])
-            if (comValue < 250 || comValue > 350) {
-                s.collapsed = true;
-                status.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("arch.stability.label.collapsed"));
-                status.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
-            }
-
-        };
-
+        Button addBlockBtn = new Button(i18n.get("arch.stability.btn.add", "Add Block"));
+        addBlockBtn.setMaxWidth(Double.MAX_VALUE);
         addBlockBtn.setOnAction(e -> {
-            if (s.collapsed)
-                return;
-            s.blocks.add(new Block(
-                    Quantities.create((Math.random() - 0.5) * 60, Units.METER),
-                    Quantities.create(1.0, Units.KILOGRAM)));
-            draw.run();
+            if (collapsed) return;
+            blocks.add(new Block(Quantities.create((Math.random() - 0.5) * 60, Units.METER), Quantities.create(1.0, Units.KILOGRAM)));
+            draw();
         });
 
+        Button resetBtn = new Button(i18n.get("arch.stability.btn.reset", "Reset Simulation"));
+        resetBtn.setMaxWidth(Double.MAX_VALUE);
         resetBtn.setOnAction(e -> {
-            s.blocks.clear();
-            s.collapsed = false;
-            s.comX = Quantities.create(300.0, Units.METER);
-            status.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("arch.stability.label.stable"));
-            status.setStyle("-fx-text-fill: green;");
-            draw.run();
+            blocks.clear();
+            collapsed = false;
+            comX = Quantities.create(300.0, Units.METER);
+            statusLabel.setText(i18n.get("arch.stability.label.stable", "Stable"));
+            statusLabel.setStyle("-fx-text-fill: green;");
+            draw();
         });
 
-        VBox controls = new VBox(10, addBlockBtn, resetBtn, status);
-        controls.setStyle("-fx-padding: 10;");
-        root.setRight(controls);
+        statusLabel = new Label(i18n.get("arch.stability.label.stable", "Stable"));
+        statusLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
 
-        draw.run();
+        panel.getChildren().addAll(
+            new Label(i18n.get("arch.stability.controls", "Stability Controls")),
+            new Separator(),
+            addBlockBtn,
+            resetBtn,
+            new Separator(),
+            statusLabel
+        );
+        return panel;
+    }
 
-        Scene scene = new Scene(root, 800, 600);
-        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(getName());
-        stage.setScene(scene);
-        stage.show();
+    private void draw() {
+        if (gc == null) return;
+        SocialI18n i18n = SocialI18n.getInstance();
+        gc.clearRect(0, 0, 600, 600);
+        gc.setFill(Color.LIGHTGREEN);
+        gc.fillRect(0, 550, 600, 50);
+        
+        // Base ground block
+        gc.setFill(Color.SADDLEBROWN);
+        gc.fillRect(250, 500, 100, 50);
+
+        double currentY = 500;
+        Quantity<Mass> baseMass = Quantities.create(10.0, Units.KILOGRAM);
+        Quantity<Length> basePos = Quantities.create(300.0, Units.METER);
+        Quantity<?> totalMoment = baseMass.multiply(basePos);
+        Quantity<Mass> totalMass = baseMass;
+
+        for (Block b : blocks) {
+            currentY -= 50;
+            double bx = 250 + b.offset.getValue().doubleValue();
+            gc.setFill(collapsed ? Color.RED : Color.GRAY);
+            gc.setStroke(Color.BLACK);
+            gc.fillRect(bx, currentY, 100, 50);
+            gc.strokeRect(bx, currentY, 100, 50);
+
+            if (!collapsed) {
+                Quantity<Length> blockX = Quantities.create(bx + 50, Units.METER);
+                Quantity<?> moment = blockX.multiply(b.mass);
+                totalMoment = totalMoment.add((Quantity) moment);
+                totalMass = totalMass.add(b.mass);
+            }
+        }
+
+        comX = totalMoment.divide(totalMass).asType(Length.class);
+        double comValue = comX.getValue().doubleValue();
+        
+        // Center of mass line
+        gc.setStroke(Color.BLUE);
+        gc.setLineWidth(2);
+        gc.strokeLine(comValue, 0, comValue, 600);
+        
+        gc.setFill(Color.BLACK);
+        gc.fillText(String.format(i18n.get("arch.stability.label.com", "CoM: %.2f"), comValue), 10, 20);
+
+        if (comValue < 250 || comValue > 350) {
+            collapsed = true;
+            if (statusLabel != null) {
+                statusLabel.setText(i18n.get("arch.stability.label.collapsed", "COLLAPSED!"));
+                statusLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+            }
+        }
+    }
+
+    @Override
+    protected String getLongDescription() {
+        return getDescription();
     }
 }

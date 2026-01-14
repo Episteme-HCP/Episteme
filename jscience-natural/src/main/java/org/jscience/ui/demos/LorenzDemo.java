@@ -23,21 +23,20 @@
 
 package org.jscience.ui.demos;
 
+import javafx.scene.Node;
 import javafx.stage.Stage;
-import org.jscience.ui.AppProvider;
+import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.viewers.mathematics.analysis.chaos.LorenzViewer;
+import org.jscience.ui.i18n.I18n;
 
 /**
+ * Lorenz Attractor Demo.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class LorenzDemo implements AppProvider {
-    @Override
-    public boolean isDemo() {
-        return true;
-    }
+public class LorenzDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
@@ -46,18 +45,21 @@ public class LorenzDemo implements AppProvider {
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("Lorenz.title");
+        return I18n.getInstance().get("Lorenz.title");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("Lorenz.desc");
+        return I18n.getInstance().get("Lorenz.desc");
     }
 
     @Override
-    public void show(Stage stage) {
-        LorenzViewer.show(stage);
+    protected Node createViewerNode() {
+        return new LorenzViewer();
+    }
+
+    @Override
+    protected String getLongDescription() {
+        return I18n.getInstance().get("Lorenz.desc");
     }
 }
-
-

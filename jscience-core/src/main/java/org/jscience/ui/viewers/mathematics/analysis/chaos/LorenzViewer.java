@@ -24,7 +24,9 @@
 package org.jscience.ui.viewers.mathematics.analysis.chaos;
 
 import javafx.animation.AnimationTimer;
-import javafx.application.Application;
+import org.jscience.ui.AbstractViewer;
+import org.jscience.ui.Simulatable;
+import org.jscience.ui.Parameter;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -48,7 +50,40 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class LorenzViewer extends Application {
+public class LorenzViewer extends AbstractViewer implements Simulatable {
+
+    @Override
+    public String getCategory() {
+        return "Mathematics";
+    }
+
+    @Override
+    public String getName() {
+        return I18n.getInstance().get("lorenz.title");
+    }
+
+    private AnimationTimer timer;
+    private boolean isRunning = false;
+    
+    @Override public void play() { 
+        if (timer != null) timer.start(); 
+        isRunning = true; 
+    }
+    @Override public void pause() { 
+        if (timer != null) timer.stop(); 
+        isRunning = false; 
+    }
+    @Override public void stop() { 
+        pause(); 
+        points.clear(); 
+        render(); 
+    }
+    @Override public void step() { 
+        stepLogic(); 
+        render(); 
+    }
+    @Override public void setSpeed(double multiplier) { }
+    @Override public boolean isPlaying() { return isRunning; }
 
     private double x = 0.1, y = 0, z = 0;
     private double sigma = 10, rho = 28, beta = 8.0 / 3.0;
@@ -64,14 +99,12 @@ public class LorenzViewer extends Application {
         }
     }
 
-    @Override
-    public void start(Stage stage) {
-        BorderPane root = new BorderPane();
+    public LorenzViewer() {
         // Use light background instead of black
-        root.setStyle("-fx-background-color: #f8f8f8;");
+        setStyle("-fx-background-color: #f8f8f8;");
 
         canvas = new Canvas(800, 600);
-        root.setCenter(canvas);
+        setCenter(canvas);
 
         VBox sidebar = new VBox(15);
         sidebar.setPadding(new Insets(20));
@@ -84,25 +117,20 @@ public class LorenzViewer extends Application {
                 createSlider(I18n.getInstance().get("lorenz.param.sigma"), 0, 50, sigma, v -> sigma = v),
                 createSlider(I18n.getInstance().get("lorenz.param.rho"), 0, 100, rho, v -> rho = v),
                 createSlider(I18n.getInstance().get("lorenz.param.beta"), 0, 10, beta, v -> beta = v));
-        root.setRight(sidebar);
+        setRight(sidebar);
 
-        new AnimationTimer() {
+        timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                step();
+                stepLogic();
                 render();
             }
-        }.start();
-
-        Scene scene = new Scene(root, 1050, 650);
-        stage.setTitle(I18n.getInstance().get("viewer.lorenz"));
-        stage.setScene(scene);
-        // ThemeManager.getInstance().applyTheme(scene); // User requested light
-        // background
-        stage.show();
+        };
+        timer.start();
+        isRunning = true;
     }
 
-    private void step() {
+    private void stepLogic() {
         double dt = 0.01;
         double dx = (sigma * (y - x)) * dt;
         double dy = (x * (rho - z) - y) * dt;
@@ -147,10 +175,6 @@ public class LorenzViewer extends Application {
             points.clear(); // Restart attractor on param change
         });
         return new VBox(5, l, s);
-    }
-
-    public static void show(Stage stage) {
-        new LorenzViewer().start(stage);
     }
 }
 

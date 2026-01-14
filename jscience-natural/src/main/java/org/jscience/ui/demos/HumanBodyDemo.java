@@ -24,7 +24,7 @@
 package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
-import org.jscience.ui.AppProvider;
+import org.jscience.ui.App;
 import org.jscience.ui.viewers.medicine.anatomy.HumanBodyViewer;
 
 /**
@@ -34,7 +34,7 @@ import org.jscience.ui.viewers.medicine.anatomy.HumanBodyViewer;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class HumanBodyDemo implements AppProvider {
+public class HumanBodyDemo implements App {
 
     @Override
     public boolean isDemo() {

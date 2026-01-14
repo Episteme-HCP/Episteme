@@ -22,6 +22,7 @@
  */
 
 /**
- * Provides JavaFX-based visual representations of physical
+ * Provides JavaFX-based visual representations of physical
+
  */
 package org.jscience.ui.devices;

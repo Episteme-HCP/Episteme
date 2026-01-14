@@ -24,7 +24,7 @@
 package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
-import org.jscience.ui.AppProvider;
+import org.jscience.ui.App;
 import org.jscience.ui.viewers.biology.genetics.GeneticsViewer;
 
 /**
@@ -33,7 +33,7 @@ import org.jscience.ui.viewers.biology.genetics.GeneticsViewer;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GeneticsDemo implements AppProvider {
+public class GeneticsDemo implements App {
     @Override
     public boolean isDemo() {
         return true;

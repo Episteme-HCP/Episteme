@@ -37,6 +37,9 @@ import javafx.stage.Stage;
 
 import org.jscience.ui.i18n.I18n;
 
+import java.util.List;
+import java.util.ArrayList;
+
 /**
  * Abstract base class for all JScience Demonstrations.
  * Provides a consistent layout with a viewer area and a control panel.
@@ -45,14 +48,14 @@ import org.jscience.ui.i18n.I18n;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public abstract class AbstractDemo extends Application implements AppProvider {
+public abstract class AbstractDemo extends Application implements App {
 
     @Override
     public boolean isDemo() {
         return true;
     }
 
-    protected ScientificViewer viewer;
+    protected Node viewer;
     private VBox controlPanel;
 
     @Override
@@ -66,8 +69,8 @@ public abstract class AbstractDemo extends Application implements AppProvider {
 
         // Center: The Viewer Node
         Node viewerNode = createViewerNode();
-        if (viewerNode instanceof ScientificViewer sv) {
-            this.viewer = sv;
+        if (viewerNode instanceof Viewer sv) {
+            this.viewer = viewerNode;
         }
 
         StackPane viewerContainer = new StackPane(viewerNode);
@@ -113,8 +116,8 @@ public abstract class AbstractDemo extends Application implements AppProvider {
         sectionTitle.setFont(Font.font("System", FontWeight.BOLD, 16));
         panel.getChildren().add(sectionTitle);
 
-        if (viewer != null) {
-            for (Parameter<?> param : viewer.getParameters()) {
+        if (viewer instanceof Viewer v) {
+            for (Parameter<?> param : v.getViewerParameters()) {
                 panel.getChildren().add(createParameterControl(param));
             }
         }
@@ -166,12 +169,23 @@ public abstract class AbstractDemo extends Application implements AppProvider {
 
     @Override
     public String getDescription() {
-        return getLongDescription();
+        return getName(); // Default to name if not overridden
     }
 
     protected abstract Node createViewerNode();
 
-    protected abstract String getLongDescription();
+    protected String getLongDescription() {
+        return ""; // Default empty, subclasses can override
+    }
+
+    @Override
+    public List<Parameter<?>> getViewerParameters() {
+        if (viewer instanceof Viewer) {
+            Viewer v = (Viewer) viewer;
+            return v.getViewerParameters();
+        }
+        return new ArrayList<>();
+    }
 
     @Override
     public void show(Stage stage) {

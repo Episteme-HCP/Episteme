@@ -33,7 +33,7 @@ import java.util.Arrays;
  * Generic Launcher for JScience Applications and Demos.
  * Handles:
  * 1. JavaFX Applications (extends Application)
- * 2. ViewerProviders (implements ViewerProvider)
+ * 2. Viewers (implements Viewer)
  * 3. Standard Main classes (public static void main)
  *
  * @author Silvere Martin-Michiellot
@@ -42,7 +42,7 @@ import java.util.Arrays;
  */
 public class AppLauncher extends Application {
 
-    private static ViewerProvider demoProvider;
+    private static Viewer demoProvider;
 
     public static void main(String[] args) {
         if (args.length < 1) {
@@ -63,9 +63,9 @@ public class AppLauncher extends Application {
                 return;
             }
 
-            // 2. If it's a ViewerProvider
-            if (ViewerProvider.class.isAssignableFrom(clazz)) {
-                demoProvider = (ViewerProvider) clazz.getDeclaredConstructor().newInstance();
+            // 2. If it's a Viewer
+            if (Viewer.class.isAssignableFrom(clazz)) {
+                demoProvider = (Viewer) clazz.getDeclaredConstructor().newInstance();
                 // Launch this wrapper app which will show the demo
                 launch(appArgs);
                 return;
@@ -77,7 +77,7 @@ public class AppLauncher extends Application {
                 mainMethod.invoke(null, (Object) appArgs);
             } catch (NoSuchMethodException e) {
                 System.err.println("Error: Class " + targetClassName
-                        + " is not an Application, ViewerProvider, and has no main method.");
+                        + " is not an Application, Viewer, and has no main method.");
                 System.exit(1);
             }
 
@@ -93,7 +93,7 @@ public class AppLauncher extends Application {
             demoProvider.show(primaryStage);
         } else {
             // Should not happen if logic is correct
-            System.err.println("No ViewerProvider loaded.");
+            System.err.println("No Viewer loaded.");
             System.exit(0);
         }
     }

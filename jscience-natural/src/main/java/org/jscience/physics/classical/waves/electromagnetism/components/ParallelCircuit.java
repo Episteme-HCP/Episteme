@@ -26,6 +26,7 @@ package org.jscience.physics.classical.waves.electromagnetism.components;
 import java.util.ArrayList;
 import java.util.List;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.physics.classical.waves.electromagnetism.circuit.CircuitElement;
 
 /**
  * Represents a parallel connection of circuit components.

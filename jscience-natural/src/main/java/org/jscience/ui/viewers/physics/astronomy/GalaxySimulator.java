@@ -38,7 +38,7 @@ public interface GalaxySimulator {
     /**
      * Initialize the simulator with the star field.
      */
-    void init(List<GalaxyViewer.StarParticle> stars);
+    void init(List<StarParticle> stars);
 
     /**
      * Update the simulation by one step.

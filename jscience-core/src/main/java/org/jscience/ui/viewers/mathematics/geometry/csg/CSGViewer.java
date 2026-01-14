@@ -23,7 +23,10 @@
 
 package org.jscience.ui.viewers.mathematics.geometry.csg;
 
-import javafx.application.Application;
+import org.jscience.ui.AbstractViewer;
+import org.jscience.ui.Parameter;
+import java.util.List;
+import java.util.ArrayList;
 import javafx.geometry.Insets;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -33,7 +36,6 @@ import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
-import javafx.stage.Stage;
 import org.jscience.ui.i18n.I18n;
 
 /**
@@ -43,16 +45,28 @@ import org.jscience.ui.i18n.I18n;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CSGViewer extends Application {
+public class CSGViewer extends AbstractViewer {
+
+    @Override
+    public String getCategory() {
+        return "Mathematics";
+    }
+
+    @Override
+    public String getName() {
+        return I18n.getInstance().get("csg.title", "CSG Viewer");
+    }
+
+    @Override
+    public List<Parameter<?>> getViewerParameters() {
+        return new ArrayList<>();
+    }
 
     private Group world = new Group();
     private Box cube;
     private Sphere sphere;
 
-    @Override
-    public void start(Stage stage) {
-        BorderPane root = new BorderPane();
-
+    public CSGViewer() {
         // 3D Scene
         SubScene subScene = new SubScene(world, 800, 600, true, SceneAntialiasing.BALANCED);
         subScene.setFill(Color.web("#1e1e1e"));
@@ -87,8 +101,16 @@ public class CSGViewer extends Application {
 
         sidebar.getChildren().addAll(title, new Separator(), new Label(I18n.getInstance().get("csg.operation")), opBox,
                 offsetLbl, offsetSlider);
-        root.setRight(sidebar);
-        root.setCenter(subScene);
+
+        // SubScene container for BorderPane
+        StackPane subSceneContainer = new StackPane(subScene);
+        subScene.widthProperty().bind(subSceneContainer.widthProperty());
+        subScene.heightProperty().bind(subSceneContainer.heightProperty());
+
+        BorderPane layout = new BorderPane();
+        layout.setRight(sidebar);
+        layout.setCenter(subSceneContainer);
+        getChildren().add(layout);
 
         // Rotation
         Rotate rotateX = new Rotate(0, Rotate.X_AXIS);
@@ -99,11 +121,6 @@ public class CSGViewer extends Application {
             rotateY.setAngle(rotateY.getAngle() + 1);
             rotateX.setAngle(rotateX.getAngle() + 0.5);
         });
-
-        Scene scene = new Scene(root, 1100, 700);
-        stage.setTitle(I18n.getInstance().get("viewer.csg"));
-        stage.setScene(scene);
-        stage.show();
     }
 
     private void setupShapes() {
@@ -151,7 +168,4 @@ public class CSGViewer extends Application {
         }
     }
 
-    public static void show(Stage stage) {
-        new CSGViewer().start(stage);
-    }
 }

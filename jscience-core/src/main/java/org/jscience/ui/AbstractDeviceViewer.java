@@ -28,6 +28,8 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import org.jscience.device.Device;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Base class for device viewers.
@@ -36,7 +38,7 @@ import org.jscience.device.Device;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public abstract class AbstractDeviceViewer<T extends Device> extends VBox {
+public abstract class AbstractDeviceViewer<T extends Device> extends VBox implements Viewer {
 
     protected final T device;
     protected final Label nameLabel;
@@ -64,4 +66,33 @@ public abstract class AbstractDeviceViewer<T extends Device> extends VBox {
     }
 
     public abstract void update();
+
+    @Override
+    public List<Parameter<?>> getViewerParameters() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public String getName() {
+        return device.getName() + " Viewer";
+    }
+
+    @Override
+    public String getCategory() {
+        return "Devices";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Control interface for " + device.getName();
+    }
+
+    @Override
+    public void show(javafx.stage.Stage stage) {
+        javafx.scene.Scene scene = new javafx.scene.Scene(this, 400, 300);
+        ThemeManager.getInstance().applyTheme(scene);
+        stage.setTitle(getName());
+        stage.setScene(scene);
+        stage.show();
+    }
 }

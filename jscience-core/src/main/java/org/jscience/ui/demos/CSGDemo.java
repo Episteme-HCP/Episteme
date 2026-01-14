@@ -24,7 +24,7 @@
 package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
-import org.jscience.ui.ViewerProvider;
+import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.viewers.mathematics.geometry.csg.CSGViewer;
 
 import org.jscience.ui.i18n.I18n;
@@ -35,7 +35,7 @@ import org.jscience.ui.i18n.I18n;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CSGDemo implements ViewerProvider {
+public class CSGDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
@@ -53,8 +53,13 @@ public class CSGDemo implements ViewerProvider {
     }
 
     @Override
-    public void show(Stage stage) {
-        CSGViewer.show(stage);
+    protected javafx.scene.Node createViewerNode() {
+        return new CSGViewer();
+    }
+
+    @Override
+    protected String getLongDescription() {
+        return "Constructive Solid Geometry Visualization.";
     }
 }
 

@@ -47,14 +47,14 @@ public class MasterControlDiscovery {
     }
 
     /**
-     * Discovers all available ViewerProvider implementations using ServiceLoader.
+     * Discovers all available Viewer implementations using ServiceLoader.
      * Use {@link #getProvidersByType()} for categorized results.
      */
-    public List<ViewerProvider> getProviders() {
-        List<ViewerProvider> results = new ArrayList<>();
+    public List<Viewer> getProviders() {
+        List<Viewer> results = new ArrayList<>();
         try {
-            ServiceLoader<ViewerProvider> loader = ServiceLoader.load(ViewerProvider.class);
-            for (ViewerProvider provider : loader) {
+            ServiceLoader<Viewer> loader = ServiceLoader.load(Viewer.class);
+            for (Viewer provider : loader) {
                 results.add(provider);
             }
         } catch (Throwable e) {
@@ -71,13 +71,13 @@ public class MasterControlDiscovery {
      * Discovers providers and groups them by type (APP, DEMO, VIEWER) and then by
      * Category.
      */
-    public Map<ProviderType, Map<String, List<ViewerProvider>>> getProvidersByType() {
-        Map<ProviderType, Map<String, List<ViewerProvider>>> groupedProviders = new EnumMap<>(ProviderType.class);
+    public Map<ProviderType, Map<String, List<Viewer>>> getProvidersByType() {
+        Map<ProviderType, Map<String, List<Viewer>>> groupedProviders = new EnumMap<>(ProviderType.class);
 
-        for (ViewerProvider provider : getProviders()) {
+        for (Viewer provider : getProviders()) {
             ProviderType type = ProviderType.VIEWER;
-            if (provider instanceof AppProvider) {
-                type = ((AppProvider) provider).isDemo() ? ProviderType.DEMO : ProviderType.APP;
+            if (provider instanceof App) {
+                type = ((App) provider).isDemo() ? ProviderType.DEMO : ProviderType.APP;
             }
 
             groupedProviders
@@ -181,7 +181,7 @@ public class MasterControlDiscovery {
 
                             // Note: We don't check for DemoProvider here anymore as we rely on the caller
                             // or just class presence
-                            // for legacy reasons. Real ViewerProviders should use getProviders().
+                            // for legacy reasons. Real Viewers should use getProviders().
 
                             processed.add(fullClassName);
                             String desc = "JScience " + (isDeviceRequested ? "Device" : suffix);

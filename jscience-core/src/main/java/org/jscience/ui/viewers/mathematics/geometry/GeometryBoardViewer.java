@@ -23,15 +23,18 @@
 
 package org.jscience.ui.viewers.mathematics.geometry;
 
-import javafx.application.Application;
+import org.jscience.ui.AbstractViewer;
+import org.jscience.ui.Simulatable;
+import org.jscience.ui.Parameter;
+import java.util.List;
+import java.util.ArrayList;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
+import org.jscience.ui.i18n.I18n;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +46,24 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GeometryBoardViewer extends Application {
+public class GeometryBoardViewer extends AbstractViewer implements Simulatable {
+
+    @Override
+    public String getCategory() {
+        return "Mathematics";
+    }
+
+    @Override
+    public String getName() {
+        return I18n.getInstance().get("GeometryBoard.title", "Geometry Board");
+    }
+
+    @Override public void play() { /* No animation */ }
+    @Override public void pause() { /* No animation */ }
+    @Override public void stop() { objects.clear(); draw(); }
+    @Override public void step() { /* No animation */ }
+    @Override public void setSpeed(double multiplier) { }
+    @Override public boolean isPlaying() { return false; }
 
     private enum Tool {
         POINT, LINE, CIRCLE, TRIANGLE, SELECT
@@ -69,10 +89,8 @@ public class GeometryBoardViewer extends Application {
     private double startX, startY;
     private boolean dragging = false;
 
-    @Override
-    public void start(Stage stage) {
-        BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: white;");
+    public GeometryBoardViewer() {
+        setStyle("-fx-background-color: white;");
 
         // Toolbar
         HBox toolbar = new HBox(10);
@@ -81,13 +99,13 @@ public class GeometryBoardViewer extends Application {
 
         ToggleGroup group = new ToggleGroup();
         toolbar.getChildren().addAll(
-                createToolBtn(org.jscience.ui.i18n.I18n.getInstance().get("geometry.tool.point"), Tool.POINT, group),
-                createToolBtn(org.jscience.ui.i18n.I18n.getInstance().get("geometry.tool.line"), Tool.LINE, group),
-                createToolBtn(org.jscience.ui.i18n.I18n.getInstance().get("geometry.tool.circle"), Tool.CIRCLE, group),
+                createToolBtn(I18n.getInstance().get("geometry.tool.point"), Tool.POINT, group),
+                createToolBtn(I18n.getInstance().get("geometry.tool.line"), Tool.LINE, group),
+                createToolBtn(I18n.getInstance().get("geometry.tool.circle"), Tool.CIRCLE, group),
                 createToolBtn("Triangle", Tool.TRIANGLE, group),
-                createToolBtn(org.jscience.ui.i18n.I18n.getInstance().get("geometry.tool.select"), Tool.SELECT, group),
+                createToolBtn(I18n.getInstance().get("geometry.tool.select"), Tool.SELECT, group),
                 new Separator(),
-                new Button(org.jscience.ui.i18n.I18n.getInstance().get("geometry.button.clear")) {
+                new Button(I18n.getInstance().get("geometry.button.clear")) {
                     {
                         setOnAction(e -> {
                             objects.clear();
@@ -95,7 +113,7 @@ public class GeometryBoardViewer extends Application {
                         });
                     }
                 });
-        root.setTop(toolbar);
+        setTop(toolbar);
 
         canvas = new Canvas(1000, 700);
         draw();
@@ -105,9 +123,6 @@ public class GeometryBoardViewer extends Application {
             startY = e.getY();
             switch (selectedTool) {
                 case SELECT:
-                    // For SELECT tool, we might want to select an existing object
-                    // For now, we'll just allow dragging behavior for potential future object
-                    // movement
                     dragging = true;
                     break;
                 case POINT:
@@ -135,20 +150,15 @@ public class GeometryBoardViewer extends Application {
             }
         });
 
-        root.setCenter(new ScrollPane(canvas));
+        setCenter(new ScrollPane(canvas));
 
         VBox sidebar = new VBox(10);
         sidebar.setPadding(new Insets(10));
         sidebar.setPrefWidth(200);
         sidebar.setStyle("-fx-background-color: #fafafa;");
         sidebar.getChildren()
-                .add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("geometry.help")));
-        root.setRight(sidebar);
-
-        Scene scene = new Scene(root, 1200, 800);
-        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.geometry"));
-        stage.setScene(scene);
-        stage.show();
+                .add(new Label(I18n.getInstance().get("geometry.help")));
+        setRight(sidebar);
     }
 
     private ToggleButton createToolBtn(String name, Tool tool, ToggleGroup group) {
@@ -271,9 +281,6 @@ public class GeometryBoardViewer extends Application {
         }
     }
 
-    public static void show(Stage stage) {
-        new GeometryBoardViewer().start(stage);
-    }
 }
 
 

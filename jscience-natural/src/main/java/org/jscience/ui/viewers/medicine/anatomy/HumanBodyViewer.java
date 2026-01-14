@@ -23,8 +23,8 @@
 
 package org.jscience.ui.viewers.medicine.anatomy;
 
-import javafx.application.Application;
 import javafx.application.Platform;
+import org.jscience.ui.AbstractViewer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.*;
@@ -64,7 +64,7 @@ import java.util.regex.Pattern;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class HumanBodyViewer extends Application implements org.jscience.ui.ViewerProvider {
+public class HumanBodyViewer extends AbstractViewer {
 
     @Override
     public String getCategory() {
@@ -74,15 +74,6 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
     @Override
     public String getName() {
         return "Human Body Viewer (JavaFX)";
-    }
-
-    @Override
-    public void show(Stage stage) {
-        try {
-            start(stage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     // 3D Scene Components
@@ -106,12 +97,13 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
     private TreeView<String> hierarchyTree;
     private java.util.Set<String> knownParts = new java.util.HashSet<>();
     private Map<String, TreeItem<String>> idToTreeItem = new ConcurrentHashMap<>();
+    private ComboBox<String> searchField;
 
+    public HumanBodyViewer() {
+        initUI();
+    }
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("JScience - Human Body Viewer");
-
+    private void initUI() {
         // --- 3D SETUP ---
         root3D = new Group();
         root3D.getChildren().addAll(skeletonLayer, muscleLayer, organLayer, nervousLayer, circulatoryLayer, skinLayer);
@@ -183,7 +175,7 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
         });
 
         // --- UI LAYOUT ---
-        BorderPane root = new BorderPane();
+        // Instead of creating new root BorderPane, we use 'this' since we are a BorderPane
         
         // CENTER: 3D View + Overlay
         StackPane centerPane = new StackPane();
@@ -205,7 +197,7 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
         StackPane.setMargin(attributionLabel, new Insets(10));
         centerPane.getChildren().add(attributionLabel);
         
-        root.setCenter(centerPane);
+        this.setCenter(centerPane);
 
         // LEFT: Toolbar (Layers + Actions)
         VBox leftToolbar = new VBox(10);
@@ -244,7 +236,7 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
                 }),
                 createButton("Reset Camera", () -> cameraController.reset())
         );
-        root.setLeft(leftToolbar);
+        this.setLeft(leftToolbar);
 
         // RIGHT: Description Panel
         VBox rightPanel = new VBox(10);
@@ -363,14 +355,7 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
         });
 
         rightPanel.getChildren().addAll(searchField, new Separator(), hierarchyTree, new Separator(), titleLabel, descriptionArea);
-        root.setRight(rightPanel);
-
-        // --- SCENE SETUP ---
-        Scene scene = new Scene(root, 1280, 800);
-        scene.getStylesheets().add(HumanBodyViewer.class.getResource("/org/jscience/ui/theme.css").toExternalForm()); // Ensure we have a dark theme
-        
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        this.setRight(rightPanel);
 
         // --- START LOADING ---
         build3DBody();
@@ -504,7 +489,7 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
     private void loadHierarchy() {
         Thread thread = new Thread(() -> {
             try {
-                InputStream is = getClass().getResourceAsStream("/z-anatomy/hierarchy.txt");
+                InputStream is = HumanBodyViewer.class.getResourceAsStream("/z-anatomy/hierarchy.txt");
                 if (is == null) {
                     System.err.println("Hierarchy file not found!");
                     return;
@@ -683,7 +668,7 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
         
         for (String v : variants) {
             String path = descFolder + v;
-            try (InputStream is = getClass().getResourceAsStream(path)) {
+            try (InputStream is = HumanBodyViewer.class.getResourceAsStream(path)) {
                  if (is != null) {
                       foundText = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
                                   .lines().collect(Collectors.joining("\n"));
@@ -721,19 +706,4 @@ public class HumanBodyViewer extends Application implements org.jscience.ui.View
         }
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
-    
-    public static void launch(Stage stage) {
-        try {
-            new HumanBodyViewer().start(stage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    
-    public static void launchMain(Stage stage) {
-        launch(stage);
-    }
 }

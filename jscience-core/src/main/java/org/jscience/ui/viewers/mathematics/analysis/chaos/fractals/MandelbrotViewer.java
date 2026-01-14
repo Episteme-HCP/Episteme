@@ -23,7 +23,10 @@
 
 package org.jscience.ui.viewers.mathematics.analysis.chaos.fractals;
 
-import javafx.application.Application;
+import org.jscience.ui.AbstractViewer;
+import org.jscience.ui.Parameter;
+import java.util.List;
+import java.util.ArrayList;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.PixelWriter;
@@ -42,7 +45,22 @@ import org.jscience.ui.ThemeManager;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class MandelbrotViewer extends Application {
+public class MandelbrotViewer extends AbstractViewer {
+
+    @Override
+    public String getCategory() {
+        return "Mathematics";
+    }
+
+    @Override
+    public String getName() {
+        return I18n.getInstance().get("mandelbrot.title", "Mandelbrot Set");
+    }
+
+    @Override
+    public List<Parameter<?>> getViewerParameters() {
+        return new ArrayList<>();
+    }
 
     private static final int WIDTH = 800;
     private static final int HEIGHT = 600;
@@ -60,8 +78,7 @@ public class MandelbrotViewer extends Application {
     private double juliaReal = -0.7;
     private double juliaImag = 0.27015;
 
-    @Override
-    public void start(Stage stage) {
+    public MandelbrotViewer() {
         canvas = new Canvas(WIDTH, HEIGHT);
         image = new WritableImage(WIDTH, HEIGHT);
 
@@ -75,7 +92,7 @@ public class MandelbrotViewer extends Application {
         javafx.scene.layout.VBox controls = new javafx.scene.layout.VBox(modeBtn);
         controls.setPickOnBounds(false); // overlay
 
-        StackPane root = new StackPane(canvasPane, controls);
+        getChildren().addAll(canvasPane, controls);
 
         modeBtn.setOnAction(e -> {
             juliaMode = modeBtn.isSelected();
@@ -110,19 +127,7 @@ public class MandelbrotViewer extends Application {
             }
         });
 
-        Scene scene = new Scene(root, WIDTH, HEIGHT);
-        // ... (Existing Scroll/Drag handlers)
-        // Adjust maxIm to aspect ratio
-        double aspect = (double) HEIGHT / WIDTH;
-        double reWidth = maxRe - minRe;
-        double imHeight = reWidth * aspect;
-        double centerIm = (minIm + maxIm) / 2;
-        minIm = centerIm - imHeight / 2;
-        maxIm = centerIm + imHeight / 2;
-
-        render();
-
-        // Interaction (Scroll/Pan) - Same as before, just kept...
+        // Interaction (Scroll/Pan)
         canvas.setOnScroll(e -> {
             double zoomFactor = (e.getDeltaY() > 0) ? 0.8 : 1.25;
 
@@ -151,7 +156,6 @@ public class MandelbrotViewer extends Application {
         });
 
         canvas.setOnMouseDragged(e -> {
-            // ... Pan logic ...
             double dx = e.getX() - dragContext.mouseAnchorX;
             double dy = e.getY() - dragContext.mouseAnchorY;
             dragContext.mouseAnchorX = e.getX();
@@ -168,10 +172,15 @@ public class MandelbrotViewer extends Application {
             render();
         });
 
-        stage.setTitle(I18n.getInstance().get("viewer.mandelbrot"));
-        stage.setScene(scene);
-        ThemeManager.getInstance().applyTheme(scene);
-        stage.show();
+        // Adjust maxIm to aspect ratio initially
+        double aspect = (double) HEIGHT / WIDTH;
+        double reWidth = maxRe - minRe;
+        double imHeight = reWidth * aspect;
+        double centerIm = (minIm + maxIm) / 2;
+        minIm = centerIm - imHeight / 2;
+        maxIm = centerIm + imHeight / 2;
+
+        render();
     }
 
     private void render() {
@@ -218,13 +227,6 @@ public class MandelbrotViewer extends Application {
         canvas.getGraphicsContext2D().drawImage(image, 0, 0);
     }
 
-    public static void show(Stage stage) {
-        new MandelbrotViewer().start(stage);
-    }
-
-    public static void main(String[] args) {
-        launch(args);
-    }
 }
 
 

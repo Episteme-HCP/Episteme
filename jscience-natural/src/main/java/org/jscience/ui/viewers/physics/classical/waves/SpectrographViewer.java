@@ -1,62 +1,36 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.jscience.ui.viewers.physics.classical.waves;
-
-import org.jscience.ui.i18n.I18n;
 
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
-import javafx.scene.layout.*;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
+import org.jscience.ui.AbstractViewer;
+import org.jscience.ui.NumericParameter;
+import org.jscience.ui.Parameter;
+import org.jscience.ui.Simulatable;
+import org.jscience.ui.i18n.I18n;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Real-time Spectrograph visualization showing frequency analysis.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- */
-import org.jscience.ui.NumericParameter;
-import org.jscience.ui.Parameter;
-import org.jscience.ui.ScientificViewer;
-import org.jscience.ui.Simulatable;
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * Real-time Spectrograph visualization showing frequency analysis.
- * Now refactored as a reusable panel.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class SpectrographViewer extends VBox implements ScientificViewer, Simulatable {
+public class SpectrographViewer extends AbstractViewer implements Simulatable {
 
     private final int BANDS = 128;
     private double[] spectrum = new double[BANDS];
@@ -77,11 +51,10 @@ public class SpectrographViewer extends VBox implements ScientificViewer, Simula
     private AnimationTimer timer;
     private String currentPattern = "Voice";
 
-    public SpectrographViewer() {
-        super(10);
-        setPadding(new Insets(10));
-        getStyleClass().add("dark-viewer-root");
+    private javafx.scene.image.WritableImage spectrogramBuffer;
+    private int spectrogramX = 0;
 
+    public SpectrographViewer() {
         setupParameters();
         buildUI();
 
@@ -90,6 +63,12 @@ public class SpectrographViewer extends VBox implements ScientificViewer, Simula
 
         setupAnimation();
     }
+    
+    @Override
+    public String getName() { return "Spectrograph Viewer"; }
+    
+    @Override
+    public String getCategory() { return "Physics"; }
 
     private void setupParameters() {
         parameters.add(new NumericParameter(
@@ -123,23 +102,24 @@ public class SpectrographViewer extends VBox implements ScientificViewer, Simula
     }
 
     private void buildUI() {
-        // Canvases
+        VBox vbox = new VBox(10);
+        vbox.setPadding(new Insets(10));
+        vbox.getStyleClass().add("dark-viewer-root");
+
         spectrumCanvas = new Canvas(600, 200);
         spectrogramCanvas = new Canvas(600, 250);
 
-        // Ensure they resize with panel
-        spectrumCanvas.widthProperty().bind(this.widthProperty().subtract(20));
-        spectrogramCanvas.widthProperty().bind(this.widthProperty().subtract(20));
-
-        getChildren().addAll(spectrumCanvas, spectrogramCanvas);
+        spectrumCanvas.widthProperty().bind(vbox.widthProperty().subtract(20));
+        spectrogramCanvas.widthProperty().bind(vbox.widthProperty().subtract(20));
 
         fpsLabel = new Label(I18n.getInstance().get("spectrograph.fps", "FPS: --"));
         fpsLabel.getStyleClass().add("dark-label-muted");
-        getChildren().add(fpsLabel);
+        
+        vbox.getChildren().addAll(spectrumCanvas, spectrogramCanvas, fpsLabel);
+        setCenter(vbox);
     }
 
     private void setupAnimation() {
-        // Gradient for Spectrum
         LinearGradient gradient = new LinearGradient(0, 1, 0, 0, true, javafx.scene.paint.CycleMethod.NO_CYCLE,
                 new Stop(0, Color.web("#00ff00")),
                 new Stop(0.5, Color.web("#ffff00")),
@@ -148,8 +128,7 @@ public class SpectrographViewer extends VBox implements ScientificViewer, Simula
         timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (!playing)
-                    return;
+                if (!playing) return;
 
                 updateSpectrum();
                 renderSpectrum(spectrumCanvas.getGraphicsContext2D(), gradient);
@@ -166,57 +145,21 @@ public class SpectrographViewer extends VBox implements ScientificViewer, Simula
         };
     }
 
-    @Override
-    public void play() {
-        this.playing = true;
-        if (timer != null)
-            timer.start();
-    }
+    @Override public void play() { this.playing = true; if (timer != null) timer.start(); }
+    @Override public void pause() { this.playing = false; }
+    @Override public void stop() { this.playing = false; reset(); }
+    @Override public void step() { updateSpectrum(); renderSpectrum(spectrumCanvas.getGraphicsContext2D(), null); }
+    @Override public void setSpeed(double multiplier) { this.simulationSpeed = multiplier; }
+    @Override public boolean isPlaying() { return playing; }
 
-    @Override
-    public void pause() {
-        this.playing = false;
-    }
-
-    @Override
-    public void stop() {
-        this.playing = false;
-        reset();
-    }
-
-    @Override
-    public void step() {
-        updateSpectrum();
-        // Force a render
-        renderSpectrum(spectrumCanvas.getGraphicsContext2D(), null); // Null gradient will need fix or use stored
-    }
-
-    @Override
-    public void setSpeed(double multiplier) {
-        this.simulationSpeed = multiplier;
-    }
-
-    @Override
-    public boolean isPlaying() {
-        return playing;
-    }
-
-    @Override
     public void reset() {
         time = 0;
         spectrogramX = 0;
-        if (spectrogramBuffer != null) {
-            spectrogramBuffer = null; // Will be recreated
-        }
+        if (spectrogramBuffer != null) spectrogramBuffer = null;
     }
 
     @Override
-    public boolean isRunning() {
-        return playing;
-    }
-
-    @Override
-    public List<Parameter<?>> getParameters() {
+    public List<Parameter<?>> getViewerParameters() {
         return parameters;
     }
 
@@ -232,7 +175,7 @@ public class SpectrographViewer extends VBox implements ScientificViewer, Simula
         gc.clearRect(0, 0, w, h);
 
         double bandWidth = w / BANDS;
-        gc.setFill(gradient);
+        gc.setFill(gradient != null ? gradient : Color.GREEN);
 
         for (int i = 0; i < BANDS; i++) {
             double barHeight = spectrum[i] * h * 0.8;
@@ -257,43 +200,30 @@ public class SpectrographViewer extends VBox implements ScientificViewer, Simula
             intensity = Math.max(0, Math.min(1.0, intensity));
 
             Color c;
-            if (intensity < 0.2)
-                c = Color.hsb(240, 1.0, intensity * 5.0);
-            else
-                c = Color.hsb((1.0 - intensity) * 240.0, 1.0, 1.0);
+            if (intensity < 0.2) c = Color.hsb(240, 1.0, intensity * 5.0);
+            else c = Color.hsb((1.0 - intensity) * 240.0, 1.0, 1.0);
 
             for (int dx = 0; dx < 2; dx++) {
                 int px = (spectrogramX + dx) % (int) w;
                 for (int py = 0; py < bandHeight; py++) {
                     int y = (int) (h - (i + 1) * bandHeight + py);
-                    if (y >= 0 && y < h) {
-                        writer.setColor(px, y, c);
-                    }
+                    if (y >= 0 && y < h) writer.setColor(px, y, c);
                 }
             }
         }
 
         gc.clearRect(0, 0, w, h);
         int part1W = (int) w - spectrogramX - 2;
-        if (part1W > 0) {
-            gc.drawImage(spectrogramBuffer, spectrogramX + 2, 0, part1W, h, 0, 0, part1W, h);
-        }
+        if (part1W > 0) gc.drawImage(spectrogramBuffer, spectrogramX + 2, 0, part1W, h, 0, 0, part1W, h);
         int part2W = spectrogramX + 2;
-        if (part2W > 0) {
-            gc.drawImage(spectrogramBuffer, 0, 0, part2W, h, part1W, 0, part2W, h);
-        }
+        if (part2W > 0) gc.drawImage(spectrogramBuffer, 0, 0, part2W, h, part1W, 0, part2W, h);
     }
 
-    private javafx.scene.image.WritableImage spectrogramBuffer;
-    private int spectrogramX = 0;
-
-    // --- Inner Classes for Spectrum Generation ---
+    // --- Inner Classes ---
 
     private interface SpectrumProvider {
         void update(double time, double sensitivity);
-
         void setSourcePattern(String pattern);
-
         double[] getSpectrum();
     }
 
@@ -307,37 +237,23 @@ public class SpectrographViewer extends VBox implements ScientificViewer, Simula
             this.spectrum = new double[bands];
         }
 
-        @Override
-        public void setSourcePattern(String pattern) {
-            this.sourcePattern = pattern;
-        }
-
-        @Override
-        public double[] getSpectrum() {
-            return spectrum;
-        }
+        @Override public void setSourcePattern(String pattern) { this.sourcePattern = pattern; }
+        @Override public double[] getSpectrum() { return spectrum; }
 
         @Override
         public void update(double time, double sensitivity) {
             for (int i = 0; i < bands; i++) {
-
                 double val = 0;
-
-                if (I18n.getInstance().get("spectrograph.source.voice", "Voice").equals(sourcePattern)
-                        || "Voice".equals(sourcePattern)) {
-                    // Formant-like bumps
+                if ("Voice".equals(sourcePattern) || I18n.getInstance().get("spectrograph.source.voice", "Voice").equals(sourcePattern)) {
                     val += Math.exp(-Math.pow((i - 20) / 5.0, 2)) * Math.sin(time * 10);
                     val += Math.exp(-Math.pow((i - 50) / 8.0, 2)) * Math.cos(time * 15);
                     val += Math.random() * 0.1;
-                } else if (I18n.getInstance().get("spectrograph.source.noise", "White Noise").equals(sourcePattern)
-                        || "White Noise".equals(sourcePattern)) {
+                } else if ("White Noise".equals(sourcePattern) || I18n.getInstance().get("spectrograph.source.noise", "White Noise").equals(sourcePattern)) {
                     val = Math.random();
-                } else if (I18n.getInstance().get("spectrograph.source.sine", "Sine Wave").equals(sourcePattern)
-                        || "Sine Wave".equals(sourcePattern)) {
+                } else if ("Sine Wave".equals(sourcePattern) || I18n.getInstance().get("spectrograph.source.sine", "Sine Wave").equals(sourcePattern)) {
                     double center = 64 + 30 * Math.sin(time * 2);
                     val = Math.exp(-Math.pow((i - center) / 2.0, 2));
                 }
-
                 spectrum[i] = Math.max(0, Math.min(1.0, val * sensitivity));
             }
         }
@@ -345,28 +261,9 @@ public class SpectrographViewer extends VBox implements ScientificViewer, Simula
 
     private static class ObjectSpectrumProvider implements SpectrumProvider {
         private final PrimitiveSpectrumProvider delegate;
-
-        // Mocking object-based logic by wrapping primitive for demo
-        public ObjectSpectrumProvider(int bands) {
-            delegate = new PrimitiveSpectrumProvider(bands);
-        }
-
-        @Override
-        public void update(double time, double sensitivity) {
-            // Slower, "Simulated Object Computation"
-            delegate.update(time, sensitivity);
-        }
-
-        @Override
-        public void setSourcePattern(String pattern) {
-            delegate.setSourcePattern(pattern);
-        }
-
-        @Override
-        public double[] getSpectrum() {
-            return delegate.getSpectrum();
-        }
+        public ObjectSpectrumProvider(int bands) { delegate = new PrimitiveSpectrumProvider(bands); }
+        @Override public void update(double time, double sensitivity) { delegate.update(time, sensitivity); }
+        @Override public void setSourcePattern(String pattern) { delegate.setSourcePattern(pattern); }
+        @Override public double[] getSpectrum() { return delegate.getSpectrum(); }
     }
 }
-
-

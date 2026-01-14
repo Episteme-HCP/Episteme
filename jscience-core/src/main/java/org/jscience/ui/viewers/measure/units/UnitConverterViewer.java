@@ -23,9 +23,11 @@
 
 package org.jscience.ui.viewers.measure.units;
 
-import javafx.application.Application;
+import org.jscience.ui.AbstractViewer;
+import org.jscience.ui.Parameter;
+import java.util.List;
+import java.util.ArrayList;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -33,7 +35,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
+import org.jscience.ui.i18n.I18n;
 
 import org.jscience.measure.Unit;
 import org.jscience.measure.Quantity;
@@ -53,7 +55,22 @@ import static org.jscience.measure.Units.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class UnitConverterViewer extends Application {
+public class UnitConverterViewer extends AbstractViewer {
+
+    @Override
+    public String getCategory() {
+        return "Measurement";
+    }
+
+    @Override
+    public String getName() {
+        return I18n.getInstance().get("converter.title", "Unit Converter");
+    }
+
+    @Override
+    public List<Parameter<?>> getViewerParameters() {
+        return new ArrayList<>();
+    }
 
     private ComboBox<String> categoryBox;
     private ComboBox<Unit<?>> fromUnitBox, toUnitBox;
@@ -61,16 +78,14 @@ public class UnitConverterViewer extends Application {
 
     private Map<String, List<?>> unitsByCategory = new HashMap<>();
 
-    @Override
-    public void start(Stage stage) {
+    public UnitConverterViewer() {
         try {
-            VBox root = new VBox(20);
-            root.setPadding(new Insets(20));
+            setPadding(new Insets(20));
 
             setupUnits();
 
             Label title = new Label(
-                    org.jscience.ui.i18n.I18n.getInstance().get("converter.title", "Universal Measure Converter"));
+                    I18n.getInstance().get("converter.title", "Universal Measure Converter"));
             title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
             // Category
@@ -81,7 +96,7 @@ public class UnitConverterViewer extends Application {
             categoryBox.setConverter(new javafx.util.StringConverter<String>() {
                 @Override
                 public String toString(String object) {
-                    return org.jscience.ui.i18n.I18n.getInstance().get("converter.cat." + object, object);
+                    return I18n.getInstance().get("converter.cat." + object, object);
                 }
 
                 @Override
@@ -91,7 +106,7 @@ public class UnitConverterViewer extends Application {
             });
             categoryBox.setOnAction(e -> updateUnitLists());
             catRow.getChildren().addAll(
-                    new Label(org.jscience.ui.i18n.I18n.getInstance().get("converter.category", "Category:")),
+                    new Label(I18n.getInstance().get("converter.category", "Category:")),
                     categoryBox);
 
             // Conversion grid
@@ -107,17 +122,17 @@ public class UnitConverterViewer extends Application {
             fromUnitBox = new ComboBox<>();
             toUnitBox = new ComboBox<>();
 
-            grid.add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("converter.from", "From:")), 0, 0);
+            grid.add(new Label(I18n.getInstance().get("converter.from", "From:")), 0, 0);
             grid.add(inputField, 1, 0);
             grid.add(fromUnitBox, 2, 0);
 
-            grid.add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("converter.to", "To:")), 0, 1);
+            grid.add(new Label(I18n.getInstance().get("converter.to", "To:")), 0, 1);
             grid.add(outputField, 1, 1);
             grid.add(toUnitBox, 2, 1);
 
             updateUnitLists();
 
-            Button convertBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("converter.convert", "Convert"));
+            Button convertBtn = new Button(I18n.getInstance().get("converter.convert", "Convert"));
             convertBtn.setMaxWidth(Double.MAX_VALUE);
             convertBtn.setOnAction(e -> doConvert());
 
@@ -125,20 +140,10 @@ public class UnitConverterViewer extends Application {
             fromUnitBox.setOnAction(e -> doConvert());
             toUnitBox.setOnAction(e -> doConvert());
 
-            root.getChildren().addAll(title, catRow, grid, convertBtn);
-
-            Scene scene = new Scene(root, 600, 350);
-            stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.converter"));
-            stage.setScene(scene);
-            stage.show();
+            getChildren().addAll(new VBox(20, title, catRow, grid, convertBtn));
         } catch (Exception e) {
-            VBox errRoot = new VBox(20);
-            errRoot.setPadding(new Insets(20));
-            errRoot.getChildren().add(new Label(String.format(org.jscience.ui.i18n.I18n.getInstance()
+            getChildren().add(new Label(String.format(I18n.getInstance()
                     .get("converter.error.launch", "Error launching Unit Converter:\n%s"), e.getMessage())));
-            Scene errScene = new Scene(errRoot, 400, 200);
-            stage.setScene(errScene);
-            stage.show();
             e.printStackTrace();
         }
     }
@@ -179,7 +184,4 @@ public class UnitConverterViewer extends Application {
         }
     }
 
-    public static void show(Stage stage) {
-        new UnitConverterViewer().start(stage);
-    }
 }

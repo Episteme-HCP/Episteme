@@ -22,6 +22,7 @@
  */
 
 /**
- * Provides pluggable traversal algorithms for graphs with optional
+ * Provides pluggable traversal algorithms for graphs with optional
+
  */
 package org.jscience.mathematics.discrete.graph;

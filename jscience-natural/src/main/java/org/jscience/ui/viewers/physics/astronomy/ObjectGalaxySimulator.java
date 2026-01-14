@@ -42,7 +42,7 @@ import java.util.Arrays;
  */
 public class ObjectGalaxySimulator implements GalaxySimulator {
 
-    private List<GalaxyViewer.StarParticle> viewStars;
+    private List<StarParticle> viewStars;
 
     // Internal Physics State
     private List<Vector<Real>> positions;
@@ -53,12 +53,12 @@ public class ObjectGalaxySimulator implements GalaxySimulator {
     private Vector<Real> g2Vel;
 
     @Override
-    public void init(List<GalaxyViewer.StarParticle> stars) {
+    public void init(List<StarParticle> stars) {
         this.viewStars = stars;
         this.positions = new ArrayList<>(stars.size());
         this.velocities = new ArrayList<>(stars.size());
 
-        for (GalaxyViewer.StarParticle s : stars) {
+        for (StarParticle s : stars) {
             positions.add(createVec2(s.x, s.y));
             velocities.add(createVec2(s.vx, s.vy));
         }
@@ -135,7 +135,7 @@ public class ObjectGalaxySimulator implements GalaxySimulator {
                 positions.set(i, p);
                 velocities.set(i, v);
 
-                GalaxyViewer.StarParticle sp = viewStars.get(i);
+                StarParticle sp = viewStars.get(i);
                 sp.x = p.get(0).doubleValue();
                 sp.y = p.get(1).doubleValue();
             }

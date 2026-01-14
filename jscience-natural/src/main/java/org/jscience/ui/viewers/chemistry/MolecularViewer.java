@@ -31,19 +31,28 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-public class MolecularViewer extends Application {
+public class MolecularViewer extends org.jscience.ui.AbstractViewer {
 
     private final MolecularRenderer renderer;
     private Label detailLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("molecule.select"));
 
     public MolecularViewer() {
         this.renderer = MolecularFactory.createRenderer();
+        initUI();
+    }
+    
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("molecule.window.title");
+    }
+    
+    @Override
+    public String getCategory() {
+        return "Chemistry";
     }
 
-    @Override
-    public void start(Stage primaryStage) {
-        BorderPane root = new BorderPane();
-        root.setCenter((javafx.scene.Node) renderer.getViewComponent());
+    private void initUI() {
+        this.setCenter((javafx.scene.Node) renderer.getViewComponent());
 
         VBox controls = new VBox(15);
         controls.setPadding(new Insets(15));
@@ -70,19 +79,10 @@ public class MolecularViewer extends Application {
                 styleSelector,
                 new Separator(),
                 detailLabel);
-        root.setRight(controls);
+        this.setRight(controls);
 
         loadModel("Benzene");
         renderer.setStyle(RenderStyle.BALL_AND_STICK);
-
-        primaryStage.setScene(new Scene(root, 1100, 800));
-        primaryStage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("molecule.window.title"));
-        primaryStage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("molecule.window.title"));
-        
-        // Apply Global Theme
-        org.jscience.ui.ThemeManager.getInstance().applyTheme(primaryStage.getScene());
-        
-        primaryStage.show();
     }
 
     private void loadModel(String name) {
@@ -140,13 +140,7 @@ public class MolecularViewer extends Application {
         return DenseVector.of(l, Real.ZERO);
     }
 
-    public static void show(Stage stage) {
-        new MolecularViewer().start(stage);
-    }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
 
     // Accessor for CrystalStructureApp to use custom rendering
     public MolecularRenderer getRenderer() {

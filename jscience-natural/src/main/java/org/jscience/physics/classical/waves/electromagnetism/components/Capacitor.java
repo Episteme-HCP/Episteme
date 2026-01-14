@@ -24,7 +24,7 @@
 package org.jscience.physics.classical.waves.electromagnetism.components;
 
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.physics.classical.waves.electromagnetism.circuits.CircuitElement;
+import org.jscience.physics.classical.waves.electromagnetism.circuit.CircuitElement;
 
 /**
  * Represents an ideal Capacitor.

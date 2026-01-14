@@ -24,7 +24,7 @@
 package org.jscience.ui.demos;
 
 import org.jscience.ui.i18n.I18n;
-import org.jscience.ui.ViewerProvider;
+import org.jscience.ui.Viewer;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Nested;
@@ -44,32 +44,32 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ViewerProviderI18nTest {
+public class ViewerI18nTest {
 
-    private static List<ViewerProvider> allProviders;
+    private static List<Viewer> allProviders;
     private static final Pattern UNRESOLVED_KEY_PATTERN = Pattern.compile("^[a-z]+\\.[a-z]+.*$");
 
     @BeforeAll
     static void loadAllProviders() {
-        ServiceLoader<ViewerProvider> loader = ServiceLoader.load(ViewerProvider.class);
+        ServiceLoader<Viewer> loader = ServiceLoader.load(Viewer.class);
         allProviders = new ArrayList<>();
-        for (ViewerProvider provider : loader) {
+        for (Viewer provider : loader) {
             allProviders.add(provider);
         }
     }
 
     @Nested
-    class ViewerProviderBasicTests {
+    class ViewerBasicTests {
 
         @Test
-        void allViewerProvidersLoadSuccessfully() {
-            assertFalse(allProviders.isEmpty(), "Should have at least one ViewerProvider");
-            System.out.println("Loaded " + allProviders.size() + " ViewerProviders");
+        void allViewersLoadSuccessfully() {
+            assertFalse(allProviders.isEmpty(), "Should have at least one Viewer");
+            System.out.println("Loaded " + allProviders.size() + " Viewers");
         }
 
         @Test
-        void allViewerProvidersHaveNonNullName() {
-            for (ViewerProvider provider : allProviders) {
+        void allViewersHaveNonNullName() {
+            for (Viewer provider : allProviders) {
                 assertNotNull(provider.getName(),
                         "Demo " + provider.getClass().getSimpleName() + " has null name");
                 assertFalse(provider.getName().isEmpty(),
@@ -78,8 +78,8 @@ public class ViewerProviderI18nTest {
         }
 
         @Test
-        void allViewerProvidersHaveNonNullDescription() {
-            for (ViewerProvider provider : allProviders) {
+        void allViewersHaveNonNullDescription() {
+            for (Viewer provider : allProviders) {
                 assertNotNull(provider.getDescription(),
                         "Demo " + provider.getClass().getSimpleName() + " has null description");
                 assertFalse(provider.getDescription().isEmpty(),
@@ -88,8 +88,8 @@ public class ViewerProviderI18nTest {
         }
 
         @Test
-        void allViewerProvidersHaveNonNullCategory() {
-            for (ViewerProvider provider : allProviders) {
+        void allViewersHaveNonNullCategory() {
+            for (Viewer provider : allProviders) {
                 assertNotNull(provider.getCategory(),
                         "Demo " + provider.getClass().getSimpleName() + " has null category");
                 assertFalse(provider.getCategory().isEmpty(),
@@ -104,7 +104,7 @@ public class ViewerProviderI18nTest {
         @Test
         void namesDoNotContainUnresolvedI18nKeys() {
             List<String> failures = new ArrayList<>();
-            for (ViewerProvider provider : allProviders) {
+            for (Viewer provider : allProviders) {
                 String name = provider.getName();
                 // Check for patterns like "demo.name" which suggest unresolved key
                 if (looksLikeUnresolvedKey(name)) {
@@ -118,7 +118,7 @@ public class ViewerProviderI18nTest {
         @Test
         void descriptionsDoNotContainUnresolvedI18nKeys() {
             List<String> failures = new ArrayList<>();
-            for (ViewerProvider provider : allProviders) {
+            for (Viewer provider : allProviders) {
                 String desc = provider.getDescription();
                 if (looksLikeUnresolvedKey(desc)) {
                     failures.add(provider.getClass().getSimpleName() + " getDescription() = '" + desc + "'");
@@ -131,7 +131,7 @@ public class ViewerProviderI18nTest {
         @Test
         void categoriesDoNotContainUnresolvedI18nKeys() {
             List<String> failures = new ArrayList<>();
-            for (ViewerProvider provider : allProviders) {
+            for (Viewer provider : allProviders) {
                 String category = provider.getCategory();
                 if (looksLikeUnresolvedKey(category)) {
                     failures.add(provider.getClass().getSimpleName() + " getCategory() = '" + category + "'");

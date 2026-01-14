@@ -38,15 +38,24 @@ import java.io.File;
 import java.util.Locale;
 import java.util.prefs.Preferences;
 
-import org.jscience.ui.AppProvider;
+import org.jscience.ui.App;
 import org.jscience.ui.ThemeManager;
 import org.jscience.ui.IconLoader;
+
+import java.util.List;
+import java.util.ArrayList;
+import org.jscience.ui.Parameter;
 
 /**
  * Abstract base class for all JScience Killer Apps.
  * Provides standard application framework with menus, toolbars, status bar,
  */
-public abstract class FeaturedAppBase extends Application implements AppProvider {
+public abstract class FeaturedAppBase extends Application implements App {
+
+    @Override
+    public List<Parameter<?>> getViewerParameters() {
+        return new ArrayList<>();
+    }
 
     protected BorderPane rootPane;
     protected Stage primaryStage;

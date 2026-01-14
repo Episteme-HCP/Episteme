@@ -23,10 +23,9 @@
 
 package org.jscience.ui.demos;
 
-import javafx.stage.Stage;
-import org.jscience.ui.ViewerProvider;
-import org.jscience.ui.viewers.engineering.electrical.circuit.CircuitSimulatorViewer;
-import org.jscience.ui.i18n.I18n;
+import javafx.scene.Node;
+import org.jscience.ui.AbstractDemo;
+import org.jscience.ui.viewers.physics.classical.waves.electromagnetism.circuit.CircuitSimulatorViewer;
 
 /**
  * 
@@ -34,7 +33,17 @@ import org.jscience.ui.i18n.I18n;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CircuitSimulatorDemo implements ViewerProvider {
+public class CircuitSimulatorDemo extends AbstractDemo {
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("circuit.title", "Circuit Simulator");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("circuit.desc", "Real-time electronic circuit simulation.");
+    }
 
     @Override
     public String getCategory() {
@@ -42,18 +51,13 @@ public class CircuitSimulatorDemo implements ViewerProvider {
     }
 
     @Override
-    public String getName() {
-        return I18n.getInstance().get("CircuitSimulator.title");
+    protected String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("circuit.long_desc", "Simulates ideal electronic components including resistors, capacitors, inductors, and voltage sources.");
     }
 
     @Override
-    public String getDescription() {
-        return I18n.getInstance().get("CircuitSimulator.desc");
-    }
-
-    @Override
-    public void show(Stage stage) {
-        CircuitSimulatorViewer.show(stage);
+    public Node createViewerNode() {
+        return new CircuitSimulatorViewer();
     }
 }
 

@@ -30,6 +30,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.AbstractViewer;
+import org.jscience.ui.Parameter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +43,12 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class MetamathViewer extends Application {
+public class MetamathViewer extends AbstractViewer {
+
+    @Override
+    public List<Parameter<?>> getViewerParameters() {
+        return new ArrayList<>();
+    }
 
     private static class Theorem {
         String name;
@@ -63,17 +70,16 @@ public class MetamathViewer extends Application {
     private ComboBox<String> theoremSelector;
     private Label theoremLabel;
 
-    @Override
-    public void start(Stage stage) {
+    public MetamathViewer() {
         initTheorems();
 
-        BorderPane root = new BorderPane();
-        root.setPadding(new Insets(10));
+        BorderPane layout = new BorderPane();
+        layout.setPadding(new Insets(10));
 
         // Header
         Label header = new Label(I18n.getInstance().get("metamath.title"));
         header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-        root.setTop(header);
+        layout.setTop(header);
 
         // Center
         VBox center = new VBox(20);
@@ -108,7 +114,7 @@ public class MetamathViewer extends Application {
 
         center.getChildren().addAll(selectorBox, theoremLabel, new Label(I18n.getInstance().get("metamath.proof")),
                 scroll);
-        root.setCenter(center);
+        layout.setCenter(center);
 
         // Sidebar
         VBox sidebar = new VBox(10);
@@ -125,17 +131,14 @@ public class MetamathViewer extends Application {
         resetBtn.setOnAction(e -> loadTheorem(currentTheorem));
 
         sidebar.getChildren().addAll(new Label(I18n.getInstance().get("metamath.tactics")), nextStepBtn, resetBtn);
-        root.setRight(sidebar);
+        layout.setRight(sidebar);
 
         // Load initial
         if (!theorems.isEmpty()) {
             loadTheorem(theorems.get(0));
         }
 
-        Scene scene = new Scene(root, 900, 600);
-        stage.setTitle(I18n.getInstance().get("viewer.metamath"));
-        stage.setScene(scene);
-        stage.show();
+        getChildren().add(layout);
     }
 
     private void initTheorems() {
@@ -197,7 +200,4 @@ public class MetamathViewer extends Application {
         }
     }
 
-    public static void show(Stage stage) {
-        new MetamathViewer().start(stage);
-    }
 }

@@ -89,7 +89,7 @@ public class JScienceDemosApp extends Application {
         root.setTop(topContainer);
 
         // Discovery
-        Map<String, List<ViewerProvider>> demosByCategory = discoverAndSortProviders();
+        Map<String, List<Viewer>> demosByCategory = discoverAndSortProviders();
 
         // Single unified content - no tabs
         VBox allContent = new VBox(15);
@@ -101,7 +101,7 @@ public class JScienceDemosApp extends Application {
             allContent.getChildren().add(new Label(I18n.getInstance().get("app.nodemos")));
         } else {
             // Demos sections
-            for (Map.Entry<String, List<ViewerProvider>> entry : demosByCategory.entrySet()) {
+            for (Map.Entry<String, List<Viewer>> entry : demosByCategory.entrySet()) {
                 // Restore logic from old app: skip social sciences if requested?
                 // The user said "completely different", implying the old state was preferred.
                 // The old state explicitly skipped "Social Sciences".
@@ -223,12 +223,12 @@ public class JScienceDemosApp extends Application {
         return header;
     }
 
-    private TitledPane createSection(String category, List<ViewerProvider> demos) {
+    private TitledPane createSection(String category, List<Viewer> demos) {
         VBox box = new VBox(8);
         box.setPadding(new Insets(10));
         box.getStyleClass().add("section-box"); // Styled in CSS
 
-        for (ViewerProvider demo : demos) {
+        for (Viewer demo : demos) {
             box.getChildren().add(createCard(demo));
         }
 
@@ -238,7 +238,7 @@ public class JScienceDemosApp extends Application {
         return pane;
     }
 
-    private HBox createCard(ViewerProvider demo) {
+    private HBox createCard(Viewer demo) {
         HBox row = new HBox(15);
         row.setAlignment(Pos.CENTER_LEFT);
         row.setPadding(new Insets(15));
@@ -278,7 +278,7 @@ public class JScienceDemosApp extends Application {
         return row;
     }
 
-    private void launchDemo(ViewerProvider demo) {
+    private void launchDemo(Viewer demo) {
         Stage stage = new Stage();
         stage.setTitle(demo.getName());
         try {
@@ -303,33 +303,33 @@ public class JScienceDemosApp extends Application {
 
     // --- Data Discovery (Kept from Modern Version) ---
 
-    private Map<String, List<ViewerProvider>> discoverAndSortProviders() {
-        Map<MasterControlDiscovery.ProviderType, Map<String, List<ViewerProvider>>> discovery = MasterControlDiscovery
+    private Map<String, List<Viewer>> discoverAndSortProviders() {
+        Map<MasterControlDiscovery.ProviderType, Map<String, List<Viewer>>> discovery = MasterControlDiscovery
                 .getInstance().getProvidersByType();
 
-        Map<String, List<ViewerProvider>> consolidated = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        Map<String, List<Viewer>> consolidated = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
         // Add Apps and Demos
         mergeProviders(consolidated, discovery.get(MasterControlDiscovery.ProviderType.APP));
         mergeProviders(consolidated, discovery.get(MasterControlDiscovery.ProviderType.DEMO));
 
         // Deduplicate and Sort Items within Categories
-        for (List<ViewerProvider> list : consolidated.values()) {
+        for (List<Viewer> list : consolidated.values()) {
             // Deduplicate by class name
             Set<String> seenClasses = new HashSet<>();
             list.removeIf(p -> !seenClasses.add(p.getClass().getName()));
 
             // Sort by Name
-            list.sort(Comparator.comparing(ViewerProvider::getName));
+            list.sort(Comparator.comparing(Viewer::getName));
         }
 
         return consolidated;
     }
 
-    private void mergeProviders(Map<String, List<ViewerProvider>> target, Map<String, List<ViewerProvider>> source) {
+    private void mergeProviders(Map<String, List<Viewer>> target, Map<String, List<Viewer>> source) {
         if (source == null)
             return;
-        for (Map.Entry<String, List<ViewerProvider>> entry : source.entrySet()) {
+        for (Map.Entry<String, List<Viewer>> entry : source.entrySet()) {
             // Translate Category Name
             String key = entry.getKey();
             String catName = I18n.getInstance().get("category." + key.toLowerCase().replace(" ", "_"), key);

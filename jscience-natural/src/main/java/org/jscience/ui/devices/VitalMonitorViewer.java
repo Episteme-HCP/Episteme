@@ -54,7 +54,7 @@ import org.jscience.ui.i18n.I18n;
  */
 import org.jscience.ui.NumericParameter;
 import org.jscience.ui.Parameter;
-import org.jscience.ui.ScientificViewer;
+import org.jscience.ui.Viewer;
 import org.jscience.ui.Simulatable;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +67,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class VitalMonitorViewer extends BorderPane implements ScientificViewer, Simulatable {
+public class VitalMonitorViewer extends BorderPane implements Viewer, Simulatable {
 
     // Colors matching professional medical monitors
     private static final Color HR_COLOR = Color.web("#00FF00"); // Green ECG

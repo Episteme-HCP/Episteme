@@ -23,32 +23,32 @@
 
 package org.jscience.ui.viewers.mathematics.symbolic;
 
-import javafx.application.Application;
+import org.jscience.ui.AbstractViewer;
+import org.jscience.ui.Parameter;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
-import javafx.scene.layout.*;
-
-import javafx.scene.text.Font;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
+import javafx.scene.text.Font;
+import java.util.List;
+import java.util.ArrayList;
 
-/**
- * Visualizer for Scientific Formulas and Mathematical Notation.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
-public class FormulaNotationViewer extends Application {
+public class FormulaNotationViewer extends AbstractViewer {
 
     @Override
-    public void start(Stage stage) {
-        VBox root = new VBox(20);
-        root.setPadding(new Insets(30));
-        root.setStyle("-fx-background-color: white;");
+    public List<Parameter<?>> getViewerParameters() {
+        return new ArrayList<>();
+    }
+
+    public FormulaNotationViewer() {
+        VBox content = new VBox(20);
+        content.setPadding(new Insets(30));
+        content.setStyle("-fx-background-color: white;");
 
         Label title = new Label(
                 org.jscience.ui.i18n.I18n.getInstance().get("formula.title", "Mathematical Formula Renderer"));
@@ -64,16 +64,23 @@ public class FormulaNotationViewer extends Application {
                 createFormulaBox(i18n.get("formula.gravitation", "Newton's Law of Gravitation"),
                         createGravitationLaw()));
 
-        root.getChildren().addAll(title, new Separator(), new ScrollPane(formulaList) {
+        content.getChildren().addAll(title, new Separator(), new ScrollPane(formulaList) {
             {
                 setFitToWidth(true);
             }
         });
 
-        Scene scene = new Scene(root, 800, 700);
-        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("viewer.formula"));
-        stage.setScene(scene);
-        stage.show();
+        getChildren().add(content);
+    }
+
+    @Override
+    public String getCategory() {
+        return "Mathematics";
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.formula");
     }
 
     private VBox createFormulaBox(String name, Region formula) {
@@ -225,7 +232,4 @@ public class FormulaNotationViewer extends Application {
         return hbox;
     }
 
-    public static void show(Stage stage) {
-        new FormulaNotationViewer().start(stage);
-    }
 }

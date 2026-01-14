@@ -137,7 +137,7 @@ public class SpinValveApp extends FeaturedAppBase {
         // Tab 4: Magnetic Field Vector View
         Tab magTab = new Tab(i18n.get("spintronics.tab.visualization") + " (Field)");
         magTab.setClosable(false);
-        magTab.setContent(new org.jscience.apps.physics.spintronics.viewer.MagneticFieldViewer().createContent());
+        magTab.setContent(new org.jscience.ui.viewers.physics.classical.waves.electromagnetism.field.MagneticFieldViewer());
         tabPane.getTabs().add(magTab);
 
         centerPanel.getChildren().add(tabPane);

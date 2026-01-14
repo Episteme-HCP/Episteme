@@ -23,11 +23,9 @@
 
 package org.jscience.ui.demos;
 
-import javafx.stage.Stage;
-import org.jscience.ui.AppProvider;
-import org.jscience.ui.viewers.engineering.electrical.components.ResistorColorCodeViewer;
-
-import org.jscience.ui.i18n.I18n;
+import javafx.scene.Node;
+import org.jscience.ui.AbstractDemo;
+import org.jscience.ui.viewers.physics.classical.waves.electromagnetism.circuit.ResistorColorCodeViewer;
 
 /**
  * 
@@ -35,31 +33,11 @@ import org.jscience.ui.i18n.I18n;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ResistorColorCodeDemo implements AppProvider {
+public class ResistorColorCodeDemo extends AbstractDemo {
 
     @Override
-    public boolean isDemo() {
-        return true;
-    }
-
-    @Override
-    public String getName() {
-        return I18n.getInstance().get("ResistorColorCode.title");
-    }
-
-    @Override
-    public String getDescription() {
-        return I18n.getInstance().get("ResistorColorCode.desc");
-    }
-
-    @Override
-    public String getCategory() {
-        return "Engineering";
-    }
-
-    @Override
-    public void show(Stage stage) {
-        new ResistorColorCodeViewer().start(stage);
+    public Node createViewerNode() {
+        return new ResistorColorCodeViewer();
     }
 }
 

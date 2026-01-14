@@ -23,7 +23,7 @@
 
 package org.jscience.physics.classical.waves.electromagnetism.components;
 
-import org.jscience.physics.classical.waves.electromagnetism.circuits.CircuitElement;
+import org.jscience.physics.classical.waves.electromagnetism.circuit.CircuitElement;
 
 /**
  * Represents a ground reference (0V potential).

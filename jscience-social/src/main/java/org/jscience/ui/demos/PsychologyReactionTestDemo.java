@@ -30,17 +30,9 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.jscience.ui.AppProvider;
+import org.jscience.ui.AbstractSimulationDemo;
 
-import java.util.Random;
-
-/**
- * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
-public class PsychologyReactionTestDemo implements AppProvider {
+public class PsychologyReactionTestDemo extends AbstractSimulationDemo {
 
     @Override
     public boolean isDemo() {
@@ -66,10 +58,15 @@ public class PsychologyReactionTestDemo implements AppProvider {
     private boolean waiting = false;
 
     @Override
-    public void show(Stage stage) {
+    public void start(Stage stage) {
+        initUI();
+        super.start(stage);
+    }
+    
+    private void initUI() {
         StackPane root = new StackPane();
         Label instruction = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.inst.start"));
-        instruction.setStyle("-fx-font-size: 20px;"); // Removed white text
+        instruction.setStyle("-fx-font-size: 20px;");
 
         Button mainBtn = new Button(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.btn.start"));
         mainBtn.setStyle("-fx-font-size: 16px;");
@@ -78,40 +75,28 @@ public class PsychologyReactionTestDemo implements AppProvider {
         center.setAlignment(javafx.geometry.Pos.CENTER);
         root.getChildren().add(center);
 
-        // root.setStyle("-fx-background-color: #333;"); // Removed dark background
-
         mainBtn.setOnAction(e -> {
             if (mainBtn.getText().equals(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.btn.start")) ||
                     mainBtn.getText().equals(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.btn.try"))) {
                 instruction.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.inst.wait"));
-                root.setStyle("-fx-background-color: #cc3333;"); // Red (Keep for functionality)
-                instruction.setStyle("-fx-font-size: 20px; -fx-text-fill: white;"); // Ensure text is white on red
+                root.setStyle("-fx-background-color: #cc3333;");
+                instruction.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
                 mainBtn.setVisible(false);
                 waiting = true;
-
-                // Random delay 2-5 sec
+                
                 new Thread(() -> {
-                    try {
-                        Thread.sleep(2000 + new Random().nextInt(3000));
-                    } catch (InterruptedException ex) {
-                    }
-
+                    try { Thread.sleep(2000 + new Random().nextInt(3000)); } catch (InterruptedException ex) {}
                     Platform.runLater(() -> {
                         if (waiting) {
-                            root.setStyle("-fx-background-color: #33cc33;"); // Green
+                            root.setStyle("-fx-background-color: #33cc33;");
                             instruction.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.inst.click"));
                             startTime = System.currentTimeMillis();
                             waiting = false;
-
-                            // Make whole screen clickable effectively by adding handler to root
                             root.setOnMouseClicked(ev -> {
                                 if (startTime > 0) {
                                     long elapsed = System.currentTimeMillis() - startTime;
-                                    instruction.setText(String.format(
-                                            org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.result.fmt"),
-                                            elapsed));
-                                    root.setStyle(""); // Reset to default
-                                    instruction.setStyle("-fx-font-size: 20px;"); // Reset text color
+                                    instruction.setText(String.format(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.result.fmt"), elapsed));
+                                    root.setStyle(""); instruction.setStyle("-fx-font-size: 20px;");
                                     mainBtn.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.btn.try"));
                                     mainBtn.setVisible(true);
                                     startTime = 0;
@@ -121,27 +106,25 @@ public class PsychologyReactionTestDemo implements AppProvider {
                         }
                     });
                 }).start();
-
             }
         });
 
-        // Anti-cheat (early click)
         root.setOnMouseClicked(e -> {
             if (waiting && startTime == 0) {
                 waiting = false;
                 instruction.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.penalty"));
-                root.setStyle(""); // Reset to default
-                instruction.setStyle("-fx-font-size: 20px;"); // Reset text color
+                root.setStyle(""); instruction.setStyle("-fx-font-size: 20px;");
                 mainBtn.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.btn.try"));
                 mainBtn.setVisible(true);
             }
         });
+        
+        this.viewer = root;
+    }
 
-        Scene scene = new Scene(root, 600, 400);
-        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(getName());
-        stage.setScene(scene);
-        stage.show();
+    @Override
+    protected String getLongDescription() {
+        return getDescription();
     }
 }
 

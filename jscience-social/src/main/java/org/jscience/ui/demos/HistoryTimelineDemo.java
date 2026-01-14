@@ -24,16 +24,9 @@
 package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
-import org.jscience.ui.AppProvider;
-import org.jscience.ui.viewers.history.HistoryTimelineViewer;
+import org.jscience.ui.AbstractDemo;
 
-/**
- * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
-public class HistoryTimelineDemo implements AppProvider {
+public class HistoryTimelineDemo extends AbstractDemo {
 
     @Override
     public boolean isDemo() {
@@ -56,8 +49,14 @@ public class HistoryTimelineDemo implements AppProvider {
     }
 
     @Override
-    public void show(Stage stage) {
-        HistoryTimelineViewer.show(stage);
+    protected javafx.scene.Node createViewerNode() {
+        org.jscience.ui.viewers.history.TimelineViewer v = new org.jscience.ui.viewers.history.TimelineViewer();
+        this.viewer = v;
+        return v;
     }
-
+    
+    @Override
+    protected String getLongDescription() {
+        return getDescription();
+    }
 }

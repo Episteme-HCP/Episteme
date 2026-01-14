@@ -24,10 +24,14 @@
 package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
-import org.jscience.ui.AppProvider;
+import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.viewers.mathematics.symbolic.FormulaNotationViewer;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.Parameter;
 
 /**
  * 
@@ -35,7 +39,7 @@ import org.jscience.ui.i18n.I18n;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class FormulaNotationDemo implements AppProvider {
+public class FormulaNotationDemo extends AbstractDemo {
     @Override
     public boolean isDemo() {
         return true;
@@ -57,7 +61,17 @@ public class FormulaNotationDemo implements AppProvider {
     }
 
     @Override
-    public void show(Stage stage) {
-        FormulaNotationViewer.show(stage);
+    protected javafx.scene.Node createViewerNode() {
+        return new FormulaNotationViewer();
+    }
+
+    @Override
+    protected String getLongDescription() {
+         return org.jscience.ui.i18n.I18n.getInstance().get("demo.formula.desc");
+    }
+
+    @Override
+    public List<Parameter<?>> getViewerParameters() {
+        return new ArrayList<>();
     }
 }

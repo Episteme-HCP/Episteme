@@ -23,7 +23,7 @@
 
 package org.jscience.ui.demos;
 
-import org.jscience.ui.ViewerProvider;
+import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.viewers.mathematics.analysis.chaos.fractals.MandelbrotViewer;
 import javafx.stage.Stage;
 
@@ -34,7 +34,7 @@ import javafx.stage.Stage;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class MandelbrotDemo implements ViewerProvider {
+public class MandelbrotDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
@@ -52,7 +52,12 @@ public class MandelbrotDemo implements ViewerProvider {
     }
 
     @Override
-    public void show(Stage stage) {
-        new MandelbrotViewer().start(stage);
+    protected javafx.scene.Node createViewerNode() {
+        return new MandelbrotViewer();
+    }
+
+    @Override
+    protected String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.mandelbrot.desc");
     }
 }

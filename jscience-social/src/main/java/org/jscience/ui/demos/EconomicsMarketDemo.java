@@ -34,15 +34,9 @@ import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.jscience.ui.AppProvider;
+import org.jscience.ui.AbstractDemo;
 
-/**
- * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
-public class EconomicsMarketDemo implements AppProvider {
+public class EconomicsMarketDemo extends AbstractDemo {
 
     @Override
     public boolean isDemo() {
@@ -65,7 +59,12 @@ public class EconomicsMarketDemo implements AppProvider {
     }
 
     @Override
-    public void show(Stage stage) {
+    public void start(Stage stage) {
+        initUI();
+        super.start(stage);
+    }
+    
+    private void initUI() {
         BorderPane root = new BorderPane();
 
         // Axes
@@ -139,11 +138,12 @@ public class EconomicsMarketDemo implements AppProvider {
 
         root.setCenter(lineChart);
         root.setBottom(controls);
-
-        Scene scene = new Scene(root, 800, 600);
-        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(getName());
-        stage.setScene(scene);
-        stage.show();
+        
+        this.viewer = root;
+    }
+    
+    @Override
+    protected String getLongDescription() {
+        return getDescription();
     }
 }

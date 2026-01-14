@@ -24,7 +24,7 @@
 package org.jscience.ui.demos;
 
 import javafx.stage.Stage;
-import org.jscience.ui.ViewerProvider;
+import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.viewers.mathematics.statistics.DistributionsViewer;
 
 /**
@@ -33,7 +33,7 @@ import org.jscience.ui.viewers.mathematics.statistics.DistributionsViewer;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class DistributionsDemo implements ViewerProvider {
+public class DistributionsDemo extends AbstractDemo {
 
     @Override
     public String getName() {
@@ -51,8 +51,13 @@ public class DistributionsDemo implements ViewerProvider {
     }
 
     @Override
-    public void show(Stage stage) {
-        DistributionsViewer.show(stage);
+    protected javafx.scene.Node createViewerNode() {
+        return new DistributionsViewer();
+    }
+
+    @Override
+    protected String getLongDescription() {
+        return "Visualizer for Normal, Poisson, and Binomial distributions.";
     }
 }
 

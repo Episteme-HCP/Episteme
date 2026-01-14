@@ -1,32 +1,13 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
-
 package org.jscience.ui.demos;
 
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
@@ -34,10 +15,9 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.Stage;
-import org.jscience.ui.AppProvider;
+import org.jscience.ui.AbstractDemo;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * Kurzweil Time Visualization Demo - Exponential vs Linear Time.
@@ -51,10 +31,10 @@ import java.util.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class KurzweilDemo implements AppProvider {
+public class KurzweilDemo extends AbstractDemo {
 
     private static final int WIDTH = 1000;
-    private static final int HEIGHT = 700;
+    // HEIGHT is handled by parent container
 
     // Time tracking
     private double realTimeSeconds = 0;
@@ -91,11 +71,6 @@ public class KurzweilDemo implements AppProvider {
     private boolean running = true;
 
     @Override
-    public boolean isDemo() {
-        return true;
-    }
-
-    @Override
     public String getCategory() {
         return org.jscience.ui.i18n.I18n.getInstance().get("category.economics", "Economics");
     }
@@ -109,20 +84,14 @@ public class KurzweilDemo implements AppProvider {
     public String getDescription() {
         return org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.desc");
     }
+    
+    @Override
+    protected String getLongDescription() {
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.desc.text");
+    }
 
     @Override
-    public void show(Stage stage) {
-        BorderPane root = new BorderPane();
-        root.getStyleClass().add("dark-viewer-root");
-
-        // Title
-        Label title = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.header"));
-        title.setFont(Font.font("System", FontWeight.BOLD, 22));
-        title.getStyleClass().add("dark-label-accent");
-        title.setPadding(new Insets(15));
-        BorderPane.setAlignment(title, Pos.CENTER);
-        root.setTop(title);
-
+    protected Node createViewerNode() {
         // Main content - two timelines
         VBox centerBox = new VBox(20);
         centerBox.setPadding(new Insets(10));
@@ -133,6 +102,7 @@ public class KurzweilDemo implements AppProvider {
         Label linearLabel = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.label.linear"));
         linearLabel.getStyleClass().add("dark-label");
         linearLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
+        // Use a preferred width logic, but fixed for now to match original approx 750px
         linearCanvas = new Canvas(WIDTH - 250, 180);
         linearBox.getChildren().addAll(linearLabel, linearCanvas);
 
@@ -145,20 +115,7 @@ public class KurzweilDemo implements AppProvider {
         logBox.getChildren().addAll(logLabel, logCanvas);
 
         centerBox.getChildren().addAll(linearBox, logBox);
-        root.setCenter(centerBox);
-
-        // Right sidebar
-        VBox sidebar = createSidebar();
-        root.setRight(sidebar);
-
-        // Description at bottom
-        TextArea description = new TextArea(
-                org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.desc.text"));
-        description.setWrapText(true);
-        description.setEditable(false);
-        description.setPrefHeight(100);
-        root.setBottom(description);
-
+        
         // Animation
         AnimationTimer timer = new AnimationTimer() {
             private long lastTime = 0;
@@ -181,17 +138,19 @@ public class KurzweilDemo implements AppProvider {
         };
         timer.start();
 
-        Scene scene = new Scene(root, WIDTH, HEIGHT);
-        org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-        stage.setTitle(getName());
-        stage.setScene(scene);
-        stage.show();
+        return centerBox;
+    }
+    
+    @Override
+    protected VBox createControlPanel() {
+        return createSidebar();
     }
 
     private VBox createSidebar() {
         VBox sidebar = new VBox(20);
         sidebar.setPadding(new Insets(20));
         sidebar.setPrefWidth(220);
+        // Note: 'dark-viewer-sidebar' might be handled by AbstractDemo's container, but keeping here for inner styling
         sidebar.getStyleClass().add("dark-viewer-sidebar");
 
         // Dual clocks
