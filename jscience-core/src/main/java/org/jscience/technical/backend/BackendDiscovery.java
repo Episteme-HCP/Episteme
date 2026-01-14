@@ -42,8 +42,14 @@ public class BackendDiscovery {
     public List<BackendProvider> getProviders() {
         List<BackendProvider> all = new ArrayList<>();
         ServiceLoader<BackendProvider> loader = ServiceLoader.load(BackendProvider.class);
-        for (BackendProvider provider : loader) {
-            all.add(provider);
+        Iterator<BackendProvider> iterator = loader.iterator();
+        while (iterator.hasNext()) {
+            try {
+                all.add(iterator.next());
+            } catch (ServiceConfigurationError e) {
+                // Log and skip providers that cannot be loaded
+                System.err.println("Warning: Could not load backend provider: " + e.getMessage());
+            }
         }
         return all;
     }
