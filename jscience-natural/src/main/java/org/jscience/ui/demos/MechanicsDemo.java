@@ -119,9 +119,9 @@ public class MechanicsDemo extends AbstractSimulationDemo {
         }
 
         private void setupParameters() {
-            parameters.add(new NumericParameter(I18n.getInstance().get("mechanics.mass", "Mass"), "Mass (kg)", 0.1, 10.0, 5.0, val -> mass = val));
-            parameters.add(new NumericParameter(I18n.getInstance().get("mechanics.spring", "Spring K"), "Spring Constant (N/m)", 0.1, 50.0, 10.0, val -> springConstant = val));
-            parameters.add(new NumericParameter(I18n.getInstance().get("mechanics.damping", "Damping"), "Damping Factor", 0.0, 2.0, 0.5, val -> damping = val));
+            parameters.add(new NumericParameter(I18n.getInstance().get("mechanics.mass", "Mass"), "Mass (kg)", 0.1, 10.0, 0.1, 5.0, val -> mass = val));
+            parameters.add(new NumericParameter(I18n.getInstance().get("mechanics.spring", "Spring K"), "Spring Constant (N/m)", 0.1, 50.0, 0.1, 10.0, val -> springConstant = val));
+            parameters.add(new NumericParameter(I18n.getInstance().get("mechanics.damping", "Damping"), "Damping Factor", 0.0, 2.0, 0.1, 0.5, val -> damping = val));
         }
 
         private void update(double dt) {

@@ -24,13 +24,15 @@
 package org.jscience.ui.demos;
 
 import javafx.application.Platform;
-import javafx.scene.Scene;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.jscience.ui.AbstractSimulationDemo;
+
+import java.util.Random;
 
 public class PsychologyReactionTestDemo extends AbstractSimulationDemo {
 
@@ -61,6 +63,12 @@ public class PsychologyReactionTestDemo extends AbstractSimulationDemo {
     public void start(Stage stage) {
         initUI();
         super.start(stage);
+    }
+    
+    @Override
+    public Node createViewerNode() {
+        initUI();
+        return viewer;
     }
     
     private void initUI() {

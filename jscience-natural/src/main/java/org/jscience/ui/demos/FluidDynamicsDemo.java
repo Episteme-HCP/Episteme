@@ -179,7 +179,7 @@ public class FluidDynamicsDemo extends AbstractSimulationDemo {
             Label viscLabel = new Label(I18n.getInstance().get("fluid.viscosity", "Viscosity"));
             Slider viscSlider = new Slider(0, 0.05, 0.0001);
             viscSlider.valueProperty().addListener((o, ov, nv) -> viscosity = nv.doubleValue());
-            controls.addAll(viscLabel, viscSlider);
+            controls.getChildren().addAll(viscLabel, viscSlider);
 
             // Engine Switch
             ToggleButton engineSwitch = new ToggleButton(I18n.getInstance().get("fluid.mode.primitive", "Simple Solver"));
@@ -208,7 +208,7 @@ public class FluidDynamicsDemo extends AbstractSimulationDemo {
             particleCheck.setSelected(showParticles);
             particleCheck.setOnAction(e -> { showParticles = particleCheck.isSelected(); drawFluid(canvas.getGraphicsContext2D()); });
             
-            controls.addAll(new Separator(), fieldCheck, particleCheck);
+            controls.getChildren().addAll(new Separator(), fieldCheck, particleCheck);
 
             // Color Scheme
             ComboBox<String> colorCombo = new ComboBox<>();

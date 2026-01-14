@@ -26,7 +26,7 @@ package org.jscience.physics.electricity.simulation;
 import org.jscience.physics.classical.waves.electromagnetism.components.Ground;
 import org.jscience.physics.classical.waves.electromagnetism.components.Resistor;
 import org.jscience.physics.classical.waves.electromagnetism.components.VoltageSource;
-import org.jscience.physics.classical.waves.electromagnetism.circuits.Circuit;
+import org.jscience.physics.classical.waves.electromagnetism.circuit.Circuit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

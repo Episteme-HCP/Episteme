@@ -26,6 +26,7 @@ import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
 import org.jscience.ui.i18n.I18n;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -231,7 +232,8 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
     // --- Star System Creation (Merged) ---
     private StarSystem createDefaultSolarSystem() {
         StarSystem s = new StarSystem("Solar System");
-        Vector<Real> o = Vector.of(new double[]{0,0,0}), z = Vector.of(new double[]{0,0,0}); // Helper
+        Vector<Real> o = DenseVector.of(Arrays.asList(Real.ZERO, Real.ZERO, Real.ZERO), org.jscience.mathematics.sets.Reals.getInstance());
+        Vector<Real> z = DenseVector.of(Arrays.asList(Real.ZERO, Real.ZERO, Real.ZERO), org.jscience.mathematics.sets.Reals.getInstance());
         Star sun = new Star("Sun", org.jscience.measure.Quantities.create(Real.of(1.989e30), Units.KILOGRAM),
                 org.jscience.measure.Quantities.create(Real.of(6.96e8), Units.METER), o, z);
         s.addBody(sun);
@@ -244,7 +246,8 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
     
     private StarSystem createBlackHoleSystem() {
         StarSystem s = new StarSystem("Cygnus X-1");
-        Vector<Real> o = Vector.of(new double[]{0,0,0}), z = Vector.of(new double[]{0,0,0});
+        Vector<Real> o = DenseVector.of(Arrays.asList(Real.ZERO, Real.ZERO, Real.ZERO), org.jscience.mathematics.sets.Reals.getInstance());
+        Vector<Real> z = DenseVector.of(Arrays.asList(Real.ZERO, Real.ZERO, Real.ZERO), org.jscience.mathematics.sets.Reals.getInstance());
         s.addBody(new Star("Black Hole", org.jscience.measure.Quantities.create(Real.of(2e31), Units.KILOGRAM),
                 org.jscience.measure.Quantities.create(Real.of(30000), Units.METER), o, z));
         s.addBody(new Planet("Companion", org.jscience.measure.Quantities.create(Real.of(4e31), Units.KILOGRAM),

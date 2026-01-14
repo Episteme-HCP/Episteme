@@ -64,6 +64,12 @@ public class EconomicsMarketDemo extends AbstractDemo {
         super.start(stage);
     }
     
+    @Override
+    public javafx.scene.Node createViewerNode() {
+        initUI();
+        return viewer;
+    }
+    
     private void initUI() {
         BorderPane root = new BorderPane();
 

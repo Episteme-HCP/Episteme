@@ -148,7 +148,7 @@ public class ObjectGalaxySimulator implements GalaxySimulator {
 
             for (int i = 0; i < positions.size(); i++) {
                 Vector<Real> p = positions.get(i);
-                GalaxyViewer.StarParticle sp = viewStars.get(i);
+                StarParticle sp = viewStars.get(i);
 
                 Real x = p.get(0);
                 Real y = p.get(1);

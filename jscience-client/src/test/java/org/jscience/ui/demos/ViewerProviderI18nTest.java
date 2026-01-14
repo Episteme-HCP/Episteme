@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ViewerI18nTest {
+public class ViewerProviderI18nTest {
 
     private static List<Viewer> allProviders;
     private static final Pattern UNRESOLVED_KEY_PATTERN = Pattern.compile("^[a-z]+\\.[a-z]+.*$");
