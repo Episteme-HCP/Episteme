@@ -29,8 +29,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -48,11 +46,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.Stack;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import java.util.regex.Pattern;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import java.util.regex.Pattern;
 
 
 /**

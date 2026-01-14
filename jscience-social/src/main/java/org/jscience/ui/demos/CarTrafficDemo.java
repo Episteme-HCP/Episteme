@@ -24,14 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jscience.ui.i18n.SocialI18n;
-import org.jscience.ui.Parameter;
 import javafx.geometry.Pos;
 
 /**
  * Car Traffic Simulation Demo.
  * Merged implementation of Viewer and Demo.
  */
-public class CarTrafficDemo extends AbstractSimulationDemo implements Simulatable {
+public class CarTrafficDemo extends AbstractSimulationDemo {
 
     // --- Simulation State ---
     private static final double TRACK_RADIUS_PIXELS = 250;
