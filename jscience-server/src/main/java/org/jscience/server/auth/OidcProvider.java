@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -64,22 +64,18 @@ import java.util.concurrent.TimeUnit;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class OidcProvider {
+public class OIDCProvider {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OidcProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OIDCProvider.class);
 
     // Cache for JWT Processors (Duration: 1h to allow key rotation)
     private static final Cache<String, ConfigurableJWTProcessor<SecurityContext>> processorCache = Caffeine.newBuilder()
             .expireAfterWrite(1, TimeUnit.HOURS)
             .build();
 
-    // Hardcoded JWKS URIs for now (in a real app, we'd fetch these from discovery
-    // endpoints)
-    private static final Map<String, String> PROVIDER_JWKS_URLS = new HashMap<>();
-    static {
-        PROVIDER_JWKS_URLS.put("google", "https://www.googleapis.com/oauth2/v3/certs");
-        PROVIDER_JWKS_URLS.put("keycloak", "http://localhost:8080/realms/jscience/protocol/openid-connect/certs");
-        PROVIDER_JWKS_URLS.put("okta", "https://dev-okta.com/oauth2/default/v1/keys");
+    // JWKS URIs loaded from configuration
+    private static String getProviderJwksUrl(String provider) {
+        return org.jscience.io.Configuration.get("auth.oidc.provider." + provider.toLowerCase() + ".jwks");
     }
 
     /**
@@ -120,6 +116,7 @@ public class OidcProvider {
                     role = Roles.SCIENTIST;
                 }
             } else if ("keycloak".equalsIgnoreCase(provider)) {
+                @SuppressWarnings("unchecked")
                 Map<String, Object> realmAccess = claims.getJSONObjectClaim("realm_access");
                 if (realmAccess != null && realmAccess.containsKey("roles")) {
                     if (realmAccess.get("roles").toString().contains("SCIENTIST")) {
@@ -158,7 +155,7 @@ public class OidcProvider {
     @SuppressWarnings("deprecation")
     private static ConfigurableJWTProcessor<SecurityContext> createProcessor(String provider)
             throws MalformedURLException {
-        String jwksUrl = PROVIDER_JWKS_URLS.get(provider.toLowerCase());
+        String jwksUrl = getProviderJwksUrl(provider);
         if (jwksUrl == null) {
             throw new IllegalArgumentException("Unknown provider: " + provider);
         }

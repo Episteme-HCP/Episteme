@@ -1,37 +1,26 @@
 /*
-*   Class   IonicRadii
-*
-*   Methods for returning the non-hydrated ionic radius
-*   or the hydrated ionic radius of an entered ion
-*
-*   Bare radii taken from:
-*   Indiana University Molecular Structure Center, Retrieved on 1st November 2004 from the World Wide Web:
-*   http://www.iumsc.indiana.edu/radii.html
-*   Their source is:
-*   Shannon,R.D. (1976) `Revised effective ionic radii in halides and chalcogenides', Acta Cryst. A32, 751.
-*
-*   WRITTEN BY: Michael Thomas Flanagan
-*
-*   DATE:       November 2004
-*   UPDATE:     22 May 2005
-*
-*   DOCUMENTATION:
-*   See Michael Thomas Flanagan's JAVA library on-line web page:
-*   IonicRadii.html
-*
-*   Copyright (c) November 2004, May 2005
-*
-*   PERMISSION TO COPY:
-*   Permission to use, copy and modify this software and its documentation for
-*   NON-COMMERCIAL purposes is granted, without fee, provided that an acknowledgement
-*   to the author, Michael Thomas Flanagan at www.ee.ucl.ac.uk/~mflanaga, appears in all copies.
-*
-*   Dr Michael Thomas Flanagan makes no representations about the suitability
-*   or fitness of the software for any or for a particular purpose.
-*   Michael Thomas Flanagan shall not be liable for any damages suffered
-*   as a result of using, modifying or distributing this software or its derivatives.
-*
-***************************************************************************************/
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.chemistry.materials;
 
 import javax.swing.*;

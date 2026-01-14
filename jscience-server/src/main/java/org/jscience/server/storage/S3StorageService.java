@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -77,12 +77,34 @@ public class S3StorageService {
     // Initialize manually or via @PostConstruct if enabled
     @javax.annotation.PostConstruct
     public void init() {
+        // Enforce configuration from properties if available
+        String confEnabled = org.jscience.io.Configuration.get("storage.s3.enabled");
+        if (confEnabled != null) {
+            this.enabled = Boolean.parseBoolean(confEnabled);
+        }
+        
         if (!enabled) {
             LOG.info("S3 Storage Service DISABLED");
             return;
         }
 
         try {
+            // Load credentials and config from properties (overriding Spring defaults if present in jscience.properties)
+            String confEndpoint = org.jscience.io.Configuration.get("storage.s3.endpoint");
+            if (confEndpoint != null) this.endpoint = confEndpoint;
+
+            String confRegion = org.jscience.io.Configuration.get("storage.s3.region");
+            if (confRegion != null) this.region = confRegion;
+
+            String confAccessKey = org.jscience.io.Configuration.get("storage.s3.access-key");
+            if (confAccessKey != null) this.accessKey = confAccessKey;
+
+            String confSecretKey = org.jscience.io.Configuration.get("storage.s3.secret-key");
+            if (confSecretKey != null) this.secretKey = confSecretKey;
+
+            String confBucket = org.jscience.io.Configuration.get("storage.s3.bucket");
+            if (confBucket != null) this.bucketName = confBucket;
+
             StaticCredentialsProvider creds = StaticCredentialsProvider.create(
                     AwsBasicCredentials.create(accessKey, secretKey));
 

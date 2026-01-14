@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ import java.util.Optional;
  * <p>
  * <b>What it does</b>: Provides access to astronomical data for stars,
  * galaxies, and other objects.
- * Uses the CDS (Centre de DonnÃƒÂ©es astronomiques de Strasbourg) Sesame
+ * Uses the CDS (Centre de Données astronomiques de Strasbourg) Sesame
  * resolver.
  * </p>
  *
@@ -57,7 +57,7 @@ import java.util.Optional;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class SimbadCatalog {
+public class SIMBADCatalog {
 
     // CDS Sesame resolver is a standard HTTP API for name resolution
     private static final String API_BASE = org.jscience.io.Configuration.get("api.simbad.base",
@@ -120,6 +120,6 @@ public class SimbadCatalog {
         }
     }
 
-    private SimbadCatalog() {
+    private SIMBADCatalog() {
     }
 }

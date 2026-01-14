@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,9 +40,9 @@ import org.jscience.mathematics.linearalgebra.matrices.RealDoubleMatrix;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class FitsFile extends AbstractDataFile {
+public class FITSFile extends AbstractDataFile {
 
-    public FitsFile(Path path) {
+    public FITSFile(Path path) {
         super(path);
     }
 
@@ -71,11 +71,11 @@ public class FitsFile extends AbstractDataFile {
             Header header = Header.read(channel);
             // Check for END of file logically? Header.read throws EOF if real EOF.
             // Check keywords
-            String simple = header.getStringValue(FitsConstants.KEY_SIMPLE);
-            String xtension = header.getStringValue(FitsConstants.KEY_XTENSION);
+            String simple = header.getStringValue(FITSConstants.KEY_SIMPLE);
+            String xtension = header.getStringValue(FITSConstants.KEY_XTENSION);
 
             if (simple != null || "IMAGE".equals(xtension)) {
-                int naxis = header.getIntValue(FitsConstants.KEY_NAXIS, 0);
+                int naxis = header.getIntValue(FITSConstants.KEY_NAXIS, 0);
                 if (naxis == 2) {
                     ImageHDU hdu = new ImageHDU(header);
                     return hdu.asMatrix(channel);
@@ -89,8 +89,8 @@ public class FitsFile extends AbstractDataFile {
             ImageHDU valueCalc = new ImageHDU(header);
             long size = valueCalc.getDataSize(); // This logic is generic enough for bits/naxis
 
-            long padding = FitsConstants.BLOCK_SIZE - (size % FitsConstants.BLOCK_SIZE);
-            if (padding == FitsConstants.BLOCK_SIZE)
+            long padding = FITSConstants.BLOCK_SIZE - (size % FITSConstants.BLOCK_SIZE);
+            if (padding == FITSConstants.BLOCK_SIZE)
                 padding = 0;
             long total = size + padding;
 
@@ -111,5 +111,3 @@ public class FitsFile extends AbstractDataFile {
         throw new IOException("No valid 2D Image HDU found in FITS file.");
     }
 }
-
-

@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,8 @@ package org.jscience.server.service;
 
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
-import org.jscience.server.auth.JwtUtil;
-import org.jscience.server.auth.OidcProvider;
+import org.jscience.server.auth.JWTUtil;
+import org.jscience.server.auth.OIDCProvider;
 import org.jscience.server.model.User;
 import org.jscience.server.proto.*;
 import org.jscience.server.repository.UserRepository;
@@ -71,7 +71,7 @@ public class AuthServiceImpl extends AuthServiceGrpc.AuthServiceImplBase {
         userRepository.save(newUser);
         LOG.info("Registered new user: {} with role: {}", username, role);
 
-        String token = JwtUtil.generateToken(username, role);
+        String token = JWTUtil.generateToken(username, role);
         responseObserver.onNext(AuthResponse.newBuilder()
                 .setSuccess(true)
                 .setToken(token)
@@ -88,13 +88,13 @@ public class AuthServiceImpl extends AuthServiceGrpc.AuthServiceImplBase {
         // OIDC Logic preserved
         if (username.startsWith("oidc:")) {
             String provider = username.substring(5);
-            OidcProvider.TokenInfo oidcUser = OidcProvider.validateToken(provider, password);
+            OIDCProvider.TokenInfo oidcUser = OIDCProvider.validateToken(provider, password);
 
             if (oidcUser != null) {
                 if (userRepository.findByUsername(oidcUser.email()).isEmpty()) {
                     userRepository.save(new User(oidcUser.email(), "oidc-managed", oidcUser.role()));
                 }
-                String token = JwtUtil.generateToken(oidcUser.email(), oidcUser.role());
+                String token = JWTUtil.generateToken(oidcUser.email(), oidcUser.role());
                 LOG.info("OIDC Login successful for: {}", oidcUser.email());
                 responseObserver.onNext(AuthResponse.newBuilder().setSuccess(true).setToken(token)
                         .setMessage("OIDC Login successful").build());
@@ -129,7 +129,7 @@ public class AuthServiceImpl extends AuthServiceGrpc.AuthServiceImplBase {
             return;
         }
 
-        String token = JwtUtil.generateToken(username, user.getRole());
+        String token = JWTUtil.generateToken(username, user.getRole());
         LOG.info("User logged in: {}", username);
         responseObserver.onNext(AuthResponse.newBuilder()
                 .setSuccess(true)
@@ -159,8 +159,8 @@ public class AuthServiceImpl extends AuthServiceGrpc.AuthServiceImplBase {
     @Override
     public void validateToken(TokenRequest request, StreamObserver<ValidationResponse> responseObserver) {
         String token = request.getToken();
-        String username = JwtUtil.validateAndGetUsername(token);
-        String role = JwtUtil.getRole(token);
+        String username = JWTUtil.validateAndGetUsername(token);
+        String role = JWTUtil.getRole(token);
 
         if (username != null && role != null) {
             responseObserver.onNext(ValidationResponse.newBuilder()

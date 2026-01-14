@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ import com.fasterxml.jackson.databind.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class SimbadReader extends AbstractResourceReader<SimbadReader.AstronomicalObject> {
+public class SIMBADReader extends AbstractResourceReader<SIMBADReader.AstronomicalObject> {
 
     @Override
     protected AstronomicalObject loadFromSource(String id) throws Exception {
@@ -74,7 +74,7 @@ public class SimbadReader extends AbstractResourceReader<SimbadReader.Astronomic
 
     static {
         Properties props = new Properties();
-        try (InputStream is = SimbadReader.class.getResourceAsStream("/jscience.properties")) {
+        try (InputStream is = SIMBADReader.class.getResourceAsStream("/jscience.properties")) {
             if (is != null)
                 props.load(is);
         } catch (Exception e) {
@@ -127,7 +127,7 @@ public class SimbadReader extends AbstractResourceReader<SimbadReader.Astronomic
             double minutes = (absDec - d) * 60;
             int m = (int) minutes;
             double s = (minutes - m) * 60;
-            return String.format("%s%02dÃƒâ€šÃ‚Â°%02d'%.2f\"", sign, d, m, s);
+            return String.format("%s%02d°%02d'%.2f\"", sign, d, m, s);
         }
 
         @Override
@@ -247,4 +247,3 @@ public class SimbadReader extends AbstractResourceReader<SimbadReader.Astronomic
         return Optional.empty();
     }
 }
-

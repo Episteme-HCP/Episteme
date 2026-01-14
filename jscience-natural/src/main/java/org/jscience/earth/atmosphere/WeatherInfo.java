@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.earth.loaders;
+package org.jscience.earth.atmosphere;
 
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
@@ -29,6 +29,7 @@ import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Temperature;
 import org.jscience.measure.quantity.Pressure;
 import org.jscience.measure.quantity.Velocity;
+import java.time.Instant;
 
 /**
  * Weather information with type-safe Quantity measurements.
@@ -47,6 +48,8 @@ public class WeatherInfo {
     private final double humidityPercent;
     private final double windSpeedMps;
     private final double cloudPercent;
+    private final double solarIrradianceWm2;
+    private final Instant timestamp;
 
     private WeatherInfo(Builder builder) {
         this.location = builder.location;
@@ -57,6 +60,8 @@ public class WeatherInfo {
         this.humidityPercent = builder.humidityPercent;
         this.windSpeedMps = builder.windSpeedMps;
         this.cloudPercent = builder.cloudPercent;
+        this.solarIrradianceWm2 = builder.solarIrradianceWm2;
+        this.timestamp = builder.timestamp;
     }
 
     public String getLocation() {
@@ -73,6 +78,14 @@ public class WeatherInfo {
 
     public double getCloudPercent() {
         return cloudPercent;
+    }
+    
+    public double getSolarIrradianceWm2() {
+        return solarIrradianceWm2;
+    }
+
+    public Instant getTimestamp() {
+        return timestamp;
     }
 
     /**
@@ -137,8 +150,8 @@ public class WeatherInfo {
 
     @Override
     public String toString() {
-        return String.format("WeatherInfo{%s: %.1fÃ‚Â°C (%s), humidity=%.0f%%, wind=%.1f m/s}",
-                location, temperatureCelsius, description, humidityPercent, windSpeedMps);
+        return String.format("WeatherInfo{%s: %.1fÃ‚Â°C (%s), humidity=%.0f%%, wind=%.1f m/s, solar=%.1f W/m2}",
+                location, temperatureCelsius, description, humidityPercent, windSpeedMps, solarIrradianceWm2);
     }
 
     public static class Builder {
@@ -150,6 +163,8 @@ public class WeatherInfo {
         private double humidityPercent = Double.NaN;
         private double windSpeedMps = Double.NaN;
         private double cloudPercent = Double.NaN;
+        private double solarIrradianceWm2 = Double.NaN;
+        private Instant timestamp = Instant.now();
 
         public Builder location(String loc) {
             this.location = loc;
@@ -190,11 +205,19 @@ public class WeatherInfo {
             this.cloudPercent = c;
             return this;
         }
+        
+        public Builder solarIrradianceWm2(double s) {
+            this.solarIrradianceWm2 = s;
+            return this;
+        }
+        
+        public Builder timestamp(Instant t) {
+            this.timestamp = t;
+            return this;
+        }
 
         public WeatherInfo build() {
             return new WeatherInfo(this);
         }
     }
 }
-
-

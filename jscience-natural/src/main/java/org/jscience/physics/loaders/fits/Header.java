@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -90,7 +90,7 @@ public class Header {
      */
     public static Header read(ReadableByteChannel channel) throws IOException {
         Header header = new Header();
-        ByteBuffer buffer = ByteBuffer.allocate(FitsConstants.BLOCK_SIZE);
+        ByteBuffer buffer = ByteBuffer.allocate(FITSConstants.BLOCK_SIZE);
         boolean endFound = false;
 
         while (!endFound) {
@@ -111,7 +111,7 @@ public class Header {
                 HeaderCard card = new HeaderCard(raw);
                 header.addCard(card);
 
-                if (FitsConstants.KEY_END.equals(card.getKeyword())) {
+                if (FITSConstants.KEY_END.equals(card.getKeyword())) {
                     endFound = true;
                     // Note: we continue consuming the rest of the block (it should be padded
                     // spaces)

@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,9 +35,9 @@ import java.time.Duration;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public final class HttpConstants {
+public final class HTTPConstants {
 
-    private HttpConstants() {
+    private HTTPConstants() {
         throw new AssertionError("Cannot instantiate constants class");
     }
 

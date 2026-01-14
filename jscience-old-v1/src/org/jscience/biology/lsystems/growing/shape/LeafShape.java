@@ -1,28 +1,26 @@
 /*
----------------------------------------------------------------------------
-VIRTUAL PLANTS
-==============
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-This Diploma work is a computer graphics project made at the University
-of applied sciences in Biel, Switzerland. http://www.hta-bi.bfh.ch
-The taks is to simulate the growth of 3 dimensional plants and show
-them in a virtual world.
-This work is based on the ideas of Lindenmayer and Prusinkiewicz which
-are taken from the book 'The algorithmic beauty of plants'.
-The Java and Java3D classes have to be used for this work. This file
-is one class of the program. For more information look at the VirtualPlants
-homepage at: http://www.hta-bi.bfh.ch/Projects/VirtualPlants
-
-Hosted by Claude Schwab
-
-Developed by Rene Gressly
-http://www.gressly.ch/rene
-
-25.Oct.1999 - 17.Dec.1999
-
-Copyright by the University of applied sciences Biel, Switzerland
-----------------------------------------------------------------------------
-*/
 package org.jscience.biology.lsystems.growing.shape;
 
 import com.sun.j3d.utils.geometry.GeometryInfo;

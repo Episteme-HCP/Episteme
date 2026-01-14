@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -85,33 +85,61 @@ public final class JScience {
 
     static {
         loadPreferences();
+        loadVersionInfo();
+    }
+
+    /** The version string (e.g., "5.0.0-SNAPSHOT") */
+    public static String VERSION;
+
+    /** The build date (e.g., "2025-12-29") */
+    public static String BUILD_DATE;
+
+    /** The authors of JScience */
+    public static final String[] AUTHORS = {
+            "Silvere Martin-Michiellot",
+            "Gemini AI (Google DeepMind)"
+    };
+
+    private static void loadVersionInfo() {
+        String v = "5.0.0-SNAPSHOT";
+        String d = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());
+        try (java.io.InputStream is = JScience.class.getResourceAsStream("/jscience.properties")) {
+            if (is != null) {
+                java.util.Properties p = new java.util.Properties();
+                p.load(is);
+                v = p.getProperty("jscience.version", v);
+                d = p.getProperty("jscience.build.date", d);
+            }
+        } catch (Exception e) {
+            // Ignore - use defaults
+        }
+        VERSION = v;
+        BUILD_DATE = d;
     }
 
     /**
      * Saves current settings to user preferences.
      */
+    /**
+     * Saves current settings to user preferences.
+     */
     public static void savePreferences() {
         try {
-            java.util.prefs.Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(JScience.class);
-            prefs.put("compute.mode", getComputeMode().name());
-            prefs.put("float.precision", getFloatPrecisionMode().name());
-            prefs.put("int.precision", getIntPrecisionMode().name());
+            org.jscience.io.UserPreferences prefs = org.jscience.io.UserPreferences.getInstance();
+            prefs.set("compute.mode", getComputeMode().name());
+            prefs.set("float.precision", getFloatPrecisionMode().name());
+            prefs.set("int.precision", getIntPrecisionMode().name());
             java.math.MathContext mc = getMathContext();
-            prefs.put("math.precision", String.valueOf(mc.getPrecision()));
-            prefs.put("math.rounding", mc.getRoundingMode().name());
-            
-            // Persist Backends
-            if (plottingBackend2D != null) prefs.put("plotting.backend.2d", plottingBackend2D.name());
-            if (plottingBackend3D != null) prefs.put("plotting.backend.3d", plottingBackend3D.name());
-            if (molecularBackendId != null) prefs.put("molecular.backend", molecularBackendId);
-            if (linearAlgebraProviderId != null) prefs.put("linear.algebra.backend", linearAlgebraProviderId);
-            if (quantumBackendId != null) prefs.put("quantum.backend", quantumBackendId);
-            if (mathBackendId != null) prefs.put("math.backend", mathBackendId);
-            if (tensorBackendId != null) prefs.put("tensor.backend", tensorBackendId);
-            if (mapBackendId != null) prefs.put("map.backend", mapBackendId);
-            if (networkBackendId != null) prefs.put("network.backend", networkBackendId);
-            
-            prefs.flush();
+            prefs.set("math.precision", String.valueOf(mc.getPrecision()));
+            prefs.set("math.rounding", mc.getRoundingMode().name());
+
+            // Backends are now persisted immediately on setXXX(), so mostly no need to save here
+            // except for legacy plotting/linear algebra fields kept in this class
+            if (plottingBackend2D != null) prefs.set("plotting.backend.2d", plottingBackend2D.name());
+            if (plottingBackend3D != null) prefs.set("plotting.backend.3d", plottingBackend3D.name());
+            if (getLinearAlgebraProviderId() != null) prefs.set("linear.algebra.backend", getLinearAlgebraProviderId());
+
+            prefs.save();
         } catch (Exception e) {
             System.err.println("Failed to save preferences: " + e.getMessage());
         }
@@ -120,27 +148,31 @@ public final class JScience {
     /**
      * Loads settings from user preferences.
      */
+    /**
+     * Loads settings from user preferences.
+     */
     public static void loadPreferences() {
         try {
-            java.util.prefs.Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(JScience.class);
+            org.jscience.io.UserPreferences prefs = org.jscience.io.UserPreferences.getInstance();
 
-            String modeStr = prefs.get("compute.mode", null);
+            String modeStr = prefs.get("compute.mode");
             if (modeStr != null) {
                 setComputeMode(ComputeMode.valueOf(modeStr));
             }
 
-            String floatStr = prefs.get("float.precision", null);
+            String floatStr = prefs.get("float.precision");
             if (floatStr != null) {
                 ComputeContext.current().setFloatPrecision(ComputeContext.FloatPrecision.valueOf(floatStr));
             }
 
-            String intStr = prefs.get("int.precision", null);
+            String intStr = prefs.get("int.precision");
             if (intStr != null) {
                 ComputeContext.current().setIntPrecision(ComputeContext.IntPrecision.valueOf(intStr));
             }
 
             try {
-                int prec = prefs.getInt("math.precision", 34);
+                String precStr = prefs.get("math.precision");
+                int prec = (precStr != null) ? Integer.parseInt(precStr) : 34;
                 String rmStr = prefs.get("math.rounding", "HALF_EVEN");
                 java.math.RoundingMode rm = java.math.RoundingMode.valueOf(rmStr);
                 setMathContext(new java.math.MathContext(prec, rm));
@@ -148,34 +180,16 @@ public final class JScience {
                 // Ignore math context errors
             }
 
-            // Load Backends
+            // Load Backends (Using setters to populate runtime if needed, though mostly direct access is preferred)
             try {
-                String pb2d = prefs.get("plotting.backend.2d", null);
+                String pb2d = prefs.get("plotting.backend.2d");
                 if (pb2d != null) plottingBackend2D = org.jscience.ui.viewers.mathematics.analysis.plotting.PlottingBackend.valueOf(pb2d);
                 
-                String pb3d = prefs.get("plotting.backend.3d", null);
+                String pb3d = prefs.get("plotting.backend.3d");
                 if (pb3d != null) plottingBackend3D = org.jscience.ui.viewers.mathematics.analysis.plotting.PlottingBackend.valueOf(pb3d);
                 
-                String mol = prefs.get("molecular.backend", null);
-                if (mol != null) molecularBackendId = mol;
-                
-                String lin = prefs.get("linear.algebra.backend", null);
-                if (lin != null) linearAlgebraProviderId = lin;
-                
-                String q = prefs.get("quantum.backend", null);
-                if (q != null) quantumBackendId = q;
-                
-                String m = prefs.get("math.backend", null);
-                if (m != null) mathBackendId = m;
-                
-                String t = prefs.get("tensor.backend", null);
-                if (t != null) tensorBackendId = t;
-
-                String map = prefs.get("map.backend", null);
-                if (map != null) mapBackendId = map;
-
-                String net = prefs.get("network.backend", null);
-                if (net != null) networkBackendId = net;
+                // No need to load other backends into local fields as they are now fetching directly from UserPreferences
+                // The getters (getMolecularBackendId, etc.) read from UserPreferences directly.
                 
             } catch (Exception e) {
                 // Ignore backend loading errors
@@ -516,118 +530,104 @@ public final class JScience {
     
     // ================= QUANTUM BACKEND =================
     
-    private static String quantumBackendId = null; // Default
-
     /**
      * Gets the ID of the current Quantum Backend.
      */
     public static String getQuantumBackendId() {
-        return quantumBackendId;
+        return org.jscience.io.UserPreferences.getInstance().getPreferredBackend("quantum");
     }
 
     /**
      * Sets the Quantum Backend by ID.
      */
     public static void setQuantumBackendId(String id) {
-        quantumBackendId = id;
+        org.jscience.io.UserPreferences.getInstance().setPreferredBackend("quantum", id);
     }
 
     // ================= LINEAR ALGEBRA BACKEND =================
-
-    private static String linearAlgebraProviderId = "cpu-dense"; // Default
 
     /**
      * Gets the ID of the current Linear Algebra Provider.
      */
     public static String getLinearAlgebraProviderId() {
-        return linearAlgebraProviderId;
+        String val = org.jscience.io.UserPreferences.getInstance().get("linear.algebra.backend");
+        return (val != null) ? val : "cpu-dense";
     }
 
     /**
      * Sets the Linear Algebra Provider by ID.
      */
     public static void setLinearAlgebraProviderId(String id) {
-        linearAlgebraProviderId = id;
-        // Ideally, we would also update the active ComputeContext here if it supports hot-swapping
-        // ComputeContext.current().setLinearAlgebraProvider(id);
+        org.jscience.io.UserPreferences.getInstance().set("linear.algebra.backend", id);
+        org.jscience.io.UserPreferences.getInstance().save(); // Force save as this might be critical
     }
 
     // ================= MATH BACKEND =================
 
-    private static String mathBackendId = null; 
-
     public static String getMathBackendId() {
-        return mathBackendId;
+        return org.jscience.io.UserPreferences.getInstance().getPreferredBackend("math");
     }
 
     public static void setMathBackendId(String id) {
-        mathBackendId = id;
+        org.jscience.io.UserPreferences.getInstance().setPreferredBackend("math", id);
     }
 
     // ================= TENSOR BACKEND =================
 
-    private static String tensorBackendId = null;
-
     public static String getTensorBackendId() {
-        return tensorBackendId;
+        return org.jscience.io.UserPreferences.getInstance().getPreferredBackend("tensor");
     }
 
     public static void setTensorBackendId(String id) {
-        tensorBackendId = id;
+        org.jscience.io.UserPreferences.getInstance().setPreferredBackend("tensor", id);
     }
 
     // ================= MOLECULAR BACKEND =================
-
-    private static String molecularBackendId = null; // Default (AUTO)
 
     /**
      * Gets the ID of the current Molecular Backend.
      */
     public static String getMolecularBackendId() {
-        return molecularBackendId;
+        return org.jscience.io.UserPreferences.getInstance().getPreferredBackend("molecular");
     }
 
     /**
      * Sets the Molecular Backend by ID.
      */
     public static void setMolecularBackendId(String id) {
-        molecularBackendId = id;
+        org.jscience.io.UserPreferences.getInstance().setPreferredBackend("molecular", id);
     }
 
     // ================= MAP BACKEND =================
-
-    private static String mapBackendId = null; // Default (AUTO)
 
     /**
      * Gets the ID of the current Map Backend.
      */
     public static String getMapBackendId() {
-        return mapBackendId;
+        return org.jscience.io.UserPreferences.getInstance().getPreferredBackend("map");
     }
 
     /**
      * Sets the Map Backend by ID.
      */
     public static void setMapBackendId(String id) {
-        mapBackendId = id;
+        org.jscience.io.UserPreferences.getInstance().setPreferredBackend("map", id);
     }
 
     // ================= NETWORK BACKEND =================
-
-    private static String networkBackendId = null; // Default (AUTO)
 
     /**
      * Gets the ID of the current Network Backend.
      */
     public static String getNetworkBackendId() {
-        return networkBackendId;
+        return org.jscience.io.UserPreferences.getInstance().getPreferredBackend("network");
     }
 
     /**
      * Sets the Network Backend by ID.
      */
     public static void setNetworkBackendId(String id) {
-        networkBackendId = id;
+        org.jscience.io.UserPreferences.getInstance().setPreferredBackend("network", id);
     }
 
     /**
@@ -661,18 +661,13 @@ public final class JScience {
             setLongPrecision();
         }
 
-        // Try to launch Dashboard via Reflection
+        // Launch Master Control
         try {
-            Class<?> dashboardClass = Class.forName("org.jscience.ui.JScienceDashboard");
-            java.lang.reflect.Method mainMethod = dashboardClass.getMethod("main", String[].class);
-            System.out.println("Launching JScience Dashboard...");
-            mainMethod.invoke(null, (Object) args);
+            System.out.println("Launching JScience Master Control...");
+            javafx.application.Application.launch(org.jscience.ui.JScienceMasterControl.class, args);
             return;
-        } catch (ClassNotFoundException e) {
-            System.out.println("JScience Dashboard not found in classpath. Showing CLI report.");
-        } catch (Exception e) {
-            System.err.println("Failed to launch JScience Dashboard: " + e.getMessage());
-            e.printStackTrace();
+        } catch (Throwable e) {
+            System.out.println("JScience Master Control not available or JavaFX missing. Showing CLI report. " + e.getMessage());
         }
 
         System.out.println(getConfigurationReport());

@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -136,6 +136,27 @@ public class UserPreferences {
      */
     public void setPreferredBackend(String backendType, String backendId) {
         set("backend." + backendType, backendId);
+    }
+
+    /**
+     * Gets an integer preference value with default.
+     */
+    public int getInt(String key, int defaultValue) {
+        String val = get(key);
+        if (val == null) return defaultValue;
+        try {
+            return Integer.parseInt(val);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Sets an integer preference value.
+     */
+    public void setInt(String key, int value) {
+        set(key, String.valueOf(value));
+        // set() already calls save()
     }
 
     /**

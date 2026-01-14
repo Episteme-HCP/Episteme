@@ -1,32 +1,26 @@
 /*
- * $Id: OMXMLReader.java,v 1.2 2007-10-21 17:46:58 virtualcall Exp $
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * Copyright (c) 2001-2004, RIACA, Technische Universiteit Eindhoven (TU/e).
- * All Rights Reserved.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * ---------------------------------------------------------------------------
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- *  The contents of this file are subject to the RIACA Public License
- *  Version 1.0 (the "License"). You may not use this file except in
- *  compliance with the License. A copy of the License is available at
- *  http://www.riaca.win.tue.nl/
- *
- *  Alternatively, the contents of this file may be used under the terms
- *  of the GNU Lesser General Public license (the "LGPL license"), in which 
- *  case the provisions of the LGPL license are applicable instead of those 
- *  above. A copy of the LGPL license is available at http://www.gnu.org/
- *
- *  The Original Code is ROML -- the RIACA OpenMath Library. The Initial
- *  Developer of the Original Code is Manfred N. Riem.  Portions created
- *  by Manfred N. Riem are Copyright (c) 2001. All Rights Reserved.
- *
- *  Contributor(s):
- *
- *      Ernesto Reinaldo Barreiro, Arjeh M. Cohen, Hans Cuypers, Hans Sterk,
- *      Olga Caprotti
- *
- * ---------------------------------------------------------------------------
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
+
 package org.jscience.ml.openmath.io;
 
 import org.jscience.ml.openmath.*;

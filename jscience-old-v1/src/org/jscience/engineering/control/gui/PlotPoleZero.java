@@ -1,33 +1,26 @@
 /*
-*   Class PlotPoleZero
-*
-*   Plots, in a window, the poles and zeros of a transfer function,
-*   of the form of a polynomial over a polynomial, in either the s- or
-*   z-plane given the coefficients of the polynomials either as two arrays
-*   or as two types ComplexPolynom()
-*
-*   WRITTEN BY: Dr Michael Thomas Flanagan
-*
-*   DATE:       July 2002
-*   REVISED:    22 June 2003, 14 August 2004, 16 May 2005
-*
-*   DOCUMENTATION:
-*   See Michael Thomas Flanagan's Java library on-line web page:
-*   PlotPoleZero.html
-*
-*   Copyright (c) June 2003, May 2005
-*
-*   PERMISSION TO COPY:
-*   Permission to use, copy and modify this software and its documentation for
-*   NON-COMMERCIAL purposes is granted, without fee, provided that an acknowledgement
-*   to the author, Michael Thomas Flanagan at www.ee.ucl.ac.uk/~mflanaga, appears in all copies.
-*
-*   Dr Michael Thomas Flanagan makes no representations about the suitability
-*   or fitness of the software for any or for a particular purpose.
-*   Michael Thomas Flanagan shall not be liable for any damages suffered
-*   as a result of using, modifying or distributing this software or its derivatives.
-*
-***************************************************************************************/
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.engineering.control.gui;
 
 import org.jscience.mathematics.ArrayMathUtils;

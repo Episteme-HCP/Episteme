@@ -1,3 +1,26 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.server.auth;
 
 import com.nimbusds.jose.*;
@@ -20,7 +43,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class OidcProviderTest {
+class OIDCProviderTest {
 
     private static RSAKey rsaKey;
     private static ConfigurableJWTProcessor<SecurityContext> testProcessor;
@@ -42,9 +65,9 @@ class OidcProviderTest {
         testProcessor.setJWSKeySelector(keySelector);
 
         // Inject this processor for all providers we test
-        OidcProvider.setJwtProcessorForTest("google", testProcessor);
-        OidcProvider.setJwtProcessorForTest("keycloak", testProcessor);
-        OidcProvider.setJwtProcessorForTest("okta", testProcessor);
+        OIDCProvider.setJwtProcessorForTest("google", testProcessor);
+        OIDCProvider.setJwtProcessorForTest("keycloak", testProcessor);
+        OIDCProvider.setJwtProcessorForTest("okta", testProcessor);
     }
 
     @Test
@@ -58,7 +81,7 @@ class OidcProviderTest {
 
         String token = createSignedToken(claims);
 
-        OidcProvider.TokenInfo info = OidcProvider.validateToken("google", token);
+        OIDCProvider.TokenInfo info = OIDCProvider.validateToken("google", token);
 
         assertNotNull(info);
         assertEquals("user@admin.com", info.email());
@@ -77,7 +100,7 @@ class OidcProviderTest {
 
         String token = createSignedToken(claims);
 
-        OidcProvider.TokenInfo info = OidcProvider.validateToken("google", token);
+        OIDCProvider.TokenInfo info = OIDCProvider.validateToken("google", token);
 
         assertNotNull(info);
         assertEquals("user@example.com", info.email());
@@ -96,7 +119,7 @@ class OidcProviderTest {
         String token = createSignedToken(claims);
 
         // Nimbus processor throws BadJOSEException on expiration
-        OidcProvider.TokenInfo info = OidcProvider.validateToken("google", token);
+        OIDCProvider.TokenInfo info = OIDCProvider.validateToken("google", token);
 
         assertNull(info, "Expired token should return null");
     }
@@ -115,7 +138,7 @@ class OidcProviderTest {
 
         String token = createSignedToken(claims);
 
-        OidcProvider.TokenInfo info = OidcProvider.validateToken("keycloak", token);
+        OIDCProvider.TokenInfo info = OIDCProvider.validateToken("keycloak", token);
 
         assertNotNull(info);
         assertEquals(Roles.SCIENTIST, info.role());
@@ -133,7 +156,7 @@ class OidcProviderTest {
 
         String token = createSignedToken(claims);
 
-        OidcProvider.TokenInfo info = OidcProvider.validateToken("okta", token);
+        OIDCProvider.TokenInfo info = OIDCProvider.validateToken("okta", token);
 
         assertNotNull(info);
         assertEquals(Roles.SCIENTIST, info.role());

@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,13 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package org.jscience.mathematics.geometry.csg.d2;
 
-import org.jscience.mathematics.geometry.Point2D;
-import org.jscience.mathematics.geometry.Line2D;
-import org.jscience.mathematics.geometry.Vector2D;
-import org.jscience.mathematics.numbers.real.Real;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,9 +32,9 @@ import java.util.List;
  * @since 1.0
  */
 public class Node2D {
-    private static final Real EPSILON = Real.of(1e-9);
+    private static final org.jscience.mathematics.numbers.real.Real EPSILON = org.jscience.mathematics.numbers.real.Real.of(1e-9);
 
-    private Line2D line;
+    private org.jscience.mathematics.geometry.Line2D line;
     private Node2D front;
     private Node2D back;
     private List<Edge> edges;
@@ -61,15 +56,19 @@ public class Node2D {
         node.front = (this.front != null) ? this.front.clone() : null;
         node.back = (this.back != null) ? this.back.clone() : null;
         node.edges = new ArrayList<>();
-        for (Edge e : edges) {
-            node.edges.add(e.clone());
+        if (this.edges != null) {
+            for (Edge e : this.edges) {
+                node.edges.add(e.clone());
+            }
         }
         return node;
     }
 
     public void invert() {
-        for (int i = 0; i < edges.size(); i++) {
-            edges.set(i, edges.get(i).flipped());
+        if (edges != null) {
+            for (int i = 0; i < edges.size(); i++) {
+                edges.set(i, edges.get(i).flipped());
+            }
         }
         if (line != null) {
             line = line.flipped();
@@ -116,7 +115,8 @@ public class Node2D {
     }
 
     public List<Edge> allEdges() {
-        List<Edge> result = new ArrayList<>(edges);
+        List<Edge> result = new ArrayList<>();
+        if (edges != null) result.addAll(edges);
         if (front != null)
             result.addAll(front.allEdges());
         if (back != null)
@@ -161,8 +161,8 @@ public class Node2D {
         int FRONT = 1;
         int BACK = 2;
 
-        Real dist1 = line.signedDistance(edge.start);
-        Real dist2 = line.signedDistance(edge.end);
+        org.jscience.mathematics.numbers.real.Real dist1 = line.signedDistance(edge.start);
+        org.jscience.mathematics.numbers.real.Real dist2 = line.signedDistance(edge.end);
 
         int type1 = (dist1.compareTo(EPSILON) > 0) ? FRONT : (dist1.compareTo(EPSILON.negate()) < 0) ? BACK : COPLANAR;
         int type2 = (dist2.compareTo(EPSILON) > 0) ? FRONT : (dist2.compareTo(EPSILON.negate()) < 0) ? BACK : COPLANAR;
@@ -172,13 +172,13 @@ public class Node2D {
         switch (edgeType) {
             case 0: // COPLANAR
                 // Check if edge normal aligns with line normal
-                Vector2D lineNormal = line.getNormal();
-                Vector2D edgeDir = Vector2D.of(
+                org.jscience.mathematics.geometry.Vector2D lineNormal = line.getNormal();
+                org.jscience.mathematics.geometry.Vector2D edgeDir = org.jscience.mathematics.geometry.Vector2D.of(
                         edge.end.getX().subtract(edge.start.getX()),
                         edge.end.getY().subtract(edge.start.getY()));
-                Vector2D edgeNormal = Vector2D.of(edgeDir.getY().negate(), edgeDir.getX());
-                Real dot = lineNormal.dot(edgeNormal);
-                if (dot.compareTo(Real.ZERO) >= 0) {
+                org.jscience.mathematics.geometry.Vector2D edgeNormal = org.jscience.mathematics.geometry.Vector2D.of(edgeDir.getY().negate(), edgeDir.getX());
+                org.jscience.mathematics.numbers.real.Real dot = lineNormal.dot(edgeNormal);
+                if (dot.compareTo(org.jscience.mathematics.numbers.real.Real.ZERO) >= 0) {
                     coplanarFront.add(edge);
                 } else {
                     coplanarBack.add(edge);
@@ -192,10 +192,10 @@ public class Node2D {
                 break;
             case 3: // SPANNING
                 // Find intersection point
-                Real t = dist1.divide(dist1.subtract(dist2));
-                Real ix = edge.start.getX().add(edge.end.getX().subtract(edge.start.getX()).multiply(t));
-                Real iy = edge.start.getY().add(edge.end.getY().subtract(edge.start.getY()).multiply(t));
-                Point2D intersection = Point2D.of(ix, iy);
+                org.jscience.mathematics.numbers.real.Real t = dist1.divide(dist1.subtract(dist2));
+                org.jscience.mathematics.numbers.real.Real ix = edge.start.getX().add(edge.end.getX().subtract(edge.start.getX()).multiply(t));
+                org.jscience.mathematics.numbers.real.Real iy = edge.start.getY().add(edge.end.getY().subtract(edge.start.getY()).multiply(t));
+                org.jscience.mathematics.geometry.Point2D intersection = org.jscience.mathematics.geometry.Point2D.of(ix, iy);
 
                 if (type1 == FRONT) {
                     frontList.add(new Edge(edge.start, intersection, edge.line));
@@ -208,5 +208,3 @@ public class Node2D {
         }
     }
 }
-
-

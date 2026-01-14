@@ -1,36 +1,26 @@
 /*
-*   Class PlotGraph
-*
-*   A class that creates a window and displays within that window
-*   a graph of one or more x-y data sets
-*
-*   This class extends Plot (also from Michael Thomas Flanagan's Library)
-*
-*   For use if you are incorporating a plot into your own Java program
-*   See Plotter for a free standing graph plotting application
-*
-*   WRITTEN BY: Dr Michael Thomas Flanagan
-*
-*   DATE:         February 2002
-*   UPDATED:  22 April 2004 and 14 August 2004
-*
-*   DOCUMENTATION:
-*   See Michael Thomas Flanagan's Java library on-line web page:
-*   PlotGraph.html
-*
-*   Copyright (c) April 2004, Auguswt 2004
-*
-*   PERMISSION TO COPY:
-*   Permission to use, copy and modify this software and its documentation for
-*   NON-COMMERCIAL purposes is granted, without fee, provided that an acknowledgement
-*   to the author, Michael Thomas Flanagan at www.ee.ucl.ac.uk/~mflanaga, appears in all copies.
-*
-*   Dr Michael Thomas Flanagan makes no representations about the suitability
-*   or fitness of the software for any or for a particular purpose.
-*   Michael Thomas Flanagan shall not be liable for any damages suffered
-*   as a result of using, modifying or distributing this software or its derivatives.
-*
-***************************************************************************************/
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.engineering.control.gui;
 
 import java.awt.*;

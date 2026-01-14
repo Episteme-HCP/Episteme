@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,17 +38,17 @@ import java.util.Optional;
 
 /**
  * Loads geographic data from GeoJSON format.
- * Supports loading regions/features with coordinates and properties.
+ * Supports loading regions/features with coordinates (including altitude) and properties.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GeoJsonReader extends AbstractResourceReader<List<Region>> {
+public class GeoJSONReader extends AbstractResourceReader<List<Region>> {
 
     private final ObjectMapper mapper;
 
-    public GeoJsonReader() {
+    public GeoJSONReader() {
         this.mapper = new ObjectMapper();
     }
 
@@ -77,6 +77,8 @@ public class GeoJsonReader extends AbstractResourceReader<List<Region>> {
     protected List<Region> loadFromSource(String id) throws Exception {
         try (InputStream is = getClass().getResourceAsStream(id)) {
             if (is == null) {
+                // Try treating id as a file path or URL if resource not found?
+                // For now, strict resource loading.
                 throw new Exception("Resource not found: " + id);
             }
             return loadRegions(is);
@@ -116,8 +118,9 @@ public class GeoJsonReader extends AbstractResourceReader<List<Region>> {
             return regions;
 
         JsonNode root = mapper.readTree(is);
+        
+        // Handle FeatureCollection
         JsonNode features = root.path("features");
-
         if (features.isArray()) {
             for (JsonNode feature : features) {
                 Region region = parseFeature(feature);
@@ -125,6 +128,11 @@ public class GeoJsonReader extends AbstractResourceReader<List<Region>> {
                     regions.add(region);
                 }
             }
+        } 
+        // Handle single Feature
+        else if ("Feature".equals(root.path("type").asText())) {
+             Region region = parseFeature(root);
+             if (region != null) regions.add(region);
         }
 
         return regions;
@@ -167,7 +175,8 @@ public class GeoJsonReader extends AbstractResourceReader<List<Region>> {
         if ("Point".equals(geometryType) && coordinates.isArray() && coordinates.size() >= 2) {
             double lon = coordinates.get(0).asDouble();
             double lat = coordinates.get(1).asDouble();
-            region.setCenter(new Coordinate(lat, lon));
+            double alt = (coordinates.size() > 2) ? coordinates.get(2).asDouble() : 0.0;
+            region.setCenter(new Coordinate(lat, lon, alt));
         } else if ("Polygon".equals(geometryType) || "MultiPolygon".equals(geometryType)) {
             Coordinate centroid = computeCentroid(coordinates, geometryType);
             if (centroid != null) {
@@ -185,9 +194,16 @@ public class GeoJsonReader extends AbstractResourceReader<List<Region>> {
         try {
             JsonNode ring;
             if ("MultiPolygon".equals(type)) {
-                ring = coordinates.get(0).get(0);
+                // MultiPolygon -> [Polygon, Polygon] -> [[[x,y]...]]
+                // Take first polygon's first ring for now
+                if (coordinates.size() > 0 && coordinates.get(0).size() > 0)
+                    ring = coordinates.get(0).get(0);
+                else return null;
             } else {
-                ring = coordinates.get(0);
+                // Polygon -> [[x,y]...]
+                 if (coordinates.size() > 0)
+                    ring = coordinates.get(0);
+                 else return null;
             }
 
             if (ring == null || !ring.isArray() || ring.isEmpty()) {
@@ -195,17 +211,21 @@ public class GeoJsonReader extends AbstractResourceReader<List<Region>> {
             }
 
             double sumLat = 0, sumLon = 0;
+            double sumAlt = 0;
             int count = 0;
             for (JsonNode point : ring) {
                 if (point.isArray() && point.size() >= 2) {
                     sumLon += point.get(0).asDouble();
                     sumLat += point.get(1).asDouble();
+                    if (point.size() > 2) {
+                        sumAlt += point.get(2).asDouble();
+                    }
                     count++;
                 }
             }
 
             if (count > 0) {
-                return new Coordinate(sumLat / count, sumLon / count);
+                return new Coordinate(sumLat / count, sumLon / count, sumAlt / count);
             }
         } catch (Exception e) {
             // Ignore and return null
@@ -235,7 +255,8 @@ public class GeoJsonReader extends AbstractResourceReader<List<Region>> {
             if (node.size() >= 2 && node.get(0).isNumber() && node.get(1).isNumber()) {
                 double lon = node.get(0).asDouble();
                 double lat = node.get(1).asDouble();
-                coords.add(new Coordinate(lat, lon));
+                double alt = (node.size() > 2) ? node.get(2).asDouble() : 0.0;
+                coords.add(new Coordinate(lat, lon, alt));
             } else {
                 for (JsonNode child : node) {
                     extractCoordinates(child, coords);
@@ -250,4 +271,3 @@ public class GeoJsonReader extends AbstractResourceReader<List<Region>> {
         }
     }
 }
-

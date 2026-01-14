@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ import javax.crypto.SecretKey;
 /**
  * JWT Token Utility for generating and validating tokens.
  */
-public class JwtUtil {
+public class JWTUtil {
     private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(
             "JScience-Super-Secret-Key-For-JWT-2024!".getBytes());
     private static final long EXPIRATION_MS = 3600000; // 1 hour
@@ -72,5 +72,3 @@ public class JwtUtil {
         }
     }
 }
-
-

@@ -1,10 +1,10 @@
-org.jscience.chemistry.PeriodicTableReader
+org.jscience.chemistry.loaders.PeriodicTableReader
 org.jscience.chemistry.loaders.ChemistryDataReader
 
 org.jscience.physics.loaders.VizieRReader
 org.jscience.physics.loaders.StarReader
-org.jscience.physics.loaders.SimbadReader
-org.jscience.physics.loaders.NasaExoplanets
+org.jscience.physics.loaders.SIMBADReader
+org.jscience.physics.loaders.NASAExoplanetsReader
 org.jscience.physics.loaders.HorizonsEphemerisReader
 org.jscience.engineering.loaders.WeatherDataReader
 org.jscience.device.loaders.nmea.NMEAReader

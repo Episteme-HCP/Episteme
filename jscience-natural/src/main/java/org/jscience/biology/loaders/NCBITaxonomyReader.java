@@ -1,3 +1,25 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 package org.jscience.biology.loaders;
 
@@ -24,18 +46,41 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class NCBITaxonomyReader {
+public class NCBITaxonomyReader extends org.jscience.io.AbstractResourceReader<org.jscience.biology.taxonomy.Species> {
 
-    public static String getCategory() {
+    @Override
+    public String getCategory() {
         return "Biology";
     }
 
-    public static String getDescription() {
+    @Override
+    public String getDescription() {
         return "NCBI Taxonomy Reader.";
     }
 
+    @Override
+    public Class<org.jscience.biology.taxonomy.Species> getResourceType() {
+        return org.jscience.biology.taxonomy.Species.class;
+    }
+
+    @Override
+    public String getResourcePath() {
+        return BASE_URL;
+    }
+    
+    @Override
+    protected org.jscience.biology.taxonomy.Species loadFromSource(String resourceId) throws Exception {
+        try {
+            long id = Long.parseLong(resourceId);
+            return fetchByTaxId(id).orElse(null);
+        } catch (NumberFormatException e) {
+            // Might be a search by name? No, load is by ID.
+            throw new IllegalArgumentException("Expected numeric TaxID, got: " + resourceId);
+        }
+    }
+
     private static final String BASE_URL;
-    private static final String SEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
+    private static final String SEARCH_URL;
 
     static {
         Properties props = new Properties();
@@ -46,6 +91,8 @@ public class NCBITaxonomyReader {
             /* ignore */ }
         BASE_URL = props.getProperty("api.ncbi.taxonomy.base",
                 "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi");
+        SEARCH_URL = props.getProperty("api.ncbi.taxonomy.search",
+                "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi");
     }
 
     private final HttpClient client = HttpClient.newHttpClient();

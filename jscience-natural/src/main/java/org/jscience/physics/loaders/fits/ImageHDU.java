@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,15 +48,15 @@ public class ImageHDU extends HDU {
     @Override
     public long getDataSize() {
         // Calculate size based on BITPIX and NAXISn
-        int bitpix = Math.abs(header.getIntValue(FitsConstants.KEY_BITPIX, 8));
-        int naxis = header.getIntValue(FitsConstants.KEY_NAXIS, 0);
+        int bitpix = Math.abs(header.getIntValue(FITSConstants.KEY_BITPIX, 8));
+        int naxis = header.getIntValue(FITSConstants.KEY_NAXIS, 0);
 
         if (naxis == 0)
             return 0;
 
         long count = 1;
         for (int i = 1; i <= naxis; i++) {
-            count *= header.getIntValue(FitsConstants.KEY_NAXIS + i, 1);
+            count *= header.getIntValue(FITSConstants.KEY_NAXIS + i, 1);
         }
 
         long bits = count * bitpix;
@@ -71,13 +71,13 @@ public class ImageHDU extends HDU {
      * @throws IOException if an error occurs
      */
     public RealDoubleMatrix asMatrix(ReadableByteChannel channel) throws IOException {
-        int naxis = header.getIntValue(FitsConstants.KEY_NAXIS, 0);
+        int naxis = header.getIntValue(FITSConstants.KEY_NAXIS, 0);
         if (naxis != 2) {
             throw new IOException("Only 2D images supported for Matrix conversion (found NAXIS=" + naxis + ")");
         }
-        int width = header.getIntValue(FitsConstants.KEY_NAXIS + "1", 0);
-        int height = header.getIntValue(FitsConstants.KEY_NAXIS + "2", 0);
-        int bitpix = header.getIntValue(FitsConstants.KEY_BITPIX, 8);
+        int width = header.getIntValue(FITSConstants.KEY_NAXIS + "1", 0);
+        int height = header.getIntValue(FITSConstants.KEY_NAXIS + "2", 0);
+        int bitpix = header.getIntValue(FITSConstants.KEY_BITPIX, 8);
 
         // FITS data is Big Endian
         long size = getDataSize();
@@ -97,22 +97,22 @@ public class ImageHDU extends HDU {
 
         for (int i = 0; i < width * height; i++) {
             switch (bitpix) {
-                case FitsConstants.BITPIX_DOUBLE:
+                case FITSConstants.BITPIX_DOUBLE:
                     data[i] = buffer.getDouble();
                     break;
-                case FitsConstants.BITPIX_FLOAT:
+                case FITSConstants.BITPIX_FLOAT:
                     data[i] = buffer.getFloat();
                     break;
-                case FitsConstants.BITPIX_INT:
+                case FITSConstants.BITPIX_INT:
                     data[i] = buffer.getInt();
                     break;
-                case FitsConstants.BITPIX_SHORT:
+                case FITSConstants.BITPIX_SHORT:
                     data[i] = buffer.getShort();
                     break;
-                case FitsConstants.BITPIX_BYTE:
+                case FITSConstants.BITPIX_BYTE:
                     data[i] = buffer.get() & 0xFF; // Unsigned byte
                     break;
-                case FitsConstants.BITPIX_LONG:
+                case FITSConstants.BITPIX_LONG:
                     data[i] = buffer.getLong();
                     break;
                 default:
@@ -121,8 +121,8 @@ public class ImageHDU extends HDU {
         }
 
         // consume padding
-        long remaining = FitsConstants.BLOCK_SIZE - (size % FitsConstants.BLOCK_SIZE);
-        if (remaining < FitsConstants.BLOCK_SIZE) {
+        long remaining = FITSConstants.BLOCK_SIZE - (size % FITSConstants.BLOCK_SIZE);
+        if (remaining < FITSConstants.BLOCK_SIZE) {
             ByteBuffer pad = ByteBuffer.allocate((int) remaining);
             while (pad.hasRemaining())
                 channel.read(pad);

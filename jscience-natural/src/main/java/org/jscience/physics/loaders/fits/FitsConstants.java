@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,9 @@ package org.jscience.physics.loaders.fits;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public final class FitsConstants {
+public final class FITSConstants {
 
-    private FitsConstants() {
+    private FITSConstants() {
     }
 
     public static final int BLOCK_SIZE = 2880;
@@ -59,5 +59,3 @@ public final class FitsConstants {
     public static final int BITPIX_FLOAT = -32;
     public static final int BITPIX_DOUBLE = -64;
 }
-
-

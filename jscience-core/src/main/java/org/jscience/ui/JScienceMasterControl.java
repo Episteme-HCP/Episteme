@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.prefs.Preferences;
+import org.jscience.io.UserPreferences;
 
 /**
  * Master Control Dashboard for JScience Application.
@@ -54,8 +54,8 @@ import java.util.prefs.Preferences;
  * @since 1.0
  */
 public class JScienceMasterControl extends Application {
-
-    private static final Preferences PREFS = Preferences.userNodeForPackage(JScienceMasterControl.class);
+    
+    private static final UserPreferences PREFS = UserPreferences.getInstance();
     private static final String PREF_SELECTED_TAB = "dashboard_selected_tab";
     private static final String PREF_SELECTED_DEVICE = "dashboard_selected_device";
 
@@ -80,8 +80,7 @@ public class JScienceMasterControl extends Application {
     public void start(Stage stage) {
         try {
             // Load persistent settings
-            // Load persistent settings
-            String lang = PREFS.get("language", Locale.getDefault().getLanguage());
+            String lang = PREFS.getLanguage();
             I18n.getInstance().setLocale(Locale.of(lang));
 
             // Theme is handled by ThemeManager
@@ -145,7 +144,7 @@ public class JScienceMasterControl extends Application {
         // Save selected tab on change
         tabPane.getSelectionModel().selectedIndexProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
-                PREFS.putInt(PREF_SELECTED_TAB, newVal.intValue());
+                PREFS.setInt(PREF_SELECTED_TAB, newVal.intValue());
             }
         });
 
@@ -191,9 +190,9 @@ public class JScienceMasterControl extends Application {
         subtitle.getStyleClass().add("dashboard-subtitle");
 
         GridPane infoGrid = new GridUtils.Builder()
-                .addRow(i18n.get("dashboard.general.version", "Version") + ":", org.jscience.JScienceVersion.VERSION)
+                .addRow(i18n.get("dashboard.general.version", "Version") + ":", org.jscience.JScience.VERSION)
                 .addRow(i18n.get("dashboard.general.build", "Build Date") + ":",
-                        org.jscience.JScienceVersion.BUILD_DATE)
+                        org.jscience.JScience.BUILD_DATE)
                 .addRow(i18n.get("dashboard.general.java", "Java Version") + ":", System.getProperty("java.version"))
                 .build();
         infoGrid.setAlignment(Pos.CENTER);
@@ -205,7 +204,7 @@ public class JScienceMasterControl extends Application {
         authorsHeader.setStyle("-fx-font-weight: bold; -fx-underline: true;");
         authorsBox.getChildren().add(authorsHeader);
 
-        for (String author : org.jscience.JScienceVersion.AUTHORS) {
+        for (String author : org.jscience.JScience.AUTHORS) {
             authorsBox.getChildren().add(new Label(author));
         }
 
@@ -296,7 +295,7 @@ public class JScienceMasterControl extends Application {
         langList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && !newVal.locale.equals(current)) {
                 i18n.setLocale(newVal.locale);
-                PREFS.put("language", newVal.locale.getLanguage()); // Save persistence
+                PREFS.setLanguage(newVal.locale.getLanguage()); // Save persistence
                 refreshUI();
             }
         });
@@ -1586,7 +1585,7 @@ public class JScienceMasterControl extends Application {
                 if (dev != null)
                     details.setText(dev.getFormattedInfo()); // Rich info using metadata
                 // Persist selection
-                PREFS.put(PREF_SELECTED_DEVICE, newVal);
+                PREFS.set(PREF_SELECTED_DEVICE, newVal);
             }
         });
 
@@ -1625,5 +1624,14 @@ public class JScienceMasterControl extends Application {
         statusLabel.setStyle("-fx-text-fill: " + (available ? "#27ae60" : "#c0392b") + "; -fx-font-weight: bold;");
 
         grid.addRow(row, nameLabel, statusLabel, descLabel);
+    }
+
+
+    /**
+     * Main entry point for standalone execution.
+     * @param args command line arguments
+     */
+    public static void main(String[] args) {
+        launch(args);
     }
 }
