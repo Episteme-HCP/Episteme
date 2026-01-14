@@ -7,7 +7,6 @@ package org.jscience.ui.viewers.geography;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
-import org.jscience.ui.AbstractViewer;
 
 /**
  * Generic Map Viewer for Geographic Information Systems (GIS).

@@ -48,7 +48,6 @@ import org.jscience.mathematics.analysis.Function;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.ui.viewers.mathematics.analysis.plotting.Plot3D;
 import org.jscience.ui.viewers.mathematics.analysis.plotting.PlotFormat;
-import org.jscience.ui.viewers.mathematics.analysis.plotting.PlottingBackend;
 
 import java.util.List;
 

@@ -27,15 +27,12 @@ import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Parameter;
 import java.util.List;
 import java.util.ArrayList;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 import org.jscience.ui.i18n.I18n;
-import org.jscience.ui.ThemeManager;
 
 /**
  * Interactive Mandelbrot Set Viewer.

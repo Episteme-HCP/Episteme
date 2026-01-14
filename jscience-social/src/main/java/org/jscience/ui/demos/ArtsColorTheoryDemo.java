@@ -4,7 +4,6 @@
  */
 package org.jscience.ui.demos;
 
-import javafx.stage.Stage;
 import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.viewers.arts.ArtsColorTheoryViewer;
 import org.jscience.ui.i18n.SocialI18n;

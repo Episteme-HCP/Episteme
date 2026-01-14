@@ -6,13 +6,9 @@
 package org.jscience.ui.demos;
 
 import javafx.animation.AnimationTimer;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import org.jscience.ui.AbstractSimulationDemo;
@@ -179,7 +175,7 @@ public class FluidDynamicsDemo extends AbstractSimulationDemo {
             Label viscLabel = new Label(I18n.getInstance().get("fluid.viscosity", "Viscosity"));
             Slider viscSlider = new Slider(0, 0.05, 0.0001);
             viscSlider.valueProperty().addListener((o, ov, nv) -> viscosity = nv.doubleValue());
-            controls.getChildren().addAll(viscLabel, viscSlider);
+            controls.addAll(List.of(viscLabel, viscSlider));
 
             // Engine Switch
             ToggleButton engineSwitch = new ToggleButton(I18n.getInstance().get("fluid.mode.primitive", "Simple Solver"));
@@ -208,7 +204,7 @@ public class FluidDynamicsDemo extends AbstractSimulationDemo {
             particleCheck.setSelected(showParticles);
             particleCheck.setOnAction(e -> { showParticles = particleCheck.isSelected(); drawFluid(canvas.getGraphicsContext2D()); });
             
-            controls.getChildren().addAll(new Separator(), fieldCheck, particleCheck);
+            controls.addAll(List.of(new Separator(), fieldCheck, particleCheck));
 
             // Color Scheme
             ComboBox<String> colorCombo = new ComboBox<>();

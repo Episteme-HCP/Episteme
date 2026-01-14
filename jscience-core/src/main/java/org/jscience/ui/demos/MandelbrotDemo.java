@@ -25,7 +25,6 @@ package org.jscience.ui.demos;
 
 import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.viewers.mathematics.analysis.chaos.fractals.MandelbrotViewer;
-import javafx.stage.Stage;
 
 /**
  * Demo Provider for Mandelbrot Set Viewer.

@@ -152,7 +152,7 @@ public class MechanicsDemo extends AbstractSimulationDemo {
             // Energy Calc (Potential + Kinetic)
             double pe = 0.5 * springConstant * (position/50.0)*(position/50.0); // Approximate scaling back to meters?
             double ke = 0.5 * mass * (velocity/50.0)*(velocity/50.0);
-            // energyLabel.setText(String.format("E: %.2f J", pe + ke)); // Optional
+            if (energyLabel != null) energyLabel.setText(String.format("E: %.2f J", pe + ke));
         }
 
         private void draw() {

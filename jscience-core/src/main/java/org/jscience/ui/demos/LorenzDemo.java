@@ -25,7 +25,6 @@ package org.jscience.ui.demos;
 
 import org.jscience.ui.AbstractSimulationDemo;
 import org.jscience.ui.viewers.mathematics.analysis.chaos.LorenzViewer;
-import javafx.stage.Stage;
 
 /**
  * Demo Provider for Lorenz Attractor Viewer.

@@ -23,12 +23,9 @@
 
 package org.jscience.ui.viewers.mathematics.logic;
 
-import javafx.application.Application;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Parameter;

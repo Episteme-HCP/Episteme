@@ -12,12 +12,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.i18n.I18n;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.statistics.timeseries.TimeSeries;
 
@@ -83,7 +80,8 @@ public class SportsResultsDemo extends AbstractDemo {
         TableColumn<Team, String> avgCol = new TableColumn<>("Trend (SMA)");
         avgCol.setCellValueFactory(cell -> cell.getValue().trend);
 
-        table.getColumns().addAll(rankCol, nameCol, playedCol, pointsCol, avgCol);
+        @SuppressWarnings("unchecked")
+        boolean added = table.getColumns().addAll(rankCol, nameCol, playedCol, pointsCol, avgCol);
 
         VBox centerBox = new VBox(10, new Label("League Standings"), table);
         centerBox.setPadding(new Insets(20));

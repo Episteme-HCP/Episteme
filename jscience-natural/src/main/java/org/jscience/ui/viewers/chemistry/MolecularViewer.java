@@ -1,14 +1,10 @@
 package org.jscience.ui.viewers.chemistry;
 
-import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import org.jscience.chemistry.Atom;
 import org.jscience.chemistry.Bond;
 import org.jscience.chemistry.Molecule;

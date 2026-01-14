@@ -33,9 +33,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.MeshView;
-import javafx.scene.transform.Rotate;
-import javafx.scene.transform.Translate;
-import javafx.stage.Stage;
 import org.jscience.biology.loaders.FbxMeshReader;
 
 import java.io.BufferedReader;
@@ -46,9 +43,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.Stack;
 
-import java.util.concurrent.atomic.AtomicReference;
 
-import java.util.regex.Pattern;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -393,14 +388,7 @@ public class HumanBodyViewer extends AbstractViewer {
         return container;
     }
     
-    // Kept generic simple one if needed elsewhere
-    private CheckBox createLayerToggle(String name, Group group) {
-        CheckBox cb = new CheckBox(name);
-        cb.setSelected(true);
-        cb.setTextFill(Color.WHITE);
-        cb.selectedProperty().addListener((obs, old, val) -> group.setVisible(val));
-        return cb;
-    }
+
     
     private Button createButton(String text, Runnable action) {
         Button btn = new Button(text);
@@ -503,7 +491,6 @@ public class HumanBodyViewer extends AbstractViewer {
                 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
                 String line;
-                int lineCount = 0;
                 
                 while ((line = reader.readLine()) != null) {
                     line = line.trim();

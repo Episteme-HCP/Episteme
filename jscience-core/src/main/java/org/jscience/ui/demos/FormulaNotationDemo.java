@@ -23,7 +23,6 @@
 
 package org.jscience.ui.demos;
 
-import javafx.scene.Node;
 import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.viewers.mathematics.symbolic.FormulaNotationViewer;
 

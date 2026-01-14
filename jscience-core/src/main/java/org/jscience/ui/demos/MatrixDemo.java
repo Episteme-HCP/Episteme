@@ -4,7 +4,6 @@
  */
 package org.jscience.ui.demos;
 
-import javafx.stage.Stage;
 import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.viewers.mathematics.linearalgebra.MatrixViewer;
 import org.jscience.ui.i18n.I18n;

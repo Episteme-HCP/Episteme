@@ -75,7 +75,8 @@ public class LotkaVolterraViewer extends AbstractViewer implements Simulatable {
         timeChart.setCreateSymbols(false);
         preySeries.setName(I18n.getInstance().get("lotka.series.prey", "Prey"));
         predSeries.setName(I18n.getInstance().get("lotka.series.pred", "Predator"));
-        timeChart.getData().addAll(preySeries, predSeries);
+        @SuppressWarnings("unchecked")
+        boolean added = timeChart.getData().addAll(preySeries, predSeries);
 
         NumberAxis xAxisPhase = new NumberAxis();
         xAxisPhase.setLabel(I18n.getInstance().get("lotka.axis.prey", "Prey"));

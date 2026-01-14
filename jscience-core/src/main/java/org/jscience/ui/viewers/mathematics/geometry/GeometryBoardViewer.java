@@ -25,7 +25,6 @@ package org.jscience.ui.viewers.mathematics.geometry;
 
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
-import org.jscience.ui.Parameter;
 import java.util.List;
 import java.util.ArrayList;
 import javafx.geometry.Insets;
@@ -36,8 +35,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.jscience.ui.i18n.I18n;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Interactive 2D Geometry Board (GeoGebra-style).

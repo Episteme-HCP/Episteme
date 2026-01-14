@@ -416,6 +416,7 @@ public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
                 case AND: isOn = i1 && i2; break;
                 case OR: isOn = i1 || i2; break;
                 case NAND: isOn = !(i1 && i2); break;
+                default: break;
             }
         }
 

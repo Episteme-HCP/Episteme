@@ -31,8 +31,6 @@ import javafx.scene.paint.Color;
 import org.jscience.ui.AbstractSimulationDemo;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
-import org.jscience.ui.i18n.I18n;
-import org.jscience.ui.Parameter;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -5,9 +5,7 @@
 
 package org.jscience.ui.viewers.mathematics.analysis.plotting.backends;
 
-import org.jscience.technical.backend.BackendDiscovery;
 import org.jscience.technical.backend.BackendProvider;
-import org.jscience.ui.viewers.mathematics.analysis.plotting.Plot3D;
 
 /**
  * BackendProvider for JavaFX 3D plotting.

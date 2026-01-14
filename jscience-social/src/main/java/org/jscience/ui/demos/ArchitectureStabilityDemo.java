@@ -24,7 +24,6 @@
 package org.jscience.ui.demos;
 
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -160,8 +159,11 @@ public class ArchitectureStabilityDemo extends AbstractSimulationDemo {
 
             if (!collapsed) {
                 Quantity<Length> blockX = Quantities.create(bx + 50, Units.METER);
+                @SuppressWarnings("unchecked")
                 Quantity<?> moment = blockX.multiply(b.mass);
-                totalMoment = totalMoment.add((Quantity) moment);
+                @SuppressWarnings("unchecked")
+                Quantity<?> tm = totalMoment.add((Quantity) moment);
+                totalMoment = tm;
                 totalMass = totalMass.add(b.mass);
             }
         }

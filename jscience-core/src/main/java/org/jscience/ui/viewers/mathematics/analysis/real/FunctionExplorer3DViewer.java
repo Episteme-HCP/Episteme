@@ -12,7 +12,6 @@ import org.jscience.mathematics.symbolic.parsing.SimpleExpressionParser;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3D;
 import org.jscience.ui.i18n.I18n;
-import org.jscience.ui.Parameter;
 import java.util.*;
 
 public class FunctionExplorer3DViewer extends AbstractViewer {

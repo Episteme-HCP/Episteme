@@ -23,18 +23,10 @@
 
 package org.jscience.ui.demos;
 
-import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 import org.jscience.ui.AbstractDemo;
@@ -47,18 +39,6 @@ import org.jscience.ui.AbstractDemo;
  * @since 1.0
  */
 public class GeographyGISDemo extends AbstractDemo {
-
-    private Canvas canvas;
-    private WritableImage terrainCache;
-    private int width = 800;
-    private int height = 600;
-    private long seed;
-    private double[][] heightMap;
-    private List<Point2D> cities = new ArrayList<>();
-
-    private CheckBox terrainChk;
-    private CheckBox roadsChk;
-    private CheckBox popChk;
 
     @Override
     public boolean isDemo() {

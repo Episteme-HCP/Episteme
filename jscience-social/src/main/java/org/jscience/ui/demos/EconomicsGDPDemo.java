@@ -23,16 +23,6 @@
 
 package org.jscience.ui.demos;
 
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import org.jscience.ui.AbstractDemo;
 
 public class EconomicsGDPDemo extends AbstractDemo {

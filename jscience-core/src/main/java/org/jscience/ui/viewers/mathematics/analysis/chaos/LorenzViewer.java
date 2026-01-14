@@ -26,9 +26,7 @@ package org.jscience.ui.viewers.mathematics.analysis.chaos;
 import javafx.animation.AnimationTimer;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
-import org.jscience.ui.Parameter;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
@@ -36,7 +34,6 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 import org.jscience.ui.i18n.I18n;
 // import org.jscience.ui.ThemeManager;
 

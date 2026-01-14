@@ -4,20 +4,13 @@
  */
 package org.jscience.ui.demos;
 
-import javafx.collections.FXCollections;
-import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
 import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.Parameter;
 import org.jscience.ui.viewers.mathematics.analysis.real.FunctionExplorer2DViewer;
 import org.jscience.ui.viewers.mathematics.analysis.real.FunctionExplorer3DViewer;
 import org.jscience.ui.i18n.I18n;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Unified Demo for 2D and 3D Function Exploration.

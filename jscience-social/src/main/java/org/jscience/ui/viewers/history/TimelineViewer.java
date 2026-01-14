@@ -5,7 +5,6 @@
 package org.jscience.ui.viewers.history;
 
 import javafx.scene.layout.BorderPane;
-import org.jscience.ui.AbstractViewer;
 
 /**
  * Generic Viewer for Timeline data.

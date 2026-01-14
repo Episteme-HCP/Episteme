@@ -6,7 +6,6 @@
 package org.jscience.ui.viewers.physics.classical.waves;
 
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;

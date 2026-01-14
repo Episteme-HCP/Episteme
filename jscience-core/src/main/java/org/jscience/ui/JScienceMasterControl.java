@@ -746,8 +746,11 @@ public class JScienceMasterControl extends Application {
         // Append available libraries list (No header)
         box.getChildren().add(createBackendCategory(i18n, 
             org.jscience.technical.backend.BackendDiscovery.TYPE_NETWORK,
-            "", // No visible header
-            ""));
+            "", ""));
+
+        box.getChildren().add(new Separator());
+        return box;
+    }
 
     private static class LibInfo {
         final String key;
@@ -1208,6 +1211,7 @@ public class JScienceMasterControl extends Application {
         List<ResourceIO<?>> allLoaders = new ArrayList<>();
         
         // Load readers
+        @SuppressWarnings("rawtypes")
         java.util.ServiceLoader<org.jscience.io.ResourceReader> readerLoader = 
             java.util.ServiceLoader.load(org.jscience.io.ResourceReader.class);
         for (org.jscience.io.ResourceReader<?> reader : readerLoader) {
@@ -1215,6 +1219,7 @@ public class JScienceMasterControl extends Application {
         }
         
         // Load writers  
+        @SuppressWarnings("rawtypes")
         java.util.ServiceLoader<org.jscience.io.ResourceWriter> writerLoader = 
             java.util.ServiceLoader.load(org.jscience.io.ResourceWriter.class);
         for (org.jscience.io.ResourceWriter<?> writer : writerLoader) {

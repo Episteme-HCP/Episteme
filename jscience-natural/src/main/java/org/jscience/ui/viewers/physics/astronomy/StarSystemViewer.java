@@ -18,6 +18,7 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import org.jscience.measure.Units;
+import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.physics.astronomy.*;

@@ -83,8 +83,9 @@ public class FinancialMarketReader extends org.jscience.io.AbstractResourceReade
     }
 
     @Override
-    public Class<?> getResourceType() {
-        return List.class;
+    @SuppressWarnings("unchecked")
+    public Class<List<Candle>> getResourceType() {
+        return (Class<List<Candle>>) (Object) List.class;
     }
 
     @Override

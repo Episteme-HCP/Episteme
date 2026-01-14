@@ -5,16 +5,13 @@
 
 package org.jscience.ui.viewers.physics.classical.waves.electromagnetism.field;
 
-import javafx.application.Application;
 import javafx.geometry.Point3D;
 import javafx.scene.*;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.transform.Rotate;
-import javafx.stage.Stage;
 
 /**
  * 3D Viewer for Magnetic Fields in Spintronics.

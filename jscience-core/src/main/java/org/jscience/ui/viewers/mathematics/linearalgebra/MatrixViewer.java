@@ -6,13 +6,11 @@ package org.jscience.ui.viewers.mathematics.linearalgebra;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 import org.jscience.mathematics.linearalgebra.Matrix;
 import org.jscience.mathematics.linearalgebra.matrices.MatrixFactory;
 import org.jscience.mathematics.numbers.real.Real;
@@ -27,7 +25,6 @@ public class MatrixViewer<T> extends AbstractViewer {
 
     private Matrix<Real> matrix;
     private Canvas heatmapCanvas;
-    private TableView<T> tableViewer; // Retaining for compatibility if T generic is used, but mostly focusing on Real for demo
     private StackPane viewContainer;
     private Spinner<Integer> rowsSpinner, colsSpinner;
     private Label infoLabel;

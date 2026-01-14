@@ -13,8 +13,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.Node;
-import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.i18n.SocialI18n;
 
 /**

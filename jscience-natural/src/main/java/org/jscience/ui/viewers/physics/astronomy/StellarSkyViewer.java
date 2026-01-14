@@ -46,7 +46,6 @@ public class StellarSkyViewer extends AbstractViewer {
     private List<StarReader.Star> stars;
     private List<ConstellationLine> constellations = new ArrayList<>();
     private List<PlanetData> planets = new ArrayList<>();
-    private List<MoonData> moons = new ArrayList<>();
     private List<DeepSkyObject> deepSkyObjects = new ArrayList<>();
 
     // State
@@ -74,7 +73,6 @@ public class StellarSkyViewer extends AbstractViewer {
     public StellarSkyViewer() {
         loadData();
         initPlanets();
-        initMoons();
         initDeepSkyObjects();
 
         skyCanvas = new Canvas(WIDTH, HEIGHT);
@@ -189,11 +187,6 @@ public class StellarSkyViewer extends AbstractViewer {
             this.name=name; this.color=color; this.N=N; this.i=i; this.w=w; this.a=a; this.e=e; this.M=M; this.nN=nN; this.ni=ni; this.nw=nw; this.na=na; this.ne=ne; this.nM=nM;
         }
     }
-    private static class MoonData { String parentName; Color color; double a, e, P, M0;
-        MoonData(String name, String p, Color c, double a_km, double e, double i, double P, double M0) {
-            this.parentName=p; this.color=c; this.a=a_km/149597870.7; this.e=e; this.P=P; this.M0=M0;
-        }
-    }
     private static class DeepSkyObject { String name, type; double ra, dec; DeepSkyObject(String n, String t, double r, double d, double m) { name=n; type=t; ra=r; dec=d; } }
 
     private void initPlanets() {
@@ -204,15 +197,6 @@ public class StellarSkyViewer extends AbstractViewer {
         planets.add(new PlanetData("Saturn", Color.GOLDENROD, 113.715, 2.484, 339.392, 9.5549, 0.0555, 317.020, 2.39e-5, 1.6e-7, 8.1e-6, 0, 0, 0.033444));
         planets.add(new PlanetData("Uranus", Color.LIGHTBLUE, 74.006, 0.773, 96.661, 19.1817, 0.0473, 142.590, 4.04e-5, 4.1e-7, 4e-6, 0, 0, 0.0117258));
         planets.add(new PlanetData("Neptune", Color.BLUE, 131.780, 1.770, 272.846, 30.0583, 0.0086, 260.247, 3e-5, 9e-8, 1e-6, 0, 0, 0.0059951));
-    }
-
-    private void initMoons() {
-        moons.add(new MoonData("Moon", "Earth", Color.WHITESMOKE, 384400, 0.0549, 5.145, 27.321, 0));
-        moons.add(new MoonData("Io", "Jupiter", Color.YELLOW, 421700, 0.0041, 0.05, 1.769, 0));
-        moons.add(new MoonData("Europa", "Jupiter", Color.WHITE, 671034, 0.009, 0.47, 3.551, 90));
-        moons.add(new MoonData("Ganymede", "Jupiter", Color.LIGHTGRAY, 1070412, 0.0013, 0.20, 7.154, 180));
-        moons.add(new MoonData("Callisto", "Jupiter", Color.DARKGRAY, 1882709, 0.0074, 0.20, 16.689, 270));
-        moons.add(new MoonData("Titan", "Saturn", Color.ORANGE, 1221870, 0.0288, 0.348, 15.945, 0));
     }
 
     private void initDeepSkyObjects() {

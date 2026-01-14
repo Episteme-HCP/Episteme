@@ -23,7 +23,6 @@
 
 package org.jscience.ui.demos;
 
-import javafx.stage.Stage;
 import org.jscience.ui.AbstractSimulationDemo;
 import org.jscience.ui.viewers.mathematics.geometry.GeometryBoardViewer;
 

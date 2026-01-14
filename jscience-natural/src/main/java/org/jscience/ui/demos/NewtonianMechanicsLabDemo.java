@@ -9,7 +9,6 @@ import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
@@ -80,6 +79,7 @@ public class NewtonianMechanicsLabDemo extends AbstractSimulationDemo {
             Tab tab = new Tab(I18n.getInstance().get("mechanics.spring.tab", "Spring"));
             Canvas canvas = new Canvas(600, 500);
 
+            @SuppressWarnings("unchecked")
             final Quantity<Mass>[] mass = new Quantity[] { Quantities.create(2.0, Units.KILOGRAM) };
             final Real[] k = { Real.of(5.0) };
             final Real[] damping = { Real.of(0.1) };

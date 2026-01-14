@@ -24,7 +24,6 @@
 package org.jscience.ui.demos;
 
 import javafx.scene.Node;
-import javafx.stage.Stage;
 import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.viewers.mathematics.analysis.chaos.LorenzViewer;
 import org.jscience.ui.i18n.I18n;

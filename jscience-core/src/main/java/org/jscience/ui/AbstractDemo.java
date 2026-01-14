@@ -69,7 +69,7 @@ public abstract class AbstractDemo extends Application implements App {
 
         // Center: The Viewer Node
         Node viewerNode = createViewerNode();
-        if (viewerNode instanceof Viewer sv) {
+        if (viewerNode instanceof Viewer) {
             this.viewer = viewerNode;
         }
 

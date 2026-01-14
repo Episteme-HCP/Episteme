@@ -25,7 +25,6 @@ package org.jscience.ui;
 
 import javafx.stage.Stage;
 import java.util.List;
-import org.jscience.ui.Parameter;
 
 /**
  * Base provider interface for all UI components (Viewers, Demos, Apps).

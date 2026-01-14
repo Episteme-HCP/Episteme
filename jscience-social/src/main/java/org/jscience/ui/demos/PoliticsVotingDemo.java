@@ -23,46 +23,13 @@
 
 package org.jscience.ui.demos;
 
-import javafx.collections.FXCollections;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import org.jscience.ui.i18n.SocialI18n;
 import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 // import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.stage.Stage;
 import org.jscience.ui.AbstractDemo;
 
 public class PoliticsVotingDemo extends AbstractDemo {
-
-    private enum VotingSystem {
-        FPTP("pol.voting.sys.fptp", "pol.voting.desc.fptp"),
-        PR("pol.voting.sys.pr", "pol.voting.desc.pr"),
-        APPROVAL("pol.voting.sys.approval", "pol.voting.desc.approval"),
-        BORDA("pol.voting.sys.borda", "pol.voting.desc.borda");
-
-        final String nameKey;
-        final String descKey;
-
-        VotingSystem(String nameKey, String descKey) {
-            this.nameKey = nameKey;
-            this.descKey = descKey;
-        }
-
-        @Override
-        public String toString() {
-            return SocialI18n.getInstance().get(nameKey);
-        }
-    }
-
-    private Label descLabel;
-    private BarChart<String, Number> chart;
 
     @Override
     public boolean isDemo() {
