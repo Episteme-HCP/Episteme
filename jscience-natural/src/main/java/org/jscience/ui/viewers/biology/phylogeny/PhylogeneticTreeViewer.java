@@ -10,6 +10,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import org.jscience.ui.AbstractViewer;
@@ -62,6 +63,11 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
 
         HBox controls = new HBox(10, toggleBtn, infoPanel);
         controls.setPadding(new javafx.geometry.Insets(10));
+        
+        // Add NCBI Taxonomy query section
+        VBox ncbiSection = createNCBIQuerySection();
+        controls.getChildren().add(0, ncbiSection);
+        
         this.setBottom(controls);
 
         loadData();
@@ -94,6 +100,69 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * Creates NCBI Taxonomy query section for browsing real species data.
+     */
+    private VBox createNCBIQuerySection() {
+        VBox section = new VBox(5);
+        section.setPadding(new javafx.geometry.Insets(5));
+        
+        Label ncbiLabel = new Label(I18n.getInstance().get("phylogeny.ncbi.title", "NCBI Query"));
+        ncbiLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 11px;");
+        
+        javafx.scene.control.TextField searchField = new javafx.scene.control.TextField();
+        searchField.setPromptText(I18n.getInstance().get("phylogeny.ncbi.prompt", "Enter species name..."));
+        searchField.setPrefWidth(180);
+        
+        Label statusLabel = new Label();
+        statusLabel.setStyle("-fx-font-size: 10px;");
+        statusLabel.setWrapText(true);
+        statusLabel.setPrefWidth(180);
+        
+        javafx.scene.control.Button queryButton = new javafx.scene.control.Button(I18n.getInstance().get("phylogeny.ncbi.search", "Search"));
+        queryButton.setStyle("-fx-font-size: 10px;");
+        queryButton.setOnAction(e -> {
+            String searchTerm = searchField.getText().trim();
+            if (searchTerm.isEmpty()) {
+                statusLabel.setText(I18n.getInstance().get("phylogeny.ncbi.empty", "Enter a species name"));
+                return;
+            }
+            
+            statusLabel.setText(I18n.getInstance().get("phylogeny.ncbi.querying", "Querying NCBI..."));
+            queryButton.setDisable(true);
+            
+            // Query in background thread
+            new Thread(() -> {
+                try {
+                    org.jscience.biology.loaders.NCBITaxonomyReader reader = 
+                        new org.jscience.biology.loaders.NCBITaxonomyReader();
+                    java.util.List<Long> taxIds = reader.searchByName(searchTerm);
+                    
+                    javafx.application.Platform.runLater(() -> {
+                        if (taxIds != null && !taxIds.isEmpty()) {
+                            statusLabel.setText(I18n.getInstance().get("phylogeny.ncbi.found", 
+                                "Found " + taxIds.size() + " results!"));
+                            // Here we could load the first result and visualize it
+                            // For now, just show feedback
+                        } else {
+                            statusLabel.setText(I18n.getInstance().get("phylogeny.ncbi.notfound", 
+                                "No results found"));
+                        }
+                        queryButton.setDisable(false);
+                    });
+                } catch (Exception ex) {
+                    javafx.application.Platform.runLater(() -> {
+                        statusLabel.setText("Error: " + ex.getMessage());
+                        queryButton.setDisable(false);
+                    });
+                }
+            }).start();
+        });
+        
+        section.getChildren().addAll(ncbiLabel, searchField, queryButton, statusLabel);
+        return section;
     }
 
     private void updateLayoutAndDraw(Canvas canvas) {
