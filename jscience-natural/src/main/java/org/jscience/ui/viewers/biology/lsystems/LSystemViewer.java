@@ -40,6 +40,9 @@ import org.jscience.ui.Simulatable;
 import org.jscience.ui.i18n.I18n;
 
 import java.util.*;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Matrix;
+import org.jscience.mathematics.linearalgebra.Vector;
 
 /**
  * Enhanced L-System Visualizer.
@@ -310,34 +313,113 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
 
     private void render3D(String commands) {
         root3D.getChildren().clear();
-        root3D.getChildren().add(new AmbientLight(Color.rgb(50, 50, 50)));
-        root3D.getChildren().add(new PointLight(Color.WHITE));
-        double step = 10;
-        recursiveBuild3D(root3D, commands, step);
-    }
-
-    private void recursiveBuild3D(Group parent, String cmds, double len) {
-        buildMock3DTree(parent, 0, new Point3D(0, 300, 0), 0, 0, 100);
-    }
-
-    private void buildMock3DTree(Group parent, int depth, Point3D pos, double ax, double az, double len) {
-        if (depth > iterations) return;
-        Cylinder c = new Cylinder(Math.max(1, 10 - depth), len);
-        c.setMaterial(new PhongMaterial(Color.hsb(120, 0.8, 0.5 + depth * 0.05)));
-        c.setTranslateY(len / 2.0);
-        Group branchGroup = new Group(c);
-        branchGroup.setTranslateX(pos.getX()); branchGroup.setTranslateY(pos.getY()); branchGroup.setTranslateZ(pos.getZ());
-        branchGroup.setRotationAxis(Rotate.Z_AXIS); branchGroup.setRotate(az);
+        root3D.getChildren().add(new AmbientLight(Color.rgb(100, 100, 100)));
+        PointLight pl = new PointLight(Color.WHITE);
+        pl.setTranslateY(-500);
+        root3D.getChildren().add(pl);
         
-        double endX = pos.getX() + Math.sin(Math.toRadians(az)) * len;
-        double endY = pos.getY() - Math.cos(Math.toRadians(az)) * len;
-        double endZ = pos.getZ() + Math.sin(Math.toRadians(ax)) * len;
+        double stepLen = 15.0;
+        double angleRad = Math.toRadians(currentSystem.angle);
+        
+        Stack<Turtle3D> stack = new Stack<>();
+        Turtle3D turtle = new Turtle3D();
+        
+        for (char c : commands.toCharArray()) {
+            switch (c) {
+                case 'F': case 'G':
+                    Vector<Real> startPos = turtle.position;
+                    Vector<Real> forward = org.jscience.mathematics.linearalgebra.vectors.VectorFactory.of(Real.class, Real.of(0), Real.of(-stepLen), Real.of(0));
+                    Vector<Real> move = turtle.orientation.multiply(forward);
+                    Vector<Real> endPos = startPos.add(move);
+                    
+                    drawBranch(startPos, endPos, 2.0);
+                    turtle.position = endPos;
+                    break;
+                case '+': // Rotate around Z
+                    turtle.rotate(angleRad, 0, 0, 1);
+                    break;
+                case '-': // Rotate around Z
+                    turtle.rotate(-angleRad, 0, 0, 1);
+                    break;
+                case '&': // Pitch down (Rotate around X)
+                    turtle.rotate(angleRad, 1, 0, 0);
+                    break;
+                case '^': // Pitch up (Rotate around X)
+                    turtle.rotate(-angleRad, 1, 0, 0);
+                    break;
+                case '\\': // Roll left (Rotate around Y)
+                    turtle.rotate(angleRad, 0, 1, 0);
+                    break;
+                case '/': // Roll right (Rotate around Y)
+                    turtle.rotate(-angleRad, 0, 1, 0);
+                    break;
+                case '[':
+                    stack.push(new Turtle3D(turtle));
+                    break;
+                case ']':
+                    if (!stack.isEmpty()) turtle = stack.pop();
+                    break;
+            }
+        }
+    }
 
-        c.setTranslateX((pos.getX() + endX) / 2); c.setTranslateY((pos.getY() + endY) / 2); c.setTranslateZ((pos.getZ() + endZ) / 2); c.setHeight(len);
-        parent.getChildren().add(c);
+    private void drawBranch(Vector<Real> start, Vector<Real> end, double radius) {
+        double dx = end.get(0).doubleValue() - start.get(0).doubleValue();
+        double dy = end.get(1).doubleValue() - start.get(1).doubleValue();
+        double dz = end.get(2).doubleValue() - start.get(2).doubleValue();
+        double len = Math.sqrt(dx*dx + dy*dy + dz*dz);
+        
+        Cylinder c = new Cylinder(radius, len);
+        c.setMaterial(new PhongMaterial(Color.BROWN));
+        
+        c.setTranslateX(start.get(0).doubleValue() + dx / 2.0);
+        c.setTranslateY(start.get(1).doubleValue() + dy / 2.0);
+        c.setTranslateZ(start.get(2).doubleValue() + dz / 2.0);
+        
+        // Orientation
+        Point3D axis = new Point3D(dx, dy, dz).crossProduct(Rotate.Y_AXIS);
+        double angle = new Point3D(dx, dy, dz).angle(Rotate.Y_AXIS);
+        c.setRotationAxis(axis);
+        c.setRotate(-angle);
+        
+        root3D.getChildren().add(c);
+    }
 
-        buildMock3DTree(parent, depth + 1, new Point3D(endX, endY, endZ), ax + 30, az + 20, len * 0.7);
-        buildMock3DTree(parent, depth + 1, new Point3D(endX, endY, endZ), ax - 20, az - 30, len * 0.7);
+    private static class Turtle3D {
+        Vector<Real> position;
+        Matrix<Real> orientation;
+
+        Turtle3D() {
+            position = org.jscience.mathematics.linearalgebra.vectors.VectorFactory.of(Real.class, Real.of(0), Real.of(0), Real.of(0));
+            orientation = org.jscience.mathematics.linearalgebra.matrices.MatrixFactory.identity(3, Real.ZERO);
+        }
+
+        Turtle3D(Turtle3D other) {
+            this.position = other.position;
+            this.orientation = other.orientation;
+        }
+
+        void rotate(double angle, double ax, double ay, double az) {
+            double c = Math.cos(angle);
+            double s = Math.sin(angle);
+            Real[][] rotArr = new Real[3][3];
+            for (int i=0; i<3; i++) for (int j=0; j<3; j++) rotArr[i][j] = Real.ZERO;
+
+            if (az == 1) { // Z-axis rotate
+                rotArr[0][0] = Real.of(c);  rotArr[0][1] = Real.of(-s); rotArr[0][2] = Real.of(0);
+                rotArr[1][0] = Real.of(s);  rotArr[1][1] = Real.of(c);  rotArr[1][2] = Real.of(0);
+                rotArr[2][0] = Real.of(0);  rotArr[2][1] = Real.of(0);  rotArr[2][2] = Real.of(1);
+            } else if (ax == 1) { // X-axis rotate
+                rotArr[0][0] = Real.of(1);  rotArr[0][1] = Real.of(0);  rotArr[0][2] = Real.of(0);
+                rotArr[1][0] = Real.of(0);  rotArr[1][1] = Real.of(c);  rotArr[1][2] = Real.of(-s);
+                rotArr[2][0] = Real.of(0);  rotArr[2][1] = Real.of(s);  rotArr[2][2] = Real.of(c);
+            } else if (ay == 1) { // Y-axis rotate
+                rotArr[0][0] = Real.of(c);  rotArr[0][1] = Real.of(0);  rotArr[0][2] = Real.of(s);
+                rotArr[1][0] = Real.of(0);  rotArr[1][1] = Real.of(1);  rotArr[1][2] = Real.of(0);
+                rotArr[2][0] = Real.of(-s); rotArr[2][1] = Real.of(0);  rotArr[2][2] = Real.of(c);
+            }
+            orientation = orientation.multiply(org.jscience.mathematics.linearalgebra.matrices.GenericMatrix.of(rotArr, Real.ZERO));
+        }
     }
 
     private Rotate rX = new Rotate(0, Rotate.X_AXIS);

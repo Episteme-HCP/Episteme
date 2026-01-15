@@ -56,7 +56,8 @@ public class SpectrographViewer extends AbstractViewer implements Simulatable {
     private double sensitivity = 1.0;
     private double simulationSpeed = 1.0;
 
-    private SpectrumProvider provider;
+    private SpectrumAnalysisProvider analysisProvider;
+    private double[] currentSamples;
     private Label fpsLabel;
     private long lastFrameTime = 0;
     private int frameCount = 0;
@@ -67,7 +68,6 @@ public class SpectrographViewer extends AbstractViewer implements Simulatable {
 
     private final List<Parameter<?>> parameters = new ArrayList<>();
     private AnimationTimer timer;
-    private String currentPattern = "Voice";
 
     private javafx.scene.image.WritableImage spectrogramBuffer;
     private int spectrogramX = 0;
@@ -76,10 +76,20 @@ public class SpectrographViewer extends AbstractViewer implements Simulatable {
         setupParameters();
         buildUI();
 
-        provider = new PrimitiveSpectrumProvider(BANDS);
-        provider.setSourcePattern(currentPattern);
-
+        analysisProvider = new PrimitiveSpectrumAnalysisProvider();
         setupAnimation();
+    }
+
+    public void setAnalysisProvider(SpectrumAnalysisProvider provider) {
+        this.analysisProvider = provider;
+    }
+
+    /**
+     * Feed time-domain samples to the viewer for real-time analysis.
+     * @param samples time-domain samples (should be power of 2 for FFT)
+     */
+    public void feedSamples(double[] samples) {
+        this.currentSamples = samples;
     }
     
     @Override
@@ -95,27 +105,16 @@ public class SpectrographViewer extends AbstractViewer implements Simulatable {
                 0.1, 5.0, 0.1, 1.0,
                 val -> this.sensitivity = val));
 
-        parameters.add(new Parameter<String>(
-                I18n.getInstance().get("spectrograph.source", "Source"),
-                I18n.getInstance().get("spectrograph.source.desc", "Selects the input signal pattern"),
-                "Voice",
-                val -> {
-                    this.currentPattern = val;
-                    if (provider != null)
-                        provider.setSourcePattern(val);
-                }));
-
         parameters.add(new Parameter<Boolean>(
                 I18n.getInstance().get("spectrograph.mode", "Scientific Mode"),
                 I18n.getInstance().get("spectrograph.mode.desc", "Toggles between primitive and object-based engines"),
                 false,
                 val -> {
                     if (val) {
-                        provider = new ObjectSpectrumProvider(BANDS);
+                        analysisProvider = new RealSpectrumAnalysisProvider();
                     } else {
-                        provider = new PrimitiveSpectrumProvider(BANDS);
+                        analysisProvider = new PrimitiveSpectrumAnalysisProvider();
                     }
-                    provider.setSourcePattern(currentPattern);
                 }));
     }
 
@@ -182,9 +181,9 @@ public class SpectrographViewer extends AbstractViewer implements Simulatable {
     }
 
     private void updateSpectrum() {
-        time += 0.05 * simulationSpeed;
-        provider.update(time, sensitivity);
-        spectrum = provider.getSpectrum();
+        if (currentSamples != null && analysisProvider != null) {
+            spectrum = analysisProvider.computeSpectrum(currentSamples, BANDS, sensitivity);
+        }
     }
 
     private void renderSpectrum(GraphicsContext gc, LinearGradient gradient) {
@@ -205,8 +204,10 @@ public class SpectrographViewer extends AbstractViewer implements Simulatable {
         double w = gc.getCanvas().getWidth();
         double h = gc.getCanvas().getHeight();
 
-        if (spectrogramBuffer == null || spectrogramBuffer.getWidth() != (int) w) {
-            spectrogramBuffer = new javafx.scene.image.WritableImage((int) w, (int) h);
+        if (spectrogramBuffer == null || (int)w <= 0 || (int)h <= 0) {
+             if (w > 0 && h > 0)
+                spectrogramBuffer = new javafx.scene.image.WritableImage((int) w, (int) h);
+             else return;
         }
 
         javafx.scene.image.PixelWriter writer = spectrogramBuffer.getPixelWriter();
@@ -235,54 +236,6 @@ public class SpectrographViewer extends AbstractViewer implements Simulatable {
         if (part1W > 0) gc.drawImage(spectrogramBuffer, spectrogramX + 2, 0, part1W, h, 0, 0, part1W, h);
         int part2W = spectrogramX + 2;
         if (part2W > 0) gc.drawImage(spectrogramBuffer, 0, 0, part2W, h, part1W, 0, part2W, h);
-    }
-
-    // --- Inner Classes ---
-
-    private interface SpectrumProvider {
-        void update(double time, double sensitivity);
-        void setSourcePattern(String pattern);
-        double[] getSpectrum();
-    }
-
-    private static class PrimitiveSpectrumProvider implements SpectrumProvider {
-        private final double[] spectrum;
-        private final int bands;
-        private String sourcePattern = "Voice";
-
-        public PrimitiveSpectrumProvider(int bands) {
-            this.bands = bands;
-            this.spectrum = new double[bands];
-        }
-
-        @Override public void setSourcePattern(String pattern) { this.sourcePattern = pattern; }
-        @Override public double[] getSpectrum() { return spectrum; }
-
-        @Override
-        public void update(double time, double sensitivity) {
-            for (int i = 0; i < bands; i++) {
-                double val = 0;
-                if ("Voice".equals(sourcePattern) || I18n.getInstance().get("spectrograph.source.voice", "Voice").equals(sourcePattern)) {
-                    val += Math.exp(-Math.pow((i - 20) / 5.0, 2)) * Math.sin(time * 10);
-                    val += Math.exp(-Math.pow((i - 50) / 8.0, 2)) * Math.cos(time * 15);
-                    val += Math.random() * 0.1;
-                } else if ("White Noise".equals(sourcePattern) || I18n.getInstance().get("spectrograph.source.noise", "White Noise").equals(sourcePattern)) {
-                    val = Math.random();
-                } else if ("Sine Wave".equals(sourcePattern) || I18n.getInstance().get("spectrograph.source.sine", "Sine Wave").equals(sourcePattern)) {
-                    double center = 64 + 30 * Math.sin(time * 2);
-                    val = Math.exp(-Math.pow((i - center) / 2.0, 2));
-                }
-                spectrum[i] = Math.max(0, Math.min(1.0, val * sensitivity));
-            }
-        }
-    }
-
-    private static class ObjectSpectrumProvider implements SpectrumProvider {
-        private final PrimitiveSpectrumProvider delegate;
-        public ObjectSpectrumProvider(int bands) { delegate = new PrimitiveSpectrumProvider(bands); }
-        @Override public void update(double time, double sensitivity) { delegate.update(time, sensitivity); }
-        @Override public void setSourcePattern(String pattern) { delegate.setSourcePattern(pattern); }
-        @Override public double[] getSpectrum() { return delegate.getSpectrum(); }
     }
 
     @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrograph.desc"); }

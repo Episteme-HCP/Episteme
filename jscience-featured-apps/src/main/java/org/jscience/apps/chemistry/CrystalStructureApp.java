@@ -43,6 +43,8 @@ import org.jscience.ui.i18n.I18n;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.linearalgebra.Vector;
 
 public class CrystalStructureApp extends FeaturedAppBase {
     private Group root3D;
@@ -70,13 +72,11 @@ public class CrystalStructureApp extends FeaturedAppBase {
 
     // Data
     private static class AtomRecord {
-        double x, y, z;
+        Vector<Real> position;
         String type; // "Na", "Cl", "C", "Si"
 
         AtomRecord(double x, double y, double z, String t) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            this.position = org.jscience.mathematics.linearalgebra.vectors.VectorFactory.of(Real.class, Real.of(x), Real.of(y), Real.of(z));
             this.type = t;
         }
     }
@@ -343,9 +343,9 @@ public class CrystalStructureApp extends FeaturedAppBase {
 
             // Draw Atoms
             for (AtomRecord a : atoms) {
-                double vx = (a.x - 1.0) * unitScaleX; // 1.0 is centering offset for 2x2x2
-                double vy = (a.y - 1.0) * unitScaleY;
-                double vz = (a.z - 1.0) * unitScaleZ;
+                double vx = (a.position.get(0).doubleValue() - 1.0) * unitScaleX; // 1.0 is centering offset for 2x2x2
+                double vy = (a.position.get(1).doubleValue() - 1.0) * unitScaleY;
+                double vz = (a.position.get(2).doubleValue() - 1.0) * unitScaleZ;
 
                 Sphere s = new Sphere(0.4);
                 s.setMaterial(getMaterial(a.type));
@@ -499,9 +499,9 @@ public class CrystalStructureApp extends FeaturedAppBase {
 
         if (showAtoms.isSelected()) {
             for (AtomRecord rec : atoms) {
-                double x = (rec.x - 0.5) * 2 * unitScale;
-                double y = (rec.y - 0.5) * 2 * unitScale;
-                double z = (rec.z - 0.5) * 2 * unitScale;
+                double x = (rec.position.get(0).doubleValue() - 0.5) * 2 * unitScale;
+                double y = (rec.position.get(1).doubleValue() - 0.5) * 2 * unitScale;
+                double z = (rec.position.get(2).doubleValue() - 0.5) * 2 * unitScale;
 
                 Sphere s = new Sphere(0.4);
                 s.setMaterial(getMaterial(rec.type));

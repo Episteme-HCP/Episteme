@@ -40,6 +40,8 @@ import org.jscience.ui.i18n.I18n;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import org.jscience.biology.loaders.FASTAReader;
+import org.jscience.biology.loaders.UniProtReader;
 
 /**
  * Enhanced Genetics Viewer.
@@ -81,11 +83,11 @@ public class GeneticsViewer extends AbstractViewer {
         driftTab.setContent(createDriftTab());
         driftTab.setClosable(false);
 
-        Tab mendelTab = new Tab(I18n.getInstance().get("genetics.tab.mendel", "Mendelian"));
-        mendelTab.setContent(createMendelTab());
-        mendelTab.setClosable(false);
+        Tab sequenceTab = new Tab(I18n.getInstance().get("genetics.tab.sequence", "Sequence Browser"));
+        sequenceTab.setContent(createSequenceTab());
+        sequenceTab.setClosable(false);
 
-        tabPane.getTabs().addAll(driftTab, mendelTab);
+        tabPane.getTabs().addAll(driftTab, sequenceTab);
         this.setCenter(tabPane);
     }
 
@@ -313,6 +315,86 @@ public class GeneticsViewer extends AbstractViewer {
         gc.fillText(offspring[1], startX + 3 * size / 4 - 15, startY + size / 4 + 8);
         gc.fillText(offspring[2], startX + size / 4 - 15, startY + 3 * size / 4 + 8);
         gc.fillText(offspring[3], startX + 3 * size / 4 - 15, startY + 3 * size / 4 + 8);
+    }
+
+    private BorderPane createSequenceTab() {
+        VBox sidebar = new VBox(15);
+        sidebar.setPadding(new Insets(20));
+        sidebar.setPrefWidth(300);
+        sidebar.getStyleClass().add("dark-viewer-sidebar");
+
+        Label title = new Label(I18n.getInstance().get("genetics.sequence.browser", "Sequence Browser"));
+        title.getStyleClass().add("dark-header");
+
+        TextField accessionField = new TextField("P01308"); // Insulin
+        Button queryBtn = new Button(I18n.getInstance().get("genetics.uniprot.query", "Query UniProt"));
+        queryBtn.setMaxWidth(Double.MAX_VALUE);
+
+        TextArea resultArea = new TextArea();
+        resultArea.setEditable(false);
+        resultArea.setWrapText(true);
+        resultArea.setFont(Font.font("Monospaced", 12));
+
+        Label statusLabel = new Label();
+        statusLabel.getStyleClass().add("dark-label-muted");
+
+        queryBtn.setOnAction(e -> {
+            String acc = accessionField.getText().trim();
+            statusLabel.setText(I18n.getInstance().get("genetics.querying", "Querying..."));
+            new Thread(() -> {
+                Map<String, String> data = UniProtReader.fetchByAccession(acc);
+                javafx.application.Platform.runLater(() -> {
+                    if (data != null) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("Accession: ").append(data.get("accession")).append("\n");
+                        sb.append("Protein: ").append(data.getOrDefault("protein_name", "N/A")).append("\n");
+                        sb.append("Organism: ").append(data.getOrDefault("organism", "N/A")).append("\n");
+                        sb.append("----------------\n");
+                        sb.append(data.get("raw_json"));
+                        resultArea.setText(sb.toString());
+                        statusLabel.setText(I18n.getInstance().get("genetics.success", "Success!"));
+                    } else {
+                        resultArea.setText(I18n.getInstance().get("genetics.error.accession", "Accession not found."));
+                        statusLabel.setText(I18n.getInstance().get("genetics.error", "Error"));
+                    }
+                });
+            }).start();
+        });
+
+        Button loadFastaBtn = new Button(I18n.getInstance().get("genetics.fasta.load", "Load FASTA"));
+        loadFastaBtn.setMaxWidth(Double.MAX_VALUE);
+        loadFastaBtn.setOnAction(e -> {
+            javafx.stage.FileChooser chooser = new javafx.stage.FileChooser();
+            chooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("FASTA", "*.fasta", "*.fa"));
+            java.io.File file = chooser.showOpenDialog(getScene().getWindow());
+            if (file != null) {
+                try {
+                    java.util.List<FASTAReader.Sequence> seqs = FASTAReader.load(new java.io.FileInputStream(file));
+                    StringBuilder sb = new StringBuilder();
+                    for (FASTAReader.Sequence s : seqs) {
+                        sb.append(">").append(s.header).append("\n");
+                        sb.append(s.data).append("\n\n");
+                    }
+                    resultArea.setText(sb.toString());
+                    statusLabel.setText(I18n.getInstance().get("genetics.loaded", "Loaded ") + seqs.size() + " sequences");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        sidebar.getChildren().addAll(
+                title, new Separator(),
+                new Label(I18n.getInstance().get("genetics.uniprot.id", "UniProt ID / Accession")), accessionField,
+                queryBtn, new Separator(),
+                loadFastaBtn, new Separator(),
+                statusLabel);
+
+        BorderPane root = new BorderPane();
+        root.setLeft(sidebar);
+        root.setCenter(resultArea);
+        root.getStyleClass().add("dark-viewer-root");
+        return root;
     }
 
     @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.genetics.desc"); }

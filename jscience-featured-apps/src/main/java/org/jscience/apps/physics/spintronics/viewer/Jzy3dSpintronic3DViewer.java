@@ -34,6 +34,8 @@ import org.jzy3d.plot3d.rendering.canvas.Quality;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.jscience.mathematics.linearalgebra.Matrix;
+import org.jscience.mathematics.linearalgebra.Vector;
 
 /**
  * Jzy3d (OpenGL) implementation of Spintronic3DViewer.
@@ -153,10 +155,11 @@ public class Jzy3dSpintronic3DViewer implements Spintronic3DViewer {
                 float x = i * cellSize;
                 float z = j * cellSize;
                 
-                org.jscience.mathematics.numbers.real.Real[] m = sim.getMagnetization(i, j);
-                float mx = (float) m[0].doubleValue();
-                float my = (float) m[1].doubleValue();
-                float mz = (float) m[2].doubleValue();
+                Real[] mData = sim.getMagnetization(i, j);
+                Vector<Real> m = org.jscience.mathematics.linearalgebra.vectors.VectorFactory.of(Real.class, mData[0], mData[1], mData[2]);
+                float mx = (float) m.get(0).doubleValue();
+                float my = (float) m.get(1).doubleValue();
+                float mz = (float) m.get(2).doubleValue();
                 
                 bases[idx] = new Coord3d(x, 0, z);
                 tips[idx] = new Coord3d(x + mx * scale, my * scale, z + mz * scale);

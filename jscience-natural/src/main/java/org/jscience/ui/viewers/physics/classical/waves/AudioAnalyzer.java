@@ -93,39 +93,30 @@ public class AudioAnalyzer {
         return samples;
     }
 
-    public List<double[]> computeSpectrogram(int windowSize, int overlap) {
+    public List<double[]> computeSpectrogram(int windowSize, int overlap, SpectrumAnalysisProvider provider) {
         List<double[]> spectrogram = new ArrayList<>();
         
         int step = windowSize - overlap;
-        double[] window = createHanningWindow(windowSize);
+        double[] hanningWindow = createHanningWindow(windowSize);
 
-        // Pre-allocate Real arrays to reuse if possible, but FFT alters them in-place, 
-        // so we need fresh ones or reset them each time.
-        
         for (int i = 0; i < audioData.length - windowSize; i += step) {
-            Real[] realPart = new Real[windowSize];
-            Real[] imagPart = new Real[windowSize];
+            double[] windowedSamples = new double[windowSize];
             
-            // Apply window function and convert to Real
+            // Apply window function
             for (int j = 0; j < windowSize; j++) {
-                realPart[j] = Real.of(audioData[i + j] * window[j]);
-                imagPart[j] = Real.ZERO;
+                windowedSamples[j] = audioData[i + j] * hanningWindow[j];
             }
 
-            // Perform FFT using internal JScience implementation
-            // Modified in-place
-            SignalFFT.fft(realPart, imagPart);
-            
-            // Extract magnitude (only first half needed for real data)
-            double[] bins = new double[windowSize / 2];
-            for (int k = 0; k < bins.length; k++) {
-                double r = realPart[k].doubleValue();
-                double im = imagPart[k].doubleValue();
-                bins[k] = Math.sqrt(r * r + im * im);
-            }
+            // Perform FFT and get magnitude using the Provider
+            // Sensitivity 1.0 here as normalization is handled in renderer
+            double[] bins = provider.computeSpectrum(windowedSamples, windowSize / 2, 1.0);
             spectrogram.add(bins);
         }
         return spectrogram;
+    }
+
+    public List<double[]> computeSpectrogram(int windowSize, int overlap) {
+        return computeSpectrogram(windowSize, overlap, new PrimitiveSpectrumAnalysisProvider());
     }
 
     private double[] createHanningWindow(int size) {

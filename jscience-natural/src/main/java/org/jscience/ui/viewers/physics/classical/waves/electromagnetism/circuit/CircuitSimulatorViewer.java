@@ -99,6 +99,7 @@ public class CircuitSimulatorViewer extends org.jscience.ui.AbstractViewer imple
         }
     }
 
+    private java.util.Map<String, Double> nodeVoltages = null;
     private List<Component> components = new ArrayList<>();
     private double startX, startY;
     private boolean dragging = false;
@@ -140,8 +141,15 @@ public class CircuitSimulatorViewer extends org.jscience.ui.AbstractViewer imple
                         setOnAction(e -> {
                             components.clear();
                             selectedComponent = null;
+                            nodeVoltages = null;
                             draw();
                         });
+                    }
+                },
+                new Separator(),
+                new Button(org.jscience.ui.i18n.I18n.getInstance().get("circuit.btn.solve", "Solve")) {
+                    {
+                        setOnAction(e -> solveCircuit());
                     }
                 });
         this.setTop(toolbar);
@@ -269,6 +277,16 @@ public class CircuitSimulatorViewer extends org.jscience.ui.AbstractViewer imple
             gc.strokeLine(0, y, canvas.getWidth(), y);
         for (Component c : components)
             drawComponent(gc, c, c == selectedComponent);
+            
+        if (nodeVoltages != null) {
+            gc.setFill(Color.BLUE);
+            for (java.util.Map.Entry<String, Double> entry : nodeVoltages.entrySet()) {
+                String[] parts = entry.getKey().split(",");
+                double x = Double.parseDouble(parts[0]);
+                double y = Double.parseDouble(parts[1]);
+                gc.fillText(String.format("%.2fV", entry.getValue()), x + 5, y - 5);
+            }
+        }
     }
 
     private void drawComponent(GraphicsContext gc, Component c, boolean selected) {
@@ -329,9 +347,123 @@ public class CircuitSimulatorViewer extends org.jscience.ui.AbstractViewer imple
 
 
 
+    private void solveCircuit() {
+        if (components.isEmpty()) return;
+
+        // 1. Identify Nodes
+        java.util.Map<String, Integer> coordToNode = new java.util.HashMap<>();
+        int nodeCount = 0;
+        for (Component c : components) {
+            String p1 = (int)c.x1 + "," + (int)c.y1;
+            String p2 = (int)c.x2 + "," + (int)c.y2;
+            if (!coordToNode.containsKey(p1)) coordToNode.put(p1, nodeCount++);
+            if (!coordToNode.containsKey(p2)) coordToNode.put(p2, nodeCount++);
+        }
+
+        // 2. Build Admittance Matrix G and Current Vector I (Nodal Analysis)
+        // We need a ground. If no ground, we pick node 0 as reference.
+        int groundNode = -1;
+        for (Component c : components) {
+            if (c.type == ComponentType.GROUND) {
+                groundNode = coordToNode.get((int)c.x1 + "," + (int)c.y1);
+                break;
+            }
+        }
+        if (groundNode == -1) groundNode = 0;
+
+        int size = nodeCount;
+        double[][] gMatrix = new double[size][size];
+        double[] iVector = new double[size];
+
+        for (Component c : components) {
+            int n1 = coordToNode.get((int)c.x1 + "," + (int)c.y1);
+            int n2 = coordToNode.get((int)c.x2 + "," + (int)c.y2);
+            double val = c.value.getValue().doubleValue();
+
+            switch (c.type) {
+                case RESISTOR -> {
+                    double g = 1.0 / val;
+                    gMatrix[n1][n1] += g;
+                    gMatrix[n2][n2] += g;
+                    gMatrix[n1][n2] -= g;
+                    gMatrix[n2][n1] -= g;
+                }
+                case BATTERY -> {
+                    // Simple model: Current injection hack for battery if not using MNA
+                    // In a real simulator, we'd use Modified Nodal Analysis (MNA).
+                    // This is a simplified demo solver.
+                    iVector[n1] -= val / 10.0; // Assume internal resistance 10 Ohm
+                    iVector[n2] += val / 10.0;
+                    double g = 1.0 / 10.0;
+                    gMatrix[n1][n1] += g;
+                    gMatrix[n2][n2] += g;
+                    gMatrix[n1][n2] -= g;
+                    gMatrix[n2][n1] -= g;
+                }
+                case WIRE -> {
+                    double g = 1e6; // High conductance
+                    gMatrix[n1][n1] += g;
+                    gMatrix[n2][n2] += g;
+                    gMatrix[n1][n2] -= g;
+                    gMatrix[n2][n1] -= g;
+                }
+                default -> {}
+            }
+        }
+
+        // 3. Solve using JScience Matrix
+        // We remove the ground row/column for a non-singular matrix
+        int reducedSize = size - 1;
+        org.jscience.mathematics.numbers.real.Real[][] reducedG = new org.jscience.mathematics.numbers.real.Real[reducedSize][reducedSize];
+        org.jscience.mathematics.numbers.real.Real[] reducedI = new org.jscience.mathematics.numbers.real.Real[reducedSize];
+
+        int rRow = 0;
+        for (int i = 0; i < size; i++) {
+            if (i == groundNode) continue;
+            int rCol = 0;
+            for (int j = 0; j < size; j++) {
+                if (j == groundNode) continue;
+                reducedG[rRow][rCol] = org.jscience.mathematics.numbers.real.Real.of(gMatrix[i][j]);
+                rCol++;
+            }
+            reducedI[rRow] = org.jscience.mathematics.numbers.real.Real.of(iVector[i]);
+            rRow++;
+        }
+
+        try {
+            org.jscience.mathematics.linearalgebra.Matrix<org.jscience.mathematics.numbers.real.Real> G = 
+                org.jscience.mathematics.linearalgebra.matrices.GenericMatrix.of(reducedG, org.jscience.mathematics.numbers.real.Real.ZERO);
+            
+            // Solve using LU decomposition
+            org.jscience.mathematics.linearalgebra.matrices.solvers.LUDecomposition lu = 
+                org.jscience.mathematics.linearalgebra.matrices.solvers.LUDecomposition.decompose(G);
+            org.jscience.mathematics.numbers.real.Real[] solution = lu.solve(reducedI);
+
+            nodeVoltages = new java.util.HashMap<>();
+            int vIdx = 0;
+            for (int i = 0; i < size; i++) {
+                if (i == groundNode) {
+                    // Set all points belonging to ground node
+                    for (java.util.Map.Entry<String, Integer> entry : coordToNode.entrySet()) {
+                        if (entry.getValue() == groundNode) nodeVoltages.put(entry.getKey(), 0.0);
+                    }
+                } else {
+                    double volt = solution[vIdx++].doubleValue();
+                    for (java.util.Map.Entry<String, Integer> entry : coordToNode.entrySet()) {
+                        if (entry.getValue() == i) nodeVoltages.put(entry.getKey(), volt);
+                    }
+                }
+            }
+            draw();
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Solver failed (likely singular matrix)
+        }
+    }
+
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("CircuitSimulatorViewer.desc", "CircuitSimulatorViewer description");
+        return org.jscience.ui.i18n.I18n.getInstance().get("CircuitSimulatorViewer.desc");
     }
 
     @Override

@@ -23,10 +23,20 @@
 
 package org.jscience.ui.demos;
 
+import javafx.animation.AnimationTimer;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import org.jscience.ui.AbstractSimulationDemo;
 import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.viewers.physics.classical.waves.AudioAnalyzer;
 import org.jscience.ui.viewers.physics.classical.waves.SpectrographViewer;
+
+import java.io.File;
 
 /**
  * Spectrograph Demo.
@@ -38,6 +48,11 @@ import org.jscience.ui.viewers.physics.classical.waves.SpectrographViewer;
 public class SpectrographDemo extends AbstractSimulationDemo {
 
     private SpectrographViewer viewer;
+    private double[] allSamples;
+    private int playhead = 0;
+    private String currentPattern = "Voice";
+    private double time = 0;
+    private AnimationTimer demoTimer;
 
     @Override public boolean isDemo() { return true; }
     @Override public String getCategory() { return "Physics"; }
@@ -49,7 +64,92 @@ public class SpectrographDemo extends AbstractSimulationDemo {
 
     @Override
     public Node createViewerNode() {
-        if (viewer == null) viewer = new SpectrographViewer();
+        if (viewer == null) {
+            viewer = new SpectrographViewer();
+            setupSignalLoop();
+        }
         return viewer;
+    }
+
+    @Override
+    public VBox createControlPanel() {
+        VBox panel = super.createControlPanel();
+        panel.getChildren().add(new Separator());
+
+        Label srcLbl = new Label("Signal Source:");
+        ComboBox<String> sourceCombo = new ComboBox<>();
+        sourceCombo.getItems().addAll("Voice (Synthetic)", "Sine Wave (Synthetic)", "White Noise", "Custom WAV...");
+        sourceCombo.setValue("Voice (Synthetic)");
+        sourceCombo.setMaxWidth(Double.MAX_VALUE);
+        sourceCombo.setOnAction(e -> {
+            String val = sourceCombo.getValue();
+            if (val.equals("Custom WAV...")) {
+                loadWavFile();
+            } else {
+                currentPattern = val;
+                allSamples = null; // Use synthetic
+            }
+        });
+
+        Button loadBtn = new Button("Load WAV File");
+        loadBtn.setMaxWidth(Double.MAX_VALUE);
+        loadBtn.setOnAction(e -> loadWavFile());
+
+        panel.getChildren().addAll(srcLbl, sourceCombo, loadBtn);
+        return panel;
+    }
+
+    private void setupSignalLoop() {
+        demoTimer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                if (viewer != null && viewer.isPlaying()) {
+                    double[] chunk = getNextChunk(256); // 256 samples for FFT
+                    viewer.feedSamples(chunk);
+                    time += 0.05;
+                }
+            }
+        };
+        demoTimer.start();
+    }
+
+    private double[] getNextChunk(int size) {
+        double[] chunk = new double[size];
+        if (allSamples != null) {
+            // Replay from loaded file
+            for (int i = 0; i < size; i++) {
+                chunk[i] = allSamples[(playhead + i) % allSamples.length];
+            }
+            playhead = (playhead + size) % allSamples.length;
+        } else {
+            // Synthetic generation
+            for (int i = 0; i < size; i++) {
+                double t = time + (double)i / size;
+                if (currentPattern.contains("Voice")) {
+                    chunk[i] = 0.5 * Math.sin(t * 10 * 2 * Math.PI) + 0.3 * Math.sin(t * 25 * 2 * Math.PI) + 0.1 * Math.random();
+                } else if (currentPattern.contains("Sine")) {
+                    double freq = 10 + 5 * Math.sin(time);
+                    chunk[i] = Math.sin(t * freq * 2 * Math.PI);
+                } else if (currentPattern.contains("Noise")) {
+                    chunk[i] = Math.random() * 2 - 1;
+                }
+            }
+        }
+        return chunk;
+    }
+
+    private void loadWavFile() {
+        FileChooser fc = new FileChooser();
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("WAV Files", "*.wav"));
+        File file = fc.showOpenDialog(null);
+        if (file != null) {
+            try {
+                AudioAnalyzer analyzer = new AudioAnalyzer(file);
+                allSamples = analyzer.getAudioData();
+                playhead = 0;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

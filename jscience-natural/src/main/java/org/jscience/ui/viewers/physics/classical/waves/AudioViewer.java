@@ -55,10 +55,13 @@ public class AudioViewer extends AbstractViewer implements Simulatable {
     private final Canvas spectrogramCanvas;
     private final ScrollPane scrollPane;
     private final VBox contentBox;
-    @SuppressWarnings("unused")
     private File currentFile;
+    private SpectrumAnalysisProvider analysisProvider = new PrimitiveSpectrumAnalysisProvider();
+    private final java.util.List<org.jscience.ui.Parameter<?>> parameters = new java.util.ArrayList<>();
 
     public AudioViewer() {
+        setupParameters();
+
         waveformCanvas = new Canvas(800, 150);
         spectrogramCanvas = new Canvas(800, 250);
         
@@ -71,6 +74,18 @@ public class AudioViewer extends AbstractViewer implements Simulatable {
         
         setCenter(scrollPane);
         setRight(createSidebar());
+    }
+
+    private void setupParameters() {
+        parameters.add(new org.jscience.ui.Parameter<Boolean>(
+            I18n.getInstance().get("audio.mode", "Scientific Mode"),
+            I18n.getInstance().get("audio.mode.desc", "Toggles between primitive (double) and scientific (Real) FFT"),
+            false,
+            val -> {
+                this.analysisProvider = val ? new RealSpectrumAnalysisProvider() : new PrimitiveSpectrumAnalysisProvider();
+                if (currentFile != null) loadAudio(currentFile); // Recompute
+            }
+        ));
     }
     
     private VBox createSidebar() {
@@ -113,12 +128,11 @@ public class AudioViewer extends AbstractViewer implements Simulatable {
 
             // Calculate and Render Spectrogram
             // Window size 1024 (power of 2), overlap 512
-            List<double[]> spectrogram = analyzer.computeSpectrogram(1024, 512);
+            List<double[]> spectrogram = analyzer.computeSpectrogram(1024, 512, analysisProvider);
             renderSpectrogram(spectrogram);
 
         } catch (Exception e) {
             e.printStackTrace();
-            // In a real app, show error dialog
         }
     }
 
@@ -187,6 +201,7 @@ public class AudioViewer extends AbstractViewer implements Simulatable {
             }
         }
         GraphicsContext gc = spectrogramCanvas.getGraphicsContext2D();
+        gc.clearRect(0, 0, width, height);
         gc.drawImage(image, 0, 0);
     }
     
@@ -195,9 +210,9 @@ public class AudioViewer extends AbstractViewer implements Simulatable {
     }
 
     // --- Simulatable ---
-    @Override public void play() { /* Implement playback if needed */ }
-    @Override public void pause() { /* Pause playback */ }
-    @Override public void stop() { /* Stop playback */ }
+    @Override public void play() { }
+    @Override public void pause() { }
+    @Override public void stop() { }
     @Override public void step() { }
     @Override public void setSpeed(double speed) { }
     @Override public boolean isPlaying() { return false; }
@@ -207,5 +222,5 @@ public class AudioViewer extends AbstractViewer implements Simulatable {
 
     @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.audio.desc"); }
     @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.audio.longdesc"); }
-    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return parameters; }
 }

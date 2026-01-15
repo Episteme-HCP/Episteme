@@ -49,6 +49,11 @@ public class MagneticFieldViewer extends org.jscience.ui.AbstractViewer {
     private final Rotate rotateX = new Rotate(20, Rotate.X_AXIS);
     private final Rotate rotateY = new Rotate(-45, Rotate.Y_AXIS);
 
+    private final org.jscience.technical.backend.algorithms.MulticoreMaxwellProvider provider = 
+        new org.jscience.technical.backend.algorithms.MulticoreMaxwellProvider();
+    private double time = 0;
+    private javafx.animation.AnimationTimer timer;
+
     public MagneticFieldViewer() {
         this.setStyle("-fx-background-color: #1a1a2e;"); // Dark background
 
@@ -67,7 +72,7 @@ public class MagneticFieldViewer extends org.jscience.ui.AbstractViewer {
         PointLight point = new PointLight(Color.WHITE);
         point.setTranslateZ(-500);
         point.setTranslateY(-500);
-        root.getChildren().clear(); // Clear before adding to avoid duplicates if called multiple times
+        root.getChildren().clear(); 
         root.getChildren().addAll(ambient, point, vectorFieldGroup);
 
         // Controls
@@ -86,49 +91,51 @@ public class MagneticFieldViewer extends org.jscience.ui.AbstractViewer {
             mouseOldY = event.getSceneY();
         });
 
-        // Generate Field
-        generateDipoleField();
-        
         // Add a representation of the magnet (Ring)
-        Cylinder magnet = new Cylinder(100, 10);
-        magnet.setRotationAxis(Rotate.X_AXIS);
-        magnet.setRotate(90); // Flat on XZ plane
+        Cylinder magnet = new Cylinder( gridSpacing / 2, 10);
         magnet.setMaterial(new PhongMaterial(Color.SILVER));
         root.getChildren().add(magnet);
 
         this.setCenter(subScene);
+        
+        // Define sources in provider
+        provider.addSource(new org.jscience.technical.backend.algorithms.MulticoreMaxwellProvider.DipoleSource(
+            new double[]{0, 0, 0}, new double[]{0, 50, 0}, 2.0, 0));
+
+        // Animation for real-time field
+        timer = new javafx.animation.AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                time += 0.05;
+                updateField();
+            }
+        };
+        timer.start();
     }
 
-    // Deprecated method for backward compatibility if needed, but we will update caller
-    public javafx.scene.Parent createContent() {
-        return this;
-    }
-
-    private void generateDipoleField() {
+    private static final double gridSpacing = 60;
+    
+    private void updateField() {
         vectorFieldGroup.getChildren().clear();
-        double gridSpacing = 40;
-        int gridRange = 4;
+        int gridRange = 3;
 
         for (int x = -gridRange; x <= gridRange; x++) {
             for (int y = -gridRange; y <= gridRange; y++) {
                 for (int z = -gridRange; z <= gridRange; z++) {
-                    if (x == 0 && z == 0 && Math.abs(y) < 1) continue; // Skip inside magnet
+                    if (x == 0 && y == 0 && z == 0) continue; 
 
                     double px = x * gridSpacing;
                     double py = y * gridSpacing;
                     double pz = z * gridSpacing;
 
-                    // Compute B-field for a dipole at origin aligned with Y axis
-                    // B = (3(m.r)r - m*r^2) / r^5
-                    // m = (0, 100000, 0)
-                    double mx = 0, my = 500000, mz = 0;
-                    double r2 = px*px + py*py + pz*pz;
-                    double r = Math.sqrt(r2);
-                    double mr = mx*px + my*py + mz*pz; // dot product
-
-                    double bx = (3 * mr * px - mx * r2) / Math.pow(r, 5);
-                    double by = (3 * mr * py - my * r2) / Math.pow(r, 5);
-                    double bz = (3 * mr * pz - mz * r2) / Math.pow(r, 5);
+                    // Compute field using MaxwellProvider
+                    // F_mu_nu components: 
+                    // F[2][3] = Bx, F[1][3] = -By, F[1][2] = Bz
+                    double[][] f = provider.computeTensor(new org.jscience.mathematics.geometry.Vector4D(time, px, py, pz));
+                    
+                    double bx = f[2][3];
+                    double by = -f[1][3];
+                    double bz = f[1][2];
 
                     double bMag = Math.sqrt(bx*bx + by*by + bz*bz);
                     
