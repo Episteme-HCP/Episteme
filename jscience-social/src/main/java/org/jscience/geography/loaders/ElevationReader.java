@@ -25,6 +25,7 @@ package org.jscience.geography.loaders;
 
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.Configuration;
+import org.jscience.ui.i18n.I18n;
 
 
 
@@ -66,12 +67,17 @@ public class ElevationReader extends AbstractResourceReader<Double> {
 
     @Override
     public String getCategory() {
-        return "Geography";
+        return I18n.getInstance().get("reader.elevation.category", "Geography");
+    }
+
+    @Override
+    public String getName() {
+        return I18n.getInstance().get("reader.elevation.name", "Elevation Reader");
     }
 
     @Override
     public String getDescription() {
-        return "Elevation Data Reader (Altimetry/Bathymetry).";
+        return I18n.getInstance().get("reader.elevation.description", "Elevation Data Reader (Altimetry/Bathymetry).");
     }
 
     @Override

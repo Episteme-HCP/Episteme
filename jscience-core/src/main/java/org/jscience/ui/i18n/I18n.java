@@ -55,7 +55,7 @@ public class I18n {
         tryAddBundle("org.jscience.ui.i18n.messages_social");
         tryAddBundle("org.jscience.client.i18n.messages_client");
         tryAddBundle("org.jscience.server.i18n.messages_server");
-        tryAddBundle("org.jscience.apps.i18n.messages_apps");
+        tryAddBundle("org.jscience.apps.ui.i18n.messages_apps");
 
     }
 

@@ -29,6 +29,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jscience.ui.i18n.I18n;
+
 import org.jscience.io.AbstractResourceReader;
 
 /**
@@ -59,12 +61,17 @@ public class StarReader extends AbstractResourceReader<List<StarReader.Star>> {
 
     @Override
     public String getCategory() {
-        return "Physics";
+        return I18n.getInstance().get("reader.star.category", "Physics");
+    }
+
+    @Override
+    public String getName() {
+        return I18n.getInstance().get("reader.star.name", "Star Reader");
     }
 
     @Override
     public String getDescription() {
-        return "Generic Star Catalog Reader (CSV).";
+        return I18n.getInstance().get("reader.star.description", "Generic Star Catalog Reader (CSV).");
     }
 
     public List<Star> loadResource(String path) throws Exception {

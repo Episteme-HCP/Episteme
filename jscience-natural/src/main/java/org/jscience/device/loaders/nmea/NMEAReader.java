@@ -25,6 +25,7 @@ package org.jscience.device.loaders.nmea;
 
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
+import org.jscience.ui.i18n.I18n;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -52,12 +53,17 @@ public class NMEAReader extends AbstractResourceReader<List<NMEAMessage>> {
 
     @Override
     public String getCategory() {
-        return "Device";
+        return I18n.getInstance().get("reader.nmea.category", "Device");
+    }
+
+    @Override
+    public String getName() {
+        return I18n.getInstance().get("reader.nmea.name", "NMEA GPS Reader");
     }
 
     @Override
     public String getDescription() {
-        return "NMEA GPS/Sensor Data Reader.";
+        return I18n.getInstance().get("reader.nmea.description", "NMEA GPS/Sensor Data Reader.");
     }
 
     @Override

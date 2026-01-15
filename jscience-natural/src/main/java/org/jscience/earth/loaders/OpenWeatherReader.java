@@ -61,6 +61,21 @@ public class OpenWeatherReader extends AbstractResourceReader<WeatherInfo> {
     }
 
     @Override
+    public String getCategory() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.openweather.category", "Earth");
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.openweather.name", "OpenWeather Reader");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.openweather.description", "Meteorological Data Reader.");
+    }
+
+    @Override
     protected WeatherInfo loadFromSource(String resourceId) throws Exception {
         // resourceId can be city name or "lat,lon"
         if (resourceId.contains(",")) {
@@ -124,15 +139,7 @@ public class OpenWeatherReader extends AbstractResourceReader<WeatherInfo> {
         return samples;
     }
 
-    @Override
-    public String getCategory() {
-        return "Earth";
-    }
 
-    @Override
-    public String getDescription() {
-        return "OpenWeather Map API Reader.";
-    }
 
     @Override
     public String getResourcePath() {

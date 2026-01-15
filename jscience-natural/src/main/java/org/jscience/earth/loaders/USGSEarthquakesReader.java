@@ -24,6 +24,7 @@
 package org.jscience.earth.loaders;
 
 import org.jscience.io.cache.ResourceCache;
+import org.jscience.ui.i18n.I18n;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -57,11 +58,11 @@ public class USGSEarthquakesReader {
             "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary");
 
     public static String getCategory() {
-        return "Earth";
+        return I18n.getInstance().get("reader.usgsearthquakes.category", "Earth");
     }
 
     public static String getDescription() {
-        return "USGS Earthquakes API Reader.";
+        return I18n.getInstance().get("reader.usgsearthquakes.description", "USGS Earthquakes API Reader.");
     }
 
     /**
