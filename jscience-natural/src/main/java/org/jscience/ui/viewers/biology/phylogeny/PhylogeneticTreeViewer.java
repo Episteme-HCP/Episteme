@@ -18,8 +18,10 @@ import org.jscience.ui.i18n.I18n;
 import org.jscience.biology.Taxon;
 import org.jscience.biology.io.PhylogeneticTreeReader;
 
+import javafx.application.Platform;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Phylogenetic Tree Viewer.
@@ -123,6 +125,15 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
         
         javafx.scene.control.Button queryButton = new javafx.scene.control.Button(I18n.getInstance().get("phylogeny.ncbi.search", "Search"));
         queryButton.setStyle("-fx-font-size: 10px;");
+        
+        javafx.scene.control.Button resetTreeBtn = new javafx.scene.control.Button(I18n.getInstance().get("phylogeny.reset", "Reset Tree"));
+        resetTreeBtn.setStyle("-fx-font-size: 10px;");
+        resetTreeBtn.setOnAction(e -> {
+            loadData();
+            updateLayoutAndDraw(canvas);
+            statusLabel.setText(I18n.getInstance().get("phylogeny.ncbi.reset", "Tree reset to default"));
+        });
+
         queryButton.setOnAction(e -> {
             String searchTerm = searchField.getText().trim();
             if (searchTerm.isEmpty()) {
@@ -140,20 +151,34 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
                         new org.jscience.biology.loaders.NCBITaxonomyReader();
                     java.util.List<Long> taxIds = reader.searchByName(searchTerm);
                     
-                    javafx.application.Platform.runLater(() -> {
-                        if (taxIds != null && !taxIds.isEmpty()) {
-                            statusLabel.setText(I18n.getInstance().get("phylogeny.ncbi.found", 
-                                "Found " + taxIds.size() + " results!"));
-                            // Here we could load the first result and visualize it
-                            // For now, just show feedback
-                        } else {
-                            statusLabel.setText(I18n.getInstance().get("phylogeny.ncbi.notfound", 
-                                "No results found"));
-                        }
-                        queryButton.setDisable(false);
-                    });
+                    if (taxIds != null && !taxIds.isEmpty()) {
+                         long taxId = taxIds.get(0);
+                         Optional<org.jscience.biology.taxonomy.Species> speciesOpt = reader.fetchByTaxId(taxId);
+
+                         Platform.runLater(() -> {
+                            if (speciesOpt.isPresent()) {
+                                org.jscience.biology.taxonomy.Species species = speciesOpt.get();
+                                String lineage = species.getAttribute("lineage");
+                                if (lineage != null) {
+                                    this.treeRoot = buildLineageTree(lineage, species.getScientificName());
+                                    updateLayoutAndDraw(canvas);
+                                    statusLabel.setText(I18n.getInstance().get("phylogeny.ncbi.loaded", "Loaded: " + species.getScientificName()));
+                                } else {
+                                    statusLabel.setText("No lineage data available.");
+                                }
+                            } else {
+                                statusLabel.setText(I18n.getInstance().get("phylogeny.ncbi.ferror", "Failed to fetch taxon details"));
+                            }
+                            queryButton.setDisable(false);
+                         });
+                    } else {
+                        Platform.runLater(() -> {
+                            statusLabel.setText(I18n.getInstance().get("phylogeny.ncbi.notfound", "No results found"));
+                            queryButton.setDisable(false);
+                        });
+                    }
                 } catch (Exception ex) {
-                    javafx.application.Platform.runLater(() -> {
+                    Platform.runLater(() -> {
                         statusLabel.setText("Error: " + ex.getMessage());
                         queryButton.setDisable(false);
                     });
@@ -161,8 +186,29 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
             }).start();
         });
         
-        section.getChildren().addAll(ncbiLabel, searchField, queryButton, statusLabel);
+        HBox btnBox = new HBox(5, queryButton, resetTreeBtn);
+        section.getChildren().addAll(ncbiLabel, searchField, btnBox, statusLabel);
         return section;
+    }
+
+    private Taxon buildLineageTree(String lineage, String terminalName) {
+        String[] levels = lineage.split("; ");
+        Taxon root = null;
+        Taxon current = null;
+        for (int i = 0; i < levels.length; i++) {
+            String name = levels[i].trim();
+            if (name.isEmpty()) continue;
+            Taxon t = new Taxon("ncbi_" + i, (current == null ? "" : current.getId()), name, Math.random(), Math.random(), Math.random());
+            if (root == null) root = t;
+            if (current != null) current.addChild(t);
+            current = t;
+        }
+        // Add the searched species as the leaf if it's not the last level
+        if (current != null && !levels[levels.length - 1].equalsIgnoreCase(terminalName)) {
+             Taxon t = new Taxon("ncbi_leaf", current.getId(), terminalName, Math.random(), Math.random(), Math.random());
+             current.addChild(t);
+        }
+        return root;
     }
 
     private void updateLayoutAndDraw(Canvas canvas) {

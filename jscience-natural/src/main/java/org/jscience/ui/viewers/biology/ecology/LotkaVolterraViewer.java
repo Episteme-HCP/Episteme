@@ -35,6 +35,7 @@ import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.mathematics.analysis.ode.DormandPrinceIntegrator;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
@@ -149,9 +150,11 @@ public class LotkaVolterraViewer extends AbstractViewer implements Simulatable {
         double[] current = { preyPop.getValue().doubleValue(), predPop.getValue().doubleValue() };
 
         double[] next = integrator.integrate((t, y) -> {
-            double dy1 = alpha * y[0] - beta * y[0] * y[1];
-            double dy2 = delta * y[0] * y[1] - gamma * y[1];
-            return new double[] { dy1, dy2 };
+            Real rY0 = Real.of(y[0]);
+            Real rY1 = Real.of(y[1]);
+            Real dY1 = Real.of(alpha).multiply(rY0).subtract(Real.of(beta).multiply(rY0).multiply(rY1));
+            Real dY2 = Real.of(delta).multiply(rY0).multiply(rY1).subtract(Real.of(gamma).multiply(rY1));
+            return new double[] { dY1.doubleValue(), dY2.doubleValue() };
         }, time, current, time + dt);
 
         preyPop = Quantities.create(Math.max(0, next[0]), Units.ONE);

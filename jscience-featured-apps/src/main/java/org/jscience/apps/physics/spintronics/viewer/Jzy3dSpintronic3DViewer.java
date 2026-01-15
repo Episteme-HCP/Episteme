@@ -194,10 +194,13 @@ public class Jzy3dSpintronic3DViewer implements Spintronic3DViewer {
         
         for (int i = 1; i < nx - 1; i++) {
             for (int j = 1; j < ny - 1; j++) {
-                org.jscience.mathematics.numbers.real.Real[] m = sim.getMagnetization(i, j);
+                Real[] mData = sim.getMagnetization(i, j);
+                org.jscience.mathematics.linearalgebra.Vector<Real> m = 
+                    org.jscience.mathematics.linearalgebra.vectors.VectorFactory.of(Real.class, 
+                        mData[0], mData[1], mData[2]);
                 
-                // Simple skyrmion detection: m_z < -0.5 (core pointing down)
-                if (m[2].doubleValue() < -0.5) {
+                // Simple skyrmion detection: m_core pointing down
+                if (m.get(2).doubleValue() < -0.5) {
                     skyrmionPoints.add(new Coord3d(i * cellSize, 5, j * cellSize));
                 }
             }

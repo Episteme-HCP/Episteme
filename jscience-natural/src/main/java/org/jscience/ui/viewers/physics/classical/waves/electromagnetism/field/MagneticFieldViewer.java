@@ -137,7 +137,11 @@ public class MagneticFieldViewer extends org.jscience.ui.AbstractViewer {
                     double by = -f[1][3];
                     double bz = f[1][2];
 
-                    double bMag = Math.sqrt(bx*bx + by*by + bz*bz);
+                    org.jscience.mathematics.linearalgebra.Vector<Real> bField = 
+                        org.jscience.mathematics.linearalgebra.vectors.VectorFactory.of(Real.class, 
+                            Real.of(bx), Real.of(by), Real.of(bz));
+
+                    double bMag = bField.norm().doubleValue();
                     
                     // Add Vector
                     addVector(px, py, pz, bx, by, bz, bMag);

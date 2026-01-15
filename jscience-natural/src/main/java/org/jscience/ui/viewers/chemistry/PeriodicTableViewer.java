@@ -56,6 +56,10 @@ import org.jscience.ui.i18n.I18n;
 
 import java.util.ArrayList;
 import java.util.List;
+import javafx.application.Platform;
+import org.jscience.chemistry.loaders.PubChemReader;
+import org.jscience.chemistry.loaders.ChEBIReader;
+import org.jscience.chemistry.loaders.PeriodicTableReader;
 
 /**
  * Interactive periodic table viewer.
@@ -94,7 +98,10 @@ public class PeriodicTableViewer extends AbstractViewer {
     private Slider zoomSlider;
 
     public PeriodicTableViewer() {
-        ChemistryDataReader.loadElements();
+        List<Element> elements = PeriodicTableReader.loadFromResource("/org/jscience/chemistry/elements.json");
+        for (Element el : elements) {
+            PeriodicTable.registerElement(el);
+        }
 
         GridPane tableGrid = createTableGrid();
         Group contentGroup = new Group(tableGrid);
@@ -221,7 +228,53 @@ public class PeriodicTableViewer extends AbstractViewer {
         nucTab.setContent(ns);
         nucTab.setClosable(false);
 
-        detailsTabPane.getTabs().addAll(elecTab, nucTab);
+        Tab compTab = new Tab(I18n.getInstance().get("periodic.compounds", "Compounds"));
+        VBox compoundContent = new VBox(10);
+        compoundContent.setPadding(new Insets(10));
+        TextField compSearch = new TextField();
+        compSearch.setPromptText("Search PubChem/ChEBI...");
+        Button searchBtn = new Button("Search");
+        searchBtn.setMaxWidth(Double.MAX_VALUE);
+        ListView<String> compList = new ListView<>();
+        compList.setPrefHeight(200);
+        
+        searchBtn.setOnAction(e -> {
+            String q = compSearch.getText().trim();
+            if (!q.isEmpty()) {
+                compList.getItems().clear();
+                compList.getItems().add("Searching...");
+                new Thread(() -> {
+                    PubChemReader pcr = new PubChemReader();
+                    List<Long> cids = pcr.searchByName(q);
+                    Platform.runLater(() -> {
+                        compList.getItems().clear();
+                        for (Long cid : cids) {
+                            compList.getItems().add("PubChem CID: " + cid);
+                        }
+                        if (cids.isEmpty()) {
+                             compList.getItems().add("No results. Trying ChEBI...");
+                             new Thread(() -> {
+                                 java.util.Map<String, String> chebi = ChEBIReader.searchByName(q);
+                                 Platform.runLater(() -> {
+                                     if (chebi != null && chebi.get("name") != null) {
+                                         compList.getItems().clear();
+                                         compList.getItems().add("ChEBI: " + chebi.get("name"));
+                                     } else {
+                                         compList.getItems().add("Not found.");
+                                     }
+                                 });
+                             }).start();
+                        }
+                    });
+                }).start();
+            }
+        });
+        
+        compoundContent.getChildren().addAll(new Label("Chemical Entities:"), compSearch, searchBtn, compList);
+        compTab.setContent(compoundContent);
+        compTab.setClosable(false);
+
+        detailsTabPane.getTabs().addAll(elecTab, nucTab, compTab);
         detailsTabPane.setVisible(false);
         panel.getChildren().addAll(title, hint, detailsTabPane);
         return panel;

@@ -73,7 +73,7 @@ public class PandemicForecasterApp extends FeaturedAppBase {
 
     // Simulation State
     private Timeline simulationTimeline;
-    private Real[][] simulationResults;
+    private org.jscience.mathematics.linearalgebra.Matrix<Real> simulationResults;
     private int currentDay = 0;
     private boolean isRunning = false;
 
@@ -369,7 +369,8 @@ public class PandemicForecasterApp extends FeaturedAppBase {
                 betaSlider.getValue()));
 
         try {
-            simulationResults = PopulationDynamics.seirdModel(initial, beta, sigma, gamma, mu, dt, days);
+            Real[][] rawResults = PopulationDynamics.seirdModel(initial, beta, sigma, gamma, mu, dt, days);
+            simulationResults = org.jscience.mathematics.linearalgebra.matrices.GenericMatrix.of(rawResults, org.jscience.mathematics.numbers.real.Reals.getInstance());
             startAnimation(days);
             isRunning = true;
             setStatus(i18n.get("status.running"));
@@ -393,11 +394,11 @@ public class PandemicForecasterApp extends FeaturedAppBase {
     }
 
     private void addDataPoint(int day) {
-        double s = simulationResults[day][0].doubleValue();
-        double e = simulationResults[day][1].doubleValue();
-        double i = simulationResults[day][2].doubleValue();
-        double r = simulationResults[day][3].doubleValue();
-        double dVal = simulationResults[day][4].doubleValue();
+        double s = simulationResults.get(day, 0).doubleValue();
+        double e = simulationResults.get(day, 1).doubleValue();
+        double i = simulationResults.get(day, 2).doubleValue();
+        double r = simulationResults.get(day, 3).doubleValue();
+        double dVal = simulationResults.get(day, 4).doubleValue();
 
         susSeriesS.getData().add(new XYChart.Data<>(day, s));
         expSeriesE.getData().add(new XYChart.Data<>(day, e));

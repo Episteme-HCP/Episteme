@@ -23,6 +23,8 @@
 
 package org.jscience.mathematics.analysis.pde;
 
+import org.jscience.mathematics.numbers.real.Real;
+
 /**
  * 1D Wave equation solver: ∂²u/∂t² = c² ∂²u/∂x²
  * <p>
@@ -46,29 +48,38 @@ package org.jscience.mathematics.analysis.pde;
 public class WaveEquationSolver {
 
     private final int nx;
-    private final double dx;
-    private final double c; // Wave speed
+    private final Real dx;
+    private final Real c; // Wave speed
 
-    private double[] uPrev; // u at t-dt
-    private double[] uCurr; // u at t
-    private double[] uNext; // u at t+dt
-    private double time;
+    private Real[] uPrev; // u at t-dt
+    private Real[] uCurr; // u at t
+    private Real[] uNext; // u at t+dt
+    private Real time = Real.ZERO;
+
+    public WaveEquationSolver(int nx, Real length, Real waveSpeed) {
+        this.nx = nx;
+        this.dx = length.divide(Real.of(nx - 1));
+        this.c = waveSpeed;
+        this.uPrev = new Real[nx];
+        this.uCurr = new Real[nx];
+        this.uNext = new Real[nx];
+        for (int i = 0; i < nx; i++) {
+            uPrev[i] = Real.ZERO;
+            uCurr[i] = Real.ZERO;
+            uNext[i] = Real.ZERO;
+        }
+    }
 
     public WaveEquationSolver(int nx, double length, double waveSpeed) {
-        this.nx = nx;
-        this.dx = length / (nx - 1);
-        this.c = waveSpeed;
-        this.uPrev = new double[nx];
-        this.uCurr = new double[nx];
-        this.uNext = new double[nx];
+        this(nx, Real.of(length), Real.of(waveSpeed));
     }
 
     /**
      * Set initial displacement.
      */
-    public void setInitialDisplacement(java.util.function.DoubleUnaryOperator f) {
+    public void setInitialDisplacement(org.jscience.mathematics.analysis.Function<Real, Real> f) {
         for (int i = 0; i < nx; i++) {
-            uCurr[i] = f.applyAsDouble(i * dx);
+            uCurr[i] = f.evaluate(dx.multiply(Real.of(i)));
             uPrev[i] = uCurr[i]; // Zero initial velocity
         }
     }
@@ -76,14 +87,14 @@ public class WaveEquationSolver {
     /**
      * Set initial displacement and velocity.
      */
-    public void setInitialConditions(java.util.function.DoubleUnaryOperator displacement,
-            java.util.function.DoubleUnaryOperator velocity,
-            double dt) {
+    public void setInitialConditions(org.jscience.mathematics.analysis.Function<Real, Real> displacement,
+            org.jscience.mathematics.analysis.Function<Real, Real> velocity,
+            Real dt) {
         for (int i = 0; i < nx; i++) {
-            double x = i * dx;
-            uCurr[i] = displacement.applyAsDouble(x);
+            Real x = dx.multiply(Real.of(i));
+            uCurr[i] = displacement.evaluate(x);
             // First step: u_prev Ã¢â€°Ë† u_curr - v*dt
-            uPrev[i] = uCurr[i] - velocity.applyAsDouble(x) * dt;
+            uPrev[i] = uCurr[i].subtract(velocity.evaluate(x).multiply(dt));
         }
     }
 
@@ -91,70 +102,72 @@ public class WaveEquationSolver {
      * Advance by one time step using leapfrog scheme.
      * CFL condition: dt <= dx/c for stability.
      */
-    public void step(double dt) {
-        double r2 = (c * dt / dx) * (c * dt / dx);
+    public void step(Real dt) {
+        Real r = c.multiply(dt).divide(dx);
+        Real r2 = r.multiply(r);
 
         // Interior points
         for (int i = 1; i < nx - 1; i++) {
-            uNext[i] = 2 * uCurr[i] - uPrev[i]
-                    + r2 * (uCurr[i + 1] - 2 * uCurr[i] + uCurr[i - 1]);
+            uNext[i] = uCurr[i].multiply(Real.of(2)).subtract(uPrev[i])
+                    .add(r2.multiply(uCurr[i + 1].subtract(uCurr[i].multiply(Real.of(2))).add(uCurr[i - 1])));
         }
 
         // Fixed boundary conditions (u = 0 at ends)
-        uNext[0] = 0;
-        uNext[nx - 1] = 0;
+        uNext[0] = Real.ZERO;
+        uNext[nx - 1] = Real.ZERO;
 
         // Shift arrays
-        double[] temp = uPrev;
+        Real[] temp = uPrev;
         uPrev = uCurr;
         uCurr = uNext;
         uNext = temp;
 
-        time += dt;
+        time = time.add(dt);
     }
 
     /**
      * Step with free boundary conditions (Ã¢Ë†â€šu/Ã¢Ë†â€šx = 0).
      */
-    public void stepFreeBoundary(double dt) {
-        double r2 = (c * dt / dx) * (c * dt / dx);
+    public void stepFreeBoundary(Real dt) {
+        Real r = c.multiply(dt).divide(dx);
+        Real r2 = r.multiply(r);
 
         for (int i = 1; i < nx - 1; i++) {
-            uNext[i] = 2 * uCurr[i] - uPrev[i]
-                    + r2 * (uCurr[i + 1] - 2 * uCurr[i] + uCurr[i - 1]);
+            uNext[i] = uCurr[i].multiply(Real.of(2)).subtract(uPrev[i])
+                    .add(r2.multiply(uCurr[i + 1].subtract(uCurr[i].multiply(Real.of(2))).add(uCurr[i - 1])));
         }
 
         // Free boundary (du/dx = 0) using ghost cells
         uNext[0] = uNext[1];
         uNext[nx - 1] = uNext[nx - 2];
 
-        double[] temp = uPrev;
+        Real[] temp = uPrev;
         uPrev = uCurr;
         uCurr = uNext;
         uNext = temp;
 
-        time += dt;
+        time = time.add(dt);
     }
 
     /**
      * Run for specified total time.
      */
-    public void solve(double totalTime, double dt) {
-        int steps = (int) (totalTime / dt);
+    public void solve(Real totalTime, Real dt) {
+        int steps = (int) totalTime.divide(dt).doubleValue();
         for (int i = 0; i < steps; i++) {
             step(dt);
         }
     }
 
-    public double[] getSolution() {
+    public Real[] getSolution() {
         return uCurr.clone();
     }
 
-    public double getValue(int i) {
+    public Real getValue(int i) {
         return uCurr[i];
     }
 
-    public double getTime() {
+    public Real getTime() {
         return time;
     }
 
@@ -162,25 +175,25 @@ public class WaveEquationSolver {
         return nx;
     }
 
-    public double getX(int i) {
-        return i * dx;
+    public Real getX(int i) {
+        return dx.multiply(Real.of(i));
     }
 
     /**
      * Total energy (kinetic + potential) - should be conserved.
      */
-    public double totalEnergy(double dt) {
-        double ke = 0, pe = 0;
+    public Real totalEnergy(Real dt) {
+        Real ke = Real.ZERO, pe = Real.ZERO;
         for (int i = 1; i < nx - 1; i++) {
             // Kinetic: 0.5 * (du/dt)^2
-            double dudt = (uCurr[i] - uPrev[i]) / dt;
-            ke += 0.5 * dudt * dudt * dx;
+            Real dudt = uCurr[i].subtract(uPrev[i]).divide(dt);
+            ke = ke.add(dudt.multiply(dudt).multiply(dx).multiply(Real.of(0.5)));
 
             // Potential: 0.5 * c^2 * (du/dx)^2
-            double dudx = (uCurr[i + 1] - uCurr[i - 1]) / (2 * dx);
-            pe += 0.5 * c * c * dudx * dudx * dx;
+            Real dudx = uCurr[i + 1].subtract(uCurr[i - 1]).divide(dx.multiply(Real.of(2)));
+            pe = pe.add(c.multiply(c).multiply(dudx).multiply(dudx).multiply(dx).multiply(Real.of(0.5)));
         }
-        return ke + pe;
+        return ke.add(pe);
     }
 
     // --- Factory methods ---
@@ -188,14 +201,14 @@ public class WaveEquationSolver {
     /**
      * Plucked string: triangular initial displacement.
      */
-    public static WaveEquationSolver pluckedString(int nx, double length, double waveSpeed,
-            double pluckPosition, double pluckHeight) {
+    public static WaveEquationSolver pluckedString(int nx, Real length, Real waveSpeed,
+            Real pluckPosition, Real pluckHeight) {
         WaveEquationSolver solver = new WaveEquationSolver(nx, length, waveSpeed);
         solver.setInitialDisplacement(x -> {
-            if (x < pluckPosition) {
-                return pluckHeight * x / pluckPosition;
+            if (x.compareTo(pluckPosition) < 0) {
+                return pluckHeight.multiply(x).divide(pluckPosition);
             } else {
-                return pluckHeight * (length - x) / (length - pluckPosition);
+                return pluckHeight.multiply(length.subtract(x)).divide(length.subtract(pluckPosition));
             }
         });
         return solver;
@@ -204,10 +217,10 @@ public class WaveEquationSolver {
     /**
      * Gaussian pulse.
      */
-    public static WaveEquationSolver gaussianPulse(int nx, double length, double waveSpeed,
-            double center, double width) {
+    public static WaveEquationSolver gaussianPulse(int nx, Real length, Real waveSpeed,
+            Real center, Real width) {
         WaveEquationSolver solver = new WaveEquationSolver(nx, length, waveSpeed);
-        solver.setInitialDisplacement(x -> Math.exp(-Math.pow((x - center) / width, 2)));
+        solver.setInitialDisplacement(x -> x.subtract(center).divide(width).pow(2).negate().exp());
         return solver;
     }
 }

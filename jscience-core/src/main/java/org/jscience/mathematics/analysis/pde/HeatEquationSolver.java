@@ -23,7 +23,7 @@
 
 package org.jscience.mathematics.analysis.pde;
 
-import java.util.function.DoubleUnaryOperator;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * 1D Heat Equation Solver.
@@ -32,41 +32,49 @@ import java.util.function.DoubleUnaryOperator;
 public class HeatEquationSolver {
 
     private final int nx; // Number of spatial points
-    private final double dx; // Spatial step
-    private final double alpha; // Thermal diffusivity
+    private final Real dx; // Spatial step
+    private final Real alpha; // Thermal diffusivity
 
-    private double[] u; // Current temperature distribution
-    private double[] uNew; // Buffer for next timestep
+    private Real[] u; // Current temperature distribution
+    private Real[] uNew; // Buffer for next timestep
 
     // Boundary conditions
-    private double leftBC = 0;
-    private double rightBC = 0;
+    private Real leftBC = Real.ZERO;
+    private Real rightBC = Real.ZERO;
     private BoundaryType leftType = BoundaryType.DIRICHLET;
     private BoundaryType rightType = BoundaryType.DIRICHLET;
 
-    public HeatEquationSolver(int nx, double length, double alpha) {
+    public HeatEquationSolver(int nx, Real length, Real alpha) {
         this.nx = nx;
-        this.dx = length / (nx - 1);
+        this.dx = length.divide(Real.of(nx - 1));
         this.alpha = alpha;
-        this.u = new double[nx];
-        this.uNew = new double[nx];
+        this.u = new Real[nx];
+        this.uNew = new Real[nx];
+        for (int i = 0; i < nx; i++) {
+            u[i] = Real.ZERO;
+            uNew[i] = Real.ZERO;
+        }
+    }
+
+    public HeatEquationSolver(int nx, double length, double alpha) {
+        this(nx, Real.of(length), Real.of(alpha));
     }
 
     /**
      * Set initial condition.
      */
-    public void setInitialCondition(DoubleUnaryOperator f) {
+    public void setInitialCondition(org.jscience.mathematics.analysis.Function<Real, Real> f) {
         for (int i = 0; i < nx; i++) {
-            u[i] = f.applyAsDouble(i * dx);
+            u[i] = f.evaluate(dx.multiply(Real.of(i)));
         }
     }
 
-    public void setLeftBoundary(BoundaryType type, double value) {
+    public void setLeftBoundary(BoundaryType type, Real value) {
         leftType = type;
         leftBC = value;
     }
 
-    public void setRightBoundary(BoundaryType type, double value) {
+    public void setRightBoundary(BoundaryType type, Real value) {
         rightType = type;
         rightBC = value;
     }
@@ -75,19 +83,19 @@ public class HeatEquationSolver {
      * Explicit Euler time step (FTCS scheme).
      * Stable if dt <= dx^2/(2*alpha)
      */
-    public void stepExplicit(double dt) {
-        double r = alpha * dt / (dx * dx);
+    public void stepExplicit(Real dt) {
+        Real r = alpha.multiply(dt).divide(dx.multiply(dx));
 
         // Interior points
         for (int i = 1; i < nx - 1; i++) {
-            uNew[i] = u[i] + r * (u[i + 1] - 2 * u[i] + u[i - 1]);
+            uNew[i] = u[i].add(r.multiply(u[i + 1].subtract(u[i].multiply(Real.of(2))).add(u[i - 1])));
         }
 
         // Boundary conditions
         applyBoundaryConditions();
 
         // Swap buffers
-        double[] temp = u;
+        Real[] temp = u;
         u = uNew;
         uNew = temp;
     }
@@ -96,71 +104,70 @@ public class HeatEquationSolver {
      * Implicit Euler time step (unconditionally stable).
      * Uses Thomas algorithm for tridiagonal system.
      */
-    public void stepImplicit(double dt) {
-        double r = alpha * dt / (dx * dx);
+    public void stepImplicit(Real dt) {
+        Real r = alpha.multiply(dt).divide(dx.multiply(dx));
 
         // Setup tridiagonal system: A * uNew = u
-        // -r * u_{i-1} + (1+2r) * u_i - r * u_{i+1} = u_i^old
-        double[] a = new double[nx]; // Lower diagonal
-        double[] b = new double[nx]; // Main diagonal
-        double[] c = new double[nx]; // Upper diagonal
-        double[] d = new double[nx]; // RHS
+        Real[] a = new Real[nx]; // Lower diagonal
+        Real[] b = new Real[nx]; // Main diagonal
+        Real[] c = new Real[nx]; // Upper diagonal
+        Real[] d = new Real[nx]; // RHS
 
         for (int i = 1; i < nx - 1; i++) {
-            a[i] = -r;
-            b[i] = 1 + 2 * r;
-            c[i] = -r;
+            a[i] = r.negate();
+            b[i] = Real.ONE.add(r.multiply(Real.of(2)));
+            c[i] = r.negate();
             d[i] = u[i];
         }
 
         // Boundary conditions
-        b[0] = 1;
-        c[0] = 0;
-        a[nx - 1] = 0;
-        b[nx - 1] = 1;
+        b[0] = Real.ONE;
+        c[0] = Real.ZERO;
+        a[nx - 1] = Real.ZERO;
+        b[nx - 1] = Real.ONE;
 
         if (leftType == BoundaryType.DIRICHLET) {
             d[0] = leftBC;
         } else {
-            b[0] = 1;
-            c[0] = -1;
-            d[0] = leftBC * dx;
+            b[0] = Real.ONE;
+            c[0] = Real.of(-1);
+            d[0] = leftBC.multiply(dx);
         }
 
         if (rightType == BoundaryType.DIRICHLET) {
             d[nx - 1] = rightBC;
         } else {
-            a[nx - 1] = -1;
-            b[nx - 1] = 1;
-            d[nx - 1] = rightBC * dx;
+            a[nx - 1] = Real.of(-1);
+            b[nx - 1] = Real.ONE;
+            d[nx - 1] = rightBC.multiply(dx);
         }
 
         // Thomas algorithm
         thomasSolve(a, b, c, d, uNew);
 
         // Swap
-        double[] temp = u;
+        Real[] temp = u;
         u = uNew;
         uNew = temp;
     }
 
-    private void thomasSolve(double[] a, double[] b, double[] c, double[] d, double[] x) {
+    private void thomasSolve(Real[] a, Real[] b, Real[] c, Real[] d, Real[] x) {
         int n = d.length;
-        double[] cp = new double[n];
-        double[] dp = new double[n];
+        Real[] cp = new Real[n];
+        Real[] dp = new Real[n];
 
-        cp[0] = c[0] / b[0];
-        dp[0] = d[0] / b[0];
+        cp[0] = c[0].divide(b[0]);
+        dp[0] = d[0].divide(b[0]);
 
         for (int i = 1; i < n; i++) {
-            double m = b[i] - a[i] * cp[i - 1];
-            cp[i] = c[i] / m;
-            dp[i] = (d[i] - a[i] * dp[i - 1]) / m;
+            Real m = b[i].subtract(a[i].multiply(cp[i - 1]));
+            cp[i] = c[i].divide(m);
+            dp[i] = d[i].subtract(a[i].multiply(dp[i - 1])).divide(m);
         }
 
         x[n - 1] = dp[n - 1];
         for (int i = n - 2; i >= 0; i--) {
-            x[i] = dp[i] - cp[i] * x[i + 1];
+            x[i] = dp[i].subtract(cp[i].multiply(x[i + 1]));
         }
     }
 
@@ -168,17 +175,17 @@ public class HeatEquationSolver {
         if (leftType == BoundaryType.DIRICHLET) {
             uNew[0] = leftBC;
         } else {
-            uNew[0] = uNew[1] - leftBC * dx;
+            uNew[0] = uNew[1].subtract(leftBC.multiply(dx));
         }
 
         if (rightType == BoundaryType.DIRICHLET) {
             uNew[nx - 1] = rightBC;
         } else {
-            uNew[nx - 1] = uNew[nx - 2] + rightBC * dx;
+            uNew[nx - 1] = uNew[nx - 2].add(rightBC.multiply(dx));
         }
     }
 
-    public double[] getSolution() {
+    public Real[] getSolution() {
         return u;
     }
 }

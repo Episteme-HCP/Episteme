@@ -120,14 +120,10 @@ new Thread(() -> {
 
 1. ✅ **StellarSkyViewer** - VizieRReader integration (DONE)
 2. **PhylogeneticTreeViewer** - Taxonomy readers (NEXT)
-3. **PeriodicTableViewer** - Chemistry readers
-4. **Audio/Spectrograph** - FFT Provider integration
-5. **MagneticField** - Maxwell Provider
-6. **Circuit** - Matrix/FEM enhancement
-7. Verify all compilations
-8. Test key functionality
-9. Document API usage examples
-10. Commit and push
+1. Verify all compilations with a full build.
+2. Test key functionality in the Demo applications.
+3. Update project documentation with new usage examples.
+4. Final Commit and push.
 
 ## Notes
 
