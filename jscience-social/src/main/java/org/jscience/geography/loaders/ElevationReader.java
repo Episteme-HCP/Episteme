@@ -25,19 +25,15 @@ package org.jscience.geography.loaders;
 
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.Configuration;
-import org.jscience.measure.Quantity;
-import org.jscience.measure.Quantities;
-import org.jscience.measure.Units;
-import org.jscience.measure.quantity.Length;
 
-import java.io.InputStream;
+
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
 
 /**
  * Reader for Altimetry and Bathymetry data (Elevation).

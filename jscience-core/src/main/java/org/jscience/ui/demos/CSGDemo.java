@@ -39,17 +39,17 @@ public class CSGDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return I18n.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("viewer.csg");
+        return I18n.getInstance().get("demo.csgdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("CSG.desc");
+        return I18n.getInstance().get("demo.csgdemo.desc");
     }
 
     @Override
@@ -59,7 +59,7 @@ public class CSGDemo extends AbstractDemo {
 
     @Override
     protected String getLongDescription() {
-        return "Constructive Solid Geometry Visualization.";
+        return I18n.getInstance().get("demo.csgdemo.longdesc");
     }
 }
 

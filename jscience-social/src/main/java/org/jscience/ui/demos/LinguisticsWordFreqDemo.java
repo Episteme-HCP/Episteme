@@ -34,17 +34,17 @@ public class LinguisticsWordFreqDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return "Linguistics";
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.linguistics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("LinguisticsWordFreq.title");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.linguisticswordfreqdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("LinguisticsWordFreq.desc");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.linguisticswordfreqdemo.desc");
     }
 
     @Override
@@ -62,7 +62,7 @@ public class LinguisticsWordFreqDemo extends AbstractDemo {
     
     @Override
     protected String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.linguisticswordfreqdemo.longdesc");
     }
 }
 

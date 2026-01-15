@@ -50,11 +50,13 @@ public class I18n {
     private I18n() {
         // Auto-register all known bundles
         addBundle(CORE_BUNDLE_BASE);
-        // Try to load natural and social bundles (they may not be on classpath)
+        // Try to load additional bundles (they may not be on classpath depending on module)
         tryAddBundle("org.jscience.ui.i18n.messages_natural");
         tryAddBundle("org.jscience.ui.i18n.messages_social");
+        tryAddBundle("org.jscience.client.i18n.messages_client");
+        tryAddBundle("org.jscience.server.i18n.messages_server");
         tryAddBundle("org.jscience.apps.i18n.messages_apps");
-        tryAddBundle("org.jscience.apps.i18n.messages");
+
     }
 
     private void tryAddBundle(String bundleBase) {

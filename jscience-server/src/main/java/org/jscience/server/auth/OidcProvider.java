@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.ParseException;
-import java.util.HashMap;
+
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -116,7 +116,6 @@ public class OIDCProvider {
                     role = Roles.SCIENTIST;
                 }
             } else if ("keycloak".equalsIgnoreCase(provider)) {
-                @SuppressWarnings("unchecked")
                 Map<String, Object> realmAccess = claims.getJSONObjectClaim("realm_access");
                 if (realmAccess != null && realmAccess.containsKey("roles")) {
                     if (realmAccess.get("roles").toString().contains("SCIENTIST")) {

@@ -46,17 +46,17 @@ public class FormulaNotationDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return I18n.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("viewer.formula");
+        return I18n.getInstance().get("demo.formulanotationdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("FormulaNotation.desc");
+        return I18n.getInstance().get("demo.formulanotationdemo.desc");
     }
 
     @Override
@@ -66,7 +66,7 @@ public class FormulaNotationDemo extends AbstractDemo {
 
     @Override
     protected String getLongDescription() {
-         return org.jscience.ui.i18n.I18n.getInstance().get("demo.formula.desc");
+         return I18n.getInstance().get("demo.formulanotationdemo.longdesc");
     }
 
     @Override

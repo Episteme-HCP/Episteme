@@ -46,6 +46,7 @@ import javafx.stage.Stage;
 
 import org.jscience.mathematics.numbers.complex.Complex;
 import org.jscience.server.proto.*;
+import org.jscience.ui.i18n.I18n;
 
 import java.io.*;
 import java.util.Iterator;
@@ -117,7 +118,7 @@ public class DistributedMandelbrotApp extends Application {
         root.setCenter(new StackPane(canvas));
         root.setBottom(createFooter());
 
-        primaryStage.setTitle("JScience Distributed Mandelbrot");
+        primaryStage.setTitle(I18n.getInstance().get("app.distributedmandelbrotapp.title", "JScience Distributed Mandelbrot"));
         primaryStage.setScene(new Scene(root, WIDTH + 40, HEIGHT + 120));
         primaryStage.show();
     }
@@ -139,8 +140,8 @@ public class DistributedMandelbrotApp extends Application {
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, WIDTH, HEIGHT);
         progressBar.setProgress(0);
-        statusLabel.setText("Ready");
-        timeLabel.setText("Time: --");
+        statusLabel.setText(I18n.getInstance().get("app.distributedmandelbrotapp.status.ready", "Ready"));
+        timeLabel.setText(I18n.getInstance().get("app.distributedmandelbrotapp.status.time", "Time: --"));
     }
 
     private void startDistributedComputation() {
@@ -152,10 +153,10 @@ public class DistributedMandelbrotApp extends Application {
         boolean useLocal = localModeToggle.isSelected() || !serverAvailable;
 
         if (useLocal) {
-            statusLabel.setText("💻 Computing locally...");
+            statusLabel.setText(I18n.getInstance().get("app.distributedmandelbrotapp.status.local", "💻 Computing locally..."));
             startLocalComputation(startTime, completed);
         } else {
-            statusLabel.setText("🌐 Submitting slices to grid...");
+            statusLabel.setText(I18n.getInstance().get("app.distributedmandelbrotapp.status.submitting", "🌐 Submitting slices to grid..."));
             startGridComputation(startTime, completed);
         }
     }
@@ -355,9 +356,9 @@ public class DistributedMandelbrotApp extends Application {
 
     private void finish(long startTime, String mode) {
         long elapsed = System.currentTimeMillis() - startTime;
-        String modeLabel = mode.equals("distributed") ? "🌐" : "💻";
-        statusLabel.setText(String.format("%s Computation complete (%s)", modeLabel, mode));
-        timeLabel.setText(String.format("Time: %.2fs", elapsed / 1000.0));
+        String modeIcon = mode.equals("distributed") ? "🌐" : "💻";
+        statusLabel.setText(String.format(I18n.getInstance().get("app.distributedmandelbrotapp.status.complete", "%s Computation complete (%s)"), modeIcon, mode));
+        timeLabel.setText(String.format(I18n.getInstance().get("app.distributedmandelbrotapp.time_format", "Time: %.2fs"), elapsed / 1000.0));
         computeBtn.setDisable(false);
     }
 
@@ -367,38 +368,38 @@ public class DistributedMandelbrotApp extends Application {
         header.setStyle("-fx-background-color: #16213e;");
         header.setAlignment(Pos.CENTER_LEFT);
 
-        Label title = new Label("🔬 Distributed Mandelbrot Set");
+        Label title = new Label(I18n.getInstance().get("app.distributedmandelbrotapp.header", "🔬 Distributed Mandelbrot Set"));
         title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #e94560;");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
-        localModeToggle = new ToggleButton("💻 Local Only");
+        localModeToggle = new ToggleButton(I18n.getInstance().get("app.distributedmandelbrotapp.btn.local_toggle", "💻 Local Only"));
         localModeToggle.setStyle("-fx-background-color: #666; -fx-text-fill: white;");
         localModeToggle.setOnAction(e -> {
             if (localModeToggle.isSelected()) {
-                statusLabel.setText("💻 Local mode - will not use grid");
+                statusLabel.setText(I18n.getInstance().get("app.distributedmandelbrotapp.status.local_mode", "💻 Local mode - will not use grid"));
             } else {
                 checkServerAvailability();
-                statusLabel.setText(serverAvailable ? "🌐 Grid available" : "⚠️ Grid unavailable");
+                statusLabel.setText(serverAvailable ? I18n.getInstance().get("app.distributedmandelbrotapp.status.grid_avail", "🌐 Grid available") : I18n.getInstance().get("app.distributedmandelbrotapp.status.grid_unavail", "⚠️ Grid unavailable"));
             }
         });
 
-        highPrecisionToggle = new CheckBox("High Precision");
+        highPrecisionToggle = new CheckBox(I18n.getInstance().get("app.distributedmandelbrotapp.chk.high_prec", "High Precision"));
         highPrecisionToggle.setStyle("-fx-text-fill: white;");
 
-        computeBtn = new Button("⚡ Compute on Grid");
+        computeBtn = new Button(I18n.getInstance().get("app.distributedmandelbrotapp.btn.compute", "⚡ Compute on Grid"));
         computeBtn.setStyle("-fx-background-color: #e94560; -fx-text-fill: white;");
         computeBtn.setOnAction(e -> startDistributedComputation());
 
-        Button saveImgBtn = new Button("💾 Save Image");
+        Button saveImgBtn = new Button(I18n.getInstance().get("app.distributedmandelbrotapp.btn.save_img", "💾 Save Image"));
         saveImgBtn.setStyle("-fx-background-color: #4ecca3; -fx-text-fill: #1a1a2e;");
         saveImgBtn.setOnAction(e -> saveImage((Stage) computeBtn.getScene().getWindow()));
 
-        Button saveCfgBtn = new Button("⚙ Save Config");
+        Button saveCfgBtn = new Button(I18n.getInstance().get("app.distributedmandelbrotapp.btn.save_cfg", "⚙ Save Config"));
         saveCfgBtn.setOnAction(e -> saveConfig((Stage) computeBtn.getScene().getWindow()));
 
-        Button loadCfgBtn = new Button("📂 Load Config");
+        Button loadCfgBtn = new Button(I18n.getInstance().get("app.distributedmandelbrotapp.btn.load_cfg", "📂 Load Config"));
         loadCfgBtn.setOnAction(e -> loadConfig((Stage) computeBtn.getScene().getWindow()));
 
         header.getChildren().addAll(title, spacer, localModeToggle, highPrecisionToggle, computeBtn, saveImgBtn,
@@ -411,13 +412,13 @@ public class DistributedMandelbrotApp extends Application {
         footer.setPadding(new Insets(10, 20, 10, 20));
         footer.setStyle("-fx-background-color: #16213e;");
 
-        statusLabel = new Label(serverAvailable ? "🌐 Grid available" : "💻 Local mode");
+        statusLabel = new Label(serverAvailable ? I18n.getInstance().get("app.distributedmandelbrotapp.status.grid_avail", "🌐 Grid available") : I18n.getInstance().get("app.distributedmandelbrotapp.status.local_footer", "💻 Local mode"));
         statusLabel.setStyle("-fx-text-fill: #4ecca3;");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
-        timeLabel = new Label("Time: --");
+        timeLabel = new Label(I18n.getInstance().get("app.distributedmandelbrotapp.status.time", "Time: --"));
         timeLabel.setStyle("-fx-text-fill: #888;");
 
         progressBar = new ProgressBar(0);
@@ -434,29 +435,29 @@ public class DistributedMandelbrotApp extends Application {
     }
 
     private void saveImage(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showSaveDialog(stage, "Save Image", "PNG Images", "*.png");
+        File file = org.jscience.client.util.FileHelper.showSaveDialog(stage, I18n.getInstance().get("app.distributedmandelbrotapp.file.save_img", "Save Image"), I18n.getInstance().get("app.distributedmandelbrotapp.file.png", "PNG Images"), "*.png");
         if (file != null) {
             try {
                 ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
             } catch (Exception e) {
-                new Alert(Alert.AlertType.ERROR, "Failed to save image: " + e.getMessage()).show();
+                new Alert(Alert.AlertType.ERROR, I18n.getInstance().get("app.distributedmandelbrotapp.alert.save_img.error", "Failed to save image: {0}", e.getMessage())).show();
             }
         }
     }
 
     private void saveConfig(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showSaveDialog(stage, "Save Config", "JSON Config", "*.json");
+        File file = org.jscience.client.util.FileHelper.showSaveDialog(stage, I18n.getInstance().get("app.distributedmandelbrotapp.file.save_cfg", "Save Config"), I18n.getInstance().get("app.distributedmandelbrotapp.file.json", "JSON Config"), "*.json");
         if (file != null) {
             try (PrintWriter pw = new PrintWriter(file)) {
                 pw.printf("{\"minRe\": %f, \"maxRe\": %f, \"minIm\": %f, \"maxIm\": %f}", minRe, maxRe, minIm, maxIm);
             } catch (Exception e) {
-                new Alert(Alert.AlertType.ERROR, "Failed to save config").show();
+                new Alert(Alert.AlertType.ERROR, I18n.getInstance().get("app.distributedmandelbrotapp.alert.save_cfg.error", "Failed to save config")).show();
             }
         }
     }
 
     private void loadConfig(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showOpenDialog(stage, "Load Config", "JSON Config", "*.json");
+        File file = org.jscience.client.util.FileHelper.showOpenDialog(stage, I18n.getInstance().get("app.distributedmandelbrotapp.file.load_cfg", "Load Config"), I18n.getInstance().get("app.distributedmandelbrotapp.file.json", "JSON Config"), "*.json");
         if (file != null) {
             try (java.util.Scanner s = new java.util.Scanner(file).useDelimiter("\\A")) {
                 String content = s.hasNext() ? s.next() : "";
@@ -478,7 +479,7 @@ public class DistributedMandelbrotApp extends Application {
                         maxIm = val;
                 }
             } catch (Exception e) {
-                new Alert(Alert.AlertType.ERROR, "Failed to load config").show();
+                new Alert(Alert.AlertType.ERROR, I18n.getInstance().get("app.distributedmandelbrotapp.alert.load_cfg.error", "Failed to load config")).show();
             }
             clearCanvas();
             startDistributedComputation();

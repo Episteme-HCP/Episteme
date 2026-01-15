@@ -53,17 +53,17 @@ public class ArchitectureStabilityDemo extends AbstractSimulationDemo {
 
     @Override
     public String getCategory() {
-        return "Architecture";
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.architecture");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("ArchitectureStability.title");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.architecturestabilitydemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("ArchitectureStability.desc");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.architecturestabilitydemo.desc");
     }
 
     private Canvas canvas;
@@ -159,7 +159,6 @@ public class ArchitectureStabilityDemo extends AbstractSimulationDemo {
 
             if (!collapsed) {
                 Quantity<Length> blockX = Quantities.create(bx + 50, Units.METER);
-                @SuppressWarnings("unchecked")
                 Quantity<?> moment = blockX.multiply(b.mass);
                 @SuppressWarnings({"unchecked", "rawtypes"})
                 Quantity<?> tm = totalMoment.add((Quantity) moment);
@@ -190,6 +189,6 @@ public class ArchitectureStabilityDemo extends AbstractSimulationDemo {
 
     @Override
     protected String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.architecturestabilitydemo.longdesc");
     }
 }

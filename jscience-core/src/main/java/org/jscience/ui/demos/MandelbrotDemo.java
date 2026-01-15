@@ -37,17 +37,17 @@ public class MandelbrotDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.mandelbrot.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.mandelbrotdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.mandelbrot.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.mandelbrotdemo.desc");
     }
 
     @Override
@@ -57,6 +57,6 @@ public class MandelbrotDemo extends AbstractDemo {
 
     @Override
     protected String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.mandelbrot.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.mandelbrotdemo.longdesc");
     }
 }

@@ -34,17 +34,22 @@ public class HistoryTimelineDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.history", "History");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.history");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.timeline.title");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.historytimelinedemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("hist.timeline.desc");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.historytimelinedemo.desc");
+    }
+
+    @Override
+    protected String getLongDescription() {
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.historytimelinedemo.longdesc");
     }
 
     @Override
@@ -54,8 +59,5 @@ public class HistoryTimelineDemo extends AbstractDemo {
         return v;
     }
     
-    @Override
-    protected String getLongDescription() {
-        return getDescription();
-    }
+
 }

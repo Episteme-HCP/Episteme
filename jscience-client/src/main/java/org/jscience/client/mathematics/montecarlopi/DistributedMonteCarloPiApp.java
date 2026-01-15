@@ -38,6 +38,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import com.google.protobuf.ByteString;
 import org.jscience.server.proto.*;
+import org.jscience.ui.i18n.I18n;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -86,7 +87,7 @@ public class DistributedMonteCarloPiApp extends Application {
 
         checkServerAvailability();
 
-        stage.setTitle("🎯 Monte Carlo π Estimation - JScience");
+        stage.setTitle(I18n.getInstance().get("app.distributedmontecarlopiapp.title", "🎯 Monte Carlo π Estimation - JScience"));
 
         canvas = new Canvas(600, 600);
         gc = canvas.getGraphicsContext2D();
@@ -97,28 +98,28 @@ public class DistributedMonteCarloPiApp extends Application {
         controls.setStyle("-fx-background-color: #1a1a2e;");
         controls.setPrefWidth(250);
 
-        Label title = new Label("Monte Carlo π");
+        Label title = new Label(I18n.getInstance().get("app.distributedmontecarlopiapp.header", "Monte Carlo π"));
         title.setStyle("-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #e94560;");
 
-        piLabel = new Label("π ≈ ?");
+        piLabel = new Label(I18n.getInstance().get("app.distributedmontecarlopiapp.pi_label", "π ≈ ?"));
         piLabel.setStyle("-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #eee;");
 
-        samplesLabel = new Label("Samples: 0");
+        samplesLabel = new Label(I18n.getInstance().get("app.distributedmontecarlopiapp.samples_label", "Samples: 0"));
         samplesLabel.setStyle("-fx-font-size: 14; -fx-text-fill: #888;");
 
-        modeLabel = new Label(serverAvailable ? "🌐 Distributed Mode" : "💻 Local Mode");
+        modeLabel = new Label(serverAvailable ? I18n.getInstance().get("app.distributedmontecarlopiapp.mode.dist", "🌐 Distributed Mode") : I18n.getInstance().get("app.distributedmontecarlopiapp.mode.local", "💻 Local Mode"));
         modeLabel.setStyle("-fx-font-size: 14; -fx-text-fill: #4ecca3;");
 
         progressBar = new ProgressBar(0);
         progressBar.setPrefWidth(200);
 
-        Label accuracyLabel = new Label("Accuracy: ±?");
+        Label accuracyLabel = new Label(I18n.getInstance().get("app.distributedmontecarlopiapp.accuracy_label", "Accuracy: ±?"));
         accuracyLabel.setStyle("-fx-font-size: 14; -fx-text-fill: #888;");
 
         Separator sep = new Separator();
         sep.setStyle("-fx-background-color: #333;");
 
-        ToggleButton distributedBtn = new ToggleButton("🌐 Distributed");
+        ToggleButton distributedBtn = new ToggleButton(I18n.getInstance().get("app.distributedmontecarlopiapp.btn.dist", "🌐 Distributed"));
         distributedBtn.setSelected(serverAvailable);
         distributedBtn.setStyle("-fx-background-color: #4ecca3; -fx-text-fill: white; " +
                 "-fx-font-size: 12; -fx-padding: 8 15;");
@@ -127,21 +128,21 @@ public class DistributedMonteCarloPiApp extends Application {
             if (useDistributed && !serverAvailable) {
                 checkServerAvailability();
             }
-            modeLabel.setText(useDistributed && serverAvailable ? "🌐 Distributed Mode" : "💻 Local Mode");
+            modeLabel.setText(useDistributed && serverAvailable ? I18n.getInstance().get("app.distributedmontecarlopiapp.mode.dist", "🌐 Distributed Mode") : I18n.getInstance().get("app.distributedmontecarlopiapp.mode.local", "💻 Local Mode"));
         });
 
-        Button startBtn = new Button("▶ Start Sampling");
+        Button startBtn = new Button(I18n.getInstance().get("app.distributedmontecarlopiapp.btn.start", "▶ Start Sampling"));
         startBtn.setStyle("-fx-background-color: #e94560; -fx-text-fill: white; " +
                 "-fx-font-size: 14; -fx-padding: 10 20;");
         startBtn.setOnAction(e -> {
             running = !running;
-            startBtn.setText(running ? "⏸ Pause" : "▶ Resume");
+            startBtn.setText(running ? I18n.getInstance().get("app.distributedmontecarlopiapp.btn.pause", "⏸ Pause") : I18n.getInstance().get("app.distributedmontecarlopiapp.btn.resume", "▶ Resume"));
             if (running && useDistributed && serverAvailable) {
                 startDistributedSampling();
             }
         });
 
-        Button resetBtn = new Button("↺ Reset");
+        Button resetBtn = new Button(I18n.getInstance().get("app.distributedmontecarlopiapp.btn.reset", "↺ Reset"));
         resetBtn.setStyle("-fx-background-color: #333; -fx-text-fill: white; " +
                 "-fx-font-size: 14; -fx-padding: 10 20;");
         resetBtn.setOnAction(e -> reset());
@@ -296,8 +297,8 @@ public class DistributedMonteCarloPiApp extends Application {
         totalSamples.set(0);
         running = false;
         drawBackground();
-        piLabel.setText("π ≈ ?");
-        samplesLabel.setText("Samples: 0");
+        piLabel.setText(I18n.getInstance().get("app.distributedmontecarlopiapp.pi_label", "π ≈ ?"));
+        samplesLabel.setText(I18n.getInstance().get("app.distributedmontecarlopiapp.samples_label", "Samples: 0"));
         progressBar.setProgress(0);
     }
 
@@ -335,10 +336,10 @@ public class DistributedMonteCarloPiApp extends Application {
                     double pi = 4.0 * inside / total;
                     double error = Math.abs(pi - Math.PI);
 
-                    piLabel.setText(String.format("π ≈ %.8f", pi));
-                    samplesLabel.setText(String.format("Samples: %,d", total));
+                    piLabel.setText(String.format(I18n.getInstance().get("app.distributedmontecarlopiapp.pi_format", "π ≈ %.8f"), pi));
+                    samplesLabel.setText(String.format(I18n.getInstance().get("app.distributedmontecarlopiapp.samples_format", "Samples: %,d"), total));
                     progressBar.setProgress((double) total / targetSamples);
-                    accuracyLabel.setText(String.format("Error: %.6f", error));
+                    accuracyLabel.setText(String.format(I18n.getInstance().get("app.distributedmontecarlopiapp.error_format", "Error: %.6f"), error));
                 }
 
                 if (total >= targetSamples) {

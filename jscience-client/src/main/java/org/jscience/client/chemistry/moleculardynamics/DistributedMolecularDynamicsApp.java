@@ -40,6 +40,7 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import org.jscience.server.proto.*;
+import org.jscience.ui.i18n.I18n;
 import org.jscience.physics.classical.mechanics.Particle;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.biology.loaders.PDBReader;
@@ -88,7 +89,7 @@ public class DistributedMolecularDynamicsApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle("🧪 Molecular Dynamics - Distributed JScience");
+        stage.setTitle(I18n.getInstance().get("app.distributedmoleculardynamicsapp.title", "🧪 Molecular Dynamics - Distributed JScience"));
 
         Group root = new Group(atomGroup);
         Box box = new Box(BOX_SIZE, BOX_SIZE, BOX_SIZE);
@@ -135,18 +136,18 @@ public class DistributedMolecularDynamicsApp extends Application {
             atomGroup.getChildren().add(s);
         }
 
-        stats = new Label("Initializing Grid...");
+        stats = new Label(I18n.getInstance().get("app.distributedmoleculardynamicsapp.stats.init", "Initializing Grid..."));
         stats.setTextFill(Color.WHITE);
         stats.setStyle("-fx-font-size: 16;");
 
-        localSimCheckBox = new CheckBox("Local Simulation");
+        localSimCheckBox = new CheckBox(I18n.getInstance().get("app.distributedmoleculardynamicsapp.chk.local", "Local Simulation"));
         localSimCheckBox.setSelected(true);
         localSimCheckBox.setTextFill(Color.WHITE);
 
-        Button exportBtn = new Button("💾 Export PDB");
+        Button exportBtn = new Button(I18n.getInstance().get("app.distributedmoleculardynamicsapp.btn.export", "💾 Export PDB"));
         exportBtn.setOnAction(e -> exportToPdb());
 
-        loadPdbBtn = new Button("📂 Load PDB");
+        loadPdbBtn = new Button(I18n.getInstance().get("app.distributedmoleculardynamicsapp.btn.load", "📂 Load PDB"));
         loadPdbBtn.setOnAction(e -> loadPdb(stage));
         HBox overlay = new HBox(20, stats, localSimCheckBox, loadPdbBtn, exportBtn);
         overlay.setAlignment(Pos.CENTER_LEFT);
@@ -173,8 +174,8 @@ public class DistributedMolecularDynamicsApp extends Application {
 
     private void exportToPdb() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save PDB Export");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDB Files", "*.pdb"));
+        fileChooser.setTitle(I18n.getInstance().get("app.distributedmoleculardynamicsapp.file.save.title", "Save PDB Export"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(I18n.getInstance().get("app.distributedmoleculardynamicsapp.file.pdb", "PDB Files"), "*.pdb"));
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
             try {
@@ -193,10 +194,10 @@ public class DistributedMolecularDynamicsApp extends Application {
                 p.addChain(chain);
 
                 new PDBWriter().save(p, file.getAbsolutePath());
-                new Alert(Alert.AlertType.INFORMATION, "Exported " + task.getNumAtoms() + " atoms to " + file.getName())
+                new Alert(Alert.AlertType.INFORMATION, I18n.getInstance().get("app.distributedmoleculardynamicsapp.alert.export.success", "Exported {0} atoms to {1}", task.getNumAtoms(), file.getName()))
                         .show();
             } catch (Exception e) {
-                new Alert(Alert.AlertType.ERROR, "Export failed: " + e.getMessage()).show();
+                new Alert(Alert.AlertType.ERROR, I18n.getInstance().get("app.distributedmoleculardynamicsapp.alert.export.error", "Export failed: {0}", e.getMessage())).show();
             }
         }
     }
@@ -311,7 +312,7 @@ public class DistributedMolecularDynamicsApp extends Application {
                     p.getMass().to(org.jscience.measure.Units.KILOGRAM).getValue().doubleValue()));
         }
         task.updateState(states, 0.0);
-        updateUI("Local Provider");
+        updateUI(I18n.getInstance().get("app.distributedmoleculardynamicsapp.status.local_provider", "Local Provider"));
     }
 
     private void runDistributedStep() {
@@ -342,7 +343,7 @@ public class DistributedMolecularDynamicsApp extends Application {
                     applyAtoms(result.getSerializedData().toByteArray());
                 }
             } catch (Exception e) {
-                Platform.runLater(() -> stats.setText("Grid Error: " + e.getMessage()));
+                Platform.runLater(() -> stats.setText(I18n.getInstance().get("app.distributedmoleculardynamicsapp.status.grid_error", "Grid Error: {0}", e.getMessage())));
             }
         }).start();
     }
@@ -395,7 +396,7 @@ public class DistributedMolecularDynamicsApp extends Application {
             Color color = speed > 1.5 ? Color.RED : (speed > 0.8 ? Color.ORANGE : Color.CYAN);
             ((PhongMaterial) mesh.getMaterial()).setDiffuseColor(color);
         }
-        stats.setText(String.format("Mode: %s | Energy: %.2f", mode, task.getTotalEnergy()));
+        stats.setText(String.format(I18n.getInstance().get("app.distributedmoleculardynamicsapp.status.format", "Mode: %s | Energy: %.2f"), mode, task.getTotalEnergy()));
     }
 
     @Override
@@ -409,7 +410,7 @@ public class DistributedMolecularDynamicsApp extends Application {
     }
 
     private void loadPdb(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showOpenDialog(stage, "Load Protein PDB", "PDB Files", "*.pdb",
+        File file = org.jscience.client.util.FileHelper.showOpenDialog(stage, I18n.getInstance().get("app.distributedmoleculardynamicsapp.file.open.title", "Load Protein PDB"), I18n.getInstance().get("app.distributedmoleculardynamicsapp.file.pdb", "PDB Files"), "*.pdb",
                 "*.ent");
         if (file != null) {
             try {
@@ -449,10 +450,10 @@ public class DistributedMolecularDynamicsApp extends Application {
                     }
                     // Re-init task with new particles
                     task = new MolecularDynamicsTask(particles, BOX_SIZE);
-                    stats.setText("Loaded: " + protein.getName() + " (" + particles.size() + " atoms)");
+                    stats.setText(I18n.getInstance().get("app.distributedmoleculardynamicsapp.status.loaded", "Loaded: {0} ({1} atoms)", protein.getName(), particles.size()));
                 }
             } catch (Exception e) {
-                new Alert(Alert.AlertType.ERROR, "Failed to load PDB: " + e.getMessage()).show();
+                new Alert(Alert.AlertType.ERROR, I18n.getInstance().get("app.distributedmoleculardynamicsapp.alert.load.error", "Failed to load PDB: {0}", e.getMessage())).show();
             }
         }
     }

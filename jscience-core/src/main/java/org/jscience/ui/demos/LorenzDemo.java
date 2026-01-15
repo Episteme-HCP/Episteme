@@ -37,17 +37,17 @@ public class LorenzDemo extends AbstractSimulationDemo {
 
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.lorenz.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.lorenzdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.lorenz.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.lorenzdemo.desc");
     }
 
     @Override
@@ -57,6 +57,6 @@ public class LorenzDemo extends AbstractSimulationDemo {
 
     @Override
     protected String getLongDescription() {
-         return org.jscience.ui.i18n.I18n.getInstance().get("demo.lorenz.desc");
+         return org.jscience.ui.i18n.I18n.getInstance().get("demo.lorenzdemo.longdesc");
     }
 }

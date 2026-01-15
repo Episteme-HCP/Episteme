@@ -34,17 +34,17 @@ public class EconomicsGDPDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.economics", "Economics");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.economics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("EconomicsGDP.title");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.economicsgdpdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("EconomicsGDP.desc");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.economicsgdpdemo.desc");
     }
 
     @Override
@@ -58,6 +58,6 @@ public class EconomicsGDPDemo extends AbstractDemo {
 
     @Override
     protected String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.economicsgdpdemo.longdesc");
     }
 }

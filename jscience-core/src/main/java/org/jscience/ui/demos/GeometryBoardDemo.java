@@ -40,17 +40,17 @@ public class GeometryBoardDemo extends AbstractSimulationDemo {
 
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("GeometryBoard.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.geometryboarddemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("GeometryBoard.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.geometryboarddemo.desc");
     }
 
     @Override
@@ -60,7 +60,7 @@ public class GeometryBoardDemo extends AbstractSimulationDemo {
 
     @Override
     protected String getLongDescription() {
-         return org.jscience.ui.i18n.I18n.getInstance().get("demo.geometry.desc");
+         return org.jscience.ui.i18n.I18n.getInstance().get("demo.geometryboarddemo.longdesc");
     }
 }
 

@@ -1627,11 +1627,5 @@ public class JScienceMasterControl extends Application {
     }
 
 
-    /**
-     * Main entry point for standalone execution.
-     * @param args command line arguments
-     */
-    public static void main(String[] args) {
-        launch(args);
-    }
+
 }

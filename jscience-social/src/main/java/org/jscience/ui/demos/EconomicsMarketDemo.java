@@ -44,17 +44,17 @@ public class EconomicsMarketDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.economics", "Economics");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.economics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.title");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.economicsmarketdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.desc");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.economicsmarketdemo.desc");
     }
 
     @Override
@@ -149,6 +149,6 @@ public class EconomicsMarketDemo extends AbstractDemo {
     
     @Override
     protected String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.economicsmarketdemo.longdesc");
     }
 }

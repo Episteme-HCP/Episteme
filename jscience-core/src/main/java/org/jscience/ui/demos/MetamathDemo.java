@@ -40,17 +40,17 @@ public class MetamathDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("Metamath.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.metamathdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("Metamath.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.metamathdemo.desc");
     }
 
     @Override
@@ -60,7 +60,7 @@ public class MetamathDemo extends AbstractDemo {
 
     @Override
     protected String getLongDescription() {
-         return org.jscience.ui.i18n.I18n.getInstance().get("demo.metamath.desc");
+         return org.jscience.ui.i18n.I18n.getInstance().get("demo.metamathdemo.longdesc");
     }
 }
 

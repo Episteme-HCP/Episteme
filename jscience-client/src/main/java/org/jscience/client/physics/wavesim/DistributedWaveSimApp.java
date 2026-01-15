@@ -41,6 +41,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import org.jscience.server.proto.*;
+import org.jscience.ui.i18n.I18n;
 
 import java.io.*;
 import java.util.concurrent.TimeUnit;
@@ -69,7 +70,7 @@ public class DistributedWaveSimApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle("🌊 Wave Equation - Distributed JScience");
+        stage.setTitle(I18n.getInstance().get("app.distributedwavesimapp.title", "🌊 Wave Equation - Distributed JScience"));
 
         canvas = new Canvas(WIDTH * SCALE, HEIGHT * SCALE);
         gc = canvas.getGraphicsContext2D();
@@ -80,7 +81,7 @@ public class DistributedWaveSimApp extends Application {
         controls.setStyle("-fx-background-color: #1a1a2e;");
         controls.setPrefWidth(220);
 
-        Label title = new Label("Wave Equation");
+        Label title = new Label(I18n.getInstance().get("app.distributedwavesimapp.header", "Wave Equation"));
         title.setStyle("-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #7c3aed;");
 
         Slider speedSlider = new Slider(0.1, 0.9, 0.5);
@@ -89,22 +90,22 @@ public class DistributedWaveSimApp extends Application {
         Slider dampSlider = new Slider(0.9, 1.0, 0.999);
         dampSlider.valueProperty().addListener((obs, old, val) -> task.setDamping(val.doubleValue()));
 
-        statusLabel = new Label("Status: Connected to Grid");
+        statusLabel = new Label(I18n.getInstance().get("app.distributedwavesimapp.status.connected", "Status: Connected to Grid"));
         statusLabel.setStyle("-fx-text-fill: #aaa; -fx-font-size: 11;");
 
-        CheckBox distCheck = new CheckBox("Distributed Mode");
+        CheckBox distCheck = new CheckBox(I18n.getInstance().get("app.distributedwavesimapp.chk.dist", "Distributed Mode"));
         distCheck.setSelected(true);
         distCheck.setStyle("-fx-text-fill: white;");
         distCheck.setOnAction(e -> distributed = distCheck.isSelected());
 
-        Button startBtn = new Button("▶ Start");
+        Button startBtn = new Button(I18n.getInstance().get("app.distributedwavesimapp.btn.start", "▶ Start"));
         startBtn.setStyle("-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-pref-width: 200;");
         startBtn.setOnAction(e -> {
             running = !running;
-            startBtn.setText(running ? "⏸ Pause" : "▶ Resume");
+            startBtn.setText(running ? I18n.getInstance().get("app.distributedwavesimapp.btn.pause", "⏸ Pause") : I18n.getInstance().get("app.distributedwavesimapp.btn.resume", "▶ Resume"));
         });
 
-        controls.getChildren().addAll(title, new Label("Speed:"), speedSlider, new Label("Damping:"), dampSlider,
+        controls.getChildren().addAll(title, new Label(I18n.getInstance().get("app.distributedwavesimapp.lbl.speed", "Speed:")), speedSlider, new Label(I18n.getInstance().get("app.distributedwavesimapp.lbl.damping", "Damping:")), dampSlider,
                 new Separator(), distCheck, statusLabel, startBtn);
 
         canvas.setOnMouseClicked(e -> createDrop((int) (e.getX() / SCALE), (int) (e.getY() / SCALE), 15));
@@ -143,7 +144,7 @@ public class DistributedWaveSimApp extends Application {
                     runDistributedStep();
                 else {
                     task.step();
-                    statusLabel.setText("Status: Local Performance");
+                    statusLabel.setText(I18n.getInstance().get("app.distributedwavesimapp.status.local", "Status: Local Performance"));
                     render();
                 }
             }
@@ -167,7 +168,7 @@ public class DistributedWaveSimApp extends Application {
                             .next();
                     if (result.getStatus() == Status.COMPLETED) {
                         applyWave(result.getSerializedData().toByteArray());
-                        statusLabel.setText("Status: Grid Computed ✅");
+                        statusLabel.setText(I18n.getInstance().get("app.distributedwavesimapp.status.dist", "Status: Grid Computed ✅"));
                         render();
                         return;
                     }
@@ -176,11 +177,11 @@ public class DistributedWaveSimApp extends Application {
             }
             task.step();
             render();
-            statusLabel.setText("Status: Grid Queued ⏳");
+            statusLabel.setText(I18n.getInstance().get("app.distributedwavesimapp.status.queued", "Status: Grid Queued ⏳"));
         } catch (Exception e) {
             task.step();
             render();
-            statusLabel.setText("Status: Grid Offline ❌");
+            statusLabel.setText(I18n.getInstance().get("app.distributedwavesimapp.status.offline", "Status: Grid Offline ❌"));
         }
     }
 

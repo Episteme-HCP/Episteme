@@ -55,6 +55,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javafx.stage.FileChooser;
+import org.jscience.ui.i18n.I18n;
 import javafx.scene.control.Button;
 import javafx.scene.control.Alert;
 
@@ -76,7 +77,7 @@ public class DistributedDnaFoldingApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle("🧬 DNA Folding - Distributed JScience");
+        stage.setTitle(I18n.getInstance().get("app.distributeddnafoldingapp.title", "🧬 DNA Folding - Distributed JScience"));
 
         EnergyView energyView = new EnergyView();
         energyLabel = energyView.label;
@@ -119,7 +120,7 @@ public class DistributedDnaFoldingApp extends Application {
                 else {
                     task.run();
                     renderMolecule();
-                    statusLabel.setText("Status: Local Performance");
+                    statusLabel.setText(I18n.getInstance().get("app.distributeddnafoldingapp.status.local", "Status: Local Performance"));
                 }
             }
         }.start();
@@ -127,8 +128,8 @@ public class DistributedDnaFoldingApp extends Application {
 
     private void exportToPdb() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save PDB Export");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDB Files", "*.pdb"));
+        fileChooser.setTitle(I18n.getInstance().get("app.distributeddnafoldingapp.file.save.title", "Save PDB Export"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(I18n.getInstance().get("app.distributeddnafoldingapp.file.pdb", "PDB Files"), "*.pdb"));
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
             try {
@@ -146,9 +147,9 @@ public class DistributedDnaFoldingApp extends Application {
                 }
                 p.addChain(chain);
                 new PDBWriter().save(p, file.getAbsolutePath());
-                new Alert(Alert.AlertType.INFORMATION, "PDB Export successful").show();
+                new Alert(Alert.AlertType.INFORMATION, I18n.getInstance().get("app.distributeddnafoldingapp.alert.export.success", "PDB Export successful")).show();
             } catch (Exception ex) {
-                new Alert(Alert.AlertType.ERROR, "Export failed: " + ex.getMessage()).show();
+                new Alert(Alert.AlertType.ERROR, I18n.getInstance().get("app.distributeddnafoldingapp.alert.export.error", "Export failed: {0}", ex.getMessage())).show();
             }
         }
     }
@@ -182,7 +183,7 @@ public class DistributedDnaFoldingApp extends Application {
                     if (result.getStatus() == Status.COMPLETED) {
                         applyFoldingResults(result.getSerializedData().toByteArray());
                         renderMolecule();
-                        statusLabel.setText("Status: Grid Computed ✅");
+                        statusLabel.setText(I18n.getInstance().get("app.distributeddnafoldingapp.status.grid_complete", "Status: Grid Computed ✅"));
                         return;
                     }
                 } catch (Exception e) {
@@ -190,11 +191,11 @@ public class DistributedDnaFoldingApp extends Application {
             }
             task.run();
             renderMolecule();
-            statusLabel.setText("Status: Grid Pending ⏳");
+            statusLabel.setText(I18n.getInstance().get("app.distributeddnafoldingapp.status.grid_pending", "Status: Grid Pending ⏳"));
         } catch (Exception e) {
             task.run();
             renderMolecule();
-            statusLabel.setText("Status: Grid Error ❌");
+            statusLabel.setText(I18n.getInstance().get("app.distributeddnafoldingapp.status.grid_error", "Status: Grid Error ❌"));
         }
     }
 
@@ -241,7 +242,7 @@ public class DistributedDnaFoldingApp extends Application {
                 moleculeGroup.getChildren().add(createBond(points.get(i - 1), p));
             }
         }
-        energyLabel.setText(String.format("Energy: %.2f kcal/mol", task.getFinalEnergy()));
+        energyLabel.setText(String.format(I18n.getInstance().get("app.distributeddnafoldingapp.energy", "Energy: %.2f kcal/mol"), task.getFinalEnergy()));
     }
 
     private Node createBond(DnaFoldingTask.Point3D p1, DnaFoldingTask.Point3D p2) {
@@ -257,8 +258,8 @@ public class DistributedDnaFoldingApp extends Application {
         VBox pane = new VBox(10);
         Label label = new Label();
         Label status = new Label();
-        CheckBox checkbox = new CheckBox("Distributed Mode");
-        Button exportBtn = new Button("💾 Export PDB");
+        CheckBox checkbox = new CheckBox(I18n.getInstance().get("app.distributeddnafoldingapp.chk.distributed", "Distributed Mode"));
+        Button exportBtn = new Button(I18n.getInstance().get("app.distributeddnafoldingapp.btn.export", "💾 Export PDB"));
 
         EnergyView() {
             pane.setStyle("-fx-background-color: rgba(30,30,50,0.8); -fx-padding: 20;");

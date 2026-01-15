@@ -43,17 +43,17 @@ public class PsychologyReactionTestDemo extends AbstractSimulationDemo {
 
     @Override
     public String getCategory() {
-        return "Psychology";
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.psychology");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("PsychologyReaction.title");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.psychologyreactiontestdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("PsychologyReaction.desc");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.psychologyreactiontestdemo.desc");
     }
 
     private long startTime = 0;
@@ -132,7 +132,7 @@ public class PsychologyReactionTestDemo extends AbstractSimulationDemo {
 
     @Override
     protected String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.psychologyreactiontestdemo.longdesc");
     }
 }
 

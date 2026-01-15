@@ -24,8 +24,6 @@
 package org.jscience.ui.demos;
 
 import org.jscience.ui.i18n.SocialI18n;
-import javafx.scene.chart.BarChart;
-import javafx.scene.control.*;
 // import javafx.scene.layout.HBox;
 import org.jscience.ui.AbstractDemo;
 
@@ -38,17 +36,17 @@ public class PoliticsVotingDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.politics", "Politics");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.politics");
     }
 
     @Override
     public String getName() {
-        return SocialI18n.getInstance().get("PoliticsVoting.title");
+        return SocialI18n.getInstance().get("demo.politicsvotingdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return SocialI18n.getInstance().get("PoliticsVoting.desc");
+        return SocialI18n.getInstance().get("demo.politicsvotingdemo.desc");
     }
 
     @Override
@@ -61,6 +59,6 @@ public class PoliticsVotingDemo extends AbstractDemo {
     
     @Override
     protected String getLongDescription() {
-        return getDescription();
+        return SocialI18n.getInstance().get("demo.politicsvotingdemo.longdesc");
     }
 }

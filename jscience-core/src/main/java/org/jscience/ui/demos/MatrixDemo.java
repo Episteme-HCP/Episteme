@@ -31,17 +31,17 @@ public class MatrixDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return I18n.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("matrix.title");
+        return I18n.getInstance().get("demo.matrixdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("matrix.desc");
+        return I18n.getInstance().get("demo.matrixdemo.desc");
     }
 
     @Override
@@ -51,6 +51,6 @@ public class MatrixDemo extends AbstractDemo {
 
     @Override
     protected String getLongDescription() {
-        return I18n.getInstance().get("matrix.desc");
+        return I18n.getInstance().get("demo.matrixdemo.longdesc");
     }
 }

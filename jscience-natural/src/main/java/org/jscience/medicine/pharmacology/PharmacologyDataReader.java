@@ -30,7 +30,7 @@ import org.jscience.medicine.Medication;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
+
 
 /**
  * Reads and manages pharmacology and medical data from various sources (loaders).

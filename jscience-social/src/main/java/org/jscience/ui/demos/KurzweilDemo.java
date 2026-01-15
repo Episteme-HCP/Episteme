@@ -91,22 +91,22 @@ public class KurzweilDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.economics", "Economics");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.economics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.title");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.kurzweildemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.desc");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.kurzweildemo.desc");
     }
     
     @Override
     protected String getLongDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.desc.text");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.kurzweildemo.longdesc");
     }
 
     @Override

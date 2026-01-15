@@ -47,6 +47,7 @@ import org.jscience.physics.classical.mechanics.Particle;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.physics.PhysicalConstants;
 import org.jscience.server.proto.*;
+import org.jscience.ui.i18n.I18n;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -122,7 +123,7 @@ public class DistributedNBodyApp extends Application {
                     int fps = frameCount;
                     frameCount = 0;
                     lastFpsTime = now;
-                    Platform.runLater(() -> fpsLabel.setText("FPS: " + fps));
+                    Platform.runLater(() -> fpsLabel.setText(I18n.getInstance().get("app.distributednbodyapp.fps", "FPS: --").replace("--", String.valueOf(fps))));
                 }
 
                 if (distributed && serverAvailable) {
@@ -140,7 +141,7 @@ public class DistributedNBodyApp extends Application {
         };
 
         Scene scene = new Scene(root, WIDTH + 40, HEIGHT + 140);
-        primaryStage.setTitle("JScience Distributed N-Body Simulation");
+        primaryStage.setTitle(I18n.getInstance().get("app.distributednbodyapp.title", "JScience Distributed N-Body Simulation"));
         primaryStage.setScene(scene);
         primaryStage.show();
         render();
@@ -202,7 +203,7 @@ public class DistributedNBodyApp extends Application {
             // Server unavailable, fall back to local
             if (serverAvailable) {
                 serverAvailable = false;
-                Platform.runLater(() -> statusLabel.setText("⚠️ Server unavailable, using local mode"));
+                Platform.runLater(() -> statusLabel.setText(I18n.getInstance().get("app.distributednbodyapp.status.local_fallback", "⚠️ Server unavailable, using local mode")));
             }
             simulation.step(Real.of(DT));
         }
@@ -254,10 +255,10 @@ public class DistributedNBodyApp extends Application {
 
     private void updateStatus() {
         if (stepCount % 60 == 0) { // Update every ~1 second
-            String mode = distributed ? (serverAvailable ? "🌐 Distributed" : "⚠️ Fallback Local") : "💻 Local";
+            String modeLabel = distributed ? (serverAvailable ? I18n.getInstance().get("app.distributednbodyapp.mode.dist", "🌐 Distributed") : I18n.getInstance().get("app.distributednbodyapp.mode.fallback", "⚠️ Fallback Local")) : I18n.getInstance().get("app.distributednbodyapp.mode.local", "💻 Local");
             double energy = simulation.totalEnergy().doubleValue();
             Platform.runLater(
-                    () -> statusLabel.setText(String.format("%s | Step: %d | E: %.2e J", mode, stepCount, energy)));
+                    () -> statusLabel.setText(String.format(I18n.getInstance().get("app.distributednbodyapp.status.format", "%s | Step: %d | E: %.2e J"), modeLabel, stepCount, energy)));
         }
     }
 
@@ -335,28 +336,28 @@ public class DistributedNBodyApp extends Application {
         header.setStyle("-fx-background-color: #16213e;");
         header.setAlignment(Pos.CENTER_LEFT);
 
-        Label title = new Label("🌌 Distributed N-Body Simulation");
+        Label title = new Label(I18n.getInstance().get("app.distributednbodyapp.header", "🌌 Distributed N-Body Simulation"));
         title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #e94560;");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
-        startBtn = new Button("▶ Start");
+        startBtn = new Button(I18n.getInstance().get("app.distributednbodyapp.btn.start", "▶ Start"));
         startBtn.setStyle("-fx-background-color: #4ecca3; -fx-text-fill: white;");
         startBtn.setOnAction(e -> toggleSimulation());
 
-        ToggleButton distributedToggle = new ToggleButton("🌐 Distributed");
+        ToggleButton distributedToggle = new ToggleButton(I18n.getInstance().get("app.distributednbodyapp.btn.dist", "🌐 Distributed"));
         distributedToggle.setStyle("-fx-background-color: #e94560; -fx-text-fill: white;");
         distributedToggle.setOnAction(e -> {
             distributed = distributedToggle.isSelected();
             if (distributed && !serverAvailable) {
                 checkServerAvailability(); // Retry connection
             }
-            statusLabel.setText(distributed ? (serverAvailable ? "🌐 Distributed Mode" : "⚠️ Server unavailable")
-                    : "💻 Local Mode");
+            statusLabel.setText(distributed ? (serverAvailable ? I18n.getInstance().get("app.distributednbodyapp.status.dist_mode", "🌐 Distributed Mode") : I18n.getInstance().get("app.distributednbodyapp.status.server_unavail", "⚠️ Server unavailable"))
+                    : I18n.getInstance().get("app.distributednbodyapp.status.local_mode", "💻 Local Mode"));
         });
 
-        Button resetBtn = new Button("🔄 Reset");
+        Button resetBtn = new Button(I18n.getInstance().get("app.distributednbodyapp.btn.reset", "🔄 Reset"));
         resetBtn.setStyle("-fx-background-color: #888; -fx-text-fill: white;");
         resetBtn.setOnAction(e -> {
             resetSimulation();
@@ -371,10 +372,10 @@ public class DistributedNBodyApp extends Application {
         running = !running;
         if (running) {
             timer.start();
-            startBtn.setText("⏸ Pause");
+            startBtn.setText(I18n.getInstance().get("app.distributednbodyapp.btn.pause", "⏸ Pause"));
         } else {
             timer.stop();
-            startBtn.setText("▶ Start");
+            startBtn.setText(I18n.getInstance().get("app.distributednbodyapp.btn.start", "▶ Start"));
         }
     }
 
@@ -383,13 +384,13 @@ public class DistributedNBodyApp extends Application {
         footer.setPadding(new Insets(10, 20, 10, 20));
         footer.setStyle("-fx-background-color: #16213e;");
 
-        statusLabel = new Label("💻 Local Mode - Ready");
+        statusLabel = new Label(I18n.getInstance().get("app.distributednbodyapp.status.ready", "💻 Local Mode - Ready"));
         statusLabel.setStyle("-fx-text-fill: #4ecca3;");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
-        fpsLabel = new Label("FPS: --");
+        fpsLabel = new Label(I18n.getInstance().get("app.distributednbodyapp.fps", "FPS: --"));
         fpsLabel.setStyle("-fx-text-fill: #888;");
 
         footer.getChildren().addAll(statusLabel, spacer, fpsLabel);

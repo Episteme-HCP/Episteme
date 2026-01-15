@@ -41,17 +41,22 @@ public class GeographyGISDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.geography", "Geography");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.geography");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("geo.gis.title");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.geographygisdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("geo.gis.desc");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.geographygisdemo.desc");
+    }
+
+    @Override
+    protected String getLongDescription() {
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.geographygisdemo.longdesc");
     }
 
     @Override
@@ -61,8 +66,5 @@ public class GeographyGISDemo extends AbstractDemo {
         return v;
     }
     
-    @Override
-    protected String getLongDescription() {
-        return getDescription();
-    }
+
 }

@@ -88,7 +88,7 @@ public class RbacInterceptor implements ServerInterceptor {
         String token = authHeader.substring("Bearer ".length());
 
         // Validate token
-        String userId = JwtUtil.validateAndGetUsername(token);
+        String userId = JWTUtil.validateAndGetUsername(token);
         if (userId == null) {
             LOG.warn("Invalid JWT token for: {}", methodName);
             call.close(Status.UNAUTHENTICATED.withDescription("Invalid or expired token"), headers);
@@ -97,7 +97,7 @@ public class RbacInterceptor implements ServerInterceptor {
         }
 
         // Extract role from token
-        String userRole = JwtUtil.getRole(token);
+        String userRole = JWTUtil.getRole(token);
 
         LOG.debug("Authenticated user {} with role {} accessing {}", userId, userRole, methodName);
 

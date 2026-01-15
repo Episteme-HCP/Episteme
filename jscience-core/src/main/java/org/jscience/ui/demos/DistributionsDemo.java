@@ -25,6 +25,7 @@ package org.jscience.ui.demos;
 
 import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.viewers.mathematics.statistics.DistributionsViewer;
+import org.jscience.ui.i18n.I18n;
 
 /**
  * 
@@ -36,17 +37,17 @@ public class DistributionsDemo extends AbstractDemo {
 
     @Override
     public String getName() {
-        return "Statistical Distributions";
+        return I18n.getInstance().get("demo.distributionsdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return "Visualizer for Normal, Poisson, and Binomial distributions.";
+        return I18n.getInstance().get("demo.distributionsdemo.desc");
     }
 
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return I18n.getInstance().get("category.mathematics");
     }
 
     @Override
@@ -56,7 +57,7 @@ public class DistributionsDemo extends AbstractDemo {
 
     @Override
     protected String getLongDescription() {
-        return "Visualizer for Normal, Poisson, and Binomial distributions.";
+        return I18n.getInstance().get("demo.distributionsdemo.longdesc");
     }
 }
 

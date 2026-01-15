@@ -55,17 +55,17 @@ public class SportsResultsDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return "Sociology";
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.sociology");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.sports.results.title", "Sports League Manager");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.sportsresultsdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.sports.results.desc", "Manage match results and view automatically calculated league standings.");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.sportsresultsdemo.desc");
     }
 
     @Override
@@ -169,7 +169,7 @@ public class SportsResultsDemo extends AbstractDemo {
 
     @Override
     protected String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.sportsresultsdemo.longdesc");
     }
 
     public static class Team {

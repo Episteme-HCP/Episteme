@@ -38,17 +38,17 @@ public class FunctionExplorer2D3DDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return I18n.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("plotting.title", "Function Explorer");
+        return I18n.getInstance().get("demo.functionexplorer2d3ddemo.name");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("plotting.desc", "Explore 2D and 3D mathematical functions.");
+        return I18n.getInstance().get("demo.functionexplorer2d3ddemo.desc");
     }
 
     @Override
@@ -74,7 +74,7 @@ public class FunctionExplorer2D3DDemo extends AbstractDemo {
 
     @Override
     protected String getLongDescription() {
-        return getDescription();
+        return I18n.getInstance().get("demo.functionexplorer2d3ddemo.longdesc");
     }
 
 

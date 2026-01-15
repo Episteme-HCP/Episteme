@@ -40,17 +40,17 @@ public class UnitConverterDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("unit.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.unitconverterdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("unit.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.unitconverterdemo.desc");
     }
 
     @Override
@@ -60,7 +60,7 @@ public class UnitConverterDemo extends AbstractDemo {
 
     @Override
     protected String getLongDescription() {
-         return org.jscience.ui.i18n.I18n.getInstance().get("demo.converter.desc");
+         return org.jscience.ui.i18n.I18n.getInstance().get("demo.unitconverterdemo.longdesc");
     }
 }
 

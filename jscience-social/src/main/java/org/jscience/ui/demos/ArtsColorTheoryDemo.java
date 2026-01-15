@@ -39,17 +39,17 @@ public class ArtsColorTheoryDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return "Arts";
+        return SocialI18n.getInstance().get("category.arts");
     }
 
     @Override
     public String getName() {
-        return SocialI18n.getInstance().get("ArtsColorTheory.title");
+        return SocialI18n.getInstance().get("demo.artscolortheorydemo.name");
     }
 
     @Override
     public String getDescription() {
-        return SocialI18n.getInstance().get("ArtsColorTheory.desc");
+        return SocialI18n.getInstance().get("demo.artscolortheorydemo.desc");
     }
 
     @Override
@@ -59,6 +59,6 @@ public class ArtsColorTheoryDemo extends AbstractDemo {
     
     @Override
     protected String getLongDescription() {
-         return SocialI18n.getInstance().get("ArtsColorTheory.desc");
+         return SocialI18n.getInstance().get("demo.artscolortheorydemo.longdesc");
     }
 }

@@ -67,17 +67,17 @@ public class CarTrafficDemo extends AbstractSimulationDemo {
 
     @Override
     public String getCategory() {
-        return "Engineering";
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.engineering");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("CarTraffic.title");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.cartrafficdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("CarTraffic.desc");
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.cartrafficdemo.desc");
     }
 
     @Override
@@ -299,7 +299,7 @@ public class CarTrafficDemo extends AbstractSimulationDemo {
 
     @Override
     protected String getLongDescription() {
-         return getDescription();
+         return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.cartrafficdemo.longdesc");
     }
 
     private static class Car {
