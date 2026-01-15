@@ -461,6 +461,11 @@ public class JScienceMasterControl extends Application {
                 new LibInfo("jsr385", true),
                 new LibInfo("indriya", isClassAvailable("tech.units.indriya.format.SimpleUnitFormat"))), i18n));
 
+        // --- Distributed Computing ---
+        content.getChildren().add(createLibCategory(i18n, "distributed", List.of(
+                new LibInfo("spark", isClassAvailable("org.apache.spark.api.java.JavaSparkContext")),
+                new LibInfo("mpj", isClassAvailable("mpi.MPI"))), i18n));
+
         // Hardware Acceleration (Compute Drivers) - moved above Math
         content.getChildren().add(createHardwareCategory(i18n));
 
