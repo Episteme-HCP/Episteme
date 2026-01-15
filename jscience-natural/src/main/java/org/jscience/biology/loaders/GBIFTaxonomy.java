@@ -148,4 +148,19 @@ public class GBIFTaxonomy extends AbstractResourceReader<String> {
 
     public GBIFTaxonomy() {
     }
+
+    @Override
+    public String getCategory() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology");
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.gbiftaxonomy.name");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.gbiftaxonomy.description");
+    }
 }

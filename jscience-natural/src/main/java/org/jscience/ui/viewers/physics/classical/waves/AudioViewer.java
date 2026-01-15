@@ -92,7 +92,7 @@ public class AudioViewer extends AbstractViewer implements Simulatable {
     
     private void openFile() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Audio File");
+        fileChooser.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("generated.audio.open.audio.file", "Open Audio File"));
         fileChooser.getExtensionFilters().add(
             new FileChooser.ExtensionFilter("Audio Files", "*.wav", "*.aif", "*.au", "*.snd")
         );
@@ -204,4 +204,8 @@ public class AudioViewer extends AbstractViewer implements Simulatable {
     
     @Override public String getName() { return "Audio Viewer"; }
     @Override public String getCategory() { return "Physics"; }
+
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.audio.desc"); }
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.audio.longdesc"); }
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

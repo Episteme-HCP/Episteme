@@ -94,7 +94,7 @@ public class MolecularViewer extends org.jscience.ui.AbstractViewer {
                 new Label(org.jscience.ui.i18n.I18n.getInstance().get("molecule.label.load")),
                 selector,
                 new Separator(),
-                new Label("Style"),
+                new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.molecular.style", "Style")),
                 styleSelector,
                 new Separator(),
                 detailLabel);
@@ -164,5 +164,15 @@ public class MolecularViewer extends org.jscience.ui.AbstractViewer {
     // Accessor for CrystalStructureApp to use custom rendering
     public MolecularRenderer getRenderer() {
         return renderer;
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("MolecularViewer.desc", "MolecularViewer description");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
     }
 }

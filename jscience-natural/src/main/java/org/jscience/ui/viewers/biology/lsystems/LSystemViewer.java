@@ -161,7 +161,7 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
         sidebar.setPrefWidth(280);
         sidebar.getStyleClass().add("dark-viewer-sidebar");
 
-        Label title = new Label("L-System Settings");
+        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.lsystem.lsystem.settings", "L-System Settings"));
         title.getStyleClass().add("dark-header");
 
         presetCombo = new ComboBox<>();
@@ -173,7 +173,7 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
         iterSlider.setShowTickLabels(true); iterSlider.setShowTickMarks(true);
         iterSlider.setMajorTickUnit(1); iterSlider.setSnapToTicks(true);
 
-        Label iterLabel = new Label("Iterations: 4");
+        Label iterLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.lsystem.iterations.4", "Iterations: 4"));
         iterSlider.valueProperty().addListener((obs, old, val) -> iterLabel.setText("Iterations: " + val.intValue()));
 
         animCheck = new CheckBox(I18n.getInstance().get("lsystem.animate", "Animate Growth"));
@@ -193,10 +193,10 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
         rulesArea.setWrapText(true);
         rulesArea.setStyle("-fx-font-family: 'Consolas', monospace; -fx-font-size: 11px;");
 
-        statusLabel = new Label("Ready");
+        statusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.lsystem.ready", "Ready"));
         statusLabel.setStyle("-fx-text-fill: #888; -fx-font-size: 10px;");
 
-        sidebar.getChildren().addAll(title, new Label("Preset:"), presetCombo, iterLabel, iterSlider, animCheck, new Separator(), new Label("Rules:"), rulesArea, new Separator(), renderBtn, statusLabel);
+        sidebar.getChildren().addAll(title, new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.lsystem.preset", "Preset:")), presetCombo, iterLabel, iterSlider, animCheck, new Separator(), new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.lsystem.rules", "Rules:")), rulesArea, new Separator(), renderBtn, statusLabel);
         this.setRight(sidebar);
         
         loadPreset("Fractal Plant");
@@ -352,4 +352,8 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
             mx = e.getSceneX(); my = e.getSceneY();
         });
     }
+
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.lsystem.desc"); }
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.lsystem.longdesc"); }
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

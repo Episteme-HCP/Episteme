@@ -43,6 +43,9 @@ import java.util.ArrayList;
 /**
  * Abstract base class for all JScience Demonstrations.
  * Provides a consistent layout with a viewer area and a control panel.
+ * 
+ * Subclasses MUST override: getCategory(), getName(), getDescription(), getLongDescription()
+ * with proper I18n support.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -112,7 +115,7 @@ public abstract class AbstractDemo extends Application implements App {
         panel.setPadding(new Insets(10));
         panel.setAlignment(Pos.TOP_LEFT);
 
-        Label sectionTitle = new Label(I18n.getInstance().get("demo.controls.title", "Parameters"));
+        Label sectionTitle = new Label(I18n.getInstance().get("demo.controls.title"));
         sectionTitle.setFont(Font.font("System", FontWeight.BOLD, 16));
         panel.getChildren().add(sectionTitle);
 
@@ -167,16 +170,21 @@ public abstract class AbstractDemo extends Application implements App {
         return box;
     }
 
+    // === MANDATORY ABSTRACT METHODS - MUST BE OVERRIDDEN WITH I18N ===
+
     @Override
-    public String getDescription() {
-        return getName(); // Default to name if not overridden
-    }
+    public abstract String getCategory();
+
+    @Override
+    public abstract String getName();
+
+    @Override
+    public abstract String getDescription();
+
+    @Override
+    public abstract String getLongDescription();
 
     protected abstract Node createViewerNode();
-
-    protected String getLongDescription() {
-        return ""; // Default empty, subclasses can override
-    }
 
     @Override
     public List<Parameter<?>> getViewerParameters() {
@@ -192,5 +200,3 @@ public abstract class AbstractDemo extends Application implements App {
         start(stage);
     }
 }
-
-

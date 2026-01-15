@@ -99,4 +99,6 @@ public class SRTMElevationReader extends AbstractResourceReader<Double> {
             return (double) val;
         }
     }
+
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.srtmelevation.name"); }
 }

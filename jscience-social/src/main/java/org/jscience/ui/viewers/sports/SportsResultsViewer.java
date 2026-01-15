@@ -205,4 +205,8 @@ public class SportsResultsViewer extends AbstractViewer {
         @Override
         public String toString() { return name.get(); }
     }
+
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.sportsresults.desc"); }
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.sportsresults.longdesc"); }
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

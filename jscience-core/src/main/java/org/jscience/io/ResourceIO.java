@@ -26,6 +26,9 @@ package org.jscience.io;
 /**
  * Common interface for all resource I/O components in JScience.
  * Replaces the old ResourceLoader.
+ * 
+ * Implementations MUST override: getCategory(), getName(), getDescription()
+ * with proper I18n support.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -57,22 +60,37 @@ public interface ResourceIO<T> {
         return new String[0];
     }
 
-    default String getName() {
-        return this.getClass().getSimpleName();
-    }
+    /**
+     * Returns the display name of this resource handler.
+     * MUST be implemented with I18n support.
+     * @return the display name
+     */
+    String getName();
 
-    default String getDescription() {
-        return "";
-    }
+    /**
+     * Returns a short description of this resource handler.
+     * MUST be implemented with I18n support.
+     * @return the description
+     */
+    String getDescription();
 
-    default String getCategory() {
-        return "category.other";
-    }
+    /**
+     * Returns the category for grouping.
+     * MUST be implemented with I18n support.
+     * @return the category name
+     */
+    String getCategory();
 
+    /**
+     * Returns true if this is an input (reader) resource.
+     */
     default boolean isInput() {
         return false;
     }
 
+    /**
+     * Returns true if this is an output (writer) resource.
+     */
     default boolean isOutput() {
         return false;
     }

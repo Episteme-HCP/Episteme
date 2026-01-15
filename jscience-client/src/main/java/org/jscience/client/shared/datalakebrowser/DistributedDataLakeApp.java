@@ -47,7 +47,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * Data Lake Browser - Visualize streaming Genome and Star data from the server.
  * Demonstrates the efficiency of gRPC streaming for large scientific datasets.
  */
-public class DistributedDataLakeApp extends Application {
+public class DistributedDataLakeApp extends Application implements org.jscience.ui.App {
 
     private ManagedChannel channel;
     private DataServiceGrpc.DataServiceStub asyncStub;
@@ -109,11 +109,11 @@ public class DistributedDataLakeApp extends Application {
         streamGenomeBtn.setStyle("-fx-background-color: #e94560; -fx-text-fill: white; -fx-font-size: 14px;");
         streamGenomeBtn.setOnAction(e -> streamGenomeData());
 
-        streamStarsBtn = new Button("Ã¢Â­Â Stream Stars");
+        streamStarsBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.distributeddatalake.stream.stars", "Ã¢Â­Â Stream Stars"));
         streamStarsBtn.setStyle("-fx-background-color: #4ecca3; -fx-text-fill: white; -fx-font-size: 14px;");
         streamStarsBtn.setOnAction(e -> streamStarData());
 
-        Button clearBtn = new Button("Clear");
+        Button clearBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("collab.btn.clear", "Clear"));
         clearBtn.setStyle("-fx-background-color: #0f3460; -fx-text-fill: white;");
         clearBtn.setOnAction(e -> {
             outputArea.clear();
@@ -211,7 +211,7 @@ public class DistributedDataLakeApp extends Application {
             public void onError(Throwable t) {
                 Platform.runLater(() -> {
                     outputArea.appendText("\nÃ°Å¸â€Â´ Error: " + t.getMessage() + "\n");
-                    statsLabel.setText("Error");
+                    statsLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.distributeddatalake.error", "Error"));
                     isStreaming = false;
                     streamGenomeBtn.setDisable(false);
                     streamStarsBtn.setDisable(false);
@@ -278,7 +278,7 @@ public class DistributedDataLakeApp extends Application {
             public void onError(Throwable t) {
                 Platform.runLater(() -> {
                     outputArea.appendText("\nÃ°Å¸â€Â´ Error: " + t.getMessage() + "\n");
-                    statsLabel.setText("Error");
+                    statsLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.distributeddatalake.error", "Error"));
                     isStreaming = false;
                     streamGenomeBtn.setDisable(false);
                     streamStarsBtn.setDisable(false);
@@ -309,5 +309,37 @@ public class DistributedDataLakeApp extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    // App Interface Implementation
+    @Override
+    public boolean isDemo() {
+        return false;
+    }
+
+    @Override
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.general", "General"); }
+
+    @Override
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributeddatalakeapp.name", "Distributed Data Lake App"); }
+
+    @Override
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributeddatalakeapp.desc", "Distributed application for Distributed Data Lake App."); }
+
+    @Override
+    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributeddatalakeapp.longdesc", "Distributed application for Distributed Data Lake App."); }
+
+    @Override
+    public void show(javafx.stage.Stage stage) {
+        try {
+            start(stage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return new java.util.ArrayList<>();
     }
 }

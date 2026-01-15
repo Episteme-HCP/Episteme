@@ -48,12 +48,12 @@ import java.io.Serializable;
  * public class MandelbrotTaskProvider implements TaskProvider&lt;int[], double[]&gt; {
  *     &#64;Override
  *     public DistributedTask&lt;int[], double[]&gt; createTask() {
- *         return createTask(PrecisionMode.REAL); // Default to Real
+ *         return createTask(TaskRegistry.PrecisionMode.REAL); // Default to Real
  *     }
  * 
  *     &#64;Override
- *     public DistributedTask&lt;int[], double[]&gt; createTask(PrecisionMode mode) {
- *         return mode == PrecisionMode.PRIMITIVE
+ *     public DistributedTask&lt;int[], double[]&gt; createTask(TaskRegistry.PrecisionMode mode) {
+ *         return mode == TaskRegistry.PrecisionMode.PRIMITIVE
  *                 ? new PrimitiveMandelbrotTask()
  *                 : new RealMandelbrotTask();
  *     }

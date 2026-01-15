@@ -59,12 +59,10 @@ public class BioMotionDemo extends AbstractSimulationDemo {
     }
 
     @Override
-    public String getCategory() {
-        return "Biology";
-    }
+    public String getCategory() { return "Biology"; }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return I18n.getInstance().get("biomotion.long_desc", 
             "A simulation of biological motion using a skeleton model with muscle and gravity dynamics.");
     }
@@ -147,7 +145,7 @@ public class BioMotionDemo extends AbstractSimulationDemo {
         }
 
         @Override
-        public String getCategory() { return "Biology"; }
+    public String getCategory() { return "Biology"; }
 
         @Override
         public String getName() { return "BioMotion"; }
@@ -273,7 +271,12 @@ public class BioMotionDemo extends AbstractSimulationDemo {
                 gc.fillOval(n.x - 5, n.y - 5, 10, 10);
             }
         }
-    }
+    
+        @Override
+        public String getDescription() { return "InternalViewer Internal Viewer"; }
+
+        @Override
+}
 
     private static class WalkerNode {
         double x, y, vx, vy;
@@ -296,4 +299,6 @@ public class BioMotionDemo extends AbstractSimulationDemo {
             this.length = length;
         }
     }
+
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

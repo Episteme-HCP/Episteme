@@ -28,38 +28,88 @@ import java.util.List;
 
 /**
  * Base provider interface for all UI components (Viewers, Demos, Apps).
+ * All methods are abstract and must be overridden by implementations.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public interface Viewer {
+    
     /**
      * Returns the category for grouping (e.g., "Chemistry", "Physics").
+     * Must be internationalized via I18n.
+     * @return the category name
      */
     String getCategory();
 
     /**
      * Returns the display name of the viewer/demo.
+     * Must be internationalized via I18n.
+     * @return the display name
      */
     String getName();
 
     /**
-     * Returns a short description.
+     * Returns a short description (1-2 lines).
+     * Must be internationalized via I18n.
+     * @return the short description
      */
-    default String getDescription() {
-        return "";
-    }
+    String getDescription();
+
+    /**
+     * Returns a long description (multi-line, detailed explanation).
+     * Must be internationalized via I18n.
+     * @return the long description
+     */
+    String getLongDescription();
 
     /**
      * Launches the component in the given stage.
+     * @param stage the JavaFX stage to display the component
      */
     void show(Stage stage);
 
     /**
      * Returns a list of parameters exposed by this viewer.
+     * Parameters allow external control and configuration.
+     * @return list of configurable parameters
      */
     List<Parameter<?>> getViewerParameters();
-}
 
+    /**
+     * Sets a parameter value by name.
+     * This allows external control of viewer parameters (e.g., from a Demo).
+     * @param parameterName the parameter name/key
+     * @param value the new value
+     * @return true if the parameter was found and set, false otherwise
+     */
+    default boolean setParameter(String parameterName, Object value) {
+        for (Parameter<?> param : getViewerParameters()) {
+            if (param.getName().equals(parameterName) || 
+                param.getName().endsWith("." + parameterName)) {
+                @SuppressWarnings("unchecked")
+                Parameter<Object> p = (Parameter<Object>) param;
+                p.setValue(value);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Gets a parameter by name.
+     * @param parameterName the parameter name/key
+     * @return the parameter, or null if not found
+     */
+    default Parameter<?> getParameter(String parameterName) {
+        for (Parameter<?> param : getViewerParameters()) {
+            if (param.getName().equals(parameterName) || 
+                param.getName().endsWith("." + parameterName)) {
+                return param;
+            }
+        }
+        return null;
+    }
+}
 

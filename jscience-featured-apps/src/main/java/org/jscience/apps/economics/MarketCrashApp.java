@@ -594,4 +594,19 @@ public class MarketCrashApp extends FeaturedAppBase {
     public static void main(String[] args) {
         launch(args);
     }
+
+    @Override
+    public String getCategory() {
+        return "Economics";
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("MarketCrashApp.name", "MarketCrash");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 }

@@ -1,0 +1,29 @@
+Id,Parent,Name,COI,RNA16S,CYTB
+1,,Primates (Order),0,0,0
+2,1,Strepsirrhini,0,0,0
+3,1,Haplorhini,0,0,0
+4,2,Lemuriformes,0,0,0
+5,2,Lorisiformes,0,0,0
+6,4,Lemur catta,0.72,0.65,0.45
+7,4,Microcebus murinus,0.70,0.63,0.48
+8,5,Nycticebus coucang,0.68,0.60,0.50
+9,3,Tarsiiformes,0,0,0
+10,3,Simiiformes,0,0,0
+11,9,Tarsius syrichta,0.75,0.68,0.55
+12,10,Platyrrhini (New World),0,0,0
+13,10,Catarrhini (Old World),0,0,0
+14,12,Saimiri sciureus,0.82,0.75,0.65
+15,12,Alouatta palliata,0.80,0.73,0.62
+16,13,Cercopithecoidea,0,0,0
+17,13,Hominoidea (Apes),0,0,0
+18,16,Macaca mulatta,0.88,0.80,0.75
+19,16,Papio anubis,0.87,0.79,0.74
+20,17,Hylobatidae,0,0,0
+21,17,Hominidae,0,0,0
+22,20,Hylobates lar,0.90,0.85,0.80
+23,21,Ponginae,0,0,0
+24,21,Homininae,0,0,0
+25,23,Pongo abelii,0.92,0.88,0.82
+26,24,Gorilla gorilla,0.95,0.92,0.88
+27,24,Pan troglodytes,0.98,0.96,0.94
+28,24,Homo sapiens,0.99,0.98,0.97

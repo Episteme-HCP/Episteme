@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Wave Equation Solver with Distributed support.
  */
-public class DistributedWaveSimApp extends Application {
+public class DistributedWaveSimApp extends Application implements org.jscience.ui.App {
 
     private static final int WIDTH = 300;
     private static final int HEIGHT = 300;
@@ -246,5 +246,37 @@ public class DistributedWaveSimApp extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    // App Interface Implementation
+    @Override
+    public boolean isDemo() {
+        return false;
+    }
+
+    @Override
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics"); }
+
+    @Override
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedwavesimapp.name", "Distributed Wave Sim App"); }
+
+    @Override
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedwavesimapp.desc", "Distributed application for Distributed Wave Sim App."); }
+
+    @Override
+    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedwavesimapp.longdesc", "Distributed application for Distributed Wave Sim App."); }
+
+    @Override
+    public void show(javafx.stage.Stage stage) {
+        try {
+            start(stage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return new java.util.ArrayList<>();
     }
 }

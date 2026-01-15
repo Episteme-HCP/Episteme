@@ -110,7 +110,7 @@ public class EarthquakeMapViewer extends MapViewer {
                 createLegendItem(Color.hsb(40, 1, 1), "Moderate (5.0 - 6.0)"),
                 createLegendItem(Color.RED, "Strong (> 6.0)"));
 
-        coordLabel = new Label("Lat: 0.00 Lon: 0.00");
+        coordLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.earthquakemap.lat.000.lon.000", "Lat: 0.00 Lon: 0.00"));
         coordLabel.setFont(Font.font("Consolas", 12));
 
         infoLabel = new Label(I18n.getInstance().get("earthquake.hover", "Hover over a quake for info."));

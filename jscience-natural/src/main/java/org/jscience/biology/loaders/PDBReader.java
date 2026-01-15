@@ -174,4 +174,6 @@ public class PDBReader extends AbstractResourceReader<Protein> {
         }
         return protein;
     }
+
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.pdb.name"); }
 }

@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Real-time Grid Monitor Dashboard showing actual JScience Cluster status.
  */
-public class DistributedGridMonitorApp extends Application {
+public class DistributedGridMonitorApp extends Application implements org.jscience.ui.App {
 
     private ManagedChannel channel;
     private ComputeServiceGrpc.ComputeServiceBlockingStub blockingStub;
@@ -71,7 +71,7 @@ public class DistributedGridMonitorApp extends Application {
         root.setCenter(splitPane);
         root.setBottom(createFooter());
 
-        primaryStage.setTitle("JScience Cluster Monitor");
+        primaryStage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("generated.distributedgridmonitor.jscience.cluster.mon", "JScience Cluster Monitor"));
         primaryStage.setScene(new Scene(root, 1200, 700));
         primaryStage.show();
 
@@ -82,7 +82,7 @@ public class DistributedGridMonitorApp extends Application {
         HBox header = new HBox(20);
         header.setPadding(new Insets(15, 20, 15, 20));
         header.setStyle("-fx-background-color: #16213e;");
-        Label title = new Label("⚡ JScience Grid Monitor");
+        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("app.title.gridmonitor", "JScience Grid Monitor"));
         title.setStyle("-fx-font-size: 24; -fx-text-fill: #e94560;");
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS); // Stats cards
@@ -109,7 +109,7 @@ public class DistributedGridMonitorApp extends Application {
         table.getColumns().add(new TableColumn<WorkerInfo, String>("Worker ID"));
         table.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("workerId"));
         VBox.setVgrow(table, javafx.scene.layout.Priority.ALWAYS);
-        pane.getChildren().addAll(new Label("Active Workers"), table);
+        pane.getChildren().addAll(new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.distributedgridmonitor.active.workers", "Active Workers")), table);
         return pane;
     }
 
@@ -121,7 +121,7 @@ public class DistributedGridMonitorApp extends Application {
         table.getColumns().add(new TableColumn<JobInfo, String>("Job ID"));
         table.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("jobId"));
         VBox.setVgrow(table, javafx.scene.layout.Priority.ALWAYS);
-        pane.getChildren().addAll(new Label("Task Queue"), table);
+        pane.getChildren().addAll(new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.distributedgridmonitor.task.queue", "Task Queue")), table);
         return pane;
     }
 
@@ -129,7 +129,7 @@ public class DistributedGridMonitorApp extends Application {
         HBox footer = new HBox(10);
         footer.setPadding(new Insets(10));
         footer.setStyle("-fx-background-color: #16213e;");
-        statusLabel = new Label("Connecting...");
+        statusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("app.title.gridmonitor", "Connecting..."));
         statusLabel.setTextFill(
                 org.jscience.server.proto.Status.UNKNOWN.name().equals("UNKNOWN") ? Color.valueOf("#4ecca3")
                         : Color.valueOf("#e94560"));
@@ -154,7 +154,7 @@ public class DistributedGridMonitorApp extends Application {
             });
         } catch (Exception e) {
             Platform.runLater(() -> {
-                statusLabel.setText("❌ Server Disconnected");
+                statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.distributedgridmonitor.server.disconnected", "❌ Server Disconnected"));
                 statusLabel.setStyle("-fx-text-fill: #e94560;");
             });
         }
@@ -194,5 +194,37 @@ public class DistributedGridMonitorApp extends Application {
         public String getJobId() {
             return jobId;
         }
+    }
+
+    // App Interface Implementation
+    @Override
+    public boolean isDemo() {
+        return false;
+    }
+
+    @Override
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.general", "General"); }
+
+    @Override
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedgridmonitorapp.name", "Distributed Grid Monitor App"); }
+
+    @Override
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedgridmonitorapp.desc", "Distributed application for Distributed Grid Monitor App."); }
+
+    @Override
+    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedgridmonitorapp.longdesc", "Distributed application for Distributed Grid Monitor App."); }
+
+    @Override
+    public void show(javafx.stage.Stage stage) {
+        try {
+            start(stage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return new java.util.ArrayList<>();
     }
 }

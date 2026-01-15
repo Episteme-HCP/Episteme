@@ -27,14 +27,17 @@ import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
+
 import org.jscience.ui.AbstractDemo;
+import org.jscience.history.Timeline;
+import org.jscience.history.HistoricalEvent;
+import org.jscience.history.FuzzyDate;
+import org.jscience.ui.viewers.history.TimelineViewer;
+import org.jscience.ui.i18n.SocialI18n;
+import org.jscience.ui.i18n.I18n;
 
 import java.util.List;
 
@@ -52,13 +55,14 @@ import java.util.List;
  */
 public class KurzweilDemo extends AbstractDemo {
 
-    private static final int WIDTH = 1000;
-    // HEIGHT is handled by parent container
-
     // Time tracking
     private double realTimeSeconds = 0;
     private double kurzweilTime = 0;
     private double accelerationFactor = 2.0;
+
+    // Viewers
+    private TimelineViewer linearViewer;
+    private TimelineViewer logViewer;
 
     // Historical milestones
     private static final List<Milestone> MILESTONES = List.of(
@@ -82,59 +86,84 @@ public class KurzweilDemo extends AbstractDemo {
             new Milestone(2025, "kurzweil.milestone.now"),
             new Milestone(2045, "kurzweil.milestone.singularity"));
 
-    private Canvas linearCanvas;
-    private Canvas logCanvas;
     private Label realTimeLabel;
     private Label kurzweilTimeLabel;
     private Label accelerationLabel;
     private boolean running = true;
 
     @Override
+    public boolean isDemo() {
+        return true;
+    }
+
+    @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.economics");
+        return SocialI18n.getInstance().get("category.history", "History");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.kurzweildemo.name");
+        return SocialI18n.getInstance().get("demo.kurzweildemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.kurzweildemo.desc");
+        return SocialI18n.getInstance().get("demo.kurzweildemo.desc");
     }
-    
+
     @Override
     protected String getLongDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.kurzweildemo.longdesc");
+        return SocialI18n.getInstance().get("demo.kurzweildemo.longdesc");
     }
 
     @Override
     protected Node createViewerNode() {
-        // Main content - two timelines
+        // Create Timeline Data
+        Timeline timeline = new Timeline("Kurzweil History");
+        for (Milestone m : MILESTONES) {
+            FuzzyDate date;
+            if (m.year < 0) {
+                date = FuzzyDate.bce(-m.year);
+            } else {
+                date = FuzzyDate.of(m.year);
+            }
+            // Category? Default to SCIENTIFIC
+            timeline.addEvent(new HistoricalEvent(m.label, date, HistoricalEvent.Category.SCIENTIFIC));
+        }
+
+        // Main content - two viewers
         VBox centerBox = new VBox(20);
         centerBox.setPadding(new Insets(10));
         centerBox.setAlignment(Pos.CENTER);
 
         // Linear timeline
         VBox linearBox = new VBox(5);
-        Label linearLabel = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.label.linear"));
+        Label linearLabel = new Label(SocialI18n.getInstance().get("kurzweil.label.linear"));
         linearLabel.getStyleClass().add("dark-label");
-        linearLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
-        // Use a preferred width logic, but fixed for now to match original approx 750px
-        linearCanvas = new Canvas(WIDTH - 250, 180);
-        linearBox.getChildren().addAll(linearLabel, linearCanvas);
+        linearLabel.getStyleClass().add("font-bold");
+
+        linearViewer = new TimelineViewer();
+        linearViewer.setTimeline(timeline);
+        linearViewer.setLogScale(false);
+        linearViewer.setPrefHeight(180);
+
+        linearBox.getChildren().addAll(linearLabel, linearViewer);
 
         // Logarithmic timeline
         VBox logBox = new VBox(5);
-        Label logLabel = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.label.log"));
+        Label logLabel = new Label(SocialI18n.getInstance().get("kurzweil.label.log"));
         logLabel.getStyleClass().add("dark-label");
-        logLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
-        logCanvas = new Canvas(WIDTH - 250, 180);
-        logBox.getChildren().addAll(logLabel, logCanvas);
+        logLabel.getStyleClass().add("font-bold");
+
+        logViewer = new TimelineViewer();
+        logViewer.setTimeline(timeline);
+        logViewer.setLogScale(true); // Using API
+        linearViewer.setPrefHeight(180);
+
+        logBox.getChildren().addAll(logLabel, logViewer);
 
         centerBox.getChildren().addAll(linearBox, logBox);
-        
+
         // Animation
         AnimationTimer timer = new AnimationTimer() {
             private long lastTime = 0;
@@ -152,14 +181,13 @@ public class KurzweilDemo extends AbstractDemo {
                 lastTime = now;
 
                 updateTime(deltaSeconds);
-                drawTimelines();
             }
         };
         timer.start();
 
         return centerBox;
     }
-    
+
     @Override
     protected VBox createControlPanel() {
         return createSidebar();
@@ -169,41 +197,41 @@ public class KurzweilDemo extends AbstractDemo {
         VBox sidebar = new VBox(20);
         sidebar.setPadding(new Insets(20));
         sidebar.setPrefWidth(220);
-        // Note: 'dark-viewer-sidebar' might be handled by AbstractDemo's container, but keeping here for inner styling
+        // Note: 'dark-viewer-sidebar' might be handled by AbstractDemo's container
         sidebar.getStyleClass().add("dark-viewer-sidebar");
 
         // Dual clocks
-        Label clockTitle = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.sidebar.clock"));
+        Label clockTitle = new Label(SocialI18n.getInstance().get("kurzweil.sidebar.clock"));
         clockTitle.getStyleClass().add("dark-label");
-        clockTitle.setFont(Font.font("System", FontWeight.BOLD, 14));
+        clockTitle.getStyleClass().add("font-bold");
 
         VBox linearClock = new VBox(5);
         Label linearClockLabel = new Label(
-                org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.sidebar.linear"));
-        linearClockLabel.setTextFill(Color.LIGHTGRAY);
-        realTimeLabel = new Label("0.00");
-        realTimeLabel.setFont(Font.font("Monospace", FontWeight.BOLD, 24));
-        realTimeLabel.setTextFill(Color.LIGHTGREEN);
+                SocialI18n.getInstance().get("kurzweil.sidebar.linear"));
+        linearClockLabel.getStyleClass().add("text-secondary");
+        realTimeLabel = new Label(I18n.getInstance().get("generated.kurzweil.000", "0.00"));
+        realTimeLabel.getStyleClass().add("font-title");
+        realTimeLabel.getStyleClass().add("text-success");
         linearClock.getChildren().addAll(linearClockLabel, realTimeLabel);
 
         VBox kurzweilClock = new VBox(5);
         Label kurzweilClockLabel = new Label(
-                org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.sidebar.kurzweil"));
-        kurzweilClockLabel.setTextFill(Color.LIGHTGRAY);
-        kurzweilTimeLabel = new Label("0.00");
-        kurzweilTimeLabel.setFont(Font.font("Monospace", FontWeight.BOLD, 24));
-        kurzweilTimeLabel.setTextFill(Color.ORANGE);
+                SocialI18n.getInstance().get("kurzweil.sidebar.kurzweil"));
+        kurzweilClockLabel.getStyleClass().add("text-secondary");
+        kurzweilTimeLabel = new Label(I18n.getInstance().get("generated.kurzweil.000", "0.00"));
+        kurzweilTimeLabel.getStyleClass().add("font-title");
+        kurzweilTimeLabel.getStyleClass().add("text-warning");
         kurzweilClock.getChildren().addAll(kurzweilClockLabel, kurzweilTimeLabel);
 
         accelerationLabel = new Label(
-                org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.sidebar.accel") + " 1.00x");
-        accelerationLabel.setTextFill(Color.YELLOW);
+                SocialI18n.getInstance().get("kurzweil.sidebar.accel") + " 1.00x");
+        accelerationLabel.getStyleClass().add("text-highlight");
         accelerationLabel.setFont(Font.font("System", 12));
 
         // Controls
         Separator sep = new Separator();
 
-        Label controlLabel = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.sidebar.base"));
+        Label controlLabel = new Label(SocialI18n.getInstance().get("kurzweil.sidebar.base"));
         controlLabel.getStyleClass().add("dark-label-muted");
 
         Slider accelSlider = new Slider(1.1, 5.0, accelerationFactor);
@@ -214,7 +242,7 @@ public class KurzweilDemo extends AbstractDemo {
             accelerationFactor = nv.doubleValue();
         });
 
-        Button resetBtn = new Button(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.btn.reset"));
+        Button resetBtn = new Button(SocialI18n.getInstance().get("kurzweil.btn.reset"));
         resetBtn.setMaxWidth(Double.MAX_VALUE);
         resetBtn.getStyleClass().add("accent-button-blue");
         resetBtn.setOnAction(e -> {
@@ -223,7 +251,7 @@ public class KurzweilDemo extends AbstractDemo {
         });
 
         ToggleButton pauseBtn = new ToggleButton(
-                org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.btn.pause"));
+                SocialI18n.getInstance().get("kurzweil.btn.pause"));
         pauseBtn.setMaxWidth(Double.MAX_VALUE);
         pauseBtn.setOnAction(e -> running = !pauseBtn.isSelected());
 
@@ -243,99 +271,7 @@ public class KurzweilDemo extends AbstractDemo {
         realTimeLabel.setText(String.format("%.2f s", realTimeSeconds));
         kurzweilTimeLabel.setText(String.format("%.2f", kurzweilTime));
         accelerationLabel.setText(String.format(
-                org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.sidebar.accel") + " %.2fx", acceleration));
-    }
-
-    private void drawTimelines() {
-        drawLinearTimeline();
-        drawLogTimeline();
-    }
-
-    private void drawLinearTimeline() {
-        GraphicsContext gc = linearCanvas.getGraphicsContext2D();
-        double w = linearCanvas.getWidth();
-        double h = linearCanvas.getHeight();
-
-        gc.setFill(Color.rgb(10, 10, 30));
-        gc.fillRect(0, 0, w, h);
-
-        double y = h / 2;
-        gc.setStroke(Color.GRAY);
-        gc.setLineWidth(2);
-        gc.strokeLine(30, y, w - 30, y);
-
-        double minYear = -100000;
-        double maxYear = 2100;
-
-        for (Milestone m : MILESTONES) {
-            if (m.year < minYear)
-                continue;
-            double x = 30 + (m.year - minYear) / (maxYear - minYear) * (w - 60);
-
-            gc.setFill(m.year <= 2025 ? Color.CYAN : Color.ORANGE);
-            gc.fillOval(x - 4, y - 4, 8, 8);
-
-            gc.setFill(Color.WHITE);
-            gc.setFont(Font.font("System", 9));
-            gc.save();
-            gc.translate(x, y - 10);
-            gc.rotate(-45);
-            String label = org.jscience.ui.i18n.SocialI18n.getInstance().get(m.label);
-            gc.fillText(label.substring(0, Math.min(20, label.length())), 0, 0);
-            gc.restore();
-        }
-
-        gc.setFill(Color.GRAY);
-        gc.setFont(Font.font("System", 10));
-        for (int year : List.of(-100000, -10000, 0, 1000, 1900, 2000, 2050)) {
-            double x = 30 + (year - minYear) / (maxYear - minYear) * (w - 60);
-            gc.fillText(
-                    year > 0 ? String.valueOf(year)
-                            : year + " " + org.jscience.ui.i18n.I18n.getInstance().get("hist.era.bce", "BCE"),
-                    x - 20, y + 25);
-        }
-    }
-
-    private void drawLogTimeline() {
-        GraphicsContext gc = logCanvas.getGraphicsContext2D();
-        double w = logCanvas.getWidth();
-        double h = logCanvas.getHeight();
-
-        gc.setFill(Color.rgb(20, 10, 10));
-        gc.fillRect(0, 0, w, h);
-
-        double y = h / 2;
-        gc.setStroke(Color.ORANGE);
-        gc.setLineWidth(2);
-        gc.strokeLine(30, y, w - 30, y);
-
-        double logMin = Math.log(1);
-        double logMax = Math.log(3000000);
-        int currentYear = 2025;
-
-        for (Milestone m : MILESTONES) {
-            double yearsAgo = Math.max(1, currentYear - m.year);
-            double logYears = Math.log(yearsAgo);
-            double x = w - 30 - (logYears - logMin) / (logMax - logMin) * (w - 60);
-
-            double size = 6 + (1 - logYears / logMax) * 6;
-            gc.setFill(m.year >= 2000 ? Color.YELLOW : (m.year >= 1900 ? Color.ORANGE : Color.DARKORANGE));
-            gc.fillOval(x - size / 2, y - size / 2, size, size);
-
-            gc.setFill(Color.WHITE);
-            gc.setFont(Font.font("System", 9));
-            gc.save();
-            gc.translate(x, y - 12);
-            gc.rotate(-45);
-            String label = org.jscience.ui.i18n.SocialI18n.getInstance().get(m.label);
-            gc.fillText(label.substring(0, Math.min(18, label.length())), 0, 0);
-            gc.restore();
-        }
-
-        gc.setFill(Color.ORANGE);
-        gc.setFont(Font.font("System", 11));
-        gc.fillText(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.chart.more"), w - 250, h - 15);
-        gc.fillText(org.jscience.ui.i18n.SocialI18n.getInstance().get("kurzweil.chart.past"), 30, h - 15);
+                SocialI18n.getInstance().get("kurzweil.sidebar.accel") + " %.2fx", acceleration));
     }
 
     private static record Milestone(int year, String label) {

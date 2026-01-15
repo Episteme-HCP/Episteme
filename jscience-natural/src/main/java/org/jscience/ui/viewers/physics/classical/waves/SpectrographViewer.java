@@ -284,4 +284,7 @@ public class SpectrographViewer extends AbstractViewer implements Simulatable {
         @Override public void setSourcePattern(String pattern) { delegate.setSourcePattern(pattern); }
         @Override public double[] getSpectrum() { return delegate.getSpectrum(); }
     }
+
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrograph.desc"); }
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrograph.longdesc"); }
 }

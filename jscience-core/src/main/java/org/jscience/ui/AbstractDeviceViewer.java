@@ -51,14 +51,15 @@ public abstract class AbstractDeviceViewer<T extends Device> extends VBox implem
         this.setPadding(new Insets(10));
 
         this.nameLabel = new Label(device.getName());
-        this.nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        this.nameLabel.getStyleClass().add("header-label");
 
-        this.statusLabel = new Label("Status: Connected");
+        this.statusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("device.status.connected", "Status: Connected"));
+        this.statusLabel.getStyleClass().add("status-label");
 
         this.getChildren().addAll(nameLabel, statusLabel);
 
         // Initial style
-        this.setStyle("-fx-border-color: #ccc; -fx-border-width: 1; -fx-background-color: #fafafa;");
+        this.getStyleClass().add("device-viewer");
     }
 
     public T getDevice() {
@@ -74,17 +75,26 @@ public abstract class AbstractDeviceViewer<T extends Device> extends VBox implem
 
     @Override
     public String getName() {
-        return device.getName() + " Viewer";
+        return java.text.MessageFormat.format(
+            org.jscience.ui.i18n.I18n.getInstance().get("device.viewer.title.fmt", "{0} Viewer"), 
+            device.getName());
     }
 
     @Override
     public String getCategory() {
-        return "Devices";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.devices", "Devices");
     }
 
     @Override
     public String getDescription() {
-        return "Control interface for " + device.getName();
+        return java.text.MessageFormat.format(
+            org.jscience.ui.i18n.I18n.getInstance().get("device.control.desc.fmt", "Control interface for {0}"), 
+            device.getName());
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
     }
 
     @Override

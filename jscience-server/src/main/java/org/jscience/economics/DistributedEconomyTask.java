@@ -25,7 +25,7 @@ package org.jscience.economics;
 
 import java.io.Serializable;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.distributed.PrecisionMode;
+
 
 /**
  * Distributed Economic Simulation Task.
@@ -42,7 +42,7 @@ public class DistributedEconomyTask implements Serializable {
     private double gdpD;
     private double inflationD;
     private double dt; // years
-    private PrecisionMode mode = PrecisionMode.REALS;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.REALS;
 
     public DistributedEconomyTask(String name, Real gdp, Real inflation) {
         this.economyName = name;
@@ -53,9 +53,9 @@ public class DistributedEconomyTask implements Serializable {
         this.dt = 1.0;
     }
 
-    public void setMode(PrecisionMode mode) {
+    public void setMode(TaskRegistry.PrecisionMode mode) {
         if (this.mode != mode) {
-            if (mode == PrecisionMode.PRIMITIVES) {
+            if (mode == TaskRegistry.PrecisionMode.PRIMITIVES) {
                 gdpD = gdp.doubleValue();
                 inflationD = inflation.doubleValue();
             } else {
@@ -71,7 +71,7 @@ public class DistributedEconomyTask implements Serializable {
         double growthRate = 0.02 + 0.05 * (Math.random() - 0.5);
         double inflationShock = 0.01 * (Math.random() - 0.5);
 
-        if (mode == PrecisionMode.REALS) {
+        if (mode == TaskRegistry.PrecisionMode.REALS) {
             double gValue = gdp.doubleValue();
             double iValue = inflation.doubleValue();
 
@@ -87,11 +87,11 @@ public class DistributedEconomyTask implements Serializable {
     }
 
     public Real getGdp() {
-        return mode == PrecisionMode.REALS ? gdp : Real.of(gdpD);
+        return mode == TaskRegistry.PrecisionMode.REALS ? gdp : Real.of(gdpD);
     }
 
     public Real getInflation() {
-        return mode == PrecisionMode.REALS ? inflation : Real.of(inflationD);
+        return mode == TaskRegistry.PrecisionMode.REALS ? inflation : Real.of(inflationD);
     }
 
     public String getEconomyName() {

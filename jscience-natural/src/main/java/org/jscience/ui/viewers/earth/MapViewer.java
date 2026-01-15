@@ -158,4 +158,24 @@ public abstract class MapViewer extends AbstractViewer {
     protected double yToLat(double y) {
         return 90 - ((y - offsetY) / (mapCanvas.getHeight() * zoom)) * 180.0;
     }
+
+    @Override
+    public String getCategory() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.earth");
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.map.title");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.map.desc");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.map.longdesc");
+    }
 }

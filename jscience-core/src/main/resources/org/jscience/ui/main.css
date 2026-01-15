@@ -67,3 +67,31 @@
     -fx-background-color: #0096c9 !important;
     -fx-text-fill: white !important;
 }
+
+/* --- Added for Rule 3 Compliance (Colors & Fonts) --- */
+
+.text-error { -fx-text-fill: #e74c3c; } /* Red */
+.text-success { -fx-text-fill: #2ecc71; } /* Green */
+.text-warning { -fx-text-fill: #e67e22; } /* Orange */
+.text-info { -fx-text-fill: #3498db; } /* Blue */
+.text-highlight { -fx-text-fill: #f1c40f; } /* Yellow */
+.text-primary { -fx-text-fill: #2c3e50; } /* Dark Blue/Gray */
+.text-secondary { -fx-text-fill: #7f8c8d; } /* Grey */
+.text-light { -fx-text-fill: #ecf0f1; } /* Light Gray */
+.text-dark { -fx-text-fill: #2c3e50; } /* Dark */
+
+.font-bold { -fx-font-weight: bold; }
+.font-italic { -fx-font-style: italic; }
+.font-large { -fx-font-size: 18px; }
+.font-xlarge { -fx-font-size: 24px; }
+.font-small { -fx-font-size: 10px; }
+.font-mono { -fx-font-family: "Monospaced"; }
+.font-title { -fx-font-size: 24px; -fx-font-weight: bold; }
+
+.bg-light { -fx-background-color: #f9f9f9; }
+.bg-dark { -fx-background-color: #2c3e50; }
+.bg-panel { -fx-background-color: #f5f5f5; -fx-padding: 10; -fx-border-color: #ddd; -fx-border-radius: 5; -fx-background-radius: 5; }
+
+/* Status Colors used by JScience */
+.status-connected { -fx-text-fill: #27ae60; -fx-font-weight: bold; }
+.status-disconnected { -fx-text-fill: #c0392b; -fx-font-weight: bold; }

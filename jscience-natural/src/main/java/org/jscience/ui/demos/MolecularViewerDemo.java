@@ -47,4 +47,14 @@ public class MolecularViewerDemo extends AbstractDemo {
     public Node createViewerNode() {
         return new MolecularViewer();
     }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("MolecularViewerDemo.desc", "MolecularViewerDemo description");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 }

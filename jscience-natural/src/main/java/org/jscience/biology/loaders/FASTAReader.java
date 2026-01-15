@@ -117,4 +117,6 @@ public class FASTAReader extends AbstractResourceReader<List<FASTAReader.Sequenc
         }
         return sequences;
     }
+
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.fasta.name"); }
 }

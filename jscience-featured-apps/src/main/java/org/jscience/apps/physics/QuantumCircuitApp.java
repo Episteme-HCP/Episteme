@@ -93,7 +93,7 @@ public class QuantumCircuitApp extends FeaturedAppBase {
 
         // Header
         mainTitleLabel = new Label(i18n.get("quantum.title"));
-        mainTitleLabel.setFont(Font.font(24));
+        mainTitleLabel.getStyleClass().add("font-title");
         pane.setTop(mainTitleLabel);
         BorderPane.setAlignment(mainTitleLabel, Pos.CENTER);
 
@@ -352,5 +352,20 @@ public class QuantumCircuitApp extends FeaturedAppBase {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    @Override
+    public String getCategory() {
+        return "Physics";
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("QuantumCircuitApp.name", "QuantumCircuit");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
     }
 }

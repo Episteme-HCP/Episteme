@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * Uses the JScience Grid to distribute sampling across multiple workers
  * for faster convergence to π.
  */
-public class DistributedMonteCarloPiApp extends Application {
+public class DistributedMonteCarloPiApp extends Application implements org.jscience.ui.App {
 
     private static final int NUM_WORKERS = 4; // Distribute across 4 tasks
     private static final long SAMPLES_PER_BATCH = 1_000_000;
@@ -360,5 +360,37 @@ public class DistributedMonteCarloPiApp extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    // App Interface Implementation
+    @Override
+    public boolean isDemo() {
+        return false;
+    }
+
+    @Override
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics", "Mathematics"); }
+
+    @Override
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedmontecarlopiapp.name", "Distributed Monte Carlo Pi App"); }
+
+    @Override
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedmontecarlopiapp.desc", "Distributed application for Distributed Monte Carlo Pi App."); }
+
+    @Override
+    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedmontecarlopiapp.longdesc", "Distributed application for Distributed Monte Carlo Pi App."); }
+
+    @Override
+    public void show(javafx.stage.Stage stage) {
+        try {
+            start(stage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return new java.util.ArrayList<>();
     }
 }

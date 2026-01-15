@@ -49,7 +49,7 @@ import org.jscience.ui.i18n.I18n;
  * Distributed CRISPR Design Application.
  * Offloads heavy genomic scanning and off-target analysis to the JScience grid.
  */
-public class DistributedCrisprApp extends Application {
+public class DistributedCrisprApp extends Application implements org.jscience.ui.App {
 
     private ManagedChannel channel;
     private ComputeServiceGrpc.ComputeServiceStub asyncStub;
@@ -262,5 +262,37 @@ public class DistributedCrisprApp extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    // App Interface Implementation
+    @Override
+    public boolean isDemo() {
+        return false;
+    }
+
+    @Override
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology"); }
+
+    @Override
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedcrisprapp.name", "Distributed Crispr App"); }
+
+    @Override
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedcrisprapp.desc", "Distributed application for Distributed Crispr App."); }
+
+    @Override
+    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedcrisprapp.longdesc", "Distributed application for Distributed Crispr App."); }
+
+    @Override
+    public void show(javafx.stage.Stage stage) {
+        try {
+            start(stage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return new java.util.ArrayList<>();
     }
 }

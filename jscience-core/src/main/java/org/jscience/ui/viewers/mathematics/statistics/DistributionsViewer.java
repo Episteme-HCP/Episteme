@@ -282,4 +282,14 @@ public class DistributionsViewer extends AbstractViewer {
         return res;
     }
 
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("DistributionsViewer.desc", "DistributionsViewer description");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 }

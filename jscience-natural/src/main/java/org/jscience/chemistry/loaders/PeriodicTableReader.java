@@ -164,4 +164,6 @@ public class PeriodicTableReader extends AbstractResourceReader<List<Element>> {
 
         return e;
     }
+
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.periodictable.name"); }
 }

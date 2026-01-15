@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Lattice Boltzmann Fluid Simulation with distributed support.
  */
-public class DistributedFluidSimApp extends Application {
+public class DistributedFluidSimApp extends Application implements org.jscience.ui.App {
 
     private final int W = 200, H = 100, SCALE = 4;
     private double[][][] f = new double[W][H][9];
@@ -291,5 +291,37 @@ public class DistributedFluidSimApp extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    // App Interface Implementation
+    @Override
+    public boolean isDemo() {
+        return false;
+    }
+
+    @Override
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics"); }
+
+    @Override
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedfluidsimapp.name", "Distributed Fluid Sim App"); }
+
+    @Override
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedfluidsimapp.desc", "Distributed application for Distributed Fluid Sim App."); }
+
+    @Override
+    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedfluidsimapp.longdesc", "Distributed application for Distributed Fluid Sim App."); }
+
+    @Override
+    public void show(javafx.stage.Stage stage) {
+        try {
+            start(stage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return new java.util.ArrayList<>();
     }
 }

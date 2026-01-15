@@ -44,7 +44,7 @@ import java.util.Optional;
  */
 public class VizieRReader extends AbstractResourceReader<Map<String, String>> {
 
-    private static final String API_URL = "https://vizier.cds.unistra.fr/viz-bin/votable";
+    private static final String API_URL = org.jscience.JScience.getProperty("data.vizier.api.url", "https://vizier.cds.unistra.fr/viz-bin/votable");
 
     public VizieRReader() {
     }
@@ -145,7 +145,7 @@ public class VizieRReader extends AbstractResourceReader<Map<String, String>> {
      * Gets catalog URL for browsing.
      */
     public static String getCatalogUrl(String catalog) {
-        return "https://vizier.cds.unistra.fr/viz-bin/VizieR?-source=" + catalog;
+        return org.jscience.JScience.getProperty("data.vizier.query.url", "https://vizier.cds.unistra.fr/viz-bin/VizieR?-source=") + catalog;
     }
 
     /**
@@ -187,5 +187,7 @@ public class VizieRReader extends AbstractResourceReader<Map<String, String>> {
             return null;
         }
     }
+
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.vizier.name"); }
 }
 

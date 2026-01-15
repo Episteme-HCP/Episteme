@@ -53,7 +53,7 @@ public class FunctionExplorer3DViewer extends AbstractViewer {
         sidebar.setMaxWidth(350);
         sidebar.setStyle("-fx-background-color: #fafafa;");
 
-        Label funcLabel = new Label("z = f(x, y) =");
+        Label funcLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.functionexplorer3d.z..fx.y", "z = f(x, y) ="));
         TextField funcInput = new TextField(DEFAULT_3D_FUNC);
 
         Label rangeLabel = new Label(i18n.get("funcexplorer.range3d", "Range [\u00B1X, \u00B1Y]"));
@@ -73,7 +73,7 @@ public class FunctionExplorer3DViewer extends AbstractViewer {
         xEval.setPromptText("x");
         TextField yEval = new TextField("0");
         yEval.setPromptText("y");
-        Label zRes = new Label("z = -");
+        Label zRes = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.functionexplorer3d.z", "z = -"));
         Button calcBtn = new Button(i18n.get("funcexplorer.btn.calcpt", "Calculate Point"));
 
         calcBtn.setOnAction(e -> {
@@ -82,7 +82,7 @@ public class FunctionExplorer3DViewer extends AbstractViewer {
                 double val = evaluate3D(p, Double.parseDouble(xEval.getText()), Double.parseDouble(yEval.getText()));
                 zRes.setText(String.format("z = %.4f", val));
             } catch (Exception ex) {
-                zRes.setText("Error");
+                zRes.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.functionexplorer3d.error", "Error"));
             }
         });
 
@@ -130,5 +130,25 @@ public class FunctionExplorer3DViewer extends AbstractViewer {
         vars.put("x", x);
         vars.put("y", y);
         return parser.parse(vars);
+    }
+
+    @Override
+    public String getCategory() {
+        return "Mathematics";
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("FunctionExplorer3DViewer.name", "FunctionExplorer3D");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("FunctionExplorer3DViewer.desc", "FunctionExplorer3DViewer description");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
     }
 }

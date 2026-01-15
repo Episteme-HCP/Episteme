@@ -161,6 +161,28 @@ public class ThermometerViewer extends PhysicalMeasureInstrument<Temperature> {
             gc.fillText(String.format("%.1fÃ‚Â°C", temp), WIDTH / 2, HEIGHT - 10);
         }
     }
+
+    // --- Mandatory Abstract Methods (I18n) ---
+
+    @Override
+    public String getCategory() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics");
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.thermometer.title");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.thermometer.desc");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.thermometer.longdesc");
+    }
 }
 
 

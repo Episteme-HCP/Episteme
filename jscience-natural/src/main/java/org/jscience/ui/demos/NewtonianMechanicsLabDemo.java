@@ -56,9 +56,7 @@ import java.util.List;
 public class NewtonianMechanicsLabDemo extends AbstractSimulationDemo {
 
     @Override
-    public String getCategory() {
-        return "Physics";
-    }
+    public String getCategory() { return "Physics"; }
 
     @Override
     public String getName() {
@@ -71,7 +69,7 @@ public class NewtonianMechanicsLabDemo extends AbstractSimulationDemo {
     }
 
     @Override
-    protected Node createViewerNode() {
+    public Node createViewerNode() {
         return new InternalNewtonianViewer();
     }
 
@@ -386,6 +384,15 @@ public class NewtonianMechanicsLabDemo extends AbstractSimulationDemo {
         @Override public boolean isPlaying() { return running; }
         
         @Override public String getName() { return "Lab Viewer"; }
-        @Override public String getCategory() { return "Physics"; }
-    }
+    @Override
+    public String getCategory() { return "Physics"; }
+    
+        @Override
+        public String getDescription() { return "InternalNewtonianViewer Internal Viewer"; }
+
+        @Override
+}
+
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.newtonianmechanicslabdemo.longdesc"); }
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

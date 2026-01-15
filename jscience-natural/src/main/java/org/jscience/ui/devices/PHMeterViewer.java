@@ -41,13 +41,35 @@ public class PHMeterViewer extends AbstractDeviceViewer<PHMeter> {
     public PHMeterViewer(PHMeter device) {
         super(device);
 
-        phLabel = new Label("pH 7.0");
+        phLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.phmeter.ph.70", "pH 7.0"));
         phLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: green;");
         this.getChildren().add(phLabel);
     }
 
     @Override
     public void update() {
-        phLabel.setText("pH 7.0");
+        phLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.phmeter.ph.70.1", "pH 7.0"));
+    }
+
+    // --- Mandatory Abstract Methods (I18n) ---
+
+    @Override
+    public String getCategory() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics");
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.phmeter.title");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.phmeter.desc");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.phmeter.longdesc");
     }
 }

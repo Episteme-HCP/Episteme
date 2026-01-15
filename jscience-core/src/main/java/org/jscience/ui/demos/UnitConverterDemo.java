@@ -39,9 +39,7 @@ public class UnitConverterDemo extends AbstractDemo {
     }
 
     @Override
-    public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics");
-    }
+    public String getCategory() { return "Measure"; }
 
     @Override
     public String getName() {
@@ -59,9 +57,8 @@ public class UnitConverterDemo extends AbstractDemo {
     }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
          return org.jscience.ui.i18n.I18n.getInstance().get("demo.unitconverterdemo.longdesc");
     }
 }
-
 

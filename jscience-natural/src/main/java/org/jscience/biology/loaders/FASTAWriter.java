@@ -57,4 +57,21 @@ public class FASTAWriter extends AbstractResourceWriter<List<FASTAReader.Sequenc
             }
         }
     }
+
+    // --- Mandatory Abstract Methods (I18n) ---
+
+    @Override
+    public String getCategory() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology");
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("writer.fasta.name");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("writer.fasta.description");
+    }
 }

@@ -188,5 +188,15 @@ public class MagneticFieldViewer extends org.jscience.ui.AbstractViewer {
         return min2 + (max2 - min2) * ((val - min1) / (max1 - min1));
     }
     
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("MagneticFieldViewer.desc", "MagneticFieldViewer description");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 }
 

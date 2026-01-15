@@ -522,4 +522,19 @@ public class FbxMeshReader extends AbstractResourceReader<Group> {
         
         return raw.trim();
     }
+
+    @Override
+    public String getCategory() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology");
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fbxmesh.name");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fbxmesh.description");
+    }
 }

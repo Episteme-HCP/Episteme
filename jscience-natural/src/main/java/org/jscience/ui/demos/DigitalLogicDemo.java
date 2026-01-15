@@ -43,7 +43,7 @@ public class DigitalLogicDemo extends AbstractSimulationDemo {
     public boolean isDemo() { return true; }
 
     @Override
-    public String getCategory() { return I18n.getInstance().get("category.computing"); }
+    public String getCategory() { return "Computing"; }
 
     @Override
     public String getName() { return I18n.getInstance().get("digital.title", "Digital Logic Simulator"); }

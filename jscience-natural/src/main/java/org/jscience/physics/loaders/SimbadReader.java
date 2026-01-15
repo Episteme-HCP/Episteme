@@ -246,4 +246,6 @@ public class SIMBADReader extends AbstractResourceReader<SIMBADReader.Astronomic
         }
         return Optional.empty();
     }
+
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.simbad.name"); }
 }

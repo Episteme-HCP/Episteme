@@ -41,7 +41,7 @@ public class MicroscopeViewer extends AbstractDeviceViewer<Microscope> {
     public MicroscopeViewer(Microscope device) {
         super(device);
 
-        magLabel = new Label("Magnification: -");
+        magLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.microscope.magnification", "Magnification: -"));
         this.getChildren().add(magLabel);
 
         update();
@@ -52,5 +52,27 @@ public class MicroscopeViewer extends AbstractDeviceViewer<Microscope> {
         if (device != null) {
             magLabel.setText("Magnification: " + device.getCurrentMagnification().toString());
         }
+    }
+
+    // --- Mandatory Abstract Methods (I18n) ---
+
+    @Override
+    public String getCategory() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics");
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.microscope.title");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.microscope.desc");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.microscope.longdesc");
     }
 }

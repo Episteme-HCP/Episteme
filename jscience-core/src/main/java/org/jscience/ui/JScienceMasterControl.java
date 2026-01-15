@@ -182,25 +182,25 @@ public class JScienceMasterControl extends Application {
                 nucleus);
 
         // --- TITLE ---
-        Label title = new Label(i18n.get("dashboard.general.title", "JScience Master Control"));
+        Label title = new Label(i18n.get("mastercontrol.general.title", "JScience Master Control"));
         title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
 
         Label subtitle = new Label(
-                i18n.get("dashboard.general.subtitle", "Universal Scientific Computing Environment"));
+                i18n.get("mastercontrol.general.subtitle", "Universal Scientific Computing Environment"));
         subtitle.getStyleClass().add("dashboard-subtitle");
 
         GridPane infoGrid = new GridUtils.Builder()
-                .addRow(i18n.get("dashboard.general.version", "Version") + ":", org.jscience.JScience.VERSION)
-                .addRow(i18n.get("dashboard.general.build", "Build Date") + ":",
+                .addRow(i18n.get("mastercontrol.general.version", "Version") + ":", org.jscience.JScience.VERSION)
+                .addRow(i18n.get("mastercontrol.general.build", "Build Date") + ":",
                         org.jscience.JScience.BUILD_DATE)
-                .addRow(i18n.get("dashboard.general.java", "Java Version") + ":", System.getProperty("java.version"))
+                .addRow(i18n.get("mastercontrol.general.java", "Java Version") + ":", System.getProperty("java.version"))
                 .build();
         infoGrid.setAlignment(Pos.CENTER);
 
         // --- AUTHORS ---
         VBox authorsBox = new VBox(5);
         authorsBox.setAlignment(Pos.CENTER);
-        Label authorsHeader = new Label(i18n.get("dashboard.general.authors", "Authors"));
+        Label authorsHeader = new Label(i18n.get("mastercontrol.general.authors", "Authors"));
         authorsHeader.setStyle("-fx-font-weight: bold; -fx-underline: true;");
         authorsBox.getChildren().add(authorsHeader);
 
@@ -209,7 +209,7 @@ public class JScienceMasterControl extends Application {
         }
 
         content.getChildren().addAll(atomIcon, title, subtitle, new Separator(), infoGrid, new Separator(), authorsBox);
-        return new Tab(i18n.get("dashboard.tab.general", "General"), content);
+        return new Tab(i18n.get("mastercontrol.tab.general", "General"), content);
     }
 
     private javafx.scene.Node createOrbit(double rx, double ry, double rotate) {
@@ -250,7 +250,7 @@ public class JScienceMasterControl extends Application {
         content.setPadding(new Insets(20));
         content.setAlignment(Pos.TOP_LEFT);
 
-        Label header = new Label(i18n.get("dashboard.i18n.header", "Language Selection"));
+        Label header = new Label(i18n.get("mastercontrol.i18n.header", "Language Selection"));
         header.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
 
         ListView<LocaleItem> langList = new ListView<>();
@@ -258,7 +258,7 @@ public class JScienceMasterControl extends Application {
         // Dynamic discovery of languages
         List<LocaleItem> items = new ArrayList<>();
         // Default languages
-        items.add(new LocaleItem(i18n.get("dashboard.lang.en", "English"), Locale.ENGLISH));
+        items.add(new LocaleItem(i18n.get("mastercontrol.lang.en", "English"), Locale.ENGLISH));
 
         for (Locale locale : i18n.getSupportedLocales()) {
             String displayName = locale.getDisplayLanguage(locale);
@@ -1179,7 +1179,7 @@ public class JScienceMasterControl extends Application {
         }
 
         if (providers.isEmpty()) {
-            Label noProviders = new Label("No " + type + " backends discovered.");
+            Label noProviders = new Label(java.text.MessageFormat.format(i18n.get("master.error.no_backends", "No {0} backends discovered."), type));
             noProviders.setStyle("-fx-font-style: italic;");
             grid.add(noProviders, 0, 0);
         }
@@ -1542,7 +1542,7 @@ public class JScienceMasterControl extends Application {
                 demo.show(stage);
             }
         } catch (Exception e) {
-            new Alert(Alert.AlertType.ERROR, "Failed to launch app: " + e.getMessage()).show();
+            new Alert(Alert.AlertType.ERROR, java.text.MessageFormat.format(I18n.getInstance().get("master.error.launch_failed", "Failed to launch app: {0}"), e.getMessage())).show();
             e.printStackTrace();
         }
     }

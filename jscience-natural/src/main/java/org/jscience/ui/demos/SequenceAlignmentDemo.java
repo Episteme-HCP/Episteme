@@ -51,9 +51,7 @@ public class SequenceAlignmentDemo extends AbstractDemo {
     }
 
     @Override
-    public String getCategory() {
-        return "Biology";
-    }
+    public String getCategory() { return "Biology"; }
 
     @Override
     public String getName() {
@@ -66,7 +64,7 @@ public class SequenceAlignmentDemo extends AbstractDemo {
     }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return I18n.getInstance().get("SequenceAlignment.long_desc", 
             "The Needleman-Wunsch algorithm performs global alignment on two sequences. " +
             "It is commonly used in bioinformatics to align protein or nucleotide sequences.");
@@ -116,11 +114,11 @@ public class SequenceAlignmentDemo extends AbstractDemo {
             results.setPadding(new Insets(10));
             results.getStyleClass().add("dark-panel");
 
-            scoreLabel = new Label("Score: 0");
+            scoreLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.sequencealignment.score.0", "Score: 0"));
             scoreLabel.getStyleClass().add("dark-label-info");
 
-            align1Label = new Label("---");
-            align2Label = new Label("---");
+            align1Label = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.sequencealignment.", "---"));
+            align2Label = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.sequencealignment.", "---"));
 
             align1Label.getStyleClass().add("dark-label-mono");
             align2Label.getStyleClass().add("dark-label-mono");
@@ -216,6 +214,13 @@ public class SequenceAlignmentDemo extends AbstractDemo {
         @Override
         public String getName() { return "Sequence Viewer"; }
         @Override
-        public String getCategory() { return "Biology"; }
-    }
+    public String getCategory() { return "Biology"; }
+    
+        @Override
+        public String getDescription() { return "InternalSequenceViewer Internal Viewer"; }
+
+        @Override
+}
+
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

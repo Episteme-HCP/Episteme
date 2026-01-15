@@ -108,4 +108,6 @@ public class GoogleElevationReader extends AbstractResourceReader<Double> {
         }
         return 0.0;
     }
+
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.googleelevation.name"); }
 }

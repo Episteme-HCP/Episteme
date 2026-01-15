@@ -52,9 +52,7 @@ public class ArchitectureStabilityDemo extends AbstractSimulationDemo {
     }
 
     @Override
-    public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.architecture");
-    }
+    public String getCategory() { return "Architecture"; }
 
     @Override
     public String getName() {

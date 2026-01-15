@@ -213,22 +213,22 @@ public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
         Label compLabel = new Label(I18n.getInstance().get("digital.components", "Components"));
         compLabel.setStyle("-fx-font-weight: bold;");
 
-        Button btnAnd = new Button("AND Gate"); btnAnd.setMaxWidth(Double.MAX_VALUE);
+        Button btnAnd = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.digitallogic.and.gate", "AND Gate")); btnAnd.setMaxWidth(Double.MAX_VALUE);
         btnAnd.setOnAction(e -> addGate(new Gate(GateType.AND, 100, 100)));
 
-        Button btnOr = new Button("OR Gate"); btnOr.setMaxWidth(Double.MAX_VALUE);
+        Button btnOr = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.digitallogic.or.gate", "OR Gate")); btnOr.setMaxWidth(Double.MAX_VALUE);
         btnOr.setOnAction(e -> addGate(new Gate(GateType.OR, 100, 150)));
 
-        Button btnNot = new Button("NOT Gate"); btnNot.setMaxWidth(Double.MAX_VALUE);
+        Button btnNot = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.digitallogic.not.gate", "NOT Gate")); btnNot.setMaxWidth(Double.MAX_VALUE);
         btnNot.setOnAction(e -> addGate(new Gate(GateType.NOT, 100, 200)));
 
-        Button btnNand = new Button("NAND Gate"); btnNand.setMaxWidth(Double.MAX_VALUE);
+        Button btnNand = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.digitallogic.nand.gate", "NAND Gate")); btnNand.setMaxWidth(Double.MAX_VALUE);
         btnNand.setOnAction(e -> addGate(new Gate(GateType.NAND, 100, 250)));
 
-        Button btnIn = new Button("Input Switch"); btnIn.setMaxWidth(Double.MAX_VALUE);
+        Button btnIn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.digitallogic.input.switch", "Input Switch")); btnIn.setMaxWidth(Double.MAX_VALUE);
         btnIn.setOnAction(e -> addGate(new Gate(GateType.INPUT, 50, 100)));
 
-        Button btnOut = new Button("Output LED"); btnOut.setMaxWidth(Double.MAX_VALUE);
+        Button btnOut = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.digitallogic.output.led", "Output LED")); btnOut.setMaxWidth(Double.MAX_VALUE);
         btnOut.setOnAction(e -> addGate(new Gate(GateType.OUTPUT, 300, 100)));
 
         Label actionLabel = new Label(I18n.getInstance().get("digital.actions", "Actions"));
@@ -250,7 +250,7 @@ public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
             if (canvas.getScene() != null && canvas.getScene().getWindow() instanceof Stage s) loadCircuit(s);
         });
 
-        statusLabel = new Label("Ready");
+        statusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.digitallogic.ready", "Ready"));
         statusLabel.setWrapText(true);
         statusLabel.setStyle("-fx-text-fill: #555; -fx-font-size: 10px;");
 
@@ -268,7 +268,7 @@ public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
 
     private void updateStatus() {
         if (statusLabel == null) return;
-        if (simulationMode) statusLabel.setText("Simulation: Click Inputs to toggle.");
+        if (simulationMode) statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.digitallogic.simulation.click.inp", "Simulation: Click Inputs to toggle."));
         else statusLabel.setText("Design: Drag gates/wires. Select & Delete to remove.");
     }
 
@@ -295,7 +295,7 @@ public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
 
     private void saveCircuit(Stage stage) {
         javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
-        fileChooser.setTitle("Save Circuit");
+        fileChooser.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("generated.digitallogic.save.circuit", "Save Circuit"));
         fileChooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("Logic Circuit", "*.lgc"));
         java.io.File file = fileChooser.showSaveDialog(stage);
         if (file != null) {
@@ -315,7 +315,7 @@ public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
 
     private void loadCircuit(Stage stage) {
         javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
-        fileChooser.setTitle("Load Circuit");
+        fileChooser.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("generated.digitallogic.load.circuit", "Load Circuit"));
         fileChooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("Logic Circuit", "*.lgc"));
         java.io.File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
@@ -467,4 +467,8 @@ public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
             gc.setFill(Color.BLACK); for (Port p : inputs) gc.fillOval(p.x - 3, p.y - 3, 6, 6); for (Port p : outputs) gc.fillOval(p.x - 3, p.y - 3, 6, 6);
         }
     }
+
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.digitallogic.desc"); }
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.digitallogic.longdesc"); }
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

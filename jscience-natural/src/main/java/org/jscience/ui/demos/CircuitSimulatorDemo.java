@@ -47,7 +47,7 @@ public class CircuitSimulatorDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return "Engineering";
+        return "Physics";
     }
 
     @Override

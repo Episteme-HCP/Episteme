@@ -52,7 +52,7 @@ import org.jscience.mathematics.numbers.real.Real;
 /**
  * Distributed Social Simulation App (Economics & Politics).
  */
-public class DistributedGeopoliticsApp extends Application {
+public class DistributedGeopoliticsApp extends Application implements org.jscience.ui.App {
 
     private ManagedChannel channel;
     private ComputeServiceGrpc.ComputeServiceBlockingStub blockingStub;
@@ -232,5 +232,37 @@ public class DistributedGeopoliticsApp extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    // App Interface Implementation
+    @Override
+    public boolean isDemo() {
+        return false;
+    }
+
+    @Override
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.politics", "Politics"); }
+
+    @Override
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedgeopoliticsapp.name", "Distributed Geopolitics App"); }
+
+    @Override
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedgeopoliticsapp.desc", "Distributed application for Distributed Geopolitics App."); }
+
+    @Override
+    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedgeopoliticsapp.longdesc", "Distributed application for Distributed Geopolitics App."); }
+
+    @Override
+    public void show(javafx.stage.Stage stage) {
+        try {
+            start(stage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return new java.util.ArrayList<>();
     }
 }

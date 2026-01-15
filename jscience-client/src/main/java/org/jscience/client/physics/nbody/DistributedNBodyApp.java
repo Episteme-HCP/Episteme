@@ -63,7 +63,7 @@ import java.util.concurrent.TimeUnit;
  * In distributed mode, particle state is serialized and sent to the server
  * for force computation, then results are applied locally.
  */
-public class DistributedNBodyApp extends Application {
+public class DistributedNBodyApp extends Application implements org.jscience.ui.App {
 
     private static final int WIDTH = 900;
     private static final int HEIGHT = 700;
@@ -417,5 +417,37 @@ public class DistributedNBodyApp extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    // App Interface Implementation
+    @Override
+    public boolean isDemo() {
+        return false;
+    }
+
+    @Override
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics"); }
+
+    @Override
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributednbodyapp.name", "Distributed N Body App"); }
+
+    @Override
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributednbodyapp.desc", "Distributed application for Distributed N Body App."); }
+
+    @Override
+    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributednbodyapp.longdesc", "Distributed application for Distributed N Body App."); }
+
+    @Override
+    public void show(javafx.stage.Stage stage) {
+        try {
+            start(stage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return new java.util.ArrayList<>();
     }
 }

@@ -75,5 +75,39 @@ public class Configuration {
     public static String get(String key, String defaultValue) {
         return properties.getProperty(key, defaultValue);
     }
+
+    /**
+     * Gets a double property value with a default.
+     * 
+     * @param key          the property key
+     * @param defaultValue the default value
+     * @return the property value as double, or defaultValue if not found or invalid
+     */
+    public static double getDouble(String key, double defaultValue) {
+        String val = properties.getProperty(key);
+        if (val == null) return defaultValue;
+        try {
+            return Double.parseDouble(val);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Gets an int property value with a default.
+     * 
+     * @param key          the property key
+     * @param defaultValue the default value
+     * @return the property value as int, or defaultValue if not found or invalid
+     */
+    public static int getInt(String key, int defaultValue) {
+        String val = properties.getProperty(key);
+        if (val == null) return defaultValue;
+        try {
+            return Integer.parseInt(val);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
 }
 

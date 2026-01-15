@@ -197,4 +197,24 @@ public class MetamathViewer extends AbstractViewer {
         }
     }
 
+
+    @Override
+    public String getCategory() {
+        return "Mathematics";
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("MetamathViewer.name", "Metamath");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("MetamathViewer.desc", "MetamathViewer description");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 }

@@ -132,4 +132,19 @@ public class FASTAParser extends AbstractResourceReader<List<BioSequence>> {
         }
         return BioSequence.Type.DNA;
     }
+
+    @Override
+    public String getCategory() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology");
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fastaparser.name");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fastaparser.description");
+    }
 }

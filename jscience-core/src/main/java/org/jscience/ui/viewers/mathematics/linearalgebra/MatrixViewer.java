@@ -36,12 +36,15 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.i18n.I18n;
+import org.jscience.io.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MatrixViewer<T> extends AbstractViewer {
 
+    private static final String CFG_PREFIX = "viewer.matrix.default.";
+    
     private Matrix<Real> matrix;
     private Canvas heatmapCanvas;
     private StackPane viewContainer;
@@ -50,7 +53,16 @@ public class MatrixViewer<T> extends AbstractViewer {
 
     @Override
     public List<Parameter<?>> getViewerParameters() {
-        return new ArrayList<>();
+        int defaultRows = Configuration.getInt(CFG_PREFIX + "rows", 8);
+        int defaultCols = Configuration.getInt(CFG_PREFIX + "cols", 8);
+        List<Parameter<?>> params = new ArrayList<>();
+        params.add(new org.jscience.ui.NumericParameter("viewer.matrix.param.rows",
+                I18n.getInstance().get("viewer.matrix.param.rows.desc"),
+                2, 50, 1, defaultRows, v -> { if(rowsSpinner != null) rowsSpinner.getValueFactory().setValue(v.intValue()); }));
+        params.add(new org.jscience.ui.NumericParameter("viewer.matrix.param.cols",
+                I18n.getInstance().get("viewer.matrix.param.cols.desc"),
+                2, 50, 1, defaultCols, v -> { if(colsSpinner != null) colsSpinner.getValueFactory().setValue(v.intValue()); }));
+        return params;
     }
 
     public MatrixViewer() {
@@ -64,30 +76,30 @@ public class MatrixViewer<T> extends AbstractViewer {
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("matrix.title", "Matrix Explorer");
+        return I18n.getInstance().get("viewer.matrix.title");
     }
     
     public void initUI() {
         BorderPane layout = new BorderPane();
-        layout.setStyle("-fx-background-color: white;");
+        layout.getStyleClass().add("viewer-background");
 
         // Header
         Label header = new Label(I18n.getInstance().get("matrix.label.header"));
-        header.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;");
+        header.getStyleClass().add("viewer-header-label");
         HBox headerBox = new HBox(header);
         headerBox.setAlignment(Pos.CENTER);
         headerBox.setPadding(new Insets(15));
-        headerBox.setStyle("-fx-background-color: #16213e;");
+        headerBox.getStyleClass().add("viewer-header");
         layout.setTop(headerBox);
 
         // Control Panel (Left)
         VBox controls = new VBox(15);
         controls.setPadding(new Insets(15));
         controls.setPrefWidth(220);
-        controls.setStyle("-fx-background-color: #f4f4f4;");
+        controls.getStyleClass().add("viewer-controls");
 
         Label sizeLabel = new Label(I18n.getInstance().get("matrix.label.size"));
-        sizeLabel.setStyle("-fx-text-fill: #aaa; -fx-font-weight: bold;");
+        sizeLabel.getStyleClass().add("viewer-section-label");
 
         HBox rowBox = new HBox(10);
         rowBox.setAlignment(Pos.CENTER_LEFT);
@@ -105,7 +117,7 @@ public class MatrixViewer<T> extends AbstractViewer {
 
         Button generateBtn = new Button(I18n.getInstance().get("matrix.button.random"));
         generateBtn.setMaxWidth(Double.MAX_VALUE);
-        generateBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+        generateBtn.getStyleClass().add("viewer-primary-button");
         generateBtn.setOnAction(e -> generateMatrix());
 
         Button identityBtn = new Button(I18n.getInstance().get("matrix.button.identity"));
@@ -115,24 +127,24 @@ public class MatrixViewer<T> extends AbstractViewer {
         Separator sep1 = new Separator();
 
         Label viewLabel = new Label(I18n.getInstance().get("matrix.view.label"));
-        viewLabel.setStyle("-fx-text-fill: #aaa; -fx-font-weight: bold;");
+        viewLabel.getStyleClass().add("viewer-section-label");
 
         ToggleGroup viewGroup = new ToggleGroup();
         RadioButton tableRadio = new RadioButton(I18n.getInstance().get("matrix.view.table"));
-        tableRadio.setStyle("-fx-text-fill: #888;");
+        tableRadio.getStyleClass().add("viewer-radio");
         tableRadio.setToggleGroup(viewGroup);
         tableRadio.setSelected(true);
         tableRadio.setOnAction(e -> showTableView());
 
         RadioButton heatmapRadio = new RadioButton(I18n.getInstance().get("matrix.view.heatmap"));
-        heatmapRadio.setStyle("-fx-text-fill: #888;");
+        heatmapRadio.getStyleClass().add("viewer-radio");
         heatmapRadio.setToggleGroup(viewGroup);
         heatmapRadio.setOnAction(e -> showHeatmapView());
 
         Separator sep2 = new Separator();
 
         Label opsLabel = new Label(I18n.getInstance().get("matrix.ops.label"));
-        opsLabel.setStyle("-fx-text-fill: #aaa; -fx-font-weight: bold;");
+        opsLabel.getStyleClass().add("viewer-section-label");
 
         Button transposeBtn = new Button(I18n.getInstance().get("matrix.ops.transpose"));
         transposeBtn.setMaxWidth(Double.MAX_VALUE);
@@ -143,7 +155,7 @@ public class MatrixViewer<T> extends AbstractViewer {
         scaleBtn.setOnAction(e -> scale(2.0));
 
         infoLabel = new Label("8x8 " + I18n.getInstance().get("matrix.info.matrix"));
-        infoLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
+        infoLabel.getStyleClass().add("viewer-info-label");
 
         controls.getChildren().addAll(
                 sizeLabel, rowBox, colBox, generateBtn, identityBtn,
@@ -154,7 +166,7 @@ public class MatrixViewer<T> extends AbstractViewer {
 
         // View Container (Center)
         viewContainer = new StackPane();
-        viewContainer.setStyle("-fx-background-color: white; -fx-border-color: lightgray;");
+        viewContainer.getStyleClass().add("viewer-content");
         viewContainer.setPadding(new Insets(20));
         layout.setCenter(viewContainer);
 
@@ -246,7 +258,7 @@ public class MatrixViewer<T> extends AbstractViewer {
 
     private void showTableView() {
         viewContainer.getChildren().clear();
-        Label placeholder = new Label("Table View Not Implemented in this Refactor (Use Heatmap)");
+        Label placeholder = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.matrix.table.view.not.imple", "Table View Not Implemented in this Refactor (Use Heatmap)"));
         viewContainer.getChildren().add(placeholder);
     }
 
@@ -333,5 +345,15 @@ public class MatrixViewer<T> extends AbstractViewer {
         gc.setFill(Color.BLACK);
         gc.fillText(String.format("%.1f", max), legendX + 20, 10);
         gc.fillText(String.format("%.1f", min), legendX + 20, legendH);
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("MatrixViewer.desc", "MatrixViewer description");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
     }
 }

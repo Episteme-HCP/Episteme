@@ -153,5 +153,7 @@ public class VirusReader extends AbstractResourceReader<VirusSpecies> {
         public String genomeType;
         public List<String> hostRange;
     }
+
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.virus.name"); }
 }
 

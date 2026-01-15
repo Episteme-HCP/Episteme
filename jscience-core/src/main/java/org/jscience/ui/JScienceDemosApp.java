@@ -295,7 +295,7 @@ public class JScienceDemosApp extends Application {
 
     private void showError(String title, String message, Exception ex) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
+        alert.setTitle(I18n.getInstance().get("status.error", "Error"));
         alert.setHeaderText(title);
         alert.setContentText(message + "\n" + ex.getMessage());
         alert.show(); // Simplified

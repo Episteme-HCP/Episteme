@@ -39,7 +39,7 @@ public class FluidSimTask implements DistributedTask<FluidSimTask, FluidSimTask>
     private Real[][] uy; // Y velocity
     private boolean[][] obstacle;
     private Real viscosity = Real.of(0.02);
-    private PrecisionMode mode = PrecisionMode.REAL;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.REAL;
     private transient LatticeBoltzmannProvider provider; // Transient, re-initialized on execution
 
     private static final double[] W = { 4.0 / 9, 1.0 / 9, 1.0 / 9, 1.0 / 9, 1.0 / 9, 1.0 / 36, 1.0 / 36, 1.0 / 36,
@@ -111,7 +111,7 @@ public class FluidSimTask implements DistributedTask<FluidSimTask, FluidSimTask>
     }
 
     public void step() {
-        if (this.mode == PrecisionMode.REAL) {
+        if (this.mode == TaskRegistry.PrecisionMode.REAL) {
             stepReal();
         } else {
             stepPrimitive();

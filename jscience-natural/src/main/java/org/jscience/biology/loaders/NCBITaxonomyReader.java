@@ -263,4 +263,9 @@ public class NCBITaxonomyReader extends org.jscience.io.AbstractResourceReader<o
         }
         return s;
     }
+
+    @Override
+    public String getName() {
+        return "NCBITaxonomy"; // Simple fallback
+    }
 }

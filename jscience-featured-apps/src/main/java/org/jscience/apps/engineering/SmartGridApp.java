@@ -217,7 +217,7 @@ public class SmartGridApp extends FeaturedAppBase {
         // Battery Status
         VBox batteryBox = new VBox(5);
         batteryTitleLabel = new Label(i18n.get("grid.label.battery_title"));
-        batteryTitleLabel.setTextFill(Color.DARKGREEN);
+        batteryTitleLabel.getStyleClass().add("status-connected");
         batteryTitleLabel.setStyle("-fx-font-weight: bold;");
 
         batteryBar = new ProgressBar(0.5);
@@ -226,7 +226,7 @@ public class SmartGridApp extends FeaturedAppBase {
 
         batteryLabel = new Label(
                 MessageFormat.format(i18n.get("grid.label.battery_charge"), batteryCharge, batteryCapacity));
-        batteryLabel.setTextFill(Color.DARKGRAY);
+        batteryLabel.getStyleClass().add("text-secondary");
 
         batteryBox.getChildren().addAll(batteryTitleLabel, batteryBar, batteryLabel);
 
@@ -245,7 +245,7 @@ public class SmartGridApp extends FeaturedAppBase {
         sli.setShowTickMarks(true);
 
         Label valLbl = new Label(MessageFormat.format(i18n.get("grid.label.mw_value"), val));
-        valLbl.setTextFill(Color.DARKGRAY);
+        valLbl.getStyleClass().add("text-secondary");
         sli.valueProperty().addListener(
                 (o, ov, nv) -> valLbl.setText(MessageFormat.format(i18n.get("grid.label.mw_value"), nv.doubleValue())));
 
@@ -565,5 +565,20 @@ public class SmartGridApp extends FeaturedAppBase {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    @Override
+    public String getCategory() {
+        return "Engineering";
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("SmartGridApp.name", "SmartGrid");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
     }
 }

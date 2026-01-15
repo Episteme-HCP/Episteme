@@ -62,9 +62,7 @@ public class FluidDynamicsDemo extends AbstractSimulationDemo {
     }
 
     @Override
-    public String getCategory() {
-        return "Physics";
-    }
+    public String getCategory() { return "Physics"; }
 
     @Override
     public javafx.scene.Node createViewerNode() {
@@ -210,7 +208,7 @@ public class FluidDynamicsDemo extends AbstractSimulationDemo {
             });
             controls.add(engineSwitch);
             
-            fpsLabel = new Label("FPS: --");
+            fpsLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.fluiddynamics.fps", "FPS: --"));
             controls.add(fpsLabel);
 
             // Toggles
@@ -317,12 +315,21 @@ public class FluidDynamicsDemo extends AbstractSimulationDemo {
         @Override public boolean isPlaying() { return running; }
         
         @Override public String getName() { return "Fluid Viewer"; }
-        @Override public String getCategory() { return "Physics"; }
-    }
+    @Override
+    public String getCategory() { return "Physics"; }
+    
+        @Override
+        public String getDescription() { return "InternalFluidViewer Internal Viewer"; }
+
+        @Override
+}
 
     private static class Particle {
         double x, y, vx, vy;
         double life = 1.0;
         Particle(double x, double y) { this.x = x; this.y = y; }
     }
+
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.fluiddynamicsdemo.longdesc"); }
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

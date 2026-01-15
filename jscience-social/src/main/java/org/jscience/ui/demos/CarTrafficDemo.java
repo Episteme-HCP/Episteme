@@ -66,9 +66,7 @@ public class CarTrafficDemo extends AbstractSimulationDemo {
     private Label jamStatusLabel;
 
     @Override
-    public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.engineering");
-    }
+    public String getCategory() { return "Architecture"; }
 
     @Override
     public String getName() {

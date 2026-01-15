@@ -43,7 +43,7 @@ public class HumanBodyDemo extends AbstractDemo {
     public boolean isDemo() { return true; }
 
     @Override
-    public String getCategory() { return "Biology"; }
+    public String getCategory() { return "Medicine"; }
 
     @Override
     public String getName() { return I18n.getInstance().get("HumanBody.title", "Human Body Anatomy"); }

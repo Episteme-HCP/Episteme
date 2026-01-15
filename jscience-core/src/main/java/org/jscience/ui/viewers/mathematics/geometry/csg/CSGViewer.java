@@ -168,4 +168,14 @@ public class CSGViewer extends AbstractViewer {
         }
     }
 
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("CSGViewer.desc", "CSGViewer description");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 }

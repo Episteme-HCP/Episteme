@@ -47,7 +47,7 @@ import java.util.List;
 public class CircuitSimulatorViewer extends org.jscience.ui.AbstractViewer implements org.jscience.ui.Simulatable {
 
     @Override
-    public String getCategory() { return "Engineering"; }
+    public String getCategory() { return "Physics"; }
     
     @Override
     public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.circuit"); }
@@ -328,4 +328,14 @@ public class CircuitSimulatorViewer extends org.jscience.ui.AbstractViewer imple
     }
 
 
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("CircuitSimulatorViewer.desc", "CircuitSimulatorViewer description");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 }

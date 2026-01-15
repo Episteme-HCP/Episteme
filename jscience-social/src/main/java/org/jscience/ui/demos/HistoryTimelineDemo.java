@@ -33,8 +33,8 @@ public class HistoryTimelineDemo extends AbstractDemo {
     }
 
     @Override
-    public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.history");
+    public String getCategory() { 
+        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.history", "History"); 
     }
 
     @Override
@@ -55,9 +55,8 @@ public class HistoryTimelineDemo extends AbstractDemo {
     @Override
     protected javafx.scene.Node createViewerNode() {
         org.jscience.ui.viewers.history.TimelineViewer v = new org.jscience.ui.viewers.history.TimelineViewer();
+        v.setTimeline(org.jscience.history.Timeline.worldHistory());
         this.viewer = v;
         return v;
     }
-    
-
 }

@@ -55,7 +55,7 @@ import java.util.concurrent.TimeUnit;
  * Visualizes 3D lattice protein folding with Monte Carlo methods.
  * Offloads computation to the JScience grid.
  */
-public class DistributedProteinFoldingApp extends Application {
+public class DistributedProteinFoldingApp extends Application implements org.jscience.ui.App {
 
     private final Group moleculeGroup = new Group();
     private ProteinFoldingTask task;
@@ -321,5 +321,37 @@ public class DistributedProteinFoldingApp extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    // App Interface Implementation
+    @Override
+    public boolean isDemo() {
+        return false;
+    }
+
+    @Override
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology"); }
+
+    @Override
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedproteinfoldingapp.name", "Distributed Protein Folding App"); }
+
+    @Override
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedproteinfoldingapp.desc", "Distributed application for Distributed Protein Folding App."); }
+
+    @Override
+    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedproteinfoldingapp.longdesc", "Distributed application for Distributed Protein Folding App."); }
+
+    @Override
+    public void show(javafx.stage.Stage stage) {
+        try {
+            start(stage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return new java.util.ArrayList<>();
     }
 }

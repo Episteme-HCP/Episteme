@@ -56,10 +56,22 @@ public class UserPreferences {
     public static final String KEY_COMPUTE_OPENCL_DEVICE = "compute.opencl.device";
     public static final String KEY_COMPUTE_CUDA_DEVICE = "compute.cuda.device";
     
-    // Default values
-    public static final String DEFAULT_LANGUAGE = "en";
-    public static final String DEFAULT_THEME = "dark";
-    public static final String DEFAULT_COMPUTE_BACKEND = "cpu";
+    // Default values - loaded from Configuration (jscience.properties), not hardcoded
+    private static String getDefaultLanguage() {
+        return Configuration.get("defaults.ui.language", "en");
+    }
+    
+    private static String getDefaultTheme() {
+        return Configuration.get("defaults.ui.theme", "dark");
+    }
+    
+    private static String getDefaultComputeBackend() {
+        return Configuration.get("defaults.compute.backend", "cpu");
+    }
+    
+    private static String getDefaultBackend(String type) {
+        return Configuration.get("defaults.backend." + type, "AUTO");
+    }
     
     private static UserPreferences instance;
     private final Properties properties;
@@ -192,9 +204,9 @@ public class UserPreferences {
 
     // === Convenience methods for common preferences ===
 
-    /** Gets the UI language (default: en). */
+    /** Gets the UI language (default from jscience.properties). */
     public String getLanguage() {
-        return get(KEY_LANGUAGE, DEFAULT_LANGUAGE);
+        return get(KEY_LANGUAGE, getDefaultLanguage());
     }
 
     /** Sets the UI language. */
@@ -202,9 +214,9 @@ public class UserPreferences {
         set(KEY_LANGUAGE, language);
     }
 
-    /** Gets the UI theme (default: dark). */
+    /** Gets the UI theme (default from jscience.properties). */
     public String getTheme() {
-        return get(KEY_THEME, DEFAULT_THEME);
+        return get(KEY_THEME, getDefaultTheme());
     }
 
     /** Sets the UI theme. */
@@ -214,7 +226,7 @@ public class UserPreferences {
 
     /** Gets the compute backend (cpu, opencl, cuda). */
     public String getComputeBackend() {
-        return get(KEY_COMPUTE_BACKEND, DEFAULT_COMPUTE_BACKEND);
+        return get(KEY_COMPUTE_BACKEND, getDefaultComputeBackend());
     }
 
     /** Sets the compute backend. */
@@ -246,5 +258,13 @@ public class UserPreferences {
     /** Sets whether GPU compute is enabled. */
     public void setGpuEnabled(boolean enabled) {
         set(KEY_COMPUTE_GPU_ENABLED, String.valueOf(enabled));
+    }
+    /** Gets a read-only view of all persistent preferences. */
+    public java.util.Map<String, String> getPreferencesMap() {
+        java.util.Map<String, String> map = new java.util.TreeMap<>(); // Sorted alphabetically
+        for (String key : properties.stringPropertyNames()) {
+            map.put(key, properties.getProperty(key));
+        }
+        return map;
     }
 }

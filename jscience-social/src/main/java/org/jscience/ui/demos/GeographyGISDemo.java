@@ -40,9 +40,7 @@ public class GeographyGISDemo extends AbstractDemo {
     }
 
     @Override
-    public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.geography");
-    }
+    public String getCategory() { return "Geography"; }
 
     @Override
     public String getName() {

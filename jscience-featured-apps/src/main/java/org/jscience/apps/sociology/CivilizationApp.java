@@ -155,7 +155,9 @@ public class CivilizationApp extends FeaturedAppBase {
 
         // Status Overlay
         statusLabel = new Label(i18n.get("civilization.status.stable"));
-        statusLabel.setStyle("-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: green;");
+        statusLabel.getStyleClass().add("font-bold");
+        statusLabel.getStyleClass().removeAll("text-success", "text-warning", "text-error", "text-info");
+        statusLabel.getStyleClass().add("text-success");
         StackPane overlay = new StackPane(statusLabel);
         overlay.setPickOnBounds(false);
         overlay.setAlignment(javafx.geometry.Pos.TOP_RIGHT);
@@ -271,16 +273,16 @@ public class CivilizationApp extends FeaturedAppBase {
     private void updateStatusLabel() {
         if (population.getValue().doubleValue() <= 0) {
             statusLabel.setText(i18n.get("civilization.status.extinct"));
-            statusLabel.setTextFill(Color.BLACK);
+            statusLabel.getStyleClass().add("text-dark");
         } else if (population.getValue().doubleValue() < 500) {
             statusLabel.setText(i18n.get("civilization.status.collapse"));
-            statusLabel.setTextFill(Color.RED);
+            statusLabel.getStyleClass().add("text-error");
         } else if (birthRateBase < 0.03) {
             statusLabel.setText(i18n.get("civilization.status.declining"));
-            statusLabel.setTextFill(Color.ORANGE);
+            statusLabel.getStyleClass().add("text-warning");
         } else {
             statusLabel.setText(i18n.get("civilization.status.thriving"));
-            statusLabel.setTextFill(Color.GREEN);
+            statusLabel.getStyleClass().add("text-success");
         }
     }
 
@@ -438,16 +440,16 @@ public class CivilizationApp extends FeaturedAppBase {
     private void updateStatus(double dPop) {
         if (population.getValue().doubleValue() <= 10) {
             statusLabel.setText(i18n.get("civilization.status.extinct"));
-            statusLabel.setTextFill(Color.BLACK);
+            statusLabel.getStyleClass().add("text-dark");
         } else if (dPop < -10) {
             statusLabel.setText(i18n.get("civilization.status.collapse"));
-            statusLabel.setTextFill(Color.RED);
+            statusLabel.getStyleClass().add("text-error");
         } else if (dPop < 0) {
             statusLabel.setText(i18n.get("civilization.status.declining"));
-            statusLabel.setTextFill(Color.ORANGE);
+            statusLabel.getStyleClass().add("text-warning");
         } else {
             statusLabel.setText(i18n.get("civilization.status.thriving"));
-            statusLabel.setTextFill(Color.GREEN);
+            statusLabel.getStyleClass().add("text-success");
         }
     }
 
@@ -521,5 +523,15 @@ public class CivilizationApp extends FeaturedAppBase {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    @Override
+    public String getCategory() {
+        return "Sociology";
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
     }
 }

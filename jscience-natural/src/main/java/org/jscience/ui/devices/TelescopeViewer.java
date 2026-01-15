@@ -81,7 +81,7 @@ public class TelescopeViewer extends BorderPane {
 
         // Title
         Label title = new Label(I18n.getInstance().get("telescope.title"));
-        title.setFont(Font.font("System", FontWeight.BOLD, 18));
+        title.getStyleClass().add("font-large");
 
         // Status panel
         HBox statusBox = createStatusPanel();
@@ -112,7 +112,7 @@ public class TelescopeViewer extends BorderPane {
         raTitle.setFont(Font.font("System", 10));
         raLabel = new Label(I18n.getInstance().get("telescope.ra.default"));
 
-        raLabel.setFont(Font.font("Monospace", FontWeight.BOLD, 14));
+        raLabel.getStyleClass().add("font-bold");
         raBox.getChildren().addAll(raTitle, raLabel);
         raBox.setAlignment(Pos.CENTER);
 
@@ -123,7 +123,7 @@ public class TelescopeViewer extends BorderPane {
         decTitle.setFont(Font.font("System", 10));
         decLabel = new Label(I18n.getInstance().get("telescope.dec.default"));
 
-        decLabel.setFont(Font.font("Monospace", FontWeight.BOLD, 14));
+        decLabel.getStyleClass().add("font-bold");
         decBox.getChildren().addAll(decTitle, decLabel);
         decBox.setAlignment(Pos.CENTER);
 
@@ -133,8 +133,8 @@ public class TelescopeViewer extends BorderPane {
 
         statusTitle.setFont(Font.font("System", 10));
         statusLabel = new Label(I18n.getInstance().get("telescope.status.disconnected"));
-        statusLabel.setTextFill(Color.ORANGE);
-        statusLabel.setFont(Font.font("System", FontWeight.BOLD, 12));
+        statusLabel.getStyleClass().add("text-warning");
+        statusLabel.getStyleClass().add("font-bold");
         statusBox.getChildren().addAll(statusTitle, statusLabel);
         statusBox.setAlignment(Pos.CENTER);
 
@@ -150,7 +150,7 @@ public class TelescopeViewer extends BorderPane {
         // Target input
         Label targetLabel = new Label(I18n.getInstance().get("telescope.target"));
 
-        targetLabel.setFont(Font.font("System", FontWeight.BOLD, 12));
+        targetLabel.getStyleClass().add("font-bold");
 
         HBox inputRow = new HBox(10);
         inputRow.setAlignment(Pos.CENTER);
@@ -173,7 +173,7 @@ public class TelescopeViewer extends BorderPane {
 
         inputRow.getChildren().addAll(
                 new Label("RA:"), raInput,
-                new Label("Dec:"), decInput,
+                new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.telescope.dec", "Dec:")), decInput,
                 slewBtn, stopBtn);
         inputRow.getChildren().filtered(n -> n instanceof Label)
                 .forEach(n -> ((Label) n).setTextFill(Color.LIGHTGRAY));
@@ -214,7 +214,7 @@ public class TelescopeViewer extends BorderPane {
             updateStatusDisplay();
         } catch (Exception e) {
             statusLabel.setText(I18n.getInstance().get("telescope.status.error"));
-            statusLabel.setTextFill(Color.RED);
+            statusLabel.getStyleClass().add("text-error");
         }
     }
 
@@ -226,10 +226,10 @@ public class TelescopeViewer extends BorderPane {
             updateStatusDisplay();
         } catch (NumberFormatException e) {
             statusLabel.setText(I18n.getInstance().get("telescope.status.invalid"));
-            statusLabel.setTextFill(Color.RED);
+            statusLabel.getStyleClass().add("text-error");
         } catch (Exception e) {
             statusLabel.setText(I18n.getInstance().get("telescope.status.slew_error"));
-            statusLabel.setTextFill(Color.RED);
+            statusLabel.getStyleClass().add("text-error");
         }
     }
 
@@ -261,10 +261,10 @@ public class TelescopeViewer extends BorderPane {
                 statusLabel.setTextFill(Color.LIME);
                 break;
             case "SLEWING":
-                statusLabel.setTextFill(Color.YELLOW);
+                statusLabel.getStyleClass().add("text-highlight");
                 break;
             default:
-                statusLabel.setTextFill(Color.ORANGE);
+                statusLabel.getStyleClass().add("text-warning");
         }
     }
 
@@ -308,6 +308,27 @@ public class TelescopeViewer extends BorderPane {
     public SimulatedTelescope getTelescope() {
         return telescope;
     }
-}
 
+    // --- Mandatory Abstract Methods (I18n) ---
+
+    @Override
+    public String getCategory() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics");
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.telescope.title");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.telescope.desc");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.telescope.longdesc");
+    }
+}
 

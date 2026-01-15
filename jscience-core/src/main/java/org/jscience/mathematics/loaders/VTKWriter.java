@@ -40,7 +40,7 @@ public class VTKWriter extends AbstractResourceWriter<double[][]> {
     
     @Override
     public String getCategory() {
-        return "Graphics";
+        return "Mathematics";
     }
 
     @Override

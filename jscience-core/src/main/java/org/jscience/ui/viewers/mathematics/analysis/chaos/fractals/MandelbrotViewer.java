@@ -23,26 +23,33 @@
 
 package org.jscience.ui.viewers.mathematics.analysis.chaos.fractals;
 
+import org.jscience.io.Configuration;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Parameter;
-import java.util.List;
-import java.util.ArrayList;
+import org.jscience.ui.NumericParameter;
+import org.jscience.ui.i18n.I18n;
+import org.jscience.mathematics.numbers.real.Real;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import org.jscience.ui.i18n.I18n;
+
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Interactive Mandelbrot Set Viewer.
- * Features Zoom, Pan, and parallel rendering.
+ * Uses Real for all internal calculations, double only for display output.
+ * All default values loaded from jscience.properties.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class MandelbrotViewer extends AbstractViewer {
+
+    private static final String CFG_PREFIX = "viewer.mandelbrot.default.";
 
     @Override
     public String getCategory() {
@@ -51,29 +58,54 @@ public class MandelbrotViewer extends AbstractViewer {
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("mandelbrot.title", "Mandelbrot Set");
+        return I18n.getInstance().get("viewer.mandelbrot.title");
     }
 
     @Override
     public List<Parameter<?>> getViewerParameters() {
-        return new ArrayList<>();
+        List<Parameter<?>> params = new ArrayList<>();
+        params.add(new NumericParameter("viewer.mandelbrot.param.minre",
+                I18n.getInstance().get("viewer.mandelbrot.param.minre.desc"),
+                -3, 1, 0.1, minRe.doubleValue(), v -> { minRe = Real.of(v); render(); }));
+        params.add(new NumericParameter("viewer.mandelbrot.param.maxre",
+                I18n.getInstance().get("viewer.mandelbrot.param.maxre.desc"),
+                -1, 3, 0.1, maxRe.doubleValue(), v -> { maxRe = Real.of(v); render(); }));
+        params.add(new NumericParameter("viewer.mandelbrot.param.minim",
+                I18n.getInstance().get("viewer.mandelbrot.param.minim.desc"),
+                -2, 2, 0.1, minIm.doubleValue(), v -> { minIm = Real.of(v); render(); }));
+        params.add(new NumericParameter("viewer.mandelbrot.param.maxim",
+                I18n.getInstance().get("viewer.mandelbrot.param.maxim.desc"),
+                -2, 2, 0.1, maxIm.doubleValue(), v -> { maxIm = Real.of(v); render(); }));
+        params.add(new NumericParameter("viewer.mandelbrot.param.maxiter",
+                I18n.getInstance().get("viewer.mandelbrot.param.maxiter.desc"),
+                50, 2000, 50, maxIter, v -> { maxIter = v.intValue(); render(); }));
+        params.add(new NumericParameter("viewer.mandelbrot.param.juliareal",
+                I18n.getInstance().get("viewer.mandelbrot.param.juliareal.desc"),
+                -2, 2, 0.01, juliaReal.doubleValue(), v -> { juliaReal = Real.of(v); if(juliaMode) render(); }));
+        params.add(new NumericParameter("viewer.mandelbrot.param.juliaimag",
+                I18n.getInstance().get("viewer.mandelbrot.param.juliaimag.desc"),
+                -2, 2, 0.01, juliaImag.doubleValue(), v -> { juliaImag = Real.of(v); if(juliaMode) render(); }));
+        return params;
     }
 
     private static final int WIDTH = 800;
     private static final int HEIGHT = 600;
-    private int maxIter = 200;
-
-    private double minRe = -2.0;
-    private double maxRe = 1.0;
-    private double minIm = -1.2;
-    private double maxIm = 1.2;
+    
+    // All defaults loaded from Configuration
+    private int maxIter = Configuration.getInt(CFG_PREFIX + "maxiter", 200);
+    private Real minRe = Real.of(Configuration.getDouble(CFG_PREFIX + "minre", -2.0));
+    private Real maxRe = Real.of(Configuration.getDouble(CFG_PREFIX + "maxre", 1.0));
+    private Real minIm = Real.of(Configuration.getDouble(CFG_PREFIX + "minim", -1.2));
+    private Real maxIm = Real.of(Configuration.getDouble(CFG_PREFIX + "maxim", 1.2));
 
     private Canvas canvas;
     private WritableImage image;
 
     private boolean juliaMode = false;
-    private double juliaReal = -0.7;
-    private double juliaImag = 0.27015;
+    private Real juliaReal = Real.of(Configuration.getDouble(CFG_PREFIX + "juliareal", -0.7));
+    private Real juliaImag = Real.of(Configuration.getDouble(CFG_PREFIX + "juliaimag", 0.27015));
+
+    private static final Real ESCAPE_RADIUS_SQ = Real.of(4.0);
 
     public MandelbrotViewer() {
         canvas = new Canvas(WIDTH, HEIGHT);
@@ -81,63 +113,60 @@ public class MandelbrotViewer extends AbstractViewer {
 
         StackPane canvasPane = new StackPane(canvas);
 
-        // Controls
         javafx.scene.control.ToggleButton modeBtn = new javafx.scene.control.ToggleButton(
                 I18n.getInstance().get("mandelbrot.mode.julia"));
         modeBtn.setTranslateY(20);
         modeBtn.setTranslateX(20);
         javafx.scene.layout.VBox controls = new javafx.scene.layout.VBox(modeBtn);
-        controls.setPickOnBounds(false); // overlay
+        controls.setPickOnBounds(false);
 
         getChildren().addAll(canvasPane, controls);
 
         modeBtn.setOnAction(e -> {
             juliaMode = modeBtn.isSelected();
-            // Reset view based on mode
             if (juliaMode) {
-                minRe = -2.0;
-                maxRe = 2.0;
-                minIm = -1.5;
-                maxIm = 1.5;
+                minRe = Real.of(-2.0);
+                maxRe = Real.of(2.0);
+                minIm = Real.of(-1.5);
+                maxIm = Real.of(1.5);
             } else {
-                // Reset to Mandelbrot default and recalculate aspect
-                minRe = -2.0;
-                maxRe = 1.0;
-                double aspect = (double) HEIGHT / WIDTH;
-                double reWidth = maxRe - minRe;
-                double imHeight = reWidth * aspect;
-                double centerIm = 0.0; // Center at origin for Mandelbrot
-                minIm = centerIm - imHeight / 2;
-                maxIm = centerIm + imHeight / 2;
+                minRe = Real.of(Configuration.getDouble(CFG_PREFIX + "minre", -2.0));
+                maxRe = Real.of(Configuration.getDouble(CFG_PREFIX + "maxre", 1.0));
+                Real aspect = Real.of((double) HEIGHT / WIDTH);
+                Real reWidth = maxRe.subtract(minRe);
+                Real imHeight = reWidth.multiply(aspect);
+                Real centerIm = Real.ZERO;
+                minIm = centerIm.subtract(imHeight.divide(Real.TWO));
+                maxIm = centerIm.add(imHeight.divide(Real.TWO));
             }
             render();
         });
 
-        // Mouse Move for dynamic Julia parameter (only if in Julia mode? Or maybe on
-        // Ctrl key?)
         canvas.setOnMouseMoved(e -> {
             if (juliaMode && e.isControlDown()) {
-                // Map mouse to complex plane (-2..2 in both? relative to window)
-                juliaReal = minRe + (e.getX() / WIDTH) * (maxRe - minRe);
-                juliaImag = maxIm - (e.getY() / HEIGHT) * (maxIm - minIm);
+                Real xRatio = Real.of(e.getX() / WIDTH);
+                Real yRatio = Real.of(e.getY() / HEIGHT);
+                juliaReal = minRe.add(xRatio.multiply(maxRe.subtract(minRe)));
+                juliaImag = maxIm.subtract(yRatio.multiply(maxIm.subtract(minIm)));
                 render();
             }
         });
 
-        // Interaction (Scroll/Pan)
         canvas.setOnScroll(e -> {
-            double zoomFactor = (e.getDeltaY() > 0) ? 0.8 : 1.25;
+            Real zoomFactor = Real.of((e.getDeltaY() > 0) ? 0.8 : 1.25);
 
-            double mouseRe = minRe + (e.getX() / WIDTH) * (maxRe - minRe);
-            double mouseIm = maxIm - (e.getY() / HEIGHT) * (maxIm - minIm);
+            Real xRatio = Real.of(e.getX() / WIDTH);
+            Real yRatio = Real.of(e.getY() / HEIGHT);
+            Real mouseRe = minRe.add(xRatio.multiply(maxRe.subtract(minRe)));
+            Real mouseIm = maxIm.subtract(yRatio.multiply(maxIm.subtract(minIm)));
 
-            double reW = (maxRe - minRe) * zoomFactor;
-            double imH = (maxIm - minIm) * zoomFactor;
+            Real reW = maxRe.subtract(minRe).multiply(zoomFactor);
+            Real imH = maxIm.subtract(minIm).multiply(zoomFactor);
 
-            minRe = mouseRe - (mouseRe - minRe) * zoomFactor;
-            maxRe = minRe + reW;
-            minIm = mouseIm - (mouseIm - minIm) * zoomFactor;
-            maxIm = minIm + imH;
+            minRe = mouseRe.subtract(mouseRe.subtract(minRe).multiply(zoomFactor));
+            maxRe = minRe.add(reW);
+            minIm = mouseIm.subtract(mouseIm.subtract(minIm).multiply(zoomFactor));
+            maxIm = minIm.add(imH);
 
             render();
         });
@@ -158,40 +187,39 @@ public class MandelbrotViewer extends AbstractViewer {
             dragContext.mouseAnchorX = e.getX();
             dragContext.mouseAnchorY = e.getY();
 
-            double rePerPixel = (maxRe - minRe) / WIDTH;
-            double imPerPixel = (maxIm - minIm) / HEIGHT;
+            Real rePerPixel = maxRe.subtract(minRe).divide(Real.of(WIDTH));
+            Real imPerPixel = maxIm.subtract(minIm).divide(Real.of(HEIGHT));
 
-            minRe -= dx * rePerPixel;
-            maxRe -= dx * rePerPixel;
-            maxIm += dy * imPerPixel;
-            minIm += dy * imPerPixel;
+            minRe = minRe.subtract(rePerPixel.multiply(Real.of(dx)));
+            maxRe = maxRe.subtract(rePerPixel.multiply(Real.of(dx)));
+            maxIm = maxIm.add(imPerPixel.multiply(Real.of(dy)));
+            minIm = minIm.add(imPerPixel.multiply(Real.of(dy)));
 
             render();
         });
 
         // Adjust maxIm to aspect ratio initially
-        double aspect = (double) HEIGHT / WIDTH;
-        double reWidth = maxRe - minRe;
-        double imHeight = reWidth * aspect;
-        double centerIm = (minIm + maxIm) / 2;
-        minIm = centerIm - imHeight / 2;
-        maxIm = centerIm + imHeight / 2;
+        Real aspect = Real.of((double) HEIGHT / WIDTH);
+        Real reWidth = maxRe.subtract(minRe);
+        Real imHeight = reWidth.multiply(aspect);
+        Real centerIm = minIm.add(maxIm).divide(Real.TWO);
+        minIm = centerIm.subtract(imHeight.divide(Real.TWO));
+        maxIm = centerIm.add(imHeight.divide(Real.TWO));
 
         render();
     }
 
     private void render() {
         PixelWriter pw = image.getPixelWriter();
-        double reFactor = (maxRe - minRe) / (WIDTH - 1);
-        double imFactor = (maxIm - minIm) / (HEIGHT - 1);
+        Real reFactor = maxRe.subtract(minRe).divide(Real.of(WIDTH - 1));
+        Real imFactor = maxIm.subtract(minIm).divide(Real.of(HEIGHT - 1));
 
-        // Sequential for JavaFX safety
         for (int y = 0; y < HEIGHT; y++) {
-            double cIm = maxIm - y * imFactor;
+            Real cIm = maxIm.subtract(imFactor.multiply(Real.of(y)));
             for (int x = 0; x < WIDTH; x++) {
-                double cRe = minRe + x * reFactor;
-                double Z_re, Z_im;
-                double K_re, K_im;
+                Real cRe = minRe.add(reFactor.multiply(Real.of(x)));
+                Real Z_re, Z_im;
+                Real K_re, K_im;
 
                 if (juliaMode) {
                     Z_re = cRe;
@@ -199,8 +227,8 @@ public class MandelbrotViewer extends AbstractViewer {
                     K_re = juliaReal;
                     K_im = juliaImag;
                 } else {
-                    Z_re = 0;
-                    Z_im = 0;
+                    Z_re = Real.ZERO;
+                    Z_im = Real.ZERO;
                     K_re = cRe;
                     K_im = cIm;
                 }
@@ -208,13 +236,15 @@ public class MandelbrotViewer extends AbstractViewer {
                 boolean isInside = true;
                 int n = 0;
                 for (; n < maxIter; n++) {
-                    double Z_re2 = Z_re * Z_re, Z_im2 = Z_im * Z_im;
-                    if (Z_re2 + Z_im2 > 4) {
+                    Real Z_re2 = Z_re.multiply(Z_re);
+                    Real Z_im2 = Z_im.multiply(Z_im);
+                    if (Z_re2.add(Z_im2).compareTo(ESCAPE_RADIUS_SQ) > 0) {
                         isInside = false;
                         break;
                     }
-                    Z_im = 2 * Z_re * Z_im + K_im;
-                    Z_re = Z_re2 - Z_im2 + K_re;
+                    Real newIm = Z_re.multiply(Z_im).multiply(Real.TWO).add(K_im);
+                    Z_re = Z_re2.subtract(Z_im2).add(K_re);
+                    Z_im = newIm;
                 }
                 Color color = isInside ? Color.BLACK : Color.hsb((n * 7) % 360, 0.8, 1.0);
                 pw.setColor(x, y, color);
@@ -224,6 +254,13 @@ public class MandelbrotViewer extends AbstractViewer {
         canvas.getGraphicsContext2D().drawImage(image, 0, 0);
     }
 
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("MandelbrotViewer.desc", "MandelbrotViewer description");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 }
-
-

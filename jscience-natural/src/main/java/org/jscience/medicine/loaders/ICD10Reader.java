@@ -160,4 +160,9 @@ public class ICD10Reader extends org.jscience.io.AbstractResourceReader<Disease>
         }
         return Optional.of(d);
     }
+
+    @Override
+    public String getName() {
+        return "ICD10"; // Simple fallback
+    }
 }

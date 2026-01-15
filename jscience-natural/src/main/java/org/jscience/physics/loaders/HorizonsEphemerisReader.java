@@ -171,5 +171,7 @@ public class HorizonsEphemerisReader extends AbstractResourceReader<List<Horizon
         }
         return points;
     }
+
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.horizonsephemeris.name"); }
 }
 

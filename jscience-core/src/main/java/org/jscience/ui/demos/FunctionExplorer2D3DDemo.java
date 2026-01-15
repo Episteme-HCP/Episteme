@@ -73,7 +73,7 @@ public class FunctionExplorer2D3DDemo extends AbstractDemo {
     }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return I18n.getInstance().get("demo.functionexplorer2d3ddemo.longdesc");
     }
 

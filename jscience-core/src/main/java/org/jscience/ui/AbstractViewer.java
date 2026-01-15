@@ -33,22 +33,48 @@ import java.util.List;
  * Abstract base class for all JScience Viewers.
  * Viewers are JavaFX Nodes that can be embedded in Demos or launched independently.
  * 
+ * Subclasses MUST override: getCategory(), getName(), getDescription(), getLongDescription()
+ * with proper I18n support.
+ * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public abstract class AbstractViewer extends BorderPane implements Viewer {
 
+    /**
+     * Returns the category for grouping. MUST be overridden with I18n.
+     * @return the category name
+     */
     @Override
-    public String getCategory() {
-        return "General";
-    }
+    public abstract String getCategory();
 
+    /**
+     * Returns the display name. MUST be overridden with I18n.
+     * @return the display name
+     */
     @Override
-    public String getName() {
-        return getClass().getSimpleName();
-    }
+    public abstract String getName();
 
+    /**
+     * Returns a short description (1-2 lines). MUST be overridden with I18n.
+     * @return the short description
+     */
+    @Override
+    public abstract String getDescription();
+
+    /**
+     * Returns a long description. MUST be overridden with I18n.
+     * @return the long description
+     */
+    @Override
+    public abstract String getLongDescription();
+
+    /**
+     * Returns the list of configurable parameters.
+     * Override this to expose viewer-specific parameters.
+     * @return list of parameters (empty by default)
+     */
     @Override
     public List<Parameter<?>> getViewerParameters() {
         return new ArrayList<>();

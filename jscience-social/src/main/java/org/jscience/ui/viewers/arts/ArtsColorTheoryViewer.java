@@ -162,4 +162,9 @@ public class ArtsColorTheoryViewer extends BorderPane implements org.jscience.ui
         return java.util.Collections.emptyList();
     }
     
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 }

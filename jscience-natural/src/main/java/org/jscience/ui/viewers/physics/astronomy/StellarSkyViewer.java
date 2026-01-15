@@ -39,7 +39,10 @@ import org.jscience.physics.loaders.*;
 import org.jscience.physics.astronomy.time.JulianDate;
 import org.jscience.physics.astronomy.time.SiderealTime;
 import org.jscience.ui.AbstractViewer;
+import org.jscience.ui.Parameter;
+import org.jscience.ui.NumericParameter;
 import org.jscience.ui.i18n.I18n;
+import org.jscience.io.Configuration;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -66,12 +69,13 @@ public class StellarSkyViewer extends AbstractViewer {
     private List<PlanetData> planets = new ArrayList<>();
     private List<DeepSkyObject> deepSkyObjects = new ArrayList<>();
 
-    // State
+    // State - defaults loaded from Configuration
+    private static final String CFG_PREFIX = "viewer.stellarsky.default.";
     private LocalDateTime simulationTime = LocalDateTime.now();
-    private double observerLat = 48.8566; // Paris
-    private double observerLon = 2.3522;
+    private double observerLat = Configuration.getDouble(CFG_PREFIX + "lat", 48.8566);
+    private double observerLon = Configuration.getDouble(CFG_PREFIX + "lon", 2.3522);
     private double viewAzimuthOffset = 0;
-    private double fovScale = 1.0;
+    private double fovScale = Configuration.getDouble(CFG_PREFIX + "fov", 1.0);
 
     // UI
     private Canvas skyCanvas;
@@ -101,8 +105,8 @@ public class StellarSkyViewer extends AbstractViewer {
         // Layout
         StackPane overlay = new StackPane();
         timeLabel = new Label();
-        timeLabel.setTextFill(Color.LIGHTGRAY);
-        timeLabel.setFont(Font.font("Monospace", FontWeight.BOLD, 14));
+        timeLabel.getStyleClass().add("text-secondary");
+        timeLabel.getStyleClass().add("font-bold");
         timeLabel.setStyle("-fx-background-color: rgba(0,0,0,0.5); -fx-padding: 5;");
         overlay.getChildren().add(timeLabel);
         overlay.setAlignment(Pos.TOP_LEFT);
@@ -435,6 +439,24 @@ public class StellarSkyViewer extends AbstractViewer {
         }
     }
     
-    @Override public String getName() { return "Stellar Viewer"; }
+    @Override public String getName() { return I18n.getInstance().get("viewer.stellarsky.title"); }
     @Override public String getCategory() { return "Physics"; }
+    
+    @Override
+    public java.util.List<Parameter<?>> getViewerParameters() {
+        java.util.List<Parameter<?>> params = new java.util.ArrayList<>();
+        params.add(new NumericParameter("viewer.stellarsky.param.lat",
+                I18n.getInstance().get("viewer.stellarsky.param.lat.desc"),
+                -90, 90, 1, observerLat, v -> { observerLat = v; drawSky(); }));
+        params.add(new NumericParameter("viewer.stellarsky.param.lon",
+                I18n.getInstance().get("viewer.stellarsky.param.lon.desc"),
+                -180, 180, 1, observerLon, v -> { observerLon = v; drawSky(); }));
+        params.add(new NumericParameter("viewer.stellarsky.param.fov",
+                I18n.getInstance().get("viewer.stellarsky.param.fov.desc"),
+                0.5, 3.0, 0.1, fovScale, v -> { fovScale = v; drawSky(); }));
+        return params;
+    }
+
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.stellarsky.desc"); }
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.stellarsky.longdesc"); }
 }

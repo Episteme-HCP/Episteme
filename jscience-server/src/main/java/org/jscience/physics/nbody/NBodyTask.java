@@ -27,7 +27,7 @@ import org.jscience.distributed.DistributedTask;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import org.jscience.distributed.PrecisionMode;
+
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.technical.backend.algorithms.NBodyProvider;
 import org.jscience.technical.backend.algorithms.MulticoreNBodyProvider;
@@ -54,13 +54,13 @@ public class NBodyTask implements DistributedTask<NBodyTask, NBodyTask> {
     private double dt = 0.01;
     private double softening = 0.1;
     private static final double G = 1.0;
-    private PrecisionMode mode = PrecisionMode.PRIMITIVES;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVES;
 
     public NBodyTask(List<Body> bodies) {
         this.bodies = new ArrayList<>(bodies);
     }
 
-    public void setMode(PrecisionMode mode) {
+    public void setMode(TaskRegistry.PrecisionMode mode) {
         this.mode = mode;
     }
 
@@ -97,7 +97,7 @@ public class NBodyTask implements DistributedTask<NBodyTask, NBodyTask> {
     }
 
     public void step() {
-        if (mode == PrecisionMode.REALS) {
+        if (mode == TaskRegistry.PrecisionMode.REALS) {
             stepReal();
         } else {
             stepPrimitive();

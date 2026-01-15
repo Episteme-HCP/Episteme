@@ -33,12 +33,12 @@ public class MandelbrotTask implements DistributedTask<MandelbrotTask, Mandelbro
     protected int maxIterations = 256;
     protected int[][] result;
 
-    public enum PrecisionMode {
+    public enum TaskRegistry.PrecisionMode {
         REALS,
         PRIMITIVES
     }
 
-    private PrecisionMode mode = PrecisionMode.PRIMITIVES;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVES;
 
     public MandelbrotTask(int width, int height, double xMin, double xMax, double yMin, double yMax) {
         this.width = width;
@@ -55,7 +55,7 @@ public class MandelbrotTask implements DistributedTask<MandelbrotTask, Mandelbro
         this(0, 0, 0, 0, 0, 0);
     }
 
-    public void setMode(PrecisionMode mode) {
+    public void setMode(TaskRegistry.PrecisionMode mode) {
         this.mode = mode;
     }
 
@@ -88,7 +88,7 @@ public class MandelbrotTask implements DistributedTask<MandelbrotTask, Mandelbro
     }
 
     public void compute() {
-        if (mode == PrecisionMode.REALS) {
+        if (mode == TaskRegistry.PrecisionMode.REALS) {
             // JScience Mode: Use Real-based Provider (handled by Multicore provider with
             // conversion internal or special Real provider)
             // Implementation note: existing provider uses doubles but we wrap for

@@ -35,9 +35,7 @@ public class PoliticsVotingDemo extends AbstractDemo {
     }
 
     @Override
-    public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.politics");
-    }
+    public String getCategory() { return "Politics"; }
 
     @Override
     public String getName() {

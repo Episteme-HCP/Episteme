@@ -175,4 +175,9 @@ public class DrugBankReader implements org.jscience.io.ResourceReader<Medication
         
         return Optional.of(m);
     }
+
+    @Override
+    public String getName() {
+        return "DrugBank"; // Simple fallback
+    }
 }

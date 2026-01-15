@@ -61,7 +61,7 @@ public class HumanBodyViewer extends AbstractViewer {
 
     @Override
     public String getCategory() {
-        return "Biology";
+        return "Medicine";
     }
 
     @Override
@@ -157,12 +157,12 @@ public class HumanBodyViewer extends AbstractViewer {
                         expandAndSelect(item);
                     }
                 } else {
-                    titleLabel.setText("Unknown Part");
-                    descriptionArea.setText("No ID found for this mesh.");
+                    titleLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.unknown.part", "Unknown Part"));
+                    descriptionArea.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.no.id.found.for.this", "No ID found for this mesh."));
                 }
             } else {
-                titleLabel.setText("Human Body");
-                descriptionArea.setText("Select a part to see its description.");
+                titleLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.human.body", "Human Body"));
+                descriptionArea.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.select.a.part.to.see", "Select a part to see its description."));
                 hierarchyTree.getSelectionModel().clearSelection();
             }
         });
@@ -176,7 +176,7 @@ public class HumanBodyViewer extends AbstractViewer {
         subScene.widthProperty().bind(centerPane.widthProperty());
         subScene.heightProperty().bind(centerPane.heightProperty());
         
-        loadingLabel = new Label("Loading Anatomy...");
+        loadingLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.loading.anatomy", "Loading Anatomy..."));
         loadingLabel.setStyle("-fx-text-fill: white; -fx-background-color: rgba(0,0,0,0.5); -fx-padding: 10; -fx-background-radius: 5;");
         loadingLabel.setVisible(false); // Managed by async loader
         StackPane.setAlignment(loadingLabel, Pos.TOP_RIGHT);
@@ -184,7 +184,7 @@ public class HumanBodyViewer extends AbstractViewer {
         centerPane.getChildren().add(loadingLabel);
         
         // Attribution Label (Bottom Right)
-        Label attributionLabel = new Label("Models: Z-Anatomy (CC BY-SA 4.0)");
+        Label attributionLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.models.zanatomy.cc.b", "Models: Z-Anatomy (CC BY-SA 4.0)"));
         attributionLabel.setStyle("-fx-text-fill: rgba(255,255,255,0.7); -fx-background-color: rgba(0,0,0,0.3); -fx-padding: 5; -fx-font-size: 10px;");
         StackPane.setAlignment(attributionLabel, Pos.BOTTOM_RIGHT);
         StackPane.setMargin(attributionLabel, new Insets(10));
@@ -198,7 +198,7 @@ public class HumanBodyViewer extends AbstractViewer {
         leftToolbar.setStyle("-fx-background-color: #2b2b2b; -fx-border-color: #3f3f3f; -fx-border-width: 0 1 0 0;");
         leftToolbar.setPrefWidth(200);
 
-        Label layersHeader = new Label("SYSTEMS");
+        Label layersHeader = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.systems", "SYSTEMS"));
         layersHeader.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
         
         leftToolbar.getChildren().addAll(
@@ -210,7 +210,7 @@ public class HumanBodyViewer extends AbstractViewer {
                 createLayerWithLoading("Nervous", nervousLayer, "/org/jscience/medicine/anatomy/models/NervousSystem100.fbx", Color.GOLD),
                 createLayerWithLoading("Circulatory", circulatoryLayer, "/org/jscience/medicine/anatomy/models/CardioVascular41.fbx", Color.DARKRED),
                 new Separator(),
-                new Label("ACTIONS"),
+                new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.actions", "ACTIONS")),
                 createButton("Center View", () -> {
                    if (selectionManager.getSelectedMesh() != null) {
                        // Center on selection
@@ -308,7 +308,7 @@ public class HumanBodyViewer extends AbstractViewer {
             }
         });
         
-        titleLabel = new Label("Human Body");
+        titleLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.human.body.1", "Human Body"));
         titleLabel.setStyle("-fx-text-fill: #e0e0e0; -fx-font-size: 18px; -fx-font-weight: bold; -fx-wrap-text: true;");
         
         descriptionArea = new TextArea("Select a part to view details.");
@@ -360,7 +360,7 @@ public class HumanBodyViewer extends AbstractViewer {
         container.setAlignment(Pos.CENTER_LEFT);
         
         CheckBox cb = new CheckBox(name);
-        cb.setTextFill(Color.WHITE);
+        cb.getStyleClass().add("text-light");
         cb.setSelected(false); // Start unchecked
         cb.setDisable(true); // Start disabled
         cb.selectedProperty().addListener((obs, old, val) -> group.setVisible(val));
@@ -691,4 +691,8 @@ public class HumanBodyViewer extends AbstractViewer {
         }
     }
 
+
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbody.desc"); }
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbody.longdesc"); }
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

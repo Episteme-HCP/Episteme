@@ -85,4 +85,21 @@ public class PDBWriter extends AbstractResourceWriter<Protein> {
             writer.println("END");
         }
     }
+
+    // --- Mandatory Abstract Methods (I18n) ---
+
+    @Override
+    public String getCategory() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology");
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("writer.pdb.name");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("writer.pdb.description");
+    }
 }

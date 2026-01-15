@@ -30,9 +30,7 @@ import org.jscience.ui.i18n.I18n;
 public class MatrixDemo extends AbstractDemo {
 
     @Override
-    public String getCategory() {
-        return I18n.getInstance().get("category.mathematics");
-    }
+    public String getCategory() { return "Mathematics"; }
 
     @Override
     public String getName() {
@@ -50,7 +48,7 @@ public class MatrixDemo extends AbstractDemo {
     }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return I18n.getInstance().get("demo.matrixdemo.longdesc");
     }
 }

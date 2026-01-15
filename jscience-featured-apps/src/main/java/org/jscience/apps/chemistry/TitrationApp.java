@@ -557,4 +557,19 @@ public class TitrationApp extends FeaturedAppBase {
     public static void main(String[] args) {
         launch(args);
     }
+
+    @Override
+    public String getCategory() {
+        return "Chemistry";
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("TitrationApp.name", "Titration");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 }

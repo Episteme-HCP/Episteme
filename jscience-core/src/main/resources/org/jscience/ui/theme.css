@@ -172,6 +172,16 @@
     -fx-text-fill: white; color: white;
 }
 
+.accent-button-orange {
+    -fx-background-color: #ff9800; background: #ff9800;
+    -fx-text-fill: white; color: white;
+}
+
+.button-secondary {
+    -fx-background-color: #7f8c8d; background: #7f8c8d;
+    -fx-text-fill: white; color: white;
+}
+
 /* Labels for dark backgrounds */
 .dark-label {
     -fx-text-fill: white; color: white;

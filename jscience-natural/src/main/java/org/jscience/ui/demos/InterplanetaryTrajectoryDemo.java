@@ -74,17 +74,15 @@ public class InterplanetaryTrajectoryDemo extends AbstractDemo {
     }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return I18n.getInstance().get("trajectory.desc", "Planning of optimal Hohmann transfers between planets.");
     }
 
     @Override
-    public String getCategory() {
-        return "Physics";
-    }
+    public String getCategory() { return "Physics"; }
 
     @Override
-    protected Node createViewerNode() {
+    public Node createViewerNode() {
         loadData();
 
         SplitPane mainSplit = new SplitPane();
@@ -175,7 +173,7 @@ public class InterplanetaryTrajectoryDemo extends AbstractDemo {
         grid.add(calcBtn, 0, 4, 2, 1);
 
         grid.add(new Label(i18n.get("trajectory.label.deltav", "Delta-V")), 0, 5);
-        deltaVLabel = new Label("--");
+        deltaVLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.interplanetarytrajectory.", "--"));
         deltaVLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
         grid.add(deltaVLabel, 1, 5);
 
@@ -358,4 +356,11 @@ public class InterplanetaryTrajectoryDemo extends AbstractDemo {
         gc.strokeOval(cx - rw, -rh, 2 * rw, 2 * rh);
         gc.restore();
     }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("InterplanetaryTrajectoryDemo.desc", "InterplanetaryTrajectoryDemo description");
+    }
+
+    @Override
 }

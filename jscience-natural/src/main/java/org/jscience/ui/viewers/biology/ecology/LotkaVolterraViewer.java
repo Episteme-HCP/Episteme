@@ -192,4 +192,8 @@ public class LotkaVolterraViewer extends AbstractViewer implements Simulatable {
         });
         return new VBox(5, lbl, s);
     }
+
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.lotkavolterra.desc"); }
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.lotkavolterra.longdesc"); }
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

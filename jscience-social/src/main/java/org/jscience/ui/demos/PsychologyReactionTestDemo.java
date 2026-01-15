@@ -42,9 +42,7 @@ public class PsychologyReactionTestDemo extends AbstractSimulationDemo {
     }
 
     @Override
-    public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.psychology");
-    }
+    public String getCategory() { return "Psychology"; }
 
     @Override
     public String getName() {
@@ -135,5 +133,4 @@ public class PsychologyReactionTestDemo extends AbstractSimulationDemo {
         return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.psychologyreactiontestdemo.longdesc");
     }
 }
-
 

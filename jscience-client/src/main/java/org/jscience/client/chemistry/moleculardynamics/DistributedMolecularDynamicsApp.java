@@ -66,7 +66,7 @@ import javafx.geometry.Pos;
 /**
  * 3D Visualization of Molecular Dynamics with Distributed Grid support.
  */
-public class DistributedMolecularDynamicsApp extends Application {
+public class DistributedMolecularDynamicsApp extends Application implements org.jscience.ui.App {
 
     private final Group atomGroup = new Group();
     private MolecularDynamicsTask task;
@@ -475,5 +475,37 @@ public class DistributedMolecularDynamicsApp extends Application {
             default:
                 return Color.PINK;
         }
+    }
+
+    // App Interface Implementation
+    @Override
+    public boolean isDemo() {
+        return false;
+    }
+
+    @Override
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry"); }
+
+    @Override
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedmoleculardynamicsapp.name", "Distributed Molecular Dynamics App"); }
+
+    @Override
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedmoleculardynamicsapp.desc", "Distributed application for Distributed Molecular Dynamics App."); }
+
+    @Override
+    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedmoleculardynamicsapp.longdesc", "Distributed application for Distributed Molecular Dynamics App."); }
+
+    @Override
+    public void show(javafx.stage.Stage stage) {
+        try {
+            start(stage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return new java.util.ArrayList<>();
     }
 }

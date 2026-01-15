@@ -100,10 +100,10 @@ public abstract class AbstractSimulationDemo extends AbstractDemo implements Sim
             HBox vcrControls = new HBox(5);
             vcrControls.setAlignment(Pos.CENTER);
 
-            playBtn = new Button("Ã¢â€“Â¶");
-            pauseBtn = new Button("Ã¢ÂÂ¸");
-            stopBtn = new Button("Ã¢ÂÂ¹");
-            stepBtn = new Button("Ã¢ÂÂ­");
+            playBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.abstractsimulation.", "Ã¢â€“Â¶"));
+            pauseBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.abstractsimulation..1", "Ã¢ÂÂ¸"));
+            stopBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.abstractsimulation..2", "Ã¢ÂÂ¹"));
+            stepBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.abstractsimulation..3", "Ã¢ÂÂ­"));
 
             playBtn.setOnAction(e -> simulatable.play());
             pauseBtn.setOnAction(e -> simulatable.pause());

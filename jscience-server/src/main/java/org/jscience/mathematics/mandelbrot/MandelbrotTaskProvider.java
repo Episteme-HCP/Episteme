@@ -39,8 +39,8 @@ public class MandelbrotTaskProvider implements TaskProvider<MandelbrotTask, Mand
     }
 
     @Override
-    public DistributedTask<MandelbrotTask, MandelbrotTask> createTask(PrecisionMode mode) {
-        if (mode == PrecisionMode.REAL) {
+    public DistributedTask<MandelbrotTask, MandelbrotTask> createTask(TaskRegistry.PrecisionMode mode) {
+        if (mode == TaskRegistry.PrecisionMode.REAL) {
             return new RealMandelbrotTask();
         }
         return new MandelbrotTask();

@@ -195,6 +195,11 @@ public abstract class FeaturedAppBase extends Application implements App {
     }
 
     @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
+
+    @Override
     public void show(Stage stage) {
         try {
             start(stage);

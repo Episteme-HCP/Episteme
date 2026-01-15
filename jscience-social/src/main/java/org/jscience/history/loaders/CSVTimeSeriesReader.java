@@ -141,5 +141,7 @@ public class CSVTimeSeriesReader extends AbstractResourceReader<Map<TimePoint, R
         }
         return series;
     }
+
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.csvtimeseries.name"); }
 }
 

@@ -296,7 +296,7 @@ public class GeneticsViewer extends AbstractViewer {
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(3);
         gc.setFill(Color.BLACK);
-        gc.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        gc.getStyleClass().add("font-title");
 
         gc.strokeRect(startX, startY, size, size);
         gc.strokeLine(startX + size / 2, startY, startX + size / 2, startY + size);
@@ -314,4 +314,8 @@ public class GeneticsViewer extends AbstractViewer {
         gc.fillText(offspring[2], startX + size / 4 - 15, startY + 3 * size / 4 + 8);
         gc.fillText(offspring[3], startX + 3 * size / 4 - 15, startY + 3 * size / 4 + 8);
     }
+
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.genetics.desc"); }
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.genetics.longdesc"); }
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

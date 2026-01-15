@@ -60,7 +60,7 @@ public class BioMotionViewer extends AbstractViewer implements Simulatable {
     public String getName() { return I18n.getInstance().get("biomotion.title", "BioMotion"); }
     
     @Override
-    public String getCategory() { return "Biology"; }
+    public String getCategory() { return "Medicine"; }
 
     public BioMotionViewer() {
         initUI();
@@ -218,4 +218,8 @@ public class BioMotionViewer extends AbstractViewer implements Simulatable {
         double length;
         Link(Node n1, Node n2, double length) { this.n1 = n1; this.n2 = n2; this.length = length; }
     }
+
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.biomotion.desc"); }
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.biomotion.longdesc"); }
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

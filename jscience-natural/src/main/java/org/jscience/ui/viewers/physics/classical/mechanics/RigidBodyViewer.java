@@ -85,6 +85,17 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
     @Override
     public String getCategory() { return "Physics"; }
 
+    @Override
+    public String getDescription() { return I18n.getInstance().get("viewer.rigidbody.desc"); }
+
+    @Override
+    public String getLongDescription() { return I18n.getInstance().get("viewer.rigidbody.longdesc"); }
+
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return new java.util.ArrayList<>();
+    }
+
     public RigidBodyViewer() {
         initUI();
     }

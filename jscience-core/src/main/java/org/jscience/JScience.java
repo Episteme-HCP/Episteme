@@ -83,9 +83,41 @@ public final class JScience {
         // Prevent instantiation
     }
 
+    private static final java.util.Properties properties = new java.util.Properties();
+
     static {
+        loadConfiguration();
         loadPreferences();
         loadVersionInfo();
+    }
+
+    private static void loadConfiguration() {
+        try (java.io.InputStream is = JScience.class.getResourceAsStream("/jscience.properties")) {
+            if (is != null) {
+                properties.load(is);
+            }
+        } catch (Exception e) {
+            // Ignore - defaults will be used or null returned
+        }
+    }
+
+    /**
+     * Gets a global configuration property from jscience.properties.
+     * @param key the property key
+     * @return the property value or null
+     */
+    public static String getProperty(String key) {
+        return properties.getProperty(key);
+    }
+
+    /**
+     * Gets a global configuration property with default.
+     * @param key the property key
+     * @param defaultValue definition value
+     * @return the property value
+     */
+    public static String getProperty(String key, String defaultValue) {
+        return properties.getProperty(key, defaultValue);
     }
 
     /** The version string (e.g., "5.0.0-SNAPSHOT") */
@@ -473,17 +505,99 @@ public final class JScience {
      * @return a string describing the current state
      */
     public static String getConfigurationReport() {
+        // Force load preferences if not done
+        loadPreferences();
+        
         StringBuilder sb = new StringBuilder();
-        sb.append("JScience Configuration Report\n");
-        sb.append("=============================\n");
-        sb.append("Compute Mode: ").append(getComputeMode()).append("\n");
-        sb.append("Backend: ").append(ComputeContext.current().getBackend()).append("\n");
-        sb.append("Float Precision: ").append(getFloatPrecisionMode()).append("\n");
+        String line = "================================================================================\n";
+        
+        // Use I18n for the main title as before
+        sb.append(line);
+        sb.append("   " + org.jscience.ui.i18n.I18n.getInstance().get("report.title", "JScience Configuration Report") + "\n");
+        sb.append(line);
+
+        // 1. SYSTEM INFO
+        sb.append("\n[SYSTEM INFORMATION]\n");
+        sb.append("JScience Version : ").append(VERSION).append("\n");
+        sb.append("Build Date       : ").append(BUILD_DATE).append("\n");
+        sb.append("Java Version     : ").append(System.getProperty("java.version")).append("\n");
+        sb.append("Java Vendor      : ").append(System.getProperty("java.vendor")).append("\n");
+        sb.append("OS Name          : ").append(System.getProperty("os.name")).append("\n");
+        sb.append("OS Arch          : ").append(System.getProperty("os.arch")).append("\n");
+        sb.append("Available Cores  : ").append(Runtime.getRuntime().availableProcessors()).append("\n");
+        
+        // 2. PREFERENCES (User settings)
+        sb.append("\n[USER PREFERENCES & PARAMETERS]\n");
+        org.jscience.io.UserPreferences prefs = org.jscience.io.UserPreferences.getInstance();
+        java.util.Map<String, String> prefMap = prefs.getPreferencesMap();
+        if (prefMap.isEmpty()) {
+            sb.append("  (No user preferences saved)\n");
+        } else {
+            for (java.util.Map.Entry<String, String> entry : prefMap.entrySet()) {
+                sb.append("  ").append(String.format("%-30s", entry.getKey()))
+                  .append(" = ").append(entry.getValue()).append("\n");
+            }
+        }
+        
+        // 3. COMPUTING CONTEXT
+        sb.append("\n[COMPUTING CONTEXT]\n");
+        sb.append("Compute Mode     : ").append(getComputeMode()).append("\n");
+        sb.append("Float Precision  : ").append(getFloatPrecisionMode()).append("\n");
         sb.append("Integer Precision: ").append(getIntPrecisionMode()).append("\n");
-        sb.append("Real Precision: ").append(MathContext.getCurrent().getRealPrecision()).append("\n");
-        sb.append("GPU Available: ").append(isGpuAvailable() ? "Yes" : "No (or not loaded)").append("\n");
-        sb.append("Available Backends: ").append(getAvailableBackends()).append("\n");
-        sb.append("Registered Providers: ").append(ComputeContext.current().toString()).append("\n");
+        sb.append("Math Precision   : ").append(getMathContext().getPrecision())
+          .append(" digits (Rounding: ").append(getMathContext().getRoundingMode()).append(")\n");
+        sb.append("GPU Available    : ").append(isGpuAvailable() ? "YES" : "NO").append("\n");
+        
+        // 4. BACKENDS (Detailed)
+        sb.append("\n[REGISTERED BACKENDS]\n");
+        appendBackends(sb, "Math", org.jscience.technical.backend.BackendDiscovery.TYPE_MATH, getMathBackendId());
+        appendBackends(sb, "Linear Algebra", "linear_algebra", getLinearAlgebraProviderId());
+        appendBackends(sb, "Tensors", org.jscience.technical.backend.BackendDiscovery.TYPE_TENSOR, getTensorBackendId());
+        appendBackends(sb, "Molecular", org.jscience.technical.backend.BackendDiscovery.TYPE_MOLECULAR, getMolecularBackendId());
+        appendBackends(sb, "Quantum", org.jscience.technical.backend.BackendDiscovery.TYPE_QUANTUM, getQuantumBackendId());
+        appendBackends(sb, "Map (GIS)", org.jscience.technical.backend.BackendDiscovery.TYPE_MAP, getMapBackendId());
+        appendBackends(sb, "Network", org.jscience.technical.backend.BackendDiscovery.TYPE_NETWORK, getNetworkBackendId());
+        
+        // Plotting is special (Enum)
+        sb.append("  Plotting (Current: 2D=").append(getPlottingBackend2D()).append(" / 3D=").append(getPlottingBackend3D()).append(")\n");
+        appendBackends(sb, "Plotting Providers", org.jscience.technical.backend.BackendDiscovery.TYPE_PLOTTING, null);
+
+        // 5. LIBRARIES (Found in Classpath)
+        sb.append("\n[LIBRARIES DETECTION]\n");
+        checkLibrary(sb, "Kotlin Utils", "kotlin.Unit");
+        checkLibrary(sb, "Groovy", "groovy.lang.GroovySystem");
+        checkLibrary(sb, "Apache Spark", "org.apache.spark.api.java.JavaSparkContext");
+        checkLibrary(sb, "ND4J / DL4J", "org.nd4j.linalg.factory.Nd4j");
+        checkLibrary(sb, "OpenCL (JOCL)", "org.jocl.CL");
+        checkLibrary(sb, "CUDA (JCuda)", "jcuda.Pointer");
+        checkLibrary(sb, "Javalin", "io.javalin.Javalin");
+        checkLibrary(sb, "Jackson", "com.fasterxml.jackson.databind.ObjectMapper");
+        checkLibrary(sb, "gRPC", "io.grpc.ManagedChannel");
+        checkLibrary(sb, "MPI (MPJ Express)", "mpi.MPI");
+        checkLibrary(sb, "Indriya (Units)", "tech.units.indriya.format.SimpleUnitFormat");
+        
+        // 6. IO LOADERS (Readers/Writers)
+        sb.append("\n[IO LOADERS]\n");
+        appendServiceLoaders(sb, org.jscience.io.ResourceReader.class, "Reader");
+        appendServiceLoaders(sb, org.jscience.io.ResourceWriter.class, "Writer");
+        
+        // 7. DEVICES
+        sb.append("\n[DEVICES]\n");
+        try {
+            org.jscience.ui.MasterControlDiscovery discovery = org.jscience.ui.MasterControlDiscovery.getInstance();
+            java.util.List<org.jscience.ui.MasterControlDiscovery.ClassInfo> devices = discovery.findClasses("Device");
+            if (devices.isEmpty()) {
+                sb.append("  (No 'Device' classes found in scan)\n");
+            } else {
+                for (org.jscience.ui.MasterControlDiscovery.ClassInfo info : devices) {
+                    sb.append("  - ").append(info.simpleName).append(" (").append(info.fullName).append(")\n");
+                }
+            }
+        } catch (Throwable t) {
+            sb.append("  (Error scanning devices (UI module missing?): ").append(t.getMessage()).append(")\n");
+        }
+        
+        sb.append("\n").append(line);
         return sb.toString();
     }
 
@@ -643,7 +757,7 @@ public final class JScience {
                 ComputeMode mode = ComputeMode.valueOf(modeProp.toUpperCase());
                 setComputeMode(mode);
             } catch (IllegalArgumentException e) {
-                System.err.println("Invalid compute mode: " + modeProp);
+                System.err.println(org.jscience.ui.i18n.I18n.getInstance().get("cli.invalid_mode", "Invalid compute mode") + ": " + modeProp);
             }
         }
 
@@ -663,13 +777,59 @@ public final class JScience {
 
         // Launch Master Control
         try {
-            System.out.println("Launching JScience Master Control...");
+            System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("cli.launching", "Launching JScience Master Control..."));
             javafx.application.Application.launch(org.jscience.ui.JScienceMasterControl.class, args);
             return;
         } catch (Throwable e) {
-            System.out.println("JScience Master Control not available or JavaFX missing. Showing CLI report. " + e.getMessage());
+            System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("cli.launch_error", "JScience Master Control not available or JavaFX missing. Showing CLI report.") + " " + e.getMessage());
         }
 
         System.out.println(getConfigurationReport());
+    }
+
+    // --- Report Helper Methods ---
+
+    private static void appendBackends(StringBuilder sb, String label, String type, String currentId) {
+        sb.append("  ").append(label).append(" (Current: ").append(currentId != null ? currentId : "AUTO").append("):\n");
+        try {
+            java.util.List<org.jscience.technical.backend.BackendProvider> list = 
+                 org.jscience.technical.backend.BackendDiscovery.getInstance().getProvidersByType(type);
+            if (list == null || list.isEmpty()) {
+                sb.append("    (None registered via SPI)\n");
+            } else {
+                for (org.jscience.technical.backend.BackendProvider p : list) {
+                     String marker = (p.getId().equals(currentId)) ? "*" : " ";
+                     sb.append("    ").append(marker).append(" [").append(p.getId()).append("] ")
+                       .append(p.getName()).append(p.isAvailable() ? "" : " (N/A)").append("\n");
+                }
+            }
+        } catch (Throwable t) {
+             sb.append("    (Error checking backends: ").append(t.getMessage()).append(")\n");
+        }
+    }
+    
+    private static void checkLibrary(StringBuilder sb, String name, String className) {
+        boolean avail = false;
+        try { Class.forName(className); avail = true; } catch (Throwable t) {}
+        sb.append("  ").append(String.format("%-25s", name)).append(": ").append(avail ? "INSTALLED" : "MISSING").append("\n");
+    }
+    
+    private static <T> void appendServiceLoaders(StringBuilder sb, Class<T> clazz, String typeLabel) {
+         try {
+             java.util.ServiceLoader<T> loader = java.util.ServiceLoader.load(clazz);
+             int count = 0;
+             for (T item : loader) {
+                 count++;
+                 String name = item.getClass().getSimpleName();
+                 // Try to check for name() method via reflection if it's not resourceIO
+                 if (item instanceof org.jscience.io.ResourceIO) {
+                      name = ((org.jscience.io.ResourceIO<?>) item).getName();
+                 }
+                 sb.append("  ").append(typeLabel).append(": ").append(name).append(" (").append(item.getClass().getName()).append(")\n");
+             }
+             if (count == 0) sb.append("  (No ").append(typeLabel).append("s found via ServiceLoader)\n");
+         } catch (Throwable t) {
+             sb.append("  (Error loading ").append(typeLabel).append("s: ").append(t.getMessage()).append(")\n");
+         }
     }
 }

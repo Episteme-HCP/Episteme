@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.distributed.PrecisionMode;
+
 
 /**
  * Protein Folding Simulation Task using the HP (Hydrophobic-Polar) Model.
@@ -66,7 +66,7 @@ public class ProteinFoldingTask implements Serializable {
     private final List<ResidueType> sequence;
     private final int iterations;
     private final double temperature;
-    private PrecisionMode mode = PrecisionMode.PRIMITIVES;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVES;
 
     private List<Monomer> currentFold;
     private double energy;
@@ -81,7 +81,7 @@ public class ProteinFoldingTask implements Serializable {
         this.temperature = temperature;
     }
 
-    public void setMode(PrecisionMode mode) {
+    public void setMode(TaskRegistry.PrecisionMode mode) {
         this.mode = mode;
     }
 
@@ -94,7 +94,7 @@ public class ProteinFoldingTask implements Serializable {
             attemptMove(rand);
         }
 
-        if (mode == PrecisionMode.REALS) {
+        if (mode == TaskRegistry.PrecisionMode.REALS) {
             this.energyReal = calculateEnergyReal(currentFold);
             this.energy = energyReal.doubleValue();
         } else {

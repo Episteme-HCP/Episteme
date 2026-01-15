@@ -41,10 +41,20 @@ public class ResistorColorCodeDemo extends AbstractDemo {
     public String getName() { return I18n.getInstance().get("resistor.title", "Resistor Color Code"); }
 
     @Override
-    public String getCategory() { return "Electronics"; }
+    public String getCategory() { return "Physics"; }
 
     @Override
     public Node createViewerNode() {
         return new ResistorColorCodeViewer();
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("ResistorColorCodeDemo.desc", "ResistorColorCodeDemo description");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
     }
 }

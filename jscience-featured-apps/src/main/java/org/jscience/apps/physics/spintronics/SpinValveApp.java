@@ -128,25 +128,25 @@ public class SpinValveApp extends FeaturedAppBase {
         tabPane.getTabs().add(chartTab);
 
         // Tab 3: RF Spectrum (STNO Mode)
-        Tab spectrumTab = new Tab("RF Spectrum");
+        Tab spectrumTab = new Tab(i18n.get("spintronics.tab.spectrum"));
         spectrumTab.setClosable(false);
         VBox spectrumBox = new VBox(10);
         spectrumBox.setPadding(new Insets(10));
         
         NumberAxis freqAxis = new NumberAxis(0, 20, 2); // 0-20 GHz
-        freqAxis.setLabel("Frequency (GHz)");
+        freqAxis.setLabel(i18n.get("spintronics.axis.freq"));
         NumberAxis powerAxis = new NumberAxis();
-        powerAxis.setLabel("Power (a.u.)");
+        powerAxis.setLabel(i18n.get("spintronics.axis.power"));
         spectrumChart = new LineChart<>(freqAxis, powerAxis);
-        spectrumChart.setTitle("Magnetization RF Spectrum");
+        spectrumChart.setTitle(i18n.get("spintronics.chart.spectrum.title"));
         spectrumChart.setCreateSymbols(false);
         spectrumChart.setAnimated(false);
         spectrumSeries = new XYChart.Series<>();
         spectrumSeries.setName("PSD");
         spectrumChart.getData().add(spectrumSeries);
         
-        peakFreqLabel = new Label("Peak: -- GHz");
-        peakFreqLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        peakFreqLabel = new Label(java.text.MessageFormat.format(i18n.get("spintronics.label.peak"), "--"));
+        peakFreqLabel.getStyleClass().add("header-title");
         
         spectrumBox.getChildren().addAll(spectrumChart, peakFreqLabel);
         spectrumTab.setContent(spectrumBox);
@@ -215,7 +215,7 @@ public class SpinValveApp extends FeaturedAppBase {
         pmaSlider = new Slider(0, 2e6, 0); // up to 2 MJ/m3
         pmaSlider.setShowTickLabels(true);
         pmaSlider.setMajorTickUnit(5e5); // 500kJ/m3 increments
-        pmaCheckBox = new CheckBox("Enable PMA (Perpendicular)");
+        pmaCheckBox = new CheckBox(i18n.get("spintronics.check.pma"));
         
         dampingSlider.valueProperty().addListener((o, ov, nv) -> updateModel());
         pmaSlider.valueProperty().addListener((o, ov, nv) -> updateModel());
@@ -237,17 +237,17 @@ public class SpinValveApp extends FeaturedAppBase {
         areaSlider.setShowTickLabels(true);
         areaSlider.valueProperty().addListener((o, ov, nv) -> updateModel());
 
-        safCheckBox = new CheckBox("Enable SAF (Co/Ru/Co)");
+        safCheckBox = new CheckBox(i18n.get("spintronics.check.saf"));
         safCheckBox.setOnAction(e -> {
             updateModelStructure(); 
             updateModel();
         });
 
-        Button hysteresisBtn = new Button("Run Hysteresis Loop");
+        Button hysteresisBtn = new Button(i18n.get("spintronics.btn.hysteresis"));
         hysteresisBtn.setMaxWidth(Double.MAX_VALUE);
         hysteresisBtn.setOnAction(e -> runHysteresis());
 
-        Button exportBtn = new Button("Export Trace (CSV)");
+        Button exportBtn = new Button(i18n.get("spintronics.btn.export"));
         exportBtn.getStyleClass().add("button-secondary");
         exportBtn.setMaxWidth(Double.MAX_VALUE);
         exportBtn.setOnAction(e -> exportHistoryToCSV());
@@ -263,14 +263,14 @@ public class SpinValveApp extends FeaturedAppBase {
                 new HBox(10, new Label("Damping (\u03B1)"), dampingSlider),
                 new HBox(10, pmaCheckBox, pmaSlider),
                 new Separator(),
-                new Label("SOT Physics (SHE)"),
+                new Label(i18n.get("spintronics.label.sot")),
                 new HBox(10, new Label("J_SOT"), sotCurrentSlider),
                 new HBox(10, new Label("\u03B8_SH"), sotHallSlider),
                 new Separator(),
-                new Label("Geometry"),
-                new HBox(10, new Label("Area (nm)"), areaSlider),
+                new Label(i18n.get("spintronics.label.geometry")),
+                new HBox(10, new Label(i18n.get("spintronics.label.area")), areaSlider),
                 new Separator(),
-                new Label("Temperature (K)"), temperatureSlider,
+                new Label(i18n.get("spintronics.label.temp")), temperatureSlider,
                 new Separator(),
                 hysteresisBtn,
                 exportBtn);
@@ -518,7 +518,7 @@ public class SpinValveApp extends FeaturedAppBase {
         
         // Update peak frequency label
         double peakGHz = stnoAnalyzer.getPeakFrequency() / 1e9;
-        peakFreqLabel.setText(String.format("Peak: %.2f GHz", peakGHz));
+        peakFreqLabel.setText(java.text.MessageFormat.format(i18n.get("spintronics.label.peak"), String.format("%.2f", peakGHz)));
         
         // WOW: Color peak label based on freq (Red: low, Blue: high)
         double hue = Math.max(0, Math.min(240, (peakGHz / 20.0) * 240));
@@ -570,5 +570,25 @@ public class SpinValveApp extends FeaturedAppBase {
         gc.fillRect(100, 90, 400, 20); // Spacer
         gc.setFill(Color.RED);
         gc.fillRect(100, 110, 400, 40); // Free
+    }
+
+    @Override
+    public String getCategory() {
+        return "Physics";
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("SpinValveApp.name", "SpinValve");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("SpinValveApp.desc", "SpinValveApp description");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
     }
 }

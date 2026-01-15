@@ -477,4 +477,6 @@ public class WorldBankReader extends AbstractResourceReader<Country> {
         // Cache is now managed by AbstractResourceReader / ResourceCache
         LOG.debug("WorldBankReader: manual cache clear requested (delegated to system cache)");
     }
+
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.worldbank.name"); }
 }

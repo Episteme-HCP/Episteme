@@ -59,7 +59,7 @@ public class GeometryBoardDemo extends AbstractSimulationDemo {
     }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
          return org.jscience.ui.i18n.I18n.getInstance().get("demo.geometryboarddemo.longdesc");
     }
 }

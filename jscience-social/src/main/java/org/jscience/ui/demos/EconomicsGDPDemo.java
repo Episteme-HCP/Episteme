@@ -33,9 +33,7 @@ public class EconomicsGDPDemo extends AbstractDemo {
     }
 
     @Override
-    public String getCategory() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.economics");
-    }
+    public String getCategory() { return "Economics"; }
 
     @Override
     public String getName() {

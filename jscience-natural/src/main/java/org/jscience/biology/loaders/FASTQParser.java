@@ -122,4 +122,19 @@ public class FASTQParser extends AbstractResourceReader<List<BioSequence>> {
         }
         return BioSequence.Type.DNA;
     }
+
+    @Override
+    public String getCategory() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology");
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fastqparser.name");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fastqparser.description");
+    }
 }

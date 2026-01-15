@@ -51,7 +51,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Advanced Climate Simulation Client (GCM) with VTK Export.
  */
-public class DistributedClimateSimApp extends Application {
+public class DistributedClimateSimApp extends Application implements org.jscience.ui.App {
 
     private GeneralCirculationModelTask task;
     private Canvas mapCanvas;
@@ -267,5 +267,37 @@ public class DistributedClimateSimApp extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    // App Interface Implementation
+    @Override
+    public boolean isDemo() {
+        return false;
+    }
+
+    @Override
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.earthsciences", "Earth Sciences"); }
+
+    @Override
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedclimatesimapp.name", "Distributed Climate Sim App"); }
+
+    @Override
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedclimatesimapp.desc", "Distributed application for Distributed Climate Sim App."); }
+
+    @Override
+    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedclimatesimapp.longdesc", "Distributed application for Distributed Climate Sim App."); }
+
+    @Override
+    public void show(javafx.stage.Stage stage) {
+        try {
+            start(stage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return new java.util.ArrayList<>();
     }
 }

@@ -41,7 +41,7 @@ public class ThermodynamicsDemo extends AbstractDemo {
     public boolean isDemo() { return true; }
 
     @Override
-    public String getCategory() { return "Physics"; }
+    public String getCategory() { return "Mathematics"; }
 
     @Override
     public String getName() { return I18n.getInstance().get("Thermodynamics.title", "Thermodynamics Explorer"); }

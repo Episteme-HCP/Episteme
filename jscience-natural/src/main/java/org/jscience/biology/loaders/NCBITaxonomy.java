@@ -118,4 +118,19 @@ public class NCBITaxonomy extends AbstractResourceReader<String> {
 
     public NCBITaxonomy() {
     }
+
+    @Override
+    public String getCategory() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology");
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.ncbitaxonomy.name");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.ncbitaxonomy.description");
+    }
 }

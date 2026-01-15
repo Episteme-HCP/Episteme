@@ -208,19 +208,19 @@ public class VitalMonitorViewer extends AbstractViewer implements Simulatable {
         panel.setStyle("-fx-background-color: black;");
         panel.setAlignment(Pos.TOP_RIGHT);
 
-        hrValueLabel = new Label("--");
+        hrValueLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.vitalmonitor.", "--"));
         VBox hrBox = createValueBox("Heart Rate", hrValueLabel, "bpm", HR_VALUE_COLOR);
 
         bpValueLabel = new Label("--/--");
         VBox bpBox = createValueBox("Blood Pressure", bpValueLabel, "mmHg", BP_COLOR);
 
-        spo2ValueLabel = new Label("--");
+        spo2ValueLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.vitalmonitor.", "--"));
         VBox spo2Box = createValueBox("Oxygen Saturation", spo2ValueLabel, "%", SPO2_COLOR);
 
-        rrValueLabel = new Label("--");
+        rrValueLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.vitalmonitor.", "--"));
         VBox rrBox = createValueBox("Respiration", rrValueLabel, "bpm", RR_COLOR);
 
-        tempValueLabel = new Label("--.-");
+        tempValueLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.vitalmonitor..3", "--.-"));
         VBox tempBox = createValueBox("Temperature", tempValueLabel, "°F", TEMP_COLOR);
 
         panel.getChildren().addAll(hrBox, bpBox, spo2Box, rrBox, tempBox);
@@ -234,7 +234,7 @@ public class VitalMonitorViewer extends AbstractViewer implements Simulatable {
         HBox valueRow = new HBox(5);
         valueRow.setAlignment(Pos.CENTER_RIGHT);
 
-        valueLabel.setFont(Font.font("Consolas", FontWeight.BOLD, 36));
+        valueLabel.getStyleClass().add("font-title");
         valueLabel.setTextFill(color);
 
         Label unitLabel = new Label(unit);
@@ -253,7 +253,7 @@ public class VitalMonitorViewer extends AbstractViewer implements Simulatable {
 
     private Label createSmallLabel(String text, Color color) {
         Label label = new Label(text);
-        label.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+        label.getStyleClass().add("font-bold");
         label.setTextFill(color);
         return label;
     }
@@ -305,4 +305,7 @@ public class VitalMonitorViewer extends AbstractViewer implements Simulatable {
         rrValueLabel.setText(String.valueOf(vitals.respirationRate()));
         tempValueLabel.setText(vitals.temperatureString());
     }
+
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.vitalmonitor.desc"); }
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.vitalmonitor.longdesc"); }
 }

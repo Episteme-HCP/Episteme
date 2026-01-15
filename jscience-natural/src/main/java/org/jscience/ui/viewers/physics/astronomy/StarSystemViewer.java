@@ -138,7 +138,7 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
         box.getStyleClass().add("dark-viewer-sidebar");
         
         Label title = new Label(I18n.getInstance().get("starsystem.presets", "Presets"));
-        title.setTextFill(Color.WHITE);
+        title.getStyleClass().add("text-light");
         title.getStyleClass().add("dark-header");
 
         ComboBox<Preset> combo = new ComboBox<>();
@@ -273,4 +273,29 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
                 org.jscience.measure.Quantities.create(Real.of(1e10), Units.METER), o, z));
         return s;
     }    
+
+    @Override
+    public String getCategory() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics");
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.starsystem.title");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.starsystem.desc");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.starsystem.longdesc");
+    }
+
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return new java.util.ArrayList<>();
+    }
 }

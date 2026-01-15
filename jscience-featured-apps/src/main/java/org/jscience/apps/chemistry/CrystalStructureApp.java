@@ -683,4 +683,19 @@ public class CrystalStructureApp extends FeaturedAppBase {
     public static void main(String[] args) {
         launch(args);
     }
+
+    @Override
+    public String getCategory() {
+        return "Chemistry";
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("CrystalStructureApp.name", "CrystalStructure");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 }

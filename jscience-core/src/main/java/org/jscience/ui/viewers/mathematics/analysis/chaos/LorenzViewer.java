@@ -24,8 +24,13 @@
 package org.jscience.ui.viewers.mathematics.analysis.chaos;
 
 import javafx.animation.AnimationTimer;
+import org.jscience.io.Configuration;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
+import org.jscience.ui.Parameter;
+import org.jscience.ui.NumericParameter;
+import org.jscience.ui.i18n.I18n;
+import org.jscience.mathematics.numbers.real.Real;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -34,14 +39,14 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import org.jscience.ui.i18n.I18n;
-// import org.jscience.ui.ThemeManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Lorenz Attractor Chaos Theory Visualization.
+ * Uses Real for all internal calculations, double only for display output.
+ * All default values loaded from jscience.properties.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -49,14 +54,55 @@ import java.util.List;
  */
 public class LorenzViewer extends AbstractViewer implements Simulatable {
 
+    // Configuration keys prefix
+    private static final String CFG_PREFIX = "viewer.lorenz.default.";
+    private static final String I18N_PREFIX = "viewer.lorenz.";
+
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return I18n.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("lorenz.title");
+        return I18n.getInstance().get(I18N_PREFIX + "title");
+    }
+
+    @Override
+    public String getDescription() {
+        return I18n.getInstance().get(I18N_PREFIX + "desc");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return I18n.getInstance().get(I18N_PREFIX + "longdesc");
+    }
+
+    @Override
+    public List<Parameter<?>> getViewerParameters() {
+        List<Parameter<?>> params = new ArrayList<>();
+        params.add(new NumericParameter("viewer.lorenz.param.sigma",
+                I18n.getInstance().get("viewer.lorenz.param.sigma.desc"),
+                0, 50, 0.5, sigma.doubleValue(), v -> { sigma = Real.of(v); points.clear(); }));
+        params.add(new NumericParameter("viewer.lorenz.param.rho",
+                I18n.getInstance().get("viewer.lorenz.param.rho.desc"),
+                0, 100, 1, rho.doubleValue(), v -> { rho = Real.of(v); points.clear(); }));
+        params.add(new NumericParameter("viewer.lorenz.param.beta",
+                I18n.getInstance().get("viewer.lorenz.param.beta.desc"),
+                0, 10, 0.1, beta.doubleValue(), v -> { beta = Real.of(v); points.clear(); }));
+        params.add(new NumericParameter("viewer.lorenz.param.x0",
+                I18n.getInstance().get("viewer.lorenz.param.x0.desc"),
+                -20, 20, 0.1, x.doubleValue(), v -> { x = Real.of(v); points.clear(); }));
+        params.add(new NumericParameter("viewer.lorenz.param.y0",
+                I18n.getInstance().get("viewer.lorenz.param.y0.desc"),
+                -30, 30, 0.1, y.doubleValue(), v -> { y = Real.of(v); points.clear(); }));
+        params.add(new NumericParameter("viewer.lorenz.param.z0",
+                I18n.getInstance().get("viewer.lorenz.param.z0.desc"),
+                0, 50, 0.1, z.doubleValue(), v -> { z = Real.of(v); points.clear(); }));
+        params.add(new NumericParameter("viewer.lorenz.param.dt",
+                I18n.getInstance().get("viewer.lorenz.param.dt.desc"),
+                0.001, 0.05, 0.001, dt.doubleValue(), v -> { dt = Real.of(v); }));
+        return params;
     }
 
     private AnimationTimer timer;
@@ -82,38 +128,47 @@ public class LorenzViewer extends AbstractViewer implements Simulatable {
     @Override public void setSpeed(double multiplier) { }
     @Override public boolean isPlaying() { return isRunning; }
 
-    private double x = 0.1, y = 0, z = 0;
-    private double sigma = 10, rho = 28, beta = 8.0 / 3.0;
-    private List<Point3D> points = new ArrayList<>();
+    // State variables using Real - defaults loaded from Configuration
+    private Real x = Real.of(Configuration.getDouble(CFG_PREFIX + "x0", 0.1));
+    private Real y = Real.of(Configuration.getDouble(CFG_PREFIX + "y0", 0.0));
+    private Real z = Real.of(Configuration.getDouble(CFG_PREFIX + "z0", 0.0));
+    
+    // System parameters using Real - defaults loaded from Configuration
+    private Real sigma = Real.of(Configuration.getDouble(CFG_PREFIX + "sigma", 10.0));
+    private Real rho = Real.of(Configuration.getDouble(CFG_PREFIX + "rho", 28.0));
+    private Real beta = Real.of(Configuration.getDouble(CFG_PREFIX + "beta", 8.0 / 3.0));
+    private Real dt = Real.of(Configuration.getDouble(CFG_PREFIX + "dt", 0.01));
+    
+    private List<RealPoint3D> points = new ArrayList<>();
     private Canvas canvas;
 
-    private static class Point3D {
-        double x, z;
+    private static class RealPoint3D {
+        Real x, y, z;
 
-        Point3D(double x, double y, double z) {
+        RealPoint3D(Real x, Real y, Real z) {
             this.x = x;
+            this.y = y;
             this.z = z;
         }
     }
 
     public LorenzViewer() {
-        // Use light background instead of black
-        setStyle("-fx-background-color: #f8f8f8;");
+        getStyleClass().add("viewer-background");
 
         canvas = new Canvas(800, 600);
         setCenter(canvas);
 
         VBox sidebar = new VBox(15);
         sidebar.setPadding(new Insets(20));
-        sidebar.setStyle("-fx-background-color: #eee;");
+        sidebar.getStyleClass().add("viewer-controls");
 
-        Label title = new Label(I18n.getInstance().get("lorenz.title"));
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        Label title = new Label(I18n.getInstance().get("viewer.lorenz.title"));
+        title.getStyleClass().add("viewer-header-label");
 
         sidebar.getChildren().addAll(title, new Separator(),
-                createSlider(I18n.getInstance().get("lorenz.param.sigma"), 0, 50, sigma, v -> sigma = v),
-                createSlider(I18n.getInstance().get("lorenz.param.rho"), 0, 100, rho, v -> rho = v),
-                createSlider(I18n.getInstance().get("lorenz.param.beta"), 0, 10, beta, v -> beta = v));
+                createSlider(I18n.getInstance().get("viewer.lorenz.param.sigma"), 0, 50, sigma.doubleValue(), v -> sigma = Real.of(v)),
+                createSlider(I18n.getInstance().get("viewer.lorenz.param.rho"), 0, 100, rho.doubleValue(), v -> rho = Real.of(v)),
+                createSlider(I18n.getInstance().get("viewer.lorenz.param.beta"), 0, 10, beta.doubleValue(), v -> beta = Real.of(v)));
         setRight(sidebar);
 
         timer = new AnimationTimer() {
@@ -128,16 +183,16 @@ public class LorenzViewer extends AbstractViewer implements Simulatable {
     }
 
     private void stepLogic() {
-        double dt = 0.01;
-        double dx = (sigma * (y - x)) * dt;
-        double dy = (x * (rho - z) - y) * dt;
-        double dz = (x * y - beta * z) * dt;
+        // Lorenz system computation using Real arithmetic
+        Real dx = sigma.multiply(y.subtract(x)).multiply(dt);
+        Real dy = x.multiply(rho.subtract(z)).subtract(y).multiply(dt);
+        Real dz = x.multiply(y).subtract(beta.multiply(z)).multiply(dt);
 
-        x += dx;
-        y += dy;
-        z += dz;
+        x = x.add(dx);
+        y = y.add(dy);
+        z = z.add(dz);
 
-        points.add(new Point3D(x, y, z));
+        points.add(new RealPoint3D(x, y, z));
         if (points.size() > 2000)
             points.remove(0);
     }
@@ -150,14 +205,14 @@ public class LorenzViewer extends AbstractViewer implements Simulatable {
         double centerX = 400, centerY = 300, scale = 10.0;
 
         for (int i = 1; i < points.size(); i++) {
-            Point3D p1 = points.get(i - 1);
-            Point3D p2 = points.get(i);
+            RealPoint3D p1 = points.get(i - 1);
+            RealPoint3D p2 = points.get(i);
 
-            // Project 3D to 2D (Rotation omitted for simplicity)
-            double x1 = centerX + p1.x * scale;
-            double y1 = centerY - p1.z * scale + 250;
-            double x2 = centerX + p2.x * scale;
-            double y2 = centerY - p2.z * scale + 250;
+            // Convert Real to double only for display
+            double x1 = centerX + p1.x.doubleValue() * scale;
+            double y1 = centerY - p1.z.doubleValue() * scale + 250;
+            double x2 = centerX + p2.x.doubleValue() * scale;
+            double y2 = centerY - p2.z.doubleValue() * scale + 250;
 
             gc.setStroke(Color.hsb((i / (double) 2000) * 360, 0.8, 1.0));
             gc.strokeLine(x1, y1, x2, y2);
@@ -169,10 +224,8 @@ public class LorenzViewer extends AbstractViewer implements Simulatable {
         Slider s = new Slider(min, max, val);
         s.valueProperty().addListener((o, ov, nv) -> {
             c.accept(nv.doubleValue());
-            points.clear(); // Restart attractor on param change
+            points.clear();
         });
         return new VBox(5, l, s);
     }
 }
-
-

@@ -81,18 +81,16 @@ public class RelativisticFlightDemo extends AbstractDemo {
     }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return I18n.getInstance().get("relativity.desc",
                 "Simulation de vol ÃƒÂ  vitesse relativiste montrant la dilatation temporelle et l'effet Doppler.");
     }
 
     @Override
-    public String getCategory() {
-        return "Physics";
-    }
+    public String getCategory() { return "Physics"; }
 
     @Override
-    protected Node createViewerNode() {
+    public Node createViewerNode() {
         initStars();
 
         StackPane root = new StackPane();
@@ -139,27 +137,27 @@ public class RelativisticFlightDemo extends AbstractDemo {
         I18n i18n = I18n.getInstance();
 
         Label title = new Label("Ã°Å¸Å¡â‚¬ " + i18n.get("relativity.panel.warp", "Warp Drive"));
-        title.setTextFill(Color.WHITE);
+        title.getStyleClass().add("text-light");
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
 
         speedLabel = new Label(i18n.get("relativity.label.speed_fmt", "Speed: {0}c", "0.000"));
-        speedLabel.setTextFill(Color.CYAN);
+        speedLabel.getStyleClass().add("text-info");
 
         gammaLabel = new Label(i18n.get("relativity.label.gamma_fmt", "Gamma: {0}", "1.00"));
-        gammaLabel.setTextFill(Color.ORANGE);
+        gammaLabel.getStyleClass().add("text-warning");
 
         earthClockLabel = new Label(
                 MessageFormat.format(i18n.get("relativity.clock.earth", "Earth Time: {0}s"), "1.00"));
         earthClockLabel.setTextFill(Color.LIGHTBLUE);
 
         shipClockLabel = new Label(MessageFormat.format(i18n.get("relativity.clock.ship", "Ship Time: {0}s"), "1.00"));
-        shipClockLabel.setTextFill(Color.LIGHTGREEN);
+        shipClockLabel.getStyleClass().add("text-success");
 
         explanationLabel = new Label(
                 MessageFormat.format(i18n.get("relativity.label.explanation", "At {0}% light speed..."), 0, "1.00"));
         explanationLabel.setWrapText(true);
-        explanationLabel.setTextFill(Color.GRAY);
-        explanationLabel.setFont(Font.font(10));
+        explanationLabel.getStyleClass().add("text-secondary");
+        explanationLabel.getStyleClass().add("font-small");
 
         speedSlider = new Slider(0, 0.999, 0);
         speedSlider.setShowTickLabels(false);
@@ -184,11 +182,11 @@ public class RelativisticFlightDemo extends AbstractDemo {
         toggles.setAlignment(Pos.CENTER);
 
         dopplerCheck = new CheckBox(i18n.get("relativity.check.doppler", "Doppler Effect"));
-        dopplerCheck.setTextFill(Color.WHITE);
+        dopplerCheck.getStyleClass().add("text-light");
         dopplerCheck.setSelected(true);
 
         aberrationCheck = new CheckBox(i18n.get("relativity.check.aberration", "Relativistic Aberration"));
-        aberrationCheck.setTextFill(Color.WHITE);
+        aberrationCheck.getStyleClass().add("text-light");
         aberrationCheck.setSelected(true);
 
         toggles.getChildren().addAll(dopplerCheck, aberrationCheck);
@@ -281,6 +279,11 @@ public class RelativisticFlightDemo extends AbstractDemo {
             gc.strokeLine(cx, cy + 20, cx, cy + 60);
         }
     }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("RelativisticFlightDemo.desc", "RelativisticFlightDemo description");
+    }
+
+    @Override
 }
-
-

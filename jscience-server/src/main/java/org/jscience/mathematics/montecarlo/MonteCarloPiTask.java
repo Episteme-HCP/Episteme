@@ -52,14 +52,14 @@ public class MonteCarloPiTask implements DistributedTask<Long, Long> {
         return Long.class;
     }
 
-    public enum PrecisionMode {
+    public enum TaskRegistry.PrecisionMode {
         REALS,
         PRIMITIVES
     }
 
-    private PrecisionMode mode = PrecisionMode.PRIMITIVES;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVES;
 
-    public void setMode(PrecisionMode mode) {
+    public void setMode(TaskRegistry.PrecisionMode mode) {
         this.mode = mode;
     }
 
@@ -75,7 +75,7 @@ public class MonteCarloPiTask implements DistributedTask<Long, Long> {
     public Long execute(Long input) {
         long samples = (input != null) ? input : this.numSamples;
 
-        if (mode == PrecisionMode.REALS) {
+        if (mode == TaskRegistry.PrecisionMode.REALS) {
             // JScience Mode: Use Real-based Provider
             org.jscience.technical.backend.algorithms.MonteCarloPiProvider provider = new org.jscience.technical.backend.algorithms.MulticoreMonteCarloPiProvider();
             return provider.countPointsInside(samples);

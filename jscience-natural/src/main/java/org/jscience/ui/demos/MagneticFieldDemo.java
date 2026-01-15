@@ -59,4 +59,9 @@ public class MagneticFieldDemo extends AbstractDemo {
     public Node createViewerNode() {
         return new MagneticFieldViewer();
     }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 }

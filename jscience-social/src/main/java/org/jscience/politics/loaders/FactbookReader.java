@@ -411,5 +411,7 @@ public class FactbookReader extends AbstractResourceReader<List<Country>> {
 
         return samples;
     }
+
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.factbook.name"); }
 }
 

@@ -40,9 +40,7 @@ public class SociologyNetworkDemo extends AbstractDemo {
     }
 
     @Override
-    public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.sociology");
-    }
+    public String getCategory() { return "Sociology"; }
 
     @Override
     public String getName() {

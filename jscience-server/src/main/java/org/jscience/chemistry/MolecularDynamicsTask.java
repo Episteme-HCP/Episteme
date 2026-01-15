@@ -41,12 +41,12 @@ public class MolecularDynamicsTask
     private List<AtomState> atoms;
     private double totalEnergy;
 
-    public enum PrecisionMode {
+    public enum TaskRegistry.PrecisionMode {
         REALS,
         PRIMITIVES
     }
 
-    private PrecisionMode mode = PrecisionMode.PRIMITIVES;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVES;
     private List<org.jscience.chemistry.Atom> jscienceAtoms;
 
     public MolecularDynamicsTask(int numAtoms, double timeStep, int steps, double boxSize) {
@@ -83,9 +83,9 @@ public class MolecularDynamicsTask
         }
     }
 
-    public void setMode(PrecisionMode mode) {
+    public void setMode(TaskRegistry.PrecisionMode mode) {
         this.mode = mode;
-        if (mode == PrecisionMode.REALS && jscienceAtoms == null) {
+        if (mode == TaskRegistry.PrecisionMode.REALS && jscienceAtoms == null) {
             syncToJScience();
         }
     }
@@ -155,7 +155,7 @@ public class MolecularDynamicsTask
 
     public void run() {
         for (int s = 0; s < steps; s++) {
-            if (mode == PrecisionMode.REALS) {
+            if (mode == TaskRegistry.PrecisionMode.REALS) {
                 jscienceStep();
             } else {
                 primitiveStep();

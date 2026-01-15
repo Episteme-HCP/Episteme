@@ -66,7 +66,7 @@ public class NetworkViewer extends AbstractViewer {
         } else {
             Pane container = new Pane();
             container.setStyle("-fx-background-color: white; -fx-border-color: #ccc;");
-            container.getChildren().add(new Label("No Network Backend Available (Install GraphStream, JUNG, etc.)"));
+            container.getChildren().add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.network.no.network.backend.a", "No Network Backend Available (Install GraphStream, JUNG, etc.)")));
             getChildren().add(container);
         }
     }
@@ -84,5 +84,10 @@ public class NetworkViewer extends AbstractViewer {
     @Override
     public String getDescription() {
         return "Visualizes networks and graphs.";
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
     }
 }

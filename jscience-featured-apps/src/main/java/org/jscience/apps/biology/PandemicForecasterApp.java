@@ -655,4 +655,19 @@ public class PandemicForecasterApp extends FeaturedAppBase {
     public static void main(String[] args) {
         launch(args);
     }
+
+    @Override
+    public String getCategory() {
+        return "Biology";
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("PandemicForecasterApp.name", "PandemicForecaster");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 }

@@ -62,9 +62,7 @@ public class GalaxyDemo extends AbstractSimulationDemo {
     }
 
     @Override
-    public String getCategory() {
-        return "Physics";
-    }
+    public String getCategory() { return "Physics"; }
 
     @Override
     public javafx.scene.Node createViewerNode() {
@@ -168,22 +166,22 @@ public class GalaxyDemo extends AbstractSimulationDemo {
         public List<javafx.scene.Node> getCustomControls() {
             List<javafx.scene.Node> controls = new ArrayList<>();
             
-            Label typeLbl = new Label("Galaxy Type:");
+            Label typeLbl = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.galaxy.galaxy.type", "Galaxy Type:"));
             ComboBox<String> galaxyTypeCombo = new ComboBox<>();
             galaxyTypeCombo.getItems().addAll("Spiral (2 arms)", "Spiral (3 arms)", "Barred Spiral", "Elliptical");
             galaxyTypeCombo.setValue("Spiral (2 arms)");
             galaxyTypeCombo.setOnAction(e -> resetGalaxy(galaxyTypeCombo.getValue()));
             
-            Button btnCollision = new Button("Trigger Collision");
+            Button btnCollision = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.galaxy.trigger.collision", "Trigger Collision"));
             btnCollision.setMaxWidth(Double.MAX_VALUE);
             btnCollision.setOnAction(e -> triggerCollision());
 
-            Button btnReset = new Button("Reset");
+            Button btnReset = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.galaxy.reset", "Reset"));
             btnReset.setMaxWidth(Double.MAX_VALUE);
             btnReset.setOnAction(e -> resetGalaxy(galaxyTypeCombo.getValue()));
 
-            timeLabel = new Label("Time: 0 Myr");
-            fpsLabel = new Label("FPS: --");
+            timeLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.galaxy.time.0.myr", "Time: 0 Myr"));
+            fpsLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.galaxy.fps", "FPS: --"));
 
             // Simulator Switch
             ToggleButton simSwitch = new ToggleButton("Mode: Primitive");
@@ -314,7 +312,8 @@ public class GalaxyDemo extends AbstractSimulationDemo {
         }
 
         @Override public String getName() { return "Galaxy"; }
-        @Override public String getCategory() { return "Physics"; }
+    @Override
+    public String getCategory() { return "Physics"; }
         
         // Simulatable
         @Override public void play() { running = true; }
@@ -323,5 +322,13 @@ public class GalaxyDemo extends AbstractSimulationDemo {
         @Override public void step() { update(); render(); }
         @Override public void setSpeed(double s) { }
         @Override public boolean isPlaying() { return running; }
-    }
+    
+        @Override
+        public String getDescription() { return "InternalGalaxyViewer Internal Viewer"; }
+
+        @Override
+}
+
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.longdesc"); }
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

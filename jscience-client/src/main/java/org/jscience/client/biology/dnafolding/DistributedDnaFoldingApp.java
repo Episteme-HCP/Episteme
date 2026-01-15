@@ -62,7 +62,7 @@ import javafx.scene.control.Alert;
 /**
  * DNA Folding Simulation 3D Visualization with JScience Grid support.
  */
-public class DistributedDnaFoldingApp extends Application {
+public class DistributedDnaFoldingApp extends Application implements org.jscience.ui.App {
 
     private final Group moleculeGroup = new Group();
     private DnaFoldingTask task;
@@ -279,5 +279,37 @@ public class DistributedDnaFoldingApp extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    // App Interface Implementation
+    @Override
+    public boolean isDemo() {
+        return false;
+    }
+
+    @Override
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology"); }
+
+    @Override
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributeddnafoldingapp.name", "Distributed Dna Folding App"); }
+
+    @Override
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributeddnafoldingapp.desc", "Distributed application for Distributed Dna Folding App."); }
+
+    @Override
+    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributeddnafoldingapp.longdesc", "Distributed application for Distributed Dna Folding App."); }
+
+    @Override
+    public void show(javafx.stage.Stage stage) {
+        try {
+            start(stage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return new java.util.ArrayList<>();
     }
 }

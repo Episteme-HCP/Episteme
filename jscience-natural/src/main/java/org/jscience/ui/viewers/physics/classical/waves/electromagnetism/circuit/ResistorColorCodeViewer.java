@@ -46,7 +46,7 @@ import java.util.Map;
 public class ResistorColorCodeViewer extends org.jscience.ui.AbstractViewer {
 
     @Override
-    public String getCategory() { return "Engineering"; }
+    public String getCategory() { return "Physics"; }
     
     @Override
     public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.resistor"); }
@@ -62,7 +62,7 @@ public class ResistorColorCodeViewer extends org.jscience.ui.AbstractViewer {
     private final Rectangle r3 = new Rectangle(20, 50);
     private final Rectangle r4 = new Rectangle(20, 50);
 
-    private final Label resultLabel = new Label("Resistance: ");
+    private final Label resultLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.resistorcolorcode.resistance", "Resistance: "));
 
     private static final Map<String, Color> colorMap = new HashMap<>();
     private static final Map<String, Integer> valMap = new HashMap<>();
@@ -154,6 +154,16 @@ public class ResistorColorCodeViewer extends org.jscience.ui.AbstractViewer {
     }
 
 
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("ResistorColorCodeViewer.desc", "ResistorColorCodeViewer description");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 }
 
 

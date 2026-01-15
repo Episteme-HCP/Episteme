@@ -63,9 +63,9 @@ public class FunctionExplorer2DViewer extends AbstractViewer {
         sidebar.setStyle("-fx-background-color: #fafafa;");
 
         // Input Section
-        Label fLabel = new Label("f(x) =");
+        Label fLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.functionexplorer2d.fx", "f(x) ="));
         TextField fInput = new TextField(defaultF);
-        Label gLabel = new Label("g(x) =");
+        Label gLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.functionexplorer2d.gx", "g(x) ="));
         TextField gInput = new TextField(defaultG);
 
         Label opLabel = new Label(i18n.get("funcexplorer.plotop", "Plot Operation:"));
@@ -200,5 +200,25 @@ public class FunctionExplorer2DViewer extends AbstractViewer {
         } catch (Exception e) {
             return 0.0;
         }
+    }
+
+    @Override
+    public String getCategory() {
+        return "Mathematics";
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("FunctionExplorer2DViewer.name", "FunctionExplorer2D");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("FunctionExplorer2DViewer.desc", "FunctionExplorer2DViewer description");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
     }
 }

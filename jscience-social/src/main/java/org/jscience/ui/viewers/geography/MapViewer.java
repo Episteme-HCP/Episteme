@@ -66,7 +66,7 @@ public class MapViewer extends StackPane implements org.jscience.ui.Viewer {
                 this.getChildren().add(info);
             }
         } else {
-            this.getChildren().add(new Label("No Map Backend Available (Install Unfolding, GeoTools, etc.)"));
+            this.getChildren().add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.map.no.map.backend.avail", "No Map Backend Available (Install Unfolding, GeoTools, etc.)")));
         }
     }
 
@@ -97,5 +97,10 @@ public class MapViewer extends StackPane implements org.jscience.ui.Viewer {
     @Override
     public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
         return java.util.Collections.emptyList();
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
     }
 }

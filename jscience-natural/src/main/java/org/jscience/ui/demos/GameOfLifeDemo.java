@@ -45,9 +45,7 @@ import java.util.List;
 public class GameOfLifeDemo extends AbstractSimulationDemo {
 
     @Override
-    public String getCategory() {
-        return I18n.getInstance().get("category.computing");
-    }
+    public String getCategory() { return "Computing"; }
 
     @Override
     public String getName() {
@@ -60,7 +58,7 @@ public class GameOfLifeDemo extends AbstractSimulationDemo {
     }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return I18n.getInstance().get("life.long_desc",
                 "Conway's Game of Life is a cellular automaton that demonstrates how complex patterns " +
                 "can emerge from simple rules. Each cell follows three rules based on its neighbors: " +
@@ -69,7 +67,7 @@ public class GameOfLifeDemo extends AbstractSimulationDemo {
     }
 
     @Override
-    protected Node createViewerNode() {
+    public Node createViewerNode() {
         return new InternalGameOfLifeViewer();
     }
 
@@ -216,6 +214,13 @@ public class GameOfLifeDemo extends AbstractSimulationDemo {
         }
 
         @Override public String getName() { return "Game of Life Viewer"; }
-        @Override public String getCategory() { return "Computing"; }
-    }
+    @Override
+    public String getCategory() { return "Computing"; }
+    
+        @Override
+        public String getDescription() { return "InternalGameOfLifeViewer Internal Viewer"; }
+
+        @Override
+}
+
 }

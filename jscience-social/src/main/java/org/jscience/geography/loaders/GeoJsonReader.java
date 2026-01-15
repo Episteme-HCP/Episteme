@@ -270,4 +270,6 @@ public class GeoJSONReader extends AbstractResourceReader<List<Region>> {
             }
         }
     }
+
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.geojson.name"); }
 }

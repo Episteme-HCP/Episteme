@@ -169,6 +169,8 @@ public class UniProtReader extends AbstractResourceReader<Map<String, String>> {
     public static String getEntryUrl(String accession) {
         return "https://www.uniprot.org/uniprotkb/" + accession;
     }
+
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.uniprot.name"); }
 }
 
 

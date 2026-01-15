@@ -25,7 +25,7 @@ package org.jscience.physics.wave;
 
 import org.jscience.distributed.DistributedTask;
 
-import org.jscience.distributed.PrecisionMode;
+
 
 /**
  * Wave Equation Simulation Task.
@@ -40,7 +40,7 @@ public class WaveSimTask implements DistributedTask<WaveSimTask, WaveSimTask> {
     private double c = 0.5;
     private double damping = 0.99;
 
-    private PrecisionMode mode = PrecisionMode.PRIMITIVES;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVES;
     private org.jscience.mathematics.numbers.real.Real[][] uReal;
     private org.jscience.mathematics.numbers.real.Real[][] uRealPrev;
 
@@ -56,9 +56,9 @@ public class WaveSimTask implements DistributedTask<WaveSimTask, WaveSimTask> {
         this(0, 0);
     }
 
-    public void setMode(PrecisionMode mode) {
+    public void setMode(TaskRegistry.PrecisionMode mode) {
         this.mode = mode;
-        if (mode == PrecisionMode.REALS && uReal == null) {
+        if (mode == TaskRegistry.PrecisionMode.REALS && uReal == null) {
             syncToReal();
         }
     }
@@ -112,7 +112,7 @@ public class WaveSimTask implements DistributedTask<WaveSimTask, WaveSimTask> {
     }
 
     public void step() {
-        if (mode == PrecisionMode.REALS) {
+        if (mode == TaskRegistry.PrecisionMode.REALS) {
             // JScience Mode: Use Real-based Provider
             org.jscience.technical.backend.algorithms.WaveProvider provider = new org.jscience.technical.backend.algorithms.MulticoreWaveProvider();
             provider.solve(uReal, uRealPrev, width, height,

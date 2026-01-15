@@ -232,4 +232,14 @@ public class FormulaNotationViewer extends AbstractViewer {
         return hbox;
     }
 
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("FormulaNotationViewer.desc", "FormulaNotationViewer description");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 }

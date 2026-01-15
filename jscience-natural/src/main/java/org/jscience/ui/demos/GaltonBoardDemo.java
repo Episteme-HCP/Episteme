@@ -46,12 +46,12 @@ import java.util.Random;
 public class GaltonBoardDemo extends AbstractSimulationDemo {
 
     @Override
-    protected Node createViewerNode() {
+    public Node createViewerNode() {
         return new GaltonBoardViewerInternal();
     }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return getDescription();
     }
 
@@ -61,9 +61,7 @@ public class GaltonBoardDemo extends AbstractSimulationDemo {
     }
 
     @Override
-    public String getCategory() {
-        return "Mathematics";
-    }
+    public String getCategory() { return "Mathematics"; }
 
     /**
      * Internal viewer implementation for Galton Board.
@@ -112,7 +110,8 @@ public class GaltonBoardDemo extends AbstractSimulationDemo {
             };
         }
 
-        @Override public String getCategory() { return "Mathematics"; }
+    @Override
+    public String getCategory() { return "Mathematics"; }
         @Override public String getName() { return "Galton Board"; }
 
         @Override public void play() { if (timer != null) timer.start(); isRunning = true; }
@@ -203,7 +202,10 @@ public class GaltonBoardDemo extends AbstractSimulationDemo {
                 gc.fillRect(baseX + i * PEG_SPACING - 10, baseY - h, 20, h);
             }
         }
-    }
+    
+        @Override
 }
 
-
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.galtonboarddemo.desc"); }
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+}

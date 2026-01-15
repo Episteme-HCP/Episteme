@@ -62,7 +62,7 @@ import javax.imageio.ImageIO;
  * Uses actual distributed computation when connected to a server with workers.
  * Falls back to local computation when server is unavailable.
  */
-public class DistributedMandelbrotApp extends Application {
+public class DistributedMandelbrotApp extends Application implements org.jscience.ui.App {
 
     private static final int WIDTH = 800;
     private static final int HEIGHT = 600;
@@ -488,5 +488,37 @@ public class DistributedMandelbrotApp extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    // App Interface Implementation
+    @Override
+    public boolean isDemo() {
+        return false;
+    }
+
+    @Override
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics", "Mathematics"); }
+
+    @Override
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedmandelbrotapp.name", "Distributed Mandelbrot App"); }
+
+    @Override
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedmandelbrotapp.desc", "Distributed application for Distributed Mandelbrot App."); }
+
+    @Override
+    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedmandelbrotapp.longdesc", "Distributed application for Distributed Mandelbrot App."); }
+
+    @Override
+    public void show(javafx.stage.Stage stage) {
+        try {
+            start(stage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return new java.util.ArrayList<>();
     }
 }

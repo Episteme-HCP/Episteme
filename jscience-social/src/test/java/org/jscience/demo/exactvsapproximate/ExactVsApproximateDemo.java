@@ -156,4 +156,3 @@ public class ExactVsApproximateDemo {
         System.out.println("Use Approximate when: speed matters (simulations, statistics)");
     }
 }
-

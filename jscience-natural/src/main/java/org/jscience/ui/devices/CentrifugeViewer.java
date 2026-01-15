@@ -44,7 +44,7 @@ public class CentrifugeViewer extends AbstractDeviceViewer<Centrifuge> {
     public CentrifugeViewer(Centrifuge device) {
         super(device);
 
-        rpmLabel = new Label("0 RPM");
+        rpmLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.centrifuge.0.rpm", "0 RPM"));
 
         rpmSlider = new Slider(0, 5000, 0); // Mock max
         try {
@@ -66,5 +66,27 @@ public class CentrifugeViewer extends AbstractDeviceViewer<Centrifuge> {
     @Override
     public void update() {
         // Update current RPM from device if needed
+    }
+
+    // --- Mandatory Abstract Methods (I18n) ---
+
+    @Override
+    public String getCategory() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics");
+    }
+
+    @Override
+    public String getName() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.centrifuge.title");
+    }
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.centrifuge.desc");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.centrifuge.longdesc");
     }
 }

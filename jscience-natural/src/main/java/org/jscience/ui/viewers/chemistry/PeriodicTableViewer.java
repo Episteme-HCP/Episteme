@@ -141,7 +141,7 @@ public class PeriodicTableViewer extends AbstractViewer {
                 if (sym == null || sym.equals("*") || sym.equals("**")) {
                     if (sym != null) {
                         Label m = new Label(sym);
-                        m.setTextFill(Color.GRAY);
+                        m.getStyleClass().add("text-secondary");
                         grid.add(m, c, r);
                     }
                     continue;
@@ -168,7 +168,7 @@ public class PeriodicTableViewer extends AbstractViewer {
         Label num = new Label(String.valueOf(finalEl.getAtomicNumber()));
         num.setFont(Font.font("Arial", 10));
         Label symLbl = new Label(finalEl.getSymbol());
-        symLbl.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        symLbl.getStyleClass().add("font-large");
         Label name = new Label(truncate(finalEl.getName(), 8));
         name.setFont(Font.font("Arial", 9));
         content.getChildren().addAll(num, symLbl, name);
@@ -195,11 +195,11 @@ public class PeriodicTableViewer extends AbstractViewer {
         panel.getStyleClass().add("dark-viewer-sidebar");
 
         Label title = new Label(I18n.getInstance().get("periodic.details", "Element Details"));
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        title.getStyleClass().add("font-large");
         title.getStyleClass().add("dark-header");
 
         Label hint = new Label(I18n.getInstance().get("periodic.hint", "Select an element to view details"));
-        hint.setTextFill(Color.LIGHTGRAY);
+        hint.getStyleClass().add("text-secondary");
         hint.setWrapText(true);
         hint.setId("hint-label");
 
@@ -236,10 +236,10 @@ public class PeriodicTableViewer extends AbstractViewer {
         VBox header = new VBox(5);
         header.setAlignment(Pos.CENTER);
         Label sym = new Label(element.getSymbol());
-        sym.setFont(Font.font("Arial", FontWeight.BOLD, 48));
+        sym.getStyleClass().add("font-title");
         sym.setTextFill(Color.web("#54a0ff"));
         Label name = new Label(element.getName());
-        name.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        name.getStyleClass().add("font-title");
         header.getChildren().addAll(sym, name);
         electronicContent.getChildren().add(header);
 
@@ -263,14 +263,14 @@ public class PeriodicTableViewer extends AbstractViewer {
         electronicContent.getChildren().add(atomBox);
 
         Label nucHeader = new Label(element.getName() + " (" + element.getSymbol() + ")");
-        nucHeader.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+        nucHeader.getStyleClass().add("font-bold");
         nuclearContent.getChildren().addAll(nucHeader, new Separator());
 
         SubScene nucView = createNucleusView(element);
-        VBox nucBox = new VBox(5, new Label("Nucleus Structure (Model)"), nucView);
+        VBox nucBox = new VBox(5, new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.periodictable.nucleus.structure.mo", "Nucleus Structure (Model)")), nucView);
         nucBox.setStyle("-fx-border-color: #666; -fx-border-width: 1px;");
 
-        Label isoLabel = new Label("Known Isotopes:");
+        Label isoLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.periodictable.known.isotopes", "Known Isotopes:"));
         isoLabel.setStyle("-fx-font-weight: bold;");
         ListView<String> isoList = new ListView<>();
         isoList.setPrefHeight(200);
@@ -474,7 +474,7 @@ public class PeriodicTableViewer extends AbstractViewer {
 
     private HBox createPropLabel(String n, String v) {
         Label nl = new Label(n + ":");
-        nl.setTextFill(Color.LIGHTGRAY);
+        nl.getStyleClass().add("text-secondary");
         nl.setMinWidth(120);
         return new HBox(10, nl, new Label(v));
     }
@@ -503,4 +503,8 @@ public class PeriodicTableViewer extends AbstractViewer {
     
     @Override public String getName() { return "Periodic Viewer"; }
     @Override public String getCategory() { return "Chemistry"; }
+
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.desc"); }
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.longdesc"); }
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

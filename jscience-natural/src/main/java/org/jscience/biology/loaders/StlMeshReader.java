@@ -180,5 +180,7 @@ public class StlMeshReader extends AbstractResourceReader<MeshView> {
 
         return new MeshView(mesh);
     }
+
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.stlmesh.name"); }
 }
 

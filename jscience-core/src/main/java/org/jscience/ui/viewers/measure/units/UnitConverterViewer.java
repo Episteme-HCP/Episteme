@@ -183,4 +183,14 @@ public class UnitConverterViewer extends AbstractViewer {
         }
     }
 
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("UnitConverterViewer.desc", "UnitConverterViewer description");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 }

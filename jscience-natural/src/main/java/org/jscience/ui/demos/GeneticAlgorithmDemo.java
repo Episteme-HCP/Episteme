@@ -61,12 +61,12 @@ public class GeneticAlgorithmDemo extends AbstractSimulationDemo {
     public String getDescription() { return I18n.getInstance().get("geneticalgo.desc", "Evolving Pathfinders using Genetic Algorithm"); }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return "A simulation of autonomous agents evolving to reach a target using genetic algorithms (Selection, Crossover, Mutation).";
     }
 
     @Override
-    protected Node createViewerNode() {
+    public Node createViewerNode() {
         return new InternalGeneticViewer();
     }
 
@@ -101,16 +101,16 @@ public class GeneticAlgorithmDemo extends AbstractSimulationDemo {
             Label title = new Label(I18n.getInstance().get("geneticalgo.stats", "Statistics"));
             title.getStyleClass().add("dark-label-accent");
 
-            genLabel = new Label("Generation: 1");
+            genLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.geneticalgorithm.generation.1", "Generation: 1"));
             genLabel.getStyleClass().add("dark-label-muted");
 
-            fitLabel = new Label("Fitness: 0.00");
+            fitLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.geneticalgorithm.fitness.000", "Fitness: 0.00"));
             fitLabel.getStyleClass().add("dark-label-muted");
 
             reachLabel = new Label("Reached: 0/" + popSize);
             reachLabel.getStyleClass().add("dark-label-muted");
             
-            Label info = new Label("Controls below.");
+            Label info = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.geneticalgorithm.controls.below", "Controls below."));
             info.getStyleClass().add("dark-label-muted");
 
             sidebar.getChildren().addAll(title, new Separator(), genLabel, fitLabel, reachLabel, new Separator(), info);
@@ -128,7 +128,7 @@ public class GeneticAlgorithmDemo extends AbstractSimulationDemo {
                 }
                 if (closest != null) {
                     Alert a = new Alert(Alert.AlertType.INFORMATION);
-                    a.setTitle("Genome Detail"); a.setHeaderText("DNA Info");
+                    a.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("generated.geneticalgorithm.genome.detail", "Genome Detail")); a.setHeaderText(org.jscience.ui.i18n.I18n.getInstance().get("generated.geneticalgorithm.dna.info", "DNA Info"));
                     a.setContentText(String.format("Fitness: %.4f\nReached: %b\nCrashed: %b", closest.fitness, closest.reached, closest.crashed));
                     a.showAndWait();
                 }
@@ -263,6 +263,14 @@ public class GeneticAlgorithmDemo extends AbstractSimulationDemo {
         }
         
         @Override public String getName() { return "Genetic Viewer"; }
-        @Override public String getCategory() { return "Computing"; }
-    }
+    @Override
+    public String getCategory() { return "Computing"; }
+    
+        @Override
+        public String getDescription() { return "InternalGeneticViewer Internal Viewer"; }
+
+        @Override
+}
+
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

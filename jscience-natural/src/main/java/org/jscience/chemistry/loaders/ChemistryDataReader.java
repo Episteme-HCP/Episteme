@@ -330,4 +330,6 @@ public class ChemistryDataReader extends AbstractResourceReader<Object> {
     public static class MoleculeListWrapper {
         public List<MoleculeData> molecules;
     }
+
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.chemistrydata.name"); }
 }

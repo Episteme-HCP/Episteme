@@ -278,6 +278,16 @@ public class GeometryBoardViewer extends AbstractViewer implements Simulatable {
         }
     }
 
+
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("GeometryBoardViewer.desc", "GeometryBoardViewer description");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 }
 
 
