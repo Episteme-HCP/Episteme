@@ -231,7 +231,7 @@ public class MarketCrashApp extends FeaturedAppBase {
 
     private void generateSampleData() {
         // Load Real Data (S&P 500 Sample)
-        try (var is = getClass().getResourceAsStream("data/SP500_Sample.csv")) {
+        try (var is = getClass().getResourceAsStream("SP500_Sample.csv")) {
             if (is != null) {
                 marketData = FinancialMarketReader.loadCSV(is, "USD");
                 log(java.text.MessageFormat.format(i18n.get("market.log.loaded"), marketData.size()));

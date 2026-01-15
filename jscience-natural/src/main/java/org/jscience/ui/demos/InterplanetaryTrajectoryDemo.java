@@ -116,7 +116,7 @@ public class InterplanetaryTrajectoryDemo extends AbstractDemo {
     private void loadData() {
         solarSystem = SolarSystemReader.load("org/jscience/physics/astronomy/solarsystem.json");
 
-        try (var is = getClass().getResourceAsStream("data/mars_horizons.txt")) {
+        try (var is = getClass().getResourceAsStream("/org/jscience/physics/astronomy/mars_horizons.txt")) {
             if (is != null) {
                 HorizonsEphemerisReader.loadEphemeris(is);
             }

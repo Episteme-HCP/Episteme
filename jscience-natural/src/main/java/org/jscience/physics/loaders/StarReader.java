@@ -50,7 +50,7 @@ public class StarReader extends AbstractResourceReader<List<StarReader.Star>> {
 
     @Override
     public String getResourcePath() {
-        return "/org/jscience/physics/astronomy/data/";
+        return "/org/jscience/physics/astronomy/";
     }
 
     @Override

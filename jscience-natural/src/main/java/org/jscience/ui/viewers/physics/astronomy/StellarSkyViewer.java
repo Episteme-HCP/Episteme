@@ -182,9 +182,9 @@ public class StellarSkyViewer extends AbstractViewer {
     }
 
     private void loadData() {
-        InputStream isStar = getClass().getResourceAsStream("/org/jscience/physics/astronomy/data/stars.csv");
+        InputStream isStar = getClass().getResourceAsStream("/org/jscience/physics/astronomy/stars.csv");
         stars = (isStar != null) ? StarReader.loadCSV(isStar) : new ArrayList<>();
-        try (InputStream isConst = getClass().getResourceAsStream("/org/jscience/physics/astronomy/data/constellations.csv")) {
+        try (InputStream isConst = getClass().getResourceAsStream("/org/jscience/physics/astronomy/constellations.csv")) {
             if (isConst != null) {
                 BufferedReader br = new BufferedReader(new InputStreamReader(isConst));
                 String line;

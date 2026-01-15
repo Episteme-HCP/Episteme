@@ -417,7 +417,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
     }
 
     private void loadSample() {
-        try (java.io.InputStream is = getClass().getResourceAsStream("/org/jscience/chemistry/data/diamond.cif")) {
+        try (java.io.InputStream is = getClass().getResourceAsStream("/org/jscience/chemistry/diamond.cif")) {
             if (is != null) {
                 loadCifStructure(is);
             } else {
