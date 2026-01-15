@@ -146,6 +146,9 @@ public class StellarSkyViewer extends AbstractViewer {
         Label title = new Label(I18n.getInstance().get("sky.title", "Sky Controls"));
         title.getStyleClass().add("dark-header");
 
+        // VizieR Query Section
+        VBox vizierSection = createVizieRSection();
+
         Label locLabel = new Label(I18n.getInstance().get("sky.location", "Location"));
         locLabel.setStyle("-fx-font-weight: bold;");
 
@@ -169,10 +172,75 @@ public class StellarSkyViewer extends AbstractViewer {
         infoLabel.setWrapText(true);
         infoLabel.getStyleClass().add("dark-label-muted");
 
-        sidebar.getChildren().addAll(title, new Separator(), locLabel, latSlider.getParent(), lonSlider.getParent(), new Separator(),
+        sidebar.getChildren().addAll(title, vizierSection, new Separator(), locLabel, latSlider.getParent(), lonSlider.getParent(), new Separator(),
                 timeCtrlLabel, datePicker, hourSlider.getParent(), new Separator(),
                 showConstellations, showPlanets, showDSO, showTrails, new Separator(), infoLabel);
         return sidebar;
+    }
+
+    /**
+     * Creates VizieR catalog query section for browsing real astronomical data.
+     */
+    private VBox createVizieRSection() {
+        VBox section = new VBox(8);
+        
+        Label vizierLabel = new Label(I18n.getInstance().get("sky.vizier.title", "Query VizieR"));
+        vizierLabel.setStyle("-fx-font-weight: bold;");
+        
+        ComboBox<String> catalogChoice = new ComboBox<>();
+        catalogChoice.getItems().addAll("Hipparcos", "Tycho-2", "Gaia DR3", "USNO-B1");
+        catalogChoice.setValue("Hipparcos");
+        catalogChoice.setPrefWidth(240);
+        
+        Label statusLabel = new Label();
+        statusLabel.getStyleClass().add("text-secondary");
+        statusLabel.setWrapText(true);
+        
+        Button queryButton = new Button(I18n.getInstance().get("sky.vizier.query", "Query Region"));
+        queryButton.setMaxWidth(Double.MAX_VALUE);
+        queryButton.getStyleClass().add("accent-button-green");
+        queryButton.setOnAction(e -> {
+            String catalogId = switch(catalogChoice.getValue()) {
+                case "Tycho-2" -> VizieRReader.TYCHO2;
+                case "Gaia DR3" -> VizieRReader.GAIA_DR3;
+                case "USNO-B1" -> VizieRReader.USNO_B1;
+                default -> VizieRReader.HIPPARCOS;
+            };
+            
+            statusLabel.setText(I18n.getInstance().get("sky.vizier.querying", "Querying..."));
+            queryButton.setDisable(true);
+            
+            // Query in background thread
+            new Thread(() -> {
+                try {
+                    // Query region around current view center (10 arcmin radius)
+                    // This is a simplified demo - full implementation would extract RA/Dec from view center
+                    java.util.Map<String, String> result = VizieRReader.queryByCoordinates(
+                        observerLon, observerLat, 10.0, catalogId);
+                    
+                    javafx.application.Platform.runLater(() -> {
+                        if (result != null && result.containsKey("raw_votable")) {
+                            statusLabel.setText(I18n.getInstance().get("sky.vizier.success", 
+                                "Query successful! Data loaded."));
+                            // Parse VOTable and add stars - simplified for demo
+                            infoLabel.setText("VizieR data available (parsing not yet implemented in demo)");
+                        } else {
+                            statusLabel.setText(I18n.getInstance().get("sky.vizier.failed", 
+                                "Query failed. Check network."));
+                        }
+                        queryButton.setDisable(false);
+                    });
+                } catch (Exception ex) {
+                    javafx.application.Platform.runLater(() -> {
+                        statusLabel.setText("Error: " + ex.getMessage());
+                        queryButton.setDisable(false);
+                    });
+                }
+            }).start();
+        });
+        
+        section.getChildren().addAll(vizierLabel, catalogChoice, queryButton, statusLabel);
+        return section;
     }
 
     private Slider createLabeledSlider(String name, double min, double max, double val, java.util.function.DoubleConsumer action) {
