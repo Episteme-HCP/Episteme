@@ -43,7 +43,7 @@ public class SpectrographDemo extends AbstractSimulationDemo {
     @Override public String getCategory() { return "Physics"; }
     @Override public String getName() { return I18n.getInstance().get("Spectrograph.title", "Spectrograph"); }
     @Override public String getDescription() { return I18n.getInstance().get("Spectrograph.desc", "Real-time frequency analysis visualization."); }
-    @Override protected String getLongDescription() { 
+    @Override public String getLongDescription() { 
         return "Visualizes sound or signal frequencies over time using a spectrogram and spectrum analyzer."; 
     }
 

@@ -52,7 +52,7 @@ public class HumanBodyDemo extends AbstractDemo {
     public String getDescription() { return I18n.getInstance().get("HumanBody.desc", "3D anatomy viewer based on Z-Anatomy."); }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return "Explore detailed 3D human anatomy with skeletal, muscular, and organ systems. Based on Z-Anatomy data.";
     }
 

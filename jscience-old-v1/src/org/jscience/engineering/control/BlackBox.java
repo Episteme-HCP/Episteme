@@ -1,26 +1,40 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
+/*      Class BlackBox
+*
+*       This class contains the constructor to create an instance of
+*       a generalised BlackBox with a single input, single output
+*       and a gain.   It contins the methods for obtaining the
+*       transfer function in the s-domain and the z-domain.
+*
+*       This class is the superclass for several sub-classes,
+*       e.g. Prop (P controller), PropDeriv (PD controller),
+*       PropInt (PI controller), PropIntDeriv (PID controller),
+*       FirstOrder, SecondOrder, AtoD (ADC), DtoA (DAC),
+*       ZeroOrderHold, DelayLine, OpenLoop (Open Loop Path),
+*       of use in control engineering.
+*
+*       Author:  Michael Thomas Flanagan.
+*
+*       Created: August 2002
+*            Updated: 17 July 2003, 18 May 2005
+*
+*
+*       DOCUMENTATION:
+*       See Michael T Flanagan's JAVA library on-line web page:
+*       BlackBox.html
+*
+*   Copyright (c) May 2005  Michael Thomas Flanagan
+*
+*   PERMISSION TO COPY:
+*   Permission to use, copy and modify this software and its documentation for
+*   NON-COMMERCIAL purposes is granted, without fee, provided that an acknowledgement
+*   to the author, Michael Thomas Flanagan at www.ee.ac.uk/~mflanaga, appears in all copies.
+*
+*   Dr Michael Thomas Flanagan makes no representations about the suitability
+*   or fitness of the software for any or for a particular purpose.
+*   Michael Thomas Flanagan shall not be liable for any damages suffered
+*   as a result of using, modifying or distributing this software or its derivatives.
+*
+***************************************************************************************/
 package org.jscience.engineering.control;
 
 

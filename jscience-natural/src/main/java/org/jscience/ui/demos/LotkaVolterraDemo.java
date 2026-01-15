@@ -52,7 +52,7 @@ public class LotkaVolterraDemo extends AbstractSimulationDemo {
     public String getDescription() { return I18n.getInstance().get("LotkaVolterra.desc", "Predator-prey population dynamics simulation."); }
     
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return "Simulate the interaction between predator and prey populations using Lotka-Volterra equations. Visualizes time series and phase portraits.";
     }
 

@@ -58,7 +58,7 @@ public class ArtsColorTheoryDemo extends AbstractDemo {
     }
     
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
          return SocialI18n.getInstance().get("demo.artscolortheorydemo.longdesc");
     }
 }

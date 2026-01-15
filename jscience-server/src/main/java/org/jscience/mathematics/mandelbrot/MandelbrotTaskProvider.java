@@ -25,7 +25,7 @@ package org.jscience.mathematics.mandelbrot;
 
 import org.jscience.distributed.DistributedTask;
 import org.jscience.distributed.TaskProvider;
-import org.jscience.distributed.TaskRegistry.PrecisionMode;
+import org.jscience.distributed.TaskRegistry;
 
 /**
  * Provider for Mandelbrot tasks, supporting both Primitive (double) and Real (arbitrary precision) modes.

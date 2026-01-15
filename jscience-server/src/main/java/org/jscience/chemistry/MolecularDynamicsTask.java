@@ -24,6 +24,7 @@
 package org.jscience.chemistry;
 
 import org.jscience.distributed.DistributedTask;
+import org.jscience.distributed.TaskRegistry;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,12 +42,9 @@ public class MolecularDynamicsTask
     private List<AtomState> atoms;
     private double totalEnergy;
 
-    public enum TaskRegistry.PrecisionMode {
-        REALS,
-        PRIMITIVES
-    }
 
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVES;
+
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
     private List<org.jscience.chemistry.Atom> jscienceAtoms;
 
     public MolecularDynamicsTask(int numAtoms, double timeStep, int steps, double boxSize) {
@@ -85,7 +83,7 @@ public class MolecularDynamicsTask
 
     public void setMode(TaskRegistry.PrecisionMode mode) {
         this.mode = mode;
-        if (mode == TaskRegistry.PrecisionMode.REALS && jscienceAtoms == null) {
+        if (mode == TaskRegistry.PrecisionMode.REAL && jscienceAtoms == null) {
             syncToJScience();
         }
     }
@@ -155,7 +153,7 @@ public class MolecularDynamicsTask
 
     public void run() {
         for (int s = 0; s < steps; s++) {
-            if (mode == TaskRegistry.PrecisionMode.REALS) {
+            if (mode == TaskRegistry.PrecisionMode.REAL) {
                 jscienceStep();
             } else {
                 primitiveStep();

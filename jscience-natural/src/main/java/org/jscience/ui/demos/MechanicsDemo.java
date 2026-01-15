@@ -61,6 +61,12 @@ public class MechanicsDemo extends AbstractSimulationDemo {
     }
 
     @Override
+    public String getLongDescription() { 
+        return I18n.getInstance().get("viewer.mechanics.long", "Detailed simulation of a Mass-Spring-Damper system."); 
+    }
+
+
+    @Override
     public Node createViewerNode() {
         return new InternalMechanicsViewer();
     }
@@ -244,7 +250,7 @@ public class MechanicsDemo extends AbstractSimulationDemo {
 
             if (dominoFallen) {
                 gc.setFill(Color.GREEN);
-                gc.getStyleClass().add("font-title");
+                gc.setFont(Font.font("System", javafx.scene.text.FontWeight.BOLD, 24));
                 gc.fillText("SUCCESS!", 350 + shift, 200);
                 gc.setFill(Color.GRAY);
                 gc.setFont(Font.font(12));
@@ -267,8 +273,9 @@ public class MechanicsDemo extends AbstractSimulationDemo {
         @Override
         public String getDescription() { return "InternalMechanicsViewer Internal Viewer"; }
 
-        @Override
+        
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.mechanicsdemo.longdesc"); }
 }
 
-    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.mechanicsdemo.longdesc"); }
+
 }

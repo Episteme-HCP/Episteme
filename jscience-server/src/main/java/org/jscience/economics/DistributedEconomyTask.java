@@ -25,6 +25,7 @@ package org.jscience.economics;
 
 import java.io.Serializable;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.distributed.TaskRegistry;
 
 
 /**
@@ -42,7 +43,7 @@ public class DistributedEconomyTask implements Serializable {
     private double gdpD;
     private double inflationD;
     private double dt; // years
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.REALS;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.REAL;
 
     public DistributedEconomyTask(String name, Real gdp, Real inflation) {
         this.economyName = name;
@@ -55,7 +56,7 @@ public class DistributedEconomyTask implements Serializable {
 
     public void setMode(TaskRegistry.PrecisionMode mode) {
         if (this.mode != mode) {
-            if (mode == TaskRegistry.PrecisionMode.PRIMITIVES) {
+            if (mode == TaskRegistry.PrecisionMode.PRIMITIVE) {
                 gdpD = gdp.doubleValue();
                 inflationD = inflation.doubleValue();
             } else {
@@ -71,7 +72,7 @@ public class DistributedEconomyTask implements Serializable {
         double growthRate = 0.02 + 0.05 * (Math.random() - 0.5);
         double inflationShock = 0.01 * (Math.random() - 0.5);
 
-        if (mode == TaskRegistry.PrecisionMode.REALS) {
+        if (mode == TaskRegistry.PrecisionMode.REAL) {
             double gValue = gdp.doubleValue();
             double iValue = inflation.doubleValue();
 
@@ -87,11 +88,11 @@ public class DistributedEconomyTask implements Serializable {
     }
 
     public Real getGdp() {
-        return mode == TaskRegistry.PrecisionMode.REALS ? gdp : Real.of(gdpD);
+        return mode == TaskRegistry.PrecisionMode.REAL ? gdp : Real.of(gdpD);
     }
 
     public Real getInflation() {
-        return mode == TaskRegistry.PrecisionMode.REALS ? inflation : Real.of(inflationD);
+        return mode == TaskRegistry.PrecisionMode.REAL ? inflation : Real.of(inflationD);
     }
 
     public String getEconomyName() {

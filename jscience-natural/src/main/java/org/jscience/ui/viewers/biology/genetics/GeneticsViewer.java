@@ -296,7 +296,7 @@ public class GeneticsViewer extends AbstractViewer {
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(3);
         gc.setFill(Color.BLACK);
-        gc.getStyleClass().add("font-title");
+        gc.setFont(Font.font("System", FontWeight.BOLD, 24));
 
         gc.strokeRect(startX, startY, size, size);
         gc.strokeLine(startX + size / 2, startY, startX + size / 2, startY + size);

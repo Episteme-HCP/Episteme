@@ -47,7 +47,7 @@ public class ChemicalReactionDemo extends AbstractDemo {
     public String getDescription() { return I18n.getInstance().get("ChemicalReaction.desc", "Interactive Chemical Equation Balancer"); }
     
     @Override
-    protected String getLongDescription() { 
+    public String getLongDescription() { 
         return "Parse, balance, and analyze chemical equations. Supports formula inspection."; 
     }
 

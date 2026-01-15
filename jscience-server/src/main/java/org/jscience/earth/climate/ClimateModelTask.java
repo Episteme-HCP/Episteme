@@ -25,6 +25,7 @@ package org.jscience.earth.climate;
 
 import java.io.Serializable;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.distributed.TaskRegistry;
 
 
 /**
@@ -52,7 +53,7 @@ public class ClimateModelTask implements Serializable {
     private final int longitudeBins;
     private double[][] temperature; // [lat][long] in Kelvin
     private Real[][] temperatureReal;
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVES;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
 
     // Physical Constants
     private static final double SOLAR_CONSTANT = 1361.0; // W/m^2
@@ -70,7 +71,7 @@ public class ClimateModelTask implements Serializable {
 
     public void setMode(TaskRegistry.PrecisionMode mode) {
         if (this.mode != mode) {
-            if (mode == TaskRegistry.PrecisionMode.REALS) {
+            if (mode == TaskRegistry.PrecisionMode.REAL) {
                 syncToReal();
             } else {
                 syncFromReal();
@@ -108,7 +109,7 @@ public class ClimateModelTask implements Serializable {
     }
 
     public void runStep(double dt) {
-        if (mode == TaskRegistry.PrecisionMode.REALS) {
+        if (mode == TaskRegistry.PrecisionMode.REAL) {
             runStepReal(Real.of(dt));
         } else {
             runStepPrimitive(dt);

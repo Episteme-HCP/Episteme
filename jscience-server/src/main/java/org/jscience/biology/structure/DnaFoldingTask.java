@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.distributed.TaskRegistry;
 
 
 /**
@@ -51,7 +52,7 @@ public class DnaFoldingTask implements Serializable {
     private final String sequence; // ACGT...
     private final int iterations;
     private final double temperature;
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVES;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
 
     // Result
     private List<Point3D> foldedStructure;
@@ -69,7 +70,7 @@ public class DnaFoldingTask implements Serializable {
     }
 
     public void run() {
-        if (mode == TaskRegistry.PrecisionMode.REALS) {
+        if (mode == TaskRegistry.PrecisionMode.REAL) {
             runReal();
         } else {
             runPrimitive();

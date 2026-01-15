@@ -228,7 +228,10 @@ public class ClothSimulationDemo extends AbstractSimulationDemo {
         public String getDescription() { return "InternalClothViewer Internal Viewer"; }
 
         @Override
-}
+        public String getLongDescription() { return getDescription(); }
+
+        
 
     @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+}
 }

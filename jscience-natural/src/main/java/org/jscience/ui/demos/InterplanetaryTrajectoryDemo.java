@@ -362,5 +362,5 @@ public class InterplanetaryTrajectoryDemo extends AbstractDemo {
         return org.jscience.ui.i18n.I18n.getInstance().get("InterplanetaryTrajectoryDemo.desc", "InterplanetaryTrajectoryDemo description");
     }
 
-    @Override
+    
 }

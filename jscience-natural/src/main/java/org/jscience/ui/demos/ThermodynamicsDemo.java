@@ -50,7 +50,7 @@ public class ThermodynamicsDemo extends AbstractDemo {
     public String getDescription() { return I18n.getInstance().get("thermo.desc", "Explore thermodynamic functions (Isotherms etc.)"); }
     
     @Override
-    protected String getLongDescription() { 
+    public String getLongDescription() { 
         return "Visualizes thermodynamic relationships. Default view shows Ideal Gas Law Isotherms usually plotted as P vs V."; 
     }
 

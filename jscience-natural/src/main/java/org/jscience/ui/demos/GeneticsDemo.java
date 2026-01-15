@@ -52,7 +52,7 @@ public class GeneticsDemo extends AbstractDemo {
     public String getDescription() { return I18n.getInstance().get("Genetics.desc", "Genetic drift and Mendelian inheritance simulations."); }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return "Explore population genetics with genetic drift simulation and Mendelian inheritance calculator with Punnett squares.";
     }
 

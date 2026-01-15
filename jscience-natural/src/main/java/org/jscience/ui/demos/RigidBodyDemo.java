@@ -52,7 +52,7 @@ public class RigidBodyDemo extends AbstractSimulationDemo {
     public String getDescription() { return I18n.getInstance().get("RigidBody.desc", "2D rigid body simulation with collisions."); }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return "Simulate 2D rigid bodies with gravity, collisions, and bouncing. Uses the JScience RigidBody physics engine.";
     }
 

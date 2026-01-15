@@ -55,7 +55,7 @@ public class AudioViewerDemo extends AbstractSimulationDemo {
     }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return "A demonstration of audio file processing, showing waveform and spectrogram analysis.";
     }
 

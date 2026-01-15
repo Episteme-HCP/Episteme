@@ -62,6 +62,12 @@ public class FluidDynamicsDemo extends AbstractSimulationDemo {
     }
 
     @Override
+    public String getLongDescription() {
+        return I18n.getInstance().get("fluid.long_desc", "Real-time fluid simulation with particle visualization and controls.");
+    }
+
+
+    @Override
     public String getCategory() { return "Physics"; }
 
     @Override
@@ -321,7 +327,9 @@ public class FluidDynamicsDemo extends AbstractSimulationDemo {
         @Override
         public String getDescription() { return "InternalFluidViewer Internal Viewer"; }
 
-        @Override
+        
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.fluiddynamicsdemo.longdesc"); }
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }
 
     private static class Particle {
@@ -330,6 +338,5 @@ public class FluidDynamicsDemo extends AbstractSimulationDemo {
         Particle(double x, double y) { this.x = x; this.y = y; }
     }
 
-    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.fluiddynamicsdemo.longdesc"); }
-    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+
 }

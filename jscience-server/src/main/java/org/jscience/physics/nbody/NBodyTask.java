@@ -24,6 +24,7 @@
 package org.jscience.physics.nbody;
 
 import org.jscience.distributed.DistributedTask;
+import org.jscience.distributed.TaskRegistry;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,7 @@ public class NBodyTask implements DistributedTask<NBodyTask, NBodyTask> {
     private double dt = 0.01;
     private double softening = 0.1;
     private static final double G = 1.0;
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVES;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
 
     public NBodyTask(List<Body> bodies) {
         this.bodies = new ArrayList<>(bodies);
@@ -97,7 +98,7 @@ public class NBodyTask implements DistributedTask<NBodyTask, NBodyTask> {
     }
 
     public void step() {
-        if (mode == TaskRegistry.PrecisionMode.REALS) {
+        if (mode == TaskRegistry.PrecisionMode.REAL) {
             stepReal();
         } else {
             stepPrimitive();

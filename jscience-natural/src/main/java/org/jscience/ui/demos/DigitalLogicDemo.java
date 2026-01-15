@@ -52,7 +52,7 @@ public class DigitalLogicDemo extends AbstractSimulationDemo {
     public String getDescription() { return I18n.getInstance().get("digital.desc", "Interactive Logic Circuit Simulator"); }
     
     @Override
-    protected String getLongDescription() { 
+    public String getLongDescription() { 
         return "Design and simulate digital logic circuits using AND, OR, NOT, NAND gates."; 
     }
 

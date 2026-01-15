@@ -220,7 +220,10 @@ public class SequenceAlignmentDemo extends AbstractDemo {
         public String getDescription() { return "InternalSequenceViewer Internal Viewer"; }
 
         @Override
-}
+        public String getLongDescription() { return getDescription(); }
+
+        
 
     @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+}
 }

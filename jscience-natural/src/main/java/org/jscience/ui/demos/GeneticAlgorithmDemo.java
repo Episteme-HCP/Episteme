@@ -270,7 +270,10 @@ public class GeneticAlgorithmDemo extends AbstractSimulationDemo {
         public String getDescription() { return "InternalGeneticViewer Internal Viewer"; }
 
         @Override
-}
+        public String getLongDescription() { return getDescription(); }
+
+        
 
     @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+}
 }

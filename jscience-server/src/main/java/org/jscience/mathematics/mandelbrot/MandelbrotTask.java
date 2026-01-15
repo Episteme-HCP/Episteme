@@ -24,6 +24,7 @@
 package org.jscience.mathematics.mandelbrot;
 
 import org.jscience.distributed.DistributedTask;
+import org.jscience.distributed.TaskRegistry;
 
 public class MandelbrotTask implements DistributedTask<MandelbrotTask, MandelbrotTask> {
 
@@ -33,12 +34,9 @@ public class MandelbrotTask implements DistributedTask<MandelbrotTask, Mandelbro
     protected int maxIterations = 256;
     protected int[][] result;
 
-    public enum TaskRegistry.PrecisionMode {
-        REALS,
-        PRIMITIVES
-    }
 
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVES;
+
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
 
     public MandelbrotTask(int width, int height, double xMin, double xMax, double yMin, double yMax) {
         this.width = width;
@@ -88,7 +86,7 @@ public class MandelbrotTask implements DistributedTask<MandelbrotTask, Mandelbro
     }
 
     public void compute() {
-        if (mode == TaskRegistry.PrecisionMode.REALS) {
+        if (mode == TaskRegistry.PrecisionMode.REAL) {
             // JScience Mode: Use Real-based Provider (handled by Multicore provider with
             // conversion internal or special Real provider)
             // Implementation note: existing provider uses doubles but we wrap for

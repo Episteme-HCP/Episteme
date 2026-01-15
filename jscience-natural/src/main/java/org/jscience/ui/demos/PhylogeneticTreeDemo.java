@@ -50,7 +50,7 @@ public class PhylogeneticTreeDemo extends AbstractDemo {
     public String getDescription() { return I18n.getInstance().get("PhylogeneticTree.desc", "Visualizes evolutionary relationships."); }
     
     @Override
-    protected String getLongDescription() { 
+    public String getLongDescription() { 
         return "Interactive phylogenetic tree visualization with radial and linear layouts, highlighting genetic marker data."; 
     }
 

@@ -24,7 +24,7 @@
 package org.jscience.physics.fluid;
 
 import org.jscience.distributed.DistributedTask;
-import org.jscience.distributed.TaskRegistry.PrecisionMode;
+import org.jscience.distributed.TaskRegistry;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.technical.backend.algorithms.LatticeBoltzmannProvider;
 

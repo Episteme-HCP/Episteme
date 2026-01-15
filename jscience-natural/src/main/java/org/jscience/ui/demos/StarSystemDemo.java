@@ -47,7 +47,7 @@ public class StarSystemDemo extends AbstractSimulationDemo {
     public String getDescription() { return I18n.getInstance().get("starsystem.desc", "3D Solar System Visualization"); }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return "Features: Solar System, Black Hole, and other presets with orbit trails and realistic visuals.";
     }
 

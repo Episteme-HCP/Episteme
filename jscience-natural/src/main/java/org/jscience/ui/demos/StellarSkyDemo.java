@@ -50,7 +50,7 @@ public class StellarSkyDemo extends AbstractDemo {
     public String getDescription() { return I18n.getInstance().get("sky.title", "Stellar Sky"); }
     
     @Override
-    protected String getLongDescription() { 
+    public String getLongDescription() { 
         return "Interactive Planetarium showing stars, planets, and constellations based on location and time."; 
     }
 

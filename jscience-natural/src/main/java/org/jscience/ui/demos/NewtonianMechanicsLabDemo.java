@@ -69,6 +69,11 @@ public class NewtonianMechanicsLabDemo extends AbstractSimulationDemo {
     }
 
     @Override
+    public String getLongDescription() {
+        return I18n.getInstance().get("viewer.newtonianmechanicslabdemo.longdesc", "Detailed simulation of newtonian mechanics experiments.");
+    }
+
+    @Override
     public Node createViewerNode() {
         return new InternalNewtonianViewer();
     }
@@ -390,9 +395,10 @@ public class NewtonianMechanicsLabDemo extends AbstractSimulationDemo {
         @Override
         public String getDescription() { return "InternalNewtonianViewer Internal Viewer"; }
 
-        @Override
-}
-
+        
     @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.newtonianmechanicslabdemo.longdesc"); }
     @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+}
+
+
 }

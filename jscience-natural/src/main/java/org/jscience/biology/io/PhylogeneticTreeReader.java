@@ -12,7 +12,6 @@ import java.util.Map;
 
 public class PhylogeneticTreeReader implements ResourceReader<Taxon> {
 
-    @Override
     public Taxon read(InputStream input) throws Exception {
         Map<String, Taxon> taxons = new HashMap<>();
         Taxon root = null;
@@ -59,8 +58,18 @@ public class PhylogeneticTreeReader implements ResourceReader<Taxon> {
         return "Phylogenetic CSV Reader";
     }
 
-    @Override
     public List<String> getSupportedExtensions() {
         return List.of("csv");
     }
+    @Override
+    public Taxon load(String resourceId) throws Exception {
+        InputStream is = getClass().getResourceAsStream(resourceId);
+        if (is == null) is = new java.io.FileInputStream(resourceId);
+        return read(is);
+    }
+
+    @Override public String getResourcePath() { return "/data/phylogeny/"; }
+    @Override public Class<Taxon> getResourceType() { return Taxon.class; }
+    @Override public String getCategory() { return "Biology"; }
+    @Override public String getDescription() { return "Reads phylogenetic trees from CSV."; }
 }

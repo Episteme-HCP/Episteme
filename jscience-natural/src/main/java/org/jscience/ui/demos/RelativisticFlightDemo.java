@@ -285,5 +285,5 @@ public class RelativisticFlightDemo extends AbstractDemo {
         return org.jscience.ui.i18n.I18n.getInstance().get("RelativisticFlightDemo.desc", "RelativisticFlightDemo description");
     }
 
-    @Override
+    
 }

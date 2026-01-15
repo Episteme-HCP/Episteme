@@ -24,6 +24,7 @@
 package org.jscience.earth.climate;
 
 import org.jscience.distributed.DistributedTask;
+import org.jscience.distributed.TaskRegistry;
 
 /**
  * Advanced General Circulation Model (GCM) Task.
@@ -43,12 +44,9 @@ public class GeneralCirculationModelTask
     private double[][][] v; // Meridional wind
     private double[][][] w; // Vertical wind
 
-    public enum TaskRegistry.PrecisionMode {
-        REALS,
-        PRIMITIVES
-    }
 
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVES;
+
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
     private org.jscience.mathematics.numbers.real.Real[][][] temperatureReal;
     private org.jscience.mathematics.numbers.real.Real[][] humidityReal;
 
@@ -115,7 +113,7 @@ public class GeneralCirculationModelTask
 
     public void setMode(TaskRegistry.PrecisionMode mode) {
         this.mode = mode;
-        if (mode == TaskRegistry.PrecisionMode.REALS && temperatureReal == null) {
+        if (mode == TaskRegistry.PrecisionMode.REAL && temperatureReal == null) {
             syncToReal();
         }
     }
@@ -153,7 +151,7 @@ public class GeneralCirculationModelTask
     }
 
     public void step(double dt) {
-        if (mode == TaskRegistry.PrecisionMode.REALS) {
+        if (mode == TaskRegistry.PrecisionMode.REAL) {
             // JScience Mode: Use Real-based Providers (LBM/NS)
             org.jscience.technical.backend.algorithms.NavierStokesProvider nsProvider = new org.jscience.technical.backend.algorithms.MulticoreNavierStokesProvider();
 

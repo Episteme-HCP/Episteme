@@ -58,7 +58,7 @@ public class LorenzDemo extends AbstractDemo {
     }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return I18n.getInstance().get("Lorenz.desc");
     }
 }

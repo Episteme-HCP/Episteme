@@ -221,6 +221,11 @@ public class GameOfLifeDemo extends AbstractSimulationDemo {
         public String getDescription() { return "InternalGameOfLifeViewer Internal Viewer"; }
 
         @Override
+        public String getLongDescription() {
+            return I18n.getInstance().get("life.long_desc", "Conway's Game of Life detailed simulation viewer.");
+        }
+
+        
 }
 
 }

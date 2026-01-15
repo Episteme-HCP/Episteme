@@ -52,7 +52,7 @@ public class LSystemDemo extends AbstractSimulationDemo {
     public String getDescription() { return I18n.getInstance().get("LSystem.desc", "Visualizing plant growth with Lindenmayer systems."); }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return "Explore the mathematical beauty of plant growth and fractals using L-Systems (Lindenmayer systems). Supports simulation and 3D visualization.";
     }
 

@@ -36,6 +36,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+import org.jscience.ui.AbstractViewer;
+
 /**
  * JavaFX viewer for telescope control and position visualization.
  * <p>
@@ -47,7 +49,7 @@ import javafx.scene.text.FontWeight;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class TelescopeViewer extends BorderPane {
+public class TelescopeViewer extends AbstractViewer {
 
     private final SimulatedTelescope telescope;
 
@@ -329,6 +331,11 @@ public class TelescopeViewer extends BorderPane {
     @Override
     public String getLongDescription() {
         return org.jscience.ui.i18n.I18n.getInstance().get("viewer.telescope.longdesc");
+    }
+
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return new java.util.ArrayList<>();
     }
 }
 

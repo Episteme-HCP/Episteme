@@ -275,7 +275,11 @@ public class BioMotionDemo extends AbstractSimulationDemo {
         @Override
         public String getDescription() { return "InternalViewer Internal Viewer"; }
 
-        @Override
+        
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+
+    @Override
+    public String getLongDescription() { return getDescription(); }
 }
 
     private static class WalkerNode {
@@ -300,5 +304,5 @@ public class BioMotionDemo extends AbstractSimulationDemo {
         }
     }
 
-    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+
 }

@@ -1,24 +1,41 @@
 /*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ * $Id: PolyhedronDisplayer.java,v 1.3 2007-10-21 21:08:22 virtualcall Exp $
+ **********************************************************
+ * kaleido
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ *  Kaleidoscopic construction of uniform polyhedra
+ *  Copyright © 1991-2003 Dr. Zvi Har’El <rl@math.technion.ac.il>
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *  
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in
+ *     the documentation and/or other materials provided with the
+ *     distribution.
+ *  
+ *  3. The end-user documentation included with the redistribution,
+ *     if any, must include the following acknowledgment:
+ *  	“This product includes software developed by
+ *  	 Dr. Zvi Har’El (http://www.math.technion.ac.il/~rl/).”
+ *     Alternately, this acknowledgment may appear in the software itself,
+ *     if and wherever such third-party acknowledgments normally appear.
+ *  
+ *  This software is provided ‘as-is’, without any express or implied
+ *  warranty.  In no event will the author be held liable for any
+ *  damages arising from the use of this software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ *  Author:
+ *	Dr. Zvi Har’El,
+ *	Deptartment of Mathematics,
+ *	Technion, Israel Institue of Technology,
+ *	Haifa 32000, Israel.
+ *	E-Mail: rl@math.technion.ac.il
+ **********************************************************
  */
 
 package org.jscience.mathematics.geometry.polyhedrons;

@@ -58,7 +58,7 @@ public class PeripheralsDemo extends AbstractDemo {
     }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return "The Peripherals panel provides a centralized interface to interact with all scientific viewers " +
                 "available in JScience. Use the tabs below to switch between instruments. " +
                 "Each instrument exposes its own parameters and simulation controls for real-time analysis.";

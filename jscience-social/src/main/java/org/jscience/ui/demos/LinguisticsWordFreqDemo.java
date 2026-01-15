@@ -59,7 +59,7 @@ public class LinguisticsWordFreqDemo extends AbstractDemo {
     }
     
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.linguisticswordfreqdemo.longdesc");
     }
 }

@@ -50,7 +50,7 @@ public class EarthquakeDemo extends AbstractDemo {
     public String getDescription() { return I18n.getInstance().get("earthquake.desc", "Interactive Seismic Map"); }
     
     @Override
-    protected String getLongDescription() { 
+    public String getLongDescription() { 
         return "Visualizes seismic data on an interactive world map with explanations and controls."; 
     }
 

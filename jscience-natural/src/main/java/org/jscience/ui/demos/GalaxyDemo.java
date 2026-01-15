@@ -62,6 +62,12 @@ public class GalaxyDemo extends AbstractSimulationDemo {
     }
 
     @Override
+    public String getLongDescription() { 
+        return I18n.getInstance().get("Galaxy.long_desc", "Detailed galaxy simulation including collisions and formation."); 
+    }
+
+
+    @Override
     public String getCategory() { return "Physics"; }
 
     @Override
@@ -326,9 +332,10 @@ public class GalaxyDemo extends AbstractSimulationDemo {
         @Override
         public String getDescription() { return "InternalGalaxyViewer Internal Viewer"; }
 
-        @Override
-}
-
+        
     @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.longdesc"); }
     @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+}
+
+
 }

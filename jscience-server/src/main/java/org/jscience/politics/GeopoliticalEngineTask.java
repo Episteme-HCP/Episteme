@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.distributed.TaskRegistry;
 
 
 /**
@@ -56,7 +57,7 @@ public class GeopoliticalEngineTask implements Serializable {
     }
 
     private List<NationState> nations;
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVES;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
 
     public GeopoliticalEngineTask(List<NationState> nations) {
         this.nations = nations;
@@ -67,7 +68,7 @@ public class GeopoliticalEngineTask implements Serializable {
     }
 
     public void run() {
-        if (mode == TaskRegistry.PrecisionMode.REALS) {
+        if (mode == TaskRegistry.PrecisionMode.REAL) {
             runReal();
         } else {
             runPrimitive();

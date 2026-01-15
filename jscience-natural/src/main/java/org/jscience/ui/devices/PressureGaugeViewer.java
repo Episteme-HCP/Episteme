@@ -204,7 +204,6 @@ public class PressureGaugeViewer extends PhysicalMeasureInstrument<Pressure> {
 
     // --- Mandatory Abstract Methods (I18n) ---
 
-    @Override
     public String getCategory() {
         return org.jscience.ui.i18n.I18n.getInstance().get("category.physics");
     }
@@ -214,12 +213,10 @@ public class PressureGaugeViewer extends PhysicalMeasureInstrument<Pressure> {
         return org.jscience.ui.i18n.I18n.getInstance().get("viewer.pressuregauge.title");
     }
 
-    @Override
     public String getDescription() {
         return org.jscience.ui.i18n.I18n.getInstance().get("viewer.pressuregauge.desc");
     }
 
-    @Override
     public String getLongDescription() {
         return org.jscience.ui.i18n.I18n.getInstance().get("viewer.pressuregauge.longdesc");
     }

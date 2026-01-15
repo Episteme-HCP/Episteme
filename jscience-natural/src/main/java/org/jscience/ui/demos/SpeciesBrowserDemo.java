@@ -50,7 +50,7 @@ public class SpeciesBrowserDemo extends AbstractDemo {
     public String getDescription() { return I18n.getInstance().get("SpeciesBrowser.desc", "Explore biological species data using the Global Biodiversity Information Facility (GBIF) API."); }
     
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return "Search and browse species taxonomy and images via the GBIF network.";
     }
 

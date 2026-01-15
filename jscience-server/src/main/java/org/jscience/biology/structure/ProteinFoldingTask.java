@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.distributed.TaskRegistry;
 
 
 /**
@@ -66,7 +67,7 @@ public class ProteinFoldingTask implements Serializable {
     private final List<ResidueType> sequence;
     private final int iterations;
     private final double temperature;
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVES;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
 
     private List<Monomer> currentFold;
     private double energy;
@@ -94,7 +95,7 @@ public class ProteinFoldingTask implements Serializable {
             attemptMove(rand);
         }
 
-        if (mode == TaskRegistry.PrecisionMode.REALS) {
+        if (mode == TaskRegistry.PrecisionMode.REAL) {
             this.energyReal = calculateEnergyReal(currentFold);
             this.energy = energyReal.doubleValue();
         } else {

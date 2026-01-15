@@ -61,6 +61,11 @@ public class GaltonBoardDemo extends AbstractSimulationDemo {
     }
 
     @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.galtonboarddemo.desc", "A demonstration of the Galton Board.");
+    }
+
+    @Override
     public String getCategory() { return "Mathematics"; }
 
     /**
@@ -203,9 +208,11 @@ public class GaltonBoardDemo extends AbstractSimulationDemo {
             }
         }
     
-        @Override
+        
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.galtonboarddemo.desc"); }
+    @Override public String getLongDescription() { return getDescription(); }
+    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }
 
-    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.galtonboarddemo.desc"); }
-    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+
 }

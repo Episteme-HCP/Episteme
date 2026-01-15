@@ -50,7 +50,7 @@ public class PeriodicTableDemo extends AbstractDemo {
     public String getDescription() { return I18n.getInstance().get("PeriodicTable.desc", "Interactive Periodic Table of Elements"); }
     
     @Override
-    protected String getLongDescription() { 
+    public String getLongDescription() { 
         return "Displays all chemical elements in standard periodic table layout with 3D atomic structure visualization."; 
     }
 

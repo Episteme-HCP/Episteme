@@ -129,7 +129,7 @@ public class PsychologyReactionTestDemo extends AbstractSimulationDemo {
     }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.psychologyreactiontestdemo.longdesc");
     }
 }

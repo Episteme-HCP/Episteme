@@ -51,7 +51,7 @@ public class CircuitSimulatorDemo extends AbstractDemo {
     }
 
     @Override
-    protected String getLongDescription() {
+    public String getLongDescription() {
         return org.jscience.ui.i18n.I18n.getInstance().get("circuit.long_desc", "Simulates ideal electronic components including resistors, capacitors, inductors, and voltage sources.");
     }
 
