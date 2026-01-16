@@ -34,7 +34,6 @@ import org.jscience.ui.i18n.I18n;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 
 import org.jscience.ui.AbstractViewer;
 
@@ -79,7 +78,7 @@ public class TelescopeViewer extends AbstractViewer {
 
     private void initializeUI() {
         setPadding(new Insets(15));
-        getStyleClass().add("dark-viewer-root");
+        getStyleClass().add("viewer-root");
 
         // Title
         Label title = new Label(I18n.getInstance().get("telescope.title"));
@@ -97,7 +96,7 @@ public class TelescopeViewer extends AbstractViewer {
         drawSkyView();
 
         StackPane canvasPane = new StackPane(skyCanvas);
-        canvasPane.getStyleClass().add("dark-viewer-root");
+        canvasPane.getStyleClass().add("viewer-root");
         setCenter(canvasPane);
         BorderPane.setMargin(canvasPane, new Insets(15));
 
@@ -143,7 +142,7 @@ public class TelescopeViewer extends AbstractViewer {
         HBox panel = new HBox(30, raBox, decBox, statusBox);
         panel.setAlignment(Pos.CENTER);
         panel.setPadding(new Insets(10));
-        panel.getStyleClass().add("dark-viewer-sidebar");
+        panel.getStyleClass().add("viewer-sidebar");
 
         return panel;
     }
@@ -178,7 +177,7 @@ public class TelescopeViewer extends AbstractViewer {
                 new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.telescope.dec", "Dec:")), decInput,
                 slewBtn, stopBtn);
         inputRow.getChildren().filtered(n -> n instanceof Label)
-                .forEach(n -> ((Label) n).setTextFill(Color.LIGHTGRAY));
+                .forEach(n -> ((Label) n).getStyleClass().add("label"));
 
         // Preset buttons
         HBox presetRow = new HBox(10);
@@ -193,7 +192,7 @@ public class TelescopeViewer extends AbstractViewer {
         VBox panel = new VBox(10, targetLabel, inputRow, presetRow);
         panel.setAlignment(Pos.CENTER);
         panel.setPadding(new Insets(15));
-        panel.getStyleClass().add("dark-viewer-sidebar");
+        panel.getStyleClass().add("viewer-sidebar");
 
         return panel;
     }

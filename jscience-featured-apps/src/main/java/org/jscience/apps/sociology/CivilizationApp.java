@@ -197,7 +197,7 @@ public class CivilizationApp extends FeaturedAppBase {
     private VBox createControls() {
         VBox box = new VBox(10);
         box.setPadding(new Insets(10));
-        box.setStyle("-fx-background-color: #eee;");
+        box.getStyleClass().add("viewer-controls");
 
         HBox sliders = new HBox(20);
 
@@ -218,7 +218,8 @@ public class CivilizationApp extends FeaturedAppBase {
                         "Aggression"));
 
         paramsTitleLabel = new Label(i18n.get("civilization.label.params"));
-        paramsTitleLabel.setStyle("-fx-font-weight: bold;");
+        paramsTitleLabel.getStyleClass().add("header-label");
+        paramsTitleLabel.setStyle("-fx-font-size: 14px;");
         box.getChildren().addAll(paramsTitleLabel, sliders);
         return box;
     }
@@ -273,7 +274,7 @@ public class CivilizationApp extends FeaturedAppBase {
     private void updateStatusLabel() {
         if (population.getValue().doubleValue() <= 0) {
             statusLabel.setText(i18n.get("civilization.status.extinct"));
-            statusLabel.getStyleClass().add("text-dark");
+            statusLabel.getStyleClass().add("description-label");
         } else if (population.getValue().doubleValue() < 500) {
             statusLabel.setText(i18n.get("civilization.status.collapse"));
             statusLabel.getStyleClass().add("text-error");
@@ -440,7 +441,7 @@ public class CivilizationApp extends FeaturedAppBase {
     private void updateStatus(double dPop) {
         if (population.getValue().doubleValue() <= 10) {
             statusLabel.setText(i18n.get("civilization.status.extinct"));
-            statusLabel.getStyleClass().add("text-dark");
+            statusLabel.getStyleClass().add("description-label");
         } else if (dPop < -10) {
             statusLabel.setText(i18n.get("civilization.status.collapse"));
             statusLabel.getStyleClass().add("text-error");

@@ -66,7 +66,7 @@ public class AudioViewer extends AbstractViewer implements Simulatable {
         spectrogramCanvas = new Canvas(800, 250);
         
         contentBox = new VBox(5, waveformCanvas, spectrogramCanvas);
-        contentBox.setStyle("-fx-background-color: #f0f0f0;");
+        contentBox.getStyleClass().add("viewer-root");
         
         scrollPane = new ScrollPane(contentBox);
         scrollPane.setFitToHeight(true);
@@ -92,10 +92,10 @@ public class AudioViewer extends AbstractViewer implements Simulatable {
         VBox box = new VBox(10);
         box.setPadding(new Insets(10));
         box.setPrefWidth(200);
-        box.getStyleClass().add("dark-viewer-sidebar");
+        box.getStyleClass().add("viewer-sidebar");
         
         Label title = new Label(I18n.getInstance().get("audio.control", "Audio Control"));
-        title.getStyleClass().add("dark-header");
+        title.getStyleClass().add("header-label");
         
         Button openBtn = new Button(I18n.getInstance().get("audio.open", "Open File"));
         openBtn.setMaxWidth(Double.MAX_VALUE);

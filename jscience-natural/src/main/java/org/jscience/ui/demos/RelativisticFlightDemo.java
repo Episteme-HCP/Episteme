@@ -31,7 +31,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 
 import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.i18n.I18n;
@@ -132,32 +131,31 @@ public class RelativisticFlightDemo extends AbstractDemo {
         VBox box = new VBox(10);
         box.setMaxHeight(220);
         box.setMaxWidth(700);
-        box.setStyle("-fx-background-color: rgba(30, 30, 30, 0.85); -fx-padding: 15; -fx-background-radius: 10;");
+        box.getStyleClass().add("info-panel");
+        box.setStyle("-fx-background-color: rgba(253, 251, 247, 0.85); -fx-padding: 15; -fx-background-radius: 10;");
 
         I18n i18n = I18n.getInstance();
 
         Label title = new Label("Ã°Å¸Å¡â‚¬ " + i18n.get("relativity.panel.warp", "Warp Drive"));
-        title.getStyleClass().add("text-light");
-        title.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
+        title.getStyleClass().add("header-label");
 
         speedLabel = new Label(i18n.get("relativity.label.speed_fmt", "Speed: {0}c", "0.000"));
-        speedLabel.getStyleClass().add("text-info");
+        speedLabel.getStyleClass().add("description-label");
 
         gammaLabel = new Label(i18n.get("relativity.label.gamma_fmt", "Gamma: {0}", "1.00"));
-        gammaLabel.getStyleClass().add("text-warning");
+        gammaLabel.getStyleClass().add("description-label");
 
         earthClockLabel = new Label(
                 MessageFormat.format(i18n.get("relativity.clock.earth", "Earth Time: {0}s"), "1.00"));
         earthClockLabel.setTextFill(Color.LIGHTBLUE);
 
         shipClockLabel = new Label(MessageFormat.format(i18n.get("relativity.clock.ship", "Ship Time: {0}s"), "1.00"));
-        shipClockLabel.getStyleClass().add("text-success");
+        shipClockLabel.getStyleClass().add("description-label");
 
         explanationLabel = new Label(
                 MessageFormat.format(i18n.get("relativity.label.explanation", "At {0}% light speed..."), 0, "1.00"));
         explanationLabel.setWrapText(true);
-        explanationLabel.getStyleClass().add("text-secondary");
-        explanationLabel.getStyleClass().add("font-small");
+        explanationLabel.getStyleClass().add("description-label");
 
         speedSlider = new Slider(0, 0.999, 0);
         speedSlider.setShowTickLabels(false);
@@ -182,11 +180,11 @@ public class RelativisticFlightDemo extends AbstractDemo {
         toggles.setAlignment(Pos.CENTER);
 
         dopplerCheck = new CheckBox(i18n.get("relativity.check.doppler", "Doppler Effect"));
-        dopplerCheck.getStyleClass().add("text-light");
+        dopplerCheck.getStyleClass().add("description-label");
         dopplerCheck.setSelected(true);
 
         aberrationCheck = new CheckBox(i18n.get("relativity.check.aberration", "Relativistic Aberration"));
-        aberrationCheck.getStyleClass().add("text-light");
+        aberrationCheck.getStyleClass().add("description-label");
         aberrationCheck.setSelected(true);
 
         toggles.getChildren().addAll(dopplerCheck, aberrationCheck);

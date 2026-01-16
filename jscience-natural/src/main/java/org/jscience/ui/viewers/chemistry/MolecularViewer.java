@@ -75,7 +75,7 @@ public class MolecularViewer extends org.jscience.ui.AbstractViewer {
 
         VBox controls = new VBox(15);
         controls.setPadding(new Insets(15));
-        controls.setStyle("-fx-background-color: #eee;");
+        controls.getStyleClass().add("viewer-sidebar");
         controls.setPrefWidth(280);
 
         ComboBox<String> selector = new ComboBox<>(FXCollections.observableArrayList(

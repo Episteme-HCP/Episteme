@@ -62,7 +62,7 @@ public class ResistorColorCodeViewer extends org.jscience.ui.AbstractViewer {
     private final Rectangle r3 = new Rectangle(20, 50);
     private final Rectangle r4 = new Rectangle(20, 50);
 
-    private final Label resultLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.resistorcolorcode.resistance", "Resistance: "));
+    private final Label resultLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("resistor.result", "Resistance: "));
 
     private static final Map<String, Color> colorMap = new HashMap<>();
     private static final Map<String, Integer> valMap = new HashMap<>();
@@ -88,8 +88,8 @@ public class ResistorColorCodeViewer extends org.jscience.ui.AbstractViewer {
         VBox root = new VBox(20);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
-        root.getStyleClass().add("dark-viewer-root");
-        resultLabel.getStyleClass().add("dark-label-accent");
+        root.getStyleClass().add("viewer-root");
+        resultLabel.getStyleClass().add("header-label");
 
         // Resistor Visual
         StackPane resistorBody = new StackPane();
@@ -150,7 +150,8 @@ public class ResistorColorCodeViewer extends org.jscience.ui.AbstractViewer {
         double m = multMap.getOrDefault(c3, 1.0);
 
         double ohms = (v1 * 10 + v2) * m;
-        resultLabel.setText(String.format("Resistance: %.0f Ohms +/- %s", ohms, c4.equals("Gold") ? "5%" : "10%"));
+        String tol = c4.equals("Gold") ? "5%" : "10%";
+        resultLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("resistor.result.fmt", "Resistance: {0} Ohms +/- {1}", ohms, tol));
     }
 
 

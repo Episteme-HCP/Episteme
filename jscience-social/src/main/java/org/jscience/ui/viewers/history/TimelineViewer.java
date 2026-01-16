@@ -10,10 +10,8 @@ import javafx.scene.text.Font;
 import org.jscience.history.HistoricalEvent;
 import org.jscience.history.Timeline;
 import org.jscience.history.FuzzyDate;
-import org.jscience.ui.ThemeManager;
 import org.jscience.ui.i18n.I18n;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -163,7 +161,7 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
                  double yearsAgo = present - year;
                  gc.setFill(yearsAgo < 50 ? Color.YELLOW : (yearsAgo < 150 ? Color.ORANGE : Color.DARKORANGE));
             } else {
-                 gc.setFill(year <= 2025 ? Color.CYAN : Color.ORANGE);
+                 gc.setFill(isPast ? Color.CYAN : Color.ORANGE);
             }
             
             double size = logScale ? (6 + (1 - (Math.log(Math.max(1, present-year)) / logMax)) * 6) : 8;

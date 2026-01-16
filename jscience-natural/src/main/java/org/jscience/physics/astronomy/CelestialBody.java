@@ -129,13 +129,15 @@ public class CelestialBody extends Particle {
      * Surface gravity: g = GM/rÃ‚Â²
      */
     public Quantity<Acceleration> getSurfaceGravity() {
-        double m = getMass().to(Units.KILOGRAM).getValue().doubleValue();
-        double r = radius.to(Units.METER).getValue().doubleValue();
+        Real m = Real.of(getMass().to(Units.KILOGRAM).getValue().doubleValue());
+        Real r = Real.of(radius.to(Units.METER).getValue().doubleValue());
 
-        // G = 6.67430e-11 N*m^2/kg^2
-        double gVal = 6.67430e-11 * m / (r * r);
-        // acceleration unit m/s^2 can be derived or constructed
-        return Quantities.create(gVal, Units.METER.divide(Units.SECOND.pow(2)).asType(Acceleration.class));
+        // G = 6.67430e-11
+        Real G = Real.of(6.67430e-11);
+        
+        Real gVal = G.multiply(m).divide(r.multiply(r));
+        
+        return Quantities.create(gVal.doubleValue(), Units.METERS_PER_SECOND_SQUARED);
     }
 
     public Quantity<Acceleration> getSurfaceGravitySafe() {

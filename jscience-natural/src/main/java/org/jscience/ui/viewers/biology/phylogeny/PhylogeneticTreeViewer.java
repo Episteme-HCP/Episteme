@@ -46,7 +46,7 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
     public String getCategory() { return "Biology"; }
 
     private void initUI() {
-        this.getStyleClass().add("dark-viewer-root");
+        this.getStyleClass().add("viewer-root");
 
         canvas = new Canvas(900, 700);
         this.setCenter(canvas);
@@ -55,7 +55,7 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
         this.heightProperty().addListener(e -> { canvas.setHeight(getHeight()); updateLayoutAndDraw(canvas); });
 
         Label infoPanel = new Label(I18n.getInstance().get("phylogeny.info.default"));
-        infoPanel.getStyleClass().add("dark-viewer-sidebar");
+        infoPanel.getStyleClass().add("viewer-sidebar");
 
         javafx.scene.control.Button toggleBtn = new javafx.scene.control.Button(I18n.getInstance().get("phylogeny.toggle_view"));
         toggleBtn.setOnAction(e -> {
@@ -198,14 +198,14 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
         for (int i = 0; i < levels.length; i++) {
             String name = levels[i].trim();
             if (name.isEmpty()) continue;
-            Taxon t = new Taxon("ncbi_" + i, (current == null ? "" : current.getId()), name, Math.random(), Math.random(), Math.random());
+            Taxon t = new Taxon("ncbi_" + i, (current == null ? "" : current.getId()), name, org.jscience.mathematics.numbers.real.Real.of(Math.random()), org.jscience.mathematics.numbers.real.Real.of(Math.random()), org.jscience.mathematics.numbers.real.Real.of(Math.random()));
             if (root == null) root = t;
             if (current != null) current.addChild(t);
             current = t;
         }
         // Add the searched species as the leaf if it's not the last level
         if (current != null && !levels[levels.length - 1].equalsIgnoreCase(terminalName)) {
-             Taxon t = new Taxon("ncbi_leaf", current.getId(), terminalName, Math.random(), Math.random(), Math.random());
+             Taxon t = new Taxon("ncbi_leaf", current.getId(), terminalName, org.jscience.mathematics.numbers.real.Real.of(Math.random()), org.jscience.mathematics.numbers.real.Real.of(Math.random()), org.jscience.mathematics.numbers.real.Real.of(Math.random()));
              current.addChild(t);
         }
         return root;
@@ -334,16 +334,16 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
     }
 
     private void drawLinearHeatmap(GraphicsContext gc, Taxon n, double startX, double y) {
-        drawCell(gc, startX, y - 9, getColor(n.getCoi()));
-        drawCell(gc, startX + 30, y - 9, getColor(n.getRna16s()));
-        drawCell(gc, startX + 60, y - 9, getColor(n.getCytb()));
+        drawCell(gc, startX, y - 9, getColor(n.getCoi().doubleValue()));
+        drawCell(gc, startX + 30, y - 9, getColor(n.getRna16s().doubleValue()));
+        drawCell(gc, startX + 60, y - 9, getColor(n.getCytb().doubleValue()));
     }
 
     private void drawRadialHeatmap(GraphicsContext gc, Taxon n, double startRadius, double angle) {
         double cx = canvas.getWidth()/2, cy = canvas.getHeight()/2;
-        drawDot(gc, cx + (startRadius + 10) * Math.cos(angle), cy + (startRadius + 10) * Math.sin(angle), getColor(n.getCoi()));
-        drawDot(gc, cx + (startRadius + 25) * Math.cos(angle), cy + (startRadius + 25) * Math.sin(angle), getColor(n.getRna16s()));
-        drawDot(gc, cx + (startRadius + 40) * Math.cos(angle), cy + (startRadius + 40) * Math.sin(angle), getColor(n.getCytb()));
+        drawDot(gc, cx + (startRadius + 10) * Math.cos(angle), cy + (startRadius + 10) * Math.sin(angle), getColor(n.getCoi().doubleValue()));
+        drawDot(gc, cx + (startRadius + 25) * Math.cos(angle), cy + (startRadius + 25) * Math.sin(angle), getColor(n.getRna16s().doubleValue()));
+        drawDot(gc, cx + (startRadius + 40) * Math.cos(angle), cy + (startRadius + 40) * Math.sin(angle), getColor(n.getCytb().doubleValue()));
     }
 
     private void drawCell(GraphicsContext gc, double x, double y, Color c) {

@@ -75,7 +75,7 @@ public class MetamathViewer extends AbstractViewer {
 
         // Header
         Label header = new Label(I18n.getInstance().get("metamath.title"));
-        header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        header.getStyleClass().add("header-label");
         layout.setTop(header);
 
         // Center
@@ -100,8 +100,8 @@ public class MetamathViewer extends AbstractViewer {
         selectorBox.getChildren().addAll(new Label(I18n.getInstance().get("metamath.select")), theoremSelector);
 
         theoremLabel = new Label();
-        theoremLabel.setStyle(
-                "-fx-font-size: 16px; -fx-background-color: #e3f2fd; -fx-padding: 10; -fx-background-radius: 5;");
+        theoremLabel.getStyleClass().add("info-panel");
+        theoremLabel.setStyle("-fx-font-size: 16px;");
         theoremLabel.setMaxWidth(Double.MAX_VALUE);
 
         proofStepsBox = new VBox(10);
@@ -117,7 +117,7 @@ public class MetamathViewer extends AbstractViewer {
         VBox sidebar = new VBox(10);
         sidebar.setPadding(new Insets(10));
         sidebar.setPrefWidth(200);
-        sidebar.setStyle("-fx-background-color: #f5f5f5;");
+        sidebar.getStyleClass().add("viewer-sidebar");
 
         Button nextStepBtn = new Button(I18n.getInstance().get("metamath.btn.next"));
         nextStepBtn.setMaxWidth(Double.MAX_VALUE);

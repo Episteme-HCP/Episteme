@@ -83,6 +83,7 @@ public class SequenceAlignmentDemo extends AbstractDemo {
 
         public InternalSequenceViewer() {
             setPadding(new Insets(20));
+            getStyleClass().add("viewer-root");
             // Top Input
             VBox inputs = new VBox(10);
             seq1Field = new TextField("GATTACA");
@@ -92,9 +93,9 @@ public class SequenceAlignmentDemo extends AbstractDemo {
             alignBtn.setOnAction(e -> runAlignment());
 
             Label l1 = new Label(I18n.getInstance().get("align.seq1", "Sequence 1:"));
-            l1.getStyleClass().add("dark-label");
+            l1.getStyleClass().add("header-label");
             Label l2 = new Label(I18n.getInstance().get("align.seq2", "Sequence 2:"));
-            l2.getStyleClass().add("dark-label");
+            l2.getStyleClass().add("header-label");
 
             inputs.getChildren().addAll(l1, seq1Field, l2, seq2Field, alignBtn);
             setTop(inputs);
@@ -112,16 +113,16 @@ public class SequenceAlignmentDemo extends AbstractDemo {
             // Bottom Result
             VBox results = new VBox(5);
             results.setPadding(new Insets(10));
-            results.getStyleClass().add("dark-panel");
+            results.getStyleClass().add("info-panel");
 
             scoreLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.sequencealignment.score.0", "Score: 0"));
-            scoreLabel.getStyleClass().add("dark-label-info");
+            scoreLabel.getStyleClass().add("header-label");
 
             align1Label = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.sequencealignment.", "---"));
             align2Label = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.sequencealignment.", "---"));
 
-            align1Label.getStyleClass().add("dark-label-mono");
-            align2Label.getStyleClass().add("dark-label-mono");
+            align1Label.getStyleClass().add("description-label");
+            align2Label.getStyleClass().add("description-label");
 
             results.getChildren().addAll(scoreLabel, align1Label, align2Label);
             setBottom(results);
@@ -197,7 +198,7 @@ public class SequenceAlignmentDemo extends AbstractDemo {
                     Label l = new Label(String.valueOf(score[i][j]));
                     l.setPrefSize(40, 30);
                     l.setAlignment(Pos.CENTER);
-                    l.getStyleClass().add("dark-cell");
+                    l.getStyleClass().add("cell");
                     matrixGrid.add(l, i + 1, j + 1);
                 }
             }
@@ -205,7 +206,7 @@ public class SequenceAlignmentDemo extends AbstractDemo {
 
         private Label createHeaderLabel(String text) {
             Label l = new Label(text);
-            l.getStyleClass().add("dark-header");
+            l.getStyleClass().add("header-label");
             l.setPrefSize(40, 30);
             l.setAlignment(Pos.CENTER);
             return l;

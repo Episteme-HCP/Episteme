@@ -100,6 +100,7 @@ public class InterplanetaryTrajectoryDemo extends AbstractDemo {
         VBox.setVgrow(solarSystemCanvas, Priority.ALWAYS);
 
         VBox controls = createControls();
+        controls.getStyleClass().add("viewer-sidebar");
         controls.setMinWidth(300);
         controls.setMaxWidth(350);
 
@@ -129,7 +130,7 @@ public class InterplanetaryTrajectoryDemo extends AbstractDemo {
         I18n i18n = I18n.getInstance();
 
         Label title = new Label("🚀 " + i18n.get("trajectory.panel.config", "Configuration"));
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        title.getStyleClass().add("header-label");
 
         List<String> planets = solarSystem.getBodies().stream()
                 .filter(b -> b instanceof Planet)
@@ -166,15 +167,15 @@ public class InterplanetaryTrajectoryDemo extends AbstractDemo {
 
         Button calcBtn = new Button(i18n.get("trajectory.button.calculate", "Calculate"));
         calcBtn.setMaxWidth(Double.MAX_VALUE);
-        calcBtn.getStyleClass().add("primary-button");
-        calcBtn.setStyle("-fx-background-color: #007bff; -fx-text-fill: white; -fx-font-weight: bold;");
+        calcBtn.getStyleClass().add("accent-button-blue");
         calcBtn.setOnAction(
                 e -> calculateTrajectory(originBox.getValue(), targetBox.getValue(), flightDurationSpinner.getValue()));
         grid.add(calcBtn, 0, 4, 2, 1);
 
         grid.add(new Label(i18n.get("trajectory.label.deltav", "Delta-V")), 0, 5);
         deltaVLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.interplanetarytrajectory.", "--"));
-        deltaVLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+        deltaVLabel.getStyleClass().add("header-label");
+        deltaVLabel.setStyle("-fx-font-size: 14px;");
         grid.add(deltaVLabel, 1, 5);
 
         missionLog = new TextArea();

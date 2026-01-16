@@ -12,15 +12,14 @@ public class Taxon {
     private String name;
     private List<Taxon> children = new ArrayList<>();
     
-    // Genetic Markers (Simulated)
-    private double coi;
-    private double rna16s;
-    private double cytb;
+    private org.jscience.mathematics.numbers.real.Real coi;
+    private org.jscience.mathematics.numbers.real.Real rna16s;
+    private org.jscience.mathematics.numbers.real.Real cytb;
     
     // Layout properties (transient)
     public transient double x, y, angle, radius;
 
-    public Taxon(String id, String parentId, String name, double coi, double rna16s, double cytb) {
+    public Taxon(String id, String parentId, String name, org.jscience.mathematics.numbers.real.Real coi, org.jscience.mathematics.numbers.real.Real rna16s, org.jscience.mathematics.numbers.real.Real cytb) {
         this.id = id;
         this.parentId = parentId;
         this.name = name;
@@ -37,7 +36,7 @@ public class Taxon {
     public String getName() { return name; }
     public String getId() { return id; }
     public String getParentId() { return parentId; }
-    public double getCoi() { return coi; }
-    public double getRna16s() { return rna16s; }
-    public double getCytb() { return cytb; }
+    public org.jscience.mathematics.numbers.real.Real getCoi() { return coi; }
+    public org.jscience.mathematics.numbers.real.Real getRna16s() { return rna16s; }
+    public org.jscience.mathematics.numbers.real.Real getCytb() { return cytb; }
 }

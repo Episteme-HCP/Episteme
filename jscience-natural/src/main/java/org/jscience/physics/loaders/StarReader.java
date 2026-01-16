@@ -84,13 +84,13 @@ public class StarReader extends AbstractResourceReader<List<StarReader.Star>> {
 
     public static class Star {
         public String name;
-        public double ra; // Right Ascension (degrees)
-        public double dec; // Declination (degrees)
-        public double dist; // Distance (light years)
-        public double mag; // Apparent Magnitude
+        public org.jscience.mathematics.numbers.real.Real ra; // Right Ascension (degrees)
+        public org.jscience.mathematics.numbers.real.Real dec; // Declination (degrees)
+        public org.jscience.mathematics.numbers.real.Real dist; // Distance (light years)
+        public org.jscience.mathematics.numbers.real.Real mag; // Apparent Magnitude
         public String spectralType; // O, B, A, F, G, K, M
 
-        public Star(String name, double ra, double dec, double dist, double mag, String spectralType) {
+        public Star(String name, org.jscience.mathematics.numbers.real.Real ra, org.jscience.mathematics.numbers.real.Real dec, org.jscience.mathematics.numbers.real.Real dist, org.jscience.mathematics.numbers.real.Real mag, String spectralType) {
             this.name = name;
             this.ra = ra;
             this.dec = dec;
@@ -117,10 +117,10 @@ public class StarReader extends AbstractResourceReader<List<StarReader.Star>> {
                 if (parts.length >= 6) {
                     // Name,RA(deg),Dec(deg),Dist(ly),Mag,Type
                     String name = parts[0].trim();
-                    double ra = Double.parseDouble(parts[1].trim());
-                    double dec = Double.parseDouble(parts[2].trim());
-                    double dist = Double.parseDouble(parts[3].trim());
-                    double mag = Double.parseDouble(parts[4].trim());
+                    org.jscience.mathematics.numbers.real.Real ra = org.jscience.mathematics.numbers.real.Real.of(parts[1].trim());
+                    org.jscience.mathematics.numbers.real.Real dec = org.jscience.mathematics.numbers.real.Real.of(parts[2].trim());
+                    org.jscience.mathematics.numbers.real.Real dist = org.jscience.mathematics.numbers.real.Real.of(parts[3].trim());
+                    org.jscience.mathematics.numbers.real.Real mag = org.jscience.mathematics.numbers.real.Real.of(parts[4].trim());
                     String type = parts[5].trim();
 
                     stars.add(new Star(name, ra, dec, dist, mag, type));

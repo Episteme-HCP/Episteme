@@ -51,11 +51,11 @@ public class ExoplanetInfo {
 
     private final String name;
     private final String hostStar;
-    private final double massJupiter;
-    private final double radiusJupiter;
-    private final double orbitalPeriodDays;
-    private final double equilibriumTemperatureK;
-    private final double distanceParsecs;
+    private final org.jscience.mathematics.numbers.real.Real massJupiter;
+    private final org.jscience.mathematics.numbers.real.Real radiusJupiter;
+    private final org.jscience.mathematics.numbers.real.Real orbitalPeriodDays;
+    private final org.jscience.mathematics.numbers.real.Real equilibriumTemperatureK;
+    private final org.jscience.mathematics.numbers.real.Real distanceParsecs;
 
     private ExoplanetInfo(Builder builder) {
         this.name = builder.name;
@@ -76,37 +76,37 @@ public class ExoplanetInfo {
     }
 
     public double getMassJupiter() {
-        return massJupiter;
+        return massJupiter.doubleValue();
     }
 
     public double getRadiusJupiter() {
-        return radiusJupiter;
+        return radiusJupiter.doubleValue();
     }
 
     public double getOrbitalPeriodDays() {
-        return orbitalPeriodDays;
+        return orbitalPeriodDays.doubleValue();
     }
 
     public double getEquilibriumTemperatureK() {
-        return equilibriumTemperatureK;
+        return equilibriumTemperatureK.doubleValue();
     }
 
     public double getDistanceParsecs() {
-        return distanceParsecs;
+        return distanceParsecs.doubleValue();
     }
 
     /**
      * Returns mass as type-safe Quantity in kg.
      */
     public Quantity<Mass> getMass() {
-        return Quantities.create(massJupiter * JUPITER_MASS_KG, Units.KILOGRAM);
+        return Quantities.create(massJupiter.multiply(org.jscience.mathematics.numbers.real.Real.of(JUPITER_MASS_KG)), Units.KILOGRAM);
     }
 
     /**
      * Returns radius as type-safe Quantity in meters.
      */
     public Quantity<Length> getRadius() {
-        return Quantities.create(radiusJupiter * JUPITER_RADIUS_M, Units.METER);
+        return Quantities.create(radiusJupiter.multiply(org.jscience.mathematics.numbers.real.Real.of(JUPITER_RADIUS_M)), Units.METER);
     }
 
     /**
@@ -120,14 +120,14 @@ public class ExoplanetInfo {
      * Returns orbital period as type-safe Quantity in seconds.
      */
     public Quantity<Time> getOrbitalPeriod() {
-        return Quantities.create(orbitalPeriodDays * DAY_S, Units.SECOND);
+        return Quantities.create(orbitalPeriodDays.multiply(org.jscience.mathematics.numbers.real.Real.of(DAY_S)), Units.SECOND);
     }
 
     /**
      * Returns distance from Earth as type-safe Quantity in meters.
      */
     public Quantity<Length> getDistance() {
-        return Quantities.create(distanceParsecs * PARSEC_M, Units.METER);
+        return Quantities.create(distanceParsecs.multiply(org.jscience.mathematics.numbers.real.Real.of(PARSEC_M)), Units.METER);
     }
 
     /**
@@ -135,7 +135,7 @@ public class ExoplanetInfo {
      * Uses simplified criterion: equilibrium temperature 200-320 K.
      */
     public boolean isPotentiallyHabitable() {
-        return equilibriumTemperatureK >= 200 && equilibriumTemperatureK <= 320;
+        return equilibriumTemperatureK.doubleValue() >= 200 && equilibriumTemperatureK.doubleValue() <= 320;
     }
 
     /**
@@ -143,11 +143,11 @@ public class ExoplanetInfo {
      * Based on radius and temperature ratios.
      */
     public double getEarthSimilarityIndex() {
-        double radiusEarth = radiusJupiter * 11.2; // Jupiter radii to Earth radii
+        double radiusEarth = radiusJupiter.doubleValue() * 11.2; // Jupiter radii to Earth radii
         double tempEarth = 255.0; // Earth equilibrium temp
 
         double radiusRatio = Math.min(radiusEarth, 1.0 / radiusEarth);
-        double tempRatio = Math.min(equilibriumTemperatureK / tempEarth, tempEarth / equilibriumTemperatureK);
+        double tempRatio = Math.min(equilibriumTemperatureK.doubleValue() / tempEarth, tempEarth / equilibriumTemperatureK.doubleValue());
 
         return Math.pow(radiusRatio * tempRatio, 0.5);
     }
@@ -161,11 +161,11 @@ public class ExoplanetInfo {
     public static class Builder {
         private String name = "";
         private String hostStar = "";
-        private double massJupiter = Double.NaN;
-        private double radiusJupiter = Double.NaN;
-        private double orbitalPeriodDays = Double.NaN;
-        private double equilibriumTemperatureK = Double.NaN;
-        private double distanceParsecs = Double.NaN;
+        private org.jscience.mathematics.numbers.real.Real massJupiter = org.jscience.mathematics.numbers.real.Real.NaN;
+        private org.jscience.mathematics.numbers.real.Real radiusJupiter = org.jscience.mathematics.numbers.real.Real.NaN;
+        private org.jscience.mathematics.numbers.real.Real orbitalPeriodDays = org.jscience.mathematics.numbers.real.Real.NaN;
+        private org.jscience.mathematics.numbers.real.Real equilibriumTemperatureK = org.jscience.mathematics.numbers.real.Real.NaN;
+        private org.jscience.mathematics.numbers.real.Real distanceParsecs = org.jscience.mathematics.numbers.real.Real.NaN;
 
         public Builder name(String name) {
             this.name = name;
@@ -178,26 +178,51 @@ public class ExoplanetInfo {
         }
 
         public Builder massJupiter(double mass) {
+            this.massJupiter = org.jscience.mathematics.numbers.real.Real.of(mass);
+            return this;
+        }
+        
+        public Builder massJupiter(org.jscience.mathematics.numbers.real.Real mass) {
             this.massJupiter = mass;
             return this;
         }
 
         public Builder radiusJupiter(double radius) {
+            this.radiusJupiter = org.jscience.mathematics.numbers.real.Real.of(radius);
+            return this;
+        }
+
+        public Builder radiusJupiter(org.jscience.mathematics.numbers.real.Real radius) {
             this.radiusJupiter = radius;
             return this;
         }
 
         public Builder orbitalPeriodDays(double days) {
+            this.orbitalPeriodDays = org.jscience.mathematics.numbers.real.Real.of(days);
+            return this;
+        }
+
+        public Builder orbitalPeriodDays(org.jscience.mathematics.numbers.real.Real days) {
             this.orbitalPeriodDays = days;
             return this;
         }
 
         public Builder equilibriumTemperatureK(double temp) {
+            this.equilibriumTemperatureK = org.jscience.mathematics.numbers.real.Real.of(temp);
+            return this;
+        }
+        
+        public Builder equilibriumTemperatureK(org.jscience.mathematics.numbers.real.Real temp) {
             this.equilibriumTemperatureK = temp;
             return this;
         }
 
         public Builder distanceParsecs(double dist) {
+            this.distanceParsecs = org.jscience.mathematics.numbers.real.Real.of(dist);
+            return this;
+        }
+        
+        public Builder distanceParsecs(org.jscience.mathematics.numbers.real.Real dist) {
             this.distanceParsecs = dist;
             return this;
         }

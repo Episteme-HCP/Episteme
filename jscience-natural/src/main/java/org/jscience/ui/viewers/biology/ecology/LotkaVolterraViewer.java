@@ -80,7 +80,7 @@ public class LotkaVolterraViewer extends AbstractViewer implements Simulatable {
 
     private void initUI() {
         this.setPadding(new Insets(10));
-        this.getStyleClass().add("dark-viewer-root");
+        this.getStyleClass().add("viewer-root");
 
         VBox chartsBox = new VBox(10);
 
@@ -114,7 +114,7 @@ public class LotkaVolterraViewer extends AbstractViewer implements Simulatable {
         VBox sidebar = new VBox(15);
         sidebar.setPadding(new Insets(10));
         sidebar.setPrefWidth(250);
-        sidebar.getStyleClass().add("dark-viewer-sidebar");
+        sidebar.getStyleClass().add("viewer-sidebar");
 
         sidebar.getChildren().addAll(
                 new Label(I18n.getInstance().get("lotka.header.params", "Parameters")),

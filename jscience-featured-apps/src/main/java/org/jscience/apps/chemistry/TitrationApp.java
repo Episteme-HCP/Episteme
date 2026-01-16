@@ -173,7 +173,7 @@ public class TitrationApp extends FeaturedAppBase {
     private VBox createLabPane() {
         VBox box = new VBox(10);
         box.setPadding(new Insets(10));
-        box.setStyle("-fx-background-color: #ddd;");
+        box.getStyleClass().add("viewer-root");
 
         labCanvas = new Canvas(300, 600);
         drawLab();
@@ -185,7 +185,7 @@ public class TitrationApp extends FeaturedAppBase {
 
     private VBox createDataPane() {
         VBox box = new VBox(15);
-        box.setPadding(new Insets(15));
+        box.getStyleClass().add("viewer-sidebar");
 
         // Chart
         phChart = ChartFactory.createLineChart(i18n.get("titration.panel.chart"),
@@ -201,7 +201,8 @@ public class TitrationApp extends FeaturedAppBase {
         grid.setVgap(10);
 
         phLabel = new Label();
-        phLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        phLabel.getStyleClass().add("header-label");
+        phLabel.setStyle("-fx-font-size: 24px;");
 
         volumeLabel = new Label();
 
@@ -231,10 +232,13 @@ public class TitrationApp extends FeaturedAppBase {
         indicatorSelector.setOnAction(e -> calculatePH()); // Update color immediately
 
         setupTitleLabel = new Label(i18n.get("titration.panel.setup"));
-        setupTitleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        setupTitleLabel.getStyleClass().add("header-label");
         acidTypeLabel = new Label(i18n.get("titration.label.acidtype"));
+        acidTypeLabel.getStyleClass().add("description-label");
         indicatorLabel = new Label(i18n.get("titration.label.indicator"));
+        indicatorLabel.getStyleClass().add("description-label");
         titrantLabel = new Label(i18n.get("titration.label.titrant"));
+        titrantLabel.getStyleClass().add("description-label");
 
         box.getChildren().addAll(
                 setupTitleLabel,

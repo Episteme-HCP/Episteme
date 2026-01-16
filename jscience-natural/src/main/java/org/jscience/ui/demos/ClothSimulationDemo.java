@@ -137,10 +137,10 @@ public class ClothSimulationDemo extends AbstractSimulationDemo {
             VBox box = new VBox(10);
             box.setPadding(new Insets(10));
             box.setPrefWidth(200);
-            box.getStyleClass().add("dark-viewer-sidebar");
+            box.getStyleClass().add("viewer-sidebar");
 
             Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.clothsimulation.settings", "Settings"));
-            title.getStyleClass().add("dark-header");
+            title.getStyleClass().add("header-label");
             
             Slider gravSlider = new Slider(0, 20, 9.81);
             Label gravLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.clothsimulation.gravity.981", "Gravity: 9.81"));

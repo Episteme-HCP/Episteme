@@ -56,7 +56,7 @@ public class ChemicalReactionViewer extends AbstractViewer {
     }
 
     private void initUI() { // Refactored from start(Stage) to build into 'this'
-        this.getStyleClass().add("dark-viewer-root");
+        this.getStyleClass().add("viewer-root");
         this.setPadding(new Insets(15));
 
         // Header (Optional inside Viewer, or leave to Demo? Viewer usually fills center)
@@ -65,10 +65,10 @@ public class ChemicalReactionViewer extends AbstractViewer {
         // Input area
         VBox inputBox = new VBox(5);
         inputBox.setPadding(new Insets(10));
-        inputBox.getStyleClass().add("dark-viewer-sidebar");
+        inputBox.getStyleClass().add("viewer-sidebar");
 
         Label inputLabel = new Label(I18n.getInstance().get("chemical.label.eqn"));
-        inputLabel.getStyleClass().add("dark-label-muted");
+        inputLabel.getStyleClass().add("description-label");
 
         inputArea = new TextArea();
         inputArea.setPromptText(I18n.getInstance().get("chemical.prompt.eqn", "Enter chemical equation, e.g.: 2H2 + O2 -> 2H2O"));
@@ -124,10 +124,10 @@ public class ChemicalReactionViewer extends AbstractViewer {
         // Output area
         VBox outputBox = new VBox(5);
         outputBox.setPadding(new Insets(10));
-        outputBox.getStyleClass().add("dark-viewer-sidebar");
+        outputBox.getStyleClass().add("viewer-sidebar");
 
         Label outputLabel = new Label(I18n.getInstance().get("chemical.label.results"));
-        outputLabel.getStyleClass().add("dark-label-muted");
+        outputLabel.getStyleClass().add("description-label");
 
         outputArea = new TextArea();
         outputArea.setEditable(false);
@@ -146,11 +146,12 @@ public class ChemicalReactionViewer extends AbstractViewer {
         // Formula parser panel on right (Sidebar)
         VBox formulaPanel = new VBox(10);
         formulaPanel.setPadding(new Insets(10));
-        formulaPanel.setStyle("-fx-background-color: #222222; -fx-background-radius: 5;"); // Or dark-viewer-sidebar
+        formulaPanel.getStyleClass().add("viewer-sidebar");
         formulaPanel.setPrefWidth(250);
 
         Label formulaTitle = new Label(I18n.getInstance().get("chemical.label.quick"));
-        formulaTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: #00d9ff;");
+        formulaTitle.getStyleClass().add("header-label");
+        formulaTitle.setStyle("-fx-font-size: 14px;");
 
         TextField formulaInput = new TextField();
         formulaInput.setPromptText(I18n.getInstance().get("chemical.prompt.formula", "e.g., Ca(OH)2"));
@@ -158,7 +159,8 @@ public class ChemicalReactionViewer extends AbstractViewer {
         TextArea formulaOutput = new TextArea();
         formulaOutput.setEditable(false);
         formulaOutput.setPrefRowCount(6);
-        formulaOutput.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 11px; -fx-text-fill: #aaaaaa; -fx-control-inner-background: #333333;");
+        formulaOutput.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 11px;");
+        formulaOutput.getStyleClass().add("description-label");
 
         Button parseFormulaBtn = new Button(I18n.getInstance().get("chemical.btn.formula"));
         parseFormulaBtn.setMaxWidth(Double.MAX_VALUE);

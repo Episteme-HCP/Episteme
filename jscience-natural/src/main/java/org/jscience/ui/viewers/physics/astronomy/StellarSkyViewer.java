@@ -69,13 +69,29 @@ public class StellarSkyViewer extends AbstractViewer {
     private List<PlanetData> planets = new ArrayList<>();
     private List<DeepSkyObject> deepSkyObjects = new ArrayList<>();
 
-    // State - defaults loaded from Configuration
+    // Parameters (Real for precision)
+    private Real observerLat = Real.of(Configuration.getDouble("viewer.stellarsky.param.lat", 48.85)); // Default: Paris
+    private Real observerLon = Real.of(Configuration.getDouble("viewer.stellarsky.param.lon", 2.35));
+    private Real fovScale = Real.of(Configuration.getDouble("viewer.stellarsky.param.fov", 1.0));
+    private double viewAzimuthOffset = 0.0;
+
+    @Override
+    public List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        List<org.jscience.ui.Parameter<?>> params = new ArrayList<>();
+        params.add(new org.jscience.ui.NumericParameter("viewer.stellarsky.param.lat",
+                I18n.getInstance().get("viewer.stellarsky.param.lat.desc", "Observer Latitude"),
+                -90, 90, 0.1, observerLat.doubleValue(), v -> { observerLat = Real.of(v); drawSky(); }));
+        params.add(new org.jscience.ui.NumericParameter("viewer.stellarsky.param.lon",
+                I18n.getInstance().get("viewer.stellarsky.param.lon.desc", "Observer Longitude"),
+                -180, 180, 0.1, observerLon.doubleValue(), v -> { observerLon = Real.of(v); drawSky(); }));
+        params.add(new org.jscience.ui.NumericParameter("viewer.stellarsky.param.fov",
+                I18n.getInstance().get("viewer.stellarsky.param.fov.desc", "Field of View Scale"),
+                0.1, 5.0, 0.1, fovScale.doubleValue(), v -> { fovScale = Real.of(v); drawSky(); }));
+        return params;
+    }
+
     private static final String CFG_PREFIX = "viewer.stellarsky.default.";
     private LocalDateTime simulationTime = LocalDateTime.now();
-    private double observerLat = Configuration.getDouble(CFG_PREFIX + "lat", 48.8566);
-    private double observerLon = Configuration.getDouble(CFG_PREFIX + "lon", 2.3522);
-    private double viewAzimuthOffset = 0;
-    private double fovScale = Configuration.getDouble(CFG_PREFIX + "fov", 1.0);
 
     // UI
     private Canvas skyCanvas;
@@ -98,22 +114,22 @@ public class StellarSkyViewer extends AbstractViewer {
         initDeepSkyObjects();
 
         skyCanvas = new Canvas(WIDTH, HEIGHT);
-        this.setStyle("-fx-background-color: #000;"); // Black background
+        this.getStyleClass().add("viewer-root");
 
         setupInteraction();
         
         // Layout
         StackPane overlay = new StackPane();
         timeLabel = new Label();
-        timeLabel.getStyleClass().add("text-secondary");
-        timeLabel.getStyleClass().add("font-bold");
-        timeLabel.setStyle("-fx-background-color: rgba(0,0,0,0.5); -fx-padding: 5;");
+        timeLabel.getStyleClass().addAll("info-panel", "description-label");
+        // Style is now handled via CSS classes
         overlay.getChildren().add(timeLabel);
         overlay.setAlignment(Pos.TOP_LEFT);
         overlay.setPadding(new Insets(10));
         overlay.setMouseTransparent(true);
         
         StackPane centerStack = new StackPane(skyCanvas, overlay);
+        centerStack.getStyleClass().add("content-dark");
         setCenter(centerStack);
         
         setRight(createSidebar());
@@ -141,22 +157,24 @@ public class StellarSkyViewer extends AbstractViewer {
         VBox sidebar = new VBox(15);
         sidebar.setPadding(new Insets(20));
         sidebar.setPrefWidth(280);
-        sidebar.getStyleClass().add("dark-viewer-sidebar");
+        sidebar.getStyleClass().add("viewer-sidebar");
 
         Label title = new Label(I18n.getInstance().get("sky.title", "Sky Controls"));
-        title.getStyleClass().add("dark-header");
+        title.getStyleClass().add("header-label");
 
         // VizieR Query Section
         VBox vizierSection = createVizieRSection();
 
         Label locLabel = new Label(I18n.getInstance().get("sky.location", "Location"));
-        locLabel.setStyle("-fx-font-weight: bold;");
+        locLabel.getStyleClass().add("header-label");
+        locLabel.setStyle("-fx-font-size: 13px;");
 
-        Slider latSlider = createLabeledSlider(I18n.getInstance().get("sky.lat", "Lat"), -90, 90, observerLat, val -> { observerLat = val; drawSky(); });
-        Slider lonSlider = createLabeledSlider(I18n.getInstance().get("sky.lon", "Lon"), -180, 180, observerLon, val -> { observerLon = val; drawSky(); });
+        Slider latSlider = createLabeledSlider(I18n.getInstance().get("sky.lat", "Lat"), -90, 90, observerLat.doubleValue(), val -> { observerLat = Real.of(val); drawSky(); });
+        Slider lonSlider = createLabeledSlider(I18n.getInstance().get("sky.lon", "Lon"), -180, 180, observerLon.doubleValue(), val -> { observerLon = Real.of(val); drawSky(); });
 
         Label timeCtrlLabel = new Label(I18n.getInstance().get("starsystem.date", "Time"));
-        timeCtrlLabel.setStyle("-fx-font-weight: bold;");
+        timeCtrlLabel.getStyleClass().add("header-label");
+        timeCtrlLabel.setStyle("-fx-font-size: 13px;");
         DatePicker datePicker = new DatePicker(simulationTime.toLocalDate());
         datePicker.setOnAction(e -> { simulationTime = simulationTime.with(datePicker.getValue()); drawSky(); });
         Slider hourSlider = createLabeledSlider(I18n.getInstance().get("sky.hour", "Hour"), 0, 23, simulationTime.getHour(), val -> {
@@ -170,7 +188,8 @@ public class StellarSkyViewer extends AbstractViewer {
 
         infoLabel = new Label(I18n.getInstance().get("sky.info.select", "Select an object..."));
         infoLabel.setWrapText(true);
-        infoLabel.getStyleClass().add("dark-label-muted");
+        infoLabel.getStyleClass().addAll("description-label", "info-panel");
+        infoLabel.setPrefHeight(100);
 
         sidebar.getChildren().addAll(title, vizierSection, new Separator(), locLabel, latSlider.getParent(), lonSlider.getParent(), new Separator(),
                 timeCtrlLabel, datePicker, hourSlider.getParent(), new Separator(),
@@ -185,7 +204,8 @@ public class StellarSkyViewer extends AbstractViewer {
         VBox section = new VBox(8);
         
         Label vizierLabel = new Label(I18n.getInstance().get("sky.vizier.title", "Query VizieR"));
-        vizierLabel.setStyle("-fx-font-weight: bold;");
+        vizierLabel.getStyleClass().add("header-label");
+        vizierLabel.setStyle("-fx-font-size: 13px;");
         
         ComboBox<String> catalogChoice = new ComboBox<>();
         catalogChoice.getItems().addAll("Hipparcos", "Tycho-2", "Gaia DR3", "USNO-B1");
@@ -364,9 +384,9 @@ public class StellarSkyViewer extends AbstractViewer {
     }
 
     private void updateInfoPanel() {
-        if (selectedPlanet != null) infoLabel.setText("Planet: " + selectedPlanet.name);
-        else if (selectedStar != null) infoLabel.setText("Star: " + selectedStar.name + " (" + selectedStar.mag + ")");
-        else if (selectedConstellation != null) infoLabel.setText("Constellation: " + selectedConstellation.name);
+        if (selectedPlanet != null) infoLabel.setText(I18n.getInstance().get("sky.info.planet", "Planet: {0}", selectedPlanet.name));
+        else if (selectedStar != null) infoLabel.setText(I18n.getInstance().get("sky.info.star", "Star: {0} ({1})", selectedStar.name, selectedStar.mag));
+        else if (selectedConstellation != null) infoLabel.setText(I18n.getInstance().get("sky.info.constellation", "Constellation: {0}", selectedConstellation.name));
         else infoLabel.setText(I18n.getInstance().get("sky.info.select", "Select an object"));
     }
 
@@ -393,8 +413,8 @@ public class StellarSkyViewer extends AbstractViewer {
 
     private HorizontalCoordinate calculateHorizontal(double ra, double dec, double days) {
         double jdVal = JulianDate.J2000 + days + ((simulationTime.getHour() + simulationTime.getMinute()/60.0 + simulationTime.getSecond()/3600.0)/24.0) - 0.5;
-        Real lmst = SiderealTime.lmstDegrees(new JulianDate(jdVal), Real.of(observerLon));
-        return CoordinateConverter.equatorialToHorizontal(new EquatorialCoordinate(ra, dec), observerLat, lmst.doubleValue());
+        Real lmst = SiderealTime.lmstDegrees(new JulianDate(jdVal), observerLon);
+        return CoordinateConverter.equatorialToHorizontal(new EquatorialCoordinate(ra, dec), observerLat.doubleValue(), lmst.doubleValue());
     }
 
     private double[] calculateProjectedPosition(StarReader.Star star, double cx, double cy, double radius) {
@@ -426,7 +446,7 @@ public class StellarSkyViewer extends AbstractViewer {
 
     private double[] project(HorizontalCoordinate hor, double cx, double cy, double radius) {
         double az = hor.getAzimuth() + viewAzimuthOffset;
-        double r = radius * (90 - hor.getAltitude()) / 90.0 * fovScale;
+        double r = radius * (90 - hor.getAltitude()) / 90.0 * fovScale.doubleValue();
         return new double[] { cx + r * Math.sin(Math.toRadians(az)), cy - r * Math.cos(Math.toRadians(az)) };
     }
 
@@ -511,19 +531,6 @@ public class StellarSkyViewer extends AbstractViewer {
     @Override public String getCategory() { return "Physics"; }
     
     @Override
-    public java.util.List<Parameter<?>> getViewerParameters() {
-        java.util.List<Parameter<?>> params = new java.util.ArrayList<>();
-        params.add(new NumericParameter("viewer.stellarsky.param.lat",
-                I18n.getInstance().get("viewer.stellarsky.param.lat.desc"),
-                -90, 90, 1, observerLat, v -> { observerLat = v; drawSky(); }));
-        params.add(new NumericParameter("viewer.stellarsky.param.lon",
-                I18n.getInstance().get("viewer.stellarsky.param.lon.desc"),
-                -180, 180, 1, observerLon, v -> { observerLon = v; drawSky(); }));
-        params.add(new NumericParameter("viewer.stellarsky.param.fov",
-                I18n.getInstance().get("viewer.stellarsky.param.fov.desc"),
-                0.5, 3.0, 0.1, fovScale, v -> { fovScale = v; drawSky(); }));
-        return params;
-    }
 
     @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.stellarsky.desc"); }
     @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.stellarsky.longdesc"); }

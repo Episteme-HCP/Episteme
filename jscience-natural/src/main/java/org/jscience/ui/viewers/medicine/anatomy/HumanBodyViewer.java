@@ -115,7 +115,7 @@ public class HumanBodyViewer extends AbstractViewer {
         selectionManager = new SelectionManager();
 
         subScene = new SubScene(root3D, 1024, 768, true, SceneAntialiasing.BALANCED);
-        subScene.setFill(Color.rgb(30, 30, 30));
+        subScene.setFill(Color.web("#fdfbf7"));
         subScene.setCamera(camera);
 
         // --- EVENT HANDLING ---
@@ -177,7 +177,8 @@ public class HumanBodyViewer extends AbstractViewer {
         subScene.heightProperty().bind(centerPane.heightProperty());
         
         loadingLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.loading.anatomy", "Loading Anatomy..."));
-        loadingLabel.setStyle("-fx-text-fill: white; -fx-background-color: rgba(0,0,0,0.5); -fx-padding: 10; -fx-background-radius: 5;");
+        loadingLabel.getStyleClass().add("info-panel");
+        loadingLabel.setStyle("-fx-padding: 10; -fx-background-radius: 5;");
         loadingLabel.setVisible(false); // Managed by async loader
         StackPane.setAlignment(loadingLabel, Pos.TOP_RIGHT);
         StackPane.setMargin(loadingLabel, new Insets(10));
@@ -185,7 +186,8 @@ public class HumanBodyViewer extends AbstractViewer {
         
         // Attribution Label (Bottom Right)
         Label attributionLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.models.zanatomy.cc.b", "Models: Z-Anatomy (CC BY-SA 4.0)"));
-        attributionLabel.setStyle("-fx-text-fill: rgba(255,255,255,0.7); -fx-background-color: rgba(0,0,0,0.3); -fx-padding: 5; -fx-font-size: 10px;");
+        attributionLabel.getStyleClass().add("description-label");
+        attributionLabel.setStyle("-fx-font-size: 10px;");
         StackPane.setAlignment(attributionLabel, Pos.BOTTOM_RIGHT);
         StackPane.setMargin(attributionLabel, new Insets(10));
         centerPane.getChildren().add(attributionLabel);
@@ -195,11 +197,11 @@ public class HumanBodyViewer extends AbstractViewer {
         // LEFT: Toolbar (Layers + Actions)
         VBox leftToolbar = new VBox(10);
         leftToolbar.setPadding(new Insets(10));
-        leftToolbar.setStyle("-fx-background-color: #2b2b2b; -fx-border-color: #3f3f3f; -fx-border-width: 0 1 0 0;");
+        leftToolbar.getStyleClass().add("viewer-sidebar");
         leftToolbar.setPrefWidth(200);
 
         Label layersHeader = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.systems", "SYSTEMS"));
-        layersHeader.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
+        layersHeader.getStyleClass().add("header-label");
         
         leftToolbar.getChildren().addAll(
                 layersHeader,
@@ -234,14 +236,14 @@ public class HumanBodyViewer extends AbstractViewer {
         // RIGHT: Description Panel
         VBox rightPanel = new VBox(10);
         rightPanel.setPadding(new Insets(10));
-        rightPanel.setStyle("-fx-background-color: #2b2b2b; -fx-border-color: #3f3f3f; -fx-border-width: 0 0 0 1;");
+        rightPanel.getStyleClass().add("viewer-sidebar");
         rightPanel.setPrefWidth(300);
 
         searchField = new ComboBox<>();
         searchField.setEditable(true);
         searchField.setPromptText("Search...");
         searchField.setMaxWidth(Double.MAX_VALUE);
-        searchField.setStyle("-fx-background-color: #3f3f3f; -fx-text-fill: white;");
+        searchField.setMaxWidth(Double.MAX_VALUE);
         
         // Search Logic
         // Search Logic
@@ -309,18 +311,19 @@ public class HumanBodyViewer extends AbstractViewer {
         });
         
         titleLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.human.body.1", "Human Body"));
-        titleLabel.setStyle("-fx-text-fill: #e0e0e0; -fx-font-size: 18px; -fx-font-weight: bold; -fx-wrap-text: true;");
+        titleLabel.getStyleClass().add("header-label");
+        titleLabel.setStyle("-fx-font-size: 18px;");
         
         descriptionArea = new TextArea("Select a part to view details.");
         descriptionArea.setWrapText(true);
         descriptionArea.setEditable(false);
-        descriptionArea.setStyle("-fx-control-inner-background: #2b2b2b; -fx-text-fill: #b0b0b0; -fx-background-color: transparent;");
+        descriptionArea.getStyleClass().add("info-panel");
         VBox.setVgrow(descriptionArea, Priority.ALWAYS);
 
         
         hierarchyTree = new TreeView<>();
         hierarchyTree.setShowRoot(false);
-        hierarchyTree.setStyle("-fx-background-color: #2b2b2b; -fx-control-inner-background: #2b2b2b; -fx-text-fill: white;");
+        hierarchyTree.setShowRoot(false);
         VBox.setVgrow(hierarchyTree, Priority.ALWAYS);
         
         // Tree Selection Listener

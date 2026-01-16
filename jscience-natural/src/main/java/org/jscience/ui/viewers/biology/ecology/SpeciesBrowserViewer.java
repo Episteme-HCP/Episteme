@@ -55,7 +55,7 @@ public class SpeciesBrowserViewer extends AbstractViewer {
     }
 
     private void initUI() {
-        getStyleClass().add("dark-viewer-root");
+        getStyleClass().add("viewer-root");
         setPadding(new Insets(10));
 
         // Search Bar

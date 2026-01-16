@@ -45,12 +45,10 @@ import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Sphere;
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 import org.jscience.chemistry.Element;
 import org.jscience.chemistry.PeriodicTable;
-import org.jscience.chemistry.loaders.ChemistryDataReader;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.i18n.I18n;
 
@@ -107,12 +105,12 @@ public class PeriodicTableViewer extends AbstractViewer {
         Group contentGroup = new Group(tableGrid);
         StackPane zoomPane = new StackPane(contentGroup);
         zoomPane.setAlignment(Pos.CENTER);
-        zoomPane.getStyleClass().add("dark-viewer-root");
+        zoomPane.getStyleClass().add("viewer-root");
 
         ScrollPane scrollPane = new ScrollPane(zoomPane);
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
-        scrollPane.setStyle("-fx-background: #1a1a2e; -fx-background-color: #1a1a2e;");
+        scrollPane.getStyleClass().add("viewer-root");
 
         detailPanel = createDetailPanel();
 
@@ -127,8 +125,8 @@ public class PeriodicTableViewer extends AbstractViewer {
         HBox topBar = new HBox(10, new Label(I18n.getInstance().get("periodic.zoom", "Zoom")), zoomSlider);
         topBar.setAlignment(Pos.CENTER_LEFT);
         topBar.setPadding(new Insets(10));
-        topBar.getStyleClass().add("dark-viewer-sidebar");
-        ((Label) topBar.getChildren().get(0)).setTextFill(Color.WHITE);
+        topBar.getStyleClass().add("viewer-sidebar");
+        ((Label) topBar.getChildren().get(0)).getStyleClass().add("label");
 
         setTop(topBar);
         setCenter(scrollPane);
@@ -140,7 +138,7 @@ public class PeriodicTableViewer extends AbstractViewer {
         grid.setHgap(3);
         grid.setVgap(3);
         grid.setPadding(new Insets(20));
-        grid.getStyleClass().add("dark-viewer-root");
+        grid.getStyleClass().add("viewer-root");
 
         for (int r = 0; r < LAYOUT.length; r++) {
             for (int c = 0; c < LAYOUT[r].length; c++) {
@@ -199,11 +197,11 @@ public class PeriodicTableViewer extends AbstractViewer {
         VBox panel = new VBox(10);
         panel.setPadding(new Insets(10));
         panel.setPrefWidth(320);
-        panel.getStyleClass().add("dark-viewer-sidebar");
+        panel.getStyleClass().add("viewer-sidebar");
 
         Label title = new Label(I18n.getInstance().get("periodic.details", "Element Details"));
         title.getStyleClass().add("font-large");
-        title.getStyleClass().add("dark-header");
+        title.getStyleClass().add("header-label");
 
         Label hint = new Label(I18n.getInstance().get("periodic.hint", "Select an element to view details"));
         hint.getStyleClass().add("text-secondary");

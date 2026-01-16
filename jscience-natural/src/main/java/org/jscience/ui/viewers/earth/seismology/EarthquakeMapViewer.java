@@ -91,11 +91,11 @@ public class EarthquakeMapViewer extends MapViewer {
     private void setupSidebar() {
         VBox sidebar = new VBox(10);
         sidebar.setPadding(new Insets(10));
-        sidebar.getStyleClass().add("dark-viewer-sidebar");
+        sidebar.getStyleClass().add("viewer-sidebar");
         sidebar.setPrefWidth(220);
 
         Label titleLabel = new Label(I18n.getInstance().get("earthquake.label.title", "Earthquake Map"));
-        titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+        titleLabel.getStyleClass().add("header-label");
 
         Label explainLabel = new Label(I18n.getInstance().get("earthquake.explanation", "Real-time visualization of seismic activity."));
         explainLabel.setWrapText(true);
@@ -152,7 +152,7 @@ public class EarthquakeMapViewer extends MapViewer {
         }
         
         // Scale Info
-        gc.setFill(Color.WHITE);
+        gc.setFill(Color.BLACK);
         gc.fillText(String.format("Zoom: %.1fx", zoom), 10, 20);
         gc.fillText(String.format("Quakes: %d", quakes.size()), 10, 35);
     }

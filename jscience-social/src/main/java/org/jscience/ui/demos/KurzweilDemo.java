@@ -139,8 +139,7 @@ public class KurzweilDemo extends AbstractDemo {
         // Linear timeline
         VBox linearBox = new VBox(5);
         Label linearLabel = new Label(SocialI18n.getInstance().get("kurzweil.label.linear"));
-        linearLabel.getStyleClass().add("dark-label");
-        linearLabel.getStyleClass().add("font-bold");
+        linearLabel.getStyleClass().add("header-label");
 
         linearViewer = new TimelineViewer();
         linearViewer.setTimeline(timeline);
@@ -152,8 +151,7 @@ public class KurzweilDemo extends AbstractDemo {
         // Logarithmic timeline
         VBox logBox = new VBox(5);
         Label logLabel = new Label(SocialI18n.getInstance().get("kurzweil.label.log"));
-        logLabel.getStyleClass().add("dark-label");
-        logLabel.getStyleClass().add("font-bold");
+        logLabel.getStyleClass().add("header-label");
 
         logViewer = new TimelineViewer();
         logViewer.setTimeline(timeline);
@@ -163,6 +161,7 @@ public class KurzweilDemo extends AbstractDemo {
         logBox.getChildren().addAll(logLabel, logViewer);
 
         centerBox.getChildren().addAll(linearBox, logBox);
+        centerBox.getStyleClass().add("viewer-root");
 
         // Animation
         AnimationTimer timer = new AnimationTimer() {
@@ -197,13 +196,11 @@ public class KurzweilDemo extends AbstractDemo {
         VBox sidebar = new VBox(20);
         sidebar.setPadding(new Insets(20));
         sidebar.setPrefWidth(220);
-        // Note: 'dark-viewer-sidebar' might be handled by AbstractDemo's container
-        sidebar.getStyleClass().add("dark-viewer-sidebar");
+        sidebar.getStyleClass().add("viewer-sidebar");
 
         // Dual clocks
         Label clockTitle = new Label(SocialI18n.getInstance().get("kurzweil.sidebar.clock"));
-        clockTitle.getStyleClass().add("dark-label");
-        clockTitle.getStyleClass().add("font-bold");
+        clockTitle.getStyleClass().add("header-label");
 
         VBox linearClock = new VBox(5);
         Label linearClockLabel = new Label(
@@ -232,7 +229,7 @@ public class KurzweilDemo extends AbstractDemo {
         Separator sep = new Separator();
 
         Label controlLabel = new Label(SocialI18n.getInstance().get("kurzweil.sidebar.base"));
-        controlLabel.getStyleClass().add("dark-label-muted");
+        controlLabel.getStyleClass().add("description-label");
 
         Slider accelSlider = new Slider(1.1, 5.0, accelerationFactor);
         accelSlider.setShowTickLabels(true);

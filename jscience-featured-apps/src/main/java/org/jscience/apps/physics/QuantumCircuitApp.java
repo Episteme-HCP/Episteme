@@ -93,7 +93,7 @@ public class QuantumCircuitApp extends FeaturedAppBase {
 
         // Header
         mainTitleLabel = new Label(i18n.get("quantum.title"));
-        mainTitleLabel.getStyleClass().add("font-title");
+        mainTitleLabel.getStyleClass().add("header-label");
         pane.setTop(mainTitleLabel);
         BorderPane.setAlignment(mainTitleLabel, Pos.CENTER);
 
@@ -103,6 +103,8 @@ public class QuantumCircuitApp extends FeaturedAppBase {
         // Gate Toolbar
         ToolBar gateToolbar = new ToolBar();
         gateToolbarLabel = new Label(i18n.get("quantum.toolbar.gates"));
+        gateToolbarLabel.getStyleClass().add("header-label");
+        gateToolbarLabel.setStyle("-fx-font-size: 14px;");
         gateToolbar.getItems().add(gateToolbarLabel);
 
         String[] gates = { "H", "X", "Y", "Z", "CNOT", "M" };
@@ -115,7 +117,7 @@ public class QuantumCircuitApp extends FeaturedAppBase {
 
         gateToolbar.getItems().add(new Separator());
         runBtn = new Button(i18n.get("quantum.button.run"));
-        runBtn.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+        runBtn.getStyleClass().add("accent-button-green");
         runBtn.setOnAction(e -> runSimulation());
         gateToolbar.getItems().add(runBtn);
 
@@ -126,7 +128,7 @@ public class QuantumCircuitApp extends FeaturedAppBase {
         // Qubit lines
         circuitPane = new VBox(5);
         circuitPane.setPadding(new Insets(10));
-        circuitPane.setStyle("-fx-background-color: white; -fx-border-color: #ccc;");
+        circuitPane.getStyleClass().add("viewer-controls");
 
         initializeCircuitOrEmpty();
 
@@ -134,10 +136,12 @@ public class QuantumCircuitApp extends FeaturedAppBase {
         VBox resultPane = new VBox(5);
         resultPane.setPadding(new Insets(10));
         resultsTitleLabel = new Label(i18n.get("quantum.label.results"));
-        resultsTitleLabel.setFont(Font.font(16));
+        resultsTitleLabel.getStyleClass().add("header-label");
+        resultsTitleLabel.setStyle("-fx-font-size: 16px;");
 
         stateVectorLabel = new Label();
-        stateVectorLabel.setFont(Font.font("Monospaced", 12));
+        stateVectorLabel.getStyleClass().add("description-label");
+        stateVectorLabel.setStyle("-fx-font-family: 'Monospaced';");
 
         xAxis = new CategoryAxis();
         yAxis = new NumberAxis();

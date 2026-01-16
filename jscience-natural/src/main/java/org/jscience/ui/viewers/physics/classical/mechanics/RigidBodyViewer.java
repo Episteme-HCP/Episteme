@@ -113,32 +113,32 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
         VBox sidebar = new VBox(12);
         sidebar.setPadding(new Insets(15));
         sidebar.setPrefWidth(180);
-        sidebar.getStyleClass().add("dark-viewer-sidebar");
+        sidebar.getStyleClass().add("viewer-sidebar");
 
         Label title = new Label(I18n.getInstance().get("rigid.title", "Rigid Bodies"));
-        title.getStyleClass().add("dark-label-accent");
+        title.getStyleClass().add("header-label");
 
         countLabel = new Label(I18n.getInstance().get("rigid.bodies", "Bodies: 0"));
-        countLabel.getStyleClass().add("dark-label-muted");
+        countLabel.getStyleClass().add("description-label");
 
         Separator sep1 = new Separator();
 
         Label gravLabel = new Label(I18n.getInstance().get("rigid.gravity", "Gravity"));
-        gravLabel.getStyleClass().add("dark-label-muted");
+        gravLabel.getStyleClass().add("description-label");
         Slider gravSlider = new Slider(0, 2, 0.5);
         gravSlider.setShowTickLabels(true);
         gravSlider.valueProperty().addListener((o, ov, nv) -> {
             gravityVal = nv.doubleValue();
-            gravLabel.setText(String.format(I18n.getInstance().get("rigid.gravity") + ": %.1f", gravityVal));
+            gravLabel.setText(I18n.getInstance().get("rigid.gravity.fmt", "Gravity: %.1f", gravityVal));
         });
 
         Label bounceLabel = new Label(I18n.getInstance().get("rigid.bounciness", "Bounciness"));
-        bounceLabel.getStyleClass().add("dark-label-muted");
+        bounceLabel.getStyleClass().add("description-label");
         Slider bounceSlider = new Slider(0.1, 1.0, 0.8);
         bounceSlider.setShowTickLabels(true);
         bounceSlider.valueProperty().addListener((o, ov, nv) -> {
             bouncinessVal = nv.doubleValue();
-            bounceLabel.setText(String.format(I18n.getInstance().get("rigid.bounciness") + ": %.1f", bouncinessVal));
+            bounceLabel.setText(I18n.getInstance().get("rigid.bounciness.fmt", "Bounciness: %.1f", bouncinessVal));
         });
 
         Separator sep2 = new Separator();

@@ -137,7 +137,7 @@ public class EconomicsMarketDemo extends AbstractDemo {
                 supplyShift,
                 new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.label.shift_demand")),
                 demandShift);
-        controls.setStyle("-fx-padding: 10; -fx-background-color: #f0f0f0;");
+        controls.getStyleClass().add("viewer-controls");
 
         root.setCenter(lineChart);
         root.setBottom(controls);

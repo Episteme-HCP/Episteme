@@ -67,11 +67,12 @@ public class DistributionsViewer extends AbstractViewer {
 
     public DistributionsViewer() {
         BorderPane layout = new BorderPane();
-        layout.getStyleClass().add("dark-viewer-root");
+        layout.getStyleClass().add("viewer-root");
+        layout.setPadding(new Insets(10));
 
         // Header
         Label header = new Label(I18n.getInstance().get("distributions.title"));
-        header.setStyle("-fx-font-size: 24px; -fx-padding: 15; -fx-font-weight: bold;");
+        header.getStyleClass().add("header-label");
         layout.setTop(header);
 
         tabPane = new TabPane();
@@ -93,7 +94,7 @@ public class DistributionsViewer extends AbstractViewer {
         // Controls
         VBox controls = new VBox(10);
         controls.setPrefWidth(250);
-        controls.setStyle("-fx-background-color: #f4f4f4; -fx-padding: 10;");
+        controls.getStyleClass().add("viewer-sidebar");
 
         Slider meanSlider = new Slider(-5, 5, 0);
         Label meanLabel = new Label(I18n.getInstance().get("distributions.mean") + ": 0.0");
@@ -158,7 +159,7 @@ public class DistributionsViewer extends AbstractViewer {
 
         VBox controls = new VBox(10);
         controls.setPrefWidth(250);
-        controls.setStyle("-fx-background-color: #f4f4f4; -fx-padding: 10;");
+        controls.getStyleClass().add("viewer-sidebar");
 
         Slider lambdaSlider = new Slider(0.1, 20, 5);
         Label lambdaLabel = new Label(I18n.getInstance().get("distributions.lambda") + ": 5.0");
@@ -208,7 +209,7 @@ public class DistributionsViewer extends AbstractViewer {
 
         VBox controls = new VBox(10);
         controls.setPrefWidth(250);
-        controls.setStyle("-fx-background-color: #f4f4f4; -fx-padding: 10;");
+        controls.getStyleClass().add("viewer-sidebar");
 
         Slider nSlider = new Slider(1, 40, 10);
         Label nLabel = new Label(I18n.getInstance().get("distributions.trials") + ": 10");

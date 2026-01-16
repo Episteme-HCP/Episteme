@@ -174,7 +174,7 @@ public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
         });
         
         StackPane root = new StackPane(canvas);
-        root.setStyle("-fx-background-color: white;");
+        root.getStyleClass().add("viewer-root");
         setCenter(root);
         setRight(createControlPanel());
         
@@ -192,7 +192,7 @@ public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
         toolbar.setPadding(new Insets(10));
         toolbar.setAlignment(Pos.TOP_LEFT);
         toolbar.setPrefWidth(200);
-        toolbar.getStyleClass().add("dark-viewer-sidebar"); // Or keep default
+        toolbar.getStyleClass().add("viewer-sidebar");
 
         ToggleButton modeBtn = new ToggleButton(I18n.getInstance().get("digital.mode.simulation", "Simulation Mode"));
         modeBtn.setSelected(true);
@@ -252,7 +252,8 @@ public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
 
         statusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.digitallogic.ready", "Ready"));
         statusLabel.setWrapText(true);
-        statusLabel.setStyle("-fx-text-fill: #555; -fx-font-size: 10px;");
+        statusLabel.getStyleClass().add("description-label");
+        statusLabel.setStyle("-fx-font-size: 10px;");
 
         toolbar.getChildren().addAll(
                 modeBtn, new Separator(),

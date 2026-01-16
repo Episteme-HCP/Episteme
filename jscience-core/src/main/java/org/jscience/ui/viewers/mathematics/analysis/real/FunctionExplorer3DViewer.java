@@ -51,7 +51,7 @@ public class FunctionExplorer3DViewer extends AbstractViewer {
         sidebar.setPadding(new Insets(15));
         sidebar.setMinWidth(300);
         sidebar.setMaxWidth(350);
-        sidebar.setStyle("-fx-background-color: #fafafa;");
+        sidebar.getStyleClass().add("viewer-sidebar");
 
         Label funcLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.functionexplorer3d.z..fx.y", "z = f(x, y) ="));
         TextField funcInput = new TextField(DEFAULT_3D_FUNC);
@@ -64,7 +64,7 @@ public class FunctionExplorer3DViewer extends AbstractViewer {
 
         Button plotBtn = new Button(i18n.get("funcexplorer.btn.plot3d", "Plot 3D Surface"));
         plotBtn.setMaxWidth(Double.MAX_VALUE);
-        plotBtn.setStyle("-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-weight: bold;");
+        plotBtn.getStyleClass().add("accent-button-orange");
 
         // Analysis 3D
         Separator sep = new Separator();
@@ -90,7 +90,7 @@ public class FunctionExplorer3DViewer extends AbstractViewer {
                 sep, analysisLabel, new HBox(5, xEval, yEval), calcBtn, zRes);
 
         StackPane chartContainer = new StackPane();
-        chartContainer.setStyle("-fx-background-color: #222;");
+        chartContainer.getStyleClass().add("viewer-root");
         Label placeholder = new Label(i18n.get("funcexplorer.placeholder", "Enter function and click Plot"));
         placeholder.setTextFill(javafx.scene.paint.Color.WHITE);
         chartContainer.getChildren().add(placeholder);

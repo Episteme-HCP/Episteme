@@ -69,7 +69,7 @@ public class CSGViewer extends AbstractViewer {
     public CSGViewer() {
         // 3D Scene
         SubScene subScene = new SubScene(world, 800, 600, true, SceneAntialiasing.BALANCED);
-        subScene.setFill(Color.web("#1e1e1e"));
+        subScene.setFill(Color.web("#fdfbf7"));
 
         PerspectiveCamera camera = new PerspectiveCamera(true);
         camera.setNearClip(0.1);
@@ -82,10 +82,10 @@ public class CSGViewer extends AbstractViewer {
         // Controls
         VBox sidebar = new VBox(20);
         sidebar.setPadding(new Insets(20));
-        sidebar.setStyle("-fx-background-color: #333; -fx-text-fill: white;");
+        sidebar.getStyleClass().add("viewer-sidebar");
 
         Label title = new Label(I18n.getInstance().get("csg.title"));
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
+        title.getStyleClass().add("header-label");
 
         ComboBox<String> opBox = new ComboBox<>();
         opBox.getItems().addAll("Show Both", "A Union B", "A Subtract B", "A Intersect B");

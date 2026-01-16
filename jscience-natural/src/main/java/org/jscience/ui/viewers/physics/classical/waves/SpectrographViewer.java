@@ -52,9 +52,7 @@ public class SpectrographViewer extends AbstractViewer implements Simulatable {
 
     private final int BANDS = 128;
     private double[] spectrum = new double[BANDS];
-    private double time = 0;
     private double sensitivity = 1.0;
-    private double simulationSpeed = 1.0;
 
     private SpectrumAnalysisProvider analysisProvider;
     private double[] currentSamples;
@@ -121,7 +119,7 @@ public class SpectrographViewer extends AbstractViewer implements Simulatable {
     private void buildUI() {
         VBox vbox = new VBox(10);
         vbox.setPadding(new Insets(10));
-        vbox.getStyleClass().add("dark-viewer-root");
+        vbox.getStyleClass().add("viewer-root");
 
         spectrumCanvas = new Canvas(600, 200);
         spectrogramCanvas = new Canvas(600, 250);
@@ -130,7 +128,8 @@ public class SpectrographViewer extends AbstractViewer implements Simulatable {
         spectrogramCanvas.widthProperty().bind(vbox.widthProperty().subtract(20));
 
         fpsLabel = new Label(I18n.getInstance().get("spectrograph.fps", "FPS: --"));
-        fpsLabel.getStyleClass().add("dark-label-muted");
+        fpsLabel.getStyleClass().add("description-label");
+        fpsLabel.setStyle("-fx-font-size: 10px;");
         
         vbox.getChildren().addAll(spectrumCanvas, spectrogramCanvas, fpsLabel);
         setCenter(vbox);
@@ -166,11 +165,10 @@ public class SpectrographViewer extends AbstractViewer implements Simulatable {
     @Override public void pause() { this.playing = false; }
     @Override public void stop() { this.playing = false; reset(); }
     @Override public void step() { updateSpectrum(); renderSpectrum(spectrumCanvas.getGraphicsContext2D(), null); }
-    @Override public void setSpeed(double multiplier) { this.simulationSpeed = multiplier; }
+    @Override public void setSpeed(double multiplier) { /* No-op */ }
     @Override public boolean isPlaying() { return playing; }
 
     public void reset() {
-        time = 0;
         spectrogramX = 0;
         if (spectrogramBuffer != null) spectrogramBuffer = null;
     }

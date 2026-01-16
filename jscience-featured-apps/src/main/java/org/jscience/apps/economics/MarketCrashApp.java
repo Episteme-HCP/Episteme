@@ -124,7 +124,7 @@ public class MarketCrashApp extends FeaturedAppBase {
 
         // Price Chart
         chartAreaTitleLabel = new Label(i18n.get("market.panel.chart"));
-        chartAreaTitleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        chartAreaTitleLabel.getStyleClass().add("header-label");
 
         priceChart = ChartFactory.createLineChart(i18n.get("market.panel.chart"), i18n.get("market.label.day"),
                 i18n.get("market.label.price_axis"));
@@ -142,7 +142,8 @@ public class MarketCrashApp extends FeaturedAppBase {
 
         // RSI Chart
         indicatorsTitleLabel = new Label(i18n.get("market.indicator.rsi"));
-        indicatorsTitleLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+        indicatorsTitleLabel.getStyleClass().add("header-label");
+        indicatorsTitleLabel.setStyle("-fx-font-size: 14px;");
 
         rsiChart = ChartFactory.createLineChart("", i18n.get("market.label.day"), i18n.get("market.indicator.rsi"));
 
@@ -161,32 +162,36 @@ public class MarketCrashApp extends FeaturedAppBase {
     private VBox createControlPanel() {
         VBox panel = new VBox(12);
         panel.setPadding(new Insets(15));
-        panel.setStyle("-fx-background-color: #fafafa; -fx-border-color: #ddd; -fx-border-width: 0 0 0 1;");
+        panel.getStyleClass().add("viewer-sidebar");
 
         // Risk Assessment
         riskTitleLabel = new Label(i18n.get("market.risk.title"));
-        riskTitleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        riskTitleLabel.getStyleClass().add("header-label");
 
         riskLabel = new Label(i18n.get("market.risk.none"));
-        riskLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-padding: 10;");
+        riskLabel.getStyleClass().add("header-label");
+        riskLabel.setStyle("-fx-font-size: 24px; -fx-padding: 10;");
 
         HBox riskBox = new HBox(riskLabel);
-        riskBox.setStyle("-fx-background-color: #e0e0e0; -fx-background-radius: 8; -fx-padding: 15;");
+        riskBox.getStyleClass().add("info-panel");
+        riskBox.setStyle("-fx-background-radius: 8; -fx-padding: 15;");
 
         // Current Stats
         statsTitleLabel = new Label(i18n.get("market.stats.title"));
-        statsTitleLabel.setStyle("-fx-font-weight: bold;");
+        statsTitleLabel.getStyleClass().add("header-label");
+        statsTitleLabel.setStyle("-fx-font-size: 14px;");
 
         currentPriceLabel = new Label(java.text.MessageFormat.format(i18n.get("market.label.price"), "--"));
         smaLabel = new Label(java.text.MessageFormat.format(i18n.get("market.label.sma"), 20, "--"));
         rsiLabel = new Label(java.text.MessageFormat.format(i18n.get("market.label.rsi"), 14, "--"));
 
         VBox statsBox = new VBox(5, currentPriceLabel, smaLabel, rsiLabel);
-        statsBox.setStyle("-fx-background-color: #f5f5f5; -fx-padding: 10; -fx-background-radius: 5;");
+        statsBox.getStyleClass().add("viewer-controls");
 
         // Indicator Settings
         settingsTitleLabel = new Label(i18n.get("market.settings.title"));
-        settingsTitleLabel.setStyle("-fx-font-weight: bold;");
+        settingsTitleLabel.getStyleClass().add("header-label");
+        settingsTitleLabel.setStyle("-fx-font-size: 14px;");
 
         VBox smaBox = createSliderBox(i18n.get("market.slider.sma"), 5, 50, 20);
         smaPeriodSlider = (Slider) smaBox.getChildren().get(1);
@@ -207,7 +212,8 @@ public class MarketCrashApp extends FeaturedAppBase {
 
         // Alert Log
         logTitleLabel = new Label(i18n.get("market.log.title"));
-        logTitleLabel.setStyle("-fx-font-weight: bold;");
+        logTitleLabel.getStyleClass().add("header-label");
+        logTitleLabel.setStyle("-fx-font-size: 14px;");
 
         alertLog = new ListView<>();
         alertLog.setPrefHeight(180);

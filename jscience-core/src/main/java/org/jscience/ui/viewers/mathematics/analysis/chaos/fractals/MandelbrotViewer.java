@@ -27,6 +27,7 @@ import org.jscience.io.Configuration;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
+import org.jscience.ui.BooleanParameter;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.mathematics.numbers.real.Real;
 import javafx.scene.canvas.Canvas;
@@ -85,6 +86,28 @@ public class MandelbrotViewer extends AbstractViewer {
         params.add(new NumericParameter("viewer.mandelbrot.param.juliaimag",
                 I18n.getInstance().get("viewer.mandelbrot.param.juliaimag.desc"),
                 -2, 2, 0.01, juliaImag.doubleValue(), v -> { juliaImag = Real.of(v); if(juliaMode) render(); }));
+        params.add(new BooleanParameter("mandelbrot.mode.julia",
+                I18n.getInstance().get("mandelbrot.mode.julia"),
+                juliaMode,
+                v -> {
+                    juliaMode = v;
+                    if (juliaMode) {
+                        minRe = Real.of(-2.0);
+                        maxRe = Real.of(2.0);
+                        minIm = Real.of(-1.5);
+                        maxIm = Real.of(1.5);
+                    } else {
+                        minRe = Real.of(Configuration.getDouble(CFG_PREFIX + "minre", -2.0));
+                        maxRe = Real.of(Configuration.getDouble(CFG_PREFIX + "maxre", 1.0));
+                        Real aspect = Real.of((double) HEIGHT / WIDTH);
+                        Real reWidth = maxRe.subtract(minRe);
+                        Real imHeight = reWidth.multiply(aspect);
+                        Real centerIm = Real.ZERO;
+                        minIm = centerIm.subtract(imHeight.divide(Real.TWO));
+                        maxIm = centerIm.add(imHeight.divide(Real.TWO));
+                    }
+                    render();
+                }));
         return params;
     }
 
@@ -112,35 +135,8 @@ public class MandelbrotViewer extends AbstractViewer {
         image = new WritableImage(WIDTH, HEIGHT);
 
         StackPane canvasPane = new StackPane(canvas);
-
-        javafx.scene.control.ToggleButton modeBtn = new javafx.scene.control.ToggleButton(
-                I18n.getInstance().get("mandelbrot.mode.julia"));
-        modeBtn.setTranslateY(20);
-        modeBtn.setTranslateX(20);
-        javafx.scene.layout.VBox controls = new javafx.scene.layout.VBox(modeBtn);
-        controls.setPickOnBounds(false);
-
-        getChildren().addAll(canvasPane, controls);
-
-        modeBtn.setOnAction(e -> {
-            juliaMode = modeBtn.isSelected();
-            if (juliaMode) {
-                minRe = Real.of(-2.0);
-                maxRe = Real.of(2.0);
-                minIm = Real.of(-1.5);
-                maxIm = Real.of(1.5);
-            } else {
-                minRe = Real.of(Configuration.getDouble(CFG_PREFIX + "minre", -2.0));
-                maxRe = Real.of(Configuration.getDouble(CFG_PREFIX + "maxre", 1.0));
-                Real aspect = Real.of((double) HEIGHT / WIDTH);
-                Real reWidth = maxRe.subtract(minRe);
-                Real imHeight = reWidth.multiply(aspect);
-                Real centerIm = Real.ZERO;
-                minIm = centerIm.subtract(imHeight.divide(Real.TWO));
-                maxIm = centerIm.add(imHeight.divide(Real.TWO));
-            }
-            render();
-        });
+        setCenter(canvasPane);
+        this.getStyleClass().add("viewer-root");
 
         canvas.setOnMouseMoved(e -> {
             if (juliaMode && e.isControlDown()) {

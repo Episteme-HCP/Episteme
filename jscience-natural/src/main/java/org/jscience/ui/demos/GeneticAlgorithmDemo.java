@@ -96,22 +96,22 @@ public class GeneticAlgorithmDemo extends AbstractSimulationDemo {
             VBox sidebar = new VBox(15);
             sidebar.setPadding(new Insets(15));
             sidebar.setPrefWidth(180);
-            sidebar.getStyleClass().add("dark-viewer-sidebar");
+            sidebar.getStyleClass().add("viewer-sidebar");
 
             Label title = new Label(I18n.getInstance().get("geneticalgo.stats", "Statistics"));
-            title.getStyleClass().add("dark-label-accent");
+            title.getStyleClass().add("header-label");
 
             genLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.geneticalgorithm.generation.1", "Generation: 1"));
-            genLabel.getStyleClass().add("dark-label-muted");
+            genLabel.getStyleClass().add("description-label");
 
             fitLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.geneticalgorithm.fitness.000", "Fitness: 0.00"));
-            fitLabel.getStyleClass().add("dark-label-muted");
+            fitLabel.getStyleClass().add("description-label");
 
             reachLabel = new Label("Reached: 0/" + popSize);
-            reachLabel.getStyleClass().add("dark-label-muted");
+            reachLabel.getStyleClass().add("description-label");
             
             Label info = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.geneticalgorithm.controls.below", "Controls below."));
-            info.getStyleClass().add("dark-label-muted");
+            info.getStyleClass().add("description-label");
 
             sidebar.getChildren().addAll(title, new Separator(), genLabel, fitLabel, reachLabel, new Separator(), info);
             setRight(sidebar);

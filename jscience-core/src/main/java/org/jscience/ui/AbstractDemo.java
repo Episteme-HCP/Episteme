@@ -151,6 +151,13 @@ public abstract class AbstractDemo extends Application implements App {
             HBox valBox = new HBox(label, new Region(), valLabel);
             HBox.setHgrow(valBox.getChildren().get(1), Priority.ALWAYS);
             box.getChildren().addAll(valBox, slider);
+        } else if (param instanceof BooleanParameter) {
+            CheckBox checkBox = new CheckBox();
+            checkBox.setSelected((Boolean) param.getValue());
+            checkBox.setOnAction(e -> {
+                ((Parameter<Boolean>) param).setValue(checkBox.isSelected());
+            });
+            box.getChildren().addAll(label, checkBox);
         } else if (param.getValue() instanceof Color) {
             @SuppressWarnings("unchecked")
             Parameter<Color> colorParam = (Parameter<Color>) param;

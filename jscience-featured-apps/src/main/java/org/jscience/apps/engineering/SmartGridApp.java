@@ -135,7 +135,8 @@ public class SmartGridApp extends FeaturedAppBase {
         box.setPadding(new Insets(10));
 
         vizTitleLabel = new Label(i18n.get("grid.viz.title"));
-        vizTitleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        vizTitleLabel.getStyleClass().add("header-label");
+        vizTitleLabel.setStyle("-fx-font-size: 14px;");
 
         gridCanvas = new Canvas(300, 500);
 
@@ -169,7 +170,8 @@ public class SmartGridApp extends FeaturedAppBase {
         statusBox.setAlignment(javafx.geometry.Pos.CENTER);
 
         frequencyLabel = new Label(java.text.MessageFormat.format(i18n.get("grid.label.freq"), 50.00));
-        frequencyLabel.setStyle("-fx-font-size: 24px; -fx-font-family: monospace; -fx-font-weight: bold;");
+        frequencyLabel.getStyleClass().add("header-label");
+        frequencyLabel.setStyle("-fx-font-size: 24px; -fx-font-family: monospace;");
 
         statusLabel = new Label(i18n.get("grid.status.stable"));
         statusLabel.setStyle(
@@ -189,10 +191,10 @@ public class SmartGridApp extends FeaturedAppBase {
     private VBox createControlRoom() {
         VBox box = new VBox(15);
         box.setPadding(new Insets(15));
-        box.setStyle("-fx-background-color: #f5f5f5;"); // Light control panel theme
+        box.getStyleClass().add("viewer-sidebar");
 
         controlRoomTitleLabel = new Label(i18n.get("grid.panel.control"));
-        controlRoomTitleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        controlRoomTitleLabel.getStyleClass().add("header-label");
 
         // Coal
         coalLabel = new Label(i18n.get("grid.control.coal"));
@@ -218,7 +220,8 @@ public class SmartGridApp extends FeaturedAppBase {
         VBox batteryBox = new VBox(5);
         batteryTitleLabel = new Label(i18n.get("grid.label.battery_title"));
         batteryTitleLabel.getStyleClass().add("status-connected");
-        batteryTitleLabel.setStyle("-fx-font-weight: bold;");
+        batteryTitleLabel.getStyleClass().add("header-label");
+        batteryTitleLabel.setStyle("-fx-font-size: 14px;");
 
         batteryBar = new ProgressBar(0.5);
         batteryBar.setMaxWidth(Double.MAX_VALUE);

@@ -38,7 +38,7 @@ import javafx.scene.control.Label;
 public class MapViewer extends StackPane implements org.jscience.ui.Viewer {
 
     public MapViewer() {
-        this.setStyle("-fx-background-color: #e0f0ff;");
+        this.getStyleClass().add("viewer-root");
         
         // Discover backend
         String backendId = org.jscience.JScience.getMapBackendId();

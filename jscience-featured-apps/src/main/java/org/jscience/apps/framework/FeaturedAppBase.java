@@ -312,7 +312,7 @@ public abstract class FeaturedAppBase extends Application implements App {
         HBox bar = new HBox(10);
         bar.setPadding(new Insets(5, 10, 5, 10));
         bar.setAlignment(Pos.CENTER_LEFT);
-        bar.setStyle("-fx-background-color: #e0e0e0;");
+        bar.getStyleClass().add("status-bar");
 
         statusLabel = new Label(i18n.get("status.ready"));
         progressBar = new ProgressBar(0);

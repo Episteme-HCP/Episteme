@@ -23,6 +23,7 @@
 
 package org.jscience.physics.loaders;
 
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
 
@@ -186,6 +187,21 @@ public class VizieRReader extends AbstractResourceReader<Map<String, String>> {
         } catch (Exception e) {
             return null;
         }
+    }
+
+
+    /**
+     * Queries stars within radius of coordinates (Real precision).
+     */
+    public static Map<String, String> queryByCoordinates(Real ra, Real dec, double radiusArcmin, String catalog) {
+        return queryByCoordinates(ra.doubleValue(), dec.doubleValue(), radiusArcmin, catalog);
+    }
+    
+    /**
+     * Queries stars within radius of coordinates (Real precision).
+     */
+    public static Map<String, String> queryByCoordinates(Real ra, Real dec, Real radiusArcmin, String catalog) {
+        return queryByCoordinates(ra.doubleValue(), dec.doubleValue(), radiusArcmin.doubleValue(), catalog);
     }
 
     @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.vizier.name"); }

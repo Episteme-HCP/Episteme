@@ -123,7 +123,7 @@ public class MechanicsDemo extends AbstractSimulationDemo {
             setupParameters();
 
             energyLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.mechanics.energy", "Energy: --"));
-            energyLabel.getStyleClass().add("text-dark"); // Dark theme handled by CSS usually, but explicit set
+            energyLabel.getStyleClass().add("description-label");
             energyLabel.setFont(Font.font("Monospaced", 16));
 
             timer = new AnimationTimer() {
@@ -182,7 +182,7 @@ public class MechanicsDemo extends AbstractSimulationDemo {
             double w = canvas.getWidth();
             double h = canvas.getHeight();
             
-            gc.setFill(Color.web("#1a1a2e"));
+            gc.setFill(Color.web("#fdfbf7"));
             gc.fillRect(0, 0, w, h);
 
             double centerX = w / 2; // Dynamic center

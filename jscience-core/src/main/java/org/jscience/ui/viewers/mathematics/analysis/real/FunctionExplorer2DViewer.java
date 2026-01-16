@@ -60,7 +60,7 @@ public class FunctionExplorer2DViewer extends AbstractViewer {
         sidebar.setMinWidth(300);
         sidebar.setMaxWidth(350);
         sidebar.setMaxWidth(350);
-        sidebar.setStyle("-fx-background-color: #fafafa;");
+        sidebar.getStyleClass().add("viewer-sidebar");
 
         // Input Section
         Label fLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.functionexplorer2d.fx", "f(x) ="));
@@ -83,12 +83,13 @@ public class FunctionExplorer2DViewer extends AbstractViewer {
 
         Button plotBtn = new Button(i18n.get("funcexplorer.btn.plot", "Plot Function"));
         plotBtn.setMaxWidth(Double.MAX_VALUE);
-        plotBtn.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold;");
+        plotBtn.getStyleClass().add("accent-button-blue");
 
         // Analysis
         Separator sep1 = new Separator();
         Label analysisLabel = new Label(i18n.get("funcexplorer.analysis", "Analysis (Click Chart)"));
-        analysisLabel.setStyle("-fx-font-weight: bold;");
+        analysisLabel.getStyleClass().add("header-label");
+        analysisLabel.setStyle("-fx-font-size: 14px;");
 
         Label cursorVal = new Label(i18n.get("funcexplorer.cursor", "Cursor:") + " -");
 
@@ -112,7 +113,7 @@ public class FunctionExplorer2DViewer extends AbstractViewer {
 
         // --- Main Area (Chart) ---
         StackPane chartContainer = new StackPane();
-        chartContainer.setStyle("-fx-background-color: white;");
+        chartContainer.getStyleClass().add("viewer-root");
         Label placeholder = new Label(i18n.get("funcexplorer.placeholder", "Enter function and click Plot"));
         chartContainer.getChildren().add(placeholder);
 

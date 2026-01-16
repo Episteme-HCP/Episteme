@@ -23,6 +23,8 @@
 
 package org.jscience.ui.viewers.physics.classical.waves.electromagnetism.field;
 
+import org.jscience.mathematics.numbers.real.Real;
+
 import javafx.geometry.Point3D;
 import javafx.scene.*;
 import javafx.scene.input.MouseEvent;
@@ -55,11 +57,11 @@ public class MagneticFieldViewer extends org.jscience.ui.AbstractViewer {
     private javafx.animation.AnimationTimer timer;
 
     public MagneticFieldViewer() {
-        this.setStyle("-fx-background-color: #1a1a2e;"); // Dark background
+        this.getStyleClass().add("viewer-root");
 
         // 3D Scene setup
         SubScene subScene = new SubScene(root, 800, 600, true, SceneAntialiasing.BALANCED);
-        subScene.setFill(Color.web("#1a1a2e"));
+        subScene.setFill(Color.web("#fdfbf7"));
         
         PerspectiveCamera camera = new PerspectiveCamera(true);
         camera.setTranslateZ(-800);

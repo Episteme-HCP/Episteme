@@ -67,7 +67,7 @@ public class BioMotionViewer extends AbstractViewer implements Simulatable {
     }
 
     private void initUI() {
-        this.getStyleClass().add("dark-viewer-root");
+        this.getStyleClass().add("viewer-root");
 
         canvas = new Canvas(800, 600);
         this.setCenter(canvas);
@@ -76,11 +76,11 @@ public class BioMotionViewer extends AbstractViewer implements Simulatable {
         this.heightProperty().addListener((o, old, val) -> { canvas.setHeight(val.doubleValue()); draw(); });
 
         VBox sidebar = new VBox(10);
-        sidebar.setStyle("-fx-padding: 10; -fx-background-color: #2b2b2b;");
+        sidebar.getStyleClass().add("viewer-sidebar");
         sidebar.setPrefWidth(200);
 
         Label title = new Label(I18n.getInstance().get("biomotion.controls", "BioMotion Controls"));
-        title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: white;");
+        title.getStyleClass().add("header-label");
 
         Button resetBtn = new Button(I18n.getInstance().get("biomotion.reset", "Reset Walker"));
         resetBtn.setMaxWidth(Double.MAX_VALUE);
@@ -88,7 +88,7 @@ public class BioMotionViewer extends AbstractViewer implements Simulatable {
 
         Slider gravSlider = new Slider(0, 20, 9.81);
         Label gravLabel = new Label(String.format("Gravity: %.2f", 9.81));
-        gravLabel.setStyle("-fx-text-fill: white;");
+        gravLabel.getStyleClass().add("description-label");
         gravSlider.valueProperty().addListener((o, ov, nv) -> {
             gravity = nv.doubleValue();
             gravLabel.setText(String.format("Gravity: %.2f", gravity));
@@ -96,7 +96,7 @@ public class BioMotionViewer extends AbstractViewer implements Simulatable {
 
         Slider muscleSlider = new Slider(0, 5, 1.0);
         Label muscleLabel = new Label(String.format("Muscle Tone: %.1f", 1.0));
-        muscleLabel.setStyle("-fx-text-fill: white;");
+        muscleLabel.getStyleClass().add("description-label");
         muscleSlider.valueProperty().addListener((o, ov, nv) -> {
             muscleStrength = nv.doubleValue();
             muscleLabel.setText(String.format("Muscle Tone: %.1f", muscleStrength));

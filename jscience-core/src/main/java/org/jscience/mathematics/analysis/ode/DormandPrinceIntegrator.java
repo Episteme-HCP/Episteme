@@ -192,78 +192,117 @@ public class DormandPrinceIntegrator {
     /**
      * Integrate with trajectory recording.
      */
-    public java.util.List<double[]> integrateWithHistory(
-            java.util.function.BiFunction<Double, double[], double[]> f,
-            double t0, double[] y0, double tEnd) {
+    /**
+     * Integrate with trajectory recording (Real version).
+     */
+    public java.util.List<Real[]> integrateWithHistory(
+            java.util.function.BiFunction<Real, Real[], Real[]> f,
+            Real t0, Real[] y0, Real tEnd) {
 
-        java.util.List<double[]> history = new java.util.ArrayList<>();
-
+        java.util.List<Real[]> history = new java.util.ArrayList<>();
         int n = y0.length;
-        double t = t0;
-        double[] y = y0.clone();
-        double h = (tEnd - t0) / 100.0;
-        h = Math.min(Math.max(h, minStep), maxStep);
-
+        Real t = t0;
+        Real[] y = y0.clone();
+        
         // Record initial state
-        double[] record = new double[n + 1];
+        Real[] record = new Real[n + 1];
         record[0] = t;
         System.arraycopy(y, 0, record, 1, n);
         history.add(record);
 
-        double[][] k = new double[7][n];
+        Real h = tEnd.subtract(t0).divide(Real.of(100.0));
+        h = h.max(minStep).min(maxStep);
 
-        while (t < tEnd) {
-            if (t + h > tEnd) {
-                h = tEnd - t;
+        Real[][] k = new Real[7][n];
+
+        while (t.compareTo(tEnd) < 0) {
+            if (t.add(h).compareTo(tEnd) > 0) {
+                h = tEnd.subtract(t);
             }
 
             k[0] = f.apply(t, y);
 
             for (int stage = 1; stage < 7; stage++) {
-                double[] yTemp = new double[n];
+                Real[] yTemp = new Real[n];
                 for (int i = 0; i < n; i++) {
                     yTemp[i] = y[i];
                     for (int j = 0; j < stage; j++) {
-                        yTemp[i] += h * A[stage][j] * k[j][i];
+                        yTemp[i] = yTemp[i].add(h.multiply(A[stage][j]).multiply(k[j][i]));
                     }
                 }
-                k[stage] = f.apply(t + C[stage] * h, yTemp);
+                k[stage] = f.apply(t.add(C[stage].multiply(h)), yTemp);
             }
 
-            double[] y5 = new double[n];
-            double[] y4 = new double[n];
+            Real[] y5 = new Real[n];
+            Real[] y4 = new Real[n];
             for (int i = 0; i < n; i++) {
                 y5[i] = y[i];
                 y4[i] = y[i];
                 for (int j = 0; j < 7; j++) {
-                    y5[i] += h * B5[j] * k[j][i];
-                    y4[i] += h * B4[j] * k[j][i];
+                    y5[i] = y5[i].add(h.multiply(B5[j]).multiply(k[j][i]));
+                    y4[i] = y4[i].add(h.multiply(B4[j]).multiply(k[j][i]));
                 }
             }
 
-            double error = 0;
+            Real error = Real.ZERO;
             for (int i = 0; i < n; i++) {
-                double sci = absTol + relTol * Math.max(Math.abs(y[i]), Math.abs(y5[i]));
-                double err = Math.abs(y5[i] - y4[i]) / sci;
-                error = Math.max(error, err);
+                Real sci = absTol.add(relTol.multiply(y[i].abs().max(y5[i].abs())));
+                Real err = y5[i].subtract(y4[i]).abs().divide(sci);
+                error = error.max(err);
             }
 
-            if (error <= 1.0) {
-                t += h;
+            if (error.compareTo(Real.ONE) <= 0) {
+                t = t.add(h);
                 y = y5;
 
-                record = new double[n + 1];
+                record = new Real[n + 1];
                 record[0] = t;
                 System.arraycopy(y, 0, record, 1, n);
                 history.add(record);
             }
 
-            double factor = 0.9 * Math.pow(1.0 / Math.max(error, 1e-10), 0.2);
-            factor = Math.max(0.1, Math.min(5.0, factor));
-            h = Math.min(Math.max(h * factor, minStep), maxStep);
+            Real errorVal = error.max(Real.of(1e-10));
+            double factorDouble = 0.9 * Math.pow(1.0 / errorVal.doubleValue(), 0.2);
+            Real factor = Real.of(Math.max(0.1, Math.min(5.0, factorDouble)));
+            h = h.multiply(factor).max(minStep).min(maxStep);
         }
 
         return history;
+    }
+
+    /**
+     * Integrate with trajectory recording (Double wrapper).
+     */
+    public java.util.List<double[]> integrateWithHistory(
+            java.util.function.BiFunction<Double, double[], double[]> f,
+            double t0, double[] y0, double tEnd) {
+
+        Real[] yReal = new Real[y0.length];
+        for (int i = 0; i < y0.length; i++)
+            yReal[i] = Real.of(y0[i]);
+
+        java.util.List<Real[]> historyReal = integrateWithHistory(
+                (t, y) -> {
+                    double[] yPrim = new double[y.length];
+                    for (int i = 0; i < y.length; i++)
+                        yPrim[i] = y[i].doubleValue();
+                    double[] dy = f.apply(t.doubleValue(), yPrim);
+                    Real[] dyReal = new Real[dy.length];
+                    for (int i = 0; i < dy.length; i++)
+                        dyReal[i] = Real.of(dy[i]);
+                    return dyReal;
+                },
+                Real.of(t0), yReal, Real.of(tEnd));
+
+        java.util.List<double[]> historyDouble = new java.util.ArrayList<>();
+        for (Real[] rec : historyReal) {
+            double[] recD = new double[rec.length];
+            for (int i = 0; i < rec.length; i++) {
+                recD[i] = rec[i].doubleValue();
+            }
+            historyDouble.add(recD);
+        }
+        return historyDouble;
     }
 }
 

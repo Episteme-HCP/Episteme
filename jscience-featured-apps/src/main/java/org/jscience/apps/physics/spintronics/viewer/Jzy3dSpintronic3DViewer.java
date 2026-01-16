@@ -34,7 +34,6 @@ import org.jzy3d.plot3d.rendering.canvas.Quality;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.jscience.mathematics.linearalgebra.Matrix;
 import org.jscience.mathematics.linearalgebra.Vector;
 
 /**

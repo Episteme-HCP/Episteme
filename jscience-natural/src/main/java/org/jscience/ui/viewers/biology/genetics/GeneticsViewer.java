@@ -77,7 +77,7 @@ public class GeneticsViewer extends AbstractViewer {
 
     private void initUI() {
         TabPane tabPane = new TabPane();
-        tabPane.getStyleClass().add("dark-tab-pane");
+        tabPane.getStyleClass().add("demo-tab-pane");
 
         Tab driftTab = new Tab(I18n.getInstance().get("genetics.tab.drift", "Genetic Drift"));
         driftTab.setContent(createDriftTab());
@@ -86,8 +86,11 @@ public class GeneticsViewer extends AbstractViewer {
         Tab sequenceTab = new Tab(I18n.getInstance().get("genetics.tab.sequence", "Sequence Browser"));
         sequenceTab.setContent(createSequenceTab());
         sequenceTab.setClosable(false);
+        Tab mendelTab = new Tab(I18n.getInstance().get("genetics.tab.mendel", "Mendelian Inheritance"));
+        mendelTab.setContent(createMendelTab());
+        mendelTab.setClosable(false);
 
-        tabPane.getTabs().addAll(driftTab, sequenceTab);
+        tabPane.getTabs().addAll(driftTab, mendelTab, sequenceTab);
         this.setCenter(tabPane);
     }
 
@@ -124,11 +127,11 @@ public class GeneticsViewer extends AbstractViewer {
 
         VBox infoPanel = new VBox(10);
         infoPanel.setPadding(new Insets(10));
-        infoPanel.getStyleClass().add("dark-viewer-sidebar");
+        infoPanel.getStyleClass().add("viewer-sidebar");
         infoPanel.setPrefWidth(200);
 
         Label titleLabel = new Label(I18n.getInstance().get("genetics.subtitle", "Genetic Drift"));
-        titleLabel.getStyleClass().add("dark-header");
+        titleLabel.getStyleClass().add("header-label");
 
         Label explanationLabel = new Label(I18n.getInstance().get("genetics.explanation", "Simulates allele frequency changes in a population over generations due to random sampling."));
         explanationLabel.setWrapText(true);
@@ -143,7 +146,7 @@ public class GeneticsViewer extends AbstractViewer {
         root.setCenter(driftCanvas);
         root.setBottom(controls);
         root.setRight(infoPanel);
-        root.getStyleClass().add("dark-viewer-root");
+        root.getStyleClass().add("viewer-root");
 
         drawDriftAxes();
         return root;
@@ -214,11 +217,11 @@ public class GeneticsViewer extends AbstractViewer {
         VBox inputPanel = new VBox(15);
         inputPanel.setPadding(new Insets(20));
         inputPanel.setPrefWidth(300);
-        inputPanel.getStyleClass().add("dark-viewer-sidebar");
+        inputPanel.getStyleClass().add("viewer-sidebar");
         inputPanel.setAlignment(Pos.TOP_LEFT);
 
         Label title = new Label(I18n.getInstance().get("genetics.tab.mendel", "Mendelian Inheritance"));
-        title.getStyleClass().add("dark-header");
+        title.getStyleClass().add("header-label");
 
         parent1Field = new TextField("Aa");
         parent2Field = new TextField("Aa");
@@ -240,7 +243,7 @@ public class GeneticsViewer extends AbstractViewer {
         BorderPane root = new BorderPane();
         root.setLeft(inputPanel);
         root.setCenter(mendelCanvas);
-        root.getStyleClass().add("dark-viewer-root");
+        root.getStyleClass().add("viewer-root");
 
         calculatePunnettSquare();
         return root;
@@ -321,10 +324,10 @@ public class GeneticsViewer extends AbstractViewer {
         VBox sidebar = new VBox(15);
         sidebar.setPadding(new Insets(20));
         sidebar.setPrefWidth(300);
-        sidebar.getStyleClass().add("dark-viewer-sidebar");
+        sidebar.getStyleClass().add("viewer-sidebar");
 
         Label title = new Label(I18n.getInstance().get("genetics.sequence.browser", "Sequence Browser"));
-        title.getStyleClass().add("dark-header");
+        title.getStyleClass().add("header-label");
 
         TextField accessionField = new TextField("P01308"); // Insulin
         Button queryBtn = new Button(I18n.getInstance().get("genetics.uniprot.query", "Query UniProt"));
@@ -336,7 +339,7 @@ public class GeneticsViewer extends AbstractViewer {
         resultArea.setFont(Font.font("Monospaced", 12));
 
         Label statusLabel = new Label();
-        statusLabel.getStyleClass().add("dark-label-muted");
+        statusLabel.getStyleClass().add("description-label");
 
         queryBtn.setOnAction(e -> {
             String acc = accessionField.getText().trim();
@@ -393,7 +396,7 @@ public class GeneticsViewer extends AbstractViewer {
         BorderPane root = new BorderPane();
         root.setLeft(sidebar);
         root.setCenter(resultArea);
-        root.getStyleClass().add("dark-viewer-root");
+        root.getStyleClass().add("viewer-root");
         return root;
     }
 

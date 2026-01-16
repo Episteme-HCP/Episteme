@@ -87,12 +87,12 @@ public class GeometryBoardViewer extends AbstractViewer implements Simulatable {
     private boolean dragging = false;
 
     public GeometryBoardViewer() {
-        setStyle("-fx-background-color: white;");
+        this.getStyleClass().add("viewer-root");
 
         // Toolbar
         HBox toolbar = new HBox(10);
         toolbar.setPadding(new Insets(10));
-        toolbar.setStyle("-fx-background-color: #f0f0f0;");
+        toolbar.getStyleClass().add("viewer-controls");
 
         ToggleGroup group = new ToggleGroup();
         toolbar.getChildren().addAll(
@@ -152,7 +152,7 @@ public class GeometryBoardViewer extends AbstractViewer implements Simulatable {
         VBox sidebar = new VBox(10);
         sidebar.setPadding(new Insets(10));
         sidebar.setPrefWidth(200);
-        sidebar.setStyle("-fx-background-color: #fafafa;");
+        sidebar.getStyleClass().add("viewer-sidebar");
         sidebar.getChildren()
                 .add(new Label(I18n.getInstance().get("geometry.help")));
         setRight(sidebar);

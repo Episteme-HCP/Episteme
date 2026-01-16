@@ -66,17 +66,17 @@ public class NASAExoplanetsReader extends AbstractResourceReader<ExoplanetInfo> 
 
     @Override
     public String getName() {
-        return "loader.nasa.name";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.nasa.exoplanets.name", "NASA Exoplanets");
     }
 
     @Override
     public String getCategory() {
-        return "Physics";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.nasa.exoplanets.category", "Astronomy");
     }
 
     @Override
     public String getDescription() {
-        return "Access to NASA Exoplanet Archive.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.nasa.exoplanets.desc", "Confirmed exoplanets from NASA Archive.");
     }
 
     @Override

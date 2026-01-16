@@ -65,7 +65,7 @@ public class NetworkViewer extends AbstractViewer {
             }
         } else {
             Pane container = new Pane();
-            container.setStyle("-fx-background-color: white; -fx-border-color: #ccc;");
+            container.getStyleClass().add("viewer-root");
             container.getChildren().add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.network.no.network.backend.a", "No Network Backend Available (Install GraphStream, JUNG, etc.)")));
             getChildren().add(container);
         }

@@ -155,7 +155,7 @@ public class PandemicForecasterApp extends FeaturedAppBase {
 
         // Title
         chartAreaTitleLabel = new Label(i18n.get("pandemic.panel.chart"));
-        chartAreaTitleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        chartAreaTitleLabel.getStyleClass().add("header-label");
 
         // SEIR Chart
         seirChart = ChartFactory.createLineChart(i18n.get("pandemic.panel.chart"), "Day", "Population");
@@ -194,17 +194,14 @@ public class PandemicForecasterApp extends FeaturedAppBase {
     private HBox createStatsPanel() {
         HBox stats = new HBox(30);
         stats.setPadding(new Insets(10));
-        stats.setStyle("-fx-background-color: #f5f5f5; -fx-background-radius: 5;");
+        stats.getStyleClass().add("viewer-controls");
 
         populationLabel = new Label(java.text.MessageFormat.format(i18n.get("pandemic.label.population"), "--"));
         peakLabel = new Label(java.text.MessageFormat.format(i18n.get("pandemic.label.peak"), "--"));
         totalLabel = new Label(java.text.MessageFormat.format(i18n.get("pandemic.label.total"), "--"));
         deadLabel = new Label(java.text.MessageFormat.format(i18n.get("pandemic.label.dead"), "--"));
 
-        populationLabel.setStyle("-fx-font-size: 14px;");
-        peakLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #d32f2f;");
-        totalLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #388e3c;");
-        deadLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #000000;");
+        deadLabel.getStyleClass().add("description-label");
 
         stats.getChildren().addAll(populationLabel, peakLabel, totalLabel, deadLabel);
         return stats;
@@ -213,11 +210,12 @@ public class PandemicForecasterApp extends FeaturedAppBase {
     private VBox createControlPanel() {
         VBox panel = new VBox(15);
         panel.setPadding(new Insets(15));
-        panel.setStyle("-fx-background-color: #fafafa; -fx-border-color: #ddd; -fx-border-width: 0 0 0 1;");
+        panel.getStyleClass().add("viewer-sidebar");
 
         // Country selector
         countrySelectLabel = new Label(i18n.get("pandemic.label.select"));
-        countrySelectLabel.setStyle("-fx-font-weight: bold;");
+        countrySelectLabel.getStyleClass().add("header-label");
+        countrySelectLabel.setStyle("-fx-font-size: 14px;");
         countrySelector = new ComboBox<>();
         countrySelector.setItems(FXCollections.observableArrayList(countries));
         countrySelector.setCellFactory(lv -> new ListCell<Country>() {
@@ -239,7 +237,8 @@ public class PandemicForecasterApp extends FeaturedAppBase {
 
         // Parameters section
         parametersTitleLabel = new Label(i18n.get("pandemic.panel.parameters"));
-        parametersTitleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        parametersTitleLabel.getStyleClass().add("header-label");
+        parametersTitleLabel.setStyle("-fx-font-size: 14px;");
 
         // Beta (transmission rate)
         VBox betaBox = createSliderWithLabel(i18n.get("pandemic.param.beta"), 0.05, 1.0, 0.3, "beta");
@@ -275,7 +274,8 @@ public class PandemicForecasterApp extends FeaturedAppBase {
 
         // Event log
         logHeaderLabel = new Label(i18n.get("pandemic.log.header"));
-        logHeaderLabel.setStyle("-fx-font-weight: bold;");
+        logHeaderLabel.getStyleClass().add("header-label");
+        logHeaderLabel.setStyle("-fx-font-size: 14px;");
         eventLog = new ListView<>();
         eventLog.setPrefHeight(150);
 
@@ -370,7 +370,7 @@ public class PandemicForecasterApp extends FeaturedAppBase {
 
         try {
             Real[][] rawResults = PopulationDynamics.seirdModel(initial, beta, sigma, gamma, mu, dt, days);
-            simulationResults = org.jscience.mathematics.linearalgebra.matrices.GenericMatrix.of(rawResults, org.jscience.mathematics.numbers.real.Reals.getInstance());
+            simulationResults = org.jscience.mathematics.linearalgebra.matrices.GenericMatrix.of(rawResults, org.jscience.mathematics.numbers.real.Real.ZERO);
             startAnimation(days);
             isRunning = true;
             setStatus(i18n.get("status.running"));
@@ -410,7 +410,7 @@ public class PandemicForecasterApp extends FeaturedAppBase {
         if (day > 0) {
             double maxI = 0;
             for (int d = 0; d <= day; d++) {
-                maxI = Math.max(maxI, simulationResults[d][2].doubleValue());
+                maxI = Math.max(maxI, simulationResults.get(d, 2).doubleValue());
             }
             peakLabel.setText(
                     java.text.MessageFormat.format(i18n.get("pandemic.label.peak"), formatNumber((long) maxI)));
@@ -534,10 +534,10 @@ public class PandemicForecasterApp extends FeaturedAppBase {
                 for (int d = 0; d < currentDay; d++) {
                     pw.printf("%d,%.0f,%.0f,%.0f,%.0f%n",
                             d,
-                            simulationResults[d][0].doubleValue(),
-                            simulationResults[d][1].doubleValue(),
-                            simulationResults[d][2].doubleValue(),
-                            simulationResults[d][3].doubleValue());
+                            simulationResults.get(d, 0).doubleValue(),
+                            simulationResults.get(d, 1).doubleValue(),
+                            simulationResults.get(d, 2).doubleValue(),
+                            simulationResults.get(d, 3).doubleValue());
                 }
                 log(java.text.MessageFormat.format(i18n.get("pandemic.log.export"), file.getName()));
                 showInfo(i18n.get("menu.file.export"),

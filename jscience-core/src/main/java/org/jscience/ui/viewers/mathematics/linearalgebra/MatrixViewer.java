@@ -81,7 +81,7 @@ public class MatrixViewer<T> extends AbstractViewer {
     
     public void initUI() {
         BorderPane layout = new BorderPane();
-        layout.getStyleClass().add("viewer-background");
+        layout.getStyleClass().add("viewer-root");
 
         // Header
         Label header = new Label(I18n.getInstance().get("matrix.label.header"));
@@ -96,7 +96,7 @@ public class MatrixViewer<T> extends AbstractViewer {
         VBox controls = new VBox(15);
         controls.setPadding(new Insets(15));
         controls.setPrefWidth(220);
-        controls.getStyleClass().add("viewer-controls");
+        controls.getStyleClass().add("viewer-sidebar");
 
         Label sizeLabel = new Label(I18n.getInstance().get("matrix.label.size"));
         sizeLabel.getStyleClass().add("viewer-section-label");

@@ -135,11 +135,10 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
         VBox box = new VBox(15);
         box.setPadding(new Insets(15));
         box.setPrefWidth(200);
-        box.getStyleClass().add("dark-viewer-sidebar");
+        box.getStyleClass().add("viewer-sidebar");
         
         Label title = new Label(I18n.getInstance().get("starsystem.presets", "Presets"));
-        title.getStyleClass().add("text-light");
-        title.getStyleClass().add("dark-header");
+        title.getStyleClass().add("header-label");
 
         ComboBox<Preset> combo = new ComboBox<>();
         combo.getItems().addAll(Preset.values());
@@ -148,7 +147,7 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
         combo.setMaxWidth(Double.MAX_VALUE);
         
         dateLabel = new Label();
-        dateLabel.getStyleClass().add("dark-label-muted");
+        dateLabel.getStyleClass().add("description-label");
         
         box.getChildren().addAll(title, combo, new Separator(), dateLabel);
         return box;

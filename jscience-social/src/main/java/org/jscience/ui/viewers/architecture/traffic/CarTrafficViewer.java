@@ -24,16 +24,16 @@
 package org.jscience.ui.viewers.architecture.traffic;
 
 import javafx.animation.AnimationTimer;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.geometry.Pos;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
 import org.jscience.ui.i18n.I18n;
+import org.jscience.io.Configuration;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
@@ -63,7 +63,6 @@ public class CarTrafficViewer extends AbstractViewer implements Simulatable {
 
     private List<Car> cars = new ArrayList<>();
     private Canvas canvas;
-    private Label jamStatusLabel;
     private boolean running = true;
     private AnimationTimer timer;
     private double speed = 1.0;
@@ -79,68 +78,13 @@ public class CarTrafficViewer extends AbstractViewer implements Simulatable {
     }
 
     private void initUI() {
-        this.setStyle("-fx-background-color: #f8f8f8;");
+        this.getStyleClass().add("viewer-root");
 
-        VBox sidebar = new VBox(15);
-        sidebar.setPadding(new Insets(20));
-        sidebar.setPrefWidth(300);
-        sidebar.setStyle("-fx-background-color: #ffffff; -fx-border-color: #ddd; -fx-border-width: 0 1 0 0;");
-
-        Label title = new Label(I18n.getInstance().get("traffic.label.header", "Traffic Simulation"));
-        title.getStyleClass().add("font-bold");
-        title.getStyleClass().removeAll("text-success", "text-warning", "text-error", "text-info");
-        title.getStyleClass().add("text-primary");
-
-        Label desc = new Label(I18n.getInstance().get("traffic.label.desc", "Intelligent Driver Model simulation"));
-        desc.setWrapText(true);
-        desc.setStyle("-fx-text-fill: #666;");
-
-        Slider densitySlider = new Slider(10, 60, 30);
-        Label densityLabel = new Label(String.format("Cars: %.0f", 30.0));
-        densitySlider.valueProperty().addListener((o, old, val) -> densityLabel.setText(String.format("Cars: %.0f", val.doubleValue())));
-
-        Slider speedSlider = new Slider(10, 50, 30);
-        Label speedLabel = new Label(String.format("Target Speed: %.0f m/s", 30.0));
-        speedSlider.valueProperty().addListener((o, old, val) -> {
-            desiredVelocity = Quantities.create(val.doubleValue(), Units.METER_PER_SECOND);
-            speedLabel.setText(String.format("Target Speed: %.0f m/s", val.doubleValue()));
-        });
-
-        Slider gapSlider = new Slider(0.5, 3.0, 1.5);
-        Label gapLabel = new Label(String.format("Time Gap: %.1f s", 1.5));
-        gapSlider.valueProperty().addListener((o, old, val) -> {
-            timeGap = Quantities.create(val.doubleValue(), Units.SECOND);
-            gapLabel.setText(String.format("Time Gap: %.1f s", val.doubleValue()));
-        });
-
-        Button resetBtn = new Button(I18n.getInstance().get("traffic.button.reset", "Reset"));
-        resetBtn.setMaxWidth(Double.MAX_VALUE);
-        resetBtn.getStyleClass().removeAll("text-success", "text-warning", "text-error", "text-info");
-        resetBtn.getStyleClass().add("text-light");
-        resetBtn.setOnAction(e -> initCars((int) densitySlider.getValue()));
-
-        Button perturbBtn = new Button(I18n.getInstance().get("traffic.button.perturb", "Perturb"));
-        perturbBtn.setMaxWidth(Double.MAX_VALUE);
-        perturbBtn.getStyleClass().removeAll("text-success", "text-warning", "text-error", "text-info");
-        perturbBtn.getStyleClass().add("text-light");
-        perturbBtn.setOnAction(e -> perturbFirstCar());
-
-        jamStatusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.cartraffic.status.free.flow", "Status: Free Flow"));
-        jamStatusLabel.getStyleClass().add("font-bold");
-        jamStatusLabel.getStyleClass().removeAll("text-success", "text-warning", "text-error", "text-info");
-        jamStatusLabel.getStyleClass().add("text-success");
-
-        HBox legendFast = createLegendItem(Color.GREEN, "Fast (>25 m/s)");
-        HBox legendSlow = createLegendItem(Color.ORANGE, "Slow");
-        HBox legendStop = createLegendItem(Color.RED, "Stopped (<5 m/s)");
-
-        sidebar.getChildren().addAll(title, desc, new Separator(), densityLabel, densitySlider, speedLabel, speedSlider, gapLabel, gapSlider, new Separator(), resetBtn, perturbBtn, new Separator(), jamStatusLabel, new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.cartraffic.legend", "Legend:")), legendFast, legendSlow, legendStop);
-        this.setRight(sidebar);
-
-        Pane canvasContainer = new Pane();
+        Pane canvasContainer = new StackPane();
         canvas = new Canvas(600, 600);
         canvasContainer.getChildren().add(canvas);
         this.setCenter(canvasContainer);
+        this.getStyleClass().add("viewer-root");
 
         canvasContainer.widthProperty().addListener((obs, o, w) -> { canvas.setWidth(w.doubleValue()); draw(); });
         canvasContainer.heightProperty().addListener((obs, o, h) -> { canvas.setHeight(h.doubleValue()); draw(); });
@@ -162,12 +106,46 @@ public class CarTrafficViewer extends AbstractViewer implements Simulatable {
         timer.start();
     }
 
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        java.util.List<org.jscience.ui.Parameter<?>> params = new java.util.ArrayList<>();
+        
+        int defaultCars = Configuration.getInt("viewer.cartraffic.default.cars", 30);
+        double defaultSpeed = Configuration.getDouble("viewer.cartraffic.default.speed", 30.0);
+        double defaultGap = Configuration.getDouble("viewer.cartraffic.default.gap", 1.5);
+
+        params.add(new org.jscience.ui.NumericParameter("traffic.label.cars", "Number of Cars", 
+            Configuration.getInt("viewer.cartraffic.cars.min", 10), 
+            Configuration.getInt("viewer.cartraffic.cars.max", 60), 
+            Configuration.getInt("viewer.cartraffic.cars.step", 5), 
+            defaultCars * 1.0, v -> initCars(v.intValue())));
+            
+        params.add(new org.jscience.ui.NumericParameter("traffic.label.speed", "Target Speed (m/s)", 
+            Configuration.getDouble("viewer.cartraffic.speed.min", 10.0), 
+            Configuration.getDouble("viewer.cartraffic.speed.max", 50.0), 
+            Configuration.getDouble("viewer.cartraffic.speed.step", 5.0), 
+            defaultSpeed, 
+            v -> desiredVelocity = Quantities.create(v, Units.METER_PER_SECOND)));
+            
+        params.add(new org.jscience.ui.NumericParameter("traffic.label.gap", "Time Gap (s)", 
+            Configuration.getDouble("viewer.cartraffic.gap.min", 0.5), 
+            Configuration.getDouble("viewer.cartraffic.gap.max", 3.0), 
+            Configuration.getDouble("viewer.cartraffic.gap.step", 0.5), 
+            defaultGap, 
+            v -> timeGap = Quantities.create(v, Units.SECOND)));
+            
+        return params;
+    }
+
     @Override public void play() { running = true; }
     @Override public void pause() { running = false; }
     @Override public void stop() { running = false; initCars(30); }
     @Override public boolean isPlaying() { return running; }
     @Override public void setSpeed(double s) { this.speed = s; }
     @Override public void step() { update(Quantities.create(0.05, Units.SECOND)); draw(); }
+    
+    public void reset(int carCount) { initCars(carCount); }
+    public void perturb() { perturbFirstCar(); }
 
     private void initCars(int count) {
         cars.clear();
@@ -238,23 +216,9 @@ public class CarTrafficViewer extends AbstractViewer implements Simulatable {
         }
 
         if (n > 0) {
-            double avgSpeed = totalSpeed / n;
-            if (stoppedCars > n / 3) {
-                jamStatusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.cartraffic.status.jammed", "Status: JAMMED"));
-                jamStatusLabel.getStyleClass().add("font-bold");
-                jamStatusLabel.getStyleClass().removeAll("text-success", "text-warning", "text-error", "text-info");
-                jamStatusLabel.getStyleClass().add("text-error");
-            } else if (avgSpeed < desiredVelocity.getValue().doubleValue() * 0.5) {
-                jamStatusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.cartraffic.status.congested", "Status: Congested"));
-                jamStatusLabel.getStyleClass().add("font-bold");
-                jamStatusLabel.getStyleClass().removeAll("text-success", "text-warning", "text-error", "text-info");
-                jamStatusLabel.getStyleClass().add("text-warning");
-            } else {
-                jamStatusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.cartraffic.status.free.flow.1", "Status: Free Flow"));
-                jamStatusLabel.getStyleClass().add("font-bold");
-                jamStatusLabel.getStyleClass().removeAll("text-success", "text-warning", "text-error", "text-info");
-                jamStatusLabel.getStyleClass().add("text-success");
-            }
+            // Status updating can be exposed via property or listener if needed
+            // For now, we removed the internal label.
+            // Ideally, the viewer publishes an event.
         }
     }
 
@@ -305,5 +269,4 @@ public class CarTrafficViewer extends AbstractViewer implements Simulatable {
 
     @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.cartraffic.desc"); }
     @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.cartraffic.longdesc"); }
-    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }
