@@ -44,11 +44,11 @@ public class ChEBIReader {
     }
 
     public static String getCategory() {
-        return "Chemistry";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry");
     }
 
     public static String getDescription() {
-        return "ChEBI Database Reader.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.chebi.desc", "ChEBI Database Reader.");
     }
 
     /**

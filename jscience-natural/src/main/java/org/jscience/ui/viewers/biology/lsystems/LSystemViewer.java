@@ -35,11 +35,14 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.transform.Rotate;
+import javafx.util.StringConverter;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
 import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.Parameter;
 
 import java.util.*;
+import java.text.MessageFormat;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.linearalgebra.Matrix;
 import org.jscience.mathematics.linearalgebra.Vector;
@@ -106,32 +109,40 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
         initUI();
     }
     
-    @Override public String getName() { return I18n.getInstance().get("viewer.lsystem", "L-System Visualizer"); }
-    @Override public String getCategory() { return "Biology"; }
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.lsystemviewer.name", "L-System Visualizer"); }
+    @Override public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology"); }
 
     private void initPresets() {
-        LSystem plant = new LSystem("Fractal Plant", "X", 25, false);
+        // Use internal IDs for keys
+        LSystem plant = new LSystem("preset.fractal_plant", "X", 25, false);
         plant.addRule('X', "F+[[X]-X]-F[-FX]+X"); plant.addRule('F', "FF");
         presets.put(plant.name, plant);
-        LSystem dragon = new LSystem("Dragon Curve", "FX", 90, false);
+        
+        LSystem dragon = new LSystem("preset.dragon_curve", "FX", 90, false);
         dragon.addRule('X', "X+YF+"); dragon.addRule('Y', "-FX-Y");
         presets.put(dragon.name, dragon);
-        LSystem sierpinski = new LSystem("Sierpinski Triangle", "F-G-G", 120, false);
+        
+        LSystem sierpinski = new LSystem("preset.sierpinski_triangle", "F-G-G", 120, false);
         sierpinski.addRule('F', "F-G+F+G-F"); sierpinski.addRule('G', "GG");
         presets.put(sierpinski.name, sierpinski);
-        LSystem bush = new LSystem("Bush", "X", 25, false);
+        
+        LSystem bush = new LSystem("preset.bush", "X", 25, false);
         bush.addRule('X', "F-[[X]+X]+F[+FX]-X"); bush.addRule('F', "FF");
         presets.put(bush.name, bush);
-        LSystem algae = new LSystem("Algae", "A", 0, false);
+        
+        LSystem algae = new LSystem("preset.algae", "A", 0, false);
         algae.addRule('A', "AB"); algae.addRule('B', "A");
         presets.put(algae.name, algae);
-        LSystem koch = new LSystem("Koch Curve", "F", 90, false);
+        
+        LSystem koch = new LSystem("preset.koch_curve", "F", 90, false);
         koch.addRule('F', "F+F-F-F+F");
         presets.put(koch.name, koch);
-        LSystem tree3D = new LSystem("3D Tree", "F", 25, true);
+        
+        LSystem tree3D = new LSystem("preset.tree3d", "F", 25, true);
         tree3D.addRule('F', "F[+F]F[-F]F"); 
         presets.put(tree3D.name, tree3D);
-        LSystem hilbert3D = new LSystem("Hilbert 3D", "X", 90, true);
+        
+        LSystem hilbert3D = new LSystem("preset.hilbert3d", "X", 90, true);
         hilbert3D.addRule('X', "^<XF^<XFX-F^>>XFX&F+>>XFX-F>X->");
         presets.put(hilbert3D.name, hilbert3D);
     }
@@ -164,25 +175,35 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
         sidebar.setPrefWidth(280);
         sidebar.getStyleClass().add("viewer-sidebar");
 
-        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.lsystem.lsystem.settings", "L-System Settings"));
+        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.lsystemviewer.settings", "L-System Settings"));
         title.getStyleClass().add("header-label");
 
         presetCombo = new ComboBox<>();
         presetCombo.getItems().addAll(presets.keySet());
-        presetCombo.setValue("Fractal Plant");
+        presetCombo.setConverter(new StringConverter<String>() {
+            @Override
+            public String toString(String object) {
+                return org.jscience.ui.i18n.I18n.getInstance().get(object, object);
+            }
+            @Override
+            public String fromString(String string) {
+                return string; // Not needed for read-only combo
+            }
+        });
+        presetCombo.setValue("preset.fractal_plant");
         presetCombo.setOnAction(e -> loadPreset(presetCombo.getValue()));
 
         iterSlider = new Slider(1, 10, 4);
         iterSlider.setShowTickLabels(true); iterSlider.setShowTickMarks(true);
         iterSlider.setMajorTickUnit(1); iterSlider.setSnapToTicks(true);
 
-        Label iterLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.lsystem.iterations.4", "Iterations: 4"));
-        iterSlider.valueProperty().addListener((obs, old, val) -> iterLabel.setText("Iterations: " + val.intValue()));
+        Label iterLabel = new Label(MessageFormat.format(org.jscience.ui.i18n.I18n.getInstance().get("viewer.lsystemviewer.iterations", "Iterations: {0}"), 4));
+        iterSlider.valueProperty().addListener((obs, old, val) -> iterLabel.setText(MessageFormat.format(org.jscience.ui.i18n.I18n.getInstance().get("viewer.lsystemviewer.iterations", "Iterations: {0}"), val.intValue())));
 
-        animCheck = new CheckBox(I18n.getInstance().get("lsystem.animate", "Animate Growth"));
+        animCheck = new CheckBox(org.jscience.ui.i18n.I18n.getInstance().get("viewer.lsystemviewer.animate", "Animate Growth"));
         animCheck.setSelected(true);
 
-        Button renderBtn = new Button(I18n.getInstance().get("lsystem.generate", "Generate & Render"));
+        Button renderBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.lsystemviewer.generate", "Generate & Render"));
         renderBtn.setMaxWidth(Double.MAX_VALUE);
         renderBtn.setOnAction(e -> {
             iterations = (int) iterSlider.getValue();
@@ -196,14 +217,14 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
         rulesArea.setWrapText(true);
         rulesArea.setStyle("-fx-font-family: 'Consolas', monospace; -fx-font-size: 11px;");
 
-        statusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.lsystem.ready", "Ready"));
+        statusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.lsystemviewer.ready", "Ready"));
         statusLabel.getStyleClass().add("description-label");
         statusLabel.setStyle("-fx-font-size: 10px;");
 
-        sidebar.getChildren().addAll(title, new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.lsystem.preset", "Preset:")), presetCombo, iterLabel, iterSlider, animCheck, new Separator(), new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.lsystem.rules", "Rules:")), rulesArea, new Separator(), renderBtn, statusLabel);
+        sidebar.getChildren().addAll(title, new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.lsystemviewer.preset", "Preset:")), presetCombo, iterLabel, iterSlider, animCheck, new Separator(), new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.lsystemviewer.rules", "Rules:")), rulesArea, new Separator(), renderBtn, statusLabel);
         this.setRight(sidebar);
         
-        loadPreset("Fractal Plant");
+        loadPreset("preset.fractal_plant");
     }
 
     private void switchView() {
@@ -234,7 +255,7 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
         long start = System.currentTimeMillis();
         String commands = currentSystem.generate(iterations);
         long dur = System.currentTimeMillis() - start;
-        statusLabel.setText(String.format("Generated %d chars in %dms", commands.length(), dur));
+        statusLabel.setText(MessageFormat.format(org.jscience.ui.i18n.I18n.getInstance().get("viewer.lsystemviewer.generated", "Generated {0} chars in {1}ms"), commands.length(), dur));
         if (is3DView) render3D(commands);
         else render2D(commands);
     }
@@ -264,7 +285,7 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
     private void draw2DInstant(String commands) {
         GraphicsContext gc = canvas2D.getGraphicsContext2D();
         double step = Math.max(800.0 / Math.pow(3, iterations), 2.0);
-        if (currentSystem.name.contains("Dragon")) step = 5;
+        if (currentSystem.name.contains("dragon")) step = 5; // Updated check for lower case key
 
         Turtle2D turtle = new Turtle2D(canvas2D.getWidth()/2, canvas2D.getHeight(), -90);
         Stack<Turtle2D> stack = new Stack<>();
@@ -329,6 +350,7 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
             switch (c) {
                 case 'F': case 'G':
                     Vector<Real> startPos = turtle.position;
+                    // Using Real.of(double)
                     Vector<Real> forward = org.jscience.mathematics.linearalgebra.vectors.VectorFactory.of(Real.class, Real.of(0), Real.of(-stepLen), Real.of(0));
                     Vector<Real> move = turtle.orientation.multiply(forward);
                     Vector<Real> endPos = startPos.add(move);
@@ -404,20 +426,21 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
             double c = Math.cos(angle);
             double s = Math.sin(angle);
             Real[][] rotArr = new Real[3][3];
+            // Using Real.ZERO and Real.of()
             for (int i=0; i<3; i++) for (int j=0; j<3; j++) rotArr[i][j] = Real.ZERO;
 
             if (az == 1) { // Z-axis rotate
-                rotArr[0][0] = Real.of(c);  rotArr[0][1] = Real.of(-s); rotArr[0][2] = Real.of(0);
-                rotArr[1][0] = Real.of(s);  rotArr[1][1] = Real.of(c);  rotArr[1][2] = Real.of(0);
-                rotArr[2][0] = Real.of(0);  rotArr[2][1] = Real.of(0);  rotArr[2][2] = Real.of(1);
+                rotArr[0][0] = Real.of(c);  rotArr[0][1] = Real.of(-s); rotArr[0][2] = Real.ZERO;
+                rotArr[1][0] = Real.of(s);  rotArr[1][1] = Real.of(c);  rotArr[1][2] = Real.ZERO;
+                rotArr[2][0] = Real.ZERO;  rotArr[2][1] = Real.ZERO;  rotArr[2][2] = Real.ONE;
             } else if (ax == 1) { // X-axis rotate
-                rotArr[0][0] = Real.of(1);  rotArr[0][1] = Real.of(0);  rotArr[0][2] = Real.of(0);
-                rotArr[1][0] = Real.of(0);  rotArr[1][1] = Real.of(c);  rotArr[1][2] = Real.of(-s);
-                rotArr[2][0] = Real.of(0);  rotArr[2][1] = Real.of(s);  rotArr[2][2] = Real.of(c);
+                rotArr[0][0] = Real.ONE;  rotArr[0][1] = Real.ZERO;  rotArr[0][2] = Real.ZERO;
+                rotArr[1][0] = Real.ZERO;  rotArr[1][1] = Real.of(c);  rotArr[1][2] = Real.of(-s);
+                rotArr[2][0] = Real.ZERO;  rotArr[2][1] = Real.of(s);  rotArr[2][2] = Real.of(c);
             } else if (ay == 1) { // Y-axis rotate
-                rotArr[0][0] = Real.of(c);  rotArr[0][1] = Real.of(0);  rotArr[0][2] = Real.of(s);
-                rotArr[1][0] = Real.of(0);  rotArr[1][1] = Real.of(1);  rotArr[1][2] = Real.of(0);
-                rotArr[2][0] = Real.of(-s); rotArr[2][1] = Real.of(0);  rotArr[2][2] = Real.of(c);
+                rotArr[0][0] = Real.of(c);  rotArr[0][1] = Real.ZERO;  rotArr[0][2] = Real.of(s);
+                rotArr[1][0] = Real.ZERO;  rotArr[1][1] = Real.ONE;  rotArr[1][2] = Real.ZERO;
+                rotArr[2][0] = Real.of(-s); rotArr[2][1] = Real.ZERO;  rotArr[2][2] = Real.of(c);
             }
             orientation = orientation.multiply(org.jscience.mathematics.linearalgebra.matrices.GenericMatrix.of(rotArr, Real.ZERO));
         }
@@ -436,7 +459,7 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
         });
     }
 
-    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.lsystem.desc"); }
-    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.lsystem.longdesc"); }
-    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.lsystemviewer.desc", "Visualizes Lindenmayer systems (fractal plants)."); }
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.lsystemviewer.longdesc", "Explore the growth of complex structures using recursive L-System rules. Includes presets for fractal plants, dragon curves, and Sierpinski triangles in both 2D and 3D."); }
+    @Override public java.util.List<Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

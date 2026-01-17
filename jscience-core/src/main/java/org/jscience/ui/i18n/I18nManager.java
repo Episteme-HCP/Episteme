@@ -41,7 +41,7 @@ public final class I18nManager {
     private final I18n delegate;
 
     private I18nManager() {
-        this.delegate = I18n.getInstance();
+        this.delegate = org.jscience.ui.i18n.I18n.getInstance();
     }
 
     public static synchronized I18nManager getInstance() {
@@ -76,6 +76,6 @@ public final class I18nManager {
     }
 
     public static Locale[] getSupportedLocales() {
-        return I18n.getInstance().getSupportedLocales();
+        return org.jscience.ui.i18n.I18n.getInstance().getSupportedLocales();
     }
 }

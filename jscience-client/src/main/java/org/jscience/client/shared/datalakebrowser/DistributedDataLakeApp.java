@@ -33,12 +33,12 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import org.jscience.server.proto.*;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.ThemeManager;
+import org.jscience.ui.theme.ThemeColors;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -72,7 +72,7 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
 
         // UI Setup
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #1a1a2e;");
+        root.getStyleClass().add("viewer-root");
 
         // Header
         HBox header = createHeader();
@@ -87,7 +87,8 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
         root.setBottom(footer);
 
         Scene scene = new Scene(root, 1000, 700);
-        primaryStage.setTitle(I18n.getInstance().get("app.distributeddatalakeapp.title", "📊 Data Lake Browser"));
+        ThemeManager.getInstance().applyTheme(scene);
+        primaryStage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.title", "JScience - Data Lake Explorer"));
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -95,30 +96,30 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
     private HBox createHeader() {
         HBox header = new HBox(20);
         header.setPadding(new Insets(15, 20, 15, 20));
-        header.setStyle("-fx-background-color: #16213e;");
+        header.getStyleClass().add("header-box");
         header.setAlignment(Pos.CENTER_LEFT);
 
-        Label title = new Label(I18n.getInstance().get("app.distributeddatalakeapp.title", "📊 Data Lake Browser"));
-        title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #4ecca3;");
+        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.title", "Data Lake Browser"));
+        title.getStyleClass().add("header-label-white");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
         // Stream controls
-        streamGenomeBtn = new Button(I18n.getInstance().get("app.distributeddatalakeapp.btn.genome", "🧬 Stream Genome"));
-        streamGenomeBtn.setStyle("-fx-background-color: #e94560; -fx-text-fill: white; -fx-font-size: 14px;");
+        streamGenomeBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.btn.genome", "Stream Genome"));
+        streamGenomeBtn.getStyleClass().add("accent-button-red");
         streamGenomeBtn.setOnAction(e -> streamGenomeData());
 
-        streamStarsBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.distributeddatalake.stream.stars", "Ã¢Â­Â Stream Stars"));
-        streamStarsBtn.setStyle("-fx-background-color: #4ecca3; -fx-text-fill: white; -fx-font-size: 14px;");
+        streamStarsBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.btn.stream_stars", "Stream Stars"));
+        streamStarsBtn.getStyleClass().add("accent-button-green");
         streamStarsBtn.setOnAction(e -> streamStarData());
 
-        Button clearBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("collab.btn.clear", "Clear"));
-        clearBtn.setStyle("-fx-background-color: #0f3460; -fx-text-fill: white;");
+        Button clearBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.btn.clear", "Clear"));
+        clearBtn.getStyleClass().add("accent-button-gray");
         clearBtn.setOnAction(e -> {
             outputArea.clear();
             progressBar.setProgress(0);
-            statsLabel.setText(I18n.getInstance().get("app.distributeddatalakeapp.status.ready", "Ready"));
+            statsLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.status.ready", "Ready"));
         });
 
         header.getChildren().addAll(title, spacer, streamGenomeBtn, streamStarsBtn, clearBtn);
@@ -128,21 +129,20 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
     private VBox createCenterPane() {
         VBox pane = new VBox(10);
         pane.setPadding(new Insets(10));
-        pane.setStyle("-fx-background-color: #0f3460;");
+        pane.getStyleClass().add("section-box-transparent");
 
-        Label label = new Label(I18n.getInstance().get("app.distributeddatalakeapp.lbl.output", "Streaming Data Output"));
-        label.setStyle("-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;");
+        Label label = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.lbl.output", "Streaming Data Output"));
+        label.getStyleClass().add("label-white");
 
         outputArea = new TextArea();
         outputArea.setEditable(false);
         outputArea.setWrapText(true);
-        outputArea.setFont(Font.font("Consolas", FontWeight.NORMAL, 12));
-        outputArea.setStyle("-fx-control-inner-background: #1a1a2e; -fx-text-fill: #4ecca3;");
+        outputArea.getStyleClass().add("info-text-area");
         VBox.setVgrow(outputArea, javafx.scene.layout.Priority.ALWAYS);
 
         progressBar = new ProgressBar(0);
         progressBar.setPrefWidth(Double.MAX_VALUE);
-        progressBar.setStyle("-fx-accent: #e94560;");
+        progressBar.getStyleClass().add("progress-bar-custom");
 
         pane.getChildren().addAll(label, outputArea, progressBar);
         return pane;
@@ -151,16 +151,16 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
     private HBox createFooter() {
         HBox footer = new HBox(20);
         footer.setPadding(new Insets(10, 20, 10, 20));
-        footer.setStyle("-fx-background-color: #16213e;");
+        footer.getStyleClass().add("status-bar");
 
-        statsLabel = new Label(I18n.getInstance().get("app.distributeddatalakeapp.status.ready", "Ready"));
-        statsLabel.setStyle("-fx-text-fill: #4ecca3;");
+        statsLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.status.ready", "Ready"));
+        statsLabel.getStyleClass().add("label-green");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
-        throughputLabel = new Label(I18n.getInstance().get("app.distributeddatalakeapp.throughput.default", "Throughput: 0 items/s"));
-        throughputLabel.setStyle("-fx-text-fill: #888;");
+        throughputLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.throughput.default", "Throughput: 0 items/s"));
+        throughputLabel.getStyleClass().add("label-muted");
 
         footer.getChildren().addAll(statsLabel, spacer, throughputLabel);
         return footer;
@@ -188,7 +188,7 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
             @Override
             public void onNext(GenomeChunk chunk) {
                 int c = count.incrementAndGet();
-                buffer.append(I18n.getInstance().get("app.distributeddatalakeapp.msg.chunk_format", "[{0}] Position: {1}, Sequence: {2}...",
+                buffer.append(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.msg.chunk_format", "[{0}] Position: {1}, Sequence: {2}...",
                         c, chunk.getStartBase(),
                         chunk.getSequence().length() > 50 ? chunk.getSequence().substring(0, 50)
                                 : chunk.getSequence())).append("\n");
@@ -198,11 +198,11 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
                         outputArea.appendText(buffer.toString());
                         buffer.setLength(0);
                         progressBar.setProgress(Math.min(c / 100.0, 1.0));
-                        statsLabel.setText(I18n.getInstance().get("app.distributeddatalakeapp.status.received_chunks", "Received: {0} chunks", c));
+                        statsLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.status.received_chunks", "Received: {0} chunks", c));
 
                         long elapsed = System.currentTimeMillis() - startTime.get();
                         double throughput = c / (elapsed / 1000.0);
-                        throughputLabel.setText(I18n.getInstance().get("app.distributeddatalakeapp.throughput.chunks", "Throughput: {0} chunks/s", String.format("%.1f", throughput)));
+                        throughputLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.throughput.chunks", "Throughput: {0} chunks/s", String.format("%.1f", throughput)));
                     });
                 }
             }
@@ -210,8 +210,8 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
             @Override
             public void onError(Throwable t) {
                 Platform.runLater(() -> {
-                    outputArea.appendText("\nÃ°Å¸â€Â´ Error: " + t.getMessage() + "\n");
-                    statsLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.distributeddatalake.error", "Error"));
+                    outputArea.appendText("\nError: " + t.getMessage() + "\n");
+                    statsLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.status.error_short", "Error"));
                     isStreaming = false;
                     streamGenomeBtn.setDisable(false);
                     streamStarsBtn.setDisable(false);
@@ -222,7 +222,7 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
             public void onCompleted() {
                 Platform.runLater(() -> {
                     outputArea.appendText(buffer.toString());
-                    outputArea.appendText("\nÃ¢Å“â€¦ Stream completed! Total: " + count.get() + " chunks\n");
+                    outputArea.appendText("\nStream completed! Total: " + count.get() + " chunks\n");
                     progressBar.setProgress(1.0);
                     statsLabel.setText("Completed: " + count.get() + " chunks");
                     isStreaming = false;
@@ -256,7 +256,7 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
             @Override
             public void onNext(StarObject star) {
                 int c = count.incrementAndGet();
-                buffer.append(String.format("[%d] Ã¢Â­Â %s | RA: %.2fÃ‚Â° | Dec: %.2fÃ‚Â° | Mag: %.2f | Type: %s%n",
+                buffer.append(String.format("[%d] Star %s | RA: %.2f | Dec: %.2f | Mag: %.2f | Type: %s%n",
                         c, star.getStarId(), star.getRa(),
                         star.getDec(), star.getMagnitude(), star.getType()));
 
@@ -265,11 +265,11 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
                         outputArea.appendText(buffer.toString());
                         buffer.setLength(0);
                         progressBar.setProgress(Math.min(c / 100.0, 1.0));
-                        statsLabel.setText(I18n.getInstance().get("app.distributeddatalakeapp.status.received_stars", "Received: {0} stars", c));
+                        statsLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.status.received_stars", "Received: {0} stars", c));
 
                         long elapsed = System.currentTimeMillis() - startTime.get();
                         double throughput = c / (elapsed / 1000.0);
-                        throughputLabel.setText(I18n.getInstance().get("app.distributeddatalakeapp.throughput.stars", "Throughput: {0} stars/s", String.format("%.1f", throughput)));
+                        throughputLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.throughput.stars", "Throughput: {0} stars/s", String.format("%.1f", throughput)));
                     });
                 }
             }
@@ -277,8 +277,8 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
             @Override
             public void onError(Throwable t) {
                 Platform.runLater(() -> {
-                    outputArea.appendText("\nÃ°Å¸â€Â´ Error: " + t.getMessage() + "\n");
-                    statsLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.distributeddatalake.error", "Error"));
+                    outputArea.appendText("\nError: " + t.getMessage() + "\n");
+                    statsLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.status.error_short", "Error"));
                     isStreaming = false;
                     streamGenomeBtn.setDisable(false);
                     streamStarsBtn.setDisable(false);
@@ -289,7 +289,7 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
             public void onCompleted() {
                 Platform.runLater(() -> {
                     outputArea.appendText(buffer.toString());
-                    outputArea.appendText("\nÃ¢Å“â€¦ Stream completed! Total: " + count.get() + " stars\n");
+                    outputArea.appendText("\nStream completed! Total: " + count.get() + " stars\n");
                     progressBar.setProgress(1.0);
                     statsLabel.setText("Completed: " + count.get() + " stars");
                     isStreaming = false;
@@ -321,13 +321,13 @@ public class DistributedDataLakeApp extends Application implements org.jscience.
     public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.general", "General"); }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributeddatalakeapp.name", "Distributed Data Lake App"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.name", "Distributed Data Lake App"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributeddatalakeapp.desc", "Distributed application for Distributed Data Lake App."); }
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.desc", "Explore massive scientific datasets via high-speed gRPC streaming."); }
 
     @Override
-    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributeddatalakeapp.longdesc", "Distributed application for Distributed Data Lake App."); }
+    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributeddatalakeapp.longdesc", "The Data Lake Browser provides a real-time window into the JScience storage cluster. It demonstrates efficient streaming of genomic sequences and astronomical catalogs, supporting multi-gigabyte datasets with minimal memory overhead."); }
 
     @Override
     public void show(javafx.stage.Stage stage) {

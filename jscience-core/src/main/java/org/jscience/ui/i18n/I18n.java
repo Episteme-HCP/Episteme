@@ -53,8 +53,8 @@ public class I18n {
         // Try to load additional bundles (they may not be on classpath depending on module)
         tryAddBundle("org.jscience.ui.i18n.messages_natural");
         tryAddBundle("org.jscience.ui.i18n.messages_social");
-        tryAddBundle("org.jscience.client.i18n.messages_client");
-        tryAddBundle("org.jscience.server.i18n.messages_server");
+        tryAddBundle("org.jscience.client.ui.i18n.messages_client");
+        tryAddBundle("org.jscience.server.ui.i18n.messages_server");
         tryAddBundle("org.jscience.apps.ui.i18n.messages_apps");
 
     }

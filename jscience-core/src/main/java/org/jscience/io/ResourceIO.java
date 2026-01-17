@@ -75,6 +75,13 @@ public interface ResourceIO<T> {
     String getDescription();
 
     /**
+     * Returns a long description of this resource handler.
+     * MUST be implemented with I18n support.
+     * @return the long description
+     */
+    String getLongDescription();
+
+    /**
      * Returns the category for grouping.
      * MUST be implemented with I18n support.
      * @return the category name

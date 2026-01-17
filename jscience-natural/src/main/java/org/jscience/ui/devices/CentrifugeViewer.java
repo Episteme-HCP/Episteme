@@ -72,21 +72,21 @@ public class CentrifugeViewer extends AbstractDeviceViewer<Centrifuge> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.centrifuge.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.centrifuge.name", "Centrifuge");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.centrifuge.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.centrifuge.desc", "A centrifuge viewer for monitoring rotational speed.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.centrifuge.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.centrifuge.longdesc", "Monitors and controls laboratory centrifuges by displaying real-time rotational speed (RPM) and centrifugal force (RCF). Allows users to set target speeds and observe acceleration/deceleration phases.");
     }
 }

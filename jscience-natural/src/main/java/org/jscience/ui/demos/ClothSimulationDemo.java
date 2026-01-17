@@ -53,10 +53,10 @@ public class ClothSimulationDemo extends AbstractSimulationDemo {
     public String getCategory() { return "Physics"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("ClothSimulation.title", "Cloth Simulation"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("ClothSimulation.title", "Cloth Simulation"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("ClothSimulation.desc", "3D Cloth Simulation using Spring-Mass System"); }
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("ClothSimulation.desc", "3D Cloth Simulation using Spring-Mass System"); }
 
     @Override
     public String getLongDescription() { 

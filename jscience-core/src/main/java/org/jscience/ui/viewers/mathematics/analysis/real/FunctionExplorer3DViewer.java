@@ -30,7 +30,7 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.symbolic.parsing.SimpleExpressionParser;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3D;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.theme.ThemeColors;
 import java.util.*;
 
 public class FunctionExplorer3DViewer extends AbstractViewer {
@@ -45,7 +45,6 @@ public class FunctionExplorer3DViewer extends AbstractViewer {
 
     private void initUI() {
         SplitPane layout = new SplitPane();
-        I18n i18n = I18n.getInstance();
 
         VBox sidebar = new VBox(15);
         sidebar.setPadding(new Insets(15));
@@ -53,28 +52,28 @@ public class FunctionExplorer3DViewer extends AbstractViewer {
         sidebar.setMaxWidth(350);
         sidebar.getStyleClass().add("viewer-sidebar");
 
-        Label funcLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.functionexplorer3d.z..fx.y", "z = f(x, y) ="));
+        Label funcLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("funcexplorer.label.z_fx", "z = f(x, y) ="));
         TextField funcInput = new TextField(DEFAULT_3D_FUNC);
 
-        Label rangeLabel = new Label(i18n.get("funcexplorer.range3d", "Range [\u00B1X, \u00B1Y]"));
+        Label rangeLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("funcexplorer.range3d", "Range [\u00B1X, \u00B1Y]"));
         TextField rangeField = new TextField("10");
 
-        CheckBox gridChk = new CheckBox(i18n.get("funcexplorer.grid", "Show Grid/Axes"));
+        CheckBox gridChk = new CheckBox(org.jscience.ui.i18n.I18n.getInstance().get("funcexplorer.grid", "Show Grid/Axes"));
         gridChk.setSelected(true);
 
-        Button plotBtn = new Button(i18n.get("funcexplorer.btn.plot3d", "Plot 3D Surface"));
+        Button plotBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("funcexplorer.btn.plot3d", "Plot 3D Surface"));
         plotBtn.setMaxWidth(Double.MAX_VALUE);
         plotBtn.getStyleClass().add("accent-button-orange");
 
         // Analysis 3D
         Separator sep = new Separator();
-        Label analysisLabel = new Label(i18n.get("funcexplorer.analysis3d", "Analysis"));
+        Label analysisLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("funcexplorer.analysis3d", "Analysis"));
         TextField xEval = new TextField("0");
         xEval.setPromptText("x");
         TextField yEval = new TextField("0");
         yEval.setPromptText("y");
-        Label zRes = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.functionexplorer3d.z", "z = -"));
-        Button calcBtn = new Button(i18n.get("funcexplorer.btn.calcpt", "Calculate Point"));
+        Label zRes = new Label(org.jscience.ui.i18n.I18n.getInstance().get("funcexplorer.label.z", "z = -"));
+        Button calcBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("funcexplorer.btn.calcpt", "Calculate Point"));
 
         calcBtn.setOnAction(e -> {
             try {
@@ -82,7 +81,7 @@ public class FunctionExplorer3DViewer extends AbstractViewer {
                 double val = evaluate3D(p, Double.parseDouble(xEval.getText()), Double.parseDouble(yEval.getText()));
                 zRes.setText(String.format("z = %.4f", val));
             } catch (Exception ex) {
-                zRes.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.functionexplorer3d.error", "Error"));
+                zRes.setText(org.jscience.ui.i18n.I18n.getInstance().get("funcexplorer.status.error", "Error"));
             }
         });
 
@@ -91,8 +90,8 @@ public class FunctionExplorer3DViewer extends AbstractViewer {
 
         StackPane chartContainer = new StackPane();
         chartContainer.getStyleClass().add("viewer-root");
-        Label placeholder = new Label(i18n.get("funcexplorer.placeholder", "Enter function and click Plot"));
-        placeholder.setTextFill(javafx.scene.paint.Color.WHITE);
+        Label placeholder = new Label(org.jscience.ui.i18n.I18n.getInstance().get("funcexplorer.placeholder", "Enter function and click Plot"));
+        placeholder.setTextFill(ThemeColors.SIDEBAR_BG);
         chartContainer.getChildren().add(placeholder);
 
         plotBtn.setOnAction(e -> {
@@ -134,21 +133,21 @@ public class FunctionExplorer3DViewer extends AbstractViewer {
 
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics", "Mathematics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("FunctionExplorer3DViewer.name", "FunctionExplorer3D");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer3dviewer.name", "Function Explorer 3D");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("FunctionExplorer3DViewer.desc", "FunctionExplorer3DViewer description");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer3dviewer.desc", "Explore 3D mathematical surfaces.");
     }
 
     @Override
     public String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer3dviewer.longdesc", "Visualize functions of two variables z = f(x, y) as 3D surfaces. Rotate, zoom, and analyze points on complex mathematical terrains.");
     }
 }

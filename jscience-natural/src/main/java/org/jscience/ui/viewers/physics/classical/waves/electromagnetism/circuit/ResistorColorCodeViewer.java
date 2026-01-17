@@ -46,10 +46,10 @@ import java.util.Map;
 public class ResistorColorCodeViewer extends org.jscience.ui.AbstractViewer {
 
     @Override
-    public String getCategory() { return "Physics"; }
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics"); }
     
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.resistor"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.resistorcolorcodeviewer.name", "Resistor Color Code"); }
 
 
     private final ComboBox<String> band1 = new ComboBox<>();
@@ -158,12 +158,12 @@ public class ResistorColorCodeViewer extends org.jscience.ui.AbstractViewer {
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("ResistorColorCodeViewer.desc", "ResistorColorCodeViewer description");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.resistorcolorcodeviewer.desc", "Resistor color code calculator.");
     }
 
     @Override
     public String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.resistorcolorcodeviewer.longdesc", "Calculate resistor values based on their color bands. Supports 4-band resistor codes, including multipliers and tolerance bands. features a visual representation of the resistor that updates in real-time.");
     }
 }
 

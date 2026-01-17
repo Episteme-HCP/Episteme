@@ -6,7 +6,7 @@
 [![Demos](https://img.shields.io/badge/Demos-59-green)](README.md#demo-applications)
 [![I18n](https://img.shields.io/badge/Languages-EN%20|%20FR%20|%20ES%20|%20DE-orange)](README.md#internationalization)
 
-```
+```text
 Mathematics → Physics → Chemistry → Biology → Human Sciences
 ```
 
@@ -165,7 +165,7 @@ Full support for English, French, Spanish, and German:
 
 Switch language via `Preferences > Language` menu.
 
-See [roadmap.md](roadmap.md) and [task.md](task.md) for detailed progress.
+
 
 ## Architecture
 

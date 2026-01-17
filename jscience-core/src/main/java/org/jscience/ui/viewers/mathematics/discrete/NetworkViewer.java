@@ -66,28 +66,28 @@ public class NetworkViewer extends AbstractViewer {
         } else {
             Pane container = new Pane();
             container.getStyleClass().add("viewer-root");
-            container.getChildren().add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.network.no.network.backend.a", "No Network Backend Available (Install GraphStream, JUNG, etc.)")));
+            container.getChildren().add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.networkviewer.error.nobackend", "No Network Backend Available (Install GraphStream, JUNG, etc.)")));
             getChildren().add(container);
         }
     }
 
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics", "Mathematics");
     }
 
     @Override
     public String getName() {
-        return "Network Viewer";
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.networkviewer.name", "Network Viewer");
     }
     
     @Override
     public String getDescription() {
-        return "Visualizes networks and graphs.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.networkviewer.desc", "Visualizes networks and graphs.");
     }
 
     @Override
     public String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.networkviewer.longdesc", "Graph theory and network visualization tool. Supports visualization of nodes and edges for discrete mathematics and social network analysis with various backend providers.");
     }
 }

@@ -40,16 +40,18 @@ public class SociologyNetworkDemo extends AbstractDemo {
     }
 
     @Override
-    public String getCategory() { return "Sociology"; }
+    public String getCategory() { 
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.sociology", "Sociology"); 
+    }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.sociologynetworkdemo.name");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.sociologynetworkdemo.name", "Social Network");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.sociologynetworkdemo.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.sociologynetworkdemo.desc", "Social graph visualization and analysis.");
     }
 
     @Override
@@ -61,6 +63,6 @@ public class SociologyNetworkDemo extends AbstractDemo {
     
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.sociologynetworkdemo.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.sociologynetworkdemo.longdesc", "Interactive visualization of social networks and graph analysis metrics.");
     }
 }

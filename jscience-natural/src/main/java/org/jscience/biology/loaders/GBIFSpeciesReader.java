@@ -42,11 +42,11 @@ import com.fasterxml.jackson.databind.*;
 public class GBIFSpeciesReader {
 
     public static String getCategory() {
-        return "Biology";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology");
     }
 
     public static String getDescription() {
-        return "GBIF Species API Reader.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.gbif.desc", "GBIF Species API Reader.");
     }
 
     private static final String BASE_URL;

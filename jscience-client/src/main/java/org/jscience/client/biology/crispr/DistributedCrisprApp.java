@@ -43,7 +43,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.stage.FileChooser;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.ThemeManager;
 
 /**
  * Distributed CRISPR Design Application.
@@ -64,38 +64,39 @@ public class DistributedCrisprApp extends Application implements org.jscience.ui
 
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(15));
-        root.setStyle("-fx-background-color: #1a1a2e;");
+        root.getStyleClass().add("viewer-root");
 
         root.setTop(createHeader());
         root.setCenter(createMainView());
         root.setBottom(createFooter());
 
-        primaryStage.setTitle(I18n.getInstance().get("app.distributedcrisprapp.title", "JScience - Distributed CRISPR Designer"));
-        primaryStage.setScene(new Scene(root, 1000, 700));
+        primaryStage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.title", "JScience - Distributed CRISPR Designer"));
+        Scene scene = new Scene(root, 1000, 700);
+        ThemeManager.getInstance().applyTheme(scene);
+        primaryStage.setScene(scene);
         primaryStage.show();
     }
 
     private VBox createHeader() {
         VBox header = new VBox(10);
-        Label title = new Label(I18n.getInstance().get("app.distributedcrisprapp.header", "🧬 Distributed CRISPR Scanner"));
-        title.setStyle("-fx-font-size: 24; -fx-text-fill: #4ecca3; -fx-font-weight: bold;");
+        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.header", "🧬 Distributed CRISPR Scanner"));
+        title.getStyleClass().add("header-label-white");
 
         genomeArea = new TextArea(
                 "ATGGCCTCCTCCGAGGACGTCATCAAGGAGCTGATGGACGACGTGGTGAAGCTGGGCGTGGGGCAGCGGCCAGAGGGGGAGGGATGGGTGCAAAAGAGGATTGAAGACCCTGGAAAGAAAAGTGCCATGTGAGTGTG");
         genomeArea.setPrefHeight(120);
-        genomeArea.setStyle(
-                "-fx-control-inner-background: #16213e; -fx-text-fill: #e94560; -fx-font-family: 'Consolas';");
+        genomeArea.getStyleClass().add("text-area-monospaced"); // We'll assume this class exists or add it to theme.css if needed, or stick to simple style
 
-        Button scanBtn = new Button(I18n.getInstance().get("app.distributedcrisprapp.btn.scan", "🚀 Start Distributed Scan"));
-        scanBtn.setStyle("-fx-background-color: #e94560; -fx-text-fill: white; -fx-font-weight: bold;");
+        Button scanBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.btn.scan", "🚀 Start Distributed Scan"));
+        scanBtn.getStyleClass().add("accent-button-red");
         scanBtn.setOnAction(e -> startDistributedScan());
 
-        Button exportBtn = new Button(I18n.getInstance().get("app.distributedcrisprapp.btn.export", "💾 Export to FASTA"));
-        exportBtn.setStyle("-fx-background-color: #4ecca3; -fx-text-fill: #1a1a2e; -fx-font-weight: bold;");
+        Button exportBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.btn.export", "💾 Export to FASTA"));
+        exportBtn.getStyleClass().add("accent-button-green");
         exportBtn.setOnAction(e -> exportToFasta());
 
-        Button loadBtn = new Button(I18n.getInstance().get("app.distributedcrisprapp.btn.load", "📂 Load FASTA"));
-        loadBtn.setStyle("-fx-background-color: #4ecca3; -fx-text-fill: #1a1a2e; -fx-font-weight: bold;");
+        Button loadBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.btn.load", "📂 Load FASTA"));
+        loadBtn.getStyleClass().add("accent-button-green");
         loadBtn.setOnAction(e -> loadFasta((Stage) genomeArea.getScene().getWindow()));
 
         HBox btns = new HBox(10, scanBtn, exportBtn, loadBtn);
@@ -105,8 +106,8 @@ public class DistributedCrisprApp extends Application implements org.jscience.ui
 
     private void exportToFasta() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(I18n.getInstance().get("app.distributedcrisprapp.file.save.title", "Save FASTA Export"));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(I18n.getInstance().get("app.distributedcrisprapp.file.fasta", "FASTA Files"), "*.fasta", "*.fa"));
+        fileChooser.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.file.save.title", "Save FASTA Export"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.file.fasta", "FASTA Files"), "*.fasta", "*.fa"));
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
             try {
@@ -119,16 +120,16 @@ public class DistributedCrisprApp extends Application implements org.jscience.ui
                     i++;
                 }
                 new org.jscience.biology.loaders.FASTAWriter().save(sequences, file.getAbsolutePath());
-                new Alert(Alert.AlertType.INFORMATION, I18n.getInstance().get("app.distributedcrisprapp.alert.export.success", "Exported {0} targets to {1}", sequences.size(), file.getName()))
+                new Alert(Alert.AlertType.INFORMATION, org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.alert.export.success", "Exported {0} targets to {1}", sequences.size(), file.getName()))
                         .show();
             } catch (Exception e) {
-                new Alert(Alert.AlertType.ERROR, I18n.getInstance().get("app.distributedcrisprapp.alert.export.error", "Export failed: {0}", e.getMessage())).show();
+                new Alert(Alert.AlertType.ERROR, org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.alert.export.error", "Export failed: {0}", e.getMessage())).show();
             }
         }
     }
 
     private void loadFasta(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showOpenDialog(stage, I18n.getInstance().get("app.distributedcrisprapp.file.load.title", "Load FASTA"), I18n.getInstance().get("app.distributedcrisprapp.file.fasta", "FASTA Files"), "*.fasta",
+        File file = org.jscience.client.util.FileHelper.showOpenDialog(stage, org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.file.load.title", "Load FASTA"), org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.file.fasta", "FASTA Files"), "*.fasta",
                 "*.fa");
         if (file != null) {
             try {
@@ -138,9 +139,9 @@ public class DistributedCrisprApp extends Application implements org.jscience.ui
                     sb.append(s.data);
                 }
                 genomeArea.setText(sb.toString());
-                statusLabel.setText(I18n.getInstance().get("app.distributedcrisprapp.status.loaded", "Loaded {0} sequences from {1}", seqs.size(), file.getName()));
+                statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.status.loaded", "Loaded {0} sequences from {1}", seqs.size(), file.getName()));
             } catch (Exception e) {
-                new Alert(Alert.AlertType.ERROR, I18n.getInstance().get("app.distributedcrisprapp.alert.load.error", "Load failed: {0}", e.getMessage())).show();
+                new Alert(Alert.AlertType.ERROR, org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.alert.load.error", "Load failed: {0}", e.getMessage())).show();
             }
         }
     }
@@ -152,17 +153,17 @@ public class DistributedCrisprApp extends Application implements org.jscience.ui
         resultsTable = new TableView<>();
         resultsTable.setStyle("-fx-background-color: #0f3460;");
 
-        TableColumn<CrisprTask.Target, Integer> colPos = new TableColumn<>(I18n.getInstance().get("app.distributedcrisprapp.col.pos", "Position"));
+        TableColumn<CrisprTask.Target, Integer> colPos = new TableColumn<>(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.col.pos", "Position"));
         colPos.setCellValueFactory(new PropertyValueFactory<>("position"));
 
-        TableColumn<CrisprTask.Target, String> colSpacer = new TableColumn<>(I18n.getInstance().get("app.distributedcrisprapp.col.spacer", "Spacer (20bp)"));
+        TableColumn<CrisprTask.Target, String> colSpacer = new TableColumn<>(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.col.spacer", "Spacer (20bp)"));
         colSpacer.setCellValueFactory(new PropertyValueFactory<>("spacer"));
         colSpacer.setPrefWidth(250);
 
-        TableColumn<CrisprTask.Target, String> colPam = new TableColumn<>(I18n.getInstance().get("app.distributedcrisprapp.col.pam", "PAM"));
+        TableColumn<CrisprTask.Target, String> colPam = new TableColumn<>(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.col.pam", "PAM"));
         colPam.setCellValueFactory(new PropertyValueFactory<>("pam"));
 
-        TableColumn<CrisprTask.Target, Double> colScore = new TableColumn<>(I18n.getInstance().get("app.distributedcrisprapp.col.score", "Efficiency Score"));
+        TableColumn<CrisprTask.Target, Double> colScore = new TableColumn<>(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.col.score", "Efficiency Score"));
         colScore.setCellValueFactory(new PropertyValueFactory<>("score"));
 
         @SuppressWarnings("unchecked")
@@ -176,15 +177,15 @@ public class DistributedCrisprApp extends Application implements org.jscience.ui
 
     private HBox createFooter() {
         HBox footer = new HBox(10);
-        statusLabel = new Label(I18n.getInstance().get("app.distributedcrisprapp.status.ready", "Ready"));
-        statusLabel.setStyle("-fx-text-fill: #4ecca3;");
+        statusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.status.ready", "Ready"));
+        statusLabel.getStyleClass().add("accent-button-green");
         footer.getChildren().add(statusLabel);
         return footer;
     }
 
     private void startDistributedScan() {
         String sequence = genomeArea.getText();
-        statusLabel.setText(I18n.getInstance().get("app.distributedcrisprapp.status.submitting", "🛰️ Submitting sequence to cluster..."));
+        statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.status.submitting", "🛰️ Submitting sequence to cluster..."));
 
         try {
             TaskRequest request = TaskRequest.newBuilder()
@@ -196,13 +197,13 @@ public class DistributedCrisprApp extends Application implements org.jscience.ui
             asyncStub.submitTask(request, new StreamObserver<TaskResponse>() {
                 @Override
                 public void onNext(TaskResponse response) {
-                    Platform.runLater(() -> statusLabel.setText(I18n.getInstance().get("app.distributedcrisprapp.status.processing", "⚙️ Cluster Processing: {0}", response.getStatus())));
+                    Platform.runLater(() -> statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.status.processing", "⚙️ Cluster Processing: {0}", response.getStatus())));
                     trackResults(response.getTaskId());
                 }
 
                 @Override
                 public void onError(Throwable t) {
-                    Platform.runLater(() -> statusLabel.setText(I18n.getInstance().get("app.distributedcrisprapp.status.grid_error", "❌ Grid Error: {0}", t.getMessage())));
+                    Platform.runLater(() -> statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.status.grid_error", "❌ Grid Error: {0}", t.getMessage())));
                 }
 
                 @Override
@@ -210,7 +211,7 @@ public class DistributedCrisprApp extends Application implements org.jscience.ui
                 }
             });
         } catch (IOException e) {
-            statusLabel.setText(I18n.getInstance().get("app.distributedcrisprapp.status.serialization_error", "❌ Local Serialization Error"));
+            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.status.serialization_error", "❌ Local Serialization Error"));
         }
     }
 
@@ -226,17 +227,17 @@ public class DistributedCrisprApp extends Application implements org.jscience.ui
                                 result.getSerializedData().toByteArray());
                         Platform.runLater(() -> {
                             resultsTable.setItems(FXCollections.observableArrayList(targets));
-                            statusLabel.setText(I18n.getInstance().get("app.distributedcrisprapp.status.complete", "✅ Grid Scan Complete: Found {0} targets.", targets.size()));
+                            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.status.complete", "✅ Grid Scan Complete: Found {0} targets.", targets.size()));
                         });
                     } catch (Exception e) {
-                        Platform.runLater(() -> statusLabel.setText(I18n.getInstance().get("app.distributedcrisprapp.status.deserialization_error", "❌ Deserialization failed")));
+                        Platform.runLater(() -> statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.status.deserialization_error", "❌ Deserialization failed")));
                     }
                 }
             }
 
             @Override
             public void onError(Throwable t) {
-                Platform.runLater(() -> statusLabel.setText(I18n.getInstance().get("app.distributedcrisprapp.status.stream_error", "❌ Result stream error")));
+                Platform.runLater(() -> statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.status.stream_error", "❌ Result stream error")));
             }
 
             @Override
@@ -274,13 +275,13 @@ public class DistributedCrisprApp extends Application implements org.jscience.ui
     public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology"); }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedcrisprapp.name", "Distributed Crispr App"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.name", "Distributed Crispr App"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedcrisprapp.desc", "Distributed application for Distributed Crispr App."); }
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.desc", "Advanced CRISPR-Cas9 target scanner leveraging distributed grid computing."); }
 
     @Override
-    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedcrisprapp.longdesc", "Distributed application for Distributed Crispr App."); }
+    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedcrisprapp.longdesc", "Identify optimal CRISPR/Cas9 guide RNA target sites with high precision. This application offloads heavy genomic sequence scanning and off-target cross-referencing to the JScience grid for rapid analysis of large genomes."); }
 
     @Override
     public void show(javafx.stage.Stage stage) {

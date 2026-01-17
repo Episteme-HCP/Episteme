@@ -26,7 +26,6 @@ package org.jscience.ui.viewers.mathematics.logic;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import org.jscience.ui.i18n.I18n;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Parameter;
 
@@ -74,7 +73,7 @@ public class MetamathViewer extends AbstractViewer {
         layout.setPadding(new Insets(10));
 
         // Header
-        Label header = new Label(I18n.getInstance().get("metamath.title"));
+        Label header = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.metamathviewer.name", "Interactive Proof Explorer"));
         header.getStyleClass().add("header-label");
         layout.setTop(header);
 
@@ -97,7 +96,7 @@ public class MetamathViewer extends AbstractViewer {
             }
         });
 
-        selectorBox.getChildren().addAll(new Label(I18n.getInstance().get("metamath.select")), theoremSelector);
+        selectorBox.getChildren().addAll(new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.metamathviewer.label.select", "Select Theorem:")), theoremSelector);
 
         theoremLabel = new Label();
         theoremLabel.getStyleClass().add("info-panel");
@@ -109,7 +108,7 @@ public class MetamathViewer extends AbstractViewer {
         scroll.setFitToWidth(true);
         scroll.setPrefHeight(400);
 
-        center.getChildren().addAll(selectorBox, theoremLabel, new Label(I18n.getInstance().get("metamath.proof")),
+        center.getChildren().addAll(selectorBox, theoremLabel, new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.metamathviewer.label.proof", "Proof Steps:")),
                 scroll);
         layout.setCenter(center);
 
@@ -119,15 +118,15 @@ public class MetamathViewer extends AbstractViewer {
         sidebar.setPrefWidth(200);
         sidebar.getStyleClass().add("viewer-sidebar");
 
-        Button nextStepBtn = new Button(I18n.getInstance().get("metamath.btn.next"));
+        Button nextStepBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.metamathviewer.button.next", "Next Step"));
         nextStepBtn.setMaxWidth(Double.MAX_VALUE);
         nextStepBtn.setOnAction(e -> applyTactic());
 
-        Button resetBtn = new Button(I18n.getInstance().get("metamath.btn.reset"));
+        Button resetBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.metamathviewer.button.reset", "Reset"));
         resetBtn.setMaxWidth(Double.MAX_VALUE);
         resetBtn.setOnAction(e -> loadTheorem(currentTheorem));
 
-        sidebar.getChildren().addAll(new Label(I18n.getInstance().get("metamath.tactics")), nextStepBtn, resetBtn);
+        sidebar.getChildren().addAll(new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.metamathviewer.label.tactics", "Tactics")), nextStepBtn, resetBtn);
         layout.setRight(sidebar);
 
         // Load initial
@@ -178,7 +177,7 @@ public class MetamathViewer extends AbstractViewer {
         currentTheorem = t;
         currentSteps.clear();
         proofStepsBox.getChildren().clear();
-        theoremLabel.setText("Theorem: " + t.formula + " (" + t.name + ")");
+        theoremLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.metamathviewer.label.theorem", "Theorem") + ": " + t.formula + " (" + t.name + ")");
     }
 
     private void applyTactic() {
@@ -200,21 +199,21 @@ public class MetamathViewer extends AbstractViewer {
 
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics", "Mathematics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("MetamathViewer.name", "Metamath");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.metamathviewer.name", "Metamath");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("MetamathViewer.desc", "MetamathViewer description");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.metamathviewer.desc", "Interactive Symbolic Proof Explorer.");
     }
 
     @Override
     public String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.metamathviewer.longdesc", "Browse and visualize formal mathematical proofs from the Metamath database. Step through logic tactics and understand the structure of complex theorems.");
     }
 }

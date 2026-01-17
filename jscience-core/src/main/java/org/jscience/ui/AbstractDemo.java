@@ -115,7 +115,7 @@ public abstract class AbstractDemo extends Application implements App {
         panel.setPadding(new Insets(10));
         panel.setAlignment(Pos.TOP_LEFT);
 
-        Label sectionTitle = new Label(I18n.getInstance().get("demo.controls.title"));
+        Label sectionTitle = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.controls.title"));
         sectionTitle.setFont(Font.font("System", FontWeight.BOLD, 16));
         panel.getChildren().add(sectionTitle);
 

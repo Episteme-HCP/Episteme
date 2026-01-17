@@ -80,16 +80,16 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
     private double speed = 1.0;
 
     @Override
-    public String getName() { return I18n.getInstance().get("rigid.window", "Rigid Body Physics"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.rigidbodyviewer.name", "Rigid Body Physics"); }
     
     @Override
-    public String getCategory() { return "Physics"; }
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("viewer.rigidbody.desc"); }
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.rigidbodyviewer.desc", "2D rigid-body physics engine simulation."); }
 
     @Override
-    public String getLongDescription() { return I18n.getInstance().get("viewer.rigidbody.longdesc"); }
+    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.rigidbodyviewer.longdesc", "Simulates multiple colliding rigid bodies in a 2D environment. features mass-based inertia, adjustable gravity, and bounciness parameters. Demonstrates momentum conservation and elastic collisions."); }
 
     @Override
     public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
@@ -115,49 +115,49 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
         sidebar.setPrefWidth(180);
         sidebar.getStyleClass().add("viewer-sidebar");
 
-        Label title = new Label(I18n.getInstance().get("rigid.title", "Rigid Bodies"));
+        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("rigid.title", "Rigid Bodies"));
         title.getStyleClass().add("header-label");
 
-        countLabel = new Label(I18n.getInstance().get("rigid.bodies", "Bodies: 0"));
+        countLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("rigid.bodies", "Bodies: 0"));
         countLabel.getStyleClass().add("description-label");
 
         Separator sep1 = new Separator();
 
-        Label gravLabel = new Label(I18n.getInstance().get("rigid.gravity", "Gravity"));
+        Label gravLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("rigid.gravity", "Gravity"));
         gravLabel.getStyleClass().add("description-label");
         Slider gravSlider = new Slider(0, 2, 0.5);
         gravSlider.setShowTickLabels(true);
         gravSlider.valueProperty().addListener((o, ov, nv) -> {
             gravityVal = nv.doubleValue();
-            gravLabel.setText(I18n.getInstance().get("rigid.gravity.fmt", "Gravity: %.1f", gravityVal));
+            gravLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("rigid.gravity.fmt", "Gravity: %.1f", gravityVal));
         });
 
-        Label bounceLabel = new Label(I18n.getInstance().get("rigid.bounciness", "Bounciness"));
+        Label bounceLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("rigid.bounciness", "Bounciness"));
         bounceLabel.getStyleClass().add("description-label");
         Slider bounceSlider = new Slider(0.1, 1.0, 0.8);
         bounceSlider.setShowTickLabels(true);
         bounceSlider.valueProperty().addListener((o, ov, nv) -> {
             bouncinessVal = nv.doubleValue();
-            bounceLabel.setText(I18n.getInstance().get("rigid.bounciness.fmt", "Bounciness: %.1f", bouncinessVal));
+            bounceLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("rigid.bounciness.fmt", "Bounciness: %.1f", bouncinessVal));
         });
 
         Separator sep2 = new Separator();
 
-        Button addBtn = new Button(I18n.getInstance().get("rigid.add", "Add Body"));
+        Button addBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("rigid.add", "Add Body"));
         addBtn.setMaxWidth(Double.MAX_VALUE);
         addBtn.getStyleClass().add("accent-button-green");
         addBtn.setOnAction(e -> addBody());
 
-        Button add5Btn = new Button(I18n.getInstance().get("rigid.add5", "Add 5 Bodies"));
+        Button add5Btn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("rigid.add5", "Add 5 Bodies"));
         add5Btn.setMaxWidth(Double.MAX_VALUE);
         add5Btn.setOnAction(e -> { for (int i = 0; i < 5; i++) addBody(); });
 
-        Button clearBtn = new Button(I18n.getInstance().get("rigid.clear", "Clear"));
+        Button clearBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("rigid.clear", "Clear"));
         clearBtn.setMaxWidth(Double.MAX_VALUE);
         clearBtn.getStyleClass().add("accent-button-red");
         clearBtn.setOnAction(e -> {
             bodies.clear();
-            countLabel.setText(I18n.getInstance().get("rigid.bodies", "Bodies: 0"));
+            countLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("rigid.bodies", "Bodies: 0"));
         });
 
         sidebar.getChildren().addAll(title, countLabel, sep1, gravLabel, gravSlider, bounceLabel, bounceSlider, sep2, addBtn, add5Btn, clearBtn);
@@ -207,7 +207,7 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
         vb.bounciness = bouncinessVal;
 
         bodies.add(vb);
-        countLabel.setText(java.text.MessageFormat.format(I18n.getInstance().get("rigid.count.fmt", "Bodies: {0}"), bodies.size()));
+        countLabel.setText(java.text.MessageFormat.format(org.jscience.ui.i18n.I18n.getInstance().get("rigid.count.fmt", "Bodies: {0}"), bodies.size()));
     }
 
     private Vector<Real> toVector(double x, double y, double z) {

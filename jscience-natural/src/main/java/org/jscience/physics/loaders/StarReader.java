@@ -61,17 +61,22 @@ public class StarReader extends AbstractResourceReader<List<StarReader.Star>> {
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("reader.star.category", "Physics");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.astronomy", "Astronomy");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("reader.star.name", "Star Reader");
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.starreader.name", "Star Reader");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("reader.star.description", "Generic Star Catalog Reader (CSV).");
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.starreader.desc", "Generic Star Catalog Reader (CSV).");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.starreader.longdesc", "Loads star catalog data from CSV resources, including position, distance, and spectral type.");
     }
 
     public List<Star> loadResource(String path) throws Exception {

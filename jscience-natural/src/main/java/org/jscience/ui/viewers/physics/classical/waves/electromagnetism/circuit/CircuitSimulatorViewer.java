@@ -47,10 +47,10 @@ import java.util.List;
 public class CircuitSimulatorViewer extends org.jscience.ui.AbstractViewer implements org.jscience.ui.Simulatable {
 
     @Override
-    public String getCategory() { return "Physics"; }
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics"); }
     
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.circuit"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.circuitsimulatorviewer.name", "Circuit Simulator"); }
 
 
     private enum ComponentType {
@@ -463,11 +463,11 @@ public class CircuitSimulatorViewer extends org.jscience.ui.AbstractViewer imple
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("CircuitSimulatorViewer.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.circuitsimulatorviewer.desc", "Interactive electrical circuit schematic designer.");
     }
 
     @Override
     public String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.circuitsimulatorviewer.longdesc", "Design and analyze electronic circuits using standard components like resistors, capacitors, and batteries. Includes a built-in nodal analysis solver using JScience linear algebra to calculate voltages across the circuit.");
     }
 }

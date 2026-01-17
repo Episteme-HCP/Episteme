@@ -37,17 +37,17 @@ public class MandelbrotDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics", "Mathematics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.mandelbrotdemo.name");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.mandelbrotdemo.name", "Mandelbrot Fractal");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.mandelbrotdemo.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.mandelbrotdemo.desc", "Interactive exploration of the Mandelbrot set and Julia sets.");
     }
 
     @Override
@@ -57,6 +57,6 @@ public class MandelbrotDemo extends AbstractDemo {
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.mandelbrotdemo.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.mandelbrotdemo.longdesc", "Deep zoom capability into the Mandelbrot set with real-time rendering.");
     }
 }

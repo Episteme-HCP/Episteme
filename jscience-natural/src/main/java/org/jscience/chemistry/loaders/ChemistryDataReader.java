@@ -50,12 +50,17 @@ public class ChemistryDataReader extends AbstractResourceReader<Object> {
 
     @Override
     public String getCategory() {
-        return "Chemistry";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry");
     }
 
     @Override
     public String getDescription() {
-        return "Generic Chemistry Data Reader (JSON).";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.chemistrydatareader.desc", "Generic Chemistry Data Reader (JSON).");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.chemistrydatareader.longdesc", "Reads chemistry data including elements and molecules from JSON resources.");
     }
 
     @Override
@@ -331,5 +336,5 @@ public class ChemistryDataReader extends AbstractResourceReader<Object> {
         public List<MoleculeData> molecules;
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.chemistrydata.name"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.chemistrydatareader.name", "Chemistry Data Reader"); }
 }

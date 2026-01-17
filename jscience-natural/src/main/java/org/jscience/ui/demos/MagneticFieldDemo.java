@@ -45,13 +45,13 @@ public class MagneticFieldDemo extends AbstractDemo {
     @Override
     public String getName() {
         // Fallback if key missing, but should be added to properties
-        String title = I18n.getInstance().get("demo.magnetic.title");
+        String title = org.jscience.ui.i18n.I18n.getInstance().get("demo.magnetic.title");
         return title != null && !title.startsWith("!") ? title : "Magnetic Vector Field";
     }
 
     @Override
     public String getDescription() {
-        String desc = I18n.getInstance().get("demo.magnetic.desc");
+        String desc = org.jscience.ui.i18n.I18n.getInstance().get("demo.magnetic.desc");
         return desc != null && !desc.startsWith("!") ? desc : "3D visualization of magnetic B-fields using vector arrows and color gradients.";
     }
 

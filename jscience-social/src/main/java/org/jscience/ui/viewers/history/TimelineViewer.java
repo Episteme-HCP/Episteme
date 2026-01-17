@@ -177,14 +177,8 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
             // HistoricalEvent name might be key
             String label = e.getName();
             // Try I18n?
-            if (label.startsWith("kurzweil.")) {
-                 // It's a key
-                 // Try looking it up via SocialI18n (passed via context? or generic I18n)
-                 // Generic I18n might not have Social keys if not loaded?
-                 // But I18n loads "messages_social" by default in my I18n class! (checked earlier)
-                 // So I18n.getInstance().get(label) should work.
-                 label = I18n.getInstance().get(label);
-            }
+            // Try I18n translation without checking prefix
+            label = org.jscience.ui.i18n.I18n.getInstance().get(label, label);
             
             gc.fillText(label, 0, 0);
             gc.restore();
@@ -198,17 +192,17 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
 
     @Override
     public String getCategory() {
-        return "History";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.history", "History");
     }
 
     @Override
     public String getName() {
-        return "Timeline Viewer";
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.timeline.name", "Timeline Viewer");
     }
     
     @Override
     public String getDescription() {
-        return "Visualizes events on a timeline.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.timeline.desc", "Visualizes events on a timeline.");
     }
 
     @Override
@@ -222,11 +216,37 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
     
     @Override
     public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
-        return java.util.Collections.emptyList();
+        java.util.List<org.jscience.ui.Parameter<?>> parameters = new java.util.ArrayList<>();
+        
+        // Defaults from jscience.properties
+        double defMin = org.jscience.io.Configuration.getDouble("viewer.timelineviewer.default.start", -10000);
+        double defMax = org.jscience.io.Configuration.getDouble("viewer.timelineviewer.default.end", 2050);
+        
+        // Initialize local vars if strictly default (or if not set by data yet)
+        if (minYear == -10000) minYear = defMin;
+        if (maxYear == 2050) maxYear = defMax;
+
+        parameters.add(new org.jscience.ui.NumericParameter("viewer.timelineviewer.param.start",
+                org.jscience.ui.i18n.I18n.getInstance().get("viewer.timelineviewer.param.start.desc", "Start Year"),
+                minYear - 10000, maxYear, 100, minYear,
+                v -> {
+                    this.minYear = v.doubleValue();
+                    draw();
+                }));
+
+        parameters.add(new org.jscience.ui.NumericParameter("viewer.timelineviewer.param.end",
+                org.jscience.ui.i18n.I18n.getInstance().get("viewer.timelineviewer.param.end.desc", "End Year"),
+                minYear, maxYear + 10000, 100, maxYear,
+                v -> {
+                    this.maxYear = v.doubleValue();
+                    draw();
+                }));
+                
+        return parameters;
     }
 
     @Override
     public String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.timeline.longdesc", "Interactive historical chronological visualization tool. features support for BCE/CE dates, event clustering, fuzzy date handling, and dynamic scaling to explore deep history and modern events.");
     }
 }

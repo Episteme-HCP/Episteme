@@ -45,6 +45,11 @@ public class SRTMElevationReader extends AbstractResourceReader<Double> {
     }
 
     @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.srtmelevation.longdesc", "Reads high-resolution elevation data from the Shuttle Radar Topography Mission (SRTM) files in HGT format.");
+    }
+
+    @Override
     public String getResourcePath() {
         return org.jscience.io.Configuration.get("data.srtm.path", "/data/srtm/");
     }
@@ -100,5 +105,5 @@ public class SRTMElevationReader extends AbstractResourceReader<Double> {
         }
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.srtmelevation.name"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.srtmelevation.name", "SRTM Elevation Reader"); }
 }

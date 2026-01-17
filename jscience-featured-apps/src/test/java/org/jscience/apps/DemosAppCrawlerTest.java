@@ -77,7 +77,7 @@ public class DemosAppCrawlerTest {
         new File(SCREENSHOT_DIR).mkdirs();
         // Force English for stable lookups
         Locale.setDefault(Locale.ENGLISH);
-        I18n.getInstance().setLocale(Locale.ENGLISH);
+        org.jscience.ui.i18n.I18n.getInstance().setLocale(Locale.ENGLISH);
     }
 
     @Start

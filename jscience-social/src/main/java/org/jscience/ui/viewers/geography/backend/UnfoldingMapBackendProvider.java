@@ -48,12 +48,12 @@ public class UnfoldingMapBackendProvider implements BackendProvider {
 
     @Override
     public String getName() {
-        return "Unfolding Maps";
+        return org.jscience.ui.i18n.I18n.getInstance().get("provider.unfolding.name", "Unfolding Maps");
     }
 
     @Override
     public String getDescription() {
-        return "Processing-based interactive map library with tile providers.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("provider.unfolding.desc", "Processing-based interactive map library with tile providers.");
     }
 
     @Override

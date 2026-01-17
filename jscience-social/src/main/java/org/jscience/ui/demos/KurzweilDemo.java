@@ -36,7 +36,6 @@ import org.jscience.history.Timeline;
 import org.jscience.history.HistoricalEvent;
 import org.jscience.history.FuzzyDate;
 import org.jscience.ui.viewers.history.TimelineViewer;
-import org.jscience.ui.i18n.SocialI18n;
 import org.jscience.ui.i18n.I18n;
 
 import java.util.List;
@@ -66,25 +65,25 @@ public class KurzweilDemo extends AbstractDemo {
 
     // Historical milestones
     private static final List<Milestone> MILESTONES = List.of(
-            new Milestone(-3000000, "kurzweil.milestone.tools"),
-            new Milestone(-100000, "kurzweil.milestone.language"),
-            new Milestone(-10000, "kurzweil.milestone.agriculture"),
-            new Milestone(-3000, "kurzweil.milestone.writing"),
-            new Milestone(-500, "kurzweil.milestone.philosophy"),
-            new Milestone(1, "kurzweil.milestone.common"),
-            new Milestone(1440, "kurzweil.milestone.print"),
-            new Milestone(1750, "kurzweil.milestone.industrial"),
-            new Milestone(1879, "kurzweil.milestone.bulb"),
-            new Milestone(1903, "kurzweil.milestone.flight"),
-            new Milestone(1945, "kurzweil.milestone.computer"),
-            new Milestone(1969, "kurzweil.milestone.moon"),
-            new Milestone(1971, "kurzweil.milestone.micro"),
-            new Milestone(1989, "kurzweil.milestone.www"),
-            new Milestone(2007, "kurzweil.milestone.phone"),
-            new Milestone(2012, "kurzweil.milestone.dl"),
-            new Milestone(2022, "kurzweil.milestone.llm"),
-            new Milestone(2025, "kurzweil.milestone.now"),
-            new Milestone(2045, "kurzweil.milestone.singularity"));
+            new Milestone(-3000000, "demo.kurzweildemo.milestone.tools"),
+            new Milestone(-100000, "demo.kurzweildemo.milestone.language"),
+            new Milestone(-10000, "demo.kurzweildemo.milestone.agriculture"),
+            new Milestone(-3000, "demo.kurzweildemo.milestone.writing"),
+            new Milestone(-500, "demo.kurzweildemo.milestone.philosophy"),
+            new Milestone(1, "demo.kurzweildemo.milestone.common"),
+            new Milestone(1440, "demo.kurzweildemo.milestone.print"),
+            new Milestone(1750, "demo.kurzweildemo.milestone.industrial"),
+            new Milestone(1879, "demo.kurzweildemo.milestone.bulb"),
+            new Milestone(1903, "demo.kurzweildemo.milestone.flight"),
+            new Milestone(1945, "demo.kurzweildemo.milestone.computer"),
+            new Milestone(1969, "demo.kurzweildemo.milestone.moon"),
+            new Milestone(1971, "demo.kurzweildemo.milestone.micro"),
+            new Milestone(1989, "demo.kurzweildemo.milestone.www"),
+            new Milestone(2007, "demo.kurzweildemo.milestone.phone"),
+            new Milestone(2012, "demo.kurzweildemo.milestone.dl"),
+            new Milestone(2022, "demo.kurzweildemo.milestone.llm"),
+            new Milestone(2025, "demo.kurzweildemo.milestone.now"),
+            new Milestone(2045, "demo.kurzweildemo.milestone.singularity"));
 
     private Label realTimeLabel;
     private Label kurzweilTimeLabel;
@@ -98,22 +97,22 @@ public class KurzweilDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return SocialI18n.getInstance().get("category.history", "History");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.history", "History");
     }
 
     @Override
     public String getName() {
-        return SocialI18n.getInstance().get("demo.kurzweildemo.name");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.kurzweildemo.name", "Kurzweil Singularity Watch");
     }
 
     @Override
     public String getDescription() {
-        return SocialI18n.getInstance().get("demo.kurzweildemo.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.kurzweildemo.desc", "Exponential growth of technology vs linear time.");
     }
 
     @Override
     public String getLongDescription() {
-        return SocialI18n.getInstance().get("demo.kurzweildemo.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.kurzweildemo.longdesc", "Visualizes the accelerating pace of paradigm shifts leading to the technological singularity.");
     }
 
     @Override
@@ -128,7 +127,10 @@ public class KurzweilDemo extends AbstractDemo {
                 date = FuzzyDate.of(m.year);
             }
             // Category? Default to SCIENTIFIC
-            timeline.addEvent(new HistoricalEvent(m.label, date, HistoricalEvent.Category.SCIENTIFIC));
+            // NOTE: Key is passed as label, TimelineViewer should translate it if it's a key.
+            // Using I18n here directly means the stored event has the localized string.
+            // Assuming HistoricalEvent doesn't store key but display string.
+            timeline.addEvent(new HistoricalEvent(org.jscience.ui.i18n.I18n.getInstance().get(m.label, "Milestone"), date, HistoricalEvent.Category.SCIENTIFIC));
         }
 
         // Main content - two viewers
@@ -138,7 +140,7 @@ public class KurzweilDemo extends AbstractDemo {
 
         // Linear timeline
         VBox linearBox = new VBox(5);
-        Label linearLabel = new Label(SocialI18n.getInstance().get("kurzweil.label.linear"));
+        Label linearLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.kurzweildemo.label.linear", "Linear Time (Calendar)"));
         linearLabel.getStyleClass().add("header-label");
 
         linearViewer = new TimelineViewer();
@@ -150,7 +152,7 @@ public class KurzweilDemo extends AbstractDemo {
 
         // Logarithmic timeline
         VBox logBox = new VBox(5);
-        Label logLabel = new Label(SocialI18n.getInstance().get("kurzweil.label.log"));
+        Label logLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.kurzweildemo.label.log", "Logarithmic Time (Technological Progress)"));
         logLabel.getStyleClass().add("header-label");
 
         logViewer = new TimelineViewer();
@@ -199,36 +201,37 @@ public class KurzweilDemo extends AbstractDemo {
         sidebar.getStyleClass().add("viewer-sidebar");
 
         // Dual clocks
-        Label clockTitle = new Label(SocialI18n.getInstance().get("kurzweil.sidebar.clock"));
+        // Dual clocks
+        Label clockTitle = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.kurzweildemo.label.clock", "Time Dilation"));
         clockTitle.getStyleClass().add("header-label");
 
         VBox linearClock = new VBox(5);
         Label linearClockLabel = new Label(
-                SocialI18n.getInstance().get("kurzweil.sidebar.linear"));
+                org.jscience.ui.i18n.I18n.getInstance().get("demo.kurzweildemo.label.linearclock", "Linear Clock:"));
         linearClockLabel.getStyleClass().add("text-secondary");
-        realTimeLabel = new Label(I18n.getInstance().get("generated.kurzweil.000", "0.00"));
+        realTimeLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.kurzweildemo.text.placeholder.zero", "0.00"));
         realTimeLabel.getStyleClass().add("font-title");
         realTimeLabel.getStyleClass().add("text-success");
         linearClock.getChildren().addAll(linearClockLabel, realTimeLabel);
 
         VBox kurzweilClock = new VBox(5);
         Label kurzweilClockLabel = new Label(
-                SocialI18n.getInstance().get("kurzweil.sidebar.kurzweil"));
+                org.jscience.ui.i18n.I18n.getInstance().get("demo.kurzweildemo.label.kurzweilclock", "Kurzweil Clock:"));
         kurzweilClockLabel.getStyleClass().add("text-secondary");
-        kurzweilTimeLabel = new Label(I18n.getInstance().get("generated.kurzweil.000", "0.00"));
+        kurzweilTimeLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.kurzweildemo.text.placeholder.zero", "0.00"));
         kurzweilTimeLabel.getStyleClass().add("font-title");
         kurzweilTimeLabel.getStyleClass().add("text-warning");
         kurzweilClock.getChildren().addAll(kurzweilClockLabel, kurzweilTimeLabel);
 
         accelerationLabel = new Label(
-                SocialI18n.getInstance().get("kurzweil.sidebar.accel") + " 1.00x");
+                org.jscience.ui.i18n.I18n.getInstance().get("demo.kurzweildemo.label.acceleration", "Acceleration:") + " 1.00x");
         accelerationLabel.getStyleClass().add("text-highlight");
         accelerationLabel.setFont(Font.font("System", 12));
 
         // Controls
         Separator sep = new Separator();
 
-        Label controlLabel = new Label(SocialI18n.getInstance().get("kurzweil.sidebar.base"));
+        Label controlLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.kurzweildemo.label.basespeed", "Base Rate:"));
         controlLabel.getStyleClass().add("description-label");
 
         Slider accelSlider = new Slider(1.1, 5.0, accelerationFactor);
@@ -239,7 +242,7 @@ public class KurzweilDemo extends AbstractDemo {
             accelerationFactor = nv.doubleValue();
         });
 
-        Button resetBtn = new Button(SocialI18n.getInstance().get("kurzweil.btn.reset"));
+        Button resetBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.kurzweildemo.button.reset", "Reset Sim"));
         resetBtn.setMaxWidth(Double.MAX_VALUE);
         resetBtn.getStyleClass().add("accent-button-blue");
         resetBtn.setOnAction(e -> {
@@ -248,7 +251,7 @@ public class KurzweilDemo extends AbstractDemo {
         });
 
         ToggleButton pauseBtn = new ToggleButton(
-                SocialI18n.getInstance().get("kurzweil.btn.pause"));
+                org.jscience.ui.i18n.I18n.getInstance().get("demo.kurzweildemo.button.pause", "Pause / Resume"));
         pauseBtn.setMaxWidth(Double.MAX_VALUE);
         pauseBtn.setOnAction(e -> running = !pauseBtn.isSelected());
 
@@ -268,7 +271,7 @@ public class KurzweilDemo extends AbstractDemo {
         realTimeLabel.setText(String.format("%.2f s", realTimeSeconds));
         kurzweilTimeLabel.setText(String.format("%.2f", kurzweilTime));
         accelerationLabel.setText(String.format(
-                SocialI18n.getInstance().get("kurzweil.sidebar.accel") + " %.2fx", acceleration));
+                org.jscience.ui.i18n.I18n.getInstance().get("demo.kurzweildemo.label.acceleration", "Acceleration:") + " %.2fx", acceleration));
     }
 
     private static record Milestone(int year, String label) {

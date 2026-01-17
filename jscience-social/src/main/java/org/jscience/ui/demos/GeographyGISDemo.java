@@ -44,17 +44,17 @@ public class GeographyGISDemo extends AbstractDemo {
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.geographygisdemo.name");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.geographygisdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.geographygisdemo.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.geographygisdemo.desc");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.geographygisdemo.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.geographygisdemo.longdesc");
     }
 
     @Override

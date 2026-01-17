@@ -46,10 +46,10 @@ public class DigitalLogicDemo extends AbstractSimulationDemo {
     public String getCategory() { return "Computing"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("digital.title", "Digital Logic Simulator"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("digital.title", "Digital Logic Simulator"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("digital.desc", "Interactive Logic Circuit Simulator"); }
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("digital.desc", "Interactive Logic Circuit Simulator"); }
     
     @Override
     public String getLongDescription() { 

@@ -44,10 +44,10 @@ public class PeriodicTableDemo extends AbstractDemo {
     public String getCategory() { return "Chemistry"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("PeriodicTable.title", "Periodic Table"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("PeriodicTable.title", "Periodic Table"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("PeriodicTable.desc", "Interactive Periodic Table of Elements"); }
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("PeriodicTable.desc", "Interactive Periodic Table of Elements"); }
     
     @Override
     public String getLongDescription() { 

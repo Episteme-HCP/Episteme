@@ -37,17 +37,17 @@ public class DistributionsDemo extends AbstractDemo {
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("demo.distributionsdemo.name");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.distributionsdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("demo.distributionsdemo.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.distributionsdemo.desc");
     }
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.mathematics");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics");
     }
 
     @Override
@@ -57,7 +57,7 @@ public class DistributionsDemo extends AbstractDemo {
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("demo.distributionsdemo.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.distributionsdemo.longdesc");
     }
 }
 

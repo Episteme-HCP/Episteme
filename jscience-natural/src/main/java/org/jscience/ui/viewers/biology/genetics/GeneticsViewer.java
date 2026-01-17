@@ -66,10 +66,10 @@ public class GeneticsViewer extends AbstractViewer {
     private Label mendelResultsLabel;
 
     @Override
-    public String getName() { return I18n.getInstance().get("viewer.genetics", "Genetics"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.geneticsviewer.name", "Genetics Viewer"); }
     
     @Override
-    public String getCategory() { return "Biology"; }
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology"); }
 
     public GeneticsViewer() {
         initUI();
@@ -79,14 +79,14 @@ public class GeneticsViewer extends AbstractViewer {
         TabPane tabPane = new TabPane();
         tabPane.getStyleClass().add("demo-tab-pane");
 
-        Tab driftTab = new Tab(I18n.getInstance().get("genetics.tab.drift", "Genetic Drift"));
+        Tab driftTab = new Tab(org.jscience.ui.i18n.I18n.getInstance().get("genetics.tab.drift", "Genetic Drift"));
         driftTab.setContent(createDriftTab());
         driftTab.setClosable(false);
 
-        Tab sequenceTab = new Tab(I18n.getInstance().get("genetics.tab.sequence", "Sequence Browser"));
+        Tab sequenceTab = new Tab(org.jscience.ui.i18n.I18n.getInstance().get("genetics.tab.sequence", "Sequence Browser"));
         sequenceTab.setContent(createSequenceTab());
         sequenceTab.setClosable(false);
-        Tab mendelTab = new Tab(I18n.getInstance().get("genetics.tab.mendel", "Mendelian Inheritance"));
+        Tab mendelTab = new Tab(org.jscience.ui.i18n.I18n.getInstance().get("genetics.tab.mendel", "Mendelian Inheritance"));
         mendelTab.setContent(createMendelTab());
         mendelTab.setClosable(false);
 
@@ -98,7 +98,7 @@ public class GeneticsViewer extends AbstractViewer {
         driftCanvas = new Canvas(700, 400);
         history = new double[generations];
 
-        Button runBtn = new Button(I18n.getInstance().get("genetics.run", "Run Simulation"));
+        Button runBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("genetics.run", "Run Simulation"));
         runBtn.setOnAction(e -> runDriftSimulation());
 
         Spinner<Integer> popSpinner = new Spinner<>(10, 1000, 100, 10);
@@ -118,9 +118,9 @@ public class GeneticsViewer extends AbstractViewer {
         freqSlider.valueProperty().addListener((o, old, val) -> initialFreq = val.doubleValue());
 
         HBox controls = new HBox(15,
-                new Label(I18n.getInstance().get("genetics.popsize", "Pop Size")), popSpinner,
-                new Label(I18n.getInstance().get("genetics.generations", "Generations")), genSpinner,
-                new Label(I18n.getInstance().get("genetics.initialfreq", "Initial Freq")), freqSlider,
+                new Label(org.jscience.ui.i18n.I18n.getInstance().get("genetics.popsize", "Pop Size")), popSpinner,
+                new Label(org.jscience.ui.i18n.I18n.getInstance().get("genetics.generations", "Generations")), genSpinner,
+                new Label(org.jscience.ui.i18n.I18n.getInstance().get("genetics.initialfreq", "Initial Freq")), freqSlider,
                 runBtn);
         controls.setPadding(new Insets(10));
         controls.setAlignment(Pos.CENTER_LEFT);
@@ -130,14 +130,14 @@ public class GeneticsViewer extends AbstractViewer {
         infoPanel.getStyleClass().add("viewer-sidebar");
         infoPanel.setPrefWidth(200);
 
-        Label titleLabel = new Label(I18n.getInstance().get("genetics.subtitle", "Genetic Drift"));
+        Label titleLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("genetics.subtitle", "Genetic Drift"));
         titleLabel.getStyleClass().add("header-label");
 
-        Label explanationLabel = new Label(I18n.getInstance().get("genetics.explanation", "Simulates allele frequency changes in a population over generations due to random sampling."));
+        Label explanationLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("genetics.explanation", "Simulates allele frequency changes in a population over generations due to random sampling."));
         explanationLabel.setWrapText(true);
         explanationLabel.setStyle("-fx-font-size: 11px;");
 
-        driftStatusLabel = new Label(I18n.getInstance().get("genetics.status.start", "Click Run to start"));
+        driftStatusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("genetics.status.start", "Click Run to start"));
         driftStatusLabel.setStyle("-fx-font-style: italic;");
 
         infoPanel.getChildren().addAll(titleLabel, new Separator(), explanationLabel, new Separator(), driftStatusLabel);
@@ -165,9 +165,9 @@ public class GeneticsViewer extends AbstractViewer {
             freq = (double) count / popSize;
         }
 
-        String outcome = freq >= 0.99 ? I18n.getInstance().get("genetics.outcome.fixed", "Fixed")
-                : freq <= 0.01 ? I18n.getInstance().get("genetics.outcome.lost", "Lost") : String.format("%.3f", freq);
-        driftStatusLabel.setText(String.format(I18n.getInstance().get("genetics.frequency", "Final Freq: %s"), outcome));
+        String outcome = freq >= 0.99 ? org.jscience.ui.i18n.I18n.getInstance().get("genetics.outcome.fixed", "Fixed")
+                : freq <= 0.01 ? org.jscience.ui.i18n.I18n.getInstance().get("genetics.outcome.lost", "Lost") : String.format("%.3f", freq);
+        driftStatusLabel.setText(String.format(org.jscience.ui.i18n.I18n.getInstance().get("genetics.frequency", "Final Freq: %s"), outcome));
 
         drawDriftAxes();
         drawDriftHistory();
@@ -183,9 +183,9 @@ public class GeneticsViewer extends AbstractViewer {
         gc.strokeLine(50, 50, 50, 350);
 
         gc.setFill(Color.web("#222222"));
-        gc.fillText(I18n.getInstance().get("genetics.axis.generation", "Generation"), 350, 385);
-        gc.fillText(I18n.getInstance().get("genetics.axis.allele", "Allele"), 5, 180);
-        gc.fillText(I18n.getInstance().get("genetics.axis.frequency", "Frequency"), 5, 195);
+        gc.fillText(org.jscience.ui.i18n.I18n.getInstance().get("genetics.axis.generation", "Generation"), 350, 385);
+        gc.fillText(org.jscience.ui.i18n.I18n.getInstance().get("genetics.axis.allele", "Allele"), 5, 180);
+        gc.fillText(org.jscience.ui.i18n.I18n.getInstance().get("genetics.axis.frequency", "Frequency"), 5, 195);
 
         gc.setStroke(Color.web("#888888"));
         gc.setLineWidth(0.5);
@@ -220,13 +220,13 @@ public class GeneticsViewer extends AbstractViewer {
         inputPanel.getStyleClass().add("viewer-sidebar");
         inputPanel.setAlignment(Pos.TOP_LEFT);
 
-        Label title = new Label(I18n.getInstance().get("genetics.tab.mendel", "Mendelian Inheritance"));
+        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("genetics.tab.mendel", "Mendelian Inheritance"));
         title.getStyleClass().add("header-label");
 
         parent1Field = new TextField("Aa");
         parent2Field = new TextField("Aa");
 
-        Button calcBtn = new Button(I18n.getInstance().get("genetics.mendel.calculate", "Calculate"));
+        Button calcBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("genetics.mendel.calculate", "Calculate"));
         calcBtn.setMaxWidth(Double.MAX_VALUE);
         calcBtn.setOnAction(e -> calculatePunnettSquare());
 
@@ -236,8 +236,8 @@ public class GeneticsViewer extends AbstractViewer {
 
         inputPanel.getChildren().addAll(
                 title, new Separator(),
-                new Label(I18n.getInstance().get("genetics.mendel.parent1", "Parent 1 Genotype")), parent1Field,
-                new Label(I18n.getInstance().get("genetics.mendel.parent2", "Parent 2 Genotype")), parent2Field,
+                new Label(org.jscience.ui.i18n.I18n.getInstance().get("genetics.mendel.parent1", "Parent 1 Genotype")), parent1Field,
+                new Label(org.jscience.ui.i18n.I18n.getInstance().get("genetics.mendel.parent2", "Parent 2 Genotype")), parent2Field,
                 new Separator(), calcBtn, new Separator(), mendelResultsLabel);
 
         BorderPane root = new BorderPane();
@@ -254,7 +254,7 @@ public class GeneticsViewer extends AbstractViewer {
         String p2 = parent2Field.getText().trim();
 
         if (p1.length() != 2 || p2.length() != 2) {
-            mendelResultsLabel.setText(I18n.getInstance().get("genetics.mendel.error", "Enter 2-character genotypes"));
+            mendelResultsLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("genetics.mendel.error", "Enter 2-character genotypes"));
             return;
         }
 
@@ -272,7 +272,7 @@ public class GeneticsViewer extends AbstractViewer {
             counts.put(s, counts.getOrDefault(s, 0) + 1);
         }
 
-        StringBuilder results = new StringBuilder(I18n.getInstance().get("genetics.mendel.ratios", "Ratios:") + "\n");
+        StringBuilder results = new StringBuilder(org.jscience.ui.i18n.I18n.getInstance().get("genetics.mendel.ratios", "Ratios:") + "\n");
         for (Map.Entry<String, Integer> entry : counts.entrySet()) {
             double percent = (entry.getValue() / 4.0) * 100;
             results.append(String.format("  %s : %.0f%%\n", entry.getKey(), percent));
@@ -326,11 +326,11 @@ public class GeneticsViewer extends AbstractViewer {
         sidebar.setPrefWidth(300);
         sidebar.getStyleClass().add("viewer-sidebar");
 
-        Label title = new Label(I18n.getInstance().get("genetics.sequence.browser", "Sequence Browser"));
+        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("genetics.sequence.browser", "Sequence Browser"));
         title.getStyleClass().add("header-label");
 
         TextField accessionField = new TextField("P01308"); // Insulin
-        Button queryBtn = new Button(I18n.getInstance().get("genetics.uniprot.query", "Query UniProt"));
+        Button queryBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("genetics.uniprot.query", "Query UniProt"));
         queryBtn.setMaxWidth(Double.MAX_VALUE);
 
         TextArea resultArea = new TextArea();
@@ -343,7 +343,7 @@ public class GeneticsViewer extends AbstractViewer {
 
         queryBtn.setOnAction(e -> {
             String acc = accessionField.getText().trim();
-            statusLabel.setText(I18n.getInstance().get("genetics.querying", "Querying..."));
+            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("genetics.querying", "Querying..."));
             new Thread(() -> {
                 Map<String, String> data = UniProtReader.fetchByAccession(acc);
                 javafx.application.Platform.runLater(() -> {
@@ -355,16 +355,16 @@ public class GeneticsViewer extends AbstractViewer {
                         sb.append("----------------\n");
                         sb.append(data.get("raw_json"));
                         resultArea.setText(sb.toString());
-                        statusLabel.setText(I18n.getInstance().get("genetics.success", "Success!"));
+                        statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("genetics.success", "Success!"));
                     } else {
-                        resultArea.setText(I18n.getInstance().get("genetics.error.accession", "Accession not found."));
-                        statusLabel.setText(I18n.getInstance().get("genetics.error", "Error"));
+                        resultArea.setText(org.jscience.ui.i18n.I18n.getInstance().get("genetics.error.accession", "Accession not found."));
+                        statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("genetics.error", "Error"));
                     }
                 });
             }).start();
         });
 
-        Button loadFastaBtn = new Button(I18n.getInstance().get("genetics.fasta.load", "Load FASTA"));
+        Button loadFastaBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("genetics.fasta.load", "Load FASTA"));
         loadFastaBtn.setMaxWidth(Double.MAX_VALUE);
         loadFastaBtn.setOnAction(e -> {
             javafx.stage.FileChooser chooser = new javafx.stage.FileChooser();
@@ -379,7 +379,7 @@ public class GeneticsViewer extends AbstractViewer {
                         sb.append(s.data).append("\n\n");
                     }
                     resultArea.setText(sb.toString());
-                    statusLabel.setText(I18n.getInstance().get("genetics.loaded", "Loaded ") + seqs.size() + " sequences");
+                    statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("genetics.loaded", "Loaded ") + seqs.size() + " sequences");
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -388,7 +388,7 @@ public class GeneticsViewer extends AbstractViewer {
 
         sidebar.getChildren().addAll(
                 title, new Separator(),
-                new Label(I18n.getInstance().get("genetics.uniprot.id", "UniProt ID / Accession")), accessionField,
+                new Label(org.jscience.ui.i18n.I18n.getInstance().get("genetics.uniprot.id", "UniProt ID / Accession")), accessionField,
                 queryBtn, new Separator(),
                 loadFastaBtn, new Separator(),
                 statusLabel);
@@ -400,7 +400,7 @@ public class GeneticsViewer extends AbstractViewer {
         return root;
     }
 
-    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.genetics.desc"); }
-    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.genetics.longdesc"); }
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.geneticsviewer.desc", "Unified viewer for population genetics and Mendelian inheritance."); }
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.geneticsviewer.longdesc", "Features Wright-Fisher model simulations for genetic drift and Punnett square calculations for Mendelian inheritance patterns. Includes tools for UniProt accession queries and FASTA file browsing."); }
     @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

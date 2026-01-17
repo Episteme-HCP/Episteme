@@ -44,10 +44,10 @@ public class ThermodynamicsDemo extends AbstractDemo {
     public String getCategory() { return "Mathematics"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("Thermodynamics.title", "Thermodynamics Explorer"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("Thermodynamics.title", "Thermodynamics Explorer"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("thermo.desc", "Explore thermodynamic functions (Isotherms etc.)"); }
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("thermo.desc", "Explore thermodynamic functions (Isotherms etc.)"); }
     
     @Override
     public String getLongDescription() { 

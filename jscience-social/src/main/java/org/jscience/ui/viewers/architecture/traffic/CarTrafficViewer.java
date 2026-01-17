@@ -68,10 +68,10 @@ public class CarTrafficViewer extends AbstractViewer implements Simulatable {
     private double speed = 1.0;
 
     @Override
-    public String getName() { return I18n.getInstance().get("traffic.title", "Traffic Simulation"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.cartraffic.name", "Traffic Simulation"); }
     
     @Override
-    public String getCategory() { return "Social"; }
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.social_sciences", "Social Sciences"); }
 
     public CarTrafficViewer() {
         initUI();
@@ -267,6 +267,6 @@ public class CarTrafficViewer extends AbstractViewer implements Simulatable {
         Quantity<Velocity> velocity;
     }
 
-    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.cartraffic.desc"); }
-    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.cartraffic.longdesc"); }
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.cartraffic.desc", "Microscopic traffic simulation (IDM model)."); }
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.cartraffic.longdesc", "Simulate traffic flow using the Intelligent Driver Model."); }
 }

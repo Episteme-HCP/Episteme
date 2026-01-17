@@ -205,20 +205,20 @@ public class PressureGaugeViewer extends PhysicalMeasureInstrument<Pressure> {
     // --- Mandatory Abstract Methods (I18n) ---
 
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.measure", "Measurement");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.pressuregauge.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.pressuregauge.name", "Pressure Gauge");
     }
 
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.pressuregauge.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.pressuregauge.desc", "An analog gauge viewer for pressure display.");
     }
 
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.pressuregauge.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.pressuregauge.longdesc", "Classic dial-style analog gauge for visualizing pressure differentials. features customizable units (Bar, PSI, kPa), high-precision needle rendering, and a metallic-finish face for professional industrial measurement simulation.");
     }
 }
 

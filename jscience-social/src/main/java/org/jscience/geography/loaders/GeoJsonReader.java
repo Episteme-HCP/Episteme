@@ -54,12 +54,17 @@ public class GeoJSONReader extends AbstractResourceReader<List<Region>> {
 
     @Override
     public String getCategory() {
-        return "Geography";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.geography", "Geography");
     }
 
     @Override
     public String getDescription() {
-        return "GeoJSON Geographic Data Reader.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.geojson.desc", "GeoJSON Geographic Data Reader.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.geojson.longdesc", "Reads geographic features and regions from GeoJSON format files.");
     }
 
     @Override
@@ -271,5 +276,5 @@ public class GeoJSONReader extends AbstractResourceReader<List<Region>> {
         }
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.geojson.name"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.geojson.name", "GeoJSON Reader"); }
 }

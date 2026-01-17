@@ -44,12 +44,12 @@ public class LorenzDemo extends AbstractDemo {
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("Lorenz.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("Lorenz.title");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("Lorenz.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("Lorenz.desc");
     }
 
     @Override
@@ -59,6 +59,6 @@ public class LorenzDemo extends AbstractDemo {
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("Lorenz.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("Lorenz.desc");
     }
 }

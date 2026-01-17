@@ -67,12 +67,17 @@ public class OpenWeatherReader extends AbstractResourceReader<WeatherInfo> {
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.openweather.name", "OpenWeather Reader");
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.openweatherreader.name", "OpenWeather Reader");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.openweather.description", "Meteorological Data Reader.");
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.openweatherreader.desc", "Meteorological Data Reader.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.openweatherreader.longdesc", "Fetches current weather data from OpenWeatherMap API.");
     }
 
     @Override

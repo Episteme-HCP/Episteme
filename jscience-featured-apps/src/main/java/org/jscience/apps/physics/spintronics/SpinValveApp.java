@@ -96,7 +96,12 @@ public class SpinValveApp extends FeaturedAppBase {
 
     @Override
     protected String getAppTitle() {
-        return i18n.get("spintronics.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spinvalveapp.name", "Spin Valve Simulation");
+    }
+
+    @Override
+    public String getName() {
+        return getAppTitle();
     }
 
     @Override
@@ -114,38 +119,38 @@ public class SpinValveApp extends FeaturedAppBase {
         TabPane tabPane = new TabPane();
 
         // Tab 1: Visualization
-        Tab vizTab = new Tab(i18n.get("spintronics.tab.visualization"));
+        Tab vizTab = new Tab(i18n.get("spintronics.tab.visualization", "3D Visualization"));
         vizTab.setClosable(false);
         renderer3D = new Spintronic3DRenderer(600, 300);
         vizTab.setContent(renderer3D.getSubScene());
         tabPane.getTabs().add(vizTab);
 
         // Tab 2: Chart
-        Tab chartTab = new Tab(i18n.get("spintronics.tab.chart"));
+        Tab chartTab = new Tab(i18n.get("spintronics.tab.chart", "GMR/TMR Response"));
         chartTab.setClosable(false);
         resistanceChart = createChart();
         chartTab.setContent(resistanceChart);
         tabPane.getTabs().add(chartTab);
 
         // Tab 3: RF Spectrum (STNO Mode)
-        Tab spectrumTab = new Tab(i18n.get("spintronics.tab.spectrum"));
+        Tab spectrumTab = new Tab(i18n.get("spintronics.tab.spectrum", "RF Spectrum (STNO)"));
         spectrumTab.setClosable(false);
         VBox spectrumBox = new VBox(10);
         spectrumBox.setPadding(new Insets(10));
         
         NumberAxis freqAxis = new NumberAxis(0, 20, 2); // 0-20 GHz
-        freqAxis.setLabel(i18n.get("spintronics.axis.freq"));
+        freqAxis.setLabel(i18n.get("spintronics.axis.freq", "Frequency (GHz)"));
         NumberAxis powerAxis = new NumberAxis();
-        powerAxis.setLabel(i18n.get("spintronics.axis.power"));
+        powerAxis.setLabel(i18n.get("spintronics.axis.power", "Power (dBm)"));
         spectrumChart = new LineChart<>(freqAxis, powerAxis);
-        spectrumChart.setTitle(i18n.get("spintronics.chart.spectrum.title"));
+        spectrumChart.setTitle(i18n.get("spintronics.chart.spectrum.title", "Power Spectral Density"));
         spectrumChart.setCreateSymbols(false);
         spectrumChart.setAnimated(false);
         spectrumSeries = new XYChart.Series<>();
         spectrumSeries.setName("PSD");
         spectrumChart.getData().add(spectrumSeries);
         
-        peakFreqLabel = new Label(java.text.MessageFormat.format(i18n.get("spintronics.label.peak"), "--"));
+        peakFreqLabel = new Label(java.text.MessageFormat.format(i18n.get("spintronics.label.peak", "Peak: {0} GHz"), "--"));
         peakFreqLabel.getStyleClass().add("header-title");
         
         spectrumBox.getChildren().addAll(spectrumChart, peakFreqLabel);
@@ -153,7 +158,7 @@ public class SpinValveApp extends FeaturedAppBase {
         tabPane.getTabs().add(spectrumTab);
         
         // Tab 4: Magnetic Field Vector View
-        Tab magTab = new Tab(i18n.get("spintronics.tab.visualization") + " (Field)");
+        Tab magTab = new Tab(i18n.get("spintronics.tab.visualization", "3D Visualization") + " (Field)");
         magTab.setClosable(false);
         magTab.setContent(new org.jscience.ui.viewers.physics.classical.waves.electromagnetism.field.MagneticFieldViewer());
         tabPane.getTabs().add(magTab);
@@ -215,7 +220,7 @@ public class SpinValveApp extends FeaturedAppBase {
         pmaSlider = new Slider(0, 2e6, 0); // up to 2 MJ/m3
         pmaSlider.setShowTickLabels(true);
         pmaSlider.setMajorTickUnit(5e5); // 500kJ/m3 increments
-        pmaCheckBox = new CheckBox(i18n.get("spintronics.check.pma"));
+        pmaCheckBox = new CheckBox(i18n.get("spintronics.check.pma", "Perpendicular Anisotropy (PMA)"));
         
         dampingSlider.valueProperty().addListener((o, ov, nv) -> updateModel());
         pmaSlider.valueProperty().addListener((o, ov, nv) -> updateModel());
@@ -237,40 +242,40 @@ public class SpinValveApp extends FeaturedAppBase {
         areaSlider.setShowTickLabels(true);
         areaSlider.valueProperty().addListener((o, ov, nv) -> updateModel());
 
-        safCheckBox = new CheckBox(i18n.get("spintronics.check.saf"));
+        safCheckBox = new CheckBox(i18n.get("spintronics.check.saf", "Synthetic Antiferromagnet (SAF)"));
         safCheckBox.setOnAction(e -> {
             updateModelStructure(); 
             updateModel();
         });
 
-        Button hysteresisBtn = new Button(i18n.get("spintronics.btn.hysteresis"));
+        Button hysteresisBtn = new Button(i18n.get("spintronics.btn.hysteresis", "Run Hysteresis Loop"));
         hysteresisBtn.setMaxWidth(Double.MAX_VALUE);
         hysteresisBtn.setOnAction(e -> runHysteresis());
 
-        Button exportBtn = new Button(i18n.get("spintronics.btn.export"));
+        Button exportBtn = new Button(i18n.get("spintronics.btn.export", "Export Trace CSV"));
         exportBtn.getStyleClass().add("button-secondary");
         exportBtn.setMaxWidth(Double.MAX_VALUE);
         exportBtn.setOnAction(e -> exportHistoryToCSV());
 
         panel.getChildren().addAll(
-                new Label(i18n.get("spintronics.label.pinned_layer")), pinnedMaterialCombo, pinnedThicknessSlider,
+                new Label(i18n.get("spintronics.label.pinned_layer", "Pinned Layer:")), pinnedMaterialCombo, pinnedThicknessSlider,
                 safCheckBox,
                 new Separator(),
-                new Label(i18n.get("spintronics.label.spacer_layer")), spacerMaterialCombo, spacerThicknessSlider,
+                new Label(i18n.get("spintronics.label.spacer_layer", "Spacer Layer:")), spacerMaterialCombo, spacerThicknessSlider,
                 new Separator(),
-                new Label(i18n.get("spintronics.label.free_layer")), freeMaterialCombo, freeThicknessSlider,
-                new Label(i18n.get("spintronics.label.angle")), freeAngleSlider,
-                new HBox(10, new Label("Damping (\u03B1)"), dampingSlider),
+                new Label(i18n.get("spintronics.label.free_layer", "Free Layer:")), freeMaterialCombo, freeThicknessSlider,
+                new Label(i18n.get("spintronics.label.angle", "Angle (deg):")), freeAngleSlider,
+                new HBox(10, new Label(i18n.get("spintronics.label.damping", "Damping (\u03B1)")), dampingSlider),
                 new HBox(10, pmaCheckBox, pmaSlider),
                 new Separator(),
-                new Label(i18n.get("spintronics.label.sot")),
-                new HBox(10, new Label("J_SOT"), sotCurrentSlider),
-                new HBox(10, new Label("\u03B8_SH"), sotHallSlider),
+                new Label(i18n.get("spintronics.label.sot", "Spin-Orbit Torque:")),
+                new HBox(10, new Label(i18n.get("spintronics.label.j_sot", "J_SOT")), sotCurrentSlider),
+                new HBox(10, new Label(i18n.get("spintronics.label.theta_sh", "\u03B8_SH")), sotHallSlider),
                 new Separator(),
-                new Label(i18n.get("spintronics.label.geometry")),
-                new HBox(10, new Label(i18n.get("spintronics.label.area")), areaSlider),
+                new Label(i18n.get("spintronics.label.geometry", "Geometry:")),
+                new HBox(10, new Label(i18n.get("spintronics.label.area", "Side Length (nm):")), areaSlider),
                 new Separator(),
-                new Label(i18n.get("spintronics.label.temp")), temperatureSlider,
+                new Label(i18n.get("spintronics.label.temp", "Temperature (K):")), temperatureSlider,
                 new Separator(),
                 hysteresisBtn,
                 exportBtn);
@@ -320,12 +325,12 @@ public class SpinValveApp extends FeaturedAppBase {
         resistanceValueLabel = new Label("0.0");
         gmrRatioLabel = new Label("0.0 %");
         sttLabel = new Label("0.0");
-        statusLabelInfo = new Label("Ready");
+        statusLabelInfo = new Label(i18n.get("spintronics.status.ready", "Ready"));
 
         hbox.getChildren().addAll(
-                new VBox(5, new Label(i18n.get("spintronics.label.resistance")), resistanceValueLabel),
-                new VBox(5, new Label(i18n.get("spintronics.label.gmr_ratio")), gmrRatioLabel),
-                new VBox(5, new Label("STT Vector (N\u00B7m)"), sttLabel));
+                new VBox(5, new Label(i18n.get("spintronics.label.resistance", "Resistance R_Area:")), resistanceValueLabel),
+                new VBox(5, new Label(i18n.get("spintronics.label.gmr_ratio", "MR Ratio:")), gmrRatioLabel),
+                new VBox(5, new Label(i18n.get("spintronics.label.stt_vector", "STT Vector (N\u00B7m)")), sttLabel));
         return new VBox(10, new Separator(), hbox);
     }
 
@@ -431,9 +436,11 @@ public class SpinValveApp extends FeaturedAppBase {
                 pw.println(String.format("%d,%.6f,%.6f,%.6f", i, m[0], m[1], m[2]));
             }
             pw.flush();
-            statusLabelInfo.setText("Exported " + historyM.size() + " samples to " + file.getName());
+            statusLabelInfo.setText(java.text.MessageFormat.format(
+                    i18n.get("spintronics.status.exported", "Exported {0} samples to {1}"), historyM.size(), file.getName()));
         } catch (Exception e) {
-            statusLabelInfo.setText("Export failed: " + e.getMessage());
+            statusLabelInfo.setText(java.text.MessageFormat.format(
+                    i18n.get("spintronics.status.export_failed", "Export failed: {0}"), e.getMessage()));
         }
     }
 
@@ -518,7 +525,7 @@ public class SpinValveApp extends FeaturedAppBase {
         
         // Update peak frequency label
         double peakGHz = stnoAnalyzer.getPeakFrequency() / 1e9;
-        peakFreqLabel.setText(java.text.MessageFormat.format(i18n.get("spintronics.label.peak"), String.format("%.2f", peakGHz)));
+        peakFreqLabel.setText(java.text.MessageFormat.format(i18n.get("spintronics.label.peak", "Peak: {0} GHz"), String.format("%.2f", peakGHz)));
         
         // WOW: Color peak label based on freq (Red: low, Blue: high)
         double hue = Math.max(0, Math.min(240, (peakGHz / 20.0) * 240));
@@ -574,21 +581,16 @@ public class SpinValveApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return "Physics";
-    }
-
-    @Override
-    public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("SpinValveApp.name", "SpinValve");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("SpinValveApp.desc", "SpinValveApp description");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spinvalveapp.desc", "Simulate Giant Magnetoresistance (GMR), Spin-Orbit Torque, and Spin Transfer Torque oscillators.");
     }
 
     @Override
     public String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spinvalveapp.longdesc", "Advanced 3D spintronics simulation laboratory. Includes modules for Giant Magnetoresistance (GMR) effect, Spin-Orbit Torque (SOT), Spin Transfer Torque (STT) oscillators, and interactive magnetic field visualization.");
     }
 }

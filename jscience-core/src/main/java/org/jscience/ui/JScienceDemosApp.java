@@ -98,7 +98,7 @@ public class JScienceDemosApp extends Application {
 
         // Add demos by category
         if (demosByCategory.isEmpty()) {
-            allContent.getChildren().add(new Label(I18n.getInstance().get("app.nodemos")));
+            allContent.getChildren().add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("app.nodemos")));
         } else {
             // Demos sections
             for (Map.Entry<String, List<Viewer>> entry : demosByCategory.entrySet()) {
@@ -125,7 +125,7 @@ public class JScienceDemosApp extends Application {
             scene.getStylesheets().add(cssResource.toExternalForm());
         }
 
-        primaryStage.setTitle(I18n.getInstance().get("app.header.title", "JScience Demos"));
+        primaryStage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("app.header.title", "JScience Demos"));
         primaryStage.setScene(scene);
 
         // Apply global theme preference
@@ -142,10 +142,10 @@ public class JScienceDemosApp extends Application {
         // exists.
         // If not, I'll fallback to standard menu construction like in the new app.
 
-        Menu languageMenu = new Menu(I18n.getInstance().get("menu.preferences.language", "Language"));
+        Menu languageMenu = new Menu(org.jscience.ui.i18n.I18n.getInstance().get("menu.preferences.language", "Language"));
         ToggleGroup langGroup = new ToggleGroup();
 
-        for (Locale locale : I18n.getInstance().getSupportedLocales()) {
+        for (Locale locale : org.jscience.ui.i18n.I18n.getInstance().getSupportedLocales()) {
             String label = locale.getDisplayLanguage(locale);
             if (label.length() > 0) {
                 label = label.substring(0, 1).toUpperCase() + label.substring(1);
@@ -153,20 +153,20 @@ public class JScienceDemosApp extends Application {
 
             RadioMenuItem item = new RadioMenuItem(label);
             item.setToggleGroup(langGroup);
-            item.setSelected(locale.getLanguage().equals(I18n.getInstance().getLocale().getLanguage()));
+            item.setSelected(locale.getLanguage().equals(org.jscience.ui.i18n.I18n.getInstance().getLocale().getLanguage()));
             item.setOnAction(e -> {
-                I18n.getInstance().setLocale(locale);
+                org.jscience.ui.i18n.I18n.getInstance().setLocale(locale);
                 buildUI();
             });
             languageMenu.getItems().add(item);
         }
 
         // Theme Menu (Delegated to ThemeManager)
-        Menu themeMenu = new Menu(I18n.getInstance().get("app.menu.theme", "Theme"));
+        Menu themeMenu = new Menu(org.jscience.ui.i18n.I18n.getInstance().get("app.menu.theme", "Theme"));
         ToggleGroup themeGroup = new ToggleGroup();
         String currentTheme = ThemeManager.getInstance().getCurrentTheme();
 
-        RadioMenuItem modenaItem = new RadioMenuItem(I18n.getInstance().get("app.menu.theme.modena", "Modena (Light)"));
+        RadioMenuItem modenaItem = new RadioMenuItem(org.jscience.ui.i18n.I18n.getInstance().get("app.menu.theme.modena", "Modena (Light)"));
         modenaItem.setToggleGroup(themeGroup);
         modenaItem.setSelected("Modena".equalsIgnoreCase(currentTheme));
         modenaItem.setOnAction(e -> {
@@ -174,7 +174,7 @@ public class JScienceDemosApp extends Application {
             ThemeManager.getInstance().applyTheme(primaryStage.getScene());
         });
 
-        RadioMenuItem caspianItem = new RadioMenuItem(I18n.getInstance().get("app.menu.theme.caspian", "Caspian"));
+        RadioMenuItem caspianItem = new RadioMenuItem(org.jscience.ui.i18n.I18n.getInstance().get("app.menu.theme.caspian", "Caspian"));
         caspianItem.setToggleGroup(themeGroup);
         caspianItem.setSelected("Caspian".equalsIgnoreCase(currentTheme));
         caspianItem.setOnAction(e -> {
@@ -183,7 +183,7 @@ public class JScienceDemosApp extends Application {
         });
 
         RadioMenuItem highContrastItem = new RadioMenuItem(
-                I18n.getInstance().get("app.menu.theme.highcontrast", "High Contrast"));
+                org.jscience.ui.i18n.I18n.getInstance().get("app.menu.theme.highcontrast", "High Contrast"));
         highContrastItem.setToggleGroup(themeGroup);
         highContrastItem.setSelected("HighContrast".equalsIgnoreCase(currentTheme));
         highContrastItem.setOnAction(e -> {
@@ -191,7 +191,7 @@ public class JScienceDemosApp extends Application {
             ThemeManager.getInstance().applyTheme(primaryStage.getScene());
         });
 
-        RadioMenuItem darkItem = new RadioMenuItem(I18n.getInstance().get("menu.view.theme.dark", "Dark"));
+        RadioMenuItem darkItem = new RadioMenuItem(org.jscience.ui.i18n.I18n.getInstance().get("menu.view.theme.dark", "Dark"));
         darkItem.setToggleGroup(themeGroup);
         darkItem.setSelected("Dark".equalsIgnoreCase(currentTheme));
         darkItem.setOnAction(e -> {
@@ -212,11 +212,11 @@ public class JScienceDemosApp extends Application {
         header.getStyleClass().add("header-box");
         // Style moved to theme.css (.header-box)
 
-        Label title = new Label(I18n.getInstance().get("app.header.title", "JScience Demos"));
+        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("app.header.title", "JScience Demos"));
         title.getStyleClass().add("header-label");
         // Inline style removed
 
-        Label subtitle = new Label(I18n.getInstance().get("app.header.subtitle", "Scientific Applications & Tools"));
+        Label subtitle = new Label(org.jscience.ui.i18n.I18n.getInstance().get("app.header.subtitle", "Scientific Applications & Tools"));
         subtitle.getStyleClass().add("header-subtitle");
 
         header.getChildren().addAll(title, subtitle);
@@ -244,7 +244,7 @@ public class JScienceDemosApp extends Application {
         row.setPadding(new Insets(15));
         row.getStyleClass().add("demo-card");
 
-        Button btn = new Button(I18n.getInstance().get("app.button.launch", "Launch"));
+        Button btn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("app.button.launch", "Launch"));
         btn.getStyleClass().add("launch-button");
         btn.setStyle("-fx-background-color: #007acc; -fx-text-fill: white; -fx-font-weight: bold; -fx-min-width: 80;");
 
@@ -295,7 +295,7 @@ public class JScienceDemosApp extends Application {
 
     private void showError(String title, String message, Exception ex) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(I18n.getInstance().get("status.error", "Error"));
+        alert.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("status.error", "Error"));
         alert.setHeaderText(title);
         alert.setContentText(message + "\n" + ex.getMessage());
         alert.show(); // Simplified
@@ -332,7 +332,7 @@ public class JScienceDemosApp extends Application {
         for (Map.Entry<String, List<Viewer>> entry : source.entrySet()) {
             // Translate Category Name
             String key = entry.getKey();
-            String catName = I18n.getInstance().get("category." + key.toLowerCase().replace(" ", "_"), key);
+            String catName = org.jscience.ui.i18n.I18n.getInstance().get("category." + key.toLowerCase().replace(" ", "_"), key);
 
             target.computeIfAbsent(catName, k -> new ArrayList<>()).addAll(entry.getValue());
         }

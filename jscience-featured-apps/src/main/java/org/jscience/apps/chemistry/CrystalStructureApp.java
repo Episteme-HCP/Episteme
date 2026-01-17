@@ -92,36 +92,48 @@ public class CrystalStructureApp extends FeaturedAppBase {
     }
 
     private enum LatticeType {
-        SC("crystal.info.sc"),
-        BCC("crystal.info.bcc"),
-        FCC("crystal.info.fcc"),
-        HCP("crystal.info.hcp"),
-        DIAMOND("crystal.info.diamond"),
-        NACL("crystal.info.nacl"),
-        CSCL("crystal.info.cscl"),
-        CIF("crystal.info.cif");
+        SC("crystal.info.sc", "Simple Cubic (SC)"),
+        BCC("crystal.info.bcc", "Body-Centered Cubic (BCC)"),
+        FCC("crystal.info.fcc", "Face-Centered Cubic (FCC)"),
+        HCP("crystal.info.hcp", "Hexagonal Close Packed (HCP)"),
+        DIAMOND("crystal.info.diamond", "Diamond (FCC-based)"),
+        NACL("crystal.info.nacl", "Sodium Chloride (NaCl)"),
+        CSCL("crystal.info.cscl", "Cesium Chloride (CsCl)"),
+        CIF("crystal.info.cif", "Custom CIF File");
 
         private final String key;
+        private final String def;
 
-        LatticeType(String key) {
+        LatticeType(String key, String def) {
             this.key = key;
+            this.def = def;
         }
 
         @Override
         public String toString() {
-            return I18n.getInstance().get(key);
+            return org.jscience.ui.i18n.I18n.getInstance().get(key, def);
         }
 
     }
 
     @Override
     protected String getAppTitle() {
-        return i18n.get("crystal.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.crystalstructureapp.name", "Crystal Structure Viewer");
+    }
+
+    @Override
+    public String getName() {
+        return getAppTitle();
     }
 
     @Override
     public String getDescription() {
-        return i18n.get("crystal.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.crystalstructureapp.desc", "3D visualization of crystal lattices.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.crystalstructureapp.longdesc", "Advanced 3D visualization tool for exploring crystalline structures at the atomic level. Supports standard lattice types including Simple Cubic, BCC, FCC, HCP, Diamond, NaCl, and CsCl. Features custom CIF file import, interactive 3D rotation and zoom, and configurable display of atoms, bonds, and unit cell boundaries.");
     }
 
     @Override
@@ -194,7 +206,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
         VBox box = new VBox(15);
         box.setStyle("-fx-padding: 15; -fx-background-color: #f4f4f4;");
 
-        viewTitleLabel = new Label("💎 " + i18n.get("crystal.title"));
+        viewTitleLabel = new Label("💎 " + i18n.get("crystal.title", "Crystal Structure Viewer"));
         viewTitleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         // Structure Selection
@@ -210,12 +222,12 @@ public class CrystalStructureApp extends FeaturedAppBase {
         });
         latticeCombo.setMaxWidth(Double.MAX_VALUE);
 
-        loadCifBtn = new Button(i18n.get("crystal.button.loadcif"));
+        loadCifBtn = new Button(i18n.get("crystal.button.loadcif", "Load CIF File..."));
         loadCifBtn.setOnAction(e -> loadCif());
         loadCifBtn.setMaxWidth(Double.MAX_VALUE);
 
         sampleBtn = new Button(
-                MessageFormat.format(i18n.get("crystal.button.loadsample"), LatticeType.DIAMOND.toString()));
+                MessageFormat.format(i18n.get("crystal.button.loadsample", "Load Sample ({0})"), LatticeType.DIAMOND.toString()));
         sampleBtn.setOnAction(e -> loadSample());
         sampleBtn.setMaxWidth(Double.MAX_VALUE);
 
@@ -224,15 +236,15 @@ public class CrystalStructureApp extends FeaturedAppBase {
 
         // Toggles
         VBox toggles = new VBox(5);
-        showAtoms = new CheckBox(i18n.get("crystal.check.atoms"));
+        showAtoms = new CheckBox(i18n.get("crystal.check.atoms", "Show Atoms"));
         showAtoms.setSelected(true);
         showAtoms.setOnAction(e -> drawStructure());
 
-        showBonds = new CheckBox(i18n.get("crystal.check.bonds"));
+        showBonds = new CheckBox(i18n.get("crystal.check.bonds", "Show Bonds"));
         showBonds.setSelected(true);
         showBonds.setOnAction(e -> drawStructure());
 
-        showUnitCell = new CheckBox(i18n.get("crystal.check.unitcell"));
+        showUnitCell = new CheckBox(i18n.get("crystal.check.unitcell", "Show Unit Cell"));
         showUnitCell.setSelected(true);
         showUnitCell.setOnAction(e -> drawStructure());
 
@@ -247,10 +259,10 @@ public class CrystalStructureApp extends FeaturedAppBase {
         rotateYSlider.setShowTickLabels(true);
         rotateYSlider.valueProperty().addListener((obs, oldVal, newVal) -> ry.setAngle(newVal.doubleValue()));
 
-        controlsTitleLabel = new Label(i18n.get("crystal.panel.controls"));
-        rotationLabel = new Label(i18n.get("crystal.label.rotation"));
-        axisXLabel = new Label(i18n.get("crystal.axis.x"));
-        axisYLabel = new Label(i18n.get("crystal.axis.y"));
+        controlsTitleLabel = new Label(i18n.get("crystal.panel.controls", "Controls"));
+        rotationLabel = new Label(i18n.get("crystal.label.rotation", "Rotation"));
+        axisXLabel = new Label(i18n.get("crystal.axis.x", "X Axis"));
+        axisYLabel = new Label(i18n.get("crystal.axis.y", "Y Axis"));
 
         box.getChildren().addAll(
                 viewTitleLabel,
@@ -272,26 +284,26 @@ public class CrystalStructureApp extends FeaturedAppBase {
     @Override
     protected void updateLocalizedUI() {
         if (viewTitleLabel != null)
-            viewTitleLabel.setText("💎 " + i18n.get("crystal.title"));
+            viewTitleLabel.setText("💎 " + i18n.get("crystal.title", "Crystal Structure Viewer"));
         if (controlsTitleLabel != null)
-            controlsTitleLabel.setText(i18n.get("crystal.panel.controls"));
+            controlsTitleLabel.setText(i18n.get("crystal.panel.controls", "Controls"));
         if (loadCifBtn != null)
-            loadCifBtn.setText(i18n.get("crystal.button.loadcif"));
+            loadCifBtn.setText(i18n.get("crystal.button.loadcif", "Load CIF File..."));
         if (sampleBtn != null)
             sampleBtn.setText(
-                    MessageFormat.format(i18n.get("crystal.button.loadsample"), LatticeType.DIAMOND.toString()));
+                    MessageFormat.format(i18n.get("crystal.button.loadsample", "Load Sample ({0})"), LatticeType.DIAMOND.toString()));
         if (showAtoms != null)
-            showAtoms.setText(i18n.get("crystal.check.atoms"));
+            showAtoms.setText(i18n.get("crystal.check.atoms", "Show Atoms"));
         if (showBonds != null)
-            showBonds.setText(i18n.get("crystal.check.bonds"));
+            showBonds.setText(i18n.get("crystal.check.bonds", "Show Bonds"));
         if (showUnitCell != null)
-            showUnitCell.setText(i18n.get("crystal.check.unitcell"));
+            showUnitCell.setText(i18n.get("crystal.check.unitcell", "Show Unit Cell"));
         if (rotationLabel != null)
-            rotationLabel.setText(i18n.get("crystal.label.rotation"));
+            rotationLabel.setText(i18n.get("crystal.label.rotation", "Rotation"));
         if (axisXLabel != null)
-            axisXLabel.setText(i18n.get("crystal.axis.x"));
+            axisXLabel.setText(i18n.get("crystal.axis.x", "X Axis"));
         if (axisYLabel != null)
-            axisYLabel.setText(i18n.get("crystal.axis.y"));
+            axisYLabel.setText(i18n.get("crystal.axis.y", "Y Axis"));
 
         if (latticeCombo != null) {
             LatticeType selected = latticeCombo.getValue();
@@ -311,7 +323,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
                 return;
 
             root3D.getChildren().clear();
-            infoLabel.setText(MessageFormat.format(i18n.get("crystal.details.formula"), cif.chemicalFormula) + "\n" +
+            infoLabel.setText(MessageFormat.format(i18n.get("crystal.details.formula", "Formula: {0}"), cif.chemicalFormula) + "\n" +
                     "a=" + cif.a + ", b=" + cif.b + ", c=" + cif.c + "\n" +
                     "alpha=" + cif.alpha + ", beta=" + cif.beta + ", gamma=" + cif.gamma);
 
@@ -398,7 +410,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
             }
 
         } catch (Exception e) {
-            infoLabel.setText(i18n.get("crystal.error.load") + ": " + e.getMessage());
+            infoLabel.setText(i18n.get("crystal.error.load", "Error loading CIF") + ": " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -421,7 +433,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
             if (is != null) {
                 loadCifStructure(is);
             } else {
-                infoLabel.setText(i18n.get("crystal.error.sample"));
+                infoLabel.setText(i18n.get("crystal.error.sample", "Sample file not found."));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -447,14 +459,14 @@ public class CrystalStructureApp extends FeaturedAppBase {
 
         if (type == LatticeType.SC) {
             // Simple Cubic
-            infoLabel.setText(i18n.get("crystal.details.sc"));
+            infoLabel.setText(i18n.get("crystal.details.sc", "Simple Cubic (Po model)"));
             for (int i = 0; i < 2; i++)
                 for (int j = 0; j < 2; j++)
                     for (int k = 0; k < 2; k++)
                         atoms.add(new AtomRecord(i, j, k, "Po"));
         } else if (type == LatticeType.BCC) {
             // BCC
-            infoLabel.setText(i18n.get("crystal.details.bcc"));
+            infoLabel.setText(i18n.get("crystal.details.bcc", "Body-Centered Cubic (Fe model)"));
             // corners
             for (int i = 0; i < 2; i++)
                 for (int j = 0; j < 2; j++)
@@ -466,7 +478,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
                     }
         } else if (type == LatticeType.FCC) {
             // FCC
-            infoLabel.setText(i18n.get("crystal.details.fcc"));
+            infoLabel.setText(i18n.get("crystal.details.fcc", "Face-Centered Cubic (Cu model)"));
             for (int i = 0; i < 2; i++)
                 for (int j = 0; j < 2; j++)
                     for (int k = 0; k < 2; k++) {
@@ -478,19 +490,19 @@ public class CrystalStructureApp extends FeaturedAppBase {
                         }
                     }
         } else if (type == LatticeType.NACL) {
-            infoLabel.setText(i18n.get("crystal.details.nacl"));
+            infoLabel.setText(i18n.get("crystal.details.nacl", "Rock Salt (NaCl model)"));
             for (int i = 0; i < 2; i++)
                 for (int j = 0; j < 2; j++)
                     for (int k = 0; k < 2; k++)
                         addNaClUnit(atoms, i, j, k);
         } else if (type == LatticeType.DIAMOND) {
-            infoLabel.setText(i18n.get("crystal.details.diamond"));
+            infoLabel.setText(i18n.get("crystal.details.diamond", "Diamond Cubic (C model)"));
             for (int i = 0; i < 2; i++)
                 for (int j = 0; j < 2; j++)
                     for (int k = 0; k < 2; k++)
                         addDiamondUnit(atoms, i, j, k, "C");
         } else if (type == LatticeType.CSCL) {
-            infoLabel.setText(i18n.get("crystal.details.cscl"));
+            infoLabel.setText(i18n.get("crystal.details.cscl", "Cesium Chloride (CsCl model)"));
             atoms.add(new AtomRecord(0, 0, 0, "Cl"));
             atoms.add(new AtomRecord(0.5, 0.5, 0.5, "Cs"));
         }
@@ -686,16 +698,6 @@ public class CrystalStructureApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return "Chemistry";
-    }
-
-    @Override
-    public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("CrystalStructureApp.name", "CrystalStructure");
-    }
-
-    @Override
-    public String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry");
     }
 }

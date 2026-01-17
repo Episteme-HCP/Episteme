@@ -34,22 +34,22 @@ public class HistoryTimelineDemo extends AbstractDemo {
 
     @Override
     public String getCategory() { 
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("category.history", "History"); 
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.history", "History"); 
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.historytimelinedemo.name");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.name", "Interactive Timeline");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.historytimelinedemo.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.desc", "Horizontal scrollable timeline.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.historytimelinedemo.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.longdesc", "Horizontal scrollable timeline visualizing historical eras and events.");
     }
 
     @Override

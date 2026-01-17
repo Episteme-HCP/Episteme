@@ -45,11 +45,11 @@ public class IUPACGoldBookReader {
     }
 
     public static String getCategory() {
-        return "Chemistry";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry");
     }
 
     public static String getDescription() {
-        return "IUPAC Gold Book Reader.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.iupacgold.desc", "IUPAC Gold Book Reader.");
     }
 
     /**

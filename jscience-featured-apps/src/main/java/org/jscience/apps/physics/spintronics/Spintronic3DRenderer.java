@@ -33,6 +33,7 @@ import javafx.scene.shape.Box;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.transform.Rotate;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.apps.framework.JScienceTheme;
 
 /**
  * 3D Renderer for Spintronics structures using JavaFX 3D.
@@ -60,7 +61,7 @@ public class Spintronic3DRenderer {
 
     public Spintronic3DRenderer(double width, double height) {
         subScene = new SubScene(world, width, height, true, SceneAntialiasing.BALANCED);
-        subScene.setFill(Color.web("#2c3e50"));
+        subScene.setFill(JScienceTheme.BACKGROUND_DARK);
         world.getChildren().add(root);
 
         PerspectiveCamera camera = new PerspectiveCamera(true);
@@ -124,17 +125,17 @@ public class Spintronic3DRenderer {
             // SAF Bottom (Pinned 1)
             Box safari1 = new Box(200, 30, 200);
             safari1.setTranslateY(-90);
-            safari1.setMaterial(new PhongMaterial(Color.web("#2c3e50"))); // Dark Blue
+            safari1.setMaterial(new PhongMaterial(JScienceTheme.BACKGROUND_DARK)); 
 
             // SAF Spacer (Ru)
             Box safariSpacer = new Box(200, 10, 200);
             safariSpacer.setTranslateY(-70);
-            safariSpacer.setMaterial(new PhongMaterial(Color.web("#95a5a6"))); // Grey
+            safariSpacer.setMaterial(new PhongMaterial(JScienceTheme.ENGINEERING_GRAY)); 
 
             // SAF Top (Pinned 2 - Reference)
             Box safari2 = new Box(200, 30, 200);
             safari2.setTranslateY(-50);
-            safari2.setMaterial(new PhongMaterial(Color.web("#34495e"))); // Blue
+            safari2.setMaterial(new PhongMaterial(JScienceTheme.IRON)); 
 
             root.getChildren().addAll(safari1, safariSpacer, safari2);
             pinnedBox = safari2; // For reference
@@ -142,18 +143,18 @@ public class Spintronic3DRenderer {
             // Simple Pinned
             pinnedBox = new Box(200, 40, 200);
             pinnedBox.setTranslateY(-60);
-            pinnedBox.setMaterial(new PhongMaterial(Color.web("#34495e")));
+            pinnedBox.setMaterial(new PhongMaterial(JScienceTheme.IRON));
             root.getChildren().add(pinnedBox);
         }
 
         // --- Main Spacer ---
         spacerBox = new Box(200, 20, 200);
-        spacerBox.setMaterial(new PhongMaterial(Color.web("#e67e22"))); // Copper color
+        spacerBox.setMaterial(new PhongMaterial(JScienceTheme.MATH_ORANGE)); // Copper color
 
         // --- Heavy Metal Electrode (SOT) ---
         heavyMetalElectrode = new Box(500, 10, 200);
         heavyMetalElectrode.setTranslateY(100);
-        heavyMetalElectrode.setMaterial(new PhongMaterial(Color.web("#7f8c8d"))); // Platinum Grey
+        heavyMetalElectrode.setMaterial(new PhongMaterial(JScienceTheme.ENGINEERING_GRAY)); 
         root.getChildren().add(heavyMetalElectrode);
 
         // --- Free Layer (Now closer to electrode if needed, but let's keep stack order) ---
@@ -167,7 +168,7 @@ public class Spintronic3DRenderer {
         // Free Layer at Y=50
         freeBox = new Box(200, 30, 200);
         freeBox.setTranslateY(60); 
-        freeBox.setMaterial(new PhongMaterial(Color.web("#c0392b"))); // Red
+        freeBox.setMaterial(new PhongMaterial(JScienceTheme.ACCENT)); 
 
         // --- Arrows ---
         pinnedArrow = createArrow(Color.WHITE);
@@ -219,7 +220,7 @@ public class Spintronic3DRenderer {
         double intensity = Math.min(1.0, absI * 1000.0); // 1mA = 1.0 glow intensity
         
         PhongMaterial mat = (PhongMaterial) freeBox.getMaterial();
-        Color baseColor = Color.web("#c0392b"); // Red
+        Color baseColor = JScienceTheme.ACCENT; 
         
         // Increase brightness and specularity with current
         mat.setDiffuseColor(baseColor.deriveColor(0, 1.0, 1.0 + intensity, 1.0));

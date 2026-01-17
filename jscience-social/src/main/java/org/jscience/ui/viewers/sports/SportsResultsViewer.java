@@ -33,9 +33,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import org.jscience.ui.AbstractViewer;
-import org.jscience.ui.i18n.I18nManager;
-import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.mathematics.statistics.timeseries.TimeSeries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,18 +46,37 @@ import java.util.List;
  */
 public class SportsResultsViewer extends AbstractViewer {
 
-    private final I18nManager i18n = I18nManager.getInstance();
+    private final org.jscience.ui.i18n.I18n i18n = org.jscience.ui.i18n.I18n.getInstance();
     private final ObservableList<Team> teams = FXCollections.observableArrayList();
     private final ObservableList<String> matchHistory = FXCollections.observableArrayList();
 
     @Override
-    public String getName() { return i18n.get("sports.title", "Sports Results"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.sportsresults.name", "Sports Results"); }
     
     @Override
-    public String getCategory() { return "Sports"; }
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.sports", "Sports"); }
 
     public SportsResultsViewer() {
         initUI();
+    }
+    
+    @Override
+    public String getDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.sportsresults.desc", "Sports Results Management");
+    }
+
+    @Override
+    public String getLongDescription() { 
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.sportsresults.longdesc", "Manage team standings, match results and simulate seasons.");
+    }
+    
+    @Override
+    public void show(javafx.stage.Stage stage) {
+         javafx.scene.Scene scene = new javafx.scene.Scene(this);
+         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
+         stage.setTitle(getName());
+         stage.setScene(scene);
+         stage.show();
     }
 
     @SuppressWarnings("unchecked")
@@ -150,63 +166,100 @@ public class SportsResultsViewer extends AbstractViewer {
         initTeams();
     }
 
-    private void initTeams() {
-        teams.addAll(new Team("Man City"), new Team("Arsenal"), new Team("Liverpool"), new Team("Aston Villa"), new Team("Tottenham"));
+    @Override
+    public List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        List<org.jscience.ui.Parameter<?>> parameters = new ArrayList<>();
+        
+        String defaultTeams = org.jscience.io.Configuration.get("viewer.sports.default.teams", "Man City,Arsenal,Liverpool");
+        
+        parameters.add(new org.jscience.ui.Parameter<String>(
+            i18n.get("sports.param.teams", "Teams List"),
+            i18n.get("sports.param.teams.desc", "Comma-separated list of team names"),
+            defaultTeams,
+            value -> reinitializeTeams(value)
+        ));
+        
+        return parameters;
     }
 
-    private void processMatch(Team home, Team away, int hs, int as) {
+    private void reinitializeTeams(String teamList) {
+        teams.clear();
+        matchHistory.clear();
+        if (teamList != null && !teamList.isEmpty()) {
+            for (String t : teamList.split(",")) {
+                teams.add(new Team(t.trim()));
+            }
+        }
+    }
+
+    private void initTeams() {
+        String defaultTeams = org.jscience.io.Configuration.get("viewer.sports.default.teams", "Man City,Arsenal,Liverpool");
+        reinitializeTeams(defaultTeams);
+    }
+
+    private void processMatch(Team home, Team away, int homeGoals, int awayGoals) {
         if (home == null || away == null || home == away) return;
-        matchHistory.add(0, home.name.get() + " " + hs + " - " + as + " " + away.name.get());
-        home.addResult(hs, as);
-        away.addResult(as, hs);
-        FXCollections.sort(teams, (t1, t2) -> t2.points.get() - t1.points.get());
+        
+        home.played++;
+        away.played++;
+        
+        int homePoints = 0, awayPoints = 0;
+        if (homeGoals > awayGoals) {
+            homePoints = 3;
+        } else if (homeGoals < awayGoals) {
+            awayPoints = 3;
+        } else {
+            homePoints = 1;
+            awayPoints = 1;
+        }
+        
+        home.addPoints(homePoints);
+        away.addPoints(awayPoints);
+        
+        matchHistory.add(String.format("%s %d - %d %s", home.name, homeGoals, awayGoals, away.name));
+        FXCollections.sort(teams, (t1, t2) -> Integer.compare(t2.points.get(), t1.points.get()));
     }
 
     private void simulateSeason() {
-        java.util.Random r = new java.util.Random();
-        for (int i = 0; i < 5; i++) {
-            processMatch(teams.get(r.nextInt(teams.size())), teams.get(r.nextInt(teams.size())), r.nextInt(4), r.nextInt(4));
-        }
-    }
-
-    public static class Team {
-        public final SimpleStringProperty name;
-        public final SimpleIntegerProperty played = new SimpleIntegerProperty(0);
-        public final SimpleIntegerProperty points = new SimpleIntegerProperty(0);
-        public final SimpleStringProperty trend = new SimpleStringProperty("--");
-        private final List<Real> pointsHistory = new ArrayList<>();
-
-        public Team(String name) {
-            this.name = new SimpleStringProperty(name);
-            pointsHistory.add(Real.ZERO);
-        }
-
-        public void addResult(int gf, int ga) {
-            played.set(played.get() + 1);
-            int p = (gf > ga) ? 3 : (gf == ga ? 1 : 0);
-            points.set(points.get() + p);
-            pointsHistory.add(Real.of(points.get()));
-            updateTrend();
-        }
-
-        private void updateTrend() {
-            if (pointsHistory.size() < 3) return;
-            Real[] data = pointsHistory.toArray(new Real[0]);
-            Real[] sma = TimeSeries.movingAverage(data, Math.min(data.length, 3));
-            if (sma.length > 0) {
-                trend.set(String.format("%.1f", sma[sma.length - 1].doubleValue()));
+        java.util.Random rand = new java.util.Random();
+        for (int i = 0; i < teams.size(); i++) {
+            for (int j = i + 1; j < teams.size(); j++) {
+                int homeGoals = rand.nextInt(4);
+                int awayGoals = rand.nextInt(4);
+                processMatch(teams.get(i), teams.get(j), homeGoals, awayGoals);
             }
         }
-
-        public String getName() { return name.get(); }
-        public int getPlayed() { return played.get(); }
-        public int getPoints() { return points.get(); }
-        
-        @Override
-        public String toString() { return name.get(); }
     }
 
-    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.sportsresults.desc"); }
-    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.sportsresults.longdesc"); }
-    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+    /**
+     * Team data model for sports standings.
+     */
+    public static class Team {
+        public final String name;
+        public int played = 0;
+        public final SimpleIntegerProperty points = new SimpleIntegerProperty(0);
+        public final SimpleStringProperty trend = new SimpleStringProperty("--");
+        private final java.util.List<Integer> pointHistory = new java.util.ArrayList<>();
+        
+        public Team(String name) {
+            this.name = name;
+        }
+        
+        public void addPoints(int pts) {
+            points.set(points.get() + pts);
+            pointHistory.add(pts);
+            if (pointHistory.size() >= 3) {
+                double avg = pointHistory.stream()
+                    .mapToInt(Integer::intValue)
+                    .average().orElse(0);
+                trend.set(String.format("%.1f", avg));
+            }
+        }
+        
+        public String getName() { return name; }
+        public int getPlayed() { return played; }
+        
+        @Override
+        public String toString() { return name; }
+    }
 }

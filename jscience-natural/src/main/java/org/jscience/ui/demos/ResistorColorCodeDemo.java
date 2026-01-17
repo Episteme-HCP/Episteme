@@ -38,7 +38,7 @@ import org.jscience.ui.viewers.physics.classical.waves.electromagnetism.circuit.
 public class ResistorColorCodeDemo extends AbstractDemo {
 
     @Override
-    public String getName() { return I18n.getInstance().get("resistor.title", "Resistor Color Code"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("resistor.title", "Resistor Color Code"); }
 
     @Override
     public String getCategory() { return "Physics"; }

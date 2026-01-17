@@ -47,7 +47,7 @@ public class FFTBenchmark {
     private static final int SIZE = 4096; // Power of 2
 
     public static void run() {
-        System.out.println(I18n.getInstance().get("benchmark.fft.title"));
+        System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("benchmark.fft.title"));
 
         benchmarkBasicFFT(SIZE);
         benchmarkJScienceFFT(SIZE);
@@ -56,7 +56,7 @@ public class FFTBenchmark {
     private static void benchmarkBasicFFT(int size) {
         Complex[] input = createRandomData(size);
 
-        SimpleBenchmarkRunner.run(I18n.getInstance().get("benchmark.fft.basic", size), () -> {
+        SimpleBenchmarkRunner.run(org.jscience.ui.i18n.I18n.getInstance().get("benchmark.fft.basic", size), () -> {
             basicFFT(input);
         });
     }
@@ -65,7 +65,7 @@ public class FFTBenchmark {
         Complex[] input = createRandomData(size);
         Vector<Complex> vector = new DenseVector<Complex>(java.util.Arrays.asList(input), Complexes.getInstance());
 
-        SimpleBenchmarkRunner.run(I18n.getInstance().get("benchmark.fft.jscience", size), () -> {
+        SimpleBenchmarkRunner.run(org.jscience.ui.i18n.I18n.getInstance().get("benchmark.fft.jscience", size), () -> {
             AlgebraicFFT.transform(vector);
         });
     }

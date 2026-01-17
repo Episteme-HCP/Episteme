@@ -78,8 +78,8 @@ public class AudioViewer extends AbstractViewer implements Simulatable {
 
     private void setupParameters() {
         parameters.add(new org.jscience.ui.Parameter<Boolean>(
-            I18n.getInstance().get("audio.mode", "Scientific Mode"),
-            I18n.getInstance().get("audio.mode.desc", "Toggles between primitive (double) and scientific (Real) FFT"),
+            org.jscience.ui.i18n.I18n.getInstance().get("audio.mode", "Scientific Mode"),
+            org.jscience.ui.i18n.I18n.getInstance().get("audio.mode.desc", "Toggles between primitive (double) and scientific (Real) FFT"),
             false,
             val -> {
                 this.analysisProvider = val ? new RealSpectrumAnalysisProvider() : new PrimitiveSpectrumAnalysisProvider();
@@ -94,10 +94,10 @@ public class AudioViewer extends AbstractViewer implements Simulatable {
         box.setPrefWidth(200);
         box.getStyleClass().add("viewer-sidebar");
         
-        Label title = new Label(I18n.getInstance().get("audio.control", "Audio Control"));
+        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("audio.control", "Audio Control"));
         title.getStyleClass().add("header-label");
         
-        Button openBtn = new Button(I18n.getInstance().get("audio.open", "Open File"));
+        Button openBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("audio.open", "Open File"));
         openBtn.setMaxWidth(Double.MAX_VALUE);
         openBtn.setOnAction(e -> openFile());
 
@@ -217,10 +217,10 @@ public class AudioViewer extends AbstractViewer implements Simulatable {
     @Override public void setSpeed(double speed) { }
     @Override public boolean isPlaying() { return false; }
     
-    @Override public String getName() { return "Audio Viewer"; }
-    @Override public String getCategory() { return "Physics"; }
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.audioviewer.name", "Audio Viewer"); }
+    @Override public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics"); }
 
-    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.audio.desc"); }
-    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.audio.longdesc"); }
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.audioviewer.desc", "Displays audio waveforms and their spectrograms."); }
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.audioviewer.longdesc", "Comprehensive audio analysis tool that displays time-domain waveforms and frequency-domain spectrograms. Supports various audio formats and scientific FFT analysis."); }
     @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return parameters; }
 }

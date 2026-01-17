@@ -105,21 +105,21 @@ public class OscilloscopeViewer extends AbstractDeviceViewer<Oscilloscope> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.measure", "Measurement");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.oscilloscope.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.oscilloscope.name", "Oscilloscope");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.oscilloscope.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.oscilloscope.desc", "An oscilloscope viewer for signal analysis.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.oscilloscope.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.oscilloscope.longdesc", "Digital storage oscilloscope simulation for visualizing time-varying signals. features dual-channel monitoring, adjustable time-base, voltage scales, and triggered waveform capture for electronic signal debugging.");
     }
 }

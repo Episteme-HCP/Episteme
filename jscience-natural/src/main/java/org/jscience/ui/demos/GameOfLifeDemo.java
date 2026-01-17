@@ -49,17 +49,17 @@ public class GameOfLifeDemo extends AbstractSimulationDemo {
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("life.title", "Conway's Game of Life");
+        return org.jscience.ui.i18n.I18n.getInstance().get("life.title", "Conway's Game of Life");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("life.desc", "Conway's Game of Life");
+        return org.jscience.ui.i18n.I18n.getInstance().get("life.desc", "Conway's Game of Life");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("life.long_desc",
+        return org.jscience.ui.i18n.I18n.getInstance().get("life.long_desc",
                 "Conway's Game of Life is a cellular automaton that demonstrates how complex patterns " +
                 "can emerge from simple rules. Each cell follows three rules based on its neighbors: " +
                 "survival, birth, or death by isolation or overpopulation. This interactive visualization " +
@@ -97,13 +97,13 @@ public class GameOfLifeDemo extends AbstractSimulationDemo {
 
         private void setupParameters() {
             parameters.add(new NumericParameter(
-                    I18n.getInstance().get("life.param.density", "Initial Density"),
+                    org.jscience.ui.i18n.I18n.getInstance().get("life.param.density", "Initial Density"),
                     "Density of alive cells when randomizing",
                     0.01, 1.0, 0.05, 0.2,
                     val -> this.initialDensity = val));
 
             parameters.add(new Parameter<Color>(
-                    I18n.getInstance().get("life.param.color", "Cell Color"),
+                    org.jscience.ui.i18n.I18n.getInstance().get("life.param.color", "Cell Color"),
                     "Color of the alive cells",
                     Color.LIME,
                     val -> {
@@ -222,7 +222,7 @@ public class GameOfLifeDemo extends AbstractSimulationDemo {
 
         @Override
         public String getLongDescription() {
-            return I18n.getInstance().get("life.long_desc", "Conway's Game of Life detailed simulation viewer.");
+            return org.jscience.ui.i18n.I18n.getInstance().get("life.long_desc", "Conway's Game of Life detailed simulation viewer.");
         }
 
         

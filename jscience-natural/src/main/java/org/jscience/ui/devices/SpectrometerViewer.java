@@ -70,21 +70,21 @@ public class SpectrometerViewer extends AbstractDeviceViewer<Spectrometer> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrometer.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrometer.name", "Spectrometer");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrometer.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrometer.desc", "A spectrometer viewer for spectral analysis.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrometer.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrometer.longdesc", "Captures and analyzes light spectra to identify chemical compositions and physical properties. features a high-resolution spectral chart with automatic peak detection and reference library comparison.");
     }
 }

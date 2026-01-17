@@ -70,12 +70,12 @@ public class InterplanetaryTrajectoryDemo extends AbstractDemo {
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("trajectory.title", "Interplanetary Trajectory");
+        return org.jscience.ui.i18n.I18n.getInstance().get("trajectory.title", "Interplanetary Trajectory");
     }
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("trajectory.desc", "Planning of optimal Hohmann transfers between planets.");
+        return org.jscience.ui.i18n.I18n.getInstance().get("trajectory.desc", "Planning of optimal Hohmann transfers between planets.");
     }
 
     @Override
@@ -127,7 +127,7 @@ public class InterplanetaryTrajectoryDemo extends AbstractDemo {
     private VBox createControls() {
         VBox panel = new VBox(15);
         panel.setPadding(new Insets(20));
-        I18n i18n = I18n.getInstance();
+        I18n i18n = org.jscience.ui.i18n.I18n.getInstance();
 
         Label title = new Label("🚀 " + i18n.get("trajectory.panel.config", "Configuration"));
         title.getStyleClass().add("header-label");
@@ -307,7 +307,7 @@ public class InterplanetaryTrajectoryDemo extends AbstractDemo {
             return;
         if (!(originBody instanceof Planet) || !(targetBody instanceof Planet))
             return;
-        I18n i18n = I18n.getInstance();
+        I18n i18n = org.jscience.ui.i18n.I18n.getInstance();
 
         LocalDate d1 = launchDatePicker.getValue();
         LocalDate d2 = d1.plusDays((long) durationDays);

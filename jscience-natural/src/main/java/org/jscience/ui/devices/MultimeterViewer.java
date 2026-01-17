@@ -58,21 +58,21 @@ public class MultimeterViewer extends AbstractDeviceViewer<Multimeter> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.measure", "Measurement");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.multimeter.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.multimeter.name", "Multimeter");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.multimeter.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.multimeter.desc", "A multimeter viewer for measuring electrical properties.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.multimeter.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.multimeter.longdesc", "Digital multimeter simulation that measures voltage, current, and resistance. features a clear LCD-style display, automatic range selection, and precise measurements for electronic circuit testing.");
     }
 }

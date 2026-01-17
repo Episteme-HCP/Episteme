@@ -82,12 +82,22 @@ public class MarketCrashApp extends FeaturedAppBase {
 
     @Override
     protected String getAppTitle() {
-        return i18n.get("market.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.marketcrashapp.name", "Market Crash Analysis");
+    }
+
+    @Override
+    public String getName() {
+        return getAppTitle();
     }
 
     @Override
     public String getDescription() {
-        return i18n.get("market.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.marketcrashapp.desc", "Financial market simulation and technical analysis.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.marketcrashapp.longdesc", "Sophisticated financial simulator designed to analyze market trends and predict potential crashes. Includes technical indicators like Simple Moving Average (SMA), Relative Strength Index (RSI), and Bollinger Bands, with real-time risk assessment and historical data playback.");
     }
 
     @Override
@@ -123,36 +133,36 @@ public class MarketCrashApp extends FeaturedAppBase {
         area.setPadding(new Insets(10));
 
         // Price Chart
-        chartAreaTitleLabel = new Label(i18n.get("market.panel.chart"));
+        chartAreaTitleLabel = new Label(i18n.get("market.panel.chart", "Price Chart"));
         chartAreaTitleLabel.getStyleClass().add("header-label");
 
-        priceChart = ChartFactory.createLineChart(i18n.get("market.panel.chart"), i18n.get("market.label.day"),
-                i18n.get("market.label.price_axis"));
+        priceChart = ChartFactory.createLineChart(i18n.get("market.panel.chart", "Price Chart"), i18n.get("market.label.day", "Day"),
+                i18n.get("market.label.price_axis", "Price ($)"));
 
         priceChart.setAnimated(false);
         priceChart.setCreateSymbols(false);
 
-        priceSeries = ChartFactory.createSeries(i18n.get("market.series.price"));
-        smaSeries = ChartFactory.createSeries(i18n.get("market.series.sma"));
-        upperBB = ChartFactory.createSeries(i18n.get("market.series.upperbb"));
-        lowerBB = ChartFactory.createSeries(i18n.get("market.series.lowerbb"));
+        priceSeries = ChartFactory.createSeries(i18n.get("market.series.price", "Price"));
+        smaSeries = ChartFactory.createSeries(i18n.get("market.series.sma", "SMA"));
+        upperBB = ChartFactory.createSeries(i18n.get("market.series.upperbb", "Upper BB"));
+        lowerBB = ChartFactory.createSeries(i18n.get("market.series.lowerbb", "Lower BB"));
 
         priceChart.getData().addAll(priceSeries, smaSeries, upperBB, lowerBB);
         VBox.setVgrow(priceChart, Priority.ALWAYS);
 
         // RSI Chart
-        indicatorsTitleLabel = new Label(i18n.get("market.indicator.rsi"));
+        indicatorsTitleLabel = new Label(i18n.get("market.indicator.rsi", "RSI"));
         indicatorsTitleLabel.getStyleClass().add("header-label");
         indicatorsTitleLabel.setStyle("-fx-font-size: 14px;");
 
-        rsiChart = ChartFactory.createLineChart("", i18n.get("market.label.day"), i18n.get("market.indicator.rsi"));
+        rsiChart = ChartFactory.createLineChart("", i18n.get("market.label.day", "Day"), i18n.get("market.indicator.rsi", "RSI"));
 
         rsiChart.setAnimated(false);
         rsiChart.setCreateSymbols(false);
         rsiChart.setPrefHeight(150);
         rsiChart.setLegendVisible(false);
 
-        rsiSeries = ChartFactory.createSeries(i18n.get("market.indicator.rsi"));
+        rsiSeries = ChartFactory.createSeries(i18n.get("market.indicator.rsi", "RSI"));
         rsiChart.getData().add(rsiSeries);
 
         area.getChildren().addAll(chartAreaTitleLabel, priceChart, indicatorsTitleLabel, rsiChart);
@@ -165,10 +175,10 @@ public class MarketCrashApp extends FeaturedAppBase {
         panel.getStyleClass().add("viewer-sidebar");
 
         // Risk Assessment
-        riskTitleLabel = new Label(i18n.get("market.risk.title"));
+        riskTitleLabel = new Label(i18n.get("market.risk.title", "Risk Assessment"));
         riskTitleLabel.getStyleClass().add("header-label");
 
-        riskLabel = new Label(i18n.get("market.risk.none"));
+        riskLabel = new Label(i18n.get("market.risk.none", "Wait for Data..."));
         riskLabel.getStyleClass().add("header-label");
         riskLabel.setStyle("-fx-font-size: 24px; -fx-padding: 10;");
 
@@ -177,33 +187,33 @@ public class MarketCrashApp extends FeaturedAppBase {
         riskBox.setStyle("-fx-background-radius: 8; -fx-padding: 15;");
 
         // Current Stats
-        statsTitleLabel = new Label(i18n.get("market.stats.title"));
+        statsTitleLabel = new Label(i18n.get("market.stats.title", "Current Statistics"));
         statsTitleLabel.getStyleClass().add("header-label");
         statsTitleLabel.setStyle("-fx-font-size: 14px;");
 
-        currentPriceLabel = new Label(java.text.MessageFormat.format(i18n.get("market.label.price"), "--"));
-        smaLabel = new Label(java.text.MessageFormat.format(i18n.get("market.label.sma"), 20, "--"));
-        rsiLabel = new Label(java.text.MessageFormat.format(i18n.get("market.label.rsi"), 14, "--"));
+        currentPriceLabel = new Label(java.text.MessageFormat.format(i18n.get("market.label.price", "Price: {0}"), "--"));
+        smaLabel = new Label(java.text.MessageFormat.format(i18n.get("market.label.sma", "SMA ({0}): {1}"), 20, "--"));
+        rsiLabel = new Label(java.text.MessageFormat.format(i18n.get("market.label.rsi", "RSI ({0}): {1}"), 14, "--"));
 
         VBox statsBox = new VBox(5, currentPriceLabel, smaLabel, rsiLabel);
         statsBox.getStyleClass().add("viewer-controls");
 
         // Indicator Settings
-        settingsTitleLabel = new Label(i18n.get("market.settings.title"));
+        settingsTitleLabel = new Label(i18n.get("market.settings.title", "Indicator Settings"));
         settingsTitleLabel.getStyleClass().add("header-label");
         settingsTitleLabel.setStyle("-fx-font-size: 14px;");
 
-        VBox smaBox = createSliderBox(i18n.get("market.slider.sma"), 5, 50, 20);
+        VBox smaBox = createSliderBox(i18n.get("market.slider.sma", "SMA Period"), 5, 50, 20);
         smaPeriodSlider = (Slider) smaBox.getChildren().get(1);
 
-        VBox rsiBox = createSliderBox(i18n.get("market.slider.rsi"), 7, 21, 14);
+        VBox rsiBox = createSliderBox(i18n.get("market.slider.rsi", "RSI Period"), 7, 21, 14);
         rsiPeriodSlider = (Slider) rsiBox.getChildren().get(1);
 
-        showSMA = new CheckBox(i18n.get("market.check.sma"));
+        showSMA = new CheckBox(i18n.get("market.check.sma", "Show SMA"));
         showSMA.setSelected(true);
         showSMA.setOnAction(e -> smaSeries.getNode().setVisible(showSMA.isSelected()));
 
-        showBollinger = new CheckBox(i18n.get("market.check.bb"));
+        showBollinger = new CheckBox(i18n.get("market.check.bb", "Show Bollinger Bands"));
         showBollinger.setSelected(true);
         showBollinger.setOnAction(e -> {
             upperBB.getNode().setVisible(showBollinger.isSelected());
@@ -211,7 +221,7 @@ public class MarketCrashApp extends FeaturedAppBase {
         });
 
         // Alert Log
-        logTitleLabel = new Label(i18n.get("market.log.title"));
+        logTitleLabel = new Label(i18n.get("market.log.title", "Alert Log"));
         logTitleLabel.getStyleClass().add("header-label");
         logTitleLabel.setStyle("-fx-font-size: 14px;");
 
@@ -240,12 +250,12 @@ public class MarketCrashApp extends FeaturedAppBase {
         try (var is = getClass().getResourceAsStream("SP500_Sample.csv")) {
             if (is != null) {
                 marketData = FinancialMarketReader.loadCSV(is, "USD");
-                log(java.text.MessageFormat.format(i18n.get("market.log.loaded"), marketData.size()));
+                log(java.text.MessageFormat.format(i18n.get("market.log.loaded", "Loaded {0} data points."), marketData.size()));
             } else {
                 generateSyntheticData();
             }
         } catch (Exception e) {
-            log(i18n.get("market.error.load", e.getMessage()));
+            log(i18n.get("market.error.load", "Error loading sample data: {0}", e.getMessage()));
             generateSyntheticData();
         }
     }
@@ -286,7 +296,7 @@ public class MarketCrashApp extends FeaturedAppBase {
             price = close;
             time = time.plus(java.time.Duration.ofDays(1));
         }
-        log(java.text.MessageFormat.format(i18n.get("market.log.loaded"), marketData.size()));
+        log(java.text.MessageFormat.format(i18n.get("market.log.loaded", "Loaded {0} data points."), marketData.size()));
     }
 
     @Override
@@ -306,7 +316,7 @@ public class MarketCrashApp extends FeaturedAppBase {
         }));
         animationTimeline.setCycleCount(Timeline.INDEFINITE);
         animationTimeline.play();
-        setStatus(i18n.get("status.running"));
+        setStatus(i18n.get("status.running", "Running..."));
     }
 
     private void addDataPoint(int idx) {
@@ -347,27 +357,27 @@ public class MarketCrashApp extends FeaturedAppBase {
 
         double close = marketData.get(currentIndex).close.getAmount().doubleValue();
         currentPriceLabel
-                .setText(java.text.MessageFormat.format(i18n.get("market.label.price"), String.format("$%.2f", close)));
+                .setText(java.text.MessageFormat.format(i18n.get("market.label.price", "Price: {0}"), String.format("$%.2f", close)));
 
         List<Candle> subset = marketData.subList(0, currentIndex + 1);
 
         Real sma = TechnicalIndicators.sma(subset, (int) smaPeriodSlider.getValue());
         if (sma != null) {
-            smaLabel.setText(java.text.MessageFormat.format(i18n.get("market.label.sma"),
+            smaLabel.setText(java.text.MessageFormat.format(i18n.get("market.label.sma", "SMA ({0}): {1}"),
                     (int) smaPeriodSlider.getValue(), String.format("$%.2f", sma.doubleValue())));
         }
 
         Real rsi = TechnicalIndicators.rsi(subset, (int) rsiPeriodSlider.getValue());
         if (rsi != null) {
             double rsiVal = rsi.doubleValue();
-            rsiLabel.setText(java.text.MessageFormat.format(i18n.get("market.label.rsi"),
+            rsiLabel.setText(java.text.MessageFormat.format(i18n.get("market.label.rsi", "RSI ({0}): {1}"),
                     (int) rsiPeriodSlider.getValue(), String.format("%.1f", rsiVal)));
 
             if (rsiVal < 30) {
-                log(java.text.MessageFormat.format(i18n.get("market.log.oversold"), currentIndex,
+                log(java.text.MessageFormat.format(i18n.get("market.log.oversold", "Day {0}: RSI Oversold ({1})"), currentIndex,
                         String.format("%.1f", rsiVal)));
             } else if (rsiVal > 70) {
-                log(java.text.MessageFormat.format(i18n.get("market.log.overbought"), currentIndex,
+                log(java.text.MessageFormat.format(i18n.get("market.log.overbought", "Day {0}: RSI Overbought ({1})"), currentIndex,
                         String.format("%.1f", rsiVal)));
             }
         }
@@ -408,17 +418,17 @@ public class MarketCrashApp extends FeaturedAppBase {
         String riskText;
         Color color;
         if (score >= 5) {
-            riskText = i18n.get("market.risk.extreme");
+            riskText = i18n.get("market.risk.extreme", "EXTREME RISK");
             color = Color.DARKRED;
-            log(java.text.MessageFormat.format(i18n.get("market.log.extreme"), currentIndex));
+            log(java.text.MessageFormat.format(i18n.get("market.log.extreme", "Day {0}: Extreme Risk Detected!"), currentIndex));
         } else if (score >= 4) {
-            riskText = i18n.get("market.risk.high");
+            riskText = i18n.get("market.risk.high", "HIGH RISK");
             color = Color.DARKORANGE;
         } else if (score >= 2) {
-            riskText = i18n.get("market.risk.moderate");
+            riskText = i18n.get("market.risk.moderate", "MODERATE RISK");
             color = Color.GOLDENROD;
         } else {
-            riskText = i18n.get("market.risk.low");
+            riskText = i18n.get("market.risk.low", "LOW RISK");
             color = Color.DARKGREEN;
         }
 
@@ -429,16 +439,16 @@ public class MarketCrashApp extends FeaturedAppBase {
     private void stopAnimation() {
         if (animationTimeline != null)
             animationTimeline.stop();
-        setStatus(i18n.get("status.complete"));
+        setStatus(i18n.get("status.complete", "Simulation complete."));
         setProgress(0);
-        log(java.text.MessageFormat.format(i18n.get("market.log.complete"), currentIndex));
+        log(java.text.MessageFormat.format(i18n.get("market.log.complete", "Simulation ended at index {0}."), currentIndex));
     }
 
     @Override
     public void onPause() {
         if (animationTimeline != null)
             animationTimeline.pause();
-        setStatus(i18n.get("status.paused"));
+        setStatus(i18n.get("status.paused", "Simulation paused."));
     }
 
     @Override
@@ -449,47 +459,47 @@ public class MarketCrashApp extends FeaturedAppBase {
     @Override
     protected void updateLocalizedUI() {
         if (chartAreaTitleLabel != null)
-            chartAreaTitleLabel.setText(i18n.get("market.panel.chart"));
+            chartAreaTitleLabel.setText(i18n.get("market.panel.chart", "Price Chart"));
         if (indicatorsTitleLabel != null)
-            indicatorsTitleLabel.setText(i18n.get("market.indicator.rsi"));
+            indicatorsTitleLabel.setText(i18n.get("market.indicator.rsi", "RSI"));
         if (riskTitleLabel != null)
-            riskTitleLabel.setText(i18n.get("market.risk.title"));
+            riskTitleLabel.setText(i18n.get("market.risk.title", "Risk Assessment"));
         if (statsTitleLabel != null)
-            statsTitleLabel.setText(i18n.get("market.stats.title"));
+            statsTitleLabel.setText(i18n.get("market.stats.title", "Current Statistics"));
         if (settingsTitleLabel != null)
-            settingsTitleLabel.setText(i18n.get("market.settings.title"));
+            settingsTitleLabel.setText(i18n.get("market.settings.title", "Indicator Settings"));
         if (logTitleLabel != null)
-            logTitleLabel.setText(i18n.get("market.log.title"));
+            logTitleLabel.setText(i18n.get("market.log.title", "Alert Log"));
 
         if (priceChart != null) {
-            priceChart.setTitle(i18n.get("market.panel.chart"));
+            priceChart.setTitle(i18n.get("market.panel.chart", "Price Chart"));
             if (priceSeries != null)
-                priceSeries.setName(i18n.get("market.series.price"));
+                priceSeries.setName(i18n.get("market.series.price", "Price"));
             if (smaSeries != null)
-                smaSeries.setName(i18n.get("market.series.sma"));
+                smaSeries.setName(i18n.get("market.series.sma", "SMA"));
             if (upperBB != null)
-                upperBB.setName(i18n.get("market.series.upperbb"));
+                upperBB.setName(i18n.get("market.series.upperbb", "Upper BB"));
             if (lowerBB != null)
-                lowerBB.setName(i18n.get("market.series.lowerbb"));
+                lowerBB.setName(i18n.get("market.series.lowerbb", "Lower BB"));
         }
         if (rsiChart != null) {
-            rsiChart.setTitle(i18n.get("market.indicator.rsi"));
+            rsiChart.setTitle(i18n.get("market.indicator.rsi", "RSI"));
         }
 
         if (showSMA != null)
-            showSMA.setText(i18n.get("market.check.sma"));
+            showSMA.setText(i18n.get("market.check.sma", "Show SMA"));
         if (showBollinger != null)
-            showBollinger.setText(i18n.get("market.check.bb"));
+            showBollinger.setText(i18n.get("market.check.bb", "Show Bollinger Bands"));
 
         // Periodic updates (stats)
         if (currentIndex > 0 && currentIndex < marketData.size()) {
             updateIndicators();
         } else {
-            riskLabel.setText(i18n.get("market.risk.none"));
-            currentPriceLabel.setText(java.text.MessageFormat.format(i18n.get("market.label.price"), "--"));
-            smaLabel.setText(java.text.MessageFormat.format(i18n.get("market.label.sma"),
+            riskLabel.setText(i18n.get("market.risk.none", "Wait for Data..."));
+            currentPriceLabel.setText(java.text.MessageFormat.format(i18n.get("market.label.price", "Price: {0}"), "--"));
+            smaLabel.setText(java.text.MessageFormat.format(i18n.get("market.label.sma", "SMA ({0}): {1}"),
                     (int) smaPeriodSlider.getValue(), "--"));
-            rsiLabel.setText(java.text.MessageFormat.format(i18n.get("market.label.rsi"),
+            rsiLabel.setText(java.text.MessageFormat.format(i18n.get("market.label.rsi", "RSI ({0}): {1}"),
                     (int) rsiPeriodSlider.getValue(), "--"));
         }
     }
@@ -500,7 +510,7 @@ public class MarketCrashApp extends FeaturedAppBase {
         clearCharts();
         currentIndex = 0;
         riskLabel.setText("--");
-        setStatus(i18n.get("status.ready"));
+        setStatus(i18n.get("status.ready", "Ready"));
     }
 
     private void clearCharts() {
@@ -603,16 +613,6 @@ public class MarketCrashApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return "Economics";
-    }
-
-    @Override
-    public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("MarketCrashApp.name", "MarketCrash");
-    }
-
-    @Override
-    public String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.economics", "Economics");
     }
 }

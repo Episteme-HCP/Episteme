@@ -60,12 +60,17 @@ public class FactbookReader extends AbstractResourceReader<List<Country>> {
 
     @Override
     public String getCategory() {
-        return "Politics";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.politics", "Politics");
     }
 
     @Override
     public String getDescription() {
-        return "CIA World Factbook Reader (XML).";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.factbook.desc", "CIA World Factbook Reader (XML).");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.factbook.longdesc", "Parses XML data from the CIA World Factbook, providing detailed country information including demographics, geography, and government.");
     }
 
     @Override
@@ -412,6 +417,6 @@ public class FactbookReader extends AbstractResourceReader<List<Country>> {
         return samples;
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.factbook.name"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.factbook.name", "CIA Factbook Reader"); }
 }
 

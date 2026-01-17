@@ -48,12 +48,12 @@ public class OpenMapBackendProvider implements BackendProvider {
 
     @Override
     public String getName() {
-        return "OpenMap";
+        return org.jscience.ui.i18n.I18n.getInstance().get("provider.openmap.name", "OpenMap");
     }
 
     @Override
     public String getDescription() {
-        return "Java toolkit for viewing and manipulating geospatial data.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("provider.openmap.desc", "Java toolkit for viewing and manipulating geospatial data.");
     }
 
     @Override

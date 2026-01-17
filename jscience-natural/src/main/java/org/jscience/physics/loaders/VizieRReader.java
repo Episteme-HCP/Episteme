@@ -52,12 +52,17 @@ public class VizieRReader extends AbstractResourceReader<Map<String, String>> {
 
     @Override
     public String getCategory() {
-        return "Physics";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.astronomy", "Astronomy");
     }
 
     @Override
     public String getDescription() {
-        return "Access to VizieR astronomical catalogs.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.vizierreader.desc", "Access to VizieR astronomical catalogs.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.vizierreader.longdesc", "Queries VizieR astronomical catalogs by object name or coordinates (conesearch).");
     }
 
     @Override
@@ -204,6 +209,6 @@ public class VizieRReader extends AbstractResourceReader<Map<String, String>> {
         return queryByCoordinates(ra.doubleValue(), dec.doubleValue(), radiusArcmin.doubleValue(), catalog);
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.vizier.name"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.vizierreader.name", "VizieR Reader"); }
 }
 

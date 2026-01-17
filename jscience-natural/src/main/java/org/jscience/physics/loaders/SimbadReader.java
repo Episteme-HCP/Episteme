@@ -61,12 +61,17 @@ public class SIMBADReader extends AbstractResourceReader<SIMBADReader.Astronomic
 
     @Override
     public String getCategory() {
-        return "Physics";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.astronomy", "Astronomy");
     }
 
     @Override
     public String getDescription() {
-        return "Access to the SIMBAD astronomical database.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.simbadreader.desc", "Access to the SIMBAD astronomical database.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.simbadreader.longdesc", "Fetches astronomical object data from CDS SIMBAD using Sesame name resolver.");
     }
 
     private static final String BASE_URL;
@@ -247,5 +252,5 @@ public class SIMBADReader extends AbstractResourceReader<SIMBADReader.Astronomic
         return Optional.empty();
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.simbad.name"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.simbadreader.name", "SIMBAD Reader"); }
 }

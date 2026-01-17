@@ -64,12 +64,17 @@ public class CSVTimeSeriesReader extends AbstractResourceReader<Map<TimePoint, R
 
     @Override
     public String getCategory() {
-        return "History";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.history", "History");
     }
 
     @Override
     public String getDescription() {
-        return "Historical Time Series Reader (CSV).";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.csvtimeseries.desc", "Historical Time Series Reader (CSV).");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.csvtimeseries.longdesc", "Reads historical time-series data from CSV files for economic and sociological analysis.");
     }
 
     @Override
@@ -142,6 +147,6 @@ public class CSVTimeSeriesReader extends AbstractResourceReader<Map<TimePoint, R
         return series;
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.csvtimeseries.name"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.csvtimeseries.name", "CSV Time Series Reader"); }
 }
 

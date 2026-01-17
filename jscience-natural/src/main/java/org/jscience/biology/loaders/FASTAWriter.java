@@ -67,11 +67,16 @@ public class FASTAWriter extends AbstractResourceWriter<List<FASTAReader.Sequenc
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("writer.fasta.name");
+        return org.jscience.ui.i18n.I18n.getInstance().get("writer.fastawriter.name", "FASTA Writer");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("writer.fasta.description");
+        return org.jscience.ui.i18n.I18n.getInstance().get("writer.fastawriter.desc", "Writes FASTA format files.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("writer.fastawriter.longdesc", "Writes biological sequences to FASTA format files.");
     }
 }

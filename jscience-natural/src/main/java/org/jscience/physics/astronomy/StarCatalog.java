@@ -124,14 +124,6 @@ public class StarCatalog implements MiniCatalog<StarCatalog.Star> {
     // ========== Enhanced Query Methods ==========
 
     /**
-     * @deprecated Use {@link #getAll()} instead
-     */
-    @Deprecated
-    public List<Star> getStars() {
-        return getAll();
-    }
-
-    /**
      * Filters stars by spectral class (O, B, A, F, G, K, M).
      *
      * @param spectralClass the spectral class letter

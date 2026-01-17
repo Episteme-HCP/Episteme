@@ -81,7 +81,7 @@ public class JScienceMasterControl extends Application {
         try {
             // Load persistent settings
             String lang = PREFS.getLanguage();
-            I18n.getInstance().setLocale(Locale.of(lang));
+            org.jscience.ui.i18n.I18n.getInstance().setLocale(Locale.of(lang));
 
             // Theme is handled by ThemeManager
             ThemeManager.getInstance().applyTheme(stage.getScene());
@@ -109,7 +109,7 @@ public class JScienceMasterControl extends Application {
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         tabPane.getTabs().clear();
 
-        I18n i18n = I18n.getInstance();
+        I18n i18n = org.jscience.ui.i18n.I18n.getInstance();
 
         tabPane.getTabs().addAll(
                 createGeneralTab(i18n),
@@ -1542,7 +1542,7 @@ public class JScienceMasterControl extends Application {
                 demo.show(stage);
             }
         } catch (Exception e) {
-            new Alert(Alert.AlertType.ERROR, java.text.MessageFormat.format(I18n.getInstance().get("master.error.launch_failed", "Failed to launch app: {0}"), e.getMessage())).show();
+            new Alert(Alert.AlertType.ERROR, java.text.MessageFormat.format(org.jscience.ui.i18n.I18n.getInstance().get("master.error.launch_failed", "Failed to launch app: {0}"), e.getMessage())).show();
             e.printStackTrace();
         }
     }

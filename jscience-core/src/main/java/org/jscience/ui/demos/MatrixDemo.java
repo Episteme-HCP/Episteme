@@ -30,16 +30,18 @@ import org.jscience.ui.i18n.I18n;
 public class MatrixDemo extends AbstractDemo {
 
     @Override
-    public String getCategory() { return "Mathematics"; }
+    public String getCategory() { 
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics", "Mathematics"); 
+    }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("demo.matrixdemo.name");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.matrixdemo.name", "Matrix Viewer");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("demo.matrixdemo.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.matrixdemo.desc", "Visualizes matrices with table and heatmap views.");
     }
 
     @Override
@@ -49,6 +51,6 @@ public class MatrixDemo extends AbstractDemo {
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("demo.matrixdemo.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.matrixdemo.longdesc", "Interactive matrix manipulation and visualization tool supporting random generation and basic operations.");
     }
 }

@@ -95,11 +95,16 @@ public class PDBWriter extends AbstractResourceWriter<Protein> {
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("writer.pdb.name");
+        return org.jscience.ui.i18n.I18n.getInstance().get("writer.pdbwriter.name", "PDB Writer");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("writer.pdb.description");
+        return org.jscience.ui.i18n.I18n.getInstance().get("writer.pdbwriter.desc", "Writes protein structures to PDB format.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("writer.pdbwriter.longdesc", "Exports protein structure data to standard PDB file format.");
     }
 }

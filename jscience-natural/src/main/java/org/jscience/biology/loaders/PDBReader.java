@@ -40,12 +40,17 @@ public class PDBReader extends AbstractResourceReader<Protein> {
 
     @Override
     public String getCategory() {
-        return "Biology";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology");
     }
 
     @Override
     public String getDescription() {
-        return "Protein Data Bank (PDB) Reader.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.pdbreader.desc", "Protein Data Bank (PDB) Reader.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.pdbreader.longdesc", "Reads protein structures from PDB format files or RCSB PDB API.");
     }
 
     @Override
@@ -175,5 +180,5 @@ public class PDBReader extends AbstractResourceReader<Protein> {
         return protein;
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.pdb.name"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.pdbreader.name", "PDB Reader"); }
 }

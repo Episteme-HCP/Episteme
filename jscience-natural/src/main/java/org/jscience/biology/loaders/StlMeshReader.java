@@ -50,12 +50,17 @@ public class StlMeshReader extends AbstractResourceReader<MeshView> {
 
     @Override
     public String getCategory() {
-        return "Biology";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology");
     }
 
     @Override
     public String getDescription() {
-        return "STL 3D Mesh Reader.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.stlmeshreader.desc", "STL 3D Mesh Reader.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.stlmeshreader.longdesc", "Loader for STL (Stereolithography) 3D mesh files in binary format.");
     }
 
     @Override
@@ -181,6 +186,6 @@ public class StlMeshReader extends AbstractResourceReader<MeshView> {
         return new MeshView(mesh);
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.stlmesh.name"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.stlmeshreader.name", "STL Mesh Reader"); }
 }
 

@@ -38,7 +38,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import com.google.protobuf.ByteString;
 import org.jscience.server.proto.*;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.ThemeManager;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -87,7 +87,7 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
 
         checkServerAvailability();
 
-        stage.setTitle(I18n.getInstance().get("app.distributedmontecarlopiapp.title", "🎯 Monte Carlo π Estimation - JScience"));
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.title", "🎯 Monte Carlo π Estimation - JScience"));
 
         canvas = new Canvas(600, 600);
         gc = canvas.getGraphicsContext2D();
@@ -95,56 +95,53 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
         // Control panel
         VBox controls = new VBox(15);
         controls.setPadding(new Insets(20));
-        controls.setStyle("-fx-background-color: #1a1a2e;");
+        controls.getStyleClass().add("viewer-sidebar");
         controls.setPrefWidth(250);
 
-        Label title = new Label(I18n.getInstance().get("app.distributedmontecarlopiapp.header", "Monte Carlo π"));
-        title.setStyle("-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #e94560;");
+        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.header", "Monte Carlo π"));
+        title.getStyleClass().add("header-label-white");
 
-        piLabel = new Label(I18n.getInstance().get("app.distributedmontecarlopiapp.pi_label", "π ≈ ?"));
-        piLabel.setStyle("-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #eee;");
+        piLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.pi_label", "π ≈ ?"));
+        piLabel.getStyleClass().add("title-label-white");
 
-        samplesLabel = new Label(I18n.getInstance().get("app.distributedmontecarlopiapp.samples_label", "Samples: 0"));
-        samplesLabel.setStyle("-fx-font-size: 14; -fx-text-fill: #888;");
+        samplesLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.samples_label", "Samples: 0"));
+        samplesLabel.getStyleClass().add("label-muted");
 
-        modeLabel = new Label(serverAvailable ? I18n.getInstance().get("app.distributedmontecarlopiapp.mode.dist", "🌐 Distributed Mode") : I18n.getInstance().get("app.distributedmontecarlopiapp.mode.local", "💻 Local Mode"));
-        modeLabel.setStyle("-fx-font-size: 14; -fx-text-fill: #4ecca3;");
+        modeLabel = new Label(serverAvailable ? org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.mode.dist", "🌐 Distributed Mode") : org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.mode.local", "💻 Local Mode"));
+        modeLabel.getStyleClass().add("label-green");
 
         progressBar = new ProgressBar(0);
         progressBar.setPrefWidth(200);
 
-        Label accuracyLabel = new Label(I18n.getInstance().get("app.distributedmontecarlopiapp.accuracy_label", "Accuracy: ±?"));
-        accuracyLabel.setStyle("-fx-font-size: 14; -fx-text-fill: #888;");
+        Label accuracyLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.accuracy_label", "Accuracy: ±?"));
+        accuracyLabel.getStyleClass().add("label-muted");
 
         Separator sep = new Separator();
         sep.setStyle("-fx-background-color: #333;");
 
-        ToggleButton distributedBtn = new ToggleButton(I18n.getInstance().get("app.distributedmontecarlopiapp.btn.dist", "🌐 Distributed"));
+        ToggleButton distributedBtn = new ToggleButton(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.btn.dist", "🌐 Distributed"));
         distributedBtn.setSelected(serverAvailable);
-        distributedBtn.setStyle("-fx-background-color: #4ecca3; -fx-text-fill: white; " +
-                "-fx-font-size: 12; -fx-padding: 8 15;");
+        distributedBtn.getStyleClass().add("accent-button-green");
         distributedBtn.setOnAction(e -> {
             useDistributed = distributedBtn.isSelected();
             if (useDistributed && !serverAvailable) {
                 checkServerAvailability();
             }
-            modeLabel.setText(useDistributed && serverAvailable ? I18n.getInstance().get("app.distributedmontecarlopiapp.mode.dist", "🌐 Distributed Mode") : I18n.getInstance().get("app.distributedmontecarlopiapp.mode.local", "💻 Local Mode"));
+            modeLabel.setText(useDistributed && serverAvailable ? org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.mode.dist", "🌐 Distributed Mode") : org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.mode.local", "💻 Local Mode"));
         });
 
-        Button startBtn = new Button(I18n.getInstance().get("app.distributedmontecarlopiapp.btn.start", "▶ Start Sampling"));
-        startBtn.setStyle("-fx-background-color: #e94560; -fx-text-fill: white; " +
-                "-fx-font-size: 14; -fx-padding: 10 20;");
+        Button startBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.btn.start", "▶ Start Sampling"));
+        startBtn.getStyleClass().add("accent-button-red");
         startBtn.setOnAction(e -> {
             running = !running;
-            startBtn.setText(running ? I18n.getInstance().get("app.distributedmontecarlopiapp.btn.pause", "⏸ Pause") : I18n.getInstance().get("app.distributedmontecarlopiapp.btn.resume", "▶ Resume"));
+            startBtn.setText(running ? org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.btn.pause", "⏸ Pause") : org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.btn.resume", "▶ Resume"));
             if (running && useDistributed && serverAvailable) {
                 startDistributedSampling();
             }
         });
 
-        Button resetBtn = new Button(I18n.getInstance().get("app.distributedmontecarlopiapp.btn.reset", "↺ Reset"));
-        resetBtn.setStyle("-fx-background-color: #333; -fx-text-fill: white; " +
-                "-fx-font-size: 14; -fx-padding: 10 20;");
+        Button resetBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.btn.reset", "↺ Reset"));
+        resetBtn.getStyleClass().add("accent-button-gray");
         resetBtn.setOnAction(e -> reset());
 
         // Info section
@@ -162,16 +159,17 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
         infoArea.setEditable(false);
         infoArea.setWrapText(true);
         infoArea.setPrefRowCount(8);
-        infoArea.setStyle("-fx-control-inner-background: #16213e; -fx-text-fill: #aaa;");
+        infoArea.getStyleClass().add("info-text-area");
 
         controls.getChildren().addAll(
                 title, piLabel, samplesLabel, modeLabel, progressBar, accuracyLabel,
                 sep, distributedBtn, startBtn, resetBtn, new Separator(), infoArea);
 
         HBox root = new HBox(canvas, controls);
-        root.setStyle("-fx-background-color: #0f0f1a;");
+        root.getStyleClass().add("viewer-root");
 
         Scene scene = new Scene(root);
+        ThemeManager.getInstance().applyTheme(scene);
         stage.setScene(scene);
         stage.show();
 
@@ -297,8 +295,9 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
         totalSamples.set(0);
         running = false;
         drawBackground();
-        piLabel.setText(I18n.getInstance().get("app.distributedmontecarlopiapp.pi_label", "π ≈ ?"));
-        samplesLabel.setText(I18n.getInstance().get("app.distributedmontecarlopiapp.samples_label", "Samples: 0"));
+        drawBackground();
+        piLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.pi_label", "π ≈ ?"));
+        samplesLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.samples_label", "Samples: 0"));
         progressBar.setProgress(0);
     }
 
@@ -336,10 +335,10 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
                     double pi = 4.0 * inside / total;
                     double error = Math.abs(pi - Math.PI);
 
-                    piLabel.setText(String.format(I18n.getInstance().get("app.distributedmontecarlopiapp.pi_format", "π ≈ %.8f"), pi));
-                    samplesLabel.setText(String.format(I18n.getInstance().get("app.distributedmontecarlopiapp.samples_format", "Samples: %,d"), total));
+                    piLabel.setText(String.format(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.pi_format", "π ≈ %.8f"), pi));
+                    samplesLabel.setText(String.format(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.samples_format", "Samples: %,d"), total));
                     progressBar.setProgress((double) total / targetSamples);
-                    accuracyLabel.setText(String.format(I18n.getInstance().get("app.distributedmontecarlopiapp.error_format", "Error: %.6f"), error));
+                    accuracyLabel.setText(String.format(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.error_format", "Error: %.6f"), error));
                 }
 
                 if (total >= targetSamples) {
@@ -372,13 +371,13 @@ public class DistributedMonteCarloPiApp extends Application implements org.jscie
     public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics", "Mathematics"); }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedmontecarlopiapp.name", "Distributed Monte Carlo Pi App"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.name", "Distributed Monte Carlo Pi App"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedmontecarlopiapp.desc", "Distributed application for Distributed Monte Carlo Pi App."); }
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.desc", "Statistical estimation of π using distributed random sampling on the JScience grid."); }
 
     @Override
-    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedmontecarlopiapp.longdesc", "Distributed application for Distributed Monte Carlo Pi App."); }
+    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedmontecarlopiapp.longdesc", "The Monte Carlo method uses random numbers to approximate mathematical constants. This application distributes billions of samples across the JScience cluster, allowing for rapid convergence and high-accuracy estimation of π through massive parallel execution."); }
 
     @Override
     public void show(javafx.stage.Stage stage) {

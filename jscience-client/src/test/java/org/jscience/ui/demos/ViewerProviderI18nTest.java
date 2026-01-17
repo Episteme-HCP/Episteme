@@ -211,13 +211,13 @@ public class ViewerProviderI18nTest {
 
         @Test
         void i18nManagerCanBeInstantiated() {
-            I18n i18n = I18n.getInstance();
+            I18n i18n = org.jscience.ui.i18n.I18n.getInstance();
             assertNotNull(i18n, "I18n manager should not be null");
         }
 
         @Test
         void knownKeysResolveCorrectly() {
-            I18n i18n = I18n.getInstance();
+            I18n i18n = org.jscience.ui.i18n.I18n.getInstance();
 
             // Test some known keys
             String[] knownKeys = {
@@ -237,7 +237,7 @@ public class ViewerProviderI18nTest {
 
         @Test
         void missingKeyReturnsKeyOrFallback() {
-            I18n i18n = I18n.getInstance();
+            I18n i18n = org.jscience.ui.i18n.I18n.getInstance();
             String result = i18n.get("totally.nonexistent.key.xyz");
             // Typically returns the key itself or a placeholder
             assertNotNull(result);

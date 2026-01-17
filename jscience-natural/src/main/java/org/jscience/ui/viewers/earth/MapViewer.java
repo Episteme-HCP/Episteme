@@ -161,21 +161,21 @@ public abstract class MapViewer extends AbstractViewer {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.earth");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.earth", "Earth Sciences");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.map.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.mapviewer.name", "Map Viewer");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.map.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.mapviewer.desc", "Abstract world map viewer with projection support.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.map.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.mapviewer.longdesc", "Base class for map-based visualizations. Provides an equirectangular projection, interactive zoom and pan, and coordinate grid drawing.");
     }
 }

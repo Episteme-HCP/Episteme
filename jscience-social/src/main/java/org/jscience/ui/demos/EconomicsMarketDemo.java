@@ -43,16 +43,16 @@ public class EconomicsMarketDemo extends AbstractDemo {
     }
 
     @Override
-    public String getCategory() { return "Economics"; }
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.economics", "Economics"); }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.economicsmarketdemo.name");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.name", "Market Equilibrium");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.economicsmarketdemo.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.desc", "Interactive Supply and Demand graph visualization determining market equilibrium.");
     }
 
     @Override
@@ -72,21 +72,21 @@ public class EconomicsMarketDemo extends AbstractDemo {
 
         // Axes
         NumberAxis xAxis = new NumberAxis(
-                org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.axis.quantity"),
+                org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.axis.quantity", "Quantity"),
                 0, 100, 10);
-        NumberAxis yAxis = new NumberAxis(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.axis.price"),
+        NumberAxis yAxis = new NumberAxis(org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.axis.price", "Price"),
                 0,
                 100, 10);
 
         LineChart<Number, Number> lineChart = new LineChart<>(xAxis, yAxis);
-        lineChart.setTitle(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.chart.title"));
+        lineChart.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.chart.title", "Supply and Demand"));
         lineChart.setAnimated(false); // crucial for smooth slider updates
 
         XYChart.Series<Number, Number> supplySeries = new XYChart.Series<>();
-        supplySeries.setName(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.series.supply"));
+        supplySeries.setName(org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.series.supply", "Supply"));
 
         XYChart.Series<Number, Number> demandSeries = new XYChart.Series<>();
-        demandSeries.setName(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.series.demand"));
+        demandSeries.setName(org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.series.demand", "Demand"));
 
         lineChart.getData().add(supplySeries);
         lineChart.getData().add(demandSeries);
@@ -133,9 +133,9 @@ public class EconomicsMarketDemo extends AbstractDemo {
         updateGraph.run(); // Init
 
         VBox controls = new VBox(10,
-                new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.label.shift_supply")),
+                new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.label.shift_supply", "Shift Supply:")),
                 supplyShift,
-                new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("econ.market.label.shift_demand")),
+                new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.label.shift_demand", "Shift Demand:")),
                 demandShift);
         controls.getStyleClass().add("viewer-controls");
 
@@ -147,6 +147,6 @@ public class EconomicsMarketDemo extends AbstractDemo {
     
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.economicsmarketdemo.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.longdesc", "Visualize and manipulate supply and demand curves to observe market equilibrium shifts.");
     }
 }

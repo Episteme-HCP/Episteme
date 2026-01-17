@@ -55,10 +55,10 @@ public class GeneticAlgorithmDemo extends AbstractSimulationDemo {
     public String getCategory() { return "Computing"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("geneticalgo.title", "Genetic Algorithm"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("geneticalgo.title", "Genetic Algorithm"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("geneticalgo.desc", "Evolving Pathfinders using Genetic Algorithm"); }
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("geneticalgo.desc", "Evolving Pathfinders using Genetic Algorithm"); }
 
     @Override
     public String getLongDescription() {
@@ -98,7 +98,7 @@ public class GeneticAlgorithmDemo extends AbstractSimulationDemo {
             sidebar.setPrefWidth(180);
             sidebar.getStyleClass().add("viewer-sidebar");
 
-            Label title = new Label(I18n.getInstance().get("geneticalgo.stats", "Statistics"));
+            Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("geneticalgo.stats", "Statistics"));
             title.getStyleClass().add("header-label");
 
             genLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.geneticalgorithm.generation.1", "Generation: 1"));
@@ -157,9 +157,9 @@ public class GeneticAlgorithmDemo extends AbstractSimulationDemo {
         }
         
         private void updateLabels() {
-            genLabel.setText(I18n.getInstance().get("geneticalgo.generation", "Generation") + " " + generation);
+            genLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("geneticalgo.generation", "Generation") + " " + generation);
             fitLabel.setText(String.format("Best Fitness: %.2f", bestFitness));
-            reachLabel.setText(I18n.getInstance().get("geneticalgo.reached", "Reached") + " " + reachedCount + "/" + popSize);
+            reachLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("geneticalgo.reached", "Reached") + " " + reachedCount + "/" + popSize);
         }
 
         private void restart() {

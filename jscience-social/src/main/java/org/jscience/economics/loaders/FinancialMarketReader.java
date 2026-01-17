@@ -90,17 +90,22 @@ public class FinancialMarketReader extends org.jscience.io.AbstractResourceReade
 
     @Override
     public String getName() {
-        return "loader.financial.name";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.financial.name", "Financial Market Reader");
     }
 
     @Override
     public String getCategory() {
-        return "Economics";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.economics", "Economics");
     }
 
     @Override
     public String getDescription() {
-        return "Financial Market Data Reader.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.financial.desc", "Financial Market Data Reader.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.financial.longdesc", "Parses financial market data candlesticks (Open, High, Low, Close, Volume) from CSV sources.");
     }
 
     @Override

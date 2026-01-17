@@ -143,42 +143,57 @@ public class HistoricalEvent implements org.jscience.util.identity.Identifiable<
     }
 
     // Notable historical events with FuzzyDate
-    public static final HistoricalEvent FRENCH_REVOLUTION = new HistoricalEvent("French Revolution",
-            "Political revolution in France", FuzzyDate.of(1789, 7, 14),
+    public static final HistoricalEvent FRENCH_REVOLUTION = new HistoricalEvent(
+            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.french_rev.name", "French Revolution"),
+            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.french_rev.desc", "Political revolution in France"), 
+            FuzzyDate.of(1789, 7, 14),
             FuzzyDate.of(1799, 11, 9), Category.POLITICAL,
             new org.jscience.geography.Place("France", org.jscience.geography.Place.Type.COUNTRY));
 
-    public static final HistoricalEvent WORLD_WAR_I = new HistoricalEvent("World War I",
-            "Global military conflict", FuzzyDate.of(1914, 7, 28),
+    public static final HistoricalEvent WORLD_WAR_I = new HistoricalEvent(
+            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.wwi.name", "World War I"),
+            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.wwi.desc", "Global military conflict"), 
+            FuzzyDate.of(1914, 7, 28),
             FuzzyDate.of(1918, 11, 11), Category.MILITARY,
             new org.jscience.geography.Place("Global", org.jscience.geography.Place.Type.REGION));
 
-    public static final HistoricalEvent WORLD_WAR_II = new HistoricalEvent("World War II",
-            "Global military conflict", FuzzyDate.of(1939, 9, 1),
+    public static final HistoricalEvent WORLD_WAR_II = new HistoricalEvent(
+            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.wwii.name", "World War II"),
+            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.wwii.desc", "Global military conflict"), 
+            FuzzyDate.of(1939, 9, 1),
             FuzzyDate.of(1945, 9, 2), Category.MILITARY,
             new org.jscience.geography.Place("Global", org.jscience.geography.Place.Type.REGION));
 
-    public static final HistoricalEvent MOON_LANDING = new HistoricalEvent("Apollo 11 Moon Landing",
+    public static final HistoricalEvent MOON_LANDING = new HistoricalEvent(
+            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.moon_landing.name", "Apollo 11 Moon Landing"),
             FuzzyDate.of(1969, 7, 20), Category.SCIENTIFIC);
 
     // Ancient events with BCE support
-    public static final HistoricalEvent FALL_OF_ROME = new HistoricalEvent("Fall of Western Rome",
-            "End of the Western Roman Empire", FuzzyDate.of(476, 9, 4),
+    public static final HistoricalEvent FALL_OF_ROME = new HistoricalEvent(
+            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.fall_of_rome.name", "Fall of Western Rome"),
+            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.fall_of_rome.desc", "End of the Western Roman Empire"), 
+            FuzzyDate.of(476, 9, 4),
             FuzzyDate.of(476, 9, 4), Category.POLITICAL,
             new org.jscience.geography.Place("Rome", org.jscience.geography.Place.Type.CITY));
 
-    public static final HistoricalEvent BATTLE_OF_MARATHON = new HistoricalEvent("Battle of Marathon",
-            "Greek victory over Persian forces", FuzzyDate.bce(490),
+    public static final HistoricalEvent BATTLE_OF_MARATHON = new HistoricalEvent(
+            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.marathon.name", "Battle of Marathon"),
+            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.marathon.desc", "Greek victory over Persian forces"), 
+            FuzzyDate.bce(490),
             FuzzyDate.bce(490), Category.MILITARY,
             new org.jscience.geography.Place("Marathon", org.jscience.geography.Place.Type.CITY));
 
-    public static final HistoricalEvent FOUNDING_OF_ROME = new HistoricalEvent("Founding of Rome",
-            "Traditional founding date of Rome", FuzzyDate.bce(753),
+    public static final HistoricalEvent FOUNDING_OF_ROME = new HistoricalEvent(
+            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.founding_rome.name", "Founding of Rome"),
+            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.founding_rome.desc", "Traditional founding date of Rome"), 
+            FuzzyDate.bce(753),
             FuzzyDate.bce(753), Category.POLITICAL,
             new org.jscience.geography.Place("Rome", org.jscience.geography.Place.Type.CITY));
 
-    public static final HistoricalEvent GREAT_PYRAMID = new HistoricalEvent("Construction of Great Pyramid",
-            "Building of the Great Pyramid of Giza", FuzzyDate.circaBce(2560),
+    public static final HistoricalEvent GREAT_PYRAMID = new HistoricalEvent(
+            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.great_pyramid.name", "Construction of Great Pyramid"),
+            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.great_pyramid.desc", "Building of the Great Pyramid of Giza"), 
+            FuzzyDate.circaBce(2560),
             FuzzyDate.circaBce(2540), Category.CULTURAL,
             new org.jscience.geography.Place("Giza", org.jscience.geography.Place.Type.CITY));
 }

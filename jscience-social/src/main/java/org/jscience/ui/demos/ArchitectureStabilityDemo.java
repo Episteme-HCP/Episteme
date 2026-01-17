@@ -39,7 +39,7 @@ import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Length;
 import org.jscience.measure.quantity.Mass;
-import org.jscience.ui.i18n.SocialI18n;
+import org.jscience.ui.i18n.I18n;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,16 +52,18 @@ public class ArchitectureStabilityDemo extends AbstractSimulationDemo {
     }
 
     @Override
-    public String getCategory() { return "Architecture"; }
+    public String getCategory() { 
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.architecture", "Architecture"); 
+    }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.architecturestabilitydemo.name");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.architecturestabilitydemo.name", "Structural Stability");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.architecturestabilitydemo.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.architecturestabilitydemo.desc", "Structural stability analysis with center of gravity.");
     }
 
     private Canvas canvas;
@@ -92,12 +94,12 @@ public class ArchitectureStabilityDemo extends AbstractSimulationDemo {
 
     @Override
     protected VBox createControlPanel() {
-        SocialI18n i18n = SocialI18n.getInstance();
+        I18n i18n = org.jscience.ui.i18n.I18n.getInstance();
         VBox panel = new VBox(15);
         panel.setPadding(new Insets(20));
         panel.setPrefWidth(280);
 
-        Button addBlockBtn = new Button(i18n.get("arch.stability.btn.add", "Add Block"));
+        Button addBlockBtn = new Button(i18n.get("demo.architecturestabilitydemo.button.add", "Add Block"));
         addBlockBtn.setMaxWidth(Double.MAX_VALUE);
         addBlockBtn.setOnAction(e -> {
             if (collapsed) return;
@@ -105,22 +107,22 @@ public class ArchitectureStabilityDemo extends AbstractSimulationDemo {
             draw();
         });
 
-        Button resetBtn = new Button(i18n.get("arch.stability.btn.reset", "Reset Simulation"));
+        Button resetBtn = new Button(i18n.get("demo.architecturestabilitydemo.button.reset", "Reset Simulation"));
         resetBtn.setMaxWidth(Double.MAX_VALUE);
         resetBtn.setOnAction(e -> {
             blocks.clear();
             collapsed = false;
             comX = Quantities.create(300.0, Units.METER);
-            statusLabel.setText(i18n.get("arch.stability.label.stable", "Stable"));
+            statusLabel.setText(i18n.get("demo.architecturestabilitydemo.label.stable", "Stable"));
             statusLabel.setStyle("-fx-text-fill: green;");
             draw();
         });
 
-        statusLabel = new Label(i18n.get("arch.stability.label.stable", "Stable"));
+        statusLabel = new Label(i18n.get("demo.architecturestabilitydemo.label.stable", "Stable"));
         statusLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
 
         panel.getChildren().addAll(
-            new Label(i18n.get("arch.stability.controls", "Stability Controls")),
+            new Label(i18n.get("demo.architecturestabilitydemo.label.controls", "Stability Controls")),
             new Separator(),
             addBlockBtn,
             resetBtn,
@@ -132,7 +134,7 @@ public class ArchitectureStabilityDemo extends AbstractSimulationDemo {
 
     private void draw() {
         if (gc == null) return;
-        SocialI18n i18n = SocialI18n.getInstance();
+        I18n i18n = org.jscience.ui.i18n.I18n.getInstance();
         gc.clearRect(0, 0, 600, 600);
         gc.setFill(Color.LIGHTGREEN);
         gc.fillRect(0, 550, 600, 50);
@@ -174,12 +176,12 @@ public class ArchitectureStabilityDemo extends AbstractSimulationDemo {
         gc.strokeLine(comValue, 0, comValue, 600);
         
         gc.setFill(Color.BLACK);
-        gc.fillText(String.format(i18n.get("arch.stability.label.com", "CoM: %.2f"), comValue), 10, 20);
+        gc.fillText(String.format(i18n.get("demo.architecturestabilitydemo.label.com", "CoM: %.2f"), comValue), 10, 20);
 
         if (comValue < 250 || comValue > 350) {
             collapsed = true;
             if (statusLabel != null) {
-                statusLabel.setText(i18n.get("arch.stability.label.collapsed", "COLLAPSED!"));
+                statusLabel.setText(i18n.get("demo.architecturestabilitydemo.label.collapsed", "COLLAPSED!"));
                 statusLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
             }
         }
@@ -187,6 +189,6 @@ public class ArchitectureStabilityDemo extends AbstractSimulationDemo {
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.architecturestabilitydemo.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.architecturestabilitydemo.longdesc", "Interactive simulation of block stacking and structural stability analysis using center of mass calculations.");
     }
 }

@@ -102,12 +102,17 @@ public class WorldBankReader extends AbstractResourceReader<Country> {
 
     @Override
     public String getCategory() {
-        return "Politics";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.politics", "Politics");
     }
 
     @Override
     public String getDescription() {
-        return "World Bank Data (Indicators & Countries).";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.worldbank.desc", "World Bank Data (Indicators & Countries).");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.worldbank.longdesc", "Fetcher for World Bank Open Data, providing access to global development data indicators and country information.");
     }
 
     @Override
@@ -478,5 +483,5 @@ public class WorldBankReader extends AbstractResourceReader<Country> {
         LOG.debug("WorldBankReader: manual cache clear requested (delegated to system cache)");
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.worldbank.name"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.worldbank.name", "World Bank Reader"); }
 }

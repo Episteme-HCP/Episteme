@@ -36,7 +36,7 @@ import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.theme.ThemeColors;
 
 /**
  * CSG (Constructive Solid Geometry) Visualization.
@@ -49,12 +49,12 @@ public class CSGViewer extends AbstractViewer {
 
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics", "Mathematics");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("csg.title", "CSG Viewer");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.csgviewer.name", "CSG Viewer");
     }
 
     @Override
@@ -69,7 +69,7 @@ public class CSGViewer extends AbstractViewer {
     public CSGViewer() {
         // 3D Scene
         SubScene subScene = new SubScene(world, 800, 600, true, SceneAntialiasing.BALANCED);
-        subScene.setFill(Color.web("#fdfbf7"));
+        subScene.setFill(ThemeColors.BACKGROUND);
 
         PerspectiveCamera camera = new PerspectiveCamera(true);
         camera.setNearClip(0.1);
@@ -84,22 +84,27 @@ public class CSGViewer extends AbstractViewer {
         sidebar.setPadding(new Insets(20));
         sidebar.getStyleClass().add("viewer-sidebar");
 
-        Label title = new Label(I18n.getInstance().get("csg.title"));
+        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("csg.title", "CSG Operations"));
         title.getStyleClass().add("header-label");
 
         ComboBox<String> opBox = new ComboBox<>();
-        opBox.getItems().addAll("Show Both", "A Union B", "A Subtract B", "A Intersect B");
-        opBox.setValue("Show Both");
+        String opBoth = org.jscience.ui.i18n.I18n.getInstance().get("csg.op.both", "Show Both");
+        String opUnion = org.jscience.ui.i18n.I18n.getInstance().get("csg.op.union", "A Union B");
+        String opSub = org.jscience.ui.i18n.I18n.getInstance().get("csg.op.subtract", "A Subtract B");
+        String opInt = org.jscience.ui.i18n.I18n.getInstance().get("csg.op.intersect", "A Intersect B");
+
+        opBox.getItems().addAll(opBoth, opUnion, opSub, opInt);
+        opBox.setValue(opBoth);
         opBox.setOnAction(e -> updateCSG(opBox.getValue()));
 
         Slider offsetSlider = new Slider(0, 10, 5);
-        Label offsetLbl = new Label(I18n.getInstance().get("csg.offset") + " 5.0");
+        Label offsetLbl = new Label(org.jscience.ui.i18n.I18n.getInstance().get("csg.offset", "Offset") + " 5.0");
         offsetSlider.valueProperty().addListener((o, ov, nv) -> {
             sphere.setTranslateX(nv.doubleValue());
-            offsetLbl.setText(I18n.getInstance().get("csg.offset") + " " + String.format("%.2f", nv.doubleValue()));
+            offsetLbl.setText(org.jscience.ui.i18n.I18n.getInstance().get("csg.offset", "Offset") + " " + String.format("%.2f", nv.doubleValue()));
         });
 
-        sidebar.getChildren().addAll(title, new Separator(), new Label(I18n.getInstance().get("csg.operation")), opBox,
+        sidebar.getChildren().addAll(title, new Separator(), new Label(org.jscience.ui.i18n.I18n.getInstance().get("csg.operation", "Boolean Operation")), opBox,
                 offsetLbl, offsetSlider);
 
         // SubScene container for BorderPane
@@ -125,14 +130,14 @@ public class CSGViewer extends AbstractViewer {
 
     private void setupShapes() {
         cube = new Box(10, 10, 10);
-        PhongMaterial m1 = new PhongMaterial(Color.CORNFLOWERBLUE);
-        m1.setSpecularColor(Color.WHITE);
+        PhongMaterial m1 = new PhongMaterial(ThemeColors.SHAPE_A);
+        m1.setSpecularColor(ThemeColors.SHAPE_SPECULAR);
         cube.setMaterial(m1);
 
         sphere = new Sphere(7);
         sphere.setTranslateX(5);
-        PhongMaterial m2 = new PhongMaterial(Color.ORANGERED);
-        m2.setSpecularColor(Color.WHITE);
+        PhongMaterial m2 = new PhongMaterial(ThemeColors.SHAPE_B);
+        m2.setSpecularColor(ThemeColors.SHAPE_SPECULAR);
         sphere.setMaterial(m2);
 
         world.getChildren().addAll(cube, sphere, new AmbientLight(Color.GRAY), new PointLight(Color.WHITE) {
@@ -143,39 +148,39 @@ public class CSGViewer extends AbstractViewer {
     }
 
     private void updateCSG(String op) {
+        String opBoth = org.jscience.ui.i18n.I18n.getInstance().get("csg.op.both", "Show Both");
+        String opUnion = org.jscience.ui.i18n.I18n.getInstance().get("csg.op.union", "A Union B");
+        String opSub = org.jscience.ui.i18n.I18n.getInstance().get("csg.op.subtract", "A Subtract B");
+        String opInt = org.jscience.ui.i18n.I18n.getInstance().get("csg.op.intersect", "A Intersect B");
+
         // Visualizing the concept using transparency and visibility
-        switch (op) {
-            case "Show Both" -> {
-                cube.setOpacity(1.0);
-                sphere.setOpacity(1.0);
-                cube.setVisible(true);
-                sphere.setVisible(true);
-            }
-            case "A Union B" -> {
-                cube.setOpacity(0.8);
-                sphere.setOpacity(0.8);
-            }
-            case "A Subtract B" -> {
-                // Mockup: highlight the subtraction area
-                cube.setOpacity(1.0);
-                sphere.setOpacity(0.2);
-            }
-            case "A Intersect B" -> {
-                cube.setOpacity(0.3);
-                sphere.setOpacity(0.3);
-                // We could add a third shape for the intersection
-            }
+        if (op.equals(opBoth)) {
+            cube.setOpacity(1.0);
+            sphere.setOpacity(1.0);
+            cube.setVisible(true);
+            sphere.setVisible(true);
+        } else if (op.equals(opUnion)) {
+            cube.setOpacity(0.8);
+            sphere.setOpacity(0.8);
+        } else if (op.equals(opSub)) {
+            // Mockup: highlight the subtraction area
+            cube.setOpacity(1.0);
+            sphere.setOpacity(0.2);
+        } else if (op.equals(opInt)) {
+            cube.setOpacity(0.3);
+            sphere.setOpacity(0.3);
+            // We could add a third shape for the intersection
         }
     }
 
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("CSGViewer.desc", "CSGViewer description");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.csgviewer.desc", "Visualizes Constructive Solid Geometry (CSG) operations like Union, Subtraction, and Intersection in 3D.");
     }
 
     @Override
     public String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.csgviewer.longdesc", "Explore Constructive Solid Geometry (CSG) concepts by combining 3D shapes. Perform boolean operations on primitive solids and adjust their relative offsets.");
     }
 }

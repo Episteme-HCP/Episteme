@@ -62,12 +62,12 @@ public class MolecularViewer extends org.jscience.ui.AbstractViewer {
     
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("molecule.window.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.molecularviewer.name", "Molecular Viewer");
     }
     
     @Override
     public String getCategory() {
-        return "Chemistry";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry");
     }
 
     private void initUI() {
@@ -168,11 +168,10 @@ public class MolecularViewer extends org.jscience.ui.AbstractViewer {
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("MolecularViewer.desc", "MolecularViewer description");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.molecularviewer.desc", "Unified molecular and biological structure viewer.");
     }
-
     @Override
     public String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.molecularviewer.longdesc", "Interactive 3D visualization of chemical structures, including organic molecules like benzene and biological macromolecules like DNA. Supports multiple rendering styles including Ball-and-Stick.");
     }
 }

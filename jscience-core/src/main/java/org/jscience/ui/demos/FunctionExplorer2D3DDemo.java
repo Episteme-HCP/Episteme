@@ -38,17 +38,17 @@ public class FunctionExplorer2D3DDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.mathematics");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("demo.functionexplorer2d3ddemo.name");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.functionexplorer2d3ddemo.name");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("demo.functionexplorer2d3ddemo.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.functionexplorer2d3ddemo.desc");
     }
 
     @Override
@@ -56,11 +56,11 @@ public class FunctionExplorer2D3DDemo extends AbstractDemo {
         TabPane tabPane = new TabPane();
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
-        Tab tab2D = new Tab(I18n.getInstance().get("funcexplorer.tab.2d", "2D Explorer"));
+        Tab tab2D = new Tab(org.jscience.ui.i18n.I18n.getInstance().get("funcexplorer.tab.2d", "2D Explorer"));
         FunctionExplorer2DViewer v2D = new FunctionExplorer2DViewer();
         tab2D.setContent(v2D);
 
-        Tab tab3D = new Tab(I18n.getInstance().get("funcexplorer.tab.3d", "3D Explorer"));
+        Tab tab3D = new Tab(org.jscience.ui.i18n.I18n.getInstance().get("funcexplorer.tab.3d", "3D Explorer"));
         FunctionExplorer3DViewer v3D = new FunctionExplorer3DViewer();
         tab3D.setContent(v3D);
 
@@ -74,7 +74,7 @@ public class FunctionExplorer2D3DDemo extends AbstractDemo {
 
     @Override
     public String getLongDescription() {
-        return I18n.getInstance().get("demo.functionexplorer2d3ddemo.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.functionexplorer2d3ddemo.longdesc");
     }
 
 

@@ -46,10 +46,10 @@ public class GeneticsDemo extends AbstractDemo {
     public String getCategory() { return "Biology"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("Genetics.title", "Genetics"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("Genetics.title", "Genetics"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("Genetics.desc", "Genetic drift and Mendelian inheritance simulations."); }
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("Genetics.desc", "Genetic drift and Mendelian inheritance simulations."); }
 
     @Override
     public String getLongDescription() {

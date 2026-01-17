@@ -46,10 +46,10 @@ public class LSystemDemo extends AbstractSimulationDemo {
     public String getCategory() { return "Biology"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("LSystem.title", "L-Systems"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("LSystem.title", "L-Systems"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("LSystem.desc", "Visualizing plant growth with Lindenmayer systems."); }
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("LSystem.desc", "Visualizing plant growth with Lindenmayer systems."); }
 
     @Override
     public String getLongDescription() {

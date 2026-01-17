@@ -80,14 +80,4 @@ public class LiftBuilding {
             elevator.tick();
         }
     }
-
-    /**
-     * @deprecated Use {@link LiftBuilding} instead.
-     */
-    @Deprecated
-    public static LiftBuilding fromBuilding(String name, int minFloor, int maxFloor) {
-        return new LiftBuilding(name, minFloor, maxFloor);
-    }
 }
-
-

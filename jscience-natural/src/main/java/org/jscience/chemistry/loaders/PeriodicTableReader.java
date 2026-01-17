@@ -50,12 +50,17 @@ public class PeriodicTableReader extends AbstractResourceReader<List<Element>> {
 
     @Override
     public String getCategory() {
-        return "Chemistry";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry");
     }
 
     @Override
     public String getDescription() {
-        return "Periodic Table of Elements Loader.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.periodictable.desc", "Periodic Table of Elements Loader.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.periodictable.longdesc", "Loads chemical elements data including atomic properties, thermodynamics, and classification from JSON resources.");
     }
 
     @Override
@@ -165,5 +170,5 @@ public class PeriodicTableReader extends AbstractResourceReader<List<Element>> {
         return e;
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.periodictable.name"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.periodictable.name", "Periodic Table Reader"); }
 }

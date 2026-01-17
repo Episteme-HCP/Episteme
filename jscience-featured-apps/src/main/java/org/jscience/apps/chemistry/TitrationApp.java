@@ -65,17 +65,19 @@ public class TitrationApp extends FeaturedAppBase {
 
     // Multi-protic acid types with pKa values
     private enum AcidType {
-        HCL("titration.acid.hcl", new double[] { -7.0 }), // Strong acid, effectively complete dissociation
-        H2SO4("titration.acid.h2so4", new double[] { -3.0, 1.99 }), // Diprotic
-        H3PO4("titration.acid.h3po4", new double[] { 2.15, 7.20, 12.35 }), // Triprotic
-        H2CO3("titration.acid.h2co3", new double[] { 6.35, 10.33 }), // Diprotic
-        ACETIC("titration.acid.acetic", new double[] { 4.76 }); // Weak monoprotic
+        HCL("titration.acid.hcl", "Hydrochloric Acid (HCl)", new double[] { -7.0 }), // Strong acid
+        H2SO4("titration.acid.h2so4", "Sulfuric Acid (H2SO4)", new double[] { -3.0, 1.99 }), // Diprotic
+        H3PO4("titration.acid.h3po4", "Phosphoric Acid (H3PO4)", new double[] { 2.15, 7.20, 12.35 }), // Triprotic
+        H2CO3("titration.acid.h2co3", "Carbonic Acid (H2CO3)", new double[] { 6.35, 10.33 }), // Diprotic
+        ACETIC("titration.acid.acetic", "Acetic Acid (CH3COOH)", new double[] { 4.76 }); // Weak monoprotic
 
         final String key;
+        final String def;
         final double[] pKa; // pKa values for each dissociation step
 
-        AcidType(String key, double[] pKa) {
+        AcidType(String key, String def, double[] pKa) {
             this.key = key;
+            this.def = def;
             this.pKa = pKa;
         }
 
@@ -85,7 +87,7 @@ public class TitrationApp extends FeaturedAppBase {
 
         @Override
         public String toString() {
-            return I18nManager.getInstance().get(key);
+            return I18nManager.getInstance().get(key, def);
         }
     }
 
@@ -108,20 +110,22 @@ public class TitrationApp extends FeaturedAppBase {
 
     // Indicators with their pH ranges and colors
     private enum Indicator {
-        PHENOLPHTHALEIN("titration.ind.phen", 8.2, 10.0, Color.TRANSPARENT, Color.DEEPPINK),
-        METHYL_ORANGE("titration.ind.methyl", 3.1, 4.4, Color.RED, Color.YELLOW),
-        BROMOTHYMOL_BLUE("titration.ind.brom", 6.0, 7.6, Color.YELLOW, Color.BLUE),
-        LITMUS("titration.ind.litmus", 5.0, 8.0, Color.RED, Color.BLUE),
-        UNIVERSAL("titration.ind.univ", 1.0, 14.0, Color.RED, Color.VIOLET);
+        PHENOLPHTHALEIN("titration.ind.phen", "Phenolphthalein", 8.2, 10.0, Color.TRANSPARENT, Color.DEEPPINK),
+        METHYL_ORANGE("titration.ind.methyl", "Methyl Orange", 3.1, 4.4, Color.RED, Color.YELLOW),
+        BROMOTHYMOL_BLUE("titration.ind.brom", "Bromothymol Blue", 6.0, 7.6, Color.YELLOW, Color.BLUE),
+        LITMUS("titration.ind.litmus", "Litmus", 5.0, 8.0, Color.RED, Color.BLUE),
+        UNIVERSAL("titration.ind.univ", "Universal Indicator", 1.0, 14.0, Color.RED, Color.VIOLET);
 
         final String key;
+        final String def;
         final double pHLow;
         final double pHHigh;
         final Color colorAcid;
         final Color colorBase;
 
-        Indicator(String key, double pHLow, double pHHigh, Color colorAcid, Color colorBase) {
+        Indicator(String key, String def, double pHLow, double pHHigh, Color colorAcid, Color colorBase) {
             this.key = key;
+            this.def = def;
             this.pHLow = pHLow;
             this.pHHigh = pHHigh;
             this.colorAcid = colorAcid;
@@ -130,7 +134,7 @@ public class TitrationApp extends FeaturedAppBase {
 
         @Override
         public String toString() {
-            return I18nManager.getInstance().get(key);
+            return I18nManager.getInstance().get(key, def);
         }
     }
 
@@ -138,12 +142,22 @@ public class TitrationApp extends FeaturedAppBase {
 
     @Override
     protected String getAppTitle() {
-        return i18n.get("titration.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.titrationapp.name", "Acid-Base Titration");
+    }
+
+    @Override
+    public String getName() {
+        return getAppTitle();
     }
 
     @Override
     public String getDescription() {
-        return i18n.get("titration.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.titrationapp.desc", "Simulate titration experiments with various acids and indicators.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.titrationapp.longdesc", "Virtual chemistry laboratory for performing acid-base titrations. Supports monoprotic and multi-protic acids (HCl, H2SO4, H3PO4, etc.) with a range of indicators including Phenolphthalein and Methyl Orange. Features real-time pH curve plotting and laboratory equipment visualization.");
     }
 
     @Override
@@ -188,10 +202,10 @@ public class TitrationApp extends FeaturedAppBase {
         box.getStyleClass().add("viewer-sidebar");
 
         // Chart
-        phChart = ChartFactory.createLineChart(i18n.get("titration.panel.chart"),
-                i18n.get("titration.label.volume"), i18n.get("titration.label.ph_axis"));
+        phChart = ChartFactory.createLineChart(i18n.get("titration.panel.chart", "pH Curve"),
+                i18n.get("titration.label.volume", "Volume Base Added (mL)"), i18n.get("titration.label.ph_axis", "pH"));
         phSeries = new XYChart.Series<>();
-        phSeries.setName(i18n.get("titration.series.ph"));
+        phSeries.setName(i18n.get("titration.series.ph", "pH Level"));
 
         phChart.getData().add(phSeries);
 
@@ -231,13 +245,13 @@ public class TitrationApp extends FeaturedAppBase {
         indicatorSelector.setMaxWidth(Double.MAX_VALUE);
         indicatorSelector.setOnAction(e -> calculatePH()); // Update color immediately
 
-        setupTitleLabel = new Label(i18n.get("titration.panel.setup"));
+        setupTitleLabel = new Label(i18n.get("titration.panel.setup", "Setup"));
         setupTitleLabel.getStyleClass().add("header-label");
-        acidTypeLabel = new Label(i18n.get("titration.label.acidtype"));
+        acidTypeLabel = new Label(i18n.get("titration.label.acidtype", "Acid Solution:"));
         acidTypeLabel.getStyleClass().add("description-label");
-        indicatorLabel = new Label(i18n.get("titration.label.indicator"));
+        indicatorLabel = new Label(i18n.get("titration.label.indicator", "Indicator:"));
         indicatorLabel.getStyleClass().add("description-label");
-        titrantLabel = new Label(i18n.get("titration.label.titrant"));
+        titrantLabel = new Label(i18n.get("titration.label.titrant", "Titrant Valve:"));
         titrantLabel.getStyleClass().add("description-label");
 
         box.getChildren().addAll(
@@ -372,9 +386,9 @@ public class TitrationApp extends FeaturedAppBase {
         }
 
         // Update UI
-        phLabel.setText(MessageFormat.format(i18n.get("titration.label.ph"), String.format("%.2f", ph)));
+        phLabel.setText(MessageFormat.format(i18n.get("titration.label.ph", "pH: {0}"), String.format("%.2f", ph)));
         volumeLabel.setText(
-                MessageFormat.format(i18n.get("titration.label.voladded"), String.format("%.2f", volumeBaseAdded)));
+                MessageFormat.format(i18n.get("titration.label.voladded", "Volume: {0} mL"), String.format("%.2f", volumeBaseAdded)));
 
         // Chart sampling (don't flood chart)
         if (phSeries.getData().isEmpty() ||
@@ -387,24 +401,24 @@ public class TitrationApp extends FeaturedAppBase {
     @Override
     protected void updateLocalizedUI() {
         if (setupTitleLabel != null)
-            setupTitleLabel.setText(i18n.get("titration.panel.setup"));
+            setupTitleLabel.setText(i18n.get("titration.panel.setup", "Setup"));
         if (acidTypeLabel != null)
-            acidTypeLabel.setText(i18n.get("titration.label.acidtype"));
+            acidTypeLabel.setText(i18n.get("titration.label.acidtype", "Acid Solution:"));
         if (indicatorLabel != null)
-            indicatorLabel.setText(i18n.get("titration.label.indicator"));
+            indicatorLabel.setText(i18n.get("titration.label.indicator", "Indicator:"));
         if (titrantLabel != null)
-            titrantLabel.setText(i18n.get("titration.label.titrant"));
+            titrantLabel.setText(i18n.get("titration.label.titrant", "Titrant Valve:"));
 
         if (phChart != null) {
-            phChart.setTitle(i18n.get("titration.panel.chart"));
+            phChart.setTitle(i18n.get("titration.panel.chart", "pH Curve"));
             if (phChart.getXAxis() instanceof NumberAxis) {
-                ((NumberAxis) phChart.getXAxis()).setLabel(i18n.get("titration.label.volume"));
+                ((NumberAxis) phChart.getXAxis()).setLabel(i18n.get("titration.label.volume", "Volume Base Added (mL)"));
             }
             if (phChart.getYAxis() instanceof NumberAxis) {
-                ((NumberAxis) phChart.getYAxis()).setLabel(i18n.get("titration.label.ph_axis"));
+                ((NumberAxis) phChart.getYAxis()).setLabel(i18n.get("titration.label.ph_axis", "pH"));
             }
             if (!phChart.getData().isEmpty()) {
-                phChart.getData().get(0).setName(i18n.get("titration.series.ph"));
+                phChart.getData().get(0).setName(i18n.get("titration.series.ph", "pH Level"));
             }
         }
         calculatePH(); // Refresh labels
@@ -564,16 +578,6 @@ public class TitrationApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return "Chemistry";
-    }
-
-    @Override
-    public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("TitrationApp.name", "Titration");
-    }
-
-    @Override
-    public String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry");
     }
 }

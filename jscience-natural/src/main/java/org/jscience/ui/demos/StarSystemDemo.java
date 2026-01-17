@@ -41,10 +41,10 @@ public class StarSystemDemo extends AbstractSimulationDemo {
     public String getCategory() { return "Physics"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("starsystem.title", "Star System 3D"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("starsystem.title", "Star System 3D"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("starsystem.desc", "3D Solar System Visualization"); }
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("starsystem.desc", "3D Solar System Visualization"); }
 
     @Override
     public String getLongDescription() {

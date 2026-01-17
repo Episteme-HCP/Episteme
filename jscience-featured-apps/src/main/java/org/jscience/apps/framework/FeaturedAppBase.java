@@ -78,7 +78,7 @@ public abstract class FeaturedAppBase extends Application implements App {
 
     protected FeaturedAppBase() {
         // Register bundle in constructor so getName() / getCategory() work for launchers
-        I18nManager.getInstance().addBundle("org.jscience.apps.i18n.messages_apps");
+        I18nManager.getInstance().addBundle("org.jscience.apps.ui.i18n.messages_apps");
     }
 
     @Override
@@ -175,28 +175,23 @@ public abstract class FeaturedAppBase extends Application implements App {
 
     @Override
     public String getCategory() {
-        return I18nManager.getInstance().get("category.featured_apps");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.featured_apps", "Featured Apps");
     }
 
     @Override
     public String getName() {
-        String title = getAppTitle();
-        if (title.startsWith("!") && title.endsWith("!")) {
-            // Fallback to class name if translation is missing
-            return getClass().getSimpleName().replace("App", "");
-        }
-        return title.replace(" - JScience", "");
+        return org.jscience.ui.i18n.I18n.getInstance().get("app." + getClass().getSimpleName().toLowerCase() + ".name", getAppTitle().replace(" - JScience", ""));
     }
 
     @Override
     public String getDescription() {
         // Standardized key based on class name, e.g., "CrystalStructureApp.desc"
-        return i18n.get(getClass().getSimpleName() + ".desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get(getClass().getSimpleName() + ".desc", "Featured Scientific Application");
     }
 
     @Override
     public String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.I18n.getInstance().get(getClass().getSimpleName() + ".longdesc", "A comprehensive scientific simulation and visualization application part of the JScience suite.");
     }
 
     @Override

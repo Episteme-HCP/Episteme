@@ -44,10 +44,10 @@ public class EarthquakeDemo extends AbstractDemo {
     public String getCategory() { return "Earth Sciences"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("earthquake.label.title", "Earthquake Map"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("earthquake.label.title", "Earthquake Map"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("earthquake.desc", "Interactive Seismic Map"); }
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("earthquake.desc", "Interactive Seismic Map"); }
     
     @Override
     public String getLongDescription() { 

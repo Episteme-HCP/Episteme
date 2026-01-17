@@ -42,11 +42,11 @@ import java.util.List;
 public class CIFReader {
 
     public static String getCategory() {
-        return "Chemistry";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry");
     }
 
     public static String getDescription() {
-        return "Crystal Structure Reader (CIF).";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.cif.desc", "Crystal Structure Reader (CIF).");
     }
 
     public static class CrystalStructure {

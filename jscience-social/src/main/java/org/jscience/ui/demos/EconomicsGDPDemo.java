@@ -33,16 +33,18 @@ public class EconomicsGDPDemo extends AbstractDemo {
     }
 
     @Override
-    public String getCategory() { return "Economics"; }
+    public String getCategory() { 
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.economics", "Economics"); 
+    }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.economicsgdpdemo.name");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsgdpdemo.name", "GDP Growth");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.economicsgdpdemo.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsgdpdemo.desc", "Economic projection model with adjustable growth rate.");
     }
 
     @Override
@@ -56,6 +58,6 @@ public class EconomicsGDPDemo extends AbstractDemo {
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.economicsgdpdemo.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsgdpdemo.longdesc", "Simulation of GDP growth over time using exponential growth models and adjustable parameters.");
     }
 }

@@ -68,12 +68,22 @@ public class QuantumCircuitApp extends FeaturedAppBase {
 
     @Override
     protected String getAppTitle() {
-        return i18n.get("quantum.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.quantumcircuitapp.name", "Quantum Circuit Designer");
+    }
+
+    @Override
+    public String getName() {
+        return getAppTitle();
     }
 
     @Override
     public String getDescription() {
-        return i18n.get("quantum.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.quantumcircuitapp.desc", "Design and simulate basic quantum circuits.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.quantumcircuitapp.longdesc", "Interactive quantum circuit designer for exploring fundamental quantum computing concepts. Features H, X, Y, Z, and CNOT gates, with real-time measurement probability visualization for multi-qubit systems.");
     }
 
     @Override
@@ -92,7 +102,7 @@ public class QuantumCircuitApp extends FeaturedAppBase {
         pane.setPadding(new Insets(10));
 
         // Header
-        mainTitleLabel = new Label(i18n.get("quantum.title"));
+        mainTitleLabel = new Label(i18n.get("quantum.title", "Quantum Circuit Designer"));
         mainTitleLabel.getStyleClass().add("header-label");
         pane.setTop(mainTitleLabel);
         BorderPane.setAlignment(mainTitleLabel, Pos.CENTER);
@@ -102,7 +112,7 @@ public class QuantumCircuitApp extends FeaturedAppBase {
 
         // Gate Toolbar
         ToolBar gateToolbar = new ToolBar();
-        gateToolbarLabel = new Label(i18n.get("quantum.toolbar.gates"));
+        gateToolbarLabel = new Label(i18n.get("quantum.toolbar.gates", "Gates:"));
         gateToolbarLabel.getStyleClass().add("header-label");
         gateToolbarLabel.setStyle("-fx-font-size: 14px;");
         gateToolbar.getItems().add(gateToolbarLabel);
@@ -110,18 +120,18 @@ public class QuantumCircuitApp extends FeaturedAppBase {
         String[] gates = { "H", "X", "Y", "Z", "CNOT", "M" };
         for (String g : gates) {
             Button b = new Button(g);
-            b.setTooltip(new Tooltip(i18n.get("quantum.gate.tooltip." + g.toLowerCase())));
+            b.setTooltip(new Tooltip(i18n.get("quantum.gate.tooltip." + g.toLowerCase(), g + " Gate")));
             b.setOnAction(e -> addGateToSelectedLine(g));
             gateToolbar.getItems().add(b);
         }
 
         gateToolbar.getItems().add(new Separator());
-        runBtn = new Button(i18n.get("quantum.button.run"));
+        runBtn = new Button(i18n.get("quantum.button.run", "Run Simulation"));
         runBtn.getStyleClass().add("accent-button-green");
         runBtn.setOnAction(e -> runSimulation());
         gateToolbar.getItems().add(runBtn);
 
-        clearBtn = new Button(i18n.get("quantum.button.clear"));
+        clearBtn = new Button(i18n.get("quantum.button.clear", "Clear Circuit"));
         clearBtn.setOnAction(e -> clearCircuit());
         gateToolbar.getItems().add(clearBtn);
 
@@ -135,7 +145,7 @@ public class QuantumCircuitApp extends FeaturedAppBase {
         // Results
         VBox resultPane = new VBox(5);
         resultPane.setPadding(new Insets(10));
-        resultsTitleLabel = new Label(i18n.get("quantum.label.results"));
+        resultsTitleLabel = new Label(i18n.get("quantum.label.results", "Simulation Results"));
         resultsTitleLabel.getStyleClass().add("header-label");
         resultsTitleLabel.setStyle("-fx-font-size: 16px;");
 
@@ -146,7 +156,7 @@ public class QuantumCircuitApp extends FeaturedAppBase {
         xAxis = new CategoryAxis();
         yAxis = new NumberAxis();
         probChart = new BarChart<>(xAxis, yAxis);
-        probChart.setTitle(i18n.get("quantum.chart.probabilities"));
+        probChart.setTitle(i18n.get("quantum.chart.probabilities", "Measurement Probabilities"));
         probChart.setAnimated(false);
         probChart.setMinHeight(200);
 
@@ -168,7 +178,7 @@ public class QuantumCircuitApp extends FeaturedAppBase {
             line.setStyle("-fx-border-width: 0 0 1 0; -fx-border-color: #eee;");
 
             // Qubit selector/label
-            ToggleButton qBtn = new ToggleButton(i18n.get("quantum.label.qubit_title", i));
+            ToggleButton qBtn = new ToggleButton(java.text.MessageFormat.format(i18n.get("quantum.label.qubit_title", "q{0}"), i));
 
             qBtn.setPrefWidth(80);
             int finalI = i;
@@ -211,7 +221,7 @@ public class QuantumCircuitApp extends FeaturedAppBase {
 
     private void clearCircuit() {
         initializeCircuitOrEmpty();
-        stateVectorLabel.setText(i18n.get("quantum.label.statevector") + ": |0...0>");
+        stateVectorLabel.setText(i18n.get("quantum.label.statevector", "State Vector") + ": |0...0>");
         probChart.getData().clear();
         selectedQubitIndex = -1;
     }
@@ -221,7 +231,7 @@ public class QuantumCircuitApp extends FeaturedAppBase {
         Random rand = new Random();
         probChart.getData().clear();
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName(i18n.get("quantum.series.probabilities"));
+        series.setName(i18n.get("quantum.series.probabilities", "Probability"));
 
         // Generate random probabilities for 3 qubits = 8 states
         double[] probs = new double[8];
@@ -237,33 +247,33 @@ public class QuantumCircuitApp extends FeaturedAppBase {
         }
         probChart.getData().add(series);
         stateVectorLabel
-                .setText(i18n.get("quantum.label.statevector") + ": " + i18n.get("quantum.status.superposition"));
+                .setText(i18n.get("quantum.label.statevector", "State Vector") + ": " + i18n.get("quantum.status.superposition", "Superposition"));
 
     }
 
     @Override
     protected void updateLocalizedUI() {
         if (mainTitleLabel != null)
-            mainTitleLabel.setText(i18n.get("quantum.title"));
+            mainTitleLabel.setText(i18n.get("quantum.title", "Quantum Circuit Designer"));
         if (gateToolbarLabel != null)
-            gateToolbarLabel.setText(i18n.get("quantum.toolbar.gates"));
+            gateToolbarLabel.setText(i18n.get("quantum.toolbar.gates", "Gates:"));
         if (runBtn != null)
-            runBtn.setText(i18n.get("quantum.button.run"));
+            runBtn.setText(i18n.get("quantum.button.run", "Run Simulation"));
         if (clearBtn != null)
-            clearBtn.setText(i18n.get("quantum.button.clear"));
+            clearBtn.setText(i18n.get("quantum.button.clear", "Clear Circuit"));
         if (resultsTitleLabel != null)
-            resultsTitleLabel.setText(i18n.get("quantum.label.results"));
+            resultsTitleLabel.setText(i18n.get("quantum.label.results", "Simulation Results"));
         if (stateVectorLabel != null && !probChart.getData().isEmpty()) {
             stateVectorLabel
-                    .setText(i18n.get("quantum.label.statevector") + ": " + i18n.get("quantum.status.superposition"));
+                    .setText(i18n.get("quantum.label.statevector", "State Vector") + ": " + i18n.get("quantum.status.superposition", "Superposition"));
         } else if (stateVectorLabel != null) {
-            stateVectorLabel.setText(i18n.get("quantum.label.statevector") + ": |0...0>");
+            stateVectorLabel.setText(i18n.get("quantum.label.statevector", "State Vector") + ": |0...0>");
         }
 
         if (probChart != null) {
-            probChart.setTitle(i18n.get("quantum.chart.probabilities"));
+            probChart.setTitle(i18n.get("quantum.chart.probabilities", "Measurement Probabilities"));
             if (!probChart.getData().isEmpty()) {
-                probChart.getData().get(0).setName(i18n.get("quantum.series.probabilities"));
+                probChart.getData().get(0).setName(i18n.get("quantum.series.probabilities", "Probability"));
             }
         }
 
@@ -271,7 +281,7 @@ public class QuantumCircuitApp extends FeaturedAppBase {
         for (int i = 0; i < qubitLines.size(); i++) {
             HBox line = qubitLines.get(i);
             if (!line.getChildren().isEmpty() && line.getChildren().get(0) instanceof ToggleButton) {
-                ((ToggleButton) line.getChildren().get(0)).setText(i18n.get("quantum.label.qubit_title", i));
+                ((ToggleButton) line.getChildren().get(0)).setText(java.text.MessageFormat.format(i18n.get("quantum.label.qubit_title", "q{0}"), i));
             }
         }
     }
@@ -360,16 +370,6 @@ public class QuantumCircuitApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return "Physics";
-    }
-
-    @Override
-    public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("QuantumCircuitApp.name", "QuantumCircuit");
-    }
-
-    @Override
-    public String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics");
     }
 }

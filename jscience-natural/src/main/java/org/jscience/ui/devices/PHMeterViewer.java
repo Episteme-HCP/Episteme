@@ -55,21 +55,21 @@ public class PHMeterViewer extends AbstractDeviceViewer<PHMeter> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.phmeter.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.phmeter.name", "pH Meter");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.phmeter.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.phmeter.desc", "A pH meter viewer for measuring acidity/alkalinity.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.phmeter.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.phmeter.longdesc", "Precise laboratory instrument for measuring the pH (hydrogen-ion activity) in water-based solutions. features a digital display with color-coded pH levels (Acidic to Basic) and automatic temperature compensation.");
     }
 }

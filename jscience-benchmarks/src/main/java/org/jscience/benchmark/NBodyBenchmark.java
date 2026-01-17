@@ -307,7 +307,7 @@ public class NBodyBenchmark implements RunnableBenchmark {
      * Benchmark runner comparing with naive implementation.
      */
     public static void main(String[] args) {
-        System.out.println(I18n.getInstance().get("benchmark.nbody.title"));
+        System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("benchmark.nbody.title"));
         System.out.println("=========================================");
 
         NBodyBenchmark sim = createSolarSystem();
@@ -315,7 +315,7 @@ public class NBodyBenchmark implements RunnableBenchmark {
 
         sim.calculateForces();
         Real initialEnergy = sim.totalEnergy();
-        System.out.println(I18n.getInstance().get("benchmark.nbody.energy.initial", initialEnergy.doubleValue()));
+        System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("benchmark.nbody.energy.initial", initialEnergy.doubleValue()));
 
         int steps = 100;
         long start = System.nanoTime();
@@ -328,21 +328,21 @@ public class NBodyBenchmark implements RunnableBenchmark {
         double energyDrift = Math.abs((finalEnergy.doubleValue() - initialEnergy.doubleValue())
                 / initialEnergy.doubleValue()) * 100;
 
-        System.out.println(I18n.getInstance().get("benchmark.nbody.energy.final", finalEnergy.doubleValue()));
-        System.out.println(I18n.getInstance().get("benchmark.nbody.energy.drift", energyDrift));
-        System.out.println(I18n.getInstance().get("benchmark.nbody.time", steps, (end - start) / 1_000_000));
-        System.out.println(I18n.getInstance().get("benchmark.nbody.bodies", sim.size()));
+        System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("benchmark.nbody.energy.final", finalEnergy.doubleValue()));
+        System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("benchmark.nbody.energy.drift", energyDrift));
+        System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("benchmark.nbody.time", steps, (end - start) / 1_000_000));
+        System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("benchmark.nbody.bodies", sim.size()));
     }
     // --- RunnableBenchmark Implementation ---
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("benchmark.nbody.name");
+        return org.jscience.ui.i18n.I18n.getInstance().get("benchmark.nbody.name");
     }
 
     @Override
     public String getDomain() {
-        return I18n.getInstance().get("benchmark.domain.physics");
+        return org.jscience.ui.i18n.I18n.getInstance().get("benchmark.domain.physics");
     }
 
     @Override

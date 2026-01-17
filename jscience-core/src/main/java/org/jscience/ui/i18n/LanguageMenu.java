@@ -43,7 +43,7 @@ public class LanguageMenu extends Menu {
         this.onLocaleChange = onLocaleChange;
 
         // Initial label
-        setText(I18n.getInstance().get("app.menu.language"));
+        setText(org.jscience.ui.i18n.I18n.getInstance().get("app.menu.language"));
 
         ToggleGroup langGroup = new ToggleGroup();
 
@@ -60,16 +60,16 @@ public class LanguageMenu extends Menu {
         item.setToggleGroup(group);
 
         // Check if this is the current language
-        if (I18n.getInstance().getLocale().getLanguage().equals(locale.getLanguage())) {
+        if (org.jscience.ui.i18n.I18n.getInstance().getLocale().getLanguage().equals(locale.getLanguage())) {
             item.setSelected(true);
         }
 
         item.setOnAction(e -> {
-            if (I18n.getInstance().get("app.menu.language").equals(getText())) {
+            if (org.jscience.ui.i18n.I18n.getInstance().get("app.menu.language").equals(getText())) {
                 // Optimization: if no change, maybe skip? But Locale object might differ.
             }
             Locale.setDefault(locale);
-            I18n.getInstance().setLocale(locale);
+            org.jscience.ui.i18n.I18n.getInstance().setLocale(locale);
             if (onLocaleChange != null) {
                 onLocaleChange.run();
             }

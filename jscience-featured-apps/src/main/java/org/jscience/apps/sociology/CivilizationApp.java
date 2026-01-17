@@ -100,12 +100,22 @@ public class CivilizationApp extends FeaturedAppBase {
 
     @Override
     protected String getAppTitle() {
-        return i18n.get("civilization.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.civilizationapp.name", "Civilization Simulator");
+    }
+
+    @Override
+    public String getName() {
+        return getAppTitle();
     }
 
     @Override
     public String getDescription() {
-        return i18n.get("civilization.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.civilizationapp.desc", "Simulate civilization growth, resources, and pollution dynamics.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.civilizationapp.longdesc", "A simplified System Dynamics model (Limits to Growth style) simulating the interaction between Population, Resources, and Pollution. Features interactive parameters like birth rate, consumption per capita, and innovation rate.");
     }
 
     @Override
@@ -154,7 +164,7 @@ public class CivilizationApp extends FeaturedAppBase {
         root.setBottom(controls);
 
         // Status Overlay
-        statusLabel = new Label(i18n.get("civilization.status.stable"));
+        statusLabel = new Label(i18n.get("civilization.status.stable", "Stable"));
         statusLabel.getStyleClass().add("font-bold");
         statusLabel.getStyleClass().removeAll("text-success", "text-warning", "text-error", "text-info");
         statusLabel.getStyleClass().add("text-success");
@@ -173,21 +183,21 @@ public class CivilizationApp extends FeaturedAppBase {
     @SuppressWarnings("unchecked")
     private LineChart<Number, Number> createChart() {
         NumberAxis xAxis = new NumberAxis();
-        xAxis.setLabel(i18n.get("civilization.label.years"));
+        xAxis.setLabel(i18n.get("civilization.label.years", "Year"));
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel(i18n.get("civilization.label.value"));
+        yAxis.setLabel(i18n.get("civilization.label.value", "Value"));
 
         LineChart<Number, Number> lc = new LineChart<>(xAxis, yAxis);
-        lc.setTitle(i18n.get("civilization.chart.title"));
+        lc.setTitle(i18n.get("civilization.chart.title", "Civilization Dynamics"));
         lc.setCreateSymbols(false);
         lc.setAnimated(false);
 
         popSeries = new XYChart.Series<>();
-        popSeries.setName(i18n.get("civilization.label.population"));
+        popSeries.setName(i18n.get("civilization.label.population", "Population"));
         resSeries = new XYChart.Series<>();
-        resSeries.setName(i18n.get("civilization.label.resources"));
+        resSeries.setName(i18n.get("civilization.label.resources", "Resources (kg)"));
         polSeries = new XYChart.Series<>();
-        polSeries.setName(i18n.get("civilization.series.pollution"));
+        polSeries.setName(i18n.get("civilization.series.pollution", "Pollution"));
 
         lc.getData().addAll(popSeries, resSeries, polSeries);
         mainChart = lc;
@@ -202,22 +212,22 @@ public class CivilizationApp extends FeaturedAppBase {
         HBox sliders = new HBox(20);
 
         sliders.getChildren().add(
-                createSlider(i18n.get("civilization.label.consumption"), 0.5, 5.0, 1.0, v -> consumptionPerCapita = v,
+                createSlider(i18n.get("civilization.label.consumption", "Consumption per Capita"), 0.5, 5.0, 1.0, v -> consumptionPerCapita = v,
                         "Consumption"));
         sliders.getChildren()
-                .add(createSlider(i18n.get("civilization.label.birth"), 0.0, 0.2, 0.05, v -> birthRateBase = v,
+                .add(createSlider(i18n.get("civilization.label.birth", "Birth Rate"), 0.0, 0.2, 0.05, v -> birthRateBase = v,
                         "Birth Rate"));
         sliders.getChildren()
-                .add(createSlider(i18n.get("civilization.label.innovation"), 0.0, 0.05, 0.0, v -> innovationRate = v,
+                .add(createSlider(i18n.get("civilization.label.innovation", "Innovation Rate"), 0.0, 0.05, 0.0, v -> innovationRate = v,
                         "Innovation"));
         sliders.getChildren()
-                .add(createSlider(i18n.get("civilization.label.regen"), 0.0, 1.0, 0.0, v -> regenerationRate = v,
+                .add(createSlider(i18n.get("civilization.label.regen", "Resource Regeneration"), 0.0, 1.0, 0.0, v -> regenerationRate = v,
                         "Regeneration"));
         sliders.getChildren()
-                .add(createSlider(i18n.get("civilization.label.aggression"), 0.0, 1.0, 0.0, v -> aggression = v,
+                .add(createSlider(i18n.get("civilization.label.aggression", "Aggression Level"), 0.0, 1.0, 0.0, v -> aggression = v,
                         "Aggression"));
 
-        paramsTitleLabel = new Label(i18n.get("civilization.label.params"));
+        paramsTitleLabel = new Label(i18n.get("civilization.label.params", "Model Parameters"));
         paramsTitleLabel.getStyleClass().add("header-label");
         paramsTitleLabel.setStyle("-fx-font-size: 14px;");
         box.getChildren().addAll(paramsTitleLabel, sliders);
@@ -273,16 +283,16 @@ public class CivilizationApp extends FeaturedAppBase {
 
     private void updateStatusLabel() {
         if (population.getValue().doubleValue() <= 0) {
-            statusLabel.setText(i18n.get("civilization.status.extinct"));
+            statusLabel.setText(i18n.get("civilization.status.extinct", "Extinct"));
             statusLabel.getStyleClass().add("description-label");
         } else if (population.getValue().doubleValue() < 500) {
-            statusLabel.setText(i18n.get("civilization.status.collapse"));
+            statusLabel.setText(i18n.get("civilization.status.collapse", "Collapsing!"));
             statusLabel.getStyleClass().add("text-error");
         } else if (birthRateBase < 0.03) {
-            statusLabel.setText(i18n.get("civilization.status.declining"));
+            statusLabel.setText(i18n.get("civilization.status.declining", "Declining"));
             statusLabel.getStyleClass().add("text-warning");
         } else {
-            statusLabel.setText(i18n.get("civilization.status.thriving"));
+            statusLabel.setText(i18n.get("civilization.status.thriving", "Thriving"));
             statusLabel.getStyleClass().add("text-success");
         }
     }
@@ -440,16 +450,16 @@ public class CivilizationApp extends FeaturedAppBase {
 
     private void updateStatus(double dPop) {
         if (population.getValue().doubleValue() <= 10) {
-            statusLabel.setText(i18n.get("civilization.status.extinct"));
+            statusLabel.setText(i18n.get("civilization.status.extinct", "Extinct"));
             statusLabel.getStyleClass().add("description-label");
         } else if (dPop < -10) {
-            statusLabel.setText(i18n.get("civilization.status.collapse"));
+            statusLabel.setText(i18n.get("civilization.status.collapse", "Collapsing!"));
             statusLabel.getStyleClass().add("text-error");
         } else if (dPop < 0) {
-            statusLabel.setText(i18n.get("civilization.status.declining"));
+            statusLabel.setText(i18n.get("civilization.status.declining", "Declining"));
             statusLabel.getStyleClass().add("text-warning");
         } else {
-            statusLabel.setText(i18n.get("civilization.status.thriving"));
+            statusLabel.setText(i18n.get("civilization.status.thriving", "Thriving"));
             statusLabel.getStyleClass().add("text-success");
         }
     }
@@ -483,43 +493,43 @@ public class CivilizationApp extends FeaturedAppBase {
         popSeries.getData().clear();
         resSeries.getData().clear();
         polSeries.getData().clear();
-        statusLabel.setText(i18n.get("civilization.status.stable"));
+        statusLabel.setText(i18n.get("civilization.status.stable", "Stable"));
     }
 
     @Override
     protected void updateLocalizedUI() {
         if (paramsTitleLabel != null)
-            paramsTitleLabel.setText(i18n.get("civilization.label.params"));
+            paramsTitleLabel.setText(i18n.get("civilization.label.params", "Model Parameters"));
         if (statusLabel != null) {
             // Refresh status text based on current state
             updateStatusLabel();
         }
         if (mainChart != null) {
-            mainChart.setTitle(i18n.get("civilization.chart.title"));
+            mainChart.setTitle(i18n.get("civilization.chart.title", "Civilization Dynamics"));
             if (mainChart.getXAxis() instanceof NumberAxis) {
-                ((NumberAxis) mainChart.getXAxis()).setLabel(i18n.get("civilization.label.years"));
+                ((NumberAxis) mainChart.getXAxis()).setLabel(i18n.get("civilization.label.years", "Year"));
             }
             if (mainChart.getYAxis() instanceof NumberAxis) {
-                ((NumberAxis) mainChart.getYAxis()).setLabel(i18n.get("civilization.label.value"));
+                ((NumberAxis) mainChart.getYAxis()).setLabel(i18n.get("civilization.label.value", "Value"));
             }
             if (!mainChart.getData().isEmpty()) {
-                popSeries.setName(i18n.get("civilization.label.population"));
-                resSeries.setName(i18n.get("civilization.label.resources"));
-                polSeries.setName(i18n.get("civilization.series.pollution"));
+                popSeries.setName(i18n.get("civilization.label.population", "Population"));
+                resSeries.setName(i18n.get("civilization.label.resources", "Resources (kg)"));
+                polSeries.setName(i18n.get("civilization.series.pollution", "Pollution"));
             }
         }
 
         // Update slider labels
         if (sliderLabels.get("Consumption") != null)
-            sliderLabels.get("Consumption").setText(i18n.get("civilization.label.consumption"));
+            sliderLabels.get("Consumption").setText(i18n.get("civilization.label.consumption", "Consumption per Capita"));
         if (sliderLabels.get("Birth Rate") != null)
-            sliderLabels.get("Birth Rate").setText(i18n.get("civilization.label.birth"));
+            sliderLabels.get("Birth Rate").setText(i18n.get("civilization.label.birth", "Birth Rate"));
         if (sliderLabels.get("Innovation") != null)
-            sliderLabels.get("Innovation").setText(i18n.get("civilization.label.innovation"));
+            sliderLabels.get("Innovation").setText(i18n.get("civilization.label.innovation", "Innovation Rate"));
         if (sliderLabels.get("Regeneration") != null)
-            sliderLabels.get("Regeneration").setText(i18n.get("civilization.label.regen"));
+            sliderLabels.get("Regeneration").setText(i18n.get("civilization.label.regen", "Resource Regeneration"));
         if (sliderLabels.get("Aggression") != null)
-            sliderLabels.get("Aggression").setText(i18n.get("civilization.label.aggression"));
+            sliderLabels.get("Aggression").setText(i18n.get("civilization.label.aggression", "Aggression Level"));
     }
 
     public static void main(String[] args) {
@@ -528,7 +538,7 @@ public class CivilizationApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return "Sociology";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.sociology", "Sociology");
     }
 
     @Override

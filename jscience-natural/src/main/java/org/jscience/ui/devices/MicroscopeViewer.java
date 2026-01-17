@@ -58,21 +58,21 @@ public class MicroscopeViewer extends AbstractDeviceViewer<Microscope> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.microscope.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.microscope.name", "Microscope");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.microscope.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.microscope.desc", "A microscope viewer for micro-scale observation.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.microscope.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.microscope.longdesc", "Simulates an optical microscope with multiple magnification levels. allows users to observe biological and material samples at cellular levels, with integrated image processing and measurement tools.");
     }
 }

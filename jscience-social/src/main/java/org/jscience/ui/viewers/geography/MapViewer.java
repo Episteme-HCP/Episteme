@@ -26,6 +26,9 @@ package org.jscience.ui.viewers.geography;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
+import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.Parameter;
+import java.text.MessageFormat;
 
 /**
  * Generic Map Viewer for Geographic Information Systems (GIS).
@@ -60,29 +63,29 @@ public class MapViewer extends StackPane implements org.jscience.ui.Viewer {
                 VBox info = new VBox(10);
                 info.setAlignment(javafx.geometry.Pos.CENTER);
                 info.getChildren().addAll(
-                    new Label("Active Map Backend: " + provider.get().getName()),
+                    new Label(MessageFormat.format(org.jscience.ui.i18n.I18n.getInstance().get("viewer.mapviewer.active", "Active Map Backend: {0}"), provider.get().getName())),
                     new Label(provider.get().getDescription())
                 );
                 this.getChildren().add(info);
             }
         } else {
-            this.getChildren().add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.map.no.map.backend.avail", "No Map Backend Available (Install Unfolding, GeoTools, etc.)")));
+            this.getChildren().add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.mapviewer.no_backend", "No Map Backend Available (Install Unfolding, GeoTools, etc.)")));
         }
     }
 
     @Override
     public String getCategory() {
-        return "Geography";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.geography", "Geography");
     }
 
     @Override
     public String getName() {
-        return "Map Viewer";
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.map.name", "Map Viewer");
     }
     
     @Override
     public String getDescription() {
-        return "Displays geographic data.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.map.desc", "Displays geographic data.");
     }
 
     @Override
@@ -95,12 +98,12 @@ public class MapViewer extends StackPane implements org.jscience.ui.Viewer {
     }
     
     @Override
-    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+    public java.util.List<Parameter<?>> getViewerParameters() {
         return java.util.Collections.emptyList();
     }
 
     @Override
     public String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.map.longdesc", "Advanced Geographic Information System (GIS) viewer that supports multiple backend providers (including Leaflet, OpenLayers, and Mapbox). features pluggable layers, coordinate mapping, and interactive exploration of spatial datasets.");
     }
 }

@@ -38,7 +38,7 @@ import org.jscience.ui.viewers.chemistry.MolecularViewer;
 public class MolecularViewerDemo extends AbstractDemo {
 
     @Override
-    public String getName() { return I18n.getInstance().get("molecular.title", "Molecular Viewer"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("molecular.title", "Molecular Viewer"); }
 
     @Override
     public String getCategory() { return "Chemistry"; }

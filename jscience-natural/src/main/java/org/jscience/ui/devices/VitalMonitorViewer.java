@@ -78,10 +78,10 @@ public class VitalMonitorViewer extends AbstractViewer implements Simulatable {
     private boolean playing = false;
 
     @Override
-    public String getName() { return I18n.getInstance().get("vital.title", "Vital Signs Monitor"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.vitalmonitor.name", "Vital Signs Monitor"); }
 
     @Override
-    public String getCategory() { return "Medicine"; }
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.medicine", "Medicine"); }
 
     @Override
     public List<Parameter<?>> getViewerParameters() { return viewerParameters; }
@@ -101,13 +101,13 @@ public class VitalMonitorViewer extends AbstractViewer implements Simulatable {
     private void setupParameters() {
         if (monitor instanceof SimulatedVitalSignsMonitor sim) {
             viewerParameters.add(new NumericParameter(
-                    I18n.getInstance().get("vital.param.hr", "Target HR"),
+                    org.jscience.ui.i18n.I18n.getInstance().get("vital.param.hr", "Target HR"),
                     "Base heart rate in beats per minute",
                     40, 200, 1, sim.getBaseHeartRate(),
                     val -> sim.setBaseHeartRate(val.intValue())));
 
             viewerParameters.add(new NumericParameter(
-                    I18n.getInstance().get("vital.param.spo2", "Target SpO2"),
+                    org.jscience.ui.i18n.I18n.getInstance().get("vital.param.spo2", "Target SpO2"),
                     "Base oxygen saturation level",
                     70, 100, 1, sim.getBaseSpO2(),
                     val -> sim.setBaseSpO2(val.intValue())));
@@ -305,6 +305,6 @@ public class VitalMonitorViewer extends AbstractViewer implements Simulatable {
         tempValueLabel.setText(vitals.temperatureString());
     }
 
-    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.vitalmonitor.desc"); }
-    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.vitalmonitor.longdesc"); }
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.vitalmonitor.desc", "Professional vital signs monitor display."); }
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.vitalmonitor.longdesc", "Captures and displays real-time patient data including ECG, heart rate, oxygen saturation (SpO2), blood pressure, respiration rate, and temperature. features professional-grade waveform rendering and high-precision status monitoring."); }
 }

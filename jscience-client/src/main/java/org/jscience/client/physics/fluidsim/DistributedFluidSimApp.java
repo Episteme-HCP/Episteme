@@ -42,7 +42,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.jscience.physics.fluid.LatticeBoltzmann;
 import org.jscience.server.proto.*;
-import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.ThemeManager;
 
 import java.io.*;
 import java.util.concurrent.TimeUnit;
@@ -69,28 +69,40 @@ public class DistributedFluidSimApp extends Application implements org.jscience.
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle(I18n.getInstance().get("app.distributedfluidsimapp.title", "🌊 Fluid Dynamics - Distributed LBM"));
+        stage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedfluidsimapp.title", "🌊 Fluid Dynamics - Distributed LBM"));
         canvas = new Canvas(W * SCALE, H * SCALE);
         gc = canvas.getGraphicsContext2D();
         initFluid();
 
         BorderPane root = new BorderPane(canvas);
+        root.getStyleClass().add("viewer-root");
+
         VBox controls = new VBox(10);
-        controls.setPadding(new Insets(10));
-        controls.setStyle("-fx-background-color: #1a1a2e;");
-        statusLabel = new Label(I18n.getInstance().get("app.distributedfluidsimapp.status.checking", "Grid Status: Checking..."));
-        statusLabel.setTextFill(Color.WHITE);
-        localSimCheckBox = new CheckBox(I18n.getInstance().get("app.distributedfluidsimapp.chk.local", "Local LBM Simulation")); // Renamed and initialized
+        controls.setPadding(new Insets(15));
+        controls.getStyleClass().add("viewer-sidebar");
+        controls.setPrefWidth(250);
+
+        Label headerLbl = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedfluidsimapp.header", "Fluid Control"));
+        headerLbl.getStyleClass().add("header-label-white");
+
+        statusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedfluidsimapp.status.checking", "Grid Status: Checking..."));
+        statusLabel.getStyleClass().add("label-muted");
+
+        localSimCheckBox = new CheckBox(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedfluidsimapp.chk.local", "Local LBM Simulation"));
         localSimCheckBox.setSelected(true);
-        localSimCheckBox.setTextFill(Color.WHITE);
-        Button loadObstacleBtn = new Button(I18n.getInstance().get("app.distributedfluidsimapp.btn.load_map", "Load Obstacle Map"));
-        loadObstacleBtn.setTextFill(Color.BLACK);
+        localSimCheckBox.getStyleClass().add("check-box-custom");
+
+        Button loadObstacleBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedfluidsimapp.btn.load_map", "Load Obstacle Map"));
+        loadObstacleBtn.getStyleClass().add("accent-button-green");
+        loadObstacleBtn.setPrefWidth(220);
         loadObstacleBtn.setOnAction(e -> loadObstacleMap(stage));
 
-        controls.getChildren().addAll(new Label(I18n.getInstance().get("app.distributedfluidsimapp.header", "Fluid Control")), localSimCheckBox, loadObstacleBtn, statusLabel);
+        controls.getChildren().addAll(headerLbl, localSimCheckBox, loadObstacleBtn, statusLabel);
         root.setRight(controls);
 
-        stage.setScene(new Scene(root));
+        Scene scene = new Scene(root);
+        ThemeManager.getInstance().applyTheme(scene);
+        stage.setScene(scene);
         stage.show();
         initGrpc();
 
@@ -144,7 +156,7 @@ public class DistributedFluidSimApp extends Application implements org.jscience.
                     if (result.getStatus() == Status.COMPLETED) {
                         applyFluidResults(result.getSerializedData().toByteArray());
                         render();
-                        statusLabel.setText(I18n.getInstance().get("app.distributedfluidsimapp.status.dist", "Mode: Distributed ✅"));
+                        statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedfluidsimapp.status.dist", "Mode: Distributed ✅"));
                         return;
                     }
                 } catch (Exception e) {
@@ -152,11 +164,11 @@ public class DistributedFluidSimApp extends Application implements org.jscience.
             }
             localStep(); // Fallback to local if distributed fails or is slow
             render();
-            statusLabel.setText(I18n.getInstance().get("app.distributedfluidsimapp.status.sluggish", "Mode: Local (Grid Sluggish)"));
+            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedfluidsimapp.status.sluggish", "Mode: Local (Grid Sluggish)"));
         } catch (Exception e) {
             localStep(); // Fallback to local if distributed fails
             render();
-            statusLabel.setText(I18n.getInstance().get("app.distributedfluidsimapp.status.offline", "Mode: Grid Offline"));
+            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedfluidsimapp.status.offline", "Mode: Grid Offline"));
         }
     }
 
@@ -205,7 +217,7 @@ public class DistributedFluidSimApp extends Application implements org.jscience.
             for (int y = 0; y < H; y++)
                 grid[x][y] = density[x][y];
         Platform.runLater(this::drawSimulation);
-        statusLabel.setText(I18n.getInstance().get("app.distributedfluidsimapp.status.local", "Mode: Local LBM"));
+        statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedfluidsimapp.status.local", "Mode: Local LBM"));
     }
 
     private void drawSimulation() {
@@ -246,7 +258,7 @@ public class DistributedFluidSimApp extends Application implements org.jscience.
     }
 
     private void loadObstacleMap(Stage stage) {
-        File file = org.jscience.client.util.FileHelper.showOpenDialog(stage, I18n.getInstance().get("app.distributedfluidsimapp.file.load_map", "Load Obstacle Map"), I18n.getInstance().get("app.distributedfluidsimapp.file.images", "Images"), "*.png",
+        File file = org.jscience.client.util.FileHelper.showOpenDialog(stage, org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedfluidsimapp.file.load_map", "Load Obstacle Map"), org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedfluidsimapp.file.images", "Images"), "*.png",
                 "*.jpg", "*.bmp");
         if (file != null) {
             try {
@@ -276,9 +288,9 @@ public class DistributedFluidSimApp extends Application implements org.jscience.
                         }
                     }
                 }
-                statusLabel.setText(I18n.getInstance().get("app.distributedfluidsimapp.status.loaded", "Map Loaded: {0}", file.getName()));
+                statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedfluidsimapp.status.loaded", "Map Loaded: {0}", file.getName()));
             } catch (Exception e) {
-                statusLabel.setText(I18n.getInstance().get("app.distributedfluidsimapp.status.load_failed", "Load Failed"));
+                statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedfluidsimapp.status.load_failed", "Load Failed"));
             }
         }
     }
@@ -303,13 +315,13 @@ public class DistributedFluidSimApp extends Application implements org.jscience.
     public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics"); }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedfluidsimapp.name", "Distributed Fluid Sim App"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedfluidsimapp.name", "Distributed Fluid Sim App"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedfluidsimapp.desc", "Distributed application for Distributed Fluid Sim App."); }
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedfluidsimapp.desc", "Distributed Lattice Boltzmann fluid simulation for aero/hydrodynamics."); }
 
     @Override
-    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("app.distributedfluidsimapp.longdesc", "Distributed application for Distributed Fluid Sim App."); }
+    public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.apps.distributedfluidsimapp.longdesc", "Model complex fluid flows around obstacles using the Lattice Boltzmann Method (LBM). This application leverages the distributed power of the JScience grid to solve large-scale fluid dynamics problems, supporting real-time interaction and obstacle map loading."); }
 
     @Override
     public void show(javafx.stage.Stage stage) {

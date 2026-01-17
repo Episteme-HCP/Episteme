@@ -46,10 +46,10 @@ public class HumanBodyDemo extends AbstractDemo {
     public String getCategory() { return "Medicine"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("HumanBody.title", "Human Body Anatomy"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("HumanBody.title", "Human Body Anatomy"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("HumanBody.desc", "3D anatomy viewer based on Z-Anatomy."); }
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("HumanBody.desc", "3D anatomy viewer based on Z-Anatomy."); }
 
     @Override
     public String getLongDescription() {

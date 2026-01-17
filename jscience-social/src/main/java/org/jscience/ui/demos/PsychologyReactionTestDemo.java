@@ -42,16 +42,16 @@ public class PsychologyReactionTestDemo extends AbstractSimulationDemo {
     }
 
     @Override
-    public String getCategory() { return "Psychology"; }
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.psychology", "Psychology"); }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.psychologyreactiontestdemo.name");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.psychologyreactiontestdemo.name", "Reaction Test");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.psychologyreactiontestdemo.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.psychologyreactiontestdemo.desc", "Visual reaction time measurement.");
     }
 
     private long startTime = 0;
@@ -71,10 +71,10 @@ public class PsychologyReactionTestDemo extends AbstractSimulationDemo {
     
     private void initUI() {
         StackPane root = new StackPane();
-        Label instruction = new Label(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.inst.start"));
+        Label instruction = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.psychologyreactiontestdemo.inst.start", "Click 'Start', then wait for GREEN background."));
         instruction.setStyle("-fx-font-size: 20px;");
 
-        Button mainBtn = new Button(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.btn.start"));
+        Button mainBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.psychologyreactiontestdemo.btn.start", "Start Test"));
         mainBtn.setStyle("-fx-font-size: 16px;");
 
         VBox center = new VBox(20, instruction, mainBtn);
@@ -82,9 +82,9 @@ public class PsychologyReactionTestDemo extends AbstractSimulationDemo {
         root.getChildren().add(center);
 
         mainBtn.setOnAction(e -> {
-            if (mainBtn.getText().equals(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.btn.start")) ||
-                    mainBtn.getText().equals(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.btn.try"))) {
-                instruction.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.inst.wait"));
+            if (mainBtn.getText().equals(org.jscience.ui.i18n.I18n.getInstance().get("demo.psychologyreactiontestdemo.btn.start", "Start Test")) ||
+                    mainBtn.getText().equals(org.jscience.ui.i18n.I18n.getInstance().get("demo.psychologyreactiontestdemo.btn.try", "Try Again"))) {
+                instruction.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.psychologyreactiontestdemo.inst.wait", "Wait for it..."));
                 root.setStyle("-fx-background-color: #cc3333;");
                 instruction.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
                 mainBtn.setVisible(false);
@@ -95,15 +95,15 @@ public class PsychologyReactionTestDemo extends AbstractSimulationDemo {
                     Platform.runLater(() -> {
                         if (waiting) {
                             root.setStyle("-fx-background-color: #33cc33;");
-                            instruction.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.inst.click"));
+                            instruction.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.psychologyreactiontestdemo.inst.click", "CLICK NOW!"));
                             startTime = System.currentTimeMillis();
                             waiting = false;
                             root.setOnMouseClicked(ev -> {
                                 if (startTime > 0) {
                                     long elapsed = System.currentTimeMillis() - startTime;
-                                    instruction.setText(String.format(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.result.fmt"), elapsed));
+                                    instruction.setText(String.format(org.jscience.ui.i18n.I18n.getInstance().get("demo.psychologyreactiontestdemo.result.fmt", "Reaction Time: %d ms"), elapsed));
                                     root.setStyle(""); instruction.setStyle("-fx-font-size: 20px;");
-                                    mainBtn.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.btn.try"));
+                                    mainBtn.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.psychologyreactiontestdemo.btn.try", "Try Again"));
                                     mainBtn.setVisible(true);
                                     startTime = 0;
                                     root.setOnMouseClicked(null);
@@ -118,9 +118,9 @@ public class PsychologyReactionTestDemo extends AbstractSimulationDemo {
         root.setOnMouseClicked(e -> {
             if (waiting && startTime == 0) {
                 waiting = false;
-                instruction.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.penalty"));
+                instruction.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.psychologyreactiontestdemo.text.penalty", "Too early! Penalized."));
                 root.setStyle(""); instruction.setStyle("-fx-font-size: 20px;");
-                mainBtn.setText(org.jscience.ui.i18n.SocialI18n.getInstance().get("psych.btn.try"));
+                mainBtn.setText(org.jscience.ui.i18n.I18n.getInstance().get("demo.psychologyreactiontestdemo.btn.try", "Try Again"));
                 mainBtn.setVisible(true);
             }
         });
@@ -130,7 +130,7 @@ public class PsychologyReactionTestDemo extends AbstractSimulationDemo {
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.SocialI18n.getInstance().get("demo.psychologyreactiontestdemo.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.psychologyreactiontestdemo.longdesc", "Measure your visual reaction time with this interactive test.");
     }
 }
 

@@ -58,11 +58,11 @@ public class USGSEarthquakesReader {
             "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary");
 
     public static String getCategory() {
-        return I18n.getInstance().get("reader.usgsearthquakes.category", "Earth");
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.usgsearthquakes.category", "Earth");
     }
 
     public static String getDescription() {
-        return I18n.getInstance().get("reader.usgsearthquakes.description", "USGS Earthquakes API Reader.");
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.usgsearthquakes.description", "USGS Earthquakes API Reader.");
     }
 
     /**

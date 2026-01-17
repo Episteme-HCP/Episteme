@@ -50,12 +50,17 @@ public class GoogleElevationReader extends AbstractResourceReader<Double> {
 
     @Override
     public String getCategory() {
-        return "Geography";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.geography", "Geography");
     }
 
     @Override
     public String getDescription() {
-        return "Google Elevation API Reader.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.googleelevation.desc", "Google Elevation API Reader.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.googleelevation.longdesc", "Retrieves elevation data from the Google Maps Elevation API.");
     }
 
     @Override
@@ -109,5 +114,5 @@ public class GoogleElevationReader extends AbstractResourceReader<Double> {
         return 0.0;
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.googleelevation.name"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.googleelevation.name", "Google Elevation Reader"); }
 }

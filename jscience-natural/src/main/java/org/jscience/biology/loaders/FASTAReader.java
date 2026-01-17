@@ -55,12 +55,17 @@ public class FASTAReader extends AbstractResourceReader<List<FASTAReader.Sequenc
 
     @Override
     public String getCategory() {
-        return "Biology";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology");
     }
 
     @Override
     public String getDescription() {
-        return "FASTA Sequence Reader.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fastareader.desc", "FASTA Sequence Reader.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fastareader.longdesc", "Reads biological sequences from FASTA files.");
     }
 
     @Override
@@ -118,5 +123,5 @@ public class FASTAReader extends AbstractResourceReader<List<FASTAReader.Sequenc
         return sequences;
     }
 
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.fasta.name"); }
+    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.fastareader.name", "FASTA Reader"); }
 }

@@ -57,10 +57,10 @@ public class BioMotionViewer extends AbstractViewer implements Simulatable {
     private double muscleStrength = 1.0;
 
     @Override
-    public String getName() { return I18n.getInstance().get("biomotion.title", "BioMotion"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.biomotionviewer.name", "BioMotion Viewer"); }
     
     @Override
-    public String getCategory() { return "Medicine"; }
+    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.medicine", "Medicine"); }
 
     public BioMotionViewer() {
         initUI();
@@ -79,10 +79,10 @@ public class BioMotionViewer extends AbstractViewer implements Simulatable {
         sidebar.getStyleClass().add("viewer-sidebar");
         sidebar.setPrefWidth(200);
 
-        Label title = new Label(I18n.getInstance().get("biomotion.controls", "BioMotion Controls"));
+        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("biomotion.controls", "BioMotion Controls"));
         title.getStyleClass().add("header-label");
 
-        Button resetBtn = new Button(I18n.getInstance().get("biomotion.reset", "Reset Walker"));
+        Button resetBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("biomotion.reset", "Reset Walker"));
         resetBtn.setMaxWidth(Double.MAX_VALUE);
         resetBtn.setOnAction(e -> initWalker());
 
@@ -219,7 +219,7 @@ public class BioMotionViewer extends AbstractViewer implements Simulatable {
         Link(Node n1, Node n2, double length) { this.n1 = n1; this.n2 = n2; this.length = length; }
     }
 
-    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.biomotion.desc"); }
-    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.biomotion.longdesc"); }
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.biomotionviewer.desc", "Physics-based biological motion simulator."); }
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.biomotionviewer.longdesc", "Simulates biological movement using a spring-mass ragdoll model. Adjust gravity and muscle tone to observe how they affect the walker's dynamics and stability."); }
     @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

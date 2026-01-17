@@ -81,7 +81,7 @@ public class TelescopeViewer extends AbstractViewer {
         getStyleClass().add("viewer-root");
 
         // Title
-        Label title = new Label(I18n.getInstance().get("telescope.title"));
+        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("telescope.title"));
         title.getStyleClass().add("font-large");
 
         // Status panel
@@ -108,10 +108,10 @@ public class TelescopeViewer extends AbstractViewer {
     private HBox createStatusPanel() {
         // RA display
         VBox raBox = new VBox(2);
-        Label raTitle = new Label(I18n.getInstance().get("telescope.ra.title"));
+        Label raTitle = new Label(org.jscience.ui.i18n.I18n.getInstance().get("telescope.ra.title"));
 
         raTitle.setFont(Font.font("System", 10));
-        raLabel = new Label(I18n.getInstance().get("telescope.ra.default"));
+        raLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("telescope.ra.default"));
 
         raLabel.getStyleClass().add("font-bold");
         raBox.getChildren().addAll(raTitle, raLabel);
@@ -119,10 +119,10 @@ public class TelescopeViewer extends AbstractViewer {
 
         // Dec display
         VBox decBox = new VBox(2);
-        Label decTitle = new Label(I18n.getInstance().get("telescope.dec.title"));
+        Label decTitle = new Label(org.jscience.ui.i18n.I18n.getInstance().get("telescope.dec.title"));
 
         decTitle.setFont(Font.font("System", 10));
-        decLabel = new Label(I18n.getInstance().get("telescope.dec.default"));
+        decLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("telescope.dec.default"));
 
         decLabel.getStyleClass().add("font-bold");
         decBox.getChildren().addAll(decTitle, decLabel);
@@ -130,10 +130,10 @@ public class TelescopeViewer extends AbstractViewer {
 
         // Status
         VBox statusBox = new VBox(2);
-        Label statusTitle = new Label(I18n.getInstance().get("telescope.status.title"));
+        Label statusTitle = new Label(org.jscience.ui.i18n.I18n.getInstance().get("telescope.status.title"));
 
         statusTitle.setFont(Font.font("System", 10));
-        statusLabel = new Label(I18n.getInstance().get("telescope.status.disconnected"));
+        statusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("telescope.status.disconnected"));
         statusLabel.getStyleClass().add("text-warning");
         statusLabel.getStyleClass().add("font-bold");
         statusBox.getChildren().addAll(statusTitle, statusLabel);
@@ -149,7 +149,7 @@ public class TelescopeViewer extends AbstractViewer {
 
     private VBox createControlPanel() {
         // Target input
-        Label targetLabel = new Label(I18n.getInstance().get("telescope.target"));
+        Label targetLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("telescope.target"));
 
         targetLabel.getStyleClass().add("font-bold");
 
@@ -164,11 +164,11 @@ public class TelescopeViewer extends AbstractViewer {
         decInput.setPrefWidth(80);
         decInput.setPromptText("Dec (Ã‚Â°)");
 
-        Button slewBtn = new Button(I18n.getInstance().get("telescope.btn.slew"));
+        Button slewBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("telescope.btn.slew"));
         slewBtn.getStyleClass().add("accent-button-blue");
         slewBtn.setOnAction(e -> slewToTarget());
 
-        Button stopBtn = new Button(I18n.getInstance().get("telescope.btn.stop"));
+        Button stopBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("telescope.btn.stop"));
         stopBtn.getStyleClass().add("accent-button-red");
         stopBtn.setOnAction(e -> stopSlew());
 
@@ -214,7 +214,7 @@ public class TelescopeViewer extends AbstractViewer {
             telescope.setPositionCallback(this::updatePosition);
             updateStatusDisplay();
         } catch (Exception e) {
-            statusLabel.setText(I18n.getInstance().get("telescope.status.error"));
+            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("telescope.status.error"));
             statusLabel.getStyleClass().add("text-error");
         }
     }
@@ -226,10 +226,10 @@ public class TelescopeViewer extends AbstractViewer {
             telescope.slewTo(ra, dec);
             updateStatusDisplay();
         } catch (NumberFormatException e) {
-            statusLabel.setText(I18n.getInstance().get("telescope.status.invalid"));
+            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("telescope.status.invalid"));
             statusLabel.getStyleClass().add("text-error");
         } catch (Exception e) {
-            statusLabel.setText(I18n.getInstance().get("telescope.status.slew_error"));
+            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("telescope.status.slew_error"));
             statusLabel.getStyleClass().add("text-error");
         }
     }
@@ -314,22 +314,22 @@ public class TelescopeViewer extends AbstractViewer {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.telescope.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.telescope.name", "Telescope");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.telescope.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.telescope.desc", "JavaFX viewer for telescope control and position visualization.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.telescope.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.telescope.longdesc", "Professional astronomical tool for controlling telescope mounts and monitoring their celestial coordinates (RA/Dec). features a real-time star field representation, slewing/parking controls, and support for ASCOM/INDILIB standards through a simulation backend.");
     }
 
     @Override

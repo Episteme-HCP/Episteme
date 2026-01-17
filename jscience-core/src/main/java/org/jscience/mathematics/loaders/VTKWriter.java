@@ -53,6 +53,11 @@ public class VTKWriter extends AbstractResourceWriter<double[][]> {
         return "Exports 2D data to VTK Structured Points format.";
     }
 
+    @Override
+    public String getLongDescription() {
+        return "Writes 2D data arrays to legacy VTK Structured Points ASCII format for visualization.";
+    }
+
     /**
      * Saves 2D data matrix to VTK format.
      */

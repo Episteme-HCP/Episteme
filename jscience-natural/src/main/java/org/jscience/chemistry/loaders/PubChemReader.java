@@ -57,11 +57,11 @@ public class PubChemReader {
     private final ObjectMapper mapper = new ObjectMapper();
 
     public String getCategory() {
-        return "Chemistry";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry");
     }
 
     public String getDescription() {
-        return "PubChem Chemical Compound Reader.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.pubchem.desc", "PubChem Chemical Compound Reader.");
     }
 
     /**

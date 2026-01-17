@@ -35,7 +35,6 @@ import org.jscience.mathematics.linearalgebra.matrices.MatrixFactory;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Parameter;
-import org.jscience.ui.i18n.I18n;
 import org.jscience.io.Configuration;
 
 import java.util.ArrayList;
@@ -43,7 +42,7 @@ import java.util.List;
 
 public class MatrixViewer<T> extends AbstractViewer {
 
-    private static final String CFG_PREFIX = "viewer.matrix.default.";
+    private static final String CFG_PREFIX = "viewer.matrixviewer.default.";
     
     private Matrix<Real> matrix;
     private Canvas heatmapCanvas;
@@ -56,11 +55,11 @@ public class MatrixViewer<T> extends AbstractViewer {
         int defaultRows = Configuration.getInt(CFG_PREFIX + "rows", 8);
         int defaultCols = Configuration.getInt(CFG_PREFIX + "cols", 8);
         List<Parameter<?>> params = new ArrayList<>();
-        params.add(new org.jscience.ui.NumericParameter("viewer.matrix.param.rows",
-                I18n.getInstance().get("viewer.matrix.param.rows.desc"),
+        params.add(new org.jscience.ui.NumericParameter("viewer.matrixviewer.param.rows",
+                org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.param.rows.desc", "Number of rows in the matrix"),
                 2, 50, 1, defaultRows, v -> { if(rowsSpinner != null) rowsSpinner.getValueFactory().setValue(v.intValue()); }));
-        params.add(new org.jscience.ui.NumericParameter("viewer.matrix.param.cols",
-                I18n.getInstance().get("viewer.matrix.param.cols.desc"),
+        params.add(new org.jscience.ui.NumericParameter("viewer.matrixviewer.param.cols",
+                org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.param.cols.desc", "Number of columns in the matrix"),
                 2, 50, 1, defaultCols, v -> { if(colsSpinner != null) colsSpinner.getValueFactory().setValue(v.intValue()); }));
         return params;
     }
@@ -71,12 +70,12 @@ public class MatrixViewer<T> extends AbstractViewer {
 
     @Override
     public String getCategory() {
-        return "Mathematics";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics", "Mathematics");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("viewer.matrix.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.name", "Matrix Viewer");
     }
     
     public void initUI() {
@@ -84,7 +83,7 @@ public class MatrixViewer<T> extends AbstractViewer {
         layout.getStyleClass().add("viewer-root");
 
         // Header
-        Label header = new Label(I18n.getInstance().get("matrix.label.header"));
+        Label header = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.label.header", "🔢 Matrix Viewer"));
         header.getStyleClass().add("viewer-header-label");
         HBox headerBox = new HBox(header);
         headerBox.setAlignment(Pos.CENTER);
@@ -98,63 +97,63 @@ public class MatrixViewer<T> extends AbstractViewer {
         controls.setPrefWidth(220);
         controls.getStyleClass().add("viewer-sidebar");
 
-        Label sizeLabel = new Label(I18n.getInstance().get("matrix.label.size"));
+        Label sizeLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.label.size", "Matrix Size"));
         sizeLabel.getStyleClass().add("viewer-section-label");
 
         HBox rowBox = new HBox(10);
         rowBox.setAlignment(Pos.CENTER_LEFT);
-        Label rowLabel = new Label(I18n.getInstance().get("matrix.label.rows") + ":");
+        Label rowLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.label.rows", "Rows") + ":");
         rowsSpinner = new Spinner<>(2, 50, 8);
         rowsSpinner.setPrefWidth(80);
         rowBox.getChildren().addAll(rowLabel, rowsSpinner);
 
         HBox colBox = new HBox(10);
         colBox.setAlignment(Pos.CENTER_LEFT);
-        Label colLabel = new Label(I18n.getInstance().get("matrix.label.cols") + ":");
+        Label colLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.label.cols", "Cols") + ":");
         colsSpinner = new Spinner<>(2, 50, 8);
         colsSpinner.setPrefWidth(80);
         colBox.getChildren().addAll(colLabel, colsSpinner);
 
-        Button generateBtn = new Button(I18n.getInstance().get("matrix.button.random"));
+        Button generateBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.button.random", "Generate Random Matrix"));
         generateBtn.setMaxWidth(Double.MAX_VALUE);
         generateBtn.getStyleClass().add("viewer-primary-button");
         generateBtn.setOnAction(e -> generateMatrix());
 
-        Button identityBtn = new Button(I18n.getInstance().get("matrix.button.identity"));
+        Button identityBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.button.identity", "Identity Matrix"));
         identityBtn.setMaxWidth(Double.MAX_VALUE);
         identityBtn.setOnAction(e -> generateIdentity());
 
         Separator sep1 = new Separator();
 
-        Label viewLabel = new Label(I18n.getInstance().get("matrix.view.label"));
+        Label viewLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.view.label", "View Mode"));
         viewLabel.getStyleClass().add("viewer-section-label");
 
         ToggleGroup viewGroup = new ToggleGroup();
-        RadioButton tableRadio = new RadioButton(I18n.getInstance().get("matrix.view.table"));
+        RadioButton tableRadio = new RadioButton(org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.view.table", "Table View"));
         tableRadio.getStyleClass().add("viewer-radio");
         tableRadio.setToggleGroup(viewGroup);
         tableRadio.setSelected(true);
         tableRadio.setOnAction(e -> showTableView());
 
-        RadioButton heatmapRadio = new RadioButton(I18n.getInstance().get("matrix.view.heatmap"));
+        RadioButton heatmapRadio = new RadioButton(org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.view.heatmap", "Heatmap View"));
         heatmapRadio.getStyleClass().add("viewer-radio");
         heatmapRadio.setToggleGroup(viewGroup);
         heatmapRadio.setOnAction(e -> showHeatmapView());
 
         Separator sep2 = new Separator();
 
-        Label opsLabel = new Label(I18n.getInstance().get("matrix.ops.label"));
+        Label opsLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.ops.label", "Operations"));
         opsLabel.getStyleClass().add("viewer-section-label");
 
-        Button transposeBtn = new Button(I18n.getInstance().get("matrix.ops.transpose"));
+        Button transposeBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.ops.transpose", "Transpose"));
         transposeBtn.setMaxWidth(Double.MAX_VALUE);
         transposeBtn.setOnAction(e -> transpose());
 
-        Button scaleBtn = new Button(I18n.getInstance().get("matrix.ops.scale"));
+        Button scaleBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.ops.scale", "Scale (2x)"));
         scaleBtn.setMaxWidth(Double.MAX_VALUE);
         scaleBtn.setOnAction(e -> scale(2.0));
 
-        infoLabel = new Label("8x8 " + I18n.getInstance().get("matrix.info.matrix"));
+        infoLabel = new Label("8x8 " + org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.info.matrix", "Matrix"));
         infoLabel.getStyleClass().add("viewer-info-label");
 
         controls.getChildren().addAll(
@@ -187,7 +186,7 @@ public class MatrixViewer<T> extends AbstractViewer {
         }
         matrix = MatrixFactory.create(data, Real.ZERO);
         updateViews();
-        infoLabel.setText(rows + "\u00D7" + cols + " " + I18n.getInstance().get("matrix.info.matrix"));
+        infoLabel.setText(rows + "\u00D7" + cols + " " + org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.info.matrix", "Matrix"));
     }
 
     private void generateIdentity() {
@@ -202,7 +201,7 @@ public class MatrixViewer<T> extends AbstractViewer {
         rowsSpinner.getValueFactory().setValue(size);
         colsSpinner.getValueFactory().setValue(size);
         updateViews();
-        infoLabel.setText(size + "\u00D7" + size + " " + I18n.getInstance().get("matrix.info.identity"));
+        infoLabel.setText(size + "\u00D7" + size + " " + org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.info.identity", "Identity"));
     }
 
     private void transpose() {
@@ -215,7 +214,7 @@ public class MatrixViewer<T> extends AbstractViewer {
             colsSpinner.getValueFactory().setValue(r);
             updateViews();
             infoLabel.setText(matrix.rows() + "\u00D7" + matrix.cols() + " ("
-                    + I18n.getInstance().get("matrix.info.transposed") + ")");
+                    + org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.info.transposed", "Transposed") + ")");
         }
     }
 
@@ -232,7 +231,7 @@ public class MatrixViewer<T> extends AbstractViewer {
             matrix = MatrixFactory.create(data, Real.ZERO);
             updateViews();
             infoLabel.setText(matrix.rows() + "\u00D7" + matrix.cols() + " ("
-                    + I18n.getInstance().get("matrix.info.scaled") + " \u00D7" + factor + ")");
+                    + org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.info.scaled", "Scaled") + " \u00D7" + factor + ")");
         }
     }
 
@@ -258,7 +257,7 @@ public class MatrixViewer<T> extends AbstractViewer {
 
     private void showTableView() {
         viewContainer.getChildren().clear();
-        Label placeholder = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.matrix.table.view.not.imple", "Table View Not Implemented in this Refactor (Use Heatmap)"));
+        Label placeholder = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.table.placeholder", "Table View Not Implemented (Use Heatmap)"));
         viewContainer.getChildren().add(placeholder);
     }
 
@@ -349,11 +348,11 @@ public class MatrixViewer<T> extends AbstractViewer {
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("MatrixViewer.desc", "MatrixViewer description");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.desc", "Interactive matrix visualization and operations.");
     }
 
     @Override
     public String getLongDescription() {
-        return getDescription();
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.longdesc", "Visualize matrices with heatmaps and perform linear algebra operations including determinant, inverse, eigenvalues, and decompositions. Supports random matrix generation and scaling.");
     }
 }

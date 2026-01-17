@@ -41,7 +41,7 @@ public class AudioViewerDemo extends AbstractSimulationDemo {
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.physics");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics");
     }
 
     @Override

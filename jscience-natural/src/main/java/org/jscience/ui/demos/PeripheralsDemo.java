@@ -26,12 +26,14 @@ package org.jscience.ui.demos;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.Label;
 import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.ui.viewers.physics.classical.waves.SpectrographViewer;
 import org.jscience.device.sim.SimulatedOscilloscope;
 import org.jscience.ui.devices.OscilloscopeViewer;
 import org.jscience.ui.devices.VitalMonitorViewer;
+import java.text.MessageFormat;
 
 /**
  * Unified demonstration of all scientific viewers and devices.
@@ -44,24 +46,22 @@ public class PeripheralsDemo extends AbstractDemo {
 
     @Override
     public String getCategory() {
-        return I18n.getInstance().get("category.engineering", "Engineering");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.engineering", "Engineering");
     }
 
     @Override
     public String getName() {
-        return I18n.getInstance().get("demo.peripherals.title", "Peripherals");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.peripherals.name", "Peripherals Demo");
     }
 
     @Override
     public String getDescription() {
-        return I18n.getInstance().get("demo.peripherals.desc", "Explore all scientific instruments in one place");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.peripherals.desc", "Explore all scientific instruments in one place");
     }
 
     @Override
     public String getLongDescription() {
-        return "The Peripherals panel provides a centralized interface to interact with all scientific viewers " +
-                "available in JScience. Use the tabs below to switch between instruments. " +
-                "Each instrument exposes its own parameters and simulation controls for real-time analysis.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.peripherals.longdesc", "Interact with various simulated peripherals and sensors including Oscilloscopes, Vital Monitors, and Spectrographs.");
     }
 
     @Override
@@ -73,36 +73,36 @@ public class PeripheralsDemo extends AbstractDemo {
         try {
             SpectrographViewer spectro = new SpectrographViewer();
             spectro.play();
-            Tab spectroTab = new Tab(I18n.getInstance().get("spectrograph.title", "Spectrograph"), spectro);
+            Tab spectroTab = new Tab(org.jscience.ui.i18n.I18n.getInstance().get("demo.peripherals.tab.spectrograph", "Spectrograph"), spectro);
             tabPane.getTabs().add(spectroTab);
         } catch (Exception e) {
             e.printStackTrace();
             tabPane.getTabs().add(new Tab("Spectrograph (Error)",
-                    new javafx.scene.control.Label("Failed to load: " + e.getMessage())));
+                    new Label(MessageFormat.format(org.jscience.ui.i18n.I18n.getInstance().get("demo.peripherals.error", "Failed to load: {0}"), e.getMessage()))));
         }
 
         // Vital Monitor
         try {
             VitalMonitorViewer vital = new VitalMonitorViewer();
             vital.play();
-            Tab vitalTab = new Tab(I18n.getInstance().get("vital.title", "Vital Monitor"), vital);
+            Tab vitalTab = new Tab(org.jscience.ui.i18n.I18n.getInstance().get("demo.peripherals.tab.vital", "Vital Monitor"), vital);
             tabPane.getTabs().add(vitalTab);
         } catch (Exception e) {
             e.printStackTrace();
             tabPane.getTabs().add(new Tab("Vital Monitor (Error)",
-                    new javafx.scene.control.Label("Failed to load: " + e.getMessage())));
+                    new Label(MessageFormat.format(org.jscience.ui.i18n.I18n.getInstance().get("demo.peripherals.error", "Failed to load: {0}"), e.getMessage()))));
         }
 
         // Oscilloscope
         try {
             OscilloscopeViewer osc = new OscilloscopeViewer(new SimulatedOscilloscope("DemoScope"));
             osc.play();
-            Tab oscTab = new Tab(I18n.getInstance().get("oscilloscope.title", "Oscilloscope"), osc);
+            Tab oscTab = new Tab(org.jscience.ui.i18n.I18n.getInstance().get("demo.peripherals.tab.oscilloscope", "Oscilloscope"), osc);
             tabPane.getTabs().add(oscTab);
         } catch (Exception e) {
             e.printStackTrace();
             tabPane.getTabs().add(new Tab("Oscilloscope (Error)",
-                    new javafx.scene.control.Label("Failed to load: " + e.getMessage())));
+                    new Label(MessageFormat.format(org.jscience.ui.i18n.I18n.getInstance().get("demo.peripherals.error", "Failed to load: {0}"), e.getMessage()))));
         }
 
         return tabPane;
@@ -112,5 +112,3 @@ public class PeripheralsDemo extends AbstractDemo {
         launch(args);
     }
 }
-
-

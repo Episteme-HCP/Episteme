@@ -50,12 +50,17 @@ public class NCBITaxonomyReader extends org.jscience.io.AbstractResourceReader<o
 
     @Override
     public String getCategory() {
-        return "Biology";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology");
     }
 
     @Override
     public String getDescription() {
-        return "NCBI Taxonomy Reader.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.ncbitaxonomyreader.desc", "Detailed NCBI Taxonomy Database Reader.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.ncbitaxonomyreader.longdesc", "Connects to NCBI Taxonomy API (E-Utils) to search and retrieve full species classification trees and metadata.");
     }
 
     @Override
@@ -266,6 +271,6 @@ public class NCBITaxonomyReader extends org.jscience.io.AbstractResourceReader<o
 
     @Override
     public String getName() {
-        return "NCBITaxonomy"; // Simple fallback
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.ncbitaxonomyreader.name", "NCBI Taxonomy Reader");
     }
 }

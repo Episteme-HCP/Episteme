@@ -530,11 +530,16 @@ public class FbxMeshReader extends AbstractResourceReader<Group> {
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fbxmesh.name");
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fbxmeshreader.name", "FBX Mesh Reader");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fbxmesh.description");
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fbxmeshreader.desc", "FBX loader for JavaFX 3D using the jfbx library.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.fbxmeshreader.longdesc", "Parses binary FBX files and creates JavaFX TriangleMesh objects, supporting transformations and scene hierarchy.");
     }
 }

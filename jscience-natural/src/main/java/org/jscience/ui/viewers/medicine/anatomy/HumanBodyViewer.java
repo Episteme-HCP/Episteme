@@ -25,6 +25,8 @@ package org.jscience.ui.viewers.medicine.anatomy;
 
 import javafx.application.Platform;
 import org.jscience.ui.AbstractViewer;
+import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.Parameter;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.*;
@@ -43,10 +45,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.Stack;
 
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
+import java.text.MessageFormat;
 
 /**
  * 3D Human Body Anatomy Viewer.
@@ -61,12 +62,12 @@ public class HumanBodyViewer extends AbstractViewer {
 
     @Override
     public String getCategory() {
-        return "Medicine";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.medicine", "Medicine");
     }
 
     @Override
     public String getName() {
-        return "Human Body Viewer (JavaFX)";
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.name", "Human Body Viewer");
     }
 
     // 3D Scene Components
@@ -157,12 +158,12 @@ public class HumanBodyViewer extends AbstractViewer {
                         expandAndSelect(item);
                     }
                 } else {
-                    titleLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.unknown.part", "Unknown Part"));
-                    descriptionArea.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.no.id.found.for.this", "No ID found for this mesh."));
+                    titleLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.unknown_part", "Unknown Part"));
+                    descriptionArea.setText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.no_id", "No ID found for this mesh."));
                 }
             } else {
-                titleLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.human.body", "Human Body"));
-                descriptionArea.setText(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.select.a.part.to.see", "Select a part to see its description."));
+                titleLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.default_title", "Human Body"));
+                descriptionArea.setText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.default_desc", "Select a part to see its description."));
                 hierarchyTree.getSelectionModel().clearSelection();
             }
         });
@@ -176,7 +177,7 @@ public class HumanBodyViewer extends AbstractViewer {
         subScene.widthProperty().bind(centerPane.widthProperty());
         subScene.heightProperty().bind(centerPane.heightProperty());
         
-        loadingLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.loading.anatomy", "Loading Anatomy..."));
+        loadingLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.loading", "Loading Anatomy..."));
         loadingLabel.getStyleClass().add("info-panel");
         loadingLabel.setStyle("-fx-padding: 10; -fx-background-radius: 5;");
         loadingLabel.setVisible(false); // Managed by async loader
@@ -185,7 +186,7 @@ public class HumanBodyViewer extends AbstractViewer {
         centerPane.getChildren().add(loadingLabel);
         
         // Attribution Label (Bottom Right)
-        Label attributionLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.models.zanatomy.cc.b", "Models: Z-Anatomy (CC BY-SA 4.0)"));
+        Label attributionLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.attribution", "Models: Z-Anatomy (CC BY-SA 4.0)"));
         attributionLabel.getStyleClass().add("description-label");
         attributionLabel.setStyle("-fx-font-size: 10px;");
         StackPane.setAlignment(attributionLabel, Pos.BOTTOM_RIGHT);
@@ -200,20 +201,20 @@ public class HumanBodyViewer extends AbstractViewer {
         leftToolbar.getStyleClass().add("viewer-sidebar");
         leftToolbar.setPrefWidth(200);
 
-        Label layersHeader = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.systems", "SYSTEMS"));
+        Label layersHeader = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.systems", "SYSTEMS"));
         layersHeader.getStyleClass().add("header-label");
         
         leftToolbar.getChildren().addAll(
                 layersHeader,
-                createLayerWithLoading("Skin", skinLayer, "/org/jscience/medicine/anatomy/models/Regions of human body100.fbx", Color.rgb(255, 218, 185, 0.4)),
-                createLayerWithLoading("Muscles", muscleLayer, "/org/jscience/medicine/anatomy/models/MuscularSystem100.fbx", Color.INDIANRED),
-                createLayerWithLoading("Skeleton", skeletonLayer, "/org/jscience/medicine/anatomy/models/SkeletalSystem100.fbx", Color.IVORY),
-                createLayerWithLoading("Organs", organLayer, "/org/jscience/medicine/anatomy/models/VisceralSystem100.fbx", Color.CORAL),
-                createLayerWithLoading("Nervous", nervousLayer, "/org/jscience/medicine/anatomy/models/NervousSystem100.fbx", Color.GOLD),
-                createLayerWithLoading("Circulatory", circulatoryLayer, "/org/jscience/medicine/anatomy/models/CardioVascular41.fbx", Color.DARKRED),
+                createLayerWithLoading(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.layer.skin", "Skin"), skinLayer, "/org/jscience/medicine/anatomy/models/Regions of human body100.fbx", Color.rgb(255, 218, 185, 0.4)),
+                createLayerWithLoading(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.layer.muscles", "Muscles"), muscleLayer, "/org/jscience/medicine/anatomy/models/MuscularSystem100.fbx", Color.INDIANRED),
+                createLayerWithLoading(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.layer.skeleton", "Skeleton"), skeletonLayer, "/org/jscience/medicine/anatomy/models/SkeletalSystem100.fbx", Color.IVORY),
+                createLayerWithLoading(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.layer.organs", "Organs"), organLayer, "/org/jscience/medicine/anatomy/models/VisceralSystem100.fbx", Color.CORAL),
+                createLayerWithLoading(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.layer.nervous", "Nervous"), nervousLayer, "/org/jscience/medicine/anatomy/models/NervousSystem100.fbx", Color.GOLD),
+                createLayerWithLoading(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.layer.circulatory", "Circulatory"), circulatoryLayer, "/org/jscience/medicine/anatomy/models/CardioVascular41.fbx", Color.DARKRED),
                 new Separator(),
-                new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.actions", "ACTIONS")),
-                createButton("Center View", () -> {
+                new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.actions", "ACTIONS")),
+                createButton(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.center_view", "Center View"), () -> {
                    if (selectionManager.getSelectedMesh() != null) {
                        // Center on selection
                        MeshView mesh = selectionManager.getSelectedMesh();
@@ -229,7 +230,7 @@ public class HumanBodyViewer extends AbstractViewer {
                        cameraController.reset();
                    }
                 }),
-                createButton("Reset Camera", () -> cameraController.reset())
+                createButton(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.reset_camera", "Reset Camera"), () -> cameraController.reset())
         );
         this.setLeft(leftToolbar);
 
@@ -241,11 +242,9 @@ public class HumanBodyViewer extends AbstractViewer {
 
         searchField = new ComboBox<>();
         searchField.setEditable(true);
-        searchField.setPromptText("Search...");
-        searchField.setMaxWidth(Double.MAX_VALUE);
+        searchField.setPromptText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.search.prompt", "Search..."));
         searchField.setMaxWidth(Double.MAX_VALUE);
         
-        // Search Logic
         // Search Logic
         searchField.getEditor().textProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal == null || newVal.isEmpty()) {
@@ -282,11 +281,6 @@ public class HumanBodyViewer extends AbstractViewer {
             }
             
             if (selected != null) {
-                // Find mesh with this ID
-                // We don't have a direct map, we have to search the scene graph or maintain a map
-                // For now, let's assume we can search recursivly or we find it in knownParts logic
-                // Better: Map<String, MeshView> partMap?
-                
                 Node found = findNodeById(root3D, selected);
                 if (found instanceof MeshView) {
                     selectionManager.select(found);
@@ -310,11 +304,11 @@ public class HumanBodyViewer extends AbstractViewer {
             }
         });
         
-        titleLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.humanbody.human.body.1", "Human Body"));
+        titleLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.default_title", "Human Body"));
         titleLabel.getStyleClass().add("header-label");
         titleLabel.setStyle("-fx-font-size: 18px;");
         
-        descriptionArea = new TextArea("Select a part to view details.");
+        descriptionArea = new TextArea(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.default_desc", "Select a part to view details."));
         descriptionArea.setWrapText(true);
         descriptionArea.setEditable(false);
         descriptionArea.getStyleClass().add("info-panel");
@@ -390,8 +384,6 @@ public class HumanBodyViewer extends AbstractViewer {
         
         return container;
     }
-    
-
     
     private Button createButton(String text, Runnable action) {
         Button btn = new Button(text);
@@ -511,86 +503,22 @@ public class HumanBodyViewer extends AbstractViewer {
                     idToTreeItem.put(name, newItem);
                     idToTreeItem.put(sanitizeIdFor3D(name), newItem);
                     
-                    // Logic:
-                    // If index == 0, it's a child of the current stack top.
                     if (index == 0) {
                         TreeItem<String> parent = stack.peek();
                         Platform.runLater(() -> parent.getChildren().add(newItem));
                         stack.push(newItem);
                         indexStack.push(index);
                     } else {
-                        // Sibling or Uncle.
-                        // We must pop until we find the predecessor (index - 1).
-                        // Note: The stack contains the path. The top is the "previous sibling" if we are at the same level.
-                        
-                        // We need to find `index - 1` in the `indexStack`? 
-                        // Actually, if we are valid, the stack top should satisfy some condition.
-                        // Simplified Logic based on Z-Anatomy structure:
-                        // The stack represents the active branch.
-                        // We pop items that are "finished".
-                        // A item is finished if the next item is its sibling (index == self.index + 1) NO, 
-                        // If next item is sibling, the PREVIOUS item (on top of stack) is finished.
-                        
-                        while (!indexStack.isEmpty() && indexStack.peek() >= index) {
-                            stack.pop();
-                            indexStack.pop();
-                        }
-                        
-                        // If logic holds, now stack.peek() is the PARENT for this new index?
-                        // No, if I popped the previous sibling (index-1), stack.peek() is the PARENT.
-                        // Wait.
-                        // Seq: A(0), B(1).
-                        // Stack: A(0). Next B(1).
-                        // A(0) < 1. Loop doesn't run? 
-                        // IF A(0) < 1, we DON'T pop? That means B(1) becomes child of A(0)? WRONG. Sibling.
-                        
-                        // Correct Logic:
-                        // We need to pop until the stack top is the PARENT.
-                        // The parent is the one whose last child had index = index - 1.
-                        // But we don't store that.
-                        
-                        // Let's use the property: Sibling replaces Sibling on Stack.
-                        // If index > 0:
-                        //   Pop the previous sibling (which should have index = index - 1).
-                        //   Add new item to the *new* stack top (which is the parent).
-                        //   Push new item.
-                        
-                        // Robustness: What if we jump levels?
-                        // We pop until we satisfy the structure.
-                        
-                        // Re-evaluating:
-                        // A(0). Stack [Root, A(0)].
-                        // B(1). B is sibling of A.
-                        // We need to Pop A. Stack [Root]. Add B to Root. Push B. Stack [Root, B(1)].
-                        // C(0). C is child of B. Add C to B. Push C. Stack [Root, B, C(0)].
-                        // D(0). D is child of C? No, usually indices restart at 0 for new level.
-                        
-                        // My loop `while (peek >= index)`:
-                        // A(0) vs 1. 0 < 1. False.
-                        // So I need `while (peek >= index - 1)` ?
-                        // A(0) vs 0. True. Pop A. Stack [Root]. OK.
-                        
-                        // Let's try:
-                        // A(0) -> [Root, A(0)]
-                        // B(1). Need to pop A(0).
-                        // Condition `lastIndex == index - 1`.
-                        // If `peek() == index - 1`, we pop it, then add to the *next* peek (parent).
-                        
                         while (!stack.isEmpty() && !indexStack.isEmpty()) {
                              int topIndex = indexStack.peek();
                              if (topIndex == index - 1) {
-                                  // Found the sibling. Pop it to get to parent.
                                   stack.pop();
                                   indexStack.pop();
                                   break; 
                              } else if (topIndex >= index) {
-                                  // We are too deep (maybe returning from a deep branch).
                                   stack.pop();
                                   indexStack.pop();
                              } else {
-                                  // topIndex < index - 1. This implies a gap? Or we looked too far?
-                                  // Usually topIndex should match index-1 eventually.
-                                  // Unless index is 0. But we handled index 0.
                                   break; 
                              }
                         }
@@ -607,7 +535,6 @@ public class HumanBodyViewer extends AbstractViewer {
                 Platform.runLater(() -> {
                      hierarchyTree.setRoot(rootItem);
                      rootItem.setExpanded(true);
-                     // loadingLabel.setVisible(false);
                 });
                 
             } catch (Exception e) {
@@ -620,22 +547,10 @@ public class HumanBodyViewer extends AbstractViewer {
     
     // Attempt to sanitize hierarchy name to match Fbx Node IDs
     private String sanitizeIdFor3D(String name) {
-        // e.g. "Parietal bone.l" -> "Parietal_bone_l" or "ParietalBone_L"
-        // This depends heavily on the FBX file.
-        // For now, simple replacement
         return name.replace(" ", "_");
-        // We will refine this as we validat against the actual IDs.
     }
 
     private void loadDefinition(String id) {
-        // ID might be "Parietal bone.l". 
-        // Definition might be "(Parietal bone)-FR.txt".
-        
-        // Strategy:
-        // 1. Exact Name: "Parietal bone.l" -> "/.../Parietal bone.l.txt" (unlikely)
-        // 2. Base name: "Parietal bone" -> "/.../Parietal bone-FR.txt"
-        // 3. Parentheses: "(Parietal bone)-FR.txt"
-        
         String cleanName = id;
         // Remove suffixes .l, .r, .g, etc. if they exist and are preceded by dot
         if (cleanName.matches(".*\\.[a-z]+$")) {
@@ -668,7 +583,7 @@ public class HumanBodyViewer extends AbstractViewer {
         if (foundText != null) {
              descriptionArea.setText(foundText);
         } else {
-             descriptionArea.setText("No description found for: " + cleanName);
+             descriptionArea.setText(MessageFormat.format(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.no_description", "No description found for: {0}"), cleanName));
         }
     }
     
@@ -695,7 +610,7 @@ public class HumanBodyViewer extends AbstractViewer {
     }
 
 
-    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbody.desc"); }
-    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbody.longdesc"); }
-    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.desc", "3D Human Anatomy Viewer"); }
+    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.longdesc", "Detailed 3D visualization of human anatomy including skeleton, muscles, organs, and nervous system."); }
+    @Override public java.util.List<Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

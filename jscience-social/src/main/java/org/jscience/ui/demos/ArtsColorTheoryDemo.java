@@ -22,43 +22,43 @@
  */
 
 package org.jscience.ui.demos;
-
-import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.viewers.arts.ArtsColorTheoryViewer;
-import org.jscience.ui.i18n.SocialI18n;
-
-/**
- * Demo for Arts & Color Theory.
- * Uses ArtsColorTheoryViewer.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
-public class ArtsColorTheoryDemo extends AbstractDemo {
-
-    @Override
-    public String getCategory() {
-        return SocialI18n.getInstance().get("category.arts");
-    }
-
-    @Override
-    public String getName() {
-        return SocialI18n.getInstance().get("demo.artscolortheorydemo.name");
-    }
-
-    @Override
-    public String getDescription() {
-        return SocialI18n.getInstance().get("demo.artscolortheorydemo.desc");
-    }
-
-    @Override
-    protected javafx.scene.Node createViewerNode() {
-        return new ArtsColorTheoryViewer();
-    }
-    
-    @Override
-    public String getLongDescription() {
-         return SocialI18n.getInstance().get("demo.artscolortheorydemo.longdesc");
-    }
-}
+ 
+ import org.jscience.ui.AbstractDemo;
+ import org.jscience.ui.viewers.arts.ArtsColorTheoryViewer;
+ import org.jscience.ui.i18n.I18n;
+ 
+ /**
+  * Demo for Arts & Color Theory.
+  * Uses ArtsColorTheoryViewer.
+  *
+  * @author Silvere Martin-Michiellot
+  * @author Gemini AI (Google DeepMind)
+  * @since 1.0
+  */
+ public class ArtsColorTheoryDemo extends AbstractDemo {
+ 
+     @Override
+     public String getCategory() {
+         return org.jscience.ui.i18n.I18n.getInstance().get("category.arts", "Arts");
+     }
+ 
+     @Override
+     public String getName() {
+         return org.jscience.ui.i18n.I18n.getInstance().get("demo.artscolortheorydemo.name", "Color Theory");
+     }
+ 
+     @Override
+     public String getDescription() {
+         return org.jscience.ui.i18n.I18n.getInstance().get("demo.artscolortheorydemo.desc", "Explore color harmonies and palettes.");
+     }
+ 
+     @Override
+     protected javafx.scene.Node createViewerNode() {
+         return new ArtsColorTheoryViewer();
+     }
+     
+     @Override
+     public String getLongDescription() {
+          return org.jscience.ui.i18n.I18n.getInstance().get("demo.artscolortheorydemo.longdesc", "Interactive tool for exploring color theory concepts like complementary, analogous, and triadic harmonies.");
+     }
+ }

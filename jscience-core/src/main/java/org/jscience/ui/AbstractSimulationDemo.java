@@ -93,7 +93,7 @@ public abstract class AbstractSimulationDemo extends AbstractDemo implements Sim
         if (viewer instanceof Simulatable simulatable) {
             panel.getChildren().add(new Separator());
 
-            Label simTitle = new Label(I18n.getInstance().get("demo.simulation.title", "Simulation Control"));
+            Label simTitle = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.simulation.title", "Simulation Control"));
             simTitle.setStyle("-fx-font-weight: bold;");
             panel.getChildren().add(simTitle);
 
@@ -114,7 +114,7 @@ public abstract class AbstractSimulationDemo extends AbstractDemo implements Sim
             panel.getChildren().add(vcrControls);
 
             // Speed control
-            Label speedLbl = new Label(I18n.getInstance().get("demo.simulation.speed", "Speed:"));
+            Label speedLbl = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.simulation.speed", "Speed:"));
             Slider speedSlider = new Slider(0.1, 5.0, 1.0);
             speedSlider.valueProperty()
                     .addListener((obs, oldVal, newVal) -> simulatable.setSpeed(newVal.doubleValue()));

@@ -165,20 +165,20 @@ public class ThermometerViewer extends PhysicalMeasureInstrument<Temperature> {
     // --- Mandatory Abstract Methods (I18n) ---
 
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics");
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.measure", "Measurement");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.thermometer.title");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.thermometer.name", "Thermometer");
     }
 
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.thermometer.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.thermometer.desc", "A thermometer viewer for temperature display.");
     }
 
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.thermometer.longdesc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.thermometer.longdesc", "Classic mercury-style thermometer that visualizes temperature values with a dynamic liquid column. Features adjustable scale ranges and precise temperature readouts in Celsius and Kelvin.");
     }
 }
 

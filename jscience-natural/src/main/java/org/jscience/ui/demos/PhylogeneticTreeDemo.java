@@ -44,10 +44,10 @@ public class PhylogeneticTreeDemo extends AbstractDemo {
     public String getCategory() { return "Biology"; }
 
     @Override
-    public String getName() { return I18n.getInstance().get("PhylogeneticTree.title", "Phylogenetic Tree"); }
+    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("PhylogeneticTree.title", "Phylogenetic Tree"); }
 
     @Override
-    public String getDescription() { return I18n.getInstance().get("PhylogeneticTree.desc", "Visualizes evolutionary relationships."); }
+    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("PhylogeneticTree.desc", "Visualizes evolutionary relationships."); }
     
     @Override
     public String getLongDescription() { 

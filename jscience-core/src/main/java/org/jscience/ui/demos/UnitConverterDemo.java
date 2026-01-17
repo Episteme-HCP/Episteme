@@ -39,16 +39,18 @@ public class UnitConverterDemo extends AbstractDemo {
     }
 
     @Override
-    public String getCategory() { return "Measure"; }
+    public String getCategory() { 
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.measure", "Measurement"); 
+    }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.unitconverterdemo.name");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.unitconverterdemo.name", "Universal Measure Converter");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.unitconverterdemo.desc");
+        return org.jscience.ui.i18n.I18n.getInstance().get("demo.unitconverterdemo.desc", "Convert between various units (Length, Mass, Time, etc.).");
     }
 
     @Override
@@ -58,7 +60,7 @@ public class UnitConverterDemo extends AbstractDemo {
 
     @Override
     public String getLongDescription() {
-         return org.jscience.ui.i18n.I18n.getInstance().get("demo.unitconverterdemo.longdesc");
+         return org.jscience.ui.i18n.I18n.getInstance().get("demo.unitconverterdemo.longdesc", "Comprehensive unit conversion tool supporting multiple categories and precision.");
     }
 }
 

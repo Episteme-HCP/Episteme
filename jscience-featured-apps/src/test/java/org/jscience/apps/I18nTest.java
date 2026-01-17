@@ -36,7 +36,7 @@ public class I18nTest {
         
         // Simulate what Launcher does
         I18nManager.getInstance().setLocale(Locale.FRENCH);
-        I18nManager.getInstance().addBundle("org.jscience.apps.i18n.messages_apps");
+        I18nManager.getInstance().addBundle("org.jscience.apps.ui.i18n.messages_apps");
         
         String title = I18nManager.getInstance().get("launcher.title");
         System.out.println("launcher.title (FR): " + title);
