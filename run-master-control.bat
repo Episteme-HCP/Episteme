@@ -9,7 +9,7 @@ set MODULE_PATH=jscience-featured-apps\target\classes;jscience-core\target\class
 set CLASSPATH=%MODULE_PATH%;%LIB_DIR%\*
 
 echo Starting JScience Master Control...
-java --module-path "%LIB_DIR%\javafx" --add-modules javafx.controls,javafx.graphics,javafx.fxml -cp "!CLASSPATH!" %APP_CLASS%
+java --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --module-path "%LIB_DIR%\javafx" --add-modules javafx.controls,javafx.graphics,javafx.fxml -cp "!CLASSPATH!" %APP_CLASS%
 
 pause
 endlocal
