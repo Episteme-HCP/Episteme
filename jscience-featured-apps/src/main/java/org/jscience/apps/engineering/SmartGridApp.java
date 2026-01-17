@@ -181,7 +181,7 @@ public class SmartGridApp extends FeaturedAppBase {
 
         frequencyLabel = new Label(java.text.MessageFormat.format(i18n.get("grid.label.freq", "{0} Hz"), 50.00));
         frequencyLabel.getStyleClass().add("header-label");
-        frequencyLabel.setStyle("-fx-font-size: 24px; -fx-font-family: monospace;");
+        frequencyLabel.getStyleClass().add("font-xlarge"); // Replaced inline style: -fx-font-size: 24px; -fx-font-family: monospace;
 
         statusLabel = new Label(i18n.get("grid.status.stable", "STABLE"));
         statusLabel.setStyle(
@@ -251,7 +251,7 @@ public class SmartGridApp extends FeaturedAppBase {
     private VBox createControlGroup(Label lbl, double min, double max, double val, Color color) {
         VBox box = new VBox(5);
         lbl.setTextFill(color);
-        lbl.setStyle("-fx-font-weight: bold;");
+        lbl.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
 
         Slider sli = new Slider(min, max, val);
         sli.setShowTickLabels(true);

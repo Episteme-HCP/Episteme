@@ -49,11 +49,11 @@ public class FormulaNotationViewer extends AbstractViewer {
     public FormulaNotationViewer() {
         VBox content = new VBox(20);
         content.setPadding(new Insets(30));
-        content.setStyle("-fx-background-color: white;");
+        content.getStyleClass().add("bg-light"); // Replaced inline style: -fx-background-color: white;
 
         Label title = new Label(
                 org.jscience.ui.i18n.I18n.getInstance().get("formula.title", "Mathematical Formula Renderer"));
-        title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1a237e;");
+        title.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1a237e;
 
         VBox formulaList = new VBox(40);
         formulaList.getChildren().addAll(
@@ -86,7 +86,7 @@ public class FormulaNotationViewer extends AbstractViewer {
     private VBox createFormulaBox(String name, Region formula) {
         VBox box = new VBox(10);
         Label lbl = new Label(name);
-        lbl.setStyle("-fx-font-style: italic; -fx-text-fill: black;");
+        lbl.getStyleClass().add("font-italic"); // Replaced inline style: -fx-font-style: italic; -fx-text-fill: black;
 
         StackPane frame = new StackPane(formula);
         frame.setPadding(new Insets(20));

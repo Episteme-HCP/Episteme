@@ -180,7 +180,7 @@ public class MarketCrashApp extends FeaturedAppBase {
 
         riskLabel = new Label(i18n.get("market.risk.none", "Wait for Data..."));
         riskLabel.getStyleClass().add("header-label");
-        riskLabel.setStyle("-fx-font-size: 24px; -fx-padding: 10;");
+        riskLabel.getStyleClass().add("font-xlarge"); // Replaced inline style: -fx-font-size: 24px; -fx-padding: 10;
 
         HBox riskBox = new HBox(riskLabel);
         riskBox.getStyleClass().add("info-panel");

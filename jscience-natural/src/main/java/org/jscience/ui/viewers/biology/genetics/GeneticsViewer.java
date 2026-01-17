@@ -138,7 +138,7 @@ public class GeneticsViewer extends AbstractViewer {
         explanationLabel.setStyle("-fx-font-size: 11px;");
 
         driftStatusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("genetics.status.start", "Click Run to start"));
-        driftStatusLabel.setStyle("-fx-font-style: italic;");
+        driftStatusLabel.getStyleClass().add("font-italic"); // Replaced inline style: -fx-font-style: italic;
 
         infoPanel.getChildren().addAll(titleLabel, new Separator(), explanationLabel, new Separator(), driftStatusLabel);
 

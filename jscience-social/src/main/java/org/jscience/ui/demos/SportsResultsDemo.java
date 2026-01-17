@@ -92,7 +92,7 @@ public class SportsResultsDemo extends AbstractDemo {
 
         TableColumn<Team, Number> pointsCol = new TableColumn<>("Pts");
         pointsCol.setCellValueFactory(cell -> cell.getValue().points);
-        pointsCol.setStyle("-fx-font-weight: bold;");
+        pointsCol.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
 
         TableColumn<Team, String> avgCol = new TableColumn<>("Trend (SMA)");
         avgCol.setCellValueFactory(cell -> cell.getValue().trend);

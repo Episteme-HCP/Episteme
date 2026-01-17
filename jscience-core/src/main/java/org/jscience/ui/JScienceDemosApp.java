@@ -246,7 +246,7 @@ public class JScienceDemosApp extends Application {
 
         Button btn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("app.button.launch", "Launch"));
         btn.getStyleClass().add("launch-button");
-        btn.setStyle("-fx-background-color: #007acc; -fx-text-fill: white; -fx-font-weight: bold; -fx-min-width: 80;");
+        btn.getStyleClass().add("font-bold"); // Replaced inline style: -fx-background-color: #007acc; -fx-text-fill: white; -fx-font-weight: bold; -fx-min-width: 80;
 
         btn.setOnAction(e -> {
             try {

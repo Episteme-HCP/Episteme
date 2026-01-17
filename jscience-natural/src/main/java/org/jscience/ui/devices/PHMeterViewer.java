@@ -42,7 +42,7 @@ public class PHMeterViewer extends AbstractDeviceViewer<PHMeter> {
         super(device);
 
         phLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.phmeter.ph.70", "pH 7.0"));
-        phLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: green;");
+        phLabel.getStyleClass().add("text-success"); // Replaced inline style: -fx-font-size: 20px; -fx-text-fill: green;
         this.getChildren().add(phLabel);
     }
 

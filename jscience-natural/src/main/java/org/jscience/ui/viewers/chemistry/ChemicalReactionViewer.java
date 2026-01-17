@@ -135,7 +135,7 @@ public class ChemicalReactionViewer extends AbstractViewer {
         outputArea.setStyle("-fx-font-family: 'Consolas', monospace;");
 
         statusLabel = new Label("");
-        statusLabel.setStyle("-fx-font-weight: bold;");
+        statusLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
 
         outputBox.getChildren().addAll(outputLabel, statusLabel, outputArea);
 
@@ -225,16 +225,16 @@ public class ChemicalReactionViewer extends AbstractViewer {
 
             if (balanced) {
                 statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("chemical.status.balanced"));
-                statusLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: green;");
+                statusLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-text-fill: green;
             } else {
                 statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("chemical.status.unbalanced"));
-                statusLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: red;");
+                statusLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-text-fill: red;
             }
 
         } catch (Exception e) {
             outputArea.setText(org.jscience.ui.i18n.I18n.getInstance().get("chemical.error.parse", "Error parsing equation:\n%s", e.getMessage()));
             statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("chemical.status.error"));
-            statusLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: red;");
+            statusLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-text-fill: red;
         }
     }
 

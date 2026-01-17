@@ -179,7 +179,7 @@ public class HumanBodyViewer extends AbstractViewer {
         
         loadingLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.loading", "Loading Anatomy..."));
         loadingLabel.getStyleClass().add("info-panel");
-        loadingLabel.setStyle("-fx-padding: 10; -fx-background-radius: 5;");
+        loadingLabel.getStyleClass().add("bg-panel"); // Replaced inline style: -fx-padding: 10; -fx-background-radius: 5;
         loadingLabel.setVisible(false); // Managed by async loader
         StackPane.setAlignment(loadingLabel, Pos.TOP_RIGHT);
         StackPane.setMargin(loadingLabel, new Insets(10));
@@ -306,7 +306,7 @@ public class HumanBodyViewer extends AbstractViewer {
         
         titleLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.default_title", "Human Body"));
         titleLabel.getStyleClass().add("header-label");
-        titleLabel.setStyle("-fx-font-size: 18px;");
+        titleLabel.getStyleClass().add("font-large"); // Replaced inline style: -fx-font-size: 18px;
         
         descriptionArea = new TextArea(org.jscience.ui.i18n.I18n.getInstance().get("viewer.humanbodyviewer.default_desc", "Select a part to view details."));
         descriptionArea.setWrapText(true);

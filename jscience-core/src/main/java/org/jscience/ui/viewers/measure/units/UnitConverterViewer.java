@@ -84,7 +84,7 @@ public class UnitConverterViewer extends AbstractViewer {
 
             Label title = new Label(
                     org.jscience.ui.i18n.I18n.getInstance().get("viewer.unitconverterviewer.name", "Universal Measure Converter"));
-            title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+            title.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 20px; -fx-font-weight: bold;
 
             // Category
             HBox catRow = new HBox(10);
@@ -115,7 +115,7 @@ public class UnitConverterViewer extends AbstractViewer {
             inputField = new TextField("1.0");
             outputField = new TextField();
             outputField.setEditable(false);
-            outputField.setStyle("-fx-font-weight: bold;");
+            outputField.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
 
             fromUnitBox = new ComboBox<>();
             toUnitBox = new ComboBox<>();

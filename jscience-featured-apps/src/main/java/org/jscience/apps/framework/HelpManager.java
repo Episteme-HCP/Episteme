@@ -75,7 +75,7 @@ public class HelpManager {
         content.setStyle("-fx-background-color: #ffffff;");
 
         Label headerLabel = new Label(title);
-        headerLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        headerLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;
         content.getChildren().add(headerLabel);
         content.getChildren().add(new Separator());
 
@@ -95,7 +95,7 @@ public class HelpManager {
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
-        scrollPane.setStyle("-fx-background-color: white;");
+        scrollPane.getStyleClass().add("bg-light"); // Replaced inline style: -fx-background-color: white;
 
         Scene scene = new Scene(scrollPane, 600, 500);
         ThemeManager.getInstance().applyTheme(scene);
@@ -108,7 +108,7 @@ public class HelpManager {
         box.setPadding(new Insets(10, 0, 10, 0));
 
         Label sectionTitle = new Label("Ã°Å¸â€œÅ’ " + section.title);
-        sectionTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #34495e;");
+        sectionTitle.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #34495e;
         box.getChildren().add(sectionTitle);
 
         Label description = new Label(section.description);
@@ -137,7 +137,7 @@ public class HelpManager {
         if (section.tip != null) {
             Label tipLabel = new Label(I18nManager.getInstance().get("help.tip") + " " + section.tip);
             tipLabel.setWrapText(true);
-            tipLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #27ae60; -fx-font-style: italic;");
+            tipLabel.getStyleClass().add("font-italic"); // Replaced inline style: -fx-font-size: 12px; -fx-text-fill: #27ae60; -fx-font-style: italic;
             box.getChildren().add(tipLabel);
         }
 

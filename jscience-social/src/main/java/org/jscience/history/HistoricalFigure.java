@@ -130,7 +130,7 @@ public class HistoricalFigure {
     public static HistoricalFigure napoleon() {
         HistoricalFigure h = new HistoricalFigure("Napoleon Bonaparte", Role.RULER);
         h.addRole(Role.MILITARY);
-        h.setTitle("Emperor");
+        h.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("auto.historicalfigure.emperor", "Emperor"));
         h.setNationality("French");
         h.setBirthDate(LocalDate.of(1769, 8, 15));
         h.setDeathDate(LocalDate.of(1821, 5, 5));
@@ -141,7 +141,7 @@ public class HistoricalFigure {
 
     public static HistoricalFigure cleopatra() {
         HistoricalFigure h = new HistoricalFigure("Cleopatra VII", Role.RULER);
-        h.setTitle("Pharaoh");
+        h.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("auto.historicalfigure.pharaoh", "Pharaoh"));
         h.setNationality("Egyptian");
         h.setBirthDate(LocalDate.of(-69, 1, 1));
         h.setDeathDate(LocalDate.of(-30, 8, 12));

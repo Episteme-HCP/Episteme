@@ -216,7 +216,7 @@ public class TitrationApp extends FeaturedAppBase {
 
         phLabel = new Label();
         phLabel.getStyleClass().add("header-label");
-        phLabel.setStyle("-fx-font-size: 24px;");
+        phLabel.getStyleClass().add("font-xlarge"); // Replaced inline style: -fx-font-size: 24px;
 
         volumeLabel = new Label();
 

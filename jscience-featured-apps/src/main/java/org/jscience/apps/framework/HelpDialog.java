@@ -104,14 +104,14 @@ public class HelpDialog extends Dialog<Void> {
     private void showTopic(String title) {
         HelpTopic topic = topics.get(title);
         if (topic == null) {
-            detailPane.setContent(new Label("Select a topic to view details."));
+            detailPane.setContent(new Label(org.jscience.ui.i18n.I18n.getInstance().get("auto.helpdialog.select_a_topic_to_view_details", "Select a topic to view details.")));
             return;
         }
 
         VBox box = new VBox(15);
 
         Label header = new Label(topic.title);
-        header.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        header.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 24px; -fx-font-weight: bold;
         box.getChildren().add(header);
 
         if (topic.imagePath != null && !topic.imagePath.isEmpty()) {

@@ -46,7 +46,7 @@ public class Launcher extends Application {
         
         String title = org.jscience.ui.i18n.I18n.getInstance().get("app.launcher.name", "JScience Featured Apps");
         Label label = new Label(title);
-        label.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        label.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 24px; -fx-font-weight: bold;
 
         StackPane root = new StackPane(label);
         root.setAlignment(Pos.CENTER);

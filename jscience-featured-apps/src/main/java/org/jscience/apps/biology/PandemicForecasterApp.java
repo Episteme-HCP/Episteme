@@ -278,7 +278,7 @@ public class PandemicForecasterApp extends FeaturedAppBase {
 
         // R0 display
         Label r0Label = new Label(java.text.MessageFormat.format(i18n.get("pandemic.label.r0", "Basic Repro. Number (R0): {0}"), "--"));
-        r0Label.setStyle("-fx-font-style: italic;");
+        r0Label.getStyleClass().add("font-italic"); // Replaced inline style: -fx-font-style: italic;
         betaSlider.valueProperty().addListener((o, ov, nv) -> updateR0Label(r0Label));
         gammaSlider.valueProperty().addListener((o, ov, nv) -> updateR0Label(r0Label));
 

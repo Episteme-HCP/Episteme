@@ -42,7 +42,7 @@ public class MultimeterViewer extends AbstractDeviceViewer<Multimeter> {
         super(device);
 
         valueLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.multimeter.000.v", "0.00 V"));
-        valueLabel.setStyle("-fx-font-family: 'Courier New'; -fx-font-size: 24px; -fx-text-fill: #222;");
+        valueLabel.getStyleClass().add("font-xlarge"); // Replaced inline style: -fx-font-family: 'Courier New'; -fx-font-size: 24px; -fx-text-fill: #222;
         this.getChildren().add(valueLabel);
 
         update();

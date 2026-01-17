@@ -78,7 +78,7 @@ public class BioMotionDemo extends AbstractSimulationDemo {
         if (viewer instanceof InternalViewer iv) {
             panel.getChildren().add(new Separator());
             Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("biomotion.controls", "Controls"));
-            title.setStyle("-fx-font-weight: bold;");
+            title.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
             
             Button resetBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("biomotion.reset", "Reset Walker"));
             resetBtn.setMaxWidth(Double.MAX_VALUE);

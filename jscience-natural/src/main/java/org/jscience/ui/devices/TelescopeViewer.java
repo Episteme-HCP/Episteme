@@ -173,7 +173,7 @@ public class TelescopeViewer extends AbstractViewer {
         stopBtn.setOnAction(e -> stopSlew());
 
         inputRow.getChildren().addAll(
-                new Label("RA:"), raInput,
+                new Label(org.jscience.ui.i18n.I18n.getInstance().get("auto.telescopeviewer.ra", "RA:")), raInput,
                 new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.telescope.dec", "Dec:")), decInput,
                 slewBtn, stopBtn);
         inputRow.getChildren().filtered(n -> n instanceof Label)

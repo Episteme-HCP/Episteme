@@ -114,12 +114,12 @@ public class ArchitectureStabilityDemo extends AbstractSimulationDemo {
             collapsed = false;
             comX = Quantities.create(300.0, Units.METER);
             statusLabel.setText(i18n.get("demo.architecturestabilitydemo.label.stable", "Stable"));
-            statusLabel.setStyle("-fx-text-fill: green;");
+            statusLabel.getStyleClass().add("text-success"); // Replaced inline style: -fx-text-fill: green;
             draw();
         });
 
         statusLabel = new Label(i18n.get("demo.architecturestabilitydemo.label.stable", "Stable"));
-        statusLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+        statusLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-text-fill: green; -fx-font-weight: bold;
 
         panel.getChildren().addAll(
             new Label(i18n.get("demo.architecturestabilitydemo.label.controls", "Stability Controls")),
@@ -182,7 +182,7 @@ public class ArchitectureStabilityDemo extends AbstractSimulationDemo {
             collapsed = true;
             if (statusLabel != null) {
                 statusLabel.setText(i18n.get("demo.architecturestabilitydemo.label.collapsed", "COLLAPSED!"));
-                statusLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+                statusLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-text-fill: red; -fx-font-weight: bold;
             }
         }
     }

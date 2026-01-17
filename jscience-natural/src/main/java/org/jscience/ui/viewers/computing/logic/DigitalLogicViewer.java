@@ -213,7 +213,7 @@ public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
         });
 
         Label compLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.digitallogicviewer.components", "Components"));
-        compLabel.setStyle("-fx-font-weight: bold;");
+        compLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
 
         Button btnAnd = new Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.digitallogicviewer.gate.and", "AND Gate")); btnAnd.setMaxWidth(Double.MAX_VALUE);
         btnAnd.setOnAction(e -> addGate(new Gate(GateType.AND, 100, 100)));
@@ -234,7 +234,7 @@ public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
         btnOut.setOnAction(e -> addGate(new Gate(GateType.OUTPUT, 300, 100)));
 
         Label actionLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.digitallogicviewer.actions", "Actions"));
-        actionLabel.setStyle("-fx-font-weight: bold; -fx-padding: 10 0 0 0;");
+        actionLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-padding: 10 0 0 0;
 
         Button clear = new Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.digitallogicviewer.clear", "Clear All"));
         clear.setMaxWidth(Double.MAX_VALUE);

@@ -243,7 +243,7 @@ public class StellarSkyViewer extends AbstractViewer {
                             statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("sky.vizier.success", 
                                 "Query successful! Data loaded."));
                             // Parse VOTable and add stars - simplified for demo
-                            infoLabel.setText("VizieR data available (parsing not yet implemented in demo)");
+                            infoLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("auto.stellarskyviewer.vizier_data_available__parsing", "VizieR data available (parsing not yet implemented in demo)"));
                         } else {
                             statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("sky.vizier.failed", 
                                 "Query failed. Check network."));

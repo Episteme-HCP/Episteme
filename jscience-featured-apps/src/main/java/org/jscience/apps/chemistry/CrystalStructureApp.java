@@ -207,7 +207,7 @@ public class CrystalStructureApp extends FeaturedAppBase {
         box.setStyle("-fx-padding: 15; -fx-background-color: #f4f4f4;");
 
         viewTitleLabel = new Label("💎 " + i18n.get("crystal.title", "Crystal Structure Viewer"));
-        viewTitleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        viewTitleLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 18px; -fx-font-weight: bold;
 
         // Structure Selection
         latticeCombo = new ComboBox<>();

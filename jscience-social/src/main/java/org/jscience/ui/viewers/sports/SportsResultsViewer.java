@@ -82,7 +82,7 @@ public class SportsResultsViewer extends AbstractViewer {
     @SuppressWarnings("unchecked")
     private void initUI() {
         Label headerVal = new Label(i18n.get("sports.header", "League Table"));
-        headerVal.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        headerVal.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 24px; -fx-font-weight: bold;
         HBox header = new HBox(headerVal);
         header.setAlignment(Pos.CENTER);
         header.setPadding(new Insets(20));
@@ -110,7 +110,7 @@ public class SportsResultsViewer extends AbstractViewer {
 
         TableColumn<Team, Number> pointsCol = new TableColumn<>(i18n.get("sports.col.pts", "Points"));
         pointsCol.setCellValueFactory(cell -> cell.getValue().points);
-        pointsCol.setStyle("-fx-font-weight: bold;");
+        pointsCol.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
 
         TableColumn<Team, String> avgCol = new TableColumn<>("Trend (SMA)");
         avgCol.setCellValueFactory(cell -> cell.getValue().trend);

@@ -94,7 +94,7 @@ public abstract class AbstractSimulationDemo extends AbstractDemo implements Sim
             panel.getChildren().add(new Separator());
 
             Label simTitle = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.simulation.title", "Simulation Control"));
-            simTitle.setStyle("-fx-font-weight: bold;");
+            simTitle.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
             panel.getChildren().add(simTitle);
 
             HBox vcrControls = new HBox(5);

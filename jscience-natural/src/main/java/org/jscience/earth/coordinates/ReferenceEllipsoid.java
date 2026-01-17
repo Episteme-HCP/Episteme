@@ -51,7 +51,13 @@ public class ReferenceEllipsoid {
     private static final Logger LOGGER = Logger.getLogger(ReferenceEllipsoid.class.getName());
     private static final Map<String, ReferenceEllipsoid> REGISTRY = new HashMap<>();
 
+    // Hardcoded standard ellipsoids to ensure visibility and avoid static init dependency
+    public static final ReferenceEllipsoid WGS84 = new ReferenceEllipsoid("WGS84", "WGS84", 6378137.0, 298.257223563);
+    public static final ReferenceEllipsoid GRS80 = new ReferenceEllipsoid("GRS80", "GRS80", 6378137.0, 298.257222101);
+
     static {
+        REGISTRY.put("WGS84", WGS84);
+        REGISTRY.put("GRS80", GRS80);
         loadEllipsoids();
     }
 
@@ -78,7 +84,8 @@ public class ReferenceEllipsoid {
     private static void loadEllipsoids() {
         try (InputStream is = ReferenceEllipsoid.class.getResourceAsStream("/org/jscience/earth/ellipsoids.json")) {
             if (is == null) {
-                LOGGER.log(Level.SEVERE, "ellipsoids.json not found!");
+                // Not severe if we have hardcoded defaults, but worth noting
+                LOGGER.log(Level.WARNING, "ellipsoids.json not found! Only hardcoded ellipsoids available.");
                 return;
             }
             ObjectMapper mapper = new ObjectMapper();
@@ -108,9 +115,6 @@ public class ReferenceEllipsoid {
         return REGISTRY.get(nameOrCode.toUpperCase());
     }
 
-    public static final ReferenceEllipsoid WGS84 = get("WGS84");
-    public static final ReferenceEllipsoid GRS80 = get("GRS80");
-
     public String getName() {
         return name;
     }
@@ -135,5 +139,3 @@ public class ReferenceEllipsoid {
         return eccentricitySquared;
     }
 }
-
-

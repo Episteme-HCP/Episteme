@@ -183,7 +183,7 @@ public class JScienceMasterControl extends Application {
 
         // --- TITLE ---
         Label title = new Label(i18n.get("mastercontrol.general.title", "JScience Master Control"));
-        title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
+        title.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 32px; -fx-font-weight: bold;
 
         Label subtitle = new Label(
                 i18n.get("mastercontrol.general.subtitle", "Universal Scientific Computing Environment"));
@@ -201,7 +201,7 @@ public class JScienceMasterControl extends Application {
         VBox authorsBox = new VBox(5);
         authorsBox.setAlignment(Pos.CENTER);
         Label authorsHeader = new Label(i18n.get("mastercontrol.general.authors", "Authors"));
-        authorsHeader.setStyle("-fx-font-weight: bold; -fx-underline: true;");
+        authorsHeader.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-underline: true;
         authorsBox.getChildren().add(authorsHeader);
 
         for (String author : org.jscience.JScience.AUTHORS) {
@@ -234,7 +234,7 @@ public class JScienceMasterControl extends Application {
 
             Builder addRow(String label, String value) {
                 Label l = new Label(label);
-                l.setStyle("-fx-font-weight: bold;");
+                l.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
                 grid.addRow(row++, l, new Label(value));
                 return this;
             }
@@ -251,7 +251,7 @@ public class JScienceMasterControl extends Application {
         content.setAlignment(Pos.TOP_LEFT);
 
         Label header = new Label(i18n.get("mastercontrol.i18n.header", "Language Selection"));
-        header.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
+        header.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-font-size: 18px;
 
         ListView<LocaleItem> langList = new ListView<>();
 
@@ -310,7 +310,7 @@ public class JScienceMasterControl extends Application {
         content.setPadding(new Insets(20));
 
         Label header = new Label(i18n.get("mastercontrol.computing.header", "Computing Management"));
-        header.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
+        header.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-font-size: 18px;
 
         GridPane grid = new GridPane();
         grid.setHgap(30);
@@ -386,8 +386,7 @@ public class JScienceMasterControl extends Application {
 
         Label gpuVal = new Label(JScience.isGpuAvailable() ? i18n.get("mastercontrol.libraries.available", "Available")
                 : i18n.get("mastercontrol.libraries.not_available", "Not Available"));
-        gpuVal.setStyle(JScience.isGpuAvailable() ? "-fx-text-fill: #27ae60; -fx-font-weight: bold;"
-                : "-fx-text-fill: #c0392b;");
+        gpuVal.getStyleClass().add(JScience.isGpuAvailable() ? "status-connected" : "status-disconnected");
 
         grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.computing.mode", "Compute Mode")), modeBox, modeInfo);
         grid.addRow(1, createHeaderLabel(i18n.get("mastercontrol.computing.float_precision", "Float Precision")),
@@ -411,7 +410,7 @@ public class JScienceMasterControl extends Application {
 
     private Label createHeaderLabel(String text) {
         Label l = new Label(text);
-        l.setStyle("-fx-font-weight: bold;");
+        l.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
         return l;
     }
 
@@ -787,7 +786,7 @@ public class JScienceMasterControl extends Application {
         String desc = i18n.get("lib." + nameKey + ".desc", descKey); // Could fallback to hardcoded if needed
 
         Label nameLabel = new Label(name);
-        nameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: black;");
+        nameLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-text-fill: black;
 
         Label descLabel = new Label(desc);
         descLabel.getStyleClass().add("mastercontrol-description");
@@ -796,7 +795,7 @@ public class JScienceMasterControl extends Application {
 
         Label statusLabel = new Label(available ? i18n.get("mastercontrol.libraries.available", "Available")
                 : i18n.get("mastercontrol.libraries.not_available", "Not Available"));
-        statusLabel.setStyle("-fx-text-fill: " + (available ? "#27ae60" : "#c0392b") + "; -fx-font-weight: bold;");
+        statusLabel.getStyleClass().add(available ? "status-connected" : "status-disconnected");
 
         grid.addRow(row, nameLabel, statusLabel, descLabel);
     }
@@ -1163,7 +1162,7 @@ public class JScienceMasterControl extends Application {
             boolean available = provider.isAvailable();
 
             Label nameLabel = new Label(name);
-            nameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: black;");
+            nameLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-text-fill: black;
 
             Label descLabel = new Label(providerDesc);
             descLabel.getStyleClass().add("mastercontrol-description");
@@ -1180,7 +1179,7 @@ public class JScienceMasterControl extends Application {
 
         if (providers.isEmpty()) {
             Label noProviders = new Label(java.text.MessageFormat.format(i18n.get("master.error.no_backends", "No {0} backends discovered."), type));
-            noProviders.setStyle("-fx-font-style: italic;");
+            noProviders.getStyleClass().add("font-italic"); // Replaced inline style: -fx-font-style: italic;
             grid.add(noProviders, 0, 0);
         }
 
@@ -1205,7 +1204,7 @@ public class JScienceMasterControl extends Application {
         scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
 
         Label header = new Label(i18n.get("mastercontrol.loaders.header", "Known Data Loaders & Formats"));
-        header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        header.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 18px; -fx-font-weight: bold;
 
         // Discover loaders via ServiceLoader for ResourceReader and ResourceWriter
         List<ResourceIO<?>> allLoaders = new ArrayList<>();
@@ -1265,7 +1264,7 @@ public class JScienceMasterControl extends Application {
         Label hint = new Label(java.text.MessageFormat.format(
                 i18n.get("mastercontrol.loaders.count", "{0} loaders found ({1} Readers, {2} Writers)"), 
                 allLoaders.size(), readerCount, writerCount));
-        hint.setStyle("-fx-font-style: italic; -fx-text-fill: #777;");
+        hint.getStyleClass().add("font-italic"); // Replaced inline style: -fx-font-style: italic; -fx-text-fill: #777;
 
         content.getChildren().addAll(header, hint);
 
@@ -1372,11 +1371,11 @@ public class JScienceMasterControl extends Application {
         content.setAlignment(Pos.TOP_LEFT);
 
         Label header = new Label(i18n.get("mastercontrol.themes.header", "Visual Theme Selection"));
-        header.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
+        header.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-font-size: 18px;
 
         VBox themeSelector = new VBox(10);
         Label comboLabel = new Label(i18n.get("mastercontrol.themes.select", "Choose Interface Style:"));
-        comboLabel.setStyle("-fx-font-weight: bold;");
+        comboLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
 
         ComboBox<String> themeCombo = new ComboBox<>();
         themeCombo.getItems().addAll("Modena", "Caspian", "High Contrast", "Dark");
@@ -1396,9 +1395,9 @@ public class JScienceMasterControl extends Application {
         previewBox.setPadding(new Insets(20));
         previewBox.setStyle("-fx-border-color: #ddd; -fx-border-radius: 5; -fx-background-color: #fdfdfd;");
         previewBox.getChildren().addAll(
-                new Label("Theme Preview Components:"),
-                new Button("Sample Button"),
-                new CheckBox("Sample CheckBox"),
+                new Label(org.jscience.ui.i18n.I18n.getInstance().get("auto.jsciencemastercontrol.theme_preview_components", "Theme Preview Components:")),
+                new Button(org.jscience.ui.i18n.I18n.getInstance().get("auto.jsciencemastercontrol.sample_button", "Sample Button")),
+                new CheckBox(org.jscience.ui.i18n.I18n.getInstance().get("auto.jsciencemastercontrol.sample_checkbox", "Sample CheckBox")),
                 new ProgressBar(0.6));
 
         content.getChildren().addAll(header, themeSelector, previewBox);
@@ -1415,10 +1414,10 @@ public class JScienceMasterControl extends Application {
         content.setPadding(new Insets(20));
 
         Label header = new Label(i18n.get("mastercontrol.apps.header", "Applications, Demos & Viewers"));
-        header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        header.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 18px; -fx-font-weight: bold;
 
         Label hint = new Label(i18n.get("mastercontrol.apps.discovering", "Discovering from SPI..."));
-        hint.setStyle("-fx-font-style: italic; -fx-text-fill: #777;");
+        hint.getStyleClass().add("font-italic"); // Replaced inline style: -fx-font-style: italic; -fx-text-fill: #777;
 
         Accordion accordion = new Accordion();
 
@@ -1493,7 +1492,7 @@ public class JScienceMasterControl extends Application {
                     VBox box = new VBox(2);
                     box.setPadding(new Insets(5));
                     Label name = new Label(item.name);
-                    name.setStyle("-fx-font-weight: bold;");
+                    name.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
                     Label desc = new Label(item.description);
                     desc.getStyleClass().add("mastercontrol-description");
                     box.getChildren().addAll(name, desc);
@@ -1552,7 +1551,7 @@ public class JScienceMasterControl extends Application {
         content.setPadding(new Insets(20));
 
         Label header = new Label(i18n.get("mastercontrol.devices.header", "Available Devices (Simulated & JNI)"));
-        header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        header.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 18px; -fx-font-weight: bold;
 
         // Create simulated device instances (Sorted)
         Map<String, org.jscience.device.sim.SimulatedDevice> devices = new TreeMap<>();
@@ -1616,7 +1615,7 @@ public class JScienceMasterControl extends Application {
         boolean available = provider.isAvailable();
 
         Label nameLabel = new Label(name);
-        nameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: black;");
+        nameLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-text-fill: black;
 
         Label descLabel = new Label(providerDesc);
         descLabel.getStyleClass().add("mastercontrol-description");

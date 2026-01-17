@@ -90,7 +90,7 @@ public class DistributedWhiteboardApp extends Application implements org.jscienc
         canvas.setOnMouseReleased(this::onMouseReleased);
 
         canvasPane.getChildren().add(canvas);
-        canvasPane.setStyle("-fx-background-color: white; -fx-padding: 10;");
+        canvasPane.getStyleClass().add("bg-light"); // Replaced inline style: -fx-background-color: white; -fx-padding: 10;
         root.setCenter(canvasPane);
 
         // Footer

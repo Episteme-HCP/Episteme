@@ -133,7 +133,7 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
         section.setPadding(new javafx.geometry.Insets(5));
         
         Label ncbiLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.title", "NCBI Query"));
-        ncbiLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 11px;");
+        ncbiLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-font-size: 11px;
         
         javafx.scene.control.TextField searchField = new javafx.scene.control.TextField();
         searchField.setPromptText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.prompt", "Enter species name..."));

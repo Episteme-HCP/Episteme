@@ -325,7 +325,7 @@ public class PeriodicTableViewer extends AbstractViewer {
         nucBox.setStyle("-fx-border-color: #666; -fx-border-width: 1px;");
 
         Label isoLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.isotopes.known", "Known Isotopes:"));
-        isoLabel.setStyle("-fx-font-weight: bold;");
+        isoLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
         ListView<String> isoList = new ListView<>();
         isoList.setPrefHeight(200);
         isoList.setItems(getIsotopes(element));
