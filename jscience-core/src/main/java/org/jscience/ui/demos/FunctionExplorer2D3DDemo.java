@@ -28,7 +28,7 @@ import javafx.scene.control.TabPane;
 import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.viewers.mathematics.analysis.real.FunctionExplorer2DViewer;
 import org.jscience.ui.viewers.mathematics.analysis.real.FunctionExplorer3DViewer;
-import org.jscience.ui.i18n.I18n;
+
 
 
 /**

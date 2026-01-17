@@ -25,6 +25,8 @@ package org.jscience.ui.viewers.mathematics.geometry;
 
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
+import org.jscience.ui.BooleanParameter;
+import org.jscience.ui.Parameter;
 import java.util.List;
 import java.util.ArrayList;
 import javafx.geometry.Insets;
@@ -85,8 +87,15 @@ public class GeometryBoardViewer extends AbstractViewer implements Simulatable {
     private double startX, startY;
     private boolean dragging = false;
 
+    private final BooleanParameter showGrid;
+
     public GeometryBoardViewer() {
         this.getStyleClass().add("viewer-root");
+        this.showGrid = new BooleanParameter(
+            "Show Grid",
+            org.jscience.ui.i18n.I18n.getInstance().get("viewer.geometryboardviewer.param.showgrid", "Show Grid"), 
+            true, 
+            val -> draw());
 
         // Toolbar
         HBox toolbar = new HBox(10);
@@ -158,6 +167,11 @@ public class GeometryBoardViewer extends AbstractViewer implements Simulatable {
         setRight(sidebar);
     }
 
+    @Override
+    public List<Parameter<?>> getViewerParameters() {
+        return List.of(showGrid);
+    }
+
     private ToggleButton createToolBtn(String name, Tool tool, ToggleGroup group) {
         ToggleButton b = new ToggleButton(name);
         b.setToggleGroup(group);
@@ -172,10 +186,12 @@ public class GeometryBoardViewer extends AbstractViewer implements Simulatable {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         // Background grid dots
-        gc.setFill(Color.LIGHTGRAY);
-        for (int x = 0; x < canvas.getWidth(); x += 50) {
-            for (int y = 0; y < canvas.getHeight(); y += 50) {
-                gc.fillOval(x - 1, y - 1, 2, 2);
+        if (showGrid.getValue()) {
+            gc.setFill(Color.LIGHTGRAY);
+            for (int x = 0; x < canvas.getWidth(); x += 50) {
+                for (int y = 0; y < canvas.getHeight(); y += 50) {
+                    gc.fillOval(x - 1, y - 1, 2, 2);
+                }
             }
         }
 

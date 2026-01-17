@@ -28,6 +28,9 @@ import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Angle;
 import org.jscience.measure.quantity.Length;
+import org.jscience.mathematics.numbers.real.Real;
+
+import java.util.Objects;
 
 /**
  * Represents a geographic coordinate (latitude/longitude) using proper
@@ -35,6 +38,7 @@ import org.jscience.measure.quantity.Length;
  * <p>
  * Uses WGS84 datum by default. This class provides a simpler API for
  * social/human geography applications while internally using proper
+ * Real precision where appropriate.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -42,7 +46,7 @@ import org.jscience.measure.quantity.Length;
  */
 public class Coordinate {
 
-    private static final double EARTH_RADIUS_METERS = 6371000.0;
+    public static final Quantity<Length> EARTH_RADIUS = Quantities.create(6371000.0, Units.METER);
 
     private final Quantity<Angle> latitude;
     private final Quantity<Angle> longitude;
@@ -113,37 +117,38 @@ public class Coordinate {
     }
 
     /**
-     * Returns latitude in degrees as a double for convenience.
+     * Returns latitude in degrees as a Real.
      */
-    public double getLatitudeDegrees() {
-        return latitude.to(Units.DEGREE_ANGLE).getValue().doubleValue();
+    public Real getLatitudeDegrees() {
+        return latitude.to(Units.DEGREE_ANGLE).getValue();
     }
 
     /**
-     * Returns longitude in degrees as a double for convenience.
+     * Returns longitude in degrees as a Real.
      */
-    public double getLongitudeDegrees() {
-        return longitude.to(Units.DEGREE_ANGLE).getValue().doubleValue();
+    public Real getLongitudeDegrees() {
+        return longitude.to(Units.DEGREE_ANGLE).getValue();
     }
 
     /**
-     * Returns altitude in meters as a double for convenience.
+     * Returns altitude in meters as a Real.
      */
-    public double getAltitudeMeters() {
-        return altitude.to(Units.METER).getValue().doubleValue();
+    public Real getAltitudeMeters() {
+        return altitude.to(Units.METER).getValue();
     }
 
     /**
      * Calculates distance to another coordinate using Haversine formula.
+     * Uses double precision for internal calculation logic for performance.
      *
      * @param other target coordinate
      * @return distance as a Length quantity
      */
     public Quantity<Length> distanceTo(Coordinate other) {
-        double lat1 = Math.toRadians(getLatitudeDegrees());
-        double lat2 = Math.toRadians(other.getLatitudeDegrees());
-        double dLat = Math.toRadians(other.getLatitudeDegrees() - getLatitudeDegrees());
-        double dLon = Math.toRadians(other.getLongitudeDegrees() - getLongitudeDegrees());
+        double lat1 = Math.toRadians(getLatitudeDegrees().doubleValue());
+        double lat2 = Math.toRadians(other.getLatitudeDegrees().doubleValue());
+        double dLat = Math.toRadians(other.getLatitudeDegrees().doubleValue() - getLatitudeDegrees().doubleValue());
+        double dLon = Math.toRadians(other.getLongitudeDegrees().doubleValue() - getLongitudeDegrees().doubleValue());
 
         double sinDLatHalf = Math.sin(dLat / 2);
         double sinDLonHalf = Math.sin(dLon / 2);
@@ -151,7 +156,7 @@ public class Coordinate {
         double a = sinDLatHalf * sinDLatHalf +
                 Math.cos(lat1) * Math.cos(lat2) * sinDLonHalf * sinDLonHalf;
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double distance = EARTH_RADIUS_METERS * c;
+        double distance = EARTH_RADIUS.getValue().doubleValue() * c;
 
         return Quantities.create(distance, Units.METER);
     }
@@ -162,9 +167,9 @@ public class Coordinate {
      * @return bearing as an Angle quantity (0-360 degrees)
      */
     public Quantity<Angle> bearingTo(Coordinate other) {
-        double lat1 = Math.toRadians(getLatitudeDegrees());
-        double lat2 = Math.toRadians(other.getLatitudeDegrees());
-        double dLon = Math.toRadians(other.getLongitudeDegrees() - getLongitudeDegrees());
+        double lat1 = Math.toRadians(getLatitudeDegrees().doubleValue());
+        double lat2 = Math.toRadians(other.getLatitudeDegrees().doubleValue());
+        double dLon = Math.toRadians(other.getLongitudeDegrees().doubleValue() - getLongitudeDegrees().doubleValue());
 
         double y = Math.sin(dLon) * Math.cos(lat2);
         double x = Math.cos(lat1) * Math.sin(lat2) -
@@ -181,8 +186,8 @@ public class Coordinate {
      */
     public String toDMS() {
         return String.format("%s, %s",
-                formatDMS(getLatitudeDegrees(), 'N', 'S'),
-                formatDMS(getLongitudeDegrees(), 'E', 'W'));
+                formatDMS(getLatitudeDegrees().doubleValue(), 'N', 'S'),
+                formatDMS(getLongitudeDegrees().doubleValue(), 'E', 'W'));
     }
 
     private String formatDMS(double coord, char pos, char neg) {
@@ -192,12 +197,12 @@ public class Coordinate {
         double m = (absCoord - d) * 60;
         int mi = (int) m;
         double s = (m - mi) * 60;
-        return String.format("%dÃ‚Â°%d'%.2f\"%c", d, mi, s, dir);
+        return String.format("%d°%d'%.2f\"%c", d, mi, s, dir);
     }
 
     @Override
     public String toString() {
-        return String.format("(%.6fÃ‚Â°, %.6fÃ‚Â°)", getLatitudeDegrees(), getLongitudeDegrees());
+        return String.format("(%.6f°, %.6f°)", getLatitudeDegrees().doubleValue(), getLongitudeDegrees().doubleValue());
     }
 
     @Override
@@ -207,14 +212,14 @@ public class Coordinate {
         if (obj == null || getClass() != obj.getClass())
             return false;
         Coordinate other = (Coordinate) obj;
-        return Double.compare(getLatitudeDegrees(), other.getLatitudeDegrees()) == 0 &&
-                Double.compare(getLongitudeDegrees(), other.getLongitudeDegrees()) == 0 &&
-                Double.compare(getAltitudeMeters(), other.getAltitudeMeters()) == 0;
+        return getLatitudeDegrees().equals(other.getLatitudeDegrees()) &&
+                getLongitudeDegrees().equals(other.getLongitudeDegrees()) &&
+                getAltitudeMeters().equals(other.getAltitudeMeters());
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(getLatitudeDegrees(), getLongitudeDegrees(), getAltitudeMeters());
+        return Objects.hash(getLatitudeDegrees(), getLongitudeDegrees(), getAltitudeMeters());
     }
 
     // ========== Notable locations ==========
@@ -224,5 +229,3 @@ public class Coordinate {
     public static final Coordinate SOUTH_POLE = new Coordinate(-90.0, 0.0);
     public static final Coordinate EQUATOR_PRIME = new Coordinate(0.0, 0.0);
 }
-
-

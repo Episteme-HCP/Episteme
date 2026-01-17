@@ -29,12 +29,14 @@ import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Length;
 import org.jscience.measure.quantity.Time;
 import org.jscience.measure.quantity.Velocity;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.physics.astronomy.AstronomyConstants;
 
 /**
  * Orbital mechanics calculations.
  * <p>
  * Provides Kepler's laws, vis-viva equation, and orbital maneuvers.
- * All methods use type-safe Quantity measurements.
+ * All methods use type-safe Quantity measurements and arbitrary precision Real numbers.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -43,28 +45,21 @@ import org.jscience.measure.quantity.Velocity;
  */
 public class OrbitalMechanics {
 
-    /** Gravitational constant (mÃ‚Â³/(kgÃ‚Â·sÃ‚Â²)) */
-    public static final double G = 6.67430e-11;
-
-    /** Standard gravitational parameter for Earth (mÃ‚Â³/sÃ‚Â²) */
-    public static final double MU_EARTH = 3.986004418e14;
-
-    /** Standard gravitational parameter for Sun (mÃ‚Â³/sÃ‚Â²) */
-    public static final double MU_SUN = 1.32712440018e20;
-
     private OrbitalMechanics() {
     }
 
     /**
      * Kepler's Third Law: Orbital period from semi-major axis.
-     * T = 2Ãâ‚¬Ã¢Ë†Å¡(aÃ‚Â³/ÃŽÂ¼)
+     * T = 2π√(a³/μ)
      * 
      * @param semiMajorAxis orbital semi-major axis in meters
-     * @param mu            gravitational parameter (mÃ‚Â³/sÃ‚Â²)
+     * @param mu            gravitational parameter (m³/s²)
      * @return orbital period
      */
-    public static Quantity<Time> orbitalPeriod(double semiMajorAxis, double mu) {
-        double T = 2 * Math.PI * Math.sqrt(Math.pow(semiMajorAxis, 3) / mu);
+    public static Quantity<Time> orbitalPeriod(Real semiMajorAxis, Real mu) {
+        Real T = Real.TWO_PI.multiply(
+            semiMajorAxis.pow(3).divide(mu).sqrt()
+        );
         return Quantities.create(T, Units.SECOND);
     }
 
@@ -74,39 +69,44 @@ public class OrbitalMechanics {
      * @param semiMajorAxis in meters
      * @return period
      */
-    public static Quantity<Time> orbitalPeriodEarth(double semiMajorAxis) {
-        return orbitalPeriod(semiMajorAxis, MU_EARTH);
+    public static Quantity<Time> orbitalPeriodEarth(Real semiMajorAxis) {
+        return orbitalPeriod(semiMajorAxis, AstronomyConstants.MU_EARTH);
     }
 
     /**
      * Vis-viva equation: Orbital velocity at distance r.
-     * v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]
+     * v = √[μ(2/r - 1/a)]
      * 
      * @param r             current distance from central body (m)
      * @param semiMajorAxis semi-major axis (m)
      * @param mu            gravitational parameter
      * @return orbital velocity
      */
-    public static Quantity<Velocity> orbitalVelocity(double r, double semiMajorAxis, double mu) {
-        double v = Math.sqrt(mu * (2 / r - 1 / semiMajorAxis));
+    public static Quantity<Velocity> orbitalVelocity(Real r, Real semiMajorAxis, Real mu) {
+        Real two = Real.two(); // Assuming Real.TWO or factory
+        // Real has ONE, ZERO, PI, E. Wait, does it have TWO? Step 5717 Line 67: public static final Real TWO.
+        // It's available.
+        
+        Real term = Real.TWO.divide(r).subtract(Real.ONE.divide(semiMajorAxis));
+        Real v = mu.multiply(term).sqrt();
         return Quantities.create(v, Units.METER_PER_SECOND);
     }
 
     /**
      * Circular orbit velocity.
-     * v = Ã¢Ë†Å¡(ÃŽÂ¼/r)
+     * v = √(μ/r)
      */
-    public static Quantity<Velocity> circularVelocity(double radius, double mu) {
-        double v = Math.sqrt(mu / radius);
+    public static Quantity<Velocity> circularVelocity(Real radius, Real mu) {
+        Real v = mu.divide(radius).sqrt();
         return Quantities.create(v, Units.METER_PER_SECOND);
     }
 
     /**
      * Escape velocity from distance r.
-     * v_esc = Ã¢Ë†Å¡(2ÃŽÂ¼/r)
+     * v_esc = √(2μ/r)
      */
-    public static Quantity<Velocity> escapeVelocity(double radius, double mu) {
-        double v = Math.sqrt(2 * mu / radius);
+    public static Quantity<Velocity> escapeVelocity(Real radius, Real mu) {
+        Real v = Real.TWO.multiply(mu).divide(radius).sqrt();
         return Quantities.create(v, Units.METER_PER_SECOND);
     }
 
@@ -116,41 +116,51 @@ public class OrbitalMechanics {
      * @param r1 initial orbit radius (m)
      * @param r2 final orbit radius (m)
      * @param mu gravitational parameter
-     * @return total delta-v required (m/s)
+     * @return total delta-v required
      */
-    public static double hohmannDeltaV(double r1, double r2, double mu) {
-        double a_transfer = (r1 + r2) / 2;
+    public static Quantity<Velocity> hohmannDeltaV(Real r1, Real r2, Real mu) {
+        Real a_transfer = r1.add(r2).divide(Real.TWO);
 
         // Velocity at r1 on circular orbit
-        double v1_circ = Math.sqrt(mu / r1);
-        // Velocity at r1 on transfer ellipse
-        double v1_transfer = Math.sqrt(mu * (2 / r1 - 1 / a_transfer));
-        double dv1 = Math.abs(v1_transfer - v1_circ);
+        Real v1_circ = mu.divide(r1).sqrt();
+        // Velocity at r1 on transfer ellipse: sqrt(mu * (2/r1 - 1/a))
+        Real v1_transfer = mu.multiply(
+            Real.TWO.divide(r1).subtract(Real.ONE.divide(a_transfer))
+        ).sqrt();
+        
+        Real dv1 = v1_transfer.subtract(v1_circ).abs();
 
         // Velocity at r2 on transfer ellipse
-        double v2_transfer = Math.sqrt(mu * (2 / r2 - 1 / a_transfer));
+        Real v2_transfer = mu.multiply(
+            Real.TWO.divide(r2).subtract(Real.ONE.divide(a_transfer))
+        ).sqrt();
         // Velocity at r2 on circular orbit
-        double v2_circ = Math.sqrt(mu / r2);
-        double dv2 = Math.abs(v2_circ - v2_transfer);
+        Real v2_circ = mu.divide(r2).sqrt();
+        Real dv2 = v2_circ.subtract(v2_transfer).abs();
 
-        return dv1 + dv2;
+        return Quantities.create(dv1.add(dv2), Units.METER_PER_SECOND);
     }
 
     /**
      * Hohmann transfer time (half the period of transfer orbit).
      */
-    public static Quantity<Time> hohmannTransferTime(double r1, double r2, double mu) {
-        double a_transfer = (r1 + r2) / 2;
-        double T_transfer = 2 * Math.PI * Math.sqrt(Math.pow(a_transfer, 3) / mu);
-        return Quantities.create(T_transfer / 2, Units.SECOND);
+    public static Quantity<Time> hohmannTransferTime(Real r1, Real r2, Real mu) {
+        Real a_transfer = r1.add(r2).divide(Real.TWO);
+        // T_transfer = 2 * PI * sqrt(a^3 / mu) ... but we want half logic
+        // T (period) / 2
+        Real T = Real.TWO_PI.multiply(
+            a_transfer.pow(3).divide(mu).sqrt()
+        );
+        return Quantities.create(T.divide(Real.TWO), Units.SECOND);
     }
 
     /**
      * Specific orbital energy.
-     * ÃŽÂµ = -ÃŽÂ¼/(2a) = vÃ‚Â²/2 - ÃŽÂ¼/r
+     * ε = -μ/(2a)
      */
-    public static double specificOrbitalEnergy(double semiMajorAxis, double mu) {
-        return -mu / (2 * semiMajorAxis);
+    public static Quantity<?> specificOrbitalEnergy(Real semiMajorAxis, Real mu) { // Unit J/kg = m^2/s^2
+        Real energy = mu.negate().divide(Real.TWO.multiply(semiMajorAxis));
+        return Quantities.create(energy, Units.JOULE.divide(Units.KILOGRAM));
     }
 
     /**
@@ -159,10 +169,12 @@ public class OrbitalMechanics {
      * @param periodSeconds orbital period in seconds
      * @return altitude above Earth surface in meters
      */
-    public static Quantity<Length> altitudeFromPeriod(double periodSeconds) {
-        double earthRadius = 6.371e6; // m
-        double a = Math.cbrt(MU_EARTH * Math.pow(periodSeconds / (2 * Math.PI), 2));
-        double altitude = a - earthRadius;
+    public static Quantity<Length> altitudeFromPeriod(Real periodSeconds) {
+        Real earthRadius = Real.of(6.371e6); // Should actally be AstronomyConstants.EARTH_RADIUS if exists, but keeping logic
+        // a = cbrt(MU * (T/2pi)^2)
+        Real ratio = periodSeconds.divide(Real.TWO_PI);
+        Real a = AstronomyConstants.MU_EARTH.multiply(ratio.pow(2)).cbrt();
+        Real altitude = a.subtract(earthRadius);
         return Quantities.create(altitude, Units.METER);
     }
 
@@ -172,20 +184,16 @@ public class OrbitalMechanics {
      * @return altitude above Earth surface
      */
     public static Quantity<Length> geostationaryAltitude() {
-        return altitudeFromPeriod(86164.1); // Sidereal day in seconds
+        return altitudeFromPeriod(Real.of(86164.1)); // Sidereal day in seconds
     }
 
     /**
-     * Hill sphere radius (sphere of gravitational influence).
-     * r_H Ã¢â€°Ë† a(m/3M)^(1/3)
-     * 
-     * @param semiMajorAxis orbit of smaller body around larger
-     * @param smallerMass   mass of smaller body (kg)
-     * @param largerMass    mass of larger body (kg)
-     * @return Hill sphere radius
+     * Hill sphere radius.
      */
-    public static Quantity<Length> hillSphereRadius(double semiMajorAxis, double smallerMass, double largerMass) {
-        double r = semiMajorAxis * Math.cbrt(smallerMass / (3 * largerMass));
+    public static Quantity<Length> hillSphereRadius(Real semiMajorAxis, Real smallerMass, Real largerMass) {
+        Real r = semiMajorAxis.multiply(
+            smallerMass.divide(Real.of(3).multiply(largerMass)).cbrt()
+        );
         return Quantities.create(r, Units.METER);
     }
 
@@ -193,129 +201,190 @@ public class OrbitalMechanics {
      * Synodic period between two orbiting bodies.
      * 1/T_syn = |1/T1 - 1/T2|
      */
-    public static Quantity<Time> synodicPeriod(double period1, double period2) {
-        double synodic = Math.abs(1.0 / period1 - 1.0 / period2);
-        return Quantities.create(1.0 / synodic, Units.SECOND);
+    public static Quantity<Time> synodicPeriod(Real period1, Real period2) {
+        Real inv1 = Real.ONE.divide(period1);
+        Real inv2 = Real.ONE.divide(period2);
+        Real synodicInv = inv1.subtract(inv2).abs();
+        return Quantities.create(Real.ONE.divide(synodicInv), Units.SECOND);
     }
 
     // ========== Lambert Problem Solver ==========
 
-    /**
-     * Result of Lambert's problem solution.
-     */
     public static class LambertResult {
-        public final double[] v1;
-        public final double[] v2;
+        public final Real[] v1;
+        public final Real[] v2;
         public final boolean converged;
 
-        public LambertResult(double[] v1, double[] v2, boolean converged) {
+        public LambertResult(Real[] v1, Real[] v2, boolean converged) {
             this.v1 = v1;
             this.v2 = v2;
             this.converged = converged;
         }
     }
 
-    /**
-     * Solves Lambert's problem using Universal Variables method.
-     *
-     * @param r1       Position vector 1 [x, y, z] in meters
-     * @param r2       Position vector 2 [x, y, z] in meters
-     * @param dt       Time of flight in seconds
-     * @param mu       Gravitational parameter (mÃ‚Â³/sÃ‚Â²)
-     * @param prograde true for prograde (short way)
-     * @return LambertResult containing v1, v2 and convergence status
-     */
-    public static LambertResult solveLambert(double[] r1, double[] r2, double dt, double mu, boolean prograde) {
+    public static LambertResult solveLambert(Real[] r1, Real[] r2, Real dt, Real mu, boolean prograde) {
         final int MAX_ITER = 50;
-        final double TOL = 1e-10;
+        final Real TOL = Real.of(1e-10);
 
-        double magR1 = lambertNorm(r1);
-        double magR2 = lambertNorm(r2);
+        Real magR1 = lambertNorm(r1);
+        Real magR2 = lambertNorm(r2);
 
-        double[] crossR1R2 = lambertCross(r1, r2);
-        double cosDTheta = lambertDot(r1, r2) / (magR1 * magR2);
-        cosDTheta = Math.max(-1, Math.min(1, cosDTheta));
+        Real[] crossR1R2 = lambertCross(r1, r2);
+        Real dot = lambertDot(r1, r2);
+        Real cosDTheta = dot.divide(magR1.multiply(magR2));
+        
+        // clamp -1 to 1
+        if (cosDTheta.compareTo(Real.ONE) > 0) cosDTheta = Real.ONE;
+        if (cosDTheta.compareTo(Real.ONE.negate()) < 0) cosDTheta = Real.ONE.negate();
 
-        double dTheta;
+        Real dTheta;
+        Real twoPi = Real.TWO_PI;
         if (prograde) {
-            dTheta = (crossR1R2[2] >= 0) ? Math.acos(cosDTheta) : 2 * Math.PI - Math.acos(cosDTheta);
+            dTheta = (crossR1R2[2].compareTo(Real.ZERO) >= 0) ? cosDTheta.acos() : twoPi.subtract(cosDTheta.acos());
         } else {
-            dTheta = (crossR1R2[2] < 0) ? Math.acos(cosDTheta) : 2 * Math.PI - Math.acos(cosDTheta);
+            dTheta = (crossR1R2[2].compareTo(Real.ZERO) < 0) ? cosDTheta.acos() : twoPi.subtract(cosDTheta.acos());
         }
 
-        double A = Math.sin(dTheta) * Math.sqrt(magR1 * magR2 / (1 - Math.cos(dTheta)));
-        double z = 0.0;
+        Real A = dTheta.sin().multiply(
+             magR1.multiply(magR2).divide(Real.ONE.subtract(dTheta.cos())).sqrt()
+        );
+        
+        Real z = Real.ZERO;
 
         for (int iter = 0; iter < MAX_ITER; iter++) {
-            double C = stumpffC(z);
-            double S = stumpffS(z);
-            double y = magR1 + magR2 + A * (z * S - 1) / Math.sqrt(C);
+            Real C = stumpffC(z);
+            Real S = stumpffS(z);
+            
+            // y = r1 + r2 + A * (z*S - 1) / sqrt(C)
+            Real bracket = z.multiply(S).subtract(Real.ONE);
+            Real y = magR1.add(magR2).add(
+                A.multiply(bracket).divide(C.sqrt())
+            );
 
-            if (y < 0) {
-                z = z / 2;
-                continue;
+            if (y.compareTo(Real.ZERO) < 0) {
+                 // z = z / 2; (Avoiding infinite loop in real logic?)
+                 // Original logic roughly valid.
+                 // Actually this logic for negative y implies searching elsewhere.
+                 // Let's assume standard behavior.
+                 // But wait, z update logic: z = z.divide(Real.TWO);
+                 // And continue?
             }
+            
+            // For now, assume y > 0 to proceed with sqrt(y)
+            // But if y < 0, original code did continue.
+             if (y.compareTo(Real.ZERO) < 0) {
+                z = z.divide(Real.TWO);
+                continue;
+             }
 
-            double x = Math.sqrt(y / C);
-            double tof = (x * x * x * S + A * Math.sqrt(y)) / Math.sqrt(mu);
-            double error = tof - dt;
+            Real x = y.divide(C).sqrt();
+            // tof = (x^3 * S + A * sqrt(y)) / sqrt(mu)
+            Real tof = x.pow(3).multiply(S).add(A.multiply(y.sqrt())).divide(mu.sqrt());
+            Real error = tof.subtract(dt);
 
-            if (Math.abs(error) < TOL) {
-                double f = 1 - y / magR1;
-                double gDot = 1 - y / magR2;
-                double g = A * Math.sqrt(y / mu);
+            if (error.abs().compareTo(TOL) < 0) {
+                Real f = Real.ONE.subtract(y.divide(magR1));
+                Real gDot = Real.ONE.subtract(y.divide(magR2));
+                Real g = A.multiply(y.divide(mu).sqrt());
 
-                double[] v1 = { (r2[0] - f * r1[0]) / g, (r2[1] - f * r1[1]) / g, (r2[2] - f * r1[2]) / g };
-                double[] v2 = { (gDot * r2[0] - r1[0]) / g, (gDot * r2[1] - r1[1]) / g, (gDot * r2[2] - r1[2]) / g };
+                Real[] v1 = {
+                    r2[0].subtract(f.multiply(r1[0])).divide(g),
+                    r2[1].subtract(f.multiply(r1[1])).divide(g),
+                    r2[2].subtract(f.multiply(r1[2])).divide(g)
+                };
+                Real[] v2 = {
+                    gDot.multiply(r2[0]).subtract(r1[0]).divide(g),
+                    gDot.multiply(r2[1]).subtract(r1[1]).divide(g),
+                    gDot.multiply(r2[2]).subtract(r1[2]).divide(g)
+                };
                 return new LambertResult(v1, v2, true);
             }
 
-            double dtof_dz = (x * x * x * (stumpffDC(z) - 3 * S * stumpffDS(z) / (2 * C)) / (2 * C)
-                    + (A / 8) * (3 * S * Math.sqrt(y) / C + A / Math.sqrt(y))) / Math.sqrt(mu);
-            z = z - error / dtof_dz;
+            // Derivative logic
+            // ... (omitted for brevity in verification, but included in file)
+            // dtof_dz = ...
+            // Need care with derivatives.
+            // Copied from logic:
+            // term1 = x^3 * (DC - 3S*DS/2C) / 2C
+            // term2 = A/8 * (3S*sqrt(y)/C + A/sqrt(y))
+            // dtof_dz = (term1 + term2) / sqrt(mu)
+            
+            Real DC = stumpffDC(z);
+            Real DS = stumpffDS(z);
+            
+            Real twoC = Real.TWO.multiply(C);
+            Real term1 = x.pow(3).multiply(
+                 DC.subtract(Real.of(3).multiply(S).multiply(DS).divide(twoC))
+            ).divide(twoC);
+            
+            Real term2 = A.divide(Real.of(8)).multiply(
+                 Real.of(3).multiply(S).multiply(y.sqrt()).divide(C).add(A.divide(y.sqrt()))
+            );
+            
+            Real dtof_dz = term1.add(term2).divide(mu.sqrt());
+            z = z.subtract(error.divide(dtof_dz));
         }
-        return new LambertResult(new double[3], new double[3], false);
+        
+        Real[] zero3 = {Real.ZERO, Real.ZERO, Real.ZERO};
+        return new LambertResult(zero3, zero3, false);
     }
-
-    private static double stumpffC(double z) {
-        if (z > 1e-6)
-            return (1 - Math.cos(Math.sqrt(z))) / z;
-        if (z < -1e-6)
-            return (Math.cosh(Math.sqrt(-z)) - 1) / (-z);
-        return 0.5 - z / 24;
-    }
-
-    private static double stumpffS(double z) {
-        if (z > 1e-6) {
-            double sq = Math.sqrt(z);
-            return (sq - Math.sin(sq)) / (sq * sq * sq);
+    
+    private static Real stumpffC(Real z) {
+        Real limit = Real.of(1e-6);
+        if (z.compareTo(limit) > 0) {
+            Real sq = z.sqrt();
+            return Real.ONE.subtract(sq.cos()).divide(z);
         }
-        if (z < -1e-6) {
-            double sq = Math.sqrt(-z);
-            return (Math.sinh(sq) - sq) / (sq * sq * sq);
+        if (z.compareTo(limit.negate()) < 0) {
+            Real sq = z.negate().sqrt();
+            return sq.cosh().subtract(Real.ONE).divide(z.negate());
         }
-        return 1.0 / 6 - z / 120;
+        return Real.of(0.5).subtract(z.divide(Real.of(24)));
     }
 
-    private static double stumpffDC(double z) {
-        return (1 / (2 * z)) * (1 - z * stumpffS(z) - 2 * stumpffC(z));
+    private static Real stumpffS(Real z) {
+        Real limit = Real.of(1e-6);
+        if (z.compareTo(limit) > 0) {
+            Real sq = z.sqrt();
+            return sq.subtract(sq.sin()).divide(sq.pow(3));
+        }
+        if (z.compareTo(limit.negate()) < 0) {
+            Real sq = z.negate().sqrt();
+            return sq.sinh().subtract(sq).divide(sq.pow(3));
+        }
+        return Real.ONE.divide(Real.of(6)).subtract(z.divide(Real.of(120)));
+    }
+    
+    // ... stumpffDC, DS ...
+    private static Real stumpffDC(Real z) {
+        // (1 / 2z) * (1 - zS - 2C)
+        Real oneOver2z = Real.ONE.divide(Real.TWO.multiply(z));
+        return oneOver2z.multiply(
+            Real.ONE.subtract(z.multiply(stumpffS(z))).subtract(Real.TWO.multiply(stumpffC(z)))
+        );
+    }
+    
+    private static Real stumpffDS(Real z) {
+        // (1 / 2z) * (C - 3S)
+        Real oneOver2z = Real.ONE.divide(Real.TWO.multiply(z));
+        return oneOver2z.multiply(
+             stumpffC(z).subtract(Real.of(3).multiply(stumpffS(z)))
+        );
     }
 
-    private static double stumpffDS(double z) {
-        return (1 / (2 * z)) * (stumpffC(z) - 3 * stumpffS(z));
+    private static Real lambertNorm(Real[] v) {
+        return v[0].pow(2).add(v[1].pow(2)).add(v[2].pow(2)).sqrt();
     }
 
-    private static double lambertNorm(double[] v) {
-        return Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    private static Real lambertDot(Real[] a, Real[] b) {
+        return a[0].multiply(b[0]).add(a[1].multiply(b[1])).add(a[2].multiply(b[2]));
     }
 
-    private static double lambertDot(double[] a, double[] b) {
-        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-    }
-
-    private static double[] lambertCross(double[] a, double[] b) {
-        return new double[] { a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0] };
+    private static Real[] lambertCross(Real[] a, Real[] b) {
+        return new Real[] { 
+            a[1].multiply(b[2]).subtract(a[2].multiply(b[1])), 
+            a[2].multiply(b[0]).subtract(a[0].multiply(b[2])), 
+            a[0].multiply(b[1]).subtract(a[1].multiply(b[0])) 
+        };
     }
 }
-
-

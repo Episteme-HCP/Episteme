@@ -105,8 +105,20 @@ public class CircuitSimulatorViewer extends org.jscience.ui.AbstractViewer imple
     private boolean dragging = false;
     private Canvas canvas;
 
+    private final org.jscience.ui.BooleanParameter showLabels;
+
     public CircuitSimulatorViewer() {
+        this.showLabels = new org.jscience.ui.BooleanParameter(
+            "Show Labels",
+            org.jscience.ui.i18n.I18n.getInstance().get("viewer.circuitsimulatorviewer.param.labels", "Show Value Labels"), 
+            true, 
+            v -> draw());
         initUI();
+    }
+
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return java.util.List.of(showLabels);
     }
 
     private void initUI() {
@@ -278,7 +290,7 @@ public class CircuitSimulatorViewer extends org.jscience.ui.AbstractViewer imple
         for (Component c : components)
             drawComponent(gc, c, c == selectedComponent);
             
-        if (nodeVoltages != null) {
+        if (nodeVoltages != null && showLabels.getValue()) {
             gc.setFill(Color.BLUE);
             for (java.util.Map.Entry<String, Double> entry : nodeVoltages.entrySet()) {
                 String[] parts = entry.getKey().split(",");
@@ -300,7 +312,7 @@ public class CircuitSimulatorViewer extends org.jscience.ui.AbstractViewer imple
                 gc.strokeLine(c.x1, c.y1, midX - 10, midY);
                 gc.strokeLine(midX + 10, midY, c.x2, c.y2);
                 gc.strokeRect(midX - 10, midY - 5, 20, 10);
-                gc.fillText(c.value.toString(), midX - 15, midY - 10);
+                if (showLabels.getValue()) gc.fillText(c.value.toString(), midX - 15, midY - 10);
             }
             case BATTERY -> {
                 gc.strokeLine(c.x1, c.y1, midX - 5, midY);

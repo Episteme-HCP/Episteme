@@ -72,6 +72,11 @@ public class NetworkViewer extends AbstractViewer {
     }
 
     @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return java.util.Collections.emptyList();
+    }
+
+    @Override
     public String getCategory() {
         return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics", "Mathematics");
     }

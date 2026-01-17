@@ -57,19 +57,26 @@ public class BackendDiscovery {
     /**
      * Returns all discovered backend providers.
      */
-    public List<BackendProvider> getProviders() {
-        List<BackendProvider> all = new ArrayList<>();
-        ServiceLoader<BackendProvider> loader = ServiceLoader.load(BackendProvider.class);
-        Iterator<BackendProvider> iterator = loader.iterator();
-        while (iterator.hasNext()) {
-            try {
-                all.add(iterator.next());
-            } catch (ServiceConfigurationError e) {
-                // Log and skip providers that cannot be loaded
-                System.err.println("Warning: Could not load backend provider: " + e.getMessage());
+    private List<BackendProvider> cachedProviders;
+
+    /**
+     * Returns all discovered backend providers.
+     */
+    public synchronized List<BackendProvider> getProviders() {
+        if (cachedProviders == null) {
+            cachedProviders = new ArrayList<>();
+            ServiceLoader<BackendProvider> loader = ServiceLoader.load(BackendProvider.class);
+            Iterator<BackendProvider> iterator = loader.iterator();
+            while (iterator.hasNext()) {
+                try {
+                    cachedProviders.add(iterator.next());
+                } catch (ServiceConfigurationError e) {
+                    // Log and skip providers that cannot be loaded
+                    System.err.println("Warning: Could not load backend provider: " + e.getMessage());
+                }
             }
         }
-        return all;
+        return cachedProviders;
     }
 
     /**

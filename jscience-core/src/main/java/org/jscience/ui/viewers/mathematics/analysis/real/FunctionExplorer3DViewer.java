@@ -29,6 +29,8 @@ import javafx.scene.layout.*;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.symbolic.parsing.SimpleExpressionParser;
 import org.jscience.ui.AbstractViewer;
+import org.jscience.ui.Parameter;
+import org.jscience.ui.RealParameter;
 import org.jscience.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3D;
 import org.jscience.ui.theme.ThemeColors;
 import java.util.*;
@@ -37,10 +39,18 @@ public class FunctionExplorer3DViewer extends AbstractViewer {
 
     private static final String DEFAULT_3D_FUNC = "sin(sqrt(x^2+y^2))";
 
-
+    private final Parameter<String> funcExpression;
+    private final RealParameter range;
 
     public FunctionExplorer3DViewer() {
+        this.funcExpression = new Parameter<>("Function", "f(x,y)", DEFAULT_3D_FUNC, v -> {}); // No auto-update for 3D (heavy)
+        this.range = new RealParameter("Range", "Range", Real.of(1), Real.of(100), Real.of(1), Real.of(10), v -> {}); 
         initUI();
+    }
+
+    @Override
+    public List<Parameter<?>> getViewerParameters() {
+        return List.of(funcExpression, range);
     }
 
     private void initUI() {
@@ -53,10 +63,14 @@ public class FunctionExplorer3DViewer extends AbstractViewer {
         sidebar.getStyleClass().add("viewer-sidebar");
 
         Label funcLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("funcexplorer.label.z_fx", "z = f(x, y) ="));
-        TextField funcInput = new TextField(DEFAULT_3D_FUNC);
+        TextField funcInput = new TextField(funcExpression.getValue());
+        funcInput.textProperty().addListener((obs, old, newVal) -> funcExpression.setValue(newVal));
 
         Label rangeLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("funcexplorer.range3d", "Range [\u00B1X, \u00B1Y]"));
-        TextField rangeField = new TextField("10");
+        TextField rangeField = new TextField(String.valueOf(range.getValue().doubleValue()));
+        rangeField.textProperty().addListener((obs, old, val) -> { 
+            try { range.setValue(Real.of(Double.parseDouble(val))); } catch(Exception e){} 
+        });
 
         CheckBox gridChk = new CheckBox(org.jscience.ui.i18n.I18n.getInstance().get("funcexplorer.grid", "Show Grid/Axes"));
         gridChk.setSelected(true);
@@ -96,8 +110,8 @@ public class FunctionExplorer3DViewer extends AbstractViewer {
 
         plotBtn.setOnAction(e -> {
             try {
-                String expr = funcInput.getText();
-                double range = Double.parseDouble(rangeField.getText());
+                String expr = funcExpression.getValue();
+                double rangeVal = range.getValue().doubleValue();
                 SimpleExpressionParser parser = new SimpleExpressionParser(expr);
 
                 JavaFXPlot3D plot = new JavaFXPlot3D("3D Surface");
@@ -109,7 +123,7 @@ public class FunctionExplorer3DViewer extends AbstractViewer {
                     } catch (Exception ex) {
                         return Real.ZERO;
                     }
-                }, Real.of(-range), Real.of(range), Real.of(-range), Real.of(range), "Surface");
+                }, Real.of(-rangeVal), Real.of(rangeVal), Real.of(-rangeVal), Real.of(rangeVal), "Surface");
 
                 chartContainer.getChildren().setAll(plot.getNode());
 

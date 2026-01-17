@@ -38,12 +38,16 @@ import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.*;
+import org.jscience.ui.QuantityParameter;
+import org.jscience.ui.RealParameter;
+import org.jscience.mathematics.numbers.real.Real;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Car Traffic Simulation using Intelligent Driver Model (IDM).
+ * Refactored to use QuantityParameter and RealParameter for strict API compliance.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -57,7 +61,7 @@ public class CarTrafficViewer extends AbstractViewer implements Simulatable {
     private Quantity<Velocity> desiredVelocity = Quantities.create(30.0, Units.METER_PER_SECOND);
     private Quantity<Time> timeGap = Quantities.create(1.5, Units.SECOND);
     private Quantity<Length> minGap = Quantities.create(2.0, Units.METER);
-    private double delta = 4.0;
+    private Real delta = Real.of(4.0);
     private Quantity<Acceleration> maxAccel = Quantities.create(1.0, Units.METERS_PER_SECOND_SQUARED);
     private Quantity<Acceleration> breakingDecel = Quantities.create(2.0, Units.METERS_PER_SECOND_SQUARED);
 
@@ -65,7 +69,7 @@ public class CarTrafficViewer extends AbstractViewer implements Simulatable {
     private Canvas canvas;
     private boolean running = true;
     private AnimationTimer timer;
-    private double speed = 1.0;
+    private Real speed = Real.ONE;
 
     @Override
     public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.cartraffic.name", "Traffic Simulation"); }
@@ -97,7 +101,7 @@ public class CarTrafficViewer extends AbstractViewer implements Simulatable {
             public void handle(long now) {
                 if (!running) return;
                 if (lastTime == 0) { lastTime = now; return; }
-                double dt = (now - lastTime) / 1e9 * speed;
+                double dt = (now - lastTime) / 1e9 * speed.doubleValue();
                 lastTime = now;
                 update(Quantities.create(dt, Units.SECOND));
                 draw();
@@ -110,29 +114,35 @@ public class CarTrafficViewer extends AbstractViewer implements Simulatable {
     public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
         java.util.List<org.jscience.ui.Parameter<?>> params = new java.util.ArrayList<>();
         
-        int defaultCars = Configuration.getInt("viewer.cartraffic.default.cars", 30);
+        int defaultCarsInt = Configuration.getInt("viewer.cartraffic.default.cars", 30);
         double defaultSpeed = Configuration.getDouble("viewer.cartraffic.default.speed", 30.0);
         double defaultGap = Configuration.getDouble("viewer.cartraffic.default.gap", 1.5);
 
-        params.add(new org.jscience.ui.NumericParameter("traffic.label.cars", "Number of Cars", 
-            Configuration.getInt("viewer.cartraffic.cars.min", 10), 
-            Configuration.getInt("viewer.cartraffic.cars.max", 60), 
-            Configuration.getInt("viewer.cartraffic.cars.step", 5), 
-            defaultCars * 1.0, v -> initCars(v.intValue())));
+        // Cars Count -> RealParameter (Integer via Real)
+        params.add(new RealParameter("traffic.label.cars", "Number of Cars", 
+            Real.of(Configuration.getInt("viewer.cartraffic.cars.min", 10)), 
+            Real.of(Configuration.getInt("viewer.cartraffic.cars.max", 60)), 
+            Real.of(Configuration.getInt("viewer.cartraffic.cars.step", 5)), 
+            Real.of(defaultCarsInt), 
+            v -> initCars((int) v.doubleValue())));
             
-        params.add(new org.jscience.ui.NumericParameter("traffic.label.speed", "Target Speed (m/s)", 
-            Configuration.getDouble("viewer.cartraffic.speed.min", 10.0), 
-            Configuration.getDouble("viewer.cartraffic.speed.max", 50.0), 
-            Configuration.getDouble("viewer.cartraffic.speed.step", 5.0), 
-            defaultSpeed, 
-            v -> desiredVelocity = Quantities.create(v, Units.METER_PER_SECOND)));
+        // Target Speed -> QuantityParameter
+        params.add(new QuantityParameter<Velocity>("traffic.label.speed", "Target Speed", 
+            Quantities.create(Configuration.getDouble("viewer.cartraffic.speed.min", 10.0), Units.METER_PER_SECOND), 
+            Quantities.create(Configuration.getDouble("viewer.cartraffic.speed.max", 50.0), Units.METER_PER_SECOND), 
+            Quantities.create(Configuration.getDouble("viewer.cartraffic.speed.step", 5.0), Units.METER_PER_SECOND), 
+            desiredVelocity, 
+            Units.METER_PER_SECOND,
+            q -> desiredVelocity = q));
             
-        params.add(new org.jscience.ui.NumericParameter("traffic.label.gap", "Time Gap (s)", 
-            Configuration.getDouble("viewer.cartraffic.gap.min", 0.5), 
-            Configuration.getDouble("viewer.cartraffic.gap.max", 3.0), 
-            Configuration.getDouble("viewer.cartraffic.gap.step", 0.5), 
-            defaultGap, 
-            v -> timeGap = Quantities.create(v, Units.SECOND)));
+        // Time Gap -> QuantityParameter
+        params.add(new QuantityParameter<Time>("traffic.label.gap", "Time Gap", 
+            Quantities.create(Configuration.getDouble("viewer.cartraffic.gap.min", 0.5), Units.SECOND), 
+            Quantities.create(Configuration.getDouble("viewer.cartraffic.gap.max", 3.0), Units.SECOND), 
+            Quantities.create(Configuration.getDouble("viewer.cartraffic.gap.step", 0.5), Units.SECOND), 
+            timeGap, 
+            Units.SECOND,
+            q -> timeGap = q));
             
         return params;
     }
@@ -141,7 +151,14 @@ public class CarTrafficViewer extends AbstractViewer implements Simulatable {
     @Override public void pause() { running = false; }
     @Override public void stop() { running = false; initCars(30); }
     @Override public boolean isPlaying() { return running; }
-    @Override public void setSpeed(double s) { this.speed = s; }
+    
+    // API: setSpeed now strictly takes Real
+    public void setSpeed(Real s) { this.speed = s; }
+    @Override public void setSpeed(double s) { this.speed = Real.of(s); } // Keep legacy/interface compatibility if abstract forces it?
+    // AbstractViewer/Simulatable usually has setSpeed(double). 
+    // If Simulatable interface is not updated, I must keep double input.
+    // I'll update Simulatable later if I can find it. For now, overload.
+
     @Override public void step() { update(Quantities.create(0.05, Units.SECOND)); draw(); }
     
     public void reset(int carCount) { initCars(carCount); }
@@ -181,7 +198,7 @@ public class CarTrafficViewer extends AbstractViewer implements Simulatable {
             Quantity<Velocity> dv = car.velocity.subtract(leadCar.velocity).asType(Velocity.class);
 
             double vRatio = car.velocity.divide(desiredVelocity).getValue().doubleValue();
-            double term1 = Math.pow(vRatio, delta);
+            double term1 = Math.pow(vRatio, delta.doubleValue());
 
             Quantity<?> moment = car.velocity.multiply(dv);
             Quantity<?> sqrtAB = maxAccel.multiply(breakingDecel).sqrt();
@@ -196,7 +213,6 @@ public class CarTrafficViewer extends AbstractViewer implements Simulatable {
         }
 
         double totalSpeed = 0;
-        int stoppedCars = 0;
 
         for (int i = 0; i < n; i++) {
             Car car = cars.get(i);
@@ -212,13 +228,6 @@ public class CarTrafficViewer extends AbstractViewer implements Simulatable {
 
             double vVal = car.velocity.getValue().doubleValue();
             totalSpeed += vVal;
-            if (vVal < 5.0) stoppedCars++;
-        }
-
-        if (n > 0) {
-            // Status updating can be exposed via property or listener if needed
-            // For now, we removed the internal label.
-            // Ideally, the viewer publishes an event.
         }
     }
 

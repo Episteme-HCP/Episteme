@@ -31,6 +31,8 @@ import javafx.scene.layout.*;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.symbolic.parsing.SimpleExpressionParser;
 import org.jscience.mathematics.analysis.SymbolicUtil;
+import org.jscience.ui.Parameter;
+import org.jscience.ui.RealParameter;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.viewers.mathematics.analysis.plotting.Plot2D;
 import org.jscience.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot2D;
@@ -42,15 +44,44 @@ public class FunctionExplorer2DViewer extends AbstractViewer {
     private static final String DEFAULT_FX = "sin(x)";
     private static final String DEFAULT_GX = "x^2/10";
 
+    private final Parameter<String> funcF;
+    private final Parameter<String> funcG;
+    private final RealParameter xMin;
+    private final RealParameter xMax;
+
     public FunctionExplorer2DViewer() {
         this(DEFAULT_FX, DEFAULT_GX);
     }
 
     public FunctionExplorer2DViewer(String defaultF, String defaultG) {
-        initUI(defaultF, defaultG);
+        // Initialize Parameters
+        // We define a shared update/plot trigger
+        // Note: We can't easily access the plotRunnable from here before initUI.
+        // So we pass a placeholder that checks if logic is ready, or we init UI first?
+        // If we init UI first, we can't pass params to it easily if they are final.
+        // We will init params with a no-op, then init UI, then set the Consumers?
+        // Parameter fields are final. We can't change the consumer.
+        // Solution: Use a wrapper "Runnable" that we populate later.
+        
+        this.updateTrigger = new Runnable() { public void run() {} }; // Placeholder
+        
+        this.funcF = new Parameter<>("f(x)", "Function F", defaultF, v -> runUpdate());
+        this.funcG = new Parameter<>("g(x)", "Function G", defaultG, v -> runUpdate());
+        this.xMin = new RealParameter("X Min", "X Min", Real.of(-1000), Real.of(1000), Real.of(1), Real.of(-10), v -> runUpdate());
+        this.xMax = new RealParameter("X Max", "X Max", Real.of(-1000), Real.of(1000), Real.of(1), Real.of(10), v -> runUpdate());
+
+        initUI();
+    }
+    
+    private Runnable updateTrigger; // Logic to run on update
+    private void runUpdate() { updateTrigger.run(); }
+
+    @Override
+    public List<Parameter<?>> getViewerParameters() {
+        return List.of(funcF, funcG, xMin, xMax);
     }
 
-    private void initUI(String defaultF, String defaultG) {
+    private void initUI() {
         SplitPane layout = new SplitPane();
         I18n i18n = org.jscience.ui.i18n.I18n.getInstance();
 
@@ -59,14 +90,16 @@ public class FunctionExplorer2DViewer extends AbstractViewer {
         sidebar.setPadding(new Insets(15));
         sidebar.setMinWidth(300);
         sidebar.setMaxWidth(350);
-        sidebar.setMaxWidth(350);
         sidebar.getStyleClass().add("viewer-sidebar");
 
         // Input Section
         Label fLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.label.fx", "f(x) ="));
-        TextField fInput = new TextField(defaultF);
+        TextField fInput = new TextField(funcF.getValue());
+        fInput.textProperty().addListener((obs, old, newVal) -> funcF.setValue(newVal)); 
+
         Label gLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.label.gx", "g(x) ="));
-        TextField gInput = new TextField(defaultG);
+        TextField gInput = new TextField(funcG.getValue());
+        gInput.textProperty().addListener((obs, old, newVal) -> funcG.setValue(newVal));
 
         Label opLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.label.plotop", "Plot Operation:"));
         ComboBox<String> opCombo = new ComboBox<>(FXCollections.observableArrayList(
@@ -75,10 +108,15 @@ public class FunctionExplorer2DViewer extends AbstractViewer {
 
         Label rangeLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.label.range", "Range [Min, Max]"));
         HBox rangeBox = new HBox(5);
-        TextField xMinField = new TextField("-10");
-        TextField xMaxField = new TextField("10");
+        TextField xMinField = new TextField(String.valueOf(xMin.getValue().doubleValue()));
+        TextField xMaxField = new TextField(String.valueOf(xMax.getValue().doubleValue()));
         xMinField.setPrefWidth(60);
         xMaxField.setPrefWidth(60);
+        
+        // Bind Range Fields
+        xMinField.textProperty().addListener((obs, old, val) -> { try { xMin.setValue(Real.of(Double.parseDouble(val))); } catch(Exception e){} });
+        xMaxField.textProperty().addListener((obs, old, val) -> { try { xMax.setValue(Real.of(Double.parseDouble(val))); } catch(Exception e){} });
+        
         rangeBox.getChildren().addAll(xMinField, xMaxField);
 
         Button plotBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.button.plot", "Plot Function"));
@@ -120,16 +158,17 @@ public class FunctionExplorer2DViewer extends AbstractViewer {
         // Logic
         Runnable doPlot = () -> {
             try {
-                String fStr = fInput.getText();
-                String gStr = gInput.getText();
+                String fStr = funcF.getValue();
+                String gStr = funcG.getValue();
                 String op = opCombo.getValue();
-                double min = Double.parseDouble(xMinField.getText());
-                double max = Double.parseDouble(xMaxField.getText());
+                double min = xMin.getValue().doubleValue();
+                double max = xMax.getValue().doubleValue();
 
                 Plot2D plot = new JavaFXPlot2D("Function Plot");
                 plot.setGrid(true);
                 plot.setLegend(true);
                 plot.setXRange(Real.of(min), Real.of(max));
+                // ... (rest is same)
 
                 SimpleExpressionParser pF = new SimpleExpressionParser(fStr);
                 SimpleExpressionParser pG = new SimpleExpressionParser(gStr);
@@ -163,17 +202,19 @@ public class FunctionExplorer2DViewer extends AbstractViewer {
                 }
 
             } catch (Exception ex) {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Plot Error: " + ex.getMessage());
-                alert.show();
+                // Ignore errors during typing or log
             }
         };
 
+        // Wire up the trigger
+        this.updateTrigger = doPlot;
         plotBtn.setOnAction(e -> doPlot.run());
+        // ...
 
         symbBtn.setOnAction(e -> {
             String op = opCombo.getValue();
-            String fStr = fInput.getText();
-            String gStr = gInput.getText();
+            String fStr = funcF.getValue();
+            String gStr = funcG.getValue();
 
             String res = "";
             if (op.equals("f(x)"))

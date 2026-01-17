@@ -39,6 +39,10 @@ import org.jscience.ui.i18n.I18n;
 
 import java.util.List;
 import java.util.ArrayList;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Unit;
+import org.jscience.measure.Quantities;
 
 /**
  * Abstract base class for all JScience Demonstrations.
@@ -151,6 +155,31 @@ public abstract class AbstractDemo extends Application implements App {
             HBox valBox = new HBox(label, new Region(), valLabel);
             HBox.setHgrow(valBox.getChildren().get(1), Priority.ALWAYS);
             box.getChildren().addAll(valBox, slider);
+        } else if (param instanceof RealParameter realParam) {
+            double minV = realParam.getMin().doubleValue();
+            double maxV = realParam.getMax().doubleValue();
+            double curV = realParam.getValue().doubleValue();
+            double stepV = realParam.getStep().doubleValue();
+
+            Slider slider = new Slider(minV, maxV, curV);
+            slider.setBlockIncrement(stepV);
+            slider.setShowTickLabels(true);
+
+            Label valLabel = new Label(String.format("%.4f", curV));
+            slider.valueProperty().addListener((obs, oldVal, newVal) -> {
+                double v = newVal.doubleValue();
+                if (stepV > 0) {
+                    v = Math.round(v / stepV) * stepV;
+                }
+                realParam.setValue(Real.of(v));
+                valLabel.setText(String.format("%.4f", v));
+            });
+
+            HBox valBox = new HBox(label, new Region(), valLabel);
+            HBox.setHgrow(valBox.getChildren().get(1), Priority.ALWAYS);
+            box.getChildren().addAll(valBox, slider);
+        } else if (param instanceof QuantityParameter<?> qParam) { // Wildcard capture for type safety inside
+             createQuantityControl(box, label, qParam);
         } else if (param instanceof BooleanParameter) {
             CheckBox checkBox = new CheckBox();
             checkBox.setSelected((Boolean) param.getValue());
@@ -200,6 +229,34 @@ public abstract class AbstractDemo extends Application implements App {
             return v.getViewerParameters();
         }
         return new ArrayList<>();
+    }
+
+    private <Q extends Quantity<Q>> void createQuantityControl(VBox box, Label label, QuantityParameter<Q> qParam) {
+        Unit<Q> unit = qParam.getUnit();
+        double minV = qParam.getMin().to(unit).getValue().doubleValue();
+        double maxV = qParam.getMax().to(unit).getValue().doubleValue();
+        double curV = qParam.getValue().to(unit).getValue().doubleValue();
+        double stepV = qParam.getStep().to(unit).getValue().doubleValue();
+
+        Slider slider = new Slider(minV, maxV, curV);
+        slider.setBlockIncrement(stepV);
+        slider.setShowTickLabels(true);
+
+        Label valLabel = new Label(String.format("%.2f %s", curV, unit.toString()));
+        slider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            double v = newVal.doubleValue();
+            if (stepV > 0) {
+              v = Math.round(v / stepV) * stepV;
+            }
+            // Create new quantity
+            Quantity<Q> newQ = Quantities.create(v, unit);
+            qParam.setValue(newQ);
+            valLabel.setText(String.format("%.2f %s", v, unit.toString()));
+        });
+
+        HBox valBox = new HBox(label, new Region(), valLabel);
+        HBox.setHgrow(valBox.getChildren().get(1), Priority.ALWAYS);
+        box.getChildren().addAll(valBox, slider);
     }
 
     @Override

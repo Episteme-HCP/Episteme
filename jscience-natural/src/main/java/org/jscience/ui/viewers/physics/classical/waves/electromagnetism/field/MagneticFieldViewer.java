@@ -56,9 +56,16 @@ public class MagneticFieldViewer extends org.jscience.ui.AbstractViewer {
     private double time = 0;
     private javafx.animation.AnimationTimer timer;
 
+    private final org.jscience.ui.RealParameter gridSpacingParam;
+
     public MagneticFieldViewer() {
         this.getStyleClass().add("viewer-root");
-
+        this.gridSpacingParam = new org.jscience.ui.RealParameter(
+            "Grid Spacing", 
+            org.jscience.ui.i18n.I18n.getInstance().get("viewer.magneticfieldviewer.param.spacing", "Grid Spacing"), 
+            Real.of(10), Real.of(200), Real.of(5), Real.of(60), 
+            val -> updateField());
+            
         // 3D Scene setup
         SubScene subScene = new SubScene(root, 800, 600, true, SceneAntialiasing.BALANCED);
         subScene.setFill(Color.web("#fdfbf7"));
@@ -94,7 +101,7 @@ public class MagneticFieldViewer extends org.jscience.ui.AbstractViewer {
         });
 
         // Add a representation of the magnet (Ring)
-        Cylinder magnet = new Cylinder( gridSpacing / 2, 10);
+        Cylinder magnet = new Cylinder( gridSpacingParam.getValue().doubleValue() / 2, 10);
         magnet.setMaterial(new PhongMaterial(Color.SILVER));
         root.getChildren().add(magnet);
 
@@ -115,11 +122,15 @@ public class MagneticFieldViewer extends org.jscience.ui.AbstractViewer {
         timer.start();
     }
 
-    private static final double gridSpacing = 60;
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return java.util.List.of(gridSpacingParam);
+    }
     
     private void updateField() {
         vectorFieldGroup.getChildren().clear();
         int gridRange = 3;
+        double gridSpacing = gridSpacingParam.getValue().doubleValue();
 
         for (int x = -gridRange; x <= gridRange; x++) {
             for (int y = -gridRange; y <= gridRange; y++) {

@@ -21,43 +21,41 @@
  * SOFTWARE.
  */
 
-package org.jscience.ui.demos;
+package org.jscience.ui;
 
-import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.viewers.mathematics.geometry.GeometryBoardViewer;
+import java.util.function.Consumer;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * 
+ * Metadata for a Real number parameter with bounds.
+ * Allows binding UI controls (double-based) to Real-based scientific models.
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GeometryBoardDemo extends AbstractDemo {
+public class RealParameter extends Parameter<Real> {
+    private final Real min;
+    private final Real max;
+    private final Real step;
 
-    @Override
-    public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics");
+    public RealParameter(String name, String description, Real min, Real max, Real step, Real defaultValue,
+            Consumer<Real> onValueChange) {
+        super(name, description, defaultValue, onValueChange);
+        this.min = min;
+        this.max = max;
+        this.step = step;
     }
 
-    @Override
-    public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.geometryboarddemo.name");
+    public Real getMin() {
+        return min;
     }
 
-    @Override
-    public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.geometryboarddemo.desc");
+    public Real getMax() {
+        return max;
     }
 
-    @Override
-    protected javafx.scene.Node createViewerNode() {
-        return new GeometryBoardViewer();
-    }
-
-    @Override
-    public String getLongDescription() {
-         return org.jscience.ui.i18n.I18n.getInstance().get("demo.geometryboarddemo.longdesc");
+    public Real getStep() {
+        return step;
     }
 }
-
-

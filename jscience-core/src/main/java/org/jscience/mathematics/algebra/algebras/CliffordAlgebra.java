@@ -62,6 +62,25 @@ public class CliffordAlgebra<E> implements Ring<CliffordAlgebra.Multivector<E>> 
         }
     }
 
+    /**
+     * Creates a basis blade with coefficient 1.
+     * @param bitmask the bitmask representing the blade (e.g. 3 for e1^e2)
+     * @return the basis blade multivector
+     */
+    public Multivector<E> getBasisBlade(int bitmask) {
+        return new Multivector<>(Collections.singletonMap(bitmask, scalarField.one()), this);
+    }
+    
+    /**
+     * Creates a scalar multivector.
+     * @param value the scalar value
+     * @return the multivector
+     */
+    public Multivector<E> scalar(E value) {
+        return new Multivector<>(Collections.singletonMap(0, value), this);
+    }
+
+
     @Override
     public Multivector<E> operate(Multivector<E> left, Multivector<E> right) {
         return multiply(left, right);

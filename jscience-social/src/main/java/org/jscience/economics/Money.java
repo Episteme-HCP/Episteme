@@ -24,17 +24,26 @@
 package org.jscience.economics;
 
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Unit;
+import org.jscience.measure.Dimension;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.UnitConverter;
+
 import java.util.Objects;
 
 /**
- * Represents a monetary amount with currency.
- * <p>
+ * Represents a quantity of money with currency.
+ * Implements Quantity&lt;Money&gt; to allow integration with the measurement system.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Money {
+public class Money implements Quantity<Money> {
+    
+    public static final Dimension DIMENSION = Dimension.NONE;
+
     private final Real amount;
     private final Currency currency;
 
@@ -47,36 +56,134 @@ public class Money {
         this(amount, Currency.of(currencyCode));
     }
 
+    @Override
+    public Real getValue() {
+        return amount;
+    }
+
+    @Override
+    public Unit<Money> getUnit() {
+        return currency;
+    }
+
+    @Override
+    public Money to(Unit<Money> targetUnit) {
+        if (targetUnit.equals(currency)) {
+            return this;
+        }
+        UnitConverter converter = currency.getConverterTo(targetUnit);
+        Real newVal = converter.convert(amount);
+        if (targetUnit instanceof Currency) {
+            return new Money(newVal, (Currency) targetUnit);
+        }
+        // If converting to a generic Unit<Money>, we can't maintain Money class contract 
+        // unless we wrap it or Money supports generic units.
+        // But Money(Real, Currency) enforces Currency.
+        // So this might fail if targetUnit is not a Currency.
+        // However, for Money, Units ARE Currencies.
+        throw new IllegalArgumentException("Target unit must be a Currency");
+    }
+
+    @Override
+    public Money add(Quantity<Money> other) {
+        if (other.getUnit().equals(currency)) {
+            return new Money(amount.add(other.getValue()), currency);
+        }
+        return add(other.to(currency));
+    }
+
+    @Override
+    public Money subtract(Quantity<Money> other) {
+        if (other.getUnit().equals(currency)) {
+            return new Money(amount.subtract(other.getValue()), currency);
+        }
+        return subtract(other.to(currency));
+    }
+
+    public Money add(Money other) {
+        return add((Quantity<Money>) other);
+    }
+
+    public Money subtract(Money other) {
+        return subtract((Quantity<Money>) other);
+    }
+
+    @Override
+    public Money multiply(Real scalar) {
+        return new Money(amount.multiply(scalar), currency);
+    }
+    
+    // Covariant method for compatibility with existing code using double
+    public Money multiply(double scalar) {
+        return multiply(Real.of(scalar));
+    }
+
+    @Override
+    public <R extends Quantity<R>> Quantity<?> multiply(Quantity<R> other) {
+        double val = amount.multiply(other.getValue()).doubleValue();
+        Unit<?> unit = currency.multiply(other.getUnit());
+        return Quantities.create(val, unit);
+    }
+
+    @Override
+    public Money divide(Real scalar) {
+        return new Money(amount.divide(scalar), currency);
+    }
+    
+    public Money divide(double scalar) {
+        return divide(Real.of(scalar));
+    }
+
+    @Override
+    public <R extends Quantity<R>> Quantity<?> divide(Quantity<R> other) {
+        double val = amount.divide(other.getValue()).doubleValue();
+        Unit<?> unit = currency.divide(other.getUnit());
+        return Quantities.create(val, unit);
+    }
+
+    @Override
+    public Money abs() {
+        return new Money(amount.abs(), currency);
+    }
+
+    @Override
+    public Money negate() {
+        return new Money(amount.negate(), currency);
+    }
+
+    @Override
+    public int compareTo(Quantity<Money> other) {
+        return amount.compareTo(other.to(currency).getValue());
+    }
+
+    @Override
+    public boolean equals(Quantity<Money> other, Real tolerance) {
+         if (other == null) return false;
+         try {
+             return this.subtract(other).getValue().abs().compareTo(tolerance) <= 0;
+         } catch(Exception e) {
+             return false;
+         }
+    }
+
+    @Override
+    public Quantity<?> pow(int exponent) {
+        return Quantities.create(amount.pow(exponent).doubleValue(), currency.pow(exponent));
+    }
+
+    @Override
+    public Quantity<?> sqrt() {
+        return Quantities.create(amount.sqrt().doubleValue(), currency.sqrt());
+    }
+
+    // --- Legacy / Convenience Methods ---
+
     public Real getAmount() {
         return amount;
     }
 
     public Currency getCurrency() {
         return currency;
-    }
-
-    public Money add(Money other) {
-        requireSameCurrency(other);
-        return new Money(amount.add(other.amount), currency);
-    }
-
-    public Money subtract(Money other) {
-        requireSameCurrency(other);
-        return new Money(amount.subtract(other.amount), currency);
-    }
-
-    public Money multiply(Real factor) {
-        return new Money(amount.multiply(factor), currency);
-    }
-
-    public Money divide(Real divisor) {
-        return new Money(amount.divide(divisor), currency);
-    }
-
-    private void requireSameCurrency(Money other) {
-        if (!currency.getCode().equals(other.currency.getCode())) {
-            throw new IllegalArgumentException("Currency mismatch");
-        }
     }
 
     @Override
@@ -100,5 +207,3 @@ public class Money {
         return new Money(Real.of(amount), Currency.EUR);
     }
 }
-
-

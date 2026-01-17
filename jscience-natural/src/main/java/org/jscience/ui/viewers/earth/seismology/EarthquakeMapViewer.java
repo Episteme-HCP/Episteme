@@ -55,8 +55,19 @@ public class EarthquakeMapViewer extends MapViewer {
     private Label infoLabel;
     private long lastTime = 0;
 
+    private final org.jscience.ui.RealParameter minMagParam;
+
     public EarthquakeMapViewer() {
         super();
+        this.minMagParam = new org.jscience.ui.RealParameter(
+            "Min Magnitude",
+            org.jscience.ui.i18n.I18n.getInstance().get("viewer.earthquakemapviewer.param.minmag", "Min Magnitude"), 
+            org.jscience.mathematics.numbers.real.Real.of(0.0), 
+            org.jscience.mathematics.numbers.real.Real.of(9.0), 
+            org.jscience.mathematics.numbers.real.Real.of(0.1), 
+            org.jscience.mathematics.numbers.real.Real.of(0.0), 
+            v -> draw());
+        
         generateMockData();
         setupSidebar();
         
@@ -68,6 +79,8 @@ public class EarthquakeMapViewer extends MapViewer {
             
             boolean hover = false;
             for(Earthquake q : quakes) {
+                 if (q.getMag() < minMagParam.getValue().doubleValue()) continue;
+
                  double qx = lonToX(q.getLon()); double qy = latToY(q.getLat());
                  double size = Math.pow(q.getMag(), 1.5) * 2 * zoom;
                  if(Math.hypot(e.getX() - qx, e.getY() - qy) < size) {
@@ -88,6 +101,11 @@ public class EarthquakeMapViewer extends MapViewer {
         }.start();
     }
 
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return java.util.List.of(minMagParam);
+    }
+
     private void setupSidebar() {
         VBox sidebar = new VBox(10);
         sidebar.setPadding(new Insets(10));
@@ -96,6 +114,16 @@ public class EarthquakeMapViewer extends MapViewer {
 
         Label titleLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("earthquake.label.title", "Earthquake Map"));
         titleLabel.getStyleClass().add("header-label");
+        
+        // Add Slider/Control for Min Mag
+        VBox filterBox = new VBox(5);
+        Label filterLabel = new Label("Filter: Min Magnitude");
+        javafx.scene.control.Slider magSlider = new javafx.scene.control.Slider(0, 9, 0);
+        magSlider.setShowTickLabels(true);
+        magSlider.setShowTickMarks(true);
+        magSlider.valueProperty().addListener((o, old, v) -> minMagParam.setValue(org.jscience.mathematics.numbers.real.Real.of(v.doubleValue())));
+        
+        filterBox.getChildren().addAll(filterLabel, magSlider);
 
         Label explainLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("earthquake.explanation", "Real-time visualization of seismic activity."));
         explainLabel.setWrapText(true);
@@ -116,7 +144,7 @@ public class EarthquakeMapViewer extends MapViewer {
         infoLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("earthquake.hover", "Hover over a quake for info."));
         infoLabel.setWrapText(true);
 
-        sidebar.getChildren().addAll(titleLabel, new Separator(), explainLabel, new Separator(),
+        sidebar.getChildren().addAll(titleLabel, new Separator(), filterBox, new Separator(), explainLabel, new Separator(),
                 legendLabel, legend, new Separator(), coordLabel, infoLabel);
         
         setRight(sidebar);
@@ -131,7 +159,11 @@ public class EarthquakeMapViewer extends MapViewer {
 
     @Override
     protected void drawOverlay(GraphicsContext gc, double width, double height) {
+        double minMag = minMagParam.getValue().doubleValue();
+        
         for (Earthquake q : quakes) {
+            if (q.getMag() < minMag) continue;
+
             double x = lonToX(q.getLon());
             double y = latToY(q.getLat());
             if(x < -50 || x > width+50 || y < -50 || y > height+50) continue; // Cull

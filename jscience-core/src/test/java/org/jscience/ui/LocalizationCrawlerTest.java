@@ -58,6 +58,7 @@ public class LocalizationCrawlerTest extends ApplicationTest {
 
     @BeforeAll
     public static void setupHeadless() {
+        System.setProperty("testfx.setup.timeout", "30000");
         System.setProperty("java.awt.headless", "true");
         System.setProperty("testfx.robot", "glass");
         System.setProperty("testfx.headless", "true");

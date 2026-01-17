@@ -1,3 +1,25 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 package org.jscience.ui.viewers.history;
 
@@ -11,12 +33,15 @@ import org.jscience.history.HistoricalEvent;
 import org.jscience.history.Timeline;
 import org.jscience.history.FuzzyDate;
 import org.jscience.ui.i18n.I18n;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.ui.RealParameter;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
  * Generic Viewer for Timeline data.
+ * Refactored to use Real precision for dates (Years).
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -27,11 +52,11 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
     private Timeline timeline;
     private final Canvas canvas;
     private boolean logScale = false;
-    private double currentYearHighlight = 2025; // Default "Now"
+    private Real currentYearHighlight = Real.of(2025); // Default "Now"
     
     // Bounds
-    private double minYear = -10000;
-    private double maxYear = 2050;
+    private Real minYear = Real.of(-10000);
+    private Real maxYear = Real.of(2050);
 
     public TimelineViewer() {
         this.canvas = new Canvas(800, 200);
@@ -54,12 +79,11 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
     
     public void setLogScale(boolean logScale) {
         this.logScale = logScale;
-        // Adjust bounds for log?
         calculateBounds();
         draw();
     }
     
-    public void setCurrentYearHighlight(double year) {
+    public void setCurrentYearHighlight(Real year) {
         this.currentYearHighlight = year;
         draw();
     }
@@ -71,26 +95,16 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
         Optional<HistoricalEvent> last = timeline.getLatestEvent();
         
         if (first.isPresent() && last.isPresent()) {
-            minYear = getYearValue(first.get().getStartDate()) - 100;
-            maxYear = getYearValue(last.get().getEndDate()) + 100;
-            
-            // Fix min for log scale (cannot be <= 0 relative to "now" in years ago?)
-            // Kurzweil used Years Ago. Standard log timeline usually means Log(Time).
-            // But History is roughly linear.
-            // Kurzweil demo specifically did "Log Years Ago".
-            // If this is a generic Viewer, Log Scale typically implies Log Time? 
-            // Or maybe "Time since Big Bang"?
-            // If I stick to Kurzweil's logic "Log Years Ago", it's specific to "Backward looking".
-            // But generic Log Scale for history usually means compressing ancient history.
-            // I'll implement Log Scale as "SymLog" or simply "Log Years Ago" if logScale is true, 
-            // assuming the intent is to show ancient event density.
-            // For now, I'll stick to a standard Linear mapping, and if logScale is true, use a Log mapping of (Present - Year).
+            minYear = getYearValue(first.get().getStartDate()).subtract(Real.of(100));
+            maxYear = getYearValue(last.get().getEndDate()).add(Real.of(100));
         }
     }
     
-    private double getYearValue(FuzzyDate date) {
-        if (date == null || date.getYear() == null) return 0;
-        return date.isBce() ? -date.getYear() : date.getYear();
+    private Real getYearValue(FuzzyDate date) {
+        if (date == null || date.getYear() == null) return Real.ZERO;
+        double val = date.getYear().doubleValue();
+        if (date.isBce()) val = -val;
+        return Real.of(val);
     }
 
     private void draw() {
@@ -99,7 +113,7 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
         double h = canvas.getHeight();
         
         // Background
-        boolean isDark = true; // Hardcode dark for now or check ThemeManager
+        boolean isDark = true;
         Color bgColor = isDark ? Color.rgb(20, 20, 30) : Color.WHITE;
         gc.setFill(bgColor);
         gc.fillRect(0, 0, w, h);
@@ -120,51 +134,60 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
         // Draw Events
         List<HistoricalEvent> events = timeline.getEvents();
         
-        // Pre-calc log parameters if needed
-        double logMin = 0;
-        double logMax = 0;
-        double present = 2025; // Reference frame
+        // Pre-calc log parameters
+        Real logMin = Real.ZERO;
+        Real logMax = Real.ZERO;
+        Real present = Real.of(2025);
         
         if (logScale) {
-             // Logic from KurzweilDemo: Log(Years Ago)
-             // Find max years ago
-             double oldest = minYear;
-             double maxAgo = Math.max(1, present - oldest);
-             logMax = Math.log(maxAgo);
-             logMin = Math.log(1); // 1 year ago
+             Real oldest = minYear;
+             // maxAgo = max(1, present - oldest)
+             Real diff = present.subtract(oldest);
+             Real maxAgo = (diff.compareTo(Real.ONE) > 0) ? diff : Real.ONE;
+             
+             logMax = maxAgo.log();
+             logMin = Real.ONE.log(); // ln(1) = 0
         }
 
         for (HistoricalEvent e : events) {
-            double year = getYearValue(e.getStartDate());
+            Real year = getYearValue(e.getStartDate());
             double x;
             
             if (logScale) {
-                double yearsAgo = Math.max(1, present - year);
-                double logY = Math.log(yearsAgo);
-                // Map logY [logMin, logMax] to x [w-30, 30] (Recently is on right)
-                // logMax (oldest) -> Left (30)
-                // logMin (recent) -> Right (w-30)
-                double ratio = (logY - logMin) / (logMax - logMin); 
-                x = (w - 30) - (ratio * (w - 60));
+                Real diff = present.subtract(year);
+                Real yearsAgo = (diff.compareTo(Real.ONE) > 0) ? diff : Real.ONE;
+                Real logY = yearsAgo.log();
+                
+                // ratio = (logY - logMin) / (logMax - logMin)
+                Real div = logMax.subtract(logMin);
+                Real ratio = (div.equals(Real.ZERO)) ? Real.ZERO : logY.subtract(logMin).divide(div);
+                
+                // x = (w - 30) - (ratio * (w - 60))
+                double r = ratio.doubleValue();
+                x = (w - 30) - (r * (w - 60));
             } else {
-                // Linear: minYear -> 30, maxYear -> w-30
-                double ratio = (year - minYear) / (maxYear - minYear);
-                x = 30 + ratio * (w - 60);
+                // Linear: ratio = (year - min) / (max - min)
+                Real range = maxYear.subtract(minYear);
+                Real ratio = (range.equals(Real.ZERO)) ? Real.ZERO : year.subtract(minYear).divide(range);
+                double r = ratio.doubleValue();
+                x = 30 + r * (w - 60);
             }
             
             // Draw Event Marker
-            // Color logic: Current vs Past
-            boolean isPast = year <= currentYearHighlight;
+            boolean isPast = year.compareTo(currentYearHighlight) <= 0;
             
+            gc.setFill(isPast ? Color.CYAN : Color.ORANGE);
+            
+            double size = 8;
             if (logScale) {
-                 // Kurzweil colors
-                 double yearsAgo = present - year;
-                 gc.setFill(yearsAgo < 50 ? Color.YELLOW : (yearsAgo < 150 ? Color.ORANGE : Color.DARKORANGE));
-            } else {
-                 gc.setFill(isPast ? Color.CYAN : Color.ORANGE);
+                 Real diff = present.subtract(year);
+                 Real yearsAgo = (diff.compareTo(Real.ONE) > 0) ? diff : Real.ONE;
+                 // size logic: 6 + (1 - log/logMax)*6
+                 double logVal = yearsAgo.log().doubleValue();
+                 double logMaxVal = logMax.doubleValue();
+                 size = 6 + (1 - (logVal / (logMaxVal == 0 ? 1 : logMaxVal))) * 6;
             }
             
-            double size = logScale ? (6 + (1 - (Math.log(Math.max(1, present-year)) / logMax)) * 6) : 8;
             gc.fillOval(x - size/2, cy - size/2, size, size);
             
             // Label
@@ -173,21 +196,11 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
             gc.save();
             gc.translate(x, cy - 12);
             gc.rotate(-45);
-            // Translate I18n label if possible, here we assume event name is key or label
-            // HistoricalEvent name might be key
             String label = e.getName();
-            // Try I18n?
-            // Try I18n translation without checking prefix
             label = org.jscience.ui.i18n.I18n.getInstance().get(label, label);
-            
             gc.fillText(label, 0, 0);
             gc.restore();
         }
-        
-        // Axis Labels (Simplified)
-        gc.setFill(Color.GRAY);
-        gc.setFont(Font.font("System", 10));
-        // ... (Implement axis ticks if time permits, skipping for brevity to focus on data)
     }
 
     @Override
@@ -218,27 +231,31 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
     public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
         java.util.List<org.jscience.ui.Parameter<?>> parameters = new java.util.ArrayList<>();
         
-        // Defaults from jscience.properties
-        double defMin = org.jscience.io.Configuration.getDouble("viewer.timelineviewer.default.start", -10000);
-        double defMax = org.jscience.io.Configuration.getDouble("viewer.timelineviewer.default.end", 2050);
+        Real defMin = Real.of(org.jscience.io.Configuration.getDouble("viewer.timelineviewer.default.start", -10000));
+        Real defMax = Real.of(org.jscience.io.Configuration.getDouble("viewer.timelineviewer.default.end", 2050));
         
-        // Initialize local vars if strictly default (or if not set by data yet)
-        if (minYear == -10000) minYear = defMin;
-        if (maxYear == 2050) maxYear = defMax;
+        if (minYear.equals(Real.of(-10000))) minYear = defMin;
+        if (maxYear.equals(Real.of(2050))) maxYear = defMax;
 
-        parameters.add(new org.jscience.ui.NumericParameter("viewer.timelineviewer.param.start",
+        parameters.add(new RealParameter("viewer.timelineviewer.param.start",
                 org.jscience.ui.i18n.I18n.getInstance().get("viewer.timelineviewer.param.start.desc", "Start Year"),
-                minYear - 10000, maxYear, 100, minYear,
+                minYear.subtract(Real.of(10000)), 
+                maxYear, 
+                Real.of(100), 
+                minYear,
                 v -> {
-                    this.minYear = v.doubleValue();
+                    this.minYear = v;
                     draw();
                 }));
 
-        parameters.add(new org.jscience.ui.NumericParameter("viewer.timelineviewer.param.end",
+        parameters.add(new RealParameter("viewer.timelineviewer.param.end",
                 org.jscience.ui.i18n.I18n.getInstance().get("viewer.timelineviewer.param.end.desc", "End Year"),
-                minYear, maxYear + 10000, 100, maxYear,
+                minYear, 
+                maxYear.add(Real.of(10000)), 
+                Real.of(100), 
+                maxYear,
                 v -> {
-                    this.maxYear = v.doubleValue();
+                    this.maxYear = v;
                     draw();
                 }));
                 

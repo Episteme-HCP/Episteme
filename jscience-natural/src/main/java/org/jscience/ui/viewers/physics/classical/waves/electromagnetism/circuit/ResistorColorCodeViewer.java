@@ -52,6 +52,11 @@ public class ResistorColorCodeViewer extends org.jscience.ui.AbstractViewer {
     public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.resistorcolorcodeviewer.name", "Resistor Color Code"); }
 
 
+    private final org.jscience.ui.Parameter<String> band1Param;
+    private final org.jscience.ui.Parameter<String> band2Param;
+    private final org.jscience.ui.Parameter<String> band3Param;
+    private final org.jscience.ui.Parameter<String> band4Param;
+
     private final ComboBox<String> band1 = new ComboBox<>();
     private final ComboBox<String> band2 = new ComboBox<>();
     private final ComboBox<String> band3 = new ComboBox<>(); // Multiplier
@@ -81,7 +86,16 @@ public class ResistorColorCodeViewer extends org.jscience.ui.AbstractViewer {
     }
 
     public ResistorColorCodeViewer() {
+        this.band1Param = new org.jscience.ui.Parameter<>("Band 1", "First Band", "Brown", v -> calculate());
+        this.band2Param = new org.jscience.ui.Parameter<>("Band 2", "Second Band", "Black", v -> calculate());
+        this.band3Param = new org.jscience.ui.Parameter<>("Multiplier", "Multiplier Band", "Red", v -> calculate());
+        this.band4Param = new org.jscience.ui.Parameter<>("Tolerance", "Tolerance Band", "Gold", v -> calculate());
         initUI();
+    }
+
+    @Override
+    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+        return java.util.List.of(band1Param, band2Param, band3Param, band4Param);
     }
 
     private void initUI() {
@@ -105,23 +119,19 @@ public class ResistorColorCodeViewer extends org.jscience.ui.AbstractViewer {
 
         // Controls
         HBox controls = new HBox(10);
-        setupComboBox(band1);
-        setupComboBox(band2);
-        setupComboBox(band3); // Multiplier
+        setupComboBox(band1, band1Param);
+        setupComboBox(band2, band2Param);
+        setupComboBox(band3, band3Param); // Multiplier
         // Tolerance (Simplified)
         band4.getItems().addAll("Gold", "Silver");
-        band4.setValue("Gold");
+        band4.setValue(band4Param.getValue());
+        band4.setOnAction(e -> band4Param.setValue(band4.getValue()));
+        // Note: Bi-directional binding purely by listeners here logic handled in setupComboBox for others
+        
         colorMap.put("Gold", Color.GOLD);
         colorMap.put("Silver", Color.SILVER);
 
         controls.getChildren().addAll(band1, band2, band3, band4);
-
-        // Listener
-        Runnable update = this::calculate;
-        band1.setOnAction(e -> update.run());
-        band2.setOnAction(e -> update.run());
-        band3.setOnAction(e -> update.run());
-        band4.setOnAction(e -> update.run());
 
         calculate();
 
@@ -129,16 +139,23 @@ public class ResistorColorCodeViewer extends org.jscience.ui.AbstractViewer {
         this.setCenter(root);
     }
 
-    private void setupComboBox(ComboBox<String> cb) {
+    private void setupComboBox(ComboBox<String> cb, org.jscience.ui.Parameter<String> param) {
         cb.getItems().addAll(COLORS);
-        cb.setValue("Brown");
+        cb.setValue(param.getValue());
+        cb.setOnAction(e -> param.setValue(cb.getValue()));
+        // We can't add a listener to param here easily because Parameter only supports one consumer (ctor).
+        // BUT calculate() is the consumer. It reads params.
+        // Does it update ComboBoxes? No.
+        // If external source updates param, ComboBox won't update.
+        // This is a limitation of the current Parameter API (single consumer).
+        // Since we don't expect external updates in this viewer, it's fine.
     }
 
     private void calculate() {
-        String c1 = band1.getValue();
-        String c2 = band2.getValue();
-        String c3 = band3.getValue();
-        String c4 = band4.getValue();
+        String c1 = band1Param.getValue();
+        String c2 = band2Param.getValue();
+        String c3 = band3Param.getValue();
+        String c4 = band4Param.getValue();
 
         r1.setFill(colorMap.get(c1));
         r2.setFill(colorMap.get(c2));

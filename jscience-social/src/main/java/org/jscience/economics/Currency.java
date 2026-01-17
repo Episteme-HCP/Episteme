@@ -23,27 +23,28 @@
 
 package org.jscience.economics;
 
+import org.jscience.measure.Unit;
+import org.jscience.measure.StandardUnit;
+import org.jscience.measure.UnitConverter;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Represents a currency with ISO 4217 code.
+ * Implements Unit&lt;Money&gt; to allow integration with the measurement system.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Currency implements org.jscience.util.identity.Identifiable<String> {
+public class Currency extends StandardUnit<Money> implements org.jscience.util.identity.Identifiable<String> {
 
     private final String code; // ISO 4217 code (e.g., "USD")
-    private final String name; // Full name (e.g., "US Dollar")
-    private final String symbol; // Symbol (e.g., "$")
     private final int decimals; // Minor unit decimals
 
     public Currency(String code, String name, String symbol, int decimals) {
+        super(symbol, name, Money.DIMENSION);
         this.code = code;
-        this.name = name;
-        this.symbol = symbol;
         this.decimals = decimals;
     }
 
@@ -56,14 +57,6 @@ public class Currency implements org.jscience.util.identity.Identifiable<String>
         return code;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getSymbol() {
-        return symbol;
-    }
-
     public int getDecimals() {
         return decimals;
     }
@@ -72,16 +65,38 @@ public class Currency implements org.jscience.util.identity.Identifiable<String>
     public String toString() {
         return code;
     }
+    
+    @Override
+    public UnitConverter getConverterTo(Unit<Money> target) {
+        if (this.equals(target)) {
+            return UnitConverter.identity();
+        }
+        throw new UnsupportedOperationException("Currency conversion between " + this.code + " and " + target + " requires an explicit Exchange Rate.");
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Currency)) return false;
+        Currency other = (Currency) obj;
+        return code.equals(other.code);
+    }
+
+    @Override
+    public int hashCode() {
+        return code.hashCode();
+    }
+    
+    // --- Flyweight Registry ---
 
     // Common currencies
     public static final Currency USD = new Currency("USD", "US Dollar", "$", 2);
-    public static final Currency EUR = new Currency("EUR", "Euro", "Ã¢â€šÂ¬", 2);
-    public static final Currency GBP = new Currency("GBP", "British Pound", "Ã‚Â£", 2);
-    public static final Currency JPY = new Currency("JPY", "Japanese Yen", "Ã‚Â¥", 0);
-    public static final Currency CNY = new Currency("CNY", "Chinese Yuan", "Ã‚Â¥", 2);
+    public static final Currency EUR = new Currency("EUR", "Euro", "€", 2);
+    public static final Currency GBP = new Currency("GBP", "British Pound", "£", 2);
+    public static final Currency JPY = new Currency("JPY", "Japanese Yen", "¥", 0);
+    public static final Currency CNY = new Currency("CNY", "Chinese Yuan", "¥", 2);
     public static final Currency CHF = new Currency("CHF", "Swiss Franc", "CHF", 2);
 
-    // Registry for flyweight pattern
     private static final Map<String, Currency> CACHE = new HashMap<>();
 
     static {
@@ -100,5 +115,3 @@ public class Currency implements org.jscience.util.identity.Identifiable<String>
         return CACHE.computeIfAbsent(upper, c -> new Currency(c, c, c, 2));
     }
 }
-
-
