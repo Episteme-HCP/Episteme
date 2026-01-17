@@ -23,109 +23,78 @@
 
 package org.jscience.ui;
 
-import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
-import javafx.scene.control.Slider;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import org.jscience.ui.i18n.I18n;
+import javafx.scene.control.Button;
+import javafx.scene.control.Separator;
+import javafx.scene.control.ToolBar;
+import javafx.scene.layout.VBox;
 
 /**
- * Base class for simulation-based demos with VCR controls.
- *
+ * Abstract base class for simulation demos that require playback controls.
+ * It implements Simulatable by delegating to the viewer (if applicable).
+ * Subclasses can override these methods if they manage simulation logic differently.
+ * 
  * @author Silvere Martin-Michiellot
- * <p>
- * <b>Reference:</b><br>
- * Zeigler, B. P., Praehofer, H., & Kim, T. G. (2000). <i>Theory of Modeling and Simulation</i>. Academic Press.
- * </p>
- *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public abstract class AbstractSimulationDemo extends AbstractDemo implements Simulatable {
 
-    protected Button playBtn;
-    protected Button pauseBtn;
-    protected Button stopBtn;
-    protected Button stepBtn;
+    @Override
+    protected VBox createControlPanel() {
+        VBox panel = super.createControlPanel();
+        
+        ToolBar toolbar = new ToolBar();
+        Button btnPlay = new Button(I18n.getInstance().get("demo.control.play", "Play"));
+        Button btnPause = new Button(I18n.getInstance().get("demo.control.pause", "Pause"));
+        Button btnStop = new Button(I18n.getInstance().get("demo.control.stop", "Reset"));
+        
+        btnPlay.setOnAction(e -> play());
+        btnPause.setOnAction(e -> pause());
+        btnStop.setOnAction(e -> stop());
+        
+        toolbar.getItems().addAll(btnPlay, btnPause, btnStop);
+        
+        // Insert at top of control panel
+        if (!panel.getChildren().isEmpty()) {
+             panel.getChildren().add(0, new Separator());
+             panel.getChildren().add(0, toolbar);
+        } else {
+             panel.getChildren().add(toolbar);
+        }
+        
+        return panel;
+    }
+
+    // Default delegation to viewer
     @Override
     public void play() {
-        if (viewer instanceof Simulatable simulatable) {
-            simulatable.play();
-        }
+        if (viewer instanceof Simulatable) ((Simulatable) viewer).play();
     }
 
     @Override
     public void pause() {
-        if (viewer instanceof Simulatable simulatable) {
-            simulatable.pause();
-        }
+        if (viewer instanceof Simulatable) ((Simulatable) viewer).pause();
     }
 
     @Override
     public void stop() {
-        if (viewer instanceof Simulatable simulatable) {
-            simulatable.stop();
-        }
+        if (viewer instanceof Simulatable) ((Simulatable) viewer).stop();
     }
-
+    
     @Override
     public void step() {
-        if (viewer instanceof Simulatable simulatable) {
-            simulatable.step();
-        }
-    }
-
-    @Override
-    public void setSpeed(double multiplier) {
-        if (viewer instanceof Simulatable simulatable) {
-            simulatable.setSpeed(multiplier);
-        }
+        if (viewer instanceof Simulatable) ((Simulatable) viewer).step();
     }
 
     @Override
     public boolean isPlaying() {
-        if (viewer instanceof Simulatable simulatable) {
-            return simulatable.isPlaying();
-        }
+        if (viewer instanceof Simulatable) return ((Simulatable) viewer).isPlaying();
         return false;
     }
-    protected VBox createControlPanel() {
-        VBox panel = super.createControlPanel();
 
-        if (viewer instanceof Simulatable simulatable) {
-            panel.getChildren().add(new Separator());
-
-            Label simTitle = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.simulation.title", "Simulation Control"));
-            simTitle.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
-            panel.getChildren().add(simTitle);
-
-            HBox vcrControls = new HBox(5);
-            vcrControls.setAlignment(Pos.CENTER);
-
-            playBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.abstractsimulation.", "Ã¢â€“Â¶"));
-            pauseBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.abstractsimulation..1", "Ã¢ÂÂ¸"));
-            stopBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.abstractsimulation..2", "Ã¢ÂÂ¹"));
-            stepBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.abstractsimulation..3", "Ã¢ÂÂ­"));
-
-            playBtn.setOnAction(e -> simulatable.play());
-            pauseBtn.setOnAction(e -> simulatable.pause());
-            stopBtn.setOnAction(e -> simulatable.stop());
-            stepBtn.setOnAction(e -> simulatable.step());
-
-            vcrControls.getChildren().addAll(playBtn, pauseBtn, stopBtn, stepBtn);
-            panel.getChildren().add(vcrControls);
-
-            // Speed control
-            Label speedLbl = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.simulation.speed", "Speed:"));
-            Slider speedSlider = new Slider(0.1, 5.0, 1.0);
-            speedSlider.valueProperty()
-                    .addListener((obs, oldVal, newVal) -> simulatable.setSpeed(newVal.doubleValue()));
-            panel.getChildren().addAll(speedLbl, speedSlider);
-        }
-
-        return panel;
+    @Override
+    public void setSpeed(double speed) {
+        if (viewer instanceof Simulatable) ((Simulatable) viewer).setSpeed(speed);
     }
 }

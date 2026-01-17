@@ -53,6 +53,11 @@ public class FunctionExplorer2DViewer extends AbstractViewer {
         this(DEFAULT_FX, DEFAULT_GX);
     }
 
+    public FunctionExplorer2DViewer(String... functions) {
+        this(functions.length > 0 ? functions[0] : DEFAULT_FX,
+             functions.length > 1 ? functions[1] : DEFAULT_GX);
+    }
+
     public FunctionExplorer2DViewer(String defaultF, String defaultG) {
         // Initialize Parameters
         // We define a shared update/plot trigger
@@ -83,8 +88,6 @@ public class FunctionExplorer2DViewer extends AbstractViewer {
 
     private void initUI() {
         SplitPane layout = new SplitPane();
-        I18n i18n = org.jscience.ui.i18n.I18n.getInstance();
-
         // --- Sidebar ---
         VBox sidebar = new VBox(15);
         sidebar.setPadding(new Insets(15));
