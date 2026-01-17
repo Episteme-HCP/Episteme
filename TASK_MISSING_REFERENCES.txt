@@ -1,0 +1,152 @@
+Candidates for Scientific Referencing (Missing Javadoc References)
+===============================================================
+
+[Named Algo: NBody] C:\Silvere\Encours\Developpement\JScience\jscience-benchmarks\src\main\java\org\jscience\benchmark\NBodyBenchmark.java
+[Named Algo: NBody] C:\Silvere\Encours\Developpement\JScience\jscience-benchmarks\src\main\java\org\jscience\benchmark\NBodyRegularBenchmark.java
+[Named Algo: MonteCarlo] C:\Silvere\Encours\Developpement\JScience\jscience-client\src\main\java\org\jscience\client\mathematics\montecarlopi\DistributedMonteCarloPiApp.java
+[Named Algo: NBody] C:\Silvere\Encours\Developpement\JScience\jscience-client\src\main\java\org\jscience\client\physics\nbody\DistributedNBodyApp.java
+[Named Algo: Ford] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\algebra\algebras\CliffordAlgebra.java
+[Named Algo: Gauss] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\analysis\integration\GaussLegendre.java
+[Named Algo: Verlet] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\analysis\ode\VerletIntegrator.java
+[Named Algo: Prim] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\analysis\series\PrimeSequence.java
+[Named Algo: Fourier] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\analysis\transform\DiscreteFourierTransform.java
+[Named Algo: Gradient] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\analysis\vectorcalculus\Gradient.java
+[Named Algo: Bellman, Ford] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\discrete\BellmanFordShortestPath.java
+[Named Algo: Dijkstra] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\discrete\DijkstraShortestPath.java
+[Named Algo: Floyd, Warshall] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\discrete\FloydWarshallShortestPath.java
+[Named Algo: Kruskal] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\discrete\KruskalMinimumSpanningTree.java
+[Named Algo: Prim] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\discrete\PrimMinimumSpanningTree.java
+[Named Algo: Gradient] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\linearalgebra\matrices\solvers\sparse\ConjugateGradient.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\logic\predicate\Quantifier.java
+[Named Algo: Prim] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\numbertheory\PrimeSieve.java
+[Named Algo: BFGS] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\optimization\BFGSOptimizer.java
+[Named Algo: BFGS] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\optimization\LBFGSOptimizer.java
+[Named Algo: Levenberg, Marquardt] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\optimization\LevenbergMarquardt.java
+[Named Algo: Poisson] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\statistics\distributions\PoissonDistribution.java
+[Named Algo: MonteCarlo] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\statistics\montecarlo\MonteCarloIntegration.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\symbolic\ConstantExpression.java
+[Named Algo: Simplex] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\topology\Simplex.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\measure\Quantities.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\measure\Quantity.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\measure\QuantityCapable.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\measure\QuantityUtils.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\measure\StandardQuantity.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\measure\adapters\RealQuantityAdapter.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\measure\metrology\MeasuredQuantities.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\measure\metrology\SimpleMeasuredQuantity.java
+[Named Algo: NBody] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\technical\backend\algorithms\CUDANBodyProvider.java
+[Named Algo: MonteCarlo] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\technical\backend\algorithms\MonteCarloPiProvider.java
+[Named Algo: MonteCarlo] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\technical\backend\algorithms\MonteCarloProvider.java
+[Named Algo: MonteCarlo] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\technical\backend\algorithms\MulticoreMonteCarloPiProvider.java
+[Named Algo: Navier, Stokes] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\technical\backend\algorithms\MulticoreNavierStokesProvider.java
+[Named Algo: NBody] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\technical\backend\algorithms\MulticoreNBodyProvider.java
+[Named Algo: Navier, Stokes] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\technical\backend\algorithms\NavierStokesProvider.java
+[Named Algo: NBody] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\technical\backend\algorithms\NBodyProvider.java
+[Named Algo: Lorenz] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\ui\demos\LorenzDemo.java
+[Named Algo: Lorenz] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\ui\viewers\mathematics\analysis\chaos\LorenzViewer.java
+[Named Algo: Bellman, Ford] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\test\java\org\jscience\mathematics\discrete\BellmanFordTest.java
+[Named Algo: Dijkstra] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\test\java\org\jscience\mathematics\discrete\DijkstraTest.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\test\java\org\jscience\measure\QuantitiesTest.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-featured-apps\src\main\java\org\jscience\apps\physics\QuantumCircuitApp.java
+[Named Algo: Genetic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\biology\genetics\PopulationGenetics.java
+[Named Algo: Genetic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\biology\io\PhylogeneticTreeReader.java
+[Named Algo: Evolutionary] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\computing\ai\evolutionary\EvolutionaryOptimizer.java
+[Named Algo: Genetic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\computing\ai\gp\GeneticProgramming.java
+[Named Algo: Swarm] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\computing\ai\swarm\ParticleSwarmOptimization.java
+[Named Algo: Hamilton] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\HamiltonianMechanics.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\NISTConstantsProvider.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\PhysicalConstant.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\PhysicalConstants.java
+[Named Algo: Navier, Stokes] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\classical\matter\fluids\NavierStokesSolver.java
+[Named Algo: Newton] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\classical\mechanics\NewtonianMechanics.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\classical\thermodynamics\EquilibriumConstant.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\classical\thermodynamics\VantHoff.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\loaders\fits\FITSConstants.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\quantum\QuantumBackend.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\quantum\QuantumCircuit.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\quantum\QuantumContext.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\quantum\QuantumGate.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\quantum\QuantumGateType.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\quantum\QuantumHarmonicOscillator.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\quantum\QuantumMechanics.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\quantum\QuantumRegister.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\quantum\backends\AmazonBraketQuantumProvider.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\quantum\backends\QiskitQuantumProvider.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\quantum\backends\Quantum4JQuantumProvider.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\quantum\backends\StrangeQuantumProvider.java
+[Named Algo: Game] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\demos\GameOfLifeDemo.java
+[Named Algo: Genetic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\demos\GeneticAlgorithmDemo.java
+[Named Algo: Genetic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\demos\GeneticsDemo.java
+[Named Algo: NBody] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\demos\HumanBodyDemo.java
+[Named Algo: Lorenz] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\demos\LorenzDemo.java
+[Named Algo: Lotka, Volterra] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\demos\LotkaVolterraDemo.java
+[Named Algo: Newton] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\demos\NewtonianMechanicsLabDemo.java
+[Named Algo: Genetic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\demos\PhylogeneticTreeDemo.java
+[Named Algo: Lotka, Volterra] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\viewers\biology\ecology\LotkaVolterraViewer.java
+[Named Algo: Genetic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\viewers\biology\genetics\GeneticsViewer.java
+[Named Algo: Genetic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\viewers\biology\phylogeny\PhylogeneticTreeViewer.java
+[Named Algo: NBody] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\viewers\medicine\anatomy\HumanBodyViewer.java
+[Named Algo: Prim] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\viewers\physics\astronomy\PrimitiveGalaxySimulator.java
+[Named Algo: Prim] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\viewers\physics\classical\matter\fluids\PrimitiveFluidSolver.java
+[Named Algo: Prim] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\viewers\physics\classical\waves\PrimitiveSpectrumAnalysisProvider.java
+[Named Algo: Prim] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\viewers\physics\classical\waves\PrimitiveSpectrumProvider.java
+[Named Algo: Genetic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\test\java\org\jscience\biology\evolution\GeneticAlgorithmTest.java
+[Named Algo: Prim] C:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\chemistry\MolecularDynamicsPrimitiveSupport.java
+[Named Algo: Prim] C:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\earth\climate\GCMPrimitiveSupport.java
+[Named Algo: Prim] C:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\mathematics\mandelbrot\MandelbrotPrimitiveSupport.java
+[Named Algo: MonteCarlo, Prim] C:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\mathematics\montecarlo\MonteCarloPiPrimitiveSupport.java
+[Named Algo: MonteCarlo] C:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\mathematics\montecarlo\MonteCarloPiTask.java
+[Named Algo: MonteCarlo] C:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\mathematics\montecarlo\MonteCarloTask.java
+[Named Algo: Prim] C:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\physics\fluid\FluidSimPrimitiveSupport.java
+[Named Algo: NBody] C:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\physics\nbody\NBodyTask.java
+[Named Algo: Prim] C:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\physics\wave\WaveSimPrimitiveSupport.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\constants\HTTPConstants.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\constants\SchedulingConstants.java
+[Named Algo: Ant] C:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\constants\ServiceConstants.java
+
+Generic Logic Classes (Review needed):
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\analysis\fem\FEMSolver.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\analysis\pde\HeatEquationSolver.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\analysis\signal\DigitalFilters.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\linearalgebra\matrices\solvers\MatrixSolver.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\optimization\Optimizer.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\statistics\timeseries\KalmanFilter.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\symbolic\SimplificationEngine.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\topology\MetricSpace.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\topology\metrics\ChebyshevMetric.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\topology\metrics\CosineMetric.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\topology\metrics\EuclideanMetric.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\topology\metrics\MahalanobisMetric.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\topology\metrics\ManhattanMetric.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\mathematics\topology\metrics\MinkowskiMetric.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\technical\backend\AlgorithmProvider.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\ui\AbstractSimulationDemo.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\main\java\org\jscience\ui\api\SimulationController.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\test\java\org\jscience\mathematics\linearalgebra\SolverTest.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-core\src\test\java\org\jscience\mathematics\optimization\OptimizerTest.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\chemistry\kinetics\CatalysiModels.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\medicine\anthropometry\BodyMetrics.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\medicine\epidemiology\SEIRModel.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\medicine\epidemiology\SEIRSModel.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\medicine\epidemiology\SIRModel.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\astronomy\mechanics\OrbitSolver.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\classical\matter\fluids\KEpsilonModel.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\classical\waves\electromagnetism\field\MaxwellSolver.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\classical\waves\optics\AberrationModel.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\relativity\SchwarzschildMetric.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\physics\relativity\SpacetimeMetric.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\demos\ClothSimulationDemo.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\viewers\physics\classical\matter\fluids\FluidSolver.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\main\java\org\jscience\ui\viewers\physics\classical\matter\fluids\ObjectFluidSolver.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\test\java\org\jscience\chemistry\ChemicalModelTest.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\test\java\org\jscience\medicine\epidemiology\SIRModelTest.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\test\java\org\jscience\physics\astrophysics\OrbitSolverTest.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-natural\src\test\java\org\jscience\physics\relativity\SpacetimeMetricTest.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\earth\climate\GeneralCirculationModelTask.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\politics\GeopoliticalEngineTask.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\metrics\MetricsExporter.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\metrics\MetricsInterceptor.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\metrics\MetricsRegistry.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-server\src\main\java\org\jscience\server\workflow\WorkflowEngine.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-social\src\main\java\org\jscience\economics\MacroModel.java
+[Logic] C:\Silvere\Encours\Developpement\JScience\jscience-social\src\test\java\org\jscience\social\SimulationEnginesTest.java

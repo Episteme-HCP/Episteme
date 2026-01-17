@@ -25,6 +25,12 @@ package org.jscience.biology.genetics;
 
 /**
  * Pairwise Sequence Alignment using Needleman-Wunsch algorithm.
+ * <p>
+ * <b>Reference:</b><br>
+ * Needleman, S. B., & Wunsch, C. D. (1970). A general method applicable to the search 
+ * for similarities in the amino acid sequence of two proteins. 
+ * <i>Journal of Molecular Biology</i>, 48(3), 443-453.
+ * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
