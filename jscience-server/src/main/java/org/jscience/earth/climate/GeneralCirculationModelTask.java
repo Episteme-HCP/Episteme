@@ -28,6 +28,12 @@ import org.jscience.distributed.TaskRegistry;
 
 /**
  * Advanced General Circulation Model (GCM) Task.
+ 
+ * <p>
+ * <b>Reference:</b><br>
+ * Zeigler, B. P., Praehofer, H., & Kim, T. G. (2000). <i>Theory of Modeling and Simulation</i>. Academic Press.
+ * </p>
+ *
  */
 public class GeneralCirculationModelTask
         implements DistributedTask<GeneralCirculationModelTask, GeneralCirculationModelTask> {

@@ -1,0 +1,49 @@
+Algorithm Duplication Audit Report
+==================================
+Files matching algorithmic keywords in different modules:
+
+[AStar] matches 3 files:
+  - jscience-core\src\main\java\org\jscience\mathematics\discrete\AStarHeuristic.java
+  - jscience-core\src\main\java\org\jscience\mathematics\discrete\AStarSearch.java
+  - jscience-natural\src\main\java\org\jscience\biology\loaders\FASTAReader.java
+
+[Alignment] matches 3 files:
+  - jscience-natural\src\main\java\org\jscience\biology\genetics\SequenceAlignment.java
+  - jscience-natural\src\main\java\org\jscience\ui\demos\SequenceAlignmentDemo.java
+  - jscience-natural\src\test\java\org\jscience\biology\genetics\SequenceAlignmentTest.java
+
+[Dijkstra] matches 2 files:
+  - jscience-core\src\main\java\org\jscience\mathematics\discrete\DijkstraShortestPath.java
+  - jscience-core\src\test\java\org\jscience\mathematics\discrete\DijkstraTest.java
+
+[Genetic] matches 11 files:
+  - jscience-natural\src\main\java\org\jscience\computing\ai\ga\GeneticAlgorithm.java
+  - jscience-natural\src\main\java\org\jscience\ui\demos\GeneticAlgorithmDemo.java
+  - jscience-natural\src\test\java\org\jscience\biology\evolution\GeneticAlgorithmTest.java
+  - jscience-natural\src\main\java\org\jscience\computing\ai\gp\GeneticProgramming.java
+  - jscience-natural\src\main\java\org\jscience\ui\demos\GeneticsDemo.java
+  - jscience-natural\src\main\java\org\jscience\ui\viewers\biology\genetics\GeneticsViewer.java
+  - jscience-natural\src\main\java\org\jscience\biology\phylogeny\PhylogeneticTree.java
+  - jscience-natural\src\main\java\org\jscience\ui\demos\PhylogeneticTreeDemo.java
+  - jscience-natural\src\main\java\org\jscience\biology\io\PhylogeneticTreeReader.java
+  - jscience-natural\src\main\java\org\jscience\ui\viewers\biology\phylogeny\PhylogeneticTreeViewer.java
+  - jscience-natural\src\main\java\org\jscience\biology\genetics\PopulationGenetics.java
+
+[Navier] matches 3 files:
+  - jscience-core\src\main\java\org\jscience\technical\backend\algorithms\MulticoreNavierStokesProvider.java
+  - jscience-core\src\main\java\org\jscience\technical\backend\algorithms\NavierStokesProvider.java
+  - jscience-natural\src\main\java\org\jscience\physics\classical\matter\fluids\NavierStokesSolver.java
+
+[Newton] matches 2 files:
+  - jscience-natural\src\main\java\org\jscience\physics\classical\mechanics\NewtonianMechanics.java
+  - jscience-natural\src\main\java\org\jscience\ui\demos\NewtonianMechanicsLabDemo.java
+
+[Stokes] matches 3 files:
+  - jscience-core\src\main\java\org\jscience\technical\backend\algorithms\MulticoreNavierStokesProvider.java
+  - jscience-core\src\main\java\org\jscience\technical\backend\algorithms\NavierStokesProvider.java
+  - jscience-natural\src\main\java\org\jscience\physics\classical\matter\fluids\NavierStokesSolver.java
+
+[Verlet] matches 2 files:
+  - jscience-natural\src\main\java\org\jscience\physics\classical\mechanics\VelocityVerlet.java
+  - jscience-core\src\main\java\org\jscience\mathematics\analysis\ode\VerletIntegrator.java
+

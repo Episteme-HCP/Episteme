@@ -45,6 +45,11 @@ import org.jscience.measure.quantity.Dimensionless;
  * Lotka-Volterra Predator-Prey Dynamics Simulation.
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Lotka, A. J. (1925). <i>Elements of Physical Biology</i>. Williams & Wilkins.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

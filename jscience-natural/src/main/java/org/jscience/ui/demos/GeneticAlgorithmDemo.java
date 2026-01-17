@@ -46,6 +46,11 @@ import java.util.Random;
  * Genetic Algorithm Demo.
  * 
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Holland, J. H. (1975). <i>Adaptation in Natural and Artificial Systems</i>. University of Michigan Press.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

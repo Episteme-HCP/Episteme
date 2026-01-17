@@ -33,6 +33,11 @@ import org.jscience.mathematics.numbers.real.Real;
  * </p>
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Hamilton, W. R. (1834). On a General Method in Dynamics. <i>Philosophical Transactions of the Royal Society</i>.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

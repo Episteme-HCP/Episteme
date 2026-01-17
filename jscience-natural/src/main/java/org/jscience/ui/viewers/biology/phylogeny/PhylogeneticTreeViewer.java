@@ -46,6 +46,12 @@ import java.text.MessageFormat;
 /**
  * Phylogenetic Tree Viewer.
  * Visualizes evolutionary relationships with simulated genetic marker data.
+ 
+ * <p>
+ * <b>Reference:</b><br>
+ * Holland, J. H. (1975). <i>Adaptation in Natural and Artificial Systems</i>. University of Michigan Press.
+ * </p>
+ *
  */
 public class PhylogeneticTreeViewer extends AbstractViewer {
 

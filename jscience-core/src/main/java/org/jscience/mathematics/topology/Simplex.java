@@ -36,6 +36,11 @@ import java.util.Set;
  * </p>
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Dantzig, G. B. (1947). Minimization of a linear function of variables subject to linear inequalities. <i>Activity Analysis of Production and Allocation</i>, 13, 317-329.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

@@ -19,6 +19,12 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
+ 
+ * <p>
+ * <b>Reference:</b><br>
+ * Aarseth, S. J. (2003). <i>Gravitational N-Body Simulations</i>. Cambridge University Press.
+ * </p>
+ *
  */
 
 package org.jscience.physics.nbody;

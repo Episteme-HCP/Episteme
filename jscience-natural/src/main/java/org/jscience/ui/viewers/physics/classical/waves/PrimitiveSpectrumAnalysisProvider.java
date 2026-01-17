@@ -28,6 +28,12 @@ import org.jscience.technical.backend.algorithms.MulticoreFFTProvider;
 
 /**
  * Primitive implementation of spectrum analysis using double arrays.
+ 
+ * <p>
+ * <b>Reference:</b><br>
+ * Prim, R. C. (1957). Shortest connection networks and some generalizations. <i>Bell System Technical Journal</i>, 36(6), 1389-1401.
+ * </p>
+ *
  */
 public class PrimitiveSpectrumAnalysisProvider implements SpectrumAnalysisProvider {
     private final FFTProvider fftProvider = new MulticoreFFTProvider();

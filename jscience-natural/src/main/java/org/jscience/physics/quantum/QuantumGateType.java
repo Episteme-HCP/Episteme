@@ -25,6 +25,12 @@ package org.jscience.physics.quantum;
 
 /**
  * Supported Quantum Gate Types.
+ 
+ * <p>
+ * <b>Reference:</b><br>
+ * Dirac, P. A. M. (1930). <i>The Principles of Quantum Mechanics</i>. Oxford University Press.
+ * </p>
+ *
  */
 public enum QuantumGateType {
     H,  // Hadamard

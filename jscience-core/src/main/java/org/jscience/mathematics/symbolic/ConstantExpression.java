@@ -30,6 +30,11 @@ import org.jscience.mathematics.structures.rings.Ring;
  * Represents a constant value as a symbolic expression.
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Mohr, P. J., et al. (2016). CODATA Recommended Values of the Fundamental Physical Constants. <i>Reviews of Modern Physics</i>.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

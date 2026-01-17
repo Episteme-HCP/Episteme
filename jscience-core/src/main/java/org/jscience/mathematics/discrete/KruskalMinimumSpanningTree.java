@@ -34,6 +34,11 @@ import java.util.*;
  * </p>
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Kruskal, J. B. (1956). On the shortest spanning subtree of a graph and the traveling salesman problem. <i>Proceedings of the American Mathematical Society</i>, 7(1), 48-50.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

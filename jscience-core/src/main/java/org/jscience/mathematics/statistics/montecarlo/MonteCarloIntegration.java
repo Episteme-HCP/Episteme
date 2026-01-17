@@ -35,6 +35,11 @@ import org.jscience.technical.backend.algorithms.MonteCarloProvider;
  * </p>
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Metropolis, N., et al. (1953). Equation of State Calculations by Fast Computing Machines. <i>The Journal of Chemical Physics</i>, 21(6), 1087.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

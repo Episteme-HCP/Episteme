@@ -19,6 +19,12 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
+ 
+ * <p>
+ * <b>Reference:</b><br>
+ * Metropolis, N., et al. (1953). Equation of State Calculations by Fast Computing Machines. <i>The Journal of Chemical Physics</i>, 21(6), 1087.
+ * </p>
+ *
  */
 
 package org.jscience.mathematics.montecarlo;

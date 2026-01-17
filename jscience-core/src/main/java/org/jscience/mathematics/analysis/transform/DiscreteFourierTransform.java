@@ -40,6 +40,11 @@ import java.util.List;
  * </p>
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Bracewell, R. N. (1999). <i>The Fourier Transform and Its Applications</i>. McGraw-Hill.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

@@ -21,13 +21,15 @@
  * SOFTWARE.
  */
 
-package org.jscience.mathematics.logic.connectors;
+package org.jscience.mathematics.loaders.logic;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
+
+import org.jscience.io.ResourceWriter;
 
 /**
  * Interface for exporting a logical system to an external formal verification
@@ -37,7 +39,7 @@ import java.util.Map;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface FormalSystemExporter {
+public interface FormalSystemExporter extends ResourceWriter<Map<String, Object>> {
 
     /**
      * Exports the given logical context/system to the specified writer.
@@ -70,6 +72,42 @@ public interface FormalSystemExporter {
      */
     default void exportSystem(Map<String, Object> system, String filePath) throws IOException {
         exportSystem(system, new File(filePath));
+    }
+
+    @Override
+    default void save(Map<String, Object> resource, String destination) throws Exception {
+        exportSystem(resource, destination);
+    }
+
+    @Override
+    default String getName() {
+        return getClass().getSimpleName();
+    }
+
+    @Override
+    default String getDescription() {
+        return "Formal System Exporter";
+    }
+
+    @Override
+    default String getLongDescription() {
+        return "Exports logical definitions to external formal systems.";
+    }
+
+    @Override
+    default String getCategory() {
+        return "Mathematics/Logic";
+    }
+
+    @Override
+    default String getResourcePath() {
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    default Class<Map<String, Object>> getResourceType() {
+        return (Class<Map<String, Object>>) (Class<?>) Map.class;
     }
 
     /**

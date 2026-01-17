@@ -28,6 +28,11 @@ package org.jscience.ui.viewers.physics.classical.waves;
  * Uses simple double arrays and Math functions.
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Prim, R. C. (1957). Shortest connection networks and some generalizations. <i>Bell System Technical Journal</i>, 36(6), 1389-1401.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

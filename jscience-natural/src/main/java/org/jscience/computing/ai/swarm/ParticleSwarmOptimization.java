@@ -36,6 +36,11 @@ import java.util.Random;
  * </p>
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Kennedy, J., & Eberhart, R. (1995). Particle swarm optimization. <i>Proceedings of ICNN'95 - International Conference on Neural Networks</i>.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

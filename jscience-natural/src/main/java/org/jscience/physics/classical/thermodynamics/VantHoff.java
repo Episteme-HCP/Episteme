@@ -27,6 +27,11 @@ package org.jscience.physics.classical.thermodynamics;
  * Van't Hoff equation for temperature dependence of K.
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * van 't Hoff, J. H. (1884). <i>Études de Dynamique Chimique</i>.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

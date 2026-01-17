@@ -42,6 +42,11 @@ import org.jscience.mathematics.geometry.Vector4D;
  * </p>
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Schwarzschild, K. (1916). Über das Gravitationsfeld eines Massenpunktes nach der Einsteinschen Theorie. <i>Sitzungsberichte der Königlich Preussischen Akademie der Wissenschaften</i>.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

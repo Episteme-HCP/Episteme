@@ -37,6 +37,11 @@ import org.jscience.technical.backend.algorithms.MulticoreMaxwellProvider;
  * Delegates to {@link MaxwellProvider}.
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Maxwell, J. C. (1865). A Dynamical Theory of the Electromagnetic Field. <i>Philosophical Transactions of the Royal Society of London</i>, 155, 459-512.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

@@ -48,6 +48,12 @@ import java.util.concurrent.atomic.LongAdder;
  * - jscience_workers_active (gauge) - Active worker count
  * - jscience_task_duration_seconds (histogram) - Task execution time
  * - jscience_queue_depth (gauge) - Current queue depth
+ 
+ * <p>
+ * <b>Reference:</b><br>
+ * Fréchet, M. (1906). Sur quelques points du calcul fonctionnel. <i>Rendiconti del Circolo Matematico di Palermo</i>.
+ * </p>
+ *
  */
 public class MetricsExporter {
 

@@ -28,6 +28,12 @@ import org.jscience.mathematics.numbers.real.Real;
 /**
  * 1D Heat Equation Solver.
  * Supports Explicit and Implicit integration schemas.
+ 
+ * <p>
+ * <b>Reference:</b><br>
+ * Fourier, J. (1822). <i>Théorie analytique de la chaleur</i>. Firmin Didot.
+ * </p>
+ *
  */
 public class HeatEquationSolver {
 

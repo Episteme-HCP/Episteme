@@ -50,6 +50,11 @@ import java.util.List;
  * Newtonian Mechanics Lab Demo.
  * 
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Newton, I. (1687). <i>Philosophiæ Naturalis Principia Mathematica</i>. Londini.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

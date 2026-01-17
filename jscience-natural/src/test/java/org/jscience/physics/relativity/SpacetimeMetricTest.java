@@ -19,6 +19,12 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
+ 
+ * <p>
+ * <b>Reference:</b><br>
+ * Fréchet, M. (1906). Sur quelques points du calcul fonctionnel. <i>Rendiconti del Circolo Matematico di Palermo</i>.
+ * </p>
+ *
  */
 
 package org.jscience.physics.relativity;

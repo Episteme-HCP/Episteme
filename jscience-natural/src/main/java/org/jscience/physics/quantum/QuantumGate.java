@@ -32,6 +32,12 @@ import java.util.List;
 /**
  * Represents a unitary quantum gate.
  * Supports both Matrix-based simulation and Symbolic (OpenQASM) representation.
+ 
+ * <p>
+ * <b>Reference:</b><br>
+ * Dirac, P. A. M. (1930). <i>The Principles of Quantum Mechanics</i>. Oxford University Press.
+ * </p>
+ *
  */
 public class QuantumGate {
 

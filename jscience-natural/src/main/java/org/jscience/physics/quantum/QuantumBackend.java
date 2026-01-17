@@ -28,6 +28,12 @@ import java.util.Map;
 /**
  * Interface for Quantum Execution Backends.
  * Implementations provide access to simulators (like Qiskit) or real hardware.
+ 
+ * <p>
+ * <b>Reference:</b><br>
+ * Dirac, P. A. M. (1930). <i>The Principles of Quantum Mechanics</i>. Oxford University Press.
+ * </p>
+ *
  */
 public interface QuantumBackend extends org.jscience.technical.backend.BackendProvider {
     

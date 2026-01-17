@@ -38,6 +38,11 @@ import org.jscience.mathematics.structures.rings.Field;
  * </p>
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Clifford, W. K. (1878). Applications of Grassmann's Extensive Algebra. <i>American Journal of Mathematics</i>, 1(4), 350-358.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

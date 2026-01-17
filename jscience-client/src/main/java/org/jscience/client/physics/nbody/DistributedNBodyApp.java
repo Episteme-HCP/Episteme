@@ -62,6 +62,12 @@ import java.util.concurrent.TimeUnit;
  * Supports both local and distributed computation modes.
  * In distributed mode, particle state is serialized and sent to the server
  * for force computation, then results are applied locally.
+ 
+ * <p>
+ * <b>Reference:</b><br>
+ * Aarseth, S. J. (2003). <i>Gravitational N-Body Simulations</i>. Cambridge University Press.
+ * </p>
+ *
  */
 public class DistributedNBodyApp extends Application implements org.jscience.ui.App {
 

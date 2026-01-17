@@ -34,6 +34,11 @@ import org.jscience.mathematics.numbers.real.Real;
  * </p>
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Hestenes, M. R., & Stiefel, E. (1952). Methods of Conjugate Gradients for Solving Linear Systems. <i>Journal of Research of the National Bureau of Standards</i>, 49(6), 409-436.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

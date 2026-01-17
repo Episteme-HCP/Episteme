@@ -21,25 +21,27 @@
  * SOFTWARE.
  */
 
-package org.jscience.mathematics.logic.connectors;
+package org.jscience.mathematics.loaders.logic;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Importer for Coq Proof Assistant files (.v).
+ * Importer for Metamath database files (.mm).
  * <p>
- * Parses Coq vernacular files and extracts:
+ * Parses Metamath databases and extracts:
  * <ul>
- * <li>Module definitions</li>
- * <li>Axioms and Parameters</li>
- * <li>Theorems and Lemmas</li>
- * <li>Definitions</li>
+ * <li>Constants ($c statements)</li>
+ * <li>Variables ($v statements)</li>
+ * <li>Axioms ($a statements)</li>
+ * <li>Provable statements ($p statements)</li>
  * </ul>
  * </p>
  *
@@ -47,12 +49,12 @@ import java.util.regex.Pattern;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CoqImporter implements FormalSystemImporter {
+public class MetamathImporter implements FormalSystemImporter {
 
-    private static final Pattern MODULE_PATTERN = Pattern.compile("Module\\s+(\\w+)\\s*\\.");
-    private static final Pattern AXIOM_PATTERN = Pattern.compile("(?:Axiom|Parameter)\\s+(\\w+)\\s*:\\s*(.+?)\\.");
-    private static final Pattern THEOREM_PATTERN = Pattern.compile("(?:Theorem|Lemma)\\s+(\\w+)\\s*:\\s*(.+?)\\.");
-    private static final Pattern DEFINITION_PATTERN = Pattern.compile("Definition\\s+(\\w+)\\s*:=\\s*(.+?)\\.");
+    private static final Pattern CONSTANT_PATTERN = Pattern.compile("\\$c\\s+(.+?)\\s*\\$\\.");
+    private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$v\\s+(.+?)\\s*\\$\\.");
+    private static final Pattern AXIOM_PATTERN = Pattern.compile("(\\w+)\\s+\\$a\\s+(.+?)\\s*\\$\\.");
+    private static final Pattern PROVABLE_PATTERN = Pattern.compile("(\\w+)\\s+\\$p\\s+(.+?)\\s*\\$\\.");
 
     @Override
     public Map<String, Object> importSystem(Reader reader) throws IOException, ParseException {
@@ -62,50 +64,58 @@ public class CoqImporter implements FormalSystemImporter {
 
         String line;
         while ((line = br.readLine()) != null) {
-            // Skip comments
-            if (!line.trim().startsWith("(*")) {
-                content.append(line).append("\n");
+            // Skip comments (lines starting with $()
+            if (!line.trim().startsWith("$(")) {
+                content.append(line).append(" ");
             }
         }
 
         String text = content.toString();
 
-        // Extract module name
-        Matcher moduleMatcher = MODULE_PATTERN.matcher(text);
-        if (moduleMatcher.find()) {
-            result.put("module", moduleMatcher.group(1));
+        // Extract constants
+        List<String> constants = new ArrayList<>();
+        Matcher constantMatcher = CONSTANT_PATTERN.matcher(text);
+        while (constantMatcher.find()) {
+            String[] tokens = constantMatcher.group(1).trim().split("\\s+");
+            for (String token : tokens) {
+                constants.add(token);
+            }
         }
+        result.put("constants", constants);
+
+        // Extract variables
+        List<String> variables = new ArrayList<>();
+        Matcher variableMatcher = VARIABLE_PATTERN.matcher(text);
+        while (variableMatcher.find()) {
+            String[] tokens = variableMatcher.group(1).trim().split("\\s+");
+            for (String token : tokens) {
+                variables.add(token);
+            }
+        }
+        result.put("variables", variables);
 
         // Extract axioms
         Map<String, String> axioms = new HashMap<>();
         Matcher axiomMatcher = AXIOM_PATTERN.matcher(text);
         while (axiomMatcher.find()) {
-            axioms.put(axiomMatcher.group(1), axiomMatcher.group(2));
+            axioms.put(axiomMatcher.group(1), axiomMatcher.group(2).trim());
         }
         result.put("axioms", axioms);
 
-        // Extract theorems
+        // Extract provable statements (theorems)
         Map<String, String> theorems = new HashMap<>();
-        Matcher theoremMatcher = THEOREM_PATTERN.matcher(text);
-        while (theoremMatcher.find()) {
-            theorems.put(theoremMatcher.group(1), theoremMatcher.group(2));
+        Matcher provableMatcher = PROVABLE_PATTERN.matcher(text);
+        while (provableMatcher.find()) {
+            theorems.put(provableMatcher.group(1), provableMatcher.group(2).trim());
         }
         result.put("theorems", theorems);
-
-        // Extract definitions
-        Map<String, String> definitions = new HashMap<>();
-        Matcher defMatcher = DEFINITION_PATTERN.matcher(text);
-        while (defMatcher.find()) {
-            definitions.put(defMatcher.group(1), defMatcher.group(2));
-        }
-        result.put("definitions", definitions);
 
         return result;
     }
 
     @Override
     public String[] getSupportedExtensions() {
-        return new String[] { ".v", ".vo" };
+        return new String[] { ".mm" };
     }
 }
 

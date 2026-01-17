@@ -35,6 +35,11 @@ import org.jscience.mathematics.linearalgebra.Vector;
  * </p>
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Euclid. (c. 300 BC). <i>Elements</i>.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

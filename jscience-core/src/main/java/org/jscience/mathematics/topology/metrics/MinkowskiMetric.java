@@ -41,6 +41,11 @@ import org.jscience.mathematics.linearalgebra.Vector;
  * </p>
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Minkowski, H. (1908). Raum und Zeit. <i>Physikalische Zeitschrift</i>, 10, 104-111.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

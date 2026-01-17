@@ -42,6 +42,11 @@ import org.jscience.measure.quantity.Mass;
  * </p>
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Press, W. H., Teukolsky, S. A., Vetterling, W. T., & Flannery, B. P. (2007). <i>Numerical Recipes: The Art of Scientific Computing</i> (3rd ed.). Cambridge University Press.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

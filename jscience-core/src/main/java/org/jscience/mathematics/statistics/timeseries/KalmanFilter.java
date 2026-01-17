@@ -33,6 +33,11 @@ package org.jscience.mathematics.statistics.timeseries;
  * where w_k ~ N(0, Q) and v_k ~ N(0, R)
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Kalman, R. E. (1960). A New Approach to Linear Filtering and Prediction Problems. <i>Journal of Basic Engineering</i>, 82(1), 35-45.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

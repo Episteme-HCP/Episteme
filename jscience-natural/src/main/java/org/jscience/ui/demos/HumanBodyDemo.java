@@ -32,6 +32,11 @@ import org.jscience.ui.viewers.medicine.anatomy.HumanBodyViewer;
  * Human Body Anatomy Demo.
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Aarseth, S. J. (2003). <i>Gravitational N-Body Simulations</i>. Cambridge University Press.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

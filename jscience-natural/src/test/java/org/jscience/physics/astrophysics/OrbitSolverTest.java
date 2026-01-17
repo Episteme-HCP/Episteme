@@ -19,6 +19,12 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
+ 
+ * <p>
+ * <b>Reference:</b><br>
+ * Press, W. H., Teukolsky, S. A., Vetterling, W. T., & Flannery, B. P. (2007). <i>Numerical Recipes: The Art of Scientific Computing</i> (3rd ed.). Cambridge University Press.
+ * </p>
+ *
  */
 
 package org.jscience.physics.astrophysics;

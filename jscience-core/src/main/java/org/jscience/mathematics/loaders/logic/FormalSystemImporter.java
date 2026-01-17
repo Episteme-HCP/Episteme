@@ -21,13 +21,15 @@
  * SOFTWARE.
  */
 
-package org.jscience.mathematics.logic.connectors;
+package org.jscience.mathematics.loaders.logic;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Map;
+
+import org.jscience.io.ResourceReader;
 
 /**
  * Interface for importing formal systems from external verification tools.
@@ -40,7 +42,7 @@ import java.util.Map;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface FormalSystemImporter {
+public interface FormalSystemImporter extends ResourceReader<Map<String, Object>> {
 
     /**
      * Imports a formal system from the specified reader.
@@ -76,6 +78,42 @@ public interface FormalSystemImporter {
      */
     default Map<String, Object> importSystem(String filePath) throws IOException, ParseException {
         return importSystem(new File(filePath));
+    }
+
+    @Override
+    default Map<String, Object> load(String resourceId) throws Exception {
+        return importSystem(resourceId);
+    }
+
+    @Override
+    default String getName() {
+        return getClass().getSimpleName();
+    }
+
+    @Override
+    default String getDescription() {
+        return "Formal System Importer";
+    }
+
+    @Override
+    default String getLongDescription() {
+        return "Imports logical definitions from external formal systems.";
+    }
+
+    @Override
+    default String getCategory() {
+        return "Mathematics/Logic";
+    }
+
+    @Override
+    default String getResourcePath() {
+        return null; // Not file-based by default logic path
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    default Class<Map<String, Object>> getResourceType() {
+        return (Class<Map<String, Object>>) (Class<?>) Map.class;
     }
 
     /**

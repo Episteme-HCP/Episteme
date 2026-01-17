@@ -33,6 +33,11 @@ import java.util.*;
  * </p>
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Floyd, R. W. (1962). Algorithm 97: Shortest Path. <i>Communications of the ACM</i>, 5(6), 345.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

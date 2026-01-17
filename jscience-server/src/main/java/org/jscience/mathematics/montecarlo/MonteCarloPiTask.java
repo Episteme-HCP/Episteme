@@ -30,6 +30,12 @@ import org.jscience.distributed.TaskRegistry;
 
 /**
  * Monte Carlo Pi Estimation Task.
+ 
+ * <p>
+ * <b>Reference:</b><br>
+ * Metropolis, N., et al. (1953). Equation of State Calculations by Fast Computing Machines. <i>The Journal of Chemical Physics</i>, 21(6), 1087.
+ * </p>
+ *
  */
 public class MonteCarloPiTask implements DistributedTask<Long, Long> {
 

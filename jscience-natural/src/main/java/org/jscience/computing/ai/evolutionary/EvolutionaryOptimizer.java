@@ -36,6 +36,11 @@ import java.util.Arrays;
  * </p>
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Nocedal, J., & Wright, S. J. (2006). <i>Numerical Optimization</i>. Springer.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

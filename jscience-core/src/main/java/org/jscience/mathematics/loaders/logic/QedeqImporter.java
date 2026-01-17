@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.mathematics.logic.connectors;
+package org.jscience.mathematics.loaders.logic;
 
 import java.io.IOException;
 import java.io.Reader;

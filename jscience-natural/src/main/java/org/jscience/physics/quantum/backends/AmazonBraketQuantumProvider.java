@@ -37,6 +37,11 @@ import java.util.Map;
  * Allows execution on AWS quantum hardware and simulators.
  * 
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Dirac, P. A. M. (1930). <i>The Principles of Quantum Mechanics</i>. Oxford University Press.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  */
 public class AmazonBraketQuantumProvider implements QuantumBackend {

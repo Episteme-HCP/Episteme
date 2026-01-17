@@ -29,6 +29,12 @@ import java.util.List;
 /**
  * Represents a Quantum Circuit / Context.
  * Holds registers and the sequence of gates.
+ 
+ * <p>
+ * <b>Reference:</b><br>
+ * Dirac, P. A. M. (1930). <i>The Principles of Quantum Mechanics</i>. Oxford University Press.
+ * </p>
+ *
  */
 public class QuantumContext {
     private final List<QuantumRegister> registers = new ArrayList<>();

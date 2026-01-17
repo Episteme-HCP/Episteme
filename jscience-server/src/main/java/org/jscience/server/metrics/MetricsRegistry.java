@@ -44,6 +44,11 @@ import java.util.concurrent.TimeUnit;
  * Centralized metrics configuration using Micrometer with Prometheus registry.
  * 
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Fréchet, M. (1906). Sur quelques points du calcul fonctionnel. <i>Rendiconti del Circolo Matematico di Palermo</i>.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

@@ -60,8 +60,9 @@ import java.util.List;
  * @javadoc Complexity: O(N) per step due to Cell-Linked Lists.
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @see org.jscience.mathematics.analysis.ode.VerletIntegrator
  */
-public class VelocityVerlet implements Serializable {
+public class MolecularDynamicsVerlet implements Serializable {
 
     private final List<Particle> particles;
     private final double cutoff;
@@ -70,7 +71,7 @@ public class VelocityVerlet implements Serializable {
     private final List<Particle>[][] cells;
 
     @SuppressWarnings("unchecked")
-    public VelocityVerlet(List<Particle> particles, double boxSize, double cutoff) {
+    public MolecularDynamicsVerlet(List<Particle> particles, double boxSize, double cutoff) {
         this.particles = particles;
         this.boxSize = boxSize;
         this.cutoff = cutoff;

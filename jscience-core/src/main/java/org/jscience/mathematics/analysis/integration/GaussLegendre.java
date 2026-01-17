@@ -34,6 +34,11 @@ import org.jscience.mathematics.numbers.real.Real;
  * Exact for polynomials of degree 2n-1.
  * </p>
  * * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Gauss, C. F. (1814). Methodus nova integralium valores per approximationem inveniendi. <i>Commentationes Societatis Regiae Scientiarum Gottingensis Recentiores</i>.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

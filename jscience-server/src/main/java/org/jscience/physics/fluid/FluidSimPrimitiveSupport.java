@@ -28,6 +28,12 @@ import java.util.stream.IntStream;
 /**
  * Primitive-based support for Lattice Boltzmann Fluid Simulation.
  * Optimized for high-performance double-precision computation.
+ 
+ * <p>
+ * <b>Reference:</b><br>
+ * Prim, R. C. (1957). Shortest connection networks and some generalizations. <i>Bell System Technical Journal</i>, 36(6), 1389-1401.
+ * </p>
+ *
  */
 public class FluidSimPrimitiveSupport {
 

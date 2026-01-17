@@ -33,6 +33,11 @@ import java.util.*;
  * </p>
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Bellman, R. (1958). On a routing problem. <i>Quarterly of Applied Mathematics</i>, 16, 87-90.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

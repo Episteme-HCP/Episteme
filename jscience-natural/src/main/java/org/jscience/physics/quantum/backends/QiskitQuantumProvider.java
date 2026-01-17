@@ -36,6 +36,12 @@ import java.util.Map;
 
 /**
  * Quantum Backend that delegates to Qiskit (Python).
+ 
+ * <p>
+ * <b>Reference:</b><br>
+ * Dirac, P. A. M. (1930). <i>The Principles of Quantum Mechanics</i>. Oxford University Press.
+ * </p>
+ *
  */
 public class QiskitQuantumProvider implements QuantumBackend {
 

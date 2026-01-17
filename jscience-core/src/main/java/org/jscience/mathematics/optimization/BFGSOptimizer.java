@@ -33,6 +33,11 @@ import org.jscience.mathematics.numbers.real.Real;
  * </p>
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Broyden, C. G., Fletcher, R., Goldfarb, D., & Shanno, D. F. (1970). The BFGS Algorithm. <i>Journal of the Institute of Mathematics and Its Applications</i>.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */

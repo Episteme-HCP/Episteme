@@ -34,6 +34,12 @@ import org.slf4j.LoggerFactory;
  * - Call counts per method
  * - Error counts per method
  * - Call duration
+ 
+ * <p>
+ * <b>Reference:</b><br>
+ * Fréchet, M. (1906). Sur quelques points du calcul fonctionnel. <i>Rendiconti del Circolo Matematico di Palermo</i>.
+ * </p>
+ *
  */
 public class MetricsInterceptor implements ServerInterceptor {
 

@@ -32,6 +32,11 @@ import java.util.function.BiFunction;
  * </p>
  *
  * @author Silvere Martin-Michiellot
+ * <p>
+ * <b>Reference:</b><br>
+ * Levenberg, K. (1944). A method for the solution of certain non-linear problems in least squares. <i>Quarterly of Applied Mathematics</i>, 2, 164-168.
+ * </p>
+ *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
