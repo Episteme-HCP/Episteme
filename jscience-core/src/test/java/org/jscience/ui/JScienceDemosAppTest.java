@@ -69,18 +69,17 @@ public class JScienceDemosAppTest {
 
     @Test
     void testMenuBarExists(FxRobot robot) {
-        // Verify menu bar has expected menus (File and View)
+        // Verify menu bar has expected menus (Language and Theme)
         MenuBar menuBar = robot.lookup(".menu-bar").queryAs(MenuBar.class);
         assertNotNull(menuBar, "Menu bar should exist");
-        assertEquals(2, menuBar.getMenus().size(), "Should have 2 menus: File, View");
+        assertEquals(2, menuBar.getMenus().size(), "Should have 2 menus: Language, Theme");
     }
 
     @Test
     void testLanguageMenuExists(FxRobot robot) {
-        // Find View menu then Language submenu
+        // Find Language menu (Index 0)
         MenuBar menuBar = robot.lookup(".menu-bar").queryAs(MenuBar.class);
-        Menu viewMenu = menuBar.getMenus().get(1); // View
-        Menu languageMenu = (Menu) viewMenu.getItems().get(0); // Language
+        Menu languageMenu = menuBar.getMenus().get(0); 
         assertNotNull(languageMenu, "Language menu should exist");
 
         // Verify it has menu items
@@ -89,10 +88,9 @@ public class JScienceDemosAppTest {
 
     @Test
     void testThemeMenuExists(FxRobot robot) {
-        // Find Theme menu
+        // Find Theme menu (Index 1)
         MenuBar menuBar = robot.lookup(".menu-bar").queryAs(MenuBar.class);
-        Menu viewMenu = menuBar.getMenus().get(1); // View
-        Menu themeMenu = (Menu) viewMenu.getItems().get(1); // Theme
+        Menu themeMenu = menuBar.getMenus().get(1);
         assertNotNull(themeMenu, "Theme menu should exist");
 
         // Verify it has options
@@ -129,10 +127,9 @@ public class JScienceDemosAppTest {
 
     @Test
     void testThemeSwitchingDoesNotCrash(FxRobot robot) {
-        // Get theme menu and click items programmatically
+        // Get theme menu (Index 1)
         MenuBar menuBar = robot.lookup(".menu-bar").queryAs(MenuBar.class);
-        Menu viewMenu = menuBar.getMenus().get(1);
-        Menu themeMenu = (Menu) viewMenu.getItems().get(1);
+        Menu themeMenu = menuBar.getMenus().get(1);
         assertNotNull(themeMenu, "Theme menu should exist");
 
         // Verify app stays visible throughout
@@ -141,10 +138,9 @@ public class JScienceDemosAppTest {
 
     @Test
     void testLanguageSwitchingDoesNotCrash(FxRobot robot) {
-        // Get language menu
+        // Get language menu (Index 0)
         MenuBar menuBar = robot.lookup(".menu-bar").queryAs(MenuBar.class);
-        Menu viewMenu = menuBar.getMenus().get(1);
-        Menu languageMenu = (Menu) viewMenu.getItems().get(0);
+        Menu languageMenu = menuBar.getMenus().get(0);
         assertNotNull(languageMenu, "Language menu should exist");
 
         // Verify app stays visible
