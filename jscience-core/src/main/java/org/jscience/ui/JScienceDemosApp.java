@@ -98,7 +98,7 @@ public class JScienceDemosApp extends Application {
 
         // Add demos by category
         if (demosByCategory.isEmpty()) {
-            allContent.getChildren().add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("app.nodemos")));
+            allContent.getChildren().add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("demosapp.nodemos")));
         } else {
             // Demos sections
             for (Map.Entry<String, List<Viewer>> entry : demosByCategory.entrySet()) {
@@ -125,7 +125,7 @@ public class JScienceDemosApp extends Application {
             scene.getStylesheets().add(cssResource.toExternalForm());
         }
 
-        primaryStage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("app.header.title", "JScience Demos"));
+        primaryStage.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("demosapp.header.title", "JScience Demos"));
         primaryStage.setScene(scene);
 
         // Apply global theme preference
@@ -162,11 +162,11 @@ public class JScienceDemosApp extends Application {
         }
 
         // Theme Menu (Delegated to ThemeManager)
-        Menu themeMenu = new Menu(org.jscience.ui.i18n.I18n.getInstance().get("app.menu.theme", "Theme"));
+        Menu themeMenu = new Menu(org.jscience.ui.i18n.I18n.getInstance().get("demosapp.menu.theme", "Theme"));
         ToggleGroup themeGroup = new ToggleGroup();
         String currentTheme = ThemeManager.getInstance().getCurrentTheme();
 
-        RadioMenuItem modenaItem = new RadioMenuItem(org.jscience.ui.i18n.I18n.getInstance().get("app.menu.theme.modena", "Modena (Light)"));
+        RadioMenuItem modenaItem = new RadioMenuItem(org.jscience.ui.i18n.I18n.getInstance().get("demosapp.menu.theme.modena", "Modena (Light)"));
         modenaItem.setToggleGroup(themeGroup);
         modenaItem.setSelected("Modena".equalsIgnoreCase(currentTheme));
         modenaItem.setOnAction(e -> {
@@ -174,7 +174,7 @@ public class JScienceDemosApp extends Application {
             ThemeManager.getInstance().applyTheme(primaryStage.getScene());
         });
 
-        RadioMenuItem caspianItem = new RadioMenuItem(org.jscience.ui.i18n.I18n.getInstance().get("app.menu.theme.caspian", "Caspian"));
+        RadioMenuItem caspianItem = new RadioMenuItem(org.jscience.ui.i18n.I18n.getInstance().get("demosapp.menu.theme.caspian", "Caspian"));
         caspianItem.setToggleGroup(themeGroup);
         caspianItem.setSelected("Caspian".equalsIgnoreCase(currentTheme));
         caspianItem.setOnAction(e -> {
@@ -183,7 +183,7 @@ public class JScienceDemosApp extends Application {
         });
 
         RadioMenuItem highContrastItem = new RadioMenuItem(
-                org.jscience.ui.i18n.I18n.getInstance().get("app.menu.theme.highcontrast", "High Contrast"));
+                org.jscience.ui.i18n.I18n.getInstance().get("demosapp.menu.theme.highcontrast", "High Contrast"));
         highContrastItem.setToggleGroup(themeGroup);
         highContrastItem.setSelected("HighContrast".equalsIgnoreCase(currentTheme));
         highContrastItem.setOnAction(e -> {
@@ -212,11 +212,11 @@ public class JScienceDemosApp extends Application {
         header.getStyleClass().add("header-box");
         // Style moved to theme.css (.header-box)
 
-        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("app.header.title", "JScience Demos"));
+        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demosapp.header.title", "JScience Demos"));
         title.getStyleClass().add("header-label");
         // Inline style removed
 
-        Label subtitle = new Label(org.jscience.ui.i18n.I18n.getInstance().get("app.header.subtitle", "Scientific Applications & Tools"));
+        Label subtitle = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demosapp.header.subtitle", "Scientific Applications & Tools"));
         subtitle.getStyleClass().add("header-subtitle");
 
         header.getChildren().addAll(title, subtitle);
@@ -244,7 +244,7 @@ public class JScienceDemosApp extends Application {
         row.setPadding(new Insets(15));
         row.getStyleClass().add("demo-card");
 
-        Button btn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("app.button.launch", "Launch"));
+        Button btn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demosapp.button.launch", "Launch"));
         btn.getStyleClass().add("launch-button");
         btn.getStyleClass().add("font-bold"); // Replaced inline style: -fx-background-color: #007acc; -fx-text-fill: white; -fx-font-weight: bold; -fx-min-width: 80;
 
