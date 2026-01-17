@@ -73,8 +73,7 @@ public class NuclearPhysics {
         Real rN = Real.of(N);
         
         // A^(1/3)
-        Real A13 = rA.pow(Real.OneThird); // Assuming Real has constant, or 1/3
-        if (A13 == null) A13 = rA.pow(Real.ONE.divide(Real.of(3)));
+        Real A13 = rA.pow(Real.ONE.divide(Real.of(3)));
 
         // Volume term: a_v * A
         Real vol = AV.multiply(rA);

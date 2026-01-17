@@ -83,7 +83,7 @@ public class OrbitalMechanics {
      * @return orbital velocity
      */
     public static Quantity<Velocity> orbitalVelocity(Real r, Real semiMajorAxis, Real mu) {
-        Real two = Real.two(); // Assuming Real.TWO or factory
+        Real two = Real.TWO; // Using Real.TWO constant
         // Real has ONE, ZERO, PI, E. Wait, does it have TWO? Step 5717 Line 67: public static final Real TWO.
         // It's available.
         
