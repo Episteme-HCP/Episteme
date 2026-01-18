@@ -25,21 +25,19 @@ package org.jscience.ui.viewers.mathematics.statistics;
 
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Parameter;
+import org.jscience.ui.ChoiceParameter;
+import org.jscience.ui.NumericParameter;
+import org.jscience.ui.i18n.I18n;
+
 import java.util.List;
 import java.util.ArrayList;
 import javafx.geometry.Insets;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
-import javafx.scene.control.*;
+import javafx.scene.chart.*;
 import javafx.scene.layout.*;
 
 /**
  * Visualization of Statistical Distributions.
- * Supports Normal, Poisson, and Binomial distributions with interactive
- * parameters.
+ * Refactored to be 100% parameter-based.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -47,250 +45,107 @@ import javafx.scene.layout.*;
  */
 public class DistributionsViewer extends AbstractViewer {
 
-    @Override
-    public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics", "Mathematics");
-    }
-
-    @Override
-    public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.distributionsviewer.name", "Statistical Distributions");
-    }
-
-    @Override
-    public List<Parameter<?>> getViewerParameters() {
-        return new ArrayList<>();
-    }
-
-    private TabPane tabPane;
+    private final StackPane chartContainer = new StackPane();
+    private String currentType = "Normal";
+    private double mu = 0.0, sigma = 1.0, lambda = 5.0, p = 0.5;
+    private int n = 10;
+    
+    private final List<Parameter<?>> parameters = new ArrayList<>();
 
     public DistributionsViewer() {
-        BorderPane layout = new BorderPane();
-        layout.getStyleClass().add("viewer-root");
-        layout.setPadding(new Insets(10));
-
-        // Header
-        Label header = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.distributionsviewer.title", "Statistical Distributions explorer"));
-        header.getStyleClass().add("header-label");
-        layout.setTop(header);
-
-        tabPane = new TabPane();
-        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-
-        tabPane.getTabs().addAll(
-                createNormalTab(),
-                createPoissonTab(),
-                createBinomialTab());
-
-        layout.setCenter(tabPane);
-        getChildren().add(layout);
+        setupParameters();
+        initUI();
+        updateChart();
     }
 
-    private Tab createNormalTab() {
-        BorderPane pane = new BorderPane();
-        pane.setPadding(new Insets(10));
+    private void setupParameters() {
+        List<String> types = List.of("Normal", "Poisson", "Binomial");
+        parameters.add(new ChoiceParameter("dist.type", I18n.getInstance().get("distributions.type", "Distribution Type"), types, "Normal", v -> {
+            currentType = v;
+            updateChart();
+        }));
 
-        // Controls
-        VBox controls = new VBox(10);
-        controls.setPrefWidth(250);
-        controls.getStyleClass().add("viewer-sidebar");
+        parameters.add(new NumericParameter("dist.mu", I18n.getInstance().get("distributions.mean", "Normal: Mean"), -5, 5, 0.1, mu, v -> { mu = v; updateChart(); }));
+        parameters.add(new NumericParameter("dist.sigma", I18n.getInstance().get("distributions.std", "Normal: Std Dev"), 0.1, 5, 0.1, sigma, v -> { sigma = v; updateChart(); }));
+        parameters.add(new NumericParameter("dist.lambda", I18n.getInstance().get("distributions.lambda", "Poisson: Lambda"), 0.1, 20, 0.5, lambda, v -> { lambda = v; updateChart(); }));
+        parameters.add(new NumericParameter("dist.n", I18n.getInstance().get("distributions.trials", "Binomial: n"), 1, 40, 1, (double)n, v -> { n = v.intValue(); updateChart(); }));
+        parameters.add(new NumericParameter("dist.p", I18n.getInstance().get("distributions.prob", "Binomial: p"), 0.01, 1, 0.01, p, v -> { p = v; updateChart(); }));
+    }
 
-        Slider meanSlider = new Slider(-5, 5, 0);
-        Label meanLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("distributions.mean", "Mean") + ": 0.0");
-        meanSlider.valueProperty()
-                .addListener((o, ov, nv) -> meanLabel.setText(
-                        String.format(org.jscience.ui.i18n.I18n.getInstance().get("distributions.mean", "Mean") + ": %.1f", nv.doubleValue())));
+    private void initUI() {
+        getStyleClass().add("viewer-root");
+        setPadding(new Insets(10));
+        setCenter(chartContainer);
+    }
 
-        Slider stdSlider = new Slider(0.1, 3, 1.0);
-        Label stdLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("distributions.std", "Std Dev") + ": 1.0");
-        stdSlider.valueProperty()
-                .addListener((o, ov, nv) -> stdLabel.setText(
-                        String.format(org.jscience.ui.i18n.I18n.getInstance().get("distributions.std", "Std Dev") + ": %.1f", nv.doubleValue())));
+    private void updateChart() {
+        chartContainer.getChildren().clear();
+        if ("Normal".equals(currentType)) {
+            chartContainer.getChildren().add(createNormalChart());
+        } else if ("Poisson".equals(currentType)) {
+            chartContainer.getChildren().add(createPoissonChart());
+        } else {
+            chartContainer.getChildren().add(createBinomialChart());
+        }
+    }
 
-        controls.getChildren().addAll(new Label(org.jscience.ui.i18n.I18n.getInstance().get("distributions.params", "Parameters")), new Separator(),
-                meanLabel, meanSlider, stdLabel,
-                stdSlider);
-
-        // Chart
-        NumberAxis xAxis = new NumberAxis(-5, 5, 0.5);
-        xAxis.setLabel(org.jscience.ui.i18n.I18n.getInstance().get("distributions.axis.value", "Value"));
+    private LineChart<Number, Number> createNormalChart() {
+        NumberAxis xAxis = new NumberAxis(-5, 5, 1);
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel(org.jscience.ui.i18n.I18n.getInstance().get("distributions.axis.pdf", "Probability Density"));
-
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("distributions.chart.normal", "Normal Distribution (Continuous)"));
         chart.setCreateSymbols(false);
-
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
-        series.setName("N(\u03BC, \u03C3\u00B2)");
+        for (double x = -5; x <= 5; x += 0.1) {
+            double pdf = (1.0 / (sigma * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((x - mu) / sigma, 2));
+            series.getData().add(new XYChart.Data<>(x, pdf));
+        }
         chart.getData().add(series);
-
-        // Update logic
-        Runnable update = () -> {
-            double mu = meanSlider.getValue();
-            double sigma = stdSlider.getValue();
-            series.getData().clear();
-            double minX = mu - 4 * sigma;
-            double maxX = mu + 4 * sigma;
-            if (minX < -5)
-                minX = -5;
-            if (maxX > 5)
-                maxX = 5;
-
-            for (double x = -5; x <= 5; x += 0.1) {
-                double pdf = (1.0 / (sigma * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((x - mu) / sigma, 2));
-                series.getData().add(new XYChart.Data<>(x, pdf));
-            }
-        };
-
-        meanSlider.valueProperty().addListener(e -> update.run());
-        stdSlider.valueProperty().addListener(e -> update.run());
-        update.run();
-
-        pane.setCenter(chart);
-        pane.setRight(controls);
-        return new Tab(org.jscience.ui.i18n.I18n.getInstance().get("distributions.tab.normal", "Normal"), pane);
+        return chart;
     }
 
-    private Tab createPoissonTab() {
-        BorderPane pane = new BorderPane();
-        pane.setPadding(new Insets(10));
-
-        VBox controls = new VBox(10);
-        controls.setPrefWidth(250);
-        controls.getStyleClass().add("viewer-sidebar");
-
-        Slider lambdaSlider = new Slider(0.1, 20, 5);
-        Label lambdaLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("distributions.lambda", "Rate (\u03BB)") + ": 5.0");
-        lambdaSlider.valueProperty()
-                .addListener((o, ov, nv) -> lambdaLabel.setText(
-                        String.format(org.jscience.ui.i18n.I18n.getInstance().get("distributions.lambda", "Rate (\u03BB)") + ": %.1f", nv.doubleValue())));
-
-        controls.getChildren().addAll(new Label(org.jscience.ui.i18n.I18n.getInstance().get("distributions.params", "Parameters")), new Separator(),
-                lambdaLabel, lambdaSlider);
-
+    private BarChart<String, Number> createPoissonChart() {
         CategoryAxis xAxis = new CategoryAxis();
-        xAxis.setLabel(org.jscience.ui.i18n.I18n.getInstance().get("distributions.axis.k_occ", "Occurrences (k)"));
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel(org.jscience.ui.i18n.I18n.getInstance().get("distributions.axis.pmf", "Probability Mass"));
-
         BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
-        chart.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("distributions.chart.poisson", "Poisson Distribution (Discrete)"));
-        chart.setAnimated(false);
-
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("P(k; \u03BB)");
+        int maxK = Math.max(10, (int)(lambda + 4 * Math.sqrt(lambda)));
+        for (int k = 0; k <= maxK; k++) {
+            double pmf = (Math.pow(lambda, k) * Math.exp(-lambda)) / factorial(k);
+            series.getData().add(new XYChart.Data<>(String.valueOf(k), pmf));
+        }
         chart.getData().add(series);
-
-        Runnable update = () -> {
-            double lambda = lambdaSlider.getValue();
-            series.getData().clear();
-            int maxK = (int) (lambda + 3 * Math.sqrt(lambda));
-            maxK = Math.max(10, maxK);
-
-            for (int k = 0; k <= maxK; k++) {
-                double pmf = (Math.pow(lambda, k) * Math.exp(-lambda)) / factorial(k);
-                series.getData().add(new XYChart.Data<>(String.valueOf(k), pmf));
-            }
-        };
-
-        lambdaSlider.valueProperty().addListener(e -> update.run());
-        update.run();
-
-        pane.setCenter(chart);
-        pane.setRight(controls);
-        return new Tab(org.jscience.ui.i18n.I18n.getInstance().get("distributions.tab.poisson", "Poisson"), pane);
+        return chart;
     }
 
-    private Tab createBinomialTab() {
-        BorderPane pane = new BorderPane();
-        pane.setPadding(new Insets(10));
-
-        VBox controls = new VBox(10);
-        controls.setPrefWidth(250);
-        controls.getStyleClass().add("viewer-sidebar");
-
-        Slider nSlider = new Slider(1, 40, 10);
-        Label nLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("distributions.trials", "Trials (n)") + ": 10");
-        nSlider.valueProperty()
-                .addListener((o, ov, nv) -> nLabel.setText(
-                        String.format(org.jscience.ui.i18n.I18n.getInstance().get("distributions.trials", "Trials (n)") + ": %d", nv.intValue())));
-
-        Slider pSlider = new Slider(0, 1, 0.5);
-        Label pLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("distributions.prob", "Probability (p)") + ": 0.5");
-        pSlider.valueProperty()
-                .addListener((o, ov, nv) -> pLabel.setText(
-                        String.format(org.jscience.ui.i18n.I18n.getInstance().get("distributions.prob", "Probability (p)") + ": %.2f", nv.doubleValue())));
-
-        controls.getChildren().addAll(new Label(org.jscience.ui.i18n.I18n.getInstance().get("distributions.params", "Parameters")), new Separator(),
-                nLabel, nSlider, pLabel, pSlider);
-
+    private BarChart<String, Number> createBinomialChart() {
         CategoryAxis xAxis = new CategoryAxis();
-        xAxis.setLabel(org.jscience.ui.i18n.I18n.getInstance().get("distributions.axis.k_suc", "Successes (k)"));
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel(org.jscience.ui.i18n.I18n.getInstance().get("distributions.axis.pmf", "Probability Mass"));
-
         BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
-        chart.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("distributions.chart.binomial", "Binomial Distribution (Discrete)"));
-        chart.setAnimated(false);
-
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("B(n, p)");
+        for (int k = 0; k <= n; k++) {
+            double pmf = combinations(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k);
+            series.getData().add(new XYChart.Data<>(String.valueOf(k), pmf));
+        }
         chart.getData().add(series);
-
-        Runnable update = () -> {
-            int n = (int) nSlider.getValue();
-            double p = pSlider.getValue();
-            series.getData().clear();
-
-            for (int k = 0; k <= n; k++) {
-                double pmf = combinations(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k);
-                series.getData().add(new XYChart.Data<>(String.valueOf(k), pmf));
-            }
-        };
-
-        nSlider.valueProperty().addListener(e -> update.run());
-        pSlider.valueProperty().addListener(e -> update.run());
-        update.run();
-
-        pane.setCenter(chart);
-        pane.setRight(controls);
-        return new Tab(org.jscience.ui.i18n.I18n.getInstance().get("distributions.tab.binomial", "Binomial"), pane);
+        return chart;
     }
 
-    private long factorial(int n) {
-        if (n <= 1)
-            return 1;
-        long res = 1;
-        for (int i = 2; i <= n; i++)
-            res *= i;
-        return res;
+    private long factorial(int k) {
+        long r = 1; for (int i = 2; i <= k; i++) r *= i; return r;
     }
 
     private long combinations(int n, int k) {
-        if (k < 0 || k > n)
-            return 0;
-        if (k == 0 || k == n)
-            return 1;
-        if (k > n / 2)
-            k = n - k;
-
+        if (k < 0 || k > n) return 0;
+        if (k == 0 || k == n) return 1;
+        if (k > n / 2) k = n - k;
         long res = 1;
-        for (int i = 1; i <= k; i++) {
-            res = res * (n - i + 1) / i;
-        }
+        for (int i = 1; i <= k; i++) res = res * (n - i + 1) / i;
         return res;
     }
 
-
-    @Override
-    public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.distributionsviewer.desc", "Visualizes different statistical distributions (Normal, Poisson, Binomial) with interactive parameters.");
-    }
-
-    @Override
-    public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.distributionsviewer.longdesc", "Interactive exploration of probability distributions. Adjust parameters like mean, standard deviation, lambda, and number of trials to see how they affect the Probability Density Function (PDF) and Probability Mass Function (PMF).");
-    }
+    @Override public String getCategory() { return I18n.getInstance().get("category.mathematics", "Mathematics"); }
+    @Override public String getName() { return I18n.getInstance().get("viewer.distributionsviewer.name", "Statistical Distributions"); }
+    @Override public String getDescription() { return I18n.getInstance().get("viewer.distributionsviewer.desc", "Statistical distributions explorer."); }
+    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.distributionsviewer.longdesc", "Detailed visualization of various statistical distributions including Normal, Poisson, and Binomial. Interactively adjust parameters like mean, standard deviation, and lambda to see how they affect the shape and characteristics of the distribution curves."); }
+    @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }
-

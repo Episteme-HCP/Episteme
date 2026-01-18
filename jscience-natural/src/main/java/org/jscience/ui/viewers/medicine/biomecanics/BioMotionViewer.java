@@ -27,12 +27,12 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
+import org.jscience.ui.Parameter;
+import org.jscience.ui.NumericParameter;
 import org.jscience.ui.i18n.I18n;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +40,7 @@ import java.util.List;
 /**
  * Biological Motion Viewer.
  * Simulates a simple physics-based walker (Ragdoll/Spring-mass).
+ * Refactored to be parameter-based.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -56,6 +57,8 @@ public class BioMotionViewer extends AbstractViewer implements Simulatable {
 
     private double gravity = 9.81;
     private double muscleStrength = 1.0;
+    
+    private List<Parameter<?>> parameters = new ArrayList<>();
 
     @Override
     public String getName() { return I18n.getInstance().get("viewer.biomotionviewer.name", "BioMotion Viewer"); }
@@ -64,48 +67,8 @@ public class BioMotionViewer extends AbstractViewer implements Simulatable {
     public String getCategory() { return I18n.getInstance().get("category.medicine", "Medicine"); }
 
     public BioMotionViewer() {
+        setupParameters();
         initUI();
-    }
-
-    private void initUI() {
-        this.getStyleClass().add("viewer-root");
-
-        canvas = new Canvas(800, 600);
-        this.setCenter(canvas);
-        
-        this.widthProperty().addListener((o, old, val) -> { canvas.setWidth(val.doubleValue() - 200); draw(); });
-        this.heightProperty().addListener((o, old, val) -> { canvas.setHeight(val.doubleValue()); draw(); });
-
-        VBox sidebar = new VBox(10);
-        sidebar.getStyleClass().add("viewer-sidebar");
-        sidebar.setPrefWidth(200);
-
-        Label title = new Label(I18n.getInstance().get("biomotion.controls", "BioMotion Controls"));
-        title.getStyleClass().add("header-label");
-
-        Button resetBtn = new Button(I18n.getInstance().get("biomotion.reset", "Reset Walker"));
-        resetBtn.setMaxWidth(Double.MAX_VALUE);
-        resetBtn.setOnAction(e -> initWalker());
-
-        Slider gravSlider = new Slider(0, 20, 9.81);
-        Label gravLabel = new Label(String.format("Gravity: %.2f", 9.81));
-        gravLabel.getStyleClass().add("description-label");
-        gravSlider.valueProperty().addListener((o, ov, nv) -> {
-            gravity = nv.doubleValue();
-            gravLabel.setText(String.format("Gravity: %.2f", gravity));
-        });
-
-        Slider muscleSlider = new Slider(0, 5, 1.0);
-        Label muscleLabel = new Label(String.format("Muscle Tone: %.1f", 1.0));
-        muscleLabel.getStyleClass().add("description-label");
-        muscleSlider.valueProperty().addListener((o, ov, nv) -> {
-            muscleStrength = nv.doubleValue();
-            muscleLabel.setText(String.format("Muscle Tone: %.1f", muscleStrength));
-        });
-
-        sidebar.getChildren().addAll(title, resetBtn, new Separator(), gravLabel, gravSlider, muscleLabel, muscleSlider);
-        this.setRight(sidebar);
-
         initWalker();
 
         timer = new AnimationTimer() {
@@ -120,9 +83,24 @@ public class BioMotionViewer extends AbstractViewer implements Simulatable {
         timer.start();
     }
 
+    private void setupParameters() {
+        parameters.add(new NumericParameter(I18n.getInstance().get("biomotion.gravity", "Gravity"), "Simulation Gravity", 0, 20, 0.1, gravity, v -> gravity = v));
+        parameters.add(new NumericParameter(I18n.getInstance().get("biomotion.muscle", "Muscle Tone"), "Muscle Strength", 0, 5, 0.1, muscleStrength, v -> muscleStrength = v));
+        parameters.add(new NumericParameter(I18n.getInstance().get("biomotion.speed", "Speed"), "Simulation Speed", 0.1, 5.0, 0.1, speed, v -> speed = v));
+    }
+
+    private void initUI() {
+        this.getStyleClass().add("viewer-root");
+        canvas = new Canvas(800, 600);
+        this.setCenter(canvas);
+        
+        this.widthProperty().addListener((o, old, val) -> { canvas.setWidth(val.doubleValue()); draw(); });
+        this.heightProperty().addListener((o, old, val) -> { canvas.setHeight(val.doubleValue()); draw(); });
+    }
+
     @Override public void play() { running = true; }
     @Override public void pause() { running = false; }
-    @Override public void stop() { running = false; initWalker(); }
+    @Override public void stop() { running = false; initWalker(); draw(); }
     @Override public boolean isPlaying() { return running; }
     @Override public void setSpeed(double s) { this.speed = s; }
     @Override public void step() { update(0.016); draw(); }
@@ -155,6 +133,7 @@ public class BioMotionViewer extends AbstractViewer implements Simulatable {
     }
 
     private void update(double dt) {
+        if (canvas == null) return;
         for (Node n : nodes) {
             if (n.fixed) continue;
             n.vy += gravity * 10 * dt;
@@ -190,6 +169,7 @@ public class BioMotionViewer extends AbstractViewer implements Simulatable {
     }
 
     private void draw() {
+        if (canvas == null) return;
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
@@ -221,7 +201,6 @@ public class BioMotionViewer extends AbstractViewer implements Simulatable {
     }
 
     @Override public String getDescription() { return I18n.getInstance().get("viewer.biomotionviewer.desc", "Physics-based biological motion simulator."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.biomotionviewer.longdesc", "Simulates biological movement using a spring-mass ragdoll model. Adjust gravity and muscle tone to observe how they affect the walker's dynamics and stability."); }
-    @Override public List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.biomotionviewer.longdesc", "Simulates biological movement using a spring-mass ragdoll model."); }
+    @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }
-

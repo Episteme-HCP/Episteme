@@ -25,12 +25,10 @@ package org.jscience.ui.viewers.biology.ecology;
 
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
@@ -49,13 +47,9 @@ import java.util.List;
 
 /**
  * Lotka-Volterra Predator-Prey Dynamics Simulation.
+ * Refactored to be 100% parameter-based.
  *
  * @author Silvere Martin-Michiellot
- * <p>
- * <b>Reference:</b><br>
- * Lotka, A. J. (1925). <i>Elements of Physical Biology</i>. Williams & Wilkins.
- * </p>
- *
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
@@ -91,10 +85,10 @@ public class LotkaVolterraViewer extends AbstractViewer implements Simulatable {
     }
 
     private void initParameters() {
-        alphaParam = new RealParameter("Alpha", "Prey Growth Rate", 0.0, 5.0, 0.1, 1.1, null);
-        betaParam = new RealParameter("Beta", "Predation Rate", 0.0, 5.0, 0.1, 0.4, null);
-        deltaParam = new RealParameter("Delta", "Predator Growth Rate", 0.0, 5.0, 0.1, 0.1, null);
-        gammaParam = new RealParameter("Gamma", "Predator Death Rate", 0.0, 5.0, 0.1, 0.4, null);
+        alphaParam = new RealParameter(I18n.getInstance().get("lotka.param.alpha", "Alpha"), "Prey Growth Rate", 0.0, 5.0, 0.1, 1.1, null);
+        betaParam = new RealParameter(I18n.getInstance().get("lotka.param.beta", "Beta"), "Predation Rate", 0.0, 5.0, 0.1, 0.4, null);
+        deltaParam = new RealParameter(I18n.getInstance().get("lotka.param.delta", "Delta"), "Predator Growth Rate", 0.0, 5.0, 0.1, 0.1, null);
+        gammaParam = new RealParameter(I18n.getInstance().get("lotka.param.gamma", "Gamma"), "Predator Death Rate", 0.0, 5.0, 0.1, 0.4, null);
     }
 
     private void initUI() {
@@ -113,8 +107,7 @@ public class LotkaVolterraViewer extends AbstractViewer implements Simulatable {
         timeChart.setCreateSymbols(false);
         preySeries.setName(I18n.getInstance().get("lotka.series.prey", "Prey"));
         predSeries.setName(I18n.getInstance().get("lotka.series.pred", "Predator"));
-        @SuppressWarnings({"unchecked", "unused"})
-        var unused = timeChart.getData().addAll(preySeries, predSeries);
+        timeChart.getData().addAll(List.of(preySeries, predSeries));
 
         NumberAxis xAxisPhase = new NumberAxis();
         xAxisPhase.setLabel(I18n.getInstance().get("lotka.axis.prey", "Prey"));
@@ -130,26 +123,6 @@ public class LotkaVolterraViewer extends AbstractViewer implements Simulatable {
         chartsBox.getChildren().addAll(timeChart, phaseChart);
         this.setCenter(chartsBox);
 
-        VBox sidebar = new VBox(15);
-        sidebar.setPadding(new Insets(10));
-        sidebar.setPrefWidth(250);
-        sidebar.getStyleClass().add("viewer-sidebar");
-
-        sidebar.getChildren().addAll(
-                new Label(I18n.getInstance().get("lotka.header.params", "Parameters")),
-                createParameterControl(alphaParam),
-                createParameterControl(betaParam),
-                createParameterControl(deltaParam),
-                createParameterControl(gammaParam)
-        );
-
-        Button resetBtn = new Button(I18n.getInstance().get("lotka.btn.reset", "Reset"));
-        resetBtn.setMaxWidth(Double.MAX_VALUE);
-        resetBtn.setOnAction(e -> reset());
-
-        sidebar.getChildren().addAll(new Separator(), resetBtn);
-        this.setLeft(sidebar);
-
         timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -159,28 +132,7 @@ public class LotkaVolterraViewer extends AbstractViewer implements Simulatable {
         timer.start();
     }
 
-    // Helper to generate UI control from Parameter manually (duplicating AbstractDemo logic mostly, or could expose it)
-    // Since AbstractViewer doesn't provide UI generation, this Viewer builds its own.
-    // Ideally we should use the same builder as AbstractDemo. 
-    // Here we implement a simple one for the Sidebar.
-    private Node createParameterControl(RealParameter param) {
-        VBox box = new VBox(3);
-        Label label = new Label(param.getName());
-        Slider slider = new Slider(param.getMin().doubleValue(), param.getMax().doubleValue(), param.getValue().doubleValue());
-        slider.setBlockIncrement(param.getStep().doubleValue());
-        slider.setShowTickLabels(true);
-
-        Label valLabel = new Label(String.format("%.2f", param.getValue().doubleValue()));
-        slider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            param.setValue(Real.of(newVal.doubleValue()));
-            valLabel.setText(String.format("%.2f", newVal.doubleValue()));
-        });
-
-        box.getChildren().addAll(label, slider, valLabel);
-        return box;
-    }
-
-    @Override public void play() { running = true; timer.start(); }
+    @Override public void play() { running = true; }
     @Override public void pause() { running = false; }
     @Override public void stop() { running = false; reset(); }
     @Override public boolean isPlaying() { return running; }
@@ -190,7 +142,6 @@ public class LotkaVolterraViewer extends AbstractViewer implements Simulatable {
         double dt = 0.05 * speed;
         double[] current = { preyPop.getValue().doubleValue(), predPop.getValue().doubleValue() };
         
-        // Cache parameters for the step (Optimization)
         double alpha = alphaParam.getValue().doubleValue();
         double beta = betaParam.getValue().doubleValue();
         double delta = deltaParam.getValue().doubleValue();
@@ -233,16 +184,10 @@ public class LotkaVolterraViewer extends AbstractViewer implements Simulatable {
         phaseSeries.getData().clear();
     }
 
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.lotkavolterra.desc", "Dynamic predator-prey ecosystem with adjustable parameters."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.lotkavolterra.longdesc", "Predicts the population dynamics of two species that interact, one as a predator and the other as prey. Adjust growth, predation, and death rates to observe cyclic population shifts."); }
+    @Override public String getDescription() { return I18n.getInstance().get("viewer.lotkavolterra.desc", "Dynamic predator-prey ecosystem."); }
+    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.lotkavolterra.longdesc", "Predicts the population dynamics of two interacting species."); }
     
     @Override public List<Parameter<?>> getViewerParameters() { 
-        List<Parameter<?>> params = new ArrayList<>();
-        params.add(alphaParam);
-        params.add(betaParam);
-        params.add(deltaParam);
-        params.add(gammaParam);
-        return params;
+        return List.of(alphaParam, betaParam, deltaParam, gammaParam);
     }
 }
-

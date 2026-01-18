@@ -24,203 +24,106 @@
 package org.jscience.ui.viewers.sports;
 
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.*;
 import org.jscience.ui.AbstractViewer;
+import org.jscience.ui.Parameter;
+import org.jscience.ui.ChoiceParameter;
+import org.jscience.ui.NumericParameter;
+import org.jscience.ui.BooleanParameter;
+import org.jscience.ui.StringParameter;
+import org.jscience.ui.i18n.I18n;
+import org.jscience.io.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.jscience.ui.i18n.I18n;
-import org.jscience.ui.Parameter;
-import org.jscience.io.Configuration;
+import java.util.stream.Collectors;
 
 /**
  * Sports Results Management Viewer.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Refactored to be 100% parameter-based.
  */
 public class SportsResultsViewer extends AbstractViewer {
 
-    private final I18n i18n = I18n.getInstance();
     private final ObservableList<Team> teams = FXCollections.observableArrayList();
     private final ObservableList<String> matchHistory = FXCollections.observableArrayList();
+    private final List<Parameter<?>> parameters = new ArrayList<>();
 
-    @Override
-    public String getName() { return I18n.getInstance().get("viewer.sportsresults.name", "Sports Results"); }
-    
-    @Override
-    public String getCategory() { return I18n.getInstance().get("category.sports", "Sports"); }
+    private String homeTeamName = "";
+    private String awayTeamName = "";
+    private int homeScore = 0;
+    private int awayScore = 0;
 
     public SportsResultsViewer() {
+        initTeams();
+        setupParameters();
         initUI();
     }
-    
-    @Override
-    public String getDescription() {
-        return I18n.getInstance().get("viewer.sportsresults.desc", "Sports Results Management");
-    }
 
-    @Override
-    public String getLongDescription() { 
-        return I18n.getInstance().get("viewer.sportsresults.longdesc", "Manage team standings, match results and simulate seasons.");
-    }
-    
-    @Override
-    public void show(javafx.stage.Stage stage) {
-         javafx.scene.Scene scene = new javafx.scene.Scene(this);
-         org.jscience.ui.ThemeManager.getInstance().applyTheme(scene);
-         stage.setTitle(getName());
-         stage.setScene(scene);
-         stage.show();
-    }
-
-    @SuppressWarnings("unchecked")
-    private void initUI() {
-        Label headerVal = new Label(i18n.get("sports.header", "League Table"));
-        headerVal.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 24px; -fx-font-weight: bold;
-        HBox header = new HBox(headerVal);
-        header.setAlignment(Pos.CENTER);
-        header.setPadding(new Insets(20));
-        this.setTop(header);
-
-        TableView<Team> table = new TableView<>();
-        table.setItems(teams);
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-
-        TableColumn<Team, Integer> rankCol = new TableColumn<>("#");
-        rankCol.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(Integer item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty ? null : String.valueOf(getIndex() + 1));
+    private void setupParameters() {
+        parameters.add(new StringParameter("sports.teams", I18n.getInstance().get("sports.param.teams", "Teams List"), Configuration.get("viewer.sports.default.teams", "Man City,Arsenal,Liverpool"), v -> reinitializeTeams(v)));
+        
+        List<String> teamNames = teams.stream().map(Team::getName).collect(Collectors.toList());
+        parameters.add(new ChoiceParameter("sports.match.home", I18n.getInstance().get("sports.form.home", "Home Team"), teamNames, "", v -> homeTeamName = v));
+        parameters.add(new ChoiceParameter("sports.match.away", I18n.getInstance().get("sports.form.away", "Away Team"), teamNames, "", v -> awayTeamName = v));
+        parameters.add(new NumericParameter("sports.match.hscore", "Home Score", 0, 20, 1, (double)homeScore, v -> homeScore = v.intValue()));
+        parameters.add(new NumericParameter("sports.match.ascore", "Away Score", 0, 20, 1, (double)awayScore, v -> awayScore = v.intValue()));
+        
+        parameters.add(new BooleanParameter("sports.match.add", I18n.getInstance().get("sports.button.add", "Add Match"), false, v -> {
+            if (v) {
+                Team h = teams.stream().filter(t -> t.name.equals(homeTeamName)).findFirst().orElse(null);
+                Team a = teams.stream().filter(t -> t.name.equals(awayTeamName)).findFirst().orElse(null);
+                processMatch(h, a, homeScore, awayScore);
             }
-        });
-        rankCol.setPrefWidth(40);
-
-        TableColumn<Team, String> nameCol = new TableColumn<>(i18n.get("sports.col.team", "Team"));
-        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-
-        TableColumn<Team, Integer> playedCol = new TableColumn<>(i18n.get("sports.col.played", "Played"));
-        playedCol.setCellValueFactory(new PropertyValueFactory<>("played"));
-
-        TableColumn<Team, Number> pointsCol = new TableColumn<>(i18n.get("sports.col.pts", "Points"));
-        pointsCol.setCellValueFactory(cell -> cell.getValue().points);
-        pointsCol.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
-
-        TableColumn<Team, String> avgCol = new TableColumn<>("Trend (SMA)");
-        avgCol.setCellValueFactory(cell -> cell.getValue().trend);
-
-        table.getColumns().addAll(rankCol, nameCol, playedCol, pointsCol, avgCol);
-
-        VBox centerBox = new VBox(10, new Label(i18n.get("sports.label.standings", "Standings")), table);
-        centerBox.setPadding(new Insets(20));
-        this.setCenter(centerBox);
-
-        VBox rightPanel = new VBox(20);
-        rightPanel.setPadding(new Insets(20));
-        rightPanel.setPrefWidth(350);
-
-        ComboBox<Team> homeBox = new ComboBox<>(teams);
-        homeBox.setPromptText(i18n.get("sports.form.home", "Home Team"));
-        homeBox.setMaxWidth(Double.MAX_VALUE);
-
-        ComboBox<Team> awayBox = new ComboBox<>(teams);
-        awayBox.setPromptText(i18n.get("sports.form.away", "Away Team"));
-        awayBox.setMaxWidth(Double.MAX_VALUE);
-
-        TextField hScore = new TextField();
-        hScore.setPromptText("Home");
-        hScore.setPrefWidth(50);
-        TextField aScore = new TextField();
-        aScore.setPromptText("Away");
-        aScore.setPrefWidth(50);
-        HBox scoreBox = new HBox(10, hScore, new Label("-"), aScore);
-        scoreBox.setAlignment(Pos.CENTER);
-
-        Button addBtn = new Button(i18n.get("sports.button.add", "Add Match"));
-        addBtn.setMaxWidth(Double.MAX_VALUE);
-        addBtn.setOnAction(e -> {
-            try {
-                processMatch(homeBox.getValue(), awayBox.getValue(),
-                        Integer.parseInt(hScore.getText()), Integer.parseInt(aScore.getText()));
-                hScore.clear();
-                aScore.clear();
-            } catch (Exception ex) { }
-        });
-
-        Button simBtn = new Button(i18n.get("sports.button.simulate", "Simulate"));
-        simBtn.setMaxWidth(Double.MAX_VALUE);
-        simBtn.setOnAction(e -> simulateSeason());
-
-        ListView<String> historyView = new ListView<>(matchHistory);
-        historyView.setPrefHeight(300);
-
-        rightPanel.getChildren().addAll(new Label(i18n.get("sports.form.title", "Add Match")), homeBox, awayBox, scoreBox, addBtn, simBtn, new Separator(), historyView);
-        this.setRight(rightPanel);
-
-        initTeams();
+        }));
+        
+        parameters.add(new BooleanParameter("sports.simulate", I18n.getInstance().get("sports.button.simulate", "Simulate Season"), false, v -> {
+            if (v) simulateSeason();
+        }));
     }
 
-    @Override
-    public List<Parameter<?>> getViewerParameters() {
-        List<Parameter<?>> parameters = new ArrayList<>();
+    private void initUI() {
+        TableView<Team> table = new TableView<>(teams);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         
-        String defaultTeams = Configuration.get("viewer.sports.default.teams", "Man City,Arsenal,Liverpool");
+        TableColumn<Team, String> nameCol = new TableColumn<>(I18n.getInstance().get("sports.col.team", "Team"));
+        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         
-        parameters.add(new Parameter<String>(
-            i18n.get("sports.param.teams", "Teams List"),
-            i18n.get("sports.param.teams.desc", "Comma-separated list of team names"),
-            defaultTeams,
-            value -> reinitializeTeams(value)
-        ));
+        TableColumn<Team, Integer> playedCol = new TableColumn<>(I18n.getInstance().get("sports.col.played", "Played"));
+        playedCol.setCellValueFactory(new PropertyValueFactory<>("played"));
         
-        return parameters;
+        TableColumn<Team, Number> pointsCol = new TableColumn<>(I18n.getInstance().get("sports.col.pts", "Points"));
+        pointsCol.setCellValueFactory(cell -> cell.getValue().points);
+        
+        table.getColumns().addAll(nameCol, playedCol, pointsCol);
+        
+        ListView<String> historyView = new ListView<>(matchHistory);
+        SplitPane split = new SplitPane(table, historyView);
+        split.setOrientation(javafx.geometry.Orientation.VERTICAL);
+        
+        setCenter(split);
     }
 
     private void reinitializeTeams(String teamList) {
-        teams.clear();
-        matchHistory.clear();
+        teams.clear(); matchHistory.clear();
         if (teamList != null && !teamList.isEmpty()) {
-            for (String t : teamList.split(",")) {
-                teams.add(new Team(t.trim()));
-            }
+            for (String t : teamList.split(",")) teams.add(new Team(t.trim()));
         }
     }
 
     private void initTeams() {
-        String defaultTeams = Configuration.get("viewer.sports.default.teams", "Man City,Arsenal,Liverpool");
-        reinitializeTeams(defaultTeams);
+        reinitializeTeams(Configuration.get("viewer.sports.default.teams", "Man City,Arsenal,Liverpool"));
     }
 
     private void processMatch(Team home, Team away, int homeGoals, int awayGoals) {
         if (home == null || away == null || home == away) return;
-        
-        home.played++;
-        away.played++;
-        
-        int homePoints = 0, awayPoints = 0;
-        if (homeGoals > awayGoals) {
-            homePoints = 3;
-        } else if (homeGoals < awayGoals) {
-            awayPoints = 3;
-        } else {
-            homePoints = 1;
-            awayPoints = 1;
-        }
-        
-        home.addPoints(homePoints);
-        away.addPoints(awayPoints);
-        
-        matchHistory.add(String.format("%s %d - %d %s", home.name, homeGoals, awayGoals, away.name));
+        home.played++; away.played++;
+        if (homeGoals > awayGoals) home.addPoints(3);
+        else if (homeGoals < awayGoals) away.addPoints(3);
+        else { home.addPoints(1); away.addPoints(1); }
+        matchHistory.add(0, String.format("%s %d - %d %s", home.name, homeGoals, awayGoals, away.name));
         FXCollections.sort(teams, (t1, t2) -> Integer.compare(t2.points.get(), t1.points.get()));
     }
 
@@ -228,43 +131,24 @@ public class SportsResultsViewer extends AbstractViewer {
         java.util.Random rand = new java.util.Random();
         for (int i = 0; i < teams.size(); i++) {
             for (int j = i + 1; j < teams.size(); j++) {
-                int homeGoals = rand.nextInt(4);
-                int awayGoals = rand.nextInt(4);
-                processMatch(teams.get(i), teams.get(j), homeGoals, awayGoals);
+                processMatch(teams.get(i), teams.get(j), rand.nextInt(4), rand.nextInt(4));
             }
         }
     }
 
-    /**
-     * Team data model for sports standings.
-     */
     public static class Team {
         public final String name;
         public int played = 0;
         public final SimpleIntegerProperty points = new SimpleIntegerProperty(0);
-        public final SimpleStringProperty trend = new SimpleStringProperty("--");
-        private final java.util.List<Integer> pointHistory = new java.util.ArrayList<>();
-        
-        public Team(String name) {
-            this.name = name;
-        }
-        
-        public void addPoints(int pts) {
-            points.set(points.get() + pts);
-            pointHistory.add(pts);
-            if (pointHistory.size() >= 3) {
-                double avg = pointHistory.stream()
-                    .mapToInt(Integer::intValue)
-                    .average().orElse(0);
-                trend.set(String.format("%.1f", avg));
-            }
-        }
-        
+        public Team(String name) { this.name = name; }
+        public void addPoints(int pts) { points.set(points.get() + pts); }
         public String getName() { return name; }
-        public int getPlayed() { return played; }
-        
-        @Override
-        public String toString() { return name; }
+        @Override public String toString() { return name; }
     }
-}
 
+    @Override public String getName() { return I18n.getInstance().get("viewer.sportsresults.name", "Sports Results"); }
+    @Override public String getCategory() { return I18n.getInstance().get("category.sports", "Sports"); }
+    @Override public String getDescription() { return I18n.getInstance().get("viewer.sportsresults.desc", "Sports Results Management"); }
+    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.sportsresults.longdesc", "A comprehensive sports league management and visualization tool. Create lists of teams, record match results with home and away scores, and maintain a real-time league table. The viewer includes a season simulation feature to quickly populate results and analyze statistical trends in team performance."); }
+    @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
+}

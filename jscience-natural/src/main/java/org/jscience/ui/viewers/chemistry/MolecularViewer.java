@@ -23,9 +23,7 @@
 
 package org.jscience.ui.viewers.chemistry;
 
-import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
-
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import org.jscience.chemistry.Atom;
@@ -38,90 +36,83 @@ import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
 
 import org.jscience.ui.viewers.chemistry.backend.MolecularRenderer;
 import org.jscience.ui.viewers.chemistry.backend.RenderStyle;
+import org.jscience.ui.AbstractViewer;
+import org.jscience.ui.Parameter;
+import org.jscience.ui.ChoiceParameter;
+import org.jscience.ui.i18n.I18n;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Unified Molecular and Biological Structure Viewer.
- * Uses pluggable MolecularRenderer backend via Factory.
+ * Refactored to be 100% parameter-based.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-public class MolecularViewer extends org.jscience.ui.AbstractViewer {
+public class MolecularViewer extends AbstractViewer {
 
     private final MolecularRenderer renderer;
-    private Label detailLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("molecule.select"));
+    private final Label detailLabel = new Label(I18n.getInstance().get("molecule.select"));
+    private String currentMolecule = "Benzene";
+    private RenderStyle currentStyle = RenderStyle.BALL_AND_STICK;
+    
+    private final List<Parameter<?>> parameters = new ArrayList<>();
 
     public MolecularViewer() {
         this.renderer = MolecularFactory.createRenderer();
+        setupParameters();
         initUI();
+        loadModel(currentMolecule);
     }
     
-    @Override
-    public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.molecularviewer.name", "Molecular Viewer");
-    }
-    
-    @Override
-    public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry");
+    @Override public String getName() { return I18n.getInstance().get("viewer.molecularviewer.name", "Molecular Viewer"); }
+    @Override public String getCategory() { return I18n.getInstance().get("category.chemistry", "Chemistry"); }
+
+    private void setupParameters() {
+        List<String> mols = List.of("Benzene", "DNA", "Protein Folding");
+        parameters.add(new ChoiceParameter("molecule.load", I18n.getInstance().get("molecule.label.load", "Molecule"), mols, currentMolecule, v -> {
+            currentMolecule = v;
+            loadModel(currentMolecule);
+        }));
+
+        List<String> styles = Arrays.stream(RenderStyle.values()).map(Enum::name).collect(Collectors.toList());
+        parameters.add(new ChoiceParameter("molecule.style", I18n.getInstance().get("generated.molecular.style", "Style"), styles, currentStyle.name(), v -> {
+            currentStyle = RenderStyle.valueOf(v);
+            renderer.setStyle(currentStyle);
+            loadModel(currentMolecule);
+        }));
     }
 
     private void initUI() {
         this.setCenter((javafx.scene.Node) renderer.getViewComponent());
 
-        VBox controls = new VBox(15);
-        controls.setPadding(new Insets(15));
-        controls.getStyleClass().add("viewer-sidebar");
-        controls.setPrefWidth(280);
-
-        ComboBox<String> selector = new ComboBox<>(FXCollections.observableArrayList(
-                "Benzene", "DNA", "Water", "Protein Folding")); // Removed some for brevity
-        selector.setValue("Benzene");
-        selector.setOnAction(e -> loadModel(selector.getValue()));
-
-        ComboBox<RenderStyle> styleSelector = new ComboBox<>(FXCollections.observableArrayList(RenderStyle.values()));
-        styleSelector.setValue(RenderStyle.BALL_AND_STICK);
-        styleSelector.setOnAction(e -> {
-            renderer.setStyle(styleSelector.getValue());
-            loadModel(selector.getValue()); // Re-render
-        });
-
-        controls.getChildren().addAll(
-                new Label(org.jscience.ui.i18n.I18n.getInstance().get("molecule.label.load")),
-                selector,
-                new Separator(),
-                new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.molecular.style", "Style")),
-                styleSelector,
-                new Separator(),
-                detailLabel);
-        this.setRight(controls);
-
-        loadModel("Benzene");
-        renderer.setStyle(RenderStyle.BALL_AND_STICK);
+        VBox sidebar = new VBox(15, detailLabel);
+        sidebar.setPadding(new Insets(15));
+        sidebar.getStyleClass().add("viewer-sidebar");
+        sidebar.setPrefWidth(280);
+        this.setRight(sidebar);
     }
 
     private void loadModel(String name) {
+        if (renderer == null) return;
         renderer.clear();
-        Molecule mol = new Molecule(name); // Helper or just container
+        Molecule mol = new Molecule(name);
 
         if ("Benzene".equals(name))
             createBenzene(mol);
         else if ("DNA".equals(name))
             createDNA(mol);
         else if ("Protein Folding".equals(name)) {
-            // Basic implementation for now, animation removed for brevity/stability
             createBenzene(mol);
         }
 
-        // Render molecule
-        for (Atom a : mol.getAtoms())
-            renderer.drawAtom(a);
-        for (Bond b : mol.getBonds())
-            renderer.drawBond(b);
+        for (Atom a : mol.getAtoms()) renderer.drawAtom(a);
+        for (Bond b : mol.getBonds()) renderer.drawBond(b);
     }
 
     private void createBenzene(Molecule mol) {
@@ -148,7 +139,6 @@ public class MolecularViewer extends org.jscience.ui.AbstractViewer {
             mol.addAtom(new Atom(PeriodicTable.bySymbol("P"),
                     vec(8 * Math.cos(ang + Math.PI), y, 8 * Math.sin(ang + Math.PI))));
         }
-        // Simplified DNA (no bonds for brevity in this demo)
     }
 
     private Vector<Real> vec(double x, double y, double z) {
@@ -159,19 +149,9 @@ public class MolecularViewer extends org.jscience.ui.AbstractViewer {
         return DenseVector.of(l, Real.ZERO);
     }
 
+    public MolecularRenderer getRenderer() { return renderer; }
 
-
-    // Accessor for CrystalStructureApp to use custom rendering
-    public MolecularRenderer getRenderer() {
-        return renderer;
-    }
-
-    @Override
-    public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.molecularviewer.desc", "Unified molecular and biological structure viewer.");
-    }
-    @Override
-    public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.molecularviewer.longdesc", "Interactive 3D visualization of chemical structures, including organic molecules like benzene and biological macromolecules like DNA. Supports multiple rendering styles including Ball-and-Stick.");
-    }
+    @Override public String getDescription() { return I18n.getInstance().get("viewer.molecularviewer.desc", "Molecular structure viewer."); }
+    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.molecularviewer.longdesc", "3D visualization of chemical structures."); }
+    @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }

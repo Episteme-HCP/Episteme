@@ -45,19 +45,21 @@ import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
 import org.jscience.ui.NumericParameter;
 import org.jscience.ui.BooleanParameter;
+import org.jscience.ui.ChoiceParameter;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.i18n.I18n;
-
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 3D Star System Viewer.
  * Features: Solar System, Black Hole etc.
+ * Refactored to be fully parameter-based.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -86,10 +88,26 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
     private int updateCounter = 0;
     private Label dateLabel;
     private SubScene subScene;
+    
+    private List<Parameter<?>> parameters = new ArrayList<>();
 
-    private enum Preset { SOLAR_SYSTEM, BLACK_HOLE, NEUTRON_STAR, SUPERGIANT }
+    private enum Preset { 
+        SOLAR_SYSTEM("Solar System"), 
+        BLACK_HOLE("Black Hole (Cygnus X-1)"), 
+        BINARY_SYSTEM("Binary System");
+        
+        private final String label;
+        Preset(String label) { this.label = label; }
+        public String getLabel() { return label; }
+        public static Preset fromLabel(String label) {
+            for (Preset p : values()) if (p.label.equals(label)) return p;
+            return SOLAR_SYSTEM;
+        }
+    }
 
     public StarSystemViewer() {
+        setupParameters();
+        
         // Camera
         Group camGroup = new Group(camera);
         camGroup.getTransforms().addAll(cameraY, cameraX, cameraZ);
@@ -106,7 +124,7 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
         setBottom(overlay);
         
         // Resize
-        widthProperty().addListener(o -> { if(getWidth()>0) subScene.setWidth(getWidth() - 220); });
+        widthProperty().addListener(o -> { if(getWidth()>0) subScene.setWidth(getWidth()); });
         heightProperty().addListener(o -> { if(getHeight()>0) subScene.setHeight(getHeight()); });
 
         loadSystem(Preset.SOLAR_SYSTEM);
@@ -121,6 +139,20 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
                 updateVisuals();
             }
         }.start();
+    }
+
+    private void setupParameters() {
+        List<String> presets = Arrays.stream(Preset.values()).map(Preset::getLabel).collect(Collectors.toList());
+        parameters.add(new ChoiceParameter("starsystem.preset", I18n.getInstance().get("starsystem.preset", "System Preset"), presets, Preset.SOLAR_SYSTEM.getLabel(), v -> {
+            loadSystem(Preset.fromLabel(v));
+        }));
+        
+        parameters.add(new NumericParameter("starsystem.timescale", I18n.getInstance().get("starsystem.timescale", "Time Scale"), 0.0, 100.0, 0.1, timeScale, v -> timeScale = v));
+        parameters.add(new NumericParameter("starsystem.planetscale", I18n.getInstance().get("starsystem.planetscale", "Planet Scale"), 1.0, 10000.0, 10.0, planetScale, v -> {
+            planetScale = v;
+            build3DWorld();
+        }));
+        parameters.add(new BooleanParameter("starsystem.paused", I18n.getInstance().get("starsystem.paused", "Paused"), paused, v -> paused = v));
     }
 
     private void setupInput(SubScene info) {
@@ -140,7 +172,6 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
     private VBox createOverlay() {
         VBox box = new VBox(5);
         box.setPadding(new Insets(5));
-        box.getStyleClass().add("viewer-sidebar");
         
         dateLabel = new Label();
         dateLabel.getStyleClass().add("description-label");
@@ -157,7 +188,8 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
             currentSystem = createBlackHoleSystem();
             planetScale = 50.0; scaleFactor = 1e-8; cameraZ.setZ(-100);
         } else {
-           currentSystem = createDefaultSolarSystem(); // Stubs
+            currentSystem = createBinarySystem();
+            planetScale = 50.0; scaleFactor = 1e-8; cameraZ.setZ(-200);
         }
         build3DWorld();
     }
@@ -201,6 +233,7 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
         if (n.contains("earth")) return Color.BLUE;
         if (n.contains("mars")) return Color.RED;
         if (n.contains("supergiant")) return Color.ALICEBLUE;
+        if (n.contains("companion")) return Color.LIGHTBLUE;
         return Color.GRAY;
     }
 
@@ -212,7 +245,9 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
             // Simplified orbit logic for demo visual
             if (body.getName().contains("Black Hole")) { x=0; }
             else if (body.getName().contains("Supergiant") || body.getName().contains("Companion")) {
-                double t = updateCounter * 0.02; x = Math.cos(t)*80; z = Math.sin(t)*80;
+                double t = updateCounter * 0.02; 
+                double r = body.getName().contains("Companion") ? 120 : 0;
+                x = Math.cos(t)*r; z = Math.sin(t)*r;
             } else if (body.getName().equalsIgnoreCase("Sun")) { x=0; }
             else if (body.getName().equalsIgnoreCase("Earth")) {
                 double t = updateCounter * 0.01; x = Math.cos(t)*150; z = Math.sin(t)*150;
@@ -232,18 +267,15 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
     }
     
     private void updateLabels() { if(dateLabel!=null) dateLabel.setText(I18n.getInstance().get("starsystem.date", "Date") + ": " + String.format("%.2f", currentDate.getValue())); }
-    private void updateVisuals() { /* star rotation */ }
+    private void updateVisuals() { }
 
-    // --- Simulatable ---
     @Override public void play() { paused = false; }
     @Override public void pause() { paused = true; }
     @Override public void stop() { paused = true; }
-    @Override public void step() { /* Single step logic could go here */ }
-    @Override public void setSpeed(double s) { timeScale = s; if(Math.abs(timeScale)<0.1 && timeScale!=0) timeScale=0.1; }
+    @Override public void step() { updatePositions(); updateLabels(); }
+    @Override public void setSpeed(double s) { timeScale = s; }
     @Override public boolean isPlaying() { return !paused; }
 
-    
-    // --- Star System Creation (Merged) ---
     private StarSystem createDefaultSolarSystem() {
         StarSystem s = new StarSystem("Solar System");
         Vector<Real> o = DenseVector.of(Arrays.asList(Real.ZERO, Real.ZERO, Real.ZERO), org.jscience.mathematics.sets.Reals.getInstance());
@@ -267,38 +299,22 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
         s.addBody(new Planet("Companion", org.jscience.measure.Quantities.create(Real.of(4e31), Units.KILOGRAM),
                 org.jscience.measure.Quantities.create(Real.of(1e10), Units.METER), o, z));
         return s;
-    }    
-
-    @Override
-    public String getCategory() {
-        return I18n.getInstance().get("category.physics", "Physics");
     }
 
-    @Override
-    public String getName() {
-        return I18n.getInstance().get("viewer.starsystemviewer.name", "Star System Viewer");
+    private StarSystem createBinarySystem() {
+        StarSystem s = new StarSystem("Binary Star");
+        Vector<Real> o = DenseVector.of(Arrays.asList(Real.ZERO, Real.ZERO, Real.ZERO), org.jscience.mathematics.sets.Reals.getInstance());
+        Vector<Real> z = DenseVector.of(Arrays.asList(Real.ZERO, Real.ZERO, Real.ZERO), org.jscience.mathematics.sets.Reals.getInstance());
+        s.addBody(new Star("Supergiant", org.jscience.measure.Quantities.create(Real.of(1e31), Units.KILOGRAM),
+                org.jscience.measure.Quantities.create(Real.of(7e8), Units.METER), o, z));
+        s.addBody(new Star("Companion", org.jscience.measure.Quantities.create(Real.of(1e31), Units.KILOGRAM),
+                org.jscience.measure.Quantities.create(Real.of(7e8), Units.METER), o, z));
+        return s;
     }
 
-    @Override
-    public String getDescription() {
-        return I18n.getInstance().get("viewer.starsystemviewer.desc", "3D celestial body and orbital dynamics simulator.");
-    }
-
-    @Override
-    public String getLongDescription() {
-        return I18n.getInstance().get("viewer.starsystemviewer.longdesc", "Explore stellar systems including our Solar System and exotic objects like black holes. features 3D navigation, orbital trails, and time scaling to observe long-term celestial mechanics.");
-    }
-
-    @Override
-    public List<Parameter<?>> getViewerParameters() {
-        List<Parameter<?>> params = new ArrayList<>();
-        params.add(new NumericParameter("starsystem.timescale", I18n.getInstance().get("starsystem.timescale", "Time Scale"), 0.0, 100.0, 0.1, timeScale, v -> timeScale = v));
-        params.add(new NumericParameter("starsystem.planetscale", I18n.getInstance().get("starsystem.planetscale", "Planet Scale"), 1.0, 10000.0, 10.0, planetScale, v -> {
-            planetScale = v;
-            build3DWorld();
-        }));
-        params.add(new BooleanParameter("starsystem.paused", I18n.getInstance().get("starsystem.paused", "Paused"), paused, v -> paused = v));
-        return params;
-    }
+    @Override public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
+    @Override public String getName() { return I18n.getInstance().get("viewer.starsystemviewer.name", "Star System Viewer"); }
+    @Override public String getDescription() { return I18n.getInstance().get("viewer.starsystemviewer.desc", "3D Star System Viewer."); }
+    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.starsystemviewer.longdesc", "Explore stellar systems and exotic objects."); }
+    @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }
-

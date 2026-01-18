@@ -27,7 +27,7 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.quantity.*;
-import org.jscience.measure.units.SI;
+import org.jscience.measure.Units;
 import org.jscience.io.MiniCatalog;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -79,18 +79,18 @@ public class StarCatalog implements MiniCatalog<StarCatalog.Star> {
                 String name = node.get("name").asText();
                 String spectralType = node.get("spectralType").asText();
 
-                // Create Quantities using Real and SI units
+                // Create Quantities using Real and Units
                 Quantity<Mass> mass = Quantities.create(
-                        Real.of(node.get("mass").asDouble()), SI.KILOGRAM);
+                        Real.of(node.get("mass").asDouble()), Units.KILOGRAM);
 
                 Quantity<Temperature> temperature = Quantities.create(
-                        Real.of(node.get("temperature").asDouble()), SI.KELVIN);
+                        Real.of(node.get("temperature").asDouble()), Units.KELVIN);
 
                 Quantity<Power> luminosity = Quantities.create(
-                        Real.of(node.get("luminosity").asDouble()), SI.WATT);
+                        Real.of(node.get("luminosity").asDouble()), Units.WATT);
 
                 Quantity<Length> radius = Quantities.create(
-                        Real.of(node.get("radius").asDouble()), SI.METRE);
+                        Real.of(node.get("radius").asDouble()), Units.METER);
 
                 double distance = node.get("distance").asDouble(); // light years
 

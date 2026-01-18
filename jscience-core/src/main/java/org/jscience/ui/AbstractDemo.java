@@ -188,6 +188,26 @@ public abstract class AbstractDemo extends Application implements App {
                 ((BooleanParameter) param).setValue(checkBox.isSelected());
             });
             box.getChildren().addAll(label, checkBox);
+        } else if (param instanceof StringParameter strParam) {
+            TextInputControl textControl;
+            if (strParam.isMultiLine()) {
+                textControl = new TextArea(strParam.getValue());
+                ((TextArea) textControl).setPrefRowCount(3);
+                ((TextArea) textControl).setWrapText(true);
+            } else {
+                textControl = new TextField(strParam.getValue());
+            }
+            textControl.textProperty().addListener((obs, oldVal, newVal) -> {
+                strParam.setValue(newVal);
+            });
+            box.getChildren().addAll(label, textControl);
+        } else if (param instanceof ChoiceParameter choiceParam) {
+            ComboBox<String> combo = new ComboBox<>();
+            combo.getItems().addAll(choiceParam.getChoices());
+            combo.setValue(choiceParam.getValue());
+            combo.setMaxWidth(Double.MAX_VALUE);
+            combo.setOnAction(e -> choiceParam.setValue(combo.getValue()));
+            box.getChildren().addAll(label, combo);
         } else if (param.getValue() instanceof Color) {
             @SuppressWarnings("unchecked")
             Parameter<Color> colorParam = (Parameter<Color>) param;

@@ -27,12 +27,12 @@ import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.BooleanParameter;
+import org.jscience.ui.StringParameter;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.biology.Taxon;
@@ -43,17 +43,14 @@ import javafx.application.Platform;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.text.MessageFormat;
 
 /**
  * Phylogenetic Tree Viewer.
- * Visualizes evolutionary relationships with simulated genetic marker data.
- 
- * <p>
- * <b>Reference:</b><br>
- * Holland, J. H. (1975). <i>Adaptation in Natural and Artificial Systems</i>. University of Michigan Press.
- * </p>
+ * Refactored to be parameter-based.
  *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public class PhylogeneticTreeViewer extends AbstractViewer {
 
@@ -62,174 +59,109 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
     private int leafCounter = 0;
     private Taxon treeRoot;
     private Canvas canvas;
+    private Label infoPanel;
+    private String ncbiQuery = "";
+    
+    private final List<Parameter<?>> parameters = new ArrayList<>();
 
     public PhylogeneticTreeViewer() {
+        setupParameters();
         initUI();
+        loadData();
     }
     
-    @Override
-    public String getName() { return I18n.getInstance().get("viewer.phylogenetictreeviewer.name", "Phylogenetic Tree Viewer"); }
-    
-    @Override
-    public String getCategory() { return I18n.getInstance().get("category.biology", "Biology"); }
+    @Override public String getName() { return I18n.getInstance().get("viewer.phylogenetictreeviewer.name", "Phylogenetic Tree Viewer"); }
+    @Override public String getCategory() { return I18n.getInstance().get("category.biology", "Biology"); }
+
+    private void setupParameters() {
+        parameters.add(new BooleanParameter("viewer.phylogenetictreeviewer.radial", I18n.getInstance().get("viewer.phylogenetictreeviewer.radial", "Radial Mode"), radialMode, v -> {
+            radialMode = v;
+            updateLayoutAndDraw(canvas);
+        }));
+
+        parameters.add(new StringParameter("viewer.phylogenetictreeviewer.ncbi.query", I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.query", "NCBI Query"), ncbiQuery, v -> ncbiQuery = v));
+        
+        parameters.add(new BooleanParameter("viewer.phylogenetictreeviewer.ncbi.search", I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.search", "Search NCBI"), false, v -> {
+            if (v) performNCBISearch();
+        }));
+        
+        parameters.add(new BooleanParameter("viewer.phylogenetictreeviewer.reset", I18n.getInstance().get("viewer.phylogenetictreeviewer.reset", "Reset Tree"), false, v -> {
+            if (v) {
+                loadData();
+                updateLayoutAndDraw(canvas);
+            }
+        }));
+    }
 
     private void initUI() {
-        this.getStyleClass().add("viewer-root");
-
+        getStyleClass().add("viewer-root");
         canvas = new Canvas(900, 700);
-        this.setCenter(canvas);
+        setCenter(canvas);
         
-        this.widthProperty().addListener(e -> { canvas.setWidth(getWidth()); updateLayoutAndDraw(canvas); });
-        this.heightProperty().addListener(e -> { canvas.setHeight(getHeight()); updateLayoutAndDraw(canvas); });
+        widthProperty().addListener(e -> { canvas.setWidth(getWidth() - 250); updateLayoutAndDraw(canvas); });
+        heightProperty().addListener(e -> { canvas.setHeight(getHeight()); updateLayoutAndDraw(canvas); });
 
-        Label infoPanel = new Label(I18n.getInstance().get("viewer.phylogenetictreeviewer.info.default", "Select a node to view details."));
-        infoPanel.getStyleClass().add("viewer-sidebar");
+        infoPanel = new Label(I18n.getInstance().get("viewer.phylogenetictreeviewer.info.default", "Select a node."));
+        infoPanel.setWrapText(true);
+        infoPanel.setPrefWidth(220);
+        
+        VBox sidebar = new VBox(20, infoPanel);
+        sidebar.setPadding(new javafx.geometry.Insets(10));
+        sidebar.getStyleClass().add("viewer-sidebar");
+        setRight(sidebar);
 
-        HBox controls = new HBox(10, infoPanel);
-        controls.setPadding(new javafx.geometry.Insets(10));
-        
-        // Add NCBI Taxonomy query section
-        VBox ncbiSection = createNCBIQuerySection();
-        controls.getChildren().add(0, ncbiSection);
-        
-        this.setBottom(controls);
-
-        loadData();
-        
         canvas.setOnMouseClicked(e -> {
+            if (treeRoot == null) return;
             Taxon clicked = findNode(treeRoot, e.getX(), e.getY());
             if (clicked != null) {
                 selectedNode = clicked;
-                String txt = MessageFormat.format(I18n.getInstance().get("viewer.phylogenetictreeviewer.info.selected", "{0} (COI: {1}, 16S: {2}, Cytb: {3})"), 
-                    clicked.getName(), clicked.getCoi(), clicked.getRna16s(), clicked.getCytb());
-                infoPanel.setText(txt);
-                drawTree(canvas.getGraphicsContext2D(), treeRoot);
+                infoPanel.setText(clicked.getName() + "\nCOI: " + clicked.getCoi());
             } else {
                 selectedNode = null;
-                infoPanel.setText(I18n.getInstance().get("viewer.phylogenetictreeviewer.info.default", "Select a node to view details."));
-                drawTree(canvas.getGraphicsContext2D(), treeRoot);
+                infoPanel.setText("Select a node.");
             }
+            drawTree(canvas.getGraphicsContext2D(), treeRoot);
         });
     }
     
+    private void performNCBISearch() {
+        if (ncbiQuery.isEmpty()) return;
+        new Thread(() -> {
+            try {
+                org.jscience.biology.loaders.NCBITaxonomyReader reader = new org.jscience.biology.loaders.NCBITaxonomyReader();
+                List<Long> taxIds = reader.searchByName(ncbiQuery);
+                if (taxIds != null && !taxIds.isEmpty()) {
+                     Optional<org.jscience.biology.taxonomy.Species> speciesOpt = reader.fetchByTaxId(taxIds.get(0));
+                     if (speciesOpt.isPresent()) {
+                         String lineage = speciesOpt.get().getAttribute("lineage");
+                         if (lineage != null) {
+                             Platform.runLater(() -> {
+                                 this.treeRoot = buildLineageTree(lineage, speciesOpt.get().getScientificName());
+                                 updateLayoutAndDraw(canvas);
+                             });
+                         }
+                     }
+                }
+            } catch (Exception ex) { ex.printStackTrace(); }
+        }).start();
+    }
+
     private void loadData() {
         try {
             PhylogeneticTreeReader reader = new PhylogeneticTreeReader();
-            // Load via classloader
             java.io.InputStream is = getClass().getResourceAsStream("/org/jscience/biology/data/primates.csv");
-            if (is != null) {
-                this.treeRoot = reader.read(is);
-            } else {
-                System.err.println("Could not find primates.csv");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            if (is != null) this.treeRoot = reader.read(is);
+        } catch (Exception e) {}
     }
     
-    /**
-     * Creates NCBI Taxonomy query section for browsing real species data.
-     */
-    private VBox createNCBIQuerySection() {
-        VBox section = new VBox(5);
-        section.setPadding(new javafx.geometry.Insets(5));
-        
-        Label ncbiLabel = new Label(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.title", "NCBI Query"));
-        ncbiLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-font-size: 11px;
-        
-        javafx.scene.control.TextField searchField = new javafx.scene.control.TextField();
-        searchField.setPromptText(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.prompt", "Enter species name..."));
-        searchField.setPrefWidth(180);
-        
-        Label statusLabel = new Label();
-        statusLabel.setStyle("-fx-font-size: 10px;");
-        statusLabel.setWrapText(true);
-        statusLabel.setPrefWidth(180);
-        
-        javafx.scene.control.Button queryButton = new javafx.scene.control.Button(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.search", "Search"));
-        queryButton.setStyle("-fx-font-size: 10px;");
-        
-        javafx.scene.control.Button resetTreeBtn = new javafx.scene.control.Button(I18n.getInstance().get("viewer.phylogenetictreeviewer.reset", "Reset Tree"));
-        resetTreeBtn.setStyle("-fx-font-size: 10px;");
-        resetTreeBtn.setOnAction(e -> {
-            loadData();
-            updateLayoutAndDraw(canvas);
-            statusLabel.setText(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.reset", "Tree reset to default"));
-        });
-
-        queryButton.setOnAction(e -> {
-            String searchTerm = searchField.getText().trim();
-            if (searchTerm.isEmpty()) {
-                statusLabel.setText(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.empty", "Enter a species name"));
-                return;
-            }
-            
-            statusLabel.setText(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.querying", "Querying NCBI..."));
-            queryButton.setDisable(true);
-            
-            // Query in background thread
-            new Thread(() -> {
-                try {
-                    org.jscience.biology.loaders.NCBITaxonomyReader reader = 
-                        new org.jscience.biology.loaders.NCBITaxonomyReader();
-                    List<Long> taxIds = reader.searchByName(searchTerm);
-                    
-                    if (taxIds != null && !taxIds.isEmpty()) {
-                         long taxId = taxIds.get(0);
-                         Optional<org.jscience.biology.taxonomy.Species> speciesOpt = reader.fetchByTaxId(taxId);
-
-                         Platform.runLater(() -> {
-                            if (speciesOpt.isPresent()) {
-                                org.jscience.biology.taxonomy.Species species = speciesOpt.get();
-                                String lineage = species.getAttribute("lineage");
-                                if (lineage != null) {
-                                    this.treeRoot = buildLineageTree(lineage, species.getScientificName());
-                                    updateLayoutAndDraw(canvas);
-                                    statusLabel.setText(MessageFormat.format(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.loaded", "Loaded: {0}"), species.getScientificName()));
-                                } else {
-                                    statusLabel.setText(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.nolineage", "No lineage data available."));
-                                }
-                            } else {
-                                statusLabel.setText(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.ferror", "Failed to fetch taxon details"));
-                            }
-                            queryButton.setDisable(false);
-                         });
-                    } else {
-                        Platform.runLater(() -> {
-                            statusLabel.setText(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.notfound", "No results found"));
-                            queryButton.setDisable(false);
-                        });
-                    }
-                } catch (Exception ex) {
-                    Platform.runLater(() -> {
-                        statusLabel.setText(MessageFormat.format(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.error", "Error: {0}"), ex.getMessage()));
-                        queryButton.setDisable(false);
-                    });
-                }
-            }).start();
-        });
-        
-        HBox btnBox = new HBox(5, queryButton, resetTreeBtn);
-        section.getChildren().addAll(ncbiLabel, searchField, btnBox, statusLabel);
-        return section;
-    }
-
     private Taxon buildLineageTree(String lineage, String terminalName) {
         String[] levels = lineage.split("; ");
-        Taxon root = null;
-        Taxon current = null;
+        Taxon root = null, current = null;
         for (int i = 0; i < levels.length; i++) {
-            String name = levels[i].trim();
-            if (name.isEmpty()) continue;
-            Taxon t = new Taxon("ncbi_" + i, (current == null ? "" : current.getId()), name, Real.of(Math.random()), Real.of(Math.random()), Real.of(Math.random()));
+            Taxon t = new Taxon("ncbi_" + i, (current == null ? "" : current.getId()), levels[i].trim(), Real.of(Math.random()), Real.of(Math.random()), Real.of(Math.random()));
             if (root == null) root = t;
             if (current != null) current.addChild(t);
             current = t;
-        }
-        // Add the searched species as the leaf if it's not the last level
-        if (current != null && !levels[levels.length - 1].equalsIgnoreCase(terminalName)) {
-             Taxon t = new Taxon("ncbi_leaf", current.getId(), terminalName, Real.of(Math.random()), Real.of(Math.random()), Real.of(Math.random()));
-             current.addChild(t);
         }
         return root;
     }
@@ -244,151 +176,65 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
 
     private void layoutLinear(Taxon node, double depth) {
         if (node.getChildren().isEmpty()) {
-            node.x = 600; 
-            node.y = 50 + leafCounter * 40;
-            leafCounter++;
+            node.x = 600; node.y = 50 + leafCounter * 40; leafCounter++;
         } else {
-            double minY = Double.MAX_VALUE;
-            double maxY = Double.MIN_VALUE;
+            double minY = 10000, maxY = -10000;
             for (Taxon child : node.getChildren()) {
                 layoutLinear(child, depth + 1);
-                minY = Math.min(minY, child.y);
-                maxY = Math.max(maxY, child.y);
+                minY = Math.min(minY, child.y); maxY = Math.max(maxY, child.y);
             }
-            node.x = 50 + depth * 150;
-            node.y = (minY + maxY) / 2;
+            node.x = 50 + depth * 150; node.y = (minY + maxY) / 2;
         }
     }
 
-    private void layoutRadial(Taxon node, double startAngle, double endAngle, double currentRadius, double cx, double cy) {
+    private void layoutRadial(Taxon node, double startAngle, double endAngle, double radius, double cx, double cy) {
         if (node.getChildren().isEmpty()) {
-            node.angle = (startAngle + endAngle) / 2;
-            node.radius = Math.min(cx, cy) - 50; 
+            node.angle = (startAngle + endAngle) / 2; node.radius = 200;
         } else {
-            node.radius = currentRadius;
+            node.radius = radius;
             double currentStart = startAngle;
-            double totalSpan = endAngle - startAngle;
-            int localLeaves = countLeaves(node);
-
-            double myMinAngle = Double.MAX_VALUE;
-            double myMaxAngle = Double.MIN_VALUE;
-
+            int totalLeaves = countLeaves(node);
+            double minA = 10, maxA = -10;
             for (Taxon child : node.getChildren()) {
-                int childLeaves = countLeaves(child);
-                double childSpan = totalSpan * ((double) childLeaves / localLeaves);
-                double childEnd = currentStart + childSpan;
-                layoutRadial(child, currentStart, childEnd, currentRadius + 60, cx, cy);
-                myMinAngle = Math.min(myMinAngle, child.angle);
-                myMaxAngle = Math.max(myMaxAngle, child.angle);
-                currentStart = childEnd;
+                double span = (endAngle - startAngle) * countLeaves(child) / totalLeaves;
+                layoutRadial(child, currentStart, currentStart + span, radius + 60, cx, cy);
+                minA = Math.min(minA, child.angle); maxA = Math.max(maxA, child.angle);
+                currentStart += span;
             }
-            node.angle = (myMinAngle + myMaxAngle) / 2;
+            node.angle = (minA + maxA) / 2;
         }
-        node.x = cx + node.radius * Math.cos(node.angle);
-        node.y = cy + node.radius * Math.sin(node.angle);
+        node.x = cx + node.radius * Math.cos(node.angle); node.y = cy + node.radius * Math.sin(node.angle);
     }
 
     private int countLeaves(Taxon n) {
         if (n.getChildren().isEmpty()) return 1;
-        int sum = 0;
-        for (Taxon c : n.getChildren()) sum += countLeaves(c);
-        return sum;
+        int s = 0; for (Taxon c : n.getChildren()) s += countLeaves(c); return s;
     }
 
     private Taxon findNode(Taxon root, double mx, double my) {
         if (Math.abs(root.x - mx) < 15 && Math.abs(root.y - my) < 15) return root;
         for (Taxon child : root.getChildren()) {
-            Taxon found = findNode(child, mx, my);
-            if (found != null) return found;
+            Taxon f = findNode(child, mx, my); if (f != null) return f;
         }
         return null;
     }
 
     private void drawTree(GraphicsContext gc, Taxon node) {
-        if (node == treeRoot) {
-            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-            if (!radialMode) {
-                gc.setFill(Color.web("#333333")); 
-                gc.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, 12));
-                gc.fillText(I18n.getInstance().get("viewer.phylogenetictreeviewer.marker.coi", "COI (Mitochondrial)"), 760, 20);
-                gc.fillText(I18n.getInstance().get("viewer.phylogenetictreeviewer.marker.rna16s", "16S RNA"), 790, 20);
-                gc.fillText(I18n.getInstance().get("viewer.phylogenetictreeviewer.marker.cytb", "CytB"), 820, 20);
-            }
-        }
-
-        gc.setStroke(Color.web("#666")); 
-        gc.setLineWidth(1.5);
-
+        if (node == treeRoot) gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        gc.setStroke(Color.GRAY);
         for (Taxon child : node.getChildren()) {
-            if (radialMode) {
-                gc.strokeLine(node.x, node.y, child.x, child.y);
-            } else {
-                gc.strokeLine(node.x, node.y, node.x, child.y);
-                gc.strokeLine(node.x, child.y, child.x, child.y);
-            }
+            if (radialMode) gc.strokeLine(node.x, node.y, child.x, child.y);
+            else { gc.strokeLine(node.x, node.y, node.x, child.y); gc.strokeLine(node.x, child.y, child.x, child.y); }
             drawTree(gc, child);
         }
-
-        if (node == selectedNode) {
-            gc.setFill(Color.ORANGERED);
-            gc.fillOval(node.x - 7, node.y - 7, 14, 14);
-        } else {
-            gc.setFill(node.getChildren().isEmpty() ? Color.web("#4CAF50") : Color.web("#2196F3"));
-            gc.fillOval(node.x - 5, node.y - 5, 10, 10);
-        }
-
-        Color textColor = Color.web("#111111"); 
-
-        if (!radialMode || node == selectedNode || node.getChildren().isEmpty()) {
-            gc.setFill(textColor);
-            gc.setTextAlign(TextAlignment.LEFT);
-            gc.setTextBaseline(VPos.CENTER);
-            gc.setFont(javafx.scene.text.Font.font("SansSerif", 12));
-            gc.fillText(node.getName(), node.x + 12, node.y);
-        }
-
-        if (node.getChildren().isEmpty()) {
-            if (radialMode) {
-                drawRadialHeatmap(gc, node, Math.min(canvas.getWidth(), canvas.getHeight())/2 - 40, node.angle);
-            } else {
-                drawLinearHeatmap(gc, node, 760, node.y);
-            }
+        gc.setFill(node == selectedNode ? Color.RED : Color.BLUE);
+        gc.fillOval(node.x - 5, node.y - 5, 10, 10);
+        if (node.getChildren().isEmpty() || node == selectedNode) {
+            gc.setFill(Color.BLACK); gc.fillText(node.getName(), node.x + 12, node.y);
         }
     }
 
-    private void drawLinearHeatmap(GraphicsContext gc, Taxon n, double startX, double y) {
-        drawCell(gc, startX, y - 9, getColor(n.getCoi().doubleValue()));
-        drawCell(gc, startX + 30, y - 9, getColor(n.getRna16s().doubleValue()));
-        drawCell(gc, startX + 60, y - 9, getColor(n.getCytb().doubleValue()));
-    }
-
-    private void drawRadialHeatmap(GraphicsContext gc, Taxon n, double startRadius, double angle) {
-        double cx = canvas.getWidth()/2, cy = canvas.getHeight()/2;
-        drawDot(gc, cx + (startRadius + 10) * Math.cos(angle), cy + (startRadius + 10) * Math.sin(angle), getColor(n.getCoi().doubleValue()));
-        drawDot(gc, cx + (startRadius + 25) * Math.cos(angle), cy + (startRadius + 25) * Math.sin(angle), getColor(n.getRna16s().doubleValue()));
-        drawDot(gc, cx + (startRadius + 40) * Math.cos(angle), cy + (startRadius + 40) * Math.sin(angle), getColor(n.getCytb().doubleValue()));
-    }
-
-    private void drawCell(GraphicsContext gc, double x, double y, Color c) {
-        gc.setFill(c); gc.fillRect(x, y, 20, 18); gc.setStroke(Color.BLACK); gc.strokeRect(x, y, 20, 18);
-    }
-
-    private void drawDot(GraphicsContext gc, double x, double y, Color c) {
-        gc.setFill(c); gc.fillOval(x - 5, y - 5, 10, 10);
-    }
-
-    private Color getColor(double val) { return Color.hsb((1.0 - val) * 240, 0.8, 0.9); }
-
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.phylogenetictreeviewer.desc", "Interactive evolutionary tree browser showing taxonomic relationships."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.phylogenetictreeviewer.longdesc", "Visualize and explore the 'Tree of Life' with support for linear and radial layouts. Features interactive node selection, genetic marker alignment (COI, 16S, CytB), and NCBI taxonomy integration."); }
-    @Override
-    public List<Parameter<?>> getViewerParameters() {
-        List<Parameter<?>> params = new ArrayList<>();
-        params.add(new BooleanParameter("viewer.phylogenetictreeviewer.radial", I18n.getInstance().get("viewer.phylogenetictreeviewer.radial", "Radial Mode"), radialMode, v -> {
-            radialMode = v;
-            updateLayoutAndDraw(canvas);
-        }));
-        return params;
-    }
+    @Override public String getDescription() { return I18n.getInstance().get("viewer.phylogenetictreeviewer.desc", "Phylogenetic tree browser."); }
+    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.phylogenetictreeviewer.longdesc", "Tree of Life viewer."); }
+    @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }
-

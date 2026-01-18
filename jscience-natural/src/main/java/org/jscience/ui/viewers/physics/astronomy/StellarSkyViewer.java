@@ -57,6 +57,7 @@ import java.util.*;
 
 /**
  * Stellar Sky Viewer.
+ * Refactored to be 100% parameter-based.
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -73,43 +74,23 @@ public class StellarSkyViewer extends AbstractViewer {
     private List<PlanetData> planets = new ArrayList<>();
     private List<DeepSkyObject> deepSkyObjects = new ArrayList<>();
 
-    // Parameters (Real for precision)
-    private Real observerLat = Real.of(Configuration.getDouble("viewer.stellarsky.param.lat", 48.85)); // Default: Paris
+    // Internal state
+    private Real observerLat = Real.of(Configuration.getDouble("viewer.stellarsky.param.lat", 48.85));
     private Real observerLon = Real.of(Configuration.getDouble("viewer.stellarsky.param.lon", 2.35));
     private Real fovScale = Real.of(Configuration.getDouble("viewer.stellarsky.param.fov", 1.0));
     private double viewAzimuthOffset = 0.0;
-
-    @Override
-    public List<Parameter<?>> getViewerParameters() {
-        List<Parameter<?>> params = new ArrayList<>();
-        params.add(new NumericParameter("viewer.stellarsky.param.lat",
-                I18n.getInstance().get("viewer.stellarsky.param.lat.desc", "Observer Latitude"),
-                -90, 90, 0.1, observerLat.doubleValue(), v -> { observerLat = Real.of(v); drawSky(); }));
-        params.add(new NumericParameter("viewer.stellarsky.param.lon",
-                I18n.getInstance().get("viewer.stellarsky.param.lon.desc", "Observer Longitude"),
-                -180, 180, 0.1, observerLon.doubleValue(), v -> { observerLon = Real.of(v); drawSky(); }));
-        params.add(new NumericParameter("viewer.stellarsky.param.fov",
-                I18n.getInstance().get("viewer.stellarsky.param.fov.desc", "Field of View Scale"),
-                0.1, 5.0, 0.1, fovScale.doubleValue(), v -> { fovScale = Real.of(v); drawSky(); }));
-        
-        params.add(new BooleanParameter("viewer.stellarsky.param.show_constellations", I18n.getInstance().get("sky.stars", "Show Constellations"), bShowConstellations, v -> { bShowConstellations = v; drawSky(); }));
-        params.add(new BooleanParameter("viewer.stellarsky.param.show_planets", I18n.getInstance().get("sky.planets", "Show Planets"), bShowPlanets, v -> { bShowPlanets = v; drawSky(); }));
-        params.add(new BooleanParameter("viewer.stellarsky.param.show_dso", I18n.getInstance().get("sky.dso", "Show DSO"), bShowDSO, v -> { bShowDSO = v; drawSky(); }));
-        params.add(new BooleanParameter("viewer.stellarsky.param.show_trails", I18n.getInstance().get("sky.trails", "Show Trails"), bShowTrails, v -> { bShowTrails = v; drawSky(); }));
-
-        return params;
-    }
-
+    private boolean bShowConstellations = true;
+    private boolean bShowPlanets = true;
+    private boolean bShowDSO = true;
+    private boolean bShowTrails = false;
     private LocalDateTime simulationTime = LocalDateTime.now();
+
+    private List<Parameter<?>> parameters = new ArrayList<>();
 
     // UI
     private Canvas skyCanvas;
     private Label infoLabel;
     private Label timeLabel;
-    private boolean bShowConstellations = true;
-    private boolean bShowPlanets = true;
-    private boolean bShowDSO = true;
-    private boolean bShowTrails = false;
 
     // Interaction
     private double lastMouseX;
@@ -121,17 +102,16 @@ public class StellarSkyViewer extends AbstractViewer {
         loadData();
         initPlanets();
         initDeepSkyObjects();
+        setupParameters();
 
         skyCanvas = new Canvas(WIDTH, HEIGHT);
         this.getStyleClass().add("viewer-root");
 
         setupInteraction();
         
-        // Layout
         StackPane overlay = new StackPane();
         timeLabel = new Label();
         timeLabel.getStyleClass().addAll("info-panel", "description-label");
-        // Style is now handled via CSS classes
         overlay.getChildren().add(timeLabel);
         overlay.setAlignment(Pos.TOP_LEFT);
         overlay.setPadding(new Insets(10));
@@ -141,13 +121,44 @@ public class StellarSkyViewer extends AbstractViewer {
         centerStack.getStyleClass().add("content-dark");
         setCenter(centerStack);
         
-        setRight(createSidebar());
+        infoLabel = new Label(I18n.getInstance().get("sky.info.select", "Select an object..."));
+        infoLabel.setWrapText(true);
+        infoLabel.getStyleClass().addAll("description-label", "info-panel");
+        infoLabel.setPrefHeight(100);
+        
+        VBox sidebar = new VBox(10, infoLabel);
+        sidebar.setPadding(new Insets(10));
+        sidebar.setPrefWidth(250);
+        sidebar.getStyleClass().add("viewer-sidebar");
+        setRight(sidebar);
 
-        // Resize
-        widthProperty().addListener(o -> { if(getWidth()>0) { skyCanvas.setWidth(getWidth()-300); drawSky(); }});
-        heightProperty().addListener(o -> { if(getHeight()>0) { skyCanvas.setHeight(getHeight()); drawSky(); }});
+        this.widthProperty().addListener(o -> { if(getWidth()>0) { skyCanvas.setWidth(getWidth()-250); drawSky(); }});
+        this.heightProperty().addListener(o -> { if(getHeight()>0) { skyCanvas.setHeight(getHeight()); drawSky(); }});
 
         drawSky();
+    }
+
+    private void setupParameters() {
+        parameters.add(new NumericParameter("viewer.stellarsky.param.lat",
+                I18n.getInstance().get("sky.lat", "Latitude"),
+                -90, 90, 0.1, observerLat.doubleValue(), v -> { observerLat = Real.of(v); drawSky(); }));
+        parameters.add(new NumericParameter("viewer.stellarsky.param.lon",
+                I18n.getInstance().get("sky.lon", "Longitude"),
+                -180, 180, 0.1, observerLon.doubleValue(), v -> { observerLon = Real.of(v); drawSky(); }));
+        parameters.add(new NumericParameter("viewer.stellarsky.param.fov",
+                I18n.getInstance().get("sky.fov", "FOV Scale"),
+                0.1, 5.0, 0.1, fovScale.doubleValue(), v -> { fovScale = Real.of(v); drawSky(); }));
+        
+        parameters.add(new NumericParameter("viewer.stellarsky.param.hour", 
+                I18n.getInstance().get("sky.hour", "Hour"), 0, 23, 1, simulationTime.getHour(), v -> {
+                    simulationTime = simulationTime.withHour(v.intValue());
+                    drawSky();
+                }));
+
+        parameters.add(new BooleanParameter("viewer.stellarsky.param.show_constellations", I18n.getInstance().get("sky.stars", "Show Constellations"), bShowConstellations, v -> { bShowConstellations = v; drawSky(); }));
+        parameters.add(new BooleanParameter("viewer.stellarsky.param.show_planets", I18n.getInstance().get("sky.planets", "Show Planets"), bShowPlanets, v -> { bShowPlanets = v; drawSky(); }));
+        parameters.add(new BooleanParameter("viewer.stellarsky.param.show_dso", I18n.getInstance().get("sky.dso", "Show DSO"), bShowDSO, v -> { bShowDSO = v; drawSky(); }));
+        parameters.add(new BooleanParameter("viewer.stellarsky.param.show_trails", I18n.getInstance().get("sky.trails", "Show Trails"), bShowTrails, v -> { bShowTrails = v; drawSky(); }));
     }
 
     private void setupInteraction() {
@@ -160,120 +171,6 @@ public class StellarSkyViewer extends AbstractViewer {
         });
         skyCanvas.setOnMouseMoved(e -> handleHover(e));
         skyCanvas.setOnMouseClicked(e -> handleClick(e));
-    }
-
-    private VBox createSidebar() {
-        VBox sidebar = new VBox(15);
-        sidebar.setPadding(new Insets(20));
-        sidebar.setPrefWidth(280);
-        sidebar.getStyleClass().add("viewer-sidebar");
-
-        Label title = new Label(I18n.getInstance().get("sky.title", "Sky Controls"));
-        title.getStyleClass().add("header-label");
-
-        // VizieR Query Section
-        VBox vizierSection = createVizieRSection();
-
-        Label locLabel = new Label(I18n.getInstance().get("sky.location", "Location"));
-        locLabel.getStyleClass().add("header-label");
-        locLabel.setStyle("-fx-font-size: 13px;");
-
-        Slider latSlider = createLabeledSlider(I18n.getInstance().get("sky.lat", "Lat"), -90, 90, observerLat.doubleValue(), val -> { observerLat = Real.of(val); drawSky(); });
-        Slider lonSlider = createLabeledSlider(I18n.getInstance().get("sky.lon", "Lon"), -180, 180, observerLon.doubleValue(), val -> { observerLon = Real.of(val); drawSky(); });
-
-        Label timeCtrlLabel = new Label(I18n.getInstance().get("starsystem.date", "Time"));
-        timeCtrlLabel.getStyleClass().add("header-label");
-        timeCtrlLabel.setStyle("-fx-font-size: 13px;");
-        DatePicker datePicker = new DatePicker(simulationTime.toLocalDate());
-        datePicker.setOnAction(e -> { simulationTime = simulationTime.with(datePicker.getValue()); drawSky(); });
-        Slider hourSlider = createLabeledSlider(I18n.getInstance().get("sky.hour", "Hour"), 0, 23, simulationTime.getHour(), val -> {
-            simulationTime = simulationTime.withHour((int)val); drawSky();
-        });
-
-        infoLabel = new Label(I18n.getInstance().get("sky.info.select", "Select an object..."));
-        infoLabel.setWrapText(true);
-        infoLabel.getStyleClass().addAll("description-label", "info-panel");
-        infoLabel.setPrefHeight(100);
-
-        sidebar.getChildren().addAll(title, vizierSection, new Separator(), locLabel, latSlider.getParent(), lonSlider.getParent(), new Separator(),
-                timeCtrlLabel, datePicker, hourSlider.getParent(), new Separator(), infoLabel);
-        return sidebar;
-    }
-
-    /**
-     * Creates VizieR catalog query section for browsing real astronomical data.
-     */
-    private VBox createVizieRSection() {
-        VBox section = new VBox(8);
-        
-        Label vizierLabel = new Label(I18n.getInstance().get("sky.vizier.title", "Query VizieR"));
-        vizierLabel.getStyleClass().add("header-label");
-        vizierLabel.setStyle("-fx-font-size: 13px;");
-        
-        ComboBox<String> catalogChoice = new ComboBox<>();
-        catalogChoice.getItems().addAll("Hipparcos", "Tycho-2", "Gaia DR3", "USNO-B1");
-        catalogChoice.setValue("Hipparcos");
-        catalogChoice.setPrefWidth(240);
-        
-        Label statusLabel = new Label();
-        statusLabel.getStyleClass().add("text-secondary");
-        statusLabel.setWrapText(true);
-        
-        Button queryButton = new Button(I18n.getInstance().get("sky.vizier.query", "Query Region"));
-        queryButton.setMaxWidth(Double.MAX_VALUE);
-        queryButton.getStyleClass().add("accent-button-green");
-        queryButton.setOnAction(e -> {
-            String catalogId = switch(catalogChoice.getValue()) {
-                case "Tycho-2" -> VizieRReader.TYCHO2;
-                case "Gaia DR3" -> VizieRReader.GAIA_DR3;
-                case "USNO-B1" -> VizieRReader.USNO_B1;
-                default -> VizieRReader.HIPPARCOS;
-            };
-            
-            statusLabel.setText(I18n.getInstance().get("sky.vizier.querying", "Querying..."));
-            queryButton.setDisable(true);
-            
-            // Query in background thread
-            new Thread(() -> {
-                try {
-                    // Query region around current view center (10 arcmin radius)
-                    // This is a simplified demo - full implementation would extract RA/Dec from view center
-                    java.util.Map<String, String> result = VizieRReader.queryByCoordinates(
-                        observerLon, observerLat, 10.0, catalogId);
-                    
-                    javafx.application.Platform.runLater(() -> {
-                        if (result != null && result.containsKey("raw_votable")) {
-                            statusLabel.setText(I18n.getInstance().get("sky.vizier.success", 
-                                "Query successful! Data loaded."));
-                            // Parse VOTable and add stars - simplified for demo
-                            infoLabel.setText(I18n.getInstance().get("auto.stellarskyviewer.vizier_data_available__parsing", "VizieR data available (parsing not yet implemented in demo)"));
-                        } else {
-                            statusLabel.setText(I18n.getInstance().get("sky.vizier.failed", 
-                                "Query failed. Check network."));
-                        }
-                        queryButton.setDisable(false);
-                    });
-                } catch (Exception ex) {
-                    javafx.application.Platform.runLater(() -> {
-                        statusLabel.setText("Error: " + ex.getMessage());
-                        queryButton.setDisable(false);
-                    });
-                }
-            }).start();
-        });
-        
-        section.getChildren().addAll(vizierLabel, catalogChoice, queryButton, statusLabel);
-        return section;
-    }
-
-    private Slider createLabeledSlider(String name, double min, double max, double val, java.util.function.DoubleConsumer action) {
-        VBox box = new VBox(2);
-        Label label = new Label(String.format("%s: %.2f", name, val));
-        Slider slider = new Slider(min, max, val);
-        slider.valueProperty().addListener((o, ov, nv) -> { action.accept(nv.doubleValue()); label.setText(String.format("%s: %.2f", name, nv.doubleValue())); });
-        slider.setUserData(box);
-        box.getChildren().addAll(label, slider);
-        return slider;
     }
 
     private void loadData() {
@@ -454,6 +351,7 @@ public class StellarSkyViewer extends AbstractViewer {
     }
 
     private void drawSky() {
+        if (timeLabel == null) return;
         timeLabel.setText(simulationTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         GraphicsContext gc = skyCanvas.getGraphicsContext2D();
         double w = skyCanvas.getWidth(), h = skyCanvas.getHeight(), cx = w/2, cy = h/2, radius = Math.min(w,h)/2 - 20;
@@ -471,7 +369,7 @@ public class StellarSkyViewer extends AbstractViewer {
         }
 
         if(bShowConstellations) {
-            gc.setStroke(Color.rgb(135, 206, 250, 0.4)); gc.setLineWidth(1);
+             gc.setStroke(Color.rgb(135, 206, 250, 0.4)); gc.setLineWidth(1);
              Map<String, double[]> sMap = new HashMap<>();
              for(StarReader.Star s : stars) {
                  double[] pos = calculateProjectedPosition(s, cx, cy, radius);
@@ -513,7 +411,7 @@ public class StellarSkyViewer extends AbstractViewer {
         gc.setFill(Color.GRAY); gc.fillText(txt, x-5, y+5);
     }
     
-    private void drawOrbitTrails(GraphicsContext gc, double cx, double cy, double radius) {
+    private void drawOrbitTrails(GraphicsContext gc, double cx, double cy, double r) {
         gc.setLineWidth(1.0);
         for(PlanetData p : planets) {
             gc.setStroke(p.color.deriveColor(0, 1, 1, 0.3));
@@ -521,7 +419,7 @@ public class StellarSkyViewer extends AbstractViewer {
             double now = getDaysSinceJ2000();
             for(int i=0; i<=20; i++) {
                 double d = now - 30 + (i/20.0)*60;
-                double[] pos = calculatePlanetProjectedPosition(p, cx, cy, radius, d);
+                double[] pos = calculatePlanetProjectedPosition(p, cx, cy, r, d);
                 if(pos!=null) {
                     if(prev!=null && Math.hypot(pos[0]-prev[0], pos[1]-prev[1]) < 100) gc.strokeLine(prev[0], prev[1], pos[0], pos[1]);
                     prev = pos;
@@ -532,8 +430,7 @@ public class StellarSkyViewer extends AbstractViewer {
     
     @Override public String getName() { return I18n.getInstance().get("viewer.stellarskyviewer.name", "Stellar Sky Viewer"); }
     @Override public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
-    
-    @Override public String getDescription() { return I18n.getInstance().get("viewer.stellarskyviewer.desc", "Real-time planetarium and sky map simulation."); }
-    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.stellarskyviewer.longdesc", "Advanced sky map that projects stars, constellations, and planets based on Earth coordinates and time. Includes support for celestial coordinate systems, magnitude filtering, and deep-sky object labeling."); }
+    @Override public String getDescription() { return I18n.getInstance().get("viewer.stellarskyviewer.desc", "Real-time sky map."); }
+    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.stellarskyviewer.longdesc", "Advanced sky map simulation."); }
+    @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }
-
