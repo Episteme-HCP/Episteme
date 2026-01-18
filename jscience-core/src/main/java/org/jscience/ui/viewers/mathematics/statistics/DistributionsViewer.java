@@ -293,3 +293,4 @@ public class DistributionsViewer extends AbstractViewer {
         return org.jscience.ui.i18n.I18n.getInstance().get("viewer.distributionsviewer.longdesc", "Interactive exploration of probability distributions. Adjust parameters like mean, standard deviation, lambda, and number of trials to see how they affect the Probability Density Function (PDF) and Probability Mass Function (PMF).");
     }
 }
+

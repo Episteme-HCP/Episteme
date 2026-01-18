@@ -36,6 +36,7 @@ import org.jscience.history.FuzzyDate;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.ui.RealParameter;
 import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.BooleanParameter;
 import org.jscience.ui.Parameter;
 
 import java.util.List;
@@ -261,6 +262,15 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
                     draw();
                 }));
                 
+        parameters.add(new BooleanParameter("viewer.timelineviewer.param.log",
+                I18n.getInstance().get("viewer.timelineviewer.param.log.desc", "Logarithmic Scale"),
+                logScale,
+                v -> {
+                    this.logScale = v;
+                    calculateBounds();
+                    draw();
+                }));
+                
         return parameters;
     }
 
@@ -269,3 +279,4 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
         return I18n.getInstance().get("viewer.timeline.longdesc", "Interactive historical chronological visualization tool. features support for BCE/CE dates, event clustering, fuzzy date handling, and dynamic scaling to explore deep history and modern events.");
     }
 }
+

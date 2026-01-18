@@ -267,3 +267,4 @@ public class SportsResultsViewer extends AbstractViewer {
         public String toString() { return name; }
     }
 }
+

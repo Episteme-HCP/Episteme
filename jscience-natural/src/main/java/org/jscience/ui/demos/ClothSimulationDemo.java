@@ -243,3 +243,4 @@ public class ClothSimulationDemo extends AbstractSimulationDemo {
     @Override public List<Parameter<?>> getViewerParameters() { return new ArrayList<>(); }
 }
 }
+

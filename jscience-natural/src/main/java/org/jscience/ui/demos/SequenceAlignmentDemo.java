@@ -228,3 +228,4 @@ public class SequenceAlignmentDemo extends AbstractDemo {
     @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }
 }
+

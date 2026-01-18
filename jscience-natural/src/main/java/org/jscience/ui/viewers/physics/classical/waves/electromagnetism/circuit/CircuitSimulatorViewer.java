@@ -483,3 +483,4 @@ public class CircuitSimulatorViewer extends org.jscience.ui.AbstractViewer imple
         return org.jscience.ui.i18n.I18n.getInstance().get("viewer.circuitsimulatorviewer.longdesc", "Design and analyze electronic circuits using standard components like resistors, capacitors, and batteries. Includes a built-in nodal analysis solver using JScience linear algebra to calculate voltages across the circuit.");
     }
 }
+

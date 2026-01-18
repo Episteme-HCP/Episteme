@@ -217,3 +217,4 @@ public class EarthquakeMapViewer extends MapViewer {
     @Override public String getDescription() { return I18n.getInstance().get("viewer.earthquakemapviewer.desc", "Visualizes seismic activity on a world map."); }
     @Override public String getLongDescription() { return I18n.getInstance().get("viewer.earthquakemapviewer.longdesc", "Interactive global map showing simulated earthquake data. Features pulse animations, magnitude color-coding, and detailed seismic information (latitude, longitude, depth, and magnitude) on hover."); }
 }
+

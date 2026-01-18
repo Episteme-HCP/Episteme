@@ -217,3 +217,4 @@ public class MetamathViewer extends AbstractViewer {
         return org.jscience.ui.i18n.I18n.getInstance().get("viewer.metamathviewer.longdesc", "Browse and visualize formal mathematical proofs from the Metamath database. Step through logic tactics and understand the structure of complex theorems.");
     }
 }
+

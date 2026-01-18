@@ -356,3 +356,4 @@ public class DistributedWhiteboardApp extends Application implements org.jscienc
         return new java.util.ArrayList<>();
     }
 }
+

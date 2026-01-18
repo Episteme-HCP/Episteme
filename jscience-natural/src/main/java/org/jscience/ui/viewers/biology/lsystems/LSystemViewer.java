@@ -470,3 +470,4 @@ public class LSystemViewer extends AbstractViewer implements Simulatable {
     @Override public String getLongDescription() { return I18n.getInstance().get("viewer.lsystemviewer.longdesc", "Explore the growth of complex structures using recursive L-System rules. Includes presets for fractal plants, dragon curves, and Sierpinski triangles in both 2D and 3D."); }
     @Override public List<Parameter<?>> getViewerParameters() { return new ArrayList<>(); }
 }
+

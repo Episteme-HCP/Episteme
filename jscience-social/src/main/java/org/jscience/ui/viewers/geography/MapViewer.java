@@ -117,3 +117,4 @@ public class MapViewer extends StackPane implements Viewer {
         return I18n.getInstance().get("viewer.map.longdesc", "Advanced Geographic Information System (GIS) viewer that supports multiple backend providers (including Leaflet, OpenLayers, and Mapbox). features pluggable layers, coordinate mapping, and interactive exploration of spatial datasets.");
     }
 }
+

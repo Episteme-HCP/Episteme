@@ -192,3 +192,4 @@ public class UnitConverterViewer extends AbstractViewer {
         return org.jscience.ui.i18n.I18n.getInstance().get("viewer.unitconverterviewer.longdesc", "Universal unit converter supporting SI, CGS, Imperial, and custom unit systems. Includes length, mass, time, energy, and more.");
     }
 }
+

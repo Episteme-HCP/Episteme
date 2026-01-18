@@ -74,3 +74,4 @@ public class FormulaNotationDemo extends AbstractDemo {
         return new ArrayList<>();
     }
 }
+

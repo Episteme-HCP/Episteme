@@ -43,9 +43,13 @@ import org.jscience.physics.astronomy.*;
 import org.jscience.physics.astronomy.time.JulianDate;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
+import org.jscience.ui.NumericParameter;
+import org.jscience.ui.BooleanParameter;
+import org.jscience.ui.Parameter;
 import org.jscience.ui.i18n.I18n;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -99,7 +103,7 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
         setCenter(subScene);
         
         VBox overlay = createOverlay();
-        setRight(overlay);
+        setBottom(overlay);
         
         // Resize
         widthProperty().addListener(o -> { if(getWidth()>0) subScene.setWidth(getWidth() - 220); });
@@ -134,24 +138,14 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
     }
     
     private VBox createOverlay() {
-        VBox box = new VBox(15);
-        box.setPadding(new Insets(15));
-        box.setPrefWidth(200);
+        VBox box = new VBox(5);
+        box.setPadding(new Insets(5));
         box.getStyleClass().add("viewer-sidebar");
-        
-        Label title = new Label(I18n.getInstance().get("starsystem.presets", "Presets"));
-        title.getStyleClass().add("header-label");
-
-        ComboBox<Preset> combo = new ComboBox<>();
-        combo.getItems().addAll(Preset.values());
-        combo.setValue(Preset.SOLAR_SYSTEM);
-        combo.setOnAction(e -> { loadSystem(combo.getValue()); build3DWorld(); });
-        combo.setMaxWidth(Double.MAX_VALUE);
         
         dateLabel = new Label();
         dateLabel.getStyleClass().add("description-label");
         
-        box.getChildren().addAll(title, combo, new Separator(), dateLabel);
+        box.getChildren().add(dateLabel);
         return box;
     }
 
@@ -296,7 +290,15 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
     }
 
     @Override
-    public List<org.jscience.ui.Parameter<?>> getViewerParameters() {
-        return new java.util.ArrayList<>();
+    public List<Parameter<?>> getViewerParameters() {
+        List<Parameter<?>> params = new ArrayList<>();
+        params.add(new NumericParameter("starsystem.timescale", I18n.getInstance().get("starsystem.timescale", "Time Scale"), 0.0, 100.0, 0.1, timeScale, v -> timeScale = v));
+        params.add(new NumericParameter("starsystem.planetscale", I18n.getInstance().get("starsystem.planetscale", "Planet Scale"), 1.0, 10000.0, 10.0, planetScale, v -> {
+            planetScale = v;
+            build3DWorld();
+        }));
+        params.add(new BooleanParameter("starsystem.paused", I18n.getInstance().get("starsystem.paused", "Paused"), paused, v -> paused = v));
+        return params;
     }
 }
+

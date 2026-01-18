@@ -224,3 +224,4 @@ public class BioMotionViewer extends AbstractViewer implements Simulatable {
     @Override public String getLongDescription() { return I18n.getInstance().get("viewer.biomotionviewer.longdesc", "Simulates biological movement using a spring-mass ragdoll model. Adjust gravity and muscle tone to observe how they affect the walker's dynamics and stability."); }
     @Override public List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }
+

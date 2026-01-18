@@ -37,6 +37,8 @@ import org.jscience.ui.Simulatable;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.ui.viewers.physics.astronomy.*;
 import org.jscience.ui.Parameter;
+import org.jscience.ui.NumericParameter;
+import org.jscience.ui.BooleanParameter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,16 +79,6 @@ public class GalaxyDemo extends AbstractSimulationDemo {
         return new InternalGalaxyViewer();
     }
 
-    @Override
-    public VBox createControlPanel() {
-        VBox panel = super.createControlPanel();
-        if (viewer instanceof InternalGalaxyViewer iv) {
-            panel.getChildren().add(new Separator());
-            panel.getChildren().addAll(iv.getCustomControls());
-        }
-        return panel;
-    }
-
     private static class InternalGalaxyViewer extends AbstractViewer implements Simulatable {
 
         private static final int STAR_COUNT = 15000;
@@ -116,6 +108,7 @@ public class GalaxyDemo extends AbstractSimulationDemo {
         private boolean running = true;
         
         private Canvas canvas;
+        private List<Parameter<?>> parameters = new ArrayList<>();
 
         public InternalGalaxyViewer() {
             StackPane root = new StackPane();
@@ -143,6 +136,8 @@ public class GalaxyDemo extends AbstractSimulationDemo {
                 render();
             });
 
+            setupParameters();
+
             new AnimationTimer() {
                 @Override
                 public void handle(long now) {
@@ -151,6 +146,24 @@ public class GalaxyDemo extends AbstractSimulationDemo {
                     }
                 }
             }.start();
+        }
+
+        private void setupParameters() {
+            parameters.add(new NumericParameter(I18n.getInstance().get("viewer.galaxydemo.zoom", "Zoom"), "View Zoom", 0.1, 5.0, 0.1, zoom, v -> zoom = v));
+            parameters.add(new BooleanParameter("viewer.galaxydemo.collision", I18n.getInstance().get("viewer.galaxydemo.collision", "Collision Mode"), collisionMode, v -> {
+                if (v && !collisionMode) triggerCollision();
+                collisionMode = v;
+            }));
+            
+            parameters.add(new Parameter<>("viewer.galaxydemo.engine", I18n.getInstance().get("viewer.galaxydemo.mode", "Simulator Mode"), "Primitive", v -> {
+                 if ("Scientific".equals(v)) {
+                    simulator = new ObjectGalaxySimulator();
+                } else {
+                    simulator = new PrimitiveGalaxySimulator();
+                }
+                simulator.init(stars);
+                simulator.setGalaxy2State(g2x, g2y, g2vx, g2vy);
+            }));
         }
 
         private void loop(long now) {
@@ -171,82 +184,11 @@ public class GalaxyDemo extends AbstractSimulationDemo {
             if (timeLabel != null) timeLabel.setText(MessageFormat.format(I18n.getInstance().get("viewer.galaxydemo.time", "Time: {0} Myr"), simulationTime / 10));
         }
 
-        public List<javafx.scene.Node> getCustomControls() {
-            List<javafx.scene.Node> controls = new ArrayList<>();
-            
-            Label typeLbl = new Label(I18n.getInstance().get("viewer.galaxydemo.type", "Galaxy Type:"));
-            ComboBox<String> galaxyTypeCombo = new ComboBox<>();
-            galaxyTypeCombo.getItems().addAll(
-                I18n.getInstance().get("viewer.galaxydemo.type.spiral2", "Spiral (2 arms)"),
-                I18n.getInstance().get("viewer.galaxydemo.type.spiral3", "Spiral (3 arms)"),
-                I18n.getInstance().get("viewer.galaxydemo.type.barred", "Barred Spiral"),
-                I18n.getInstance().get("viewer.galaxydemo.type.elliptical", "Elliptical")
-            );
-            galaxyTypeCombo.getSelectionModel().select(0);
-            galaxyTypeCombo.setOnAction(e -> resetGalaxy(galaxyTypeCombo.getSelectionModel().getSelectedIndex()));
-            
-            Button btnCollision = new Button(I18n.getInstance().get("viewer.galaxydemo.collision", "Trigger Collision"));
-            btnCollision.setMaxWidth(Double.MAX_VALUE);
-            btnCollision.setOnAction(e -> triggerCollision());
-
-            Button btnReset = new Button(I18n.getInstance().get("viewer.galaxydemo.reset", "Reset"));
-            btnReset.setMaxWidth(Double.MAX_VALUE);
-            btnReset.setOnAction(e -> resetGalaxy(galaxyTypeCombo.getSelectionModel().getSelectedIndex()));
-
-            timeLabel = new Label(MessageFormat.format(I18n.getInstance().get("viewer.galaxydemo.time", "Time: {0} Myr"), 0));
-            fpsLabel = new Label(MessageFormat.format(I18n.getInstance().get("viewer.galaxydemo.fps", "FPS: {0}"), "--"));
-
-            // Simulator Switch
-            ToggleButton simSwitch = new ToggleButton(I18n.getInstance().get("viewer.galaxydemo.mode.primitive", "Mode: Primitive"));
-            simSwitch.setMaxWidth(Double.MAX_VALUE);
-            simSwitch.setOnAction(e -> {
-                if (simSwitch.isSelected()) {
-                    simulator = new ObjectGalaxySimulator();
-                    simSwitch.setText(I18n.getInstance().get("viewer.galaxydemo.mode.scientific", "Mode: Scientific"));
-                } else {
-                    simulator = new PrimitiveGalaxySimulator();
-                    simSwitch.setText(I18n.getInstance().get("viewer.galaxydemo.mode.primitive", "Mode: Primitive"));
-                }
-                simulator.init(stars);
-                simulator.setGalaxy2State(g2x, g2y, g2vx, g2vy);
-            });
-
-            controls.add(typeLbl);
-            controls.add(galaxyTypeCombo);
-            controls.add(btnCollision);
-            controls.add(btnReset);
-            controls.add(new Separator());
-            controls.add(simSwitch);
-            controls.add(fpsLabel);
-            controls.add(timeLabel);
-
-            return controls;
-        }
-
         private void resetGalaxy(int typeIndex) {
             stars.clear();
             galaxy2.clear();
             collisionMode = false;
             simulationTime = 0;
-            // Map index to type ID expected by initGalaxy
-            // 0: Spiral 2, 1: Spiral 3, 2: Barred??
-            // Based on previous code: type=1 was used for Galaxy 2 (red).
-            // Main galaxy uses type=0 for "normal" colors.
-            // Let's implement logic based on index.
-            // 0 -> 2 arms
-            // 1 -> 3 arms
-            // 2 -> Barred (Not implemented in createStar really, just mapped to type arg)
-            
-            // I will pass the index as type to createStar and handle it there if needed.
-            // Original code had: int armCount = type == 0 ? 2 : 3; 
-            // So type 0 is 2 arms. Type something else is 3?
-            
-            // Let's stick to the mapping: 
-            // 0 -> 2 arms
-            // 1 -> 3 arms
-            // We pass this 'type' param to initGalaxy.
-            
-            // Refined logic:
             initGalaxy(stars, 0, 0, typeIndex);
             simulator.init(stars);
         }
@@ -263,19 +205,12 @@ public class GalaxyDemo extends AbstractSimulationDemo {
         }
 
         private void initGalaxy(List<StarParticle> list, double cx, double cy, int type) {
-            // Adjust count based on type if needed
             for (int i = 0; i < STAR_COUNT / (type == 1 ? 2 : 1); i++) {
                 list.add(createStar(cx, cy, type));
             }
         }
 
         private StarParticle createStar(double cx, double cy, int type) {
-            // Types:
-            // 0: Default Spiral (2 arms)
-            // 1: Red Collision Galaxy (from triggerCollision)
-            // 2: 3 arms (Index 1 from combo)
-            // 3: Barred / Elliptical? (Just placeholders for now to keep it running)
-            
             double angle = random.nextDouble() * Math.PI * 2;
             double dist = random.nextDouble();
             dist = Math.pow(dist, 2.0);
@@ -356,6 +291,7 @@ public class GalaxyDemo extends AbstractSimulationDemo {
     
         @Override public String getDescription() { return I18n.getInstance().get("viewer.galaxydemo.desc", "Simulation of spiral galaxies and interaction mechanics."); }
         @Override public String getLongDescription() { return I18n.getInstance().get("viewer.galaxydemo.longdesc", "Detailed galaxy simulation including collisions and formation."); }
-        @Override public java.util.List<Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+        @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
     }
 }
+

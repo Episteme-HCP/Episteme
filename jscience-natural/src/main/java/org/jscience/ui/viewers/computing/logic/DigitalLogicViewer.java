@@ -12,12 +12,12 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import org.jscience.ui.Parameter;
+import org.jscience.ui.BooleanParameter;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
 import org.jscience.ui.i18n.I18n;
@@ -172,22 +172,6 @@ public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
         toolbar.setPrefWidth(200);
         toolbar.getStyleClass().add("viewer-sidebar");
 
-        ToggleButton modeBtn = new ToggleButton(I18n.getInstance().get("viewer.digitallogicviewer.mode.simulation", "Simulation Mode"));
-        modeBtn.setSelected(true);
-        modeBtn.setMaxWidth(Double.MAX_VALUE);
-        modeBtn.setOnAction(e -> {
-            simulationMode = modeBtn.isSelected();
-            modeBtn.setText(simulationMode ? I18n.getInstance().get("viewer.digitallogicviewer.mode.simulation", "Simulation Mode")
-                    : I18n.getInstance().get("viewer.digitallogicviewer.mode.design", "Design Mode"));
-            if (simulationMode) {
-                selectedComponent = null;
-                selectedConnection = null;
-                circuit.simulate();
-            }
-            draw();
-            updateStatus();
-        });
-
         Label compLabel = new Label(I18n.getInstance().get("viewer.digitallogicviewer.components", "Components"));
         compLabel.getStyleClass().add("font-bold");
 
@@ -213,7 +197,7 @@ public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
         statusLabel.setWrapText(true);
         statusLabel.getStyleClass().add("description-label");
 
-        toolbar.getChildren().addAll(modeBtn, new Separator(), compLabel, btnIn, btnOut, btnAnd, btnOr, btnNot, btnNand, new Separator(), statusLabel);
+        toolbar.getChildren().addAll(new Separator(), compLabel, btnIn, btnOut, btnAnd, btnOr, btnNot, btnNand, new Separator(), statusLabel);
         return toolbar;
     }
 
@@ -322,5 +306,20 @@ public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
     @Override public String getCategory() { return I18n.getInstance().get("category.computing", "Computing"); }
     @Override public String getDescription() { return I18n.getInstance().get("viewer.digitallogicviewer.desc", "Digital logic simulator."); }
     @Override public String getLongDescription() { return I18n.getInstance().get("viewer.digitallogicviewer.longdesc", "Refactored logic simulator using LogicCircuit backend."); }
-    @Override public List<Parameter<?>> getViewerParameters() { return new ArrayList<>(); }
+    @Override
+    public List<Parameter<?>> getViewerParameters() {
+        List<Parameter<?>> params = new ArrayList<>();
+        params.add(new BooleanParameter("viewer.digitallogicviewer.simulation", I18n.getInstance().get("viewer.digitallogicviewer.mode.simulation", "Simulation Mode"), simulationMode, v -> {
+            simulationMode = v;
+            if (simulationMode) {
+                selectedComponent = null;
+                selectedConnection = null;
+                circuit.simulate();
+            }
+            draw();
+            updateStatus();
+        }));
+        return params;
+    }
 }
+

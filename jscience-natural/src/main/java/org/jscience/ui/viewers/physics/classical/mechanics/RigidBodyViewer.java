@@ -30,7 +30,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
-import javafx.scene.control.Slider;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
@@ -40,6 +39,8 @@ import org.jscience.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.jscience.mathematics.sets.Reals;
 import org.jscience.physics.classical.mechanics.PhysicsEngine;
 import org.jscience.physics.classical.mechanics.RigidBody;
+import org.jscience.ui.NumericParameter;
+import org.jscience.ui.Parameter;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
 import org.jscience.ui.i18n.I18n;
@@ -88,8 +89,17 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
     public String getLongDescription() { return I18n.getInstance().get("viewer.rigidbodyviewer.longdesc", "Simulates multiple colliding rigid bodies in a 2D environment. features mass-based inertia, adjustable gravity, and bounciness parameters. Demonstrates momentum conservation and elastic collisions."); }
 
     @Override
-    public List<org.jscience.ui.Parameter<?>> getViewerParameters() {
-        return new java.util.ArrayList<>();
+    public List<Parameter<?>> getViewerParameters() {
+        List<Parameter<?>> params = new ArrayList<>();
+        params.add(new NumericParameter("rigid.gravity", I18n.getInstance().get("rigid.gravity", "Gravity"), 0, 2, 0.1, gravityVal, v -> {
+            gravityVal = v;
+            render();
+        }));
+        params.add(new NumericParameter("rigid.bounciness", I18n.getInstance().get("rigid.bounciness", "Bounciness"), 0.1, 1.0, 0.05, bouncinessVal, v -> {
+            bouncinessVal = v;
+            render();
+        }));
+        return params;
     }
 
     public RigidBodyViewer() {
@@ -123,25 +133,6 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
         countLabel.getStyleClass().add("description-label");
 
         Separator sep1 = new Separator();
-
-        Label gravLabel = new Label(I18n.getInstance().get("rigid.gravity", "Gravity"));
-        gravLabel.getStyleClass().add("description-label");
-        Slider gravSlider = new Slider(0, 2, 0.5);
-        gravSlider.setShowTickLabels(true);
-        gravSlider.valueProperty().addListener((o, ov, nv) -> {
-            gravityVal = nv.doubleValue();
-            gravLabel.setText(I18n.getInstance().get("rigid.gravity.fmt", "Gravity: %.1f", gravityVal));
-        });
-
-        Label bounceLabel = new Label(I18n.getInstance().get("rigid.bounciness", "Bounciness"));
-        bounceLabel.getStyleClass().add("description-label");
-        Slider bounceSlider = new Slider(0.1, 1.0, 0.8);
-        bounceSlider.setShowTickLabels(true);
-        bounceSlider.valueProperty().addListener((o, ov, nv) -> {
-            bouncinessVal = nv.doubleValue();
-            bounceLabel.setText(I18n.getInstance().get("rigid.bounciness.fmt", "Bounciness: %.1f", bouncinessVal));
-        });
-
         Separator sep2 = new Separator();
 
         Button addBtn = new Button(I18n.getInstance().get("rigid.add", "Add Body"));
@@ -162,7 +153,7 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
             countLabel.setText(I18n.getInstance().get("rigid.bodies", "Bodies: 0"));
         });
 
-        sidebar.getChildren().addAll(title, countLabel, sep1, gravLabel, gravSlider, bounceLabel, bounceSlider, sep2, addBtn, add5Btn, clearBtn);
+        sidebar.getChildren().addAll(title, countLabel, sep1, sep2, addBtn, add5Btn, clearBtn);
         this.setRight(sidebar);
 
         timer = new AnimationTimer() {
@@ -244,3 +235,4 @@ public class RigidBodyViewer extends AbstractViewer implements Simulatable {
         }
     }
 }
+

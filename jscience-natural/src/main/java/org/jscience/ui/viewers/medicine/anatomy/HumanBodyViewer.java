@@ -621,3 +621,4 @@ public class HumanBodyViewer extends AbstractViewer {
     @Override public String getLongDescription() { return I18n.getInstance().get("viewer.humanbodyviewer.longdesc", "Detailed 3D visualization of human anatomy including skeleton, muscles, organs, and nervous system."); }
     @Override public List<Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }
+

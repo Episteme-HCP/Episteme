@@ -409,3 +409,4 @@ public class GeneticsViewer extends AbstractViewer {
     @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.geneticsviewer.longdesc", "Features Wright-Fisher model simulations for genetic drift and Punnett square calculations for Mendelian inheritance patterns. Includes tools for UniProt accession queries and FASTA file browsing."); }
     @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }
+

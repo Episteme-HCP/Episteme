@@ -282,3 +282,4 @@ public class GeneticAlgorithmDemo extends AbstractSimulationDemo {
     @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }
 }
+

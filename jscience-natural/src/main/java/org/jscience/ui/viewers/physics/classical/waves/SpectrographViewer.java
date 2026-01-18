@@ -256,3 +256,4 @@ public class SpectrographViewer extends AbstractViewer implements Simulatable {
     @Override public String getDescription() { return I18n.getInstance().get("viewer.spectrographviewer.desc", "Real-time frequency analysis visualization."); }
     @Override public String getLongDescription() { return I18n.getInstance().get("viewer.spectrographviewer.longdesc", "Captures and processes live signals to generate a real-time spectrogram and spectrum bar chart. Supports adjustable sensitivity, frequency bands, and optimized rendering for high-resolution frequency analysis."); }
 }
+

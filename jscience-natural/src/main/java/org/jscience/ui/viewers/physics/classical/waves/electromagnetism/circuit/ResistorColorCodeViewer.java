@@ -185,3 +185,4 @@ public class ResistorColorCodeViewer extends org.jscience.ui.AbstractViewer {
 }
 
 
+

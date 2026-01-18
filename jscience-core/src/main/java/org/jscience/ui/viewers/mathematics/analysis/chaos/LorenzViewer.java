@@ -228,3 +228,4 @@ public class LorenzViewer extends AbstractViewer implements Simulatable {
         return new VBox(5, l, s);
     }
 }
+

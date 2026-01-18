@@ -577,3 +577,4 @@ public class PeriodicTableViewer extends AbstractViewer {
         return params;
     }
 }
+

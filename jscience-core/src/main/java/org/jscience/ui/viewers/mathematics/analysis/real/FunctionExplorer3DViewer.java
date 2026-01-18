@@ -165,3 +165,4 @@ public class FunctionExplorer3DViewer extends AbstractViewer {
         return org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer3dviewer.longdesc", "Visualize functions of two variables z = f(x, y) as 3D surfaces. Rotate, zoom, and analyze points on complex mathematical terrains.");
     }
 }
+

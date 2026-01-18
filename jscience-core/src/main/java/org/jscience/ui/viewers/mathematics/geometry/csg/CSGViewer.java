@@ -184,3 +184,4 @@ public class CSGViewer extends AbstractViewer {
         return org.jscience.ui.i18n.I18n.getInstance().get("viewer.csgviewer.longdesc", "Explore Constructive Solid Geometry (CSG) concepts by combining 3D shapes. Perform boolean operations on primitive solids and adjust their relative offsets.");
     }
 }
+

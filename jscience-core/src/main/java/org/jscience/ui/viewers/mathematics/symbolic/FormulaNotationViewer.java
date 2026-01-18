@@ -243,3 +243,4 @@ public class FormulaNotationViewer extends AbstractViewer {
         return org.jscience.ui.i18n.I18n.getInstance().get("viewer.formulanotationviewer.longdesc", "Demonstrates rendering of complex mathematical formulas like Schrödinger equation and Euler's identity using custom JavaFX text layouts.");
     }
 }
+

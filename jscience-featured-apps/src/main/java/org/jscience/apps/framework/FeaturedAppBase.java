@@ -616,3 +616,4 @@ public abstract class FeaturedAppBase extends Application implements App {
         this.simulationControlsVisible.set(visible);
     }
 }
+

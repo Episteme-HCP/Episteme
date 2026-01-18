@@ -96,3 +96,4 @@ public class NetworkViewer extends AbstractViewer {
         return org.jscience.ui.i18n.I18n.getInstance().get("viewer.networkviewer.longdesc", "Graph theory and network visualization tool. Supports visualization of nodes and edges for discrete mathematics and social network analysis with various backend providers.");
     }
 }
+

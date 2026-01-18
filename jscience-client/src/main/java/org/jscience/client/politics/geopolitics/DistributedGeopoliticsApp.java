@@ -270,3 +270,4 @@ public class DistributedGeopoliticsApp extends Application implements org.jscien
         return new java.util.ArrayList<>();
     }
 }
+

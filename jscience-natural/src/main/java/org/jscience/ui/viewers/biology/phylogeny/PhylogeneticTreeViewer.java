@@ -32,6 +32,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import org.jscience.ui.Parameter;
+import org.jscience.ui.BooleanParameter;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.biology.Taxon;
@@ -39,6 +40,7 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.biology.io.PhylogeneticTreeReader;
 
 import javafx.application.Platform;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.text.MessageFormat;
@@ -83,13 +85,7 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
         Label infoPanel = new Label(I18n.getInstance().get("viewer.phylogenetictreeviewer.info.default", "Select a node to view details."));
         infoPanel.getStyleClass().add("viewer-sidebar");
 
-        javafx.scene.control.Button toggleBtn = new javafx.scene.control.Button(I18n.getInstance().get("viewer.phylogenetictreeviewer.toggle_view", "Toggle View"));
-        toggleBtn.setOnAction(e -> {
-            radialMode = !radialMode;
-            updateLayoutAndDraw(canvas);
-        });
-
-        HBox controls = new HBox(10, toggleBtn, infoPanel);
+        HBox controls = new HBox(10, infoPanel);
         controls.setPadding(new javafx.geometry.Insets(10));
         
         // Add NCBI Taxonomy query section
@@ -385,5 +381,14 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
 
     @Override public String getDescription() { return I18n.getInstance().get("viewer.phylogenetictreeviewer.desc", "Interactive evolutionary tree browser showing taxonomic relationships."); }
     @Override public String getLongDescription() { return I18n.getInstance().get("viewer.phylogenetictreeviewer.longdesc", "Visualize and explore the 'Tree of Life' with support for linear and radial layouts. Features interactive node selection, genetic marker alignment (COI, 16S, CytB), and NCBI taxonomy integration."); }
-    @Override public java.util.List<Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+    @Override
+    public List<Parameter<?>> getViewerParameters() {
+        List<Parameter<?>> params = new ArrayList<>();
+        params.add(new BooleanParameter("viewer.phylogenetictreeviewer.radial", I18n.getInstance().get("viewer.phylogenetictreeviewer.radial", "Radial Mode"), radialMode, v -> {
+            radialMode = v;
+            updateLayoutAndDraw(canvas);
+        }));
+        return params;
+    }
 }
+

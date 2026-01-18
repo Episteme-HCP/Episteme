@@ -347,3 +347,4 @@ public class MagneticFieldViewer extends org.jscience.ui.AbstractViewer {
         return I18n.getInstance().get("viewer.magneticfieldviewer.longdesc", "Interactive high-fidelity 3D visualization of magnetic field vectors and streamlines."); 
     }
 }
+

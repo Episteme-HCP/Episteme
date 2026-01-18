@@ -229,3 +229,4 @@ public class AudioViewer extends AbstractViewer implements Simulatable {
     @Override public String getLongDescription() { return I18n.getInstance().get("viewer.audioviewer.longdesc", "Comprehensive audio analysis tool that displays time-domain waveforms and frequency-domain spectrograms. Supports various audio formats and scientific FFT analysis."); }
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
 }
+

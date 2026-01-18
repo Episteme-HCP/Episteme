@@ -171,3 +171,4 @@ public class SpeciesBrowserViewer extends AbstractViewer {
     @Override public String getLongDescription() { return I18n.getInstance().get("viewer.speciesbrowserviewer.longdesc", "Connects to the Global Biodiversity Information Facility (GBIF) to search and retrieve detailed taxonomic classification, scientific names, and media for millions of species."); }
     @Override public List<Parameter<?>> getViewerParameters() { return new ArrayList<>(); }
 }
+

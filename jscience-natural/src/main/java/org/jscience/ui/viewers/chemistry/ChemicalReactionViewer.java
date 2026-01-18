@@ -259,3 +259,4 @@ public class ChemicalReactionViewer extends AbstractViewer {
     @Override public String getLongDescription() { return I18n.getInstance().get("viewer.chemicalreactionviewer.longdesc", "Advanced chemical equation analyzer that verifies stoichiometry, calculates element balances, and identifies reactants and products. Includes a quick formula parser for rapid composition analysis."); }
     @Override public List<Parameter<?>> getViewerParameters() { return new ArrayList<>(); }
 }
+

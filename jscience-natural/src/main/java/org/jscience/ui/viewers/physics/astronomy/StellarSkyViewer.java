@@ -40,8 +40,13 @@ import org.jscience.physics.astronomy.time.SiderealTime;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
+import org.jscience.ui.BooleanParameter;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.io.Configuration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -78,14 +83,20 @@ public class StellarSkyViewer extends AbstractViewer {
     public List<Parameter<?>> getViewerParameters() {
         List<Parameter<?>> params = new ArrayList<>();
         params.add(new NumericParameter("viewer.stellarsky.param.lat",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.stellarsky.param.lat.desc", "Observer Latitude"),
+                I18n.getInstance().get("viewer.stellarsky.param.lat.desc", "Observer Latitude"),
                 -90, 90, 0.1, observerLat.doubleValue(), v -> { observerLat = Real.of(v); drawSky(); }));
         params.add(new NumericParameter("viewer.stellarsky.param.lon",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.stellarsky.param.lon.desc", "Observer Longitude"),
+                I18n.getInstance().get("viewer.stellarsky.param.lon.desc", "Observer Longitude"),
                 -180, 180, 0.1, observerLon.doubleValue(), v -> { observerLon = Real.of(v); drawSky(); }));
         params.add(new NumericParameter("viewer.stellarsky.param.fov",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.stellarsky.param.fov.desc", "Field of View Scale"),
+                I18n.getInstance().get("viewer.stellarsky.param.fov.desc", "Field of View Scale"),
                 0.1, 5.0, 0.1, fovScale.doubleValue(), v -> { fovScale = Real.of(v); drawSky(); }));
+        
+        params.add(new BooleanParameter("viewer.stellarsky.param.show_constellations", I18n.getInstance().get("sky.stars", "Show Constellations"), bShowConstellations, v -> { bShowConstellations = v; drawSky(); }));
+        params.add(new BooleanParameter("viewer.stellarsky.param.show_planets", I18n.getInstance().get("sky.planets", "Show Planets"), bShowPlanets, v -> { bShowPlanets = v; drawSky(); }));
+        params.add(new BooleanParameter("viewer.stellarsky.param.show_dso", I18n.getInstance().get("sky.dso", "Show DSO"), bShowDSO, v -> { bShowDSO = v; drawSky(); }));
+        params.add(new BooleanParameter("viewer.stellarsky.param.show_trails", I18n.getInstance().get("sky.trails", "Show Trails"), bShowTrails, v -> { bShowTrails = v; drawSky(); }));
+
         return params;
     }
 
@@ -95,10 +106,10 @@ public class StellarSkyViewer extends AbstractViewer {
     private Canvas skyCanvas;
     private Label infoLabel;
     private Label timeLabel;
-    private CheckBox showConstellations;
-    private CheckBox showPlanets;
-    private CheckBox showDSO;
-    private CheckBox showTrails;
+    private boolean bShowConstellations = true;
+    private boolean bShowPlanets = true;
+    private boolean bShowDSO = true;
+    private boolean bShowTrails = false;
 
     // Interaction
     private double lastMouseX;
@@ -179,19 +190,13 @@ public class StellarSkyViewer extends AbstractViewer {
             simulationTime = simulationTime.withHour((int)val); drawSky();
         });
 
-        showConstellations = new CheckBox(I18n.getInstance().get("sky.stars", "Constellations")); showConstellations.setSelected(true); showConstellations.setOnAction(e -> drawSky());
-        showPlanets = new CheckBox(I18n.getInstance().get("sky.planets", "Solar System")); showPlanets.setSelected(true); showPlanets.setOnAction(e -> drawSky());
-        showDSO = new CheckBox(I18n.getInstance().get("sky.dso", "Deep Sky")); showDSO.setSelected(true); showDSO.setOnAction(e -> drawSky());
-        showTrails = new CheckBox(I18n.getInstance().get("sky.trails", "Trails")); showTrails.setSelected(false); showTrails.setOnAction(e -> drawSky());
-
         infoLabel = new Label(I18n.getInstance().get("sky.info.select", "Select an object..."));
         infoLabel.setWrapText(true);
         infoLabel.getStyleClass().addAll("description-label", "info-panel");
         infoLabel.setPrefHeight(100);
 
         sidebar.getChildren().addAll(title, vizierSection, new Separator(), locLabel, latSlider.getParent(), lonSlider.getParent(), new Separator(),
-                timeCtrlLabel, datePicker, hourSlider.getParent(), new Separator(),
-                showConstellations, showPlanets, showDSO, showTrails, new Separator(), infoLabel);
+                timeCtrlLabel, datePicker, hourSlider.getParent(), new Separator(), infoLabel);
         return sidebar;
     }
 
@@ -321,7 +326,7 @@ public class StellarSkyViewer extends AbstractViewer {
         hoveredPlanet = newPlanet;
         if (hoveredPlanet == null) hoveredStar = findStarAt(mx, my); else hoveredStar = null;
 
-        if (hoveredPlanet == null && hoveredStar == null && showConstellations.isSelected()) {
+        if (hoveredPlanet == null && hoveredStar == null && bShowConstellations) {
             Map<String, double[]> starPos = new HashMap<>();
             double w = skyCanvas.getWidth(), h = skyCanvas.getHeight(), cx = w / 2, cy = h / 2;
             double radius = Math.min(w, h) / 2 - 20;
@@ -465,7 +470,7 @@ public class StellarSkyViewer extends AbstractViewer {
             }
         }
 
-        if(showConstellations.isSelected()) {
+        if(bShowConstellations) {
             gc.setStroke(Color.rgb(135, 206, 250, 0.4)); gc.setLineWidth(1);
              Map<String, double[]> sMap = new HashMap<>();
              for(StarReader.Star s : stars) {
@@ -478,8 +483,8 @@ public class StellarSkyViewer extends AbstractViewer {
              }
         }
 
-        if(showPlanets.isSelected()) {
-            if(showTrails.isSelected()) drawOrbitTrails(gc, cx, cy, radius);
+        if(bShowPlanets) {
+            if(bShowTrails) drawOrbitTrails(gc, cx, cy, radius);
             for(PlanetData p : planets) {
                 double[] pos = calculatePlanetProjectedPosition(p, cx, cy, radius);
                 if(pos!=null) {
@@ -489,7 +494,7 @@ public class StellarSkyViewer extends AbstractViewer {
             }
         }
 
-        if(showDSO.isSelected()) {
+        if(bShowDSO) {
             for(DeepSkyObject d : deepSkyObjects) {
                  HorizontalCoordinate hor = calculateHorizontal(d.ra, d.dec, getDaysSinceJ2000());
                  if(hor.getAltitude()>0) {
@@ -531,3 +536,4 @@ public class StellarSkyViewer extends AbstractViewer {
     @Override public String getDescription() { return I18n.getInstance().get("viewer.stellarskyviewer.desc", "Real-time planetarium and sky map simulation."); }
     @Override public String getLongDescription() { return I18n.getInstance().get("viewer.stellarskyviewer.longdesc", "Advanced sky map that projects stars, constellations, and planets based on Earth coordinates and time. Includes support for celestial coordinate systems, magnitude filtering, and deep-sky object labeling."); }
 }
+

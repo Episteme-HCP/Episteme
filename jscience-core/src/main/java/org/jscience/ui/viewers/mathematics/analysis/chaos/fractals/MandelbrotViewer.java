@@ -259,3 +259,4 @@ public class MandelbrotViewer extends AbstractViewer {
         return org.jscience.ui.i18n.I18n.getInstance().get("viewer.mandelbrotviewer.longdesc", "Explore the infinite complexity of the Mandelbrot set with zoom and pan controls. Switch to Julia mode to explore related Julia sets with customizable parameters.");
     }
 }
+

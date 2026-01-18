@@ -356,3 +356,4 @@ public class MatrixViewer<T> extends AbstractViewer {
         return org.jscience.ui.i18n.I18n.getInstance().get("viewer.matrixviewer.longdesc", "Visualize matrices with heatmaps and perform linear algebra operations including determinant, inverse, eigenvalues, and decompositions. Supports random matrix generation and scaling.");
     }
 }
+

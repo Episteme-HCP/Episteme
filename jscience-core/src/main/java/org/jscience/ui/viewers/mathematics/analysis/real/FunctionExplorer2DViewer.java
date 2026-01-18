@@ -267,3 +267,4 @@ public class FunctionExplorer2DViewer extends AbstractViewer {
         return I18n.getInstance().get("viewer.functionexplorer2dviewer.longdesc", "Enter and plot 2D mathematical functions f(x) and g(x). Perform operations like addition and multiplication, and calculate symbolic derivatives with real-time visualization.");
     }
 }
+
