@@ -109,7 +109,7 @@ public class JScienceMasterControl extends Application {
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         tabPane.getTabs().clear();
 
-        I18n i18n = org.jscience.ui.i18n.I18n.getInstance();
+        I18n i18n = I18n.getInstance();
 
         tabPane.getTabs().addAll(
                 createGeneralTab(i18n),
@@ -204,7 +204,7 @@ public class JScienceMasterControl extends Application {
         authorsHeader.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-underline: true;
         authorsBox.getChildren().add(authorsHeader);
 
-        for (String author : org.jscience.JScience.AUTHORS) {
+        for (String author : JScience.AUTHORS) {
             authorsBox.getChildren().add(new Label(author));
         }
 
@@ -510,19 +510,19 @@ public class JScienceMasterControl extends Application {
         // Molecular Rendering Backend
         ComboBox<String> backendBox = new ComboBox<>();
         // Fetch available molecular backends via SPI
-        java.util.List<org.jscience.technical.backend.BackendProvider> providers = 
-            org.jscience.technical.backend.BackendDiscovery.getInstance()
-                .getProvidersByType(org.jscience.technical.backend.BackendDiscovery.TYPE_MOLECULAR);
+        List<BackendProvider> providers = 
+            BackendDiscovery.getInstance()
+                .getProvidersByType(BackendDiscovery.TYPE_MOLECULAR);
 
         // Map names to IDs for lookup
         java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
         nameToId.put("AUTO", null);
-        for (org.jscience.technical.backend.BackendProvider p : providers) {
+        for (BackendProvider p : providers) {
             nameToId.put(p.getName(), p.getId());
         }
         backendBox.getItems().addAll(nameToId.keySet());
         
-        String currentId = org.jscience.io.UserPreferences.getInstance().getPreferredBackend("molecular");
+        String currentId = PREFS.getPreferredBackend("molecular");
         String currentName = "AUTO";
         for (var entry : nameToId.entrySet()) {
             if (java.util.Objects.equals(entry.getValue(), currentId)) {
@@ -533,7 +533,7 @@ public class JScienceMasterControl extends Application {
         backendBox.setValue(currentName);
         backendBox.setOnAction(e -> {
             String name = backendBox.getValue();
-            org.jscience.io.UserPreferences.getInstance().setPreferredBackend("molecular", nameToId.get(name));
+            PREFS.setPreferredBackend("molecular", nameToId.get(name));
         });
 
         VBox backendInfo = createInfoBox(
@@ -550,7 +550,7 @@ public class JScienceMasterControl extends Application {
 
         // Append available libraries list (No header)
         box.getChildren().add(createBackendCategory(i18n, 
-            org.jscience.technical.backend.BackendDiscovery.TYPE_MOLECULAR,
+            BackendDiscovery.TYPE_MOLECULAR,
             "", // No visible header
             ""));
 
@@ -575,19 +575,19 @@ public class JScienceMasterControl extends Application {
         // Quantum Backend
         ComboBox<String> backendBox = new ComboBox<>();
         // Fetch available quantum backends via SPI
-        java.util.List<org.jscience.technical.backend.BackendProvider> providers = 
-            org.jscience.technical.backend.BackendDiscovery.getInstance()
-                .getProvidersByType(org.jscience.technical.backend.BackendDiscovery.TYPE_QUANTUM);
+        List<BackendProvider> providers = 
+            BackendDiscovery.getInstance()
+                .getProvidersByType(BackendDiscovery.TYPE_QUANTUM);
 
         // Map names to IDs for lookup
         java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
         nameToId.put("AUTO", null);
-        for (org.jscience.technical.backend.BackendProvider p : providers) {
+        for (BackendProvider p : providers) {
             nameToId.put(p.getName(), p.getId());
         }
         backendBox.getItems().addAll(nameToId.keySet());
         
-        String currentId = org.jscience.io.UserPreferences.getInstance().getPreferredBackend("quantum");
+        String currentId = PREFS.getPreferredBackend("quantum");
         String currentName = "AUTO";
         for (var entry : nameToId.entrySet()) {
             if (java.util.Objects.equals(entry.getValue(), currentId)) {
@@ -598,7 +598,7 @@ public class JScienceMasterControl extends Application {
         backendBox.setValue(currentName);
         backendBox.setOnAction(e -> {
             String name = backendBox.getValue();
-            org.jscience.io.UserPreferences.getInstance().setPreferredBackend("quantum", nameToId.get(name));
+            PREFS.setPreferredBackend("quantum", nameToId.get(name));
         });
 
         VBox backendInfo = createInfoBox(
@@ -615,7 +615,7 @@ public class JScienceMasterControl extends Application {
 
         // Append available libraries list
         box.getChildren().add(createBackendCategory(i18n, 
-            org.jscience.technical.backend.BackendDiscovery.TYPE_QUANTUM,
+            BackendDiscovery.TYPE_QUANTUM,
             "", ""));
 
         box.getChildren().add(new Separator());
@@ -639,19 +639,19 @@ public class JScienceMasterControl extends Application {
         // Map Rendering Backend
         ComboBox<String> backendBox = new ComboBox<>();
         // Fetch available map backends via SPI
-        java.util.List<org.jscience.technical.backend.BackendProvider> providers = 
-            org.jscience.technical.backend.BackendDiscovery.getInstance()
-                .getProvidersByType(org.jscience.technical.backend.BackendDiscovery.TYPE_MAP);
+        List<BackendProvider> providers = 
+            BackendDiscovery.getInstance()
+                .getProvidersByType(BackendDiscovery.TYPE_MAP);
 
         // Map names to IDs for lookup
         java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
         nameToId.put("AUTO", null);
-        for (org.jscience.technical.backend.BackendProvider p : providers) {
+        for (BackendProvider p : providers) {
             nameToId.put(p.getName(), p.getId());
         }
         backendBox.getItems().addAll(nameToId.keySet());
         
-        String currentId = org.jscience.io.UserPreferences.getInstance().getPreferredBackend("map");
+        String currentId = PREFS.getPreferredBackend("map");
         String currentName = "AUTO";
         for (var entry : nameToId.entrySet()) {
             if (java.util.Objects.equals(entry.getValue(), currentId)) {
@@ -662,7 +662,7 @@ public class JScienceMasterControl extends Application {
         backendBox.setValue(currentName);
         backendBox.setOnAction(e -> {
             String name = backendBox.getValue();
-            org.jscience.io.UserPreferences.getInstance().setPreferredBackend("map", nameToId.get(name));
+            PREFS.setPreferredBackend("map", nameToId.get(name));
         });
 
         VBox backendInfo = createInfoBox(
@@ -679,7 +679,7 @@ public class JScienceMasterControl extends Application {
 
         // Append available libraries list (No header)
         box.getChildren().add(createBackendCategory(i18n, 
-            org.jscience.technical.backend.BackendDiscovery.TYPE_MAP,
+            BackendDiscovery.TYPE_MAP,
             "", // No visible header
             ""));
 
@@ -704,19 +704,19 @@ public class JScienceMasterControl extends Application {
         // Network Rendering Backend
         ComboBox<String> backendBox = new ComboBox<>();
         // Fetch available network backends via SPI
-        java.util.List<org.jscience.technical.backend.BackendProvider> providers = 
-            org.jscience.technical.backend.BackendDiscovery.getInstance()
-                .getProvidersByType(org.jscience.technical.backend.BackendDiscovery.TYPE_NETWORK);
+        List<BackendProvider> providers = 
+            BackendDiscovery.getInstance()
+                .getProvidersByType(BackendDiscovery.TYPE_NETWORK);
 
         // Map names to IDs for lookup
         java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
         nameToId.put("AUTO", null);
-        for (org.jscience.technical.backend.BackendProvider p : providers) {
+        for (BackendProvider p : providers) {
             nameToId.put(p.getName(), p.getId());
         }
         backendBox.getItems().addAll(nameToId.keySet());
         
-        String currentId = org.jscience.io.UserPreferences.getInstance().getPreferredBackend("network");
+        String currentId = PREFS.getPreferredBackend("network");
         String currentName = "AUTO";
         for (var entry : nameToId.entrySet()) {
             if (java.util.Objects.equals(entry.getValue(), currentId)) {
@@ -727,7 +727,7 @@ public class JScienceMasterControl extends Application {
         backendBox.setValue(currentName);
         backendBox.setOnAction(e -> {
             String name = backendBox.getValue();
-            org.jscience.io.UserPreferences.getInstance().setPreferredBackend("network", nameToId.get(name));
+            PREFS.setPreferredBackend("network", nameToId.get(name));
         });
 
         VBox backendInfo = createInfoBox(
@@ -744,7 +744,7 @@ public class JScienceMasterControl extends Application {
 
         // Append available libraries list (No header)
         box.getChildren().add(createBackendCategory(i18n, 
-            org.jscience.technical.backend.BackendDiscovery.TYPE_NETWORK,
+            BackendDiscovery.TYPE_NETWORK,
             "", ""));
 
         box.getChildren().add(new Separator());
@@ -1210,7 +1210,8 @@ public class JScienceMasterControl extends Application {
         List<ResourceIO<?>> allLoaders = new ArrayList<>();
         
         // Load readers
-        @SuppressWarnings("rawtypes")
+        // Load readers
+        @SuppressWarnings({"rawtypes", "unchecked"})
         java.util.ServiceLoader<org.jscience.io.ResourceReader> readerLoader = 
             java.util.ServiceLoader.load(org.jscience.io.ResourceReader.class);
         java.util.Iterator<org.jscience.io.ResourceReader> readerIter = readerLoader.iterator();
@@ -1223,7 +1224,7 @@ public class JScienceMasterControl extends Application {
         }
         
         // Load writers  
-        @SuppressWarnings("rawtypes")
+        @SuppressWarnings({"rawtypes", "unchecked"})
         java.util.ServiceLoader<org.jscience.io.ResourceWriter> writerLoader = 
             java.util.ServiceLoader.load(org.jscience.io.ResourceWriter.class);
         java.util.Iterator<org.jscience.io.ResourceWriter> writerIter = writerLoader.iterator();

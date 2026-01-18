@@ -24,6 +24,8 @@
 package org.jscience.ui.demos;
 
 import org.jscience.ui.AbstractDemo;
+import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.viewers.mathematics.analysis.real.FunctionExplorer2DViewer;
 
 public class EconomicsGDPDemo extends AbstractDemo {
 
@@ -34,30 +36,30 @@ public class EconomicsGDPDemo extends AbstractDemo {
 
     @Override
     public String getCategory() { 
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.economics", "Economics"); 
+        return I18n.getInstance().get("category.economics", "Economics"); 
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsgdpdemo.name", "GDP Growth");
+        return I18n.getInstance().get("demo.economicsgdpdemo.name", "GDP Growth");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsgdpdemo.desc", "Economic projection model with adjustable growth rate.");
+        return I18n.getInstance().get("demo.economicsgdpdemo.desc", "Economic projection model with adjustable growth rate.");
     }
 
     @Override
     protected javafx.scene.Node createViewerNode() {
         // User requested: "should use FunctionExplorer2DViewer"
         // P = P0 * (1+r)^t -> y = 25 * (1 + 0.02)^x
-        org.jscience.ui.viewers.mathematics.analysis.real.FunctionExplorer2DViewer v = new org.jscience.ui.viewers.mathematics.analysis.real.FunctionExplorer2DViewer();
+        FunctionExplorer2DViewer v = new FunctionExplorer2DViewer();
         this.viewer = v;
         return v;
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsgdpdemo.longdesc", "Simulation of GDP growth over time using exponential growth models and adjustable parameters.");
+        return I18n.getInstance().get("demo.economicsgdpdemo.longdesc", "Simulation of GDP growth over time using exponential growth models and adjustable parameters.");
     }
 }

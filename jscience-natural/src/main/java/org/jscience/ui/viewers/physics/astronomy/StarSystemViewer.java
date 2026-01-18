@@ -45,8 +45,10 @@ import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
 import org.jscience.ui.i18n.I18n;
 
+
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -137,7 +139,7 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
         box.setPrefWidth(200);
         box.getStyleClass().add("viewer-sidebar");
         
-        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("starsystem.presets", "Presets"));
+        Label title = new Label(I18n.getInstance().get("starsystem.presets", "Presets"));
         title.getStyleClass().add("header-label");
 
         ComboBox<Preset> combo = new ComboBox<>();
@@ -235,7 +237,7 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
         }
     }
     
-    private void updateLabels() { if(dateLabel!=null) dateLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("starsystem.date", "Date") + ": " + String.format("%.2f", currentDate.getValue())); }
+    private void updateLabels() { if(dateLabel!=null) dateLabel.setText(I18n.getInstance().get("starsystem.date", "Date") + ": " + String.format("%.2f", currentDate.getValue())); }
     private void updateVisuals() { /* star rotation */ }
 
     // --- Simulatable ---
@@ -275,26 +277,26 @@ public class StarSystemViewer extends AbstractViewer implements Simulatable {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics");
+        return I18n.getInstance().get("category.physics", "Physics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.starsystemviewer.name", "Star System Viewer");
+        return I18n.getInstance().get("viewer.starsystemviewer.name", "Star System Viewer");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.starsystemviewer.desc", "3D celestial body and orbital dynamics simulator.");
+        return I18n.getInstance().get("viewer.starsystemviewer.desc", "3D celestial body and orbital dynamics simulator.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.starsystemviewer.longdesc", "Explore stellar systems including our Solar System and exotic objects like black holes. features 3D navigation, orbital trails, and time scaling to observe long-term celestial mechanics.");
+        return I18n.getInstance().get("viewer.starsystemviewer.longdesc", "Explore stellar systems including our Solar System and exotic objects like black holes. features 3D navigation, orbital trails, and time scaling to observe long-term celestial mechanics.");
     }
 
     @Override
-    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+    public List<org.jscience.ui.Parameter<?>> getViewerParameters() {
         return new java.util.ArrayList<>();
     }
 }

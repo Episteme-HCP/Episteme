@@ -110,8 +110,8 @@ public class GeoMap {
      * Calculates the bottom-right coordinate of this map.
      */
     public Coordinate getBottomRightCoordinate() {
-        double topLat = topLeftCoordinate.getLatitudeDegrees();
-        double topLon = topLeftCoordinate.getLongitudeDegrees();
+        double topLat = topLeftCoordinate.getLatitudeDegrees().doubleValue();
+        double topLon = topLeftCoordinate.getLongitudeDegrees().doubleValue();
 
         // Height goes down (south), width goes right (east)
         double bottomLat = topLat - heightDegrees;

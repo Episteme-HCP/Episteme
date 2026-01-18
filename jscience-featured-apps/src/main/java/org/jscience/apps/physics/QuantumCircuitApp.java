@@ -33,13 +33,14 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.text.Font;
+
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 
 import org.jscience.apps.framework.FeaturedAppBase;
+import org.jscience.ui.i18n.I18n;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +75,7 @@ public class QuantumCircuitApp extends FeaturedAppBase {
 
     @Override
     protected String getAppTitle() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.quantumcircuitapp.name", "Quantum Circuit Designer");
+        return I18n.getInstance().get("viewer.quantumcircuitapp.name", "Quantum Circuit Designer");
     }
 
     @Override
@@ -84,12 +85,12 @@ public class QuantumCircuitApp extends FeaturedAppBase {
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.quantumcircuitapp.desc", "Design and simulate basic quantum circuits.");
+        return I18n.getInstance().get("viewer.quantumcircuitapp.desc", "Design and simulate basic quantum circuits.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.quantumcircuitapp.longdesc", "Interactive quantum circuit designer for exploring fundamental quantum computing concepts. Features H, X, Y, Z, and CNOT gates, with real-time measurement probability visualization for multi-qubit systems.");
+        return I18n.getInstance().get("viewer.quantumcircuitapp.longdesc", "Interactive quantum circuit designer for exploring fundamental quantum computing concepts. Features H, X, Y, Z, and CNOT gates, with real-time measurement probability visualization for multi-qubit systems.");
     }
 
     @Override
@@ -376,6 +377,6 @@ public class QuantumCircuitApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics");
+        return I18n.getInstance().get("category.physics", "Physics");
     }
 }

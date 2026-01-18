@@ -30,13 +30,14 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
+
 
 import org.jscience.apps.framework.FeaturedAppBase;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.*;
+import org.jscience.ui.i18n.I18n;
 
 /**
  * Civilization Evolution Simulator.
@@ -100,7 +101,7 @@ public class CivilizationApp extends FeaturedAppBase {
 
     @Override
     protected String getAppTitle() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.civilizationapp.name", "Civilization Simulator");
+        return I18n.getInstance().get("viewer.civilizationapp.name", "Civilization Simulator");
     }
 
     @Override
@@ -110,12 +111,12 @@ public class CivilizationApp extends FeaturedAppBase {
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.civilizationapp.desc", "Simulate civilization growth, resources, and pollution dynamics.");
+        return I18n.getInstance().get("viewer.civilizationapp.desc", "Simulate civilization growth, resources, and pollution dynamics.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.civilizationapp.longdesc", "A simplified System Dynamics model (Limits to Growth style) simulating the interaction between Population, Resources, and Pollution. Features interactive parameters like birth rate, consumption per capita, and innovation rate.");
+        return I18n.getInstance().get("viewer.civilizationapp.longdesc", "A simplified System Dynamics model (Limits to Growth style) simulating the interaction between Population, Resources, and Pollution. Features interactive parameters like birth rate, consumption per capita, and innovation rate.");
     }
 
     @Override
@@ -538,11 +539,8 @@ public class CivilizationApp extends FeaturedAppBase {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.sociology", "Sociology");
+        return I18n.getInstance().get("category.sociology", "Sociology");
     }
 
-    @Override
-    public String getLongDescription() {
-        return getDescription();
-    }
+
 }

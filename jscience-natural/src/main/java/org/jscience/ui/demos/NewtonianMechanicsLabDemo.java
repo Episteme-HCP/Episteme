@@ -61,21 +61,21 @@ import java.util.List;
 public class NewtonianMechanicsLabDemo extends AbstractSimulationDemo {
 
     @Override
-    public String getCategory() { return "Physics"; }
+    public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("mechanics.lab.title", "Newtonian Lab");
+        return I18n.getInstance().get("mechanics.lab.title", "Newtonian Lab");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.mechanics.lab", "Experiments with Springs, Pendulums, and Gravity.");
+        return I18n.getInstance().get("viewer.mechanics.lab", "Experiments with Springs, Pendulums, and Gravity.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.newtonianmechanicslabdemo.longdesc", "Detailed simulation of newtonian mechanics experiments.");
+        return I18n.getInstance().get("viewer.newtonianmechanicslabdemo.longdesc", "Detailed simulation of newtonian mechanics experiments.");
     }
 
     @Override
@@ -102,7 +102,7 @@ public class NewtonianMechanicsLabDemo extends AbstractSimulationDemo {
         }
 
         private Tab createSpringTab() {
-            Tab tab = new Tab(org.jscience.ui.i18n.I18n.getInstance().get("mechanics.spring.tab", "Spring"));
+            Tab tab = new Tab(I18n.getInstance().get("mechanics.spring.tab", "Spring"));
             Canvas canvas = new Canvas(600, 500);
 
             @SuppressWarnings("unchecked")
@@ -120,11 +120,11 @@ public class NewtonianMechanicsLabDemo extends AbstractSimulationDemo {
             Slider mSlider = labeledSlider("Mass (kg)", 0.5, 10, 2.0, v -> mass[0] = Quantities.create(v, Units.KILOGRAM));
             Slider kSlider = labeledSlider("Spring k (N/m)", 1, 50, 5.0, v -> k[0] = Real.of(v));
 
-            Label energyLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("mechanics.energy.label", "Energy Plot"));
+            Label energyLabel = new Label(I18n.getInstance().get("mechanics.energy.label", "Energy Plot"));
             Canvas phaseCanvas = new Canvas(200, 200);
             List<Point2D> phaseTrail = new ArrayList<>();
 
-            controls.getChildren().addAll(new Label(org.jscience.ui.i18n.I18n.getInstance().get("mechanics.spring.controls", "Controls")), new Separator(),
+            controls.getChildren().addAll(new Label(I18n.getInstance().get("mechanics.spring.controls", "Controls")), new Separator(),
                     mSlider.getParent(),
                     kSlider.getParent(), energyLabel, new Separator(), phaseCanvas);
 
@@ -184,7 +184,7 @@ public class NewtonianMechanicsLabDemo extends AbstractSimulationDemo {
         }
 
         private Tab createPendulumTab() {
-            Tab tab = new Tab(org.jscience.ui.i18n.I18n.getInstance().get("mechanics.pendulum.tab", "Pendulum"));
+            Tab tab = new Tab(I18n.getInstance().get("mechanics.pendulum.tab", "Pendulum"));
             Canvas canvas = new Canvas(600, 500);
 
             final Real[] length = { Real.of(200.0) };
@@ -196,7 +196,7 @@ public class NewtonianMechanicsLabDemo extends AbstractSimulationDemo {
             controls.setPadding(new Insets(15));
             Slider lSlider = labeledSlider("Length (m)", 1, 5, 2.0, v -> length[0] = Real.of(v * 100));
 
-            Label pLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("mechanics.period.label", "Phase Space"));
+            Label pLabel = new Label(I18n.getInstance().get("mechanics.period.label", "Phase Space"));
             Canvas phaseCanvas = new Canvas(200, 200);
             List<Point2D> phaseTrail = new ArrayList<>();
 
@@ -235,7 +235,7 @@ public class NewtonianMechanicsLabDemo extends AbstractSimulationDemo {
             timer.start();
             timers.add(timer);
 
-            controls.getChildren().addAll(new Label(org.jscience.ui.i18n.I18n.getInstance().get("mechanics.pendulum.controls", "Controls")), new Separator(),
+            controls.getChildren().addAll(new Label(I18n.getInstance().get("mechanics.pendulum.controls", "Controls")), new Separator(),
                     lSlider.getParent(), pLabel, phaseCanvas);
             tab.setContent(new HBox(20, canvas, controls));
             return tab;
@@ -251,7 +251,7 @@ public class NewtonianMechanicsLabDemo extends AbstractSimulationDemo {
         }
 
         private Tab createGravityTab() {
-            Tab tab = new Tab(org.jscience.ui.i18n.I18n.getInstance().get("mechanics.gravity.tab", "Gravity"));
+            Tab tab = new Tab(I18n.getInstance().get("mechanics.gravity.tab", "Gravity"));
             Canvas canvas = new Canvas(600, 500);
 
             final Real[] y = { Real.of(50.0) };
@@ -260,7 +260,7 @@ public class NewtonianMechanicsLabDemo extends AbstractSimulationDemo {
             final Real g = Real.of(9.81 * 30);
 
             VBox controls = new VBox(15);
-            Button drop = new Button(org.jscience.ui.i18n.I18n.getInstance().get("mechanics.drop", "Drop"));
+            Button drop = new Button(I18n.getInstance().get("mechanics.drop", "Drop"));
             drop.setOnAction(e -> {
                 y[0] = Real.of(50.0);
                 vy[0] = Real.ZERO;
@@ -301,7 +301,7 @@ public class NewtonianMechanicsLabDemo extends AbstractSimulationDemo {
         }
 
         private Tab createCollisionTab() {
-            Tab tab = new Tab(org.jscience.ui.i18n.I18n.getInstance().get("mechanics.collision.tab", "Collision"));
+            Tab tab = new Tab(I18n.getInstance().get("mechanics.collision.tab", "Collision"));
             Canvas canvas = new Canvas(700, 300);
 
             final Real[] m1 = { Real.of(2.0) };
@@ -393,16 +393,30 @@ public class NewtonianMechanicsLabDemo extends AbstractSimulationDemo {
         @Override public void setSpeed(double s) { }
         @Override public boolean isPlaying() { return running; }
         
-        @Override public String getName() { return "Lab Viewer"; }
-    @Override
-    public String getCategory() { return "Physics"; }
-    
         @Override
-        public String getDescription() { return "InternalNewtonianViewer Internal Viewer"; }
+        public String getName() {
+            return I18n.getInstance().get("viewer.newtonian.name", "Newtonian Lab Viewer");
+        }
 
-        
-    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.newtonianmechanicslabdemo.longdesc"); }
-    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+        @Override
+        public String getCategory() {
+            return "Physics";
+        }
+
+        @Override
+        public String getDescription() {
+            return I18n.getInstance().get("viewer.newtonian.desc", "Visual simulation of newtonian mechanics.");
+        }
+
+        @Override
+        public String getLongDescription() {
+            return I18n.getInstance().get("viewer.newtonian.long", "Detailed simulation of newtonian mechanics experiments.");
+        }
+
+        @Override
+        public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+            return new java.util.ArrayList<>();
+        }
 }
 
 

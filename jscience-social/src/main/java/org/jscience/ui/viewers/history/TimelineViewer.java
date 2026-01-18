@@ -32,9 +32,11 @@ import javafx.scene.text.Font;
 import org.jscience.history.HistoricalEvent;
 import org.jscience.history.Timeline;
 import org.jscience.history.FuzzyDate;
-import org.jscience.ui.i18n.I18n;
+
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.ui.RealParameter;
+import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.Parameter;
 
 import java.util.List;
 import java.util.Optional;
@@ -197,7 +199,7 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
             gc.translate(x, cy - 12);
             gc.rotate(-45);
             String label = e.getName();
-            label = org.jscience.ui.i18n.I18n.getInstance().get(label, label);
+            label = I18n.getInstance().get(label, label);
             gc.fillText(label, 0, 0);
             gc.restore();
         }
@@ -205,17 +207,17 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.history", "History");
+        return I18n.getInstance().get("category.history", "History");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.timeline.name", "Timeline Viewer");
+        return I18n.getInstance().get("viewer.timeline.name", "Timeline Viewer");
     }
     
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.timeline.desc", "Visualizes events on a timeline.");
+        return I18n.getInstance().get("viewer.timeline.desc", "Visualizes events on a timeline.");
     }
 
     @Override
@@ -228,8 +230,8 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
     }
     
     @Override
-    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
-        java.util.List<org.jscience.ui.Parameter<?>> parameters = new java.util.ArrayList<>();
+    public List<Parameter<?>> getViewerParameters() {
+        List<Parameter<?>> parameters = new java.util.ArrayList<>();
         
         Real defMin = Real.of(org.jscience.io.Configuration.getDouble("viewer.timelineviewer.default.start", -10000));
         Real defMax = Real.of(org.jscience.io.Configuration.getDouble("viewer.timelineviewer.default.end", 2050));
@@ -238,7 +240,7 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
         if (maxYear.equals(Real.of(2050))) maxYear = defMax;
 
         parameters.add(new RealParameter("viewer.timelineviewer.param.start",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.timelineviewer.param.start.desc", "Start Year"),
+                I18n.getInstance().get("viewer.timelineviewer.param.start.desc", "Start Year"),
                 minYear.subtract(Real.of(10000)), 
                 maxYear, 
                 Real.of(100), 
@@ -249,7 +251,7 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
                 }));
 
         parameters.add(new RealParameter("viewer.timelineviewer.param.end",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.timelineviewer.param.end.desc", "End Year"),
+                I18n.getInstance().get("viewer.timelineviewer.param.end.desc", "End Year"),
                 minYear, 
                 maxYear.add(Real.of(10000)), 
                 Real.of(100), 
@@ -264,6 +266,6 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.timeline.longdesc", "Interactive historical chronological visualization tool. features support for BCE/CE dates, event clustering, fuzzy date handling, and dynamic scaling to explore deep history and modern events.");
+        return I18n.getInstance().get("viewer.timeline.longdesc", "Interactive historical chronological visualization tool. features support for BCE/CE dates, event clustering, fuzzy date handling, and dynamic scaling to explore deep history and modern events.");
     }
 }

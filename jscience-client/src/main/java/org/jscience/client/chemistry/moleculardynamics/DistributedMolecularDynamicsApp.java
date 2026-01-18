@@ -40,7 +40,7 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import org.jscience.server.proto.*;
-import org.jscience.ui.ThemeManager;
+
 import org.jscience.physics.classical.mechanics.Particle;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.biology.loaders.PDBReader;

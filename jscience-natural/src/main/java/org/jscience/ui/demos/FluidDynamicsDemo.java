@@ -53,22 +53,22 @@ public class FluidDynamicsDemo extends AbstractSimulationDemo {
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("fluid.title", "Fluid Dynamics");
+        return I18n.getInstance().get("fluid.title", "Fluid Dynamics");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("fluid.info", "Fluid simulation using simplified Navier-Stokes equations.");
+        return I18n.getInstance().get("fluid.info", "Fluid simulation using simplified Navier-Stokes equations.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("fluid.long_desc", "Real-time fluid simulation with particle visualization and controls.");
+        return I18n.getInstance().get("fluid.long_desc", "Real-time fluid simulation with particle visualization and controls.");
     }
 
 
     @Override
-    public String getCategory() { return "Physics"; }
+    public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
 
     @Override
     public javafx.scene.Node createViewerNode() {
@@ -177,7 +177,7 @@ public class FluidDynamicsDemo extends AbstractSimulationDemo {
             controls.add(new Separator());
             
             // Grid Resolution
-            controls.add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("fluid.resolution", "Grid Resolution"))); 
+            controls.add(new Label(I18n.getInstance().get("fluid.resolution", "Grid Resolution"))); 
             ComboBox<Integer> resCombo = new ComboBox<>();
             resCombo.getItems().addAll(32, 64, 128);
             resCombo.setValue(N);
@@ -194,35 +194,35 @@ public class FluidDynamicsDemo extends AbstractSimulationDemo {
             controls.add(resCombo);
 
             // Viscosity
-            Label viscLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("fluid.viscosity", "Viscosity"));
+            Label viscLabel = new Label(I18n.getInstance().get("fluid.viscosity", "Viscosity"));
             Slider viscSlider = new Slider(0, 0.05, 0.0001);
             viscSlider.valueProperty().addListener((o, ov, nv) -> viscosity = nv.doubleValue());
             controls.addAll(List.of(viscLabel, viscSlider));
 
             // Engine Switch
-            ToggleButton engineSwitch = new ToggleButton(org.jscience.ui.i18n.I18n.getInstance().get("fluid.mode.primitive", "Simple Solver"));
+            ToggleButton engineSwitch = new ToggleButton(I18n.getInstance().get("fluid.mode.primitive", "Simple Solver"));
             engineSwitch.setMaxWidth(Double.MAX_VALUE);
             engineSwitch.setOnAction(e -> {
                 if (engineSwitch.isSelected()) {
                     solver = new ObjectFluidSolver();
-                    engineSwitch.setText(org.jscience.ui.i18n.I18n.getInstance().get("fluid.mode.scientific", "Object Solver"));
+                    engineSwitch.setText(I18n.getInstance().get("fluid.mode.scientific", "Object Solver"));
                 } else {
                     solver = new PrimitiveFluidSolver();
-                    engineSwitch.setText(org.jscience.ui.i18n.I18n.getInstance().get("fluid.mode.primitive", "Simple Solver"));
+                    engineSwitch.setText(I18n.getInstance().get("fluid.mode.primitive", "Simple Solver"));
                 }
                 solver.initialize(N, SCALE);
             });
             controls.add(engineSwitch);
             
-            fpsLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.fluiddynamics.fps", "FPS: --"));
+            fpsLabel = new Label(I18n.getInstance().get("generated.fluiddynamics.fps", "FPS: --"));
             controls.add(fpsLabel);
 
             // Toggles
-            CheckBox fieldCheck = new CheckBox(org.jscience.ui.i18n.I18n.getInstance().get("fluid.check.field", "Show Flow"));
+            CheckBox fieldCheck = new CheckBox(I18n.getInstance().get("fluid.check.field", "Show Flow"));
             fieldCheck.setSelected(showField);
             fieldCheck.setOnAction(e -> { showField = fieldCheck.isSelected(); drawFluid(canvas.getGraphicsContext2D()); });
             
-            CheckBox particleCheck = new CheckBox(org.jscience.ui.i18n.I18n.getInstance().get("fluid.check.particles", "Show Particles"));
+            CheckBox particleCheck = new CheckBox(I18n.getInstance().get("fluid.check.particles", "Show Particles"));
             particleCheck.setSelected(showParticles);
             particleCheck.setOnAction(e -> { showParticles = particleCheck.isSelected(); drawFluid(canvas.getGraphicsContext2D()); });
             
@@ -235,7 +235,7 @@ public class FluidDynamicsDemo extends AbstractSimulationDemo {
             colorCombo.setOnAction(e -> { colorScheme = colorCombo.getValue(); drawFluid(canvas.getGraphicsContext2D()); });
             controls.add(colorCombo);
 
-            Button resetBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("fluid.btn.reset", "Reset Particles"));
+            Button resetBtn = new Button(I18n.getInstance().get("fluid.btn.reset", "Reset Particles"));
             resetBtn.setMaxWidth(Double.MAX_VALUE);
             resetBtn.setOnAction(e -> resetParticles());
             controls.add(resetBtn);
@@ -320,15 +320,14 @@ public class FluidDynamicsDemo extends AbstractSimulationDemo {
         @Override public void setSpeed(double s) { this.simSpeed = s; }
         @Override public boolean isPlaying() { return running; }
         
-        @Override public String getName() { return "Fluid Viewer"; }
-    @Override
-    public String getCategory() { return "Physics"; }
-    
+        @Override public String getName() { return I18n.getInstance().get("viewer.fluiddynamics.name", "Fluid Viewer"); }
         @Override
-        public String getDescription() { return "InternalFluidViewer Internal Viewer"; }
+        public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
+        @Override
+        public String getDescription() { return I18n.getInstance().get("viewer.fluiddynamics.desc", "Fluid Dynamics Viewer"); }
 
         
-    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.fluiddynamicsdemo.longdesc"); }
+    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.fluiddynamicsdemo.longdesc"); }
     @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }
 

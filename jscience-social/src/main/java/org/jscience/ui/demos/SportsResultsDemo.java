@@ -36,6 +36,7 @@ import javafx.scene.layout.VBox;
 import org.jscience.ui.AbstractDemo;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.statistics.timeseries.TimeSeries;
+import org.jscience.ui.i18n.I18n;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,12 +59,12 @@ public class SportsResultsDemo extends AbstractDemo {
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.sportsresultsdemo.name");
+        return I18n.getInstance().get("demo.sportsresultsdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.sportsresultsdemo.desc");
+        return I18n.getInstance().get("demo.sportsresultsdemo.desc");
     }
 
     @Override
@@ -100,7 +101,7 @@ public class SportsResultsDemo extends AbstractDemo {
         @SuppressWarnings({"unchecked", "unused"})
         var unused = table.getColumns().addAll(rankCol, nameCol, playedCol, pointsCol, avgCol);
 
-        VBox centerBox = new VBox(10, new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.sportsresults.league.standings", "League Standings")), table);
+        VBox centerBox = new VBox(10, new Label(I18n.getInstance().get("generated.sportsresults.league.standings", "League Standings")), table);
         centerBox.setPadding(new Insets(20));
         return centerBox;
     }
@@ -125,7 +126,7 @@ public class SportsResultsDemo extends AbstractDemo {
         HBox scoreBox = new HBox(10, hScore, new Label("-"), aScore);
         scoreBox.setAlignment(Pos.CENTER);
 
-        Button addBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.sportsresults.add.result", "Add Result"));
+        Button addBtn = new Button(I18n.getInstance().get("generated.sportsresults.add.result", "Add Result"));
         addBtn.setMaxWidth(Double.MAX_VALUE);
         addBtn.setOnAction(e -> {
             try {
@@ -135,14 +136,14 @@ public class SportsResultsDemo extends AbstractDemo {
             } catch (Exception ex) {}
         });
 
-        Button simBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("generated.sportsresults.simulate.season", "Simulate Season"));
+        Button simBtn = new Button(I18n.getInstance().get("generated.sportsresults.simulate.season", "Simulate Season"));
         simBtn.setMaxWidth(Double.MAX_VALUE);
         simBtn.setOnAction(e -> simulateSeason());
 
         ListView<String> historyView = new ListView<>(matchHistory);
         historyView.setPrefHeight(300);
 
-        rightPanel.getChildren().addAll(new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.sportsresults.match.entry", "Match Entry")), homeBox, awayBox, scoreBox, addBtn, simBtn, new Separator(), historyView);
+        rightPanel.getChildren().addAll(new Label(I18n.getInstance().get("generated.sportsresults.match.entry", "Match Entry")), homeBox, awayBox, scoreBox, addBtn, simBtn, new Separator(), historyView);
         return rightPanel;
     }
 
@@ -167,7 +168,7 @@ public class SportsResultsDemo extends AbstractDemo {
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.sportsresultsdemo.longdesc");
+        return I18n.getInstance().get("demo.sportsresultsdemo.longdesc");
     }
 
     public static class Team {

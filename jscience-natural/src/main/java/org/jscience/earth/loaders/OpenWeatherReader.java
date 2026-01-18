@@ -37,6 +37,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
 import org.jscience.earth.atmosphere.WeatherInfo;
+import org.jscience.ui.i18n.I18n;
 
 /**
  * OpenWeather API loader for meteorological data.
@@ -62,22 +63,22 @@ public class OpenWeatherReader extends AbstractResourceReader<WeatherInfo> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.openweather.category", "Earth");
+        return I18n.getInstance().get("reader.openweather.category", "Earth");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.openweatherreader.name", "OpenWeather Reader");
+        return I18n.getInstance().get("reader.openweatherreader.name", "OpenWeather Reader");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.openweatherreader.desc", "Meteorological Data Reader.");
+        return I18n.getInstance().get("reader.openweatherreader.desc", "Meteorological Data Reader.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.openweatherreader.longdesc", "Fetches current weather data from OpenWeatherMap API.");
+        return I18n.getInstance().get("reader.openweatherreader.longdesc", "Fetches current weather data from OpenWeatherMap API.");
     }
 
     @Override

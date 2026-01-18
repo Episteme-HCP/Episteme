@@ -30,6 +30,7 @@ import org.jscience.server.proto.MatrixRequest;
 import org.jscience.server.proto.MatrixResponse;
 import org.jscience.server.proto.MatrixServiceGrpc;
 import org.jscience.mathematics.linearalgebra.matrices.RealDoubleMatrix;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

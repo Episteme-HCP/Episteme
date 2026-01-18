@@ -31,7 +31,11 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import org.jscience.ui.*;
+import org.jscience.ui.AbstractSimulationDemo;
+import org.jscience.ui.AbstractViewer;
+import org.jscience.ui.NumericParameter;
+import org.jscience.ui.Parameter;
+import org.jscience.ui.Simulatable;
 import org.jscience.ui.i18n.I18n;
 
 import java.util.ArrayList;
@@ -48,21 +52,21 @@ import java.util.List;
 public class MechanicsDemo extends AbstractSimulationDemo {
 
     @Override
-    public String getCategory() { return "Physics"; }
+    public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("mechanics.title", "Mechanics: Mass-Spring");
+        return I18n.getInstance().get("mechanics.title", "Mechanics: Mass-Spring");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.mechanics", "Simulation of a Mass-Spring-Damper system.");
+        return I18n.getInstance().get("viewer.mechanics", "Simulation of a Mass-Spring-Damper system.");
     }
 
     @Override
     public String getLongDescription() { 
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.mechanics.long", "Detailed simulation of a Mass-Spring-Damper system."); 
+        return I18n.getInstance().get("viewer.mechanics.long", "Detailed simulation of a Mass-Spring-Damper system."); 
     }
 
 
@@ -122,7 +126,7 @@ public class MechanicsDemo extends AbstractSimulationDemo {
 
             setupParameters();
 
-            energyLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.mechanics.energy", "Energy: --"));
+            energyLabel = new Label(I18n.getInstance().get("generated.mechanics.energy", "Energy: --"));
             energyLabel.getStyleClass().add("description-label");
             energyLabel.setFont(Font.font("Monospaced", 16));
 
@@ -141,9 +145,9 @@ public class MechanicsDemo extends AbstractSimulationDemo {
         }
 
         private void setupParameters() {
-            parameters.add(new NumericParameter(org.jscience.ui.i18n.I18n.getInstance().get("mechanics.mass", "Mass"), "Mass (kg)", 0.1, 10.0, 0.1, 5.0, val -> mass = val));
-            parameters.add(new NumericParameter(org.jscience.ui.i18n.I18n.getInstance().get("mechanics.spring", "Spring K"), "Spring Constant (N/m)", 0.1, 50.0, 0.1, 10.0, val -> springConstant = val));
-            parameters.add(new NumericParameter(org.jscience.ui.i18n.I18n.getInstance().get("mechanics.damping", "Damping"), "Damping Factor", 0.0, 2.0, 0.1, 0.5, val -> damping = val));
+            parameters.add(new NumericParameter(I18n.getInstance().get("mechanics.mass", "Mass"), "Mass (kg)", 0.1, 10.0, 0.1, 5.0, val -> mass = val));
+            parameters.add(new NumericParameter(I18n.getInstance().get("mechanics.spring", "Spring K"), "Spring Constant (N/m)", 0.1, 50.0, 0.1, 10.0, val -> springConstant = val));
+            parameters.add(new NumericParameter(I18n.getInstance().get("mechanics.damping", "Damping"), "Damping Factor", 0.0, 2.0, 0.1, 0.5, val -> damping = val));
         }
 
         private void update(double dt) {
@@ -266,15 +270,25 @@ public class MechanicsDemo extends AbstractSimulationDemo {
         @Override public boolean isPlaying() { return running; }
         
         @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
-        @Override public String getName() { return "Mechanics Viewer"; }
-    @Override
-    public String getCategory() { return "Physics"; }
-    
         @Override
-        public String getDescription() { return "InternalMechanicsViewer Internal Viewer"; }
+        public String getName() {
+            return I18n.getInstance().get("viewer.mechanics.name", "Mechanics Viewer");
+        }
 
-        
-    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.mechanicsdemo.longdesc"); }
+        @Override
+        public String getCategory() {
+            return I18n.getInstance().get("category.physics", "Physics");
+        }
+
+        @Override
+        public String getDescription() {
+            return I18n.getInstance().get("viewer.mechanics.desc", "Visual simulation of mass-spring physics.");
+        }
+
+        @Override
+        public String getLongDescription() {
+            return I18n.getInstance().get("viewer.mechanics.long", "Detailed simulation of a Mass-Spring-Damper system.");
+        }
 }
 
 

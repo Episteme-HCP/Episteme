@@ -1,26 +1,3 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.physics.loaders;
 
 import java.io.BufferedReader;
@@ -30,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jscience.ui.i18n.I18n;
-
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.io.AbstractResourceReader;
 
 /**
@@ -61,22 +38,22 @@ public class StarReader extends AbstractResourceReader<List<StarReader.Star>> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.astronomy", "Astronomy");
+        return I18n.getInstance().get("category.astronomy", "Astronomy");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.starreader.name", "Star Reader");
+        return I18n.getInstance().get("reader.starreader.name", "Star Reader");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.starreader.desc", "Generic Star Catalog Reader (CSV).");
+        return I18n.getInstance().get("reader.starreader.desc", "Generic Star Catalog Reader (CSV).");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.starreader.longdesc", "Loads star catalog data from CSV resources, including position, distance, and spectral type.");
+        return I18n.getInstance().get("reader.starreader.longdesc", "Loads star catalog data from CSV resources, including position, distance, and spectral type.");
     }
 
     public List<Star> loadResource(String path) throws Exception {
@@ -89,13 +66,13 @@ public class StarReader extends AbstractResourceReader<List<StarReader.Star>> {
 
     public static class Star {
         public String name;
-        public org.jscience.mathematics.numbers.real.Real ra; // Right Ascension (degrees)
-        public org.jscience.mathematics.numbers.real.Real dec; // Declination (degrees)
-        public org.jscience.mathematics.numbers.real.Real dist; // Distance (light years)
-        public org.jscience.mathematics.numbers.real.Real mag; // Apparent Magnitude
+        public Real ra; // Right Ascension (degrees)
+        public Real dec; // Declination (degrees)
+        public Real dist; // Distance (light years)
+        public Real mag; // Apparent Magnitude
         public String spectralType; // O, B, A, F, G, K, M
 
-        public Star(String name, org.jscience.mathematics.numbers.real.Real ra, org.jscience.mathematics.numbers.real.Real dec, org.jscience.mathematics.numbers.real.Real dist, org.jscience.mathematics.numbers.real.Real mag, String spectralType) {
+        public Star(String name, Real ra, Real dec, Real dist, Real mag, String spectralType) {
             this.name = name;
             this.ra = ra;
             this.dec = dec;
@@ -122,10 +99,10 @@ public class StarReader extends AbstractResourceReader<List<StarReader.Star>> {
                 if (parts.length >= 6) {
                     // Name,RA(deg),Dec(deg),Dist(ly),Mag,Type
                     String name = parts[0].trim();
-                    org.jscience.mathematics.numbers.real.Real ra = org.jscience.mathematics.numbers.real.Real.of(parts[1].trim());
-                    org.jscience.mathematics.numbers.real.Real dec = org.jscience.mathematics.numbers.real.Real.of(parts[2].trim());
-                    org.jscience.mathematics.numbers.real.Real dist = org.jscience.mathematics.numbers.real.Real.of(parts[3].trim());
-                    org.jscience.mathematics.numbers.real.Real mag = org.jscience.mathematics.numbers.real.Real.of(parts[4].trim());
+                    Real ra = Real.of(parts[1].trim());
+                    Real dec = Real.of(parts[2].trim());
+                    Real dist = Real.of(parts[3].trim());
+                    Real mag = Real.of(parts[4].trim());
                     String type = parts[5].trim();
 
                     stars.add(new Star(name, ra, dec, dist, mag, type));

@@ -38,14 +38,18 @@ import java.util.List;
  */
 public class MulticoreMaxwellProvider implements MaxwellProvider {
 
-    private final List<DipoleSource> sources = new ArrayList<>();
+    private final List<MaxwellSource> sources = new ArrayList<>();
+
+    public List<MaxwellSource> getSources() {
+        return sources;
+    }
 
     public MulticoreMaxwellProvider() {
         // Add some default oscillating sources (e.g., a simple antenna)
         sources.add(new DipoleSource(new double[] { 0, 0, 0 }, new double[] { 0, 0, 1 }, 1.0, 1.0));
     }
 
-    public void addSource(DipoleSource source) {
+    public void addSource(MaxwellSource source) {
         sources.add(source);
     }
 
@@ -109,7 +113,7 @@ public class MulticoreMaxwellProvider implements MaxwellProvider {
     /**
      * Represents an oscillating electric dipole source.
      */
-    public static class DipoleSource {
+    public static class DipoleSource implements MaxwellSource {
         private final double[] pos;
         private final double[] p0; // Dipole moment amplitude vector
         private final double omega;
@@ -122,10 +126,16 @@ public class MulticoreMaxwellProvider implements MaxwellProvider {
             this.phase = phase;
         }
 
+        @Override
+        public double[] getPosition() {
+            return pos;
+        }
+
         /**
          * Computes E and B field contributions at (t, x, y, z).
          * Using simplified far-field approximation or full Hertzian dipole formulas.
          */
+        @Override
         public double[] computeFields(double t, double x, double y, double z) {
             double rx = x - pos[0];
             double ry = y - pos[1];

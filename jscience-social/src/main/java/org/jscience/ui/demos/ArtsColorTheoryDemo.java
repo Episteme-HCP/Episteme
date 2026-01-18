@@ -39,17 +39,17 @@ package org.jscience.ui.demos;
  
      @Override
      public String getCategory() {
-         return org.jscience.ui.i18n.I18n.getInstance().get("category.arts", "Arts");
+         return I18n.getInstance().get("category.arts", "Arts");
      }
  
      @Override
      public String getName() {
-         return org.jscience.ui.i18n.I18n.getInstance().get("demo.artscolortheorydemo.name", "Color Theory");
+         return I18n.getInstance().get("demo.artscolortheorydemo.name", "Color Theory");
      }
  
      @Override
      public String getDescription() {
-         return org.jscience.ui.i18n.I18n.getInstance().get("demo.artscolortheorydemo.desc", "Explore color harmonies and palettes.");
+         return I18n.getInstance().get("demo.artscolortheorydemo.desc", "Explore color harmonies and palettes.");
      }
  
      @Override
@@ -59,6 +59,6 @@ package org.jscience.ui.demos;
      
      @Override
      public String getLongDescription() {
-          return org.jscience.ui.i18n.I18n.getInstance().get("demo.artscolortheorydemo.longdesc", "Interactive tool for exploring color theory concepts like complementary, analogous, and triadic harmonies.");
+          return I18n.getInstance().get("demo.artscolortheorydemo.longdesc", "Interactive tool for exploring color theory concepts like complementary, analogous, and triadic harmonies.");
      }
  }

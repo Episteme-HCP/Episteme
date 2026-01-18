@@ -25,6 +25,8 @@ package org.jscience.chemistry;
 
 import org.jscience.distributed.DistributedTask;
 import org.jscience.distributed.TaskRegistry;
+
+import org.jscience.mathematics.numbers.real.Real;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -217,10 +219,10 @@ public class MolecularDynamicsTask
             }
 
             if (hit) {
-                a.setPosition(org.jscience.mathematics.numbers.real.Real.of(x),
-                        org.jscience.mathematics.numbers.real.Real.of(y),
-                        org.jscience.mathematics.numbers.real.Real.of(z));
-                a.setVelocity(a.getVelocity().multiply(org.jscience.mathematics.numbers.real.Real.of(-1)));
+                a.setPosition(Real.of(x),
+                        Real.of(y),
+                        Real.of(z));
+                a.setVelocity(a.getVelocity().multiply(Real.of(-1)));
             }
         }
         syncFromJScience();

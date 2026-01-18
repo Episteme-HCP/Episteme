@@ -69,9 +69,7 @@ public class UserPreferences {
         return Configuration.get("defaults.compute.backend", "cpu");
     }
     
-    private static String getDefaultBackend(String type) {
-        return Configuration.get("defaults.backend." + type, "AUTO");
-    }
+
     
     private static UserPreferences instance;
     private final Properties properties;

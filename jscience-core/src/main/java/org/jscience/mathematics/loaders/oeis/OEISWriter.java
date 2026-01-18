@@ -58,6 +58,26 @@ public class OEISWriter extends AbstractResourceWriter<IntegerSequence> {
         return null;
     }
 
+    @Override
+    public String getCategory() {
+        return "Mathematics";
+    }
+
+    @Override
+    public String getName() {
+        return "OEIS Writer";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Exports sequences to OEIS formats.";
+    }
+
+    @Override
+    public String getLongDescription() {
+        return "Support for stripped and b-file formats used by the On-Line Encyclopedia of Integer Sequences.";
+    }
+
     public OEISWriter() {
     }
 

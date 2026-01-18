@@ -35,7 +35,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import org.jscience.ui.AbstractViewer;
-import org.jscience.ui.i18n.I18n;
+
 
 import java.util.HashMap;
 import java.util.Map;

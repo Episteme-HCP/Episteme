@@ -47,6 +47,11 @@ public class RealParameter extends Parameter<Real> {
         this.step = step;
     }
 
+    public RealParameter(String name, String description, double min, double max, double step, double defaultValue,
+            Consumer<Real> onValueChange) {
+        this(name, description, Real.of(min), Real.of(max), Real.of(step), Real.of(defaultValue), onValueChange);
+    }
+
     public Real getMin() {
         return min;
     }

@@ -24,6 +24,8 @@
 package org.jscience.ui.demos;
 
 import org.jscience.ui.AbstractDemo;
+import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.viewers.mathematics.analysis.real.FunctionExplorer2DViewer;
 
 public class LinguisticsWordFreqDemo extends AbstractDemo {
 
@@ -34,17 +36,17 @@ public class LinguisticsWordFreqDemo extends AbstractDemo {
 
     @Override
     public String getCategory() { 
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.linguistics", "Linguistics"); 
+        return I18n.getInstance().get("category.linguistics", "Linguistics"); 
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.linguisticswordfreqdemo.name", "Word Frequency");
+        return I18n.getInstance().get("demo.linguisticswordfreqdemo.name", "Word Frequency");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.linguisticswordfreqdemo.desc", "Text word frequency analyzer.");
+        return I18n.getInstance().get("demo.linguisticswordfreqdemo.desc", "Text word frequency analyzer.");
     }
 
     @Override
@@ -55,14 +57,14 @@ public class LinguisticsWordFreqDemo extends AbstractDemo {
         // or re-implement logic if we can map it to a 2D function.
         // Since "Word Frequency" maps Rank -> Frequency (Zipf's Law), we can plot this as a function.
         // f(r) = C / r^s
-        org.jscience.ui.viewers.mathematics.analysis.real.FunctionExplorer2DViewer v = new org.jscience.ui.viewers.mathematics.analysis.real.FunctionExplorer2DViewer();
+        FunctionExplorer2DViewer v = new FunctionExplorer2DViewer();
         this.viewer = v;
         return v;
     }
     
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.linguisticswordfreqdemo.longdesc", "Analyze text to determine word frequency distributions (Zipf's Law).");
+        return I18n.getInstance().get("demo.linguisticswordfreqdemo.longdesc", "Analyze text to determine word frequency distributions (Zipf's Law).");
     }
 }
 

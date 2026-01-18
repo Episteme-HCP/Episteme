@@ -41,13 +41,13 @@ public class SpeciesBrowserDemo extends AbstractDemo {
     public boolean isDemo() { return true; }
 
     @Override
-    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.biology"); }
+    public String getCategory() { return I18n.getInstance().get("category.biology"); }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("SpeciesBrowser.title", "Species Browser"); }
+    public String getName() { return I18n.getInstance().get("SpeciesBrowser.title", "Species Browser"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("SpeciesBrowser.desc", "Explore biological species data using the Global Biodiversity Information Facility (GBIF) API."); }
+    public String getDescription() { return I18n.getInstance().get("SpeciesBrowser.desc", "Explore biological species data using the Global Biodiversity Information Facility (GBIF) API."); }
     
     @Override
     public String getLongDescription() {

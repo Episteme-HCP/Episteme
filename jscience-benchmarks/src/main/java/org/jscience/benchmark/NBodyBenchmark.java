@@ -32,7 +32,7 @@ import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Mass;
 import org.jscience.measure.quantity.Time;
-import org.jscience.ui.i18n.I18n;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;

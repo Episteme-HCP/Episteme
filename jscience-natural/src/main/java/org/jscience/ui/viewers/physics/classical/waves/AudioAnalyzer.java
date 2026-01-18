@@ -24,6 +24,8 @@
 package org.jscience.ui.viewers.physics.classical.waves;
 
 import org.jscience.mathematics.analysis.transform.SignalFFT;
+import org.jscience.physics.classical.waves.SpectrumAnalysisProvider;
+import org.jscience.physics.classical.waves.PrimitiveSpectrumAnalysisProvider;
 
 import javax.sound.sampled.*;
 import java.io.File;

@@ -60,10 +60,10 @@ public class GeneticAlgorithmDemo extends AbstractSimulationDemo {
     public String getCategory() { return "Computing"; }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("geneticalgo.title", "Genetic Algorithm"); }
+    public String getName() { return I18n.getInstance().get("geneticalgo.title", "Genetic Algorithm"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("geneticalgo.desc", "Evolving Pathfinders using Genetic Algorithm"); }
+    public String getDescription() { return I18n.getInstance().get("geneticalgo.desc", "Evolving Pathfinders using Genetic Algorithm"); }
 
     @Override
     public String getLongDescription() {
@@ -103,19 +103,19 @@ public class GeneticAlgorithmDemo extends AbstractSimulationDemo {
             sidebar.setPrefWidth(180);
             sidebar.getStyleClass().add("viewer-sidebar");
 
-            Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("geneticalgo.stats", "Statistics"));
+            Label title = new Label(I18n.getInstance().get("geneticalgo.stats", "Statistics"));
             title.getStyleClass().add("header-label");
 
-            genLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.geneticalgorithm.generation.1", "Generation: 1"));
+            genLabel = new Label(I18n.getInstance().get("generated.geneticalgorithm.generation.1", "Generation: 1"));
             genLabel.getStyleClass().add("description-label");
 
-            fitLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.geneticalgorithm.fitness.000", "Fitness: 0.00"));
+            fitLabel = new Label(I18n.getInstance().get("generated.geneticalgorithm.fitness.000", "Fitness: 0.00"));
             fitLabel.getStyleClass().add("description-label");
 
             reachLabel = new Label("Reached: 0/" + popSize);
             reachLabel.getStyleClass().add("description-label");
             
-            Label info = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.geneticalgorithm.controls.below", "Controls below."));
+            Label info = new Label(I18n.getInstance().get("generated.geneticalgorithm.controls.below", "Controls below."));
             info.getStyleClass().add("description-label");
 
             sidebar.getChildren().addAll(title, new Separator(), genLabel, fitLabel, reachLabel, new Separator(), info);
@@ -133,7 +133,7 @@ public class GeneticAlgorithmDemo extends AbstractSimulationDemo {
                 }
                 if (closest != null) {
                     Alert a = new Alert(Alert.AlertType.INFORMATION);
-                    a.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("generated.geneticalgorithm.genome.detail", "Genome Detail")); a.setHeaderText(org.jscience.ui.i18n.I18n.getInstance().get("generated.geneticalgorithm.dna.info", "DNA Info"));
+                    a.setTitle(I18n.getInstance().get("generated.geneticalgorithm.genome.detail", "Genome Detail")); a.setHeaderText(I18n.getInstance().get("generated.geneticalgorithm.dna.info", "DNA Info"));
                     a.setContentText(String.format("Fitness: %.4f\nReached: %b\nCrashed: %b", closest.fitness, closest.reached, closest.crashed));
                     a.showAndWait();
                 }
@@ -162,9 +162,9 @@ public class GeneticAlgorithmDemo extends AbstractSimulationDemo {
         }
         
         private void updateLabels() {
-            genLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("geneticalgo.generation", "Generation") + " " + generation);
+            genLabel.setText(I18n.getInstance().get("geneticalgo.generation", "Generation") + " " + generation);
             fitLabel.setText(String.format("Best Fitness: %.2f", bestFitness));
-            reachLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("geneticalgo.reached", "Reached") + " " + reachedCount + "/" + popSize);
+            reachLabel.setText(I18n.getInstance().get("geneticalgo.reached", "Reached") + " " + reachedCount + "/" + popSize);
         }
 
         private void restart() {

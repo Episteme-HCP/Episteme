@@ -35,6 +35,7 @@ import javafx.scene.text.FontWeight;
 import org.jscience.earth.seismology.Earthquake;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.ui.viewers.earth.MapViewer;
+import org.jscience.ui.RealParameter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,13 +60,10 @@ public class EarthquakeMapViewer extends MapViewer {
 
     public EarthquakeMapViewer() {
         super();
-        this.minMagParam = new org.jscience.ui.RealParameter(
+        this.minMagParam = new RealParameter(
             "Min Magnitude",
-            org.jscience.ui.i18n.I18n.getInstance().get("viewer.earthquakemapviewer.param.minmag", "Min Magnitude"), 
-            org.jscience.mathematics.numbers.real.Real.of(0.0), 
-            org.jscience.mathematics.numbers.real.Real.of(9.0), 
-            org.jscience.mathematics.numbers.real.Real.of(0.1), 
-            org.jscience.mathematics.numbers.real.Real.of(0.0), 
+            I18n.getInstance().get("viewer.earthquakemapviewer.param.minmag", "Min Magnitude"), 
+            0.0, 9.0, 0.1, 0.0, 
             v -> draw());
         
         generateMockData();
@@ -75,7 +73,7 @@ public class EarthquakeMapViewer extends MapViewer {
         mapCanvas.setOnMouseMoved(e -> {
             double lon = xToLon(e.getX());
             double lat = yToLat(e.getY());
-            coordLabel.setText(String.format(org.jscience.ui.i18n.I18n.getInstance().get("earthquake.coord.fmt", "Lat: %.2f  Lon: %.2f"), lat, lon));
+            coordLabel.setText(String.format(I18n.getInstance().get("earthquake.coord.fmt", "Lat: %.2f  Lon: %.2f"), lat, lon));
             
             boolean hover = false;
             for(Earthquake q : quakes) {
@@ -84,13 +82,13 @@ public class EarthquakeMapViewer extends MapViewer {
                  double qx = lonToX(q.getLon()); double qy = latToY(q.getLat());
                  double size = Math.pow(q.getMag(), 1.5) * 2 * zoom;
                  if(Math.hypot(e.getX() - qx, e.getY() - qy) < size) {
-                     infoLabel.setText(String.format(org.jscience.ui.i18n.I18n.getInstance().get("earthquake.info.format", "Mag: %.1f\nLat: %.2f\nLon: %.2f\nDepth: %.0f km"),
+                     infoLabel.setText(String.format(I18n.getInstance().get("earthquake.info.format", "Mag: %.1f\nLat: %.2f\nLon: %.2f\nDepth: %.0f km"),
                              q.getMag(), q.getLat(), q.getLon(), q.getDepth()));
                      hover = true;
                      break;
                  }
             }
-            if(!hover) infoLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("earthquake.hover", "Hover over a quake for info."));
+            if(!hover) infoLabel.setText(I18n.getInstance().get("earthquake.hover", "Hover over a quake for info."));
         });
         
         new AnimationTimer() {
@@ -112,7 +110,7 @@ public class EarthquakeMapViewer extends MapViewer {
         sidebar.getStyleClass().add("viewer-sidebar");
         sidebar.setPrefWidth(220);
 
-        Label titleLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("earthquake.label.title", "Earthquake Map"));
+        Label titleLabel = new Label(I18n.getInstance().get("earthquake.label.title", "Earthquake Map"));
         titleLabel.getStyleClass().add("header-label");
         
         // Add Slider/Control for Min Mag
@@ -125,10 +123,10 @@ public class EarthquakeMapViewer extends MapViewer {
         
         filterBox.getChildren().addAll(filterLabel, magSlider);
 
-        Label explainLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("earthquake.explanation", "Real-time visualization of seismic activity."));
+        Label explainLabel = new Label(I18n.getInstance().get("earthquake.explanation", "Real-time visualization of seismic activity."));
         explainLabel.setWrapText(true);
 
-        Label legendLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("earthquake.legend", "Magnitude"));
+        Label legendLabel = new Label(I18n.getInstance().get("earthquake.legend", "Magnitude"));
         legendLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
 
         VBox legend = new VBox(3);
@@ -138,10 +136,10 @@ public class EarthquakeMapViewer extends MapViewer {
                 createLegendItem(Color.hsb(40, 1, 1), "Moderate (5.0 - 6.0)"),
                 createLegendItem(Color.RED, "Strong (> 6.0)"));
 
-        coordLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.earthquakemap.lat.000.lon.000", "Lat: 0.00 Lon: 0.00"));
+        coordLabel = new Label(I18n.getInstance().get("generated.earthquakemap.lat.000.lon.000", "Lat: 0.00 Lon: 0.00"));
         coordLabel.setFont(Font.font("Consolas", 12));
 
-        infoLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("earthquake.hover", "Hover over a quake for info."));
+        infoLabel = new Label(I18n.getInstance().get("earthquake.hover", "Hover over a quake for info."));
         infoLabel.setWrapText(true);
 
         sidebar.getChildren().addAll(titleLabel, new Separator(), filterBox, new Separator(), explainLabel, new Separator(),
@@ -214,8 +212,8 @@ public class EarthquakeMapViewer extends MapViewer {
         }
     }
     
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.earthquakemapviewer.name", "Earthquake Map Viewer"); }
-    @Override public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.earth", "Earth Sciences"); }
-    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.earthquakemapviewer.desc", "Visualizes seismic activity on a world map."); }
-    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.earthquakemapviewer.longdesc", "Interactive global map showing simulated earthquake data. Features pulse animations, magnitude color-coding, and detailed seismic information (latitude, longitude, depth, and magnitude) on hover."); }
+    @Override public String getName() { return I18n.getInstance().get("viewer.earthquakemapviewer.name", "Earthquake Map Viewer"); }
+    @Override public String getCategory() { return I18n.getInstance().get("category.earth", "Earth Sciences"); }
+    @Override public String getDescription() { return I18n.getInstance().get("viewer.earthquakemapviewer.desc", "Visualizes seismic activity on a world map."); }
+    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.earthquakemapviewer.longdesc", "Interactive global map showing simulated earthquake data. Features pulse animations, magnitude color-coding, and detailed seismic information (latitude, longitude, depth, and magnitude) on hover."); }
 }

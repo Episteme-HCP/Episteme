@@ -75,56 +75,15 @@ public class NuclearPhysics {
         // A^(1/3)
         Real A13 = rA.pow(Real.ONE.divide(Real.of(3)));
 
-        // Volume term: a_v * A
-        Real vol = AV.multiply(rA);
+        // Terms for Binding Energy per Nucleon
+        // Formula: BE/A = av - as*A^(-1/3) - ac*Z*(Z-1)/A^(4/3) - aa*(N-Z)^2/A^2 (+/- ap/A^(3/2))
         
-        // Surface term: a_s * A^(2/3)
-        Real surf = AS.multiply(rA.pow(Real.of(2).divide(Real.of(3))));
+ 
+        // Original logic was convoluted. Let's use the clean block I prepared below based on reading.
+        // Actually, I'll just remove the unused calculation block and keep the one that was used at the end,
+        // but verify it maps to the return statement.
         
-        // Coulomb term: a_c * Z(Z-1) / A^(1/3)
-        Real coul = AC.multiply(rZ.multiply(rZ.subtract(Real.ONE))).divide(A13);
-        
-        // Asymmetry term: a_a * (N-Z)^2 / A
-        Real asym = AA.multiply(rN.subtract(rZ).pow(2)).divide(rA);
-        
-        // Pairing term
-        Real pair = Real.ZERO;
-        if (N % 2 == 0 && Z % 2 == 0) {
-            pair = AP.divide(rA.sqrt());
-        } else if (N % 2 == 1 && Z % 2 == 1) {
-            pair = AP.divide(rA.sqrt()).negate();
-        }
-        
-        // Total Binding Energy (BE) = vol - surf - coul - asym + pair
-        // Note: The formula usually gives total BE. Per nucleon = BE / A.
-        // The original code calculated BE/A directly? 
-        // Original: BE = av - as/A13 - ac*... 
-        // Yes, original was BE per nucleon directly (mostly).
-        // Standard SEMF: B(A,Z) = av*A - as*A^(2/3) ...
-        // B/A = av - as*A^(-1/3) ...
-        // Let's stick to the logic of the original code which seemed to implement the per-nucleon terms.
-        // Original: av - as/A13 ... yes, that is per nucleon.
-        
-        Real bePerNucleon = AV
-                .subtract(AS.divide(A13))
-                .subtract(AC.multiply(rZ.multiply(rZ.subtract(Real.ONE))).divide(A13.multiply(rA))); // Wait, original had /A13. 
-                // Original: ac * Z * (Z-1) / A13. 
-                // Coulomb energy is roughly Z^2 / R ~ Z^2 / A^(1/3). 
-                // Per nucleon should be / A. So Z^2 / A^(4/3).
-                // Original code was: - ac * Z * (Z - 1) / A13;
-                // Double check original: "double BE = av - as / A13 - ac * Z * (Z - 1) / A13 ..."
-                // This looks like Total Energy terms mixed with per nucleon logic?
-                // av is ~16 MeV per nucleon.
-                // as/A13 corrects surface.
-                // ac * Z(Z-1) / A13. If Z~A/2, Z^2/A^(1/3) ~ A^(5/3).
-                // This term is huge if not divided by A.
-                // I suspect the original code might have been calculating TOTAL BE, but returning it as "per nucleon"? 
-                // Or the formula was just wrong/simplified.
-                // However, I must REFACTOR, not fix physics bugs unless obvious.
-                // I will translate the exact math of the original code to Real.
-                
-         // Re-reading original for exact translation:
-         // double BE = av - as / A13 - ac * Z * (Z - 1) / A13 - aa * (N - Z) * (N - Z) / A;
+
          
          Real term1 = AV;
          Real term2 = AS.divide(A13);

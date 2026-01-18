@@ -44,10 +44,10 @@ public class StellarSkyDemo extends AbstractDemo {
     public String getCategory() { return "Physics"; }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("sky.window.title", "Night Sky Visualizer"); }
+    public String getName() { return I18n.getInstance().get("sky.window.title", "Night Sky Visualizer"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("sky.title", "Stellar Sky"); }
+    public String getDescription() { return I18n.getInstance().get("sky.title", "Stellar Sky"); }
     
     @Override
     public String getLongDescription() { 

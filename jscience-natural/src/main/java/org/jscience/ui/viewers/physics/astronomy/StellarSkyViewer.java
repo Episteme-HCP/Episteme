@@ -31,8 +31,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
+
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.physics.astronomy.coordinates.*;
 import org.jscience.physics.loaders.*;
@@ -76,21 +75,20 @@ public class StellarSkyViewer extends AbstractViewer {
     private double viewAzimuthOffset = 0.0;
 
     @Override
-    public List<org.jscience.ui.Parameter<?>> getViewerParameters() {
-        List<org.jscience.ui.Parameter<?>> params = new ArrayList<>();
-        params.add(new org.jscience.ui.NumericParameter("viewer.stellarsky.param.lat",
+    public List<Parameter<?>> getViewerParameters() {
+        List<Parameter<?>> params = new ArrayList<>();
+        params.add(new NumericParameter("viewer.stellarsky.param.lat",
                 org.jscience.ui.i18n.I18n.getInstance().get("viewer.stellarsky.param.lat.desc", "Observer Latitude"),
                 -90, 90, 0.1, observerLat.doubleValue(), v -> { observerLat = Real.of(v); drawSky(); }));
-        params.add(new org.jscience.ui.NumericParameter("viewer.stellarsky.param.lon",
+        params.add(new NumericParameter("viewer.stellarsky.param.lon",
                 org.jscience.ui.i18n.I18n.getInstance().get("viewer.stellarsky.param.lon.desc", "Observer Longitude"),
                 -180, 180, 0.1, observerLon.doubleValue(), v -> { observerLon = Real.of(v); drawSky(); }));
-        params.add(new org.jscience.ui.NumericParameter("viewer.stellarsky.param.fov",
+        params.add(new NumericParameter("viewer.stellarsky.param.fov",
                 org.jscience.ui.i18n.I18n.getInstance().get("viewer.stellarsky.param.fov.desc", "Field of View Scale"),
                 0.1, 5.0, 0.1, fovScale.doubleValue(), v -> { fovScale = Real.of(v); drawSky(); }));
         return params;
     }
 
-    private static final String CFG_PREFIX = "viewer.stellarsky.default.";
     private LocalDateTime simulationTime = LocalDateTime.now();
 
     // UI
@@ -159,34 +157,34 @@ public class StellarSkyViewer extends AbstractViewer {
         sidebar.setPrefWidth(280);
         sidebar.getStyleClass().add("viewer-sidebar");
 
-        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("sky.title", "Sky Controls"));
+        Label title = new Label(I18n.getInstance().get("sky.title", "Sky Controls"));
         title.getStyleClass().add("header-label");
 
         // VizieR Query Section
         VBox vizierSection = createVizieRSection();
 
-        Label locLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("sky.location", "Location"));
+        Label locLabel = new Label(I18n.getInstance().get("sky.location", "Location"));
         locLabel.getStyleClass().add("header-label");
         locLabel.setStyle("-fx-font-size: 13px;");
 
-        Slider latSlider = createLabeledSlider(org.jscience.ui.i18n.I18n.getInstance().get("sky.lat", "Lat"), -90, 90, observerLat.doubleValue(), val -> { observerLat = Real.of(val); drawSky(); });
-        Slider lonSlider = createLabeledSlider(org.jscience.ui.i18n.I18n.getInstance().get("sky.lon", "Lon"), -180, 180, observerLon.doubleValue(), val -> { observerLon = Real.of(val); drawSky(); });
+        Slider latSlider = createLabeledSlider(I18n.getInstance().get("sky.lat", "Lat"), -90, 90, observerLat.doubleValue(), val -> { observerLat = Real.of(val); drawSky(); });
+        Slider lonSlider = createLabeledSlider(I18n.getInstance().get("sky.lon", "Lon"), -180, 180, observerLon.doubleValue(), val -> { observerLon = Real.of(val); drawSky(); });
 
-        Label timeCtrlLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("starsystem.date", "Time"));
+        Label timeCtrlLabel = new Label(I18n.getInstance().get("starsystem.date", "Time"));
         timeCtrlLabel.getStyleClass().add("header-label");
         timeCtrlLabel.setStyle("-fx-font-size: 13px;");
         DatePicker datePicker = new DatePicker(simulationTime.toLocalDate());
         datePicker.setOnAction(e -> { simulationTime = simulationTime.with(datePicker.getValue()); drawSky(); });
-        Slider hourSlider = createLabeledSlider(org.jscience.ui.i18n.I18n.getInstance().get("sky.hour", "Hour"), 0, 23, simulationTime.getHour(), val -> {
+        Slider hourSlider = createLabeledSlider(I18n.getInstance().get("sky.hour", "Hour"), 0, 23, simulationTime.getHour(), val -> {
             simulationTime = simulationTime.withHour((int)val); drawSky();
         });
 
-        showConstellations = new CheckBox(org.jscience.ui.i18n.I18n.getInstance().get("sky.stars", "Constellations")); showConstellations.setSelected(true); showConstellations.setOnAction(e -> drawSky());
-        showPlanets = new CheckBox(org.jscience.ui.i18n.I18n.getInstance().get("sky.planets", "Solar System")); showPlanets.setSelected(true); showPlanets.setOnAction(e -> drawSky());
-        showDSO = new CheckBox(org.jscience.ui.i18n.I18n.getInstance().get("sky.dso", "Deep Sky")); showDSO.setSelected(true); showDSO.setOnAction(e -> drawSky());
-        showTrails = new CheckBox(org.jscience.ui.i18n.I18n.getInstance().get("sky.trails", "Trails")); showTrails.setSelected(false); showTrails.setOnAction(e -> drawSky());
+        showConstellations = new CheckBox(I18n.getInstance().get("sky.stars", "Constellations")); showConstellations.setSelected(true); showConstellations.setOnAction(e -> drawSky());
+        showPlanets = new CheckBox(I18n.getInstance().get("sky.planets", "Solar System")); showPlanets.setSelected(true); showPlanets.setOnAction(e -> drawSky());
+        showDSO = new CheckBox(I18n.getInstance().get("sky.dso", "Deep Sky")); showDSO.setSelected(true); showDSO.setOnAction(e -> drawSky());
+        showTrails = new CheckBox(I18n.getInstance().get("sky.trails", "Trails")); showTrails.setSelected(false); showTrails.setOnAction(e -> drawSky());
 
-        infoLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("sky.info.select", "Select an object..."));
+        infoLabel = new Label(I18n.getInstance().get("sky.info.select", "Select an object..."));
         infoLabel.setWrapText(true);
         infoLabel.getStyleClass().addAll("description-label", "info-panel");
         infoLabel.setPrefHeight(100);
@@ -203,7 +201,7 @@ public class StellarSkyViewer extends AbstractViewer {
     private VBox createVizieRSection() {
         VBox section = new VBox(8);
         
-        Label vizierLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("sky.vizier.title", "Query VizieR"));
+        Label vizierLabel = new Label(I18n.getInstance().get("sky.vizier.title", "Query VizieR"));
         vizierLabel.getStyleClass().add("header-label");
         vizierLabel.setStyle("-fx-font-size: 13px;");
         
@@ -216,7 +214,7 @@ public class StellarSkyViewer extends AbstractViewer {
         statusLabel.getStyleClass().add("text-secondary");
         statusLabel.setWrapText(true);
         
-        Button queryButton = new Button(org.jscience.ui.i18n.I18n.getInstance().get("sky.vizier.query", "Query Region"));
+        Button queryButton = new Button(I18n.getInstance().get("sky.vizier.query", "Query Region"));
         queryButton.setMaxWidth(Double.MAX_VALUE);
         queryButton.getStyleClass().add("accent-button-green");
         queryButton.setOnAction(e -> {
@@ -227,7 +225,7 @@ public class StellarSkyViewer extends AbstractViewer {
                 default -> VizieRReader.HIPPARCOS;
             };
             
-            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("sky.vizier.querying", "Querying..."));
+            statusLabel.setText(I18n.getInstance().get("sky.vizier.querying", "Querying..."));
             queryButton.setDisable(true);
             
             // Query in background thread
@@ -240,12 +238,12 @@ public class StellarSkyViewer extends AbstractViewer {
                     
                     javafx.application.Platform.runLater(() -> {
                         if (result != null && result.containsKey("raw_votable")) {
-                            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("sky.vizier.success", 
+                            statusLabel.setText(I18n.getInstance().get("sky.vizier.success", 
                                 "Query successful! Data loaded."));
                             // Parse VOTable and add stars - simplified for demo
-                            infoLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("auto.stellarskyviewer.vizier_data_available__parsing", "VizieR data available (parsing not yet implemented in demo)"));
+                            infoLabel.setText(I18n.getInstance().get("auto.stellarskyviewer.vizier_data_available__parsing", "VizieR data available (parsing not yet implemented in demo)"));
                         } else {
-                            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("sky.vizier.failed", 
+                            statusLabel.setText(I18n.getInstance().get("sky.vizier.failed", 
                                 "Query failed. Check network."));
                         }
                         queryButton.setDisable(false);
@@ -384,10 +382,10 @@ public class StellarSkyViewer extends AbstractViewer {
     }
 
     private void updateInfoPanel() {
-        if (selectedPlanet != null) infoLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("sky.info.planet", "Planet: {0}", selectedPlanet.name));
-        else if (selectedStar != null) infoLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("sky.info.star", "Star: {0} ({1})", selectedStar.name, selectedStar.mag));
-        else if (selectedConstellation != null) infoLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("sky.info.constellation", "Constellation: {0}", selectedConstellation.name));
-        else infoLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("sky.info.select", "Select an object"));
+        if (selectedPlanet != null) infoLabel.setText(I18n.getInstance().get("sky.info.planet", "Planet: {0}", selectedPlanet.name));
+        else if (selectedStar != null) infoLabel.setText(I18n.getInstance().get("sky.info.star", "Star: {0} ({1})", selectedStar.name, selectedStar.mag));
+        else if (selectedConstellation != null) infoLabel.setText(I18n.getInstance().get("sky.info.constellation", "Constellation: {0}", selectedConstellation.name));
+        else infoLabel.setText(I18n.getInstance().get("sky.info.select", "Select an object"));
     }
 
     private double getDaysSinceJ2000() {
@@ -527,9 +525,9 @@ public class StellarSkyViewer extends AbstractViewer {
         }
     }
     
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.stellarskyviewer.name", "Stellar Sky Viewer"); }
-    @Override public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics"); }
+    @Override public String getName() { return I18n.getInstance().get("viewer.stellarskyviewer.name", "Stellar Sky Viewer"); }
+    @Override public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
     
-    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.stellarskyviewer.desc", "Real-time planetarium and sky map simulation."); }
-    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.stellarskyviewer.longdesc", "Advanced sky map that projects stars, constellations, and planets based on Earth coordinates and time. Includes support for celestial coordinate systems, magnitude filtering, and deep-sky object labeling."); }
+    @Override public String getDescription() { return I18n.getInstance().get("viewer.stellarskyviewer.desc", "Real-time planetarium and sky map simulation."); }
+    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.stellarskyviewer.longdesc", "Advanced sky map that projects stars, constellations, and planets based on Earth coordinates and time. Includes support for celestial coordinate systems, magnitude filtering, and deep-sky object labeling."); }
 }

@@ -85,8 +85,8 @@ public class GeoPath {
             return false;
         Coordinate start = getStart();
         Coordinate end = getEnd();
-        double latDiff = Math.abs(start.getLatitudeDegrees() - end.getLatitudeDegrees());
-        double lonDiff = Math.abs(start.getLongitudeDegrees() - end.getLongitudeDegrees());
+        double latDiff = Math.abs(start.getLatitudeDegrees().doubleValue() - end.getLatitudeDegrees().doubleValue());
+        double lonDiff = Math.abs(start.getLongitudeDegrees().doubleValue() - end.getLongitudeDegrees().doubleValue());
         return latDiff < 1e-9 && lonDiff < 1e-9;
     }
 

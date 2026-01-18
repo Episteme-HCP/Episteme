@@ -120,9 +120,9 @@ public class Money implements Quantity<Money> {
 
     @Override
     public <R extends Quantity<R>> Quantity<?> multiply(Quantity<R> other) {
-        double val = amount.multiply(other.getValue()).doubleValue();
+        Real val = amount.multiply(other.getValue());
         Unit<?> unit = currency.multiply(other.getUnit());
-        return Quantities.create(val, unit);
+        return Quantities.create(val, (Unit<?>) unit);
     }
 
     @Override
@@ -136,9 +136,9 @@ public class Money implements Quantity<Money> {
 
     @Override
     public <R extends Quantity<R>> Quantity<?> divide(Quantity<R> other) {
-        double val = amount.divide(other.getValue()).doubleValue();
+        Real val = amount.divide(other.getValue());
         Unit<?> unit = currency.divide(other.getUnit());
-        return Quantities.create(val, unit);
+        return Quantities.create(val, (Unit<?>) unit);
     }
 
     @Override

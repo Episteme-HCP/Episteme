@@ -54,11 +54,11 @@ public class SpectrographDemo extends AbstractSimulationDemo {
     private AnimationTimer demoTimer;
 
     @Override public boolean isDemo() { return true; }
-    @Override public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics"); }
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.spectrographdemo.name", "Spectrograph"); }
-    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("demo.spectrographdemo.desc", "Real-time frequency analysis visualization."); }
+    @Override public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
+    @Override public String getName() { return I18n.getInstance().get("demo.spectrographdemo.name", "Spectrograph"); }
+    @Override public String getDescription() { return I18n.getInstance().get("demo.spectrographdemo.desc", "Real-time frequency analysis visualization."); }
     @Override public String getLongDescription() { 
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.spectrographdemo.longdesc", "Visualizes sound or signal frequencies over time using a spectrogram and spectrum analyzer."); 
+        return I18n.getInstance().get("demo.spectrographdemo.longdesc", "Visualizes sound or signal frequencies over time using a spectrogram and spectrum analyzer."); 
     }
 
     @Override
@@ -75,14 +75,14 @@ public class SpectrographDemo extends AbstractSimulationDemo {
         VBox panel = super.createControlPanel();
         panel.getChildren().add(new Separator());
 
-        Label srcLbl = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.spectrographdemo.label.source", "Signal Source:"));
+        Label srcLbl = new Label(I18n.getInstance().get("demo.spectrographdemo.label.source", "Signal Source:"));
         ComboBox<String> sourceCombo = new ComboBox<>();
         sourceCombo.getItems().addAll(
-                org.jscience.ui.i18n.I18n.getInstance().get("demo.spectrographdemo.source.voice", "Voice (Synthetic)"),
-                org.jscience.ui.i18n.I18n.getInstance().get("demo.spectrographdemo.source.sine", "Sine Wave (Synthetic)"),
-                org.jscience.ui.i18n.I18n.getInstance().get("demo.spectrographdemo.source.noise", "White Noise"),
-                org.jscience.ui.i18n.I18n.getInstance().get("demo.spectrographdemo.source.custom", "Custom WAV..."));
-        sourceCombo.setValue(org.jscience.ui.i18n.I18n.getInstance().get("demo.spectrographdemo.source.voice", "Voice (Synthetic)"));
+                I18n.getInstance().get("demo.spectrographdemo.source.voice", "Voice (Synthetic)"),
+                I18n.getInstance().get("demo.spectrographdemo.source.sine", "Sine Wave (Synthetic)"),
+                I18n.getInstance().get("demo.spectrographdemo.source.noise", "White Noise"),
+                I18n.getInstance().get("demo.spectrographdemo.source.custom", "Custom WAV..."));
+        sourceCombo.setValue(I18n.getInstance().get("demo.spectrographdemo.source.voice", "Voice (Synthetic)"));
         sourceCombo.setMaxWidth(Double.MAX_VALUE);
         sourceCombo.setOnAction(e -> {
             String val = sourceCombo.getValue();
@@ -94,7 +94,7 @@ public class SpectrographDemo extends AbstractSimulationDemo {
             }
         });
 
-        Button loadBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("demo.spectrographdemo.btn.load", "Load WAV File"));
+        Button loadBtn = new Button(I18n.getInstance().get("demo.spectrographdemo.btn.load", "Load WAV File"));
         loadBtn.setMaxWidth(Double.MAX_VALUE);
         loadBtn.setOnAction(e -> loadWavFile());
 

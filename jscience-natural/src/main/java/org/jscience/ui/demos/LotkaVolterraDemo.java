@@ -51,10 +51,10 @@ public class LotkaVolterraDemo extends AbstractSimulationDemo {
     public String getCategory() { return "Biology"; }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("LotkaVolterra.title", "Lotka-Volterra"); }
+    public String getName() { return I18n.getInstance().get("LotkaVolterra.title", "Lotka-Volterra"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("LotkaVolterra.desc", "Predator-prey population dynamics simulation."); }
+    public String getDescription() { return I18n.getInstance().get("LotkaVolterra.desc", "Predator-prey population dynamics simulation."); }
     
     @Override
     public String getLongDescription() {

@@ -55,17 +55,17 @@ public class SequenceAlignmentDemo extends AbstractDemo {
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("SequenceAlignment.title", "Sequence Alignment");
+        return I18n.getInstance().get("SequenceAlignment.title", "Sequence Alignment");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("SequenceAlignment.desc", "Needleman-Wunsch Global Alignment Algorithm");
+        return I18n.getInstance().get("SequenceAlignment.desc", "Needleman-Wunsch Global Alignment Algorithm");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("SequenceAlignment.long_desc", 
+        return I18n.getInstance().get("SequenceAlignment.long_desc", 
             "The Needleman-Wunsch algorithm performs global alignment on two sequences. " +
             "It is commonly used in bioinformatics to align protein or nucleotide sequences.");
     }
@@ -88,13 +88,13 @@ public class SequenceAlignmentDemo extends AbstractDemo {
             VBox inputs = new VBox(10);
             seq1Field = new TextField("GATTACA");
             seq2Field = new TextField("GCATGCU");
-            Button alignBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("align.btn.align", "Align Sequences"));
+            Button alignBtn = new Button(I18n.getInstance().get("align.btn.align", "Align Sequences"));
             alignBtn.setMaxWidth(Double.MAX_VALUE);
             alignBtn.setOnAction(e -> runAlignment());
 
-            Label l1 = new Label(org.jscience.ui.i18n.I18n.getInstance().get("align.seq1", "Sequence 1:"));
+            Label l1 = new Label(I18n.getInstance().get("align.seq1", "Sequence 1:"));
             l1.getStyleClass().add("header-label");
-            Label l2 = new Label(org.jscience.ui.i18n.I18n.getInstance().get("align.seq2", "Sequence 2:"));
+            Label l2 = new Label(I18n.getInstance().get("align.seq2", "Sequence 2:"));
             l2.getStyleClass().add("header-label");
 
             inputs.getChildren().addAll(l1, seq1Field, l2, seq2Field, alignBtn);
@@ -115,11 +115,11 @@ public class SequenceAlignmentDemo extends AbstractDemo {
             results.setPadding(new Insets(10));
             results.getStyleClass().add("info-panel");
 
-            scoreLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.sequencealignment.score.0", "Score: 0"));
+            scoreLabel = new Label(I18n.getInstance().get("generated.sequencealignment.score.0", "Score: 0"));
             scoreLabel.getStyleClass().add("header-label");
 
-            align1Label = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.sequencealignment.", "---"));
-            align2Label = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.sequencealignment.", "---"));
+            align1Label = new Label(I18n.getInstance().get("generated.sequencealignment.", "---"));
+            align2Label = new Label(I18n.getInstance().get("generated.sequencealignment.", "---"));
 
             align1Label.getStyleClass().add("description-label");
             align2Label.getStyleClass().add("description-label");
@@ -177,7 +177,7 @@ public class SequenceAlignmentDemo extends AbstractDemo {
                 }
             }
 
-            scoreLabel.setText(String.format(org.jscience.ui.i18n.I18n.getInstance().get("align.score.fmt", "Alignment Score: %d"), score[n][m]));
+            scoreLabel.setText(String.format(I18n.getInstance().get("align.score.fmt", "Alignment Score: %d"), score[n][m]));
             align1Label.setText(a1.reverse().toString());
             align2Label.setText(a2.reverse().toString());
 

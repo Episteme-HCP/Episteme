@@ -305,6 +305,7 @@ public class MasterControlLibrariesUITest {
         robot.clickOn("#tab-libraries");
 
         // Look for ComboBox controls (backend selectors)
+        @SuppressWarnings("rawtypes")
         Set<ComboBox> comboBoxes = robot.lookup(".combo-box").queryAllAs(ComboBox.class);
 
         // Should have multiple backend selectors (Math, Tensor, Molecular, Quantum, Map, Network)
@@ -316,6 +317,7 @@ public class MasterControlLibrariesUITest {
     void testBackendSelectorsHaveAutoOption(FxRobot robot) {
         robot.clickOn("#tab-libraries");
 
+        @SuppressWarnings("rawtypes")
         Set<ComboBox> comboBoxes = robot.lookup(".combo-box").queryAllAs(ComboBox.class);
 
         for (ComboBox<?> combo : comboBoxes) {

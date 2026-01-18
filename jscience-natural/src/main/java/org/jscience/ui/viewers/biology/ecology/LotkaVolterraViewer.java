@@ -91,10 +91,10 @@ public class LotkaVolterraViewer extends AbstractViewer implements Simulatable {
     }
 
     private void initParameters() {
-        alphaParam = new RealParameter("Alpha (Prey Growth)", Real.of(0.0), Real.of(5.0), Real.of(1.1), Real.of(0.1));
-        betaParam = new RealParameter("Beta (Predation)", Real.of(0.0), Real.of(5.0), Real.of(0.4), Real.of(0.1));
-        deltaParam = new RealParameter("Delta (Predator Growth)", Real.of(0.0), Real.of(5.0), Real.of(0.1), Real.of(0.1));
-        gammaParam = new RealParameter("Gamma (Predator Death)", Real.of(0.0), Real.of(5.0), Real.of(0.4), Real.of(0.1));
+        alphaParam = new RealParameter("Alpha", "Prey Growth Rate", 0.0, 5.0, 0.1, 1.1, null);
+        betaParam = new RealParameter("Beta", "Predation Rate", 0.0, 5.0, 0.1, 0.4, null);
+        deltaParam = new RealParameter("Delta", "Predator Growth Rate", 0.0, 5.0, 0.1, 0.1, null);
+        gammaParam = new RealParameter("Gamma", "Predator Death Rate", 0.0, 5.0, 0.1, 0.4, null);
     }
 
     private void initUI() {
@@ -196,18 +196,12 @@ public class LotkaVolterraViewer extends AbstractViewer implements Simulatable {
         double delta = deltaParam.getValue().doubleValue();
         double gamma = gammaParam.getValue().doubleValue();
 
-        double[] next = integrator.integrate((t, y) -> {
-            // Using Real for calculation logic inside the integrator might be expected by JScience
-            // but the Integrator interface likely accepts double[] (Apache Commons Math style?).
-            // Checking imports: org.jscience.mathematics.analysis.ode.DormandPrinceIntegrator.
-            // If it's JScience implementation, it might expect Real vectors?
-            // The original code passed `double[]` and wrapped logic in Real, then returned double[].
-            // I will preserve that structure but use the parameters.
-            Real rY0 = Real.of(y[0]);
-            Real rY1 = Real.of(y[1]);
-            Real dY1 = Real.of(alpha).multiply(rY0).subtract(Real.of(beta).multiply(rY0).multiply(rY1));
-            Real dY2 = Real.of(delta).multiply(rY0).multiply(rY1).subtract(Real.of(gamma).multiply(rY1));
-            return new double[] { dY1.doubleValue(), dY2.doubleValue() };
+        double[] next = integrator.integrate((Double t, double[] y) -> {
+            double rY0 = y[0];
+            double rY1 = y[1];
+            double dY1 = alpha * rY0 - beta * rY0 * rY1;
+            double dY2 = delta * rY0 * rY1 - gamma * rY1;
+            return new double[] { dY1, dY2 };
         }, time, current, time + dt);
 
         preyPop = Quantities.create(Math.max(0, next[0]), Units.ONE);

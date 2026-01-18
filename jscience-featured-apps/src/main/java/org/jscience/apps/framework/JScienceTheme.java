@@ -62,6 +62,7 @@ public final class JScienceTheme {
     public static final Color MATH_ORANGE = Color.web("#e67e22");
     public static final Color ENGINEERING_GRAY = Color.web("#95a5a6");
     public static final Color ECONOMICS_GOLD = Color.web("#f1c40f");
+    public static final Color IRON = Color.web("#434b4d");
 
     // Chart series colors
     public static final Color[] CHART_SERIES = {

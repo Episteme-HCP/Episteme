@@ -24,6 +24,8 @@
 package org.jscience.ui.demos;
 
 import org.jscience.ui.AbstractDemo;
+import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.viewers.geography.MapViewer;
 
 /**
  * Geography GIS Demo using JScience geometry types.
@@ -44,22 +46,22 @@ public class GeographyGISDemo extends AbstractDemo {
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.geographygisdemo.name");
+        return I18n.getInstance().get("demo.geographygisdemo.name");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.geographygisdemo.desc");
+        return I18n.getInstance().get("demo.geographygisdemo.desc");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.geographygisdemo.longdesc");
+        return I18n.getInstance().get("demo.geographygisdemo.longdesc");
     }
 
     @Override
     protected javafx.scene.Node createViewerNode() {
-        org.jscience.ui.viewers.geography.MapViewer v = new org.jscience.ui.viewers.geography.MapViewer();
+        MapViewer v = new MapViewer();
         this.viewer = v;
         return v;
     }

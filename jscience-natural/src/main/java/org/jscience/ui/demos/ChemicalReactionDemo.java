@@ -41,10 +41,10 @@ public class ChemicalReactionDemo extends AbstractDemo {
     public String getCategory() { return "Chemistry"; }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("ChemicalReaction.title", "Reaction Parser"); }
+    public String getName() { return I18n.getInstance().get("ChemicalReaction.title", "Reaction Parser"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("ChemicalReaction.desc", "Interactive Chemical Equation Balancer"); }
+    public String getDescription() { return I18n.getInstance().get("ChemicalReaction.desc", "Interactive Chemical Equation Balancer"); }
     
     @Override
     public String getLongDescription() { 

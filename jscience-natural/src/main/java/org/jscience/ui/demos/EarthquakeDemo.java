@@ -41,17 +41,17 @@ public class EarthquakeDemo extends AbstractDemo {
     public boolean isDemo() { return true; }
 
     @Override
-    public String getCategory() { return "Earth Sciences"; }
+    public String getCategory() { return I18n.getInstance().get("category.earth_sciences", "Earth Sciences"); }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("earthquake.label.title", "Earthquake Map"); }
+    public String getName() { return I18n.getInstance().get("earthquake.label.title", "Earthquake Map"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("earthquake.desc", "Interactive Seismic Map"); }
+    public String getDescription() { return I18n.getInstance().get("earthquake.desc", "Interactive Seismic Map"); }
     
     @Override
     public String getLongDescription() { 
-        return "Visualizes seismic data on an interactive world map with explanations and controls."; 
+        return I18n.getInstance().get("earthquake.long_desc", "Visualizes seismic data on an interactive world map with explanations and controls."); 
     }
 
     @Override

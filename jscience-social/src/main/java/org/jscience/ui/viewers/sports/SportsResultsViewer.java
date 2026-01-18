@@ -37,6 +37,10 @@ import org.jscience.ui.AbstractViewer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.Parameter;
+import org.jscience.io.Configuration;
+
 /**
  * Sports Results Management Viewer.
  *
@@ -46,15 +50,15 @@ import java.util.List;
  */
 public class SportsResultsViewer extends AbstractViewer {
 
-    private final org.jscience.ui.i18n.I18n i18n = org.jscience.ui.i18n.I18n.getInstance();
+    private final I18n i18n = I18n.getInstance();
     private final ObservableList<Team> teams = FXCollections.observableArrayList();
     private final ObservableList<String> matchHistory = FXCollections.observableArrayList();
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.sportsresults.name", "Sports Results"); }
+    public String getName() { return I18n.getInstance().get("viewer.sportsresults.name", "Sports Results"); }
     
     @Override
-    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.sports", "Sports"); }
+    public String getCategory() { return I18n.getInstance().get("category.sports", "Sports"); }
 
     public SportsResultsViewer() {
         initUI();
@@ -62,12 +66,12 @@ public class SportsResultsViewer extends AbstractViewer {
     
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.sportsresults.desc", "Sports Results Management");
+        return I18n.getInstance().get("viewer.sportsresults.desc", "Sports Results Management");
     }
 
     @Override
     public String getLongDescription() { 
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.sportsresults.longdesc", "Manage team standings, match results and simulate seasons.");
+        return I18n.getInstance().get("viewer.sportsresults.longdesc", "Manage team standings, match results and simulate seasons.");
     }
     
     @Override
@@ -167,12 +171,12 @@ public class SportsResultsViewer extends AbstractViewer {
     }
 
     @Override
-    public List<org.jscience.ui.Parameter<?>> getViewerParameters() {
-        List<org.jscience.ui.Parameter<?>> parameters = new ArrayList<>();
+    public List<Parameter<?>> getViewerParameters() {
+        List<Parameter<?>> parameters = new ArrayList<>();
         
-        String defaultTeams = org.jscience.io.Configuration.get("viewer.sports.default.teams", "Man City,Arsenal,Liverpool");
+        String defaultTeams = Configuration.get("viewer.sports.default.teams", "Man City,Arsenal,Liverpool");
         
-        parameters.add(new org.jscience.ui.Parameter<String>(
+        parameters.add(new Parameter<String>(
             i18n.get("sports.param.teams", "Teams List"),
             i18n.get("sports.param.teams.desc", "Comma-separated list of team names"),
             defaultTeams,
@@ -193,7 +197,7 @@ public class SportsResultsViewer extends AbstractViewer {
     }
 
     private void initTeams() {
-        String defaultTeams = org.jscience.io.Configuration.get("viewer.sports.default.teams", "Man City,Arsenal,Liverpool");
+        String defaultTeams = Configuration.get("viewer.sports.default.teams", "Man City,Arsenal,Liverpool");
         reinitializeTeams(defaultTeams);
     }
 

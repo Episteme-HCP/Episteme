@@ -21,5 +21,5 @@
  * SOFTWARE.
  */
 
-package org.jscience.mathematics.logic.connectors;
+package org.jscience.mathematics.loaders.logic;
 

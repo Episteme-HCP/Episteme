@@ -39,6 +39,9 @@ import org.jscience.ui.AbstractSimulationDemo;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;
 import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.Parameter;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Cloth Simulation Demo.
@@ -58,10 +61,10 @@ public class ClothSimulationDemo extends AbstractSimulationDemo {
     public String getCategory() { return "Physics"; }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("ClothSimulation.title", "Cloth Simulation"); }
+    public String getName() { return I18n.getInstance().get("ClothSimulation.title", "Cloth Simulation"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("ClothSimulation.desc", "3D Cloth Simulation using Spring-Mass System"); }
+    public String getDescription() { return I18n.getInstance().get("ClothSimulation.desc", "3D Cloth Simulation using Spring-Mass System"); }
 
     @Override
     public String getLongDescription() { 
@@ -144,24 +147,24 @@ public class ClothSimulationDemo extends AbstractSimulationDemo {
             box.setPrefWidth(200);
             box.getStyleClass().add("viewer-sidebar");
 
-            Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.clothsimulation.settings", "Settings"));
+            Label title = new Label(I18n.getInstance().get("generated.clothsimulation.settings", "Settings"));
             title.getStyleClass().add("header-label");
             
             Slider gravSlider = new Slider(0, 20, 9.81);
-            Label gravLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.clothsimulation.gravity.981", "Gravity: 9.81"));
+            Label gravLabel = new Label(I18n.getInstance().get("generated.clothsimulation.gravity.981", "Gravity: 9.81"));
             gravSlider.valueProperty().addListener((o,ov,nv) -> {
                 system.setGravity(0, -nv.doubleValue(), 0);
                 gravLabel.setText(String.format("Gravity: %.2f", nv.doubleValue()));
             });
             
             Slider dampSlider = new Slider(0, 1, 0.1);
-            Label dampLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("generated.clothsimulation.damping.010", "Damping: 0.10"));
+            Label dampLabel = new Label(I18n.getInstance().get("generated.clothsimulation.damping.010", "Damping: 0.10"));
             dampSlider.valueProperty().addListener((o,ov,nv) -> {
                 system.setDamping(nv.doubleValue());
                 dampLabel.setText(String.format("Damping: %.2f", nv.doubleValue()));
             });
 
-            CheckBox wireCheck = new CheckBox(org.jscience.ui.i18n.I18n.getInstance().get("generated.clothsimulation.wireframe", "Wireframe"));
+            CheckBox wireCheck = new CheckBox(I18n.getInstance().get("generated.clothsimulation.wireframe", "Wireframe"));
             wireCheck.selectedProperty().addListener((o,ov,nv) -> meshView.setDrawMode(nv ? DrawMode.LINE : DrawMode.FILL));
             
             box.getChildren().addAll(title, new Separator(), gravLabel, gravSlider, dampLabel, dampSlider, new Separator(), wireCheck);
@@ -237,6 +240,6 @@ public class ClothSimulationDemo extends AbstractSimulationDemo {
 
         
 
-    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+    @Override public List<Parameter<?>> getViewerParameters() { return new ArrayList<>(); }
 }
 }

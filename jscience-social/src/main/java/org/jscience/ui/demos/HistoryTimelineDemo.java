@@ -24,6 +24,9 @@
 package org.jscience.ui.demos;
 
 import org.jscience.ui.AbstractDemo;
+import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.viewers.history.TimelineViewer;
+import org.jscience.history.Timeline;
 
 public class HistoryTimelineDemo extends AbstractDemo {
 
@@ -34,28 +37,28 @@ public class HistoryTimelineDemo extends AbstractDemo {
 
     @Override
     public String getCategory() { 
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.history", "History"); 
+        return I18n.getInstance().get("category.history", "History"); 
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.name", "Interactive Timeline");
+        return I18n.getInstance().get("demo.historytimelinedemo.name", "Interactive Timeline");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.desc", "Horizontal scrollable timeline.");
+        return I18n.getInstance().get("demo.historytimelinedemo.desc", "Horizontal scrollable timeline.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.longdesc", "Horizontal scrollable timeline visualizing historical eras and events.");
+        return I18n.getInstance().get("demo.historytimelinedemo.longdesc", "Horizontal scrollable timeline visualizing historical eras and events.");
     }
 
     @Override
     protected javafx.scene.Node createViewerNode() {
-        org.jscience.ui.viewers.history.TimelineViewer v = new org.jscience.ui.viewers.history.TimelineViewer();
-        v.setTimeline(org.jscience.history.Timeline.worldHistory());
+        TimelineViewer v = new TimelineViewer();
+        v.setTimeline(Timeline.worldHistory());
         this.viewer = v;
         return v;
     }

@@ -99,12 +99,21 @@ public interface Device extends AutoCloseable {
     }
 
     /**
-     * Returns a map of current status readings (Power, Uptime, etc.).
+     * Returns the current status readings (Power, Uptime, etc.).
      * 
      * @return the readings map
      */
     default java.util.Map<String, String> getReadings() {
         return java.util.Collections.emptyMap();
+    }
+
+    /**
+     * Returns the current status of the device as a string.
+     * 
+     * @return the status string (e.g. "CONNECTED", "SLEWING", "ERROR")
+     */
+    default String getStatus() {
+        return isConnected() ? "CONNECTED" : "DISCONNECTED";
     }
 
     /**

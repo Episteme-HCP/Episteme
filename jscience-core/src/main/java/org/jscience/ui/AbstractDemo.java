@@ -35,7 +35,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
-import org.jscience.ui.i18n.I18n;
+
 
 import java.util.List;
 import java.util.ArrayList;
@@ -43,6 +43,7 @@ import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Unit;
 import org.jscience.measure.Quantities;
+import org.jscience.ui.i18n.I18n;
 
 /**
  * Abstract base class for all JScience Demonstrations.
@@ -119,7 +120,7 @@ public abstract class AbstractDemo extends Application implements App {
         panel.setPadding(new Insets(10));
         panel.setAlignment(Pos.TOP_LEFT);
 
-        Label sectionTitle = new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.controls.title"));
+        Label sectionTitle = new Label(I18n.getInstance().get("demo.controls.title"));
         sectionTitle.setFont(Font.font("System", FontWeight.BOLD, 16));
         panel.getChildren().add(sectionTitle);
 
@@ -184,7 +185,7 @@ public abstract class AbstractDemo extends Application implements App {
             CheckBox checkBox = new CheckBox();
             checkBox.setSelected((Boolean) param.getValue());
             checkBox.setOnAction(e -> {
-                ((Parameter<Boolean>) param).setValue(checkBox.isSelected());
+                ((BooleanParameter) param).setValue(checkBox.isSelected());
             });
             box.getChildren().addAll(label, checkBox);
         } else if (param.getValue() instanceof Color) {

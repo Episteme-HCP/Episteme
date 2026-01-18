@@ -32,7 +32,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import java.util.List;
+import org.jscience.ui.Parameter;
 import org.jscience.ui.i18n.I18n;
+
 
 /**
  * Viewer for Arts & Color Theory.
@@ -103,22 +106,22 @@ public class ArtsColorTheoryViewer extends BorderPane implements org.jscience.ui
         harmonies.setAlignment(Pos.CENTER);
 
         harmonies.getChildren()
-                .add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.artscolortheoryviewer.label.comp", "Complementary (Contrast)")));
+                .add(new Label(I18n.getInstance().get("viewer.artscolortheoryviewer.label.comp", "Complementary (Contrast)")));
         harmonies.getChildren().addAll(compBox, compCode);
 
         HBox ana = new HBox(10, new VBox(5, ana1Box, ana1Code), new VBox(5, ana2Box, ana2Code));
         ana.setAlignment(Pos.CENTER);
         harmonies.getChildren()
-                .add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.artscolortheoryviewer.label.analog", "Analogous (Harmony)")));
+                .add(new Label(I18n.getInstance().get("viewer.artscolortheoryviewer.label.analog", "Analogous (Harmony)")));
         harmonies.getChildren().add(ana);
 
         HBox tri = new HBox(10, new VBox(5, tri1Box, tri1Code), new VBox(5, tri2Box, tri2Code));
         tri.setAlignment(Pos.CENTER);
         harmonies.getChildren()
-                .add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.artscolortheoryviewer.label.triad", "Triadic (Vibrant)")));
+                .add(new Label(I18n.getInstance().get("viewer.artscolortheoryviewer.label.triad", "Triadic (Vibrant)")));
         harmonies.getChildren().add(tri);
 
-        VBox main = new VBox(10, new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.artscolortheoryviewer.label.hue", "Select Hue")),
+        VBox main = new VBox(10, new Label(I18n.getInstance().get("viewer.artscolortheoryviewer.label.hue", "Select Hue")),
                 hueSlider, colorBox, mainCode);
         main.setAlignment(Pos.CENTER);
 
@@ -135,17 +138,17 @@ public class ArtsColorTheoryViewer extends BorderPane implements org.jscience.ui
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.arts", "Arts");
+        return I18n.getInstance().get("category.arts", "Arts");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.artscolortheory.name", "Color Theory");
+        return I18n.getInstance().get("viewer.artscolortheory.name", "Color Theory");
     }
     
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.artscolortheory.desc", "Explore color harmonies and palettes.");
+        return I18n.getInstance().get("viewer.artscolortheory.desc", "Explore color harmonies and palettes.");
     }
 
     @Override
@@ -158,13 +161,13 @@ public class ArtsColorTheoryViewer extends BorderPane implements org.jscience.ui
     }
     
     @Override
-    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
+    public List<Parameter<?>> getViewerParameters() {
         return java.util.Collections.emptyList();
     }
     
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.artscolortheory.longdesc", "Interactive color palette explorer based on formal color theory. Calculate and visualize complementary, analogous, and triadic color harmonies in real-time. includes HEX code generation and saturation/brightness adjustments.");
+        return I18n.getInstance().get("viewer.artscolortheory.longdesc", "Interactive color palette explorer based on formal color theory. Calculate and visualize complementary, analogous, and triadic color harmonies in real-time. includes HEX code generation and saturation/brightness adjustments.");
     }
 }

@@ -40,7 +40,7 @@ import org.jscience.politics.GeopoliticalEngineTask;
 import org.jscience.politics.loaders.FactbookReader;
 import org.jscience.server.proto.*;
 import org.jscience.ui.ThemeManager;
-import org.jscience.ui.theme.ThemeColors;
+
 
 import java.io.*;
 import java.util.ArrayList;

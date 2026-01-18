@@ -52,6 +52,7 @@ import org.jscience.chemistry.PeriodicTable;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.i18n.I18n;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import javafx.application.Platform;
@@ -125,7 +126,7 @@ public class PeriodicTableViewer extends AbstractViewer {
             contentGroup.setScaleY(nv.doubleValue());
         });
 
-        HBox topBar = new HBox(10, new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.zoom", "Zoom")), zoomSlider);
+        HBox topBar = new HBox(10, new Label(I18n.getInstance().get("viewer.periodictable.zoom", "Zoom")), zoomSlider);
         topBar.setAlignment(Pos.CENTER_LEFT);
         topBar.setPadding(new Insets(10));
         topBar.getStyleClass().add("viewer-sidebar");
@@ -202,18 +203,18 @@ public class PeriodicTableViewer extends AbstractViewer {
         panel.setPrefWidth(320);
         panel.getStyleClass().add("viewer-sidebar");
 
-        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.details.title", "Element Details"));
+        Label title = new Label(I18n.getInstance().get("viewer.periodictable.details.title", "Element Details"));
         title.getStyleClass().add("font-large");
         title.getStyleClass().add("header-label");
 
-        Label hint = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.details.hint", "Select an element to view details"));
+        Label hint = new Label(I18n.getInstance().get("viewer.periodictable.details.hint", "Select an element to view details"));
         hint.getStyleClass().add("text-secondary");
         hint.setWrapText(true);
         hint.setId("hint-label");
 
         detailsTabPane = new TabPane();
 
-        Tab elecTab = new Tab(org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.electronic.header", "Electronic"));
+        Tab elecTab = new Tab(I18n.getInstance().get("viewer.periodictable.electronic.header", "Electronic"));
         electronicContent = new VBox(10);
         electronicContent.setPadding(new Insets(10));
         ScrollPane es = new ScrollPane(electronicContent);
@@ -221,7 +222,7 @@ public class PeriodicTableViewer extends AbstractViewer {
         elecTab.setContent(es);
         elecTab.setClosable(false);
 
-        Tab nucTab = new Tab(org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.nuclear.header", "Nuclear"));
+        Tab nucTab = new Tab(I18n.getInstance().get("viewer.periodictable.nuclear.header", "Nuclear"));
         nuclearContent = new VBox(10);
         nuclearContent.setPadding(new Insets(10));
         ScrollPane ns = new ScrollPane(nuclearContent);
@@ -229,12 +230,12 @@ public class PeriodicTableViewer extends AbstractViewer {
         nucTab.setContent(ns);
         nucTab.setClosable(false);
 
-        Tab compTab = new Tab(org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.compounds.header", "Compounds"));
+        Tab compTab = new Tab(I18n.getInstance().get("viewer.periodictable.compounds.header", "Compounds"));
         VBox compoundContent = new VBox(10);
         compoundContent.setPadding(new Insets(10));
         TextField compSearch = new TextField();
-        compSearch.setPromptText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.search.prompt", "Search PubChem/ChEBI..."));
-        Button searchBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.search.button", "Search"));
+        compSearch.setPromptText(I18n.getInstance().get("viewer.periodictable.search.prompt", "Search PubChem/ChEBI..."));
+        Button searchBtn = new Button(I18n.getInstance().get("viewer.periodictable.search.button", "Search"));
         searchBtn.setMaxWidth(Double.MAX_VALUE);
         ListView<String> compList = new ListView<>();
         compList.setPrefHeight(200);
@@ -243,7 +244,7 @@ public class PeriodicTableViewer extends AbstractViewer {
             String q = compSearch.getText().trim();
             if (!q.isEmpty()) {
                 compList.getItems().clear();
-                compList.getItems().add(org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.searching", "Searching..."));
+                compList.getItems().add(I18n.getInstance().get("viewer.periodictable.searching", "Searching..."));
                 new Thread(() -> {
                     PubChemReader pcr = new PubChemReader();
                     List<Long> cids = pcr.searchByName(q);
@@ -253,7 +254,7 @@ public class PeriodicTableViewer extends AbstractViewer {
                             compList.getItems().add("PubChem CID: " + cid);
                         }
                         if (cids.isEmpty()) {
-                             compList.getItems().add(org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.no_results", "No results. Trying ChEBI..."));
+                             compList.getItems().add(I18n.getInstance().get("viewer.periodictable.no_results", "No results. Trying ChEBI..."));
                              new Thread(() -> {
                                  java.util.Map<String, String> chebi = ChEBIReader.searchByName(q);
                                  Platform.runLater(() -> {
@@ -261,7 +262,7 @@ public class PeriodicTableViewer extends AbstractViewer {
                                          compList.getItems().clear();
                                          compList.getItems().add("ChEBI: " + chebi.get("name"));
                                      } else {
-                                         compList.getItems().add(org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.not_found", "Not found."));
+                                         compList.getItems().add(I18n.getInstance().get("viewer.periodictable.not_found", "Not found."));
                                      }
                                  });
                              }).start();
@@ -271,7 +272,7 @@ public class PeriodicTableViewer extends AbstractViewer {
             }
         });
         
-        compoundContent.getChildren().addAll(new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.entities.label", "Chemical Entities:")), compSearch, searchBtn, compList);
+        compoundContent.getChildren().addAll(new Label(I18n.getInstance().get("viewer.periodictable.entities.label", "Chemical Entities:")), compSearch, searchBtn, compList);
         compTab.setContent(compoundContent);
         compTab.setClosable(false);
 
@@ -302,16 +303,16 @@ public class PeriodicTableViewer extends AbstractViewer {
         }
 
         VBox props = new VBox(5);
-        props.getChildren().add(createPropLabel(org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.atomic_number", "Atomic Number"), String.valueOf(element.getAtomicNumber())));
-        props.getChildren().add(createPropLabel(org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.category", "Category"),
-                element.getCategory() != null ? element.getCategory().name() : org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.unknown", "Unknown")));
+        props.getChildren().add(createPropLabel(I18n.getInstance().get("viewer.periodictable.atomic_number", "Atomic Number"), String.valueOf(element.getAtomicNumber())));
+        props.getChildren().add(createPropLabel(I18n.getInstance().get("viewer.periodictable.category", "Category"),
+                element.getCategory() != null ? element.getCategory().name() : I18n.getInstance().get("viewer.periodictable.unknown", "Unknown")));
         if (element.getAtomicMass() != null)
-            props.getChildren().add(createPropLabel(org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.atomic_mass", "Atomic Mass"),
+            props.getChildren().add(createPropLabel(I18n.getInstance().get("viewer.periodictable.atomic_mass", "Atomic Mass"),
                     String.format("%.4f u", element.getAtomicMass().getValue().doubleValue())));
         electronicContent.getChildren().addAll(props, new Separator());
 
         SubScene atomView = createAtomView(element);
-        VBox atomBox = new VBox(5, new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.structure", "Atomic Structure (3D)")),
+        VBox atomBox = new VBox(5, new Label(I18n.getInstance().get("viewer.periodictable.structure", "Atomic Structure (3D)")),
                 atomView);
         atomBox.setStyle("-fx-border-color: #666; -fx-border-width: 1px;");
         electronicContent.getChildren().add(atomBox);
@@ -321,10 +322,10 @@ public class PeriodicTableViewer extends AbstractViewer {
         nuclearContent.getChildren().addAll(nucHeader, new Separator());
 
         SubScene nucView = createNucleusView(element);
-        VBox nucBox = new VBox(5, new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.nucleus.structure", "Nucleus Structure (Model)")), nucView);
+        VBox nucBox = new VBox(5, new Label(I18n.getInstance().get("viewer.periodictable.nucleus.structure", "Nucleus Structure (Model)")), nucView);
         nucBox.setStyle("-fx-border-color: #666; -fx-border-width: 1px;");
 
-        Label isoLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.isotopes.known", "Known Isotopes:"));
+        Label isoLabel = new Label(I18n.getInstance().get("viewer.periodictable.isotopes.known", "Known Isotopes:"));
         isoLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
         ListView<String> isoList = new ListView<>();
         isoList.setPrefHeight(200);
@@ -555,18 +556,18 @@ public class PeriodicTableViewer extends AbstractViewer {
         }
     }
     
-    @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictableviewer.name", "Periodic Table"); }
-    @Override public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry"); }
+    @Override public String getName() { return I18n.getInstance().get("viewer.periodictableviewer.name", "Periodic Table"); }
+    @Override public String getCategory() { return I18n.getInstance().get("category.chemistry", "Chemistry"); }
 
-    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictableviewer.desc", "Interactive periodic table with all 118 elements, color-coded by category."); }
-    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictableviewer.longdesc", "Detailed periodic table featuring atomic structure (3D orbitals), nuclear composition, and isotopic data. Includes color-coded categories and property details for every element."); }
+    @Override public String getDescription() { return I18n.getInstance().get("viewer.periodictableviewer.desc", "Interactive periodic table with all 118 elements, color-coded by category."); }
+    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.periodictableviewer.longdesc", "Detailed periodic table featuring atomic structure (3D orbitals), nuclear composition, and isotopic data. Includes color-coded categories and property details for every element."); }
     
     @Override 
     public java.util.List<Parameter<?>> getViewerParameters() { 
         List<Parameter<?>> params = new ArrayList<>();
         params.add(new NumericParameter(
-            org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.zoom", "Zoom"),
-            org.jscience.ui.i18n.I18n.getInstance().get("viewer.periodictable.zoom.desc", "Zoom level of the table"),
+            I18n.getInstance().get("viewer.periodictable.zoom", "Zoom"),
+            I18n.getInstance().get("viewer.periodictable.zoom.desc", "Zoom level of the table"),
             0.5, 2.0, 0.1, zoomSlider.getValue(),
             val -> {
                 zoomSlider.setValue(val);

@@ -38,6 +38,8 @@ import org.jscience.ui.Parameter;
 import org.jscience.ui.Simulatable;
 import org.jscience.ui.i18n.I18n;
 
+import org.jscience.physics.classical.waves.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,21 +93,21 @@ public class SpectrographViewer extends AbstractViewer implements Simulatable {
     }
     
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrographviewer.name", "Spectrograph Viewer"); }
+    public String getName() { return I18n.getInstance().get("viewer.spectrographviewer.name", "Spectrograph Viewer"); }
     
     @Override
-    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics"); }
+    public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
 
     private void setupParameters() {
         parameters.add(new NumericParameter(
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrographviewer.param.sensitivity", "Sensitivity"),
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrographviewer.param.sensitivity.desc", "Adjusts the signal responsiveness"),
+                I18n.getInstance().get("viewer.spectrographviewer.param.sensitivity", "Sensitivity"),
+                I18n.getInstance().get("viewer.spectrographviewer.param.sensitivity.desc", "Adjusts the signal responsiveness"),
                 0.1, 5.0, 0.1, 1.0,
                 val -> this.sensitivity = val));
 
         parameters.add(new NumericParameter(
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrographviewer.param.bands", "Frequency Bands"),
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrographviewer.param.bands.desc", "Number of frequency bins to visualize"),
+                I18n.getInstance().get("viewer.spectrographviewer.param.bands", "Frequency Bands"),
+                I18n.getInstance().get("viewer.spectrographviewer.param.bands.desc", "Number of frequency bins to visualize"),
                 16.0, 1024.0, 16.0, (double)bands,
                 val -> {
                     this.bands = val.intValue();
@@ -115,8 +117,8 @@ public class SpectrographViewer extends AbstractViewer implements Simulatable {
                 }));
 
         parameters.add(new Parameter<Boolean>(
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrographviewer.param.mode", "Scientific Mode"),
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrographviewer.param.mode.desc", "Toggles between primitive and object-based engines"),
+                I18n.getInstance().get("viewer.spectrographviewer.param.mode", "Scientific Mode"),
+                I18n.getInstance().get("viewer.spectrographviewer.param.mode.desc", "Toggles between primitive and object-based engines"),
                 false,
                 val -> {
                     if (val) {
@@ -138,7 +140,7 @@ public class SpectrographViewer extends AbstractViewer implements Simulatable {
         spectrumCanvas.widthProperty().bind(vbox.widthProperty().subtract(20));
         spectrogramCanvas.widthProperty().bind(vbox.widthProperty().subtract(20));
 
-        fpsLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrographviewer.fps.label", "FPS: --"));
+        fpsLabel = new Label(I18n.getInstance().get("viewer.spectrographviewer.fps.label", "FPS: --"));
         fpsLabel.getStyleClass().add("description-label");
         fpsLabel.setStyle("-fx-font-size: 10px;");
         
@@ -168,7 +170,7 @@ public class SpectrographViewer extends AbstractViewer implements Simulatable {
                 if (lastFrameTime > 0) {
                     double fps = 1_000_000_000.0 / (now - lastFrameTime);
                     if (frameCount++ % 60 == 0) {
-                        fpsLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrographviewer.fps.format", "FPS: %.1f", fps));
+                        fpsLabel.setText(I18n.getInstance().get("viewer.spectrographviewer.fps.format", "FPS: %.1f", fps));
                     }
                 }
                 lastFrameTime = now;
@@ -251,6 +253,6 @@ public class SpectrographViewer extends AbstractViewer implements Simulatable {
         if (part2W > 0) gc.drawImage(spectrogramBuffer, 0, 0, part2W, h, part1W, 0, part2W, h);
     }
 
-    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrographviewer.desc", "Real-time frequency analysis visualization."); }
-    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.spectrographviewer.longdesc", "Captures and processes live signals to generate a real-time spectrogram and spectrum bar chart. Supports adjustable sensitivity, frequency bands, and optimized rendering for high-resolution frequency analysis."); }
+    @Override public String getDescription() { return I18n.getInstance().get("viewer.spectrographviewer.desc", "Real-time frequency analysis visualization."); }
+    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.spectrographviewer.longdesc", "Captures and processes live signals to generate a real-time spectrogram and spectrum bar chart. Supports adjustable sensitivity, frequency bands, and optimized rendering for high-resolution frequency analysis."); }
 }

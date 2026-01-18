@@ -111,14 +111,14 @@ public class CrystalStructureApp extends FeaturedAppBase {
 
         @Override
         public String toString() {
-            return org.jscience.ui.i18n.I18n.getInstance().get(key, def);
+            return I18n.getInstance().get(key, def);
         }
 
     }
 
     @Override
     protected String getAppTitle() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.crystalstructureapp.name", "Crystal Structure Viewer");
+        return I18n.getInstance().get("viewer.crystalstructureapp.name", "Crystal Structure Viewer");
     }
 
     @Override
@@ -128,12 +128,12 @@ public class CrystalStructureApp extends FeaturedAppBase {
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.crystalstructureapp.desc", "3D visualization of crystal lattices.");
+        return I18n.getInstance().get("viewer.crystalstructureapp.desc", "3D visualization of crystal lattices.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.crystalstructureapp.longdesc", "Advanced 3D visualization tool for exploring crystalline structures at the atomic level. Supports standard lattice types including Simple Cubic, BCC, FCC, HCP, Diamond, NaCl, and CsCl. Features custom CIF file import, interactive 3D rotation and zoom, and configurable display of atoms, bonds, and unit cell boundaries.");
+        return I18n.getInstance().get("viewer.crystalstructureapp.longdesc", "Advanced 3D visualization tool for exploring crystalline structures at the atomic level. Supports standard lattice types including Simple Cubic, BCC, FCC, HCP, Diamond, NaCl, and CsCl. Features custom CIF file import, interactive 3D rotation and zoom, and configurable display of atoms, bonds, and unit cell boundaries.");
     }
 
     @Override

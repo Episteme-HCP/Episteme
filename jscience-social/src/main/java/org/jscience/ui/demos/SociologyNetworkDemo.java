@@ -24,6 +24,8 @@
 package org.jscience.ui.demos;
 
 import org.jscience.ui.AbstractDemo;
+import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.viewers.mathematics.discrete.NetworkViewer;
 
 /**
  * Sociology Network Demo using JScience Vector2D types.
@@ -41,28 +43,28 @@ public class SociologyNetworkDemo extends AbstractDemo {
 
     @Override
     public String getCategory() { 
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.sociology", "Sociology"); 
+        return I18n.getInstance().get("category.sociology", "Sociology"); 
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.sociologynetworkdemo.name", "Social Network");
+        return I18n.getInstance().get("demo.sociologynetworkdemo.name", "Social Network");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.sociologynetworkdemo.desc", "Social graph visualization and analysis.");
+        return I18n.getInstance().get("demo.sociologynetworkdemo.desc", "Social graph visualization and analysis.");
     }
 
     @Override
     protected javafx.scene.Node createViewerNode() {
-        org.jscience.ui.viewers.mathematics.discrete.NetworkViewer v = new org.jscience.ui.viewers.mathematics.discrete.NetworkViewer();
+        NetworkViewer v = new NetworkViewer();
         this.viewer = v;
         return v;
     }
     
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.sociologynetworkdemo.longdesc", "Interactive visualization of social networks and graph analysis metrics.");
+        return I18n.getInstance().get("demo.sociologynetworkdemo.longdesc", "Interactive visualization of social networks and graph analysis metrics.");
     }
 }

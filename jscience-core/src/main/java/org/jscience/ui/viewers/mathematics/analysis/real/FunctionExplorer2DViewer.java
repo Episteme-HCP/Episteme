@@ -96,20 +96,20 @@ public class FunctionExplorer2DViewer extends AbstractViewer {
         sidebar.getStyleClass().add("viewer-sidebar");
 
         // Input Section
-        Label fLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.label.fx", "f(x) ="));
+        Label fLabel = new Label(I18n.getInstance().get("viewer.functionexplorer2dviewer.label.fx", "f(x) ="));
         TextField fInput = new TextField(funcF.getValue());
         fInput.textProperty().addListener((obs, old, newVal) -> funcF.setValue(newVal)); 
 
-        Label gLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.label.gx", "g(x) ="));
+        Label gLabel = new Label(I18n.getInstance().get("viewer.functionexplorer2dviewer.label.gx", "g(x) ="));
         TextField gInput = new TextField(funcG.getValue());
         gInput.textProperty().addListener((obs, old, newVal) -> funcG.setValue(newVal));
 
-        Label opLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.label.plotop", "Plot Operation:"));
+        Label opLabel = new Label(I18n.getInstance().get("viewer.functionexplorer2dviewer.label.plotop", "Plot Operation:"));
         ComboBox<String> opCombo = new ComboBox<>(FXCollections.observableArrayList(
                 "f(x)", "g(x)", "f(x) + g(x)", "f(x) * g(x)"));
         opCombo.setValue("f(x)");
 
-        Label rangeLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.label.range", "Range [Min, Max]"));
+        Label rangeLabel = new Label(I18n.getInstance().get("viewer.functionexplorer2dviewer.label.range", "Range [Min, Max]"));
         HBox rangeBox = new HBox(5);
         TextField xMinField = new TextField(String.valueOf(xMin.getValue().doubleValue()));
         TextField xMaxField = new TextField(String.valueOf(xMax.getValue().doubleValue()));
@@ -122,25 +122,25 @@ public class FunctionExplorer2DViewer extends AbstractViewer {
         
         rangeBox.getChildren().addAll(xMinField, xMaxField);
 
-        Button plotBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.button.plot", "Plot Function"));
+        Button plotBtn = new Button(I18n.getInstance().get("viewer.functionexplorer2dviewer.button.plot", "Plot Function"));
         plotBtn.setMaxWidth(Double.MAX_VALUE);
         plotBtn.getStyleClass().add("accent-button-blue");
 
         // Analysis
         Separator sep1 = new Separator();
-        Label analysisLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.label.analysis", "Analysis (Click Chart)"));
+        Label analysisLabel = new Label(I18n.getInstance().get("viewer.functionexplorer2dviewer.label.analysis", "Analysis (Click Chart)"));
         analysisLabel.getStyleClass().add("header-label");
         analysisLabel.setStyle("-fx-font-size: 14px;");
 
-        Label cursorVal = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.label.cursor", "Cursor:") + " -");
+        Label cursorVal = new Label(I18n.getInstance().get("viewer.functionexplorer2dviewer.label.cursor", "Cursor:") + " -");
 
-        Label symTitle = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.label.symderiv", "Symbolic Derivative:"));
+        Label symTitle = new Label(I18n.getInstance().get("viewer.functionexplorer2dviewer.label.symderiv", "Symbolic Derivative:"));
         TextArea symResult = new TextArea();
         symResult.setPrefRowCount(2);
         symResult.setEditable(false);
         symResult.setWrapText(true);
 
-        Button symbBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.button.derivative", "Calculate Derivative (Symbolic)"));
+        Button symbBtn = new Button(I18n.getInstance().get("viewer.functionexplorer2dviewer.button.derivative", "Calculate Derivative (Symbolic)"));
         symbBtn.setMaxWidth(Double.MAX_VALUE);
 
         sidebar.getChildren().addAll(
@@ -155,7 +155,7 @@ public class FunctionExplorer2DViewer extends AbstractViewer {
         // --- Main Area (Chart) ---
         StackPane chartContainer = new StackPane();
         chartContainer.getStyleClass().add("viewer-root");
-        Label placeholder = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.text.placeholder", "Enter function and click Plot"));
+        Label placeholder = new Label(I18n.getInstance().get("viewer.functionexplorer2dviewer.text.placeholder", "Enter function and click Plot"));
         chartContainer.getChildren().add(placeholder);
 
         // Logic
@@ -197,7 +197,7 @@ public class FunctionExplorer2DViewer extends AbstractViewer {
                     node.setCreateSymbols(true);
 
                     node.setOnMouseClicked(me -> {
-                        cursorVal.setText(String.format(org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.label.cursor", "Cursor:") + " (%.1f, %.1f)",
+                        cursorVal.setText(String.format(I18n.getInstance().get("viewer.functionexplorer2dviewer.label.cursor", "Cursor:") + " (%.1f, %.1f)",
                                 me.getX(), me.getY()));
                     });
 
@@ -227,7 +227,7 @@ public class FunctionExplorer2DViewer extends AbstractViewer {
             else if (op.equals("f(x) + g(x)")) {
                 res = SymbolicUtil.differentiate(fStr) + " + " + SymbolicUtil.differentiate(gStr);
             } else {
-                res = org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.error.complex", "Complex operations not supported in demo.");
+                res = I18n.getInstance().get("viewer.functionexplorer2dviewer.error.complex", "Complex operations not supported in demo.");
             }
             symResult.setText(res);
         });
@@ -249,21 +249,21 @@ public class FunctionExplorer2DViewer extends AbstractViewer {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics", "Mathematics");
+        return I18n.getInstance().get("category.mathematics", "Mathematics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.name", "Function Explorer 2D");
+        return I18n.getInstance().get("viewer.functionexplorer2dviewer.name", "Function Explorer 2D");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.desc", "A 2D viewer for plotting and analyzing mathematical functions.");
+        return I18n.getInstance().get("viewer.functionexplorer2dviewer.desc", "A 2D viewer for plotting and analyzing mathematical functions.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.functionexplorer2dviewer.longdesc", "Enter and plot 2D mathematical functions f(x) and g(x). Perform operations like addition and multiplication, and calculate symbolic derivatives with real-time visualization.");
+        return I18n.getInstance().get("viewer.functionexplorer2dviewer.longdesc", "Enter and plot 2D mathematical functions f(x) and g(x). Perform operations like addition and multiplication, and calculate symbolic derivatives with real-time visualization.");
     }
 }

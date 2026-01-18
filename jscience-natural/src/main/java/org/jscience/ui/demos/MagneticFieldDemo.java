@@ -24,44 +24,62 @@
 package org.jscience.ui.demos;
 
 import javafx.scene.Node;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Sphere;
 import org.jscience.ui.AbstractDemo;
-import org.jscience.ui.i18n.I18n;
 import org.jscience.ui.viewers.physics.classical.waves.electromagnetism.field.MagneticFieldViewer;
+import org.jscience.ui.viewers.physics.classical.waves.electromagnetism.field.SourceVisualizer;
+import org.jscience.technical.backend.algorithms.MulticoreMaxwellProvider;
+import org.jscience.technical.backend.algorithms.MaxwellSource;
 
 /**
- * Demo Provider for Spintronics Magnetic Field Visualization.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Demo Provider for Magnetic Field Visualization with physical source bodies.
  */
 public class MagneticFieldDemo extends AbstractDemo {
 
-    @Override
-    public String getCategory() {
-        return "Physics";
-    }
+    @Override public String getCategory() { return "Physics"; }
 
     @Override
     public String getName() {
-        // Fallback if key missing, but should be added to properties
-        String title = org.jscience.ui.i18n.I18n.getInstance().get("demo.magnetic.title");
-        return title != null && !title.startsWith("!") ? title : "Magnetic Vector Field";
+        return "Planetary Magnetic Field";
     }
 
     @Override
     public String getDescription() {
-        String desc = org.jscience.ui.i18n.I18n.getInstance().get("demo.magnetic.desc");
-        return desc != null && !desc.startsWith("!") ? desc : "3D visualization of magnetic B-fields using vector arrows and color gradients.";
+        return "High-fidelity visualization of the Earth's magnetic dipole using streamlines and field gradients.";
     }
 
     @Override
     public Node createViewerNode() {
-        return new MagneticFieldViewer();
+        MulticoreMaxwellProvider provider = new MulticoreMaxwellProvider();
+        
+        // Single central dipole representing Earth
+        provider.addSource(new MulticoreMaxwellProvider.DipoleSource(
+            new double[]{0, 0, 0}, new double[]{0, 1500, 0}, 10.0, 0));
+            
+        MagneticFieldViewer viewer = new MagneticFieldViewer(provider);
+        
+        // Add a visualizer for the central planet (Globe)
+        viewer.addVisualizer(new SourceVisualizer() {
+            @Override
+            public boolean supports(MaxwellSource source) {
+                // If at center, treat as the planet
+                return Math.abs(source.getPosition()[0]) < 1;
+            }
+
+            @Override
+            public Node getVisualRepresentation(MaxwellSource source) {
+                Sphere earth = new Sphere(80);
+                PhongMaterial mat = new PhongMaterial(Color.web("#224488"));
+                mat.setSpecularColor(Color.WHITE);
+                earth.setMaterial(mat);
+                return earth;
+            }
+        });
+        
+        return viewer;
     }
 
-    @Override
-    public String getLongDescription() {
-        return getDescription();
-    }
+    @Override public String getLongDescription() { return getDescription(); }
 }

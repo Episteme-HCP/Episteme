@@ -29,6 +29,14 @@ import javafx.scene.layout.*;
 import javafx.scene.image.ImageView;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.i18n.I18n;
+import org.jscience.biology.services.GbifService;
+import org.jscience.biology.services.GbifService.GbifSpecies;
+import javafx.scene.image.Image;
+import org.jscience.ui.Parameter;
+import java.util.ArrayList;
+import java.util.List;
+import javafx.application.Platform;
+
 
 /**
  * Species Browser Viewer using GBIF API.
@@ -40,15 +48,15 @@ import org.jscience.ui.i18n.I18n;
 public class SpeciesBrowserViewer extends AbstractViewer {
 
     private TextField searchField;
-    private ListView<org.jscience.biology.services.GbifService.GbifSpecies> resultList;
+    private ListView<GbifSpecies> resultList;
     private TextArea detailArea;
     private ImageView imageView;
     
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.speciesbrowserviewer.name", "Species Browser"); }
+    public String getName() { return I18n.getInstance().get("viewer.speciesbrowserviewer.name", "Species Browser"); }
     
     @Override
-    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology"); }
+    public String getCategory() { return I18n.getInstance().get("category.biology", "Biology"); }
 
     public SpeciesBrowserViewer() {
         initUI();
@@ -66,14 +74,14 @@ public class SpeciesBrowserViewer extends AbstractViewer {
         searchField = new TextField("Panthera leo");
         searchField.setPrefWidth(300);
 
-        Button searchBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("species.btn.search", "Search GBIF"));
+        Button searchBtn = new Button(I18n.getInstance().get("species.btn.search", "Search GBIF"));
         searchBtn.setDefaultButton(true);
 
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxSize(20, 20);
         progress.setVisible(false);
 
-        searchBar.getChildren().addAll(new Label(org.jscience.ui.i18n.I18n.getInstance().get("species.label.species", "Species:")), searchField, searchBtn, progress);
+        searchBar.getChildren().addAll(new Label(I18n.getInstance().get("species.label.species", "Species:")), searchField, searchBtn, progress);
         setTop(searchBar);
 
         // Main Content
@@ -83,7 +91,7 @@ public class SpeciesBrowserViewer extends AbstractViewer {
 
         VBox details = new VBox(10);
         details.setPadding(new Insets(0, 0, 0, 10));
-        detailArea = new TextArea(org.jscience.ui.i18n.I18n.getInstance().get("species.prompt.search", "Search for a species to view details from GBIF..."));
+        detailArea = new TextArea(I18n.getInstance().get("species.prompt.search", "Search for a species to view details from GBIF..."));
         detailArea.setEditable(false);
         detailArea.setWrapText(true);
         detailArea.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 13px;");
@@ -92,7 +100,7 @@ public class SpeciesBrowserViewer extends AbstractViewer {
         imageView.setFitWidth(300);
         imageView.setPreserveRatio(true);
 
-        details.getChildren().addAll(new Label(org.jscience.ui.i18n.I18n.getInstance().get("species.label.taxonomy", "Taxonomy & Details:")), detailArea, imageView);
+        details.getChildren().addAll(new Label(I18n.getInstance().get("species.label.taxonomy", "Taxonomy & Details:")), detailArea, imageView);
 
         split.getItems().addAll(resultList, details);
         split.setDividerPositions(0.35);
@@ -103,17 +111,17 @@ public class SpeciesBrowserViewer extends AbstractViewer {
             String query = searchField.getText().trim();
             if (!query.isEmpty()) {
                 progress.setVisible(true);
-                org.jscience.biology.services.GbifService.getInstance().searchSpecies(query)
-                        .thenAccept(results -> javafx.application.Platform.runLater(() -> {
+                GbifService.getInstance().searchSpecies(query)
+                        .thenAccept(results -> Platform.runLater(() -> {
                             resultList.getItems().setAll(results);
                             progress.setVisible(false);
                             if (results.isEmpty()) {
-                                detailArea.setText(org.jscience.ui.i18n.I18n.getInstance().get("species.msg.notfound", "No results found for: %s", query));
+                                detailArea.setText(I18n.getInstance().get("species.msg.notfound", "No results found for: %s", query));
                             }
                         }))
                         .exceptionally(ex -> {
-                            javafx.application.Platform.runLater(() -> {
-                                detailArea.setText(org.jscience.ui.i18n.I18n.getInstance().get("species.error", "Error: %s", ex.getMessage()));
+                            Platform.runLater(() -> {
+                                detailArea.setText(I18n.getInstance().get("species.error", "Error: %s", ex.getMessage()));
                                 progress.setVisible(false);
                             });
                             return null;
@@ -127,29 +135,29 @@ public class SpeciesBrowserViewer extends AbstractViewer {
         });
     }
 
-    private void updateDetails(org.jscience.biology.services.GbifService.GbifSpecies species) {
+    private void updateDetails(GbifSpecies species) {
         StringBuilder sb = new StringBuilder();
-        sb.append(org.jscience.ui.i18n.I18n.getInstance().get("species.detail.name", "Scientific Name: %s", species.scientificName())).append("\n");
-        sb.append(org.jscience.ui.i18n.I18n.getInstance().get("species.detail.rank", "Rank: %s", species.rank())).append("\n\n");
-        sb.append(org.jscience.ui.i18n.I18n.getInstance().get("species.detail.classification", "Classification:")).append("\n");
+        sb.append(I18n.getInstance().get("species.detail.name", "Scientific Name: %s", species.scientificName())).append("\n");
+        sb.append(I18n.getInstance().get("species.detail.rank", "Rank: %s", species.rank())).append("\n\n");
+        sb.append(I18n.getInstance().get("species.detail.classification", "Classification:")).append("\n");
         sb.append("  Kingdom: ").append(species.kingdom()).append("\n");
         sb.append("  Phylum:  ").append(species.phylum()).append("\n");
         sb.append("  Class:   ").append(species.clazz()).append("\n");
         sb.append("  Order:   ").append(species.order()).append("\n");
         sb.append("  Family:  ").append(species.family()).append("\n");
         sb.append("  Genus:   ").append(species.genus()).append("\n");
-        sb.append("\n").append(org.jscience.ui.i18n.I18n.getInstance().get("species.source", "Source: Global Biodiversity Information Facility (GBIF)"));
+        sb.append("\n").append(I18n.getInstance().get("species.source", "Source: Global Biodiversity Information Facility (GBIF)"));
 
         detailArea.setText(sb.toString());
 
         // Fetch image
         imageView.setImage(null);
-        org.jscience.biology.services.GbifService.getInstance().getSpeciesMedia(species.key())
+        GbifService.getInstance().getSpeciesMedia(species.key())
                 .thenAccept(url -> {
                     if (url != null) {
-                        javafx.application.Platform.runLater(() -> {
+                        Platform.runLater(() -> {
                             try {
-                                javafx.scene.image.Image img = new javafx.scene.image.Image(url, true);
+                                Image img = new Image(url, true);
                                 imageView.setImage(img);
                             } catch (Exception e) {
                                 // Silent fail for image loading
@@ -159,7 +167,7 @@ public class SpeciesBrowserViewer extends AbstractViewer {
                 });
     }
 
-    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.speciesbrowserviewer.desc", "Explore biological species data using the Global Biodiversity Information Facility (GBIF) API."); }
-    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.speciesbrowserviewer.longdesc", "Connects to the Global Biodiversity Information Facility (GBIF) to search and retrieve detailed taxonomic classification, scientific names, and media for millions of species."); }
-    @Override public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
+    @Override public String getDescription() { return I18n.getInstance().get("viewer.speciesbrowserviewer.desc", "Explore biological species data using the Global Biodiversity Information Facility (GBIF) API."); }
+    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.speciesbrowserviewer.longdesc", "Connects to the Global Biodiversity Information Facility (GBIF) to search and retrieve detailed taxonomic classification, scientific names, and media for millions of species."); }
+    @Override public List<Parameter<?>> getViewerParameters() { return new ArrayList<>(); }
 }

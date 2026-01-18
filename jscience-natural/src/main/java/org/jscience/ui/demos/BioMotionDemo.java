@@ -49,12 +49,12 @@ public class BioMotionDemo extends AbstractSimulationDemo {
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("biomotion.title", "BioMotion Simulation");
+        return I18n.getInstance().get("biomotion.title", "BioMotion Simulation");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("biomotion.desc",
+        return I18n.getInstance().get("biomotion.desc",
                 "Physics-based biological motion simulation (Skeleton/Walker).");
     }
 
@@ -63,7 +63,7 @@ public class BioMotionDemo extends AbstractSimulationDemo {
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("biomotion.long_desc", 
+        return I18n.getInstance().get("biomotion.long_desc", 
             "A simulation of biological motion using a skeleton model with muscle and gravity dynamics.");
     }
 
@@ -77,25 +77,25 @@ public class BioMotionDemo extends AbstractSimulationDemo {
         VBox panel = super.createControlPanel();
         if (viewer instanceof InternalViewer iv) {
             panel.getChildren().add(new Separator());
-            Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("biomotion.controls", "Controls"));
+            Label title = new Label(I18n.getInstance().get("biomotion.controls", "Controls"));
             title.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
             
-            Button resetBtn = new Button(org.jscience.ui.i18n.I18n.getInstance().get("biomotion.reset", "Reset Walker"));
+            Button resetBtn = new Button(I18n.getInstance().get("biomotion.reset", "Reset Walker"));
             resetBtn.setMaxWidth(Double.MAX_VALUE);
             resetBtn.setOnAction(e -> iv.reset());
 
             Slider gravSlider = new Slider(0, 20, 9.81);
-            Label gravLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("biomotion.gravity", "Gravity: %.2f", 9.81));
+            Label gravLabel = new Label(I18n.getInstance().get("biomotion.gravity", "Gravity: %.2f", 9.81));
             gravSlider.valueProperty().addListener((o, ov, nv) -> {
                 iv.setGravity(nv.doubleValue());
-                gravLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("biomotion.gravity", "Gravity: %.2f", nv.doubleValue()));
+                gravLabel.setText(I18n.getInstance().get("biomotion.gravity", "Gravity: %.2f", nv.doubleValue()));
             });
 
             Slider muscleSlider = new Slider(0, 5, 1.0);
-            Label muscleLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("biomotion.muscle", "Muscle Tone: %.1f", 1.0));
+            Label muscleLabel = new Label(I18n.getInstance().get("biomotion.muscle", "Muscle Tone: %.1f", 1.0));
             muscleSlider.valueProperty().addListener((o, ov, nv) -> {
                 iv.setMuscleStrength(nv.doubleValue());
-                muscleLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("biomotion.muscle", "Muscle Tone: %.1f", nv.doubleValue()));
+                muscleLabel.setText(I18n.getInstance().get("biomotion.muscle", "Muscle Tone: %.1f", nv.doubleValue()));
             });
 
             panel.getChildren().addAll(title, resetBtn, new Separator(), gravLabel, gravSlider, muscleLabel, muscleSlider);

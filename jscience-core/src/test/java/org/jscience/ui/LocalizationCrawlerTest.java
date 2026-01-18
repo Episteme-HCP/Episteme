@@ -71,7 +71,7 @@ public class LocalizationCrawlerTest extends ApplicationTest {
     @Override
     public void start(Stage stage) {
         // Force Chinese locale for testing
-        org.jscience.ui.i18n.I18n.getInstance().setLocale(TARGET_LOCALE);
+        I18n.getInstance().setLocale(TARGET_LOCALE);
 
         JScienceMasterControl app = new JScienceMasterControl();
         app.start(stage);

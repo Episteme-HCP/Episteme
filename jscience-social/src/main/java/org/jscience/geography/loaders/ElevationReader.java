@@ -29,6 +29,7 @@ import org.jscience.ui.i18n.I18n;
 
 
 
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -67,22 +68,22 @@ public class ElevationReader extends AbstractResourceReader<Double> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.elevation.category", "Geography");
+        return I18n.getInstance().get("reader.elevation.category", "Geography");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.elevation.name", "Elevation Reader");
+        return I18n.getInstance().get("reader.elevation.name", "Elevation Reader");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.elevation.description", "Elevation Data Reader (Altimetry/Bathymetry).");
+        return I18n.getInstance().get("reader.elevation.description", "Elevation Data Reader (Altimetry/Bathymetry).");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.elevation.longdesc", "Reads elevation data from various sources including Google Maps API, SRTM, and ETOPO1.");
+        return I18n.getInstance().get("reader.elevation.longdesc", "Reads elevation data from various sources including Google Maps API, SRTM, and ETOPO1.");
     }
 
     @Override

@@ -28,7 +28,7 @@ import java.io.OutputStream;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import org.jscience.mathematics.loaders.Serializer;
+import org.jscience.io.Serializer;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.numbers.complex.Complex;
 
@@ -60,6 +60,26 @@ public class OpenMathWriter implements Serializer<Object>, org.jscience.io.Resou
     @Override
     public Class<Object> getResourceType() {
         return Object.class;
+    }
+
+    @Override
+    public String getCategory() {
+        return "Internal";
+    }
+
+    @Override
+    public String getName() {
+        return "OpenMath Writer";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Serializes objects to OpenMath XML format.";
+    }
+
+    @Override
+    public String getLongDescription() {
+        return "Standard-compliant OpenMath serializer supporting JScience core types (Real, Complex, etc.) for cross-platform scientific data exchange.";
     }
 
     @Override

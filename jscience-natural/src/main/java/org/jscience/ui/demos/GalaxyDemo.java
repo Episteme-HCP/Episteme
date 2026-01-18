@@ -55,22 +55,22 @@ public class GalaxyDemo extends AbstractSimulationDemo {
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.name", "Galaxy Dynamics");
+        return I18n.getInstance().get("viewer.galaxydemo.name", "Galaxy Dynamics");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.desc", "Simulation of spiral galaxies and interaction mechanics.");
+        return I18n.getInstance().get("viewer.galaxydemo.desc", "Simulation of spiral galaxies and interaction mechanics.");
     }
 
     @Override
     public String getLongDescription() { 
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.longdesc", "Detailed galaxy simulation including collisions and formation."); 
+        return I18n.getInstance().get("viewer.galaxydemo.longdesc", "Detailed galaxy simulation including collisions and formation."); 
     }
 
 
     @Override
-    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics"); }
+    public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
 
     @Override
     public javafx.scene.Node createViewerNode() {
@@ -157,7 +157,7 @@ public class GalaxyDemo extends AbstractSimulationDemo {
             long cur = System.nanoTime();
             if (frameCount % 30 == 0 && lastFrameTime > 0) {
                 double fps = 30.0 * 1e9 / (cur - lastFrameTime);
-                if (fpsLabel != null) fpsLabel.setText(MessageFormat.format(org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.fps", "FPS: {0}"), String.format("%.1f", fps)));
+                if (fpsLabel != null) fpsLabel.setText(MessageFormat.format(I18n.getInstance().get("viewer.galaxydemo.fps", "FPS: {0}"), String.format("%.1f", fps)));
                 lastFrameTime = cur;
             } else if (lastFrameTime == 0) {
                 lastFrameTime = cur;
@@ -168,44 +168,44 @@ public class GalaxyDemo extends AbstractSimulationDemo {
             update();
             render();
             simulationTime++;
-            if (timeLabel != null) timeLabel.setText(MessageFormat.format(org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.time", "Time: {0} Myr"), simulationTime / 10));
+            if (timeLabel != null) timeLabel.setText(MessageFormat.format(I18n.getInstance().get("viewer.galaxydemo.time", "Time: {0} Myr"), simulationTime / 10));
         }
 
         public List<javafx.scene.Node> getCustomControls() {
             List<javafx.scene.Node> controls = new ArrayList<>();
             
-            Label typeLbl = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.type", "Galaxy Type:"));
+            Label typeLbl = new Label(I18n.getInstance().get("viewer.galaxydemo.type", "Galaxy Type:"));
             ComboBox<String> galaxyTypeCombo = new ComboBox<>();
             galaxyTypeCombo.getItems().addAll(
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.type.spiral2", "Spiral (2 arms)"),
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.type.spiral3", "Spiral (3 arms)"),
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.type.barred", "Barred Spiral"),
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.type.elliptical", "Elliptical")
+                I18n.getInstance().get("viewer.galaxydemo.type.spiral2", "Spiral (2 arms)"),
+                I18n.getInstance().get("viewer.galaxydemo.type.spiral3", "Spiral (3 arms)"),
+                I18n.getInstance().get("viewer.galaxydemo.type.barred", "Barred Spiral"),
+                I18n.getInstance().get("viewer.galaxydemo.type.elliptical", "Elliptical")
             );
             galaxyTypeCombo.getSelectionModel().select(0);
             galaxyTypeCombo.setOnAction(e -> resetGalaxy(galaxyTypeCombo.getSelectionModel().getSelectedIndex()));
             
-            Button btnCollision = new Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.collision", "Trigger Collision"));
+            Button btnCollision = new Button(I18n.getInstance().get("viewer.galaxydemo.collision", "Trigger Collision"));
             btnCollision.setMaxWidth(Double.MAX_VALUE);
             btnCollision.setOnAction(e -> triggerCollision());
 
-            Button btnReset = new Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.reset", "Reset"));
+            Button btnReset = new Button(I18n.getInstance().get("viewer.galaxydemo.reset", "Reset"));
             btnReset.setMaxWidth(Double.MAX_VALUE);
             btnReset.setOnAction(e -> resetGalaxy(galaxyTypeCombo.getSelectionModel().getSelectedIndex()));
 
-            timeLabel = new Label(MessageFormat.format(org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.time", "Time: {0} Myr"), 0));
-            fpsLabel = new Label(MessageFormat.format(org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.fps", "FPS: {0}"), "--"));
+            timeLabel = new Label(MessageFormat.format(I18n.getInstance().get("viewer.galaxydemo.time", "Time: {0} Myr"), 0));
+            fpsLabel = new Label(MessageFormat.format(I18n.getInstance().get("viewer.galaxydemo.fps", "FPS: {0}"), "--"));
 
             // Simulator Switch
-            ToggleButton simSwitch = new ToggleButton(org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.mode.primitive", "Mode: Primitive"));
+            ToggleButton simSwitch = new ToggleButton(I18n.getInstance().get("viewer.galaxydemo.mode.primitive", "Mode: Primitive"));
             simSwitch.setMaxWidth(Double.MAX_VALUE);
             simSwitch.setOnAction(e -> {
                 if (simSwitch.isSelected()) {
                     simulator = new ObjectGalaxySimulator();
-                    simSwitch.setText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.mode.scientific", "Mode: Scientific"));
+                    simSwitch.setText(I18n.getInstance().get("viewer.galaxydemo.mode.scientific", "Mode: Scientific"));
                 } else {
                     simulator = new PrimitiveGalaxySimulator();
-                    simSwitch.setText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.mode.primitive", "Mode: Primitive"));
+                    simSwitch.setText(I18n.getInstance().get("viewer.galaxydemo.mode.primitive", "Mode: Primitive"));
                 }
                 simulator.init(stars);
                 simulator.setGalaxy2State(g2x, g2y, g2vx, g2vy);
@@ -340,11 +340,11 @@ public class GalaxyDemo extends AbstractSimulationDemo {
             }
             gc.setGlobalBlendMode(BlendMode.SRC_OVER);
             gc.setFill(Color.WHITE);
-            gc.fillText(MessageFormat.format(org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.zoom", "Zoom: {0}"), String.format("%.2f", zoom)), 10, 60);
+            gc.fillText(MessageFormat.format(I18n.getInstance().get("viewer.galaxydemo.zoom", "Zoom: {0}"), String.format("%.2f", zoom)), 10, 60);
         }
 
-        @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.name", "Galaxy Dynamics"); }
-        @Override public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.physics", "Physics"); }
+        @Override public String getName() { return I18n.getInstance().get("viewer.galaxydemo.name", "Galaxy Dynamics"); }
+        @Override public String getCategory() { return I18n.getInstance().get("category.physics", "Physics"); }
         
         // Simulatable
         @Override public void play() { running = true; }
@@ -354,8 +354,8 @@ public class GalaxyDemo extends AbstractSimulationDemo {
         @Override public void setSpeed(double s) { }
         @Override public boolean isPlaying() { return running; }
     
-        @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.desc", "Simulation of spiral galaxies and interaction mechanics."); }
-        @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.galaxydemo.longdesc", "Detailed galaxy simulation including collisions and formation."); }
+        @Override public String getDescription() { return I18n.getInstance().get("viewer.galaxydemo.desc", "Simulation of spiral galaxies and interaction mechanics."); }
+        @Override public String getLongDescription() { return I18n.getInstance().get("viewer.galaxydemo.longdesc", "Detailed galaxy simulation including collisions and formation."); }
         @Override public java.util.List<Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
     }
 }

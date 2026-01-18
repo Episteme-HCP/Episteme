@@ -43,17 +43,17 @@ public class DigitalLogicDemo extends AbstractSimulationDemo {
     public boolean isDemo() { return true; }
 
     @Override
-    public String getCategory() { return "Computing"; }
+    public String getCategory() { return I18n.getInstance().get("category.computing", "Computing"); }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("digital.title", "Digital Logic Simulator"); }
+    public String getName() { return I18n.getInstance().get("digital.title", "Digital Logic Simulator"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("digital.desc", "Interactive Logic Circuit Simulator"); }
+    public String getDescription() { return I18n.getInstance().get("digital.desc", "Interactive Logic Circuit Simulator"); }
     
     @Override
     public String getLongDescription() { 
-        return "Design and simulate digital logic circuits using AND, OR, NOT, NAND gates."; 
+        return I18n.getInstance().get("digital.long_desc", "Design and simulate digital logic circuits using AND, OR, NOT, NAND gates."); 
     }
 
     @Override

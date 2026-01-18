@@ -39,17 +39,17 @@ public class SimpleBenchmarkRunner {
     }
 
     public static void run(String name, int warmupIterations, int measurementIterations, Runnable benchmark) {
-        System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("benchmark.runner.running", name));
+        System.out.println(I18n.getInstance().get("benchmark.runner.running", name));
 
         // Warmup
-        System.out.print("  " + org.jscience.ui.i18n.I18n.getInstance().get("benchmark.runner.warmup"));
+        System.out.print("  " + I18n.getInstance().get("benchmark.runner.warmup"));
         for (int i = 0; i < warmupIterations; i++) {
             benchmark.run();
         }
-        System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("benchmark.runner.done"));
+        System.out.println(I18n.getInstance().get("benchmark.runner.done"));
 
         // Measurement
-        System.out.print("  " + org.jscience.ui.i18n.I18n.getInstance().get("benchmark.runner.measuring"));
+        System.out.print("  " + I18n.getInstance().get("benchmark.runner.measuring"));
         long start = System.nanoTime();
         for (int i = 0; i < measurementIterations; i++) {
             benchmark.run();
@@ -60,12 +60,12 @@ public class SimpleBenchmarkRunner {
         double totalTimeMs = (end - start) / 1_000_000.0;
         double avgTimeMs = totalTimeMs / measurementIterations;
 
-        System.out.println("  " + org.jscience.ui.i18n.I18n.getInstance().get("benchmark.runner.results", totalTimeMs, avgTimeMs));
+        System.out.println("  " + I18n.getInstance().get("benchmark.runner.results", totalTimeMs, avgTimeMs));
         System.out.println("--------------------------------------------------");
     }
 
     public static void main(String[] args) {
-        System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("benchmark.runner.suite"));
+        System.out.println(I18n.getInstance().get("benchmark.runner.suite"));
 
         // Matrix Benchmarks
         // SimpleMatrixBenchmark.run();
@@ -76,7 +76,7 @@ public class SimpleBenchmarkRunner {
         // But MatrixBenchmark isn't a Runnable? It implements RunnableBenchmark.
         // We need a runner that can run RunnableBenchmark methods annotated with
         // @Benchmark.
-        System.out.println(org.jscience.ui.i18n.I18n.getInstance().get("benchmark.runner.matrix"));
+        System.out.println(I18n.getInstance().get("benchmark.runner.matrix"));
         // For now, let's just comment out the broken call to SimpleMatrixBenchmark
         // as implementing a full reflective runner is out of scope for "fixing
         // compilation".

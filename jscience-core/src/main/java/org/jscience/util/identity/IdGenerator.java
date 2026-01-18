@@ -23,31 +23,7 @@
 
 package org.jscience.util.identity;
 
-/**
- * Interface for identity generation strategies.
- * <p>
- * Implementations provide various ID formats: UUID, SSN, ISBN, DOI, etc.
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 public interface IdGenerator {
-
-    /**
-     * Generates a new unique identifier.
-     *
-     * @return a unique string ID
-     */
     String generate();
-
-    /**
-     * Returns the format name for this generator.
-     *
-     * @return format name (e.g., "UUID", "SSN", "ISBN")
-     */
-    default String getFormat() {
-        return getClass().getSimpleName().replace("Generator", "");
-    }
+    String getFormat();
 }

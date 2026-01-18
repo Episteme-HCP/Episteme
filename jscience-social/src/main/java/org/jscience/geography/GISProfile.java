@@ -57,8 +57,8 @@ public class GISProfile {
      * @return Vector with [x, y] map coordinates (in radians)
      */
     public Vector<Real> project(Coordinate coord) {
-        double latRad = Math.toRadians(coord.getLatitudeDegrees());
-        double lonRad = Math.toRadians(coord.getLongitudeDegrees());
+        double latRad = Math.toRadians(coord.getLatitudeDegrees().doubleValue());
+        double lonRad = Math.toRadians(coord.getLongitudeDegrees().doubleValue());
 
         List<Real> coords = new ArrayList<>();
 

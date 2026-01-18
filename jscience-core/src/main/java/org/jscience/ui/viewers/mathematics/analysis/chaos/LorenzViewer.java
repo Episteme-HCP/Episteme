@@ -30,6 +30,7 @@ import org.jscience.ui.Simulatable;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.ui.i18n.I18n;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -58,47 +59,47 @@ public class LorenzViewer extends AbstractViewer implements Simulatable {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics", "Mathematics");
+        return I18n.getInstance().get("category.mathematics", "Mathematics");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.lorenzviewer.name", "Lorenz Attractor");
+        return I18n.getInstance().get("viewer.lorenzviewer.name", "Lorenz Attractor");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.lorenzviewer.desc", "Lorenz system chaos visualization.");
+        return I18n.getInstance().get("viewer.lorenzviewer.desc", "Lorenz system chaos visualization.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.lorenzviewer.longdesc", "Interactive 2D visualization of the Lorenz attractor. Adjust the sigma, rho, and beta parameters to explore deterministic chaos and sensitivity to initial conditions.");
+        return I18n.getInstance().get("viewer.lorenzviewer.longdesc", "Interactive 2D visualization of the Lorenz attractor. Adjust the sigma, rho, and beta parameters to explore deterministic chaos and sensitivity to initial conditions.");
     }
 
     @Override
     public List<Parameter<?>> getViewerParameters() {
         List<Parameter<?>> params = new ArrayList<>();
         params.add(new NumericParameter("viewer.lorenzviewer.param.sigma",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.lorenzviewer.param.sigma.desc", "Prandtl number controlling fluid viscosity ratio"),
+                I18n.getInstance().get("viewer.lorenzviewer.param.sigma.desc", "Prandtl number controlling fluid viscosity ratio"),
                 0, 50, 0.5, sigma.doubleValue(), v -> { sigma = Real.of(v); points.clear(); }));
         params.add(new NumericParameter("viewer.lorenzviewer.param.rho",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.lorenzviewer.param.rho.desc", "Rayleigh number controlling convection intensity"),
+                I18n.getInstance().get("viewer.lorenzviewer.param.rho.desc", "Rayleigh number controlling convection intensity"),
                 0, 100, 1, rho.doubleValue(), v -> { rho = Real.of(v); points.clear(); }));
         params.add(new NumericParameter("viewer.lorenzviewer.param.beta",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.lorenzviewer.param.beta.desc", "Geometric factor related to cell dimensions"),
+                I18n.getInstance().get("viewer.lorenzviewer.param.beta.desc", "Geometric factor related to cell dimensions"),
                 0, 10, 0.1, beta.doubleValue(), v -> { beta = Real.of(v); points.clear(); }));
         params.add(new NumericParameter("viewer.lorenzviewer.param.x0",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.lorenzviewer.param.x0.desc", "Initial X coordinate of the attractor"),
+                I18n.getInstance().get("viewer.lorenzviewer.param.x0.desc", "Initial X coordinate of the attractor"),
                 -20, 20, 0.1, x.doubleValue(), v -> { x = Real.of(v); points.clear(); }));
         params.add(new NumericParameter("viewer.lorenzviewer.param.y0",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.lorenzviewer.param.y0.desc", "Initial Y coordinate of the attractor"),
+                I18n.getInstance().get("viewer.lorenzviewer.param.y0.desc", "Initial Y coordinate of the attractor"),
                 -30, 30, 0.1, y.doubleValue(), v -> { y = Real.of(v); points.clear(); }));
         params.add(new NumericParameter("viewer.lorenzviewer.param.z0",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.lorenzviewer.param.z0.desc", "Initial Z coordinate of the attractor"),
+                I18n.getInstance().get("viewer.lorenzviewer.param.z0.desc", "Initial Z coordinate of the attractor"),
                 0, 50, 0.1, z.doubleValue(), v -> { z = Real.of(v); points.clear(); }));
         params.add(new NumericParameter("viewer.lorenzviewer.param.dt",
-                org.jscience.ui.i18n.I18n.getInstance().get("viewer.lorenzviewer.param.dt.desc", "Integration time step size"),
+                I18n.getInstance().get("viewer.lorenzviewer.param.dt.desc", "Integration time step size"),
                 0.001, 0.05, 0.001, dt.doubleValue(), v -> { dt = Real.of(v); }));
         return params;
     }
@@ -141,11 +142,11 @@ public class LorenzViewer extends AbstractViewer implements Simulatable {
     private Canvas canvas;
 
     private static class RealPoint3D {
-        Real x, y, z;
+        Real x, z; // Removed unused y
 
         RealPoint3D(Real x, Real y, Real z) {
             this.x = x;
-            this.y = y;
+            // this.y = y; // Unused
             this.z = z;
         }
     }
@@ -160,13 +161,13 @@ public class LorenzViewer extends AbstractViewer implements Simulatable {
         sidebar.setPadding(new Insets(20));
         sidebar.getStyleClass().add("viewer-controls");
 
-        Label title = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.lorenzviewer.title", "Lorenz Attractor"));
+        Label title = new Label(I18n.getInstance().get("viewer.lorenzviewer.title", "Lorenz Attractor"));
         title.getStyleClass().add("viewer-header-label");
 
         sidebar.getChildren().addAll(title, new Separator(),
-                createSlider(org.jscience.ui.i18n.I18n.getInstance().get("viewer.lorenzviewer.param.sigma", "Sigma"), 0, 50, sigma.doubleValue(), v -> sigma = Real.of(v)),
-                createSlider(org.jscience.ui.i18n.I18n.getInstance().get("viewer.lorenzviewer.param.rho", "Rho"), 0, 100, rho.doubleValue(), v -> rho = Real.of(v)),
-                createSlider(org.jscience.ui.i18n.I18n.getInstance().get("viewer.lorenzviewer.param.beta", "Beta"), 0, 10, beta.doubleValue(), v -> beta = Real.of(v)));
+                createSlider(I18n.getInstance().get("viewer.lorenzviewer.param.sigma", "Sigma"), 0, 50, sigma.doubleValue(), v -> sigma = Real.of(v)),
+                createSlider(I18n.getInstance().get("viewer.lorenzviewer.param.rho", "Rho"), 0, 100, rho.doubleValue(), v -> rho = Real.of(v)),
+                createSlider(I18n.getInstance().get("viewer.lorenzviewer.param.beta", "Beta"), 0, 10, beta.doubleValue(), v -> beta = Real.of(v)));
         setRight(sidebar);
 
         timer = new AnimationTimer() {

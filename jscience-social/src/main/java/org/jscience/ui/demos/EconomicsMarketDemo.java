@@ -34,6 +34,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.jscience.ui.AbstractDemo;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.ui.i18n.I18n;
 
 public class EconomicsMarketDemo extends AbstractDemo {
 
@@ -43,16 +45,16 @@ public class EconomicsMarketDemo extends AbstractDemo {
     }
 
     @Override
-    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.economics", "Economics"); }
+    public String getCategory() { return I18n.getInstance().get("category.economics", "Economics"); }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.name", "Market Equilibrium");
+        return I18n.getInstance().get("demo.economicsmarketdemo.name", "Market Equilibrium");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.desc", "Interactive Supply and Demand graph visualization determining market equilibrium.");
+        return I18n.getInstance().get("demo.economicsmarketdemo.desc", "Interactive Supply and Demand graph visualization determining market equilibrium.");
     }
 
     @Override
@@ -72,21 +74,21 @@ public class EconomicsMarketDemo extends AbstractDemo {
 
         // Axes
         NumberAxis xAxis = new NumberAxis(
-                org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.axis.quantity", "Quantity"),
+                I18n.getInstance().get("demo.economicsmarketdemo.axis.quantity", "Quantity"),
                 0, 100, 10);
-        NumberAxis yAxis = new NumberAxis(org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.axis.price", "Price"),
+        NumberAxis yAxis = new NumberAxis(I18n.getInstance().get("demo.economicsmarketdemo.axis.price", "Price"),
                 0,
                 100, 10);
 
         LineChart<Number, Number> lineChart = new LineChart<>(xAxis, yAxis);
-        lineChart.setTitle(org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.chart.title", "Supply and Demand"));
+        lineChart.setTitle(I18n.getInstance().get("demo.economicsmarketdemo.chart.title", "Supply and Demand"));
         lineChart.setAnimated(false); // crucial for smooth slider updates
 
         XYChart.Series<Number, Number> supplySeries = new XYChart.Series<>();
-        supplySeries.setName(org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.series.supply", "Supply"));
+        supplySeries.setName(I18n.getInstance().get("demo.economicsmarketdemo.series.supply", "Supply"));
 
         XYChart.Series<Number, Number> demandSeries = new XYChart.Series<>();
-        demandSeries.setName(org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.series.demand", "Demand"));
+        demandSeries.setName(I18n.getInstance().get("demo.economicsmarketdemo.series.demand", "Demand"));
 
         lineChart.getData().add(supplySeries);
         lineChart.getData().add(demandSeries);
@@ -96,29 +98,29 @@ public class EconomicsMarketDemo extends AbstractDemo {
         Slider demandShift = new Slider(-20, 20, 0);
 
         Runnable updateGraph = () -> {
-            org.jscience.mathematics.numbers.real.Real sShift = org.jscience.mathematics.numbers.real.Real
+            Real sShift = Real
                     .of(supplyShift.getValue());
-            org.jscience.mathematics.numbers.real.Real dShift = org.jscience.mathematics.numbers.real.Real
+            Real dShift = Real
                     .of(demandShift.getValue());
 
             ObservableList<XYChart.Data<Number, Number>> sData = FXCollections.observableArrayList();
             ObservableList<XYChart.Data<Number, Number>> dData = FXCollections.observableArrayList();
 
             for (int q = 0; q <= 100; q += 10) {
-                org.jscience.mathematics.numbers.real.Real quantity = org.jscience.mathematics.numbers.real.Real.of(q);
+                Real quantity = Real.of(q);
 
                 // Supply: P = 0.5Q + 10 + shift
-                org.jscience.mathematics.numbers.real.Real pSupply = quantity
-                        .multiply(org.jscience.mathematics.numbers.real.Real.of(0.5))
-                        .add(org.jscience.mathematics.numbers.real.Real.of(10))
+                Real pSupply = quantity
+                        .multiply(Real.of(0.5))
+                        .add(Real.of(10))
                         .add(sShift);
 
                 sData.add(new XYChart.Data<>(q, Math.max(0, pSupply.doubleValue())));
 
                 // Demand: P = -0.5Q + 90 + shift
-                org.jscience.mathematics.numbers.real.Real pDemand = quantity
-                        .multiply(org.jscience.mathematics.numbers.real.Real.of(-0.5))
-                        .add(org.jscience.mathematics.numbers.real.Real.of(90))
+                Real pDemand = quantity
+                        .multiply(Real.of(-0.5))
+                        .add(Real.of(90))
                         .add(dShift);
 
                 dData.add(new XYChart.Data<>(q, Math.max(0, pDemand.doubleValue())));
@@ -133,9 +135,9 @@ public class EconomicsMarketDemo extends AbstractDemo {
         updateGraph.run(); // Init
 
         VBox controls = new VBox(10,
-                new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.label.shift_supply", "Shift Supply:")),
+                new Label(I18n.getInstance().get("demo.economicsmarketdemo.label.shift_supply", "Shift Supply:")),
                 supplyShift,
-                new Label(org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.label.shift_demand", "Shift Demand:")),
+                new Label(I18n.getInstance().get("demo.economicsmarketdemo.label.shift_demand", "Shift Demand:")),
                 demandShift);
         controls.getStyleClass().add("viewer-controls");
 
@@ -147,6 +149,6 @@ public class EconomicsMarketDemo extends AbstractDemo {
     
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("demo.economicsmarketdemo.longdesc", "Visualize and manipulate supply and demand curves to observe market equilibrium shifts.");
+        return I18n.getInstance().get("demo.economicsmarketdemo.longdesc", "Visualize and manipulate supply and demand curves to observe market equilibrium shifts.");
     }
 }

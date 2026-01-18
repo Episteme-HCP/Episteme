@@ -53,22 +53,22 @@ public class NMEAReader extends AbstractResourceReader<List<NMEAMessage>> {
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.nmea.category", "Device");
+        return I18n.getInstance().get("reader.nmea.category", "Device");
     }
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.nmeareader.name", "NMEA GPS Reader");
+        return I18n.getInstance().get("reader.nmeareader.name", "NMEA GPS Reader");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.nmeareader.desc", "NMEA GPS/Sensor Data Reader.");
+        return I18n.getInstance().get("reader.nmeareader.desc", "NMEA GPS/Sensor Data Reader.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.nmeareader.longdesc", "Reads NMEA 0183 standard messages from GPS receivers and other marine electronics.");
+        return I18n.getInstance().get("reader.nmeareader.longdesc", "Reads NMEA 0183 standard messages from GPS receivers and other marine electronics.");
     }
 
     @Override

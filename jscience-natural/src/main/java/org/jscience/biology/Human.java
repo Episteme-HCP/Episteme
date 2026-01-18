@@ -55,10 +55,10 @@ public class Human extends Individual {
     }
 
     public Human(Individual.Sex sex, LocalDate birthDate) {
-        this(new org.jscience.util.id.UUIDGenerator().generate(), sex, birthDate);
+        this(new org.jscience.util.identity.UUIDGenerator().generate(), sex, birthDate);
     }
 
-    public Human(org.jscience.util.id.IdGenerator generator, Individual.Sex sex, LocalDate birthDate) {
+    public Human(org.jscience.util.identity.IdGenerator generator, Individual.Sex sex, LocalDate birthDate) {
         this(generator.generate(), sex, birthDate);
     }
 

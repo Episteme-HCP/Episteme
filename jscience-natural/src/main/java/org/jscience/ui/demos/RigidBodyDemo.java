@@ -46,10 +46,10 @@ public class RigidBodyDemo extends AbstractSimulationDemo {
     public String getCategory() { return "Physics"; }
 
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("RigidBody.title", "Rigid Body Physics"); }
+    public String getName() { return I18n.getInstance().get("RigidBody.title", "Rigid Body Physics"); }
 
     @Override
-    public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("RigidBody.desc", "2D rigid body simulation with collisions."); }
+    public String getDescription() { return I18n.getInstance().get("RigidBody.desc", "2D rigid body simulation with collisions."); }
 
     @Override
     public String getLongDescription() {
@@ -58,7 +58,10 @@ public class RigidBodyDemo extends AbstractSimulationDemo {
 
     @Override
     public Node createViewerNode() {
-        if (viewer == null) viewer = new RigidBodyViewer();
+        if (viewer == null) {
+            org.jscience.physics.classical.mechanics.PhysicsEngine engine = new org.jscience.physics.classical.mechanics.PhysicsEngine();
+            viewer = new RigidBodyViewer(engine);
+        }
         return viewer;
     }
 }

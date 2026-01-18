@@ -31,14 +31,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
+import org.jscience.ui.Parameter;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.i18n.I18n;
-import org.jscience.ui.Parameter;
 import org.jscience.biology.Taxon;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.biology.io.PhylogeneticTreeReader;
 
 import javafx.application.Platform;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.text.MessageFormat;
@@ -66,10 +66,10 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
     }
     
     @Override
-    public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.name", "Phylogenetic Tree Viewer"); }
+    public String getName() { return I18n.getInstance().get("viewer.phylogenetictreeviewer.name", "Phylogenetic Tree Viewer"); }
     
     @Override
-    public String getCategory() { return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology"); }
+    public String getCategory() { return I18n.getInstance().get("category.biology", "Biology"); }
 
     private void initUI() {
         this.getStyleClass().add("viewer-root");
@@ -80,10 +80,10 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
         this.widthProperty().addListener(e -> { canvas.setWidth(getWidth()); updateLayoutAndDraw(canvas); });
         this.heightProperty().addListener(e -> { canvas.setHeight(getHeight()); updateLayoutAndDraw(canvas); });
 
-        Label infoPanel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.info.default", "Select a node to view details."));
+        Label infoPanel = new Label(I18n.getInstance().get("viewer.phylogenetictreeviewer.info.default", "Select a node to view details."));
         infoPanel.getStyleClass().add("viewer-sidebar");
 
-        javafx.scene.control.Button toggleBtn = new javafx.scene.control.Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.toggle_view", "Toggle View"));
+        javafx.scene.control.Button toggleBtn = new javafx.scene.control.Button(I18n.getInstance().get("viewer.phylogenetictreeviewer.toggle_view", "Toggle View"));
         toggleBtn.setOnAction(e -> {
             radialMode = !radialMode;
             updateLayoutAndDraw(canvas);
@@ -104,13 +104,13 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
             Taxon clicked = findNode(treeRoot, e.getX(), e.getY());
             if (clicked != null) {
                 selectedNode = clicked;
-                String txt = MessageFormat.format(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.info.selected", "{0} (COI: {1}, 16S: {2}, Cytb: {3})"), 
+                String txt = MessageFormat.format(I18n.getInstance().get("viewer.phylogenetictreeviewer.info.selected", "{0} (COI: {1}, 16S: {2}, Cytb: {3})"), 
                     clicked.getName(), clicked.getCoi(), clicked.getRna16s(), clicked.getCytb());
                 infoPanel.setText(txt);
                 drawTree(canvas.getGraphicsContext2D(), treeRoot);
             } else {
                 selectedNode = null;
-                infoPanel.setText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.info.default", "Select a node to view details."));
+                infoPanel.setText(I18n.getInstance().get("viewer.phylogenetictreeviewer.info.default", "Select a node to view details."));
                 drawTree(canvas.getGraphicsContext2D(), treeRoot);
             }
         });
@@ -138,11 +138,11 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
         VBox section = new VBox(5);
         section.setPadding(new javafx.geometry.Insets(5));
         
-        Label ncbiLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.title", "NCBI Query"));
+        Label ncbiLabel = new Label(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.title", "NCBI Query"));
         ncbiLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-font-size: 11px;
         
         javafx.scene.control.TextField searchField = new javafx.scene.control.TextField();
-        searchField.setPromptText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.prompt", "Enter species name..."));
+        searchField.setPromptText(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.prompt", "Enter species name..."));
         searchField.setPrefWidth(180);
         
         Label statusLabel = new Label();
@@ -150,25 +150,25 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
         statusLabel.setWrapText(true);
         statusLabel.setPrefWidth(180);
         
-        javafx.scene.control.Button queryButton = new javafx.scene.control.Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.search", "Search"));
+        javafx.scene.control.Button queryButton = new javafx.scene.control.Button(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.search", "Search"));
         queryButton.setStyle("-fx-font-size: 10px;");
         
-        javafx.scene.control.Button resetTreeBtn = new javafx.scene.control.Button(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.reset", "Reset Tree"));
+        javafx.scene.control.Button resetTreeBtn = new javafx.scene.control.Button(I18n.getInstance().get("viewer.phylogenetictreeviewer.reset", "Reset Tree"));
         resetTreeBtn.setStyle("-fx-font-size: 10px;");
         resetTreeBtn.setOnAction(e -> {
             loadData();
             updateLayoutAndDraw(canvas);
-            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.reset", "Tree reset to default"));
+            statusLabel.setText(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.reset", "Tree reset to default"));
         });
 
         queryButton.setOnAction(e -> {
             String searchTerm = searchField.getText().trim();
             if (searchTerm.isEmpty()) {
-                statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.empty", "Enter a species name"));
+                statusLabel.setText(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.empty", "Enter a species name"));
                 return;
             }
             
-            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.querying", "Querying NCBI..."));
+            statusLabel.setText(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.querying", "Querying NCBI..."));
             queryButton.setDisable(true);
             
             // Query in background thread
@@ -176,7 +176,7 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
                 try {
                     org.jscience.biology.loaders.NCBITaxonomyReader reader = 
                         new org.jscience.biology.loaders.NCBITaxonomyReader();
-                    java.util.List<Long> taxIds = reader.searchByName(searchTerm);
+                    List<Long> taxIds = reader.searchByName(searchTerm);
                     
                     if (taxIds != null && !taxIds.isEmpty()) {
                          long taxId = taxIds.get(0);
@@ -189,24 +189,24 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
                                 if (lineage != null) {
                                     this.treeRoot = buildLineageTree(lineage, species.getScientificName());
                                     updateLayoutAndDraw(canvas);
-                                    statusLabel.setText(MessageFormat.format(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.loaded", "Loaded: {0}"), species.getScientificName()));
+                                    statusLabel.setText(MessageFormat.format(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.loaded", "Loaded: {0}"), species.getScientificName()));
                                 } else {
-                                    statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.nolineage", "No lineage data available."));
+                                    statusLabel.setText(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.nolineage", "No lineage data available."));
                                 }
                             } else {
-                                statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.ferror", "Failed to fetch taxon details"));
+                                statusLabel.setText(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.ferror", "Failed to fetch taxon details"));
                             }
                             queryButton.setDisable(false);
                          });
                     } else {
                         Platform.runLater(() -> {
-                            statusLabel.setText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.notfound", "No results found"));
+                            statusLabel.setText(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.notfound", "No results found"));
                             queryButton.setDisable(false);
                         });
                     }
                 } catch (Exception ex) {
                     Platform.runLater(() -> {
-                        statusLabel.setText(MessageFormat.format(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.error", "Error: {0}"), ex.getMessage()));
+                        statusLabel.setText(MessageFormat.format(I18n.getInstance().get("viewer.phylogenetictreeviewer.ncbi.error", "Error: {0}"), ex.getMessage()));
                         queryButton.setDisable(false);
                     });
                 }
@@ -225,14 +225,14 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
         for (int i = 0; i < levels.length; i++) {
             String name = levels[i].trim();
             if (name.isEmpty()) continue;
-            Taxon t = new Taxon("ncbi_" + i, (current == null ? "" : current.getId()), name, org.jscience.mathematics.numbers.real.Real.of(Math.random()), org.jscience.mathematics.numbers.real.Real.of(Math.random()), org.jscience.mathematics.numbers.real.Real.of(Math.random()));
+            Taxon t = new Taxon("ncbi_" + i, (current == null ? "" : current.getId()), name, Real.of(Math.random()), Real.of(Math.random()), Real.of(Math.random()));
             if (root == null) root = t;
             if (current != null) current.addChild(t);
             current = t;
         }
         // Add the searched species as the leaf if it's not the last level
         if (current != null && !levels[levels.length - 1].equalsIgnoreCase(terminalName)) {
-             Taxon t = new Taxon("ncbi_leaf", current.getId(), terminalName, org.jscience.mathematics.numbers.real.Real.of(Math.random()), org.jscience.mathematics.numbers.real.Real.of(Math.random()), org.jscience.mathematics.numbers.real.Real.of(Math.random()));
+             Taxon t = new Taxon("ncbi_leaf", current.getId(), terminalName, Real.of(Math.random()), Real.of(Math.random()), Real.of(Math.random()));
              current.addChild(t);
         }
         return root;
@@ -314,9 +314,9 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
             if (!radialMode) {
                 gc.setFill(Color.web("#333333")); 
                 gc.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, 12));
-                gc.fillText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.marker.coi", "COI (Mitochondrial)"), 760, 20);
-                gc.fillText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.marker.rna16s", "16S RNA"), 790, 20);
-                gc.fillText(org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.marker.cytb", "CytB"), 820, 20);
+                gc.fillText(I18n.getInstance().get("viewer.phylogenetictreeviewer.marker.coi", "COI (Mitochondrial)"), 760, 20);
+                gc.fillText(I18n.getInstance().get("viewer.phylogenetictreeviewer.marker.rna16s", "16S RNA"), 790, 20);
+                gc.fillText(I18n.getInstance().get("viewer.phylogenetictreeviewer.marker.cytb", "CytB"), 820, 20);
             }
         }
 
@@ -383,7 +383,7 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
 
     private Color getColor(double val) { return Color.hsb((1.0 - val) * 240, 0.8, 0.9); }
 
-    @Override public String getDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.desc", "Interactive evolutionary tree browser showing taxonomic relationships."); }
-    @Override public String getLongDescription() { return org.jscience.ui.i18n.I18n.getInstance().get("viewer.phylogenetictreeviewer.longdesc", "Visualize and explore the 'Tree of Life' with support for linear and radial layouts. Features interactive node selection, genetic marker alignment (COI, 16S, CytB), and NCBI taxonomy integration."); }
+    @Override public String getDescription() { return I18n.getInstance().get("viewer.phylogenetictreeviewer.desc", "Interactive evolutionary tree browser showing taxonomic relationships."); }
+    @Override public String getLongDescription() { return I18n.getInstance().get("viewer.phylogenetictreeviewer.longdesc", "Visualize and explore the 'Tree of Life' with support for linear and radial layouts. Features interactive node selection, genetic marker alignment (COI, 16S, CytB), and NCBI taxonomy integration."); }
     @Override public java.util.List<Parameter<?>> getViewerParameters() { return new java.util.ArrayList<>(); }
 }

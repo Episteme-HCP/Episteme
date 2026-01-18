@@ -38,7 +38,7 @@ import java.util.ArrayList;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public abstract class AbstractDeviceViewer<T extends Device> extends VBox implements Viewer {
+public abstract class AbstractDeviceViewer<T extends Device> extends AbstractViewer {
 
     protected final T device;
     protected final Label nameLabel;
@@ -46,9 +46,11 @@ public abstract class AbstractDeviceViewer<T extends Device> extends VBox implem
 
     public AbstractDeviceViewer(T device) {
         this.device = device;
-        this.setAlignment(Pos.CENTER);
-        this.setSpacing(10);
-        this.setPadding(new Insets(10));
+        
+        VBox container = new VBox(10);
+        container.setAlignment(Pos.CENTER);
+        container.setPadding(new Insets(10));
+        container.getStyleClass().add("device-viewer");
 
         this.nameLabel = new Label(device.getName());
         this.nameLabel.getStyleClass().add("header-label");
@@ -56,10 +58,8 @@ public abstract class AbstractDeviceViewer<T extends Device> extends VBox implem
         this.statusLabel = new Label(org.jscience.ui.i18n.I18n.getInstance().get("device.status.connected", "Status: Connected"));
         this.statusLabel.getStyleClass().add("status-label");
 
-        this.getChildren().addAll(nameLabel, statusLabel);
-
-        // Initial style
-        this.getStyleClass().add("device-viewer");
+        container.getChildren().addAll(nameLabel, statusLabel);
+        this.setCenter(container);
     }
 
     public T getDevice() {

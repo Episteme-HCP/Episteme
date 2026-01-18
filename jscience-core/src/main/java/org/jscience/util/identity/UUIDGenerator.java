@@ -25,18 +25,7 @@ package org.jscience.util.identity;
 
 import java.util.UUID;
 
-/**
- * Generates Universally Unique Identifiers (UUIDs).
- * <p>
- * Uses Java's standard UUID v4 (random-based) implementation.
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 public class UUIDGenerator implements IdGenerator {
-
     @Override
     public String generate() {
         return UUID.randomUUID().toString();

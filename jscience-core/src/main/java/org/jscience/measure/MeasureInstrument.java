@@ -264,8 +264,13 @@ public abstract class MeasureInstrument<Q extends Quantity<Q>> implements Device
         this.locationDescription = locationDescription;
     }
 
-    public Status getStatus() {
+    public Status getInstrumentStatus() {
         return status;
+    }
+
+    @Override
+    public String getStatus() {
+        return status.name();
     }
 
     public void setStatus(Status status) {

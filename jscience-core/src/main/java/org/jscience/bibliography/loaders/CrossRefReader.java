@@ -50,7 +50,7 @@ import java.util.Optional;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-import org.jscience.ui.i18n.I18n;
+
 
 public class CrossRefReader extends AbstractResourceReader<CitationInfo> {
 

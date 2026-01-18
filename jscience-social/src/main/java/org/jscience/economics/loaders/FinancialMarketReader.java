@@ -26,6 +26,8 @@ package org.jscience.economics.loaders;
 import org.jscience.economics.Money;
 import org.jscience.history.TimePoint;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.ui.i18n.I18n;
+import org.jscience.io.AbstractResourceReader;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -36,7 +38,7 @@ import java.util.List;
 /**
  * Reads financial market data from various formats.
  */
-public class FinancialMarketReader extends org.jscience.io.AbstractResourceReader<List<FinancialMarketReader.Candle>> {
+public class FinancialMarketReader extends AbstractResourceReader<List<FinancialMarketReader.Candle>> {
 
     private static final FinancialMarketReader INSTANCE = new FinancialMarketReader();
 
@@ -90,22 +92,22 @@ public class FinancialMarketReader extends org.jscience.io.AbstractResourceReade
 
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.financial.name", "Financial Market Reader");
+        return I18n.getInstance().get("reader.financial.name", "Financial Market Reader");
     }
 
     @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.economics", "Economics");
+        return I18n.getInstance().get("category.economics", "Economics");
     }
 
     @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.financial.desc", "Financial Market Data Reader.");
+        return I18n.getInstance().get("reader.financial.desc", "Financial Market Data Reader.");
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.financial.longdesc", "Parses financial market data candlesticks (Open, High, Low, Close, Volume) from CSV sources.");
+        return I18n.getInstance().get("reader.financial.longdesc", "Parses financial market data candlesticks (Open, High, Low, Close, Volume) from CSV sources.");
     }
 
     @Override

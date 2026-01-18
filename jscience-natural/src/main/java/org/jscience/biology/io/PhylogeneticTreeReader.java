@@ -25,6 +25,7 @@ package org.jscience.biology.io;
 
 import org.jscience.biology.Taxon;
 import org.jscience.io.AbstractResourceReader;
+
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.ui.i18n.I18n;
 
@@ -96,22 +97,22 @@ public class PhylogeneticTreeReader extends AbstractResourceReader<Taxon> {
     
     @Override
     public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.phylogenetictreereader.name", "Phylogenetic Tree Reader");
+        return I18n.getInstance().get("reader.phylogenetictreereader.name", "Phylogenetic Tree Reader");
     }
 
     @Override
     public String getCategory() { 
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.biology", "Biology"); 
+        return I18n.getInstance().get("category.biology", "Biology"); 
     }
 
     @Override
     public String getDescription() { 
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.phylogenetictreereader.desc", "Reads phylogenetic trees from CSV format."); 
+        return I18n.getInstance().get("reader.phylogenetictreereader.desc", "Reads phylogenetic trees from CSV format."); 
     }
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.phylogenetictreereader.longdesc", "Parses phylogenetic tree data from CSV, reconstructing hierarchical taxon relationships.");
+        return I18n.getInstance().get("reader.phylogenetictreereader.longdesc", "Parses phylogenetic tree data from CSV, reconstructing hierarchical taxon relationships.");
     }
 
     @Override public String getResourcePath() { return "/data/phylogeny/"; }
