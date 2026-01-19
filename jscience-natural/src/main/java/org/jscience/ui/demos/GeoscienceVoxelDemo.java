@@ -24,7 +24,7 @@
 package org.jscience.ui.demos;
 
 import javafx.scene.Node;
-import org.jscience.geology.GoldAssayVoxelModel;
+import org.jscience.earth.geology.GoldAssayVoxelModel;
 import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.viewers.shared.volume.VoxelViewer;
 

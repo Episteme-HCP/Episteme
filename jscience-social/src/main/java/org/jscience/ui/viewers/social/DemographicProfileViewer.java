@@ -1,0 +1,62 @@
+package org.jscience.ui.viewers.social;
+
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import org.jscience.ui.AbstractViewer;
+import org.jscience.ui.i18n.I18n;
+import org.jscience.sociology.DemographicData;
+
+import java.util.List;
+
+/**
+ * Visualizes population structures using demographic pyramids.
+ * Supports comparison and historical evolution.
+ */
+public final class DemographicProfileViewer extends AbstractViewer {
+
+    private final BarChart<Number, String> chart;
+    private final XYChart.Series<Number, String> maleSeries = new XYChart.Series<>();
+    private final XYChart.Series<Number, String> femaleSeries = new XYChart.Series<>();
+
+    public DemographicProfileViewer() {
+        NumberAxis xAxis = new NumberAxis();
+        CategoryAxis yAxis = new CategoryAxis();
+        
+        xAxis.setLabel(I18n.getInstance().get("viewer.demography.axis.population", "Population Count"));
+        yAxis.setLabel(I18n.getInstance().get("viewer.demography.axis.age", "Age Group"));
+
+        chart = new BarChart<>(xAxis, yAxis);
+        chart.setTitle(I18n.getInstance().get("viewer.demography.title", "Population Pyramid"));
+        
+        maleSeries.setName(I18n.getInstance().get("viewer.demography.male", "Male"));
+        femaleSeries.setName(I18n.getInstance().get("viewer.demography.female", "Female"));
+        
+        chart.getData().add(maleSeries);
+        chart.getData().add(femaleSeries);
+        
+        setCenter(chart);
+        getStyleClass().add("demographic-profile-viewer");
+    }
+
+    public void setDemographicData(DemographicData data) {
+        maleSeries.getData().clear();
+        femaleSeries.getData().clear();
+        
+        List<DemographicData.AgeGroup> groups = data.getConsolidatedGroups(5);
+        for (var group : groups) {
+            String label = group.minAge() + "-" + group.maxAge();
+            // Male values are negative to show on the left in a pyramid
+            maleSeries.getData().add(new XYChart.Data<>(-group.maleCount(), label));
+            femaleSeries.getData().add(new XYChart.Data<>(group.femaleCount(), label));
+        }
+    }
+
+    @Override public String getCategory() { return I18n.getInstance().get("category.social", "Social Sciences"); }
+    @Override public String getName() { return I18n.getInstance().get("viewer.demography.name", "Demographic Profile Viewer"); }
+    @Override public String getDescription() { return I18n.getInstance().get("viewer.demography.desc", "Visualizes population pyramids and demographic structures."); }
+    @Override public String getLongDescription() { 
+        return I18n.getInstance().get("viewer.demography.longdesc", "Advanced demographic analysis tool. Comparative visualization of age and gender distribution across populations."); 
+    }
+}

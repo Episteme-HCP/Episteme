@@ -1,37 +1,10 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.arts;
 
-import java.time.LocalDate;
+import org.jscience.history.time.UncertainDate;
 import java.util.*;
 
 /**
  * Represents a book or publication.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
  */
 public class Book {
 
@@ -45,19 +18,21 @@ public class Book {
     private final List<String> authors = new ArrayList<>();
     private String isbn;
     private String publisher;
-    private LocalDate publicationDate;
+    private UncertainDate publicationDate;
     private int pages;
     private Genre genre;
     private String language;
     private String synopsis;
 
     public Book(String title) {
-        this.title = title;
+        this.title = Objects.requireNonNull(title, "Title cannot be null");
     }
 
     public Book(String title, String author) {
         this(title);
-        this.authors.add(author);
+        if (author != null) {
+            this.authors.add(author);
+        }
     }
 
     // Getters
@@ -77,7 +52,7 @@ public class Book {
         return publisher;
     }
 
-    public LocalDate getPublicationDate() {
+    public UncertainDate getPublicationDate() {
         return publicationDate;
     }
 
@@ -106,7 +81,7 @@ public class Book {
         this.publisher = publisher;
     }
 
-    public void setPublicationDate(LocalDate date) {
+    public void setPublicationDate(UncertainDate date) {
         this.publicationDate = date;
     }
 
@@ -127,37 +102,29 @@ public class Book {
     }
 
     public void addAuthor(String author) {
-        authors.add(author);
+        if (author != null) {
+            authors.add(author);
+        }
+    }
+
+    public void addAuthor(Artist artist) {
+        if (artist != null) {
+            authors.add(artist.getName());
+        }
     }
 
     /**
      * Returns formatted citation.
      */
     public String getCitation() {
-        String authorStr = String.join(", ", authors);
-        int year = publicationDate != null ? publicationDate.getYear() : 0;
-        return String.format("%s (%d). %s. %s.", authorStr, year, title, publisher);
+        String authorStr = authors.isEmpty() ? "Unknown Author" : String.join(", ", authors);
+        String yearStr = publicationDate != null ? publicationDate.toString() : "n.d.";
+        return String.format("%s (%s). %s. %s.", authorStr, yearStr, title, publisher != null ? publisher : "n.p.");
     }
 
     @Override
     public String toString() {
-        return String.format("\"%s\" by %s", title, String.join(", ", authors));
-    }
-
-    // Classic books
-    public static Book originOfSpecies() {
-        Book b = new Book("On the Origin of Species", "Charles Darwin");
-        b.setPublicationDate(LocalDate.of(1859, 11, 24));
-        b.setGenre(Genre.SCIENCE);
-        b.setPages(502);
-        return b;
-    }
-
-    public static Book principia() {
-        Book b = new Book("Principia Mathematica", "Isaac Newton");
-        b.setPublicationDate(LocalDate.of(1687, 7, 5));
-        b.setGenre(Genre.SCIENCE);
-        return b;
+        return String.format("\"%s\" by %s", title, authors.isEmpty() ? "Unknown Author" : String.join(", ", authors));
     }
 }
 

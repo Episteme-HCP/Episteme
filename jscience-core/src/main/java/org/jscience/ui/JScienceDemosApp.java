@@ -1,27 +1,4 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-package org.jscience.ui;
+﻿package org.jscience.ui;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -37,18 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.util.*;
 
-/**
- * JScience Main Application.
- * <p>
- * Central entry point for discovering and launching all scientific
- * applications,
- * demos, and visualization tools.
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
 public class JScienceDemosApp extends Application {
 
     private static final Logger logger = LoggerFactory.getLogger(JScienceDemosApp.class);
@@ -65,46 +30,54 @@ public class JScienceDemosApp extends Application {
     private void buildUI() {
         BorderPane root = new BorderPane();
 
-        // Load CSS with null protection
-        // Using likely old path or trying standard path
-        // Load CSS with null protection
-        // Using likely old path or trying standard path
         cssResource = getClass().getResource("/org/jscience/ui/theme.css");
         if (cssResource == null) {
             cssResource = getClass().getResource("/org/jscience/ui/style.css");
         }
 
-        if (cssResource != null) {
-            // we will add it to the scene later
-        } else {
+        if (cssResource == null) {
             logger.warn("theme.css not found, using default styling");
         }
 
-        // Header
         VBox header = createHeader();
-
-        // Menu Bar
         MenuBar menuBar = createMenuBar();
         VBox topContainer = new VBox(menuBar, header);
         root.setTop(topContainer);
 
-        // Discovery
+        TabPane mainTabs = new TabPane();
+        mainTabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        
+        Tab demoTab = new Tab(I18n.getInstance().get("demosapp.tab.demos", "Applications & Demos"));
+        demoTab.setContent(createDiscoveryView());
+        
+        Tab libTab = new Tab(I18n.getInstance().get("demosapp.tab.libraries", "Libraries"));
+        libTab.setContent(createLibraryView());
+        
+        mainTabs.getTabs().addAll(demoTab, libTab);
+        root.setCenter(mainTabs);
+
+        Scene scene = new Scene(root, 1000, 750);
+        if (cssResource != null) {
+            scene.getStylesheets().add(cssResource.toExternalForm());
+        }
+
+        primaryStage.setTitle(I18n.getInstance().get("demosapp.header.title", "JScience Demos"));
+        primaryStage.setScene(scene);
+
+        ThemeManager.getInstance().applyTheme(scene);
+    }
+    
+    private javafx.scene.Node createDiscoveryView() {
         Map<String, List<Viewer>> demosByCategory = discoverAndSortProviders();
 
-        // Single unified content - no tabs
         VBox allContent = new VBox(15);
         allContent.setPadding(new Insets(20));
         allContent.getStyleClass().add("content-box");
 
-        // Add demos by category
         if (demosByCategory.isEmpty()) {
             allContent.getChildren().add(new Label(I18n.getInstance().get("demosapp.nodemos")));
         } else {
-            // Demos sections
             for (Map.Entry<String, List<Viewer>> entry : demosByCategory.entrySet()) {
-                // Restore logic from old app: skip social sciences if requested?
-                // The user said "completely different", implying the old state was preferred.
-                // The old state explicitly skipped "Social Sciences".
                 if ("Social Sciences".equalsIgnoreCase(entry.getKey())
                         || "Sciences Sociales".equalsIgnoreCase(entry.getKey())) {
                     continue;
@@ -117,30 +90,22 @@ public class JScienceDemosApp extends Application {
 
         ScrollPane scroll = new ScrollPane(allContent);
         scroll.setFitToWidth(true);
-        root.setCenter(scroll);
-
-        Scene scene = new Scene(root, 1000, 750);
-        // Add CSS to scene as well
-        if (cssResource != null) {
-            scene.getStylesheets().add(cssResource.toExternalForm());
-        }
-
-        primaryStage.setTitle(I18n.getInstance().get("demosapp.header.title", "JScience Demos"));
-        primaryStage.setScene(scene);
-
-        // Apply global theme preference
-        ThemeManager.getInstance().applyTheme(scene);
+        scroll.setStyle("-fx-background-color: transparent;");
+        return scroll;
+    }
+    
+    private javafx.scene.Node createLibraryView() {
+        VBox libContent = new VBox(20);
+        libContent.setPadding(new Insets(30));
+        libContent.setAlignment(Pos.TOP_LEFT);
+        
+        Label libTitle = new Label("System Libraries & Engines");
+        libTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #007acc;");
+        return libContent;
     }
 
     private MenuBar createMenuBar() {
         MenuBar menuBar = new MenuBar();
-
-        // Language Menu
-        // Adapting old LanguageMenu logic to be inline if LanguageMenu class is
-        // missing?
-        // Old code used `new LanguageMenu(this::buildUI)`. Assuming LanguageMenu class
-        // exists.
-        // If not, I'll fallback to standard menu construction like in the new app.
 
         Menu languageMenu = new Menu(I18n.getInstance().get("menu.preferences.language", "Language"));
         ToggleGroup langGroup = new ToggleGroup();
@@ -161,7 +126,6 @@ public class JScienceDemosApp extends Application {
             languageMenu.getItems().add(item);
         }
 
-        // Theme Menu (Delegated to ThemeManager)
         Menu themeMenu = new Menu(I18n.getInstance().get("demosapp.menu.theme", "Theme"));
         ToggleGroup themeGroup = new ToggleGroup();
         String currentTheme = ThemeManager.getInstance().getCurrentTheme();
@@ -210,11 +174,9 @@ public class JScienceDemosApp extends Application {
         header.setPadding(new Insets(20));
         header.setAlignment(Pos.CENTER);
         header.getStyleClass().add("header-box");
-        // Style moved to theme.css (.header-box)
 
         Label title = new Label(I18n.getInstance().get("demosapp.header.title", "JScience Demos"));
         title.getStyleClass().add("header-label");
-        // Inline style removed
 
         Label subtitle = new Label(I18n.getInstance().get("demosapp.header.subtitle", "Scientific Applications & Tools"));
         subtitle.getStyleClass().add("header-subtitle");
@@ -226,8 +188,8 @@ public class JScienceDemosApp extends Application {
     private TitledPane createSection(String category, List<Viewer> demos) {
         VBox box = new VBox(8);
         box.setPadding(new Insets(10));
-        box.getStyleClass().add("section-box"); // Styled in CSS
-
+        box.getStyleClass().add("section-box"); 
+        
         for (Viewer demo : demos) {
             box.getChildren().add(createCard(demo));
         }
@@ -246,7 +208,7 @@ public class JScienceDemosApp extends Application {
 
         Button btn = new Button(I18n.getInstance().get("demosapp.button.launch", "Launch"));
         btn.getStyleClass().add("launch-button");
-        btn.getStyleClass().add("font-bold"); // Replaced inline style: -fx-background-color: #007acc; -fx-text-fill: white; -fx-font-weight: bold; -fx-min-width: 80;
+        btn.getStyleClass().add("font-bold");
 
         btn.setOnAction(e -> {
             try {
@@ -283,7 +245,6 @@ public class JScienceDemosApp extends Application {
         stage.setTitle(demo.getName());
         try {
             demo.show(stage);
-            // Auto-apply theme to all demos
             if (stage.getScene() != null) {
                 ThemeManager.getInstance().applyTheme(stage.getScene());
             }
@@ -298,10 +259,8 @@ public class JScienceDemosApp extends Application {
         alert.setTitle(I18n.getInstance().get("status.error", "Error"));
         alert.setHeaderText(title);
         alert.setContentText(message + "\n" + ex.getMessage());
-        alert.show(); // Simplified
+        alert.show(); 
     }
-
-    // --- Data Discovery (Kept from Modern Version) ---
 
     private Map<String, List<Viewer>> discoverAndSortProviders() {
         Map<MasterControlDiscovery.ProviderType, Map<String, List<Viewer>>> discovery = MasterControlDiscovery
@@ -309,17 +268,12 @@ public class JScienceDemosApp extends Application {
 
         Map<String, List<Viewer>> consolidated = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
-        // Add Apps and Demos
         mergeProviders(consolidated, discovery.get(MasterControlDiscovery.ProviderType.APP));
         mergeProviders(consolidated, discovery.get(MasterControlDiscovery.ProviderType.DEMO));
 
-        // Deduplicate and Sort Items within Categories
         for (List<Viewer> list : consolidated.values()) {
-            // Deduplicate by class name
             Set<String> seenClasses = new HashSet<>();
             list.removeIf(p -> !seenClasses.add(p.getClass().getName()));
-
-            // Sort by Name
             list.sort(Comparator.comparing(Viewer::getName));
         }
 
@@ -330,7 +284,6 @@ public class JScienceDemosApp extends Application {
         if (source == null)
             return;
         for (Map.Entry<String, List<Viewer>> entry : source.entrySet()) {
-            // Translate Category Name
             String key = entry.getKey();
             String catName = I18n.getInstance().get("category." + key.toLowerCase().replace(" ", "_"), key);
 

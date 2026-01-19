@@ -6,5 +6,4 @@ org.jscience.ui.demos.CSGDemo
 org.jscience.ui.demos.MandelbrotDemo
 org.jscience.ui.demos.LorenzDemo
 org.jscience.ui.demos.GaltonBoardDemo
-
-
+org.jscience.ui.demos.KnowledgeNavigatorDemo

@@ -1,39 +1,14 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.sports;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.Objects;
 import org.jscience.util.identity.Identifiable;
 import org.jscience.util.Temporal;
+import org.jscience.history.time.UncertainDate;
+import org.jscience.geography.Place;
 
 /**
  * Represents a sports match/game.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
  */
 public class Match implements Identifiable<String>, Temporal {
 
@@ -43,21 +18,21 @@ public class Match implements Identifiable<String>, Temporal {
 
     private final String id;
     private final Sport sport;
-    private final LocalDateTime dateTime;
+    private final UncertainDate date;
     private final Team homeTeam;
     private final Team awayTeam;
-    private String venue;
+    private Place venue;
     private Status status;
     private int homeScore;
     private int awayScore;
-    private String competition;
+    private Competition competition;
 
-    public Match(Sport sport, LocalDateTime dateTime, Team homeTeam, Team awayTeam) {
+    public Match(Sport sport, UncertainDate date, Team homeTeam, Team awayTeam) {
         this.id = UUID.randomUUID().toString();
-        this.sport = sport;
-        this.dateTime = dateTime;
-        this.homeTeam = homeTeam;
-        this.awayTeam = awayTeam;
+        this.sport = Objects.requireNonNull(sport, "Sport cannot be null");
+        this.date = Objects.requireNonNull(date, "Date cannot be null");
+        this.homeTeam = Objects.requireNonNull(homeTeam, "Home team cannot be null");
+        this.awayTeam = Objects.requireNonNull(awayTeam, "Away team cannot be null");
         this.status = Status.SCHEDULED;
     }
 
@@ -68,17 +43,22 @@ public class Match implements Identifiable<String>, Temporal {
 
     @Override
     public java.time.Instant getTimestamp() {
-        return dateTime != null ? java.time.Instant.ofEpochSecond(dateTime.toEpochSecond(java.time.ZoneOffset.UTC))
-                : java.time.Instant.MIN;
+        Object val = date.getMin(0);
+        if (val instanceof java.time.Instant i) {
+            return i;
+        }
+        if (val instanceof java.time.chrono.ChronoLocalDate cld) {
+             return java.time.LocalDate.from(cld).atStartOfDay(java.time.ZoneId.of("UTC")).toInstant();
+        }
+        throw new IllegalStateException("Match date type not supported: " + (val == null ? "null" : val.getClass()));
     }
 
-    // Getters
     public Sport getSport() {
         return sport;
     }
 
-    public LocalDateTime getDateTime() {
-        return dateTime;
+    public UncertainDate getDate() {
+        return date;
     }
 
     public Team getHomeTeam() {
@@ -89,7 +69,7 @@ public class Match implements Identifiable<String>, Temporal {
         return awayTeam;
     }
 
-    public String getVenue() {
+    public Place getVenue() {
         return venue;
     }
 
@@ -105,12 +85,11 @@ public class Match implements Identifiable<String>, Temporal {
         return awayScore;
     }
 
-    public String getCompetition() {
+    public Competition getCompetition() {
         return competition;
     }
 
-    // Setters
-    public void setVenue(String venue) {
+    public void setVenue(Place venue) {
         this.venue = venue;
     }
 
@@ -118,35 +97,23 @@ public class Match implements Identifiable<String>, Temporal {
         this.status = status;
     }
 
-    public void setCompetition(String competition) {
+    public void setCompetition(Competition competition) {
         this.competition = competition;
     }
 
-    /**
-     * Records the final score.
-     */
     public void setScore(int homeScore, int awayScore) {
         this.homeScore = homeScore;
         this.awayScore = awayScore;
         this.status = Status.COMPLETED;
     }
 
-    /**
-     * Returns the winner or null if tie/not finished.
-     */
     public Team getWinner() {
-        if (status != Status.COMPLETED)
-            return null;
-        if (homeScore > awayScore)
-            return homeTeam;
-        if (awayScore > homeScore)
-            return awayTeam;
+        if (status != Status.COMPLETED) return null;
+        if (homeScore > awayScore) return homeTeam;
+        if (awayScore > homeScore) return awayTeam;
         return null; // Tie
     }
 
-    /**
-     * Checks if match ended in a tie.
-     */
     public boolean isTie() {
         return status == Status.COMPLETED && homeScore == awayScore;
     }
@@ -158,7 +125,7 @@ public class Match implements Identifiable<String>, Temporal {
                     homeTeam.getName(), awayTeam.getName(), homeScore, awayScore, sport.getName());
         }
         return String.format("%s vs %s @ %s (%s)",
-                homeTeam.getName(), awayTeam.getName(), dateTime, status);
+                homeTeam.getName(), awayTeam.getName(), date, status);
     }
 }
 

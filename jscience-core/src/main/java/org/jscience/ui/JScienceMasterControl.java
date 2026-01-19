@@ -477,6 +477,10 @@ public class JScienceMasterControl extends Application {
         // Visualization & Plotting - uses SPI discovery + Config
         content.getChildren().add(createPlottingCategory(i18n));
 
+        // Audio Processing - uses SPI discovery
+        content.getChildren().add(new Separator());
+        content.getChildren().add(createAudioCategory(i18n));
+
         // Molecular Viewing - uses SPI discovery
         content.getChildren().add(new Separator());
         content.getChildren().add(createChemistryCategory(i18n));
@@ -745,6 +749,70 @@ public class JScienceMasterControl extends Application {
         // Append available libraries list (No header)
         box.getChildren().add(createBackendCategory(i18n, 
             BackendDiscovery.TYPE_NETWORK,
+            "", ""));
+
+        box.getChildren().add(new Separator());
+        return box;
+    }
+
+    private VBox createAudioCategory(I18n i18n) {
+        VBox box = new VBox(12);
+        Label header = new Label(i18n.get("mastercontrol.audio.title", "Audio Processing"));
+        header.getStyleClass().add("header-title");
+
+        Label desc = new Label(i18n.get("mastercontrol.libraries.cat.audio.desc", "High-performance FFT, Spectrograms, and Playback"));
+        desc.getStyleClass().add("mastercontrol-description");
+        box.getChildren().add(desc);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(20);
+        grid.setVgap(15);
+        grid.setPadding(new Insets(10, 0, 10, 0));
+
+        // Audio Backend
+        ComboBox<String> backendBox = new ComboBox<>();
+        // Fetch available audio backends via SPI
+        List<BackendProvider> providers = 
+            BackendDiscovery.getInstance() // Now resolved
+                .getProvidersByType(BackendDiscovery.TYPE_AUDIO); 
+
+        // Map names to IDs for lookups
+        java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
+        nameToId.put("AUTO", null);
+        for (BackendProvider p : providers) {
+            nameToId.put(p.getName(), p.getId());
+        }
+        backendBox.getItems().addAll(nameToId.keySet());
+        
+        String currentId = PREFS.getPreferredBackend("audio");
+        String currentName = "AUTO";
+        for (var entry : nameToId.entrySet()) {
+            if (java.util.Objects.equals(entry.getValue(), currentId)) {
+                currentName = entry.getKey();
+                break;
+            }
+        }
+        backendBox.setValue(currentName);
+        backendBox.setOnAction(e -> {
+            String name = backendBox.getValue();
+            PREFS.setPreferredBackend("audio", nameToId.get(name));
+        });
+
+        VBox backendInfo = createInfoBox(
+            i18n.get("mastercontrol.audio.backend", "Audio Engine"), 
+            i18n.get("mastercontrol.audio.backend.desc", 
+                "Select the underlying audio processing library (JavaSound, Tarsos, etc.).\n" +
+                "Affects latency and supported formats."));
+
+        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.audio.backend", "Audio Engine")),
+                backendBox,
+                backendInfo);
+
+        box.getChildren().addAll(header, grid);
+
+        // Append available libraries list
+        box.getChildren().add(createBackendCategory(i18n, 
+            BackendDiscovery.TYPE_AUDIO,
             "", ""));
 
         box.getChildren().add(new Separator());
@@ -1211,7 +1279,7 @@ public class JScienceMasterControl extends Application {
         
         // Load readers
         // Load readers
-        @SuppressWarnings({"rawtypes", "unchecked"})
+        // Load readers
         java.util.ServiceLoader<org.jscience.io.ResourceReader> readerLoader = 
             java.util.ServiceLoader.load(org.jscience.io.ResourceReader.class);
         java.util.Iterator<org.jscience.io.ResourceReader> readerIter = readerLoader.iterator();
@@ -1224,7 +1292,6 @@ public class JScienceMasterControl extends Application {
         }
         
         // Load writers  
-        @SuppressWarnings({"rawtypes", "unchecked"})
         java.util.ServiceLoader<org.jscience.io.ResourceWriter> writerLoader = 
             java.util.ServiceLoader.load(org.jscience.io.ResourceWriter.class);
         java.util.Iterator<org.jscience.io.ResourceWriter> writerIter = writerLoader.iterator();

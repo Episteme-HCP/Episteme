@@ -40,15 +40,16 @@ public class ArchitectureRestorationTest {
     @Test
     public void testLiftSimulation() {
         LiftBuilding empireState = new LiftBuilding("Empire State", 0, 102);
-        Elevator expressLift = new Elevator("Express 1", 20);
+        Elevator expressLift = new Elevator("Express 1", 20, 102);
 
         empireState.addElevator(expressLift);
         assertEquals(0, expressLift.getCurrentFloor());
-        assertEquals(Elevator.State.WAITING, expressLift.getState());
+        assertEquals(Elevator.State.IDLE, expressLift.getState());
 
         // Call to 50th floor
-        expressLift.call(50);
-        assertEquals(Elevator.State.MOVING_UP, expressLift.getState());
+        expressLift.pressFloorButton(50);
+        empireState.tick();
+        assertEquals(Elevator.State.MOVING, expressLift.getState());
 
         // Simulate ticks (would normally loop, here manual step check)
         empireState.tick();

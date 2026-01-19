@@ -26,7 +26,6 @@ package org.jscience.ui.viewers.medicine.biomecanics;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Simulatable;

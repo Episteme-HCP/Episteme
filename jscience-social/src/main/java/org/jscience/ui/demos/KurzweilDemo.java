@@ -32,7 +32,7 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
 import org.jscience.ui.AbstractDemo;
-import org.jscience.history.Timeline;
+import org.jscience.history.HistoricalTimeline;
 import org.jscience.history.HistoricalEvent;
 import org.jscience.history.FuzzyDate;
 import org.jscience.ui.viewers.history.TimelineViewer;
@@ -118,7 +118,7 @@ public class KurzweilDemo extends AbstractDemo {
     @Override
     protected Node createViewerNode() {
         // Create Timeline Data
-        Timeline timeline = new Timeline("Kurzweil History");
+        HistoricalTimeline timeline = new HistoricalTimeline("Kurzweil History");
         for (Milestone m : MILESTONES) {
             FuzzyDate date;
             if (m.year < 0) {

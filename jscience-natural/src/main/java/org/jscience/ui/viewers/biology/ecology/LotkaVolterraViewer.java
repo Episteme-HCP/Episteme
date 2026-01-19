@@ -36,13 +36,10 @@ import org.jscience.ui.Parameter;
 import org.jscience.ui.RealParameter;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.mathematics.analysis.ode.DormandPrinceIntegrator;
-import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Dimensionless;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**

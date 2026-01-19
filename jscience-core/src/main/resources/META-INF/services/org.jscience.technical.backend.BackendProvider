@@ -1,30 +1,5 @@
-# Plotting Backend Providers
-org.jscience.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot2DBackendProvider
-org.jscience.ui.viewers.mathematics.analysis.plotting.backends.JavaFXPlot3DBackendProvider
-org.jscience.ui.viewers.mathematics.analysis.plotting.backends.XChartPlot2DBackendProvider
-org.jscience.ui.viewers.mathematics.analysis.plotting.backends.JFreeChartPlot2DBackendProvider
-org.jscience.ui.viewers.mathematics.analysis.plotting.backends.Jzy3dPlot3DBackendProvider
-
-# Unified Technical Backend (Math & Tensors)
-org.jscience.technical.backend.math.JScienceMathBackendProvider
-org.jscience.technical.backend.math.EJMLBackendProvider
-org.jscience.technical.backend.math.JBlasBackendProvider
-org.jscience.technical.backend.math.CommonsMathBackendProvider
-org.jscience.technical.backend.math.ColtBackendProvider
-org.jscience.technical.backend.math.ND4JBackendProvider
-
-# High-Performance Compute Backends (Implementing BackendProvider directly)
-org.jscience.technical.backend.cpu.CPUBackend
-org.jscience.technical.backend.cuda.CUDABackend
-org.jscience.technical.backend.opencl.OpenCLBackend
-
-# Linear Algebra Implementation Providers
-org.jscience.mathematics.linearalgebra.backends.OpenCLDenseLinearAlgebraProvider
-org.jscience.mathematics.linearalgebra.backends.OpenCLSparseLinearAlgebraProvider
-org.jscience.mathematics.linearalgebra.backends.ColtLinearAlgebraProvider
-org.jscience.mathematics.linearalgebra.backends.EJMLLinearAlgebraProvider
-
-# Network Backend Providers
-org.jscience.ui.viewers.mathematics.discrete.backend.JavaFXNetworkBackendProvider
-org.jscience.ui.viewers.mathematics.discrete.backend.JGraphTBackendProvider
-org.jscience.ui.viewers.mathematics.discrete.backend.GraphStreamBackendProvider
+org.jscience.media.backend.JavaSoundBackendProvider
+org.jscience.media.backend.TarsosBackendProvider
+org.jscience.media.backend.VLCJBackendProvider
+org.jscience.media.backend.MinimBackendProvider
+org.jscience.media.backend.JavaCVBackendProvider

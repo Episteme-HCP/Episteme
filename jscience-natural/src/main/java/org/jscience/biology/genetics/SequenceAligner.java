@@ -20,61 +20,54 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
+ 
 package org.jscience.biology.genetics;
 
+import org.jscience.mathematics.numbers.real.Real;
+
 /**
- * Pairwise Sequence Alignment using Needleman-Wunsch algorithm.
- * <p>
- * <b>Reference:</b><br>
- * Needleman, S. B., & Wunsch, C. D. (1970). A general method applicable to the search 
- * for similarities in the amino acid sequence of two proteins. 
- * <i>Journal of Molecular Biology</i>, 48(3), 443-453.
- * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Pairwise Sequence Alignment using Needleman-Wunsch algorithm with high-precision scores.
  */
 public class SequenceAligner {
 
-    private final int matchScore;
-    private final int mismatchScore;
-    private final int gapScore;
+    private final Real matchScore;
+    private final Real mismatchScore;
+    private final Real gapScore;
 
-    public SequenceAligner(int matchScore, int mismatchScore, int gapScore) {
+    public SequenceAligner(Real matchScore, Real mismatchScore, Real gapScore) {
         this.matchScore = matchScore;
         this.mismatchScore = mismatchScore;
         this.gapScore = gapScore;
     }
 
     public static SequenceAligner defaultDNA() {
-        return new SequenceAligner(1, -1, -2);
+        return new SequenceAligner(Real.of(1.0), Real.of(-1.0), Real.of(-2.0));
     }
 
     public static SequenceAligner defaultProtein() {
-        return new SequenceAligner(5, -3, -4); // BLOSUM62 approximation
+        return new SequenceAligner(Real.of(5.0), Real.of(-3.0), Real.of(-4.0));
     }
 
     public AlignmentResult align(String seq1, String seq2) {
         int n = seq1.length();
         int m = seq2.length();
-        int[][] score = new int[n + 1][m + 1];
+        Real[][] score = new Real[n + 1][m + 1];
 
         // Initialization
         for (int i = 0; i <= n; i++)
-            score[i][0] = i * gapScore;
+            score[i][0] = Real.of(i).multiply(gapScore);
         for (int j = 0; j <= m; j++)
-            score[0][j] = j * gapScore;
+            score[0][j] = Real.of(j).multiply(gapScore);
 
         // Fill matrix
         for (int i = 1; i <= n; i++) {
             for (int j = 1; j <= m; j++) {
-                int match = score[i - 1][j - 1]
-                        + (seq1.charAt(i - 1) == seq2.charAt(j - 1) ? matchScore : mismatchScore);
-                int delete = score[i - 1][j] + gapScore;
-                int insert = score[i][j - 1] + gapScore;
-                score[i][j] = Math.max(match, Math.max(delete, insert));
+                Real match = score[i - 1][j - 1].add(seq1.charAt(i - 1) == seq2.charAt(j - 1) ? matchScore : mismatchScore);
+                Real delete = score[i - 1][j].add(gapScore);
+                Real insert = score[i][j - 1].add(gapScore);
+                
+                Real best = match.compareTo(delete) > 0 ? match : delete;
+                score[i][j] = best.compareTo(insert) > 0 ? best : insert;
             }
         }
 
@@ -85,13 +78,12 @@ public class SequenceAligner {
         int j = m;
 
         while (i > 0 || j > 0) {
-            if (i > 0 && j > 0 && score[i][j] == score[i - 1][j - 1]
-                    + (seq1.charAt(i - 1) == seq2.charAt(j - 1) ? matchScore : mismatchScore)) {
+            if (i > 0 && j > 0 && score[i][j].compareTo(score[i - 1][j - 1].add(
+                    seq1.charAt(i - 1) == seq2.charAt(j - 1) ? matchScore : mismatchScore)) == 0) {
                 align1.append(seq1.charAt(i - 1));
                 align2.append(seq2.charAt(j - 1));
-                i--;
-                j--;
-            } else if (i > 0 && score[i][j] == score[i - 1][j] + gapScore) {
+                i--; j--;
+            } else if (i > 0 && score[i][j].compareTo(score[i - 1][j].add(gapScore)) == 0) {
                 align1.append(seq1.charAt(i - 1));
                 align2.append('-');
                 i--;
@@ -105,20 +97,71 @@ public class SequenceAligner {
         return new AlignmentResult(align1.reverse().toString(), align2.reverse().toString(), score[n][m]);
     }
 
-    public static class AlignmentResult {
-        public final String alignedSeq1;
-        public final String alignedSeq2;
-        public final int score;
+    /**
+     * Smith-Waterman local alignment algorithm.
+     * Finds the best local alignment (highest-scoring substring match).
+     */
+    public AlignmentResult localAlign(String seq1, String seq2) {
+        int n = seq1.length();
+        int m = seq2.length();
+        Real[][] score = new Real[n + 1][m + 1];
+        
+        // Initialize with zeros (local alignment allows starting anywhere)
+        for (int i = 0; i <= n; i++) score[i][0] = Real.ZERO;
+        for (int j = 0; j <= m; j++) score[0][j] = Real.ZERO;
 
-        public AlignmentResult(String s1, String s2, int score) {
-            this.alignedSeq1 = s1;
-            this.alignedSeq2 = s2;
-            this.score = score;
+        int maxI = 0, maxJ = 0;
+        Real maxScore = Real.ZERO;
+
+        // Fill matrix
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= m; j++) {
+                Real match = score[i - 1][j - 1].add(
+                    seq1.charAt(i - 1) == seq2.charAt(j - 1) ? matchScore : mismatchScore);
+                Real delete = score[i - 1][j].add(gapScore);
+                Real insert = score[i][j - 1].add(gapScore);
+                
+                Real best = match.compareTo(delete) > 0 ? match : delete;
+                best = best.compareTo(insert) > 0 ? best : insert;
+                score[i][j] = best.compareTo(Real.ZERO) > 0 ? best : Real.ZERO;
+                
+                if (score[i][j].compareTo(maxScore) > 0) {
+                    maxScore = score[i][j];
+                    maxI = i;
+                    maxJ = j;
+                }
+            }
         }
 
+        // Traceback from max score position
+        StringBuilder align1 = new StringBuilder();
+        StringBuilder align2 = new StringBuilder();
+        int i = maxI, j = maxJ;
+
+        while (i > 0 && j > 0 && score[i][j].compareTo(Real.ZERO) > 0) {
+            if (score[i][j].compareTo(score[i - 1][j - 1].add(
+                    seq1.charAt(i - 1) == seq2.charAt(j - 1) ? matchScore : mismatchScore)) == 0) {
+                align1.append(seq1.charAt(i - 1));
+                align2.append(seq2.charAt(j - 1));
+                i--; j--;
+            } else if (score[i][j].compareTo(score[i - 1][j].add(gapScore)) == 0) {
+                align1.append(seq1.charAt(i - 1));
+                align2.append('-');
+                i--;
+            } else {
+                align1.append('-');
+                align2.append(seq2.charAt(j - 1));
+                j--;
+            }
+        }
+
+        return new AlignmentResult(align1.reverse().toString(), align2.reverse().toString(), maxScore);
+    }
+
+    public record AlignmentResult(String alignedSeq1, String alignedSeq2, Real score) {
         @Override
         public String toString() {
-            return String.format("Score: %d\n%s\n%s", score, alignedSeq1, alignedSeq2);
+            return String.format("Score: %s\n%s\n%s", score, alignedSeq1, alignedSeq2);
         }
     }
 }

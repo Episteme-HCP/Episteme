@@ -405,4 +405,21 @@
       </plugins>
     </pluginManagement>
   </build>
+  <repositories>
+    <repository>
+      <id>tarsosdsp-releases</id>
+      <name>TarsosDSP Releases</name>
+      <url>https://mvn.0110.be/releases</url>
+    </repository>
+    <repository>
+      <id>jitpack.io</id>
+      <name>JitPack</name>
+      <url>https://jitpack.io</url>
+    </repository>
+    <repository>
+      <id>jzy3d-releases</id>
+      <name>Jzy3d Releases</name>
+      <url>https://maven.jzy3d.org/releases</url>
+    </repository>
+  </repositories>
 </project>

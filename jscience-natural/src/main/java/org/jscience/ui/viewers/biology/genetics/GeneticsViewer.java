@@ -24,7 +24,6 @@
 package org.jscience.ui.viewers.biology.genetics;
 
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
@@ -32,7 +31,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
@@ -40,13 +38,8 @@ import org.jscience.ui.BooleanParameter;
 import org.jscience.ui.ChoiceParameter;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.biology.loaders.FASTAReader;
-import org.jscience.biology.loaders.UniProtReader;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Enhanced Genetics Viewer.
@@ -74,7 +67,6 @@ public class GeneticsViewer extends AbstractViewer {
     private Label mendelResultsLabel;
 
     // Sequence Browser
-    private String sequenceID = "P01308";
     private TextArea resultArea;
     private Label sequenceStatusLabel;
 

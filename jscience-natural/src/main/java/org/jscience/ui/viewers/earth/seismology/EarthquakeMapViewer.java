@@ -30,14 +30,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import org.jscience.earth.seismology.Earthquake;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.ui.viewers.earth.MapViewer;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.NumericParameter;
-import org.jscience.mathematics.numbers.real.Real;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,26 +1,3 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.architecture.lift;
 
 import java.util.ArrayList;
@@ -29,13 +6,9 @@ import java.util.List;
 
 /**
  * Represents a building equipped with elevators for lift simulation.
- * <p>
- * This is a specialized building class for elevator/lift simulations.
- * For general architectural buildings, see
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * 
+ * Dispatcher Algorithm: Estimated Time of Arrival (ETA)
+ * Reference: Barney, G. C. (2003). Elevator Traffic Handbook.
  */
 public class LiftBuilding {
 
@@ -43,41 +16,91 @@ public class LiftBuilding {
     private final int minFloor;
     private final int maxFloor;
     private final List<Elevator> elevators;
+    private final List<List<Passenger>> floorQueues;
 
     public LiftBuilding(String name, int minFloor, int maxFloor) {
         this.name = name;
         this.minFloor = minFloor;
         this.maxFloor = maxFloor;
         this.elevators = new ArrayList<>();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getMinFloor() {
-        return minFloor;
-    }
-
-    public int getMaxFloor() {
-        return maxFloor;
-    }
-
-    public int getFloorCount() {
-        return maxFloor - minFloor + 1;
+        
+        int floorCount = maxFloor - minFloor + 1;
+        this.floorQueues = new ArrayList<>(floorCount);
+        for (int i = 0; i < floorCount; i++) {
+            floorQueues.add(new ArrayList<>());
+        }
     }
 
     public void addElevator(Elevator elevator) {
         elevators.add(elevator);
     }
 
-    public List<Elevator> getElevators() {
-        return Collections.unmodifiableList(elevators);
+    /**
+     * External hall call from a specific floor.
+     * Uses ETA algorithm to dispatch the most suitable elevator.
+     */
+    public void hallCall(int floor, Elevator.Direction direction) {
+        Elevator best = null;
+        int minEta = Integer.MAX_VALUE;
+
+        for (Elevator e : elevators) {
+            int eta = calculateETA(e, floor, direction);
+            if (eta < minEta) {
+                minEta = eta;
+                best = e;
+            }
+        }
+
+        if (best != null) {
+            best.hallCall(floor, direction);
+        }
+    }
+
+    private int calculateETA(Elevator e, int targetFloor, Elevator.Direction callDir) {
+        int dist = Math.abs(e.getCurrentFloor() - targetFloor);
+        
+        // Penalize if moving away
+        if (e.getDirection() == Elevator.Direction.UP && targetFloor < e.getCurrentFloor()) dist += 10;
+        if (e.getDirection() == Elevator.Direction.DOWN && targetFloor > e.getCurrentFloor()) dist += 10;
+        
+        // Penalize if moving in wrong direction
+        if (e.getDirection() != Elevator.Direction.NONE && e.getDirection() != callDir) dist += 5;
+        
+        return dist;
+    }
+
+    public void addPassenger(Passenger p) {
+        int floorIdx = p.getSourceFloor() - minFloor;
+        if (floorIdx >= 0 && floorIdx < floorQueues.size()) {
+            floorQueues.get(floorIdx).add(p);
+            hallCall(p.getSourceFloor(), p.getDestinationFloor() > p.getSourceFloor() ? 
+                    Elevator.Direction.UP : Elevator.Direction.DOWN);
+        }
     }
 
     public void tick() {
         for (Elevator elevator : elevators) {
             elevator.tick();
+            
+            // Handle passengers entering the elevator at the current floor
+            if (elevator.getState() == Elevator.State.OPEN) {
+                int floorIdx = elevator.getCurrentFloor() - minFloor;
+                if (floorIdx >= 0 && floorIdx < floorQueues.size()) {
+                    List<Passenger> queue = floorQueues.get(floorIdx);
+                    queue.removeIf(p -> {
+                        if (elevator.getPassengerCount() < elevator.getCapacity()) {
+                            elevator.addPassenger(p);
+                            return true;
+                        }
+                        return false;
+                    });
+                }
+            }
         }
     }
+
+    public String getName() { return name; }
+    public int getMinFloor() { return minFloor; }
+    public int getMaxFloor() { return maxFloor; }
+    public List<Elevator> getElevators() { return Collections.unmodifiableList(elevators); }
 }

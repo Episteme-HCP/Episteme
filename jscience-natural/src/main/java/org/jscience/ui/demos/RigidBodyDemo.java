@@ -59,8 +59,7 @@ public class RigidBodyDemo extends AbstractSimulationDemo {
     @Override
     public Node createViewerNode() {
         if (viewer == null) {
-            org.jscience.physics.classical.mechanics.PhysicsEngine engine = new org.jscience.physics.classical.mechanics.PhysicsEngine();
-            viewer = new RigidBodyViewer(engine);
+            viewer = new RigidBodyViewer();
         }
         return viewer;
     }

@@ -1,37 +1,12 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.arts;
 
 import java.util.*;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.history.time.UncertainDate;
+import org.jscience.economics.Money;
 
 /**
  * Represents a film/movie.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
  */
 public class Film {
 
@@ -46,23 +21,23 @@ public class Film {
 
     private final String title;
     private String director;
-    private int releaseYear;
+    private UncertainDate releaseDate;
     private int durationMinutes;
     private Genre genre;
     private Rating rating;
     private String studio;
     private final List<String> cast = new ArrayList<>();
-    private long boxOffice;
+    private Money boxOffice;
     private Real imdbRating;
 
     public Film(String title) {
-        this.title = title;
+        this.title = Objects.requireNonNull(title, "Title cannot be null");
     }
 
-    public Film(String title, String director, int releaseYear) {
+    public Film(String title, String director, UncertainDate releaseDate) {
         this(title);
         this.director = director;
-        this.releaseYear = releaseYear;
+        this.releaseDate = releaseDate;
     }
 
     // Getters
@@ -74,8 +49,8 @@ public class Film {
         return director;
     }
 
-    public int getReleaseYear() {
-        return releaseYear;
+    public UncertainDate getReleaseDate() {
+        return releaseDate;
     }
 
     public int getDurationMinutes() {
@@ -94,7 +69,7 @@ public class Film {
         return studio;
     }
 
-    public long getBoxOffice() {
+    public Money getBoxOffice() {
         return boxOffice;
     }
 
@@ -110,9 +85,15 @@ public class Film {
     public void setDirector(String director) {
         this.director = director;
     }
+    
+    public void setDirector(Artist artist) {
+        if (artist != null) {
+            this.director = artist.getName();
+        }
+    }
 
-    public void setReleaseYear(int year) {
-        this.releaseYear = year;
+    public void setReleaseDate(UncertainDate date) {
+        this.releaseDate = date;
     }
 
     public void setDurationMinutes(int duration) {
@@ -131,8 +112,8 @@ public class Film {
         this.studio = studio;
     }
 
-    public void setBoxOffice(long amount) {
-        this.boxOffice = amount;
+    public void setBoxOffice(Money boxOffice) {
+        this.boxOffice = boxOffice;
     }
 
     public void setImdbRating(Real rating) {
@@ -140,30 +121,20 @@ public class Film {
     }
 
     public void addCastMember(String actor) {
-        cast.add(actor);
+        if (actor != null) {
+            cast.add(actor);
+        }
+    }
+    
+    public void addCastMember(Artist artist) {
+        if (artist != null) {
+            cast.add(artist.getName());
+        }
     }
 
     @Override
     public String toString() {
-        return String.format("%s (%d) dir. %s", title, releaseYear, director);
-    }
-
-    // Classic films
-    public static Film citizenKane() {
-        Film f = new Film("Citizen Kane", "Orson Welles", 1941);
-        f.setGenre(Genre.DRAMA);
-        f.setDurationMinutes(119);
-        f.setImdbRating(Real.of(8.3));
-        f.addCastMember("Orson Welles");
-        return f;
-    }
-
-    public static Film twoThousandOne() {
-        Film f = new Film("2001: A Space Odyssey", "Stanley Kubrick", 1968);
-        f.setGenre(Genre.SCIENCE_FICTION);
-        f.setDurationMinutes(149);
-        f.setImdbRating(Real.of(8.3));
-        return f;
+        return String.format("%s (%s) dir. %s", title, releaseDate != null ? releaseDate.toString() : "Unknown", director);
     }
 }
 

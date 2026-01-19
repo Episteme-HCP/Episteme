@@ -23,12 +23,14 @@
 
 package org.jscience.arts.music;
 
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.quantity.Frequency;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+
 /**
- * Represents a musical note.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Represents a musical note with microtonal and dynamic properties.
  */
 public class Note {
 
@@ -37,7 +39,7 @@ public class Note {
     }
 
     public enum Duration {
-        WHOLE(1.0), HALF(0.5), QUARTER(0.25), EIGHTH(0.125), SIXTEENTH(0.0625);
+        WHOLE(1.0), HALF(0.5), QUARTER(0.25), EIGHTH(0.125), SIXTEENTH(0.0625), THIRTY_SECOND(0.03125);
 
         private final double value;
 
@@ -51,97 +53,75 @@ public class Note {
     }
 
     private final Pitch pitch;
-    private final int octave; // 0-8 (middle C is C4)
+    private final int octave;
     private final Duration duration;
-    private boolean sharp;
-    private boolean flat;
+    private final int cents; // Microtonal adjustment in cents
+    private final double velocity; // 0.0 to 1.0 (dynamic)
+
+    public Note(Pitch pitch, int octave, Duration duration, int cents, double velocity) {
+        this.pitch = pitch;
+        this.octave = octave;
+        this.duration = duration;
+        this.cents = cents;
+        this.velocity = Math.max(0.0, Math.min(1.0, velocity));
+    }
 
     public Note(Pitch pitch, int octave, Duration duration) {
-        this.pitch = pitch;
-        this.octave = Math.max(0, Math.min(8, octave));
-        this.duration = duration;
+        this(pitch, octave, duration, 0, 0.8);
     }
 
     public Note(Pitch pitch, int octave) {
         this(pitch, octave, Duration.QUARTER);
     }
 
-    // Getters
-    public Pitch getPitch() {
-        return pitch;
-    }
-
-    public int getOctave() {
-        return octave;
-    }
-
-    public Duration getDuration() {
-        return duration;
-    }
-
-    public boolean isSharp() {
-        return sharp;
-    }
-
-    public boolean isFlat() {
-        return flat;
-    }
-
-    public void setSharp(boolean sharp) {
-        this.sharp = sharp;
-        this.flat = false;
-    }
-
-    public void setFlat(boolean flat) {
-        this.flat = flat;
-        this.sharp = false;
-    }
+    public Pitch getPitch() { return pitch; }
+    public int getOctave() { return octave; }
+    public Duration getDuration() { return duration; }
+    public int getCents() { return cents; }
+    public double getVelocity() { return velocity; }
 
     /**
-     * Returns frequency in Hz (A4 = 440 Hz).
+     * Returns frequency as a Real-based Quantity.
+     * f = 440 * 2^((n - 69 + cents/100) / 12)
      */
-    public double getFrequency() {
-        // Calculate semitones from A4
-        int pitchIndex = pitch.ordinal();
-        int a4Index = Pitch.A.ordinal();
-        int semitones = pitchIndex - a4Index + (octave - 4) * 12;
-        if (sharp)
-            semitones++;
-        if (flat)
-            semitones--;
-        return 440.0 * Math.pow(2, semitones / 12.0);
+    public Quantity<Frequency> getFrequency() {
+        int n = getMidiNote();
+        double semitones = (n - 69) + (cents / 100.0);
+        Real freq = Real.of(440.0).multiply(Real.of(2.0).pow(semitones / 12.0));
+        return Quantities.create(freq.doubleValue(), Units.HERTZ);
     }
 
-    /**
-     * Returns MIDI note number (middle C = 60).
-     */
     public int getMidiNote() {
-        int note = (octave + 1) * 12 + pitch.ordinal();
-        if (sharp)
-            note++;
-        if (flat)
-            note--;
-        return note;
+        return (octave + 1) * 12 + pitch.ordinal();
     }
 
-    /**
-     * Returns scientific pitch notation (e.g., "C4", "A#5").
-     */
     public String getNotation() {
         String name = pitch.name().replace("_SHARP", "#");
-        if (sharp && !name.contains("#"))
-            name += "#";
-        if (flat)
-            name += "b";
-        return name + octave;
+        String micro = cents != 0 ? (cents > 0 ? "+" + cents : cents) + "c" : "";
+        return name + octave + micro;
     }
 
     @Override
     public String toString() {
-        return String.format("%s (%s, %.2f Hz)", getNotation(), duration, getFrequency());
+        return String.format("%s (vel=%.2f, f=%.2f Hz)", getNotation(), velocity, getFrequency().getValue().doubleValue());
     }
 
-    // Common notes
+    public static Note fromMidi(int midiNote, double durationValue) {
+        int octave = (midiNote / 12) - 1;
+        Pitch pitch = Pitch.values()[midiNote % 12];
+        // Closest duration
+        Duration duration = Duration.QUARTER;
+        double minDiff = Double.MAX_VALUE;
+        for (Duration d : Duration.values()) {
+            double diff = Math.abs(d.getValue() - durationValue);
+            if (diff < minDiff) {
+                minDiff = diff;
+                duration = d;
+            }
+        }
+        return new Note(pitch, octave, duration);
+    }
+
     public static final Note MIDDLE_C = new Note(Pitch.C, 4);
     public static final Note A440 = new Note(Pitch.A, 4);
 }

@@ -26,7 +26,7 @@ package org.jscience.ui.demos;
 import org.jscience.ui.AbstractDemo;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.ui.viewers.history.TimelineViewer;
-import org.jscience.history.Timeline;
+import org.jscience.history.HistoricalTimeline;
 
 public class HistoryTimelineDemo extends AbstractDemo {
 
@@ -58,7 +58,7 @@ public class HistoryTimelineDemo extends AbstractDemo {
     @Override
     protected javafx.scene.Node createViewerNode() {
         TimelineViewer v = new TimelineViewer();
-        v.setTimeline(Timeline.worldHistory());
+        v.setTimeline(HistoricalTimeline.worldHistory());
         this.viewer = v;
         return v;
     }

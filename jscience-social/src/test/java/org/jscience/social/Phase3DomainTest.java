@@ -48,13 +48,13 @@ public class Phase3DomainTest {
 
     @Test
     public void testArtsDomain() {
-        Person artist = new Person("Da Vinci", Person.Gender.MALE);
-        Artwork monaLisa = new Artwork("Mona Lisa", artist, 1503, Artwork.Type.PAINTING);
+        Artwork monaLisa = new Artwork("Mona Lisa", "Portrait", null, null, ArtForm.PAINTING);
+        monaLisa.addAuthor("Da Vinci");
 
-        assertEquals("Mona Lisa", monaLisa.getTitle());
-        assertEquals(artist, monaLisa.getCreator());
-        assertEquals(Artwork.Type.PAINTING, monaLisa.getType());
-        assertNotNull(monaLisa.getId());
+        assertEquals("Mona Lisa", monaLisa.getName());
+        assertTrue(monaLisa.getAuthors().contains("Da Vinci"));
+        assertEquals(ArtForm.PAINTING, monaLisa.getCategory());
+        assertNotNull(monaLisa.toString());
     }
 
     @Test

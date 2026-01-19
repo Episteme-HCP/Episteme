@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import org.jscience.geography.*;
 import org.jscience.sociology.*;
 import org.jscience.politics.*;
@@ -60,14 +61,13 @@ public class Phase4DomainTest {
     public void testPoliticsExpansion() {
         Country usa = new Country("USA", "US");
         Election election = new Election("2024 Presidential", usa, LocalDate.of(2024, 11, 5));
-        Ballot ballot = new Ballot(election);
-
-        ballot.addChoice("Alice");
-        ballot.addChoice("Bob");
-
-        ballot.castVote("Alice");
-        ballot.castVote("Alice");
-        ballot.castVote("Bob");
+        
+        // Ballot is a record, and doesn't update the election directly anymore.
+        // We simulate casting a ballot.
+        Ballot ballot = new Ballot("voter-1", List.of("Alice", "Bob"), null);
+        
+        election.addVote(ballot.rankedChoices().get(0), 1);
+        election.addVote("Alice", 1); // Cast another vote for Alice
 
         assertEquals(2, election.getResults().get("Alice"));
         assertEquals("Alice", election.getWinner());
@@ -77,9 +77,9 @@ public class Phase4DomainTest {
     public void testMilitaryDomain() {
         Country uk = new Country("UK", "GB");
         Country germany = new Country("Germany", "DE");
-        Place europe = new Place("Europe", Place.Type.CONTINENT); // Fixed constructor
+        Place europe = new Place("Europe", Place.Type.CONTINENT);
 
-        Conflict ww2 = new Conflict("WW2", europe, LocalDate.of(1939, 9, 1));
+        org.jscience.politics.military.Conflict ww2 = new org.jscience.politics.military.Conflict("WW2", europe, LocalDate.of(1939, 9, 1));
         ww2.addBelligerent(uk);
         ww2.addBelligerent(germany);
 

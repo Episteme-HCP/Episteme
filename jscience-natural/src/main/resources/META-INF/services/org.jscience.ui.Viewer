@@ -1,4 +1,3 @@
-
 org.jscience.ui.demos.UnitConverterDemo
 org.jscience.ui.demos.SequenceAlignmentDemo
 org.jscience.ui.demos.SpeciesBrowserDemo
@@ -7,9 +6,7 @@ org.jscience.ui.demos.GeometryBoardDemo
 org.jscience.ui.demos.RigidBodyDemo
 org.jscience.ui.demos.MetamathDemo
 org.jscience.ui.demos.PeripheralsDemo
-
 org.jscience.ui.demos.DigitalLogicDemo
-
 org.jscience.ui.demos.ChemicalReactionDemo
 org.jscience.ui.demos.CircuitSimulatorDemo
 org.jscience.ui.demos.ClothSimulationDemo
@@ -28,10 +25,10 @@ org.jscience.ui.demos.PeriodicTableDemo
 org.jscience.ui.demos.PhylogeneticTreeDemo
 org.jscience.ui.demos.RelativisticFlightDemo
 org.jscience.ui.demos.ResistorColorCodeDemo
-org.jscience.ui.demos.SpectrographDemo
 org.jscience.ui.demos.StarSystemDemo
 org.jscience.ui.demos.StellarSkyDemo
 org.jscience.ui.demos.ThermodynamicsDemo
 org.jscience.ui.demos.VitalMonitorDemo
 org.jscience.ui.demos.InterplanetaryTrajectoryDemo
-org.jscience.ui.demos.AudioViewerDemo
+org.jscience.ui.demos.QuantumCircuitDemo
+org.jscience.ui.demos.ChemicalKineticsDemo

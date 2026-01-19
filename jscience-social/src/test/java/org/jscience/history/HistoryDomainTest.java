@@ -33,7 +33,7 @@ public class HistoryDomainTest {
 
     @Test
     public void testTimeline() {
-        Timeline timeline = new Timeline("World History");
+        HistoricalTimeline timeline = new HistoricalTimeline("World History");
         timeline.addEvent(HistoricalEvent.FRENCH_REVOLUTION);
         timeline.addEvent(HistoricalEvent.WORLD_WAR_I);
         timeline.addEvent(HistoricalEvent.MOON_LANDING);
@@ -51,7 +51,7 @@ public class HistoryDomainTest {
 
     @Test
     public void testEventsBetween() {
-        Timeline timeline = Timeline.worldHistory();
+        HistoricalTimeline timeline = HistoricalTimeline.worldHistory();
         // 1900 to 1950
         List<HistoricalEvent> events = timeline.getEventsBetween(
                 FuzzyDate.of(1900, 1, 1),

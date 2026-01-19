@@ -1,0 +1,5 @@
+org.jscience.media.backend.JavaSoundEngine
+org.jscience.media.backend.TarsosDSPEngine
+org.jscience.media.backend.MinimEngine
+org.jscience.media.backend.VLCJEngine
+org.jscience.media.backend.JavaCVEngine

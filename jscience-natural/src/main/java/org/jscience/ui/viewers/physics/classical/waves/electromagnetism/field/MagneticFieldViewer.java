@@ -155,6 +155,33 @@ public class MagneticFieldViewer extends org.jscience.ui.AbstractViewer {
         fieldGroup.getChildren().add(g);
     }
 
+    private final List<SourceVisualizer> visualizers = new java.util.ArrayList<>();
+
+    public void addVisualizer(SourceVisualizer visualizer) {
+        visualizers.add(visualizer);
+        updateVisualizers();
+    }
+
+    private void updateVisualizers() {
+        // Clear old visualizer nodes (heuristic: usually at end or marked, but here we just rebuild if needed or add them)
+        // For simplicity in this demo fix, we just append them to root if not present.
+        // A better approach would be a dedicated group.
+        
+        for (org.jscience.technical.backend.algorithms.MaxwellSource source : provider.getSources()) {
+            for (SourceVisualizer v : visualizers) {
+                if (v.supports(source)) {
+                    Node node = v.getVisualRepresentation(source);
+                    // Add position logic if not built-in to node
+                    double[] pos = source.getPosition();
+                    node.setTranslateX(pos[0]);
+                    node.setTranslateY(pos[1]);
+                    node.setTranslateZ(pos[2]);
+                    fieldGroup.getChildren().add(node);
+                }
+            }
+        }
+    }
+
     @Override public List<Parameter<?>> getViewerParameters() { return parameters; }
     @Override public String getDescription() { return I18n.getInstance().get("viewer.magneticfieldviewer.desc", "3D magnetic field visualization."); }
     @Override public String getLongDescription() { return I18n.getInstance().get("viewer.magneticfieldviewer.longdesc", "Interactive 3D field lines."); }

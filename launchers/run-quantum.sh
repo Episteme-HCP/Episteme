@@ -1,6 +1,7 @@
 #!/bin/bash
+APP_CLASS=org.jscience.apps.physics.QuantumCircuitApp
+LIB_DIR=launchers/lib
+MODULE_PATH="jscience-featured-apps/target/classes:jscience-core/target/classes:jscience-natural/target/classes:jscience-social/target/classes"
 
-APP_CLASS="org.jscience.apps.physics.QuantumCircuitApp"
-
-echo "Starting Quantum Circuit Simulator..."
-mvn -f ../pom.xml exec:java -pl jscience-featured-apps -Dexec.mainClass="$APP_CLASS"
+echo "Starting Quantum Circuit Designer..."
+java --module-path "${LIB_DIR}/javafx" --add-modules javafx.controls,javafx.graphics,javafx.fxml -cp "${MODULE_PATH}:${LIB_DIR}/*" ${APP_CLASS}

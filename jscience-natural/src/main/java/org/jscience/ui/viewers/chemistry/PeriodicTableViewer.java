@@ -23,15 +23,11 @@
 
 package org.jscience.ui.viewers.chemistry;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import org.jscience.chemistry.Element;
 import org.jscience.chemistry.PeriodicTable;
 import org.jscience.chemistry.loaders.PeriodicTableReader;
@@ -41,7 +37,6 @@ import org.jscience.ui.NumericParameter;
 import org.jscience.ui.StringParameter;
 import org.jscience.ui.BooleanParameter;
 import org.jscience.ui.i18n.I18n;
-import org.jscience.io.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;

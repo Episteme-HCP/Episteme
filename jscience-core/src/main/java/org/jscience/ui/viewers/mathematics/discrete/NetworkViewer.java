@@ -26,16 +26,26 @@ package org.jscience.ui.viewers.mathematics.discrete;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.Label;
 import org.jscience.ui.AbstractViewer;
+import org.jscience.ui.Parameter;
+import org.jscience.ui.RealParameter;
+import org.jscience.ui.i18n.I18n;
+import org.jscience.ui.viewers.mathematics.discrete.backend.JavaFXNetworkRenderer;
+
+import java.util.*;
 
 /**
- * Generic Network/Graph Viewer.
- * Supports visualization of nodes and edges for discrete mathematics and social network analysis.
+ * Universal Network/Graph Viewer.
+ * Visualizes complex graphs using native force-directed layout or external backends (GraphStream, JGraphT).
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public class NetworkViewer extends AbstractViewer {
+
+    private JavaFXNetworkRenderer nativeRenderer;
+    private Object activeBackend;
+
 
     public NetworkViewer() {
         // Discover backend
@@ -51,49 +61,63 @@ public class NetworkViewer extends AbstractViewer {
         }
         
         if (provider.isPresent()) {
-            Object backend = provider.get().createBackend();
-            if (backend instanceof org.jscience.ui.viewers.mathematics.discrete.backend.JavaFXNetworkRenderer) {
-                getChildren().add(((org.jscience.ui.viewers.mathematics.discrete.backend.JavaFXNetworkRenderer)backend).getCanvas());
+            activeBackend = provider.get().createBackend();
+            if (activeBackend instanceof JavaFXNetworkRenderer renderer) {
+                this.nativeRenderer = renderer;
+                setCenter(new Pane(renderer.getCanvas()));
+                renderer.getCanvas().widthProperty().bind(((Pane)getCenter()).widthProperty());
+                renderer.getCanvas().heightProperty().bind(((Pane)getCenter()).heightProperty());
             } else {
                 javafx.scene.layout.VBox info = new javafx.scene.layout.VBox(10);
                 info.setAlignment(javafx.geometry.Pos.CENTER);
                 info.getChildren().addAll(
-                    new Label("Active Network Backend: " + provider.get().getName()),
+                    new Label(I18n.getInstance().get("viewer.network.active", "Active Backend: ") + provider.get().getName()),
                     new Label(provider.get().getDescription())
                 );
-                getChildren().add(info);
+                setCenter(info);
             }
         } else {
             Pane container = new Pane();
             container.getStyleClass().add("viewer-root");
             container.getChildren().add(new Label(org.jscience.ui.i18n.I18n.getInstance().get("viewer.networkviewer.error.nobackend", "No Network Backend Available (Install GraphStream, JUNG, etc.)")));
-            getChildren().add(container);
+            setCenter(container);
+        }
+    }
+
+    /**
+     * Sets the graph data to be rendered by the active backend.
+     */
+    public void setData(Object graphData) {
+        if (nativeRenderer != null) {
+            nativeRenderer.renderNetwork(graphData);
+        } else if (activeBackend != null) {
+            // Logic for other backends (if they support a standard render method)
+            try {
+                activeBackend.getClass().getMethod("renderNetwork", Object.class).invoke(activeBackend, graphData);
+            } catch (Exception ignored) {}
         }
     }
 
     @Override
-    public java.util.List<org.jscience.ui.Parameter<?>> getViewerParameters() {
-        return java.util.Collections.emptyList();
+    public List<Parameter<?>> getViewerParameters() {
+        List<Parameter<?>> params = new ArrayList<>();
+        params.add(new RealParameter(
+            I18n.getInstance().get("viewer.network.repulsion", "Repulsion Strength"), 
+            "Strength of node repulsion (force physics)", 0.0, 5000.0, 100.0, 1000.0, val -> {
+                if (nativeRenderer != null) nativeRenderer.setRepulsion(val);
+            }));
+        params.add(new RealParameter(
+            I18n.getInstance().get("viewer.network.spring", "Spring Strength"), 
+            "Strength of edge attraction", 0.0, 1.0, 0.01, 0.05, val -> {
+                if (nativeRenderer != null) nativeRenderer.setSpringStrength(val);
+            }));
+        return params;
     }
 
-    @Override
-    public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.mathematics", "Mathematics");
-    }
-
-    @Override
-    public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.networkviewer.name", "Network Viewer");
-    }
-    
-    @Override
-    public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.networkviewer.desc", "Visualizes networks and graphs.");
-    }
-
-    @Override
-    public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("viewer.networkviewer.longdesc", "Graph theory and network visualization tool. Supports visualization of nodes and edges for discrete mathematics and social network analysis with various backend providers.");
+    @Override public String getCategory() { return I18n.getInstance().get("category.mathematics", "Mathematics"); }
+    @Override public String getName() { return I18n.getInstance().get("viewer.network.name", "Universal Network Viewer"); }
+    @Override public String getDescription() { return I18n.getInstance().get("viewer.network.desc", "Visualizes networks and graphs with multiple backends."); }
+    @Override public String getLongDescription() { 
+        return I18n.getInstance().get("viewer.network.longdesc", "Advanced graph theory and network visualization tool. Supports high-performance native force-directed layout and external providers like GraphStream or JUNG."); 
     }
 }
-

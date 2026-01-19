@@ -215,6 +215,14 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
 
     public abstract boolean isInfinite();
 
+    public boolean isPositive() {
+        return sign() > 0;
+    }
+
+    public boolean isNegative() {
+        return sign() < 0;
+    }
+
     public abstract double doubleValue();
 
     public abstract BigDecimal bigDecimalValue();

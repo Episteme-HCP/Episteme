@@ -29,7 +29,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import org.jscience.ui.AbstractSimulationDemo;
 import org.jscience.ui.AbstractViewer;

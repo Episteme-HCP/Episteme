@@ -23,13 +23,11 @@
 
 package org.jscience.ui.viewers.biology.phylogeny;
 
-import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.TextAlignment;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.BooleanParameter;
 import org.jscience.ui.StringParameter;

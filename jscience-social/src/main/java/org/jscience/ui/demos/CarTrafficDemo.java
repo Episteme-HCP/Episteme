@@ -83,7 +83,7 @@ public class CarTrafficDemo extends AbstractSimulationDemo {
         // Initialize simulation
         double trackRadius = TRACK_RADIUS_PIXELS;
         Quantity<Length> trackLength = Quantities.create(2 * Math.PI * trackRadius, Units.METER);
-        simulator = new org.jscience.architecture.traffic.TrafficSimulator(trackLength);
+        simulator = new org.jscience.architecture.traffic.TrafficSimulator(trackLength, 2);
         simulator.initCars(30);
 
         // Start animation loop

@@ -44,6 +44,7 @@ public class BackendDiscovery {
     public static final String TYPE_QUANTUM = "quantum";
     public static final String TYPE_MAP = "map";
     public static final String TYPE_NETWORK = "network";
+    public static final String TYPE_AUDIO = "audio";
 
     private static final BackendDiscovery INSTANCE = new BackendDiscovery();
 

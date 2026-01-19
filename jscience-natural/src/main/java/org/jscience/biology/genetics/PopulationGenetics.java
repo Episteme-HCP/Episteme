@@ -1,76 +1,91 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.biology.genetics;
 
 import org.jscience.mathematics.numbers.real.Real;
+import java.util.*;
 
 /**
- * Population genetics models.
- *
- * @author Silvere Martin-Michiellot
- * <p>
- * <b>Reference:</b><br>
- * Holland, J. H. (1975). <i>Adaptation in Natural and Artificial Systems</i>. University of Michigan Press.
- * </p>
- *
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Models population genetics and evolutionary equilibrium.
  */
-public class PopulationGenetics {
+public final class PopulationGenetics {
 
-    /** Hardy-Weinberg genotype frequencies: [p², 2pq, q²] */
-    public static Real[] hardyWeinbergFrequencies(Real p) {
-        if (p.compareTo(Real.ZERO) < 0 || p.compareTo(Real.ONE) > 0)
-            throw new IllegalArgumentException("Allele frequency p must be between 0 and 1");
-        Real q = Real.ONE.subtract(p);
-        return new Real[] { p.pow(2), Real.TWO.multiply(p).multiply(q), q.pow(2) };
+    private PopulationGenetics() {}
+
+    public record GenotypeFrequencies(
+        double aa, // homozygous dominant
+        double aa_alt, // heterozygous (Aa)
+        double lower_aa // homozygous recessive
+    ) {}
+
+    public record AlleleFrequencies(
+        double p, // dominant
+        double q  // recessive
+    ) {}
+
+    /**
+     * Hardy-Weinberg Equilibrium: p² + 2pq + q² = 1.
+     * Calculates genotype frequencies from allele frequencies.
+     */
+    public static GenotypeFrequencies calculateHardyWeinberg(AlleleFrequencies alleles) {
+        double p = alleles.p();
+        double q = alleles.q();
+        return new GenotypeFrequencies(p * p, 2 * p * q, q * q);
     }
 
-    /** Estimate allele frequency: p = (2*AA + Aa) / (2*N) */
-    public static Real estimateAlleleFrequency(int AA, int Aa, int aa) {
-        int N = AA + Aa + aa;
-        if (N == 0)
-            return Real.ZERO;
-        return Real.of(2.0 * AA + Aa).divide(Real.of(2.0 * N));
+    /**
+     * Estimates allele frequencies from observed genotypes using maximum likelihood.
+     */
+    public static AlleleFrequencies estimateAlleles(GenotypeFrequencies observed) {
+        double p = observed.aa() + 0.5 * observed.aa_alt();
+        return new AlleleFrequencies(p, 1 - p);
     }
 
-    /** Fixation index: F_ST = (H_T - H_S) / H_T */
-    public static Real fixationIndex(Real heterozygosityTotal, Real heterozygositySub) {
-        if (heterozygosityTotal.isZero())
-            return Real.ZERO;
-        return heterozygosityTotal.subtract(heterozygositySub).divide(heterozygosityTotal);
+    /**
+     * Calculates the Selection Coefficient 's'.
+     * Fitness W = 1 - s.
+     */
+    public static Real selectionCoefficient(double fitness) {
+        return Real.of(1.0 - fitness);
     }
 
-    /** Wright-Fisher step (genetic drift simulation) */
-    public static int wrightFisherStep(int initialCountAlleleA, int populationSize) {
-        int totalGenes = 2 * populationSize;
-        double p = (double) initialCountAlleleA / totalGenes;
-        int nextGenCount = 0;
-        for (int i = 0; i < totalGenes; i++) {
-            if (Math.random() < p)
-                nextGenCount++;
+    /**
+     * Projects allele frequency change due to selection.
+     * Δp = (p * q * [p(w11-w12) + q(w12-w22)]) / W_mean
+     */
+    public static List<AlleleFrequencies> simulateSelection(AlleleFrequencies initial,
+            double wAA, double wAa, double waa, int generations) {
+        
+        List<AlleleFrequencies> history = new ArrayList<>();
+        double p = initial.p();
+        double q = initial.q();
+        
+        for (int i = 0; i < generations; i++) {
+            history.add(new AlleleFrequencies(p, q));
+            
+            double wMean = p * p * wAA + 2 * p * q * wAa + q * q * waa;
+            double pNext = (p * p * wAA + p * q * wAa) / wMean;
+            
+            p = pNext;
+            q = 1 - p;
         }
-        return nextGenCount;
+        
+        return history;
+    }
+
+    /**
+     * Calculates Inbreeding Coefficient (F).
+     * F = (He - Ho) / He
+     */
+    public static Real inbreedingCoefficient(double expectedHet, double observedHet) {
+        if (expectedHet == 0) return Real.ZERO;
+        return Real.of((expectedHet - observedHet) / expectedHet);
+    }
+
+    /**
+     * Checks for genetic drift probability using Wright-Fisher model.
+     * Variance in allele frequency Δp = p*q / 2N
+     */
+    public static Real driftVariance(AlleleFrequencies alleles, int populationSize) {
+        double var = (alleles.p() * alleles.q()) / (2.0 * populationSize);
+        return Real.of(var);
     }
 }

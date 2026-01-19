@@ -23,11 +23,8 @@
 
 package org.jscience.ui.viewers.computing.logic;
 
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import org.jscience.ui.Parameter;

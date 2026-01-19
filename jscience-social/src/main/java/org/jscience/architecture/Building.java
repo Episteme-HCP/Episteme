@@ -23,40 +23,42 @@
 
 package org.jscience.architecture;
 
+import org.jscience.history.time.UncertainDate;
+import org.jscience.geography.Place;
+import java.util.Objects;
+
 /**
  * Represents a building or architectural structure.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
  */
 public class Building {
 
     public enum Style {
         CLASSICAL, GOTHIC, RENAISSANCE, BAROQUE, NEOCLASSICAL,
         ART_NOUVEAU, ART_DECO, MODERNIST, POSTMODERN, CONTEMPORARY,
-        BRUTALIST, DECONSTRUCTIVIST, HIGH_TECH
+        BRUTALIST, DECONSTRUCTIVIST, HIGH_TECH, BYZANTINE, ROMANESQUE,
+        ISLAMIC, VERNACULAR
     }
 
     public enum Type {
         RESIDENTIAL, COMMERCIAL, INDUSTRIAL, RELIGIOUS, EDUCATIONAL,
-        GOVERNMENT, CULTURAL, HEALTHCARE, RECREATIONAL, INFRASTRUCTURE
+        GOVERNMENT, CULTURAL, HEALTHCARE, RECREATIONAL, INFRASTRUCTURE,
+        MILITARY, MIXED_USE
     }
 
     private final String name;
     private final Style style;
     private final Type type;
-    private final int yearBuilt;
+    private final UncertainDate buildDate;
     private final String architect;
-    private final String location;
+    private final Place location;
     private final double heightMeters;
 
-    public Building(String name, Style style, Type type, int yearBuilt,
-            String architect, String location, double heightMeters) {
-        this.name = name;
+    public Building(String name, Style style, Type type, UncertainDate buildDate,
+            String architect, Place location, double heightMeters) {
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
         this.style = style;
         this.type = type;
-        this.yearBuilt = yearBuilt;
+        this.buildDate = buildDate;
         this.architect = architect;
         this.location = location;
         this.heightMeters = heightMeters;
@@ -74,15 +76,15 @@ public class Building {
         return type;
     }
 
-    public int getYearBuilt() {
-        return yearBuilt;
+    public UncertainDate getBuildDate() {
+        return buildDate;
     }
 
     public String getArchitect() {
         return architect;
     }
 
-    public String getLocation() {
+    public Place getLocation() {
         return location;
     }
 
@@ -92,17 +94,9 @@ public class Building {
 
     @Override
     public String toString() {
-        return String.format("%s (%s, %d) by %s - %.0fm",
-                name, style, yearBuilt, architect, heightMeters);
+        return String.format("%s (%s, %s) by %s at %s - %.1fm",
+                name, style, buildDate, architect, (location != null ? location.getName() : "Unknown"), heightMeters);
     }
-
-    // Famous buildings
-    public static final Building EIFFEL_TOWER = new Building("Eiffel Tower", Style.ART_NOUVEAU,
-            Type.CULTURAL, 1889, "Gustave Eiffel", "Paris, France", 330);
-    public static final Building EMPIRE_STATE = new Building("Empire State Building", Style.ART_DECO,
-            Type.COMMERCIAL, 1931, "Shreve, Lamb & Harmon", "New York, USA", 443);
-    public static final Building SAGRADA_FAMILIA = new Building("Sagrada Familia", Style.ART_NOUVEAU,
-            Type.RELIGIOUS, 1882, "Antoni GaudÃƒÂ­", "Barcelona, Spain", 172);
 }
 
 

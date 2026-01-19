@@ -24,8 +24,6 @@
 package org.jscience.ui;
 
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -257,6 +255,15 @@ public class MasterControlLibrariesUITest {
                 (l.getText().toLowerCase().contains("visual") ||
                  l.getText().toLowerCase().contains("plotting")));
         assertTrue(found, "Visualization & Plotting section should be displayed");
+    }
+
+    @Test
+    void testAudioCategoryDisplayed(FxRobot robot) {
+        robot.clickOn("#tab-libraries");
+        Set<Label> labels = robot.lookup(".header-title").queryAllAs(Label.class);
+        boolean found = labels.stream().anyMatch(l -> l.getText() != null &&
+                (l.getText().toLowerCase().contains("audio")));
+        assertTrue(found, "Audio Processing section should be displayed");
     }
 
     @Test

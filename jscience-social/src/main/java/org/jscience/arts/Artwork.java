@@ -1,84 +1,122 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.arts;
 
-import java.util.UUID;
-import org.jscience.util.identity.Identifiable;
-import org.jscience.sociology.Person;
+import org.jscience.history.time.UncertainDate;
+import org.jscience.geography.Place;
+import org.jscience.economics.Money;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Objects;
 
 /**
- * Represents a piece of artwork.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * A class representing a piece of art (Artwork).
+ * Integrates history (UncertainDate), geography (Place), economics (Money), and scientific analysis.
  */
-public class Artwork implements Identifiable<String> {
+public class Artwork {
 
-    public enum Type {
-        PAINTING, SCULPTURE, LITERATURE, MUSIC, FILM, ARCHITECTURE, OTHER
+    private final String name;
+    private final String description;
+    private final UncertainDate productionDate;
+    private final Place productionPlace;
+    private final ArtForm category;
+
+    private final Set<String> authors; // Names of authors/artists
+    private Money estimatedValue;
+    
+    private final Set<Analysis> analyses;
+    private final Set<Restoration> restorations;
+
+    public Artwork(String name, String description, UncertainDate productionDate, Place productionPlace, ArtForm category) {
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        this.description = description;
+        this.productionDate = productionDate;
+        this.productionPlace = productionPlace;
+        this.category = Objects.requireNonNull(category, "Category cannot be null");
+        this.authors = new HashSet<>();
+        this.analyses = new HashSet<>();
+        this.restorations = new HashSet<>();
     }
 
-    private final String id;
-    private final String title;
-    private final Person creator;
-    private final int year;
-    private final Type type;
-
-    public Artwork(String title, Person creator, int year, Type type) {
-        this.id = UUID.randomUUID().toString();
-        this.title = title;
-        this.creator = creator;
-        this.year = year;
-        this.type = type;
+    public String getName() {
+        return name;
     }
 
-    @Override
-    public String getId() {
-        return id;
+    public String getDescription() {
+        return description;
     }
 
-    public String getTitle() {
-        return title;
+    public UncertainDate getProductionDate() {
+        return productionDate;
     }
 
-    public Person getCreator() {
-        return creator;
+    public Place getProductionPlace() {
+        return productionPlace;
     }
 
-    public int getYear() {
-        return year;
+    public ArtForm getCategory() {
+        return category;
     }
 
-    public Type getType() {
-        return type;
+    public Set<String> getAuthors() {
+        return Collections.unmodifiableSet(authors);
+    }
+    
+    public void addAuthor(String authorName) {
+        if (authorName != null) {
+            authors.add(authorName);
+        }
+    }
+
+    public void addAuthor(Artist artist) {
+        if (artist != null) {
+            authors.add(artist.getName());
+        }
+    }
+
+    public Money getEstimatedValue() {
+        return estimatedValue;
+    }
+
+    public void setEstimatedValue(Money estimatedValue) {
+        this.estimatedValue = estimatedValue;
+    }
+
+    public Set<Analysis> getAnalyses() {
+        return Collections.unmodifiableSet(analyses);
+    }
+    
+    public void addAnalysis(Analysis analysis) {
+        if (analysis != null) {
+            analyses.add(analysis);
+        }
+    }
+
+    public Set<Restoration> getRestorations() {
+        return Collections.unmodifiableSet(restorations);
+    }
+    
+    public void addRestoration(Restoration restoration) {
+        if (restoration != null) {
+            restorations.add(restoration);
+        }
     }
 
     @Override
     public String toString() {
-        return String.format("'%s' by %s (%d)", title, creator != null ? creator.getName() : "Unknown", year);
+        return String.format("%s (%s)", name, category);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Artwork artwork)) return false;
+        return category == artwork.category && 
+               Objects.equals(name, artwork.name) && 
+               Objects.equals(productionDate, artwork.productionDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, productionDate, category);
     }
 }
-
-

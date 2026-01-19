@@ -23,11 +23,9 @@
 
 package org.jscience.ui.viewers.physics.classical.waves.electromagnetism.circuit;
 
-import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;

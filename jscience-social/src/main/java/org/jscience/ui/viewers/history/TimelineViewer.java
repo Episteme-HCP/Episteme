@@ -30,7 +30,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.jscience.history.HistoricalEvent;
-import org.jscience.history.Timeline;
+import org.jscience.history.HistoricalTimeline;
 import org.jscience.history.FuzzyDate;
 
 import org.jscience.mathematics.numbers.real.Real;
@@ -52,7 +52,7 @@ import java.util.Optional;
  */
 public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer {
 
-    private Timeline timeline;
+    private HistoricalTimeline timeline;
     private final Canvas canvas;
     private boolean logScale = false;
     private Real currentYearHighlight = Real.of(2025); // Default "Now"
@@ -74,7 +74,7 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
         canvas.heightProperty().addListener(o -> draw());
     }
 
-    public void setTimeline(Timeline timeline) {
+    public void setTimeline(HistoricalTimeline timeline) {
         this.timeline = timeline;
         calculateBounds();
         draw();

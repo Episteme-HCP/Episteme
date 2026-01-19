@@ -49,6 +49,10 @@ public class Belief extends Concept {
     public List<Concept> getRelatedConcepts() {
         return Collections.unmodifiableList(relatedConcepts);
     }
+
+    public String getStatement() {
+        return getName();
+    }
 }
 
 

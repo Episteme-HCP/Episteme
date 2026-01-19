@@ -97,7 +97,8 @@ public class SportsResultsViewer extends AbstractViewer {
         TableColumn<Team, Number> pointsCol = new TableColumn<>(I18n.getInstance().get("sports.col.pts", "Points"));
         pointsCol.setCellValueFactory(cell -> cell.getValue().points);
         
-        table.getColumns().addAll(nameCol, playedCol, pointsCol);
+        @SuppressWarnings({"unchecked", "unused"})
+        boolean added = table.getColumns().addAll(nameCol, playedCol, pointsCol);
         
         ListView<String> historyView = new ListView<>(matchHistory);
         SplitPane split = new SplitPane(table, historyView);
