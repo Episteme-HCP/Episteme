@@ -36,6 +36,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.jscience.util.Named;
+
 /**
  * A molecule: collection of atoms connected by bonds.
  *
@@ -43,7 +45,7 @@ import java.util.stream.Collectors;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Molecule {
+public class Molecule implements Named {
 
     private final String name;
     private final List<Atom> atoms;

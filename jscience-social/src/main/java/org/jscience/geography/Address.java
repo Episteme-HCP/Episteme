@@ -1,72 +1,249 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.geography;
 
+import org.jscience.politics.Country;
+
+import org.jscience.util.Named;
+import org.jscience.util.Positioned;
+
+
 /**
- * Represents a physical address.
+ * A class representing all the informations needed to reach a place.
  *
  * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @version 1.0
  */
-public class Address implements Locatable {
 
-    private final String street;
-    private final City city;
-    private final String postalCode;
+//this is the basic information
+//in fact it happens that many more specific fields may be required (all highly place dependant)
+//http://kropla.com/dialcode.htm for international phone country codes
+public class Address extends Object implements Named, Positioned {
+    /** DOCUMENT ME! */
+    private String fullName; //for example the
 
-    public Address(String street, City city, String postalCode) {
-        this.street = street;
+    /** DOCUMENT ME! */
+    private String company;
+
+    /** DOCUMENT ME! */
+    private String address1; //building...
+
+    /** DOCUMENT ME! */
+    private String address2; //street...
+
+    /** DOCUMENT ME! */
+    private String city;
+
+    /** DOCUMENT ME! */
+    private String state;
+
+    /** DOCUMENT ME! */
+    private String zipCode;
+
+    /** DOCUMENT ME! */
+    private Country country;
+
+    /** DOCUMENT ME! */
+    private String phoneNumber;
+
+    /** DOCUMENT ME! */
+    private Place place;
+
+    //you have to build up a new object should any field in the constructor change
+    /**
+     * Creates a new Address object.
+     *
+     * @param fullName DOCUMENT ME!
+     * @param address DOCUMENT ME!
+     * @param city DOCUMENT ME!
+     * @param zipCode DOCUMENT ME!
+     * @param country DOCUMENT ME!
+     */
+    public Address(String fullName, String address, String city,
+        String zipCode, Country country) {
+        this(fullName, null, address, null, city, null, zipCode, country);
+    }
+
+/**
+     * Creates a new Address object.
+     *
+     * @param fullName DOCUMENT ME!
+     * @param address1 DOCUMENT ME!
+     * @param address2 DOCUMENT ME!
+     * @param city     DOCUMENT ME!
+     * @param zipCode  DOCUMENT ME!
+     * @param country  DOCUMENT ME!
+     */
+    public Address(String fullName, String address1, String address2,
+        String city, String zipCode, Country country) {
+        this(fullName, null, address1, address2, city, null, zipCode, country);
+    }
+
+/**
+     * Creates a new Address object.
+     *
+     * @param fullName DOCUMENT ME!
+     * @param address1 DOCUMENT ME!
+     * @param address2 DOCUMENT ME!
+     * @param city     DOCUMENT ME!
+     * @param state    DOCUMENT ME!
+     * @param zipCode  DOCUMENT ME!
+     * @param country  DOCUMENT ME!
+     */
+    public Address(String fullName, String address1, String address2,
+        String city, String state, String zipCode, Country country) {
+        this(fullName, null, address1, address2, city, state, zipCode, country);
+    }
+
+/**
+     * Creates a new Address object.
+     *
+     * @param fullName DOCUMENT ME!
+     * @param company  DOCUMENT ME!
+     * @param address1 DOCUMENT ME!
+     * @param address2 DOCUMENT ME!
+     * @param city     DOCUMENT ME!
+     * @param state    DOCUMENT ME!
+     * @param zipCode  DOCUMENT ME!
+     * @param country  DOCUMENT ME!
+     */
+    public Address(String fullName, String company, String address1,
+        String address2, String city, String state, String zipCode,
+        Country country) {
+        this.fullName = fullName;
+        this.company = company;
+        this.address1 = address1;
+        this.address2 = address2;
         this.city = city;
-        this.postalCode = postalCode;
+        this.state = state;
+        this.zipCode = zipCode;
+        this.country = country;
     }
 
-    @Override
-    public Place getLocation() {
-        return city; // Address is located within the city
+    //may return null
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public String getName() {
+        return fullName;
     }
 
-    public String getStreet() {
-        return street;
+    //may return null
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public String getCompany() {
+        return company;
     }
 
-    public City getCity() {
+    //may return null
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public String getAddress1() {
+        return address1;
+    }
+
+    //may return null
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public String getAddress2() {
+        return address2;
+    }
+
+    //may return null
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public String getCity() {
         return city;
     }
 
-    public String getPostalCode() {
-        return postalCode;
+    //may return null
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public String getState() {
+        return state;
     }
 
-    @Override
-    public String toString() {
-        return String.format("%s, %s %s, %s",
-                street,
-                postalCode,
-                city.getName(),
-                city.getExactCountry() != null ? city.getExactCountry().getName() : "");
+    //may return null
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    //may return null
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Country getCountry() {
+        return country;
+    }
+
+    //may return null
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public String getCountryName() {
+        return country.getName();
+    }
+
+    //may return null
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param phone DOCUMENT ME!
+     */
+    public void setPhoneNumber(String phone) {
+        this.phoneNumber = phone;
+    }
+
+    //may return null
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Place getPosition() {
+        return place;
+    }
+
+    //usually set as a callback to a place
+    /**
+     * DOCUMENT ME!
+     *
+     * @param place DOCUMENT ME!
+     */
+    public void setPosition(Place place) {
+        this.place = place;
     }
 }
-
-

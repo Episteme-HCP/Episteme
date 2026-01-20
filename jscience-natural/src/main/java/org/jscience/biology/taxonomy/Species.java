@@ -27,6 +27,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import org.jscience.util.identity.Identifiable;
+import org.jscience.util.Named;
+
 /**
  * Represents a biological species with full taxonomic classification.
  * <p>
@@ -38,7 +41,7 @@ import java.util.Objects;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Species {
+public class Species implements Identifiable<String>, Named {
 
     /**
      * IUCN Red List conservation status.
@@ -84,6 +87,16 @@ public class Species {
         this.commonName = commonName;
         this.scientificName = scientificName;
         this.conservationStatus = ConservationStatus.NOT_EVALUATED;
+    }
+
+    @Override
+    public String getId() {
+        return scientificName;
+    }
+
+    @Override
+    public String getName() {
+        return commonName != null ? commonName : scientificName;
     }
 
     // ========== Getters ==========

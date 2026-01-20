@@ -1,111 +1,239 @@
 package org.jscience.politics;
 
-import org.jscience.history.time.UncertainDate;
+import org.jscience.biology.Population;
+
 import org.jscience.geography.Place;
-import java.util.*;
+
+import org.jscience.util.Commented;
+import org.jscience.util.Named;
+
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Set;
+
 
 /**
- * Modernized Conflict class using UncertainDate and immutable design.
+ * A class representing the basic information about a conflict.
+ *
+ * @author Silvere Martin-Michiellot
+ * @version 1.0
  */
-public final class Conflict {
+import org.jscience.geography.Locatable;
 
-    public enum ConflictType {
-        WAR, CIVIL_WAR, REBELLION, COUP, REVOLUTION, 
-        BORDER_CONFLICT, COLONIAL_WAR, RELIGIOUS_WAR
+public class Conflict extends Object implements Named, Commented, Locatable {
+    /** DOCUMENT ME! */
+    private String name;
+
+    /** DOCUMENT ME! */
+    private Set groups;
+
+    /** DOCUMENT ME! */
+    private Place place;
+
+    /** DOCUMENT ME! */
+    private Date startingDate;
+
+    /** DOCUMENT ME! */
+    private Date endDate;
+
+    /** DOCUMENT ME! */
+    private String comments;
+
+/**
+     * Creates a new Conflict object.
+     *
+     * @param name         DOCUMENT ME!
+     * @param groups       DOCUMENT ME!
+     * @param place        DOCUMENT ME!
+     * @param startingDate DOCUMENT ME!
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public Conflict(String name, Set groups, Place place, Date startingDate) {
+        if ((name != null) && (name.length() > 0) && (groups != null) &&
+                (groups.size() > 0) && (place != null) &&
+                (startingDate != null)) {
+            Iterator iterator;
+            boolean valid;
+
+            iterator = groups.iterator();
+            valid = true;
+
+            while (iterator.hasNext() && valid) {
+                valid = iterator.next() instanceof Population;
+            }
+
+            if (valid) {
+                this.name = name;
+                this.place = place;
+                this.groups = groups;
+                this.startingDate = startingDate;
+                this.endDate = null;
+                this.comments = null;
+            } else {
+                throw new IllegalArgumentException(
+                    "The groups Set must contain only Populations.");
+            }
+        } else {
+            throw new IllegalArgumentException(
+                "The Conflict constructor can't have null or empty arguments.");
+        }
     }
-
-    public enum Status {
-        ONGOING, CEASEFIRE, TREATY_SIGNED, DECISIVE_VICTORY, STALEMATE
-    }
-
-    private final String name;
-    private final ConflictType type;
-    private final UncertainDate startDate;
-    private final UncertainDate endDate;
-    private final Place primaryLocation;
-    private final List<String> belligerents;
-    private final Status status;
-    private final String description;
-
-    private Conflict(Builder builder) {
-        this.name = Objects.requireNonNull(builder.name);
-        this.type = builder.type != null ? builder.type : ConflictType.WAR;
-        this.startDate = Objects.requireNonNull(builder.startDate);
-        this.endDate = builder.endDate;
-        this.primaryLocation = builder.primaryLocation;
-        this.belligerents = List.copyOf(builder.belligerents);
-        this.status = builder.status != null ? builder.status : Status.ONGOING;
-        this.description = builder.description;
-    }
-
-    public String getName() { return name; }
-    public ConflictType getType() { return type; }
-    public UncertainDate getStartDate() { return startDate; }
-    public Optional<UncertainDate> getEndDate() { return Optional.ofNullable(endDate); }
-    public Optional<Place> getPrimaryLocation() { return Optional.ofNullable(primaryLocation); }
-    public List<String> getBelligerents() { return belligerents; }
-    public Status getStatus() { return status; }
-    public Optional<String> getDescription() { return Optional.ofNullable(description); }
 
     /**
-     * Calculates the duration of the conflict in years (approximate).
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
      */
-    public OptionalDouble getDurationYears() {
-        if (endDate == null) return OptionalDouble.empty();
-        
-        var start = startDate.getEarliestPossible();
-        var end = endDate.getLatestPossible();
-        if (start == null || end == null) return OptionalDouble.empty();
-        
-        long days = java.time.temporal.ChronoUnit.DAYS.between(start, end);
-        return OptionalDouble.of(days / 365.25);
+    public String getName() {
+        return name;
     }
 
-    public boolean isOngoing() {
-        return status == Status.ONGOING;
-    }
-
-    public boolean involves(String party) {
-        return belligerents.stream()
-            .anyMatch(b -> b.equalsIgnoreCase(party));
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%s (%s, %s - %s)", 
-            name, type,
-            startDate.toString(),
-            endDate != null ? endDate.toString() : "ongoing");
-    }
-
-    public static Builder builder(String name, UncertainDate startDate) {
-        return new Builder(name, startDate);
-    }
-
-    public static class Builder {
-        private final String name;
-        private final UncertainDate startDate;
-        private ConflictType type;
-        private UncertainDate endDate;
-        private Place primaryLocation;
-        private final List<String> belligerents = new ArrayList<>();
-        private Status status;
-        private String description;
-
-        public Builder(String name, UncertainDate startDate) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param name DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public void setName(String name) {
+        if ((name != null) && (name.length() > 0)) {
             this.name = name;
-            this.startDate = startDate;
+        } else {
+            throw new IllegalArgumentException(
+                "The name can't be null or empty.");
         }
+    }
 
-        public Builder type(ConflictType type) { this.type = type; return this; }
-        public Builder endDate(UncertainDate end) { this.endDate = end; return this; }
-        public Builder location(Place place) { this.primaryLocation = place; return this; }
-        public Builder addBelligerent(String party) { belligerents.add(party); return this; }
-        public Builder status(Status status) { this.status = status; return this; }
-        public Builder description(String desc) { this.description = desc; return this; }
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Set getGroups() {
+        return groups;
+    }
 
-        public Conflict build() {
-            return new Conflict(this);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param groups DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public void setGroups(Set groups) {
+        Iterator iterator;
+        boolean valid;
+
+        if ((groups != null) && (groups.size() > 0)) {
+            iterator = groups.iterator();
+            valid = true;
+
+            while (iterator.hasNext() && valid) {
+                valid = iterator.next() instanceof Population;
+            }
+
+            if (valid) {
+                this.groups = groups;
+            } else {
+                throw new IllegalArgumentException(
+                    "The groups Set must contain only Populations.");
+            }
+        } else {
+            throw new IllegalArgumentException(
+                "The groups Set can't be null or empty.");
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    @Override
+    public Place getPosition() {
+        return place;
+    }
+
+    public Place getPlace() {
+        return place;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param place DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public void setPlace(Place place) {
+        if ((place != null)) {
+            this.place = place;
+        } else {
+            throw new IllegalArgumentException("The place must be non null.");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Date getStartingDate() {
+        return startingDate;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param date DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public void setStartingDate(Date date) {
+        if ((date != null)) {
+            this.startingDate = date;
+        } else {
+            throw new IllegalArgumentException("The date must be non null.");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+
+    //may return null
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param date DOCUMENT ME!
+     */
+    public void setEndDate(Date date) {
+        this.endDate = date;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+
+    //may return null
+    public String getComments() {
+        return comments;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param comments DOCUMENT ME!
+     */
+    public void setComments(String comments) {
+        this.comments = comments;
     }
 }

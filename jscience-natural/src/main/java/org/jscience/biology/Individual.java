@@ -25,8 +25,13 @@ package org.jscience.biology;
 
 import java.time.LocalDate;
 import java.util.*;
-
 import org.jscience.biology.taxonomy.Species;
+import org.jscience.util.identity.Identifiable;
+import org.jscience.util.Named;
+import org.jscience.util.Persistable;
+import org.jscience.util.Positioned;
+import org.jscience.util.TemporalEntity;
+import org.jscience.geography.Place;
 
 /**
  * Represents an individual organism - a single instance of a species.
@@ -40,7 +45,12 @@ import org.jscience.biology.taxonomy.Species;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Individual {
+public class Individual implements Identifiable<String>, Named {
+
+    @Override
+    public String getName() {
+        return (String) traits.getOrDefault("name", id);
+    }
 
     public enum Sex {
         MALE, FEMALE, HERMAPHRODITE, ASEXUAL, UNKNOWN
@@ -77,7 +87,12 @@ public class Individual {
     private final List<Individual> parents = new ArrayList<>();
     private final List<Individual> offspring = new ArrayList<>();
     private final Map<String, Object> traits = new HashMap<>();
+    private final Set<Organ> organs = new HashSet<>();
+    private final Set<Tissue> tissues = new HashSet<>();
+    private final Set<Behavior> behaviors = new HashSet<>();
     private ReproductionMode reproductionMode = ReproductionMode.SEXUAL;
+
+    private org.jscience.geography.Place place;
 
     public Individual(String id, Species species, Sex sex, LocalDate birthDate) {
         this.id = Objects.requireNonNull(id);
@@ -89,6 +104,27 @@ public class Individual {
 
     public Individual(String id, Species species, Sex sex) {
         this(id, species, sex, LocalDate.now());
+    }
+    
+    // --- Interface Implementations ---
+
+    @Override
+    public java.time.temporal.TemporalAccessor getStartTime() {
+        return birthDate;
+    }
+
+    @Override
+    public java.time.temporal.TemporalAccessor getEndTime() {
+        return deathDate; // May be null if alive
+    }
+
+    @Override
+    public org.jscience.geography.Place getPosition() {
+        return place;
+    }
+    
+    public void setPosition(org.jscience.geography.Place place) {
+        this.place = place;
     }
 
     // ========== Getters ==========
@@ -129,6 +165,14 @@ public class Individual {
      */
     public List<Individual> getParents() {
         return Collections.unmodifiableList(parents);
+    }
+    
+    public Set<Behavior> getBehaviors() {
+        return Collections.unmodifiableSet(behaviors);
+    }
+    
+    public void addBehavior(Behavior behavior) {
+        behaviors.add(behavior);
     }
 
     // ========== Setters ==========

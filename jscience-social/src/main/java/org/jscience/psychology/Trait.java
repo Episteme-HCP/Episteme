@@ -23,6 +23,7 @@
 
 package org.jscience.psychology;
 
+import org.jscience.util.Named;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
@@ -33,7 +34,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Trait {
+public class Trait implements Named {
 
     private final String name;
     private final String description;

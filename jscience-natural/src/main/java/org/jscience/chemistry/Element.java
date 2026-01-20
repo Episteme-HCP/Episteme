@@ -33,6 +33,9 @@ import org.jscience.measure.quantity.ThermalConductivity;
 import org.jscience.measure.quantity.Energy;
 import org.jscience.mathematics.numbers.real.Real;
 
+import org.jscience.util.identity.Identifiable;
+import org.jscience.util.Named;
+
 /**
  * A chemical element.
  * Modernized to use JScience V5 Quantity system.
@@ -41,7 +44,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Element {
+public class Element implements Identifiable<String>, Named {
 
     public enum ElementCategory {
         ALKALI_METAL, ALKALINE_EARTH_METAL, TRANSITION_METAL, POST_TRANSITION_METAL, CHEMICALLY_UNKNOWN, METALLOID,
@@ -80,6 +83,12 @@ public class Element {
 
     // --- Getters and Setters ---
 
+    @Override
+    public String getId() {
+        return symbol;
+    }
+
+    @Override
     public String getName() {
         return name;
     }

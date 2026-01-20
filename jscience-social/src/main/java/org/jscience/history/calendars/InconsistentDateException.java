@@ -1,31 +1,22 @@
+//repackaged after the code from Mark E. Shoulson
+//email <mark@kli.org>
+//website http://web.meson.org/calendars/
+//released under GPL
 package org.jscience.history.calendars;
 
-import java.time.DateTimeException;
-
 /**
- * Thrown when a date string is determined to be inconsistent or invalid 
- * during parsing or construction.
+ * DOCUMENT ME!
+ *
+ * @author $author$
+ * @version $Revision: 1.2 $
  */
-public class InconsistentDateException extends DateTimeException {
-
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Constructs a new InconsistentDateException object with the specified detail message.
+public class InconsistentDateException extends RuntimeException {
+/**
+     * Creates a new InconsistentDateException object.
      *
-     * @param message the detail message.
+     * @param s DOCUMENT ME!
      */
-    public InconsistentDateException(String message) {
-        super(message);
-    }
-    
-    /**
-     * Constructs a new InconsistentDateException object with the specified detail message and cause.
-     * 
-     * @param message the detail message.
-     * @param cause the cause.
-     */
-    public InconsistentDateException(String message, Throwable cause) {
-        super(message, cause);
+    public InconsistentDateException(String s) {
+        super(s);
     }
 }

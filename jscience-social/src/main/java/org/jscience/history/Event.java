@@ -4,12 +4,13 @@ import org.jscience.history.time.UncertainDate;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import org.jscience.util.Temporal;
 
 /**
  * A class representing a historical event.
  * Uses UncertainDate to handle potential fuzziness in dating.
  */
-public class Event implements Comparable<Event> {
+public class Event implements Comparable<Event>, Temporal {
 
     private final UncertainDate date;
     private final String happening;
@@ -58,6 +59,11 @@ public class Event implements Comparable<Event> {
     public Instant getEnd() {
         LocalDate max = (LocalDate) date.getMax(0);
         return max.atStartOfDay(ZoneId.of("UTC")).toInstant();
+    }
+
+    @Override
+    public Instant getTimestamp() {
+        return getStart();
     }
 
     public String getHappening() {

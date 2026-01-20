@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.jscience.util.identity.Identifiable;
+import org.jscience.util.Named;
 
 /**
  * Represents a Deoxyribonucleic acid (DNA) strand.
@@ -36,7 +38,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class DNA implements Serializable, Cloneable {
+public class DNA implements Serializable, Cloneable, Identifiable<String>, Named {
 
     private final List<Base> bases;
 
@@ -116,6 +118,16 @@ public class DNA implements Serializable, Cloneable {
             sb.append(b.name().charAt(0));
         }
         return sb.toString();
+    }
+
+    @Override
+    public String getId() {
+        return toString();
+    }
+
+    @Override
+    public String getName() {
+        return "DNA Strand (" + getLength() + " bases)";
     }
 }
 

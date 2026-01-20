@@ -28,6 +28,8 @@ import org.jscience.measure.Unit;
 import org.jscience.measure.Quantities;
 import org.jscience.mathematics.numbers.real.Real;
 
+import org.jscience.util.Named;
+
 /**
  * Represents a physical constant with uncertainty.
  *
@@ -40,7 +42,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class PhysicalConstant<Q extends Quantity<Q>> {
+public class PhysicalConstant<Q extends Quantity<Q>> implements Named {
 
     private final String name;
     private final double value;

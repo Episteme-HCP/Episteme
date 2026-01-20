@@ -7,9 +7,9 @@ echo "==========================================="
 echo "[1/2] Building Runnable Fat JAR..."
 # Use ./mvnw if available, else mvn
 if [ -f "./mvnw" ]; then
-    ./mvnw clean package -pl jscience-killer-apps -am -DskipTests
+    ./mvnw clean package -pl jscience-featured-apps -am -DskipTests
 else
-    mvn clean package -pl jscience-killer-apps -am -DskipTests
+    mvn clean package -pl jscience-featured-apps -am -DskipTests
 fi
 
 if [ $? -ne 0 ]; then
@@ -28,12 +28,12 @@ fi
 # For now, sticking to the standard cross-platform args similar to the bat file
 
 jpackage --name "JScienceSuite" \
-  --input jscience-killer-apps/target \
-  --main-jar jscience-killer-apps-1.0.0-SNAPSHOT.jar \
+  --input jscience-featured-apps/target \
+  --main-jar jscience-featured-apps-1.0.0-SNAPSHOT.jar \
   --main-class org.jscience.apps.Launcher \
   --type app-image \
   --dest installer \
-  --description "JScience Demos and Killer Apps" \
+  --description "JScience Demos and Featured Apps" \
   --vendor "Silvere Martin-Michiellot"
 
 if [ $? -eq 0 ]; then

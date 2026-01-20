@@ -29,6 +29,9 @@ import org.jscience.measure.quantity.Time;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 
+import org.jscience.util.identity.Identifiable;
+import org.jscience.util.Named;
+
 /**
  * Represents a specific isotope of an element.
  *
@@ -36,7 +39,7 @@ import org.jscience.measure.Units;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Isotope {
+public class Isotope implements Identifiable<String>, Named {
 
     private final Element element;
     private final int neutronCount;
@@ -75,6 +78,16 @@ public class Isotope {
 
     public boolean isStable() {
         return !radioactive;
+    }
+
+    @Override
+    public String getName() {
+        return element.getName() + "-" + getMassNumber();
+    }
+
+    @Override
+    public String getId() {
+        return element.getSymbol() + "-" + getMassNumber();
     }
 
     public Quantity<Time> getHalfLife() {

@@ -1,39 +1,91 @@
+//repackaged after the code from Mark E. Shoulson
+//email <mark@kli.org>
+//website http://web.meson.org/calendars/
+//released under GPL
 package org.jscience.history.calendars;
 
 /**
- * Base class for alternate calendar implementations.
- * It uses a Rata Die (RD) counting system for days.
+ * DOCUMENT ME!
+ *
+ * @author $author$
+ * @version $Revision: 1.3 $
  */
 public abstract class AlternateCalendar {
-    
-    public static long EPOCH = 0L;
+    /** DOCUMENT ME! */
+    public static long EPOCH;
+
+    /** DOCUMENT ME! */
     public static boolean unicode;
+
+    /** DOCUMENT ME! */
     public static final double JD_EPOCH = -1721424.5D;
 
+    /** DOCUMENT ME! */
     protected long rd;
 
+/**
+     * Creates a new AlternateCalendar object.
+     */
     public AlternateCalendar() {
         rd = EPOCH;
     }
 
+/**
+     * Creates a new AlternateCalendar object.
+     *
+     * @param l DOCUMENT ME!
+     */
     public AlternateCalendar(long l) {
         rd = l;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param l DOCUMENT ME!
+     * @param l1 DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static long mod(long l, long l1) {
         return l - (l1 * fldiv(l, l1));
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param l DOCUMENT ME!
+     * @param i DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static int mod(long l, int i) {
         return (int) mod(l, i);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param l DOCUMENT ME!
+     * @param l1 DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static long amod(long l, long l1) {
         return 1L + mod(l - 1L, l1);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param l DOCUMENT ME!
+     * @param l1 DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static long fldiv(long l, long l1) {
         long l2 = l / l1;
+
         if ((l2 * l1) > l) {
             return l2 - 1L;
         } else {
@@ -41,52 +93,131 @@ public abstract class AlternateCalendar {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param l DOCUMENT ME!
+     */
     public abstract void set(long l);
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public long toRD() {
         return rd;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public double toJD() {
         return toJD(toRD());
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param l DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double toJD(long l) {
-        return (double) l - JD_EPOCH;
+        return (double) l - -1721424.5D;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static long fromJD(double d) {
-        return (long) Math.floor(d + JD_EPOCH);
+        return (long) Math.floor(d + -1721424.5D);
     }
 
-    public boolean before(AlternateCalendar other) {
-        return toRD() < other.toRD(); // Wait, old code said > ? Let's check view_file output.
+    /**
+     * DOCUMENT ME!
+     *
+     * @param altcalendar DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public boolean before(AlternateCalendar altcalendar) {
+        return toRD() > altcalendar.toRD();
     }
 
-    public boolean after(AlternateCalendar other) {
-        return toRD() > other.toRD(); // Old code check.
+    /**
+     * DOCUMENT ME!
+     *
+     * @param altcalendar DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public boolean after(AlternateCalendar altcalendar) {
+        return toRD() < altcalendar.toRD();
     }
 
-    public static long difference(AlternateCalendar c1, AlternateCalendar c2) {
-        return c1.toRD() - c2.toRD();
+    /**
+     * DOCUMENT ME!
+     *
+     * @param altcalendar DOCUMENT ME!
+     * @param altcalendar1 DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public static long difference(AlternateCalendar altcalendar,
+        AlternateCalendar altcalendar1) {
+        return altcalendar.toRD() - altcalendar1.toRD();
     }
 
-    public long difference(AlternateCalendar other) {
-        return difference(this, other);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param altcalendar DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public long difference(AlternateCalendar altcalendar) {
+        return difference(this, altcalendar);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param l DOCUMENT ME!
+     */
     public void add(long l) {
         set(rd + l);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param l DOCUMENT ME!
+     */
     public void subtract(long l) {
         set(rd - l);
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     protected abstract void recomputeFromRD();
 
+    /**
+     * DOCUMENT ME!
+     */
     protected abstract void recomputeRD();
 
-    @Override
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public abstract String toString();
 }

@@ -87,7 +87,7 @@ public class HistoricalEvent implements org.jscience.util.identity.Identifiable<
     }
 
     @Override
-    public org.jscience.geography.Place getLocation() {
+    public org.jscience.geography.Place getPosition() {
         return location;
     }
 

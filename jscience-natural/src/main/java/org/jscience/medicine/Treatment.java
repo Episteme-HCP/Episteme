@@ -1,124 +1,137 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.medicine;
 
-import java.util.*;
+import org.jscience.economics.Organization;
+import org.jscience.economics.money.Money;
+import org.jscience.geography.Place;
+import org.jscience.measure.Amount;
+import org.jscience.measure.Identification;
+
+import java.util.Date;
+
 
 /**
- * Represents a medical treatment plan.
+ * The Treatment class provides some useful information for curing an
+ * individual.
  *
  * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @version 1.0
  */
-public class Treatment {
 
-    public enum Type {
-        MEDICATION, SURGERY, THERAPY, RADIATION, CHEMOTHERAPY,
-        IMMUNOTHERAPY, PHYSICAL_THERAPY, LIFESTYLE, SUPPORTIVE
+//we could also take into account the fact that the same treatment may cure multiple pathologies
+//also treatments work only for some species, and even better have to be adapted to specific individuals
+//yet the aim of this class (used alone) is rather to describe the specific/generic treatment for a pathology
+//see patient if you want to use actual treatments
+//we should also take into account many fields and constants from the NCD
+//also see http://en.wikipedia.org/wiki/International_Nonproprietary_Name and
+//http://en.wikipedia.org/wiki/Anatomical_Therapeutic_Chemical_Classification_System
+public class Treatment extends org.jscience.economics.resources.Object {
+    /**
+     * DOCUMENT ME!
+     */
+    private Pathology pathology;
+
+    /**
+     * DOCUMENT ME!
+     */
+    private String presentation;
+
+    /**
+     * DOCUMENT ME!
+     */
+    private String route;
+
+    /**
+     * DOCUMENT ME!
+     */
+    private String formula;
+
+    /**
+     * DOCUMENT ME!
+     */
+    private String dosage;
+
+    /**
+     * Creates a new Treatment object.
+     *
+     * @param organization   DOCUMENT ME!
+     * @param name           DOCUMENT ME!
+     * @param description    DOCUMENT ME!
+     * @param value          DOCUMENT ME!
+     * @param amount         DOCUMENT ME!
+     * @param productionDate DOCUMENT ME!
+     * @param identification DOCUMENT ME!
+     * @param pathology      DOCUMENT ME!
+     * @param presentation   DOCUMENT ME!
+     * @param route          DOCUMENT ME!
+     * @param formula        DOCUMENT ME!
+     * @param dosage         DOCUMENT ME!
+     */
+    public Treatment(String name,
+                     String description, Amount amount, Organization organization, Place productionPlace,
+                     Date productionDate, Identification identification, Amount<Money> value,
+                     Pathology pathology, String presentation, String route, String formula,
+                     String dosage) {
+        super(name, description, amount, organization, productionPlace, productionDate,
+                identification, value);
+
+        if ((pathology != null) && (presentation != null) &&
+                (presentation.length() > 0) && (route != null) &&
+                (route.length() > 0) && (formula != null) &&
+                (formula.length() > 0) && (dosage != null) &&
+                (dosage.length() > 0)) {
+            this.pathology = pathology;
+            this.presentation = presentation;
+            this.route = route;
+            this.formula = formula;
+            this.dosage = dosage;
+        } else {
+            throw new IllegalArgumentException(
+                    "The Treatment constructor doesn't accept null or empty arguments.");
+        }
     }
 
-    private final String name;
-    private Type type;
-    private Disease targetDisease;
-    private String description;
-    private int durationDays;
-    private final List<Medication> medications = new ArrayList<>();
-    private String frequency;
-    private double successRate; // 0.0 to 1.0
-
-    public Treatment(String name, Type type) {
-        this.name = name;
-        this.type = type;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Pathology getPathology() {
+        return pathology;
     }
 
-    // Getters
-    public String getName() {
-        return name;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public String getPresentation() {
+        return presentation;
     }
 
-    public Type getType() {
-        return type;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public String getRoute() {
+        return route;
     }
 
-    public Disease getTargetDisease() {
-        return targetDisease;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public String getFormula() {
+        return formula;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public int getDurationDays() {
-        return durationDays;
-    }
-
-    public String getFrequency() {
-        return frequency;
-    }
-
-    public double getSuccessRate() {
-        return successRate;
-    }
-
-    public List<Medication> getMedications() {
-        return Collections.unmodifiableList(medications);
-    }
-
-    // Setters
-    public void setType(Type type) {
-        this.type = type;
-    }
-
-    public void setTargetDisease(Disease disease) {
-        this.targetDisease = disease;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setDurationDays(int days) {
-        this.durationDays = days;
-    }
-
-    public void setFrequency(String frequency) {
-        this.frequency = frequency;
-    }
-
-    public void setSuccessRate(double rate) {
-        this.successRate = Math.max(0, Math.min(1, rate));
-    }
-
-    public void addMedication(Medication med) {
-        medications.add(med);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Treatment '%s' (%s) - %d days", name, type, durationDays);
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public String getDosage() {
+        return dosage;
     }
 }
-
-

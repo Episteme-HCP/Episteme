@@ -1,106 +1,134 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.law;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import org.jscience.util.identity.Identifiable;
-import org.jscience.util.Temporal;
-import org.jscience.sociology.Person;
+import org.jscience.economics.Organization;
+
+import org.jscience.measure.Identification;
+import org.jscience.measure.Identified;
+
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Vector;
+
 
 /**
- * Represents a legal contract between parties.
+ * A class representing a piece of paper usually used when setting a deal,
+ * describing it.
  *
  * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @version 1.0
  */
-public class Contract implements Identifiable<String>, Temporal {
 
-    private final String id;
-    private final String title;
-    private final LocalDate date;
-    private final List<Person> parties = new ArrayList<>();
-    private final List<String> clauses = new ArrayList<>();
-    private boolean valid;
+//this could be an insurance contract for example
+//or anything you rent or buy...
+//there is no set method because this is meant to be a paper that you can't fill or modify
+//contracts usually refer to some properties of people but they are usually not a property themselves
+//computer licences, for example GPL should be found in org.jscience.sociology.License, not in org.jscience.law.Contract
+//also you can have a different idea on this
+public class Contract extends Object implements Identified {
+    //many other fields could be used:
+    //the generic name
+    //the place where it was signed
+    //the period (beginning, end) when it is usable
+    //the extra clauses, that may also be added at a later time
+    //there is also sometimes an authority that makes sure both parties respect the contract
+    /** DOCUMENT ME! */
+    private Organization firstParty;
 
-    public Contract(String title, LocalDate date) {
-        this.id = UUID.randomUUID().toString();
-        this.title = title;
-        this.date = date;
-        this.valid = true;
+    /** DOCUMENT ME! */
+    private Organization secondParty;
+
+    /** DOCUMENT ME! */
+    private Identification identification; //big contracts usually don't have any identification (:from hand to hand)
+
+    /** DOCUMENT ME! */
+    private Date date; //when it is signed by both parties
+
+    /** DOCUMENT ME! */
+    private Vector contents;
+
+/**
+     * Creates a new Contract object.
+     *
+     * @param firstParty     DOCUMENT ME!
+     * @param secondParty    DOCUMENT ME!
+     * @param identification DOCUMENT ME!
+     * @param date           DOCUMENT ME!
+     * @param contents       DOCUMENT ME!
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public Contract(Organization firstParty, Organization secondParty,
+        Identification identification, Date date, Vector contents) {
+        Iterator iterator;
+        boolean valid;
+
+        if ((firstParty != null) && (secondParty != null) &&
+                (identification != null) && (date != null) &&
+                (contents != null) && (contents.size() > 0)) {
+            iterator = contents.iterator();
+            valid = true;
+
+            while (iterator.hasNext() && valid) {
+                valid = iterator.next() instanceof String;
+            }
+
+            if (valid) {
+                this.firstParty = firstParty;
+                this.secondParty = secondParty;
+                this.identification = identification;
+                this.date = date;
+                this.contents = contents;
+            } else {
+                throw new IllegalArgumentException(
+                    "The contents Vector must contain only Strings.");
+            }
+        } else {
+            throw new IllegalArgumentException(
+                "The Contract constructor can't have null arguments or empty contents.");
+        }
     }
 
-    @Override
-    public String getId() {
-        return id;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Organization getFirstParty() {
+        return firstParty;
     }
 
-    public String getTitle() {
-        return title;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Organization getSecondParty() {
+        return secondParty;
     }
 
-    @Override
-    public java.time.Instant getTimestamp() {
-        return date != null ? java.time.Instant.ofEpochSecond(date.toEpochDay() * 86400) : java.time.Instant.MIN;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Identification getIdentification() {
+        return identification;
     }
 
-    public LocalDate getDate() {
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Date getDate() {
         return date;
     }
 
-    public boolean isValid() {
-        return valid;
-    }
-
-    public void setValid(boolean valid) {
-        this.valid = valid;
-    }
-
-    public void addParty(Person person) {
-        parties.add(person);
-    }
-
-    public List<Person> getParties() {
-        return Collections.unmodifiableList(parties);
-    }
-
-    public void addClause(String clause) {
-        clauses.add(clause);
-    }
-
-    public List<String> getClauses() {
-        return Collections.unmodifiableList(clauses);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Contract: %s (%s)", title, date);
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Vector getContents() {
+        return contents;
     }
 }
-
-

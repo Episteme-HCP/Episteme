@@ -120,6 +120,16 @@ public class EducationLevel implements ExtensibleEnum<EducationLevel> {
     public String toString() {
         return description;
     }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getId() {
+        return name;
+    }
 }
 
 

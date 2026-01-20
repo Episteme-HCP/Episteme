@@ -1,189 +1,309 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.medicine;
 
-import java.util.*;
+import org.jscience.biology.*;
+
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Vector;
+
 
 /**
- * Represents a disease or medical condition.
+ * A class representing a disease.
  *
  * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @version 1.0
  */
-public class Disease {
 
-    public enum Origin {
-        VIRAL, BACTERIAL, FUNGAL, PARASITIC, PRION, GENETIC,
-        AUTOIMMUNE, ENVIRONMENTAL, NUTRITIONAL, UNKNOWN
+//look at the ICD for example disease although there is no field here to support their coding standards
+//http://www.wolfbane.com/icd/
+//http://www.eicd.com/ (official site)
+public class Disease extends Pathology {
+    //constant used both for transmission and origin
+    /** DOCUMENT ME! */
+    public final static int UNKNOWN = 0; //unknown or unreferenced
+
+    //multiple sources can be considered
+    /** DOCUMENT ME! */
+    public final static int GENETIC = 1; //1<<0;
+
+    /** DOCUMENT ME! */
+    public final static int WATER = 2; //1<<1;//poisoned source
+
+    /** DOCUMENT ME! */
+    public final static int FOOD = 4; //poisoned source
+
+    /** DOCUMENT ME! */
+    public final static int AIR = 8; //breathing poisoned air
+
+    /** DOCUMENT ME! */
+    public final static int CONTACT = 16; //for example through sex or blood
+
+    /** DOCUMENT ME! */
+    public final static int PARASIT = 32; //a parasit of the specie (should set the corresponding specie in the vector Set)
+
+    //origin, mutually exclusive
+    /** DOCUMENT ME! */
+    public final static int VIRUS = 1;
+
+    /** DOCUMENT ME! */
+    public final static int BACTERIA = 2;
+
+    /** DOCUMENT ME! */
+    public final static int PRION = 3; //protein induced
+
+    /** DOCUMENT ME! */
+    public final static int DNA = 4; //genetic diseases
+
+    /** DOCUMENT ME! */
+    private int transmission; //how the disease in transmitted
+
+    /** DOCUMENT ME! */
+    private int origin; //what is the corresponding microorganism
+
+    /** DOCUMENT ME! */
+    private Set vectors; //the specie that propagates the virus but is immune
+
+    /** DOCUMENT ME! */
+    private Set targets; //the infected species
+
+    /** DOCUMENT ME! */
+    private Object microorganism;
+
+    //vectors should be a Set of species (may be empty)
+    /**
+     * Creates a new Disease object.
+     *
+     * @param name DOCUMENT ME!
+     * @param transmission DOCUMENT ME!
+     * @param origin DOCUMENT ME!
+     * @param vectors DOCUMENT ME!
+     * @param targets DOCUMENT ME!
+     */
+    public Disease(String name, int transmission, int origin, Set vectors,
+        Set targets) {
+        super(name);
+
+        Iterator iterator;
+        boolean valid;
+
+        if ((vectors != null) && (targets != null) && (targets.size() > 0)) {
+            iterator = targets.iterator();
+            valid = true;
+
+            while (iterator.hasNext() && valid) {
+                valid = iterator.next() instanceof Species;
+            }
+
+            if (valid) {
+                iterator = vectors.iterator();
+                valid = true;
+
+                while (iterator.hasNext() && valid) {
+                    valid = iterator.next() instanceof Species;
+                }
+
+                if (valid) {
+                    this.transmission = transmission;
+                    this.origin = origin;
+                    this.vectors = vectors;
+                    this.targets = targets;
+                    microorganism = null;
+                } else {
+                    throw new IllegalArgumentException(
+                        "The set of vectors should contain only Species.");
+                }
+            } else {
+                throw new IllegalArgumentException(
+                    "The set of targets should contain only Species.");
+            }
+        } else {
+            throw new IllegalArgumentException(
+                "The Disease constructor can't have null arguments (and name and targets shouldn't be empty).");
+        }
     }
 
-    public enum Transmission {
-        AIRBORNE, DROPLET, CONTACT, BLOOD, SEXUAL, FECAL_ORAL,
-        VECTOR, VERTICAL, FOOD, WATER, NONE
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public int getTransmission() {
+        return transmission;
     }
 
-    public enum Severity {
-        MILD, MODERATE, SEVERE, CRITICAL, FATAL
+    /**
+     * DOCUMENT ME!
+     *
+     * @param transmission DOCUMENT ME!
+     */
+    public void setTransmission(int transmission) {
+        this.transmission = transmission;
     }
 
-    private final String name;
-    private String icdCode; // ICD-10 code
-    private Origin origin;
-    private final Set<Transmission> transmissionModes = EnumSet.noneOf(Transmission.class);
-    private Severity severity;
-    private String description;
-    private final List<String> symptoms = new ArrayList<>();
-    private int incubationDays;
-    private boolean chronic;
-    private boolean curable;
-
-    public Disease(String name) {
-        this.name = name;
-        this.origin = Origin.UNKNOWN;
-    }
-
-    public Disease(String name, Origin origin) {
-        this(name);
-        this.origin = origin;
-    }
-
-    // Getters
-    public String getName() {
-        return name;
-    }
-
-    public String getIcdCode() {
-        return icdCode;
-    }
-
-    public Origin getOrigin() {
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public int getOrigin() {
         return origin;
     }
 
-    public Set<Transmission> getTransmissionModes() {
-        return Collections.unmodifiableSet(transmissionModes);
-    }
-
-    public Severity getSeverity() {
-        return severity;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public List<String> getSymptoms() {
-        return Collections.unmodifiableList(symptoms);
-    }
-
-    public int getIncubationDays() {
-        return incubationDays;
-    }
-
-    public boolean isChronic() {
-        return chronic;
-    }
-
-    public boolean isCurable() {
-        return curable;
-    }
-
-    // Setters
-    public void setIcdCode(String code) {
-        this.icdCode = code;
-    }
-
-    public void setOrigin(Origin origin) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param origin DOCUMENT ME!
+     */
+    public void setOrigin(int origin) {
         this.origin = origin;
     }
 
-    public void setSeverity(Severity severity) {
-        this.severity = severity;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Set getVectors() {
+        return vectors;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param vector DOCUMENT ME!
+     */
+    public void addVector(Vector vector) {
+        vectors.add(vector);
     }
 
-    public void setIncubationDays(int days) {
-        this.incubationDays = days;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param vector DOCUMENT ME!
+     */
+    public void removeVector(Vector vector) {
+        vectors.remove(vector);
     }
 
-    public void setChronic(boolean chronic) {
-        this.chronic = chronic;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param vectors DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public void setVectors(Set vectors) {
+        Iterator iterator;
+        boolean valid;
+
+        if (vectors != null) {
+            iterator = vectors.iterator();
+            valid = true;
+
+            while (iterator.hasNext() && valid) {
+                valid = iterator.next() instanceof Species;
+            }
+
+            if (valid) {
+                this.vectors = vectors;
+            } else {
+                throw new IllegalArgumentException(
+                    "The set of vectors should contain only Species.");
+            }
+        } else {
+            throw new IllegalArgumentException("The vectors can't be null.");
+        }
     }
 
-    public void setCurable(boolean curable) {
-        this.curable = curable;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Set getTargets() {
+        return targets;
     }
 
-    public void addTransmissionMode(Transmission mode) {
-        transmissionModes.add(mode);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param target DOCUMENT ME!
+     */
+    public void addTarget(Species target) {
+        targets.add(target);
     }
 
-    public void addSymptom(String symptom) {
-        symptoms.add(symptom);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param target DOCUMENT ME!
+     */
+    public void removeTarget(Species target) {
+        targets.remove(target);
     }
 
-    public boolean isInfectious() {
-        return !transmissionModes.isEmpty() && transmissionModes.stream()
-                .anyMatch(t -> t != Transmission.NONE);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param targets DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public void setTargets(Set targets) {
+        Iterator iterator;
+        boolean valid;
+
+        if ((targets != null) && (targets.size() > 0)) {
+            iterator = targets.iterator();
+            valid = true;
+
+            while (iterator.hasNext() && valid) {
+                valid = iterator.next() instanceof Species;
+            }
+
+            if (valid) {
+                this.targets = targets;
+            } else {
+                throw new IllegalArgumentException(
+                    "The set of targets should contain only Species.");
+            }
+        } else {
+            throw new IllegalArgumentException(
+                "The targets can't be null or empty.");
+        }
     }
 
-    @Override
-    public String toString() {
-        return String.format("%s (%s, %s)", name, origin, severity);
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Object getMicroorganism() {
+        return microorganism;
     }
 
-    // Common diseases
-    public static Disease influenza() {
-        Disease d = new Disease("Influenza", Origin.VIRAL);
-        d.setIcdCode("J10");
-        d.addTransmissionMode(Transmission.AIRBORNE);
-        d.addTransmissionMode(Transmission.DROPLET);
-        d.setSeverity(Severity.MILD);
-        d.setIncubationDays(2);
-        d.setCurable(true);
-        d.addSymptom("Fever");
-        d.addSymptom("Cough");
-        d.addSymptom("Fatigue");
-        return d;
-    }
+    //the microorganism corresponding to the disease, should be either a DNA (genetic), a Cell (bacteria), a Virus, or a Protein (prion)
+    /**
+     * DOCUMENT ME!
+     *
+     * @param microorganism DOCUMENT ME!
+     */
+    public void setMicroorganism(Object microorganism) {
+        if (microorganism != null) {
+            if (microorganism instanceof Virus) {
+                origin = VIRUS;
+            } else if (microorganism instanceof Cell) {
+                origin = BACTERIA;
+            } else if (microorganism instanceof Protein) {
+                origin = PRION;
+            } else if (microorganism instanceof DNA) {
+                origin = DNA;
+            } else {
+                throw new IllegalArgumentException(
+                    "You can only set micro-organisms that are Virus, Cells, or Proteins.");
+            }
+        }
 
-    public static Disease covid19() {
-        Disease d = new Disease("COVID-19", Origin.VIRAL);
-        d.setIcdCode("U07.1");
-        d.addTransmissionMode(Transmission.AIRBORNE);
-        d.addTransmissionMode(Transmission.DROPLET);
-        d.setSeverity(Severity.MODERATE);
-        d.setIncubationDays(5);
-        d.addSymptom("Fever");
-        d.addSymptom("Cough");
-        d.addSymptom("Loss of taste/smell");
-        return d;
+        this.microorganism = microorganism;
     }
 }
-
-

@@ -24,6 +24,8 @@
 package org.jscience.sociology;
 
 import java.util.*;
+import org.jscience.util.identity.Identifiable;
+import org.jscience.util.Named;
 
 /**
  * Represents a religion or faith tradition.
@@ -32,7 +34,7 @@ import java.util.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Religion {
+public class Religion implements Identifiable<String>, Named {
 
     public enum Type {
         MONOTHEISTIC, POLYTHEISTIC, PANTHEISTIC, ATHEISTIC,
@@ -59,7 +61,12 @@ public class Religion {
         this.type = type;
     }
 
-    // Getters
+    @Override
+    public String getId() {
+        return name;
+    }
+
+    @Override
     public String getName() {
         return name;
     }
@@ -175,5 +182,3 @@ public class Religion {
         return r;
     }
 }
-
-

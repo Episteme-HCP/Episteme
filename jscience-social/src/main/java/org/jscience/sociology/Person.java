@@ -23,8 +23,11 @@
 
 package org.jscience.sociology;
 
+import org.jscience.biology.Individual;
+import org.jscience.biology.HomoSapiens;
 import org.jscience.economics.Money;
 import org.jscience.geography.Place;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -34,31 +37,44 @@ import java.util.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Person
-        implements org.jscience.util.identity.Identifiable<String>, org.jscience.geography.Locatable {
+public class Person extends Individual
+        implements org.jscience.geography.Locatable {
 
     public enum Gender {
-        MALE, FEMALE, OTHER, UNSPECIFIED
+        MALE, FEMALE, OTHER, UNSPECIFIED;
+        
+        public Individual.Sex toSex() {
+            switch(this) {
+                case MALE: return Individual.Sex.MALE;
+                case FEMALE: return Individual.Sex.FEMALE;
+                default: return Individual.Sex.UNKNOWN;
+            }
+        }
+        
+        public static Gender fromSex(Individual.Sex sex) {
+            switch(sex) {
+                case MALE: return MALE;
+                case FEMALE: return FEMALE;
+                default: return UNSPECIFIED;
+            }
+        }
     }
 
-    private final String id;
-    private final String name;
-    private final Gender gender;
-    private final java.time.LocalDate birthDate;
     private final String nationality;
     private final List<String> roles;
     private final List<Role> structuralRoles;
-
-    // V1 Features
+    
+    // V1 Features Modernized
+    private final Set<Person> spouses = new HashSet<>();
     private Money wealth;
-    private Place location;
+    
+    // address remains as specific data
+    private String address;
 
-    public Person(String id, String name, Gender gender, java.time.LocalDate birthDate,
+    public Person(String id, String name, Individual.Sex sex, LocalDate birthDate,
             String nationality) {
-        this.id = id;
-        this.name = name;
-        this.gender = gender;
-        this.birthDate = birthDate;
+        super(id, HomoSapiens.SPECIES, sex, birthDate);
+        setTrait("name", name);
         this.nationality = nationality;
 
         this.roles = new ArrayList<>();
@@ -67,25 +83,25 @@ public class Person
         this.wealth = Money.usd(0);
     }
 
+    public Person(String id, String name, Gender gender, LocalDate birthDate, String nationality) {
+        this(id, name, gender.toSex(), birthDate, nationality);
+    }
+
+    public Person(String name, Individual.Sex sex) {
+        this(java.util.UUID.randomUUID().toString(), name, sex, LocalDate.now().minusYears(20), "Unknown");
+    }
+
     public Person(String name, Gender gender) {
-        this(java.util.UUID.randomUUID().toString(), name, gender, java.time.LocalDate.now().minusYears(20), "Unknown");
+        this(name, gender.toSex());
     }
 
     @Override
-    public String getId() {
-        return id;
-    }
-
     public String getName() {
-        return name;
+        return super.getName();
     }
 
     public Gender getGender() {
-        return gender;
-    }
-
-    public java.time.LocalDate getBirthDate() {
-        return birthDate;
+        return Gender.fromSex(getSex());
     }
 
     public String getNationality() {
@@ -112,18 +128,35 @@ public class Person
         }
     }
 
-    @Override
-    public Place getLocation() {
-        return location;
-    }
+    // getLocation provided by Individual
 
-    public void move(Place newLocation) {
-        if (this.location != null) {
-            this.location.removeInhabitant(this);
+    // --- Relationship Management (V1 Spouses modernized) ---
+    
+    public Set<Person> getSpouses() {
+        return Collections.unmodifiableSet(spouses);
+    }
+    
+    public void addSpouse(Person spouse) {
+        if (spouse != null) {
+            spouses.add(spouse);
         }
-        this.location = newLocation;
-        if (this.location != null) {
-            this.location.addInhabitant(this);
+    }
+    
+    public void removeSpouse(Person spouse) {
+        spouses.remove(spouse);
+    }
+    
+    // --- Location Management ---
+    // Note: getLocation() is provided by Individual via Positioned<Place>
+    
+    public void move(Place newLocation) {
+        Place oldLocation = getPosition();
+        if (oldLocation != null) {
+            oldLocation.removeInhabitant(this);
+        }
+        setPosition(newLocation);
+        if (newLocation != null) {
+            newLocation.addInhabitant(this);
         }
     }
 
@@ -142,13 +175,17 @@ public class Person
         return Collections.unmodifiableList(structuralRoles);
     }
 
-    public int getAge() {
-        return java.time.Period.between(birthDate, java.time.LocalDate.now()).getYears();
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     @Override
     public String toString() {
-        return String.format("%s (%s, %d years, %s)", name, gender, getAge(), nationality);
+        return String.format("%s (%s, %d years, %s)", getName(), getSex(), getAge(), nationality);
     }
 }
 

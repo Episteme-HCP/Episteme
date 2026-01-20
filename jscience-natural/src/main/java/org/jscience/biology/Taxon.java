@@ -25,24 +25,27 @@ package org.jscience.biology;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.jscience.util.identity.Identifiable;
+import org.jscience.util.Named;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a taxonomic group in a phylogenetic tree.
  */
-public class Taxon {
+public class Taxon implements Identifiable<String>, Named {
     private String id;
     private String parentId;
     private String name;
     private List<Taxon> children = new ArrayList<>();
     
-    private org.jscience.mathematics.numbers.real.Real coi;
-    private org.jscience.mathematics.numbers.real.Real rna16s;
-    private org.jscience.mathematics.numbers.real.Real cytb;
+    private Real coi;
+    private Real rna16s;
+    private Real cytb;
     
     // Layout properties (transient)
     public transient double x, y, angle, radius;
 
-    public Taxon(String id, String parentId, String name, org.jscience.mathematics.numbers.real.Real coi, org.jscience.mathematics.numbers.real.Real rna16s, org.jscience.mathematics.numbers.real.Real cytb) {
+    public Taxon(String id, String parentId, String name, Real coi, Real rna16s, Real cytb) {
         this.id = id;
         this.parentId = parentId;
         this.name = name;
@@ -56,10 +59,15 @@ public class Taxon {
     }
     
     public List<Taxon> getChildren() { return children; }
+    
+    @Override
     public String getName() { return name; }
+    
+    @Override
     public String getId() { return id; }
+    
     public String getParentId() { return parentId; }
-    public org.jscience.mathematics.numbers.real.Real getCoi() { return coi; }
-    public org.jscience.mathematics.numbers.real.Real getRna16s() { return rna16s; }
-    public org.jscience.mathematics.numbers.real.Real getCytb() { return cytb; }
+    public Real getCoi() { return coi; }
+    public Real getRna16s() { return rna16s; }
+    public Real getCytb() { return cytb; }
 }

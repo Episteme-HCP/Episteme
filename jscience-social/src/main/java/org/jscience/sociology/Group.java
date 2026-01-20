@@ -24,6 +24,9 @@
 package org.jscience.sociology;
 
 import java.util.*;
+import java.util.UUID;
+import org.jscience.util.identity.Identifiable;
+import org.jscience.util.Named;
 
 /**
  * Represents a social group of persons.
@@ -36,12 +39,13 @@ import java.util.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Group {
+public class Group implements Identifiable<String>, Named {
 
     public enum Type {
         FAMILY, COMMUNITY, ORGANIZATION, NATION, TRIBE, TEAM, CLASS, NETWORK
     }
 
+    private final String id;
     private final String name;
     private final Type type;
     private final List<Person> members = new ArrayList<>();
@@ -49,10 +53,17 @@ public class Group {
     private final Map<Person, String> roles = new HashMap<>();
 
     public Group(String name, Type type) {
+        this.id = UUID.randomUUID().toString();
         this.name = name;
         this.type = type;
     }
 
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
     public String getName() {
         return name;
     }

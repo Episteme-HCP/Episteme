@@ -1,84 +1,167 @@
-﻿package org.jscience.history.calendars;
+//repackaged after the code from Mark E. Shoulson
+//email <mark@kli.org>
+//website http://web.meson.org/calendars/
+//released under GPL
+package org.jscience.history.calendars;
+
+import java.util.Enumeration;
 
 
+// Referenced classes of package calendars:
+/**
+ * DOCUMENT ME!
+ *
+ * @author $author$
+ * @version $Revision: 1.3 $
+  */
 public class CopticCalendar extends JulianCalendar {
-    
-    // Coptic Epoch: August 29, 284 AD (Julian)
+    /** DOCUMENT ME! */
     public static long EPOCH = (new JulianCalendar(8, 29, 284)).toRD();
 
+    /** DOCUMENT ME! */
     private static final String[] MONTHS = {
             "Tut", "Babah", "Hatur", "Kiyahk", "Tubah", "Amshir", "Baramhat",
             "Baramundah", "Bashans", "Ba'unah", "Abib", "Misra", "al-Nasi"
-    };
+        };
 
+/**
+     * Creates a new CopticCalendar object.
+     */
     public CopticCalendar() {
         this(EPOCH);
     }
 
+/**
+     * Creates a new CopticCalendar object.
+     *
+     * @param l DOCUMENT ME!
+     */
     public CopticCalendar(long l) {
         set(l);
     }
 
+/**
+     * Creates a new CopticCalendar object.
+     *
+     * @param altcalendar DOCUMENT ME!
+     */
     public CopticCalendar(AlternateCalendar altcalendar) {
         this(altcalendar.toRD());
     }
 
-    public CopticCalendar(int month, int day, int year) {
+/**
+     * Creates a new CopticCalendar object.
+     *
+     * @param i DOCUMENT ME!
+     * @param j DOCUMENT ME!
+     * @param k DOCUMENT ME!
+     */
+    public CopticCalendar(int i, int j, int k) {
         super(1, 1, 1);
-        set(month, day, year);
+        set(i, j, k);
     }
 
-    @Override
-    public synchronized void set(int month, int day, int year) {
-        super.month = month;
-        super.day = day;
-        super.year = year;
-        recomputeRD();
-    }
-
+    /**
+     * DOCUMENT ME!
+     *
+     * @param i DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static boolean isLeapYear(int i) {
         return AlternateCalendar.mod(i, 4) == 3;
     }
 
-    @Override
+    /**
+     * DOCUMENT ME!
+     */
     protected synchronized void recomputeRD() {
         super.rd = (EPOCH - 1L) + (long) (365 * (super.year - 1)) +
             AlternateCalendar.fldiv(super.year, 4L) +
             (long) (30 * (super.month - 1)) + (long) super.day;
     }
 
-    @Override
+    /**
+     * DOCUMENT ME!
+     */
     protected synchronized void recomputeFromRD() {
-        super.year = (int) AlternateCalendar.fldiv((4L * (super.rd - EPOCH)) + 1463L, 1461L);
-        
-        long startOfYear = (new CopticCalendar(1, 1, super.year)).toRD();
-        super.month = (int) AlternateCalendar.fldiv(super.rd - startOfYear, 30L) + 1;
-        
-        long startOfMonth = (new CopticCalendar(super.month, 1, super.year)).toRD();
-        super.day = (int) ((super.rd + 1L) - startOfMonth);
+        super.year = (int) AlternateCalendar.fldiv((4L * (super.rd - EPOCH)) +
+                1463L, 1461L);
+        super.month = (int) AlternateCalendar.fldiv(super.rd -
+                (new CopticCalendar(1, 1, super.year)).toRD(), 30L) + 1;
+        super.day = (int) ((super.rd + 1L) -
+            (new CopticCalendar(super.month, 1, super.year)).toRD());
     }
 
-    @Override
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     protected String monthName() {
-        return MONTHS[Math.max(0, Math.min(super.month - 1, 12))];
+        return MONTHS[super.month - 1];
     }
 
-    @Override
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     protected String getSuffix() {
         return "";
     }
 
-    @Override
-    public java.util.List<String> getMonths() {
-        return java.util.Arrays.asList(MONTHS);
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Enumeration getMonths() {
+        return new ArrayEnumeration(MONTHS);
     }
 
-    @Override
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public String toString() {
         try {
-            return super.day + " " + monthName() + " " + super.year + getSuffix();
-        } catch (Exception e) {
-            return "Invalid date: " + super.month + " " + super.day + " " + super.year;
+            return super.day + " " + monthName() + " " + super.year +
+            getSuffix();
+        } catch (ArrayIndexOutOfBoundsException _ex) {
+            return "Invalid date: " + super.month + " " + super.day + " " +
+            super.year;
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param args DOCUMENT ME!
+     */
+    public static void main(String[] args) {
+        int i;
+        int j;
+        int k;
+
+        try {
+            i = Integer.parseInt(args[0]);
+            j = Integer.parseInt(args[1]);
+            k = Integer.parseInt(args[2]);
+        } catch (Exception _ex) {
+            i = k = j = 1;
+        }
+
+        GregorianCalendar gregorian = new GregorianCalendar(i, j, k);
+        System.out.println(gregorian.toRD());
+        System.out.println(gregorian + "\n");
+
+        CopticCalendar coptic = new CopticCalendar(gregorian);
+        System.out.println(gregorian + ": " + coptic);
+        coptic.set(i, j, k);
+        System.out.println("CopticCalendar(" + i + "," + j + "," + k + "): " +
+            coptic);
+        System.out.println(coptic.toRD());
     }
 }

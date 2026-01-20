@@ -24,6 +24,9 @@
 package org.jscience.sociology;
 
 import java.util.*;
+import org.jscience.util.identity.Identifiable;
+import org.jscience.util.Named;
+import java.util.UUID;
 
 /**
  * Represents a society.
@@ -32,13 +35,14 @@ import java.util.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Society implements org.jscience.geography.Locatable {
+public class Society implements org.jscience.geography.Locatable, Identifiable<String>, Named {
 
     public enum Type {
         HUNTER_GATHERER, PASTORAL, HORTICULTURAL, AGRICULTURAL,
         INDUSTRIAL, POST_INDUSTRIAL, INFORMATION
     }
 
+    private final String id;
     private final String name;
     private Type type;
     private Culture culture;
@@ -48,7 +52,13 @@ public class Society implements org.jscience.geography.Locatable {
     private org.jscience.geography.Place location;
 
     public Society(String name) {
+        this.id = UUID.randomUUID().toString();
         this.name = name;
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 
     public Society(String name, Type type) {
@@ -82,7 +92,7 @@ public class Society implements org.jscience.geography.Locatable {
     }
 
     @Override
-    public org.jscience.geography.Place getLocation() {
+    public org.jscience.geography.Place getPosition() {
         return location;
     }
 

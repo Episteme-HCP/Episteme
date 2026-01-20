@@ -1,74 +1,64 @@
 package org.jscience.geography;
 
-import org.jscience.geography.coordinates.Coordinates;
+import org.jscience.util.Named;
+import org.jscience.util.Positioned;
+
 
 /**
- * A Geographical Place.
- * Represents a named entity at a location.
+ * A class representing a geographical spot, namely a feature. It is meant
+ * to be used primarily to define places like human settlements, that is
+ * places with a name.
+ *
+ * @author Silvere Martin-Michiellot
+ * @version 1.0
  */
-public class Place {
-    
-    public enum Type {
-        CITY, COUNTRY, REGION, CONTINENT, OTHER
-    }
+public class Place extends Object implements Named, Positioned {
+    /** DOCUMENT ME! */
+    private String name;
 
-    private final String name;
-    private final Type type;
-    private final Coordinates coordinates; // or Boundary
-    private String region;
-    private String country;
-    private int population;
+    /** DOCUMENT ME! */
+    private Boundary boundary;
 
-    public Place(String name, Coordinates coordinates) {
-        this(name, Type.OTHER, coordinates);
-    }
-    
-    public Place(String name, Type type) {
-        this(name, type, null);
-    }
-
-    public Place(String name, Type type, Coordinates coordinates) {
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("Place name cannot be null or empty.");
+/**
+     * Creates a new Place object.
+     *
+     * @param name     DOCUMENT ME!
+     * @param boundary DOCUMENT ME!
+     */
+    public Place(String name, Boundary boundary) {
+        if ((name != null) && (name.length() > 0) && (boundary != null)) {
+            this.name = name;
+            this.boundary = boundary;
+        } else {
+            throw new IllegalArgumentException(
+                "The Place constructor can't have null or empty arguments.");
         }
-        this.name = name;
-        this.type = type != null ? type : Type.OTHER;
-        this.coordinates = coordinates;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public String getName() {
         return name;
     }
-    
-    public Type getType() {
-        return type;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Boundary getBoundary() {
+        return boundary;
     }
 
-    public Coordinates getCoordinates() {
-        return coordinates;
-    }
-    
-    public String getRegion() { return region; }
-    public void setRegion(String region) { this.region = region; }
-    
-    public String getCountry() { return country; }
-    public void setCountry(String country) { this.country = country; }
-    
-    public int getPopulation() { return population; }
-    public void setPopulation(int population) { this.population = population; }
-
-    public void addInhabitant(Object inhabitant) {
-        this.population++;
-    }
-
-    public void removeInhabitant(Object inhabitant) {
-        if (this.population > 0) {
-            this.population--;
-        }
-    }
-    
-    @Override
-    public String toString() {
-        return name + (coordinates != null ? " (" + coordinates + ")" : "");
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Object getPosition() {
+        return boundary.getPosition();
     }
 }

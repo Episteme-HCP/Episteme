@@ -24,6 +24,8 @@
 package org.jscience.biology;
 
 import org.jscience.biology.genetics.BioSequence;
+import org.jscience.util.identity.Identifiable;
+import org.jscience.util.Named;
 
 /**
  * Represents a virus - an infectious agent that replicates inside living cells.
@@ -48,7 +50,7 @@ import org.jscience.biology.genetics.BioSequence;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Virus {
+public class Virus implements Identifiable<String>, Named {
 
     /**
      * Virus lifecycle stages.
@@ -114,6 +116,12 @@ public class Virus {
         this.currentStage = Stage.DORMANT;
     }
 
+    @Override
+    public String getId() {
+        return name.toLowerCase().replace(' ', '-');
+    }
+
+    @Override
     public String getName() {
         return name;
     }
@@ -223,5 +231,3 @@ public class Virus {
                 null, 200);
     }
 }
-
-

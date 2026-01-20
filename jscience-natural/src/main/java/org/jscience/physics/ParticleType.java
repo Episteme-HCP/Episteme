@@ -27,6 +27,9 @@ import org.jscience.mathematics.numbers.real.Real;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.jscience.util.identity.Identifiable;
+import org.jscience.util.Named;
+
 /**
  * Standard Model particles and properties.
  *
@@ -34,7 +37,7 @@ import java.util.HashMap;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ParticleType {
+public class ParticleType implements Identifiable<String>, Named {
 
     /** Speed of light (m/s) */
     public static final Real C = PhysicalConstants.c;
@@ -74,10 +77,12 @@ public class ParticleType {
         this.type = type;
     }
 
-    public String getSymbol() {
+    @Override
+    public String getId() {
         return symbol;
     }
 
+    @Override
     public String getName() {
         return name;
     }

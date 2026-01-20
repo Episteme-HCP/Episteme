@@ -1,115 +1,147 @@
+//repackaged after the code from Mark E. Shoulson
+//email <mark@kli.org>
+//website http://web.meson.org/calendars/
+//released under GPL
 package org.jscience.history.calendars;
 
+
+// Referenced classes of package calendars:
 /**
- * Bahai Calendar.
- * Based on the Solar Year.
- * 19 Months of 19 Days + Ayyam-i-Ha (Intercalary Days).
- * Era: Badi (begins 1844 AD).
- */
+ * DOCUMENT ME!
+ *
+ * @author $author$
+ * @version $Revision: 1.3 $
+  */
 public class BahaiCalendar extends SevenDaysWeek {
-    
+    /** DOCUMENT ME! */
     private static final String[] DAYS = {
             "Jamal", "Kamal", "Fidal", "`Idal", "Istijlal", "Istiqlal", "Jalal"
-    };
+        };
 
+    /** DOCUMENT ME! */
     private static final String[] MONTHS = {
             "Baha", "Jalal", "Jamal", "`Azamat", "Nur", "Rahmat", "Kalimat",
             "Kamal", "Asma'", "`Izzat", "Mashiyyat", "`Ilm", "Qudrat", "Qawl",
             "Masail", "Sharaf", "Sultan", "Mulk", "Ayyam-i-Ha", "`Ala'"
-    };
+        };
 
+    /** DOCUMENT ME! */
     private static final String[] YEARS = {
             "Alif", "Ba'", "Ab", "Dal", "Bab", "Vav", "Abad", "Jad", "Baha",
             "Hubb", "Bahhaj", "Javab", "Ahad", "Vahhab", "Vidad", "Badi'",
             "Bahi'", "Abha", "Vahid"
-    };
+        };
 
+    /** DOCUMENT ME! */
     public static final long EPOCH = (new GregorianCalendar(3, 21, 1844)).toRD();
 
+    /** DOCUMENT ME! */
+    private static final int EPYEAR = 1844;
+
+    /** DOCUMENT ME! */
     private int major;
+
+    /** DOCUMENT ME! */
     private int cycle;
+
+    /** DOCUMENT ME! */
     private int year;
+
+    /** DOCUMENT ME! */
     private int month;
+
+    /** DOCUMENT ME! */
     private int day;
 
+/**
+     * Creates a new BahaiCalendar object.
+     */
     public BahaiCalendar() {
         this(EPOCH);
     }
 
+/**
+     * Creates a new BahaiCalendar object.
+     *
+     * @param l DOCUMENT ME!
+     */
     public BahaiCalendar(long l) {
         set(l);
     }
 
+/**
+     * Creates a new BahaiCalendar object.
+     *
+     * @param altcalendar DOCUMENT ME!
+     */
     public BahaiCalendar(AlternateCalendar altcalendar) {
         set(altcalendar.toRD());
     }
 
-    public BahaiCalendar(int major, int cycle, int year, int month, int day) {
-        set(major, cycle, year, month, day);
+/**
+     * Creates a new BahaiCalendar object.
+     *
+     * @param i  DOCUMENT ME!
+     * @param j  DOCUMENT ME!
+     * @param k  DOCUMENT ME!
+     * @param l  DOCUMENT ME!
+     * @param i1 DOCUMENT ME!
+     */
+    public BahaiCalendar(int i, int j, int k, int l, int i1) {
+        set(i, j, k, l, i1);
     }
 
-    @Override
+    /**
+     * DOCUMENT ME!
+     *
+     * @param l DOCUMENT ME!
+     */
     public synchronized void set(long l) {
         super.rd = l;
         recomputeFromRD();
     }
 
-    public synchronized void set(int major, int cycle, int year, int month, int day) {
-        this.major = major;
-        this.cycle = cycle;
-        this.year = year;
-        this.month = month;
-        this.day = day;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param i DOCUMENT ME!
+     * @param j DOCUMENT ME!
+     * @param k DOCUMENT ME!
+     * @param l DOCUMENT ME!
+     * @param i1 DOCUMENT ME!
+     */
+    public synchronized void set(int i, int j, int k, int l, int i1) {
+        major = i;
+        cycle = j;
+        year = k;
+        month = l;
+        day = i1;
         recomputeRD();
     }
 
-    @Override
-    protected synchronized void recomputeRD() {
+    /**
+     * DOCUMENT ME!
+     */
+    public synchronized void recomputeRD() {
         int i = (((361 * (major - 1)) + (19 * (cycle - 1)) + year) - 1) + 1844;
-        long rdBase = (new GregorianCalendar(3, 20, i)).toRD();
+        super.rd = (new GregorianCalendar(3, 20, i)).toRD() +
+            (long) (19 * (month - 1));
 
-        // Start from Nau-Ruz
-        super.rd = rdBase + (long) (19 * (month - 1));
-
-        // Adjust for Ayyam-i-Ha (Month 19 is 'Ala, Month 18 is Mulk. 
-        // Wait, Ayyam-i-Ha is usually inserted before the last month.
-        // In this implementation, MONTHS[18] is Ayyam-i-Ha (index 18 -> 19th item in array?). 
-        // Ah, array size is 20. 
-        // 1..18 normal months. 
-        // 19 = Ayyam-i-Ha? 
-        // 20 = `Ala` (Fast)
-        
         if (month == 20) {
-             // If we are in the last month ('Ala), we must have passed Ayyam-i-Ha.
-             // How many days in Ayyam-i-Ha?
-             // Common: 4, Leap: 5.
-             if (GregorianCalendar.isLeapYear(i + 1)) {
-                super.rd -= 14L; // (19 * 19) calculation assumed uniform 19?
-                // Old code logic:
-                // super.rd += (long)(19 * (month - 1));
-                // if month=20, we added 19*19 = 361 days. 
-                // But we should have added 18*19 + lengthOfAyyamIHa?
-                // 18*19 = 342.
-                // 361 - 342 = 19. 
-                // Ayyam-i-Ha is 4 or 5 days. 
-                // So we overshot by 19 - 4 = 15 or 19 - 5 = 14.
-                // Hence: if leap -> rd -= 14 (adding 5 effective). else rd -= 15 (adding 4 effective).
-             } else {
+            if (GregorianCalendar.isLeapYear(i + 1)) {
+                super.rd -= 14L;
+            } else {
                 super.rd -= 15L;
-             }
+            }
         }
-        
-        // Wait, if month is 19 (Ayyam-i-Ha), then we added 19*18 = 342.
-        // And we are IN Ayyam-i-Ha, day runs 1..5?
-        // Logic seems to treat month 19 as a regular month in first line? 
-        // No, if month=19, we added 19*18. That's correct start of Ayyam-i-Ha.
-        
+
         super.rd += day;
     }
 
-    @Override
-    protected synchronized void recomputeFromRD() {
-        // Find Gregorian Year
+    /**
+     * DOCUMENT ME!
+     */
+    public synchronized void recomputeFromRD() {
         int i = (new GregorianCalendar(super.rd)).getYear();
         int j = i - 1844;
 
@@ -119,66 +151,96 @@ public class BahaiCalendar extends SevenDaysWeek {
         }
 
         major = (int) AlternateCalendar.fldiv(j, 361L) + 1;
-        
-        long mod361 = AlternateCalendar.mod(j, 361);
-        cycle = (int) AlternateCalendar.fldiv(mod361, 19L) + 1;
-        year = (int) AlternateCalendar.mod(j, 19) + 1;
+        cycle = (int) AlternateCalendar.fldiv(AlternateCalendar.mod(j, 361), 19L) +
+            1;
+        year = AlternateCalendar.mod(j, 19) + 1;
 
-        // Calculate start of year
-        long l = super.rd - (new BahaiCalendar(major, cycle, year, 1, 1)).toRD();
-        
-        // Approximate check: Month 20 ('Ala)
+        long l = super.rd -
+            (new BahaiCalendar(major, cycle, year, 1, 1)).toRD();
         BahaiCalendar bahai = new BahaiCalendar(major, cycle, year, 20, 1);
 
         if (super.rd >= bahai.toRD()) {
             month = 20;
         } else {
-            // Standard 19 day months
             month = (int) AlternateCalendar.fldiv(l, 19L) + 1;
         }
 
-        BahaiCalendar currentMonthStart = new BahaiCalendar(major, cycle, year, month, 1);
-        day = (int) ((super.rd + 1L) - currentMonthStart.toRD());
+        day = (int) ((super.rd + 1L) -
+            (new BahaiCalendar(major, cycle, year, month, 1)).toRD());
     }
 
-    @Override
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public String toString() {
-        int w = weekDay();
-        int mIdx = month - 1;
-        // Logic from old code regarding index 18 (Ayyam-i-Ha?)
-        // If "j == 18" (month 19?), increment?
-        // Old code: int j = day - 1? No, month index? 
-        // "int j = day - 1;" "if (j == 18) j++;" 
-        // Wait, DAYS has 7 items, MONTHS has 20 items. 
-        // The old code uses `MONTHS[j]` where j was derived from `day`? 
-        // That seems wrong. It says "day of [MonthName]".
-        // Ah, Bahai days also have names (19 names). 
-        // But DAYS array only has 7 names (Weekday names).
-        // Where are the day names? 
-        // In the old code `MONTHS` is reused?
-        // "MONTHS[j]" -> `day - 1`. Yes, Bahai days of month have same names as Months of year.
-        // Except Month 19 (Ayyam-i-Ha) is not a day name. Day 19 is 'Ala?
-        // Let's check:
-        // Month Names: 1..18, 19=Ayyam-i-Ha, 20='Ala.
-        // Day Names: 1..19. 
-        // If day is 19, name is 'Ala (which is MONTHS[19] in old code index? No MONTHS[19] is 'Ala).
-        // But MONTHS[18] is Ayyam-i-Ha. Day 18 is Mulk? 
-        // If day=19, index=18. If index=18, old code increments to 19 ('Ala). 
-        // Because "Ayyam-i-Ha" is not a day name.
-        
-        int dayNameIndex = day - 1;
-        if (dayNameIndex == 18) { // If it hits Ayyam-i-Ha index
-             dayNameIndex++;      // Skip to 'Ala
+        int i = weekDay();
+        int j = day - 1;
+
+        if (j == 18) {
+            j++;
         }
 
         try {
-            return DAYS[w] + " (" + SevenDaysWeek.DAYNAMES[w] +
-            ") the day of " + MONTHS[dayNameIndex] + " of the month of " +
+            return DAYS[i] + " (" + SevenDaysWeek.DAYNAMES[i] +
+            ") the day of " + MONTHS[j] + " of the month of " +
             MONTHS[month - 1] + " of the year of " + YEARS[year - 1] +
             " of Vahid " + cycle + " of Kull-i-Shay " + major + "\n(" + major +
             " " + cycle + " " + year + " " + month + " " + day + ")";
-        } catch (Exception e) {
-            return "Invalid date: " + major + "-" + cycle + "-" + year;
+        } catch (ArrayIndexOutOfBoundsException _ex) {
+            return "Invalid date: " + major + " " + cycle + " " + year + " " +
+            month + " " + day;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param args DOCUMENT ME!
+     */
+    public static void main(String[] args) {
+        int i = 0;
+        int j = 0;
+        int k = 0;
+        int l = 0;
+        int i1 = 0;
+        int j1 = 0;
+        int k1 = 0;
+        int l1 = 0;
+
+        try {
+            if (args.length >= 5) {
+                l = Integer.parseInt(args[0]);
+                i1 = Integer.parseInt(args[1]);
+                j1 = Integer.parseInt(args[2]);
+                k1 = Integer.parseInt(args[3]);
+                l1 = Integer.parseInt(args[4]);
+            } else {
+                i = Integer.parseInt(args[0]);
+                j = Integer.parseInt(args[1]);
+                k = Integer.parseInt(args[2]);
+            }
+        } catch (Exception _ex) {
+            i = k = j = 1;
+        }
+
+        if (i != 0) {
+            GregorianCalendar gregorian = new GregorianCalendar(i, j, k);
+            System.out.println(gregorian.toRD());
+            System.out.println(gregorian + "\n");
+
+            BahaiCalendar bahai = new BahaiCalendar(gregorian);
+            System.out.println(gregorian + ": " + bahai);
+
+            return;
+        } else {
+            BahaiCalendar bahai1 = new BahaiCalendar(l, i1, j1, k1, l1);
+            System.out.println("BahaiCalendar(" + l + " " + i1 + " " + j1 +
+                " " + k1 + " " + l1 + "): " + bahai1);
+            System.out.println(bahai1.toRD());
+
+            return;
         }
     }
 }

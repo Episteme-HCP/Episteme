@@ -1,18 +1,20 @@
+//this class is under GPL
+/**
+ @brief Declaration of coordinate base classes.
+ */
 package org.jscience.geography.coordinates;
 
 /**
- * Coordinate Interface.
- * Represents a point in a spatial reference frame.
+ * The Coordinates interface is the base class for all coordinate types..
+ *
+ * @see Coord2D, Coord3D
  */
 public interface Coordinates {
-    
+    /// Returns an array containing the coordinate component values.
     /**
-     * Returns the dimensionality of this coordinate.
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
      */
-    int getDimension();
-
-    /**
-     * Returns the value for a specific dimension index.
-     */
-    double get(int dimension);
+    public double[] getValues();
 }

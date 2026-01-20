@@ -1,129 +1,169 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.law;
 
-import java.time.LocalDate;
-import java.util.*;
+import org.jscience.psychology.social.HumanGroup;
+
+import org.jscience.util.Named;
+
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Vector;
+
 
 /**
- * Represents an international treaty between nations.
+ * A class representing a Set of agreements between two or more parties.
  *
  * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @version 1.0
  */
-public class Treaty {
 
-    public enum Type {
-        PEACE, TRADE, ALLIANCE, ENVIRONMENTAL, HUMAN_RIGHTS,
-        ARMS_CONTROL, EXTRADITION, CULTURAL
+//also named declaration
+public class Treaty extends Object implements Named {
+    /** DOCUMENT ME! */
+    private String name;
+
+    /** DOCUMENT ME! */
+    private Date date;
+
+    /** DOCUMENT ME! */
+    private Set groups; //the set of HumanGroups
+
+    /** DOCUMENT ME! */
+    private Vector articles; //it is not guarantied that the elements of the vector are ordonned by number
+
+    //must be a vector of Articles
+    /**
+     * Creates a new Treaty object.
+     *
+     * @param name DOCUMENT ME!
+     * @param date DOCUMENT ME!
+     * @param groups DOCUMENT ME!
+     * @param articles DOCUMENT ME!
+     */
+    public Treaty(String name, Date date, Set groups, Vector articles) {
+        Iterator iterator;
+        boolean valid;
+
+        if ((name != null) && (name.length() > 0) && (date != null) &&
+                (groups != null) && (articles != null)) {
+            iterator = articles.iterator();
+            valid = true;
+
+            while (iterator.hasNext() && valid) {
+                valid = iterator.next() instanceof Article;
+            }
+
+            if (valid) {
+                iterator = groups.iterator();
+
+                while (iterator.hasNext() && valid) {
+                    valid = iterator.next() instanceof HumanGroup;
+                }
+
+                if (valid) {
+                    this.name = name;
+                    this.date = date;
+                    this.groups = groups;
+                    this.articles = articles;
+                } else {
+                    throw new IllegalArgumentException(
+                        "The Set should contain only HumanGroups.");
+                }
+            } else {
+                throw new IllegalArgumentException(
+                    "The Vector can consist only of Articles.");
+            }
+        } else {
+            throw new IllegalArgumentException(
+                "The Treaty constructor can't have null arguments (and name can't be empty).");
+        }
     }
 
-    public enum Status {
-        NEGOTIATING, SIGNED, RATIFIED, IN_FORCE, SUSPENDED, TERMINATED
-    }
-
-    private final String name;
-    private final Type type;
-    private final LocalDate signedDate;
-    private final List<String> signatories = new ArrayList<>();
-    private Status status;
-    private String depositaryOrg; // e.g., "United Nations"
-
-    public Treaty(String name, Type type, LocalDate signedDate) {
-        this.name = name;
-        this.type = type;
-        this.signedDate = signedDate;
-        this.status = Status.SIGNED;
-    }
-
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public String getName() {
         return name;
     }
 
-    public Type getType() {
-        return type;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Date getDate() {
+        return date;
     }
 
-    public LocalDate getSignedDate() {
-        return signedDate;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Set getGroups() {
+        return groups;
     }
 
-    public Status getStatus() {
-        return status;
-    }
-
-    public String getDepositaryOrg() {
-        return depositaryOrg;
-    }
-
-    public List<String> getSignatories() {
-        return Collections.unmodifiableList(signatories);
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public void setDepositaryOrg(String org) {
-        this.depositaryOrg = org;
-    }
-
-    public void addSignatory(String country) {
-        if (!signatories.contains(country)) {
-            signatories.add(country);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param group DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public void addGroup(HumanGroup group) {
+        if (group != null) {
+            this.groups.add(group);
+        } else {
+            throw new IllegalArgumentException(
+                "You can't add a null HumanGroup.");
         }
     }
 
-    public int getSignatoryCount() {
-        return signatories.size();
+    //this normally does not happen
+    /**
+     * DOCUMENT ME!
+     *
+     * @param group DOCUMENT ME!
+     */
+    public void removeGroup(HumanGroup group) {
+        this.groups.remove(group);
     }
 
-    public boolean isSignatory(String country) {
-        return signatories.contains(country);
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Vector getArticles() {
+        return articles;
     }
 
-    @Override
-    public String toString() {
-        return String.format("%s (%s, %d) - %d signatories, %s",
-                name, type, signedDate.getYear(), signatories.size(), status);
+    //each article should have a corresponding number that goes in a logical progression
+    /**
+     * DOCUMENT ME!
+     *
+     * @param article DOCUMENT ME!
+     */
+    public void addArticle(Article article) {
+        if (article != null) {
+            this.articles.add(article);
+        } else {
+            throw new IllegalArgumentException("You can't add a null Article.");
+        }
     }
 
-    // Notable treaties
-    public static Treaty unCharter() {
-        Treaty t = new Treaty("Charter of the United Nations", Type.PEACE, LocalDate.of(1945, 6, 26));
-        t.setStatus(Status.IN_FORCE);
-        t.setDepositaryOrg("United Nations");
-        return t;
+    //be cautious when removing an article as there still may be some other articles refering to this article
+    /**
+     * DOCUMENT ME!
+     *
+     * @param article DOCUMENT ME!
+     */
+    public void removeArticle(Article article) {
+        this.articles.remove(article);
     }
 
-    public static Treaty parisAgreement() {
-        Treaty t = new Treaty("Paris Agreement", Type.ENVIRONMENTAL, LocalDate.of(2015, 12, 12));
-        t.setStatus(Status.IN_FORCE);
-        t.setDepositaryOrg("United Nations");
-        return t;
-    }
+    //perhaps toString could be implemented
 }
-
-

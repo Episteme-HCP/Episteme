@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import java.io.Serializable;
+import org.jscience.util.Temporal;
 
 /**
  * Represents a specific point in time.
@@ -38,7 +39,7 @@ import java.io.Serializable;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class TimePoint implements Comparable<TimePoint>, Serializable {
+public class TimePoint implements Comparable<TimePoint>, Serializable, Temporal {
 
     private final Instant instant;
 
@@ -63,6 +64,11 @@ public class TimePoint implements Comparable<TimePoint>, Serializable {
     }
 
     public Instant toInstant() {
+        return instant;
+    }
+
+    @Override
+    public Instant getTimestamp() {
         return instant;
     }
 

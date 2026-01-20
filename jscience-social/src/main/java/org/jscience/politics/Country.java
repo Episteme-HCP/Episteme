@@ -1,287 +1,390 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.politics;
 
-import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.economics.Currency;
+
+import org.jscience.geography.Place;
+
+import org.jscience.util.Named;
+
+import java.awt.*;
+
+import java.util.Collections;
+import java.util.Set;
+
 
 /**
- * Represents a country/nation with standard codes.
+ * A class representing the basic facts about a country (the modern tribe)
+ * or also kingdoms, empires...
  *
  * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @version 1.0
  */
-public class Country extends org.jscience.geography.Place implements org.jscience.util.identity.Identifiable<String> {
 
+//you should understand country in the broadest possible sense here
+//some countries also account for a religious hierarchy
+//we could add many fields here
+//for a list of candidates see http://www.cia.gov/cia/publications/factbook/docs/profileguide.html
+//may be we should see a country as one nation along with many (not empowered tribes)
+//this means that you won't get a country's population using getNation() or that getNation gives the common ground philosophy for that country
+//perhaps we should therefore define a country as composed of many nations...
+public class Country extends Place implements Named {
+    /** DOCUMENT ME! */
     private String name;
-    private String alpha2;
-    private String alpha3;
-    private int numericCode;
-    private String capital;
-    private String continent;
-    private long population;
-    private Real areaSqKm;
 
-    public Country(String name, String alpha2) {
-        super(name, Type.COUNTRY);
-        this.name = name;
-        this.alpha2 = alpha2;
-        this.areaSqKm = Real.ZERO;
+    /** DOCUMENT ME! */
+    private Nation nation;
+
+    /** DOCUMENT ME! */
+    private Administration army;
+
+    /** DOCUMENT ME! */
+    private Administration police;
+
+    /** DOCUMENT ME! */
+    private Administration justice;
+
+    /** DOCUMENT ME! */
+    private Currency currency;
+
+    /** DOCUMENT ME! */
+    private double gDP;
+
+    /** DOCUMENT ME! */
+    private double gNP;
+
+    /** DOCUMENT ME! */
+    private Image flag;
+
+    /** DOCUMENT ME! */
+    private City capital;
+
+    /** DOCUMENT ME! */
+    private Set cities;
+
+    /** DOCUMENT ME! */
+    private Set regions; //if any
+
+/**
+     * Creates a new Country object.
+     *
+     * @param name    DOCUMENT ME!
+     * @param nation  DOCUMENT ME!
+     * @param capital DOCUMENT ME!
+     */
+    public Country(String name, Nation nation, City capital) {
+        super(name, nation.getFormalTerritory().getBoundary());
+
+        if ((name != null) && (name.length() > 0) && (nation != null) &&
+                (capital != null)) {
+            this.name = name;
+            this.nation = nation;
+            this.capital = capital;
+            this.army = null;
+            this.police = null;
+            this.justice = null;
+            this.currency = null;
+            this.gDP = -1;
+            this.gNP = -1;
+            this.flag = null;
+            this.cities = Collections.EMPTY_SET;
+            this.regions = Collections.EMPTY_SET;
+        } else {
+            throw new IllegalArgumentException(
+                "The Country constructor doesn't allow null or empty arguments.");
+        }
     }
 
-    public Country(String name, String alpha2, String alpha3, int numericCode,
-            String capital, String continent, long population, Real areaSqKm) {
-        this(name, alpha2);
-        this.alpha3 = alpha3;
-        this.numericCode = numericCode;
-        this.capital = capital;
-        this.continent = continent;
-        this.population = population;
-        this.areaSqKm = areaSqKm;
-
-        // Update Place fields as possible
-        this.setRegion(continent);
-        this.setCountry(name); // It is the country itself
-    }
-
-    public Country(String name, String alpha2, String alpha3, int numericCode,
-            String capital, String continent, long population, double areaSqKm) {
-        this(name, alpha2, alpha3, numericCode, capital, continent, population, Real.of(areaSqKm));
-    }
-
-    @Override
-    public String getId() {
-        return alpha3 != null ? alpha3 : alpha2;
-    }
-
-    @Override
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public String getName() {
         return name;
     }
 
-    public String getAlpha2() {
-        return alpha2;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Nation getNation() {
+        return nation;
     }
 
-    public String getAlpha3() {
-        return alpha3;
+    //may return null
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Administration getArmy() {
+        return army;
     }
 
-    public int getNumericCode() {
-        return numericCode;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param army DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public void setArmy(Administration army) {
+        if (army != null) {
+            if (army.getPosition() == this) {
+                this.army = army;
+            } else {
+                throw new IllegalArgumentException(
+                    "You can't set an army whose country is not this.");
+            }
+        } else {
+            this.army = null;
+        }
     }
 
-    public String getCapital() {
+    //may return null
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Administration getPolice() {
+        return police;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param police DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public void setPolice(Administration police) {
+        if (police != null) {
+            if (police.getPosition() == this) {
+                this.police = police;
+            } else {
+                throw new IllegalArgumentException(
+                    "You can't set a police whose country is not this.");
+            }
+        } else {
+            this.police = null;
+        }
+    }
+
+    //may return null
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Administration getJustice() {
+        return justice;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param justice DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public void setJustice(Administration justice) {
+        if (justice != null) {
+            if (justice.getPosition() == this) {
+                this.justice = justice;
+            } else {
+                throw new IllegalArgumentException(
+                    "You can't set a justice whose country is not this.");
+            }
+        } else {
+            this.police = null;
+        }
+    }
+
+    //schools could also be considered as stateforces
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param currency DOCUMENT ME!
+     */
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
+    }
+
+    //may return-1
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public double getGDP() {
+        return gDP;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param gdp DOCUMENT ME!
+     */
+    public void setGDP(double gdp) {
+        this.gDP = gdp;
+    }
+
+    //may return -1
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public double getGNP() {
+        return gNP;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param gnp DOCUMENT ME!
+     */
+    public void setGNP(double gnp) {
+        this.gNP = gnp;
+    }
+
+    //may return null
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Image getFlag() {
+        return flag;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param flag DOCUMENT ME!
+     */
+    public void setFlag(Image flag) {
+        this.flag = flag;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public City getCapital() {
         return capital;
     }
 
-    public String getContinent() {
-        return continent;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param capital DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+
+    //you should only set only a city which is in the cities Set
+    public void setCapital(City capital) {
+        if ((capital != null)) {
+            if (cities.contains(capital)) {
+                this.capital = capital;
+            } else {
+                throw new IllegalArgumentException(
+                    "The capital must be in the Set of cities.");
+            }
+        } else {
+            throw new IllegalArgumentException("The capital must be non null.");
+        }
     }
 
-    @Override
-    public int getPopulation() {
-        return (int) population; // Place uses int, Country uses long. Potential overflow for China/India but
-                                 // Place should be updated eventually.
+    /**
+     * DOCUMENT ME!
+     *
+     * @param city DOCUMENT ME!
+     */
+    public void addCity(City city) {
+        cities.add(city);
     }
 
-    public long getPopulationLong() {
-        return population;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param city DOCUMENT ME!
+     */
+    public void removeCity(City city) {
+        cities.remove(city);
+        city.setCountry(null);
     }
 
-    public Real getAreaSqKm() {
-        return areaSqKm;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Set getCities() {
+        return cities;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param city DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public boolean containsCity(City city) {
+        return cities.contains(city);
     }
 
-    public void setAlpha2(String alpha2) {
-        this.alpha2 = alpha2;
+    //some countries also have regions
+    /**
+     * DOCUMENT ME!
+     *
+     * @param region DOCUMENT ME!
+     */
+    protected void addRegion(Region region) {
+        regions.add(region);
     }
 
-    public void setAlpha3(String alpha3) {
-        this.alpha3 = alpha3;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param region DOCUMENT ME!
+     */
+    public void removeRegion(Region region) {
+        regions.remove(region);
+        region.setCountry(null);
     }
 
-    public void setNumericCode(int numericCode) {
-        this.numericCode = numericCode;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Set getRegions() {
+        return regions;
     }
 
-    public void setCapital(String capital) {
-        this.capital = capital;
-    }
-
-    public void setContinent(String continent) {
-        this.continent = continent;
-    }
-
-    public void setPopulation(long population) {
-        this.population = population;
-    }
-
-    public void setAreaSqKm(Real areaSqKm) {
-        this.areaSqKm = areaSqKm;
-    }
-
-    public void setAreaSqKm(double areaSqKm) {
-        this.areaSqKm = Real.of(areaSqKm);
-    }
-
-    public Real getPopulationDensity() {
-        return areaSqKm.doubleValue() > 0 ? Real.of(population).divide(areaSqKm) : Real.ZERO;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%s (%s)", name, alpha2);
-    }
-
-    // Major countries
-    public static final Country USA = new Country("United States", "US", "USA", 840,
-            "Washington D.C.", "North America", 331_000_000L, 9_833_520.0);
-    public static final Country CHINA = new Country("China", "CN", "CHN", 156,
-            "Beijing", "Asia", 1_412_000_000L, 9_596_960.0);
-    public static final Country INDIA = new Country("India", "IN", "IND", 356,
-            "New Delhi", "Asia", 1_380_000_000L, 3_287_263.0);
-    public static final Country FRANCE = new Country("France", "FR", "FRA", 250,
-            "Paris", "Europe", 67_000_000L, 643_801.0);
-    public static final Country GERMANY = new Country("Germany", "DE", "DEU", 276,
-            "Berlin", "Europe", 83_000_000L, 357_022.0);
-    public static final Country UK = new Country("United Kingdom", "GB", "GBR", 826,
-            "London", "Europe", 67_000_000L, 242_495.0);
-    public static final Country JAPAN = new Country("Japan", "JP", "JPN", 392,
-            "Tokyo", "Asia", 126_000_000L, 377_975.0);
-    public static final Country BRAZIL = new Country("Brazil", "BR", "BRA", 76,
-            "BrasÃƒÂ­lia", "South America", 212_000_000L, 8_515_767.0);
-    // Expanded fields from Factbook data
-    private double coastlineKm;
-    private String governmentType;
-    private int independenceYear;
-    private double populationGrowthRate;
-    private double lifeExpectancy;
-    private double birthRate;
-    private double deathRate;
-    private String currencyCode;
-    private java.util.List<String> majorIndustries = new java.util.ArrayList<>();
-    private java.util.List<String> naturalResources = new java.util.ArrayList<>();
-    private java.util.List<String> borderCountries = new java.util.ArrayList<>();
-    
-    // Merged from jscience-natural
-    private double stability; // 0.0 - 1.0
-    private double militarySpending; // Billions USD
-
-    public double getStability() {
-        return stability;
-    }
-
-    public void setStability(double stability) {
-        this.stability = stability;
-    }
-
-    public double getMilitarySpending() {
-        return militarySpending;
-    }
-
-    public void setMilitarySpending(double militarySpending) {
-        this.militarySpending = militarySpending;
-    }
-
-    public double getCoastlineKm() {
-        return coastlineKm;
-    }
-
-    public void setCoastlineKm(double coastlineKm) {
-        this.coastlineKm = coastlineKm;
-    }
-
-    public String getGovernmentType() {
-        return governmentType;
-    }
-
-    public void setGovernmentType(String governmentType) {
-        this.governmentType = governmentType;
-    }
-
-    public int getIndependenceYear() {
-        return independenceYear;
-    }
-
-    public void setIndependenceYear(int independenceYear) {
-        this.independenceYear = independenceYear;
-    }
-
-    public double getPopulationGrowthRate() {
-        return populationGrowthRate;
-    }
-
-    public void setPopulationGrowthRate(double populationGrowthRate) {
-        this.populationGrowthRate = populationGrowthRate;
-    }
-
-    public double getLifeExpectancy() {
-        return lifeExpectancy;
-    }
-
-    public void setLifeExpectancy(double lifeExpectancy) {
-        this.lifeExpectancy = lifeExpectancy;
-    }
-
-    public double getBirthRate() {
-        return birthRate;
-    }
-
-    public void setBirthRate(double birthRate) {
-        this.birthRate = birthRate;
-    }
-
-    public double getDeathRate() {
-        return deathRate;
-    }
-
-    public void setDeathRate(double deathRate) {
-        this.deathRate = deathRate;
-    }
-
-    public String getCurrencyCode() {
-        return currencyCode;
-    }
-
-    public void setCurrencyCode(String currencyCode) {
-        this.currencyCode = currencyCode;
-    }
-
-    public java.util.List<String> getMajorIndustries() {
-        return majorIndustries;
-    }
-
-    public java.util.List<String> getNaturalResources() {
-        return naturalResources;
-    }
-
-    public java.util.List<String> getBorderCountries() {
-        return borderCountries;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param region DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public boolean containsRegion(Region region) {
+        return regions.contains(region);
     }
 }

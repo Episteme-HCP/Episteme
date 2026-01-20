@@ -1,143 +1,125 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.geography;
 
-import java.util.*;
-import org.jscience.measure.Quantity;
-import org.jscience.measure.Quantities;
-import org.jscience.measure.Units;
-import org.jscience.measure.quantity.Length;
+
+//import org.jscience.mathematics.geometry.*;
+import org.jscience.geography.coordinates.Coord;
+
+import org.jscience.util.Positioned;
+
 
 /**
- * Represents a geographic boundary/border.
+ * A class representing a boundary.
  *
  * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @version 1.0
  */
-public class Boundary {
 
-    public enum Type {
-        NATIONAL, STATE, PROVINCIAL, COUNTY, MUNICIPAL,
-        NATURAL, MARITIME, TREATY_DEFINED
-    }
+//you should feed this class with valid coordinates
+//this is actually more than a boundary, it defines for a 2D space regions that are in or out using convex polygons.
+//single hole regions are defined with two overlapping polygons.
+//may be we should replace this class by org.jscience.geometry.ParametricCurve
+public class Boundary extends Object implements Positioned {
+    /** DOCUMENT ME! */
+    private Coord[] coords;
 
-    private final String name;
-    private Type type;
-    private final List<Coordinate> points = new ArrayList<>();
-    private double lengthMeters;
-    private String entity1;
-    private String entity2;
+    /** DOCUMENT ME! */
+    private boolean[] boundariesIncluded;
 
-    public Boundary(String name, Type type) {
-        this.name = name;
-        this.type = type;
-        this.lengthMeters = 0.0;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    /**
-     * Returns the length in kilometers.
+/**
+     * Creates a new Boundary object.
      */
-    public double getLengthKm() {
-        return lengthMeters / 1000.0;
+    public Boundary() {
+        this.coords = new Coord[0];
+        boundariesIncluded = new boolean[coords.length];
     }
 
+    //this defines a polygonal boundary of any sort (may be empty): last coordinates should be linked to the zeroth coordinate thus closing the boundary
     /**
-     * Returns the length as a Length quantity.
+     * Creates a new Boundary object.
+     *
+     * @param coords DOCUMENT ME!
      */
-    public Quantity<Length> getLength() {
-        return Quantities.create(lengthMeters, Units.METER);
-    }
+    public Boundary(Coord[] coords) {
+        if (coords != null) {
+            this.coords = coords;
+            boundariesIncluded = new boolean[coords.length];
 
-    public String getEntity1() {
-        return entity1;
-    }
-
-    public String getEntity2() {
-        return entity2;
-    }
-
-    public List<Coordinate> getPoints() {
-        return Collections.unmodifiableList(points);
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
-    public void setLengthKm(double lengthKm) {
-        this.lengthMeters = lengthKm * 1000.0;
-    }
-
-    public void setLengthMeters(double lengthMeters) {
-        this.lengthMeters = lengthMeters;
-    }
-
-    public void setEntities(String entity1, String entity2) {
-        this.entity1 = entity1;
-        this.entity2 = entity2;
-    }
-
-    public void addPoint(Coordinate coord) {
-        points.add(coord);
-    }
-
-    /**
-     * Calculates the total length of the boundary from its points.
-     * 
-     * @return length as a Length quantity
-     */
-    public Quantity<Length> calculateLength() {
-        if (points.size() < 2)
-            return Quantities.create(0, Units.METER);
-        double total = 0.0;
-        for (int i = 1; i < points.size(); i++) {
-            total += points.get(i - 1).distanceTo(points.get(i))
-                    .to(Units.METER).getValue().doubleValue();
+            for (int i = 0; i < boundariesIncluded.length; i++) {
+                boundariesIncluded[i] = true;
+            }
+        } else {
+            throw new IllegalArgumentException(
+                "The Boundary constructor can't have null arguments.");
         }
-        return Quantities.create(total, Units.METER);
     }
 
-    @Override
-    public String toString() {
-        return String.format("Boundary '%s' (%s): %.1f km", name, type, getLengthKm());
+    //last element of the boundariesIncluded is to be used for the closure
+    /**
+     * Creates a new Boundary object.
+     *
+     * @param coords DOCUMENT ME!
+     * @param boundariesIncluded DOCUMENT ME!
+     */
+    public Boundary(Coord[] coords, boolean[] boundariesIncluded) {
+        if ((coords != null) && (boundariesIncluded.length > 0) &&
+                (boundariesIncluded.length == coords.length)) {
+            this.coords = coords;
+            this.boundariesIncluded = boundariesIncluded;
+        } else {
+            throw new IllegalArgumentException(
+                "The Boundary constructor can't have null arguments.");
+        }
     }
 
-    public static Boundary usCanadaBorder() {
-        Boundary b = new Boundary("US-Canada Border", Type.NATIONAL);
-        b.setEntities("United States", "Canada");
-        b.setLengthKm(8891); // kilometers
-        return b;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Object getPosition() {
+        return this;
     }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Coord[] getCoords() {
+        return coords;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public boolean[] getBoundariesInclusion() {
+        return boundariesIncluded;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param boundary DOCUMENT ME!
+     */
+    public void union(Boundary boundary) {
+        //    if (boundary!=null) {
+        //TODO   //this is very complicated code I don't have time to produce now
+        //    } else throw new IllegalArgumentException("You can't make the union with null boundary.");
+        throw new RuntimeException(
+            "Not yet implemented ; use org.jscience.geometry to provide similar function.");
+    }
+
+    //public void intersection(Boundary boundary) {
+    //    if (boundary!=null) {
+    //TODO   //this is very complicated code I don't have time to produce now
+    //    } else throw new IllegalArgumentException("You can't make the union with null boundary.");
+    //  }
+
+    //we should also provide:
+    // public boolean isIncluded(Boundary boundary);
+    // public boolean isEmptyIntersection(Boundary boundary);
+    //public double computeArea();
+    //don't forget to include an implementation for the subclass TimedBoundary
 }
-
-

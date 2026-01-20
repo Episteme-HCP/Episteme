@@ -1,133 +1,99 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.linguistics;
 
-import java.util.*;
-
 /**
- * Represents a word in a language with etymology and translations.
+ * The Word defines sequences of Morphemes.
  *
  * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @version 1.0
  */
-public class Word {
+public class Word extends Object {
+    /** DOCUMENT ME! */
+    private Morpheme[] morphemes;
 
-    public enum PartOfSpeech {
-        NOUN, VERB, ADJECTIVE, ADVERB, PRONOUN, PREPOSITION,
-        CONJUNCTION, INTERJECTION, ARTICLE, DETERMINER
+/**
+     * Creates a new Word object.
+     *
+     * @param language DOCUMENT ME!
+     * @param string   DOCUMENT ME!
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public Word(Language language, String string) {
+        if ((language != null) && (string != null) && (string.length() > 0)) {
+            morphemes = new Morpheme[string.length()];
+
+            for (int i = 0; i < string.length(); i++) {
+                morphemes[i] = new Morpheme(language, string.substring(i, i +
+                            1));
+            }
+        } else {
+            throw new IllegalArgumentException(
+                "The Lexeme constructor arguments can't be null and string can't be empty.");
+        }
     }
 
-    private final String text;
-    private final Language language;
-    private PartOfSpeech partOfSpeech;
-    private String definition;
-    private String pronunciation; // IPA notation
-    private String etymology;
-    private final List<String> synonyms = new ArrayList<>();
-    private final List<String> antonyms = new ArrayList<>();
-    private final Map<Language, String> translations = new HashMap<>();
+/**
+     * Creates a new Word object.
+     *
+     * @param morphemes DOCUMENT ME!
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public Word(Morpheme[] morphemes) {
+        boolean valid;
+        int i;
 
-    public Word(String text, Language language) {
-        this.text = text;
-        this.language = language;
+        if ((morphemes != null) && (morphemes.length > 0)) {
+            i = 1;
+            valid = true;
+
+            while ((valid) && (i < morphemes.length)) {
+                valid = (morphemes[i].getLanguage() == morphemes[0].getLanguage());
+            }
+
+            if (valid) {
+                this.morphemes = morphemes;
+            } else {
+                throw new IllegalArgumentException(
+                    "The morphemes must all be of the same Language.");
+            }
+        } else {
+            throw new IllegalArgumentException(
+                "The Word constructor arguments can't be null and morphemes can't be empty.");
+        }
     }
 
-    // Getters
-    public String getText() {
-        return text;
-    }
-
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public Language getLanguage() {
-        return language;
+        return morphemes[0].getLanguage();
     }
 
-    public PartOfSpeech getPartOfSpeech() {
-        return partOfSpeech;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public Morpheme[] getMorphemes() {
+        return morphemes;
     }
 
-    public String getDefinition() {
-        return definition;
-    }
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public String getString() {
+        int i;
+        StringBuffer result;
 
-    public String getPronunciation() {
-        return pronunciation;
-    }
+        result = new StringBuffer();
 
-    public String getEtymology() {
-        return etymology;
-    }
+        for (i = 0; i < morphemes.length; i++) {
+            result.append(morphemes[i].getString());
+        }
 
-    public List<String> getSynonyms() {
-        return Collections.unmodifiableList(synonyms);
-    }
-
-    public List<String> getAntonyms() {
-        return Collections.unmodifiableList(antonyms);
-    }
-
-    public Map<Language, String> getTranslations() {
-        return Collections.unmodifiableMap(translations);
-    }
-
-    // Setters
-    public void setPartOfSpeech(PartOfSpeech pos) {
-        this.partOfSpeech = pos;
-    }
-
-    public void setDefinition(String def) {
-        this.definition = def;
-    }
-
-    public void setPronunciation(String pron) {
-        this.pronunciation = pron;
-    }
-
-    public void setEtymology(String etymology) {
-        this.etymology = etymology;
-    }
-
-    public void addSynonym(String word) {
-        synonyms.add(word);
-    }
-
-    public void addAntonym(String word) {
-        antonyms.add(word);
-    }
-
-    public void addTranslation(Language lang, String translation) {
-        translations.put(lang, translation);
-    }
-
-    public String getTranslation(Language lang) {
-        return translations.get(lang);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%s (%s, %s)", text, language.getName(), partOfSpeech);
+        return result.toString();
     }
 }
-
-

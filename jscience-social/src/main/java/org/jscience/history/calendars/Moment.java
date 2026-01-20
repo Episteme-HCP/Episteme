@@ -1,15 +1,29 @@
+//repackaged after the code from Mark E. Shoulson
+//email <mark@kli.org>
+//website http://web.meson.org/calendars/
+//released under GPL
 package org.jscience.history.calendars;
 
-/**
- * Represents a moment in time with high precision, used for astronomical calculations.
- */
-public class Moment {
-    
-    public static final double JD2000 = (new GregorianCalendar(1, 1, 2000)).toJD() + 0.5D;
 
+// Referenced classes of package calendars:
+/**
+ * DOCUMENT ME!
+ *
+ * @author $author$
+ * @version $Revision: 1.3 $
+  */
+public class Moment {
+    /** DOCUMENT ME! */
+    public static final double JD2000 = (new GregorianCalendar(1, 1, 2000)).toJD() +
+        0.5D;
+
+    /** DOCUMENT ME! */
     private static final long JAN1900 = (new GregorianCalendar(1, 1, 1900)).toRD();
+
+    /** DOCUMENT ME! */
     private static final long JAN1810 = (new GregorianCalendar(1, 1, 1810)).toRD();
 
+    /** DOCUMENT ME! */
     private static final double[] LONG_COEFFS = {
             403406D, 195207D, 119433D, 112392D, 3891D, 2819D, 1721D, 660D, 350D,
             334D, 314D, 268D, 242D, 234D, 158D, 132D, 129D, 114D, 99D, 93D, 86D,
@@ -17,6 +31,7 @@ public class Moment {
             21D, 21D, 20D, 18D, 17D, 14D, 13D, 13D, 13D, 12D, 10D, 10D, 10D, 10D
         };
 
+    /** DOCUMENT ME! */
     private static final double[] LONG_MULTS = {
             0.016210430000000001D, 628.30348067D, 628.30821523999998D,
             628.29634301999999D, 1256.605691D, 1256.6098400000001D,
@@ -35,6 +50,7 @@ public class Moment {
             214.63249999999999D, 1572.0840000000001D
         };
 
+    /** DOCUMENT ME! */
     private static final double[] LONG_ADDS = {
             4.7219639999999998D, 5.9374580000000003D, 1.1155889999999999D,
             5.7816159999999996D, 5.5473999999999997D, 1.512D,
@@ -53,46 +69,112 @@ public class Moment {
             2.5499999999999998D
         };
 
+    /** DOCUMENT ME! */
     public static final double MEANSYNODICMONTH = 29.530588853000001D;
 
+    /** DOCUMENT ME! */
     private double moment;
 
+/**
+     * Creates a new Moment object.
+     *
+     * @param l DOCUMENT ME!
+     */
     public Moment(long l) {
         moment = l;
     }
 
+/**
+     * Creates a new Moment object.
+     *
+     * @param d DOCUMENT ME!
+     */
     public Moment(double d) {
         moment = d;
     }
 
+/**
+     * Creates a new Moment object.
+     *
+     * @param altcalendar DOCUMENT ME!
+     */
     public Moment(AlternateCalendar altcalendar) {
         this(altcalendar.toRD());
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static Moment jdCreate(double d) {
         return new Moment(momentFromJD(d));
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     private static double sind(double d) {
         return Math.sin((d * 3.1415926535897931D) / 180D);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     private static double cosd(double d) {
         return Math.cos((d * 3.1415926535897931D) / 180D);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     private static double tand(double d) {
         return Math.tan((d * 3.1415926535897931D) / 180D);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double momentFromJD(double d) {
-        return d + -1721424.5D; // Using similar logic to AlternateCalendar
+        return d + -1721424.5D;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double jdFromMoment(double d) {
         return d - -1721424.5D;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double equationOfTime(double d) {
         double d1 = (d - JD2000) / 36525D;
         double d2 = 280.46645000000001D +
@@ -112,18 +194,45 @@ public class Moment {
         (0.5D * d6 * d6 * sind(4D * d2)) - (1.25D * d5 * d5 * sind(2D * d3))) / 6.2831853071795862D;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public double equationOfTime() {
         return equationOfTime(jdFromMoment(moment));
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double apparentFromLocal(double d) {
         return d + equationOfTime(d);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double localFromApparent(double d) {
         return d - equationOfTime(d);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     * @param ad DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     private static double polynomial(double d, double[] ad) {
         double d1 = 0.0D;
 
@@ -133,6 +242,13 @@ public class Moment {
         return d1;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double siderealFromJD(double d) {
         double d1 = (d - JD2000) / 36525D;
         double[] ad = {
@@ -143,10 +259,22 @@ public class Moment {
         return (((polynomial(d1, ad) / 360D) % 1.0D) + 1.0D) % 1.0D;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public double siderealFromJD() {
         return siderealFromJD(jdFromMoment(moment));
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double ephemerisCorrection(double d) {
         double d1 = (new GregorianCalendar((long) d)).getYear();
 
@@ -190,31 +318,76 @@ public class Moment {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public double ephemerisCorrection() {
         return ephemerisCorrection(moment);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double ephemerisFromUniversal(double d) {
         return d + ephemerisCorrection(momentFromJD(d));
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double universalFromEphemeris(double d) {
         return d - ephemerisCorrection(momentFromJD(d));
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double julianCenturies(double d) {
         return (ephemerisFromUniversal(d) - JD2000) / 36525D;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public double julianCenturies() {
         return julianCenturies(moment);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double abberation(double d) {
         return (1.7E-006D * cosd(177.63D + (35999.018479999999D * d))) -
         9.7299999999999993E-005D;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double nutation(double d) {
         double d1 = polynomial(d,
                 new double[] {
@@ -230,6 +403,13 @@ public class Moment {
         (6.3999999999999997E-006D * sind(d2));
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double solarLongitude(double d) {
         double d1 = julianCenturies(d);
         double d2 = 0.0D;
@@ -245,10 +425,23 @@ public class Moment {
         360D) % 360D;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public double solarLongitude() {
         return solarLongitude(jdFromMoment(moment));
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     * @param i DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double dateNextSolarLongitude(double d, int i) {
         double d4 = ((((double) i * Math.ceil(solarLongitude(d) / (double) i)) % 360D) +
             360D) % 360D;
@@ -273,6 +466,16 @@ public class Moment {
         return d3;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param l DOCUMENT ME!
+     * @param d DOCUMENT ME!
+     * @param d1 DOCUMENT ME!
+     * @param d2 DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double solarMoment(long l, double d, double d1, double d2) {
         double d3 = (double) (new GregorianCalendar(l)).dayNumber() + 0.5D +
             d2 + (d1 / -360D);
@@ -303,6 +506,13 @@ public class Moment {
         return d11 - Math.floor(d11);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double newMoonAtOrAfter(double d) {
         GregorianCalendar gregorian = new GregorianCalendar((long) Math.floor(
                     momentFromJD(d)));
@@ -317,10 +527,24 @@ public class Moment {
         return newMoonTime(i);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double newMoonBefore(double d) {
         return newMoonAtOrAfter(newMoonAtOrAfter(d) - 45D);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param i DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double newMoonTime(int i) {
         double d = (double) i / 1236.8499999999999D;
         double d1 = polynomial(d,
@@ -419,12 +643,56 @@ public class Moment {
         return universalFromEphemeris(d1 + d7 + d8);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     * @param d1 DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double universalFromLocal(double d, double d1) {
         return d - (d1 / 1440D);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param d DOCUMENT ME!
+     * @param d1 DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public static double localFromUniversal(double d, double d1) {
         return d + (d1 / 1440D);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param args DOCUMENT ME!
+     */
+    public static void main(String[] args) {
+        GregorianCalendar gregorian = new GregorianCalendar(Integer.parseInt(
+                    args[0]), Integer.parseInt(args[1]),
+                Integer.parseInt(args[2]));
+        double d = gregorian.toJD();
+        System.out.println(d);
+        System.out.println(1440D * equationOfTime(d));
+        System.out.println(solarLongitude(d + 0.5D));
+
+        if (args.length >= 6) {
+            d += ((double) (Integer.parseInt(args[5]) +
+            (60 * (Integer.parseInt(args[4]) +
+            (60 * Integer.parseInt(args[3]))))) / 86400D);
+        }
+
+        System.out.println(d);
+        System.out.println(siderealFromJD(d));
+        System.out.println("JD2000: " + JD2000);
+        System.out.println(newMoonAtOrAfter(d));
+        System.out.println("Eph: " +
+            ephemerisCorrection(Integer.parseInt(args[3])));
+        System.out.println(newMoonAtOrAfter(2392807.5D));
+    }
 }

@@ -1,170 +1,240 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.psychology;
 
-import java.util.*;
-import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.util.Commented;
+import org.jscience.util.Named;
+
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Vector;
+
+
+//human and other species organize themselves around activities and a set of behaviors are associated to support the activity
+
+//this class should be plugged in Individual and/or Role
+
+//perhaps we should have a stronger system with "tasks (or activities) that are sequential or parallel and each can be sub divided into other activities or terminal behaviors" including preconditions to trigger the behaviors, a scheduler at Individual level and a blackboard of current activities (as well as needs and resources for the individuals ; a genetically encoded action selection system) (a repertoire of behaviors at Species level). Current system provides no ordering at all. (moreover current model allows for activities to be dependent upon themselves, ie cycles with subactivities)... probably all this should rathr be part of JRobotics after all.
 
 /**
- * Represents a human activity with goals and sub-activities.
- * <p>
- * Modernized from v1 with hierarchical activity modeling.
- * </p>
+ * DOCUMENT ME!
  *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
-public class Activity {
+ * @author $author$
+ * @version $Revision: 1.6 $
+  */
+public class Activity extends Object implements Named, Commented {
+    /** DOCUMENT ME! */
+    private String name;
 
-    public enum Category {
-        WORK, LEISURE, SOCIAL, PHYSICAL, MENTAL, CREATIVE, DOMESTIC, SPIRITUAL
-    }
+    /** DOCUMENT ME! */
+    private String comments;
 
-    private final String name;
-    private String description;
+    /** DOCUMENT ME! */
     private String goal;
-    private Category category;
-    private final List<Activity> subActivities = new ArrayList<>();
-    private final List<Behavior> behaviors = new ArrayList<>();
-    private int durationMinutes;
-    private Real energyCost;
 
+    /** DOCUMENT ME! */
+    private Vector subActivities;
+
+    /** DOCUMENT ME! */
+    private Set behaviors;
+
+/**
+     * Creates a new Activity object.
+     *
+     * @param name DOCUMENT ME!
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
     public Activity(String name) {
-        this.name = Objects.requireNonNull(name);
+        if ((name != null) && (name.length() > 0)) {
+            this.name = name;
+            this.comments = new String();
+            this.goal = new String();
+            this.subActivities = new Vector();
+            this.behaviors = null;
+        } else {
+            throw new IllegalArgumentException(
+                "The Activity constructor can't have null or empty arguments.");
+        }
     }
 
-    public Activity(String name, Category category) {
-        this(name);
-        this.category = category;
-    }
-
-    // Getters
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public String getName() {
         return name;
     }
 
-    public String getDescription() {
-        return description;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public String getComments() {
+        return comments;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param comments DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public void setComments(String comments) {
+        if (comments != null) {
+            this.comments = comments;
+        } else {
+            throw new IllegalArgumentException("You can't set a null comment.");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
     public String getGoal() {
         return goal;
     }
 
-    public Category getCategory() {
-        return category;
-    }
-
-    public int getDurationMinutes() {
-        return durationMinutes;
-    }
-
-    public Real getEnergyCost() {
-        return energyCost;
-    }
-
-    // Setters
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
+    /**
+     * DOCUMENT ME!
+     *
+     * @param goal DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
     public void setGoal(String goal) {
-        this.goal = goal;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public void setDurationMinutes(int duration) {
-        this.durationMinutes = duration;
-    }
-
-    public void setEnergyCost(Real cost) {
-        this.energyCost = cost.max(Real.of(-1)).min(Real.ONE);
-    }
-
-    // Sub-activities
-    public void addSubActivity(Activity activity) {
-        subActivities.add(activity);
-    }
-
-    public List<Activity> getSubActivities() {
-        return Collections.unmodifiableList(subActivities);
-    }
-
-    public boolean hasSubActivities() {
-        return !subActivities.isEmpty();
-    }
-
-    // Behaviors
-    public void addBehavior(Behavior behavior) {
-        behaviors.add(behavior);
-    }
-
-    public List<Behavior> getBehaviors() {
-        return Collections.unmodifiableList(behaviors);
+        if (goal != null) {
+            this.goal = goal;
+        } else {
+            throw new IllegalArgumentException("You can't set a null goal.");
+        }
     }
 
     /**
-     * Returns total duration including sub-activities.
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
      */
-    public int getTotalDuration() {
-        int total = durationMinutes;
-        for (Activity sub : subActivities) {
-            total += sub.getTotalDuration();
+    public Vector getSubActivities() {
+        return subActivities;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param activity DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public void addSubActivity(Activity activity) {
+        if (behaviors == null) {
+            if (activity != null) {
+                subActivities.add(activity);
+            } else {
+                throw new IllegalArgumentException(
+                    "You can't add a null Activity.");
+            }
+        } else {
+            throw new IllegalArgumentException(
+                "You can only set sub activities when there is no behavior.");
         }
-        return total;
     }
 
-    @Override
-    public String toString() {
-        return String.format("Activity '%s' (%s) - %d min", name, category, durationMinutes);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param activity DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public void removeSubActivity(Activity activity) {
+        if (activity != null) {
+            subActivities.remove(activity);
+        } else {
+            throw new IllegalArgumentException(
+                "You can't remove null Activity.");
+        }
     }
 
-    // Common activities
-    public static Activity work() {
-        Activity a = new Activity("Work", Category.WORK);
-        a.setDurationMinutes(480);
-        a.setEnergyCost(Real.of(0.6));
-        return a;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param activities DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public void setSubActivities(Vector activities) {
+        Iterator iterator;
+        boolean valid;
+
+        if (behaviors == null) {
+            if (activities != null) {
+                iterator = activities.iterator();
+                valid = true;
+
+                while (iterator.hasNext() && valid) {
+                    valid = iterator.next() instanceof Activity;
+                }
+
+                if (valid) {
+                    this.subActivities = activities;
+                } else {
+                    throw new IllegalArgumentException(
+                        "The activities Vector must contain only Activities.");
+                }
+            } else {
+                throw new IllegalArgumentException(
+                    "You can't set a null activities Vector.");
+            }
+        } else {
+            throw new IllegalArgumentException(
+                "You can only set sub activities when there is no behavior.");
+        }
     }
 
-    public static Activity sleep() {
-        Activity a = new Activity("Sleep", Category.PHYSICAL);
-        a.setDurationMinutes(480);
-        a.setEnergyCost(Real.of(-1.0)); // Restores energy
-        return a;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+
+    //may return null
+    public Set getBehaviors() {
+        return behaviors;
     }
 
-    public static Activity exercise() {
-        Activity a = new Activity("Exercise", Category.PHYSICAL);
-        a.setDurationMinutes(60);
-        a.setEnergyCost(Real.of(0.4));
-        return a;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param behaviors DOCUMENT ME!
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public void setBehaviors(Set behaviors) {
+        Iterator iterator;
+        boolean valid;
+
+        if ((behaviors != null) && (behaviors.size() > 0)) {
+            if (subActivities.size() == 0) {
+                iterator = behaviors.iterator();
+                valid = true;
+
+                while (iterator.hasNext() && valid) {
+                    valid = iterator.next() instanceof Behavior;
+                }
+
+                if (valid) {
+                    this.behaviors = behaviors;
+                } else {
+                    throw new IllegalArgumentException(
+                        "The behaviors Set must contain only Behaviors.");
+                }
+            } else {
+                throw new IllegalArgumentException(
+                    "You can only set Behaviors when there is no sub activity.");
+            }
+        }
     }
 }
-
-
