@@ -1,37 +1,60 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2014 - JScience (http://jscience.org/)
+ * All rights reserved.
+ * 
+ * Permission to use, copy, modify, and distribute this software is
+ * freely granted, provided that this notice is preserved.
+ */
 package org.jscience.economics;
 
 import org.jscience.biology.Individual;
-
+import org.jscience.sociology.Role;
 import org.jscience.sociology.Situation;
 
-
 /**
- * A class representing the interaction of people around resources.
+ * Represents a social situation involving the interaction of people around 
+ * economic resources and activities.
+ * 
+ * <p>This class extends {@link Situation} to provide a base for modeling
+ * economic contexts where individuals participate as {@link EconomicAgent}s.
+ * Subclasses like {@link WorkSituation} provide more specialized behavior.</p>
  *
- * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author <a href="mailto:silvere.martin-michiellot@jscience.org">Silvere Martin-Michiellot</a>
+ * @version 6.0, July 21, 2014
+ * @see Situation
+ * @see EconomicAgent
+ * @see WorkSituation
  */
-
-//you may prefer this class to org.jscience.sociology.Situations.WORKING
 public class EconomicSituation extends Situation {
-    //use the organization name as the name, or a part of it if your organization is big
+
     /**
-     * Creates a new EconomicSituation object.
+     * Creates a new economic situation.
      *
-     * @param name DOCUMENT ME!
-     * @param comments DOCUMENT ME!
+     * @param name the name of this economic situation.
+     * @param comments additional description or comments about the situation.
      */
     public EconomicSituation(String name, String comments) {
         super(name, comments);
     }
 
-    //builds out a worker
     /**
-     * DOCUMENT ME!
+     * Adds an individual as an economic agent participating in this situation.
+     * 
+     * <p>This method creates a new {@link EconomicAgent} role for the 
+     * individual and associates them with this economic context.</p>
      *
-     * @param individual DOCUMENT ME!
+     * @param individual the individual to add as an economic agent.
      */
     public void addEconomicAgent(Individual individual) {
-        super.addRole(new EconomicAgent(individual, this));
+        addRole(new EconomicAgent(individual, this));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addRole(Role role) {
+        super.addRole(role);
     }
 }

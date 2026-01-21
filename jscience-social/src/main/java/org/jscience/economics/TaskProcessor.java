@@ -1,30 +1,36 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2014 - JScience (http://jscience.org/)
+ * All rights reserved.
+ * 
+ * Permission to use, copy, modify, and distribute this software is
+ * freely granted, provided that this notice is preserved.
+ */
 package org.jscience.economics;
 
 import java.util.Set;
 
-
-//human process some tasks,
 /**
- * DOCUMENT ME!
- *
- * @author $author$
- * @version $Revision: 1.3 $
-  */
+ * An entity capable of performing tasks by consuming resources.
+ * 
+ * @author <a href="mailto:jacob.dixon@jscience.org">Jacob Dixon</a>
+ * @version 6.0, July 21, 2014
+ */
 public interface TaskProcessor {
+    
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the set of resources available to this processor.
+     * 
+     * @return the set of available resources.
      */
-    public Set getResources();
+    Set<Resource> getResources();
 
-    //returns true if the task is consumed
     /**
-     * DOCUMENT ME!
+     * Consumes the necessary resources to perform the given task.
      *
-     * @param task DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param task the task to perform.
+     * @return {@code true} if resources were successfully consumed; 
+     *         {@code false} otherwise.
      */
-    public boolean consumeResources(Task task);
+    boolean consumeResources(Task task);
 }

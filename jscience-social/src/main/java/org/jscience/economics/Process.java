@@ -1,137 +1,132 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2014 - JScience (http://jscience.org/)
+ * All rights reserved.
+ * 
+ * Permission to use, copy, modify, and distribute this software is
+ * freely granted, provided that this notice is preserved.
+ */
 package org.jscience.economics;
 
 import org.jscience.util.Named;
 
-
-//a rather abstract way by which you are able to modify your surroundings
 /**
- * DOCUMENT ME!
- *
- * @author $author$
- * @version $Revision: 1.5 $
-  */
-//http://en.wikipedia.org/wiki/Taxonomy_of_manufacturing_processes
-//or see processes.pdf in this directory
+ * Defines various manufacturing and industrial processes.
+ * Used to categorize activities in the production of goods.
+ * Based on the taxonomy of manufacturing processes.
+ * 
+ * @author Silvere Martin-Michiellot
+ * @version 1.2
+ */
 public class Process implements Named {
-    /** DOCUMENT ME! */
+
+    /** Fermentation process. */
     public final static Process FERMENTATION = new Process("Fermentation");
 
-    /** DOCUMENT ME! */
-    public final static Process HEAT = new Process("Heat"); //and melt and burn
+    /** Heat process (includes melt, burn). */
+    public final static Process HEAT = new Process("Heat"); 
 
-    /** DOCUMENT ME! */
-    public final static Process SPLIT = new Process("Split"); //cut, separate, filter, dig
+    /** Split process (cut, separate, filter, dig). */
+    public final static Process SPLIT = new Process("Split"); 
 
-    /** DOCUMENT ME! */
-    public final static Process HIT = new Process("Hit"); //push firmly, press, nail, pedal...
+    /** Hit process (push firmly, press, nail, pedal). */
+    public final static Process HIT = new Process("Hit"); 
 
-    /** DOCUMENT ME! */
-    public final static Process MIX = new Process("Mix"); //salt, etc
+    /** Mix process. */
+    public final static Process MIX = new Process("Mix"); 
 
-    /** DOCUMENT ME! */
+    /** Dry process. */
     public final static Process DRY = new Process("Dry");
 
-    /** DOCUMENT ME! */
+    /** Humidify process. */
     public final static Process HUMIDIFY = new Process("Humidify");
 
-    /** DOCUMENT ME! */
-    public final static Process GROUP = new Process("Group"); //also centralize, the opposite of separate (split)
+    /** Group process (centralize). */
+    public final static Process GROUP = new Process("Group"); 
 
-    /** DOCUMENT ME! */
+    /** Clean process. */
     public final static Process CLEAN = new Process("Clean");
 
-    /** DOCUMENT ME! */
-    public final static Process STORE = new Process("Store"); //and keep for later use or wait
+    /** Store process (keep for later use). */
+    public final static Process STORE = new Process("Store"); 
 
-    /** DOCUMENT ME! */
-    public final static Process AGGITATE = new Process("Aggitate");
+    /** Agitate process. */
+    public final static Process AGITATE = new Process("Agitate");
 
-    /** DOCUMENT ME! */
-    public final static Process TRANSPORT = new Process("Transport"); //moving, includes lifting, pushing, turning
+    /** Transport process (moving, lifting, pushing). */
+    public final static Process TRANSPORT = new Process("Transport"); 
 
-    /** DOCUMENT ME! */
+    /** Mould process. */
     public final static Process MOULD = new Process("Mould");
 
-    /** DOCUMENT ME! */
-    public final static Process SPRAY = new Process("Spray"); //and paint, and spill
+    /** Spray process (paint, spill). */
+    public final static Process SPRAY = new Process("Spray"); 
 
-    /** DOCUMENT ME! */
-    public final static Process PARALLELIZE = new Process("Parallelize"); // TAYLORIZE = DIVIDE and PARALLELIZE and GROUP
+    /** Parallelize process. */
+    public final static Process PARALLELIZE = new Process("Parallelize"); 
 
-    /** DOCUMENT ME! */
-    public final static Process FREEZE = new Process("Freeze"); //includes freshen
+    /** Freeze process. */
+    public final static Process FREEZE = new Process("Freeze"); 
 
-    /** DOCUMENT ME! */
-    public final static Process POUR = new Process("Pour"); //and fill
+    /** Pour process (fill). */
+    public final static Process POUR = new Process("Pour"); 
 
-    /** DOCUMENT ME! */
-    public final static Process SELECT = new Process("Select"); //grab, etc.
+    /** Select process (grab). */
+    public final static Process SELECT = new Process("Select"); 
 
-    /** DOCUMENT ME! */
-    public final static Process ACTIVATE = new Process("Activate"); //power on, etc
+    /** Activate process (power on). */
+    public final static Process ACTIVATE = new Process("Activate"); 
 
-    /** DOCUMENT ME! */
+    /** Ventilate process. */
     public final static Process VENTILATE = new Process("Ventilate");
 
-    /** DOCUMENT ME! */
+    /** Inflate process. */
     public final static Process INFLATE = new Process("Inflate");
 
-    /** DOCUMENT ME! */
-    public final static Process ASSEMBLE = new Process("Assemble"); //includes glue or screw
+    /** Assemble process (glue, screw, etc.). */
+    public final static Process ASSEMBLE = new Process("Assemble"); 
 
-    /** DOCUMENT ME! */
-    private String name;
-
-    /** DOCUMENT ME! */
+    private final String name;
     private String comments;
 
-    //sew, dig....
-/**
+    /**
      * Creates a new Process object.
      *
-     * @param name DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param name the name of the process
+     * @throws IllegalArgumentException if name is null or empty
      */
     public Process(String name) {
         if ((name != null) && (name.length() > 0)) {
             this.name = name;
-            this.comments = new String();
+            this.comments = "";
         } else {
-            throw new IllegalArgumentException(
-                "The Process constructor can't have null or empty arguments.");
+            throw new IllegalArgumentException("Process name cannot be null or empty.");
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public String getName() {
         return name;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the comments associated with this process.
+     * @return the comments
      */
     public String getComments() {
         return comments;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param comments DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Sets the comments for this process.
+     * @param comments the comments to set
+     * @throws IllegalArgumentException if comments is null
      */
     public void setComments(String comments) {
         if (comments != null) {
             this.comments = comments;
         } else {
-            throw new IllegalArgumentException("You can't set a null comment.");
+            throw new IllegalArgumentException("Comments cannot be null.");
         }
     }
 }

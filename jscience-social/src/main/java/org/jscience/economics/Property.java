@@ -1,34 +1,36 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2014 - JScience (http://jscience.org/)
+ * All rights reserved.
+ * 
+ * Permission to use, copy, modify, and distribute this software is
+ * freely granted, provided that this notice is preserved.
+ */
 package org.jscience.economics;
 
 import org.jscience.economics.money.Money;
-
-import org.jscience.measure.Amount;
-
 import java.util.Set;
 
-
 /**
- * An interface which defines what belongs to whom. Should be implementated by
- * classes corresponding to physical or intellectual property.
+ * An interface defining ownership and value of assets.
+ * Implemented by classes representing physical or intellectual property.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @version 1.2
  */
-
-//perhaps this interface should only have the first method
 public interface Property {
-    //a Set of Humans
+    
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the set of owners of this property.
+     * 
+     * @return a Set of {@link EconomicAgent} who own this property
      */
-    public Set getOwners();
+    Set<EconomicAgent> getOwners();
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the monetary value of this property.
+     * 
+     * @return the value as a {@link Money} object
      */
-    public Amount<Money> getValue();
+    Money getValue();
 }

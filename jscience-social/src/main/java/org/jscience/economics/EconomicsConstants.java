@@ -1,102 +1,114 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2014 - JScience (http://jscience.org/)
+ * All rights reserved.
+ * 
+ * Permission to use, copy, modify, and distribute this software is
+ * freely granted, provided that this notice is preserved.
+ */
 package org.jscience.economics;
 
 /**
  * A class representing some useful constants for economics.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @version 1.2
  */
-public final class EconomicsConstants extends Object {
+public final class EconomicsConstants {
+
+    /** 
+     * Default constructor (private).
+     */
+    private EconomicsConstants() {
+        // Prevents instantiation.
+    }
+
     //could put the standard currencies here although they are in the money subpackage
-    /** DOCUMENT ME! */
+    /** Constant for unknown or undefined value. */
     public final static int UNKNOWN = 0;
 
-    //also look into Resource class
-    /** DOCUMENT ME! */
-    public final static int PRIMARY_INDUSTRY = 1; //Primary industry extracts natural materials and provides raw materials for secondary industry.
+    /** Primary industry focused on raw material extraction. */
+    public final static int PRIMARY_INDUSTRY = 1;
 
-    /** DOCUMENT ME! */
-    public final static int SECONDARY_INDUSTRY = 2; //Secondary industry processes raw materials or semi-finished goods into more valuable products.
+    /** Secondary industry focused on manufacturing and processing. */
+    public final static int SECONDARY_INDUSTRY = 2;
 
-    /** DOCUMENT ME! */
-    public final static int TERTIARY_INDUSTRY = 4; //Tertiary industry is the provision of services.
+    /** Tertiary industry focused on services. */
+    public final static int TERTIARY_INDUSTRY = 4;
 
-    /** DOCUMENT ME! */
-    public final static int QUATERNARY_INDUSTRY = 8; //Quaternary industry is the activity related to the application, manipulation and transmission of information.
+    /** Quaternary industry focused on information and technology. */
+    public final static int QUATERNARY_INDUSTRY = 8;
 
-    //also look into Task class
-    /** DOCUMENT ME! */
-    public final static int PRODUCTION_PROCESS = 1; //raw extraction, primary production
+    /** Process involving raw extraction and primary production. */
+    public final static int PRODUCTION_PROCESS = 1;
 
-    /** DOCUMENT ME! */
-    public final static int TRANSFORMATION_PROCESS = 2; //factory production
+    /** Process involving factory production and transformation. */
+    public final static int TRANSFORMATION_PROCESS = 2;
 
-    /** DOCUMENT ME! */
-    public final static int DISTRIBUTION_PROCESS = 4; //the service of moving the product to the place it is going to be sold
+    /** Process involving logistics and distribution. */
+    public final static int DISTRIBUTION_PROCESS = 4;
 
-    /** DOCUMENT ME! */
-    public final static int CONSUMPTION_PROCESS = 8; //the end user
+    /** Process involving consumption by the end user. */
+    public final static int CONSUMPTION_PROCESS = 8;
 
-    //kind of industry
-    /** DOCUMENT ME! */
+    /** Industry sector for transport. */
     public final static int TRANSPORT = 1;
 
-    /** DOCUMENT ME! */
+    /** Industry sector for hygiene. */
     public final static int HYGIENE = 2;
 
-    /** DOCUMENT ME! */
+    /** Industry sector for food and alimentation. */
     public final static int ALIMENTATION = 4;
 
-    /** DOCUMENT ME! */
+    /** Industry sector for housing and habitat. */
     public final static int HABITAT = 8;
 
-    /** DOCUMENT ME! */
+    /** Industry sector for technology. */
     public final static int TECHNOLOGY = 16;
 
-    /** DOCUMENT ME! */
+    /** Industry sector for energy. */
     public final static int ENERGY = 32;
 
-    /** DOCUMENT ME! */
+    /** Industry sector for societal services. */
     public final static int SOCIETY = 64;
 
-    //organization sub levels
-    /** DOCUMENT ME! */
+    /** Department for human resource management. */
     public final static int HUMAN_RESOURCES = 1;
 
-    /** DOCUMENT ME! */
-    public final static int SALES = 2; //salesman, etc
+    /** Department for sales activities. */
+    public final static int SALES = 2;
 
-    /** DOCUMENT ME! */
-    public final static int MARKETING = 4; //and communication
+    /** Department for marketing and communication. */
+    public final static int MARKETING = 4;
 
-    /** DOCUMENT ME! */
-    public final static int ACCOUNTING = 8; //salaries, treasure, etc
+    /** Department for accounting and financial tracking. */
+    public final static int ACCOUNTING = 8;
 
-    /** DOCUMENT ME! */
+    /** Department for research and development. */
     public final static int RESEARCH = 16;
 
-    /** DOCUMENT ME! */
+    /** Department for production operations. */
     public final static int PRODUCTION = 32;
 
-    /** DOCUMENT ME! */
-    public final static int DISTRIBUTION = 64; //includes internal distribution and external shipping
+    /** Department for distribution and shipping. */
+    public final static int DISTRIBUTION = 64;
 
-    /** DOCUMENT ME! */
-    public final static int BUYING_CENTRE = 128; //includes storage
+    /** Department for procurement and storage. */
+    public final static int BUYING_CENTRE = 128;
 
-    /** DOCUMENT ME! */
-    public final static int SUPERVIsORY = 256; //board, commitee, head, etc
+    /** Management level for supervision and board oversight. */
+    public final static int SUPERVISORY = 256;
 
-    /** DOCUMENT ME! */
-    public final static int FINANCING = 512; //money
- 
-   /** DOCUMENT ME! */
-    public final static int LEGAL = 1024; //taxs, administrative, legal
-  
-  /** DOCUMENT ME! */
-    public final static int INFRASTRUCTURE = 2048; //and security
-  
-  /** DOCUMENT ME! */
-    public final static int INFORMATION = 4096; //information systems
+    /** Department for financing and capital management. */
+    public final static int FINANCING = 512;
+
+    /** Department for legal and administrative compliance. */
+    public final static int LEGAL = 1024;
+
+    /** Department for infrastructure maintenance and security. */
+    public final static int INFRASTRUCTURE = 2048;
+
+    /** Department for information systems and IT. */
+    public final static int INFORMATION = 4096;
 
 }
