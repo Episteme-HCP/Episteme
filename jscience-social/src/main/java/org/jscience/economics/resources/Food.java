@@ -1,28 +1,48 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2014 - JScience (http://jscience.org/)
+ * All rights reserved.
+ * 
+ * Permission to use, copy, modify, and distribute this software is
+ * freely granted, provided that this notice is preserved.
+ */
 package org.jscience.economics.resources;
 
+import java.time.Instant;
+import org.jscience.measure.Quantity;
+import javax.measure.quantity.Energy;
+
 /**
- * A class representing something that can be eaten or drunk.
+ * An interface representing a substance that can be eaten or drunk to provide nutritional support.
+ * Food contains nutrients such as carbohydrates, fats, proteins, vitamins, or minerals.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @version 1.2
  */
-
-//also account for drinks
-//although most food is dead creatures, food can be made of Minerals (salt for example),
-//but also of pure synthetics chemicals (artifacts)
-//some people are also capable of eating almost everything (car, tv, etc...) (yes amazingly) although this is not really food since one can't sustain living eating this
 public interface Food {
+    
     /**
-     * DOCUMENT ME!
+     * Returns the composition of the food.
      *
-     * @return DOCUMENT ME!
+     * @return the composition as a string description
      */
-    public String getComposition();
+    String getComposition();
 
-    //we could also wonder for its calories, etc...
-    //and the date until you can eat/drink it ("best before")
-    //where and how it was made
-    //the proper way to prepare it and to eat it
-    //how to store it
-    //what it is stored in
+    /**
+     * Returns the energy content (calories) of the food.
+     * 
+     * @return the energy quantity, or null if unknown
+     */
+    default Quantity<Energy> getEnergyContent() {
+        return null;
+    }
+
+    /**
+     * Returns the expiration date ("best before" date) of the food.
+     * 
+     * @return the expiration instant, or null if non-perishable or unknown
+     */
+    default Instant getExpirationDate() {
+        return null;
+    }
 }

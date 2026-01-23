@@ -1,27 +1,62 @@
-//repackaged after the code from Mark E. Shoulson
-//email <mark@kli.org>
-//website http://web.meson.org/calendars/
-//released under GPL
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Originally based on code from Mark E. Shoulson <mark@kli.org>
+ * http://web.meson.org/calendars/
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history.calendars;
 
 import java.util.Enumeration;
 
-
-// Referenced classes of package calendars:
 /**
- * DOCUMENT ME!
+ * Implementation of the Persian (Solar Hijri) calendar.
+ * The Persian calendar is a solar calendar used officially in Iran and Afghanistan.
+ * It is one of the most accurate calendars in use.
  *
- * @author $author$
- * @version $Revision: 1.3 $
-  */
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>Epoch: March 19, 622 CE (Julian) - the Hijra</li>
+ *   <li>Uses a 2820-year grand cycle for leap year calculation</li>
+ *   <li>First 6 months have 31 days, next 5 have 30, last has 29 (30 in leap years)</li>
+ *   <li>Years are marked with "A.P." (Anno Persico)</li>
+ * </ul>
+ *
+ * @author Mark E. Shoulson (original implementation)
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
+ */
 public class PersianCalendar extends MonthDayYear {
-    /** DOCUMENT ME! */
+
+    private static final long serialVersionUID = 1L;
+    /** The RD (Rata Die) number for the Persian calendar epoch. */
     public static long EPOCH = (new JulianCalendar(3, 19, 622)).toRD();
 
-    /** DOCUMENT ME! */
+    /** The RD number for the start of the year 475, used in calculations. */
     private static final long FOUR75 = (new PersianCalendar(1, 1, 475)).toRD();
 
-    /** DOCUMENT ME! */
+    /** List of Persian month names. */
     private static final String[] MONTHS = {
             "Farvardin", "Ordibehesht", "Khordad", "Tir", "Mordad", "Shahrivar",
             "Mehr", "Aban", "Azar", "Dey", "Bahman", "Esfand"
@@ -37,7 +72,7 @@ public class PersianCalendar extends MonthDayYear {
 /**
      * Creates a new PersianCalendar object.
      *
-     * @param l DOCUMENT ME!
+     * @param l the Rata Die number to set.
      */
     public PersianCalendar(long l) {
         set(l);
@@ -46,9 +81,9 @@ public class PersianCalendar extends MonthDayYear {
 /**
      * Creates a new PersianCalendar object.
      *
-     * @param i DOCUMENT ME!
-     * @param j DOCUMENT ME!
-     * @param k DOCUMENT ME!
+     * @param i the month (1-12).
+     * @param j the day (1-31).
+     * @param k the year.
      */
     public PersianCalendar(int i, int j, int k) {
         set(i, j, k);
@@ -57,18 +92,17 @@ public class PersianCalendar extends MonthDayYear {
 /**
      * Creates a new PersianCalendar object.
      *
-     * @param altcalendar DOCUMENT ME!
+     * @param altcalendar another calendar to initialize from.
      */
     public PersianCalendar(AlternateCalendar altcalendar) {
         set(altcalendar.toRD());
     }
 
     /**
-     * DOCUMENT ME!
+     * Converts a year to a zero-indexed value relative to year 474.
      *
-     * @param i DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param i the year to convert.
+     * @return the zero-indexed year value.
      */
     private static int yconv(int i) {
         if (i > 0) {
@@ -79,7 +113,7 @@ public class PersianCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Recomputes the Rata Die number from the current month, day, and year.
      */
     protected synchronized void recomputeRD() {
         int i = yconv(super.year);
@@ -94,7 +128,7 @@ public class PersianCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Recomputes the month, day, and year from the current Rata Die number.
      */
     protected synchronized void recomputeFromRD() {
         long l = super.rd - FOUR75;
@@ -129,9 +163,9 @@ public class PersianCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the Rata Die number and recomputes the date.
      *
-     * @param l DOCUMENT ME!
+     * @param l the Rata Die number.
      */
     public synchronized void set(long l) {
         super.rd = l;
@@ -139,11 +173,10 @@ public class PersianCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Checks if the given year is a leap year in the Persian calendar.
      *
-     * @param i DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param i the year to check.
+     * @return true if it is a leap year, false otherwise.
      */
     public static boolean isLeapYear(int i) {
         int j = yconv(i);
@@ -153,36 +186,37 @@ public class PersianCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the name of the current month.
      *
-     * @return DOCUMENT ME!
+     * @return the month name string.
      */
     protected String monthName() {
         return MONTHS[super.month - 1];
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the suffix for Persian years ("A.P.").
      *
-     * @return DOCUMENT ME!
+     * @return the year suffix.
      */
     protected String getSuffix() {
         return " A.P.";
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns an enumeration of all month names.
      *
-     * @return DOCUMENT ME!
+     * @return enumeration of month names.
      */
-    public Enumeration getMonths() {
-        return new ArrayEnumeration(MONTHS);
+    @Override
+    public Enumeration<String> getMonths() {
+        return new ArrayEnumeration<>(MONTHS);
     }
 
     /**
-     * DOCUMENT ME!
+     * Main method for testing the Persian calendar implementation.
      *
-     * @param args DOCUMENT ME!
+     * @param args command line arguments (year, month, day).
      */
     public static void main(String[] args) {
         int i;

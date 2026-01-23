@@ -23,34 +23,58 @@
 
 package org.jscience.politics;
 
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Objects;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
 
 /**
- * Represents a political party.
+ * Represents a political party, characterized by its ideology, leadership, and organization.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
-public class Party {
+@Persistent
+public class Party implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+    /** Common political ideologies. */
     public enum Ideology {
         FAR_LEFT, LEFT, CENTER_LEFT, CENTER, CENTER_RIGHT, RIGHT, FAR_RIGHT,
         GREEN, LIBERTARIAN, NATIONALIST, SOCIALIST, LIBERAL, CONSERVATIVE
     }
 
+    @Id
     private final String name;
+    @Attribute
     private String abbreviation;
+    @Attribute
     private Ideology ideology;
+    @Attribute
     private LocalDate foundedDate;
+    @Attribute
     private String leader;
+    @Attribute
     private String headquarters;
+    @Attribute
     private long memberCount;
+    @Attribute
     private String color;
 
+    /**
+     * Creates a new Political Party.
+     * @param name     the official name of the party
+     * @param ideology the core ideology
+     * @throws NullPointerException if name or ideology is null
+     */
     public Party(String name, Ideology ideology) {
-        this.name = name;
-        this.ideology = ideology;
+        this.name = Objects.requireNonNull(name, "Party name cannot be null");
+        this.ideology = Objects.requireNonNull(ideology, "Ideology cannot be null");
     }
 
     // Getters
@@ -116,9 +140,20 @@ public class Party {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Party party = (Party) o;
+        return Objects.equals(name, party.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+
+    @Override
     public String toString() {
-        return String.format("%s (%s) - %s", name, abbreviation, ideology);
+        return String.format("%s (%s) - %s", name, abbreviation != null ? abbreviation : "?", ideology);
     }
 }
-
-

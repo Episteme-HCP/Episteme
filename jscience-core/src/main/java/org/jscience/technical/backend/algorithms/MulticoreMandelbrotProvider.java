@@ -114,7 +114,6 @@ public class MulticoreMandelbrotProvider implements MandelbrotProvider {
         return result;
     }
 
-    @Override
     public String getName() {
         return "Multicore Mandelbrot";
     }

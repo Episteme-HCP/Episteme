@@ -38,6 +38,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.*;
 
 public class SimulationEnginesTest {
@@ -47,13 +48,13 @@ public class SimulationEnginesTest {
         Economy eco = Economy.usa();
         MacroModel model = new MacroModel(eco);
 
-        double initialGdp = eco.getGdp().doubleValue();
+        double initialGdp = eco.getGdp().getAmount().doubleValue();
         model.simulateYear();
 
         assertTrue(eco.getInflationRate().doubleValue() >= 0);
         assertTrue(eco.getUnemploymentRate().doubleValue() >= 0);
 
-        double prediction = model.predictGDP(10, Real.of(0.03)).doubleValue();
+        double prediction = model.predictGDP(10, Real.of(0.03)).getAmount().doubleValue();
         assertTrue(prediction > initialGdp);
     }
 

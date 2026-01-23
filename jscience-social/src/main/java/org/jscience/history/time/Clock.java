@@ -1,54 +1,76 @@
-package org.jscience.history.time;
-
-import javax.swing.*;
-import javax.swing.event.EventListenerList;
-
-
-/**
- * A class representing a way to display and change time.
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * @author Silvere Martin-Michiellot
- * @version 1.0
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
-//  http://en.wikipedia.org/wiki/Clock
-public abstract class Clock implements TimeListener {
-    /**
-     * DOCUMENT ME!
-     */
-    private TimeServer timeServer;
+package org.jscience.history.time;
+
+import java.util.Objects;
+
+import java.io.Serializable;
+
+/**
+ * An abstract base class for clock implementations that observe a {@link TimeServer}.
+ * A clock maintains a reference to a time server and reacts to its chronological updates.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
+ */
+public abstract class Clock implements TimeListener, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    /** The time server instance this clock is synchronized with. */
+    private final TimeServer timeServer;
 
     /**
-     * Creates a new Clock object.
+     * Creates a new Clock synchronized with the specified time server.
      *
-     * @param timeServer DOCUMENT ME!
+     * @param timeServer the source of chronological updates
+     * @throws NullPointerException if timeServer is null
      */
-    public Clock(TimeServer timeServer) {
-        this.timeServer = timeServer;
-        timeServer.addTimeListener(this);
+    protected Clock(TimeServer timeServer) {
+        this.timeServer = Objects.requireNonNull(timeServer, "TimeServer cannot be null");
+        this.timeServer.addTimeListener(this);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the time server associated with this clock.
      *
-     * @return DOCUMENT ME!
+     * @return the time server
      */
-    public TimeServer getTimeServer() {
+    public final TimeServer getTimeServer() {
         return timeServer;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the current time representation held by this clock.
      *
-     * @return DOCUMENT ME!
+     * @return the current time
      */
     public abstract Time getTime();
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public String toString() {
         return getTime().toString();
     }

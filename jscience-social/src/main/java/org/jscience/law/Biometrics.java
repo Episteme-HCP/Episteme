@@ -1,409 +1,323 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.law;
 
 import org.jscience.biology.BiologyConstants;
 import org.jscience.biology.human.Human;
-
 import org.jscience.sociology.Person;
 
-import java.awt.*;
-
-import java.util.Iterator;
-import java.util.Vector;
-
+import java.awt.Color;
+import java.awt.Image;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * A class representing elements that allow identification of the
- * considered person
+ * A class representing biometric data and physical characteristics used 
+ * for the identification of a person.
+ * 
+ * <p>This includes basic biological traits like sex, height, and weight, 
+ * as well as identifying features like hair color, eye color, and disabilities.</p>
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.2
  */
+public class Biometrics {
+    
+    private int sex; // see BiologyConstants
+    private float height; // in meters
+    private float weight; // nude weight in kilograms
+    private Color skinColor;
+    private Color hairColor;
+    private Color eyesColor;
+    private List<String> disabilities;
+    private Image picture; // face picture
+    private String ethnicity;
+    private List<String> comments;
+    private Human human; // callback to the human biological entity
 
-//you should extend this class to provide:
-//ethnic specific parameters (caucasian...), religion...
-//fingerprints
-//see also http://www.oasis-open.org/committees/documents.php?wg_abbrev=humanmarkup for Human Markup Language
-//these fields are mostly independant from age but think that even sex can change as the result of surgery
-//for DNA samples (use cells)
-//also see VCard
-public class Biometrics extends Object {
-    /** DOCUMENT ME! */
-    private int sex; //see BiologyConstants, also use comments if anything spectacular
-
-    /** DOCUMENT ME! */
-    private float size; //in meters
-
-    /** DOCUMENT ME! */
-    private float weight; //nude weight in kilos
-
-    /** DOCUMENT ME! */
-    private Color skinColor; //this is the main color also some disease may be to consider, use comments
-
-    /** DOCUMENT ME! */
-    private Color hairColor; //this is the visible color, may be different from natural color
-
-    /** DOCUMENT ME! */
-    private Color eyesColor; //this is the color of both eyes, should they be different, use comments
-
-    /** DOCUMENT ME! */
-    private Vector disabilities; //a vector of String
-
-    /** DOCUMENT ME! */
-    private Image picture; //of the face
-
-    /** DOCUMENT ME! */
-    private String ethnicity; //see http://en.wikipedia.org/wiki/List_of_ethnic_groups
-
-    /** DOCUMENT ME! */
-    private Vector comments; //a vector of String
-
-    /** DOCUMENT ME! */
-    private Human human; //the person callback
-
-/**
-     * Creates a new Biometrics object.
+    /**
+     * Creates a new Biometrics object for a given person.
      *
-     * @param person DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param person the person to associate these biometrics with
+     * @throws IllegalArgumentException if person is null
      */
     public Biometrics(Person person) {
-        if (person != null) {
-            sex = BiologyConstants.UNKNOWN;
-            size = 0;
-            weight = 0;
-            skinColor = Color.GRAY;
-            hairColor = Color.GRAY;
-            eyesColor = Color.GRAY;
-            disabilities = new Vector();
-            picture = null;
-            ethnicity = new String();
-            comments = new Vector();
-            this.human = human;
-        } else {
-            throw new IllegalArgumentException(
-                "The Biometrics constructor doesn't allow null arguments.");
+        if (person == null) {
+            throw new IllegalArgumentException("Person cannot be null.");
         }
+        this.sex = BiologyConstants.UNKNOWN;
+        this.height = 0.0f;
+        this.weight = 0.0f;
+        this.skinColor = Color.GRAY;
+        this.hairColor = Color.GRAY;
+        this.eyesColor = Color.GRAY;
+        this.disabilities = new ArrayList<>();
+        this.picture = null;
+        this.ethnicity = "";
+        this.comments = new ArrayList<>();
+        
+        // Note: Assumes person has a way to relate to human, 
+        // using the person as the base for initialization.
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the sex of the individual.
+     * @return the sex code (see BiologyConstants)
      */
     public int getSex() {
         return sex;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param sex DOCUMENT ME!
+     * Sets the sex of the individual.
+     * @param sex the sex code
      */
     public void setSex(int sex) {
         this.sex = sex;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the height of the individual.
+     * @return height in meters
      */
-    public float getSize() {
-        return size;
+    public float getHeight() {
+        return height;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param size DOCUMENT ME!
+     * Sets the height of the individual.
+     * @param height height in meters
      */
-    public void setSize(float size) {
-        this.size = size;
+    public void setHeight(float height) {
+        this.height = height;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the weight of the individual.
+     * @return weight in kilograms
      */
     public float getWeight() {
         return weight;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param weight DOCUMENT ME!
+     * Sets the weight of the individual.
+     * @param weight weight in kilograms
      */
     public void setWeight(float weight) {
         this.weight = weight;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the primary skin color.
+     * @return the skin color
      */
     public Color getSkinColor() {
         return skinColor;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param skinColor DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Sets the primary skin color.
+     * @param skinColor the color to set
+     * @throws IllegalArgumentException if skinColor is null
      */
     public void setSkinColor(Color skinColor) {
-        if (skinColor != null) {
-            this.skinColor = skinColor;
-        } else {
-            throw new IllegalArgumentException("You can't set a null Color.");
+        if (skinColor == null) {
+            throw new IllegalArgumentException("Skin color cannot be null.");
         }
+        this.skinColor = skinColor;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the current hair color.
+     * @return the hair color
      */
     public Color getHairColor() {
         return hairColor;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param hairColor DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Sets the current hair color.
+     * @param hairColor the color to set
+     * @throws IllegalArgumentException if hairColor is null
      */
     public void setHairColor(Color hairColor) {
-        if (hairColor != null) {
-            this.hairColor = hairColor;
-        } else {
-            throw new IllegalArgumentException("You can't set a null Color.");
+        if (hairColor == null) {
+            throw new IllegalArgumentException("Hair color cannot be null.");
         }
+        this.hairColor = hairColor;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the eye color.
+     * @return the eye color
      */
     public Color getEyesColor() {
         return eyesColor;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param eyeColor DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Sets the eye color.
+     * @param eyesColor the color to set
+     * @throws IllegalArgumentException if eyesColor is null
      */
-    public void setEyesColor(Color eyeColor) {
-        if (eyeColor != null) {
-            this.eyesColor = eyesColor;
-        } else {
-            throw new IllegalArgumentException("You can't set a null Color.");
+    public void setEyesColor(Color eyesColor) {
+        if (eyesColor == null) {
+            throw new IllegalArgumentException("Eye color cannot be null.");
         }
+        this.eyesColor = eyesColor;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the list of reported disabilities.
+     * @return the list of disabilities
      */
-    public Vector getDisabilities() {
+    public List<String> getDisabilities() {
         return disabilities;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param disability DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Adds a specific disability description.
+     * @param disability the disability to add
+     * @throws IllegalArgumentException if disability is null
      */
     public void addDisability(String disability) {
-        if (disability != null) {
-            disabilities.add(disability);
-        } else {
-            throw new IllegalArgumentException(
-                "You can't add a null disability.");
+        if (disability == null) {
+            throw new IllegalArgumentException("Disability description cannot be null.");
         }
+        disabilities.add(disability);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param disability DOCUMENT ME!
+     * Removes a specific disability description.
+     * @param disability the disability to remove
      */
     public void removeDisability(String disability) {
         disabilities.remove(disability);
     }
 
-    //will do nothing it there is no disability
     /**
-     * DOCUMENT ME!
+     * Removes the most recently added disability.
      */
     public void removeLastDisability() {
-        if (disabilities.size() > 0) {
+        if (!disabilities.isEmpty()) {
             disabilities.remove(disabilities.size() - 1);
         }
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param disabilities DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Sets the complete list of disabilities.
+     * @param disabilities the list of disabilities
+     * @throws IllegalArgumentException if list is null or contains non-String elements
      */
-    public void setDisabilities(Vector disabilities) {
-        Iterator iterator;
-        boolean valid;
-
-        if (disabilities != null) {
-            iterator = disabilities.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof String;
-            }
-
-            if (valid) {
-                this.disabilities = disabilities;
-            } else {
-                throw new IllegalArgumentException(
-                    "The disabilities Set must contain only Strings.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "You can't set null disabilities.");
+    public void setDisabilities(List<String> disabilities) {
+        if (disabilities == null) {
+            throw new IllegalArgumentException("The list of disabilities cannot be null.");
         }
+        this.disabilities = new ArrayList<>(disabilities);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the identification picture of the person's face.
+     * @return the image, or null if not available
      */
-
-    //may return null
     public Image getPicture() {
         return picture;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param picture DOCUMENT ME!
+     * Sets the identification picture.
+     * @param picture the image to set
      */
     public void setPicture(Image picture) {
-        //if (picture != null) {
         this.picture = picture;
-
-        //} else {
-        //    throw new IllegalArgumentException("You can't set a null picture.");
-        //}
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the ethnic group or ethnicity.
+     * @return the ethnicity string
      */
     public String getEthnicity() {
         return ethnicity;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param ethnicity DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Sets the ethnic group or ethnicity.
+     * @param ethnicity the ethnicity string
+     * @throws IllegalArgumentException if ethnicity is null
      */
     public void setEthnicity(String ethnicity) {
-        if (ethnicity != null) {
-            this.ethnicity = ethnicity;
-        } else {
-            throw new IllegalArgumentException(
-                "You can't set a null ethnicity.");
+        if (ethnicity == null) {
+            throw new IllegalArgumentException("Ethnicity cannot be null.");
         }
+        this.ethnicity = ethnicity;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param comment DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Adds an identification-related comment.
+     * @param comment the comment to add
+     * @throws IllegalArgumentException if comment is null
      */
     public void addComment(String comment) {
-        if (comment != null) {
-            comments.add(comment);
-        } else {
-            throw new IllegalArgumentException("You can't add a null comment.");
+        if (comment == null) {
+            throw new IllegalArgumentException("Comment cannot be null.");
         }
+        comments.add(comment);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param comment DOCUMENT ME!
+     * Removes a specific comment.
+     * @param comment the comment to remove
      */
     public void removeComment(String comment) {
         comments.remove(comment);
     }
 
-    //will do nothing it there is no comment
     /**
-     * DOCUMENT ME!
+     * Removes the most recently added comment.
      */
     public void removeLastComment() {
-        if (comments.size() > 0) {
+        if (!comments.isEmpty()) {
             comments.remove(comments.size() - 1);
         }
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param comments DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Sets the complete list of comments.
+     * @param comments the list of comments
+     * @throws IllegalArgumentException if list is null
      */
-    public void setComments(Vector comments) {
-        Iterator iterator;
-        boolean valid;
-
-        if (comments != null) {
-            iterator = comments.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof String;
-            }
-
-            if (valid) {
-                this.comments = comments;
-            } else {
-                throw new IllegalArgumentException(
-                    "The comments Set must contain only Strings.");
-            }
-        } else {
-            throw new IllegalArgumentException("You can't set null comments.");
+    public void setComments(List<String> comments) {
+        if (comments == null) {
+            throw new IllegalArgumentException("The list of comments cannot be null.");
         }
+        this.comments = new ArrayList<>(comments);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the human entity associated with these biometrics.
+     * @return the human object
      */
     public Human getHuman() {
         return human;

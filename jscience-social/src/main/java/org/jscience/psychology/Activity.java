@@ -1,53 +1,68 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.psychology;
 
 import org.jscience.util.Commented;
 import org.jscience.util.Named;
 
-import java.util.Iterator;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-import java.util.Vector;
-
-
-//human and other species organize themselves around activities and a set of behaviors are associated to support the activity
-
-//this class should be plugged in Individual and/or Role
-
-//perhaps we should have a stronger system with "tasks (or activities) that are sequential or parallel and each can be sub divided into other activities or terminal behaviors" including preconditions to trigger the behaviors, a scheduler at Individual level and a blackboard of current activities (as well as needs and resources for the individuals ; a genetically encoded action selection system) (a repertoire of behaviors at Species level). Current system provides no ordering at all. (moreover current model allows for activities to be dependent upon themselves, ie cycles with subactivities)... probably all this should rathr be part of JRobotics after all.
 
 /**
- * DOCUMENT ME!
+ * Represents a structured activity composed of nested sub-activities or atomic behaviors.
+ * Activities help organize behaviors into goal-oriented sequences for individuals or roles.
  *
- * @author $author$
- * @version $Revision: 1.6 $
-  */
-public class Activity extends Object implements Named, Commented {
-    /** DOCUMENT ME! */
-    private String name;
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.7
+ * @since 1.0
+ */
+public class Activity implements Named, Commented, Serializable {
 
-    /** DOCUMENT ME! */
+    private static final long serialVersionUID = 1L;
+
+    private final String name;
     private String comments;
-
-    /** DOCUMENT ME! */
     private String goal;
+    private List<Activity> subActivities;
+    private Set<Behavior> behaviors;
 
-    /** DOCUMENT ME! */
-    private Vector subActivities;
-
-    /** DOCUMENT ME! */
-    private Set behaviors;
-
-/**
-     * Creates a new Activity object.
+    /**
+     * Creates a new Activity with the specified name.
      *
-     * @param name DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param name the name of the activity
+     * @throws IllegalArgumentException if name is null or empty
      */
     public Activity(String name) {
         if ((name != null) && (name.length() > 0)) {
             this.name = name;
-            this.comments = new String();
-            this.goal = new String();
-            this.subActivities = new Vector();
+            this.comments = "";
+            this.goal = "";
+            this.subActivities = new ArrayList<>();
             this.behaviors = null;
         } else {
             throw new IllegalArgumentException(
@@ -55,87 +70,55 @@ public class Activity extends Object implements Named, Commented {
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public String getName() {
         return name;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public String getComments() {
         return comments;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param comments DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
+    @Override
     public void setComments(String comments) {
-        if (comments != null) {
-            this.comments = comments;
-        } else {
-            throw new IllegalArgumentException("You can't set a null comment.");
-        }
+        this.comments = Objects.requireNonNull(comments, "You can't set a null comment.");
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the goal of the activity.
+     * @return the goal description
      */
     public String getGoal() {
         return goal;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param goal DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Sets the goal description for this activity.
+     * @param goal the new goal
+     * @throws NullPointerException if goal is null
      */
     public void setGoal(String goal) {
-        if (goal != null) {
-            this.goal = goal;
-        } else {
-            throw new IllegalArgumentException("You can't set a null goal.");
-        }
+        this.goal = Objects.requireNonNull(goal, "You can't set a null goal.");
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the list of sub-activities.
+     * @return the sub-activities list
      */
-    public Vector getSubActivities() {
+    public List<Activity> getSubActivities() {
         return subActivities;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param activity DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Adds a sub-activity to this activity.
+     * @param activity the activity to add
+     * @throws IllegalArgumentException if this activity already has atomic behaviors
+     * @throws NullPointerException if activity is null
      */
     public void addSubActivity(Activity activity) {
         if (behaviors == null) {
-            if (activity != null) {
-                subActivities.add(activity);
-            } else {
-                throw new IllegalArgumentException(
-                    "You can't add a null Activity.");
-            }
+            subActivities.add(Objects.requireNonNull(activity, "You can't add a null Activity."));
         } else {
             throw new IllegalArgumentException(
                 "You can only set sub activities when there is no behavior.");
@@ -143,51 +126,23 @@ public class Activity extends Object implements Named, Commented {
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param activity DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Removes a sub-activity from this activity.
+     * @param activity the activity to remove
+     * @throws NullPointerException if activity is null
      */
     public void removeSubActivity(Activity activity) {
-        if (activity != null) {
-            subActivities.remove(activity);
-        } else {
-            throw new IllegalArgumentException(
-                "You can't remove null Activity.");
-        }
+        subActivities.remove(Objects.requireNonNull(activity, "You can't remove null Activity."));
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param activities DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Sets the sub-activities list.
+     * @param activities the list of activities
+     * @throws IllegalArgumentException if this activity already has atomic behaviors
+     * @throws NullPointerException if activities is null
      */
-    public void setSubActivities(Vector activities) {
-        Iterator iterator;
-        boolean valid;
-
+    public void setSubActivities(List<Activity> activities) {
         if (behaviors == null) {
-            if (activities != null) {
-                iterator = activities.iterator();
-                valid = true;
-
-                while (iterator.hasNext() && valid) {
-                    valid = iterator.next() instanceof Activity;
-                }
-
-                if (valid) {
-                    this.subActivities = activities;
-                } else {
-                    throw new IllegalArgumentException(
-                        "The activities Vector must contain only Activities.");
-                }
-            } else {
-                throw new IllegalArgumentException(
-                    "You can't set a null activities Vector.");
-            }
+            this.subActivities = Objects.requireNonNull(activities, "You can't set a null activities list.");
         } else {
             throw new IllegalArgumentException(
                 "You can only set sub activities when there is no behavior.");
@@ -195,46 +150,28 @@ public class Activity extends Object implements Named, Commented {
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the set of atomic behaviors associated with this activity.
+     * @return the behaviors set
      */
-
-    //may return null
-    public Set getBehaviors() {
+    public Set<Behavior> getBehaviors() {
         return behaviors;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param behaviors DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Sets the atomic behaviors for this activity.
+     * @param behaviors the set of behaviors
+     * @throws IllegalArgumentException if this activity already has sub-activities
      */
-    public void setBehaviors(Set behaviors) {
-        Iterator iterator;
-        boolean valid;
-
-        if ((behaviors != null) && (behaviors.size() > 0)) {
-            if (subActivities.size() == 0) {
-                iterator = behaviors.iterator();
-                valid = true;
-
-                while (iterator.hasNext() && valid) {
-                    valid = iterator.next() instanceof Behavior;
-                }
-
-                if (valid) {
-                    this.behaviors = behaviors;
-                } else {
-                    throw new IllegalArgumentException(
-                        "The behaviors Set must contain only Behaviors.");
-                }
+    public void setBehaviors(Set<Behavior> behaviors) {
+        if (behaviors != null && !behaviors.isEmpty()) {
+            if (subActivities.isEmpty()) {
+                this.behaviors = behaviors;
             } else {
                 throw new IllegalArgumentException(
-                    "You can only set Behaviors when there is no sub activity.");
+                    "You can only set behaviors when there are no sub activities.");
             }
+        } else {
+            this.behaviors = null;
         }
     }
 }

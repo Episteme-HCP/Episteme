@@ -25,6 +25,11 @@ package org.jscience.arts;
 
 import java.time.LocalDate;
 import java.util.*;
+import org.jscience.util.identity.Identified;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Attribute;
+import java.util.Objects;
 
 /**
  * Represents an artist (painter, sculptor, musician, etc.).
@@ -33,24 +38,34 @@ import java.util.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Artist {
+@Persistent
+public class Artist implements Identified<String> {
 
     public enum Medium {
         PAINTING, SCULPTURE, MUSIC, DANCE, THEATER, FILM,
         PHOTOGRAPHY, ARCHITECTURE, LITERATURE, DIGITAL
     }
 
+    @Id
     private final String name;
+    @Attribute
     private final Set<Medium> media = EnumSet.noneOf(Medium.class);
+    @Attribute
     private String nationality;
+    @Attribute
     private LocalDate birthDate;
+    @Attribute
     private LocalDate deathDate;
+    @Attribute
     private String movement; // e.g., "Impressionism", "Baroque"
+    @Attribute
     private final List<String> notableWorks = new ArrayList<>();
+    @Attribute
     private String biography;
 
     public Artist(String name) {
-        this.name = name;
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
     }
 
     public Artist(String name, Medium primaryMedium) {
@@ -59,6 +74,11 @@ public class Artist {
     }
 
     // Getters
+    @Override
+    public String getId() {
+        return name;
+    }
+
     public String getName() {
         return name;
     }

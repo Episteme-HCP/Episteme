@@ -8,41 +8,39 @@
  */
 package org.jscience.economics.money;
 
+import org.jscience.measure.Dimension;
+import org.jscience.measure.StandardUnit;
+import org.jscience.measure.Unit;
+import org.jscience.measure.UnitConverter;
+import org.jscience.util.identity.Identified;
 
-import javax.measure.converter.ConversionException;
-import javax.measure.converter.UnitConverter;
-import javax.measure.unit.DerivedUnit;
-import javax.measure.unit.Unit;
-import javax.measure.unit.UnitFormat;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <p> This class represents a currency {@link javax.measure.unit.Unit Unit}.
- * Currencies are a special form of {@link DerivedUnit}, conversions
+ * <p> This class represents a currency {@link org.jscience.measure.Unit Unit}.
+ * Currencies are a special form of unit, conversions
  * between currencies is possible if their respective exchange rates
  * have been set and the conversion factor can be changed dynamically.</p>
  * <p/>
  * <p> Quantities stated in {@link Currency} are usually instances of
  * {@link Money}.</p>
  * <p/>
- * <p> By default, the label associated to a currency is its ISO-4217 code
- * (see the <a href="http://www.bsi-global.com/iso4217currency"> ISO 4217
- * maintenance agency</a> for a table of currency codes). An application may
- * change this default using the {@link javax.measure.unit.UnitFormat#label
- * UnitFormat.label(String)} method.
- * For example:[code]
- * UnitFormat.getStandardInstance().label(Currency.EUR, "€");
- * UnitFormat.getStandardInstance().label(Currency.GBP, "£");
- * UnitFormat.getStandardInstance().label(Currency.JPY, "¥");
- * UnitFormat.getStandardInstance().label(Currency.USD, "$");
- * [/code]</p>
  *
  * @author <a href="mailto:jean-marie@dautelle.com">Jean-Marie Dautelle</a>
  * @version 3.0, February 13, 2006
- * @see #setExchangeRate
  */
-public class Currency extends DerivedUnit<Money> {
+public class Currency extends StandardUnit<Money> implements Identified<String> {
+
+    /**
+     * Holds the Reference currency.
+     */
+    private static Currency REFERENCE; // Will be set to USD later
+
+    /**
+     * Holds the exchanges rate to the reference currency.
+     */
+    private static final Map<String, Double> TO_REFERENCE = new HashMap<>();
 
     /**
      * The Australian Dollar currency unit.
@@ -89,213 +87,104 @@ public class Currency extends DerivedUnit<Money> {
      */
     public static final Currency USD = new Currency("USD");
 
-    /**
-     * Holds the reference currency.
-     */
-    private static Currency REFERENCE;
+    static {
+        REFERENCE = USD;
+        // Initialize default exchange rates
+        TO_REFERENCE.put(USD.getCode(), 1.0);
+    }
 
-    /**
-     * Holds the exchanges rate to the reference currency.
-     */
-    private static final Map<String, Double> TO_REFERENCE =
-            new HashMap<String, Double>();
-
-    /**
-     * Holds the converter to the {@link Money#BASE_UNIT money base unit}.
-     */
-    private final Converter _toBaseUnit;
-
-    private String longName;
+    private final String code;
 
     /**
      * Creates the currency unit for the given currency code.
-     * See the <a href="http://www.bsi-global.com/iso4217currency"> ISO 4217
-     * maintenance agency</a> for more information, including a table of
-     * currency codes.
      *
-     * @param code the ISO-4217 code of the currency (e.g.
-     *             <code>"EUR", "USD", "JPY"</code>).
-     * @throws IllegalArgumentException if the specified code is not an ISO-4217
-     *                                  code.
+     * @param code the ISO-4217 code of the currency.
      */
     public Currency(String code) {
-        _toBaseUnit = new Converter(code, false);
-        longName = new String();
-        UnitFormat.getInstance().label(this, code);
+        super(code, code, Money.DIMENSION);
+        this.code = code;
+        // Self-register default exchange rate if referencing itself or USD default
+        if (code.equals("USD")) {
+             TO_REFERENCE.put(code, 1.0);
+        }
     }
-
-    public Currency(String longName, String code) {
-        _toBaseUnit = new Converter(code, false);
-        this.longName = longName;
-        UnitFormat.getInstance().label(this, code);
-    }
-
-
-    public String getLongName() {
-
-        return longName;
-
-    }
-
-    public void setLongName(String longName) {
-
-        this.longName = longName;
-
+    
+    public static Currency of(String code) {
+        // Simple factory - in a real app, use a cache or look up existing static fields
+        if ("USD".equals(code)) return USD;
+        if ("EUR".equals(code)) return EUR;
+        return new Currency(code);
     }
 
     /**
      * Returns the currency code for this currency.
      *
-     * @return the ISO-4217 code of the currency
-     *         (e.g. <code>"EUR", "USD", "JPY"</code>).
+     * @return the ISO-4217 code.
      */
     public String getCode() {
-        return _toBaseUnit._code;
+        return code;
+    }
+
+    @Override
+    public String getId() {
+        return code;
     }
 
     /**
-     * Returns the default number of fraction digits used with this currency
-     * unit. For example, the default number of fraction digits for
-     * the {@link Currency#EUR} is 2, while for the {@link Currency#JPY} (Yen)
-     * it's 0. This method can be overriden for custom currencies returning
-     * values different from <code>2</code>.
-     *
-     * @return the default number of fraction digits for this currency.
-     */
-    public int getDefaultFractionDigits() {
-        return (this.equals(JPY) || (this.equals(KRW))) ?
-                0 : 2;
-    }
-
-    /**
-     * Sets the reference currency (context-local). Changing the
-     * reference currency clears all the exchange rates previously set.
-     *
-     * @param currency the new reference currency.
+     * Sets the reference currency (context-local).
      */
     public static void setReferenceCurrency(Currency currency) {
         REFERENCE = currency;
+        // Reset rates relative to new reference? 
+        // For simplicity, we assume TO_REFERENCE stores rates relative to the CURRENT reference.
         TO_REFERENCE.clear();
         TO_REFERENCE.put(currency.getCode(), 1.0);
     }
 
-    /**
-     * Returns the currency used as reference when setting the exchange rate.
-     * By default, the reference currency is the currency for the default
-     * country locale.
-     *
-     * @return the reference currency.
-     * @see #setExchangeRate
-     */
     public static Currency getReferenceCurrency() {
         return REFERENCE;
     }
 
-    /**
-     * Sets the exchange rate of this {@link Currency} relatively to
-     * the reference currency. Setting the exchange rate allows
-     * for conversion between {@link Money} stated in different currencies.
-     * For example:<pre>
-     *     Currency.setReferenceCurrency(Currency.USD);
-     *     Currency.EUR.setExchangeRate(1.17); // 1.0 € = 1.17 $
-     * </pre>
-     *
-     * @param refAmount the amount stated in the {@link #getReferenceCurrency}
-     *                  equals to one unit of this {@link Currency}.
-     * @see #getReferenceCurrency
-     */
     public void setExchangeRate(double refAmount) {
         TO_REFERENCE.put(this.getCode(), refAmount);
     }
 
-    /**
-     * Returns the exchange rate for this {@link Currency}.
-     *
-     * @return the amount stated in the {@link #getReferenceCurrency}
-     *         equals to one unit of this {@link Currency}.
-     * @throws ConversionException if the exchange rate has not be set for
-     *                             this {@link Currency}.
-     */
     public double getExchangeRate() {
-        Double refAmount = TO_REFERENCE.get(this.getCode());
-        if (refAmount == null)
-            throw new ConversionException("Exchange rate not set for " + this.getCode());
-        return refAmount.doubleValue();
+        Double rate = TO_REFERENCE.get(this.getCode());
+        if (rate == null) throw new IllegalStateException("Exchange rate not set for " + code);
+        return rate;
     }
 
+    @Override
+    public UnitConverter getConverterTo(Unit<Money> targetUnit) {
+        if (targetUnit.equals(this)) return UnitConverter.identity();
+        
+        if (targetUnit instanceof Currency) {
+            Currency target = (Currency) targetUnit;
+            double thisRate = this.getExchangeRate(); // Value of 1 unit of this in Reference
+            double targetRate = target.getExchangeRate(); // Value of 1 unit of target in Reference
+            
+            // 1 This = thisRate Reference
+            // 1 Target = targetRate Reference => 1 Reference = 1/targetRate Target
+            // 1 This = (thisRate / targetRate) Target
+            
+            return new org.jscience.measure.converters.MultiplyConverter(
+                 org.jscience.mathematics.numbers.real.Real.of(thisRate / targetRate));
+        }
+        
+        return super.getConverterTo(targetUnit);
+    }
 
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof Currency))
-            return false;
+        if (!(obj instanceof Currency)) return false;
         Currency that = (Currency) obj;
-        return this._toBaseUnit.equals(that._toBaseUnit);
+        return this.code.equals(that.code);
     }
 
     @Override
     public int hashCode() {
-        return _toBaseUnit.hashCode();
+        return code.hashCode();
     }
-
-    @Override
-    public Unit<? super Money> getStandardUnit() {
-        return Money.BASE_UNIT;
-    }
-
-    @Override
-    public UnitConverter toStandardUnit() {
-        return _toBaseUnit;
-    }
-
-    /**
-     * This class represents the currency converters.
-     */
-    private static class Converter extends UnitConverter {
-
-        String _code;
-
-        boolean _invert;
-
-        private Converter(String code, boolean invert) {
-            _code = code;
-            _invert = invert;
-        }
-
-        @Override
-        public UnitConverter inverse() {
-            return new Converter(_code, !_invert);
-        }
-
-        @Override
-        public double convert(double x) throws ConversionException {
-            Double refAmount = TO_REFERENCE.get(_code);
-            if (refAmount == null)
-                throw new ConversionException("Exchange rate not set for " + _code);
-            return _invert ? x / refAmount.doubleValue() : x * refAmount.doubleValue();
-        }
-
-        @Override
-        public boolean isLinear() {
-            return true;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (!(obj instanceof Converter))
-                return false;
-            Converter that = (Converter) obj;
-            return this._code.equals(that._code) && (this._invert == that._invert);
-        }
-
-        @Override
-        public int hashCode() {
-            return _invert ? _code.hashCode() : -_code.hashCode();
-        }
-
-        private static final long serialVersionUID = 1L;
-    }
-
-    private static final long serialVersionUID = 1L;
 }

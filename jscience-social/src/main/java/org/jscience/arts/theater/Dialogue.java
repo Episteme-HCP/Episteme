@@ -1,4 +1,4 @@
-﻿package org.jscience.arts.theater;
+package org.jscience.arts.theater;
 
 
 /**

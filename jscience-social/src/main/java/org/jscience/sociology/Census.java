@@ -23,29 +23,54 @@
 
 package org.jscience.sociology;
 
-import java.util.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
- * 
+ * Represents a systematic collection of demographic data for a population of individuals.
+ * Provides analytical methods for population statistics like average age and gender distribution.
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
-public class Census {
+public class Census implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final List<Person> population;
 
+    /**
+     * Creates a new Census for the given population.
+     *
+     * @param population the list of people to analyze
+     * @throws NullPointerException if population is null
+     */
     public Census(List<Person> population) {
-        this.population = new ArrayList<>(population);
+        this.population = new ArrayList<>(Objects.requireNonNull(population, "Population cannot be null"));
     }
 
+    /**
+     * Returns the total number of individuals in the census.
+     * @return population size
+     */
     public int getTotalPopulation() {
         return population.size();
     }
 
+    /**
+     * Calculates the average age of the population.
+     * @return average age in years, or 0.0 if population is empty
+     */
     public double getAverageAge() {
-        if (population.isEmpty())
+        if (population.isEmpty()) {
             return 0.0;
+        }
         double totalAge = 0;
         for (Person p : population) {
             totalAge += p.getAge();
@@ -53,13 +78,16 @@ public class Census {
         return totalAge / population.size();
     }
 
+    /**
+     * Returns the distribution of genders within the population.
+     * @return a map from gender to the count of individuals
+     */
     public Map<Person.Gender, Long> getGenderDistribution() {
         Map<Person.Gender, Long> dist = new EnumMap<>(Person.Gender.class);
         for (Person p : population) {
-            dist.put(p.getGender(), dist.getOrDefault(p.getGender(), 0L) + 1);
+            Person.Gender gender = p.getGender();
+            dist.put(gender, dist.getOrDefault(gender, 0L) + 1);
         }
         return dist;
     }
 }
-
-

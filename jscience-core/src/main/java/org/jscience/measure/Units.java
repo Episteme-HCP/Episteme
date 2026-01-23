@@ -126,7 +126,7 @@ public final class Units {
         /**
          * Radian: rad (plane angle).
          */
-        public static final Unit<Dimensionless> RADIAN = new StandardUnit<>("rad", "radian", Dimension.DIMENSIONLESS);
+        public static final Unit<Angle> RADIAN = new StandardUnit<>("rad", "radian", Dimension.DIMENSIONLESS);
 
         /**
          * Steradian: sr (solid angle).
@@ -358,7 +358,7 @@ public final class Units {
 
         /** Degree: 1Ã‚Â° = Ãâ‚¬/180 rad */
         @SuppressWarnings("unchecked")
-        public static final Unit<Angle> DEGREE_ANGLE = (Unit<Angle>) ((Unit<?>) RADIAN).multiply(Math.PI / 180.0);
+        public static final Unit<Angle> DEGREE_ANGLE = ((StandardUnit<Angle>) RADIAN).multiply(Math.PI / 180.0);
 
         /** Minute (angle): 1' = 1Ã‚Â°/60 */
         public static final Unit<Angle> MINUTE_ANGLE = (Unit<Angle>) DEGREE_ANGLE.divide(60);

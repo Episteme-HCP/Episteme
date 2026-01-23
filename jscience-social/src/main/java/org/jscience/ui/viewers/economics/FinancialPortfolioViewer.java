@@ -8,7 +8,8 @@ import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.NumericParameter;
 import org.jscience.ui.Parameter;
 import org.jscience.economics.PortfolioData;
-import org.jscience.economics.Money;
+import org.jscience.economics.money.Money;
+import org.jscience.economics.money.Currency;
 
 import java.util.*;
 

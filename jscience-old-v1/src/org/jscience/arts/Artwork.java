@@ -22,7 +22,7 @@ import java.util.Set;
  * @version 1.0
  */
 
-//we also could extend org.jscience.economics.resources.Object instead of org.jscience.economics.resources.Artifact
+//we also could extend org.jscience.economics.resources.PhysicalObject instead of org.jscience.economics.resources.Artifact
 //should you want to represent a TV program, you should use a timeline of Performances or a more complicated system
 //we do not provide an identification system because they are usually art dependant and highly specific
 //although we do not provide any direct support for the actual location of the piece of art (or artwork), the owners field can provide a hint

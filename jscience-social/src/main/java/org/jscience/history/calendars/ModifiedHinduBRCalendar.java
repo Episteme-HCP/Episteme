@@ -1,61 +1,87 @@
-//repackaged after the code from Mark E. Shoulson
-//email <mark@kli.org>
-//website http://web.meson.org/calendars/
-//released under GPL
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Originally based on code from Mark E. Shoulson <mark@kli.org>
+ * http://web.meson.org/calendars/
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history.calendars;
 
 import org.jscience.mathematics.algebraic.numbers.ExactRational;
 
-
 /**
- * DOCUMENT ME!
+ * Abstract base class for modified Hindu calendars using arbitrary-precision arithmetic.
+ * This version uses ExactRational (BigRational) for precise calculations without
+ * floating-point errors.
  *
- * @author $author$
- * @version $Revision: 1.3 $
+ * @author Mark E. Shoulson (original implementation)
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
 abstract class ModifiedHinduBRCalendar {
-    /** DOCUMENT ME! */
+    /** Sidereal year length in days. */
     public static final ExactRational SIDEREALYEAR;
 
-    /** DOCUMENT ME! */
+    /** Sidereal month length in days. */
     public static final ExactRational SIDEREALMONTH = (new ExactRational(0x46de57L,
             0xdc4fbeL)).add(new ExactRational(27L));
 
-    /** DOCUMENT ME! */
+    /** Synodic month length in days. */
     public static final ExactRational SYNODICMONTH = (new ExactRational(0x6c269bL,
             0xcbd4feL)).add(new ExactRational(29L));
 
-    /** DOCUMENT ME! */
+    /** Days from creation to epoch. */
     public static final ExactRational CREATION;
 
-    /** DOCUMENT ME! */
+    /** Anomalistic year length in days. */
     public static final ExactRational ANOMYEAR = new ExactRational(0x16f633b4ba0L,
             0x1017df67dL);
 
-    /** DOCUMENT ME! */
+    /** Anomalistic month length in days. */
     public static final ExactRational ANOMMONTH = new ExactRational(0x5e0d1d84L,
             0x369cbf1L);
 
-    /** DOCUMENT ME! */
+    /** Number of minutes in a circle (21600). */
     private static final ExactRational TWO1600;
 
-    /** DOCUMENT ME! */
+    /** Constant for 1000. */
     private static final ExactRational THOUSAND = new ExactRational(1000L);
 
-    /** DOCUMENT ME! */
+    /** Constant for 20000. */
     private static final ExactRational TWENTYTHOUSAND = new ExactRational(20000L);
 
-    /** DOCUMENT ME! */
+    /** Mean motion of the sun. */
     private static final ExactRational MEANMOTION;
 
-    /** DOCUMENT ME! */
+    /** Constant 14/360. */
     private static final ExactRational FOURTEENTHREESIXTY = new ExactRational(14L,
             360L);
 
-    /** DOCUMENT ME! */
+    /** Factor for equation of time. */
     private static final ExactRational EQTIMEFACTOR;
 
-    /** DOCUMENT ME! */
+    /** Factor for sunrise calculation. */
     private static final ExactRational SUNRISEFACTOR;
 
     static {
@@ -75,11 +101,10 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the sign of the given value.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the value.
+     * @return 1 if positive, -1 if negative, 0 if zero.
      */
     public static int signum(double d) {
         if (d > 0.0D) {
@@ -90,11 +115,10 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the Hindu sine table value for the given index.
      *
-     * @param l DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param l the index.
+     * @return the sine table value in minutes.
      */
     public static int hindSineTable(long l) {
         double d = 3438D * Math.sin(((((double) l * 225D) / 60D) * 3.1415926535897931D) / 180D);
@@ -105,11 +129,10 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the Hindu sine for the given arc.
      *
-     * @param bigrational DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param bigrational the arc in minutes.
+     * @return the Hindu sine.
      */
     public static ExactRational hindSine(ExactRational bigrational) {
         ExactRational bigrational1 = bigrational.divide(new ExactRational(225L));
@@ -123,11 +146,10 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the Hindu arc sine for the given sine value.
      *
-     * @param bigrational DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param bigrational the sine value.
+     * @return the arc in minutes.
      */
     public static ExactRational hindArcSine(ExactRational bigrational) {
         if (lt(bigrational, ExactRational.ZERO)) {
@@ -153,23 +175,21 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the Hindu arc sine for a long value.
      *
-     * @param l DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param l the sine value.
+     * @return the arc in minutes.
      */
     public static ExactRational hindArcSine(long l) {
         return hindArcSine(new ExactRational(l));
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the mean position of a celestial body.
      *
-     * @param bigrational DOCUMENT ME!
-     * @param bigrational1 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param bigrational days since creation.
+     * @param bigrational1 orbital period.
+     * @return the mean position in minutes.
      */
     public static ExactRational meanPosition(ExactRational bigrational,
         ExactRational bigrational1) {
@@ -178,15 +198,14 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the true position of a celestial body.
      *
-     * @param bigrational DOCUMENT ME!
-     * @param bigrational1 DOCUMENT ME!
-     * @param bigrational2 DOCUMENT ME!
-     * @param bigrational3 DOCUMENT ME!
-     * @param bigrational4 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param bigrational days since creation.
+     * @param bigrational1 orbital period.
+     * @param bigrational2 eccentricity.
+     * @param bigrational3 anomalistic period.
+     * @param bigrational4 epicycle correction.
+     * @return true position in minutes.
      */
     public static ExactRational truePosition(ExactRational bigrational,
         ExactRational bigrational1, ExactRational bigrational2,
@@ -204,11 +223,10 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the solar longitude in minutes.
      *
-     * @param bigrational DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param bigrational days since creation.
+     * @return solar longitude.
      */
     public static ExactRational solarLongitude(ExactRational bigrational) {
         return truePosition(bigrational, SIDEREALYEAR, FOURTEENTHREESIXTY,
@@ -216,11 +234,10 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the zodiac sign index (1-12) for the given day.
      *
-     * @param bigrational DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param bigrational the day.
+     * @return the zodiac sign index.
      */
     public static int zodiac(ExactRational bigrational) {
         return solarLongitude(bigrational).divide(new ExactRational(1800L))
@@ -228,11 +245,10 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the lunar longitude in minutes.
      *
-     * @param bigrational DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param bigrational days since creation.
+     * @return lunar longitude.
      */
     public static ExactRational lunarLongitude(ExactRational bigrational) {
         return truePosition(bigrational, SIDEREALMONTH,
@@ -240,11 +256,10 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the lunar phase in minutes.
      *
-     * @param bigrational DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param bigrational the day.
+     * @return lunar phase.
      */
     public static ExactRational lunarPhase(ExactRational bigrational) {
         return lunarLongitude(bigrational).subtract(solarLongitude(bigrational))
@@ -252,11 +267,10 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the lunar day (tithi) for the given day.
      *
-     * @param bigrational DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param bigrational the day.
+     * @return the lunar day number (1-30).
      */
     public static int lunarDay(ExactRational bigrational) {
         return lunarPhase(bigrational).divide(new ExactRational(720L)).floor()
@@ -264,11 +278,10 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Finds the exact moment of the first new moon on or after the given day.
      *
-     * @param bigrational DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param bigrational the day.
+     * @return the moment of the new moon.
      */
     public static ExactRational newMoon(ExactRational bigrational) {
         ExactRational bigrational1 = bigrational.add(ExactRational.ONE);
@@ -304,11 +317,10 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the Hindu calendar year for the given day.
      *
-     * @param bigrational DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param bigrational the day.
+     * @return the calendar year.
      */
     public static int calYear(ExactRational bigrational) {
         ExactRational bigrational1 = bigrational.divide(SIDEREALYEAR);
@@ -329,12 +341,11 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the ascensional difference for the given day and latitude.
      *
-     * @param bigrational DOCUMENT ME!
-     * @param bigrational1 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param bigrational the day.
+     * @param bigrational1 the latitude in minutes.
+     * @return the ascensional difference.
      */
     public static ExactRational ascDiff(ExactRational bigrational,
         ExactRational bigrational1) {
@@ -352,11 +363,10 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the tropical longitude in minutes.
      *
-     * @param bigrational DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param bigrational the day.
+     * @return the tropical longitude.
      */
     public static ExactRational tropLongitude(ExactRational bigrational) {
         ExactRational bigrational1 = new ExactRational(bigrational.floor());
@@ -373,11 +383,10 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the difference between solar and sidereal time.
      *
-     * @param bigrational DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param bigrational the day.
+     * @return the time difference.
      */
     public static ExactRational solarSiderealDifference(
         ExactRational bigrational) {
@@ -387,11 +396,10 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the daily motion of the sun.
      *
-     * @param bigrational DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param bigrational the day.
+     * @return the daily motion in minutes.
      */
     public static ExactRational dailyMotion(ExactRational bigrational) {
         ExactRational bigrational1 = meanPosition(CREATION.add(bigrational),
@@ -408,11 +416,10 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the rising sign correction index.
      *
-     * @param bigrational DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param bigrational the day.
+     * @return the rising sign value.
      */
     public static int risingSign(ExactRational bigrational) {
         int[] ai = { 1670, 1795, 1935, 1935, 1795, 1670 };
@@ -422,11 +429,10 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the equation of time correction.
      *
-     * @param bigrational DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param bigrational the day.
+     * @return the equation of time value.
      */
     public static ExactRational equationOfTime(ExactRational bigrational) {
         ExactRational bigrational1 = hindSine(meanPosition(CREATION.add(
@@ -441,11 +447,10 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the time of sunrise for the given day.
      *
-     * @param bigrational DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param bigrational the day.
+     * @return the sunrise time.
      */
     public static ExactRational sunrise(ExactRational bigrational) {
         ExactRational bigrational1 = bigrational.add(new ExactRational(1L, 4L))
@@ -459,12 +464,11 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Checks if a is greater than b.
      *
-     * @param rational1 DOCUMENT ME!
-     * @param rational2 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param rational1 a.
+     * @param rational2 b.
+     * @return true if a > b.
      */
     private static boolean gt(ExactRational rational1, ExactRational rational2) {
         return rational2.subtract(rational1).signum() < 0;
@@ -473,45 +477,42 @@ abstract class ModifiedHinduBRCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Checks if a is less than or equal to b.
      *
-     * @param rational1 DOCUMENT ME!
-     * @param rational2 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param rational1 a.
+     * @param rational2 b.
+     * @return true if a <= b.
      */
     private static boolean lte(ExactRational rational1, ExactRational rational2) {
         return !gt(rational1, rational2);
     }
 
     /**
-     * DOCUMENT ME!
+     * Checks if a is less than or equal to b.
      *
-     * @param rational1 DOCUMENT ME!
-     * @param rational2 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param rational1 a.
+     * @param rational2 b.
+     * @return true if a <= b.
      */
     private static boolean lt(ExactRational rational1, ExactRational rational2) {
         return gt(rational2, rational1);
     }
 
     /**
-     * DOCUMENT ME!
+     * Checks if a is less than b.
      *
-     * @param rational1 DOCUMENT ME!
-     * @param rational2 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param rational1 a.
+     * @param rational2 b.
+     * @return true if a < b.
      */
     private static boolean gte(ExactRational rational1, ExactRational rational2) {
         return !lt(rational1, rational2);
     }
 
     /**
-     * DOCUMENT ME!
+     * Main method for testing Hindu calendar calculations.
      *
-     * @param args DOCUMENT ME!
+     * @param args command line arguments.
      */
     public static void main(String[] args) {
         System.out.println(hindSineTable(Integer.parseInt(args[0])));

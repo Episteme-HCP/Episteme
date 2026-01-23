@@ -1,169 +1,168 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.law;
 
 import org.jscience.psychology.social.HumanGroup;
-
 import org.jscience.util.Named;
-
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-import java.util.Vector;
-
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
- * A class representing a Set of agreements between two or more parties.
+ * Represents a formal agreement between multiple human groups (nations, organizations, etc.).
+ * A treaty consists of participants (groups) and a collection of articles.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
+@Persistent
+public class Treaty implements Named {
 
-//also named declaration
-public class Treaty extends Object implements Named {
-    /** DOCUMENT ME! */
+    /** The formal name of the treaty. */
+    @Attribute
     private String name;
 
-    /** DOCUMENT ME! */
+    /** The date the treaty was signed or ratified. */
+    @Attribute
     private Date date;
 
-    /** DOCUMENT ME! */
-    private Set groups; //the set of HumanGroups
+    /** The groups that are party to this treaty. */
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private Set<HumanGroup> groups;
 
-    /** DOCUMENT ME! */
-    private Vector articles; //it is not guarantied that the elements of the vector are ordonned by number
+    /** The specific clauses or articles of the treaty. */
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private List<Article> articles;
 
-    //must be a vector of Articles
     /**
-     * Creates a new Treaty object.
+     * Creates a new Treaty.
      *
-     * @param name DOCUMENT ME!
-     * @param date DOCUMENT ME!
-     * @param groups DOCUMENT ME!
-     * @param articles DOCUMENT ME!
+     * @param name     the name (cannot be empty)
+     * @param date     the signing date
+     * @param groups   the participating groups
+     * @param articles the treaty articles
+     * @throws NullPointerException if any argument is null
+     * @throws IllegalArgumentException if name is empty
      */
-    public Treaty(String name, Date date, Set groups, Vector articles) {
-        Iterator iterator;
-        boolean valid;
+    public Treaty(String name, Date date, Set<HumanGroup> groups, List<Article> articles) {
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be empty");
+        }
+        this.date = Objects.requireNonNull(date, "Date cannot be null");
+        this.groups = new HashSet<>(Objects.requireNonNull(groups, "Groups set cannot be null"));
+        this.articles = new ArrayList<>(Objects.requireNonNull(articles, "Articles list cannot be null"));
 
-        if ((name != null) && (name.length() > 0) && (date != null) &&
-                (groups != null) && (articles != null)) {
-            iterator = articles.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Article;
-            }
-
-            if (valid) {
-                iterator = groups.iterator();
-
-                while (iterator.hasNext() && valid) {
-                    valid = iterator.next() instanceof HumanGroup;
-                }
-
-                if (valid) {
-                    this.name = name;
-                    this.date = date;
-                    this.groups = groups;
-                    this.articles = articles;
-                } else {
-                    throw new IllegalArgumentException(
-                        "The Set should contain only HumanGroups.");
-                }
-            } else {
-                throw new IllegalArgumentException(
-                    "The Vector can consist only of Articles.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Treaty constructor can't have null arguments (and name can't be empty).");
+        // Validate types if they were passed as raw collections in legacy code
+        for (Object g : groups) {
+            if (!(g instanceof HumanGroup)) throw new IllegalArgumentException("Groups must contain only HumanGroup instances");
+        }
+        for (Object a : articles) {
+            if (!(a instanceof Article)) throw new IllegalArgumentException("Articles must contain only Article instances");
         }
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the name of the treaty.
      *
-     * @return DOCUMENT ME!
+     * @return the name
      */
+    @Override
     public String getName() {
         return name;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the signing date.
      *
-     * @return DOCUMENT ME!
+     * @return the date
      */
     public Date getDate() {
         return date;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns an unmodifiable view of the participating groups.
      *
-     * @return DOCUMENT ME!
+     * @return the groups
      */
-    public Set getGroups() {
-        return groups;
+    public Set<HumanGroup> getGroups() {
+        return Collections.unmodifiableSet(groups);
     }
 
     /**
-     * DOCUMENT ME!
+     * Adds a group to the treaty.
      *
-     * @param group DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param group the group to add
+     * @throws NullPointerException if group is null
      */
     public void addGroup(HumanGroup group) {
-        if (group != null) {
-            this.groups.add(group);
-        } else {
-            throw new IllegalArgumentException(
-                "You can't add a null HumanGroup.");
-        }
+        groups.add(Objects.requireNonNull(group, "HumanGroup cannot be null"));
     }
 
-    //this normally does not happen
     /**
-     * DOCUMENT ME!
+     * Removes a group from the treaty.
      *
-     * @param group DOCUMENT ME!
+     * @param group the group to remove
      */
     public void removeGroup(HumanGroup group) {
         this.groups.remove(group);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns an unmodifiable view of the treaty articles.
      *
-     * @return DOCUMENT ME!
+     * @return the articles
      */
-    public Vector getArticles() {
-        return articles;
+    public List<Article> getArticles() {
+        return Collections.unmodifiableList(articles);
     }
 
-    //each article should have a corresponding number that goes in a logical progression
     /**
-     * DOCUMENT ME!
+     * Adds an article to the treaty.
      *
-     * @param article DOCUMENT ME!
+     * @param article the article to add
+     * @throws NullPointerException if article is null
      */
     public void addArticle(Article article) {
-        if (article != null) {
-            this.articles.add(article);
-        } else {
-            throw new IllegalArgumentException("You can't add a null Article.");
-        }
+        articles.add(Objects.requireNonNull(article, "Article cannot be null"));
     }
 
-    //be cautious when removing an article as there still may be some other articles refering to this article
     /**
-     * DOCUMENT ME!
+     * Removes an article from the treaty.
      *
-     * @param article DOCUMENT ME!
+     * @param article the article to remove
      */
     public void removeArticle(Article article) {
         this.articles.remove(article);
     }
-
-    //perhaps toString could be implemented
 }

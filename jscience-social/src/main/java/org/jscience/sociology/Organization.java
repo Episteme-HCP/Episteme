@@ -24,66 +24,131 @@
 package org.jscience.sociology;
 
 import java.time.LocalDate;
+import java.time.Period;
+import java.util.Objects;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
 
 /**
- * Represents an organization (company, NGO, government agency, etc.).
+ * Represents a formal organization such as a company, NGO, or government agency.
+ * Extends {@link Group} to include organizational metadata like sector, industry, and headquarters.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
+@Persistent
 public class Organization extends Group {
 
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Categories of organizational sectors.
+     */
     public enum Sector {
         PUBLIC, PRIVATE, NON_PROFIT, GOVERNMENT, ACADEMIC, MILITARY
     }
 
+    @Attribute
     private final LocalDate foundedDate;
+    
+    @Attribute
     private final Sector sector;
+    
+    @Attribute
     private String headquarters;
+    
+    @Attribute
     private long employeeCount;
+    
+    @Attribute
     private String industry;
 
+    /**
+     * Creates a new organization.
+     *
+     * @param name        the name of the organization
+     * @param foundedDate the date the organization was established
+     * @param sector      the economic or social sector
+     * @throws NullPointerException if any argument is null
+     */
     public Organization(String name, LocalDate foundedDate, Sector sector) {
-        super(name, Type.ORGANIZATION);
-        this.foundedDate = foundedDate;
-        this.sector = sector;
+        super(name, Group.Type.ORGANIZATION);
+        this.foundedDate = Objects.requireNonNull(foundedDate, "Founding date cannot be null");
+        this.sector = Objects.requireNonNull(sector, "Sector cannot be null");
     }
 
+    /**
+     * Returns the founding date.
+     * @return the date
+     */
     public LocalDate getFoundedDate() {
         return foundedDate;
     }
 
+    /**
+     * Returns the organization's sector.
+     * @return the sector
+     */
     public Sector getSector() {
         return sector;
     }
 
+    /**
+     * Returns the headquarters location.
+     * @return headquarters address or description
+     */
     public String getHeadquarters() {
         return headquarters;
     }
 
-    public long getEmployeeCount() {
-        return employeeCount;
-    }
-
-    public String getIndustry() {
-        return industry;
-    }
-
+    /**
+     * Sets the headquarters location.
+     * @param headquarters the location string
+     */
     public void setHeadquarters(String headquarters) {
         this.headquarters = headquarters;
     }
 
+    /**
+     * Returns the current employee or member count.
+     * @return employee count
+     */
+    public long getEmployeeCount() {
+        return employeeCount;
+    }
+
+    /**
+     * Sets the current employee or member count.
+     * @param employeeCount count
+     */
     public void setEmployeeCount(long employeeCount) {
         this.employeeCount = employeeCount;
     }
 
+    /**
+     * Returns the industry or field of operation.
+     * @return industry string
+     */
+    public String getIndustry() {
+        return industry;
+    }
+
+    /**
+     * Sets the industry or field of operation.
+     * @param industry industry string
+     */
     public void setIndustry(String industry) {
         this.industry = industry;
     }
 
+    /**
+     * Calculates the age of the organization in years.
+     * @return age in years
+     */
     public int getAge() {
-        return java.time.Period.between(foundedDate, LocalDate.now()).getYears();
+        return Period.between(foundedDate, LocalDate.now()).getYears();
     }
 
     @Override
@@ -91,15 +156,4 @@ public class Organization extends Group {
         return String.format("Organization '%s' (%s, %s): %d employees, founded %d",
                 getName(), sector, industry, employeeCount, foundedDate.getYear());
     }
-
-    // Notable organizations
-    public static Organization unitedNations() {
-        Organization un = new Organization("United Nations", LocalDate.of(1945, 10, 24), Sector.GOVERNMENT);
-        un.setHeadquarters("New York, USA");
-        un.setIndustry("International Relations");
-        un.setEmployeeCount(44000);
-        return un;
-    }
 }
-
-

@@ -83,79 +83,54 @@ public class GeodeticCoordinate {
     /**
      * Calculates the internal radius of curvature in the prime vertical (N).
      * N = a / sqrt(1 - e^2 * sin^2(phi))
+     * 
+     * @return N in meters
      */
     public Real getPrimeVerticalRadius() {
-        Real a = Real.of(ellipsoid.getSemiMajorAxis().to(Units.METER).getValue().doubleValue());
-        Real e2 = ellipsoid.getEccentricitySquared();
+        double a = ellipsoid.getSemiMajorAxis().to(Units.METER).getValue().doubleValue();
+        double e2 = ellipsoid.getEccentricitySquared().doubleValue();
 
-        // Need math functions for Real or generic Math interface.
-        // Assuming Real.of(double) and standard Math for now, but ideally Real has its
-        // own trigonometry.
-        // If Real doesn't have sin(), we might need to cast to double, calculate, and
-        // back.
-        // Let's check Real methods later, but for now assuming standard interactions or
-        // utilizing JDK Math for the double value.
-
-        @SuppressWarnings("unchecked")
-        Unit<Angle> rad = (Unit<Angle>) (Unit<?>) Units.RADIAN;
-
-        double phi = latitude.to(rad).getValue().doubleValue();
+        double phi = latitude.to(Units.RADIAN).getValue().doubleValue();
         double sinPhi = Math.sin(phi);
-        double denom = Math.sqrt(1.0 - e2.doubleValue() * sinPhi * sinPhi);
+        double denom = Math.sqrt(1.0 - e2 * sinPhi * sinPhi);
 
-        return a.divide(Real.of(denom));
+        return Real.of(a / denom);
     }
 
     /**
      * Converts to Earth-Centered, Earth-Fixed (ECEF) Cartesian coordinates.
-     */
-    /**
-     * Converts to Earth-Centered, Earth-Fixed (ECEF) Cartesian coordinates.
      * 
-     * @return 3D Vector [X, Y, Z] in Meters
+     * @return ECEFCoordinate [X, Y, Z]
      */
-    /**
-     * Converts to Earth-Centered, Earth-Fixed (ECEF) Cartesian coordinates.
-     * 
-     * @return 3D Vector [X, Y, Z] in Meters
-     */
-    public Vector<Real> toECEF() {
-        Real a = Real.of(ellipsoid.getSemiMajorAxis().to(Units.METER).getValue().doubleValue());
-        Real e2 = ellipsoid.getEccentricitySquared();
+    public ECEFCoordinate toECEF() {
+        double a = ellipsoid.getSemiMajorAxis().to(Units.METER).getValue().doubleValue();
+        double e2 = ellipsoid.getEccentricitySquared().doubleValue();
 
-        @SuppressWarnings("unchecked")
-        Unit<Angle> rad = (Unit<Angle>) (Unit<?>) Units.RADIAN;
-
-        double lat = latitude.to(rad).getValue().doubleValue();
-        double lon = longitude.to(rad).getValue().doubleValue();
+        double phi = latitude.to(Units.RADIAN).getValue().doubleValue();
+        double lambda = longitude.to(Units.RADIAN).getValue().doubleValue();
         double h = height.to(Units.METER).getValue().doubleValue();
 
-        double sinLat = Math.sin(lat);
-        double cosLat = Math.cos(lat);
-        double sinLon = Math.sin(lon);
-        double cosLon = Math.cos(lon);
+        double sinPhi = Math.sin(phi);
+        double cosPhi = Math.cos(phi);
+        double sinLambda = Math.sin(lambda);
+        double cosLambda = Math.cos(lambda);
 
-        double N = a.doubleValue() / Math.sqrt(1.0 - e2.doubleValue() * sinLat * sinLat);
+        double N = a / Math.sqrt(1.0 - e2 * sinPhi * sinPhi);
 
-        double x = (N + h) * cosLat * cosLon;
-        double y = (N + h) * cosLat * sinLon;
-        double z = (N * (1.0 - e2.doubleValue()) + h) * sinLat;
+        double x = (N + h) * cosPhi * cosLambda;
+        double y = (N + h) * cosPhi * sinLambda;
+        double z = (N * (1.0 - e2) + h) * sinPhi;
 
-        // Return Vector<Real> representing values in Meters
-        List<Real> elements = new ArrayList<>();
-        elements.add(Real.of(x));
-        elements.add(Real.of(y));
-        elements.add(Real.of(z));
+        return new ECEFCoordinate(Real.of(x), Real.of(y), Real.of(z), ellipsoid);
+    }
 
-        // We cast to Vector<Length> to satisfy the interface if strictly needed,
-        // but physically it's Vector<Real> (numeric vector).
-        // The javadoc says "@return 3D Vector [X, Y, Z] in Meters"
-        // If the return type is Vector<Length>, we have a problem because
-        // Vector<Length>
-        // expects Length elements which aren't a Field.
-        // I will change return type to Vector<Real> and update Javadoc.
-
-        return VectorFactory.<Real>create(elements, Real.ZERO);
+    @Override
+    public String toString() {
+        return String.format("Geodetic[Lat=%.6f°, Lon=%.6f°, H=%.2fm, %s]", 
+            latitude.to(Units.DEGREE_ANGLE).getValue().doubleValue(),
+            longitude.to(Units.DEGREE_ANGLE).getValue().doubleValue(),
+            height.to(Units.METER).getValue().doubleValue(),
+            ellipsoid.getName());
     }
 }
 

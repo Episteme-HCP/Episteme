@@ -20,25 +20,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package org.jscience.philosophy;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 /**
+ * Represents a formal logical argument where a conclusion is inferred from 
+ * two premises.
  * 
+ * <p> A classic syllogism consists of a Major Premise, a Minor Premise, and 
+ *     a Conclusion, following Aristotelian logical structures.</p>
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @version 6.0, July 21, 2014
  */
-public class Syllogism {
+public class Syllogism implements Serializable {
+
+
+    private static final long serialVersionUID = 1L;
 
     private final Premise majorPremise;
     private final Premise minorPremise;
     private final Premise conclusion;
 
+    /**
+     * Constructs a Syllogism.
+     * @param majorPremise the major premise (containing the major term)
+     * @param minorPremise the minor premise (containing the minor term)
+     * @param conclusion   the inferred conclusion
+     * @throws NullPointerException if any premise is null
+     */
     public Syllogism(Premise majorPremise, Premise minorPremise, Premise conclusion) {
-        this.majorPremise = majorPremise;
-        this.minorPremise = minorPremise;
-        this.conclusion = conclusion;
+        this.majorPremise = Objects.requireNonNull(majorPremise, "Major Premise cannot be null");
+        this.minorPremise = Objects.requireNonNull(minorPremise, "Minor Premise cannot be null");
+        this.conclusion = Objects.requireNonNull(conclusion, "Conclusion cannot be null");
     }
 
     public Premise getMajorPremise() {
@@ -53,17 +70,21 @@ public class Syllogism {
         return conclusion;
     }
 
+    /**
+     * Checks if the argument is "sound".
+     * A sound argument is one that is both valid (logical structure) and has true premises.
+     * Note: This method only checks the truth values of the components as defined; 
+     * it does not validate the logical inference form itself (Use LogicSolver for formal validity).
+     * 
+     * @return true if all premises and the conclusion are marked as true
+     */
     public boolean isSound() {
-        // A sound argument is valid and its premises are true.
-        // We only check premise truth here as validity requires advanced parsing.
         return majorPremise.isTrue() && minorPremise.isTrue() && conclusion.isTrue();
     }
 
     @Override
     public String toString() {
-        return String.format("Major: %s\nMinor: %s\nTherefore: %s",
+        return String.format("Major: %s%nMinor: %s%nTherefore: %s",
                 majorPremise.getStatement(), minorPremise.getStatement(), conclusion.getStatement());
     }
 }
-
-

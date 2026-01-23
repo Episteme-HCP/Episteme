@@ -1,55 +1,156 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history;
 
 import org.jscience.history.time.UncertainDate;
 import org.jscience.mathematics.numbers.real.Real;
+import java.io.Serializable;
 import java.util.*;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
  * Simulates counterfactual historical scenarios ("What if?").
+ * Analyzes historical contingency and potential alternative timelines based on causal chains.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
 public final class CounterfactualSimulator {
 
-    private CounterfactualSimulator() {}
-
-    public record HistoricalEvent(
-        String id,
-        String name,
-        UncertainDate date,
-        String category,
-        double importance,  // 0-1
-        List<String> consequences  // IDs of events that depend on this
-    ) {}
-
-    public record CounterfactualScenario(
-        String name,
-        String description,
-        HistoricalEvent divergencePoint,
-        String alternativeOutcome,
-        List<String> affectedEvents,
-        Map<String, String> changedConsequences
-    ) {}
-
-    public record SimulationResult(
-        CounterfactualScenario scenario,
-        List<String> butterfliedEvents,
-        List<String> unchangedEvents,
-        double historicalDivergence,  // 0-1
-        String narrativeSummary
-    ) {}
-
-    private static final List<HistoricalEvent> EVENT_DATABASE = new ArrayList<>();
-
-    /**
-     * Adds an event to the database.
-     */
-    public static void addEvent(HistoricalEvent event) {
-        EVENT_DATABASE.add(event);
+    private CounterfactualSimulator() {
+        // Prevent instantiation
     }
 
     /**
-     * Simulates the cascade effects of a counterfactual.
+     * Internal representation of a historical event with its causal dependencies.
+     * 
+     * @param id           unique ID
+     * @param name         event name
+     * @param date         fuzzy date
+     * @param category     event category
+     * @param importance   importance weight (0.0 to 1.0)
+     * @param consequences list of dependent event IDs
+     */
+    @Persistent
+    public record ContingencyEvent(
+        @Attribute String id,
+        @Attribute String name,
+        @Relation(type = Relation.Type.ONE_TO_ONE) UncertainDate date,
+        @Attribute String category,
+        @Attribute double importance,
+        @Attribute List<String> consequences
+    ) implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        public ContingencyEvent {
+            Objects.requireNonNull(id, "ID cannot be null");
+            Objects.requireNonNull(name, "Name cannot be null");
+            Objects.requireNonNull(date, "Date cannot be null");
+            consequences = consequences != null ? List.copyOf(consequences) : List.of();
+        }
+    }
+
+    /**
+     * Defines a specific counterfactual scenario starting from a divergence point.
+     * 
+     * @param name                scenario name
+     * @param description         scenario summary
+     * @param divergencePoint     the original event being changed
+     * @param alternativeOutcome  the new outcome for the divergence point
+     * @param affectedEvents       explicitly list of known affected events (optional)
+     * @param changedConsequences mapping of event IDs to their new alternative outcomes
+     */
+    @Persistent
+    public record CounterfactualScenario(
+        @Attribute String name,
+        @Attribute String description,
+        @Relation(type = Relation.Type.MANY_TO_ONE) ContingencyEvent divergencePoint,
+        @Attribute String alternativeOutcome,
+        @Attribute List<String> affectedEvents,
+        @Attribute Map<String, String> changedConsequences
+    ) implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        public CounterfactualScenario {
+            Objects.requireNonNull(name, "Scenario name cannot be null");
+            Objects.requireNonNull(divergencePoint, "Divergence point cannot be null");
+            affectedEvents = affectedEvents != null ? List.copyOf(affectedEvents) : List.of();
+            changedConsequences = changedConsequences != null ? Map.copyOf(changedConsequences) : Map.of();
+        }
+    }
+
+    /**
+     * The analytical results of a counterfactual simulation.
+     * 
+     * @param scenario            the scenario tested
+     * @param butterfliedEvents   list of events that changed
+     * @param unchangedEvents     list of events that remained the same
+     * @param historicalDivergence measure of divergence (0.0 to 1.0)
+     * @param narrativeSummary    generated text analysis
+     */
+    @Persistent
+    public record SimulationResult(
+        @Relation(type = Relation.Type.MANY_TO_ONE) CounterfactualScenario scenario,
+        @Attribute List<String> butterfliedEvents,
+        @Attribute List<String> unchangedEvents,
+        @Attribute double historicalDivergence,
+        @Attribute String narrativeSummary
+    ) implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        public SimulationResult {
+            Objects.requireNonNull(scenario, "Scenario cannot be null");
+            butterfliedEvents = butterfliedEvents != null ? List.copyOf(butterfliedEvents) : List.of();
+            unchangedEvents = unchangedEvents != null ? List.copyOf(unchangedEvents) : List.of();
+        }
+    }
+
+    private static final List<ContingencyEvent> EVENT_DATABASE = Collections.synchronizedList(new ArrayList<>());
+
+    /**
+     * Registers a contingency event in the simulation database.
+     * 
+     * @param event the event to add
+     * @throws NullPointerException if event is null
+     */
+    public static void addEvent(ContingencyEvent event) {
+        EVENT_DATABASE.add(Objects.requireNonNull(event, "Event cannot be null"));
+    }
+
+    /**
+     * Simulates the cascade effects of a counterfactual scenario.
+     * 
+     * @param scenario the scenario to simulate
+     * @return simulation results
+     * @throws NullPointerException if scenario is null
      */
     public static SimulationResult simulate(CounterfactualScenario scenario) {
+        Objects.requireNonNull(scenario, "Scenario cannot be null");
         Set<String> butterflied = new HashSet<>();
         Set<String> unchanged = new HashSet<>();
         
@@ -57,13 +158,15 @@ public final class CounterfactualSimulator {
         cascadeEffects(scenario.divergencePoint().id(), butterflied);
         
         // Find unchanged events (before divergence or unrelated)
-        for (HistoricalEvent e : EVENT_DATABASE) {
-            if (!butterflied.contains(e.id())) {
-                // Check if before divergence
-                if (e.date().compareTo(scenario.divergencePoint().date()) < 0) {
-                    unchanged.add(e.id());
-                } else if (!isConnected(e.id(), scenario.divergencePoint().id())) {
-                    unchanged.add(e.id());
+        synchronized (EVENT_DATABASE) {
+            for (ContingencyEvent e : EVENT_DATABASE) {
+                if (!butterflied.contains(e.id()) && !e.id().equals(scenario.divergencePoint().id())) {
+                    // Check if before divergence
+                    if (e.date().compareTo(scenario.divergencePoint().date()) < 0) {
+                        unchanged.add(e.id());
+                    } else if (!isConnected(e.id(), scenario.divergencePoint().id())) {
+                        unchanged.add(e.id());
+                    }
                 }
             }
         }
@@ -85,17 +188,20 @@ public final class CounterfactualSimulator {
     }
 
     /**
-     * Analyzes the historical contingency of an event.
+     * Calculates the historical contingency score of a specific event.
+     * 
+     * @param eventId unique ID of the event
+     * @return contingency score as a {@link Real} number
+     * @throws NullPointerException if eventId is null
      */
     public static Real calculateContingency(String eventId) {
-        HistoricalEvent event = findEvent(eventId);
+        Objects.requireNonNull(eventId, "Event ID cannot be null");
+        ContingencyEvent event = findEvent(eventId);
         if (event == null) return Real.ZERO;
         
-        // Count how many events depend on this one
         Set<String> dependents = new HashSet<>();
         cascadeEffects(eventId, dependents);
         
-        // Contingency = importance * number of dependents / total events
         double contingency = event.importance() * dependents.size() / 
             Math.max(1, EVENT_DATABASE.size());
         
@@ -103,72 +209,78 @@ public final class CounterfactualSimulator {
     }
 
     /**
-     * Suggests plausible counterfactuals for an event.
+     * Suggests plausible counterfactual outcomes for a given event category.
+     * 
+     * @param eventId unique ID of the event
+     * @return unmodifiable list of counterfactual suggestions
+     * @throws NullPointerException if eventId is null
      */
     public static List<String> suggestCounterfactuals(String eventId) {
-        HistoricalEvent event = findEvent(eventId);
+        Objects.requireNonNull(eventId, "Event ID cannot be null");
+        ContingencyEvent event = findEvent(eventId);
         if (event == null) return Collections.emptyList();
         
         List<String> suggestions = new ArrayList<>();
-        
-        String category = event.category().toLowerCase();
+        String category = event.category().toLowerCase().trim();
         
         if (category.contains("battle") || category.contains("war")) {
-            suggestions.add("What if the opposing side won?");
-            suggestions.add("What if the battle never occurred (diplomacy succeeded)?");
-            suggestions.add("What if key commander died before the battle?");
-        }
-        
-        if (category.contains("invention") || category.contains("discovery")) {
-            suggestions.add("What if the invention was delayed by 50 years?");
-            suggestions.add("What if a different inventor made the discovery?");
-            suggestions.add("What if the invention was suppressed?");
-        }
-        
-        if (category.contains("assassination") || category.contains("death")) {
-            suggestions.add("What if the target survived?");
-            suggestions.add("What if the assassination succeeded earlier?");
-        }
-        
-        if (category.contains("treaty") || category.contains("agreement")) {
-            suggestions.add("What if negotiations failed?");
-            suggestions.add("What if terms were more/less favorable?");
+            suggestions.addAll(Arrays.asList(
+                "What if the opposing side won?",
+                "What if the battle never occurred (diplomacy succeeded)?",
+                "What if the key commander died before the battle?"
+            ));
+        } else if (category.contains("invention") || category.contains("discovery")) {
+            suggestions.addAll(Arrays.asList(
+                "What if the invention was delayed by 50 years?",
+                "What if a different inventor made the discovery?",
+                "What if the invention was suppressed?"
+            ));
+        } else if (category.contains("assassination") || category.contains("death")) {
+            suggestions.addAll(Arrays.asList(
+                "What if the target survived?",
+                "What if the assassination succeeded earlier?"
+            ));
+        } else if (category.contains("treaty") || category.contains("agreement")) {
+            suggestions.addAll(Arrays.asList(
+                "What if negotiations failed?",
+                "What if the terms were more/less favorable?"
+            ));
         }
         
         suggestions.add("What if this event never happened?");
         suggestions.add("What if this event happened 10 years earlier/later?");
         
-        return suggestions;
+        return Collections.unmodifiableList(suggestions);
     }
 
     /**
-     * Loads sample historical events.
+     * Populates the database with sample historical dataset for simulation testing.
      */
     public static void loadSampleData() {
-        addEvent(new HistoricalEvent("roman_republic", "Founding of Roman Republic",
-            UncertainDate.circa(-509), "Political", 0.9, List.of("punic_wars", "roman_empire")));
+        addEvent(new ContingencyEvent("roman_republic", "Founding of Roman Republic",
+            UncertainDate.circa(-509), "Political", 0.9, Arrays.asList("punic_wars", "roman_empire")));
         
-        addEvent(new HistoricalEvent("punic_wars", "Punic Wars",
-            UncertainDate.circa(-264), "War", 0.85, List.of("roman_empire")));
+        addEvent(new ContingencyEvent("punic_wars", "Punic Wars",
+            UncertainDate.circa(-264), "War", 0.85, Collections.singletonList("roman_empire")));
         
-        addEvent(new HistoricalEvent("roman_empire", "Roman Empire established",
-            UncertainDate.circa(-27), "Political", 0.95, List.of("christianity_rise", "fall_of_rome")));
+        addEvent(new ContingencyEvent("roman_empire", "Roman Empire established",
+            UncertainDate.circa(-27), "Political", 0.95, Arrays.asList("christianity_rise", "fall_of_rome")));
         
-        addEvent(new HistoricalEvent("christianity_rise", "Rise of Christianity",
-            UncertainDate.circa(30), "Religious", 0.95, List.of("constantine", "medieval_church")));
+        addEvent(new ContingencyEvent("christianity_rise", "Rise of Christianity",
+            UncertainDate.circa(30), "Religious", 0.95, Arrays.asList("constantine", "medieval_church")));
         
-        addEvent(new HistoricalEvent("fall_of_rome", "Fall of Western Roman Empire",
-            UncertainDate.certain(476, 9, 4), "Political", 0.9, List.of("medieval_period")));
+        addEvent(new ContingencyEvent("fall_of_rome", "Fall of Western Roman Empire",
+            UncertainDate.certain(476, 9, 4), "Political", 0.9, Collections.singletonList("medieval_period")));
         
-        addEvent(new HistoricalEvent("printing_press", "Gutenberg Printing Press",
-            UncertainDate.circa(1440), "Technology", 0.9, List.of("reformation", "scientific_rev")));
+        addEvent(new ContingencyEvent("printing_press", "Gutenberg Printing Press",
+            UncertainDate.circa(1440), "Technology", 0.9, Arrays.asList("reformation", "scientific_rev")));
         
-        addEvent(new HistoricalEvent("reformation", "Protestant Reformation",
-            UncertainDate.certain(1517, 10, 31), "Religious", 0.85, List.of("30_years_war")));
+        addEvent(new ContingencyEvent("reformation", "Protestant Reformation",
+            UncertainDate.certain(1517, 10, 31), "Religious", 0.85, Collections.singletonList("30_years_war")));
     }
 
     private static void cascadeEffects(String eventId, Set<String> affected) {
-        HistoricalEvent event = findEvent(eventId);
+        ContingencyEvent event = findEvent(eventId);
         if (event == null) return;
         
         for (String consequenceId : event.consequences()) {
@@ -184,11 +296,13 @@ public final class CounterfactualSimulator {
         return affected.contains(eventId);
     }
 
-    private static HistoricalEvent findEvent(String id) {
-        return EVENT_DATABASE.stream()
-            .filter(e -> e.id().equals(id))
-            .findFirst()
-            .orElse(null);
+    private static ContingencyEvent findEvent(String id) {
+        synchronized (EVENT_DATABASE) {
+            return EVENT_DATABASE.stream()
+                .filter(e -> e.id().equals(id))
+                .findFirst()
+                .orElse(null);
+        }
     }
 
     private static String generateNarrative(CounterfactualScenario scenario, Set<String> butterflied) {
@@ -199,11 +313,11 @@ public final class CounterfactualSimulator {
         sb.append("Affected historical events: ").append(butterflied.size()).append("\n");
         
         for (String eventId : butterflied) {
-            HistoricalEvent e = findEvent(eventId);
+            ContingencyEvent e = findEvent(eventId);
             if (e != null) {
                 sb.append("  - ").append(e.name());
                 if (scenario.changedConsequences().containsKey(eventId)) {
-                    sb.append(" → ").append(scenario.changedConsequences().get(eventId));
+                    sb.append(" -> ").append(scenario.changedConsequences().get(eventId));
                 }
                 sb.append("\n");
             }

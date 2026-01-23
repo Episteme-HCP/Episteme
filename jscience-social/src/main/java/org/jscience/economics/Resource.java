@@ -1,237 +1,174 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2014 - JScience (http://jscience.org/)
+ * All rights reserved.
+ * 
+ * Permission to use, copy, modify, and distribute this software is
+ * freely granted, provided that this notice is preserved.
+ */
 package org.jscience.economics;
 
 import org.jscience.biology.Individual;
-
 import org.jscience.geography.Place;
-
-import org.jscience.measure.Amount;
-
+import org.jscience.measure.Quantity;
 import org.jscience.util.Positioned;
+import org.jscience.util.Temporal;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
-import java.util.Date;
-import java.util.Iterator;
+import java.time.Instant;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
-
 /**
- * A class representing the stuff that is extracted from the soil (coil,
+ * A class representing the stuff that is extracted from the soil (coal,
  * fruits...), a final product or human labor. A product is usually a resource
  * for another factory/consumer.
+ * 
+ * <p>Resources can be people, equipment, facilities, funding, or anything else 
+ * capable of definition (usually other than labour) required for the completion 
+ * of a project activity. The lack of a resource will therefore be a constraint 
+ * on the completion of the project activity.</p>
+ * 
+ * <p>Resources may be storable or non storable. Storable resources remain 
+ * available unless depleted by usage, and may be replenished by project tasks 
+ * which produce them. Non-storable resources must be renewed for each time 
+ * period, even if not utilised in previous time periods.</p>
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @version 1.2
  */
+@Persistent
+public class Resource extends PotentialResource implements Positioned<Place>, Temporal {
 
-//They can be people, equipment, facilities, funding, or anything else capable of definition
-//(usually other than labour) required for the completion of a project activity. The lack of
-//a resource will therefore be a constraint on the completion of the project activity.
-//Resources may be storable or non storable. Storable resources remain available unless
-//depeleted by usage, and may be replenished by project tasks which produce them. Non-storable
-//resources must be renewed for each time period, even if not utilised in previous time periods.
-public class Resource extends PotentialResource implements Positioned {
-    /** DOCUMENT ME! */
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    private Identification identification;
+
+    @Attribute
     private Community producer;
 
-    /** DOCUMENT ME! */
-    private Set owners;
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private Set<Individual> owners;
 
-    /** DOCUMENT ME! */
+    @Attribute
     private Place productionPlace;
 
-    /** DOCUMENT ME! */
+    @Attribute
     private Place place;
 
-    /** DOCUMENT ME! */
-    private Date productionDate;
+    @Attribute
+    private final Instant productionDate;
 
-/**
+    /**
      * Creates a new Resource object.
      *
-     * @param name        DOCUMENT ME!
-     * @param description DOCUMENT ME!
-     * @param amount      DOCUMENT ME!
-     * @param community   DOCUMENT ME!
+     * @param name        the name, not null.
+     * @param description the description, not null.
+     * @param amount      the quantity, not null.
+     * @param community   the producer community, not null.
      */
-    public Resource(String name, String description, Amount amount,
+    public Resource(String name, String description, Quantity<?> amount,
         Community community) {
         this(name, description, amount, community, community.getPosition(),
-            new Date());
-    }
-
-/**
-     * Creates a new Resource object.
-     *
-     * @param name            DOCUMENT ME!
-     * @param description     DOCUMENT ME!
-     * @param amount          DOCUMENT ME!
-     * @param producer        DOCUMENT ME!
-     * @param productionPlace DOCUMENT ME!
-     * @param productionDate  DOCUMENT ME!
-     */
-    public Resource(String name, String description, Amount amount,
-        Community producer, Place productionPlace, Date productionDate) {
-        super(name, description, amount);
-
-        if ((producer != null) && (productionPlace != null) &&
-                (productionDate != null)) {
-            this.producer = producer;
-            this.owners = producer.getIndividuals();
-            this.productionPlace = productionPlace;
-            this.place = productionPlace;
-            this.productionDate = productionDate;
-        } else {
-            throw new IllegalArgumentException(
-                "The Resource constructor can't have null arguments and name and description can't be empty.");
-        }
+            Instant.now());
     }
 
     /**
-     * DOCUMENT ME!
+     * Creates a new Resource object.
      *
-     * @return DOCUMENT ME!
+     * @param name            the name, not null.
+     * @param description     the description, not null.
+     * @param amount          the quantity, not null.
+     * @param producer        the producer, not null.
+     * @param productionPlace the place of production, not null.
+     * @param productionDate  the date of production, not null.
      */
+    public Resource(String name, String description, Quantity<?> amount,
+        Community producer, Place productionPlace, Instant productionDate) {
+        super(name, description, amount);
+
+        this.producer = Objects.requireNonNull(producer, "Producer cannot be null");
+        this.productionPlace = Objects.requireNonNull(productionPlace, "Production place cannot be null");
+        this.productionDate = Objects.requireNonNull(productionDate, "Production date cannot be null");
+        
+        this.place = productionPlace;
+        // Use getIndividuals() which returns a Collection/Set of Individuals
+        this.owners = new HashSet<>(producer.getIndividuals());
+    }
+
     public Community getProducer() {
         return producer;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Set getOwners() {
-        return owners;
+    public Set<Individual> getOwners() {
+        return Collections.unmodifiableSet(owners);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param owner DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
     public void addOwner(Individual owner) {
-        if (owner != null) {
-            owners.add(owner);
-        } else {
-            throw new IllegalArgumentException("You can't add a null owner.");
-        }
+        owners.add(Objects.requireNonNull(owner, "Owner cannot be null"));
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param owner DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
     public void removeOwner(Individual owner) {
-        if ((owners.size() > 1)) {
-            owners.remove(owner);
-        } else {
-            throw new IllegalArgumentException("You can't remove last owner.");
+        if (owners.size() <= 1) {
+             throw new IllegalArgumentException("Cannot remove last owner");
         }
+        owners.remove(owner);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param owners DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    public void setOwners(Set owners) {
-        Iterator iterator;
-        boolean valid;
-
-        if ((owners != null) && (owners.size() > 0)) {
-            iterator = owners.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Individual;
-            }
-
-            if (valid) {
-                this.owners = owners;
-            } else {
-                throw new IllegalArgumentException(
-                    "The owners Set must contain only Individual.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "You can't set a null or empty owners set.");
-        }
+    public void setOwners(Set<Individual> owners) {
+        Objects.requireNonNull(owners, "Owners set cannot be null");
+        if (owners.isEmpty()) throw new IllegalArgumentException("Owners set cannot be empty");
+        this.owners = new HashSet<>(owners);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public Place getProductionPlace() {
         return productionPlace;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public Place getPosition() {
         return place;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param place DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
     public void setPosition(Place place) {
-        if (place != null) {
-            this.place = place;
-        } else {
-            throw new IllegalArgumentException("You can't set a null place.");
-        }
+        this.place = Objects.requireNonNull(place, "Place cannot be null");
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the production timestamp.
+     * @return the production instant
      */
-    public Date getProductionDate() {
+    @Override
+    public Instant getTimestamp() {
         return productionDate;
     }
 
-    //equality on all but identification (which should never be the same anyway)
-    /**
-     * DOCUMENT ME!
-     *
-     * @param o DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    public Instant getProductionDate() {
+        return productionDate;
+    }
+
+    @Override
     public boolean equals(Object o) {
-        Resource resource;
+        if (this == o) return true;
+        if (!(o instanceof Resource)) return false;
+        if (!super.equals(o)) return false;
+        Resource resource = (Resource) o;
+        return Objects.equals(producer, resource.producer) &&
+                Objects.equals(owners, resource.owners) &&
+                Objects.equals(productionPlace, resource.productionPlace) &&
+                Objects.equals(place, resource.place) &&
+                Objects.equals(productionDate, resource.productionDate);
+    }
 
-        if ((o != null) && (o instanceof Resource)) {
-            resource = (Resource) o;
-
-            return this.getName().equals(resource.getName()) &&
-            this.getDescription().equals(resource.getDescription()) &&
-            this.getAmount().equals(resource.getAmount()) &&
-            this.getProducer().equals(resource.getProducer()) &&
-            this.getOwners().equals(resource.getOwners()) &&
-            this.getProductionPlace().equals(resource.getProductionPlace()) &&
-            this.getPosition().equals(resource.getPosition()) &&
-            this.getProductionDate().equals(resource.getProductionDate()) &&
-            (this.getDecayTime() == resource.getDecayTime()) &&
-            (this.getKind() == resource.getKind());
-        } else {
-            return false;
-        }
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), producer, owners, productionPlace, place, productionDate);
     }
 }

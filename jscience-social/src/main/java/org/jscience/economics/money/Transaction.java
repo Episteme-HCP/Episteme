@@ -3,8 +3,8 @@ package org.jscience.economics.money;
 import org.jscience.economics.Organization;
 
 import org.jscience.measure.Amount;
-import org.jscience.measure.Identification;
-import org.jscience.measure.Identified;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.Identified;
 
 import java.util.Date;
 

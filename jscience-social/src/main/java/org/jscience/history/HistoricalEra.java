@@ -23,83 +23,184 @@
 
 package org.jscience.history;
 
+import java.io.Serializable;
 import java.util.*;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a historical era or period.
- * <p>
+ * Tracks time span, geographical region, and key events defining the period.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
-public class HistoricalEra {
+@Persistent
+public class HistoricalEra implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+    /** The common name of the era. */
+    @Attribute
     private final String name;
+
+    /** Estimated start date. */
+    @Relation(type = Relation.Type.ONE_TO_ONE)
     private FuzzyDate startDate;
+
+    /** Estimated end date. */
+    @Relation(type = Relation.Type.ONE_TO_ONE)
     private FuzzyDate endDate;
+
+    /** Descriptive summary of the era. */
+    @Attribute
     private String description;
+
+    /** Primary geographical region where the era is defined. */
+    @Attribute
     private String region;
+
+    /** Key historical events belonging to this era. */
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private final List<HistoricalEvent> keyEvents = new ArrayList<>();
 
+    /**
+     * Creates a new HistoricalEra.
+     * 
+     * @param name the name of the era
+     * @throws NullPointerException if name is null
+     * @throws IllegalArgumentException if name is blank
+     */
     public HistoricalEra(String name) {
+        Objects.requireNonNull(name, "Name cannot be null");
+        if (name.isBlank()) {
+            throw new IllegalArgumentException("Name cannot be blank");
+        }
         this.name = name;
     }
 
+    /**
+     * Creates a new HistoricalEra with defined boundaries.
+     * 
+     * @param name the name of the era
+     * @param startDate start date
+     * @param endDate end date
+     * @throws NullPointerException if name is null
+     * @throws IllegalArgumentException if name is blank
+     */
     public HistoricalEra(String name, FuzzyDate startDate, FuzzyDate endDate) {
         this(name);
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-    // Getters
+    /**
+     * Returns the name of the era.
+     *
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the start date.
+     *
+     * @return start date (fuzzy)
+     */
     public FuzzyDate getStartDate() {
         return startDate;
     }
 
+    /**
+     * Returns the end date.
+     *
+     * @return end date (fuzzy)
+     */
     public FuzzyDate getEndDate() {
         return endDate;
     }
 
+    /**
+     * Returns the description.
+     *
+     * @return description
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Returns the region.
+     *
+     * @return region
+     */
     public String getRegion() {
         return region;
     }
 
+    /**
+     * Returns an unmodifiable list of key events.
+     *
+     * @return key events
+     */
     public List<HistoricalEvent> getKeyEvents() {
         return Collections.unmodifiableList(keyEvents);
     }
 
-    // Setters
+    /**
+     * Sets the start date.
+     *
+     * @param date start date
+     */
     public void setStartDate(FuzzyDate date) {
         this.startDate = date;
     }
 
+    /**
+     * Sets the end date.
+     *
+     * @param date end date
+     */
     public void setEndDate(FuzzyDate date) {
         this.endDate = date;
     }
 
+    /**
+     * Sets the description.
+     *
+     * @param desc description
+     */
     public void setDescription(String desc) {
         this.description = desc;
     }
 
+    /**
+     * Sets the region.
+     *
+     * @param region region
+     */
     public void setRegion(String region) {
         this.region = region;
     }
 
+    /**
+     * Adds a key event to this era.
+     *
+     * @param event the event to add
+     * @throws NullPointerException if event is null
+     */
     public void addKeyEvent(HistoricalEvent event) {
-        keyEvents.add(event);
+        keyEvents.add(Objects.requireNonNull(event, "HistoricalEvent cannot be null"));
     }
 
     /**
-     * Returns approximate duration in years.
+     * Returns the approximate duration in years.
+     * 
+     * @return duration in years
      */
     public int getDurationYears() {
         if (startDate == null || endDate == null)
@@ -115,13 +216,28 @@ public class HistoricalEra {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof HistoricalEra that)) return false;
+        return Objects.equals(name, that.name) && 
+               Objects.equals(startDate, that.startDate) && 
+               Objects.equals(region, that.region);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, startDate, region);
+    }
+
+    @Override
     public String toString() {
         return String.format("Era '%s' (%s to %s)", name,
                 startDate != null ? startDate : "unknown",
                 endDate != null ? endDate : "unknown");
     }
 
-    // Historical eras with FuzzyDate support
+    // Static factories for common eras
+
     public static HistoricalEra renaissance() {
         HistoricalEra e = new HistoricalEra("Renaissance",
                 FuzzyDate.circa(1400), FuzzyDate.circa(1600));
@@ -162,5 +278,3 @@ public class HistoricalEra {
         return e;
     }
 }
-
-

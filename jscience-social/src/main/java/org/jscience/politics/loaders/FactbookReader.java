@@ -85,6 +85,11 @@ public class FactbookReader extends AbstractResourceReader<List<Country>> {
     }
 
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"2024", "2023"};
+    }
+
+    @Override
     protected List<Country> loadFromSource(String id) throws Exception {
         try (InputStream is = getClass().getResourceAsStream(id)) {
             if (is == null) {

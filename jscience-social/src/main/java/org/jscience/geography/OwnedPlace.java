@@ -8,6 +8,10 @@ import org.jscience.economics.money.Money;
 
 import org.jscience.measure.Amount;
 
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
+
 import java.util.Iterator;
 import java.util.Set;
 
@@ -18,11 +22,14 @@ import java.util.Set;
  * @author Silvere Martin-Michiellot
  * @version 1.0
  */
+@Persistent
 public class OwnedPlace extends Place implements Property {
     /** DOCUMENT ME! */
+    @Relation(type = Relation.Type.MANY_TO_MANY)
     private Set owners; //humans
 
     /** DOCUMENT ME! */
+    @Attribute
     private Amount<Money> value;
 
     //there also should be a field for the property contract but we are not sure it really exist (it depends on the country) and this would really be unconvenient for the developer

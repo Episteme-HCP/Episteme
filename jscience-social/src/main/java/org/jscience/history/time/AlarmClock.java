@@ -1,108 +1,149 @@
-package org.jscience.history.time;
-
-/**
- * A class representing a way to display and change time.
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * @author Silvere Martin-Michiellot
- * @version 1.0
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
-//  http://en.wikipedia.org/wiki/Clock
-public abstract class AlarmClock extends Clock {
-    /**
-     * DOCUMENT ME!
-     */
-    private double delta = 1000;
+package org.jscience.history.time;
 
-    /**
-     * DOCUMENT ME!
-     */
+import java.util.Objects;
+
+/**
+ * An abstract alarm clock that triggers an action when a specified target time is reached.
+ * Monitors standard {@link ModernTime} updates from a {@link TimeServer}.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
+ */
+public abstract class AlarmClock extends Clock {
+
+    /** Tolerance in seconds for triggering the alarm. */
+    private double toleranceSeconds = 1.0;
+
+    /** The target time for the alarm to trigger. */
     private ModernTime alarmTime;
 
-    /**
-     * DOCUMENT ME!
-     */
-    private ModernTime time;
+    /** Current time track. */
+    private ModernTime currentTime;
+
+    /** Flag to prevent multiple triggers for the same alarm event. */
+    private boolean alarmFired = false;
 
     /**
-     * Creates a new AlarmClock object.
+     * Creates a new AlarmClock associated with a time server.
      *
-     * @param timeServer DOCUMENT ME!
+     * @param timeServer the time server to monitor
      */
-    public AlarmClock(TimeServer timeServer) {
+    protected AlarmClock(TimeServer timeServer) {
         super(timeServer);
+        this.currentTime = new ModernTime();
     }
 
     /**
-     * DOCUMENT ME!
+     * Starts the underlying time server updates.
      */
     public void start() {
-        //start the time server
         getTimeServer().start();
     }
 
     /**
-     * DOCUMENT ME!
+     * Stops the underlying time server updates.
      */
     public void stop() {
-        //stop the time server
         getTimeServer().stop();
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the target alarm time.
      *
-     * @return DOCUMENT ME!
+     * @return alarm time
      */
     public ModernTime getAlarmTime() {
         return alarmTime;
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the target alarm time. Resets the triggered flag.
      *
-     * @param alarmTime DOCUMENT ME!
+     * @param alarmTime the target time
      */
     public void setAlarmTime(ModernTime alarmTime) {
         this.alarmTime = alarmTime;
+        this.alarmFired = false;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the current time held by the clock.
+     * 
+     * @return current time
      */
+    @Override
     public ModernTime getTime() {
-        return time;
+        return currentTime;
     }
 
     /**
-     * DOCUMENT ME!
+     * Updates the internal clock time.
      *
-     * @param time DOCUMENT ME!
+     * @param time the new time state
+     * @throws NullPointerException if time is null
      */
     public void setTime(ModernTime time) {
-        this.time = time;
+        this.currentTime = Objects.requireNonNull(time, "Time cannot be null");
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param event DOCUMENT ME!
-     */
+    @Override
     public void timeChanged(TimeEvent event) {
-        setTime((ModernTime) event.getTime());
+        Objects.requireNonNull(event, "TimeEvent cannot be null");
+        if (event.getTime() instanceof ModernTime mt) {
+            setTime(mt);
+            checkAlarm();
+        }
+    }
 
-        if ((alarmTime != null) &&
-                ((((ModernTime) event.getTime()).getTimeInSeconds() -
-                getAlarmTime().getTimeInSeconds()) < delta)) {
-            //alarm fires
-            fireAlarm();
+    private void checkAlarm() {
+        if (alarmTime != null && !alarmFired) {
+            double currentSeconds = currentTime.getTimeInSeconds();
+            double targetSeconds = alarmTime.getTimeInSeconds();
+            
+            // Trigger if we've reached or just passed the target within the tolerance
+            if (currentSeconds >= targetSeconds && (currentSeconds - targetSeconds) <= toleranceSeconds) {
+                alarmFired = true;
+                fireAlarm();
+            }
         }
     }
 
     /**
-     * DOCUMENT ME!
+     * Hook method called when the alarm condition is met.
      */
     public abstract void fireAlarm();
+
+    /**
+     * Sets the firing tolerance.
+     * 
+     * @param seconds tolerance in seconds
+     */
+    public void setTolerance(double seconds) {
+        this.toleranceSeconds = seconds;
+    }
 }

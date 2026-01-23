@@ -23,20 +23,28 @@
 
 package org.jscience.sociology;
 
-import org.jscience.util.ExtensibleEnum;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
 import org.jscience.util.EnumRegistry;
+import org.jscience.util.ExtensibleEnum;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
 
 /**
- * Extensible occupation type for persons.
- * <p>
- * Unlike a fixed enum, new occupation types can be registered at runtime.
- * </p>
+ * Represents an extensible set of occupation types for individuals.
+ * Allows runtime registration of custom professions beyond the built-in defaults.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
-public class Occupation implements ExtensibleEnum<Occupation> {
+@Persistent
+public final class Occupation implements ExtensibleEnum<Occupation>, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private static final EnumRegistry<Occupation> REGISTRY = new EnumRegistry<>();
 
@@ -53,9 +61,17 @@ public class Occupation implements ExtensibleEnum<Occupation> {
     public static final Occupation MERCHANT = register("MERCHANT", "Commerce profession", true);
     public static final Occupation RETIRED = register("RETIRED", "No longer working", true);
 
+    @Id
+    @Attribute
     private final String name;
+    
+    @Attribute
     private final String description;
+    
+    @Attribute
     private final int ordinal;
+    
+    @Attribute
     private final boolean builtIn;
 
     private Occupation(String name, String description, int ordinal, boolean builtIn) {
@@ -73,19 +89,33 @@ public class Occupation implements ExtensibleEnum<Occupation> {
 
     /**
      * Registers a custom occupation type.
+     *
+     * @param name        unique name for the occupation
+     * @param description descriptive text for the profession
+     * @return the registered Occupation instance
      */
     public static Occupation registerCustom(String name, String description) {
         Occupation existing = REGISTRY.valueOf(name);
-        if (existing != null)
+        if (existing != null) {
             return existing;
+        }
         return register(name, description, false);
     }
 
+    /**
+     * Retrieves an occupation by its name.
+     * @param name the name to look up
+     * @return the matching Occupation, or null if not found
+     */
     public static Occupation valueOf(String name) {
         return REGISTRY.valueOf(name);
     }
 
-    public static java.util.List<Occupation> values() {
+    /**
+     * Returns all registered occupations.
+     * @return a list of all occupations
+     */
+    public static List<Occupation> values() {
         return REGISTRY.values();
     }
 
@@ -95,34 +125,46 @@ public class Occupation implements ExtensibleEnum<Occupation> {
     }
 
     @Override
-    public int ordinal() {
-        return ordinal;
+    public String getName() {
+        return name;
     }
 
-    @Override
-    public String description() {
+    /**
+     * Returns the description of the occupation.
+     * @return the description
+     */
+    public String getDescription() {
         return description;
     }
 
     @Override
+    public int ordinal() {
+        return ordinal;
+    }
+
+    /**
+     * Returns whether this occupation is a built-in standard.
+     * @return true if built-in
+     */
     public boolean isBuiltIn() {
         return builtIn;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Occupation)) return false;
+        Occupation that = (Occupation) o;
+        return Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 
     @Override
     public String toString() {
         return name;
     }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getId() {
-        return name;
-    }
 }
-
-

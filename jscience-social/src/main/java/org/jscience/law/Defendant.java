@@ -1,89 +1,97 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.law;
 
 import org.jscience.biology.Individual;
-
 import org.jscience.sociology.Role;
 
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.Set;
 
-
 /**
- * The people against whom the trial is done, may be a human, a group, a
- * country... (a Set of HumanGroups)
+ * Represents the defendant in a legal proceeding. A defendant is 
+ * an individual or entity against whom a lawsuit or criminal charge is brought.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.2
  */
 public class Defendant extends Role {
-    /** DOCUMENT ME! */
-    private Set charges;
+    
+    private Set<String> charges;
 
-/**
+    /**
      * Creates a new Defendant object.
      *
-     * @param individual       DOCUMENT ME!
-     * @param lawSuitSituation DOCUMENT ME!
+     * @param individual the individual taking the role of defendant
+     * @param lawSuitSituation the legal situation or trial context
      */
     public Defendant(Individual individual, LawSuitSituation lawSuitSituation) {
         super(individual, "Defendant", lawSuitSituation, Role.CLIENT);
-        charges = Collections.EMPTY_SET;
+        this.charges = new HashSet<>();
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the set of charges brought against the defendant.
+     * @return a set of charge descriptions
      */
-    public Set getCharges() {
+    public Set<String> getCharges() {
         return charges;
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the legal charges for this defendant.
      *
-     * @param charges DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param charges a set of strings representing individual charges
+     * @throws IllegalArgumentException if the set is null or contains non-string elements
      */
-    public void setCharges(Set charges) {
-        Iterator iterator;
-        boolean valid;
+    public void setCharges(Set<String> charges) {
+        if (charges == null) {
+            throw new IllegalArgumentException("The set of charges cannot be null.");
+        }
 
-        if (charges != null) {
-            iterator = charges.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof String;
+        for (Object charge : charges) {
+            if (!(charge instanceof String)) {
+                throw new IllegalArgumentException("Charges must be represented by Strings.");
             }
+        }
 
-            if (valid) {
-                this.charges = charges;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Set of charges should contain only Strings.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Set of charges shouldn't be null.");
+        this.charges = new HashSet<>(charges);
+    }
+
+    /**
+     * Adds a specific charge to the defendant's record.
+     * @param charge the charge description
+     */
+    public void addCharge(String charge) {
+        if (charge != null) {
+            charges.add(charge);
         }
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param charge DOCUMENT ME!
-     */
-    public void addCharge(String charge) {
-        charges.add(charge);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param charge DOCUMENT ME!
+     * Removes a specific charge from the defendant's record.
+     * @param charge the charge description to remove
      */
     public void removeCharge(String charge) {
         charges.remove(charge);

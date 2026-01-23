@@ -1,55 +1,81 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.psychology.experimental;
 
+import java.io.Serializable;
+import java.util.Objects;
 import org.jscience.util.Named;
 
-
 /**
- * A class representing a psychology variable (whether intergroups or
- * intragroups). A variable is the thing you are working on or the thing you
- * measure.
+ * Represents a psychological variable that can be manipulated or measured in an experiment.
+ * Variables can be inter-group (independent) or intra-group (dependent).
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
-public class Variable extends Object implements Named {
-    /** DOCUMENT ME! */
-    private String name;
+public class Variable implements Named, Serializable {
 
-    /** DOCUMENT ME! */
-    private String unit; //useing the international system
+    private static final long serialVersionUID = 1L;
 
-/**
-     * Creates a new Variable object.
-     *
-     * @param name DOCUMENT ME!
-     * @param unit DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    public Variable(String name, String unit) {
-        if ((name != null) && (unit != null) && (name.length() > 0)) {
-            this.name = name;
-            this.unit = unit;
-        } else {
-            throw new IllegalArgumentException(
-                "The ValuedVariable constructor can't have null arguments (and name can't be empty).");
-        }
-    }
+    private final String name;
+    private final String unit;
 
     /**
-     * DOCUMENT ME!
+     * Creates a new experimental variable.
      *
-     * @return DOCUMENT ME!
+     * @param name identifying name of the variable
+     * @param unit the unit of measurement (using the International System if possible)
+     * @throws IllegalArgumentException if name or unit is empty
+     * @throws NullPointerException if any argument is null
      */
+    public Variable(String name, String unit) {
+        Objects.requireNonNull(name, "Variable name cannot be null");
+        Objects.requireNonNull(unit, "Variable unit cannot be null");
+        if (name.isEmpty() || unit.isEmpty()) {
+            throw new IllegalArgumentException("Arguments cannot be empty");
+        }
+        this.name = name;
+        this.unit = unit;
+    }
+
+    @Override
     public String getName() {
         return name;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the unit of measurement for this variable.
+     * @return the unit string
      */
     public String getUnit() {
         return unit;
+    }
+
+    @Override
+    public String toString() {
+        return name + " (" + unit + ")";
     }
 }

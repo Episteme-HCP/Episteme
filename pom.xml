@@ -20,6 +20,7 @@
     <module>jscience-server</module>
     <module>jscience-worker</module>
     <module>jscience-client</module>
+    <module>jscience-database</module>
   </modules>
   <licenses>
     <license>
@@ -86,6 +87,11 @@
       <dependency>
         <groupId>org.jscience</groupId>
         <artifactId>jscience-natural</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jscience</groupId>
+        <artifactId>jscience-database</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!-- Web Server (Javalin) -->

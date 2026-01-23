@@ -23,7 +23,10 @@
 
 package org.jscience.util.identity;
 
-public interface IdGenerator {
-    String generate();
+/**
+ * Interface for identification generators.
+ */
+public interface IDGenerator {
+    Identification generate();
     String getFormat();
 }

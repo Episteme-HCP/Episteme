@@ -26,7 +26,7 @@ import java.util.Date;
 //in a virtual world you will probably prefer to build up ready to use tools
 //for example you will not design a hammer but a wireless automatic nailer (that contains nails) and can be applied directly on Objets
 //you will therefore never have to locate nails first, put nails under hammer and then nail, but directly nail.
-public abstract class Tool extends org.jscience.economics.resources.Object {
+public abstract class Tool extends org.jscience.economics.resources.PhysicalObject {
     /** DOCUMENT ME! */
     private String purpose; //the human readable purpose of this tool, for example: a hammer nails
 

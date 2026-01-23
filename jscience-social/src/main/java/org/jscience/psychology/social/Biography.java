@@ -1,92 +1,102 @@
-package org.jscience.psychology.social;
-
-import org.jscience.util.Commented;
-
-import java.util.Collections;
-import java.util.Map;
-
-
-/**
- * A class representing the events that happen during a lifetime in an
- * ordonned manner. It is not meant to be as readble as a real biography but
- * to store the useful information.
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * @author Silvere Martin-Michiellot
- * @version 1.0
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
-//from a Biography, you should be able to rebuilt the Set of Events (see org.jscience.psychology.events).
-//However, note that a Biography is considering a whole lifetime with general events and may NOT be suitable to represent the much fine grained day life activities supported by Events.
-public class Biography extends Object implements Commented {
-    /** DOCUMENT ME! */
-    private Map timelines;
+package org.jscience.psychology.social;
 
-    /** DOCUMENT ME! */
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import org.jscience.util.Commented;
+
+/**
+ * Represents the structured chronological sequence of events spanning an individual's lifetime.
+ * A biography is composed of multiple parallel {@link HumanTimeline} instances categorized by 
+ * specific domains of life (e.g., work, health, social).
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
+ */
+public class Biography implements Commented, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private final Map<String, HumanTimeline> timelines;
     private String comments;
 
-    //sets a new timeline for each of the default categories
     /**
-     * Creates a new Biography object.
+     * Creates a new Biography with default categorical timelines initialized.
      */
     public Biography() {
-        timelines = Collections.EMPTY_MAP;
-        timelines.put(HumanTimeline.HOME, new HumanTimeline(HumanTimeline.HOME));
-        timelines.put(HumanTimeline.SOCIAL,
-            new HumanTimeline(HumanTimeline.SOCIAL));
-        timelines.put(HumanTimeline.SEX, new HumanTimeline(HumanTimeline.SEX));
-        timelines.put(HumanTimeline.FRIENDS,
-            new HumanTimeline(HumanTimeline.FRIENDS));
-        timelines.put(HumanTimeline.LEISURE,
-            new HumanTimeline(HumanTimeline.LEISURE));
-        timelines.put(HumanTimeline.HEALTH,
-            new HumanTimeline(HumanTimeline.HEALTH));
-        timelines.put(HumanTimeline.AWE, new HumanTimeline(HumanTimeline.AWE));
-        timelines.put(HumanTimeline.RELIGIOUS,
-            new HumanTimeline(HumanTimeline.RELIGIOUS));
-        timelines.put(HumanTimeline.PERSONAL,
-            new HumanTimeline(HumanTimeline.PERSONAL));
-        timelines.put(HumanTimeline.EMOTION,
-            new HumanTimeline(HumanTimeline.EMOTION));
-        timelines.put(HumanTimeline.WORK, new HumanTimeline(HumanTimeline.WORK));
-        timelines.put(HumanTimeline.MONEY,
-            new HumanTimeline(HumanTimeline.MONEY));
+        this.timelines = new HashMap<>();
+        this.comments = "";
+        
+        initializeDefaultTimelines();
+    }
+
+    private void initializeDefaultTimelines() {
+        String[] subjects = {
+            HumanTimeline.HOME, HumanTimeline.SOCIAL, HumanTimeline.SEX,
+            HumanTimeline.FRIENDS, HumanTimeline.LEISURE, HumanTimeline.HEALTH,
+            HumanTimeline.AWE, HumanTimeline.RELIGIOUS, HumanTimeline.PERSONAL,
+            HumanTimeline.EMOTION, HumanTimeline.WORK, HumanTimeline.MONEY
+        };
+        
+        for (String category : subjects) {
+            timelines.put(category, new HumanTimeline(category));
+        }
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the timeline for a specific life category.
      *
-     * @param category DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param category the name of the category
+     * @return the associated timeline, or {@code null} if not found
      */
     public HumanTimeline getTimeline(String category) {
-        return (HumanTimeline) timelines.get(category);
+        return timelines.get(category);
     }
 
     /**
-     * DOCUMENT ME!
+     * Registers a new domain-specific timeline to this biography.
      *
-     * @param timeline DOCUMENT ME!
+     * @param timeline the timeline to add
+     * @throws NullPointerException if timeline is null
      */
     public void addTimeline(HumanTimeline timeline) {
+        Objects.requireNonNull(timeline, "Timeline cannot be null");
         timelines.put(timeline.getCategory(), timeline);
     }
 
-    //you cannot remove timelines
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public String getComments() {
         return comments;
     }
 
-    //you could also set up a timeline
-    /**
-     * DOCUMENT ME!
-     */
-    public void setComments() {
-        this.comments = comments;
+    @Override
+    public void setComments(String comments) {
+        this.comments = Objects.requireNonNull(comments, "Comments cannot be null");
     }
 }

@@ -1,390 +1,260 @@
-package org.jscience.politics;
-
-import org.jscience.economics.Currency;
-
-import org.jscience.geography.Place;
-
-import org.jscience.util.Named;
-
-import java.awt.*;
-
-import java.util.Collections;
-import java.util.Set;
-
-
-/**
- * A class representing the basic facts about a country (the modern tribe)
- * or also kingdoms, empires...
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * @author Silvere Martin-Michiellot
- * @version 1.0
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
-//you should understand country in the broadest possible sense here
-//some countries also account for a religious hierarchy
-//we could add many fields here
-//for a list of candidates see http://www.cia.gov/cia/publications/factbook/docs/profileguide.html
-//may be we should see a country as one nation along with many (not empowered tribes)
-//this means that you won't get a country's population using getNation() or that getNation gives the common ground philosophy for that country
-//perhaps we should therefore define a country as composed of many nations...
-public class Country extends Place implements Named {
-    /** DOCUMENT ME! */
-    private String name;
+package org.jscience.politics;
 
-    /** DOCUMENT ME! */
-    private Nation nation;
-
-    /** DOCUMENT ME! */
-    private Administration army;
-
-    /** DOCUMENT ME! */
-    private Administration police;
-
-    /** DOCUMENT ME! */
-    private Administration justice;
-
-    /** DOCUMENT ME! */
-    private Currency currency;
-
-    /** DOCUMENT ME! */
-    private double gDP;
-
-    /** DOCUMENT ME! */
-    private double gNP;
-
-    /** DOCUMENT ME! */
-    private Image flag;
-
-    /** DOCUMENT ME! */
-    private City capital;
-
-    /** DOCUMENT ME! */
-    private Set cities;
-
-    /** DOCUMENT ME! */
-    private Set regions; //if any
+import java.awt.Image;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import org.jscience.economics.money.Currency;
+import org.jscience.geography.Place;
+import org.jscience.util.Named;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
-     * Creates a new Country object.
-     *
-     * @param name    DOCUMENT ME!
-     * @param nation  DOCUMENT ME!
-     * @param capital DOCUMENT ME!
-     */
-    public Country(String name, Nation nation, City capital) {
-        super(name, nation.getFormalTerritory().getBoundary());
+ * Represents a sovereign state, kingdom, empire, or modern nation-state.
+ * A country aggregates territorial information, cultural identity (Nation), 
+ * and administrative structures (Army, Police, Justice).
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
+ */
+@Persistent
+public class Country extends Place implements Named, Serializable {
 
-        if ((name != null) && (name.length() > 0) && (nation != null) &&
-                (capital != null)) {
-            this.name = name;
-            this.nation = nation;
-            this.capital = capital;
-            this.army = null;
-            this.police = null;
-            this.justice = null;
-            this.currency = null;
-            this.gDP = -1;
-            this.gNP = -1;
-            this.flag = null;
-            this.cities = Collections.EMPTY_SET;
-            this.regions = Collections.EMPTY_SET;
-        } else {
-            throw new IllegalArgumentException(
-                "The Country constructor doesn't allow null or empty arguments.");
-        }
-    }
+    private static final long serialVersionUID = 1L;
+
+    @Attribute
+    private final String name;
+
+    @Relation(type = Relation.Type.MANY_TO_ONE)
+    private final Nation nation;
+
+    @Relation(type = Relation.Type.ONE_TO_ONE)
+    private Administration army;
+
+    @Relation(type = Relation.Type.ONE_TO_ONE)
+    private Administration police;
+
+    @Relation(type = Relation.Type.ONE_TO_ONE)
+    private Administration justice;
+
+    @Attribute
+    private Currency currency;
+
+    @Attribute
+    private double gdp = -1.0;
+
+    @Attribute
+    private double gnp = -1.0;
+
+    @Attribute
+    private transient Image flag;
+
+    @Relation(type = Relation.Type.MANY_TO_ONE)
+    private City capital;
+
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private final Set<City> cities = new HashSet<>();
+
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private final Set<Region> regions = new HashSet<>();
 
     /**
-     * DOCUMENT ME!
+     * Initializes a new Country instance.
      *
-     * @return DOCUMENT ME!
+     * @param name    the name of the country
+     * @param nation  the cultural nation or group identity
+     * @param capital the capital city
+     * @throws NullPointerException if any argument is null
      */
+    public Country(String name, Nation nation, City capital) {
+        super(Objects.requireNonNull(name, "Name cannot be null"), 
+              Objects.requireNonNull(nation, "Nation cannot be null").getFormalTerritory().getBoundary());
+        this.name = name;
+        this.nation = nation;
+        this.capital = Objects.requireNonNull(capital, "Capital cannot be null");
+    }
+
+    @Override
     public String getName() {
         return name;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public Nation getNation() {
         return nation;
     }
 
-    //may return null
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public Administration getArmy() {
         return army;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param army DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Sets the national army.
+     * @param army the administration
+     * @throws IllegalArgumentException if the administration belongs to another country
      */
     public void setArmy(Administration army) {
-        if (army != null) {
-            if (army.getPosition() == this) {
-                this.army = army;
-            } else {
-                throw new IllegalArgumentException(
-                    "You can't set an army whose country is not this.");
-            }
-        } else {
-            this.army = null;
+        if (army != null && !Objects.equals(army.getPosition(), this)) {
+            throw new IllegalArgumentException("Army must be positioned within this country.");
         }
+        this.army = army;
     }
 
-    //may return null
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public Administration getPolice() {
         return police;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param police DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Sets the national police.
+     * @param police the administration
+     * @throws IllegalArgumentException if the administration belongs to another country
      */
     public void setPolice(Administration police) {
-        if (police != null) {
-            if (police.getPosition() == this) {
-                this.police = police;
-            } else {
-                throw new IllegalArgumentException(
-                    "You can't set a police whose country is not this.");
-            }
-        } else {
-            this.police = null;
+        if (police != null && !Objects.equals(police.getPosition(), this)) {
+            throw new IllegalArgumentException("Police must be positioned within this country.");
         }
+        this.police = police;
     }
 
-    //may return null
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public Administration getJustice() {
         return justice;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param justice DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Sets the national justice system.
+     * @param justice the administration
+     * @throws IllegalArgumentException if the administration belongs to another country
      */
     public void setJustice(Administration justice) {
-        if (justice != null) {
-            if (justice.getPosition() == this) {
-                this.justice = justice;
-            } else {
-                throw new IllegalArgumentException(
-                    "You can't set a justice whose country is not this.");
-            }
-        } else {
-            this.police = null;
+        if (justice != null && !Objects.equals(justice.getPosition(), this)) {
+            throw new IllegalArgumentException("Justice must be positioned within this country.");
         }
+        this.justice = justice;
     }
 
-    //schools could also be considered as stateforces
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public Currency getCurrency() {
         return currency;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param currency DOCUMENT ME!
-     */
     public void setCurrency(Currency currency) {
         this.currency = currency;
     }
 
-    //may return-1
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public double getGDP() {
-        return gDP;
+        return gdp;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param gdp DOCUMENT ME!
-     */
     public void setGDP(double gdp) {
-        this.gDP = gdp;
+        this.gdp = gdp;
     }
 
-    //may return -1
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public double getGNP() {
-        return gNP;
+        return gnp;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param gnp DOCUMENT ME!
-     */
     public void setGNP(double gnp) {
-        this.gNP = gnp;
+        this.gnp = gnp;
     }
 
-    //may return null
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public Image getFlag() {
         return flag;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param flag DOCUMENT ME!
-     */
     public void setFlag(Image flag) {
         this.flag = flag;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public City getCapital() {
         return capital;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param capital DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Sets the capital city.
+     * @param capital the city, must be within this country's cities
+     * @throws IllegalArgumentException if capital is null or from another country
      */
-
-    //you should only set only a city which is in the cities Set
     public void setCapital(City capital) {
-        if ((capital != null)) {
-            if (cities.contains(capital)) {
-                this.capital = capital;
-            } else {
-                throw new IllegalArgumentException(
-                    "The capital must be in the Set of cities.");
-            }
-        } else {
-            throw new IllegalArgumentException("The capital must be non null.");
+        if (capital == null) {
+            throw new IllegalArgumentException("Capital cannot be null.");
+        }
+        if (!cities.contains(capital)) {
+            throw new IllegalArgumentException("The capital city must belong to this country.");
+        }
+        this.capital = capital;
+    }
+
+    public void addCity(City city) {
+        if (city != null) {
+            cities.add(city);
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param city DOCUMENT ME!
-     */
-    public void addCity(City city) {
-        cities.add(city);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param city DOCUMENT ME!
-     */
     public void removeCity(City city) {
         cities.remove(city);
-        city.setCountry(null);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Set getCities() {
-        return cities;
+    public Set<City> getCities() {
+        return Collections.unmodifiableSet(cities);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param city DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public boolean containsCity(City city) {
-        return cities.contains(city);
+    public void addRegion(Region region) {
+        if (region != null) {
+            regions.add(region);
+        }
     }
 
-    //some countries also have regions
-    /**
-     * DOCUMENT ME!
-     *
-     * @param region DOCUMENT ME!
-     */
-    protected void addRegion(Region region) {
-        regions.add(region);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param region DOCUMENT ME!
-     */
     public void removeRegion(Region region) {
         regions.remove(region);
-        region.setCountry(null);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Set getRegions() {
-        return regions;
+    public Set<Region> getRegions() {
+        return Collections.unmodifiableSet(regions);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param region DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public boolean containsRegion(Region region) {
-        return regions.contains(region);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Country)) return false;
+        if (!super.equals(o)) return false;
+        Country country = (Country) o;
+        return Objects.equals(name, country.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), name);
+    }
+
+    @Override
+    public String toString() {
+        return name + " (Nation: " + nation.getName() + ")";
     }
 }

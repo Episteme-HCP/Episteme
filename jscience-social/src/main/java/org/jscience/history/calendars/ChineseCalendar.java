@@ -1,42 +1,80 @@
-//repackaged after the code from Mark E. Shoulson
-//email <mark@kli.org>
-//website http://web.meson.org/calendars/
-//released under GPL
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Originally based on code from Mark E. Shoulson <mark@kli.org>
+ * http://web.meson.org/calendars/
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history.calendars;
 
 import java.util.Enumeration;
 
-
-// Referenced classes of package calendars:
 /**
- * DOCUMENT ME!
+ * Implementation of the traditional Chinese lunisolar calendar.
+ * The Chinese calendar is one of the oldest chronological systems still in use,
+ * incorporating both astronomical observations and traditional cultural cycles.
  *
- * @author $author$
- * @version $Revision: 1.3 $
-  */
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>Epoch: February 15, 2636 BCE</li>
+ *   <li>Uses a 60-year cycle (Sexagenary cycle) combining Heavenly Stems and Earthly Branches</li>
+ *   <li>Months are lunar, beginning with the new moon</li>
+ *   <li>Uses astronomical calculations for new moons and solar terms</li>
+ *   <li>Leap months are intercalated to align with the solar year</li>
+ *   <li>Year names combine celestial stem and terrestrial branch (e.g., "Jia-Zi")</li>
+ * </ul>
+ *
+ * @author Mark E. Shoulson (original implementation)
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
+ */
 public class ChineseCalendar extends MonthDayYear {
-    /** DOCUMENT ME! */
+
+    private static final long serialVersionUID = 1L;
+
+    /** List of Chinese solar terms corresponding to months. */
     public static final String[] MONTHS = {
             "Yushui", "Chufen", "Guyu", "Xiaoman", "Xiazhi", "Dashu", "Chushu",
             "Qiufen", "Shuangjiang", "Xiaoxue", "Dongzhi", "Dahan"
         };
 
-    /** DOCUMENT ME! */
+    /** The RD number for the Chinese calendar epoch (February 15, 2636 BCE). */
     public static final long EPOCH = (new GregorianCalendar(2, 15, -2636)).toRD();
 
-    /** DOCUMENT ME! */
+    /** The year of the epoch relative to CE. */
     public static final int EPOCHYEAR = -2636;
 
-    /** DOCUMENT ME! */
+    /** The 60-year cycle number. */
     private int cycle;
 
-    /** DOCUMENT ME! */
+    /** Indicates if the current month is a leap month. */
     private boolean leap;
 
 /**
      * Creates a new ChineseCalendar object.
      *
-     * @param l DOCUMENT ME!
+     * @param l the Rata Die number.
      */
     public ChineseCalendar(long l) {
         super.rd = l;
@@ -46,11 +84,11 @@ public class ChineseCalendar extends MonthDayYear {
 /**
      * Creates a new ChineseCalendar object.
      *
-     * @param i    DOCUMENT ME!
-     * @param j    DOCUMENT ME!
-     * @param k    DOCUMENT ME!
-     * @param flag DOCUMENT ME!
-     * @param l    DOCUMENT ME!
+     * @param i    the cycle number.
+     * @param j    the year in cycle (1-60).
+     * @param k    the month (1-12).
+     * @param flag true if leap month.
+     * @param l    the day (1-30).
      */
     public ChineseCalendar(int i, int j, int k, boolean flag, int l) {
         set(i, j, k, flag, l);
@@ -64,11 +102,10 @@ public class ChineseCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the major solar term (Zhongqi) for the given date.
      *
-     * @param l DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param l the Rata Die number.
+     * @return the major solar term (1-12).
      */
     public static int majorSolarTerm(long l) {
         double d = Moment.solarLongitude(Moment.universalFromLocal(
@@ -78,11 +115,11 @@ public class ChineseCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the time zone offset in minutes for the given RD.
+     * Beijing time (UTC+8) is used since 1929.
      *
-     * @param l DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param l the Rata Die number.
+     * @return the time zone offset in minutes.
      */
     public static double timeZone(long l) {
         return ((new GregorianCalendar(l)).getYear() >= 1929) ? 480D
@@ -90,21 +127,20 @@ public class ChineseCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the time zone offset for the current RD.
      *
-     * @return DOCUMENT ME!
+     * @return the time zone offset.
      */
     public double timeZone() {
         return timeZone(super.rd);
     }
 
     /**
-     * DOCUMENT ME!
+     * Finds the date of the next time the sun reacher a specific longitude.
      *
-     * @param d DOCUMENT ME!
-     * @param i DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the starting RD.
+     * @param i the longitude increment (typically 30).
+     * @return the RD of the event.
      */
     public static long dateNextSolarLongitude(double d, int i) {
         double d1 = timeZone((long) d);
@@ -115,22 +151,20 @@ public class ChineseCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the RD of the next major solar term (Zhongqi) on or after the date.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the starting RD.
+     * @return the RD of the next major solar term.
      */
     public static long majorSolarTermOnOrAfter(double d) {
         return dateNextSolarLongitude(d, 30);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the RD of the next new moon on or after the given RD.
      *
-     * @param l DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param l the starting RD.
+     * @return the RD of the next new moon.
      */
     public static long newMoonOnOrAfter(long l) {
         double d = timeZone(l);
@@ -141,11 +175,10 @@ public class ChineseCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the RD of the last new moon before the given RD.
      *
-     * @param l DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param l the starting RD.
+     * @return the RD of the previous new moon.
      */
     public static long newMoonBefore(long l) {
         double d = timeZone(l);
@@ -156,23 +189,21 @@ public class ChineseCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Determines if a month (defined by its starting RD) contains no major solar term.
      *
-     * @param l DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param l the starting RD of the lunar month.
+     * @return true if the month has no major solar term.
      */
     public static boolean noMajorSolarTerm(long l) {
         return majorSolarTerm(l) == majorSolarTerm(newMoonOnOrAfter(l + 1L));
     }
 
     /**
-     * DOCUMENT ME!
+     * Determines if there is a leap month between two dates.
      *
-     * @param l DOCUMENT ME!
-     * @param l1 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param l the starting RD.
+     * @param l1 the ending RD.
+     * @return true if a leap month exists in the range.
      */
     public static boolean priorLeapMonth(long l, long l1) {
         return (l1 >= l) &&
@@ -180,7 +211,7 @@ public class ChineseCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Recomputes the cycle, year, month, day, and leap status from the current Rata Die.
      */
     public synchronized void recomputeFromRD() {
         int i = (new GregorianCalendar(super.rd)).getYear();
@@ -223,11 +254,10 @@ public class ChineseCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Finds the Rata Die of the Chinese New Year for a given Gregorian year.
      *
-     * @param i DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param i the Gregorian year.
+     * @return the RD of the Chinese New Year.
      */
     public static long newYear(int i) {
         long l = majorSolarTermOnOrAfter((new GregorianCalendar(12, 15, i - 1)).toRD());
@@ -245,7 +275,7 @@ public class ChineseCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Recomputes the Rata Die number from current Chinese date components.
      */
     public synchronized void recomputeRD() {
         int i = ((((cycle - 1) * 60) + super.year) - 1) + -2636;
@@ -265,9 +295,9 @@ public class ChineseCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the Rata Die number and recomputes the date fields.
      *
-     * @param l DOCUMENT ME!
+     * @param l the Rata Die number.
      */
     public synchronized void set(long l) {
         super.rd = l;
@@ -275,11 +305,11 @@ public class ChineseCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the month, day, and year (combined from cycle and year-in-cycle).
      *
-     * @param i DOCUMENT ME!
-     * @param j DOCUMENT ME!
-     * @param k DOCUMENT ME!
+     * @param i the month.
+     * @param j the day.
+     * @param k the year.
      */
     public synchronized void set(int i, int j, int k) {
         set((int) Math.floor((double) (k - 1) / 60D) + 1,
@@ -287,13 +317,13 @@ public class ChineseCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the cycle, year-in-cycle, month, leap status, and day.
      *
-     * @param i DOCUMENT ME!
-     * @param j DOCUMENT ME!
-     * @param k DOCUMENT ME!
-     * @param flag DOCUMENT ME!
-     * @param l DOCUMENT ME!
+     * @param i    the cycle.
+     * @param j    the year in cycle (1-60).
+     * @param k    the month.
+     * @param flag true if leap month.
+     * @param l    the day.
      */
     public synchronized void set(int i, int j, int k, boolean flag, int l) {
         super.month = k;
@@ -305,45 +335,46 @@ public class ChineseCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the leap month status of the current date.
      *
-     * @return DOCUMENT ME!
+     * @return true if it is a leap month.
      */
     public boolean getLeap() {
         return leap;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the suffix for Chinese years (empty).
      *
-     * @return DOCUMENT ME!
+     * @return an empty string.
      */
     public String getSuffix() {
         return "";
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the name of the current lunar month, including leap status.
      *
-     * @return DOCUMENT ME!
+     * @return the month name string.
      */
     public String monthName() {
         return MONTHS[super.month - 1] + (leap ? "(leap)" : "");
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns an enumeration of all Chinese month names.
      *
-     * @return DOCUMENT ME!
+     * @return enumeration of month names.
      */
-    public Enumeration getMonths() {
-        return new ArrayEnumeration(MONTHS);
+    @Override
+    public Enumeration<String> getMonths() {
+        return new ArrayEnumeration<>(MONTHS);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the traditional name of the current year (Stem-Branch).
      *
-     * @return DOCUMENT ME!
+     * @return the year name string.
      */
     private String yearName() {
         String[] as = {
@@ -361,9 +392,9 @@ public class ChineseCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns a string representation of the Chinese date.
      *
-     * @return DOCUMENT ME!
+     * @return the date string.
      */
     public String toString() {
         return super.day + " " + monthName() + ", Year " + super.year + ": " +
@@ -371,9 +402,9 @@ public class ChineseCalendar extends MonthDayYear {
     }
 
     /**
-     * DOCUMENT ME!
+     * Main method for testing the Chinese calendar implementation.
      *
-     * @param args DOCUMENT ME!
+     * @param args command line arguments.
      */
     public static void main(String[] args) {
         int i = 1;

@@ -71,7 +71,7 @@ public final class LanguageDetector {
                 }
             }
             double normalized = trigrams.isEmpty() ? 0 : trigramScore / trigrams.size();
-            scores.merge(language, normalized, Double::sum);
+            scores.merge(language, normalized, (v1, v2) -> v1 + v2);
         }
         
         // Normalize scores

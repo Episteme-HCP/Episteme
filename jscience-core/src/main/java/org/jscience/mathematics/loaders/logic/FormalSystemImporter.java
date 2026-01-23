@@ -117,6 +117,17 @@ public interface FormalSystemImporter extends ResourceReader<Map<String, Object>
     }
 
     /**
+     * Returns the supported versions of the formal system format.
+     * Each importer class should override this to declare specific version support.
+     * 
+     * @return array of supported version strings
+     */
+    @Override
+    default String[] getSupportedVersions() {
+        return new String[] {}; // Version-agnostic by default
+    }
+
+    /**
      * Returns the file extensions this importer can handle.
      * 
      * @return array of file extensions (e.g., [".v", ".vo"])

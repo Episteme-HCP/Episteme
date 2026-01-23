@@ -23,6 +23,8 @@
 
 package org.jscience.economics;
 
+import org.jscience.economics.money.Currency;
+import org.jscience.economics.money.Money;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**

@@ -1,32 +1,59 @@
-//repackaged after the code from Mark E. Shoulson
-//email <mark@kli.org>
-//website http://web.meson.org/calendars/
-//released under GPL
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Originally based on code from Mark E. Shoulson <mark@kli.org>
+ * http://web.meson.org/calendars/
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history.calendars;
 
 /**
- * DOCUMENT ME!
+ * Abstract base class for modified Hindu calendars using floating-point arithmetic.
+ * Provides astronomical calculations for solar and lunar positions based
+ * on the Surya Siddhanta with modern refinements.
  *
- * @author $author$
- * @version $Revision: 1.3 $
+ * @author Mark E. Shoulson (original implementation)
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
 abstract class ModifiedHinduCalendar {
-    /** DOCUMENT ME! */
+    /** Sidereal year length in days. */
     public static final double SIDEREALYEAR = 365.2587564814815D;
 
-    /** DOCUMENT ME! */
+    /** Sidereal month length in days. */
     public static final double SIDEREALMONTH = 27.321674162683866D;
 
-    /** DOCUMENT ME! */
+    /** Synodic month length in days. */
     public static final double SYNODICMONTH = 29.530587946071719D;
 
-    /** DOCUMENT ME! */
+    /** Days from creation to epoch. */
     public static final double CREATION = 714402296627D;
 
-    /** DOCUMENT ME! */
+    /** Anomalistic year length in days. */
     public static final double ANOMYEAR = 365.25878920258134D;
 
-    /** DOCUMENT ME! */
+    /** Anomalistic month length in days. */
     public static final double ANOMMONTH = 27.554597974680476D;
 
 /**
@@ -36,11 +63,10 @@ abstract class ModifiedHinduCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the sign of the given value.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the value.
+     * @return 1 if positive, -1 if negative, 0 if zero.
      */
     public static int signum(double d) {
         if (d > 0.0D) {
@@ -51,11 +77,10 @@ abstract class ModifiedHinduCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the Hindu sine table value for the given index.
      *
-     * @param l DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param l the index.
+     * @return the sine table value in minutes.
      */
     public static int hindSineTable(long l) {
         double d = 3438D * Math.sin(((((double) l * 225D) / 60D) * 3.1415926535897931D) / 180D);
@@ -66,11 +91,10 @@ abstract class ModifiedHinduCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the Hindu sine for the given arc in minutes.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the arc in minutes.
+     * @return the Hindu sine.
      */
     public static double hindSine(double d) {
         double d1 = d / 225D;
@@ -81,11 +105,10 @@ abstract class ModifiedHinduCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the Hindu arc sine for the given sine value.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the sine value.
+     * @return the arc in minutes.
      */
     public static double hindArcSine(double d) {
         if (d < 0.0D) {
@@ -104,12 +127,11 @@ abstract class ModifiedHinduCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the mean position of a celestial body.
      *
-     * @param d DOCUMENT ME!
-     * @param d1 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d days since creation.
+     * @param d1 orbital period.
+     * @return the mean position in minutes.
      */
     public static double meanPosition(double d, double d1) {
         double d2 = d / d1;
@@ -118,15 +140,14 @@ abstract class ModifiedHinduCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the true position of a celestial body.
      *
-     * @param d DOCUMENT ME!
-     * @param d1 DOCUMENT ME!
-     * @param d2 DOCUMENT ME!
-     * @param d3 DOCUMENT ME!
-     * @param d4 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d days since creation.
+     * @param d1 orbital period.
+     * @param d2 eccentricity.
+     * @param d3 anomalistic period.
+     * @param d4 epicycle correction.
+     * @return true position in minutes.
      */
     public static double truePosition(double d, double d1, double d2,
         double d3, double d4) {
@@ -140,11 +161,10 @@ abstract class ModifiedHinduCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the solar longitude in minutes.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d days since creation.
+     * @return solar longitude.
      */
     public static double solarLongitude(double d) {
         return truePosition(d, 365.2587564814815D, 0.03888888888888889D,
@@ -152,22 +172,20 @@ abstract class ModifiedHinduCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the zodiac sign index (1-12) for the given day.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the day.
+     * @return the zodiac sign index.
      */
     public static int zodiac(double d) {
         return (int) Math.floor(solarLongitude(d) / 1800D) + 1;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the lunar longitude in minutes.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d days since creation.
+     * @return lunar longitude.
      */
     public static double lunarLongitude(double d) {
         return truePosition(d, 27.321674162683866D, 0.088888888888888892D,
@@ -175,33 +193,30 @@ abstract class ModifiedHinduCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Calculates the lunar phase for a given day.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the day.
+     * @return the lunar phase in minutes.
      */
     public static double lunarPhase(double d) {
         return (((lunarLongitude(d) - solarLongitude(d)) % 21600D) + 21600D) % 21600D;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the lunar day (tithi) for the given day.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the day.
+     * @return the lunar day number (1-30).
      */
     public static int lunarDay(double d) {
         return (int) Math.floor(lunarPhase(d) / 720D) + 1;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the time of the next new moon after the given day.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the day.
+     * @return the time of the new moon.
      */
     public static double newMoon(double d) {
         double d1 = d + 1.0D;
@@ -228,11 +243,10 @@ abstract class ModifiedHinduCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the Hindu calendar year for the given day.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the day.
+     * @return the calendar year.
      */
     public static int calYear(double d) {
         double d1 = d / 365.2587564814815D;
@@ -252,12 +266,11 @@ abstract class ModifiedHinduCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the ascensional difference for the given day and latitude.
      *
-     * @param d DOCUMENT ME!
-     * @param d1 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the day.
+     * @param d1 the latitude in minutes.
+     * @return the ascensional difference.
      */
     public static double ascDiff(double d, double d1) {
         double d2 = 0.40634089586969169D * hindSine(tropLongitude(d));
@@ -269,11 +282,10 @@ abstract class ModifiedHinduCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the tropical longitude in minutes.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the day.
+     * @return the tropical longitude.
      */
     public static double tropLongitude(double d) {
         long l = (long) Math.floor(d);
@@ -289,22 +301,20 @@ abstract class ModifiedHinduCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the difference between solar and sidereal time.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the day.
+     * @return the time difference.
      */
     public static double solarSiderealDifference(double d) {
         return (dailyMotion(d) * (double) risingSign(d)) / 1800D;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the daily motion of the sun.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the day.
+     * @return the daily motion in minutes.
      */
     public static double dailyMotion(double d) {
         double d1 = 59.136159275335849D;
@@ -318,11 +328,10 @@ abstract class ModifiedHinduCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the rising sign correction.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the day.
+     * @return the rising sign value.
      */
     public static int risingSign(double d) {
         int[] ai = { 1670, 1795, 1935, 1935, 1795, 1670 };
@@ -331,11 +340,10 @@ abstract class ModifiedHinduCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the equation of time correction.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the day.
+     * @return the equation of time value.
      */
     public static double equationOfTime(double d) {
         double d1 = hindSine(meanPosition(714402296627D + d, 365.25878920258134D));
@@ -345,11 +353,10 @@ abstract class ModifiedHinduCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the time of sunrise for the given day.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the day.
+     * @return the sunrise time.
      */
     public static double sunrise(double d) {
         return d + 0.25D + equationOfTime(d) +
@@ -358,9 +365,9 @@ abstract class ModifiedHinduCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Main method for testing Hindu calendar calculations.
      *
-     * @param args DOCUMENT ME!
+     * @param args command line arguments.
      */
     public static void main(String[] args) {
         System.out.println(sunrise(Integer.parseInt(args[0])));

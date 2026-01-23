@@ -23,7 +23,7 @@
 
 package org.jscience.economics.loaders;
 
-import org.jscience.economics.Money;
+import org.jscience.economics.money.Money;
 import org.jscience.history.TimePoint;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.ui.i18n.I18n;
@@ -113,6 +113,11 @@ public class FinancialMarketReader extends AbstractResourceReader<List<Financial
     @Override
     public String getResourcePath() {
         return "financial_market_data.csv";
+    }
+
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"OHLCV CSV 1.0"};
     }
 
     public static List<Candle> loadCSV(InputStream is, String currencyCode) {

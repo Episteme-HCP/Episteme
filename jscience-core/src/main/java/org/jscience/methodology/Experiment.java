@@ -24,7 +24,7 @@
 package org.jscience.methodology;
 
 import org.jscience.util.Named;
-import org.jscience.util.identity.Identifiable;
+import org.jscience.util.identity.Identified;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -34,7 +34,7 @@ import java.util.concurrent.CompletableFuture;
  * @param <I> The input configuration type
  * @param <R> The result type
  */
-public interface Experiment<I, R> extends Named, Identifiable<String> {
+public interface Experiment<I, R> extends Named, Identified<String> {
     
     /**
      * Executes the experiment with the given input.

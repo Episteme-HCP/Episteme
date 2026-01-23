@@ -1,110 +1,115 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.psychology;
 
+import java.io.Serializable;
+
 /**
- * A class representing useful constants in psychology.
+ * Common constants used across psychological and behavioral models.
+ * Includes definitions for emotions, needs, personality traits, and sleep states.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
-public final class PsychologyConstants extends Object {
-    /** DOCUMENT ME! */
+public final class PsychologyConstants implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private PsychologyConstants() {
+        // Prevent instantiation
+    }
+
+    /** Unspecified or unknown state. */
     public final static int UNKNOWN = 0;
 
-    //human and animal emotions, note that only human cries and smile is usually considered to be a human only feature
-    //see http://en.wikipedia.org/wiki/List_of_emotions
-    /** DOCUMENT ME! */
+    // Primary Emotions
+    /** State of emotional neutralness. */
     public final static int NONE = 1;
+    /** Strong feeling of annoyance, displeasure, or hostility. */
+    public final static int ANGER = 2;
+    /** Feeling of deep distress caused by loss or disappointment. */
+    public final static int SORROW = 3;
+    /** Feeling of great pleasure and happiness. */
+    public final static int JOY = 4;
+    /** Feeling of revulsion or strong disapproval. */
+    public final static int DISGUST = 5;
+    /** Consent to receive or undertake something. */
+    public final static int ACCEPTANCE = 6;
+    /** Expectation or prediction of future events. */
+    public final static int ANTICIPATION = 7;
+    /** Reaction to an unexpected event. */
+    public final static int SURPRISE = 8;
+    /** Unpleasant emotion caused by a threat of danger. */
+    public final static int FEAR = 9;
 
-    /** DOCUMENT ME! */
-    public final static int ANGER = 2; //anger (or rage, which can be directed to the self or others)
+    // Maslow's Hierarchy of Needs
+    /** Basic survival needs (food, water, shelter). */
+    public final static int PHYSIOLOGICAL_NEEDS = 1;
+    /** Stability and protection from physical or emotional harm. */
+    public final static int SECURITY_NEEDS = 2;
+    /** Belonging, love, and social connection. */
+    public final static int SOCIAL_NEEDS = 4;
+    /** Achievement, recognition, and self-respect. */
+    public final static int EGO_NEEDS = 8;
+    /** Personal growth and reaching full potential. */
+    public final static int SELF_NEEDS = 16;
 
-    /** DOCUMENT ME! */
-    public final static int SORROW = 3; //sorrow (or sadness, or grief or depression [which some people think of a separate emotion-see depression)
+    // BIG FIVE Personality Traits (Five Factor Model)
+    /** Tendency to be outgoing, energetic, and talkative. */
+    public final static int PERSONALITY_EXTROVERSION = 1;
+    /** Tendency to experience negative emotions (emotional stability). */
+    public final static int PERSONALITY_NEUROTICISM = 2;
+    /** Tendency to be compassionate and cooperative. */
+    public final static int PERSONALITY_AGREEABLENESS = 4;
+    /** Tendency to be organized, dependable, and disciplined. */
+    public final static int PERSONALITY_CONSCIENTIOUSNESS = 8;
+    /** Tendency to be curious and open to new experiences. */
+    public final static int PERSONALITY_OPENNESS = 16;
 
-    /** DOCUMENT ME! */
-    public final static int JOY = 4; //joy (happiness, glee, gladness)
+    // Jungian/MBTI Personality Dimensions
+    /** Extraversion vs. Introversion. */
+    public final static int PERSONALITY_EXTRAVERSION_INTROVERSION = 1;
+    /** Intuition vs. Sensing. */
+    public final static int PERSONALITY_INTUITION_SENSING = 2;
+    /** Thinking vs. Feeling. */
+    public final static int PERSONALITY_THINKING_FEELING = 4;
+    /** Perceiving vs. Judging. */
+    public final static int PERSONALITY_PERCEIVEING_JUDGING = 8;
 
-    /** DOCUMENT ME! */
-    public final static int DISGUST = 5; //disgust
-
-    /** DOCUMENT ME! */
-    public final static int ACCEPTANCE = 6; //acceptance
-
-    /** DOCUMENT ME! */
-    public final static int ANTICIPATION = 7; //anticipation
-
-    /** DOCUMENT ME! */
-    public final static int SURPRISE = 8; //surprise
-
-    /** DOCUMENT ME! */
-    public final static int FEAR = 9; //fear (or terror, shock, phobia)
-
-    //one may also consider Boredom, Envy, Guilt, Hate, Hope, Jealousy, Love, Regret, Remorse, Sadness, Shame
-// may be we should have a class for emotions
-
-    //may be we should include Maslow's Hierarchy of Needs like seen at http://www.deepermind.com/20maslow.htm
-    //here or in org.jscience.biology.BiologyConstants
-    /** DOCUMENT ME! */
-    public final static int PHYSIOLOGICAL_NEEDS = 1; //Physiological Needs (warmth, shelter, food)
-
-    /** DOCUMENT ME! */
-    public final static int SECURITY_NEEDS = 2; //Security Needs (protection from danger)
-
-    /** DOCUMENT ME! */
-    public final static int SOCIAL_NEEDS = 4; // Social Needs (love, friendship, comradeship)
-
-    /** DOCUMENT ME! */
-    public final static int EGO_NEEDS = 8; // Ego Needs (self respect, personal worth, autonomy)
-
-    /** DOCUMENT ME! */
-    public final static int SELF_NEEDS = 16; //Self Actualization Needs (full potential)
-
-    //http://en.wikipedia.org/wiki/Personality
-    //Cattell
-    /** DOCUMENT ME! */
-    public final static int PERSONALITY_EXTROVERSION = 1; //Extroversion (i.e., "extroversion vs. introversion" above; outgoing and physical-stimulation-oriented vs. quiet and physical-stimulation-averse)
-
-    /** DOCUMENT ME! */
-    public final static int PERSONALITY_NEUROTICISM = 2; //Neuroticism (i.e., emotional stability; calm, unperturbable, optimistic vs. emotionally reactive, prone to negative emotions)
-
-    /** DOCUMENT ME! */
-    public final static int PERSONALITY_AGREEABLENESS = 4; //Agreeableness (i.e., affable, friendly, conciliatory vs. aggressive, dominant, disagreeable)
-
-    /** DOCUMENT ME! */
-    public final static int PERSONALITY_CONSCIENTIOUSNESS = 8; //Conscientiousness (i.e., dutiful, planful, and orderly vs. spontaneous, flexible, and unreliable)
-
-    /** DOCUMENT ME! */
-    public final static int PERSONALITY_OPENNESS = 16; //Openness to experience (i.e., open to new ideas and change vs. traditional and staid)
-
-    //Keirsey
-    /** DOCUMENT ME! */
-    public final static int PERSONALITY_EXTRAVERSION_INTROVERSION = 1; //Extroversion vs. Introversion (see above)
-
-    /** DOCUMENT ME! */
-    public final static int PERSONALITY_INTUITION_SENSING = 2; //Intuition vs. Sensing (trust in conceptual/abstract models of reality versus concrete sensory-oriented facts)
-
-    /** DOCUMENT ME! */
-    public final static int PERSONALITY_THINKING_FEELING = 4; //Thinking vs. Feeling (thinking as the prime-mover in decision-making vs. feelings as the prime-mover in decision-making)
-
-    /** DOCUMENT ME! */
-    public final static int PERSONALITY_PERCEIVEING_JUDGING = 8; //Perceiving vs. Judging (desire to perceive events vs. desire to have things done so judgements can be made)
-
-    //Stages of sleep
-    /** DOCUMENT ME! */
+    // Sleep Stages
+    /** Fully conscious and alert state. */
     public final static int AWAKE = 1;
-
-    /** DOCUMENT ME! */
+    /** Non-Rapid Eye Movement Stage 1 (Light sleep). */
     public final static int NREM1 = 2;
-
-    /** DOCUMENT ME! */
+    /** Non-Rapid Eye Movement Stage 2 (Onset of sleep). */
     public final static int NREM2 = 3;
-
-    /** DOCUMENT ME! */
+    /** Non-Rapid Eye Movement Stage 3 (Deep sleep). */
     public final static int NREM3 = 4;
-
-    /** DOCUMENT ME! */
+    /** Non-Rapid Eye Movement Stage 4 (Very deep sleep). */
     public final static int NREM4 = 5;
-
-    /** DOCUMENT ME! */
+    /** Rapid Eye Movement (Dreaming sleep). */
     public final static int REM = 6;
 }

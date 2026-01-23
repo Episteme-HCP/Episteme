@@ -23,21 +23,28 @@
 
 package org.jscience.sociology;
 
-import org.jscience.util.ExtensibleEnum;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
 import org.jscience.util.EnumRegistry;
+import org.jscience.util.ExtensibleEnum;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
 
 /**
- * Extensible education level type.
- * <p>
- * Unlike a fixed enum, new education levels can be registered at runtime
- * for different national systems.
- * </p>
+ * Represents an extensible set of education levels, facilitating support for various national systems.
+ * Standard levels are based on the International Standard Classification of Education (ISCED).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
-public class EducationLevel implements ExtensibleEnum<EducationLevel> {
+@Persistent
+public final class EducationLevel implements ExtensibleEnum<EducationLevel>, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private static final EnumRegistry<EducationLevel> REGISTRY = new EnumRegistry<>();
 
@@ -46,16 +53,23 @@ public class EducationLevel implements ExtensibleEnum<EducationLevel> {
     public static final EducationLevel PRIMARY = register("PRIMARY", "Primary education", 1, true);
     public static final EducationLevel LOWER_SECONDARY = register("LOWER_SECONDARY", "Lower secondary", 2, true);
     public static final EducationLevel UPPER_SECONDARY = register("UPPER_SECONDARY", "Upper secondary", 3, true);
-    public static final EducationLevel POST_SECONDARY = register("POST_SECONDARY", "Post-secondary non-tertiary", 4,
-            true);
+    public static final EducationLevel POST_SECONDARY = register("POST_SECONDARY", "Post-secondary non-tertiary", 4, true);
     public static final EducationLevel SHORT_CYCLE = register("SHORT_CYCLE", "Short-cycle tertiary", 5, true);
     public static final EducationLevel BACHELOR = register("BACHELOR", "Bachelor's or equivalent", 6, true);
     public static final EducationLevel MASTER = register("MASTER", "Master's or equivalent", 7, true);
     public static final EducationLevel DOCTORATE = register("DOCTORATE", "Doctoral or equivalent", 8, true);
 
+    @Id
+    @Attribute
     private final String name;
+    
+    @Attribute
     private final String description;
+    
+    @Attribute
     private final int ordinal;
+    
+    @Attribute
     private final boolean builtIn;
 
     private EducationLevel(String name, String description, int ordinal, boolean builtIn) {
@@ -73,27 +87,34 @@ public class EducationLevel implements ExtensibleEnum<EducationLevel> {
 
     /**
      * Registers a custom education level.
+     *
+     * @param name        unique name for the level
+     * @param description descriptive level text
+     * @return the registered EducationLevel instance
      */
     public static EducationLevel registerCustom(String name, String description) {
         EducationLevel existing = REGISTRY.valueOf(name);
-        if (existing != null)
+        if (existing != null) {
             return existing;
+        }
         return register(name, description, REGISTRY.size(), false);
     }
 
+    /**
+     * Retrieves an education level by its name.
+     * @param name the name to look up
+     * @return the matching EducationLevel, or null if not found
+     */
     public static EducationLevel valueOf(String name) {
         return REGISTRY.valueOf(name);
     }
 
-    public static java.util.List<EducationLevel> values() {
-        return REGISTRY.values();
-    }
-
     /**
-     * Returns the ISCED level (0-8).
+     * Returns all registered education levels.
+     * @return a list of all levels
      */
-    public int getIscedLevel() {
-        return ordinal;
+    public static List<EducationLevel> values() {
+        return REGISTRY.values();
     }
 
     @Override
@@ -102,34 +123,46 @@ public class EducationLevel implements ExtensibleEnum<EducationLevel> {
     }
 
     @Override
-    public int ordinal() {
-        return ordinal;
+    public String getName() {
+        return name;
     }
 
-    @Override
-    public String description() {
+    /**
+     * Returns the description of the education level.
+     * @return the description
+     */
+    public String getDescription() {
         return description;
     }
 
     @Override
+    public int ordinal() {
+        return ordinal;
+    }
+
+    /**
+     * Returns whether this level is a built-in ISCED standard level.
+     * @return true if built-in
+     */
     public boolean isBuiltIn() {
         return builtIn;
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof EducationLevel)) return false;
+        EducationLevel that = (EducationLevel) o;
+        return Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+
+    @Override
     public String toString() {
-        return description;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getId() {
         return name;
     }
 }
-
-

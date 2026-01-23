@@ -97,6 +97,11 @@ public class ElevationReader extends AbstractResourceReader<Double> {
     }
 
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"Google API v3", "SRTM 3.0", "ETOPO1"};
+    }
+
+    @Override
     protected Double loadFromSource(String coordinates) throws Exception {
         // coordinates format: "lat,lon"
         String[] parts = coordinates.split(",");

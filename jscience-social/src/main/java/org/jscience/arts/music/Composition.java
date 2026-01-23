@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import org.jscience.history.time.UncertainDate;
+import java.time.Instant;
 import org.jscience.geography.Place;
 
 /**
@@ -24,7 +24,7 @@ public class Composition extends Artwork {
     private final TimeSignature timeSignature;
     private final List<Track> tracks;
 
-    public Composition(String name, String description, UncertainDate productionDate, 
+    public Composition(String name, String description, Instant productionDate, 
                        Place productionPlace, String keySignature, double tempoBpm, 
                        TimeSignature timeSignature, List<Track> tracks) {
         super(name, description, productionDate, productionPlace, ArtForm.MUSIC);
@@ -34,7 +34,7 @@ public class Composition extends Artwork {
         this.tracks = new ArrayList<>(Objects.requireNonNull(tracks));
     }
 
-    public Composition(String name, String description, UncertainDate productionDate, Place productionPlace) {
+    public Composition(String name, String description, Instant productionDate, Place productionPlace) {
         this(name, description, productionDate, productionPlace, "C Major", 120.0, new TimeSignature(4, 4), new ArrayList<>());
     }
 

@@ -1,315 +1,254 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.psychology;
 
-import org.jscience.util.Commented;
-import org.jscience.util.Named;
+import java.io.Serializable;
+import java.util.Objects;
 import org.jscience.biology.Individual;
+import org.jscience.util.Commented;
 
-//useful to build up an ethogram
 /**
- * DOCUMENT ME!
+ * Represents a specific behavior that an individual can exhibit.
+ * Behaviors are categorized into reflexes, self-oriented behaviors, or social behaviors.
+ * This class provides a comprehensive ethogram of common biological and social behaviors.
  *
- * @author $author$
- * @version $Revision: 1.5 $
-  */
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.5
+ * @since 1.0
+ */
+public class Behavior implements Commented, org.jscience.biology.Behavior, Serializable {
 
-//also see http://en.wikipedia.org/wiki/Hand_gesture
-//http://en.wikipedia.org/wiki/Gesture
+    private static final long serialVersionUID = 1L;
 
-public class Behavior extends Object implements Named, Commented, org.jscience.biology.Behavior {
-    
-    @Override
-    public void execute(Individual individual) {
-        // Default implementation: do nothing or log
-        // Specific behaviors can override this to perform actions on the individual
-    }
-    //behaviors are either on instinct, self or social
-    //mutually exclusive
-    /** DOCUMENT ME! */
+    /** Categorization for behaviors of unknown nature. */
     public final static int UNKNOWN = 0;
 
-    /** DOCUMENT ME! */
+    /** Categorization for innate, involuntary reflex actions. */
     public final static int REFLEX = 1;
 
-    /** DOCUMENT ME! */
+    /** Categorization for individual-oriented behaviors (e.g., feeding, sleeping). */
     public final static int SELF = 2;
 
-    /** DOCUMENT ME! */
+    /** Categorization for interaction-oriented behaviors with other individuals. */
     public final static int SOCIAL = 3;
 
-    //attitude: modulates behavior: example careful, aggressive, afraid
-    //this internal state is usually displayed for social species on the face, and is called emotion
-    //use the emotion constants from PsychologyConstants
-    //instinct (such as eyes closing)
-    /** DOCUMENT ME! */
+    // Standard biological reflex behaviors
+    /** Vital reflex for gas exchange. */
     public final static Behavior BREATH = new Behavior("Breath", Behavior.REFLEX);
+    
+    /** Primitive reflex for biological transformation. */
+    public final static Behavior MUTATE = new Behavior("Mutate", Behavior.REFLEX);
 
-    /** DOCUMENT ME! */
-    public final static Behavior MUTATE = new Behavior("Mutate", Behavior.REFLEX); //how to become a butterfly
-
-    //Human reflexes
-    //Reflex actions seen in adult humans include:
-    //Accommodation reflex
-    //Achilles reflex
-    //Anocutaneous reflex
-    //Babinski reflex
-    //Biceps stretch reflex
-    //Brachioradialis reflex
-    //Crossed extensor reflex
-    //Mammalian diving reflex
-    //Gag reflex
-    //Gastroc-Soleus reflex
-    //H-reflex
-    //Patellar reflex (knee-jerk reflex)
-    //Photic sneeze reflex
-    //Pupillary reflex
-    //Quadriceps reflex
-    //Salivation
-    //Scratch reflex
-    //Sneeze
-    //Tendon reflex
-    //Triceps stretch reflex
-    //Vestibulo-ocular reflex
-    //Withdrawal reflex
-    //Processes such as breathing, digestion and the maintenance of the heartbeat can also be regarded as reflex actions, according to some definitions of the term.
-    //Newborn babies have a number of other reflexes which are not seen in adults, including:
-    //suckling
-    //hand-to-mouth reflex
-    //Moro reflex, also known as the startle reflex
-    //grasp reflex
-    //Asymmetrical tonic neck reflex (ATNR)
-    //Symmetrical tonic neck reflex (STNR)
-    //Tonic labyrinthine reflex (TLR)
-    //self, instincts/innate:
-    /** DOCUMENT ME! */
-    public final static Behavior NONE = new Behavior("None", Behavior.SELF); //inactive, drowsy
-
-    /** DOCUMENT ME! */
+    // Standard self-oriented behaviors
+    /** State of inactivity or resting. */
+    public final static Behavior NONE = new Behavior("None", Behavior.SELF);
+    
+    /** Hygiene and self-maintenance behavior. */
     public final static Behavior CLEAN = new Behavior("Clean", Behavior.SELF);
-
-    /** DOCUMENT ME! */
+    
+    /** Biological maintenance and wound recovery. */
     public final static Behavior HEAL = new Behavior("Heal", Behavior.SELF);
-
-    /** DOCUMENT ME! */
-    public final static Behavior REPRODUCE = new Behavior("Reproduce",
-            Behavior.SELF); //or mate
-
-    /** DOCUMENT ME! */
-    public final static Behavior NEST_MAKING = new Behavior("Make a nest",
-            Behavior.SELF);
-
-    /** DOCUMENT ME! */
-    public final static Behavior FIGHT = new Behavior("Fight", Behavior.SELF); //not to feed, fight or flight against enemy, a response to a hunt or an agression
-
-    /** DOCUMENT ME! */
+    
+    /** Mating or reproductive activity. */
+    public final static Behavior REPRODUCE = new Behavior("Reproduce", Behavior.SELF);
+    
+    /** Formation of a shelter or reproductive site. */
+    public final static Behavior NEST_MAKING = new Behavior("Make a nest", Behavior.SELF);
+    
+    /** Defensive or offensive combat behavior. */
+    public final static Behavior FIGHT = new Behavior("Fight", Behavior.SELF);
+    
+    /** Restorative dormant state. */
     public final static Behavior SLEEP = new Behavior("Sleep", Behavior.SELF);
-
-    /** DOCUMENT ME! */
-    public final static Behavior HUNT = new Behavior("Hunt", Behavior.SELF); //includes stalking, hiding ; sometimes collective behavior
-
-    /** DOCUMENT ME! */
+    
+    /** Predatory or resource gathering search. */
+    public final static Behavior HUNT = new Behavior("Hunt", Behavior.SELF);
+    
+    /** Nutrient ingestion behavior. */
     public final static Behavior FEED = new Behavior("Feed", Behavior.SELF);
-
-    /** DOCUMENT ME! */
-    public final static Behavior DEFECATE = new Behavior("Defecate",
-            Behavior.SELF);
-
-    /** DOCUMENT ME! */
-    public final static Behavior OBSERVE = new Behavior("Observe", Behavior.SELF); //generally with head moving, also accounts for hearing, sniffing the air
-
-    /** DOCUMENT ME! */
-    public final static Behavior MOVE = new Behavior("Move", Behavior.SELF); //go to somewhere else, includes hunt or move away (may be we need something different for flight or avoid) or gathering or jump, crawl, run, walk, swim, fly...
-
-    /** DOCUMENT ME! */
-    public final static Behavior WAVE = new Behavior("Wave", Behavior.SELF); //don't move but do some gesture or change facial expression
-
-    /** DOCUMENT ME! */
-    public final static Behavior MAKE_NOISE = new Behavior("Make some noise",
-            Behavior.SELF); //verbal gesture, sing, peck, etc
-
-    /** DOCUMENT ME! */
+    
+    /** Waste elimination behavior. */
+    public final static Behavior DEFECATE = new Behavior("Defecate", Behavior.SELF);
+    
+    /** Information gathering through senses. */
+    public final static Behavior OBSERVE = new Behavior("Observe", Behavior.SELF);
+    
+    /** Locomotion behavior. */
+    public final static Behavior MOVE = new Behavior("Move", Behavior.SELF);
+    
+    /** Gestural communication or basic signaling. */
+    public final static Behavior WAVE = new Behavior("Wave", Behavior.SELF);
+    
+    /** Acoustic signaling behavior. */
+    public final static Behavior MAKE_NOISE = new Behavior("Make some noise", Behavior.SELF);
+    
+    /** Dropping or letting go of an item. */
     public final static Behavior RELEASE = new Behavior("Release", Behavior.SELF);
-
-    /** DOCUMENT ME! */
+    
+    /** Grasping or maintaining possession of an item. */
     public final static Behavior HOLD = new Behavior("Hold", Behavior.SELF);
 
-    //the following may also be considered as activities:
-    //self, higher order, exhibited only by some species:
-    /** DOCUMENT ME! */
-    public final static Behavior TOOLMAKING = new Behavior("Make a tool",
-            Behavior.SELF);
-
-    /** DOCUMENT ME! */
-    public final static Behavior TOOLUSING = new Behavior("Use a tool",
-            Behavior.SELF); //like it is expected to be used
-
-    //self, task oriented: cut, burn, carry, explore, protect one's territory... usually species dependant, sometimes using a tool
-    /** DOCUMENT ME! */
+    // Complex tool-oriented behaviors
+    /** Construction of implements. */
+    public final static Behavior TOOLMAKING = new Behavior("Make a tool", Behavior.SELF);
+    
+    /** Application of implements for a task. */
+    public final static Behavior TOOLUSING = new Behavior("Use a tool", Behavior.SELF);
+    
+    /** Separation behavior, often with tools. */
     public final static Behavior CUT = new Behavior("Cut", Behavior.SELF);
-
-    /** DOCUMENT ME! */
-    public final static Behavior BURN = new Behavior("Burn", Behavior.SELF); // can also be done with acid, for example by ants
-
-    /** DOCUMENT ME! */
+    
+    /** Thermal manipulation behavior. */
+    public final static Behavior BURN = new Behavior("Burn", Behavior.SELF);
+    
+    /** Transportation of items. */
     public final static Behavior CARRY = new Behavior("Carry", Behavior.SELF);
+    
+    /** Environmental mapping and discovery behavior. */
+    public final static Behavior EXPLORE = new Behavior("Explore", Behavior.SELF);
 
-    /** DOCUMENT ME! */
-    public final static Behavior EXPLORE = new Behavior("Explore", Behavior.SELF); //includes moving around or touching something unkwnown, map territory which is not "going to" but rather "moving around" a central place
-
-    //self, higest order, human only:
-    /** DOCUMENT ME! */
+    // Human-specific or high-order cognitive behaviors
+    /** Information decoding from text. */
     public final static Behavior READ = new Behavior("Read", Behavior.SOCIAL);
-
-    /** DOCUMENT ME! */
+    
+    /** Information encoding into symbols. */
     public final static Behavior WRITE = new Behavior("Write", Behavior.SOCIAL);
 
-    //list is almost unlimited : pray, study, drive...
-    //one could argue about rather abstract behaviors to be included here: love, adapt
-    //social, instincts/innate:
-    /** DOCUMENT ME! */
-    public final static Behavior LEK = new Behavior("Lek", Behavior.SOCIAL); //rut, etc
-
-    /** DOCUMENT ME! */
-    public final static Behavior GROOMING = new Behavior("Grooming",
-            Behavior.SOCIAL);
-
-    /** DOCUMENT ME! */
-    public final static Behavior COMMUNICATE = new Behavior("Communicate",
-            Behavior.SOCIAL); //gesture or verbal or sight, for example bee dance
-
-    /** DOCUMENT ME! */
-    public final static Behavior IMITATE = new Behavior("Imitate",
-            Behavior.SOCIAL);
-
-    /** DOCUMENT ME! */
-    public final static Behavior PLAY = new Behavior("Play", Behavior.SOCIAL); //includes pretend, act
-
-    /** DOCUMENT ME! */
-    public final static Behavior PARENTAL_CARE = new Behavior("Parental care",
-            Behavior.SOCIAL); //care about others and especially youngs, raise brood, extended grooming, may be confused
-
-    /** DOCUMENT ME! */
+    // Social behaviors
+    /** Competitive reproductive display. */
+    public final static Behavior LEK = new Behavior("Lek", Behavior.SOCIAL);
+    
+    /** Social bonding through physical maintenance. */
+    public final static Behavior GROOMING = new Behavior("Grooming", Behavior.SOCIAL);
+    
+    /** Information exchange between individuals. */
+    public final static Behavior COMMUNICATE = new Behavior("Communicate", Behavior.SOCIAL);
+    
+    /** Learning by observing and repeating others. */
+    public final static Behavior IMITATE = new Behavior("Imitate", Behavior.SOCIAL);
+    
+    /** Non-utilitarian recreational interaction. */
+    public final static Behavior PLAY = new Behavior("Play", Behavior.SOCIAL);
+    
+    /** Brood raising and juvenile maintenance. */
+    public final static Behavior PARENTAL_CARE = new Behavior("Parental care", Behavior.SOCIAL);
+    
+    /** Signal of imminent danger to a group. */
     public final static Behavior ALERT = new Behavior("Alert", Behavior.SOCIAL);
+    
+    /** Joint effort toward a shared goal. */
+    public final static Behavior COOPERATE = new Behavior("Cooperate", Behavior.SOCIAL);
+    
+    /** Social conflict or hostile signaling. */
+    public final static Behavior AGRESSION = new Behavior("Agression", Behavior.SOCIAL);
+    
+    /** Recreational performance for others. */
+    public final static Behavior ENTERTAIN = new Behavior("Entertain", Behavior.SOCIAL);
+    
+    /** Directing attention to an object or location. */
+    public final static Behavior POINT = new Behavior("Point", Behavior.SOCIAL);
+    
+    /** Reciprocal transfer of goods or services. */
+    public final static Behavior EXCHANGE = new Behavior("Exchange", Behavior.SOCIAL);
+    
+    /** Standardized recreational physical competition. */
+    public final static Behavior SPORT = new Behavior("Sport", Behavior.SOCIAL);
 
-    /** DOCUMENT ME! */
-    public final static Behavior COOPERATE = new Behavior("Cooperate",
-            Behavior.SOCIAL); //towards a common goal which has to be specified apart
-
-    /** DOCUMENT ME! */
-    public final static Behavior AGRESSION = new Behavior("Agression",
-            Behavior.SOCIAL); //perhpas we need something different for berserk, panic attack (and even something different for panic itself)
-
-    //the following may also be considered as activities:
-    //Animals which have passed the mirror test are Common Chimpanzees, Bonobos, orangutans, dolphins, pigeons and humans. //Surprisingly, gorillas have not passed the test, although at least one specific gorilla, Koko, has passed the test
-    //social, higher order, exhibited only by some species, usually needs a notion of self:
-    /** DOCUMENT ME! */
-    public final static Behavior ENTERTAIN = new Behavior("Entertain",
-            Behavior.SOCIAL);
-
-    /** DOCUMENT ME! */
-    public final static Behavior POINT = new Behavior("Point", Behavior.SOCIAL); //show something
-
-    /** DOCUMENT ME! */
-    public final static Behavior EXCHANGE = new Behavior("Exchange",
-            Behavior.SOCIAL); //bargain, give (yet expecting return), etc... perhaps different from sharing
-
-    //social, higest order, human only:
-    /** DOCUMENT ME! */
-    public final static Behavior SPORT = new Behavior("Sport", Behavior.SOCIAL); //practicing a sport
-
-    //list is almost unlimited
-    //one could argue about rather abstract behaviors to be included here
-    /** DOCUMENT ME! */
-    private String name;
-
-    /** DOCUMENT ME! */
-    private int kind;
-
-    /** DOCUMENT ME! */
+    private final String name;
+    private final int kind;
     private String comments;
+    private int attitude;
 
-    /** DOCUMENT ME! */
-    private int attitude; //modulates behavior: example careful, aggressive, afraid... and this gives also the notion of emergency which makes the difference between walking and running
-
-/**
-     * Creates a new Behavior object.
+    /**
+     * Creates a new Behavior with a given name and kind.
      *
-     * @param name DOCUMENT ME!
-     * @param kind DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param name identifying name of the behavior
+     * @param kind categorization (REFLEX, SELF, SOCIAL)
+     * @throws IllegalArgumentException if name is null or empty
      */
     public Behavior(String name, int kind) {
         if ((name != null) && (name.length() > 0)) {
             this.name = name;
             this.kind = kind;
             this.attitude = UNKNOWN;
-            this.comments = new String();
+            this.comments = "";
         } else {
             throw new IllegalArgumentException(
                 "The Behavior constructor can't have null or empty arguments.");
         }
     }
 
+    @Override
+    public void execute(Individual individual) {
+        // Default implementation: specific behaviors can override this to perform actions
+    }
+
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the name of the behavior.
+     * @return the name
      */
     public String getName() {
         return name;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the categorization kind of the behavior.
+     * @return the kind (REFLEX, SELF, SOCIAL)
      */
     public int getKind() {
         return kind;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the current emotional or practical attitude modulating this behavior.
+     * @return the attitude constant
      */
     public int getAttitude() {
         return attitude;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param attitude DOCUMENT ME!
+     * Sets the attitude modulating this behavior.
+     * @param attitude the new attitude state
      */
-
-    //multiple behaviors triggering at the same time may produce conflicting emotions
     public void setAttitude(int attitude) {
         this.attitude = attitude;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public String getComments() {
         return comments;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param comments DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
+    @Override
     public void setComments(String comments) {
-        if (comments != null) {
-            this.comments = comments;
-        } else {
-            throw new IllegalArgumentException("You can't set a null comment.");
-        }
+        this.comments = Objects.requireNonNull(comments, "You can't set a null comment.");
     }
 
-    //may be we should provide support for the sartDate and endDate for which this behavior is activated
+    @Override
+    public String toString() {
+        return name;
+    }
 }

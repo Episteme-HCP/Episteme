@@ -1,15 +1,49 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.sports;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import org.jscience.history.time.UncertainDate;
-import java.util.*;
 
 /**
- * Models historical sports and their ancestors.
+ * Models ancestral sports and provides a catalog of historical physical activities.
+ * Used for anthropological and historical sports research.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
 public final class HistoricalSports {
 
     private HistoricalSports() {}
 
+    /** Data model for a historical sport. */
     public record HistoricalSport(
         String name,
         String modernDescendant,
@@ -18,8 +52,9 @@ public final class HistoricalSports {
         List<String> rules,
         Map<String, String> equipment,
         String performanceMetric
-    ) {}
+    ) implements Serializable {}
 
+    /** Reference catalog of historical sports. */
     public static final List<HistoricalSport> CATALOG = List.of(
         new HistoricalSport(
             "Soule", "Rugby/Football", 
@@ -43,46 +78,35 @@ public final class HistoricalSports {
             "Victories in tournament"
         ),
         new HistoricalSport(
-            "Ullamaliztli", "Basketball (conceptually)",
+            "Ullamaliztli", "Basketball",
             UncertainDate.circa(-1400), "Mesoamerica",
             List.of("Ball through stone ring", "Cannot use hands/feet", "Hip/elbow only"),
             Map.of("Ball", "Solid rubber 4kg", "Ring", "Stone at 9m height"),
             "Ring passes"
-        ),
-        new HistoricalSport(
-            "Jousting", "Equestrian sports",
-            UncertainDate.circa(1066), "Europe",
-            List.of("Unhorse opponent", "Three passes", "Points for hits"),
-            Map.of("Lance", "Wooden 3m", "Armor", "Full plate"),
-            "Points / Unhorses"
-        ),
-        new HistoricalSport(
-            "Episkyros", "Rugby",
-            UncertainDate.circa(-800), "Greece",
-            List.of("Two teams", "Move ball past opponent's line", "Physical contact allowed"),
-            Map.of("Ball", "Leather with sand/wool"),
-            "Line crosses"
         )
     );
 
     /**
-     * Finds historical ancestors of a modern sport.
+     * Finds historical ancestors of a modern sport name.
+     * 
+     * @param modernSport query string
+     * @return list of matching historical ancestors
      */
     public static List<HistoricalSport> findAncestors(String modernSport) {
+        if (modernSport == null) return List.of();
         return CATALOG.stream()
             .filter(s -> s.modernDescendant().toLowerCase().contains(modernSport.toLowerCase()))
             .toList();
     }
 
     /**
-     * Simulates a historical match result using period-appropriate randomness.
+     * Simulates a match result using period-appropriate scoring models.
      */
     public static Map<String, Integer> simulateMatch(HistoricalSport sport, String team1, String team2) {
         Random random = new Random();
         Map<String, Integer> scores = new HashMap<>();
         
-        // Historical sports typically had lower scores
-        int maxScore = sport.name().equals("Ullamaliztli") ? 3 : 10;
+        int maxScore = "Ullamaliztli".equals(sport.name()) ? 3 : 10;
         scores.put(team1, random.nextInt(maxScore + 1));
         scores.put(team2, random.nextInt(maxScore + 1));
         

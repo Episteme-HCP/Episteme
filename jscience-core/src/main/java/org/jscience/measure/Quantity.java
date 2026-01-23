@@ -216,6 +216,46 @@ public interface Quantity<Q extends Quantity<Q>> {
     int compareTo(Quantity<Q> other);
 
     /**
+     * Checks if this quantity is strictly greater than another quantity.
+     * 
+     * @param other the quantity to compare with
+     * @return true if this > other
+     */
+    default boolean isGreaterThan(Quantity<Q> other) {
+        return compareTo(other) > 0;
+    }
+
+    /**
+     * Checks if this quantity is strictly less than another quantity.
+     * 
+     * @param other the quantity to compare with
+     * @return true if this < other
+     */
+    default boolean isLessThan(Quantity<Q> other) {
+        return compareTo(other) < 0;
+    }
+
+    /**
+     * Checks if this quantity is greater than or equal to another quantity.
+     * 
+     * @param other the quantity to compare with
+     * @return true if this >= other
+     */
+    default boolean isGreaterThanOrEqualTo(Quantity<Q> other) {
+        return compareTo(other) >= 0;
+    }
+
+    /**
+     * Checks if this quantity is less than or equal to another quantity.
+     * 
+     * @param other the quantity to compare with
+     * @return true if this <= other
+     */
+    default boolean isLessThanOrEqualTo(Quantity<Q> other) {
+        return compareTo(other) <= 0;
+    }
+
+    /**
      * Checks if this quantity equals another within tolerance.
      * 
      * @param other     the quantity to compare with

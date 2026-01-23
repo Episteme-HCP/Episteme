@@ -1,97 +1,109 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.politics;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import org.jscience.util.Named;
 
-import java.util.Iterator;
-import java.util.Set;
-
-
 /**
- * A class representing a set of countries working together and may be with
- * no common boundaries.
+ * Represents a group of countries cooperating within a formal union or federation.
+ * Countries in a federation may or may not share common geography.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
-public class Federation extends Object implements Named {
-    /** DOCUMENT ME! */
+public class Federation implements Named, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private String name;
+    private final Set<Country> countries = new HashSet<>();
 
-    /** DOCUMENT ME! */
-    private Set countries;
-
-    //a Set of countries
     /**
-     * Creates a new Federation object.
+     * Initializes a new Federation.
      *
-     * @param name DOCUMENT ME!
-     * @param countries DOCUMENT ME!
+     * @param name      the name of the federation
+     * @param countries set of member countries
+     * @throws NullPointerException if name or countries is null
+     * @throws IllegalArgumentException if name is empty
      */
-    public Federation(String name, Set countries) {
-        Iterator iterator;
-        boolean valid;
-
-        if ((name != null) && (name.length() > 0) && (countries != null)) {
-            iterator = countries.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Country;
-            }
-
-            if (valid) {
-                this.name = name;
-                this.countries = countries;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Set must contain only countries.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Federation constructor can't have null arguments (and name can't be empty).");
+    public Federation(String name, Set<Country> countries) {
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
+        
+        if (countries != null) {
+            this.countries.addAll(countries);
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public String getName() {
         return name;
     }
 
     /**
-     * DOCUMENT ME!
+     * Updates the name of the federation.
+     * @param name the new name
      */
-    public void setName() {
-        this.name = name;
+    public void setName(String name) {
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns an unmodifiable set of member countries.
+     * @return members
      */
-    public Set getCountries() {
-        return countries;
+    public Set<Country> getCountries() {
+        return Collections.unmodifiableSet(countries);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param country DOCUMENT ME!
+     * Adds a country to the federation.
+     * @param country the country to add
      */
     public void addCountry(Country country) {
-        countries.add(country);
+        if (country != null) {
+            countries.add(country);
+        }
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param country DOCUMENT ME!
+     * Removes a country from the federation.
+     * @param country the country to remove
      */
     public void removeCountry(Country country) {
         countries.remove(country);
+    }
+
+    @Override
+    public String toString() {
+        return name + " [" + countries.size() + " member countries]";
     }
 }

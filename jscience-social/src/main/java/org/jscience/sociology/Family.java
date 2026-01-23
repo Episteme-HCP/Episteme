@@ -23,80 +23,127 @@
 
 package org.jscience.sociology;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
- * Represents a family unit as a social structure.
- * <p>
- * Models family relationships: parents, children, extended family.
- * </p>
+ * Represents a family unit within the social structure.
+ * Extends the basic {@link Group} to model specific familial relationships like parents and children.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
+@Persistent
 public class Family extends Group {
 
+    private static final long serialVersionUID = 1L;
+
+    @Relation(type = Relation.Type.MANY_TO_ONE)
     private Person parent1;
+    
+    @Relation(type = Relation.Type.MANY_TO_ONE)
     private Person parent2;
+    
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private final List<Person> children = new ArrayList<>();
 
+    /**
+     * Creates a new family with the given family name.
+     * @param familyName the surname or name identifying the family unit
+     */
     public Family(String familyName) {
         super(familyName, Type.FAMILY);
     }
 
+    /**
+     * Sets the primary parent of the family.
+     * @param parent the parent person
+     */
     public void setParent1(Person parent) {
         this.parent1 = parent;
-        addMember(parent, "parent");
+        if (parent != null) {
+            addMember(parent);
+            assignRole(parent, "Parent");
+        }
     }
 
+    /**
+     * Sets the secondary parent of the family.
+     * @param parent the parent person
+     */
     public void setParent2(Person parent) {
         this.parent2 = parent;
-        addMember(parent, "parent");
+        if (parent != null) {
+            addMember(parent);
+            assignRole(parent, "Parent");
+        }
     }
 
+    /**
+     * Adds a child to the family unit.
+     * @param child the child person
+     */
     public void addChild(Person child) {
-        children.add(child);
-        addMember(child, "child");
+        if (child != null && !children.contains(child)) {
+            children.add(child);
+            addMember(child);
+            assignRole(child, "Child");
+        }
     }
 
+    /**
+     * Returns the primary parent.
+     * @return parent1
+     */
     public Person getParent1() {
         return parent1;
     }
 
+    /**
+     * Returns the secondary parent.
+     * @return parent2
+     */
     public Person getParent2() {
         return parent2;
     }
 
+    /**
+     * Returns an unmodifiable list of children in the family.
+     * @return the children list
+     */
     public List<Person> getChildren() {
         return Collections.unmodifiableList(children);
     }
 
+    /**
+     * Returns a list containing all defined parents.
+     * @return list of parents
+     */
     public List<Person> getParents() {
-        List<Person> parents = new ArrayList<>();
-        if (parent1 != null)
-            parents.add(parent1);
-        if (parent2 != null)
-            parents.add(parent2);
+        List<Person> parents = new ArrayList<>(2);
+        if (parent1 != null) parents.add(parent1);
+        if (parent2 != null) parents.add(parent2);
         return parents;
     }
 
+    /**
+     * Returns the number of children in this family unit.
+     * @return child count
+     */
     public int getNumChildren() {
         return children.size();
     }
 
     /**
-     * Returns generation size (number of children).
+     * Simple measure of generational depth within this specific unit.
+     * @return 2 if children exist, 1 otherwise
      */
     public int getGenerationCount() {
-        return children.size() > 0 ? 2 : 1;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Family '%s': %d parents, %d children",
-                getName(), getParents().size(), children.size());
+        return children.isEmpty() ? 1 : 2;
     }
 }
-
-

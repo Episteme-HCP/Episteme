@@ -1,212 +1,190 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.law;
 
 import org.jscience.biology.Individual;
-
 import org.jscience.measure.Report;
-
 import org.jscience.sociology.Role;
 
-import java.util.Iterator;
-import java.util.Vector;
-
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * A class representing an individual in an organized country basic facts.
+ * Represents an individual's legal and administrative status within a jurisdiction.
+ * This includes their educational history, legal record, and biometric data.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.2
  */
-
-//don't expect any of these records to be complete until the death of the individual
 public class ResponsibleIndividual extends Role {
-    /** DOCUMENT ME! */
-    private Vector schoolRecords; //including diplomas, Vector of strings, use identification or equivalent to define each String
 
-    /** DOCUMENT ME! */
-    private Vector policeRecords; //Set of strings, use identification or equivalent to define each String
-
-    /** DOCUMENT ME! */
+    private final List<License> schoolRecords;
+    private final List<Report> policeRecords;
     private Biometrics biometrics;
 
-/**
-     * Creates a new ResponsibleIndividual object.
+    /**
+     * Creates a new ResponsibleIndividual for a given person in a specific legal context.
      *
-     * @param individual DOCUMENT ME!
-     * @param situation  DOCUMENT ME!
+     * @param individual the individual being represented
+     * @param situation the street situation context (e.g., citizenship or residence context)
      */
-    public ResponsibleIndividual(Individual individual,
-        StreetSituation situation) {
+    public ResponsibleIndividual(Individual individual, StreetSituation situation) {
         super(individual, "Responsible Individual", situation, Role.CLIENT);
-        this.schoolRecords = new Vector();
-        this.policeRecords = new Vector();
+        this.schoolRecords = new ArrayList<>();
+        this.policeRecords = new ArrayList<>();
         this.biometrics = null;
     }
 
-    //returns the complete list of school records sorted by date
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the list of educational degrees and certifications (school records).
+     * @return the list of school records
      */
-    public Vector getSchoolRecords() {
-        return schoolRecords;
+    public List<License> getSchoolRecords() {
+        return new ArrayList<>(schoolRecords);
     }
 
     /**
-     * DOCUMENT ME!
+     * Adds a new educational degree or certificate.
      *
-     * @param schoolRecord DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param schoolRecord the license/diploma to add
+     * @throws IllegalArgumentException if the record is null
      */
     public void addSchoolRecord(License schoolRecord) {
-        if (schoolRecords != null) {
-            schoolRecords.add(schoolRecord);
-        } else {
-            throw new IllegalArgumentException(
-                "You can't add a null school record.");
+        if (schoolRecord == null) {
+            throw new IllegalArgumentException("School record cannot be null.");
         }
+        schoolRecords.add(schoolRecord);
     }
 
-    //this is very rare
     /**
-     * DOCUMENT ME!
-     *
-     * @param schoolRecord DOCUMENT ME!
+     * Removes an educational degree or certificate.
+     * @param schoolRecord the record to remove
      */
     public void removeSchoolRecord(License schoolRecord) {
         schoolRecords.remove(schoolRecord);
     }
 
-    //this is very rare
     /**
-     * DOCUMENT ME!
+     * Removes the most recent educational record.
      */
     public void removeLastSchoolRecord() {
-        schoolRecords.remove(schoolRecords.size() - 1);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param schoolRecords DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    public void setSchoolRecords(Vector schoolRecords) {
-        Iterator iterator;
-        boolean valid;
-
-        if (schoolRecords != null) {
-            iterator = schoolRecords.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof License;
-            }
-
-            if (valid) {
-                this.schoolRecords = schoolRecords;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Vector of school records should contain only Licences.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Vector of school records shouldn't be null.");
+        if (!schoolRecords.isEmpty()) {
+            schoolRecords.remove(schoolRecords.size() - 1);
         }
     }
 
-    //returns the complete list of police records sorted by date
     /**
-     * DOCUMENT ME!
+     * Sets the complete list of educational records.
      *
-     * @return DOCUMENT ME!
+     * @param schoolRecords the list of License objects
+     * @throws IllegalArgumentException if the list is null or contains non-License elements
      */
-    public Vector getPoliceRecords() {
-        return policeRecords;
+    public void setSchoolRecords(List<License> schoolRecords) {
+        if (schoolRecords == null) {
+            throw new IllegalArgumentException("School records list cannot be null.");
+        }
+        
+        for (Object record : schoolRecords) {
+            if (!(record instanceof License)) {
+                throw new IllegalArgumentException("The list of school records must contain only License objects.");
+            }
+        }
+        
+        this.schoolRecords.clear();
+        this.schoolRecords.addAll(schoolRecords);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the list of legal and police reports.
+     * @return the list of police records
+     */
+    public List<Report> getPoliceRecords() {
+        return new ArrayList<>(policeRecords);
+    }
+
+    /**
+     * Adds a new police report or record.
      *
-     * @param policeRecord DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param policeRecord the report to add
+     * @throws IllegalArgumentException if the record is null
      */
     public void addPoliceRecord(Report policeRecord) {
-        if (policeRecord != null) {
-            policeRecords.add(policeRecord);
-        } else {
-            throw new IllegalArgumentException(
-                "You can't add a null police record.");
+        if (policeRecord == null) {
+            throw new IllegalArgumentException("Police record cannot be null.");
         }
+        policeRecords.add(policeRecord);
     }
 
-    //this is very rare
     /**
-     * DOCUMENT ME!
-     *
-     * @param policeRecord DOCUMENT ME!
+     * Removes a specific police report or record.
+     * @param policeRecord the report to remove
      */
     public void removePoliceRecord(Report policeRecord) {
         policeRecords.remove(policeRecord);
     }
 
-    //this is very rare
     /**
-     * DOCUMENT ME!
+     * Removes the most recent police record.
      */
     public void removeLastPoliceRecord() {
-        policeRecords.remove(policeRecords.size() - 1);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param policeRecords DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    public void setPoliceRecords(Vector policeRecords) {
-        Iterator iterator;
-        boolean valid;
-
-        if (policeRecords != null) {
-            iterator = policeRecords.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Report;
-            }
-
-            if (valid) {
-                this.policeRecords = policeRecords;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Vector of police records should contain only Reports.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Vector of police records shouldn't be null.");
+        if (!policeRecords.isEmpty()) {
+            policeRecords.remove(policeRecords.size() - 1);
         }
     }
 
-    //may return null
     /**
-     * DOCUMENT ME!
+     * Sets the complete list of police records.
      *
-     * @return DOCUMENT ME!
+     * @param policeRecords the list of Report objects
+     * @throws IllegalArgumentException if the list is null or contains non-Report elements
+     */
+    public void setPoliceRecords(List<Report> policeRecords) {
+        if (policeRecords == null) {
+            throw new IllegalArgumentException("Police records list cannot be null.");
+        }
+        
+        for (Object record : policeRecords) {
+            if (!(record instanceof Report)) {
+                throw new IllegalArgumentException("The list of police records must contain only Report objects.");
+            }
+        }
+        
+        this.policeRecords.clear();
+        this.policeRecords.addAll(policeRecords);
+    }
+
+    /**
+     * Returns the biometric data for the individual.
+     * @return the biometric data, or null if not available
      */
     public Biometrics getBiometrics() {
         return biometrics;
     }
 
-    //the current biometrics
     /**
-     * DOCUMENT ME!
-     *
-     * @param biometrics DOCUMENT ME!
+     * Sets the biometric data for the individual.
+     * @param biometrics the biometric data to set
      */
     public void setBiometrics(Biometrics biometrics) {
         this.biometrics = biometrics;

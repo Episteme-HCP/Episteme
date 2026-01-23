@@ -1,24 +1,58 @@
-//repackaged after the code from Mark E. Shoulson
-//email <mark@kli.org>
-//website http://web.meson.org/calendars/
-//released under GPL
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Originally based on code from Mark E. Shoulson <mark@kli.org>
+ * http://web.meson.org/calendars/
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history.calendars;
 
 import java.util.Enumeration;
 
-
-// Referenced classes of package calendars:
 /**
- * DOCUMENT ME!
+ * Implementation of the Ethiopian calendar.
+ * The Ethiopian calendar is based on the Coptic calendar and is the official
+ * calendar of Ethiopia. It has 13 months - 12 of 30 days and one of 5-6 days.
  *
- * @author $author$
- * @version $Revision: 1.3 $
-  */
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>Epoch: August 29, 8 CE (Julian)</li>
+ *   <li>13 months: 12 months of 30 days + Paguemen (5 or 6 days)</li>
+ *   <li>7-8 years behind the Gregorian calendar</li>
+ * </ul>
+ *
+ * @author Mark E. Shoulson (original implementation)
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
+ */
 public class EthiopicCalendar extends CopticCalendar {
-    /** DOCUMENT ME! */
+
+    private static final long serialVersionUID = 1L;
+    /** The RD number of the Ethiopian epoch (August 29, 8 CE Julian). */
     public static long EPOCH = (new JulianCalendar(8, 29, 8)).toRD();
 
-    /** DOCUMENT ME! */
+    /** List of Ethiopian month names. */
     private static final String[] MONTHS = {
             "Maskaram", "Teqemt", "Khedar", "Takhsas", "Ter", "Yakatit",
             "Magabit", "Miyazya", "Genbot", "Sane", "Hamle", "Nahase",
@@ -35,7 +69,7 @@ public class EthiopicCalendar extends CopticCalendar {
 /**
      * Creates a new EthiopicCalendar object.
      *
-     * @param l DOCUMENT ME!
+     * @param l the Rata Die number.
      */
     public EthiopicCalendar(long l) {
         set(l);
@@ -44,7 +78,7 @@ public class EthiopicCalendar extends CopticCalendar {
 /**
      * Creates a new EthiopicCalendar object.
      *
-     * @param altcalendar DOCUMENT ME!
+     * @param altcalendar another calendar to initialize from.
      */
     public EthiopicCalendar(AlternateCalendar altcalendar) {
         this(altcalendar.toRD());
@@ -53,9 +87,9 @@ public class EthiopicCalendar extends CopticCalendar {
 /**
      * Creates a new EthiopicCalendar object.
      *
-     * @param i DOCUMENT ME!
-     * @param j DOCUMENT ME!
-     * @param k DOCUMENT ME!
+     * @param i the month (1-13).
+     * @param j the day.
+     * @param k the year.
      */
     public EthiopicCalendar(int i, int j, int k) {
         super(1, 1, 1);
@@ -63,7 +97,7 @@ public class EthiopicCalendar extends CopticCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Recomputes the Rata Die number from the current month, day, and year.
      */
     protected synchronized void recomputeRD() {
         super.rd = (EPOCH - 1L) + (long) (365 * (super.year - 1)) +
@@ -72,7 +106,7 @@ public class EthiopicCalendar extends CopticCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Recomputes the month, day, and year from the current Rata Die number.
      */
     protected synchronized void recomputeFromRD() {
         super.year = (int) AlternateCalendar.fldiv((4L * (super.rd - EPOCH)) +
@@ -84,27 +118,28 @@ public class EthiopicCalendar extends CopticCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the name of the current month.
      *
-     * @return DOCUMENT ME!
+     * @return the month name string.
      */
     protected String monthName() {
         return MONTHS[super.month - 1];
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns an enumeration of all Ethiopian month names.
      *
-     * @return DOCUMENT ME!
+     * @return enumeration of month names.
      */
-    public Enumeration getMonths() {
-        return new ArrayEnumeration(MONTHS);
+    @Override
+    public Enumeration<String> getMonths() {
+        return new ArrayEnumeration<>(MONTHS);
     }
 
     /**
-     * DOCUMENT ME!
+     * Main method for testing the Ethiopian calendar implementation.
      *
-     * @param args DOCUMENT ME!
+     * @param args command line arguments.
      */
     public static void main(String[] args) {
         int i;

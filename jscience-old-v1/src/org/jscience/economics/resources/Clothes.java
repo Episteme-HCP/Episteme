@@ -17,7 +17,7 @@ import java.util.Date;
  * @author Silvere Martin-Michiellot
  * @version 1.0
  */
-public abstract class Clothes extends org.jscience.economics.resources.Object {
+public abstract class Clothes extends org.jscience.economics.resources.PhysicalObject {
 /**
      * Creates a new Clothes object.
      *

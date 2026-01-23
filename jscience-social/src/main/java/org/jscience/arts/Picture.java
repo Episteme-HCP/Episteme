@@ -1,7 +1,6 @@
 package org.jscience.arts;
 
-import org.jscience.history.time.UncertainDate;
-import org.jscience.geography.Place;
+import java.time.Instant;
 import java.util.Objects;
 
 /**
@@ -22,14 +21,14 @@ public class Picture extends Artwork {
     private double widthCm;
     private double heightCm;
 
-    public Picture(String name, String description, UncertainDate productionDate, 
+    public Picture(String name, String description, Instant productionDate, 
                    Place productionPlace, ArtForm category, Medium medium, Support support) {
         super(name, description, productionDate, productionPlace, category);
         this.medium = Objects.requireNonNull(medium, "Medium cannot be null");
         this.support = Objects.requireNonNull(support, "Support cannot be null");
     }
 
-    public Picture(String name, UncertainDate productionDate, Medium medium) {
+    public Picture(String name, Instant productionDate, Medium medium) {
         this(name, "", productionDate, null, ArtForm.PAINTING, medium, Support.CANVAS);
     }
 

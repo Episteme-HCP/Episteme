@@ -1,34 +1,65 @@
-package org.jscience.politics;
-
-import org.jscience.economics.Organization;
-
-import org.jscience.geography.BusinessPlace;
-
-import org.jscience.measure.Identification;
-
-import java.util.Set;
-
-
-/**
- * An organization targetted towards managing a human group living.
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * @author Silvere Martin-Michiellot
- * @version 1.0
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
-//just a tagging class
-public class PoliticalParty extends Organization {
+package org.jscience.politics;
+
+import java.io.Serializable;
+import java.util.Set;
+import org.jscience.biology.Human;
+import org.jscience.economics.Organization;
+import org.jscience.economics.money.Account;
+import org.jscience.geography.BusinessPlace;
+import org.jscience.util.identity.Identification;
+
 /**
-     * Creates a new PoliticalParty object.
+ * Represents a political party organized for democratic participation and governance.
+ * A political party is an internal organization within a jurisdiction (Country/Nation).
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
+ */
+public class PoliticalParty extends Organization implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Initializes a new PoliticalParty.
      *
-     * @param name           DOCUMENT ME!
-     * @param identification DOCUMENT ME!
-     * @param owners         DOCUMENT ME!
-     * @param place          DOCUMENT ME!
-     * @param accounts       DOCUMENT ME!
+     * @param name           the official name of the party
+     * @param identification unique organizational identification
+     * @param owners         set of primary members or founders
+     * @param place          headquarters location
+     * @param accounts       financial accounts for party funding
      */
     public PoliticalParty(String name, Identification identification,
-        Set owners, BusinessPlace place, Set accounts) {
+        Set<Human> owners, BusinessPlace place, Set<Account> accounts) {
         super(name, identification, owners, place, accounts);
+    }
+
+    @Override
+    public String toString() {
+        return "Political Party: " + getName();
     }
 }

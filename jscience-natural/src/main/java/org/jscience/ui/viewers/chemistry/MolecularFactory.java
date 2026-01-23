@@ -26,8 +26,8 @@ package org.jscience.ui.viewers.chemistry;
 import org.jscience.technical.backend.BackendDiscovery;
 import org.jscience.technical.backend.BackendProvider;
 
-import org.jscience.ui.viewers.chemistry.backend.MolecularRenderer;
-import org.jscience.ui.viewers.chemistry.backend.JavaFXMolecularRenderer;
+import org.jscience.ui.viewers.chemistry.backends.MolecularRenderer;
+import org.jscience.ui.viewers.chemistry.backends.JavaFXMolecularRenderer;
 
 import java.util.List;
 import java.util.Optional;

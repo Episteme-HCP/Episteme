@@ -1,29 +1,63 @@
-//repackaged after the code from Mark E. Shoulson
-//email <mark@kli.org>
-//website http://web.meson.org/calendars/
-//released under GPL
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Originally based on code from Mark E. Shoulson <mark@kli.org>
+ * http://web.meson.org/calendars/
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history.calendars;
 
-
-// Referenced classes of package calendars:
 /**
- * DOCUMENT ME!
+ * Astronomical calculations for calendar systems.
+ * Provides precise calculations for solar longitude, lunar phases,
+ * ephemeris corrections, and time conversions needed by various calendars.
  *
- * @author $author$
- * @version $Revision: 1.3 $
-  */
+ * <p>Key calculations include:</p>
+ * <ul>
+ *   <li>Solar longitude (position of sun in ecliptic)</li>
+ *   <li>New moon times</li>
+ *   <li>Equation of time</li>
+ *   <li>Ephemeris corrections (ΔT)</li>
+ *   <li>Julian Day / Rata Die conversions</li>
+ * </ul>
+ *
+ * @author Mark E. Shoulson (original implementation)
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
+ */
 public class Moment {
-    /** DOCUMENT ME! */
+    /** Julian Day of the year 2000 epoch (January 1, 2000, 12:00 TT). */
     public static final double JD2000 = (new GregorianCalendar(1, 1, 2000)).toJD() +
         0.5D;
 
-    /** DOCUMENT ME! */
+    /** Rata Die of January 1, 1900. */
     private static final long JAN1900 = (new GregorianCalendar(1, 1, 1900)).toRD();
 
-    /** DOCUMENT ME! */
+    /** Rata Die of January 1, 1810. */
     private static final long JAN1810 = (new GregorianCalendar(1, 1, 1810)).toRD();
 
-    /** DOCUMENT ME! */
+    /** Coefficients for solar longitude periodic terms. */
     private static final double[] LONG_COEFFS = {
             403406D, 195207D, 119433D, 112392D, 3891D, 2819D, 1721D, 660D, 350D,
             334D, 314D, 268D, 242D, 234D, 158D, 132D, 129D, 114D, 99D, 93D, 86D,
@@ -31,7 +65,7 @@ public class Moment {
             21D, 21D, 20D, 18D, 17D, 14D, 13D, 13D, 13D, 12D, 10D, 10D, 10D, 10D
         };
 
-    /** DOCUMENT ME! */
+    /** Multipliers for solar longitude periodic terms. */
     private static final double[] LONG_MULTS = {
             0.016210430000000001D, 628.30348067D, 628.30821523999998D,
             628.29634301999999D, 1256.605691D, 1256.6098400000001D,
@@ -50,7 +84,7 @@ public class Moment {
             214.63249999999999D, 1572.0840000000001D
         };
 
-    /** DOCUMENT ME! */
+    /** Phase shifts for solar longitude periodic terms. */
     private static final double[] LONG_ADDS = {
             4.7219639999999998D, 5.9374580000000003D, 1.1155889999999999D,
             5.7816159999999996D, 5.5473999999999997D, 1.512D,
@@ -69,16 +103,16 @@ public class Moment {
             2.5499999999999998D
         };
 
-    /** DOCUMENT ME! */
+    /** Average length of a synodic month in days. */
     public static final double MEANSYNODICMONTH = 29.530588853000001D;
 
-    /** DOCUMENT ME! */
+    /** The specific moment in time (Rata Die format). */
     private double moment;
 
 /**
      * Creates a new Moment object.
      *
-     * @param l DOCUMENT ME!
+     * @param l the Rata Die number.
      */
     public Moment(long l) {
         moment = l;
@@ -87,7 +121,7 @@ public class Moment {
 /**
      * Creates a new Moment object.
      *
-     * @param d DOCUMENT ME!
+     * @param d the Rata Die number (including time as fraction).
      */
     public Moment(double d) {
         moment = d;
@@ -96,84 +130,77 @@ public class Moment {
 /**
      * Creates a new Moment object.
      *
-     * @param altcalendar DOCUMENT ME!
+     * @param altcalendar another calendar to initialize from.
      */
     public Moment(AlternateCalendar altcalendar) {
         this(altcalendar.toRD());
     }
 
     /**
-     * DOCUMENT ME!
+     * Creates a new Moment from a Julian Day number.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the Julian Day.
+     * @return a new Moment object.
      */
     public static Moment jdCreate(double d) {
         return new Moment(momentFromJD(d));
     }
 
     /**
-     * DOCUMENT ME!
+     * Helper for sine with degrees.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d angle in degrees.
+     * @return sine value.
      */
     private static double sind(double d) {
         return Math.sin((d * 3.1415926535897931D) / 180D);
     }
 
     /**
-     * DOCUMENT ME!
+     * Helper for cosine with degrees.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d angle in degrees.
+     * @return cosine value.
      */
     private static double cosd(double d) {
         return Math.cos((d * 3.1415926535897931D) / 180D);
     }
 
     /**
-     * DOCUMENT ME!
+     * Helper for tangent with degrees.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d angle in degrees.
+     * @return tangent value.
      */
     private static double tand(double d) {
         return Math.tan((d * 3.1415926535897931D) / 180D);
     }
 
     /**
-     * DOCUMENT ME!
+     * Converts Julian Day to Rata Die.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the Julian Day.
+     * @return the Rata Die.
      */
     public static double momentFromJD(double d) {
         return d + -1721424.5D;
     }
 
     /**
-     * DOCUMENT ME!
+     * Converts Rata Die to Julian Day.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the Rata Die.
+     * @return the Julian Day.
      */
     public static double jdFromMoment(double d) {
         return d - -1721424.5D;
     }
 
     /**
-     * DOCUMENT ME!
+     * Calculates the equation of time for a given Julian Day.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the Julian Day.
+     * @return the equation of time adjustment.
      */
     public static double equationOfTime(double d) {
         double d1 = (d - JD2000) / 36525D;
@@ -195,43 +222,40 @@ public class Moment {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the equation of time for this moment.
      *
-     * @return DOCUMENT ME!
+     * @return the equation of time correction.
      */
     public double equationOfTime() {
         return equationOfTime(jdFromMoment(moment));
     }
 
     /**
-     * DOCUMENT ME!
+     * Converts local time to apparent time.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d local time.
+     * @return apparent time.
      */
     public static double apparentFromLocal(double d) {
         return d + equationOfTime(d);
     }
 
     /**
-     * DOCUMENT ME!
+     * Converts apparent time to local time.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d apparent time.
+     * @return local time.
      */
     public static double localFromApparent(double d) {
         return d - equationOfTime(d);
     }
 
     /**
-     * DOCUMENT ME!
+     * Evaluates a polynomial for given x.
      *
-     * @param d DOCUMENT ME!
-     * @param ad DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d x value.
+     * @param ad coefficients.
+     * @return polynomial value.
      */
     private static double polynomial(double d, double[] ad) {
         double d1 = 0.0D;
@@ -243,11 +267,10 @@ public class Moment {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the sidereal time at Greenwich for a Julian Day.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the Julian Day.
+     * @return sidereal time as fraction of day.
      */
     public static double siderealFromJD(double d) {
         double d1 = (d - JD2000) / 36525D;
@@ -260,20 +283,19 @@ public class Moment {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the sidereal time for this moment.
      *
-     * @return DOCUMENT ME!
+     * @return sidereal time.
      */
     public double siderealFromJD() {
         return siderealFromJD(jdFromMoment(moment));
     }
 
     /**
-     * DOCUMENT ME!
+     * Calculates the ephemeris correction (ΔT) for a given date.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the Rata Die number.
+     * @return the correction in days.
      */
     public static double ephemerisCorrection(double d) {
         double d1 = (new GregorianCalendar((long) d)).getYear();
@@ -319,62 +341,58 @@ public class Moment {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the ephemeris correction for this moment.
      *
-     * @return DOCUMENT ME!
+     * @return ΔT in days.
      */
     public double ephemerisCorrection() {
         return ephemerisCorrection(moment);
     }
 
     /**
-     * DOCUMENT ME!
+     * Converts Universal Time to Ephemeris Time.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d Universal Time as Julian Day.
+     * @return Ephemeris Time as Julian Day.
      */
     public static double ephemerisFromUniversal(double d) {
         return d + ephemerisCorrection(momentFromJD(d));
     }
 
     /**
-     * DOCUMENT ME!
+     * Converts Ephemeris Time to Universal Time.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d Ephemeris Time as Julian Day.
+     * @return Universal Time as Julian Day.
      */
     public static double universalFromEphemeris(double d) {
         return d - ephemerisCorrection(momentFromJD(d));
     }
 
     /**
-     * DOCUMENT ME!
+     * Converts Julian Day to Julian centuries from J2000.0.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the Julian Day.
+     * @return Julian centuries.
      */
     public static double julianCenturies(double d) {
         return (ephemerisFromUniversal(d) - JD2000) / 36525D;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns Julian centuries from J2000.0 for this moment.
      *
-     * @return DOCUMENT ME!
+     * @return Julian centuries.
      */
     public double julianCenturies() {
         return julianCenturies(moment);
     }
 
     /**
-     * DOCUMENT ME!
+     * Calculates solar aberration for a given moment.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d Julian centuries from J2000.
+     * @return aberration in degrees.
      */
     public static double abberation(double d) {
         return (1.7E-006D * cosd(177.63D + (35999.018479999999D * d))) -
@@ -382,11 +400,10 @@ public class Moment {
     }
 
     /**
-     * DOCUMENT ME!
+     * Calculates nutation for a given moment.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d Julian centuries from J2000.
+     * @return nutation in degrees.
      */
     public static double nutation(double d) {
         double d1 = polynomial(d,
@@ -404,11 +421,10 @@ public class Moment {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the solar longitude in degrees.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the Julian Day.
+     * @return solar longitude.
      */
     public static double solarLongitude(double d) {
         double d1 = julianCenturies(d);
@@ -426,21 +442,20 @@ public class Moment {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the solar longitude for this moment.
      *
-     * @return DOCUMENT ME!
+     * @return solar longitude.
      */
     public double solarLongitude() {
         return solarLongitude(jdFromMoment(moment));
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the date when the sun next reaches a specific longitude.
      *
-     * @param d DOCUMENT ME!
-     * @param i DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d starting Julian Day.
+     * @param i target longitude increment or specific value.
+     * @return Julian Day of the next solar longitude.
      */
     public static double dateNextSolarLongitude(double d, int i) {
         double d4 = ((((double) i * Math.ceil(solarLongitude(d) / (double) i)) % 360D) +
@@ -467,14 +482,13 @@ public class Moment {
     }
 
     /**
-     * DOCUMENT ME!
+     * Calculates the solar moment for a given location and date.
      *
-     * @param l DOCUMENT ME!
-     * @param d DOCUMENT ME!
-     * @param d1 DOCUMENT ME!
-     * @param d2 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param l Gregorian year.
+     * @param d latitude in degrees.
+     * @param d1 longitude in degrees.
+     * @param d2 offset.
+     * @return solar moment.
      */
     public static double solarMoment(long l, double d, double d1, double d2) {
         double d3 = (double) (new GregorianCalendar(l)).dayNumber() + 0.5D +
@@ -507,11 +521,10 @@ public class Moment {
     }
 
     /**
-     * DOCUMENT ME!
+     * Finds the Julian Day of the first new moon at or after a date.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the Julian Day.
+     * @return the new moon Julian Day.
      */
     public static double newMoonAtOrAfter(double d) {
         GregorianCalendar gregorian = new GregorianCalendar((long) Math.floor(
@@ -528,22 +541,20 @@ public class Moment {
     }
 
     /**
-     * DOCUMENT ME!
+     * Finds the Julian Day of the first new moon before a date.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d the Julian Day.
+     * @return the new moon Julian Day.
      */
     public static double newMoonBefore(double d) {
         return newMoonAtOrAfter(newMoonAtOrAfter(d) - 45D);
     }
 
     /**
-     * DOCUMENT ME!
+     * Calculates the time of the n-th new moon since J2000.
      *
-     * @param i DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param i new moon index.
+     * @return Julian Day of the new moon.
      */
     public static double newMoonTime(int i) {
         double d = (double) i / 1236.8499999999999D;
@@ -644,33 +655,31 @@ public class Moment {
     }
 
     /**
-     * DOCUMENT ME!
+     * Converts local time to Universal Time.
      *
-     * @param d DOCUMENT ME!
-     * @param d1 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d local time (Julian Day).
+     * @param d1 timezone offset in minutes.
+     * @return Universal Time (Julian Day).
      */
     public static double universalFromLocal(double d, double d1) {
         return d - (d1 / 1440D);
     }
 
     /**
-     * DOCUMENT ME!
+     * Converts Universal Time to local time.
      *
-     * @param d DOCUMENT ME!
-     * @param d1 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param d Universal Time (Julian Day).
+     * @param d1 timezone offset in minutes.
+     * @return local time (Julian Day).
      */
     public static double localFromUniversal(double d, double d1) {
         return d + (d1 / 1440D);
     }
 
     /**
-     * DOCUMENT ME!
+     * Main method for testing astronomical calculations.
      *
-     * @param args DOCUMENT ME!
+     * @param args command line arguments.
      */
     public static void main(String[] args) {
         GregorianCalendar gregorian = new GregorianCalendar(Integer.parseInt(

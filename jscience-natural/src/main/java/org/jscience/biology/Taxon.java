@@ -25,14 +25,14 @@ package org.jscience.biology;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.jscience.util.identity.Identifiable;
+import org.jscience.util.identity.Identified;
 import org.jscience.util.Named;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a taxonomic group in a phylogenetic tree.
  */
-public class Taxon implements Identifiable<String>, Named {
+public class Taxon implements Identified<String>, Named {
     private String id;
     private String parentId;
     private String name;

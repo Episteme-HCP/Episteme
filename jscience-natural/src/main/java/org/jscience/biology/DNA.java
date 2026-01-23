@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.jscience.util.identity.Identifiable;
+import org.jscience.util.identity.Identified;
 import org.jscience.util.Named;
 
 /**
@@ -38,7 +38,7 @@ import org.jscience.util.Named;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class DNA implements Serializable, Cloneable, Identifiable<String>, Named {
+public class DNA implements Serializable, Cloneable, Identified<String>, Named {
 
     private final List<Base> bases;
 

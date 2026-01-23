@@ -21,6 +21,7 @@
  * SOFTWARE.
  */
 /**
- * Provides the {@link org.jscience.history.archeology} module.
+ * Provides classes and interfaces for archaeological research and analysis.
+ * Includes models for excavation sites, artifacts, civilizations, and stratigraphic sequences.
  */
 package org.jscience.history.archeology;

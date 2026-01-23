@@ -1,32 +1,69 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.sociology;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 import org.jscience.mathematics.numbers.real.Real;
-import java.util.*;
 
 /**
- * Schelling's model of spatial segregation.
+ * An implementation of Thomas Schelling's model of spatial segregation.
+ * demonstrating how individual preferences for similar neighbors (homophily) can lead
+ * to macro-level segregation, even with mild preferences.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
 public final class SegregationModel {
 
     private SegregationModel() {}
 
+    /** Types of agents or occupancy status in the grid. */
     public enum AgentType { TYPE_A, TYPE_B, EMPTY }
 
+    /** Represents a snapshot of the grid at a specific simulation step. */
     public record GridState(
         int step,
         AgentType[][] grid,
         double segregationIndex,
         double happinessRate,
         int moves
-    ) {}
+    ) implements Serializable {}
 
     /**
-     * Runs Schelling segregation simulation.
+     * Runs the Schelling segregation simulation.
      * 
-     * @param size Grid size (size x size)
-     * @param density Fraction of cells occupied
-     * @param threshold Minimum fraction of same-type neighbors required for happiness
-     * @param steps Number of simulation steps
+     * @param size      Dimensions of the grid (size x size)
+     * @param density   Fraction of cells initially occupied (0.0 to 1.0)
+     * @param threshold Minimum fraction of similar neighbors required for an agent to be "happy"
+     * @param steps     Maximum number of simulation steps
+     * @return List of GridState objects representing the simulation history
      */
     public static List<GridState> simulate(int size, double density, double threshold, int steps) {
         List<GridState> history = new ArrayList<>();
@@ -49,7 +86,7 @@ public final class SegregationModel {
         for (int step = 1; step <= steps; step++) {
             int moves = 0;
             
-            // Find unhappy agents
+            // Identify unhappy agents and empty spots
             List<int[]> unhappy = new ArrayList<>();
             List<int[]> empty = new ArrayList<>();
             
@@ -79,7 +116,7 @@ public final class SegregationModel {
             
             history.add(createState(step, grid, moves));
             
-            // Stop if no moves (equilibrium)
+            // Stop if no agents moved (equilibrium reached)
             if (moves == 0) break;
         }
         
@@ -87,7 +124,7 @@ public final class SegregationModel {
     }
 
     /**
-     * Checks if an agent is happy with their neighborhood.
+     * Checks if an agent at (row, col) is satisfied with their neighborhood.
      */
     private static boolean isHappy(AgentType[][] grid, int row, int col, double threshold) {
         AgentType type = grid[row][col];
@@ -114,13 +151,17 @@ public final class SegregationModel {
         }
         
         int total = same + different;
-        if (total == 0) return true;
+        if (total == 0) return true; // Happy if no neighbors
         
         return (double) same / total >= threshold;
     }
 
     /**
-     * Calculates segregation index (dissimilarity index).
+     * Calculates the Segregation (Dissimilarity) Index.
+     * Uses a simplified block-level dissimilarity measure.
+     * 
+     * @param grid the simulation grid
+     * @return the segregation index score
      */
     public static Real calculateSegregationIndex(AgentType[][] grid) {
         int size = grid.length;
@@ -138,8 +179,7 @@ public final class SegregationModel {
         
         // Calculate neighborhood-level dissimilarity
         double sum = 0;
-        int blockSize = size / 5; // 5x5 blocks
-        if (blockSize < 1) blockSize = 1;
+        int blockSize = Math.max(1, size / 5); // Use 5x5 blocks or smaller
         
         for (int bi = 0; bi < size; bi += blockSize) {
             for (int bj = 0; bj < size; bj += blockSize) {
@@ -160,7 +200,11 @@ public final class SegregationModel {
     }
 
     /**
-     * Calculates happiness rate.
+     * Calculates the percentage of agents who are currently "happy".
+     * 
+     * @param grid      the simulation grid
+     * @param threshold the happiness threshold used
+     * @return happiness rate (0.0 to 1.0)
      */
     public static Real calculateHappiness(AgentType[][] grid, double threshold) {
         int happy = 0, total = 0;
@@ -179,7 +223,9 @@ public final class SegregationModel {
     }
 
     /**
-     * Visualizes grid as string.
+     * Generates a string visualization of the grid.
+     * @param grid the grid to visualize
+     * @return string representation
      */
     public static String visualize(AgentType[][] grid) {
         StringBuilder sb = new StringBuilder();

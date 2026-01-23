@@ -1,68 +1,66 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.economics;
 
-
 /**
- * Leontief Input-Output Model for inter-industry dependencies.
- * (I - A)X = D
+ * Implements the Leontief Input-Output model to analyze inter-industry dependencies 
+ * and production requirements.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
 public final class InputOutputModel {
 
     private InputOutputModel() {}
 
     /**
-     * Calculates total production X required to meet final demand D.
-     * X = (I - A)^-1 * D
-     * 
-     * @param technicalCoefficients Matrix A (n x n)
-     * @param finalDemand Vector D
-     * @return Total output Vector X
+     * Solves for total sector output X given technical requirement matrix A and final demand D.
+     * X = (I - A)⁻¹ D
      */
     public static double[] solveTotalOutput(double[][] technicalCoefficients, double[] finalDemand) {
         int n = finalDemand.length;
         double[][] iminusA = new double[n][n];
-
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 iminusA[i][j] = (i == j ? 1.0 : 0.0) - technicalCoefficients[i][j];
             }
         }
-
-        // Solve using Gaussian elimination (simplified for small N)
         return solveSystem(iminusA, finalDemand);
     }
 
-    /**
-     * Calculates the Leontief Inverse (I - A)^-1.
-     * Elements represent total impact (direct + indirect).
-     */
+    /** Calculates the Leontief Inverse matrix. */
     public static double[][] calculateLeontiefInverse(double[][] a) {
         int n = a.length;
-        double[][] identity = new double[n][n];
         double[][] iminusA = new double[n][n];
         for (int i = 0; i < n; i++) {
-            identity[i][i] = 1.0;
             for (int j = 0; j < n; j++) {
-                iminusA[i][j] = (i == j ? 1 : 0) - a[i][j];
+                iminusA[i][j] = (i == j ? 1.0 : 0.0) - a[i][j];
             }
         }
         return invert(iminusA);
-    }
-
-    /**
-     * Calculates multipliers for each sector.
-     * Sum of columns in Leontief Inverse.
-     */
-    public static double[] calculateMultipliers(double[][] leontiefInverse) {
-        int n = leontiefInverse.length;
-        double[] multipliers = new double[n];
-        for (int j = 0; j < n; j++) {
-            double sum = 0;
-            for (int i = 0; i < n; i++) {
-                sum += leontiefInverse[i][j];
-            }
-            multipliers[j] = sum;
-        }
-        return multipliers;
     }
 
     private static double[] solveSystem(double[][] m, double[] b) {
@@ -74,13 +72,11 @@ public final class InputOutputModel {
         }
 
         for (int i = 0; i < n; i++) {
-            // Find pivot
             int pivot = i;
             for (int j = i + 1; j < n; j++) {
                 if (Math.abs(a[j][i]) > Math.abs(a[pivot][i])) pivot = j;
             }
             double[] temp = a[i]; a[i] = a[pivot]; a[pivot] = temp;
-
             for (int j = i + 1; j < n; j++) {
                 double factor = a[j][i] / a[i][i];
                 for (int k = i; k <= n; k++) a[j][k] -= factor * a[i][k];

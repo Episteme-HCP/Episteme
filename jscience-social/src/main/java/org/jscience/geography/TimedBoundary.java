@@ -1,254 +1,143 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.geography;
 
-import org.jscience.geography.coordinates.Coord;
-
-import org.jscience.mathematics.algebraic.numbers.Double;
 import org.jscience.mathematics.analysis.Interval;
 import org.jscience.mathematics.analysis.IntervalsList;
 
+import java.util.Objects;
 
 /**
- * A class used to define a boundary that changes according to time frame.
- * This is to be used for things that move.
+ * A boundary that changes over time.
+ * <p>
+ * This is useful for representing historical borders, moving entities, 
+ * or seasonal geographical phenomena. It maintains a list of time intervals
+ * and corresponding boundary states.
+ * </p>
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
-
-//ok may be this class should extend Object as it is basically of pairs Interval/Boundary
-//yet this is done this way as to enable seamless support for places that expect boundary
 public class TimedBoundary extends Boundary {
-    /** DOCUMENT ME! */
-    private IntervalsList dates;
 
-    /** DOCUMENT ME! */
-    private Coord[][] coords;
+    private static final long serialVersionUID = 1L;
 
-    /** DOCUMENT ME! */
-    private boolean[][] boundariesIncluded;
+    /** The time intervals for which each boundary state is valid. */
+    private final IntervalsList dates;
 
-/**
-     * Creates a new TimedBoundary object.
+    /** The sequence of coordinate sets corresponding to each time interval. */
+    private final Coordinate[][] timedCoordinates;
+
+    /** The sequence of edge inclusion flags for each boundary state. */
+    private final boolean[][] timedEdgesIncluded;
+
+    /**
+     * Creates a new TimedBoundary valid for all time.
      *
-     * @param coords DOCUMENT ME!
+     * @param initial the initial boundary state
      */
-    public TimedBoundary(Coord[] coords) {
-        super(coords);
+    public TimedBoundary(Boundary initial) {
+        super(initial.getCoordinates(), initial.getEdgesIncluded());
+        this.dates = new IntervalsList(new Interval(
+            new org.jscience.mathematics.numbers.real.RealDouble(Double.NEGATIVE_INFINITY),
+            new org.jscience.mathematics.numbers.real.RealDouble(Double.POSITIVE_INFINITY)));
+        this.timedCoordinates = new Coordinate[][] { initial.getCoordinates() };
+        this.timedEdgesIncluded = new boolean[][] { initial.getEdgesIncluded() };
+    }
 
-        if ((coords != null) && (coords.length > 0)) {
-            this.coords = new Coord[1][];
-            this.dates = new IntervalsList(new Interval(
-                        new Double(Double.NEGATIVE_INFINITY),
-                        new Double(Double.POSITIVE_INFINITY)));
-            System.arraycopy(coords, 0, this.coords[1], 0, coords.length);
-            this.boundariesIncluded = new boolean[1][];
+    /**
+     * Creates a multi-state timed boundary.
+     *
+     * @param dates              the validity intervals
+     * @param timedCoordinates   the coordinate sets for each interval
+     * @param timedEdgesIncluded the edge inclusion flags for each interval
+     * @throws IllegalArgumentException if array lengths don't match
+     */
+    public TimedBoundary(IntervalsList dates, Coordinate[][] timedCoordinates, 
+                         boolean[][] timedEdgesIncluded) {
+        super(timedCoordinates[0], timedEdgesIncluded[0]);
+        
+        Objects.requireNonNull(dates);
+        Objects.requireNonNull(timedCoordinates);
+        Objects.requireNonNull(timedEdgesIncluded);
 
-            for (int i = 0; i < boundariesIncluded.length; i++) {
-                this.boundariesIncluded[0][i] = true;
+        if (dates.getSize() != timedCoordinates.length || 
+            dates.getSize() != timedEdgesIncluded.length) {
+            throw new IllegalArgumentException("Intervals and data arrays must have same length");
+        }
+
+        this.dates = dates;
+        this.timedCoordinates = timedCoordinates;
+        this.timedEdgesIncluded = timedEdgesIncluded;
+    }
+
+    /**
+     * Returns the boundary state valid at the given time.
+     *
+     * @param time the time to query
+     * @return the boundary at that time, or the default (first) state if not found
+     */
+    public Boundary getAt(double time) {
+        int index = findIntervalIndex(time);
+        if (index >= 0) {
+            return new Boundary(timedCoordinates[index], timedEdgesIncluded[index]);
+        }
+        return new Boundary(coordinates, edgesIncluded);
+    }
+
+    private int findIntervalIndex(double time) {
+        // Implementation depends on IntervalsList structure
+        // Assuming we can iterate as it's a list of intervals
+        for (int i = 0; i < dates.getSize(); i++) {
+            Interval interval = dates.get(i);
+            if (interval.contains(new org.jscience.mathematics.numbers.real.RealDouble(time))) {
+                return i;
             }
-        } else {
-            throw new IllegalArgumentException(
-                "The TimedBoundary constructor can't have null or empty arguments.");
         }
-    }
-
-/**
-     * Creates a new TimedBoundary object.
-     *
-     * @param coords             DOCUMENT ME!
-     * @param boundariesIncluded DOCUMENT ME!
-     */
-    public TimedBoundary(Coord[] coords, boolean[] boundariesIncluded) {
-        super(coords, boundariesIncluded);
-
-        if ((coords != null) && (coords.length > 0) &&
-                (boundariesIncluded.length > 0) &&
-                (boundariesIncluded.length == coords.length)) {
-            this.coords = new Coord[1][];
-            this.dates = new IntervalsList(new Interval(
-                        new Double(Double.NEGATIVE_INFINITY),
-                        new Double(Double.POSITIVE_INFINITY)));
-            System.arraycopy(coords, 0, this.coords[0], 0, coords.length);
-            this.boundariesIncluded = new boolean[1][];
-            System.arraycopy(boundariesIncluded, 0, this.boundariesIncluded[0],
-                0, boundariesIncluded.length);
-        } else {
-            throw new IllegalArgumentException(
-                "The TimedBoundary constructor can't have null or empty arguments.");
-        }
-    }
-
-    //may be we should also check that every element from coord[] is of length>0
-    /**
-     * Creates a new TimedBoundary object.
-     *
-     * @param dates DOCUMENT ME!
-     * @param coords DOCUMENT ME!
-     */
-    public TimedBoundary(IntervalsList dates, Coord[][] coords) {
-        super(coords[0]);
-
-        boolean[] boundariesIncluded1;
-
-        if ((dates != null) && (dates.getSize() > 0) && (coords != null) &&
-                (coords.length > 0) && (coords[0].length > 0) &&
-                (coords.length == dates.getSize())) {
-            this.coords = coords;
-            boundariesIncluded = new boolean[coords.length][];
-
-            for (int i = 0; i < coords.length; i++) {
-                boundariesIncluded1 = new boolean[coords[i].length];
-
-                for (int j = 0; j < boundariesIncluded1.length; j++) {
-                    boundariesIncluded1[j] = true;
-                }
-
-                boundariesIncluded[i] = boundariesIncluded1;
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The TimedBoundary constructor can't have null or empty arguments.");
-        }
-    }
-
-    //may be we should also check that every element from coord[] and from boundariesIncluded[] is of length>0
-    /**
-     * Creates a new TimedBoundary object.
-     *
-     * @param dates DOCUMENT ME!
-     * @param coords DOCUMENT ME!
-     * @param boundariesIncluded DOCUMENT ME!
-     */
-    public TimedBoundary(IntervalsList dates, Coord[][] coords,
-        boolean[][] boundariesIncluded) {
-        super(coords[0], boundariesIncluded[0]);
-
-        boolean valid;
-        int i;
-
-        if ((dates != null) && (dates.getSize() > 0) && (coords != null) &&
-                (coords.length > 0) && (coords[0].length > 0) &&
-                (coords.length == dates.getSize()) &&
-                (boundariesIncluded.length > 0) &&
-                (boundariesIncluded[0].length > 0) &&
-                (boundariesIncluded.length == dates.getSize())) {
-            this.coords = coords;
-            valid = true;
-            i = 0;
-
-            while ((i < coords.length) && (valid)) {
-                valid = (boundariesIncluded[i].length == coords[i].length);
-            }
-
-            if (valid) {
-                this.boundariesIncluded = boundariesIncluded;
-            } else {
-                throw new IllegalArgumentException(
-                    "The length of each boundariesIncluded element must match the corresponding coords element.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The TimedBoundary constructor can't have null or empty arguments.");
-        }
+        return -1;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the time intervals.
      *
-     * @return DOCUMENT ME!
-     */
-    public Boundary getDefaultBoundary() {
-        return new Boundary(coords[0], boundariesIncluded[0]);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param i DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws IndexOutOfBoundsException DOCUMENT ME!
-     */
-    public Boundary getBoundary(int i) {
-        if ((i >= 0) && (i < dates.getSize())) {
-            return new Boundary(coords[i], boundariesIncluded[i]);
-        } else {
-            throw new IndexOutOfBoundsException(
-                "You can't get the Boundary for this interval.");
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @return validity intervals
      */
     public IntervalsList getDates() {
         return dates;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Coord[][] getDatedCoords() {
-        return coords;
+    @Override
+    public Coordinate getCentroid() {
+        // Return centroid of the current state (or default)
+        return super.getCentroid();
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public boolean[][] getDatedBoundariesInclusion() {
-        return boundariesIncluded;
-    }
-
-    // we have to take care of overridding every method
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Object getPosition() {
-        return getDefaultBoundary().getPosition();
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Coord[] getCoords() {
-        return getDefaultBoundary().getCoords();
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public boolean[] getBoundariesInclusion() {
-        return getDefaultBoundary().getBoundariesInclusion();
-    }
-
-    //explicitely unsupported
-    /**
-     * DOCUMENT ME!
-     *
-     * @param boundary DOCUMENT ME!
-     */
-    public void union(Boundary boundary) {
-    }
-
-    //explicitely unsupported
-    /**
-     * DOCUMENT ME!
-     *
-     * @param boundary DOCUMENT ME!
-     */
-    public void intersection(Boundary boundary) {
+    @Override
+    public String toString() {
+        return String.format("TimedBoundary[%d states, current: %s]", 
+            dates.getSize(), super.toString());
     }
 }

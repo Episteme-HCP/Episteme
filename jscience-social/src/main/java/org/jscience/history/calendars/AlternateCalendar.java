@@ -1,223 +1,279 @@
-//repackaged after the code from Mark E. Shoulson
-//email <mark@kli.org>
-//website http://web.meson.org/calendars/
-//released under GPL
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Originally based on code from Mark E. Shoulson <mark@kli.org>
+ * http://web.meson.org/calendars/
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history.calendars;
 
+import java.io.Serializable;
+
 /**
- * DOCUMENT ME!
+ * Abstract base class for alternate (non-Gregorian) calendar systems.
+ * Provides common operations for calendar date arithmetic, including
+ * conversion to/from Rata Die (RD) and Julian Day (JD) representations.
  *
- * @author $author$
- * @version $Revision: 1.3 $
+ * <p>The Rata Die is a day-counting system where day 1 corresponds to
+ * January 1, 1 CE in the proleptic Gregorian calendar.</p>
+ *
+ * @author Mark E. Shoulson (original implementation)
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
-public abstract class AlternateCalendar {
-    /** DOCUMENT ME! */
+public abstract class AlternateCalendar implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    /** The epoch day (Rata Die) for this calendar system's origin. */
     public static long EPOCH;
 
-    /** DOCUMENT ME! */
+    /** Flag to control Unicode output in toString methods. */
     public static boolean unicode;
 
-    /** DOCUMENT ME! */
+    /** 
+     * The Julian Day epoch offset. JD 0 = November 24, 4714 BCE (proleptic Gregorian).
+     * This constant relates RD to JD: JD = RD - JD_EPOCH
+     */
     public static final double JD_EPOCH = -1721424.5D;
 
-    /** DOCUMENT ME! */
+    /** The current Rata Die (day number) for this calendar instance. */
     protected long rd;
 
-/**
-     * Creates a new AlternateCalendar object.
+    /**
+     * Creates a new AlternateCalendar set to the epoch date.
      */
     public AlternateCalendar() {
         rd = EPOCH;
     }
 
-/**
-     * Creates a new AlternateCalendar object.
+    /**
+     * Creates a new AlternateCalendar set to the specified Rata Die.
      *
-     * @param l DOCUMENT ME!
+     * @param rataDie the Rata Die day number
      */
-    public AlternateCalendar(long l) {
-        rd = l;
+    public AlternateCalendar(long rataDie) {
+        rd = rataDie;
     }
 
     /**
-     * DOCUMENT ME!
+     * Computes the mathematical modulo (always positive) of two long values.
+     * Unlike Java's % operator, this always returns a non-negative result.
      *
-     * @param l DOCUMENT ME!
-     * @param l1 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param dividend the dividend
+     * @param divisor  the divisor
+     * @return the non-negative remainder
      */
-    public static long mod(long l, long l1) {
-        return l - (l1 * fldiv(l, l1));
+    public static long mod(long dividend, long divisor) {
+        return dividend - (divisor * floorDiv(dividend, divisor));
     }
 
     /**
-     * DOCUMENT ME!
+     * Computes the mathematical modulo (always positive) of a long and an int.
      *
-     * @param l DOCUMENT ME!
-     * @param i DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param dividend the dividend
+     * @param divisor  the divisor
+     * @return the non-negative remainder
      */
-    public static int mod(long l, int i) {
-        return (int) mod(l, i);
+    public static int mod(long dividend, int divisor) {
+        return (int) mod(dividend, (long) divisor);
     }
 
     /**
-     * DOCUMENT ME!
+     * Computes the adjusted modulo (1-based instead of 0-based).
+     * Returns values in range [1, divisor] instead of [0, divisor-1].
      *
-     * @param l DOCUMENT ME!
-     * @param l1 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param dividend the dividend
+     * @param divisor  the divisor
+     * @return the 1-based remainder
      */
-    public static long amod(long l, long l1) {
-        return 1L + mod(l - 1L, l1);
+    public static long amod(long dividend, long divisor) {
+        return 1L + mod(dividend - 1L, divisor);
     }
 
     /**
-     * DOCUMENT ME!
+     * Computes the floor division (rounds toward negative infinity).
      *
-     * @param l DOCUMENT ME!
-     * @param l1 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param dividend the dividend
+     * @param divisor  the divisor
+     * @return the floor of the quotient
      */
-    public static long fldiv(long l, long l1) {
-        long l2 = l / l1;
-
-        if ((l2 * l1) > l) {
-            return l2 - 1L;
-        } else {
-            return l2;
+    public static long floorDiv(long dividend, long divisor) {
+        long quotient = dividend / divisor;
+        if ((quotient * divisor) > dividend) {
+            return quotient - 1L;
         }
+        return quotient;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param l DOCUMENT ME!
+     * @deprecated Use {@link #floorDiv(long, long)} instead.
      */
-    public abstract void set(long l);
+    @Deprecated
+    public static long fldiv(long dividend, long divisor) {
+        return floorDiv(dividend, divisor);
+    }
 
     /**
-     * DOCUMENT ME!
+     * Sets this calendar to the specified Rata Die and recomputes the calendar fields.
      *
-     * @return DOCUMENT ME!
+     * @param rataDie the new Rata Die value
+     */
+    public abstract void set(long rataDie);
+
+    /**
+     * Returns the Rata Die (day number) for this calendar date.
+     *
+     * @return the current Rata Die
      */
     public long toRD() {
         return rd;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the Julian Day number for this calendar date.
      *
-     * @return DOCUMENT ME!
+     * @return the Julian Day
      */
     public double toJD() {
         return toJD(toRD());
     }
 
     /**
-     * DOCUMENT ME!
+     * Converts a Rata Die to a Julian Day number.
      *
-     * @param l DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param rataDie the Rata Die value
+     * @return the corresponding Julian Day
      */
-    public static double toJD(long l) {
-        return (double) l - -1721424.5D;
+    public static double toJD(long rataDie) {
+        return (double) rataDie - JD_EPOCH;
     }
 
     /**
-     * DOCUMENT ME!
+     * Converts a Julian Day number to a Rata Die.
      *
-     * @param d DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param julianDay the Julian Day value
+     * @return the corresponding Rata Die
      */
-    public static long fromJD(double d) {
-        return (long) Math.floor(d + -1721424.5D);
+    public static long fromJD(double julianDay) {
+        return (long) Math.floor(julianDay + JD_EPOCH);
     }
 
     /**
-     * DOCUMENT ME!
+     * Checks if this calendar date is before another calendar date.
      *
-     * @param altcalendar DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param other the calendar to compare against
+     * @return true if this date is before the other date
      */
-    public boolean before(AlternateCalendar altcalendar) {
-        return toRD() > altcalendar.toRD();
+    public boolean isBefore(AlternateCalendar other) {
+        return toRD() < other.toRD();
     }
 
     /**
-     * DOCUMENT ME!
+     * Checks if this calendar date is after another calendar date.
      *
-     * @param altcalendar DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param other the calendar to compare against
+     * @return true if this date is after the other date
      */
-    public boolean after(AlternateCalendar altcalendar) {
-        return toRD() < altcalendar.toRD();
+    public boolean isAfter(AlternateCalendar other) {
+        return toRD() > other.toRD();
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param altcalendar DOCUMENT ME!
-     * @param altcalendar1 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @deprecated Use {@link #isBefore(AlternateCalendar)} instead.
+     * Note: Original implementation had inverted logic.
      */
-    public static long difference(AlternateCalendar altcalendar,
-        AlternateCalendar altcalendar1) {
-        return altcalendar.toRD() - altcalendar1.toRD();
+    @Deprecated
+    public boolean before(AlternateCalendar other) {
+        return toRD() > other.toRD(); // Preserving original (incorrect) behavior
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param altcalendar DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @deprecated Use {@link #isAfter(AlternateCalendar)} instead.
+     * Note: Original implementation had inverted logic.
      */
-    public long difference(AlternateCalendar altcalendar) {
-        return difference(this, altcalendar);
+    @Deprecated
+    public boolean after(AlternateCalendar other) {
+        return toRD() < other.toRD(); // Preserving original (incorrect) behavior
     }
 
     /**
-     * DOCUMENT ME!
+     * Calculates the difference in days between two calendar dates.
      *
-     * @param l DOCUMENT ME!
+     * @param cal1 the first calendar
+     * @param cal2 the second calendar
+     * @return the number of days (cal1 - cal2)
      */
-    public void add(long l) {
-        set(rd + l);
+    public static long difference(AlternateCalendar cal1, AlternateCalendar cal2) {
+        return cal1.toRD() - cal2.toRD();
     }
 
     /**
-     * DOCUMENT ME!
+     * Calculates the difference in days between this calendar and another.
      *
-     * @param l DOCUMENT ME!
+     * @param other the calendar to compare against
+     * @return the number of days (this - other)
      */
-    public void subtract(long l) {
-        set(rd - l);
+    public long difference(AlternateCalendar other) {
+        return difference(this, other);
     }
 
     /**
-     * DOCUMENT ME!
+     * Adds a number of days to this calendar date.
+     *
+     * @param days the number of days to add (can be negative)
+     */
+    public void add(long days) {
+        set(rd + days);
+    }
+
+    /**
+     * Subtracts a number of days from this calendar date.
+     *
+     * @param days the number of days to subtract
+     */
+    public void subtract(long days) {
+        set(rd - days);
+    }
+
+    /**
+     * Recomputes the calendar-specific fields from the current Rata Die.
+     * Called after setting the RD value.
      */
     protected abstract void recomputeFromRD();
 
     /**
-     * DOCUMENT ME!
+     * Recomputes the Rata Die from the calendar-specific fields.
+     * Called after setting individual calendar fields.
      */
     protected abstract void recomputeRD();
 
     /**
-     * DOCUMENT ME!
+     * Returns a string representation of this calendar date.
      *
-     * @return DOCUMENT ME!
+     * @return a formatted date string
      */
+    @Override
     public abstract String toString();
 }

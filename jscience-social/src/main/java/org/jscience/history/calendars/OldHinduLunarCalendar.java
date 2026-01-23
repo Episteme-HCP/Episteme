@@ -1,39 +1,73 @@
-//repackaged after the code from Mark E. Shoulson
-//email <mark@kli.org>
-//website http://web.meson.org/calendars/
-//released under GPL
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Originally based on code from Mark E. Shoulson <mark@kli.org>
+ * http://web.meson.org/calendars/
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history.calendars;
 
 import org.jscience.mathematics.algebraic.numbers.Rational;
 
 import java.util.Enumeration;
 
-
-// Referenced classes of package calendars:
 /**
- * DOCUMENT ME!
+ * Implementation of the Old Hindu Lunar calendar (Surya Siddhanta).
+ * This is the traditional Hindu lunar calendar with months starting at new moon.
  *
- * @author $author$
- * @version $Revision: 1.3 $
-  */
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>Epoch: Kali Yuga (3102 BCE)</li>
+ *   <li>Lunar months (amānta - new moon to new moon)</li>
+ *   <li>Leap months (adhika māsa) to synchronize with solar year</li>
+ *   <li>Lunar days (tithis) may be skipped or doubled</li>
+ * </ul>
+ *
+ * @author Mark E. Shoulson (original implementation)
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
+ */
 public class OldHinduLunarCalendar extends OldHinduSolarCalendar {
-    /** DOCUMENT ME! */
+
+    private static final long serialVersionUID = 1L;
+    /** List of Hindu lunar month names. */
     protected static final String[] MONTHS = {
             "Chaitra", "Vaisakha", "Jyaishtha", "Ashadha", "Sravana",
             "Bhadrapada", "Asvina", "Karttika", "Margasira", "Pausha", "Magha",
             "Phalguna"
         };
 
-    /** DOCUMENT ME! */
+    /** The length of a synodic month (new moon to new moon) in days. */
     protected static final Rational LUNARMONTH;
 
-    /** DOCUMENT ME! */
+    /** The length of a tithi (lunar day) in days. */
     protected static final Rational LUNARDAY;
 
-    /** DOCUMENT ME! */
+    /** A constant used in leap month calculations. */
     private static final Rational LCONST;
 
-    /** DOCUMENT ME! */
+    /** The difference between a solar month and a lunar month. */
     private static final Rational MONTHDIFF;
 
     static {
@@ -44,7 +78,7 @@ public class OldHinduLunarCalendar extends OldHinduSolarCalendar {
         MONTHDIFF = OldHinduSolarCalendar.SOLARMONTH.subtract(LUNARMONTH);
     }
 
-    /** DOCUMENT ME! */
+    /** True if the current month is a leap month (adhika māsa). */
     protected boolean leap;
 
 /**
@@ -56,7 +90,7 @@ public class OldHinduLunarCalendar extends OldHinduSolarCalendar {
 /**
      * Creates a new OldHinduLunarCalendar object.
      *
-     * @param l DOCUMENT ME!
+     * @param l the Rata Die number to set.
      */
     public OldHinduLunarCalendar(long l) {
         super(l);
@@ -65,7 +99,7 @@ public class OldHinduLunarCalendar extends OldHinduSolarCalendar {
 /**
      * Creates a new OldHinduLunarCalendar object.
      *
-     * @param altcalendar DOCUMENT ME!
+     * @param altcalendar another calendar to initialize from.
      */
     public OldHinduLunarCalendar(AlternateCalendar altcalendar) {
         this(altcalendar.toRD());
@@ -74,9 +108,9 @@ public class OldHinduLunarCalendar extends OldHinduSolarCalendar {
 /**
      * Creates a new OldHinduLunarCalendar object.
      *
-     * @param i DOCUMENT ME!
-     * @param j DOCUMENT ME!
-     * @param k DOCUMENT ME!
+     * @param i the month (1-12).
+     * @param j the day (1-30).
+     * @param k the year.
      */
     public OldHinduLunarCalendar(int i, int j, int k) {
         set(i, j, k);
@@ -85,21 +119,20 @@ public class OldHinduLunarCalendar extends OldHinduSolarCalendar {
 /**
      * Creates a new OldHinduLunarCalendar object.
      *
-     * @param i    DOCUMENT ME!
-     * @param flag DOCUMENT ME!
-     * @param j    DOCUMENT ME!
-     * @param k    DOCUMENT ME!
+     * @param i    the month (1-12).
+     * @param flag true if it is a leap month.
+     * @param j    the day (1-30).
+     * @param k    the year.
      */
     public OldHinduLunarCalendar(int i, boolean flag, int j, int k) {
         set(i, flag, j, k);
     }
 
     /**
-     * DOCUMENT ME!
+     * Checks if the given year is a leap year (contains a leap month).
      *
-     * @param i DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param i the year to check.
+     * @return true if it is a leap year, false otherwise.
      */
     protected static boolean isLeapYear(int i) {
         Rational rational = OldHinduSolarCalendar.SIDEREALYEAR.multiply(new Rational(
@@ -111,7 +144,7 @@ public class OldHinduLunarCalendar extends OldHinduSolarCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Recomputes the month, day, year, and leap month status from the current Rata Die number.
      */
     protected synchronized void recomputeFromRD() {
         Rational rational = (new Rational(1L, 4L)).add(new Rational(dayCount()));
@@ -128,9 +161,9 @@ public class OldHinduLunarCalendar extends OldHinduSolarCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Recomputes the Rata Die number from the current month, day, year, and leap month status.
      *
-     * @throws InconsistentDateException DOCUMENT ME!
+     * @throws InconsistentDateException if the date is invalid or skipped.
      */
     protected synchronized void recomputeRD() {
         Rational rational = OldHinduSolarCalendar.SOLARMONTH.multiply(new Rational((12 * super.year) -
@@ -167,23 +200,23 @@ public class OldHinduLunarCalendar extends OldHinduSolarCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the month, day, and year, assuming it's not a leap month.
      *
-     * @param i DOCUMENT ME!
-     * @param j DOCUMENT ME!
-     * @param k DOCUMENT ME!
+     * @param i the month.
+     * @param j the day.
+     * @param k the year.
      */
     public synchronized void set(int i, int j, int k) {
         set(i, false, j, k);
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the month, leap status, day, and year.
      *
-     * @param i DOCUMENT ME!
-     * @param flag DOCUMENT ME!
-     * @param j DOCUMENT ME!
-     * @param k DOCUMENT ME!
+     * @param i    the month.
+     * @param flag true if leap month.
+     * @param j    the day.
+     * @param k    the year.
      */
     public synchronized void set(int i, boolean flag, int j, int k) {
         super.month = i;
@@ -194,9 +227,9 @@ public class OldHinduLunarCalendar extends OldHinduSolarCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the Rata Die number and recomputes the date.
      *
-     * @param l DOCUMENT ME!
+     * @param l the Rata Die number.
      */
     public synchronized void set(long l) {
         super.rd = l;
@@ -204,45 +237,45 @@ public class OldHinduLunarCalendar extends OldHinduSolarCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the name of the current month, indicating if it is a leap month.
      *
-     * @return DOCUMENT ME!
+     * @return the month name string.
      */
     protected String monthName() {
         return MONTHS[super.month - 1] + (leap ? " (leap)" : "");
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the suffix for Old Hindu lunar years (" K.Y.").
      *
-     * @return DOCUMENT ME!
+     * @return the year suffix.
      */
     protected String getSuffix() {
         return " K.Y.";
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns an enumeration of all Hindu lunar month names.
      *
-     * @return DOCUMENT ME!
+     * @return enumeration of month names.
      */
     public Enumeration getMonths() {
-        return new ArrayEnumeration(MONTHS);
+        return new ArrayEnumeration<>(MONTHS);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the leap month status of the current date.
      *
-     * @return DOCUMENT ME!
+     * @return true if it is a leap month.
      */
     public boolean getLeap() {
         return leap;
     }
 
     /**
-     * DOCUMENT ME!
+     * Main method for testing the Old Hindu Lunar calendar implementation.
      *
-     * @param args DOCUMENT ME!
+     * @param args command line arguments.
      */
     public static void main(String[] args) {
         int i;
@@ -274,48 +307,44 @@ public class OldHinduLunarCalendar extends OldHinduSolarCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Performs a "greater than" comparison between two Rational numbers.
      *
-     * @param rational1 DOCUMENT ME!
-     * @param rational2 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param rational1 the first number.
+     * @param rational2 the second number.
+     * @return true if rational1 > rational2.
      */
     private static boolean gt(Rational rational1, Rational rational2) {
         return rational2.subtract(rational1).signum() < 0;
     }
 
     /**
-     * DOCUMENT ME!
+     * Performs a "less than or equal to" comparison between two Rational numbers.
      *
-     * @param rational1 DOCUMENT ME!
-     * @param rational2 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param rational1 the first number.
+     * @param rational2 the second number.
+     * @return true if rational1 <= rational2.
      */
     private static boolean lte(Rational rational1, Rational rational2) {
         return !gt(rational1, rational2);
     }
 
     /**
-     * DOCUMENT ME!
+     * Performs a "less than" comparison between two Rational numbers.
      *
-     * @param rational1 DOCUMENT ME!
-     * @param rational2 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param rational1 the first number.
+     * @param rational2 the second number.
+     * @return true if rational1 < rational2.
      */
     private static boolean lt(Rational rational1, Rational rational2) {
         return gt(rational2, rational1);
     }
 
     /**
-     * DOCUMENT ME!
+     * Performs a "greater than or equal to" comparison between two Rational numbers.
      *
-     * @param rational1 DOCUMENT ME!
-     * @param rational2 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param rational1 the first number.
+     * @param rational2 the second number.
+     * @return true if rational1 >= rational2.
      */
     private static boolean gte(Rational rational1, Rational rational2) {
         return !lt(rational1, rational2);

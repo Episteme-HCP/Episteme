@@ -38,7 +38,7 @@ public interface ComputeBackend extends BackendProvider {
 
     @Override
     default String getType() {
-        return "tensor"; // Default type for compute backends
+        return "Generic"; // Default type for compute backends
     }
 
     @Override

@@ -27,8 +27,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import org.jscience.util.identity.Identifiable;
+import org.jscience.util.identity.Identified;
 import org.jscience.util.Named;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a biological species with full taxonomic classification.
@@ -41,7 +45,8 @@ import org.jscience.util.Named;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Species implements Identifiable<String>, Named {
+@Persistent
+public class Species implements Identified<String>, Named {
 
     /**
      * IUCN Red List conservation status.
@@ -68,24 +73,36 @@ public class Species implements Identifiable<String>, Named {
         }
     }
 
+    @Attribute
     private final String commonName;
+    @Id
     private final String scientificName;
+    @Attribute
     private final Map<String, String> attributes = new HashMap<>();
+    @Relation(type = Relation.Type.MANY_TO_ONE)
     private Species ancestor;
+    @Attribute
     private ConservationStatus conservationStatus;
 
     // Taxonomic ranks
+    @Attribute
     private String kingdom;
+    @Attribute
     private String phylum;
+    @Attribute
     private String taxonomicClass;
+    @Attribute
     private String order;
+    @Attribute
     private String family;
+    @Attribute
     private String genus;
+    @Attribute
     private String specificEpithet;
 
     public Species(String commonName, String scientificName) {
-        this.commonName = commonName;
-        this.scientificName = scientificName;
+        this.commonName = Objects.requireNonNull(commonName, "Common name cannot be null");
+        this.scientificName = Objects.requireNonNull(scientificName, "Scientific name cannot be null");
         this.conservationStatus = ConservationStatus.NOT_EVALUATED;
     }
 

@@ -30,6 +30,8 @@ import org.jscience.geography.Place;
 import org.jscience.sociology.Person;
 
 import java.time.LocalDate;
+import org.jscience.economics.money.Money;
+import org.jscience.economics.money.Currency;
 
 public class EconomicsRestorationTest {
 
@@ -56,12 +58,12 @@ public class EconomicsRestorationTest {
         assertTrue(widgetFactory.canProduce("Widget"));
 
         Money productionCost = Money.usd(100.0);
-        MaterialResource<?> widget = widgetFactory.produce("Widget", 10.0, productionCost);
+        MaterialResource widget = widgetFactory.produce("Widget", 10.0, productionCost);
 
         assertNotNull(widget);
         assertEquals("Widget", widget.getName());
-        assertEquals(10.0, widget.getQuantity().doubleValue(), 0.001);
-        assertEquals(london, widget.getLocation());
+        assertEquals(10.0, widget.getAmount().getValue().doubleValue(), 0.001);
+        assertEquals(london, widget.getPosition());
         assertEquals(productionCost, widget.getValue());
 
         // Verify Capital Deduction

@@ -23,45 +23,85 @@
 
 package org.jscience.politics;
 
+import java.io.Serializable;
+import java.util.Objects;
 import org.jscience.geography.Place;
+import org.jscience.util.Named;
 
 /**
- * Martin-Michiellot
+ * Represents an electoral district or voting precinct.
+ * Constituencies define the geographic area and population size for representative allocation.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
-public class Constituency {
+public class Constituency implements Named, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final String name;
     private final Place area;
     private int population;
     private int electorateSize; // Number of eligible voters
 
+    /**
+     * Creates a new Constituency.
+     *
+     * @param name       the name of the district
+     * @param area       the geographic region
+     * @param population total resident population
+     * @throws NullPointerException if name or area is null
+     */
     public Constituency(String name, Place area, int population) {
-        this.name = name;
-        this.area = area;
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        this.area = Objects.requireNonNull(area, "Area cannot be null");
         this.population = population;
         this.electorateSize = (int) (population * 0.7); // Rough estimate default
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the geographic area of the constituency.
+     * @return the place/area
+     */
     public Place getArea() {
         return area;
     }
 
+    /**
+     * Returns the total population count.
+     * @return population
+     */
     public int getPopulation() {
         return population;
     }
 
+    /**
+     * Sets the total population count.
+     * @param population new population
+     */
+    public void setPopulation(int population) {
+        this.population = population;
+    }
+
+    /**
+     * Returns the estimated or actual number of eligible voters.
+     * @return electorate size
+     */
     public int getElectorateSize() {
         return electorateSize;
     }
 
+    /**
+     * Updates the number of eligible voters in the constituency.
+     * @param size electorate size
+     */
     public void setElectorateSize(int size) {
         this.electorateSize = size;
     }
@@ -71,5 +111,3 @@ public class Constituency {
         return String.format("%s (%d voters)", name, electorateSize);
     }
 }
-
-

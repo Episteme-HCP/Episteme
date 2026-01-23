@@ -23,7 +23,7 @@
 
 package org.jscience.physics.astronomy;
 
-import org.jscience.util.identity.Identifiable;
+import org.jscience.util.identity.Identified;
 import org.jscience.util.Named;
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.numbers.real.Real;
@@ -47,7 +47,7 @@ import org.jscience.measure.Units;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CelestialBody extends Particle implements Identifiable<String>, Named {
+public class CelestialBody extends Particle implements Identified<String>, Named {
 
     private String name;
     private Quantity<Length> radius;

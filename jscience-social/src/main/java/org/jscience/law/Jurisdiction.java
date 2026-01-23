@@ -30,7 +30,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Martin-Michiellot
+ * Represents a legal jurisdiction, defined by its name, territory, and set of applicable statutes.
+ * Jurisdictions can be hierarchical (e.g., a state jurisdiction within a federal jurisdiction).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)

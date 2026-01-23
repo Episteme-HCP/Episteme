@@ -23,45 +23,85 @@
 
 package org.jscience.sociology;
 
-import java.util.*;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 /**
- * Represents a social network graph.
+ * Represents a social network graph where persons are nodes and relationships are edges.
+ * Provides basic graph algorithms for social network analysis, such as degrees of separation.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
-public class SocialNetwork {
+public class SocialNetwork implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+    // Adjacency list storing the network graph.
     private final Map<Person, Set<Person>> adjList = new HashMap<>();
 
+    /**
+     * Adds a person to the network as a node.
+     * @param p the person to add
+     */
     public void addPerson(Person p) {
-        adjList.putIfAbsent(p, new HashSet<>());
+        if (p != null) {
+            adjList.putIfAbsent(p, new HashSet<>());
+        }
     }
 
+    /**
+     * Adds a bidirectional connection (relationship) between two people.
+     * Automatically adds the persons to the network if they are not already present.
+     *
+     * @param p1 first person
+     * @param p2 second person
+     */
     public void addConnection(Person p1, Person p2) {
+        if (p1 == null || p2 == null) return;
+        
         addPerson(p1);
         addPerson(p2);
+        
         adjList.get(p1).add(p2);
         adjList.get(p2).add(p1);
     }
 
+    /**
+     * Checks if two people are directly connected.
+     *
+     * @param p1 first person
+     * @param p2 second person
+     * @return true if a direct connection exists
+     */
     public boolean areConnected(Person p1, Person p2) {
-        if (!adjList.containsKey(p1))
+        if (p1 == null || p2 == null || !adjList.containsKey(p1)) {
             return false;
+        }
         return adjList.get(p1).contains(p2);
     }
 
     /**
-     * Finds the shortest path (degrees of separation) between two people.
-     * Uses BFS. Returns -1 if no path.
+     * Finds the shortest path (degrees of separation) between two people using Breadth-First Search (BFS).
+     *
+     * @param start the starting person
+     * @param end   the target person
+     * @return the number of hops (degrees), or 0 if same person, or -1 if no path exists
      */
     public int getDegreesOfSeparation(Person start, Person end) {
-        if (start.equals(end))
-            return 0;
-        if (!adjList.containsKey(start) || !adjList.containsKey(end))
+        if (start == null || end == null) return -1;
+        if (start.equals(end)) return 0;
+        
+        if (!adjList.containsKey(start) || !adjList.containsKey(end)) {
             return -1;
+        }
 
         Queue<Person> queue = new LinkedList<>();
         Map<Person, Integer> distances = new HashMap<>();
@@ -73,7 +113,11 @@ public class SocialNetwork {
             Person current = queue.poll();
             int dist = distances.get(current);
 
-            for (Person neighbor : adjList.get(current)) {
+            // Using get() safely as current is guaranteed to be in adjList
+            Set<Person> neighbors = adjList.get(current);
+            if (neighbors == null) continue;
+
+            for (Person neighbor : neighbors) {
                 if (!distances.containsKey(neighbor)) {
                     distances.put(neighbor, dist + 1);
                     queue.add(neighbor);
@@ -87,5 +131,3 @@ public class SocialNetwork {
         return -1; // No path found
     }
 }
-
-

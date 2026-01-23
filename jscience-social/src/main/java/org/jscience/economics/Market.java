@@ -23,9 +23,16 @@
 
 package org.jscience.economics;
 
+import org.jscience.economics.money.Currency;
+import org.jscience.economics.money.Money;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.util.Named;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
+
 import java.util.HashMap;
 import java.util.Map;
-import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a market where goods are traded.
@@ -34,11 +41,16 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Market {
+@Persistent
+public class Market implements Named {
 
+    @Attribute
     private final String name;
+    @Relation(type = Relation.Type.MANY_TO_ONE)
     private final Currency currency;
+    @Attribute
     private final Map<String, Money> prices;
+    @Attribute
     private final Map<String, Integer> inventory;
 
     public Market(String name, Currency currency) {
@@ -48,6 +60,7 @@ public class Market {
         this.inventory = new HashMap<>();
     }
 
+    @Override
     public String getName() {
         return name;
     }

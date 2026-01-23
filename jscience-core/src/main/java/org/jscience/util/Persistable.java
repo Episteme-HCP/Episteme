@@ -33,6 +33,6 @@ package org.jscience.util;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface Persistable<ID> extends java.io.Serializable, org.jscience.util.identity.Identifiable<ID> {
+public interface Persistable<ID> extends java.io.Serializable, org.jscience.util.identity.Identified<ID> {
     // Marker for persistence capable entities
 }

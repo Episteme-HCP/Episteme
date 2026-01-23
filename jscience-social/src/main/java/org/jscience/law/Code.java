@@ -1,126 +1,125 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.law;
 
 import org.jscience.util.Named;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.Vector;
-
+import java.util.List;
 
 /**
- * A class representing a set of laws used in a specifica area.
+ * A class representing a systematic collection of laws or regulations 
+ * (e.g., Civil Code, Penal Code) applicable in a specific jurisdiction.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.2
  */
-
-//may be we should extend constitution even if the meaning is not quite the same
-public class Code extends Object implements Named {
-    /** DOCUMENT ME! */
+public class Code implements Named {
+    
     private String name;
-
-    /** DOCUMENT ME! */
     private String category;
-
-    /** DOCUMENT ME! */
     private Date date;
+    private List<Article> articles;
 
-    /** DOCUMENT ME! */
-    private Vector articles; //it is not guarantied that the elements of the vector are ordonned by number
-
-    //must be a vector of Articles
     /**
      * Creates a new Code object.
      *
-     * @param name DOCUMENT ME!
-     * @param category DOCUMENT ME!
-     * @param date DOCUMENT ME!
-     * @param articles DOCUMENT ME!
+     * @param name the name of the code (e.g., "Code Civil")
+     * @param category the legal category (e.g., "Civil Law")
+     * @param date the date of promulgation or publication
+     * @param articles the initial list of articles
+     * @throws IllegalArgumentException if any argument is null or if the list contains non-Article entities
      */
-    public Code(String name, String category, Date date, Vector articles) {
-        Iterator iterator;
-        boolean valid;
-
-        if ((name != null) && (name.length() > 0) && (category != null) &&
-                (category.length() > 0) && (date != null) &&
-                (articles != null)) {
-            iterator = articles.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Article;
-            }
-
-            if (valid) {
-                this.name = name;
-                this.category = category;
-                this.date = date;
-                this.articles = articles;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Vector can consist only of Articles.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Code constructor can't have null arguments (and name and category can't be empty).");
+    public Code(String name, String category, Date date, List<Article> articles) {
+        if (name == null || name.isEmpty() || category == null || 
+            category.isEmpty() || date == null || articles == null) {
+            throw new IllegalArgumentException("Code arguments cannot be null or empty.");
         }
+
+        for (Object article : articles) {
+            if (!(article instanceof Article)) {
+                throw new IllegalArgumentException("The list must contain only Articles.");
+            }
+        }
+
+        this.name = name;
+        this.category = category;
+        this.date = date;
+        this.articles = new ArrayList<>(articles);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the name of the legal code.
+     * @return the name
      */
+    @Override
     public String getName() {
         return name;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the category of the code.
+     * @return the category
      */
     public String getCategory() {
         return category;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the publication or effective date of the code.
+     * @return the date
      */
     public Date getDate() {
         return date;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the list of articles contained in this code.
+     * @return the list of articles
      */
-    public Vector getArticles() {
+    public List<Article> getArticles() {
         return articles;
     }
 
-    //each article should have a corresponding number that goes in a logical progression
     /**
-     * DOCUMENT ME!
-     *
-     * @param article DOCUMENT ME!
+     * Adds an article to the code.
+     * @param article the article to add
+     * @throws IllegalArgumentException if article is null
      */
     public void addArticle(Article article) {
-        this.articles.addElement(article);
+        if (article == null) {
+            throw new IllegalArgumentException("Cannot add a null article.");
+        }
+        this.articles.add(article);
     }
 
-    //be cautious when removing an article as there still may be some other articles refering to this article
     /**
-     * DOCUMENT ME!
-     *
-     * @param article DOCUMENT ME!
+     * Removes an article from the code.
+     * @param article the article to remove
      */
     public void removeArticle(Article article) {
         this.articles.remove(article);
     }
-
-    //perhaps toString could be implemented
 }

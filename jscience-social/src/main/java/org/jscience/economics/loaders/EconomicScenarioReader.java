@@ -1,7 +1,7 @@
 package org.jscience.economics.loaders;
 
 import org.jscience.economics.PortfolioData;
-import org.jscience.economics.Money;
+import org.jscience.economics.money.Money;
 import org.jscience.economics.Currency;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.io.AbstractResourceReader;
@@ -21,6 +21,7 @@ public final class EconomicScenarioReader extends AbstractResourceReader<Portfol
     @Override public String getLongDescription() { return "Support for JSON and CSV portfolio structures with built-in sample data."; }
     @Override public String getResourcePath() { return "data/economics"; }
     @Override public Class<PortfolioData> getResourceType() { return PortfolioData.class; }
+    @Override public String[] getSupportedVersions() { return new String[] {"1.0"}; }
 
     @Override
     protected PortfolioData loadFromSource(String id) throws Exception {

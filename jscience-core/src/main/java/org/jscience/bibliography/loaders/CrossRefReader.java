@@ -90,6 +90,11 @@ public class CrossRefReader extends AbstractResourceReader<CitationInfo> {
         return CitationInfo.class;
     }
 
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"v1"};
+    }
+
     private static final String API_BASE = org.jscience.io.Configuration.get(
             "api.crossref.base", "https://api.crossref.org/works/");
 

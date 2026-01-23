@@ -1,135 +1,118 @@
-package org.jscience.politics;
-
-import org.jscience.biology.Individual;
-
-import org.jscience.geography.Boundary;
-import org.jscience.geography.Place;
-
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Set;
-
-
-/**
- * A class representing a common country subdivision.
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * @author Silvere Martin-Michiellot
- * @version 1.0
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
-//we could also define State, County... also these subdivisions are very dependent about the country you live in
-//Countries using administrative regions
-//The following countries use the term "region" (or its cognate) as the name of a type of subnational entity:
-//Belgium (in French, région; in German, Region; the term gewest is used in Dutch)
-//Chile (región)
-//Congo (région)
-//Côte d'Ivoire (région)
-//France (région)
-//Ghana
-//Hungary (régió)
-//Italy (regione)
-//Mali (région)
-//Namibia
-//New Zealand
-//Peru (región)
-//Tanzania
-//Togo (région)
-//The Canadian province of Québec also uses the "administrative region" (région administrative).
-//Prior to 1996, Scotland was also divided into regions.
-//The government of the Philippines uses the region (in Filipino, rehiyon) when it's necessary to group provinces, the primary administrative subdivision of the country.
-//The government of Singapore makes use of regions for its own administrative purposes. Similarly, the British government also makes limited use of regions for England.
-//The following countries use an administrative subdivision conventionally referred to as a region in English:
-//Russia, which uses the обла�?ть (oblast').
-//Ukraine, which uses the обла�?ть (oblast').
-//China has five 自治区 (zìzhìqū) and two 特別行政�?� (or 特别行政区; tèbiéxíngzhèngqū) which are conventionally translated as "autonomous region" and "special administrative region", respectively.
-public class Region extends Place {
-    /** DOCUMENT ME! */
-    private Country country;
+package org.jscience.politics;
 
-    /** DOCUMENT ME! */
-    private Set leaders; //the current responsible persons in the region
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import org.jscience.biology.Individual;
+import org.jscience.geography.Boundary;
+import org.jscience.geography.Place;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
-     * Creates a new Region object.
-     *
-     * @param name     DOCUMENT ME!
-     * @param boundary DOCUMENT ME!
-     * @param country  DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
+ * Represents a major subnational administrative division (State, Province, Oblast, etc.).
+ * Regions aggregate local leadership and territorial boundaries within a Country.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
+ */
+@Persistent
+public class Region extends Place implements Serializable {
 
-    //region is automatically added to country
+    private static final long serialVersionUID = 1L;
+
+    @Relation(type = Relation.Type.MANY_TO_ONE)
+    private Country country;
+
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private final Set<Individual> leaders = new HashSet<>();
+
+    /**
+     * Initializes a new Region.
+     *
+     * @param name     the name of the region
+     * @param boundary the geographic boundary
+     * @param country  the parent country
+     * @throws NullPointerException if any argument is null
+     */
     public Region(String name, Boundary boundary, Country country) {
-        super(name, boundary);
+        super(Objects.requireNonNull(name, "Name cannot be null"), 
+              Objects.requireNonNull(boundary, "Boundary cannot be null"));
+        this.country = Objects.requireNonNull(country, "Country cannot be null");
+        this.country.addRegion(this);
+    }
 
-        if ((country != null) && (leaders != null)) {
-            this.country = country;
-            this.country.addRegion(this);
-            this.leaders = Collections.EMPTY_SET;
-        } else {
-            throw new IllegalArgumentException(
-                "The Region constructor can't have null arguments.");
+    /**
+     * Returns an unmodifiable set of the region's current leaders.
+     * @return leaders set
+     */
+    public Set<Individual> getLeaders() {
+        return Collections.unmodifiableSet(leaders);
+    }
+
+    /**
+     * Adds an individual to the region's leadership team.
+     * @param leader the individual to add
+     */
+    public void addLeader(Individual leader) {
+        if (leader != null) {
+            leaders.add(leader);
         }
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Removes an individual from the region's leadership.
+     * @param leader the individual to remove
      */
-    public Set getLeaders() {
-        return leaders;
+    public void removeLeader(Individual leader) {
+        leaders.remove(leader);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param leaders DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Returns the parent country associated with this region.
+     * @return the country
      */
-
-    //a good policy is to set the leaders to getGovernement().getOrganigram().getWorkers()
-    public void setLeaders(Set leaders) {
-        Iterator iterator;
-        boolean valid;
-
-        if (leaders != null) {
-            iterator = leaders.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Individual;
-            }
-
-            if (valid) {
-                this.leaders = leaders;
-            } else {
-                throw new IllegalArgumentException(
-                    "The leaders Set must contain only Individuals.");
-            }
-        } else {
-            throw new IllegalArgumentException("You can't set null leaders.");
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-
-    //may return null if unset by removing from the regions of a country
     public Country getCountry() {
         return country;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param country DOCUMENT ME!
+     * Updates the parent country association.
+     * @param country the new country
      */
     protected void setCountry(Country country) {
         this.country = country;
+    }
+
+    @Override
+    public String toString() {
+        return getName() + " [" + (country != null ? country.getName() : "Independent") + "]";
     }
 }

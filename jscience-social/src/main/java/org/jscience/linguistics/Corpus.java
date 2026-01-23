@@ -33,27 +33,51 @@ import java.util.*;
  */
 public class Corpus {
 
+    private final String name;
     private final List<String> documents = new ArrayList<>();
 
+    public Corpus(String name) {
+        this.name = name;
+    }
+
+    public String getName() { return name; }
+
     public void addDocument(String text) {
-        documents.add(text);
+        if (text != null) documents.add(text);
     }
 
     /**
-     * Calculates word frequency map.
-     * Simple tokenization by splitting on whitespace.
+     * Calculates word frequency map across the entire corpus.
      */
-    public Map<String, Integer> getWordFrequency() {
-        Map<String, Integer> frequency = new HashMap<>();
+    public Map<String, Long> getWordFrequency() {
+        Map<String, Long> frequency = new LinkedHashMap<>();
         for (String doc : documents) {
-            String[] words = doc.toLowerCase().replaceAll("[^a-zA-Z ]", "").split("\\s+");
-            for (String word : words) {
-                if (!word.isEmpty()) {
-                    frequency.put(word, frequency.getOrDefault(word, 0) + 1);
-                }
+            List<String> tokens = org.jscience.linguistics.analysis.LinguisticAnalysis.tokenize(doc);
+            for (String word : tokens) {
+                frequency.put(word, frequency.getOrDefault(word, 0L) + 1);
             }
         }
-        return frequency;
+        // Sort by frequency descending
+        return frequency.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .collect(java.util.stream.Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new));
+    }
+
+    public long getTotalTokens() {
+        return documents.stream()
+                .mapToLong(doc -> org.jscience.linguistics.analysis.LinguisticAnalysis.tokenize(doc).size())
+                .sum();
+    }
+
+    public long getVocabularySize() {
+        return documents.stream()
+                .flatMap(doc -> org.jscience.linguistics.analysis.LinguisticAnalysis.tokenize(doc).stream())
+                .distinct()
+                .count();
     }
 
     public int getDocumentCount() {

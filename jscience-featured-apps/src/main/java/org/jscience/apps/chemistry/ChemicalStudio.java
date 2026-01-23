@@ -1,4 +1,4 @@
-﻿package org.jscience.apps.chemistry;
+package org.jscience.apps.chemistry;
 
 import javafx.scene.control.*;
 import javafx.scene.layout.*;

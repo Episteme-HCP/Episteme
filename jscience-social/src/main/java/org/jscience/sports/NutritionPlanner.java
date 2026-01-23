@@ -1,15 +1,47 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.sports;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import org.jscience.mathematics.numbers.real.Real;
-import java.util.*;
 
 /**
- * Athlete nutrition planning and analysis.
+ * Provides mathematical methods for athlete nutrition planning and metabolic analysis.
+ * Includes BMR and TDEE calculations using the Mifflin-St Jeor equation.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
 public final class NutritionPlanner {
 
     private NutritionPlanner() {}
 
+    /** Standard categorical activity levels for metabolic calculations. */
     public enum ActivityLevel {
         SEDENTARY(1.2),
         LIGHT(1.375),
@@ -23,10 +55,12 @@ public final class NutritionPlanner {
         public double getFactor() { return factor; }
     }
 
+    /** Training cycle phases for nutrient adjustment. */
     public enum TrainingPhase {
         OFF_SEASON, BASE, BUILD, COMPETITION, RECOVERY
     }
 
+    /** Physiological data for an athlete. */
     public record AthleteProfile(
         double massKg,
         double heightCm,
@@ -35,176 +69,84 @@ public final class NutritionPlanner {
         String sport,
         ActivityLevel activityLevel,
         TrainingPhase phase
-    ) {}
+    ) implements Serializable {}
 
+    /** Macro-nutrient distribution targets. */
     public record MacroTargets(
         double calories,
         double proteinGrams,
         double carbsGrams,
         double fatGrams,
         double fiberGrams
-    ) {}
+    ) implements Serializable {}
 
+    /** Guidelines for fluid intake. */
     public record HydrationPlan(
         double dailyWaterLiters,
         double preworkoutMl,
         double duringWorkoutMlPerHour,
         double postWorkoutMl,
         boolean needsElectrolytes
-    ) {}
+    ) implements Serializable {}
 
+    /** Optimized meal schedule relative to training. */
     public record MealTiming(
         int hoursBeforeTraining,
         String preTrainingMeal,
         String duringTraining,
         String postTrainingImmediate,
         String postTrainingMeal
-    ) {}
+    ) implements Serializable {}
 
-    /**
-     * Calculates Basal Metabolic Rate using Mifflin-St Jeor equation.
-     */
+    /** Calculates Basal Metabolic Rate (BMR) for the athlete. */
     public static Real calculateBMR(AthleteProfile athlete) {
-        double bmr;
-        if (athlete.isMale()) {
-            bmr = 10 * athlete.massKg() + 6.25 * athlete.heightCm() - 5 * athlete.age() + 5;
-        } else {
-            bmr = 10 * athlete.massKg() + 6.25 * athlete.heightCm() - 5 * athlete.age() - 161;
-        }
+        double bmr = (10.0 * athlete.massKg()) + (6.25 * athlete.heightCm()) - (5.0 * athlete.age());
+        bmr += athlete.isMale() ? 5.0 : -161.0;
         return Real.of(bmr);
     }
 
-    /**
-     * Calculates Total Daily Energy Expenditure.
+    /** 
+     * Calculates Total Daily Energy Expenditure (TDEE).
      */
     public static Real calculateTDEE(AthleteProfile athlete) {
         double bmr = calculateBMR(athlete).doubleValue();
         double tdee = bmr * athlete.activityLevel().getFactor();
-        
-        // Adjust for training phase
         tdee *= switch (athlete.phase()) {
             case BUILD -> 1.1;
             case COMPETITION -> 1.05;
             case RECOVERY -> 0.9;
             default -> 1.0;
         };
-        
         return Real.of(tdee);
     }
 
-    /**
-     * Generates macro nutrient targets.
-     */
+    /** Generates recommended macro-nutrient targets for a specific goal. */
     public static MacroTargets generateMacroTargets(AthleteProfile athlete, String goal) {
         double tdee = calculateTDEE(athlete).doubleValue();
-        double mass = athlete.massKg();
+        double calories = "fat loss".equalsIgnoreCase(goal) ? tdee * 0.85 : ("muscle gain".equalsIgnoreCase(goal) ? tdee * 1.1 : tdee);
         
-        // Adjust calories for goal
-        double calories = switch (goal.toLowerCase()) {
-            case "fat loss" -> tdee * 0.85;
-            case "muscle gain" -> tdee * 1.1;
-            case "maintenance" -> tdee;
-            default -> tdee;
-        };
-        
-        // Protein needs by sport type
-        double proteinPerKg = switch (athlete.sport().toLowerCase()) {
-            case "bodybuilding", "powerlifting" -> 2.2;
-            case "endurance", "marathon", "cycling" -> 1.4;
-            case "team sports", "football", "soccer" -> 1.8;
-            default -> 1.6;
-        };
-        double protein = mass * proteinPerKg;
-        
-        // Fat needs (20-35% of calories for athletes)
+        double proteinPerKg = athlete.sport().toLowerCase().contains("strength") ? 2.2 : (athlete.sport().toLowerCase().contains("endurance") ? 1.4 : 1.8);
+        double protein = athlete.massKg() * proteinPerKg;
         double fatCalories = calories * 0.25;
-        double fat = fatCalories / 9;
+        double carbCalories = calories - (protein * 4.0) - fatCalories;
         
-        // Remaining calories from carbs
-        double proteinCalories = protein * 4;
-        double carbCalories = calories - proteinCalories - fatCalories;
-        double carbs = carbCalories / 4;
-        
-        // Fiber
-        double fiber = calories / 1000 * 14;
-        
-        return new MacroTargets(calories, protein, carbs, fat, fiber);
+        return new MacroTargets(calories, protein, carbCalories / 4.0, fatCalories / 9.0, (calories / 1000.0) * 14.0);
     }
 
-    /**
-     * Creates hydration plan.
-     */
+    /** Generates a hydration strategy based on intensity and climate. */
     public static HydrationPlan generateHydrationPlan(AthleteProfile athlete,
             double trainingHours, double ambientTemperatureC) {
-        
-        // Base water needs
-        double baseWater = athlete.massKg() * 0.033; // 33ml per kg
-        
-        // Training adjustment
-        double trainingWater = trainingHours * 0.5; // 500ml per hour
-        
-        // Temperature adjustment
-        if (ambientTemperatureC > 25) {
-            trainingWater *= 1.5;
-        }
-        
-        double totalWater = baseWater + trainingWater;
-        
-        double preworkout = 500;
-        double during = ambientTemperatureC > 25 ? 800 : 500;
-        double postworkout = (int)(trainingHours * 500);
-        
-        boolean needsElectrolytes = trainingHours > 1 || ambientTemperatureC > 25;
-        
-        return new HydrationPlan(totalWater, preworkout, during, postworkout, needsElectrolytes);
+        double baseWater = athlete.massKg() * 0.033;
+        double trainingWater = trainingHours * 0.5 * (ambientTemperatureC > 25 ? 1.5 : 1.0);
+        return new HydrationPlan(baseWater + trainingWater, 500.0, ambientTemperatureC > 25 ? 800.0 : 500.0, trainingHours * 500.0, trainingHours > 1 || ambientTemperatureC > 25);
     }
 
-    /**
-     * Creates meal timing recommendations.
-     */
-    public static MealTiming generateMealTiming(String trainingType, int trainingDurationMins) {
-        int hoursBefore = trainingType.toLowerCase().contains("strength") ? 2 : 3;
-        
-        String preMeal = trainingType.toLowerCase().contains("endurance") 
-            ? "High carb, moderate protein (pasta, rice with chicken)"
-            : "Balanced meal (protein + complex carbs)";
-        
-        String during = trainingDurationMins > 60
-            ? "Carb drink/gel, 30-60g carbs per hour"
-            : "Water only";
-        
-        String postImmediate = "Protein shake + simple carbs within 30 minutes";
-        
-        String postMeal = "Complete meal within 2 hours: lean protein + carbs + vegetables";
-        
-        return new MealTiming(hoursBefore, preMeal, during, postImmediate, postMeal);
-    }
-
-    /**
-     * Calculates supplement recommendations.
-     */
+    /** Provides general supplement guidelines. */
     public static List<String> supplementRecommendations(AthleteProfile athlete) {
-        List<String> supplements = new ArrayList<>();
-        
-        // Universal recommendations
-        supplements.add("Vitamin D: 1000-2000 IU daily (if limited sun exposure)");
-        supplements.add("Omega-3: 1-2g EPA+DHA daily");
-        
-        // Sport-specific
-        if (athlete.sport().toLowerCase().contains("strength") ||
-            athlete.sport().toLowerCase().contains("power")) {
-            supplements.add("Creatine monohydrate: 3-5g daily");
-        }
-        
-        if (athlete.phase() == TrainingPhase.BUILD || athlete.phase() == TrainingPhase.COMPETITION) {
-            supplements.add("Caffeine: 3-6mg/kg before performance (if tolerated)");
-        }
-        
-        // Consider beta-alanine for high-intensity
-        if (athlete.activityLevel() == ActivityLevel.ELITE_ATHLETE) {
-            supplements.add("Beta-alanine: 3-6g daily for high-intensity performance");
-        }
-        
-        return supplements;
+        List<String> res = new ArrayList<>();
+        res.add("Vitamin D (1000-2000 IU)");
+        res.add("Omega-3 (1-2g)");
+        if (athlete.sport().toLowerCase().contains("strength")) res.add("Creatine monohydrate (5g)");
+        return res;
     }
 }

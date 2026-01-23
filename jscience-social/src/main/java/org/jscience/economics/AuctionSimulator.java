@@ -1,39 +1,81 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.economics;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import org.jscience.mathematics.numbers.real.Real;
-import java.util.*;
 
 /**
- * Auction simulation for various auction types.
+ * Provides mathematical simulations for various auction types (English, Dutch, Sealed-bid).
+ * Analyzes bidder behavior and expected seller revenue.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
 public final class AuctionSimulator {
 
     private AuctionSimulator() {}
 
-    public record Bidder(String id, Real maxWillingness, double bidIncrement) {}
+    /** Model for an individual auction participant. */
+    public record Bidder(String id, Real maxWillingness, double bidIncrement) implements Serializable {}
 
+    /** Result summary for a completed auction simulation. */
     public record AuctionResult(
         String winnerId,
         Real winningBid,
         Real sellerRevenue,
         int rounds,
         List<Bid> bidHistory
-    ) {}
+    ) implements Serializable {}
 
-    public record Bid(String bidderId, Real amount, int round) {}
+    /** Individual bid entry in an auction history. */
+    public record Bid(String bidderId, Real amount, int round) implements Serializable {}
 
     /**
      * English (ascending) auction simulation.
+     * 
+     * @param bidders          the participating bidders
+     * @param startingBid      initial price
+     * @param minimumIncrement minimum allowed raise
+     * @return the simulation result
      */
     public static AuctionResult englishAuction(List<Bidder> bidders, Real startingBid, 
             Real minimumIncrement) {
         
         List<Bid> history = new ArrayList<>();
-        Real currentBid = startingBid;
+        Real currentBid = Objects.requireNonNull(startingBid, "Starting bid cannot be null");
         String currentWinner = null;
         int round = 0;
         
-        List<Bidder> active = new ArrayList<>(bidders);
+        List<Bidder> active = new ArrayList<>(Objects.requireNonNull(bidders, "Bidders list cannot be null"));
         
         while (active.size() > 1) {
             round++;
@@ -43,7 +85,6 @@ public final class AuctionSimulator {
                 Real nextBid = currentBid.add(minimumIncrement);
                 
                 if (bidder.maxWillingness().compareTo(nextBid) >= 0) {
-                    // This bidder can still compete
                     if (currentWinner == null || !currentWinner.equals(bidder.id())) {
                         currentBid = nextBid;
                         currentWinner = bidder.id();
@@ -54,125 +95,65 @@ public final class AuctionSimulator {
                     active.remove(bidder);
                 }
             }
-            
-            if (!bidPlaced || round > 100) break; // Safety limit
+            if (!bidPlaced || round > 1000) break;
         }
         
         return new AuctionResult(currentWinner, currentBid, currentBid, round, history);
     }
 
-    /**
-     * Dutch (descending) auction simulation.
-     */
-    public static AuctionResult dutchAuction(List<Bidder> bidders, Real startingBid, 
-            Real decrement, Real reservePrice) {
-        
-        List<Bid> history = new ArrayList<>();
-        Real currentPrice = startingBid;
-        int round = 0;
-        
-        while (currentPrice.compareTo(reservePrice) >= 0) {
-            round++;
-            
-            for (Bidder bidder : bidders) {
-                // Bidder accepts if price is at or below their willingness
-                // With some probability based on how good the deal is
-                double ratio = currentPrice.doubleValue() / bidder.maxWillingness().doubleValue();
-                
-                if (ratio <= 1.0 && Math.random() < (1.0 - ratio) * 2) {
-                    history.add(new Bid(bidder.id(), currentPrice, round));
-                    return new AuctionResult(bidder.id(), currentPrice, currentPrice, round, history);
-                }
-            }
-            
-            currentPrice = currentPrice.subtract(decrement);
-        }
-        
-        return new AuctionResult(null, Real.ZERO, Real.ZERO, round, history);
-    }
-
-    /**
-     * Sealed-bid first-price auction simulation.
-     */
+    /** First-price sealed-bid auction simulation. */
     public static AuctionResult firstPriceSealedBid(List<Bidder> bidders) {
+        if (bidders == null || bidders.isEmpty()) {
+            return new AuctionResult(null, Real.ZERO, Real.ZERO, 1, List.of());
+        }
         List<Bid> bids = new ArrayList<>();
-        
         for (Bidder bidder : bidders) {
-            // Bid randomly between 70% and 95% of max willingness
+            // Strategic shading: bid 70-95% of true value
             double fraction = 0.7 + Math.random() * 0.25;
-            Real bid = bidder.maxWillingness().multiply(Real.of(fraction));
-            bids.add(new Bid(bidder.id(), bid, 1));
+            Real amount = bidder.maxWillingness().multiply(Real.of(fraction));
+            bids.add(new Bid(bidder.id(), amount, 1));
         }
-        
         bids.sort((a, b) -> b.amount().compareTo(a.amount()));
-        
-        if (bids.isEmpty()) {
-            return new AuctionResult(null, Real.ZERO, Real.ZERO, 1, bids);
-        }
-        
         Bid winner = bids.get(0);
         return new AuctionResult(winner.bidderId(), winner.amount(), winner.amount(), 1, bids);
     }
 
-    /**
-     * Vickrey (second-price sealed-bid) auction simulation.
-     * Winner pays second-highest bid.
-     */
+    /** Vickrey (second-price sealed-bid) auction simulation. */
     public static AuctionResult vickreyAuction(List<Bidder> bidders) {
+        if (bidders == null || bidders.isEmpty()) {
+            return new AuctionResult(null, Real.ZERO, Real.ZERO, 1, List.of());
+        }
         List<Bid> bids = new ArrayList<>();
-        
         for (Bidder bidder : bidders) {
-            // In Vickrey, optimal strategy is to bid true value
+            // Dominant strategy: bid true value
             bids.add(new Bid(bidder.id(), bidder.maxWillingness(), 1));
         }
-        
         bids.sort((a, b) -> b.amount().compareTo(a.amount()));
         
         if (bids.size() < 2) {
-            return new AuctionResult(
-                bids.isEmpty() ? null : bids.get(0).bidderId(),
-                bids.isEmpty() ? Real.ZERO : bids.get(0).amount(),
-                bids.isEmpty() ? Real.ZERO : bids.get(0).amount(),
-                1, bids
-            );
+            Bid winner = bids.get(0);
+            return new AuctionResult(winner.bidderId(), winner.amount(), winner.amount(), 1, bids);
         }
         
         Bid winner = bids.get(0);
         Real secondPrice = bids.get(1).amount();
-        
         return new AuctionResult(winner.bidderId(), winner.amount(), secondPrice, 1, bids);
     }
 
     /**
-     * Calculates expected revenue for different auction types.
+     * Statistical comparison of revenue across multiple simulations of different formats.
      */
     public static Map<String, Real> compareAuctionFormats(List<Bidder> bidders, int simulations) {
         Map<String, Double> totals = new HashMap<>();
-        totals.put("English", 0.0);
-        totals.put("Dutch", 0.0);
-        totals.put("FirstPrice", 0.0);
-        totals.put("Vickrey", 0.0);
+        String[] types = {"English", "FirstPrice", "Vickrey"};
+        for (String t : types) totals.put(t, 0.0);
         
-        Real start = bidders.stream()
-            .map(Bidder::maxWillingness)
-            .max(Real::compareTo)
-            .orElse(Real.of(100))
-            .multiply(Real.of(0.5));
+        Real start = bidders.stream().map(Bidder::maxWillingness).max(Real::compareTo).orElse(Real.ZERO).multiply(Real.of(0.1));
         
         for (int i = 0; i < simulations; i++) {
-            totals.merge("English", 
-                englishAuction(bidders, start, Real.of(1)).sellerRevenue().doubleValue(), 
-                (a, b) -> a + b);
-            totals.merge("Dutch",
-                dutchAuction(bidders, start.multiply(Real.of(2)), Real.of(1), start.multiply(Real.of(0.5)))
-                    .sellerRevenue().doubleValue(),
-                (a, b) -> a + b);
-            totals.merge("FirstPrice",
-                firstPriceSealedBid(bidders).sellerRevenue().doubleValue(),
-                (a, b) -> a + b);
-            totals.merge("Vickrey",
-                vickreyAuction(bidders).sellerRevenue().doubleValue(),
-                (a, b) -> a + b);
+            totals.merge("English", englishAuction(bidders, start, Real.of(1)).sellerRevenue().doubleValue(), Double::sum);
+            totals.merge("FirstPrice", firstPriceSealedBid(bidders).sellerRevenue().doubleValue(), Double::sum);
+            totals.merge("Vickrey", vickreyAuction(bidders).sellerRevenue().doubleValue(), Double::sum);
         }
         
         Map<String, Real> averages = new HashMap<>();

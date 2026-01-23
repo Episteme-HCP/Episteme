@@ -18,3 +18,6 @@ org.jscience.biology.loaders.VirusReader
 org.jscience.biology.loaders.ObjMeshReader
 org.jscience.biology.loaders.UniProtReader
 org.jscience.biology.loaders.FASTAReader
+org.jscience.medicine.loaders.DrugBankReader
+org.jscience.medicine.loaders.ICD10Reader
+org.jscience.medicine.loaders.DICOMReader

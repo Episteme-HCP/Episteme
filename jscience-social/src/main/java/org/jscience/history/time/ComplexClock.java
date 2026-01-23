@@ -1,111 +1,130 @@
-package org.jscience.history.time;
-
-/**
- * A class representing a way to display and change time.
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * @author Silvere Martin-Michiellot
- * @version 1.0
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
-//  http://en.wikipedia.org/wiki/Clock
-public class ComplexClock {
-    /** DOCUMENT ME! */
-    private ChronometerClock chronometer;
+package org.jscience.history.time;
 
-    /** DOCUMENT ME! */
-    private AlarmClock alarm;
-
-    /** DOCUMENT ME! */
-    private CountdownClock countdown;
-
-    /** DOCUMENT ME! */
-    private BasicClock clock;
+import java.util.Objects;
 
 /**
-     * Creates a new ComplexClock object.
+ * A composite clock container that aggregates multiple specialized clock functionalities.
+ * Groups a standard clock, chronometer, alarm, and countdown into a single management unit.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
+ */
+public class ComplexClock {
+
+    /** The chronometer function. */
+    private ChronometerClock chronometer;
+
+    /** The alarm clock function. */
+    private AlarmClock alarm;
+
+    /** The countdown function. */
+    private CountdownClock countdown;
+
+    /** The primary basic clock. */
+    private BasicClock clock;
+
+    /**
+     * Creates a new ComplexClock with initial clock components.
      *
-     * @param clock DOCUMENT ME!
-     * @param chronometer DOCUMENT ME!
-     * @param alarm DOCUMENT ME!
-     * @param countdown DOCUMENT ME!
+     * @param clock       the primary clock
+     * @param chronometer the chronometer
+     * @param alarm       the alarm clock
+     * @param countdown   the countdown clock
+     * @throws NullPointerException if any component is null
      */
-    public ComplexClock(BasicClock clock, ChronometerClock chronometer,
-        AlarmClock alarm, CountdownClock countdown) {
-        this.chronometer = chronometer;
-        this.alarm = alarm;
-        this.countdown = countdown;
-        this.clock = clock;
+    public ComplexClock(BasicClock clock, ChronometerClock chronometer, AlarmClock alarm, CountdownClock countdown) {
+        this.clock = Objects.requireNonNull(clock, "BasicClock cannot be null");
+        this.chronometer = Objects.requireNonNull(chronometer, "ChronometerClock cannot be null");
+        this.alarm = Objects.requireNonNull(alarm, "AlarmClock cannot be null");
+        this.countdown = Objects.requireNonNull(countdown, "CountdownClock cannot be null");
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the chronometer component.
+     * @return chronometer
      */
     public ChronometerClock getChronometer() {
         return chronometer;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param chronometer DOCUMENT ME!
+     * Sets the chronometer component.
+     * @param chronometer the chronometer
      */
     public void setChronometer(ChronometerClock chronometer) {
-        this.chronometer = chronometer;
+        this.chronometer = Objects.requireNonNull(chronometer, "ChronometerClock cannot be null");
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the alarm component.
+     * @return alarm
      */
     public AlarmClock getAlarm() {
         return alarm;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param alarm DOCUMENT ME!
+     * Sets the alarm component.
+     * @param alarm the alarm clock
      */
     public void setAlarm(AlarmClock alarm) {
-        this.alarm = alarm;
+        this.alarm = Objects.requireNonNull(alarm, "AlarmClock cannot be null");
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the countdown component.
+     * @return countdown
      */
     public CountdownClock getCountdown() {
         return countdown;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param countdown DOCUMENT ME!
+     * Sets the countdown component.
+     * @param countdown the countdown clock
      */
     public void setCountdown(CountdownClock countdown) {
-        this.countdown = countdown;
+        this.countdown = Objects.requireNonNull(countdown, "CountdownClock cannot be null");
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the primary basic clock.
+     * @return basic clock
      */
     public BasicClock getClock() {
         return clock;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param clock DOCUMENT ME!
+     * Sets the primary basic clock.
+     * @param clock the basic clock
      */
     public void setClock(BasicClock clock) {
-        this.clock = clock;
+        this.clock = Objects.requireNonNull(clock, "BasicClock cannot be null");
     }
 }

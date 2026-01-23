@@ -33,7 +33,7 @@ import org.jscience.measure.quantity.ThermalConductivity;
 import org.jscience.measure.quantity.Energy;
 import org.jscience.mathematics.numbers.real.Real;
 
-import org.jscience.util.identity.Identifiable;
+import org.jscience.util.identity.Identified;
 import org.jscience.util.Named;
 
 /**
@@ -44,7 +44,7 @@ import org.jscience.util.Named;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Element implements Identifiable<String>, Named {
+public class Element implements Identified<String>, Named {
 
     public enum ElementCategory {
         ALKALI_METAL, ALKALINE_EARTH_METAL, TRANSITION_METAL, POST_TRANSITION_METAL, CHEMICALLY_UNKNOWN, METALLOID,

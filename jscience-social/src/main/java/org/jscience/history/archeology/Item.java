@@ -1,346 +1,267 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history.archeology;
 
-import org.jscience.bibliography.BibRef;
-
-import org.jscience.biology.human.Human;
-
+import org.jscience.arts.Analysis;
+import org.jscience.arts.Restoration;
+import org.jscience.bibliography.Citation;
+import org.jscience.biology.Human;
 import org.jscience.economics.Organization;
-import org.jscience.economics.money.Currency;
-
+import org.jscience.economics.money.Money;
+import org.jscience.economics.resources.PhysicalObject;
 import org.jscience.geography.Place;
 import org.jscience.geography.Places;
-
 import org.jscience.measure.Amount;
-import org.jscience.measure.Analysis;
-import org.jscience.measure.Description;
-import org.jscience.measure.Identification;
+import org.jscience.methodology.ScientificDescription;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
-import org.jscience.arts.Artwork;
-import org.jscience.arts.Restoration;
-
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Vector;
-
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.*;
 
 /**
- * A class representing an item. This item can be about whatever you want,
- * usually a fossilized bone, or plant, a crafted artifact but also a pile of
- * stones.
+ * Represents an archaeological item (fossil, artifact, etc.) found at a site.
+ * Tracks discovery details, archaeological context (civilization), and post-discovery 
+ * activities like analysis, restoration, and publications.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.3
+ * @since 1.0
  */
-public class Item extends org.jscience.economics.resources.Object {
-    //what can be done on site
-    //items have no name since this could be misleading the correct description of the object. Actuals users of this package, send me an email if really this is bothering you too much.
-    /** DOCUMENT ME! */
-    private Set discoverers; //A Set of Human, who found it
+@Persistent
+public class Item extends PhysicalObject implements Serializable {
 
-    /** DOCUMENT ME! */
-    private Date discoveryDate; //date when it was found
+    private static final long serialVersionUID = 1L;
 
-    /** DOCUMENT ME! */
-    private Place originalPosition; //where it was found, using GeoTransform external package, sorry
+    /** People who discovered the item. */
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private final Set<Human> discoverers;
 
-    //what is done at a latter stage
-    /** DOCUMENT ME! */
+    /** Date and time of discovery. */
+    @Attribute
+    private final Instant discoveryDate;
+
+    /** Geographical location where the item was originally found. */
+    @Relation(type = Relation.Type.MANY_TO_ONE)
+    private final Place originalPosition;
+
+    /** Historical civilization associated with the item. */
+    @Relation(type = Relation.Type.MANY_TO_ONE)
     private Civilization civilization;
 
-    //what may also be done
-    /** DOCUMENT ME! */
-    private Vector extraDescriptions; //Vector of Descriptions, further descriptions, by people not on site, should include the date/author by which each description is made
+    /** Additional descriptive entries by researchers or experts. */
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private List<ScientificDescription> extraDescriptions = new ArrayList<>();
 
-    /** DOCUMENT ME! */
-    private Vector publications; //Vector of BibRef, publications
+    /** Bibliographical references citing or documenting this item. */
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private List<Citation> publications = new ArrayList<>();
 
-    /** DOCUMENT ME! */
-    private Vector analysis; //a Vector of Analysis, analysis should include (test, date, lab who provides the test, result, comments)
+    /** Scientific analyses performed on the item. */
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private List<Analysis> analyses = new ArrayList<>();
 
-    /** DOCUMENT ME! */
-    private Vector restorations; //a Vector of Restorations, restorations should include (process, date, museum who provides the restoration, result, comments)
+    /** Restoration records for the item. */
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private List<Restoration> restorations = new ArrayList<>();
 
-/**
-     * Creates a new Item object.
+    /**
+     * Creates a new archaeological Item.
      *
-     * @param organization     DOCUMENT ME!
-     * @param name             DOCUMENT ME!
-     * @param description      DOCUMENT ME!
-     * @param productionDate   DOCUMENT ME!
-     * @param identification   DOCUMENT ME!
-     * @param discoverers      DOCUMENT ME!
-     * @param discoveryDate    DOCUMENT ME!
-     * @param originalPosition DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param name             the name or designation
+     * @param description      general description
+     * @param organization     the curator/owner organization
+     * @param productionDate   estimated date of creation (pre-discovery)
+     * @param identification   formal identification data
+     * @param discoverers      set of humans involved in discovery
+     * @param discoveryDate    moment of discovery
+     * @param originalPosition location of discovery
+     * @throws NullPointerException if any required argument is null
+     * @throws IllegalArgumentException if discoverers set is empty
      */
     public Item(String name, String description, Organization organization,
-        Date productionDate, Identification identification, Set discoverers,
-        Date discoveryDate, Place originalPosition) {
+                Instant productionDate, Identification identification, Set<Human> discoverers,
+                Instant discoveryDate, Place originalPosition) {
         super(name, description, Amount.ONE, organization, Places.EARTH,
-            productionDate, identification, Amount.valueOf(0, Currency.USD));
+            Date.from(productionDate), identification, Money.usd(0));
 
-        Iterator iterator;
-        boolean valid;
-
-        if ((discoverers != null) && (discoverers.size() > 0) &&
-                (discoveryDate != null) && (originalPosition != null)) {
-            iterator = discoverers.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Human;
-            }
-
-            if (valid) {
-                this.discoverers = discoverers;
-                this.discoveryDate = discoveryDate;
-                this.originalPosition = originalPosition;
-                this.civilization = null;
-                this.extraDescriptions = new Vector();
-                this.publications = new Vector();
-                this.analysis = new Vector();
-                this.restorations = new Vector();
-            } else {
-                throw new IllegalArgumentException(
-                    "The Set of discoverers should contain only Humans.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Item constructor can't have null arguments (and identifiction and discoverers can't be empty).");
+        this.discoverers = new HashSet<>(Objects.requireNonNull(discoverers, "Discoverers cannot be null"));
+        if (this.discoverers.isEmpty()) {
+            throw new IllegalArgumentException("Discoverers cannot be empty");
         }
+        
+        this.discoveryDate = Objects.requireNonNull(discoveryDate, "Discovery date cannot be null");
+        this.originalPosition = Objects.requireNonNull(originalPosition, "Original position cannot be null");
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns an unmodifiable view of the discoverers.
      *
-     * @return DOCUMENT ME!
+     * @return the set of discoverers
      */
-    public Set getDiscoverers() {
-        return discoverers;
+    public Set<Human> getDiscoverers() {
+        return Collections.unmodifiableSet(discoverers);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the date when the item was discovered.
      *
-     * @return DOCUMENT ME!
+     * @return discovery date
      */
-    public Date getDateOfDiscovery() {
+    public Instant getDateOfDiscovery() {
         return discoveryDate;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the original geographical position of the find.
      *
-     * @return DOCUMENT ME!
+     * @return discovery location
      */
-
-    //you should use a TimedBoundary and the same Place Object for getPlace and getOriginalPosition
-    //the original position should be the first boundary element but not necessarily, use the date of discovery to guess
-    //the contemporary position should be the last boundary element
     public Place getOriginalPosition() {
         return originalPosition;
     }
 
-    //time in seconds
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Calculates the estimated physical age of the object in seconds.
+     * 
+     * @return age in seconds
      */
     public double getAge() {
-        //does this work ???
-        return new Date().getTime() - getProductionDate().getTime();
+        return (double) (Instant.now().getEpochSecond() - getProductionDate().toInstant().getEpochSecond());
     }
 
-    //may return null, unknown civilization
     /**
-     * DOCUMENT ME!
+     * Returns the associated civilization.
      *
-     * @return DOCUMENT ME!
+     * @return the civilization, or null if unknown
      */
     public Civilization getCivilization() {
         return civilization;
     }
 
     /**
-     * DOCUMENT ME!
+     * Assigns a civilization to the item.
      *
-     * @param civilization DOCUMENT ME!
+     * @param civilization the civilization
      */
     public void setCivilization(Civilization civilization) {
         this.civilization = civilization;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the list of extra descriptions.
      *
-     * @return DOCUMENT ME!
+     * @return descriptions list
      */
-    public Vector getExtraDescriptions() {
-        return extraDescriptions;
+    public List<ScientificDescription> getExtraDescriptions() {
+        return Collections.unmodifiableList(extraDescriptions);
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the extra descriptions.
      *
-     * @param extraDescriptions DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param extraDescriptions list of descriptions
+     * @throws NullPointerException if list is null
      */
-    public void setExtraDescriptions(Vector extraDescriptions) {
-        Iterator iterator;
-        boolean valid;
-
-        if (extraDescriptions != null) {
-            iterator = extraDescriptions.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Description;
-            }
-
-            if (valid) {
-                this.extraDescriptions = extraDescriptions;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Vector of descriptions should contain only Descriptions.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Vector of descriptions can't be null.");
-        }
+    public void setExtraDescriptions(List<ScientificDescription> extraDescriptions) {
+        this.extraDescriptions = new ArrayList<>(Objects.requireNonNull(extraDescriptions, "Description list cannot be null"));
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the list of publications.
      *
-     * @return DOCUMENT ME!
+     * @return publications list
      */
-    public Vector getPublications() {
-        return publications;
+    public List<Citation> getPublications() {
+        return Collections.unmodifiableList(publications);
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the publications references.
      *
-     * @param publications DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param publications list of citations
+     * @throws NullPointerException if list is null
      */
-    public void setPublications(Vector publications) {
-        Iterator iterator;
-        boolean valid;
-
-        if (publications != null) {
-            iterator = publications.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof BibRef;
-            }
-
-            if (valid) {
-                this.publications = publications;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Vector of publications should contain only BibRefs.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Vector of publications can't be null.");
-        }
+    public void setPublications(List<Citation> publications) {
+        this.publications = new ArrayList<>(Objects.requireNonNull(publications, "Publication list cannot be null"));
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the list of scientific analyses.
      *
-     * @return DOCUMENT ME!
+     * @return analysis list
      */
-    public Vector getAnalysis() {
-        return analysis;
+    public List<Analysis> getAnalyses() {
+        return Collections.unmodifiableList(analyses);
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the scientific analyses.
      *
-     * @param analysis DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param analyses list of analysis results
+     * @throws NullPointerException if list is null
      */
-    public void setAnalysis(Vector analysis) {
-        Iterator iterator;
-        boolean valid;
-
-        if (analysis != null) {
-            iterator = analysis.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Analysis;
-            }
-
-            if (valid) {
-                this.analysis = analysis;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Vector of analysis should contain only Analysis.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Vector of analysis can't be null.");
-        }
+    public void setAnalyses(List<Analysis> analyses) {
+        this.analyses = new ArrayList<>(Objects.requireNonNull(analyses, "Analysis list cannot be null"));
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the list of restoration records.
      *
-     * @return DOCUMENT ME!
+     * @return restorations list
      */
-    public Vector getRestoration() {
-        return restorations;
+    public List<Restoration> getRestorations() {
+        return Collections.unmodifiableList(restorations);
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the restoration records.
      *
-     * @param restorations DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param restorations list of restoration events
+     * @throws NullPointerException if list is null
      */
-    public void setRestorations(Vector restorations) {
-        Iterator iterator;
-        boolean valid;
-
-        if (restorations != null) {
-            iterator = restorations.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Restoration;
-            }
-
-            if (valid) {
-                this.restorations = restorations;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Vector of restorations should contain only Restorations.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Vector of restorations can't be null.");
-        }
+    public void setRestorations(List<Restoration> restorations) {
+        this.restorations = new ArrayList<>(Objects.requireNonNull(restorations, "Restoration list cannot be null"));
     }
 
-    //just in case you want to use this item for an exposition, use this method to "convert" this item to an artwork
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Artwork getArtwork() {
-        return new Artwork(getName(), getDescription(), getAmount(),
-            getProducer(), getProductionPlace(), getProductionDate(),
-            getIdentification(), getValue());
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Item item)) return false;
+        if (!super.equals(o)) return false;
+        return Objects.equals(discoverers, item.discoverers) && 
+               Objects.equals(discoveryDate, item.discoveryDate) && 
+               Objects.equals(originalPosition, item.originalPosition) && 
+               Objects.equals(civilization, item.civilization);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), discoverers, discoveryDate, originalPosition, civilization);
     }
 }

@@ -23,42 +23,106 @@
 
 package org.jscience.history;
 
-import java.util.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
- * A timeline representing a sequence of historical events with FuzzyDate
- * support.
- * <p>
+ * A timeline representing a sequence of historical events with {@link FuzzyDate} support.
+ * Provides analytical methods to filter and explore historical periods.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
-public class HistoricalTimeline {
+@Persistent
+public class HistoricalTimeline implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+    /** The display name of the timeline. */
+    @Attribute
     private final String name;
+
+    /** The collection of events in this timeline. */
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private final List<HistoricalEvent> events = new ArrayList<>();
 
+    /**
+     * Creates a new HistoricalTimeline.
+     * 
+     * @param name the name of the timeline
+     * @throws NullPointerException if name is null
+     * @throws IllegalArgumentException if name is blank
+     */
     public HistoricalTimeline(String name) {
+        Objects.requireNonNull(name, "Name cannot be null");
+        if (name.isBlank()) {
+            throw new IllegalArgumentException("Name cannot be blank");
+        }
         this.name = name;
     }
 
+    /**
+     * Returns the name of the timeline.
+     *
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Adds an event to the timeline.
+     *
+     * @param event the event to add
+     * @return this timeline for chaining
+     * @throws NullPointerException if event is null
+     */
     public HistoricalTimeline addEvent(HistoricalEvent event) {
-        events.add(event);
+        events.add(Objects.requireNonNull(event, "HistoricalEvent cannot be null"));
         return this;
     }
 
+    /**
+     * Returns all events in this timeline, sorted by start date.
+     *
+     * @return unmodifiable sorted list of events
+     */
     public List<HistoricalEvent> getEvents() {
         return events.stream()
                 .sorted(Comparator.comparing(HistoricalEvent::getStartDate))
                 .toList();
     }
 
+    /**
+     * Returns an unmodifiable list of raw events.
+     * 
+     * @return the internal events list
+     */
+    public List<HistoricalEvent> getRawEvents() {
+        return Collections.unmodifiableList(events);
+    }
+
+    /**
+     * Returns events occurring between two fuzzy dates.
+     * 
+     * @param start start of period
+     * @param end end of period
+     * @return filtered unmodifiable list of events
+     * @throws NullPointerException if start or end is null
+     */
     public List<HistoricalEvent> getEventsBetween(FuzzyDate start, FuzzyDate end) {
+        Objects.requireNonNull(start, "Start date cannot be null");
+        Objects.requireNonNull(end, "End date cannot be null");
         return events.stream()
                 .filter(e -> e.getStartDate().compareTo(start) >= 0 &&
                         e.getEndDate().compareTo(end) <= 0)
@@ -66,7 +130,15 @@ public class HistoricalTimeline {
                 .toList();
     }
 
+    /**
+     * Returns events in a specific category.
+     * 
+     * @param category the category to filter by
+     * @return filtered unmodifiable list of events
+     * @throws NullPointerException if category is null
+     */
     public List<HistoricalEvent> getEventsByCategory(HistoricalEvent.Category category) {
+        Objects.requireNonNull(category, "Category cannot be null");
         return events.stream()
                 .filter(e -> e.getCategory() == category)
                 .sorted(Comparator.comparing(HistoricalEvent::getStartDate))
@@ -74,7 +146,9 @@ public class HistoricalTimeline {
     }
 
     /**
-     * Gets events in BCE period.
+     * Returns events occurring in the BCE (Before Common Era) period.
+     *
+     * @return unmodifiable list of BCE events
      */
     public List<HistoricalEvent> getBceEvents() {
         return events.stream()
@@ -83,16 +157,28 @@ public class HistoricalTimeline {
                 .toList();
     }
 
+    /**
+     * Returns the earliest event in the timeline.
+     *
+     * @return optional earliest event
+     */
     public Optional<HistoricalEvent> getEarliestEvent() {
         return events.stream().min(Comparator.comparing(HistoricalEvent::getStartDate));
     }
 
+    /**
+     * Returns the latest event in the timeline.
+     *
+     * @return optional latest event
+     */
     public Optional<HistoricalEvent> getLatestEvent() {
         return events.stream().max(Comparator.comparing(HistoricalEvent::getEndDate));
     }
 
     /**
-     * Returns approximate time span in years.
+     * Returns the approximate total time span of this timeline in years.
+     * 
+     * @return time span in years
      */
     public int getTimeSpanYears() {
         Optional<HistoricalEvent> earliest = getEarliestEvent();
@@ -110,11 +196,27 @@ public class HistoricalTimeline {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof HistoricalTimeline that)) return false;
+        return Objects.equals(name, that.name) && Objects.equals(events, that.events);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, events);
+    }
+
+    @Override
     public String toString() {
         return String.format("HistoricalTimeline '%s' with %d events", name, events.size());
     }
 
-    // Factory for common timelines
+    /**
+     * Factory method creating a timeline of major world history events.
+     *
+     * @return world history timeline
+     */
     public static HistoricalTimeline worldHistory() {
         return new HistoricalTimeline("World History")
                 .addEvent(HistoricalEvent.GREAT_PYRAMID)
@@ -127,6 +229,11 @@ public class HistoricalTimeline {
                 .addEvent(HistoricalEvent.MOON_LANDING);
     }
 
+    /**
+     * Factory method creating a timeline of major ancient history events.
+     *
+     * @return ancient history timeline
+     */
     public static HistoricalTimeline ancientHistory() {
         return new HistoricalTimeline("Ancient History")
                 .addEvent(HistoricalEvent.GREAT_PYRAMID)
@@ -135,5 +242,3 @@ public class HistoricalTimeline {
                 .addEvent(HistoricalEvent.FALL_OF_ROME);
     }
 }
-
-

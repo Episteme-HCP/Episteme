@@ -56,6 +56,25 @@
         </dependency>
         -->
 
+        <!-- JSBML -->
+        <dependency>
+            <groupId>org.sbml.jsbml</groupId>
+            <artifactId>jsbml</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+
+        <!-- JAXB (Jakarta XML Binding) -->
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
         <!-- Quantum Computing: Amazon Braket -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
@@ -111,11 +130,59 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <!-- Exclude files with dependencies on unimplemented modules -->
+                        <exclude>**/medicine/Doctor.java</exclude>
+                        <exclude>**/medicine/Patient.java</exclude>
+                        <exclude>**/medicine/Treatment.java</exclude>
+                        <exclude>**/medicine/MedicalSituation.java</exclude>
+                        <exclude>**/medicine/Disease.java</exclude>
+                        <exclude>**/medicine/Pathology.java</exclude>
+                        <exclude>**/medicine/loaders/**</exclude>
+                        <exclude>**/medicine/pharmacology/**</exclude>
+                        <exclude>**/geography/Boundary.java</exclude>
+                        <exclude>**/geography/Region.java</exclude>
+                        <exclude>**/geography/Place.java</exclude>
+                        <exclude>**/geography/Places.java</exclude>
+                        <exclude>**/earth/coordinates/CoordinateConverter.java</exclude>
+                        <exclude>**/earth/coordinates/PolyconicCoordinate.java</exclude>
+                        <exclude>**/earth/coordinates/DatumTransformation.java</exclude>
+                        <exclude>**/earth/coordinates/HistoricalGeodeticModels.java</exclude>
+                        <exclude>**/earth/geodesy/GeodeticCalculator.java</exclude>
+                        <exclude>**/biology/loaders/BiologicalResourceReader.java</exclude>
+                        <exclude>**/physics/ParticleType.java</exclude>
+                        <!-- AnIML/ThermoML readers depend on JAXB-generated classes -->
+                        <exclude>**/chemistry/loaders/animl/**</exclude>
+                        <exclude>**/physics/loaders/thermoml/**</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
+            <!-- JAXB Plugin - disabled, AniML classes are pre-generated in target/generated-sources -->
+            <!-- Enable if regenerating from XSD is needed
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>xjc</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <sources>
+                        <source>src/main/resources/xsd</source>
+                    </sources>
+                </configuration>
+            </plugin>
+            -->
         </plugins>
     </build>
 </project>

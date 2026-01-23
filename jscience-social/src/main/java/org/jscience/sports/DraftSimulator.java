@@ -1,28 +1,75 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.sports;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import org.jscience.mathematics.numbers.real.Real;
-import java.util.*;
 
 /**
- * Draft and transfer simulation for sports leagues.
+ * Simulates sports drafts and recruitment processes.
+ * Includes serpentine draft logic and lottery-weighted selection order.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
 public final class DraftSimulator {
 
     private DraftSimulator() {}
 
+    /** Data model for a draft prospect. */
     public record Prospect(
         String name,
         String position,
-        double overallRating, // 0-100
-        double potential,     // 0-100
+        double overallRating,
+        double potential,
         int age,
         Map<String, Double> attributes
-    ) {}
+    ) implements Serializable {}
 
-    public record DraftPick(int round, int pickNumber, String team, Prospect prospect) {}
+    /** Details of a specific draft pick. */
+    public record DraftPick(
+        int round, 
+        int pickNumber, 
+        String team, 
+        Prospect prospect
+    ) implements Serializable {}
 
     /**
-     * Simulates a serpentine draft (1st pick in round 1 gets last in round 2).
+     * Simulates a serpentine draft over a specified number of rounds.
+     * 
+     * @param teamOrder initial team selection order
+     * @param prospects available players
+     * @param rounds    total rounds to simulate
+     * @return the sequence of draft picks
      */
     public static List<DraftPick> simulateSerpentineDraft(
             List<String> teamOrder, List<Prospect> prospects, int rounds) {
@@ -41,7 +88,6 @@ public final class DraftSimulator {
             for (String team : roundOrder) {
                 if (available.isEmpty()) break;
                 
-                // Simple AI: pick best available with some randomness
                 int index = selectProspect(available, team, round);
                 Prospect pick = available.remove(index);
                 
@@ -50,12 +96,15 @@ public final class DraftSimulator {
                 pickInRound++;
             }
         }
-        
         return results;
     }
 
     /**
-     * Simulates a lottery draft (weighted by inverse standings).
+     * Simulates a weighted lottery to determine draft order.
+     * 
+     * @param teamStandings mapping of teams to their standings (1 = best)
+     * @param lotteryPicks  number of picks determined by lottery
+     * @return the resulting selection order
      */
     public static List<String> simulateLotteryOrder(Map<String, Integer> teamStandings, 
             int lotteryPicks) {
@@ -63,7 +112,6 @@ public final class DraftSimulator {
         List<String> teams = new ArrayList<>(teamStandings.keySet());
         int totalTeams = teams.size();
         
-        // Calculate lottery weights (worse teams get more chances)
         Map<String, Integer> weights = new HashMap<>();
         for (String team : teams) {
             int standing = teamStandings.get(team);
@@ -89,26 +137,19 @@ public final class DraftSimulator {
             }
         }
         
-        // Remaining teams in reverse standings order
-        remaining.sort((a, b) -> teamStandings.get(a) - teamStandings.get(b));
-        Collections.reverse(remaining);
+        remaining.sort((a, b) -> teamStandings.get(b) - teamStandings.get(a));
         lotteryResults.addAll(remaining);
         
         return lotteryResults;
     }
 
-    /**
-     * Calculates trade value of picks.
-     */
+    /** Calculates the estimated trade value of a specific pick. */
     public static Real calculatePickValue(int pickNumber, int totalPicks) {
-        // Trade value formula (exponential decay)
-        double value = 1000 * Math.exp(-0.05 * (pickNumber - 1));
+        double value = 1000.0 * Math.exp(-0.05 * (pickNumber - 1));
         return Real.of(value);
     }
 
-    /**
-     * Suggests fair trade packages.
-     */
+    /** Evaluates if a trade proposal between two teams is fair. */
     public static boolean isFairTrade(List<Integer> teamAPicks, List<Integer> teamBPicks, 
             int totalPicks, double maxImbalance) {
         
@@ -125,7 +166,6 @@ public final class DraftSimulator {
 
     private static int selectProspect(List<Prospect> available, String team, int round) {
         Random random = new Random();
-        // Better teams (later picks) reach more, worse teams pick best available
         int reachRange = Math.min(3, available.size());
         return random.nextInt(reachRange);
     }

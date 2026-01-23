@@ -1,156 +1,95 @@
-package org.jscience.economics;
-
-import java.util.Iterator;
-import java.util.Set;
-
-
-/**
- * A class representing a transfer of property from one entity to another
- * without the use of money.
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * @author Silvere Martin-Michiellot
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
-//Barter occurs directly between economic agents without the need for organizations
-//the exchange only comes when barterResources() is called
-public class Barter extends Object {
-    /** DOCUMENT ME! */
-    private EconomicAgent economicAgent1;
+package org.jscience.economics;
 
-    /** DOCUMENT ME! */
-    private Set agent1Resources;
-
-    /** DOCUMENT ME! */
-    private EconomicAgent economicAgent2;
-
-    /** DOCUMENT ME! */
-    private Set agent2Resources;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 /**
-     * Creates a new Barter object.
-     *
-     * @param economicAgent1  DOCUMENT ME!
-     * @param agent1Resources DOCUMENT ME!
-     * @param economicAgent2  DOCUMENT ME!
-     * @param agent2Resources DOCUMENT ME!
+ * Represents a direct exchange of property between two agents without using money.
+ * Atomic transaction that validates ownership before execution.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
+ */
+public class Barter implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private final EconomicAgent agent1;
+    private final Set<Resource> resources1;
+    private final EconomicAgent agent2;
+    private final Set<Resource> resources2;
+
+    /**
+     * Initializes a barter contract.
+     * 
+     * @param agent1     first participant
+     * @param resources1 resources offered by agent1
+     * @param agent2     second participant
+     * @param resources2 resources offered by agent2
+     * @throws IllegalArgumentException if ownership is not verified
      */
-    public Barter(EconomicAgent economicAgent1, Set agent1Resources,
-        EconomicAgent economicAgent2, Set agent2Resources) {
-        Iterator iterator;
-        boolean valid;
+    public Barter(EconomicAgent agent1, Set<Resource> resources1,
+                  EconomicAgent agent2, Set<Resource> resources2) {
+        this.agent1 = Objects.requireNonNull(agent1, "Agent1 cannot be null");
+        this.agent2 = Objects.requireNonNull(agent2, "Agent2 cannot be null");
+        this.resources1 = new HashSet<>(Objects.requireNonNull(resources1));
+        this.resources2 = new HashSet<>(Objects.requireNonNull(resources2));
 
-        if ((economicAgent1 != null) && (agent1Resources != null) &&
-                (economicAgent2 != null) && (agent2Resources != null)) {
-            iterator = agent1Resources.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Resource;
-            }
-
-            if (valid) {
-                iterator = agent1Resources.iterator();
-
-                while (iterator.hasNext() && valid) {
-                    valid = economicAgent1.getBelongings()
-                                          .contains(iterator.next());
-                }
-
-                if (valid) {
-                    iterator = agent2Resources.iterator();
-
-                    while (iterator.hasNext() && valid) {
-                        valid = iterator.next() instanceof Resource;
-                    }
-
-                    if (valid) {
-                        iterator = agent2Resources.iterator();
-
-                        while (iterator.hasNext() && valid) {
-                            valid = economicAgent2.getBelongings()
-                                                  .contains(iterator.next());
-                        }
-
-                        if (valid) {
-                            this.economicAgent1 = economicAgent1;
-                            this.agent1Resources = agent1Resources;
-                            this.economicAgent2 = economicAgent2;
-                            this.agent2Resources = agent2Resources;
-                        } else {
-                            throw new IllegalArgumentException(
-                                "All agent2Resources should be owned by economicAgent2.");
-                        }
-                    } else {
-                        throw new IllegalArgumentException(
-                            "agent2Resources should be a Set of Resources.");
-                    }
-                } else {
-                    throw new IllegalArgumentException(
-                        "All agent1Resources should be owned by economicAgent1.");
-                }
-            } else {
-                throw new IllegalArgumentException(
-                    "agent1Resources should be a Set of Resources.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Barter constructor can't have null arguments.");
+        if (!agent1.getBelongings().containsAll(this.resources1)) {
+            throw new IllegalArgumentException("Agent1 does not own all offered resources");
+        }
+        if (!agent2.getBelongings().containsAll(this.resources2)) {
+            throw new IllegalArgumentException("Agent2 does not own all offered resources");
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public EconomicAgent getEconomicAgent1() {
-        return economicAgent1;
-    }
+    public EconomicAgent getAgent1() { return agent1; }
+    public Set<Resource> getResources1() { return Collections.unmodifiableSet(resources1); }
+    public EconomicAgent getAgent2() { return agent2; }
+    public Set<Resource> getResources2() { return Collections.unmodifiableSet(resources2); }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Executes the exchange, updating both agents' belongings.
      */
-    public Set getAgent1Resources() {
-        return agent1Resources;
-    }
+    public void execute() {
+        Set<Resource> newBelongings1 = new HashSet<>(agent1.getBelongings());
+        Set<Resource> newBelongings2 = new HashSet<>(agent2.getBelongings());
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public EconomicAgent getEconomicAgent2() {
-        return economicAgent2;
-    }
+        newBelongings1.removeAll(resources1);
+        newBelongings1.addAll(resources2);
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Set getAgent2Resources() {
-        return agent2Resources;
-    }
+        newBelongings2.removeAll(resources2);
+        newBelongings2.addAll(resources1);
 
-    /**
-     * DOCUMENT ME!
-     */
-    public void barterResources() {
-        Set resources;
-
-        resources = economicAgent2.getBelongings();
-        resources.removeAll(agent2Resources);
-        economicAgent2.setBelongings(resources);
-        resources = economicAgent1.getBelongings();
-        resources.addAll(agent2Resources);
-        economicAgent1.setBelongings(resources);
-        resources = economicAgent2.getBelongings();
-        resources.addAll(agent1Resources);
-        economicAgent2.setBelongings(resources);
-        resources = economicAgent1.getBelongings();
-        resources.removeAll(agent1Resources);
-        economicAgent1.setBelongings(resources);
+        agent1.setBelongings(newBelongings1);
+        agent2.setBelongings(newBelongings2);
     }
 }

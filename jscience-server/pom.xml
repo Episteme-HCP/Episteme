@@ -91,6 +91,13 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- JScience Social (for WorldBank and Economic Tools) -->
+        <dependency>
+            <groupId>org.jscience</groupId>
+            <artifactId>jscience-social</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- Database (PG + H2) -->
         <dependency>
             <groupId>org.postgresql</groupId>

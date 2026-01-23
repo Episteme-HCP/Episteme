@@ -1,117 +1,226 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history;
 
 import org.jscience.mathematics.numbers.real.Real;
+import java.io.Serializable;
 import java.util.*;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
 
 /**
- * Maps and models historical trade routes.
+ * Maps and models historical trade routes, connecting distant trading posts.
+ * Provides tools for distance calculation, travel time estimation, and network centrality analysis.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
 public final class TradeRouteMapper {
 
-    private TradeRouteMapper() {}
-
-    public record TradingPost(
-        String name,
-        double latitude,
-        double longitude,
-        String region,
-        int foundedYear,
-        List<String> primaryGoods
-    ) {}
-
-    public record TradeRoute(
-        String name,
-        List<TradingPost> waypoints,
-        int activeFromYear,
-        int activeToYear,
-        String primaryCommodity,
-        String transportMode  // land, sea, river, mixed
-    ) {}
-
-    public record RouteSegment(
-        TradingPost start,
-        TradingPost end,
-        double distanceKm,
-        int travelDays,
-        double dangerLevel  // 0-1
-    ) {}
-
-    private static final List<TradeRoute> ROUTES = new ArrayList<>();
-    private static final List<TradingPost> POSTS = new ArrayList<>();
+    private TradeRouteMapper() {
+        // Prevent instantiation
+    }
 
     /**
-     * Initializes historical trade routes.
+     * Represents a historical trading hub with its geographical location and primary goods.
+     * 
+     * @param name        trading post name
+     * @param latitude    geographical latitude
+     * @param longitude   geographical longitude
+     * @param region      geographical region name
+     * @param foundedYear year the trading post was established (CE, negative for BCE)
+     * @param primaryGoods list of primary commodities traded
+     */
+    @Persistent
+    public record TradingPost(
+        @Attribute String name,
+        @Attribute double latitude,
+        @Attribute double longitude,
+        @Attribute String region,
+        @Attribute int foundedYear,
+        @Attribute List<String> primaryGoods
+    ) implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        public TradingPost {
+            Objects.requireNonNull(name, "Trading post name cannot be null");
+            primaryGoods = primaryGoods != null ? List.copyOf(primaryGoods) : List.of();
+        }
+    }
+
+    /**
+     * Represents an established trade route consisting of multiple waypoints.
+     * 
+     * @param name             route name
+     * @param waypoints        ordered list of trading posts along the route
+     * @param activeFromYear   start of active period (CE, negative for BCE)
+     * @param activeToYear     end of active period (CE)
+     * @param primaryCommodity the main traded good on this route
+     * @param transportMode    mode of transport (land, sea, river, mixed)
+     */
+    @Persistent
+    public record TradeRoute(
+        @Attribute String name,
+        @Attribute List<TradingPost> waypoints,
+        @Attribute int activeFromYear,
+        @Attribute int activeToYear,
+        @Attribute String primaryCommodity,
+        @Attribute String transportMode
+    ) implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        public TradeRoute {
+            Objects.requireNonNull(name, "Trade route name cannot be null");
+            waypoints = waypoints != null ? List.copyOf(waypoints) : List.of();
+        }
+    }
+
+    /**
+     * Specific segment between two consecutive trading posts in a route.
+     * 
+     * @param start       segment origin
+     * @param end         segment destination
+     * @param distanceKm  distance in kilometers
+     * @param travelDays  estimated travel time in days
+     * @param dangerLevel risk level (0.0 = safe, 1.0 = perilous)
+     */
+    @Persistent
+    public record RouteSegment(
+        @Attribute TradingPost start,
+        @Attribute TradingPost end,
+        @Attribute double distanceKm,
+        @Attribute int travelDays,
+        @Attribute double dangerLevel
+    ) implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        public RouteSegment {
+            Objects.requireNonNull(start, "Start post cannot be null");
+            Objects.requireNonNull(end, "End post cannot be null");
+        }
+    }
+
+    private static final List<TradeRoute> ROUTES = Collections.synchronizedList(new ArrayList<>());
+    private static final List<TradingPost> POSTS = Collections.synchronizedList(new ArrayList<>());
+
+    /**
+     * Initializes the database with major historical trade routes.
      */
     public static void loadHistoricalData() {
         // Silk Road waypoints
         TradingPost xian = new TradingPost("Chang'an (Xi'an)", 34.27, 108.95, "China", -200, 
-            List.of("silk", "porcelain", "tea"));
+            Arrays.asList("silk", "porcelain", "tea"));
         TradingPost dunhuang = new TradingPost("Dunhuang", 40.14, 94.66, "China", -100,
-            List.of("silk", "jade"));
+            Arrays.asList("silk", "jade"));
         TradingPost samarkand = new TradingPost("Samarkand", 39.65, 66.96, "Central Asia", -700,
-            List.of("paper", "textiles"));
+            Arrays.asList("paper", "textiles"));
         TradingPost ctesiphon = new TradingPost("Ctesiphon", 33.10, 44.58, "Persia", -600,
-            List.of("spices", "glassware"));
+            Arrays.asList("spices", "glassware"));
         TradingPost antioch = new TradingPost("Antioch", 36.20, 36.16, "Levant", -300,
-            List.of("purple dye", "glassware"));
+            Arrays.asList("purple dye", "glassware"));
         TradingPost constantinople = new TradingPost("Constantinople", 41.01, 28.98, "Byzantium", 330,
-            List.of("gold", "silk", "spices"));
+            Arrays.asList("gold", "silk", "spices"));
         
-        POSTS.addAll(List.of(xian, dunhuang, samarkand, ctesiphon, antioch, constantinople));
+        synchronized (POSTS) {
+            POSTS.addAll(Arrays.asList(xian, dunhuang, samarkand, ctesiphon, antioch, constantinople));
+        }
         
-        ROUTES.add(new TradeRoute("Silk Road", 
-            List.of(xian, dunhuang, samarkand, ctesiphon, antioch, constantinople),
-            -130, 1453, "silk", "land"));
+        synchronized (ROUTES) {
+            ROUTES.add(new TradeRoute("Silk Road", 
+                Arrays.asList(xian, dunhuang, samarkand, ctesiphon, antioch, constantinople),
+                -130, 1453, "silk", "land"));
+        }
         
         // Spice Route
         TradingPost malacca = new TradingPost("Malacca", 2.19, 102.25, "Southeast Asia", 1400,
-            List.of("spices", "tin"));
+            Arrays.asList("spices", "tin"));
         TradingPost calicut = new TradingPost("Calicut", 11.25, 75.77, "India", 100,
-            List.of("pepper", "textiles"));
+            Arrays.asList("pepper", "textiles"));
         TradingPost aden = new TradingPost("Aden", 12.79, 45.03, "Arabia", -200,
-            List.of("frankincense", "myrrh"));
+            Arrays.asList("frankincense", "myrrh"));
         TradingPost alexandria = new TradingPost("Alexandria", 31.20, 29.92, "Egypt", -332,
-            List.of("grain", "papyrus"));
+            Arrays.asList("grain", "papyrus"));
         TradingPost venice = new TradingPost("Venice", 45.44, 12.32, "Italy", 421,
-            List.of("glass", "textiles"));
+            Arrays.asList("glass", "textiles"));
         
-        POSTS.addAll(List.of(malacca, calicut, aden, alexandria, venice));
+        synchronized (POSTS) {
+            POSTS.addAll(Arrays.asList(malacca, calicut, aden, alexandria, venice));
+        }
         
-        ROUTES.add(new TradeRoute("Spice Route",
-            List.of(malacca, calicut, aden, alexandria, venice),
-            100, 1500, "spices", "sea"));
+        synchronized (ROUTES) {
+            ROUTES.add(new TradeRoute("Spice Route",
+                Arrays.asList(malacca, calicut, aden, alexandria, venice),
+                100, 1500, "spices", "sea"));
+        }
         
         // Hanseatic League
         TradingPost lubeck = new TradingPost("Lübeck", 53.87, 10.69, "Germany", 1143,
-            List.of("salt", "beer"));
+            Arrays.asList("salt", "beer"));
         TradingPost bergen = new TradingPost("Bergen", 60.39, 5.32, "Norway", 1070,
-            List.of("fish", "timber"));
+            Arrays.asList("fish", "timber"));
         TradingPost novgorod = new TradingPost("Novgorod", 58.52, 31.28, "Russia", 859,
-            List.of("furs", "wax"));
+            Arrays.asList("furs", "wax"));
         TradingPost bruges = new TradingPost("Bruges", 51.21, 3.22, "Flanders", 850,
-            List.of("cloth", "wool"));
+            Arrays.asList("cloth", "wool"));
         
-        POSTS.addAll(List.of(lubeck, bergen, novgorod, bruges));
+        synchronized (POSTS) {
+            POSTS.addAll(Arrays.asList(lubeck, bergen, novgorod, bruges));
+        }
         
-        ROUTES.add(new TradeRoute("Hanseatic Route",
-            List.of(bergen, lubeck, novgorod, bruges),
-            1200, 1500, "fish", "sea"));
+        synchronized (ROUTES) {
+            ROUTES.add(new TradeRoute("Hanseatic Route",
+                Arrays.asList(bergen, lubeck, novgorod, bruges),
+                1200, 1500, "fish", "sea"));
+        }
     }
 
     /**
-     * Gets all routes active in a given year.
+     * Retrieves all recorded routes that were active in a specific year.
+     * 
+     * @param year historical year
+     * @return unmodifiable list of active trade routes
      */
     public static List<TradeRoute> getActiveRoutes(int year) {
-        return ROUTES.stream()
-            .filter(r -> year >= r.activeFromYear() && year <= r.activeToYear())
-            .toList();
+        synchronized (ROUTES) {
+            return ROUTES.stream()
+                .filter(r -> year >= r.activeFromYear() && year <= r.activeToYear())
+                .toList();
+        }
     }
 
     /**
-     * Calculates total route distance.
+     * Calculates the total distance of a trade route in kilometers using haversine formula.
+     * 
+     * @param route the trade route
+     * @return total distance as a {@link Real} number
+     * @throws NullPointerException if route is null
      */
     public static Real calculateRouteDistance(TradeRoute route) {
-        double total = 0;
+        Objects.requireNonNull(route, "Trade route cannot be null");
+        double total = 0.0;
         List<TradingPost> waypoints = route.waypoints();
         
         for (int i = 0; i < waypoints.size() - 1; i++) {
@@ -125,64 +234,81 @@ public final class TradeRouteMapper {
     }
 
     /**
-     * Estimates travel time based on historical conditions.
+     * Estimates the number of travel days for a route based on transport mode.
+     * 
+     * @param route the trade route
+     * @return estimated duration in days
+     * @throws NullPointerException if route is null
      */
     public static int estimateTravelDays(TradeRoute route) {
+        Objects.requireNonNull(route, "Trade route cannot be null");
         double distance = calculateRouteDistance(route).doubleValue();
         
-        // Average daily travel distance by mode
-        double dailyKm = switch (route.transportMode()) {
-            case "land" -> 30;  // Caravan
-            case "sea" -> 100;  // Sailing ship
-            case "river" -> 50;
-            default -> 40;
+        String mode = route.transportMode();
+        double dailyKm = switch (mode != null ? mode.toLowerCase().trim() : "mixed") {
+            case "land" -> 30.0;  // Typical caravan speed
+            case "sea" -> 100.0;  // Average sailing speed
+            case "river" -> 50.0;
+            default -> 40.0;
         };
         
         return (int) Math.ceil(distance / dailyKm);
     }
 
     /**
-     * Finds trading posts that dealt in a specific commodity.
+     * Searches for trading posts associated with a specific commodity.
+     * 
+     * @param commodity commodity name
+     * @return unmodifiable list of trading posts dealing in that commodity
+     * @throws NullPointerException if commodity is null
      */
     public static List<TradingPost> findByGoods(String commodity) {
-        return POSTS.stream()
-            .filter(p -> p.primaryGoods().stream()
-                .anyMatch(g -> g.toLowerCase().contains(commodity.toLowerCase())))
-            .toList();
+        Objects.requireNonNull(commodity, "Commodity name cannot be null");
+        String lower = commodity.toLowerCase().trim();
+        synchronized (POSTS) {
+            return POSTS.stream()
+                .filter(p -> p.primaryGoods().stream()
+                    .anyMatch(g -> g.toLowerCase().contains(lower)))
+                .toList();
+        }
     }
 
     /**
-     * Calculates network centrality (importance in trade network).
+     * Calculates the network centrality of trading posts based on route connectivity.
+     * 
+     * @return unmodifiable map of trading post names to centrality score (0.0 to 1.0)
      */
     public static Map<String, Real> calculateCentrality() {
-        Map<String, Integer> connections = new HashMap<>();
+        Map<String, Integer> correlations = new HashMap<>();
         
-        for (TradeRoute route : ROUTES) {
-            for (TradingPost post : route.waypoints()) {
-                connections.merge(post.name(), 1, Integer::sum);
+        synchronized (ROUTES) {
+            for (TradeRoute route : ROUTES) {
+                for (TradingPost post : route.waypoints()) {
+                    correlations.merge(post.name(), 1, Integer::sum);
+                }
             }
         }
         
-        int maxConnections = connections.values().stream()
+        int maxConn = correlations.values().stream()
             .mapToInt(Integer::intValue)
             .max().orElse(1);
         
         Map<String, Real> centrality = new HashMap<>();
-        connections.forEach((name, count) -> 
-            centrality.put(name, Real.of((double) count / maxConnections)));
+        correlations.forEach((name, count) -> 
+            centrality.put(name, Real.of((double) count / maxConn)));
         
-        return centrality;
+        return Collections.unmodifiableMap(centrality);
     }
 
     private static double haversineDistance(double lat1, double lon1, double lat2, double lon2) {
-        double R = 6371; // Earth radius km
+        double r = 6371.0; // Earth radius in km
         double dLat = Math.toRadians(lat2 - lat1);
         double dLon = Math.toRadians(lon2 - lon1);
         
-        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+        double a = Math.sin(dLat / 2.0) * Math.sin(dLat / 2.0) +
                    Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                   Math.sin(dLon/2) * Math.sin(dLon/2);
+                   Math.sin(dLon / 2.0) * Math.sin(dLon / 2.0);
         
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return r * 2.0 * Math.atan2(Math.sqrt(a), Math.sqrt(1.0 - a));
     }
 }

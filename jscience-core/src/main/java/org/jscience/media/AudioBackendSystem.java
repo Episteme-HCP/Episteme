@@ -5,7 +5,7 @@
 
 package org.jscience.media;
 
-import org.jscience.media.backend.JavaSoundBackend;
+import org.jscience.media.backends.JavaSoundBackend;
 import org.jscience.technical.backend.BackendDiscovery;
 import org.jscience.technical.backend.BackendProvider;
 import java.util.List;

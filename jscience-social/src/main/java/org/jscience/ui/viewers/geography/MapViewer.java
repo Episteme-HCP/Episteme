@@ -32,7 +32,7 @@ import org.jscience.ui.Viewer;
 import org.jscience.JScience;
 import org.jscience.technical.backend.BackendProvider;
 import org.jscience.technical.backend.BackendDiscovery;
-import org.jscience.ui.viewers.geography.backend.JavaFXMapRenderer;
+import org.jscience.ui.viewers.geography.backends.JavaFXMapRenderer;
 import org.jscience.ui.ThemeManager;
 
 import java.text.MessageFormat;

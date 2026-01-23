@@ -22,7 +22,7 @@ import java.util.Date;
 //of course you can always subdivide any event in many more events, arrange them in hierarchies or whatever
 public class Event extends java.lang.Object {
     /** DOCUMENT ME! */
-    private org.jscience.philosophy.storytelling.Object object;
+    private org.jscience.philosophy.storytelling.StoryObject object;
 
     /** DOCUMENT ME! */
     private Place place;
@@ -41,7 +41,7 @@ public class Event extends java.lang.Object {
      * @param date       DOCUMENT ME!
      * @param individual DOCUMENT ME!
      */
-    public Event(org.jscience.philosophy.storytelling.Object object,
+    public Event(org.jscience.philosophy.storytelling.StoryObject object,
         Place place, Date date, Individual individual) {
         this.object = object;
         this.place = place;
@@ -54,7 +54,7 @@ public class Event extends java.lang.Object {
      *
      * @return DOCUMENT ME!
      */
-    public org.jscience.philosophy.storytelling.Object getObject() {
+    public org.jscience.philosophy.storytelling.StoryObject getObject() {
         return object;
     }
 

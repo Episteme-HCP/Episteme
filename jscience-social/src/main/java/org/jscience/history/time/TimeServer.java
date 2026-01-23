@@ -1,74 +1,95 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history.time;
 
-import java.util.Timer;
-
-import javax.swing.*;
 import javax.swing.event.EventListenerList;
-
+import java.util.Objects;
 
 /**
- * A class representing a way get time values.
+ * An abstract base class for chronological services capable of broadcasting time updates to listeners.
+ * Concrete implementations may represent real-time clocks, simulation engines, or network-synchronized services.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
 public abstract class TimeServer {
-    /** A list of event listeners for this component. */
-    private EventListenerList listenerList = new EventListenerList();
+    
+    /** Internal registry of event listeners. */
+    private final EventListenerList listenerList = new EventListenerList();
 
     /**
-     * DOCUMENT ME!
+     * Activates the time server, initiating update broadcasts.
      */
     public abstract void start();
 
     /**
-     * DOCUMENT ME!
+     * Deactivates the time server, halting all broadcasts.
      */
     public abstract void stop();
 
     /**
-     * DOCUMENT ME!
+     * Propagates a time event to all registered listeners.
      *
-     * @param evt DOCUMENT ME!
+     * @param evt the time event to dispatch
+     * @throws NullPointerException if event is null
      */
     public void dispatchTimeEvent(TimeEvent evt) {
-        Object[] list = getTimeListeners();
-
-        for (int i = 0; i < list.length; i++) {
-            TimeListener target = (TimeListener) list[i];
+        Objects.requireNonNull(evt, "TimeEvent cannot be null");
+        TimeListener[] listeners = getTimeListeners();
+        for (TimeListener target : listeners) {
             target.timeChanged(evt);
         }
     }
 
     /**
-     * Adds the specified listener to receive events from this clock.
+     * Adds a listener to be notified of time updates.
      *
-     * @param l the TimeListener
+     * @param listener the observer to add
+     * @throws NullPointerException if listener is null
      */
-    public void addTimeListener(TimeListener l) {
-        listenerList.add(TimeListener.class, l);
+    public void addTimeListener(TimeListener listener) {
+        Objects.requireNonNull(listener, "Listener cannot be null");
+        listenerList.add(TimeListener.class, listener);
     }
 
     /**
-     * Removes the specified TimeListener so that it no longer receives
-     * events from this clock.
+     * Removes a listener from the notification list.
      *
-     * @param l the TimeListener
+     * @param listener the observer to remove
      */
-    public void removeTimeListener(TimeListener l) {
-        listenerList.remove(TimeListener.class, l);
+    public void removeTimeListener(TimeListener listener) {
+        listenerList.remove(TimeListener.class, listener);
     }
 
     /**
-     * Returns an array of all the <code>TimeListener</code>s added to
-     * this <code>Clock</code> with <code>addTimeListener</code>.
+     * Returns an array of all currently registered time listeners.
      *
-     * @return all of the <code>TimeListener</code>s added or an empty array if
-     *         no listeners have been added
-     *
-     * @see #addTimeListener
+     * @return array of listeners (may be empty)
      */
     public TimeListener[] getTimeListeners() {
-        return (TimeListener[]) listenerList.getListeners(TimeListener.class);
+        return listenerList.getListeners(TimeListener.class);
     }
 }

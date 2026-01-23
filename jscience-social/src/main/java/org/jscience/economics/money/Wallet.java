@@ -2,8 +2,6 @@ package org.jscience.economics.money;
 
 import org.jscience.economics.Bank;
 
-import org.jscience.measure.Amount;
-
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -50,18 +48,18 @@ public final class Wallet extends Object {
      *
      * @return DOCUMENT ME!
      */
-    public final Amount<Money> getValue(Bank bank, Currency resultCurrency) {
+    public final Money getValue(Bank bank, Currency resultCurrency) {
         Iterator iterator;
-        Amount<Money> currentAmount;
-        Amount<Money> result;
+        Money currentAmount;
+        Money result;
 
         if ((bank != null) && (resultCurrency != null)) {
-            result = Amount.valueOf(0, resultCurrency);
+            result = Money.valueOf(0, resultCurrency);
             iterator = contents.iterator();
 
             while (iterator.hasNext()) {
-                currentAmount = (Amount<Money>) iterator.next();
-                result.plus(currentAmount);
+                currentAmount = (Money) iterator.next();
+                result = result.add(currentAmount);
             }
 
             return result;
@@ -80,7 +78,7 @@ public final class Wallet extends Object {
      */
 
     //the current good idea is to add coin after coin here
-    public final void addValue(Amount<Money> amount) {
+    public final void addValue(Money amount) {
         if (amount != null) {
             contents.add(amount);
         } else {
@@ -94,7 +92,7 @@ public final class Wallet extends Object {
      *
      * @param amount DOCUMENT ME!
      */
-    public final void removeValue(Amount<Money> amount) {
+    public final void removeValue(Money amount) {
         contents.remove(amount);
     }
 

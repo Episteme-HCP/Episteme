@@ -23,8 +23,11 @@
 
 package org.jscience.history;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
 
 /**
  * Represents a date with varying degrees of precision and uncertainty.
@@ -43,9 +46,13 @@ import java.util.Objects;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
-public class FuzzyDate implements Comparable<FuzzyDate> {
+@Persistent
+public class FuzzyDate implements Comparable<FuzzyDate>, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Precision levels for historical dates.
@@ -81,11 +88,22 @@ public class FuzzyDate implements Comparable<FuzzyDate> {
         }
     }
 
+    @Attribute
     private final Integer year;
+
+    @Attribute
     private final Integer month; // 1-12
+
+    @Attribute
     private final Integer day; // 1-31
+
+    @Attribute
     private final Precision precision;
+
+    @Attribute
     private final Era era;
+
+    @Attribute
     private final String qualifier; // e.g., "early", "late", "mid"
 
     private FuzzyDate(Integer year, Integer month, Integer day,
@@ -93,7 +111,7 @@ public class FuzzyDate implements Comparable<FuzzyDate> {
         this.year = year;
         this.month = month;
         this.day = day;
-        this.precision = precision;
+        this.precision = Objects.requireNonNull(precision, "Precision cannot be null");
         this.era = era != null ? era : Era.CE;
         this.qualifier = qualifier;
     }
@@ -102,6 +120,11 @@ public class FuzzyDate implements Comparable<FuzzyDate> {
 
     /**
      * Creates an exact date.
+     * 
+     * @param year the year
+     * @param month the month (1-12)
+     * @param day the day (1-31)
+     * @return a new FuzzyDate
      */
     public static FuzzyDate of(int year, int month, int day) {
         return new FuzzyDate(year, month, day, Precision.EXACT, Era.CE, null);
@@ -109,6 +132,10 @@ public class FuzzyDate implements Comparable<FuzzyDate> {
 
     /**
      * Creates a year-month date.
+     * 
+     * @param year the year
+     * @param month the month (1-12)
+     * @return a new FuzzyDate
      */
     public static FuzzyDate of(int year, int month) {
         return new FuzzyDate(year, month, null, Precision.MONTH, Era.CE, null);
@@ -116,6 +143,9 @@ public class FuzzyDate implements Comparable<FuzzyDate> {
 
     /**
      * Creates a year-only date.
+     * 
+     * @param year the year
+     * @return a new FuzzyDate
      */
     public static FuzzyDate of(int year) {
         return new FuzzyDate(year, null, null, Precision.YEAR, Era.CE, null);
@@ -123,13 +153,19 @@ public class FuzzyDate implements Comparable<FuzzyDate> {
 
     /**
      * Creates an approximate ("circa") date.
+     * 
+     * @param year the year
+     * @return a new FuzzyDate
      */
     public static FuzzyDate circa(int year) {
         return new FuzzyDate(year, null, null, Precision.APPROXIMATE, Era.CE, null);
     }
 
     /**
-     * Creates a BCE date.
+     * Creates a BCE year-only date.
+     * 
+     * @param year the year (absolute value)
+     * @return a new FuzzyDate
      */
     public static FuzzyDate bce(int year) {
         return new FuzzyDate(year, null, null, Precision.YEAR, Era.BCE, null);
@@ -137,6 +173,9 @@ public class FuzzyDate implements Comparable<FuzzyDate> {
 
     /**
      * Creates an approximate BCE date.
+     * 
+     * @param year the year (absolute value)
+     * @return a new FuzzyDate
      */
     public static FuzzyDate circaBce(int year) {
         return new FuzzyDate(year, null, null, Precision.APPROXIMATE, Era.BCE, null);
@@ -147,6 +186,7 @@ public class FuzzyDate implements Comparable<FuzzyDate> {
      *
      * @param century the century number (e.g., 5 for "5th century")
      * @param era     the era
+     * @return a new FuzzyDate
      */
     public static FuzzyDate century(int century, Era era) {
         int year = (century - 1) * 100 + 50; // middle of century
@@ -157,6 +197,7 @@ public class FuzzyDate implements Comparable<FuzzyDate> {
      * Creates a decade reference.
      *
      * @param decade the decade start year (e.g., 1920 for "1920s")
+     * @return a new FuzzyDate
      */
     public static FuzzyDate decade(int decade) {
         return new FuzzyDate(decade + 5, null, null, Precision.DECADE, Era.CE, null);
@@ -164,6 +205,8 @@ public class FuzzyDate implements Comparable<FuzzyDate> {
 
     /**
      * Creates an unknown date.
+     * 
+     * @return a new FuzzyDate representing unknown time
      */
     public static FuzzyDate unknown() {
         return new FuzzyDate(null, null, null, Precision.UNKNOWN, null, null);
@@ -171,8 +214,13 @@ public class FuzzyDate implements Comparable<FuzzyDate> {
 
     /**
      * Creates from a LocalDate.
+     * 
+     * @param date the local date
+     * @return a new FuzzyDate
+     * @throws NullPointerException if date is null
      */
     public static FuzzyDate from(LocalDate date) {
+        Objects.requireNonNull(date, "LocalDate cannot be null");
         return of(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
     }
 
@@ -211,16 +259,16 @@ public class FuzzyDate implements Comparable<FuzzyDate> {
     }
 
     /**
-     * Converts to LocalDate if precision allows.
+     * Converts to {@link LocalDate} if precision allows.
      *
      * @return LocalDate representation
-     * @throws IllegalStateException if date is too imprecise or BCE
+     * @throws IllegalStateException if date is too imprecise, BCE, or unknown
      */
     public LocalDate toLocalDate() {
-        if (precision == Precision.UNKNOWN || isBce()) {
+        if (precision == Precision.UNKNOWN || isBce() || year == null) {
             throw new IllegalStateException("Cannot convert to LocalDate: " + this);
         }
-        int y = year != null ? year : 1;
+        int y = year;
         int m = month != null ? month : 1;
         int d = day != null ? day : 1;
         return LocalDate.of(y, m, d);
@@ -269,11 +317,11 @@ public class FuzzyDate implements Comparable<FuzzyDate> {
         }
 
         if (precision == Precision.CENTURY && year != null) {
-            int century = (Math.abs(year) / 100) + 1;
-            sb.append(ordinal(century)).append(" century");
+            int centuryNum = (Math.abs(year) / 100) + 1;
+            sb.append(ordinal(centuryNum)).append(" century");
         } else if (precision == Precision.DECADE && year != null) {
-            int decade = (year / 10) * 10;
-            sb.append(decade).append("s");
+            int decadeVal = (year / 10) * 10;
+            sb.append(decadeVal).append("s");
         } else {
             if (day != null) {
                 sb.append(day).append(" ");
@@ -340,5 +388,3 @@ public class FuzzyDate implements Comparable<FuzzyDate> {
         return Objects.hash(year, month, day, precision, era);
     }
 }
-
-

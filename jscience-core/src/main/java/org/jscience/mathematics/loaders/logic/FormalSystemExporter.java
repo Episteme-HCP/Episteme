@@ -111,6 +111,17 @@ public interface FormalSystemExporter extends ResourceWriter<Map<String, Object>
     }
 
     /**
+     * Returns the supported versions of the formal system format.
+     * Each exporter class should override this to declare specific version support.
+     * 
+     * @return array of supported version strings
+     */
+    @Override
+    default String[] getSupportedVersions() {
+        return new String[] {}; // Version-agnostic by default
+    }
+
+    /**
      * Returns the file extension typically used by this system.
      * 
      * @return the file extension (e.g., ".v", ".mm")

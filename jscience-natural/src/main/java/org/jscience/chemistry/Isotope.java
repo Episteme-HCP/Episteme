@@ -29,7 +29,7 @@ import org.jscience.measure.quantity.Time;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 
-import org.jscience.util.identity.Identifiable;
+import org.jscience.util.identity.Identified;
 import org.jscience.util.Named;
 
 /**
@@ -39,7 +39,7 @@ import org.jscience.util.Named;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Isotope implements Identifiable<String>, Named {
+public class Isotope implements Identified<String>, Named {
 
     private final Element element;
     private final int neutronCount;

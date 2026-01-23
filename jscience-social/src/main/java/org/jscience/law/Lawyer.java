@@ -1,107 +1,118 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.law;
 
 import org.jscience.biology.Individual;
-
 import org.jscience.economics.Worker;
-
 import org.jscience.politics.Administration;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
-
 /**
- * The Lawyer class provides some useful information for people whose job
- * is to defend individuals.
+ * The Lawyer class represents a legal professional whose primary role is to 
+ * provide legal advice and represent individuals or organizations in legal matters.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.2
  */
 public class Lawyer extends Worker {
-    /** DOCUMENT ME! */
-    private Set clients;
+    
+    /** The set of individuals represented by this lawyer. */
+    private Set<Individual> clients;
 
-/**
+    /**
      * Creates a new Lawyer object.
      *
-     * @param individual       DOCUMENT ME!
-     * @param lawSuitSituation DOCUMENT ME!
-     * @param function         DOCUMENT ME!
-     * @param administration   DOCUMENT ME!
+     * @param individual the biological individual who is a lawyer
+     * @param lawSuitSituation the legal situation or context
+     * @param function the specific role or title (e.g., "Counsel", "Advocate")
+     * @param administration the administrative body the lawyer belongs to
+     * @throws IllegalArgumentException if individual, lawSuitSituation, or administration is null
      */
     public Lawyer(Individual individual, LawSuitSituation lawSuitSituation,
         String function, Administration administration) {
         super(individual, lawSuitSituation, function, administration);
-        clients = new HashSet();
+        this.clients = new HashSet<>();
     }
 
-/**
-     * Creates a new Lawyer object.
+    /**
+     * Creates a new Lawyer object with the default function "Lawyer".
      *
-     * @param individual       DOCUMENT ME!
-     * @param lawSuitSituation DOCUMENT ME!
-     * @param administration   DOCUMENT ME!
+     * @param individual the biological individual who is a lawyer
+     * @param lawSuitSituation the legal situation or context
+     * @param administration the administrative body the lawyer belongs to
+     * @throws IllegalArgumentException if individual, lawSuitSituation, or administration is null
      */
     public Lawyer(Individual individual, LawSuitSituation lawSuitSituation,
         Administration administration) {
         super(individual, lawSuitSituation, "Lawyer", administration);
-        clients = new HashSet();
+        this.clients = new HashSet<>();
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the set of clients currently represented by this lawyer.
+     * @return the set of clients
      */
-    public Set getClients() {
+    public Set<Individual> getClients() {
         return clients;
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the set of clients for this lawyer.
      *
-     * @param clients DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param clients the new set of clients
+     * @throws IllegalArgumentException if the set is null or contains non-Individual entities
      */
-    public void setClients(Set clients) {
-        Iterator iterator;
-        boolean valid;
-
-        if (clients != null) {
-            iterator = clients.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Individual;
-            }
-
-            if (valid) {
-                this.clients = clients;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Set of clients should contain only Individual.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Set of clients shouldn't be null.");
+    public void setClients(Set<Individual> clients) {
+        if (clients == null) {
+            throw new IllegalArgumentException("The Set of clients cannot be null.");
         }
+
+        for (Object client : clients) {
+            if (!(client instanceof Individual)) {
+                throw new IllegalArgumentException("The Set of clients must contain only Individual.");
+            }
+        }
+        this.clients = clients;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param individual DOCUMENT ME!
+     * Adds a new client to the lawyer's representation.
+     * @param individual the individual to add as a client
+     * @throws IllegalArgumentException if individual is null
      */
     public void addClient(Individual individual) {
+        if (individual == null) {
+            throw new IllegalArgumentException("Cannot add a null client.");
+        }
         clients.add(individual);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param individual DOCUMENT ME!
+     * Removes a client from the lawyer's representation.
+     * @param individual the individual to remove
      */
     public void removeClient(Individual individual) {
         clients.remove(individual);

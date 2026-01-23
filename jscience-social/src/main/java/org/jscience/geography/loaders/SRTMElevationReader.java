@@ -60,6 +60,11 @@ public class SRTMElevationReader extends AbstractResourceReader<Double> {
     }
 
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"SRTM 3.0", "SRTM 1.0"};
+    }
+
+    @Override
     protected Double loadFromSource(String coordinates) throws Exception {
         // coordinates: "lat,lon"
         String[] parts = coordinates.split(",");

@@ -9,11 +9,9 @@ package org.jscience.linguistics;
 public class Languages extends Object {
     //I am not sure I have the correct set here
     /** DOCUMENT ME! */
-    public final static Language EN_US = new Language("American English",
+    public final static Language EN_US = new Language("en", "American English",
             "abcdefghijklmnopqrstuvwxyz");
 
-    //I am not sure I have the correct set here
-    /** DOCUMENT ME! */
-    public final static Language FR_FR = new Language("French French",
+    public final static Language FR_FR = new Language("fr", "French French",
             "abcdefghijklmnopqrstuvwxyzéèêùçàô");
 }

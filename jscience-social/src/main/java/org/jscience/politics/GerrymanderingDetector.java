@@ -1,48 +1,90 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.politics;
 
-import java.util.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Detects gerrymandering in electoral district maps.
+ * Provides algorithms to detect gerrymandering and partisan bias in electoral district maps.
+ * Includes implementations for Efficiency Gap, Mean-Median Difference, and Declination.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
 public final class GerrymanderingDetector {
 
     private GerrymanderingDetector() {}
 
+    /** Data model for an individual electoral district. */
     public record District(
         String id,
         int totalVoters,
         int partyAVotes,
         int partyBVotes,
-        double compactnessScore,  // 0-1 (1 = perfectly compact)
-        List<double[]> boundary   // Polygon vertices
-    ) {}
+        double compactnessScore,
+        List<double[]> boundary
+    ) implements Serializable {}
 
+    /** Comprehensive analysis result for a full district map. */
     public record GerrymanderAnalysis(
-        double efficiencyGap,      // |wasted votes difference| / total votes
-        double meanMedianDiff,     // Difference between mean and median vote share
-        double declination,        // Asymmetry measure
+        double efficiencyGap,
+        double meanMedianDiff,
+        double declination,
         double overallCompactness,
         List<String> packedDistricts,
         List<String> crackedDistricts,
         String verdict
-    ) {}
+    ) implements Serializable {}
 
     /**
-     * Analyzes district map for gerrymandering.
+     * Performs a multi-metric analysis of a set of districts to detect partisan bias.
+     * 
+     * @param districts the list of districts in the map
+     * @return a detailed analysis result
      */
     public static GerrymanderAnalysis analyze(List<District> districts) {
-        // Calculate efficiency gap
+        if (districts == null || districts.isEmpty()) {
+            return new GerrymanderAnalysis(0, 0, 0, 0, List.of(), List.of(), "Insufficient data");
+        }
+
         int totalWastedA = 0, totalWastedB = 0, totalVotes = 0;
         List<Double> partyAShares = new ArrayList<>();
         
         for (District d : districts) {
-            int threshold = d.totalVoters() / 2 + 1;
+            int threshold = (d.totalVoters() / 2) + 1;
             boolean aWins = d.partyAVotes() > d.partyBVotes();
             
             if (aWins) {
-                totalWastedA += d.partyAVotes() - threshold;  // Excess votes
-                totalWastedB += d.partyBVotes();              // All losing votes
+                totalWastedA += d.partyAVotes() - threshold;
+                totalWastedB += d.partyBVotes();
             } else {
                 totalWastedA += d.partyAVotes();
                 totalWastedB += d.partyBVotes() - threshold;
@@ -52,45 +94,36 @@ public final class GerrymanderingDetector {
             partyAShares.add((double) d.partyAVotes() / d.totalVoters());
         }
         
-        double efficiencyGap = Math.abs(totalWastedA - totalWastedB) / (double) totalVotes;
+        double efficiencyGap = totalVotes > 0 ? (double) Math.abs(totalWastedA - totalWastedB) / totalVotes : 0;
         
-        // Mean-median difference
         double mean = partyAShares.stream().mapToDouble(Double::doubleValue).average().orElse(0);
         Collections.sort(partyAShares);
         double median = partyAShares.get(partyAShares.size() / 2);
         double meanMedianDiff = mean - median;
         
-        // Declination (simplified)
         double declination = calculateDeclination(districts);
+        double avgCompactness = districts.stream().mapToDouble(District::compactnessScore).average().orElse(0.5);
         
-        // Compactness
-        double avgCompactness = districts.stream()
-            .mapToDouble(District::compactnessScore)
-            .average()
-            .orElse(0.5);
-        
-        // Identify packed and cracked districts
         List<String> packed = new ArrayList<>();
         List<String> cracked = new ArrayList<>();
         
         for (District d : districts) {
             double voteShare = (double) d.partyAVotes() / d.totalVoters();
             if (voteShare > 0.75) {
-                packed.add(d.id() + " (Party A packed: " + String.format("%.1f%%", voteShare * 100) + ")");
+                packed.add(d.id() + " (Party A packed)");
             } else if (voteShare < 0.25) {
-                packed.add(d.id() + " (Party B packed: " + String.format("%.1f%%", (1-voteShare) * 100) + ")");
+                packed.add(d.id() + " (Party B packed)");
             }
             if (voteShare > 0.45 && voteShare < 0.5) {
-                cracked.add(d.id() + " (narrowly lost: " + String.format("%.1f%%", voteShare * 100) + ")");
+                cracked.add(d.id() + " (narrowly lost)");
             }
         }
         
-        // Verdict
         String verdict;
         if (efficiencyGap > 0.08 || Math.abs(meanMedianDiff) > 0.04) {
-            verdict = "LIKELY GERRYMANDERED - Significant asymmetry detected";
+            verdict = "LIKELY GERRYMANDERED - High partisan asymmetry";
         } else if (efficiencyGap > 0.05 || avgCompactness < 0.3) {
-            verdict = "POSSIBLY GERRYMANDERED - Some indicators elevated";
+            verdict = "POSSIBLY GERRYMANDERED - Irregular indicators";
         } else {
             verdict = "NO STRONG EVIDENCE of gerrymandering";
         }
@@ -101,66 +134,14 @@ public final class GerrymanderingDetector {
         );
     }
 
-    /**
-     * Calculates compactness using Polsby-Popper method.
-     * PP = 4π × Area / Perimeter²
-     */
-    public static double polsbyPopperCompactness(List<double[]> polygon) {
-        if (polygon.size() < 3) return 0;
-        
-        double area = calculatePolygonArea(polygon);
-        double perimeter = calculatePolygonPerimeter(polygon);
-        
-        if (perimeter <= 0) return 0;
-        return 4 * Math.PI * area / (perimeter * perimeter);
-    }
-
-    /**
-     * Calculates compactness using convex hull ratio.
-     */
-    public static double convexHullCompactness(List<double[]> polygon) {
-        double originalArea = calculatePolygonArea(polygon);
-        List<double[]> hull = convexHull(polygon);
-        double hullArea = calculatePolygonArea(hull);
-        
-        return hullArea > 0 ? originalArea / hullArea : 0;
-    }
-
-    /**
-     * Simulates seats-votes curve.
-     */
-    public static Map<Double, Double> seatsVotesCurve(List<District> districts, int points) {
-        Map<Double, Double> curve = new LinkedHashMap<>();
-        
-        for (int i = 0; i <= points; i++) {
-            double swing = (i - points / 2) * 0.01; // -0.5 to +0.5
-            int seatsWon = 0;
-            
-            for (District d : districts) {
-                double adjustedVoteShare = (double) d.partyAVotes() / d.totalVoters() + swing;
-                if (adjustedVoteShare > 0.5) seatsWon++;
-            }
-            
-            double voteShare = 0.5 + swing;
-            double seatShare = (double) seatsWon / districts.size();
-            curve.put(voteShare, seatShare);
-        }
-        
-        return curve;
-    }
-
     private static double calculateDeclination(List<District> districts) {
-        // Simplified declination calculation
         List<Double> wonShares = new ArrayList<>();
         List<Double> lostShares = new ArrayList<>();
         
         for (District d : districts) {
             double share = (double) d.partyAVotes() / d.totalVoters();
-            if (share > 0.5) {
-                wonShares.add(share);
-            } else {
-                lostShares.add(share);
-            }
+            if (share > 0.5) wonShares.add(share);
+            else lostShares.add(share);
         }
         
         double avgWon = wonShares.stream().mapToDouble(Double::doubleValue).average().orElse(0.6);
@@ -170,16 +151,28 @@ public final class GerrymanderingDetector {
                Math.atan2(0.5 - avgLost, 1.0 / lostShares.size());
     }
 
+    /**
+     * Calculates geometric compactness using the Polsby-Popper method.
+     * PP = 4π × Area / Perimeter²
+     * 
+     * @param polygon list of vertices
+     * @return compactness ratio between 0 and 1
+     */
+    public static double polsbyPopperCompactness(List<double[]> polygon) {
+        if (polygon == null || polygon.size() < 3) return 0;
+        double area = calculatePolygonArea(polygon);
+        double perimeter = calculatePolygonPerimeter(polygon);
+        return perimeter > 0 ? (4.0 * Math.PI * area) / (perimeter * perimeter) : 0;
+    }
+
     private static double calculatePolygonArea(List<double[]> polygon) {
-        if (polygon.size() < 3) return 0;
-        
         double area = 0;
         for (int i = 0; i < polygon.size(); i++) {
             int j = (i + 1) % polygon.size();
             area += polygon.get(i)[0] * polygon.get(j)[1];
             area -= polygon.get(j)[0] * polygon.get(i)[1];
         }
-        return Math.abs(area) / 2;
+        return Math.abs(area) / 2.0;
     }
 
     private static double calculatePolygonPerimeter(List<double[]> polygon) {
@@ -193,20 +186,26 @@ public final class GerrymanderingDetector {
         return perimeter;
     }
 
-    private static List<double[]> convexHull(List<double[]> points) {
-        // Graham scan - simplified
-        if (points.size() < 3) return new ArrayList<>(points);
-        
-        // Just return points sorted by angle from centroid as approximation
-        double cx = points.stream().mapToDouble(p -> p[0]).average().orElse(0);
-        double cy = points.stream().mapToDouble(p -> p[1]).average().orElse(0);
-        
-        List<double[]> sorted = new ArrayList<>(points);
-        sorted.sort((a, b) -> Double.compare(
-            Math.atan2(a[1] - cy, a[0] - cx),
-            Math.atan2(b[1] - cy, b[0] - cx)
-        ));
-        
-        return sorted;
+    /**
+     * Simulates a seats-votes curve to visualize partisan lean.
+     * 
+     * @param districts base districts
+     * @param points    number of points on the curve
+     * @return map of total vote share to resulting seat share
+     */
+    public static Map<Double, Double> seatsVotesCurve(List<District> districts, int points) {
+        Map<Double, Double> curve = new LinkedHashMap<>();
+        for (int i = 0; i <= points; i++) {
+            double swing = (i - points / 2.0) * 0.01;
+            int seatsWon = 0;
+            for (District d : districts) {
+                double adjustedVoteShare = (double) d.partyAVotes() / d.totalVoters() + swing;
+                if (adjustedVoteShare > 0.5) seatsWon++;
+            }
+            double voteShare = 0.5 + swing;
+            double seatShare = (double) seatsWon / districts.size();
+            curve.put(voteShare, seatShare);
+        }
+        return curve;
     }
 }

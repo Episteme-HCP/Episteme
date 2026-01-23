@@ -1,139 +1,117 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history.archeology;
 
-import org.jscience.astronomy.AstronomyConstants;
-
-import org.jscience.mathematics.algebraic.numbers.Double;
-import org.jscience.mathematics.analysis.Interval;
-
+import org.jscience.history.HistoryConstants;
+import org.jscience.mathematics.algebra.Interval;
+import org.jscience.mathematics.algebra.intervals.RealInterval;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * A class representing the archeology useful constants.
+ * Constants useful for archaeology and geological time scales.
+ * All intervals are expressed in seconds relative to the Unix Epoch (1970-01-01T00:00:00Z).
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
+ * @see <a href="http://en.wikipedia.org/wiki/Geologic_timescale">Geologic Timescale (Wikipedia)</a>
  */
-public final class ArcheologyConstants extends Object {
-    /** DOCUMENT ME! */
-    public final static int ANTIQUE = 1;
+public final class ArcheologyConstants {
 
-    /** DOCUMENT ME! */
-    public final static int MEDIEVAL = 2;
+    /** Historical period category identifiers. */
+    public static final int ANTIQUE = 1;
+    public static final int MEDIEVAL = 2;
+    public static final int MODERN = 3;
+    public static final int CONTEMPORARY = 4;
 
-    /** DOCUMENT ME! */
-    public final static int MODERN = 3;
+    private static final double YEAR = HistoryConstants.JULIAN_YEAR_SECONDS;
 
-    /** DOCUMENT ME! */
-    public final static int CONTEMPORARY = 4;
+    /** Holocene Epoch interval (~10,000 years ago to present). */
+    public static final Interval<Real> HOLOCENE = RealInterval.closed(-1.0e4 * YEAR, 0.0);
 
-    //see http://en.wikipedia.org/wiki/Geologic_timescale
-    //may be we would better define these using intervals
-    //currently defines end of era or epoch
-    /** DOCUMENT ME! */
-    public final static Interval HOLOCENE = new Interval(new Double(
-                -1.0e4 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(0));
+    /** Pleistocene Epoch interval (~1.6M years ago to ~10,000 years ago). */
+    public static final Interval<Real> PLEISTOCENE = RealInterval.closed(-1.6e6 * YEAR, -1.0e4 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval PLEISTOCENE = new Interval(new Double(
-                -1.6e6 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-1.0e4 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY)); //quaternary begins
+    /** Pliocene Epoch interval (~5M years ago to ~1.6M years ago). */
+    public static final Interval<Real> PLIOCENE = RealInterval.closed(-5.0e6 * YEAR, -1.6e6 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval PLIOCENE = new Interval(new Double(
-                -5.0e6 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-1.6e6 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY));
+    /** Miocene Epoch interval (~23M years ago to ~5M years ago). */
+    public static final Interval<Real> MIOCENE = RealInterval.closed(-2.3e7 * YEAR, -5.0e6 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval MIOCENE = new Interval(new Double(
-                -2.3e7 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-5.0e6 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY));
+    /** Oligocene Epoch interval (~38M years ago to ~23M years ago). */
+    public static final Interval<Real> OLIGOCENE = RealInterval.closed(-3.8e7 * YEAR, -2.3e7 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval OLIGOCENE = new Interval(new Double(
-                -3.8e7 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-2.3e7 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY));
+    /** Eocene Epoch interval (~55M years ago to ~38M years ago). */
+    public static final Interval<Real> EOCENE = RealInterval.closed(-5.5e7 * YEAR, -3.8e7 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval EOCENE = new Interval(new Double(
-                -5.5e7 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-3.8e7 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY));
+    /** Paleocene Epoch interval (~64.3M years ago to ~55M years ago). */
+    public static final Interval<Real> PALEOCENE = RealInterval.closed(-6.43e7 * YEAR, -5.5e7 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval PALEOCENE = new Interval(new Double(
-                -6.43e7 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-5.5e7 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY)); //tertiary begins
+    /** Cretaceous Period interval (~146M years ago to ~64.3M years ago). */
+    public static final Interval<Real> CRETACEOUS = RealInterval.closed(-1.46e8 * YEAR, -6.43e7 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval CRETACEOUS = new Interval(new Double(
-                -1.46e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-6.43e7 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY));
+    /** Jurassic Period interval (~208M years ago to ~146M years ago). */
+    public static final Interval<Real> JURASSIC = RealInterval.closed(-2.08e8 * YEAR, -1.46e8 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval JURASSIC = new Interval(new Double(
-                -2.08e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-1.46e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY));
+    /** Triassic Period interval (~251.1M years ago to ~208M years ago). */
+    public static final Interval<Real> TRIASSIC = RealInterval.closed(-2.511e8 * YEAR, -2.08e8 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval TRIASSIC = new Interval(new Double(
-                -2.511e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-2.08e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY)); //secondary begins
+    /** Permian Period interval (~325M years ago to ~251.1M years ago). */
+    public static final Interval<Real> PERMIAN = RealInterval.closed(-3.25e8 * YEAR, -2.511e8 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval PERMIAN = new Interval(new Double(
-                -3.25e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-2.511e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY));
+    /** Carboniferous Period interval (~360M years ago to ~325M years ago). */
+    public static final Interval<Real> CARBONIFEROUS = RealInterval.closed(-3.6e8 * YEAR, -3.25e8 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval CARBONIFEROUS = new Interval(new Double(
-                -3.6e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-3.25e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY));
+    /** Devonian Period interval (~408.5M years ago to ~360M years ago). */
+    public static final Interval<Real> DEVONIAN = RealInterval.closed(-4.085e8 * YEAR, -3.6e8 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval DEVONIAN = new Interval(new Double(
-                -4.085e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-3.6e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY));
+    /** Silurian Period interval (~443.5M years ago to ~408.5M years ago). */
+    public static final Interval<Real> SILURIAN = RealInterval.closed(-4.435e8 * YEAR, -4.085e8 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval SILURIAN = new Interval(new Double(
-                -4.435e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-4.085e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY));
+    /** Ordovician Period interval (~490M years ago to ~443.5M years ago). */
+    public static final Interval<Real> ORDOVICIAN = RealInterval.closed(-4.9e8 * YEAR, -4.435e8 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval ORDOVICIAN = new Interval(new Double(
-                -4.9e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-4.435e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY));
+    /** Cambrian Period interval (~545M years ago to ~490M years ago). */
+    public static final Interval<Real> CAMBRIAN = RealInterval.closed(-5.45e8 * YEAR, -4.9e8 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval CAMBRIAN = new Interval(new Double(
-                -5.45e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-4.9e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY)); //primary begins
+    /** Neoproterozoic Era interval (~900M years ago to ~545M years ago). */
+    public static final Interval<Real> NEOPROTEROZOIC = RealInterval.closed(-9.0e8 * YEAR, -5.45e8 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval NEOPROTEROZOIC = new Interval(new Double(
-                -9.0e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-5.45e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY));
+    /** Mesoproterozoic Era interval (~1.6B years ago to ~900M years ago). */
+    public static final Interval<Real> MESOPROTEROZOIC = RealInterval.closed(-1.6e9 * YEAR, -9.0e8 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval MESOPROTEROZOIC = new Interval(new Double(
-                -1.6e9 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-9.0e8 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY));
+    /** Paleoproterozoic Era interval (~2.5B years ago to ~1.6B years ago). */
+    public static final Interval<Real> PALEOPROTEROZOIC = RealInterval.closed(-2.5e9 * YEAR, -1.6e9 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval PALEOPROTEROZOIC = new Interval(new Double(
-                -2.5e9 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-1.6e9 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY));
+    /** Archean Eon interval (~3.8B years ago to ~2.5B years ago). */
+    public static final Interval<Real> ARCHEAN = RealInterval.closed(-3.8e9 * YEAR, -2.5e9 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval ARCHEAN = new Interval(new Double(
-                -3.8e9 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-2.5e9 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY));
+    /** Hadean Eon interval (~4.1B years ago to ~3.8B years ago). */
+    public static final Interval<Real> HADEAN = RealInterval.closed(-4.1e9 * YEAR, -3.8e9 * YEAR);
 
-    /** DOCUMENT ME! */
-    public final static Interval HADEAN = new Interval(new Double(
-                -4.1e9 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY),
-            new Double(-3.8e9 * AstronomyConstants.JULIAN_YEAR * AstronomyConstants.EARTH_DAY));
-
-    //4,100 million- Oldest known rock;
-    //4,400 million- Oldest known mineral;
-    //4,600- Formation of Earth
+    private ArcheologyConstants() {
+        // Utility class
+    }
 }

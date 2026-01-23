@@ -1,171 +1,77 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.economics;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.jscience.mathematics.numbers.real.Real;
-import java.util.*;
 
 /**
- * Macroeconomic indicators calculation and analysis.
+ * Standard macroeconomic formulas for GDP, inflation, trade, and debt analysis.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
 public final class MacroIndicators {
 
     private MacroIndicators() {}
 
-    /**
-     * GDP calculation using expenditure approach.
-     * GDP = C + I + G + (X - M)
-     */
+    /** GDP (Expenditure Approach): C + I + G + (NX). */
     public static Real calculateGDP(Real consumption, Real investment, 
-            Real governmentSpending, Real exports, Real imports) {
-        return consumption.add(investment).add(governmentSpending).add(exports).subtract(imports);
+            Real governmentSpending, Real netExports) {
+        return consumption.add(investment).add(governmentSpending).add(netExports);
     }
 
-    /**
-     * Real GDP adjusted for inflation.
-     */
+    /** Real GDP adjusted by deflator. */
     public static Real realGDP(Real nominalGDP, Real deflator) {
         return nominalGDP.divide(deflator).multiply(Real.of(100));
     }
 
-    /**
-     * GDP growth rate between two periods.
-     */
-    public static Real gdpGrowthRate(Real gdpCurrent, Real gdpPrevious) {
-        return gdpCurrent.subtract(gdpPrevious).divide(gdpPrevious).multiply(Real.of(100));
-    }
-
-    /**
-     * Inflation rate using CPI.
-     */
+    /** Annual inflation rate based on Consumer Price Index (CPI). */
     public static Real inflationRate(Real cpiCurrent, Real cpiPrevious) {
+        if (cpiPrevious.isZero()) return Real.ZERO;
         return cpiCurrent.subtract(cpiPrevious).divide(cpiPrevious).multiply(Real.of(100));
     }
 
-    /**
-     * Unemployment rate calculation.
-     */
-    public static Real unemploymentRate(long unemployed, long laborForce) {
-        return Real.of((double) unemployed / laborForce * 100);
-    }
-
-    /**
-     * Labor force participation rate.
-     */
-    public static Real laborForceParticipation(long laborForce, long workingAgePopulation) {
-        return Real.of((double) laborForce / workingAgePopulation * 100);
-    }
-
-    /**
-     * Trade balance.
-     */
-    public static Real tradeBalance(Real exports, Real imports) {
-        return exports.subtract(imports);
-    }
-
-    /**
-     * Current account balance.
-     */
-    public static Real currentAccountBalance(Real tradeBalance, Real netIncome, Real transfers) {
-        return tradeBalance.add(netIncome).add(transfers);
-    }
-
-    /**
-     * Debt-to-GDP ratio.
-     */
+    /** Debt-to-GDP ratio as a percentage. */
     public static Real debtToGDP(Real totalDebt, Real gdp) {
+        if (gdp.isZero()) return Real.ZERO;
         return totalDebt.divide(gdp).multiply(Real.of(100));
     }
 
-    /**
-     * Budget deficit/surplus as percentage of GDP.
-     */
-    public static Real budgetBalance(Real governmentRevenue, Real governmentExpenditure, Real gdp) {
-        return governmentRevenue.subtract(governmentExpenditure).divide(gdp).multiply(Real.of(100));
-    }
-
-    /**
-     * Money supply multiplier.
-     */
-    public static Real moneyMultiplier(Real reserveRatio) {
-        return Real.of(1.0).divide(reserveRatio);
-    }
-
-    /**
-     * Velocity of money (MV = PY).
-     */
-    public static Real velocityOfMoney(Real nominalGDP, Real moneySupply) {
-        return nominalGDP.divide(moneySupply);
-    }
-
-    /**
-     * Fisher equation for real interest rate.
-     * r = i - π
-     */
-    public static Real realInterestRate(Real nominalRate, Real inflationRate) {
-        return nominalRate.subtract(inflationRate);
-    }
-
-    /**
-     * Taylor Rule for recommended interest rate.
-     * i = r* + π + 0.5(π - π*) + 0.5(y - y*)
-     */
-    public static Real taylorRule(Real neutralRate, Real currentInflation, Real targetInflation,
-            Real outputGap) {
+    /** Taylor Rule for central bank interest rate settings. */
+    public static Real taylorRule(Real neutralRate, Real currentInflation, Real targetInflation, Real outputGap) {
         Real inflationGap = currentInflation.subtract(targetInflation);
         return neutralRate.add(currentInflation)
             .add(inflationGap.multiply(Real.of(0.5)))
             .add(outputGap.multiply(Real.of(0.5)));
     }
 
-    /**
-     * Okun's Law - relationship between unemployment and GDP gap.
-     * Each 1% unemployment above natural rate ≈ 2% GDP gap.
-     */
-    public static Real okunnGDPGap(Real actualUnemployment, Real naturalUnemployment) {
-        return actualUnemployment.subtract(naturalUnemployment).multiply(Real.of(-2));
-    }
-
-    /**
-     * Phillips Curve - inflation-unemployment tradeoff.
-     */
-    public static Real phillipsCurveInflation(Real expectedInflation, Real unemploymentGap, 
-            Real supplyShock) {
-        // π = πe - β(u - u*) + ε
-        return expectedInflation.subtract(unemploymentGap.multiply(Real.of(0.5))).add(supplyShock);
-    }
-
-    /**
-     * Gini coefficient from income distribution.
-     */
+    /** Gini coefficient for reaching income distribution analysis. */
     public static Real giniCoefficient(List<Real> incomes) {
-        if (incomes == null || incomes.size() < 2) return Real.ZERO;
-        
-        List<Real> sorted = new ArrayList<>(incomes);
-        sorted.sort(Real::compareTo);
-        
-        int n = sorted.size();
-        double sum = sorted.stream().mapToDouble(Real::doubleValue).sum();
-        
-        double numerator = 0;
-        for (int i = 0; i < n; i++) {
-            numerator += (2 * (i + 1) - n - 1) * sorted.get(i).doubleValue();
-        }
-        
-        double gini = numerator / (n * sum);
-        return Real.of(gini);
-    }
-
-    /**
-     * Human Development Index (simplified).
-     */
-    public static Real hdi(Real lifeExpectancy, Real meanSchooling, Real gniPerCapita) {
-        // Normalize each dimension
-        double healthIndex = (lifeExpectancy.doubleValue() - 20) / (85 - 20);
-        double educationIndex = meanSchooling.doubleValue() / 15;
-        double incomeIndex = (Math.log(gniPerCapita.doubleValue()) - Math.log(100)) / 
-            (Math.log(75000) - Math.log(100));
-        
-        // Geometric mean
-        double hdi = Math.pow(healthIndex * educationIndex * incomeIndex, 1.0/3.0);
-        return Real.of(Math.max(0, Math.min(1, hdi)));
+        return EconomicMetrics.giniCoefficient(incomes);
     }
 }

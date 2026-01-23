@@ -1,212 +1,186 @@
-package org.jscience.sociology;
-
-import org.jscience.linguistics.Language;
-
-import org.jscience.philosophy.Belief;
-
-import org.jscience.util.Commented;
-import org.jscience.util.Named;
-
-import java.util.Iterator;
-import java.util.Set;
-
-
-/**
- * A class representing the common elements of a group of individuals, what
- * we usually also call civilization.
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * @author Silvere Martin-Michiellot
- * @version 1.0
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
-//for taboos, see http://en.wikipedia.org/wiki/Taboo
-//although not defined here food is very important for culture and may be considered
-//(you could tell where you are just by what you eat)
-//A common way of understanding culture sees it as consisting of three elements:
-//values 
-//norms 
-//artifacts.
+package org.jscience.sociology;
 
-//this class is really meant to be extended as needed and only cover some real basic information.
-//yet, the idea is to keep it's use simple
-//some more information could be:
-//we could also add typical artwork, or typical artifacts (org.jscience.economics.Resource, or org.jscience.economics.decorum.Artifact)
-//we could list hobbies and sports
-//we could also list existing culture specific organizations (institutions)
-//we could also list events on a typical day (org.jscience.history.Timeline or org.jscience.philosophy.storytelling.Event)
-//we could also list some typical roles, situations
-public class Culture extends Object implements Named, Commented {
-    /** DOCUMENT ME! */
-    private String name;
-
-    /** DOCUMENT ME! */
-    private Language language;
-
-    /** DOCUMENT ME! */
-    private int technologicalLevel; //please don't argue about the so called "progress thesis"
-
-    /** DOCUMENT ME! */
-    private Set beliefs;
-
-    /** DOCUMENT ME! */
-    private Set celebrations;
-
-    /** DOCUMENT ME! */
-    private Set rituals;
-
-    /** DOCUMENT ME! */
-    private int marritalType;
-
-    /** DOCUMENT ME! */
-    private String comments;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import org.jscience.linguistics.Language;
+import org.jscience.philosophy.Belief;
+import org.jscience.util.Commented;
+import org.jscience.util.Named;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
-     * Creates a new Culture object.
-     *
-     * @param name               DOCUMENT ME!
-     * @param language           DOCUMENT ME!
-     * @param technologicalLevel DOCUMENT ME!
-     * @param beliefs            DOCUMENT ME!
-     * @param celebrations       DOCUMENT ME!
-     * @param rituals            DOCUMENT ME!
-     * @param marritalType       DOCUMENT ME!
-     * @param comments           DOCUMENT ME!
-     */
-    public Culture(String name, Language language, int technologicalLevel,
-        Set beliefs, Set celebrations, Set rituals, int marritalType,
-        String comments) {
-        Iterator iterator;
-        boolean valid;
+ * Represents the cumulative shared elements of a social group or civilization.
+ * A culture encompasses values (beliefs), norms (rituals), and societal artifacts,
+ * as well as identifying traits like language and technological sophistication.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
+ */
+@Persistent
+public class Culture implements Named, Commented, Serializable {
 
-        if ((name != null) && (name.length() > 0) && (language != null) &&
-                (beliefs != null) && (celebrations != null) &&
-                (rituals != null) && (comments != null) &&
-                (comments.length() > 0)) {
-            iterator = beliefs.iterator();
-            valid = true;
+    private static final long serialVersionUID = 1L;
 
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Belief;
-            }
+    @Id
+    private Identification identification;
 
-            if (valid) {
-                iterator = celebrations.iterator();
-                valid = true;
+    @Attribute
+    private String name;
 
-                while (iterator.hasNext() && valid) {
-                    valid = iterator.next() instanceof Celebration;
-                }
+    @Attribute
+    private Language language;
 
-                if (valid) {
-                    iterator = celebrations.iterator();
-                    valid = true;
+    @Attribute
+    private int technologicalLevel;
 
-                    while (iterator.hasNext() && valid) {
-                        valid = iterator.next() instanceof Ritual;
-                    }
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private Set<Belief> beliefs;
 
-                    if (valid) {
-                        this.name = name;
-                        this.language = language;
-                        this.technologicalLevel = technologicalLevel;
-                        this.beliefs = beliefs;
-                        this.celebrations = celebrations;
-                        this.rituals = rituals;
-                        this.marritalType = marritalType;
-                        this.comments = comments;
-                    } else {
-                        throw new IllegalArgumentException(
-                            "The rituals Set should contain only Rituals.");
-                    }
-                } else {
-                    throw new IllegalArgumentException(
-                        "The celebrations Set should contain only Celebrations.");
-                }
-            } else {
-                throw new IllegalArgumentException(
-                    "The beliefs Set should contain only Beliefs.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Culture constructor doesn't accept null or empty arguments (apart from beliefs, rituals and celebrations).");
-        }
-    }
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private Set<Celebration> celebrations;
+
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private Set<Ritual> rituals;
+
+    @Attribute
+    private int maritalType;
+
+    @Attribute
+    private String comments;
 
     /**
-     * DOCUMENT ME!
+     * Creates a new Culture with specified traits.
      *
-     * @return DOCUMENT ME!
+     * @param name               civilization name
+     * @param language           primary language
+     * @param technologicalLevel complexity level
+     * @param beliefs            set of shared beliefs
+     * @param celebrations       set of cultural celebrations
+     * @param rituals            set of cultural rituals
+     * @param maritalType        preferred marital structure
+     * @param comments           descriptive details
+     * @throws NullPointerException if any required argument is null
      */
+    public Culture(String name, Language language, int technologicalLevel,
+            Set<Belief> beliefs, Set<Celebration> celebrations, Set<Ritual> rituals,
+            int maritalType, String comments) {
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        this.language = Objects.requireNonNull(language, "Language cannot be null");
+        this.beliefs = new HashSet<>(Objects.requireNonNull(beliefs, "Beliefs set cannot be null"));
+        this.celebrations = new HashSet<>(Objects.requireNonNull(celebrations, "Celebrations set cannot be null"));
+        this.rituals = new HashSet<>(Objects.requireNonNull(rituals, "Rituals set cannot be null"));
+        this.comments = Objects.requireNonNull(comments, "Comments cannot be null");
+        this.technologicalLevel = technologicalLevel;
+        this.maritalType = maritalType;
+        this.identification = new SimpleIdentification(name + ":" + System.currentTimeMillis());
+    }
+
+    @Override
     public String getName() {
         return name;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the primary language of this culture.
+     * @return the language
      */
     public Language getLanguage() {
         return language;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the technological advancement level.
+     * @return the level
      */
     public int getTechnologicalLevel() {
         return technologicalLevel;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns an unmodifiable set of shared beliefs.
+     * @return the beliefs
      */
-    public Set getBeliefs() {
-        return beliefs;
+    public Set<Belief> getBeliefs() {
+        return Collections.unmodifiableSet(beliefs);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns an unmodifiable set of celebrations.
+     * @return the celebrations
      */
-    public Set getRituals() {
-        return rituals;
+    public Set<Celebration> getCelebrations() {
+        return Collections.unmodifiableSet(celebrations);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns an unmodifiable set of rituals.
+     * @return the rituals
      */
-    public Set getCelebrations() {
-        return celebrations;
+    public Set<Ritual> getRituals() {
+        return Collections.unmodifiableSet(rituals);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the marital system classification.
+     * @return the marital type
      */
-    public int getMarritalType() {
-        return marritalType;
+    public int getMaritalType() {
+        return maritalType;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public String getComments() {
         return comments;
     }
 
-    //we could also add typical artwork, or typical artifacts (org.jscience.economics.Resource, or org.jscience.economics.decorum.Artifact)
-    //we could list hobbies and sports
-    //we could also list existing culture specific organizations (institutions)
-    //we could also list events on a typical day (org.jscience.history.Timeline or org.jscience.philosophy.Events.Event)
-    //we could also list some typical roles, situations
+    @Override
+    public void setComments(String comments) {
+        this.comments = Objects.requireNonNull(comments, "Comments cannot be null");
+    }
+
+    /**
+     * Returns the persistent identification for this culture.
+     * @return the identification
+     */
+    public Identification getIdentification() {
+        return identification;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

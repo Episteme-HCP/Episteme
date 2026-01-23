@@ -74,6 +74,11 @@ public class GoogleElevationReader extends AbstractResourceReader<Double> {
     }
 
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"v3"};
+    }
+
+    @Override
     protected Double loadFromSource(String coordinates) throws Exception {
         // coordinates: "lat,lon"
         String[] parts = coordinates.split(",");

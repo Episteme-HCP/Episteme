@@ -23,43 +23,85 @@
 
 package org.jscience.sociology;
 
-import java.util.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.util.identity.Identified;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
 
 /**
- * Represents an educational institution.
+ * Represents an educational institution, such as a school, university, or college.
+ * Provides details about the institution's type, level, size, and location.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
-public class School {
+@Persistent
+public class School implements Identified<String>, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+    /** Categorization of the institution type. */
     public enum Type {
         PRIMARY, SECONDARY, HIGH_SCHOOL, COLLEGE, UNIVERSITY,
         VOCATIONAL, ONLINE, PRIVATE, PUBLIC, CHARTER
     }
 
+    /** Educational level or tier. */
     public enum Level {
         PRESCHOOL, ELEMENTARY, MIDDLE, HIGH, UNDERGRADUATE, GRADUATE, DOCTORAL
     }
 
+    @Id
+    private final String id;
+    @Attribute
     private final String name;
+    @Attribute
     private Type type;
+    @Attribute
     private Level level;
+    @Attribute
     private String location;
+    @Attribute
     private int foundedYear;
+    @Attribute
     private long studentCount;
+    @Attribute
     private int facultyCount;
+    @Attribute
     private final List<String> programs = new ArrayList<>();
+    @Attribute
     private Real acceptanceRate;
 
+    /**
+     * Creates a new School.
+     *
+     * @param name identifying name
+     * @param type institution type
+     * @throws NullPointerException if inputs are null
+     * @throws IllegalArgumentException if name is empty
+     */
     public School(String name, Type type) {
-        this.name = name;
-        this.type = type;
+        this.id = UUID.randomUUID().toString();
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
+        this.type = Objects.requireNonNull(type, "Type cannot be null");
     }
 
     // Getters
+    @Override
+    public String getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }
@@ -126,11 +168,14 @@ public class School {
     }
 
     public void addProgram(String program) {
-        programs.add(program);
+        if (program != null) {
+            programs.add(program);
+        }
     }
 
     /**
      * Returns student-to-faculty ratio.
+     * @return ratio, or ZERO if no faculty
      */
     public Real getStudentFacultyRatio() {
         return facultyCount > 0 ? Real.of((double) studentCount / facultyCount) : Real.ZERO;
@@ -155,5 +200,3 @@ public class School {
         return s;
     }
 }
-
-

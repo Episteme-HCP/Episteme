@@ -23,17 +23,28 @@
 
 package org.jscience.politics;
 
-import java.util.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 /**
- * Represents a government or administration.
+ * Represents the structure and executive configuration of a national government.
+ * Groups administrative types, leadership roles, and ministerial departments.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
-public class Government {
+public class Government implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Common constitutional and administrative types of government.
+     */
     public enum Type {
         DEMOCRACY, REPUBLIC, MONARCHY, CONSTITUTIONAL_MONARCHY,
         PARLIAMENTARY, PRESIDENTIAL, FEDERAL, UNITARY,
@@ -49,12 +60,18 @@ public class Government {
     private int termYears;
     private final List<String> ministries = new ArrayList<>();
 
+    /**
+     * Initializes a new Government for a specific country.
+     *
+     * @param countryName name of the country
+     * @param type        initial government archetype
+     * @throws NullPointerException if any argument is null
+     */
     public Government(String countryName, Type type) {
-        this.countryName = countryName;
-        this.type = type;
+        this.countryName = Objects.requireNonNull(countryName, "Country name cannot be null");
+        this.type = Objects.requireNonNull(type, "Type cannot be null");
     }
 
-    // Getters
     public String getCountryName() {
         return countryName;
     }
@@ -63,57 +80,66 @@ public class Government {
         return type;
     }
 
+    public void setType(Type type) {
+        this.type = Objects.requireNonNull(type, "Type cannot be null");
+    }
+
     public String getHeadOfState() {
         return headOfState;
-    }
-
-    public String getHeadOfGovernment() {
-        return headOfGovernment;
-    }
-
-    public String getRulingParty() {
-        return rulingParty;
-    }
-
-    public int getLegislatureSeats() {
-        return legislatureSeats;
-    }
-
-    public int getTermYears() {
-        return termYears;
-    }
-
-    public List<String> getMinistries() {
-        return Collections.unmodifiableList(ministries);
-    }
-
-    // Setters
-    public void setType(Type type) {
-        this.type = type;
     }
 
     public void setHeadOfState(String head) {
         this.headOfState = head;
     }
 
+    public String getHeadOfGovernment() {
+        return headOfGovernment;
+    }
+
     public void setHeadOfGovernment(String head) {
         this.headOfGovernment = head;
+    }
+
+    public String getRulingParty() {
+        return rulingParty;
     }
 
     public void setRulingParty(String party) {
         this.rulingParty = party;
     }
 
+    public int getLegislatureSeats() {
+        return legislatureSeats;
+    }
+
     public void setLegislatureSeats(int seats) {
         this.legislatureSeats = seats;
+    }
+
+    public int getTermYears() {
+        return termYears;
     }
 
     public void setTermYears(int years) {
         this.termYears = years;
     }
 
+    /**
+     * Returns an unmodifiable list of government ministries or departments.
+     * @return list of ministry names
+     */
+    public List<String> getMinistries() {
+        return Collections.unmodifiableList(ministries);
+    }
+
+    /**
+     * Registers a new ministry or executive department.
+     * @param ministry the name of the department
+     */
     public void addMinistry(String ministry) {
-        ministries.add(ministry);
+        if (ministry != null) {
+            ministries.add(ministry);
+        }
     }
 
     @Override
@@ -121,7 +147,10 @@ public class Government {
         return String.format("%s Government (%s)", countryName, type);
     }
 
-    // Example governments
+    /**
+     * Factory method for a standard US presidential government structure.
+     * @return US Government template
+     */
     public static Government usGovernment() {
         Government g = new Government("United States", Type.PRESIDENTIAL);
         g.setHeadOfState("President");
@@ -134,5 +163,3 @@ public class Government {
         return g;
     }
 }
-
-

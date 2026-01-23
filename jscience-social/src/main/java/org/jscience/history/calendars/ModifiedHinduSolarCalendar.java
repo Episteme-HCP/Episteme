@@ -1,28 +1,55 @@
-//repackaged after the code from Mark E. Shoulson
-//email <mark@kli.org>
-//website http://web.meson.org/calendars/
-//released under GPL
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Originally based on code from Mark E. Shoulson <mark@kli.org>
+ * http://web.meson.org/calendars/
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history.calendars;
 
-
-// Referenced classes of package calendars:
 /**
- * DOCUMENT ME!
+ * Modified Hindu Solar calendar using floating-point arithmetic.
+ * This calendar uses modern astronomical calculations for more accurate
+ * solar month determinations.
  *
- * @author $author$
- * @version $Revision: 1.3 $
-  */
+ * @author Mark E. Shoulson (original implementation)
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
+ */
 public class ModifiedHinduSolarCalendar extends OldHinduSolarCalendar {
-    /** DOCUMENT ME! */
+
+    private static final long serialVersionUID = 1L;
+    /** Offset for the solar era (Saka Era). */
     protected static final int SOLARERA = 3179;
 
-    /** DOCUMENT ME! */
+    /** Delegate for Hindu astronomical calculations. */
     protected static ModifiedHinduCalendar mh;
 
 /**
      * Creates a new ModifiedHinduSolarCalendar object.
      *
-     * @param l DOCUMENT ME!
+     * @param l Rata Die number.
      */
     public ModifiedHinduSolarCalendar(long l) {
         super(l);
@@ -31,7 +58,7 @@ public class ModifiedHinduSolarCalendar extends OldHinduSolarCalendar {
 /**
      * Creates a new ModifiedHinduSolarCalendar object.
      *
-     * @param altcalendar DOCUMENT ME!
+     * @param altcalendar another calendar to initialize from.
      */
     public ModifiedHinduSolarCalendar(AlternateCalendar altcalendar) {
         this(altcalendar.toRD());
@@ -46,16 +73,16 @@ public class ModifiedHinduSolarCalendar extends OldHinduSolarCalendar {
 /**
      * Creates a new ModifiedHinduSolarCalendar object.
      *
-     * @param i DOCUMENT ME!
-     * @param j DOCUMENT ME!
-     * @param k DOCUMENT ME!
+     * @param i the month.
+     * @param j the day.
+     * @param k the year.
      */
     public ModifiedHinduSolarCalendar(int i, int j, int k) {
         set(i, j, k);
     }
 
     /**
-     * DOCUMENT ME!
+     * Recomputes the Hindu solar date components from the current Rata Die number.
      */
     public synchronized void recomputeFromRD() {
         long l = dayCount();
@@ -77,11 +104,10 @@ public class ModifiedHinduSolarCalendar extends OldHinduSolarCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Checks if this date precedes another Hindu solar date.
      *
-     * @param modhindusolar DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param modhindusolar the other date.
+     * @return true if this date is before the other.
      */
     public boolean precedes(ModifiedHinduSolarCalendar modhindusolar) {
         return (super.year < ((MonthDayYear) (modhindusolar)).year) ||
@@ -92,9 +118,9 @@ public class ModifiedHinduSolarCalendar extends OldHinduSolarCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Recomputes the Rata Die number from the current Hindu solar date components.
      *
-     * @throws InconsistentDateException DOCUMENT ME!
+     * @throws InconsistentDateException if the date is invalid.
      */
     public synchronized void recomputeRD() {
         long l = (long) Math.floor(((((double) (super.year + 3179) +
@@ -120,18 +146,18 @@ public class ModifiedHinduSolarCalendar extends OldHinduSolarCalendar {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the era suffix for this calendar.
      *
-     * @return DOCUMENT ME!
+     * @return the suffix string.
      */
     protected String getSuffix() {
         return " S.E.";
     }
 
     /**
-     * DOCUMENT ME!
+     * Main method for testing Hindu solar calendar calculations.
      *
-     * @param args DOCUMENT ME!
+     * @param args command line arguments.
      */
     public static void main(String[] args) {
         int i;

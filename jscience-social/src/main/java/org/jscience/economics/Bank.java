@@ -1,130 +1,109 @@
-package org.jscience.economics;
-
-import org.jscience.economics.money.Account;
-import org.jscience.economics.money.ChangeSource;
-import org.jscience.economics.Currency;
-
-import org.jscience.geography.BusinessPlace;
-
-import org.jscience.measure.Identification;
-
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Set;
-
-
-/**
- * A class representing a bank.
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * @author Silvere Martin-Michiellot
- * @version 1.0
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
-//banks give away money for organizations to have more capital
-//banks get money back from organizations and usually ask for more than was actually given
-public class Bank extends Organization implements ChangeSource {
-    /** DOCUMENT ME! */
-    private Set clientAccounts;
+package org.jscience.economics;
+
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import org.jscience.economics.money.Account;
+import org.jscience.economics.money.ChangeSource;
+import org.jscience.economics.money.Currency;
+import org.jscience.economics.money.Money;
+import org.jscience.geography.BusinessPlace;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
-     * Creates a new Bank object.
-     *
-     * @param name           DOCUMENT ME!
-     * @param identification DOCUMENT ME!
-     * @param owners         DOCUMENT ME!
-     * @param place          DOCUMENT ME!
-     * @param accounts       DOCUMENT ME!
+ * Represents a banking institution capable of managing accounts and providing 
+ * currency conversion services.
+ * Extends {@link Organization} and implements {@link ChangeSource}.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
+ */
+@Persistent
+public class Bank extends Organization implements ChangeSource, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private Set<Account> clientAccounts;
+
+    /**
+     * Initializes a new Bank with official documentation.
+     * 
+     * @param name           official bank name
+     * @param identification legal tax/regulatory ID
+     * @param owners         set of owners
+     * @param place          physical headquarters
+     * @param accounts       initial capital accounts
      */
-    public Bank(String name, Identification identification, Set owners,
-        BusinessPlace place, Set accounts) {
+    public Bank(String name, Identification identification, Set<Human> owners,
+            BusinessPlace place, Set<Account> accounts) {
         super(name, identification, owners, place, accounts);
-        clientAccounts = Collections.EMPTY_SET;
+        this.clientAccounts = new HashSet<>();
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Minimal constructor for the modern API.
      */
-    public Set getClientAccounts() {
-        return clientAccounts;
+    public Bank(String name, org.jscience.geography.Place place, Money initialCapital) {
+        super(name, place, initialCapital);
+        this.clientAccounts = new HashSet<>();
+    }
+
+    /** Returns unmodifiable set of client accounts. */
+    public Set<Account> getClientAccounts() {
+        return Collections.unmodifiableSet(clientAccounts);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param account DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Registers a new account with this bank.
+     * @param account the account to add
      */
     public void addClientAccount(Account account) {
-        if ((account != null) && (account.getBank().equals(this))) {
-            clientAccounts.add(account);
-        } else {
-            throw new IllegalArgumentException("You can't add a null Account.");
+        Objects.requireNonNull(account, "Account cannot be null");
+        if (!account.getBank().equals(this)) {
+             throw new IllegalArgumentException("Account does not belong to this bank");
         }
+        clientAccounts.add(account);
     }
 
-    //or close account (you should first be sure the account is empty (this is unchecked))
-    /**
-     * DOCUMENT ME!
-     *
-     * @param account DOCUMENT ME!
-     */
     public void removeClientAccount(Account account) {
         clientAccounts.remove(account);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param accounts DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    public void setClientAccounts(Set accounts) {
-        Iterator iterator;
-        boolean valid;
-        Object currentElement;
-
-        if (accounts != null) {
-            valid = true;
-            iterator = accounts.iterator();
-
-            while (iterator.hasNext() && valid) {
-                currentElement = iterator.next();
-                valid = (currentElement instanceof Account) &&
-                    (((Account) currentElement).getBank().equals(this));
-            }
-
-            if (valid) {
-                this.clientAccounts = accounts;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Set of Accounts should contain only Accounts from this bank.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Set of Accounts shouldn't be null.");
-        }
-    }
-
-    //this method should be overridden to provide actual change
-    /**
-     * DOCUMENT ME!
-     *
-     * @param amount DOCUMENT ME!
-     * @param source DOCUMENT ME!
-     * @param target DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public float getConverted(float amount, Currency source, Currency target) {
-        if ((source != null) && (target != null)) {
-            return amount;
-        } else {
-            throw new IllegalArgumentException(
-                "You can't convert null Currencies.");
-        }
+    @Override
+    public Money getConverted(Money amount, Currency target) {
+        Objects.requireNonNull(amount, "Amount cannot be null");
+        Objects.requireNonNull(target, "Target currency cannot be null");
+        // Standard non-fee conversion
+        return amount.to(target);
     }
 }

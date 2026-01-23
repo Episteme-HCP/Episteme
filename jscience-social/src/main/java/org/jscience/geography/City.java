@@ -24,7 +24,7 @@
 package org.jscience.geography;
 
 import org.jscience.politics.Country;
-import org.jscience.util.identity.Identifiable;
+import org.jscience.util.identity.Identified;
 
 /**
  * Represents a city or settlement.
@@ -33,7 +33,7 @@ import org.jscience.util.identity.Identifiable;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class City extends Place implements Identifiable<String> {
+public class City extends Place implements Identified<String> {
 
     private final String id; // Typically name or code
     private final Country exactCountry; // Renamed to avoid name clash with Place.getCountry()

@@ -78,6 +78,11 @@ public class CSVTimeSeriesReader extends AbstractResourceReader<Map<TimePoint, R
     }
 
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"RFC 4180"};
+    }
+
+    @Override
     protected Map<TimePoint, Real> loadFromSource(String id) throws Exception {
         return loadTimeSeries(id);
     }

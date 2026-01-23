@@ -1,550 +1,292 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.economics;
 
-import org.jscience.biology.human.Human;
-import org.jscience.biology.human.HumanSpecies;
-
+import org.jscience.biology.Human;
+import org.jscience.biology.taxonomy.HomoSapiens;
 import org.jscience.economics.money.Account;
-import org.jscience.economics.money.Currency;
 import org.jscience.economics.money.Money;
-
 import org.jscience.geography.BusinessPlace;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.Identified;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
-import org.jscience.measure.Amount;
-import org.jscience.measure.Identification;
-import org.jscience.measure.Identified;
-
+import java.io.Serializable;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
-
 /**
- * A class representing an organization basic facts. It can be a company, a
- * familly... or an individual (consumer).
+ * Represents a formal social and economic entity, such as a company, 
+ * institution, or cooperative.
+ * 
+ * <p>An organization can own assets, employ workers (via an {@link Organigram}), 
+ * manage financial {@link Account}s, and interact with other organizations 
+ * as providers or clients.</p>
  *
- * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author <a href="mailto:silvere.martin-michiellot@jscience.org">Silvere Martin-Michiellot</a>
+ * @author Gemini AI (Google DeepMind)
+ * @version 6.0, July 21, 2014
  */
+@Persistent
+public class Organization extends Community implements Property, Identified<String>, Serializable {
 
-//the clients are all the consumers/organizations buying resources from this organization
-//and consumers/organizations themselves are in turn providers of resources
-//nevertheless, organization keep specific records of their clients depending or their consuming habits
-//often having a file of recent customers.
-//also accounts for institutions, a very important acknowledged organization normally without competitors.
-//this also could be a syndicate, a non profit organization (you have to subclass this class and provide support for members, which are in a way clients)
-//an insurance company or whatever
-//there are several reasons to subclass this class:
-//we do not account for the fact that some resources might have decayed in the meantime:
-//work will always be a success if it can and there will be no loss
-//this may be an important factor for example in the food industry
-//neither is the fact that the capital also decays for external causes (money value changes) or internal causes (you still have to pay for the place where the buildings are or electricity the basic price even if not used)
-//also not taken into account is the fact that working takes time and some delays may occur (because some machines break or are already in use by another work, workers are on strike...)
-//also, factories are able to do only a limited set of works (they are specialized) as the result of the knowledge of people that work inside and the avaialable machines are only able to do some works
-//for example a factory which mines the soil is not able to cut the hair of people (although this seems to be an easy job)
-//although there is support for accounts and worker, there is no money flow, and therefore your accounts are never decreased by buying resources or making people work
-//we do not take into account that you actually need a "real" factory (buidlings and machines that have been removed from the capital to be used)
-//and a "real" workforce (men that will get paid even if they don't work)
-//finally, you can always buy a ressource, change the price and ressell it.
-//(this is usually forbidden in many countries)
-//moreover, you can always sell even if there is no one to buy.
-//there is no underlying "intelligent production model" (in which you build only things people would buy):
-//said in other words, is up to you to actually decide to do a work or another (an automatic model based on actual gain or loss could be used)
-//you can use a factory subclass to define operational market where you actually trade real goods
-//this class also accounts for money markets, stock exchange, bourse and the like
-//we do not define workplaces here although a factory may be split actually into many places
-public class Organization extends Community implements Property,
-    Identified {
-    /** DOCUMENT ME! */
+    private static final long serialVersionUID = 1L;
+
+    @Attribute
     private String name;
+    
+    @Id
+    private Identification identification;
+    
+    /** The estimated total value of the organization. */
+    @Attribute
+    private Money value;
 
-    /** DOCUMENT ME! */
-    private Identification identification; //the legal number
+    /** The economic agents (individuals or other organizations) that own this entity. */
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private Set<EconomicAgent> owners;
 
-    /** DOCUMENT ME! */
-    private Amount<Money> value;
-
-    /** DOCUMENT ME! */
-    private Set owners; //the people involved
-
-    /** DOCUMENT ME! */
+    /** The internal organizational structure and worker hierarchy. */
+    @Relation(type = Relation.Type.ONE_TO_ONE)
     private Organigram organigram;
 
-    /** DOCUMENT ME! */
-    private Set accounts;
+    /** The financial accounts belonging to the organization. */
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private Set<Account> accounts;
 
-    /** DOCUMENT ME! */
-    private Amount<Money> capital;
+    /** The current working capital of the organization. */
+    @Attribute
+    private Money capital;
 
-    /** DOCUMENT ME! */
-    private Set providers;
+    /** The set of organizations that supply goods or services. */
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private Set<Organization> providers;
 
-    /** DOCUMENT ME! */
-    private Set clients;
+    /** The set of organizations that consume goods or services. */
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private Set<Organization> clients;
 
-    /**
-     * Creates a new Organization object.
-     *
-     * @param name DOCUMENT ME!
-     * @param identification DOCUMENT ME!
-     * @param owners DOCUMENT ME!
-     * @param place DOCUMENT ME!
-     * @param accounts DOCUMENT ME!
-     */
-    public Organization(String name, Identification identification, Set owners,
-        BusinessPlace place, Set accounts) {
-        super(new HumanSpecies(), place);
-
-        Iterator iterator;
-        boolean valid;
-
-        if ((name != null) && (name.length() > 0) && (identification != null) &&
-                (owners != null) && (accounts != null) &&
-                (accounts.size() > 0)) {
-            iterator = owners.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Human;
-            }
-
-            if (valid) {
-                iterator = accounts.iterator();
-                valid = true;
-
-                while (iterator.hasNext() && valid) {
-                    valid = iterator.next() instanceof Account;
-                }
-
-                if (valid) {
-                    this.name = name;
-                    this.identification = identification;
-                    this.value = Amount.valueOf(0, Currency.USD);
-                    this.owners = owners;
-                    this.organigram = new Organigram(name, getIndividuals());
-                    this.accounts = accounts;
-                    this.capital = Amount.valueOf(0, Currency.USD);
-                    this.providers = Collections.EMPTY_SET;
-                    this.clients = Collections.EMPTY_SET;
-                } else {
-                    throw new IllegalArgumentException(
-                        "The accounts Set must contain only Accounts.");
-                }
-            } else {
-                throw new IllegalArgumentException(
-                    "The owners Set must contain only Humans.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Organization constructor can't have null arguments and name and accounts can't be empty.");
-        }
+    @Override
+    public String getId() {
+        return identification != null ? identification.getId() : name;
     }
 
     /**
-     * DOCUMENT ME!
+     * Creates a new organization.
      *
-     * @return DOCUMENT ME!
+     * @param name           the name of the organization.
+     * @param identification the legal identification of the organization.
+     * @param owners         the initial set of owners.
+     * @param place          the business location.
+     * @param accounts       the initial set of financial accounts.
      */
+    public Organization(String name, Identification identification, Set<EconomicAgent> owners,
+                        BusinessPlace place, Set<Account> accounts) {
+        super(HomoSapiens.SPECIES, place);
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
+        
+        this.identification = Objects.requireNonNull(identification, "Identification cannot be null");
+        this.owners = Objects.requireNonNull(owners, "Owners set cannot be null");
+        this.accounts = Objects.requireNonNull(accounts, "Accounts set cannot be null");
+        if (accounts.isEmpty()) throw new IllegalArgumentException("Accounts cannot be empty");
+
+        this.value = Money.usd(0);
+        this.organigram = new Organigram(name, new HashSet<>());
+        this.capital = Money.usd(0);
+        this.providers = new HashSet<>();
+        this.clients = new HashSet<>();
+    }
+
+    /**
+     * Convenience constructor for modern API.
+     */
+    public Organization(String name, org.jscience.geography.Place place, Money initialCapital) {
+        super(HomoSapiens.SPECIES, place);
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
+
+        this.identification = new SimpleIdentification(name);
+        this.value = Money.usd(0);
+        this.owners = new HashSet<>();
+        this.accounts = new HashSet<>();
+        this.accounts.add(new Account(null, owners, identification, "Main Account", initialCapital));
+        this.organigram = new Organigram(name, new HashSet<>());
+        this.capital = initialCapital;
+        this.providers = new HashSet<>();
+        this.clients = new HashSet<>();
+    }
+
     public String getName() {
         return name;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param name DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
     public void setName(String name) {
-        if ((name != null) && (name.length() > 0)) {
-            this.name = name;
-        } else {
-            throw new IllegalArgumentException(
-                "You can't set a null or empty name.");
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be null or empty");
         }
+        this.name = name;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public Identification getIdentification() {
         return identification;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param identification DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
     public void setIdentification(Identification identification) {
-        if (identification != null) {
-            this.identification = identification;
-        } else {
-            throw new IllegalArgumentException(
-                "You can't set a null identification.");
-        }
+        this.identification = Objects.requireNonNull(identification, "Identification cannot be null");
     }
 
-    //this is the price if sold by owners
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Amount<Money> getValue() {
+    public Money getValue() {
         return value;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param value DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    public void setValue(Amount<Money> value) {
-        if (value != null) {
-            this.value = value;
-        } else {
-            throw new IllegalArgumentException("You can't set a null value.");
-        }
+    public void setValue(Money value) {
+        this.value = Objects.requireNonNull(value, "Value cannot be null");
+    }
+
+    @Override
+    public Set<EconomicAgent> getOwners() {
+        return Collections.unmodifiableSet(owners);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Adds an owner to the organization.
+     * @param owner the new owner
      */
-    public Set getOwners() {
-        return owners;
+    public void addOwner(EconomicAgent owner) {
+        owners.add(Objects.requireNonNull(owner, "Owner cannot be null"));
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param owner DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Removes an owner from the organization.
+     * @param owner the owner to remove
      */
-    public void addOwner(Human owner) {
-        if (owner != null) {
-            owners.add(owner);
-        } else {
-            throw new IllegalArgumentException("You can't add a null owner.");
-        }
+    public void removeOwner(EconomicAgent owner) {
+        owners.remove(owner);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param owner DOCUMENT ME!
+     * Sets the set of owners for the organization.
+     * @param owners the new set of owners
      */
-    public void removeOwner(Human owner) {
-        if (owner != null) {
-            //if (owners.contains(owner)) {
-            //if (owners.size() > 1) {
-            owners.remove(owner);
-
-            // } else {
-            //  throw new IllegalArgumentException("You can't remove last owner.");
-            // }
-        }
+    public void setOwners(Set<EconomicAgent> owners) {
+        this.owners = new HashSet<>(Objects.requireNonNull(owners, "Owners set cannot be null"));
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param owners DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    public void setOwners(Set owners) {
-        Iterator iterator;
-        boolean valid;
-
-        //if ((owners != null) && (owners.size() > 0)) {
-        if (owners != null) {
-            iterator = owners.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Human;
-            }
-
-            if (valid) {
-                this.owners = owners;
-            } else {
-                throw new IllegalArgumentException(
-                    "The owners Set must contain only Humans.");
-            }
-
-            //} else {
-            //  throw new IllegalArgumentException("You can't set a null or empty owners set.");
-            //}
-        } else {
-            throw new IllegalArgumentException(
-                "You can't set a null owners set.");
-        }
-    }
-
-    //may return null
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public Organigram getOrganigram() {
         return organigram;
     }
 
-    //should be the top element of the organigram
-    /**
-     * DOCUMENT ME!
-     *
-     * @param organigram DOCUMENT ME!
-     */
     public void setOrganigram(Organigram organigram) {
         this.organigram = organigram;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Set getProviders() {
-        return providers;
+    public Set<Organization> getProviders() {
+        return Collections.unmodifiableSet(providers);
     }
 
-    //you can add a provider even if you haven't actually bought anything from him
-    /**
-     * DOCUMENT ME!
-     *
-     * @param organization DOCUMENT ME!
-     */
     public void addProvider(Organization organization) {
-        if (organization != null) {
-            providers.add(organization);
-        } else {
-            throw new IllegalArgumentException(
-                "You can't add a null Organization.");
-        }
+        providers.add(Objects.requireNonNull(organization, "Provider cannot be null"));
     }
 
-    //you can remove a provider usually when you haven't bought anything for some time
-    /**
-     * DOCUMENT ME!
-     *
-     * @param organization DOCUMENT ME!
-     */
     public void removeProvider(Organization organization) {
         providers.remove(organization);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Set getClients() {
-        return clients;
+    public Set<Organization> getClients() {
+        return Collections.unmodifiableSet(clients);
     }
 
-    //you can add a clients even if you haven't actually bought anything from him
-    /**
-     * DOCUMENT ME!
-     *
-     * @param organization DOCUMENT ME!
-     */
     public void addClient(Organization organization) {
-        if (organization != null) {
-            clients.add(organization);
-        } else {
-            throw new IllegalArgumentException(
-                "You can't add a null Organization.");
-        }
+        clients.add(Objects.requireNonNull(organization, "Client cannot be null"));
     }
 
-    //you can remove a clients usually when you haven't bought anything for some time
-    /**
-     * DOCUMENT ME!
-     *
-     * @param organization DOCUMENT ME!
-     */
     public void removeClient(Organization organization) {
         clients.remove(organization);
     }
 
-    //the capital value is changed accordingly but NOT accounts
-    /**
-     * DOCUMENT ME!
-     *
-     * @param value DOCUMENT ME!
-     * @param otherParty DOCUMENT ME!
-     * @param wantedResources DOCUMENT ME!
-     */
-    public void buyResources(Amount<Money> value, Organization otherParty,
-        Set wantedResources) {
-        Iterator iterator;
-        boolean valid;
-        Set currentResources;
+    public void buyResources(Money value, Organization otherParty, Set<Resource> wantedResources) {
+        Objects.requireNonNull(value, "Value cannot be null");
+        Objects.requireNonNull(otherParty, "Other party cannot be null");
+        Objects.requireNonNull(wantedResources, "Wanted resources cannot be null");
 
-        if ((value != null) && (otherParty != null) &&
-                (wantedResources != null)) {
-            valid = true;
-            iterator = wantedResources.iterator();
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Resource;
-            }
-
-            if (valid) {
-                iterator = wantedResources.iterator();
-
-                while (iterator.hasNext() && valid) {
-                    valid = otherParty.getResources().contains(iterator.next());
-                }
-
-                if (valid) { //probably many useless calls here
-                    currentResources = otherParty.getResources();
-                    currentResources.removeAll(wantedResources);
-                    otherParty.setResources(currentResources);
-                    currentResources = getResources();
-                    currentResources.addAll(wantedResources);
-                    setResources(currentResources);
-                    otherParty.getCapital().plus(value);
-                    setCapital(getCapital().minus(value));
-                } else {
-                    throw new IllegalArgumentException(
-                        "All wantedResources should be owned by otherParty.");
-                }
-            } else {
-                throw new IllegalArgumentException(
-                    "wantedResources should be a Set of Resources.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "price, otherParty and wantedResources can't be null.");
+        if (!otherParty.getResources().containsAll(wantedResources)) {
+            throw new IllegalArgumentException("Other party does not own all wanted resources");
         }
+
+        // Transfer resources
+        Set<Resource> currentResources = new HashSet<>(otherParty.getResources());
+        currentResources.removeAll(wantedResources);
+        otherParty.setResources(currentResources);
+
+        currentResources = new HashSet<>(getResources());
+        currentResources.addAll(wantedResources);
+        setResources(currentResources);
+
+        // Transfer money
+        otherParty.setCapital(otherParty.getCapital().add(value));
+        this.setCapital(this.getCapital().subtract(value));
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Amount<Money> getCapital() {
+    public Money getCapital() {
         return capital;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param value DOCUMENT ME!
-     */
-    public void setCapital(Amount<Money> value) {
-        if (value!=null) {
-            if (value.isGreaterThan(Amount.valueOf(0, Currency.USD))) {
-          capital = value;
-        } else throw new IllegalArgumentException("Capital must be greater than 0.");
-        } else throw new IllegalArgumentException("You cannot set a null capital.");
-      }
-
-     //the money related issues
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Set getAccounts() {
-        return accounts;
+    public void setCapital(Money value) {
+        this.capital = Objects.requireNonNull(value, "Capital cannot be null");
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param account DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
+    public Set<Account> getAccounts() {
+        return Collections.unmodifiableSet(accounts);
+    }
+
     public void addAccount(Account account) {
-        if (account != null) {
-            accounts.add(account);
-        } else {
-            throw new IllegalArgumentException("You can't add a null Account.");
-        }
+        accounts.add(Objects.requireNonNull(account, "Account cannot be null"));
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param account DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
     public void removeAccount(Account account) {
-        if (account != null) {
-            if (accounts.contains(account)) {
-                if (accounts.size() > 1) {
-                    accounts.remove(account);
-                } else {
-                    throw new IllegalArgumentException(
-                        "You can't remove last Account.");
-                }
-            }
+        if (accounts.size() <= 1) {
+             throw new IllegalStateException("Cannot remove the last account");
         }
+        accounts.remove(account);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param accounts DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    public void setAccounts(Set accounts) {
-        Iterator iterator;
-        boolean valid;
-
-        if ((accounts != null) && (accounts.size() > 0)) {
-            valid = true;
-            iterator = accounts.iterator();
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Account;
-            }
-
-            if (valid) {
-                this.accounts = accounts;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Set of Accounts should contain only Accounts.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Set of Accounts shouldn't be null or empty.");
+    public void setAccounts(Set<Account> accounts) {
+        Objects.requireNonNull(accounts, "Accounts set cannot be null");
+        if (accounts.isEmpty()) {
+            throw new IllegalArgumentException("Accounts set cannot be empty");
         }
+        this.accounts = new HashSet<>(accounts);
     }
 
-    //all elements should be workers and on the opposite all workers should be in the organigram
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Set getWorkers() {
-/**
-         * Set set; Iterator iterator; HashSet result; result = new HashSet();
-         * if (organigram != null) { set = organigram.getAllChildren();
-         * set.add(organigram); iterator = set.iterator(); while
-         * (iterator.hasNext()) { result.addAll(((Organigram)
-         * iterator.next()).getWorkers()); }} return result;
-         */
-        return organigram.getAllWorkers();
+    public Set<Worker> getWorkers() {
+        return organigram != null ? organigram.getAllWorkers() : Collections.emptySet();
     }
 
     //perhaps we should also provide a setter/getter for country in which this organization is built

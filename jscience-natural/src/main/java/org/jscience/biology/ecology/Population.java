@@ -28,6 +28,12 @@ import java.util.function.Predicate;
 import org.jscience.biology.Individual;
 import org.jscience.biology.taxonomy.Species;
 
+import org.jscience.util.Named;
+import org.jscience.util.Positioned;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
+
 /**
  * Represents a population of individuals of the same species.
  * <p>
@@ -39,19 +45,29 @@ import org.jscience.biology.taxonomy.Species;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Population {
+@Persistent
+public class Population implements Named, Positioned {
 
+    @Attribute
     private final String name;
+    @Attribute
     private final Species species;
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private final List<Individual> members = new ArrayList<>();
-    private final String location;
+    @Attribute
+    private org.jscience.geography.Place territory;
 
-    public Population(String name, Species species, String location) {
+    public Population(String name, Species species, org.jscience.geography.Place territory) {
         this.name = name;
         this.species = species;
-        this.location = location;
+        this.territory = territory;
     }
 
+    public Population(Species species) {
+        this("Unnamed Population", species, null);
+    }
+
+    @Override
     public String getName() {
         return name;
     }
@@ -60,8 +76,21 @@ public class Population {
         return species;
     }
 
+    public org.jscience.geography.Place getTerritory() {
+        return territory;
+    }
+
+    public void setTerritory(org.jscience.geography.Place territory) {
+        this.territory = territory;
+    }
+
+    @Override
+    public org.jscience.geography.Place getPosition() {
+        return territory;
+    }
+
     public String getLocation() {
-        return location;
+        return territory != null ? territory.getName() : "Unknown";
     }
 
     public void addMember(Individual individual) {
@@ -73,6 +102,17 @@ public class Population {
 
     public void removeMember(Individual individual) {
         members.remove(individual);
+    }
+
+    public Set<Individual> getIndividuals() {
+        return new HashSet<>(members);
+    }
+
+    public void setIndividuals(Set<Individual> individuals) {
+        members.clear();
+        if (individuals != null) {
+            members.addAll(individuals);
+        }
     }
 
     public List<Individual> getMembers() {
@@ -171,7 +211,7 @@ public class Population {
     @Override
     public String toString() {
         return String.format("Population '%s' of %s at %s: %d members (%d alive)",
-                name, species.getScientificName(), location, size(), countAlive());
+                name, species.getScientificName(), getLocation(), size(), countAlive());
     }
 }
 

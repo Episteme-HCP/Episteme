@@ -37,6 +37,11 @@ import org.jscience.measure.quantity.Mass;
 import org.jscience.measure.quantity.Velocity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,14 +59,22 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@Persistent
 public class Particle implements SpatialOctree.SpatialObject {
 
+    @Id
+    private Identification identification;
+    @Attribute
     private Vector<Real> position;
+    @Attribute
     private Vector<Real> velocity;
+    @Attribute
     private Vector<Real> acceleration;
+    @Attribute
     private Quantity<Mass> mass;
 
     public Particle(double x, double y, double z, double massKg) {
+        this.identification = new SimpleIdentification("P" + System.nanoTime());
         this.mass = Quantities.create(massKg, Units.KILOGRAM);
         this.position = createVector(x, y, z);
         this.velocity = createVector(0, 0, 0);
@@ -69,6 +82,7 @@ public class Particle implements SpatialOctree.SpatialObject {
     }
 
     public Particle(Vector<Real> position, Vector<Real> velocity, Quantity<Mass> mass) {
+        this.identification = new SimpleIdentification("P" + System.nanoTime());
         this.position = position;
         this.velocity = velocity;
         this.acceleration = createVector(0, 0, 0);

@@ -61,8 +61,8 @@ public class MacroModel {
 
         // Update GDP
         if (economy.getGdp() != null) {
-            Real currentGdp = economy.getGdp();
-            Real newGdp = currentGdp.multiply(Real.ONE.add(gdpGrowth));
+            org.jscience.economics.money.Money currentGdp = economy.getGdp();
+            org.jscience.economics.money.Money newGdp = currentGdp.multiply(Real.ONE.add(gdpGrowth));
             economy.setGdp(newGdp);
         }
 
@@ -85,9 +85,9 @@ public class MacroModel {
     /**
      * Predicts GDP for next N years based on constant growth.
      */
-    public Real predictGDP(int years, Real assumedGrowthRate) {
+    public org.jscience.economics.money.Money predictGDP(int years, Real assumedGrowthRate) {
         if (economy.getGdp() == null)
-            return Real.ZERO;
+            return org.jscience.economics.money.Money.usd(0.0);
         return economy.getGdp().multiply(Real.ONE.add(assumedGrowthRate).pow(Real.of(years)));
     }
 }

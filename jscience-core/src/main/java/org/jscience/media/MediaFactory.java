@@ -5,7 +5,7 @@
 
 package org.jscience.media;
 
-import org.jscience.media.backend.*;
+import org.jscience.media.backends.*;
 import java.util.*;
 
 /**

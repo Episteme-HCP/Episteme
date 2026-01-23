@@ -37,6 +37,6 @@ public interface ChangeSource {
      */
 
     //returns the converted amount
-    public float getConverted(float amount, Currency source, Currency target)
+    public Money getConverted(Money amount, Currency target)
             throws UnavailableDataException;
 }

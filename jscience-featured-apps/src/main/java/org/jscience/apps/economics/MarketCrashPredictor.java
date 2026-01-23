@@ -25,7 +25,7 @@ package org.jscience.apps.economics;
 
 import org.jscience.economics.analysis.TechnicalIndicators;
 import org.jscience.economics.loaders.FinancialMarketReader.Candle;
-import org.jscience.economics.Money;
+import org.jscience.economics.money.Money;
 import org.jscience.history.TimePoint;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.ui.i18n.I18nManager;

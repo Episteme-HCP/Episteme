@@ -1,69 +1,112 @@
-package org.jscience.politics;
-
-import org.jscience.economics.Organization;
-
-import org.jscience.geography.BusinessPlace;
-
-import org.jscience.measure.Identification;
-import org.jscience.measure.StringIdentificationFactory;
-
-import java.util.Set;
-
-
-/**
- * A class representing a group of people organized in a hierarchy and
- * loyal subjects to a state, they represent the active force. Armies, Police,
- * may be politicians, and prosecutors
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * @author Silvere Martin-Michiellot
- * @version 1.0
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
-//stateforce require no identification as they are part of the state and are all unique: there is one army, one police, etc.
-//for the same reason there no owners as the government or normally the whole country owns the stateforce
-//also called bureaucracy
-public class Administration extends Organization {
-    /** DOCUMENT ME! */
-    private Country country;
+package org.jscience.politics;
+
+import java.io.Serializable;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.jscience.biology.Human;
+import org.jscience.economics.Organization;
+import org.jscience.economics.money.Account;
+import org.jscience.geography.BusinessPlace;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.StringIdentificationFactory;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
-     * Creates a new Administration object.
+ * Represents a state-managed administrative organization (agency, ministry, police, etc.).
+ * Administrations are structured hierarchies of individuals serving a Country.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.2
+ * @since 1.0
+ */
+@Persistent
+public class Administration extends Organization implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Relation(type = Relation.Type.MANY_TO_ONE)
+    private final Country country;
+
+    /**
+     * Creates an Administration using a default identification strategy.
      *
-     * @param name     DOCUMENT ME!
-     * @param country  DOCUMENT ME!
-     * @param place    DOCUMENT ME!
-     * @param accounts DOCUMENT ME!
+     * @param name     the name of the administration
+     * @param country  the country of affiliation
+     * @param place    the headquarters location
+     * @param accounts financial accounts for operation
+     * @throws NullPointerException if any argument is null
      */
-    public Administration(String name, Country country, BusinessPlace place,
-        Set accounts) {
-        super(name,
+    public Administration(String name, Country country, BusinessPlace place, Set<Account> accounts) {
+        super(Objects.requireNonNull(name, "Name cannot be null"),
             new StringIdentificationFactory().generateIdentification(name),
-            country.getNation().getIndividuals(), place, accounts);
-        this.country = country;
-    }
-
-/**
-     * Creates a new Administration object.
-     *
-     * @param name           DOCUMENT ME!
-     * @param identification DOCUMENT ME!
-     * @param country        DOCUMENT ME!
-     * @param place          DOCUMENT ME!
-     * @param accounts       DOCUMENT ME!
-     */
-    public Administration(String name, Identification identification,
-        Country country, BusinessPlace place, Set accounts) {
-        super(name, identification, country.getNation().getIndividuals(),
+            Objects.requireNonNull(country, "Country cannot be null")
+                .getNation().getIndividuals().stream()
+                .filter(Human.class::isInstance)
+                .map(Human.class::cast)
+                .collect(Collectors.toSet()), 
             place, accounts);
         this.country = country;
     }
 
     /**
-     * DOCUMENT ME!
+     * Creates an Administration with explicit identification.
      *
-     * @return DOCUMENT ME!
+     * @param name           the name
+     * @param identification unique identifier
+     * @param country        the country
+     * @param place          the location
+     * @param accounts       financial accounts
+     * @throws NullPointerException if any argument is null
+     */
+    public Administration(String name, Identification identification,
+        Country country, BusinessPlace place, Set<Account> accounts) {
+        super(Objects.requireNonNull(name, "Name cannot be null"), 
+            Objects.requireNonNull(identification, "Identification cannot be null"), 
+            Objects.requireNonNull(country, "Country cannot be null")
+                .getNation().getIndividuals().stream()
+                .filter(Human.class::isInstance)
+                .map(Human.class::cast)
+                .collect(Collectors.toSet()),
+            place, accounts);
+        this.country = country;
+    }
+
+    /**
+     * Returns the country associated with this administration.
+     * @return the country
      */
     public Country getCountry() {
         return country;
+    }
+
+    @Override
+    public String toString() {
+        return getName() + " [" + country.getName() + "]";
     }
 }

@@ -1,4 +1,4 @@
-﻿package org.jscience.arts.theater;
+package org.jscience.arts.theater;
 
 import java.util.ArrayList;
 import java.util.Collections;

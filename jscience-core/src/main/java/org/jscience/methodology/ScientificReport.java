@@ -23,7 +23,7 @@
 
 package org.jscience.methodology;
 
-import org.jscience.util.identity.Identifiable;
+import org.jscience.util.identity.Identified;
 import java.time.Instant;
 import java.util.List;
 
@@ -35,7 +35,7 @@ public record ScientificReport(
     String author,
     Instant date,
     List<String> contents
-) implements Identifiable<String> {
+) implements Identified<String> {
 
     @Override public String getId() { return id; }
 }

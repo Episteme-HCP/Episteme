@@ -1,6 +1,7 @@
 package org.jscience.arts;
 
-import org.jscience.history.time.UncertainDate;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.*;
 
 /**
@@ -49,9 +50,8 @@ public final class ArtCritiqueEngine {
     public static List<CritiqueResult> evaluate(Artwork artwork, List<String> observedTechniques) {
         List<CritiqueResult> results = new ArrayList<>();
         
-        UncertainDate date = artwork.getProductionDate();
-        int year = date != null && date.getEarliestPossible() != null 
-            ? date.getEarliestPossible().getYear() : 1500;
+        Instant date = artwork.getProductionDate();
+        int year = date != null ? date.atZone(ZoneOffset.UTC).getYear() : 1500;
 
         List<TechnicalStandard> periodStandards = STANDARDS.stream()
             .filter(s -> year >= s.startYear() && year <= s.endYear())

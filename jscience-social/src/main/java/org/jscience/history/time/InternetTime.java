@@ -1,282 +1,213 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history.time;
 
 import org.jscience.measure.Amount;
-
-import javax.measure.quantity.Duration;
-import javax.measure.unit.BaseUnit;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
-import javax.naming.OperationNotSupportedException;
-import java.util.Calendar;
-
+import org.jscience.measure.Unit;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Time;
+import java.io.Serializable;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
 
 /**
- * DOCUMENT ME!
+ * Represents Swatch Internet Time, dividing the day into 1000 ".beats".
+ * It is based on Biel Mean Time (BMT), which is UTC+1.
+ * <p>
+ * One beat is equal to exactly 86.4 standard seconds.
+ * </p>
  *
- * @author $author$
- * @version $Revision: 1.1 $
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.2
+ * @since 1.0
+ * @see <a href="http://en.wikipedia.org/wiki/Swatch_Internet_Time">Swatch Internet Time (Wikipedia)</a>
  */
+@Persistent
+public class InternetTime extends org.jscience.history.time.Time {
 
-//written after the genuine http://www.swatch.com/internettime/info/unix.php
-//http://en.wikipedia.org/wiki/Swatch_Internet_Time
-public class InternetTime extends Time {
-    /** DOCUMENT ME! */
-    public static final int TICKS_PER_DAY = 1000;
+    private static final long serialVersionUID = 1L;
 
-   /** DOCUMENT ME! */
-    public static final int MILLISECONDS_PER_TICK = 1000;
+    /** Number of beats per day. */
+    public static final int BEATS_PER_DAY = 1000;
 
-    /**
-     * A unit of duration equal to <code>1/1000 s</code> (standard name
-     * <code>ms</code>).
-     */
-    public static final Unit<Duration> INTERNET_MILLISECOND = SI.SECOND.divide(MILLISECONDS_PER_TICK);
+    /** Number of standard milliseconds in one beat (86.4 seconds). */
+    public static final int MILLISECONDS_PER_BEAT = 86400;
 
-    /**
-     * The base unit for duration quantities (<code>t</code>).
-     */
-    public static final BaseUnit<Duration> INTERNET_TICK =  new BaseUnit<Duration>( "t");;
+    /** Beat unit of duration (86.4 seconds). */
+    public static final Unit<Time> BEAT = Units.SECOND.multiply(86.4);
 
-     /**
-     * A unit of duration equal to <code>1000 {@link #INTERNET_TICK}</code>
-     * (standard name <code>d</code>).
-     */
-    public static final Unit<Duration> INTERNET_DAY = INTERNET_TICK.times(TICKS_PER_DAY);
+    /** Millibeat unit (0.001 beat). */
+    public static final Unit<Time> MILLI_BEAT = BEAT.divide(1000);
 
-    /** DOCUMENT ME! */
-    public final static Unit<Duration> DAYS_TICKS_MILLIS = INTERNET_DAY.compound(INTERNET_TICK)
-                                                                                  .compound(INTERNET_MILLISECOND);
+    private static final long MILLIS_PER_DAY = 86400000L;
 
-    /** DOCUMENT ME! */
-    private static final long MILLISECONDS_PER_DAY =  1000 * 1000L;
+    @Attribute
+    private int millibeats;
 
-    /** DOCUMENT ME! */
-    private int millis;
+    @Attribute
+    private int beats;
 
-    /** DOCUMENT ME! */
-    private int ticks;
-
-     /** DOCUMENT ME! */
+    @Attribute
     private int days;
 
-     //we could also offer constructor using Measure<Duration>
-/**
-     * Creates a new InternetTime object.
-     *
-      */
-
-    //get sure it is positive
-    public InternetTime(double days, double ticks, double millis) {
-        if ((days >= 0) && (ticks >= 0) &&
-                (millis >= 0)) {
-            double time = (days * MILLISECONDS_PER_DAY) +
-                (ticks * MILLISECONDS_PER_TICK) + millis;
-            this.millis = (int) (time % MILLISECONDS_PER_TICK);
-            time /= MILLISECONDS_PER_TICK;
-            this.ticks = (int) (time % TICKS_PER_DAY);
-            this.days = (int) (time / TICKS_PER_DAY);
-        } else {
-            throw new IllegalArgumentException(
-                "Days, ticks and millis must be greater or equal to zero.");
-        }
-    }
-
-    //in milliseconds
-/**
-     * Creates a new InternetTime object.
-     *
-     * @param millis DOCUMENT ME!
+    /**
+     * Creates InternetTime from components.
+     * 
+     * @param days count of days
+     * @param beats beat component (0-999)
+     * @param millibeats millibeat component (0-999)
+     * @throws IllegalArgumentException if any value is negative
      */
-
-    //get sure it is positive
-    public InternetTime(double millis) {
-        if (millis >= 0) {
-            this.millis = (int) (millis % MILLISECONDS_PER_TICK);
-            millis /= MILLISECONDS_PER_TICK;
-            this.ticks = (int) (millis % TICKS_PER_DAY);
-            this.days = (int) (millis / TICKS_PER_DAY);
-        } else {
-            throw new IllegalArgumentException(
-                "Millis must be greater or equal to zero.");
+    public InternetTime(double days, double beats, double millibeats) {
+        if (days < 0 || beats < 0 || millibeats < 0) {
+            throw new IllegalArgumentException("Time components cannot be negative");
         }
+        initFromComponents(days, beats, millibeats);
     }
 
-    //using currenttime
-/**
-     * Creates a new InternetTime object.
+    /**
+     * Creates InternetTime from raw milliseconds (SI).
+     * 
+     * @param siMillis standard milliseconds
+     * @throws IllegalArgumentException if siMillis is negative
+     */
+    public InternetTime(double siMillis) {
+        if (siMillis < 0) {
+            throw new IllegalArgumentException("Milliseconds cannot be negative");
+        }
+        initFromSiMillis(siMillis);
+    }
+
+    /**
+     * Creates InternetTime representing the current moment.
      */
     public InternetTime() {
-        this(getCurrentInternetTime());
+        this((double) System.currentTimeMillis());
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Amount<Duration> getTime() {
-        return Amount.valueOf(millis, DAYS_TICKS_MILLIS);
+    private void initFromComponents(double days, double beats, double millibeats) {
+        this.millibeats = (int) (millibeats % 1000);
+        beats += millibeats / 1000;
+        this.beats = (int) (beats % BEATS_PER_DAY);
+        this.days = (int) (days + beats / BEATS_PER_DAY);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    private void initFromSiMillis(double siMillis) {
+        double bmtMillis = (siMillis + 3600000.0); // UTC+1
+        this.days = (int) (bmtMillis / MILLIS_PER_DAY);
+        double dayMillis = bmtMillis % MILLIS_PER_DAY;
+        double totalBeats = dayMillis / 86400.0;
+        this.beats = (int) totalBeats;
+        this.millibeats = (int) ((totalBeats - beats) * 1000.0);
+    }
+
+    @Override
+    public Amount<Time> getTime() {
+        long totalMillibeats = (long)days * BEATS_PER_DAY * 1000L + (long)beats * 1000L + millibeats;
+        return Amount.valueOf(totalMillibeats, MILLI_BEAT);
+    }
+
+    @Override
     public int getMilliseconds() {
-        return millis;
+        return millibeats;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public int getSeconds() {
-        return ticks;
+        return beats;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public int getMinutes() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Internet Time does not use minutes");
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public int getHours() {
-        throw new UnsupportedOperationException();
-     }
+        throw new UnsupportedOperationException("Internet Time does not use hours");
+    }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public int getDays() {
         return days;
     }
 
-    /**
-     * DOCUMENT ME!
-     */
+    @Override
     public void nextMillisecond() {
-        millis += 1;
-
-        if (millis > MILLISECONDS_PER_TICK) {
-            millis = 0;
-            ticks += 1;
-
-            if (ticks > TICKS_PER_DAY) {
-                        ticks = 0;
-                        days += 1;
-                    }
-                }
+        millibeats++;
+        if (millibeats >= 1000) {
+            millibeats = 0;
+            nextSecond();
         }
+    }
 
-    /**
-     * DOCUMENT ME!
-     */
+    @Override
     public void nextSecond() {
-        ticks += 1;
+        beats++;
+        if (beats >= BEATS_PER_DAY) {
+            beats = 0;
+            days++;
+        }
+    }
 
-if (ticks > TICKS_PER_DAY) {
-             ticks = 0;
-             days += 1;
-         }
-     }
-    /**
-     * DOCUMENT ME!
-     */
+    @Override
     public void nextMinute() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Internet Time does not use minutes");
     }
 
-    /**
-     * DOCUMENT ME!
-     */
+    @Override
     public void nextHour() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Internet Time does not use hours");
     }
 
-    /**
-     * DOCUMENT ME!
-     */
+    @Override
     public void nextDay() {
-        days += 1;
+        days++;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public String toString() {
-        StringBuffer value;
-
-        value = new StringBuffer();
-        value.append(days);
-        value.append(" d ");
-        value.append(ticks);
-        value.append(" t ");
-        value.append(millis);
-        value.append(" ms");
-
-        return value.toString();
-    }
-
-   /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    private static long getCurrentDayMillis() {
-        long l = System.currentTimeMillis();
-
-        return (l + 0x36ee80L) % 0x5265c00L;
+        return String.format("%d d @%03d.%03d", days, beats, millibeats);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the current Internet Time beat as an integer.
+     * 
+     * @return current beat (0-999)
      */
-    public static int getCurrentInternetTime() {
-        int i = (int) (getCurrentDayMillis() / 0x15180L);
-
-        if (i >= 1000) {
-            i = 0;
-        }
-
-        return i;
+    public static int getCurrentBeat() {
+        long bmtMillis = (System.currentTimeMillis() + 3600000L) % MILLIS_PER_DAY;
+        return (int) (bmtMillis / 86400L);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Formats the current Internet Time.
+     * 
+     * @return current time string (e.g. "@123")
      */
-    public static String getCurrentInternetTimeAsString() {
-        int i = getCurrentInternetTime();
-        String s = String.valueOf(i);
-
-        if (s.length() == 1) {
-            s = "00" + s;
-        }
-
-        if (s.length() == 2) {
-            s = "0" + s;
-        }
-
-        s = "@" + s;
-
-        return s;
+    public static String getCurrentTimeDisplay() {
+        return String.format("@%03d", getCurrentBeat());
     }
-
 }

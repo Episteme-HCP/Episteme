@@ -79,6 +79,11 @@ public class GeoJSONReader extends AbstractResourceReader<List<Region>> {
     }
 
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"RFC 7946", "1.0"};
+    }
+
+    @Override
     protected List<Region> loadFromSource(String id) throws Exception {
         try (InputStream is = getClass().getResourceAsStream(id)) {
             if (is == null) {

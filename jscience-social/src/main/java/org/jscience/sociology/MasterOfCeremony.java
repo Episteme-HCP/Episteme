@@ -23,24 +23,40 @@
 
 package org.jscience.sociology;
 
+import java.io.Serializable;
+import org.jscience.biology.Individual;
 import org.jscience.economics.Organization;
 
 /**
- * A role for the person leading a celebration.
+ * A specialized role for the person leading, organizing, or officiating a celebration or event.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
-public class MasterOfCeremony extends Role {
+public class MasterOfCeremony extends Role implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final Organization organization;
 
-    public MasterOfCeremony(Person person, Situation situation, Organization organization) {
-        super(person, "Master of Ceremony", situation, Role.SUPERVISOR);
+    /**
+     * Creates a new MasterOfCeremony.
+     *
+     * @param individual   the individual performing the role
+     * @param situation    the event or celebration
+     * @param organization the organization managing or sponsoring the event (can be null)
+     */
+    public MasterOfCeremony(Individual individual, Situation situation, Organization organization) {
+        super(individual, "Master of Ceremony", situation, Role.SUPERVISOR);
         this.organization = organization;
     }
 
+    /**
+     * Returns the sponsoring organization, if any.
+     * @return the organization or null
+     */
     public Organization getOrganization() {
         return organization;
     }

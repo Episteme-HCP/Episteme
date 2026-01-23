@@ -32,7 +32,7 @@ import java.util.Vector;
  * @author Silvere Martin-Michiellot
  * @version 1.0
  */
-public class Item extends org.jscience.economics.resources.Object {
+public class Item extends org.jscience.economics.resources.PhysicalObject {
     //what can be done on site
     //items have no name since this could be misleading the correct description of the object. Actuals users of this package, send me an email if really this is bothering you too much.
     /** DOCUMENT ME! */

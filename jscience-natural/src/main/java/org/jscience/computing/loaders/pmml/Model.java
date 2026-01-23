@@ -1,0 +1,75 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ */
+
+package org.jscience.computing.loaders.pmml;
+
+import java.util.*;
+
+/** Predictive model representation. */
+public class Model {
+    private String type;
+    private String modelName;
+    private String functionName;
+    private String targetField;
+    private String activationFunction;
+    private String splitCharacteristic;
+    private double intercept;
+    private int layerCount;
+    private int clusterCount;
+    private TreeNode rootNode;
+    private final Map<String, Double> coefficients = new LinkedHashMap<>();
+    private final Map<String, String> miningFields = new LinkedHashMap<>();
+
+    public String getType() { return type; }
+    public void setType(String t) { this.type = t; }
+    
+    public String getModelName() { return modelName; }
+    public void setModelName(String n) { this.modelName = n; }
+    
+    public String getFunctionName() { return functionName; }
+    public void setFunctionName(String f) { this.functionName = f; }
+    
+    public String getTargetField() { return targetField; }
+    public void setTargetField(String t) { this.targetField = t; }
+    
+    public String getActivationFunction() { return activationFunction; }
+    public void setActivationFunction(String a) { this.activationFunction = a; }
+    
+    public String getSplitCharacteristic() { return splitCharacteristic; }
+    public void setSplitCharacteristic(String s) { this.splitCharacteristic = s; }
+    
+    public double getIntercept() { return intercept; }
+    public void setIntercept(double i) { this.intercept = i; }
+    
+    public int getLayerCount() { return layerCount; }
+    public void setLayerCount(int c) { this.layerCount = c; }
+    
+    public int getClusterCount() { return clusterCount; }
+    public void setClusterCount(int c) { this.clusterCount = c; }
+    
+    public TreeNode getRootNode() { return rootNode; }
+    public void setRootNode(TreeNode n) { this.rootNode = n; }
+    
+    public void addCoefficient(String name, double value) { coefficients.put(name, value); }
+    public Map<String, Double> getCoefficients() { return Collections.unmodifiableMap(coefficients); }
+    
+    public void addMiningField(String name, String usage) { miningFields.put(name, usage); }
+    public Map<String, String> getMiningFields() { return Collections.unmodifiableMap(miningFields); }
+    
+    /** Predict for regression model. */
+    public double predictRegression(Map<String, Double> inputs) {
+        double result = intercept;
+        for (Map.Entry<String, Double> coef : coefficients.entrySet()) {
+            Double inputVal = inputs.get(coef.getKey());
+            if (inputVal != null) {
+                result += coef.getValue() * inputVal;
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public String toString() { return type + "{" + modelName + ", function=" + functionName + "}"; }
+}

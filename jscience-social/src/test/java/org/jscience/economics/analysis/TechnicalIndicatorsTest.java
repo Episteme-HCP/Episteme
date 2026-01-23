@@ -27,8 +27,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.jscience.economics.loaders.FinancialMarketReader;
-import org.jscience.economics.Money;
-import org.jscience.economics.Currency;
+import org.jscience.economics.money.Money;
+import org.jscience.economics.money.Currency;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.history.TimePoint;
 

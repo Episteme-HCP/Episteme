@@ -24,7 +24,7 @@
 package org.jscience.biology;
 
 import org.jscience.biology.genetics.BioSequence;
-import org.jscience.util.identity.Identifiable;
+import org.jscience.util.identity.Identified;
 import org.jscience.util.Named;
 
 /**
@@ -50,7 +50,7 @@ import org.jscience.util.Named;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Virus implements Identifiable<String>, Named {
+public class Virus implements Identified<String>, Named {
 
     /**
      * Virus lifecycle stages.

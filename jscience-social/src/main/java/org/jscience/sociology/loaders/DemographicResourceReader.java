@@ -20,6 +20,7 @@ public final class DemographicResourceReader extends AbstractResourceReader<Demo
     @Override public String getLongDescription() { return "Supports individual group analysis and aggregated demographic pyramids."; }
     @Override public String getResourcePath() { return "data/sociology"; }
     @Override public Class<DemographicData> getResourceType() { return DemographicData.class; }
+    @Override public String[] getSupportedVersions() { return new String[] {"1.0"}; }
 
     @Override
     protected DemographicData loadFromSource(String id) throws Exception {

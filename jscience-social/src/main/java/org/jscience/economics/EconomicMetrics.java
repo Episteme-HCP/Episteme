@@ -1,45 +1,69 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.economics;
 
-import org.jscience.mathematics.numbers.real.Real;
-import java.util.List;
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * Economic metrics and inequality analysis.
+ * Calculates economic metrics and population-wide indicators such as the Gini coefficient.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
 public final class EconomicMetrics {
 
     private EconomicMetrics() {}
 
     /**
-     * Calculates the Gini coefficient for a population's income distribution.
-     * G = (sum|xi - xj|) / (2 * n^2 * mean)
+     * Calculates the Gini coefficient for reaching a value between 0.0 (perfect equality) 
+     * and 1.0 (perfect inequality).
      * 
-     * @param incomes List of individual incomes.
-     * @return Gini coefficient (0.0 for perfect equality, 1.0 for perfect inequality).
+     * @param incomes individual income data points
+     * @return the Gini index as a Real number
      */
     public static Real giniCoefficient(List<Real> incomes) {
-        if (incomes == null || incomes.size() < 2) return Real.of(0.0);
+        if (incomes == null || incomes.size() < 2) return Real.ZERO;
         
-        List<Real> sortedIncomes = new ArrayList<>(incomes);
-        Collections.sort(sortedIncomes, (a, b) -> a.compareTo(b));
+        List<Real> sorted = new ArrayList<>(incomes);
+        Collections.sort(sorted, Real::compareTo);
         
-        int n = sortedIncomes.size();
-        Real sumOfAbsoluteDifferences = Real.of(0.0);
-        Real sumOfIncomes = Real.of(0.0);
+        int n = sorted.size();
+        Real sumOfIncomes = Real.ZERO;
+        Real weightedSum = Real.ZERO;
         
         for (int i = 0; i < n; i++) {
-            sumOfIncomes = sumOfIncomes.add(sortedIncomes.get(i));
-            // Optimization for Gini formula: sum( (2i - n - 1) * yi )
+            sumOfIncomes = sumOfIncomes.add(sorted.get(i));
             Real weight = Real.of(2 * (i + 1) - n - 1);
-            sumOfAbsoluteDifferences = sumOfAbsoluteDifferences.add(weight.multiply(sortedIncomes.get(i)));
+            weightedSum = weightedSum.add(weight.multiply(sorted.get(i)));
         }
         
-        Real mean = sumOfIncomes.divide(Real.of(n));
-        if (mean.compareTo(Real.of(0.0)) == 0) return Real.of(0.0);
-        
-        // G = sumAbDiff / (n * sumIncomes)
-        return sumOfAbsoluteDifferences.divide(Real.of(n).multiply(sumOfIncomes));
+        if (sumOfIncomes.isZero()) return Real.ZERO;
+        return weightedSum.divide(Real.of(n).multiply(sumOfIncomes));
     }
 }

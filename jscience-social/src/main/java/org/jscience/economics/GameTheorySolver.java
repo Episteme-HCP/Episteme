@@ -1,21 +1,53 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.economics;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import org.jscience.mathematics.numbers.real.Real;
-import java.util.*;
 
 /**
- * Solves for Nash Equilibrium and other game theory concepts.
+ * Specialized utility for solving matrix-form games and identifying strategic equilibria.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
 public final class GameTheorySolver {
 
     private GameTheorySolver() {}
 
-    public record Payoff(double playerA, double playerB) {}
+    /** Data structure for 2-player payoff entries. */
+    public record Payoff(double playerA, double playerB) implements Serializable {}
 
     /**
-     * Finds Pure Strategy Nash Equilibria in a 2x2 matrix game.
+     * Finds index pairs (row, col) representing pure Nash Equilibria.
      */
     public static List<int[]> findPureNashEquilibria(Payoff[][] matrix) {
+        if (matrix == null || matrix.length == 0) return List.of();
         List<int[]> equilibria = new ArrayList<>();
         int rows = matrix.length;
         int cols = matrix[0].length;
@@ -31,53 +63,25 @@ public final class GameTheorySolver {
     }
 
     private static boolean isBestResponseA(Payoff[][] matrix, int row, int col) {
-        double currentPayoff = matrix[row][col].playerA();
+        double current = matrix[row][col].playerA();
         for (int i = 0; i < matrix.length; i++) {
-            if (matrix[i][col].playerA() > currentPayoff) return false;
+            if (matrix[i][col].playerA() > current) return false;
         }
         return true;
     }
 
     private static boolean isBestResponseB(Payoff[][] matrix, int row, int col) {
-        double currentPayoff = matrix[row][col].playerB();
+        double current = matrix[row][col].playerB();
         for (int j = 0; j < matrix[0].length; j++) {
-            if (matrix[row][j].playerB() > currentPayoff) return false;
+            if (matrix[row][j].playerB() > current) return false;
         }
         return true;
     }
 
-    /**
-     * Calculates Mixed Strategy Nash Equilibrium for a 2x2 zero-sum game.
-     * Returns probabilities for Player A.
-     */
-    public static Real[] solveMixed2x2(double[][] payoffsA) {
-        // Solving for p such that p*a + (1-p)*c = p*b + (1-p)*d
-        double a = payoffsA[0][0];
-        double b = payoffsA[0][1];
-        double c = payoffsA[1][0];
-        double d = payoffsA[1][1];
-
-        double p = (d - c) / (a - b - c + d);
-        return new Real[]{Real.of(p), Real.of(1 - p)};
-    }
-
-    /**
-     * Models the Tragedy of the Commons.
-     * Utility = (Value * Users) / Users - Cost(Users)
+    /** 
+     * Calculates the Tragedy of the Commons payoff for a given number of users.
      */
     public static Real calculateCommonsPayoff(int users, double resourceValue, double baseCost) {
-        // Simplified: value increases with users but cost increases quadratically
-        double payoff = resourceValue - baseCost * users;
-        return Real.of(payoff);
-    }
-
-    /**
-     * Classic Prisoner's Dilemma matrix.
-     */
-    public static Payoff[][] prisonersDilemma() {
-        return new Payoff[][] {
-            { new Payoff(-1, -1), new Payoff(-3, 0) }, // [Cooperate, Cooperate], [Cooperate, Defect]
-            { new Payoff(0, -3),  new Payoff(-2, -2) }  // [Defect, Cooperate], [Defect, Defect]
-        };
+        return Real.of(resourceValue - (baseCost * users));
     }
 }

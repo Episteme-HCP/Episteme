@@ -5,8 +5,6 @@ import org.jscience.biology.human.Human;
 import org.jscience.economics.Organization;
 import org.jscience.economics.Property;
 
-import org.jscience.measure.Amount;
-
 import java.util.Iterator;
 import java.util.Set;
 
@@ -39,7 +37,7 @@ public final class Share extends Object implements Property {
     private Organization company;
 
     /** DOCUMENT ME! */
-    private Amount<Money> currentValue;
+    private Money currentValue;
 
     //this is one share
     /**
@@ -51,7 +49,7 @@ public final class Share extends Object implements Property {
      * @param currentValue DOCUMENT ME!
      */
     public Share(Set owners, String symbol, Organization company,
-        Amount<Money> currentValue) {
+        Money currentValue) {
         Iterator iterator;
         boolean valid;
 
@@ -112,7 +110,7 @@ public final class Share extends Object implements Property {
      *
      * @return DOCUMENT ME!
      */
-    public final Amount<Money> getValue() {
+    public final Money getValue() {
         return currentValue;
     }
 }

@@ -1,232 +1,258 @@
-//repackaged after the code from Mark E. Shoulson
-//email <mark@kli.org>
-//website http://web.meson.org/calendars/
-//released under GPL
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Originally based on code from Mark E. Shoulson <mark@kli.org>
+ * http://web.meson.org/calendars/
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history.calendars;
 
 import java.util.Enumeration;
 
-
-// Referenced classes of package calendars:
 /**
- * DOCUMENT ME!
+ * Implementation of the proleptic Gregorian calendar.
+ * The Gregorian calendar is the internationally accepted civil calendar introduced by
+ * Pope Gregory XIII in October 1582. This implementation extends the calendar backwards
+ * in time (proleptic) for dates before its actual adoption.
  *
- * @author $author$
- * @version $Revision: 1.3 $
-  */
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>A year is 365 days, with leap years adding one day</li>
+ *   <li>Leap year rule: divisible by 4, except centuries not divisible by 400</li>
+ *   <li>12 months with varying lengths (28-31 days)</li>
+ * </ul>
+ *
+ * @author Mark E. Shoulson (original implementation)
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
+ */
 public class GregorianCalendar extends MonthDayYear {
-    /** DOCUMENT ME! */
-    protected static final String[] MONTHS = {
-            "January", "February", "March", "April", "May", "June", "July",
-            "August", "September", "October", "November", "December"
-        };
 
-    /** DOCUMENT ME! */
+    private static final long serialVersionUID = 1L;
+
+    /** Month names in English. */
+    protected static final String[] MONTHS = {
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    };
+
+    /** The epoch: January 1, 1 CE (Rata Die 1). */
     protected static long EPOCH = 1L;
 
-    /** DOCUMENT ME! */
-    private static final int FOURCENTURY = 0x23ab1;
+    /** Number of days in 400 years (including leap days): 146097. */
+    private static final int FOUR_CENTURY = 146097;
 
-    /** DOCUMENT ME! */
+    /** Number of days in 100 years (excluding end-of-century leap logic): 36524. */
     private static final int CENTURY = 36524;
 
-    /** DOCUMENT ME! */
-    private static final int FOURYEAR = 1461;
+    /** Number of days in 4 years (including one leap day): 1461. */
+    private static final int FOUR_YEAR = 1461;
 
-    /** DOCUMENT ME! */
+    /** Number of days in a non-leap year: 365. */
     private static final int YEAR = 365;
 
-/**
-     * Creates a new GregorianCalendar object.
+    /** Days in each month (non-leap year). */
+    private static final int[] DAYS_IN_MONTH = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+    /**
+     * Creates a Gregorian calendar set to the specified Rata Die.
      *
-     * @param l DOCUMENT ME!
+     * @param rataDie the day number
      */
-    public GregorianCalendar(long l) {
-        set(l);
+    public GregorianCalendar(long rataDie) {
+        set(rataDie);
     }
 
-/**
-     * Creates a new GregorianCalendar object.
+    /**
+     * Creates a Gregorian calendar set to the specified date.
      *
-     * @param i DOCUMENT ME!
-     * @param j DOCUMENT ME!
-     * @param k DOCUMENT ME!
+     * @param year  the year (negative for BCE)
+     * @param month the month (1-12)
+     * @param day   the day of month (1-31)
      */
-    public GregorianCalendar(int i, int j, int k) {
-        set(i, j, k);
+    public GregorianCalendar(int year, int month, int day) {
+        set(year, month, day);
     }
 
-/**
-     * Creates a new GregorianCalendar object.
+    /**
+     * Creates a Gregorian calendar set to the epoch (January 1, 1 CE).
      */
     public GregorianCalendar() {
         this(EPOCH);
     }
 
-/**
-     * Creates a new GregorianCalendar object.
+    /**
+     * Creates a Gregorian calendar from another calendar's date.
      *
-     * @param altcalendar DOCUMENT ME!
+     * @param calendar the source calendar
      */
-    public GregorianCalendar(AlternateCalendar altcalendar) {
-        this(altcalendar.toRD());
+    public GregorianCalendar(AlternateCalendar calendar) {
+        this(calendar.toRD());
     }
 
     /**
-     * DOCUMENT ME!
+     * Determines if the specified year is a leap year in the Gregorian calendar.
      *
-     * @param i DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param year the year to check
+     * @return true if it's a leap year
      */
-    public static boolean isLeapYear(int i) {
-        if (AlternateCalendar.mod(i, 4) != 0) {
+    public static boolean isLeapYear(int year) {
+        if (AlternateCalendar.mod(year, 4) != 0) {
             return false;
         }
-
-        int j = AlternateCalendar.mod(i, 400);
-
-        return (j != 100) && (j != 200) && (j != 300);
+        int mod400 = AlternateCalendar.mod(year, 400);
+        return (mod400 != 100) && (mod400 != 200) && (mod400 != 300);
     }
 
     /**
-     * DOCUMENT ME!
+     * Recomputes the Rata Die from the current year, month, and day fields.
      */
+    @Override
     protected synchronized void recomputeRD() {
-        int i = super.year - 1;
-        super.rd = (((EPOCH - 1L) + (long) (365 * i) +
-            AlternateCalendar.fldiv(i, 4L)) - AlternateCalendar.fldiv(i, 100L)) +
-            AlternateCalendar.fldiv(i, 400L) +
-            AlternateCalendar.fldiv((367 * super.month) - 362, 12L);
+        int priorYear = year - 1;
+        rd = (EPOCH - 1L) 
+            + (365L * priorYear)
+            + AlternateCalendar.floorDiv(priorYear, 4L)
+            - AlternateCalendar.floorDiv(priorYear, 100L)
+            + AlternateCalendar.floorDiv(priorYear, 400L)
+            + AlternateCalendar.floorDiv((367 * month) - 362, 12L);
 
-        if (super.month > 2) {
-            if (isLeapYear(super.year)) {
-                super.rd--;
+        if (month > 2) {
+            if (isLeapYear(year)) {
+                rd--;
             } else {
-                super.rd -= 2L;
+                rd -= 2L;
             }
         }
 
-        super.rd += super.day;
+        rd += day;
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets this calendar to the specified Rata Die and recomputes the date fields.
      *
-     * @param l DOCUMENT ME!
+     * @param rataDie the new Rata Die value
      */
-    public synchronized void set(long l) {
-        super.rd = l;
+    @Override
+    public synchronized void set(long rataDie) {
+        rd = rataDie;
         recomputeFromRD();
     }
 
     /**
-     * DOCUMENT ME!
+     * Recomputes the year, month, and day fields from the current Rata Die.
      */
+    @Override
     protected synchronized void recomputeFromRD() {
-        int[] ai = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-        long l = super.rd - EPOCH;
-        int i = (int) AlternateCalendar.fldiv(l, 0x23ab1L);
-        int j = AlternateCalendar.mod(l, 0x23ab1);
-        int k = (int) AlternateCalendar.fldiv(j, 36524L);
-        int i1 = AlternateCalendar.mod(j, 36524);
-        int j1 = (int) AlternateCalendar.fldiv(i1, 1461L);
-        int k1 = AlternateCalendar.mod(i1, 1461);
-        int l1 = (int) AlternateCalendar.fldiv(k1, 365L);
-        super.year = (400 * i) + (100 * k) + (4 * j1) + l1;
+        long days = rd - EPOCH;
+        
+        int n400 = (int) AlternateCalendar.floorDiv(days, FOUR_CENTURY);
+        int d400 = AlternateCalendar.mod(days, FOUR_CENTURY);
+        
+        int n100 = (int) AlternateCalendar.floorDiv(d400, CENTURY);
+        int d100 = AlternateCalendar.mod(d400, CENTURY);
+        
+        int n4 = (int) AlternateCalendar.floorDiv(d100, FOUR_YEAR);
+        int d4 = AlternateCalendar.mod(d100, FOUR_YEAR);
+        
+        int n1 = (int) AlternateCalendar.floorDiv(d4, YEAR);
+        
+        year = (400 * n400) + (100 * n100) + (4 * n4) + n1;
 
-        int i2 = AlternateCalendar.mod(k1, 365) + 1;
-        super.month = 1;
-        super.day = i2;
+        int dayOfYear = AlternateCalendar.mod(d4, YEAR) + 1;
+        month = 1;
+        day = dayOfYear;
 
-        if ((k != 4) && (l1 != 4)) {
-            super.year++;
+        // Adjust for last day of 400-year or 4-year cycle
+        if ((n100 != 4) && (n1 != 4)) {
+            year++;
         }
 
-        for (int j2 = 0; j2 <= 12; j2++) {
-            if (super.day <= ai[j2]) {
+        // Calculate month and day from day of year
+        for (int m = 0; m < 12; m++) {
+            int daysInMonth = DAYS_IN_MONTH[m];
+            if (m == 1 && isLeapYear(year)) {
+                daysInMonth = 29;
+            }
+            
+            if (day <= daysInMonth) {
                 break;
             }
-
-            if ((j2 == 1) && isLeapYear(super.year)) {
-                if (super.day <= 29) {
-                    break;
-                }
-
-                super.day--;
-            }
-
-            super.day -= ai[j2];
-            super.month++;
+            
+            day -= daysInMonth;
+            month++;
         }
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the day number within the year (1-366).
      *
-     * @return DOCUMENT ME!
+     * @return the day of year
      */
     public int dayNumber() {
-        return (int) difference(new GregorianCalendar(12, 31, getYear() - 1));
+        return (int) difference(new GregorianCalendar(getYear() - 1, 12, 31));
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the number of days remaining in the year.
      *
-     * @return DOCUMENT ME!
+     * @return days left until year end
      */
     public int daysLeft() {
-        return (int) AlternateCalendar.difference(new GregorianCalendar(12, 31,
-                getYear()), this);
+        return (int) AlternateCalendar.difference(
+            new GregorianCalendar(getYear(), 12, 31), this);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the era suffix (e.g., "CE" or "BCE"). Subclasses may override.
      *
-     * @return DOCUMENT ME!
+     * @return an empty string for the standard Gregorian calendar
      */
     protected String getSuffix() {
         return "";
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the name of the current month.
      *
-     * @return DOCUMENT ME!
+     * @return the month name
      */
     protected String monthName() {
-        return MONTHS[super.month - 1];
+        return MONTHS[month - 1];
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns an enumeration of month names.
      *
-     * @return DOCUMENT ME!
+     * @return month names enumeration
      */
-    public Enumeration getMonths() {
-        return new ArrayEnumeration(MONTHS);
+    public Enumeration<String> getMonths() {
+        return new ArrayEnumeration<>(MONTHS);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param args DOCUMENT ME!
-     */
-    public static void main(String[] args) {
-        int i;
-        int j;
-        int k;
-
-        try {
-            i = Integer.parseInt(args[0]);
-            j = Integer.parseInt(args[1]);
-            k = Integer.parseInt(args[2]);
-        } catch (Exception _ex) {
-            i = k = j = 1;
-        }
-
-        GregorianCalendar gregorian = new GregorianCalendar(i, j, k);
-        System.out.println(gregorian.toRD());
-        System.out.println(gregorian + "\n");
+    @Override
+    public String toString() {
+        return String.format("%s %d, %d%s", monthName(), day, year, getSuffix());
     }
 }

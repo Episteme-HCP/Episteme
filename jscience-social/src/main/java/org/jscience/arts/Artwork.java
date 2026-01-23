@@ -1,32 +1,51 @@
 package org.jscience.arts;
 
-import org.jscience.history.time.UncertainDate;
-import org.jscience.geography.Place;
-import org.jscience.economics.Money;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Objects;
+import java.util.UUID;
+import org.jscience.geography.Place;
+import org.jscience.economics.money.Money;
+import org.jscience.util.identity.Identified;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Relation;
 
 /**
  * A class representing a piece of art (Artwork).
- * Integrates history (UncertainDate), geography (Place), economics (Money), and scientific analysis.
+ * Integrates history (Instant), geography (Place), economics (Money), and scientific analysis.
  */
-public class Artwork {
+@Persistent
+public class Artwork implements Identified<String> {
 
+    @Id
+    private final String id;
+    @Attribute
     private final String name;
+    @Attribute
     private final String description;
-    private final UncertainDate productionDate;
+    @Attribute
+    private final Instant productionDate;
+    @Relation(type = Relation.Type.MANY_TO_ONE)
     private final Place productionPlace;
+    @Attribute
     private final ArtForm category;
 
+    @Attribute
     private final Set<String> authors; // Names of authors/artists
+    @Relation(type = Relation.Type.MANY_TO_ONE)
     private Money estimatedValue;
     
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private final Set<Analysis> analyses;
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private final Set<Restoration> restorations;
 
-    public Artwork(String name, String description, UncertainDate productionDate, Place productionPlace, ArtForm category) {
+    public Artwork(String name, String description, Instant productionDate, Place productionPlace, ArtForm category) {
+        this.id = UUID.randomUUID().toString();
         this.name = Objects.requireNonNull(name, "Name cannot be null");
         this.description = description;
         this.productionDate = productionDate;
@@ -37,6 +56,11 @@ public class Artwork {
         this.restorations = new HashSet<>();
     }
 
+    @Override
+    public String getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }
@@ -45,7 +69,7 @@ public class Artwork {
         return description;
     }
 
-    public UncertainDate getProductionDate() {
+    public Instant getProductionDate() {
         return productionDate;
     }
 

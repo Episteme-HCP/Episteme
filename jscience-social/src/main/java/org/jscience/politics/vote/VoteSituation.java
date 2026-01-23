@@ -1,334 +1,203 @@
+```
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.politics.vote;
 
-import org.jscience.biology.Individual;
-
+import org.jscience.biology.human.Human;
 import org.jscience.sociology.Situation;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-import java.util.Vector;
+import java.util.stream.Collectors;
 
 
 /**
- * This class represent a person in a voting situation. This class
- * represents all the information and process to collectively choose something
- * by people (ie: vote).
+ * Represents a collective decision-making process where individuals cast votes.
+ * This situation manages multiple rounds, ballot definitions, and voter participation.
+ * It is primarily designed for simulation and testing of various voting systems.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
-
-//see http://en.wikipedia.org/wiki/Voting_system
-//and http://en.wikipedia.org/wiki/Effects_of_different_voting_systems_under_similar_circumstances
-//inspired by http://www.cs.unc.edu/~wluebke/comp204/liberty/
-//this system is not a distributed real time system to be used in production environment
-//it is a simulation system (that offers the same functionality although not multi process or backed up by a database)
-//which aim is to help design or test voting systems and outcomes
 public abstract class VoteSituation extends Situation {
-    //results computation system
-    //mutually exclusive
-    //single
-    //public final static int BINARY_OTHER = 1000;
-    //public final static int BINARY_APPROVAL = 1001;
-    //public final static int BINARY_RUNOFF = 1002;
-    //public final static int BINARY_TOP_TWO = 1003;
-    //public final static int BINARY_RANDOM = 1004;
-    //public final static int RANKED_OTHER = 2000;
-    //public final static int RANKED_INSTANT_RUNOFF = 2001;
-    //public final static int RANKED_BORDA_COUNT = 2002;
-    //public final static int RANKED_COOMBS = 2003;
-    //public final static int RANKED_SUPPLEMENTARY = 2004;
-    //public final static int RANKED_BUCKLIN = 2005;
-    //public final static int CONDORCET_OTHER = 3000;
-    //public final static int CONDORCET_MINIMAX = 3001;
-    //public final static int CONDORCET_COPLEAND = 3002;
-    //public final static int CONDORCET_SCHULZE = 3003;
-    //public final static int CONDORCET_RANKED_PAIRS = 3004;
-    //public final static int RATED_OTHER = 4000;
-    //public final static int RATED_RANGE = 4001;
-    //public final static int RATED_CUMULATIVE = 4002;
-    //multiple
-    //public final static int PROPORTIONAL_OTHER = 10000;
-    //public final static int PROPORTIONAL_SINGLE_TRANSFERABLE = 10001;
-    //public final static int PROPORTIONAL_SAINTE_LAGUE = 10002;//PROPORTIONAL_HIGHEST_AVERAGE
-    //public final static int PROPORTIONAL_HONDT = 10003;//PROPORTIONAL_HIGHEST_AVERAGE
-    //public final static int PROPORTIONAL_LARGEST_REMAINDER = 10004;
-    //public final static int PARTLY_PROPORTIONAL_OTHER = 11000;
-    //public final static int PARTLY_PROPORTIONAL_CUMULATIVE = 11001;
-    //public final static int PARTLY_PROPORTIONAL_SINGLE_NON_TRANSFERABLE = 11002;
-    //public final static int NON_PROPORTIONAL_OTHER = 12000;
-    //public final static int NON_PROPORTIONAL_BLOC = 12001;
-    /** DOCUMENT ME! */
-    private Vector ballots;
 
-    /** DOCUMENT ME! */
-    private boolean closedRound;
+    private final List<Ballot> ballots;
+    private boolean roundClosed;
 
-/**
-     * Creates a new VoteSituation object.
+    /**
+     * Creates a new VoteSituation.
      *
-     * @param name     DOCUMENT ME!
-     * @param comments DOCUMENT ME!
+     * @param name     the name of the election/vote
+     * @param comments descriptive details
      */
     public VoteSituation(String name, String comments) {
         super(name, comments);
-        ballots = new Vector();
-        closedRound = false;
+        this.ballots = new ArrayList<>();
+        this.roundClosed = true; // Initially closed until a ballot is set
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param individual DOCUMENT ME!
+     * Adds a voter who chooses a single option randomly.
+     * @param human the individual
      */
-    public void addSingleChoiceRandomVoter(Individual individual) {
-        super.addRole(new SingleChoiceRandomVoter(individual, this));
+    public void addSingleChoiceRandomVoter(Human human) {
+        super.addRole(new SingleChoiceRandomVoter(human, this));
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param individual DOCUMENT ME!
+     * Adds a voter who chooses multiple options randomly.
+     * @param human the individual
      */
-    public void addMultipleChoicesRandomVoter(Individual individual) {
-        super.addRole(new MultipleChoicesRandomVoter(individual, this));
+    public void addMultipleChoicesRandomVoter(Human human) {
+        super.addRole(new MultipleChoicesRandomVoter(human, this));
     }
 
-    //actually starts a new round (and gives a new Ballot to fill to all voters)
     /**
-     * DOCUMENT ME!
+     * Sets the template ballot for a new round and distributes copies to all voters.
      *
-     * @param ballot DOCUMENT ME!
+     * @param ballot the master ballot for the round
+     * @throws IllegalArgumentException if the previous round is not yet closed
      */
     public void setBallotForRoundI(Ballot ballot) {
-        Iterator iterator;
-
-        if (ballot != null) {
-            if (isRoundClosed()) {
-                ballots.add(ballot);
-                iterator = getVoters().iterator();
-
-                while (iterator.hasNext()) {
-                    ((Voter) iterator.next()).setBallotForCurrentRound((Ballot) ballot.clone());
-                }
-
-                closedRound = false;
-            } else {
-                throw new IllegalArgumentException(
-                    "You can't add a new Ballot until the round is closed. Call closeVote() first or let people all vote.");
-            }
-        } else {
-            throw new IllegalArgumentException("You can't add a null Ballot.");
+        Objects.requireNonNull(ballot, "Ballot cannot be null.");
+        
+        if (!isRoundClosed()) {
+            throw new IllegalArgumentException("Cannot start a new round until the current one is closed.");
         }
+
+        ballots.add(ballot);
+        Set<Voter> voters = getVoters();
+        for (Voter voter : voters) {
+            voter.setBallotForCurrentRound(ballot.clone());
+        }
+        roundClosed = false;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the current round number (1-indexed).
+     * @return current round
      */
     public int getCurrentRoundNumber() {
         return ballots.size();
     }
 
-    //you must call setBallotForCurrentRound() before this method
     /**
-     * DOCUMENT ME!
-     *
-     * @param i DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Retrieves the master ballot for a specific round.
+     * @param i the round number (1-indexed)
+     * @return the ballot
      */
     public Ballot getBallotForRoundI(int i) {
-        return (Ballot) ballots.get(i - 1);
+        return ballots.get(i - 1);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns all master ballots used in the election.
+     * @return list of ballots
      */
-    public Vector getBallots() {
-        return ballots;
+    public List<Ballot> getBallots() {
+        return Collections.unmodifiableList(ballots);
     }
 
-    //you must call setBallotForCurrentRound() before this method
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the template ballot for the current round.
+     * @return current master ballot
      */
     public Ballot getCurrentBallot() {
-        return (Ballot) ballots.get(ballots.size() - 1);
+        if (ballots.isEmpty()) return null;
+        return ballots.get(ballots.size() - 1);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the set of all voters currently registered in this situation.
+     * @return set of voters
      */
-    public Set getVoters() {
-        Iterator iterator;
-        Object value;
-        Set result;
-
-        iterator = getRoles().iterator();
-        result = Collections.EMPTY_SET;
-
-        while (iterator.hasNext()) {
-            value = iterator.next();
-
-            if (value instanceof Voter) {
-                result.add(value);
-            }
-        }
-
-        return result;
+    public Set<Voter> getVoters() {
+        return getRoles().stream()
+                .filter(Voter.class::isInstance)
+                .map(Voter.class::cast)
+                .collect(Collectors.toSet());
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param voter DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Triggers the voting action for a specific voter.
+     * @param voter the voter casting a ballot
      */
     public void vote(Voter voter) {
-        if (voter != null) {
-            if (getRoles().contains(voter)) {
-                voter.select();
-                voter.vote();
-            } else {
-                throw new IllegalArgumentException("Only voters can vote.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "You can't make vote a null voter.");
+        Objects.requireNonNull(voter, "Voter cannot be null.");
+        if (!getRoles().contains(voter)) {
+            throw new IllegalArgumentException("Individual is not a registered voter in this situation.");
         }
+        voter.select();
+        voter.vote();
     }
 
-    //Returns whether a voter has voted or not for this round.
     /**
-     * DOCUMENT ME!
-     *
-     * @param voter DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Checks if a specific voter has already cast their ballot for the current round.
+     * @param voter the voter to check
+     * @return true if voted
      */
     public boolean getVotedStatus(Voter voter) {
-        if (voter != null) {
-            return voter.hasVotedAtRoundI(getCurrentRoundNumber());
-        } else {
-            throw new IllegalArgumentException(
-                "You can't get the status of a null voter.");
-        }
+        Objects.requireNonNull(voter, "Voter cannot be null.");
+        return voter.hasVotedAtRoundI(getCurrentRoundNumber());
     }
 
-    //returns whether this round is over or not
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Checks if the current round is closed.
+     * A round is considered closed if explicitly called or if all voters have finished.
+     * @return true if closed
      */
     public boolean isRoundClosed() {
-        Iterator iterator;
-        boolean found;
+        if (roundClosed) return true;
+        
+        Set<Voter> voters = getVoters();
+        if (voters.isEmpty()) return true;
 
-        if (closedRound) {
-            return true;
-        } else {
-            iterator = getVoters().iterator();
-            found = false;
-
-            while (iterator.hasNext() && !found) {
-                found = ((Voter) iterator.next()).hasVotedAtRoundI(getCurrentRoundNumber());
-            }
-
-            return !found;
-        }
+        return voters.stream().allMatch(v -> v.hasVotedAtRoundI(getCurrentRoundNumber()));
     }
 
     /**
-     * DOCUMENT ME!
+     * Manually closes the current voting round.
      */
     public void closeRound() {
-        closedRound = true;
+        this.roundClosed = true;
     }
 
-    //this is a rather useless convenience method
     /**
-     * DOCUMENT ME!
+     * Processes the results of a specific round using the provided algorithm.
      *
-     * @param method DOCUMENT ME!
-     * @param round DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param processor the algorithm to use for counting
+     * @param round     the round to process
+     * @return true if a next round is required according to the processor
      */
-    public boolean processResult(BallotsProcessor method, int round) {
-        Set valids;
-
-        //Ballot resultBallot;
-        boolean otherRound;
-
-        if (method != null) {
-            valids = method.validateBallots(getVoters(), round);
-
-            //resultBallot = method.getResults();
-            return otherRound = method.shouldProceedToNextRound();
-        } else {
-            throw new IllegalArgumentException(
-                "You can't get a result with a null method.");
-        }
+    public boolean processResult(BallotsProcessor processor, int round) {
+        Objects.requireNonNull(processor, "Processor cannot be null.");
+        processor.validateBallots(getVoters(), round);
+        return processor.shouldProceedToNextRound();
     }
-
-    //unused from liberty:
-    //Adds a choice to the choice database.
-    //public void addChoice(String title, String prompt, List<String> options) {
-    //}
-    //_Factory Method_ for creating a ChoicesConnection object.
-    //public static ChoicesConnection create(String databaseURL) {
-    //}
-    //Returns the options for a choice from the database.
-    //public List<String> getChoiceOptions(String title) {
-    //}
-    //Returns the prompt for a choice from the database.
-    //public String getChoicePrompt(String title) {
-    //}
-    //Returns a list of titles from the database.
-    //public List<String> getChoiceTitles() {
-    //}
-    //Initializes the internal connection object with the specified database URL.
-    //protected void initialize(String databaseURL) {
-    //}
-    //Removes a choice from the database, or throws an exception if the choice does not exist in the database.
-    //public void removeChoice(String title) {
-    //}
-    //Returns the options for a choice from the database.
-    //public List<String> getChoiceOptions(String title) {
-    //}
-    //Returns the number of votes for the specified option of the choice with the specified title.
-    //public long getChoiceOptionTally(String title, String option) {
-    //}
-    //Returns the prompt for a choice from the database.
-    //public String getChoicePrompt(String title) {
-    //}
-    //Returns a list of titles from the database.
-    //public List<String> getChoiceTitles() {
-    //}
-    //Returns whether a voter has voted or not.
-    //public boolean getVotedStatus(String firstName, String middleName, String lastName, String ssn) {
-    //}
-    //Increments the number of votes for the specified option of the choice with the specified title.
-    //public void incrementChoiceOption(String title, String option) {
-    //}
-    //Initializes the internal connection objects.
-    //protected void initialize() {
-    //}
-    //Returns whether or not the voter with the specified name and social security number is registered in the database.
-    //public boolean isVoterRegistered(String firstName, String middleName, String lastName, String ssn) {
-    //}
-    //Called to record whether a voter has voted with the system.
-    //public void setVotedStatus(String firstName, String middleName, String lastName, String ssn, boolean voted) {
-    //}
 }
+```

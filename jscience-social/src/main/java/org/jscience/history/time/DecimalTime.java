@@ -1,338 +1,232 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history.time;
 
 import org.jscience.measure.Amount;
-
+import org.jscience.measure.Unit;
+import org.jscience.measure.StandardUnit;
+import org.jscience.measure.Dimension;
+import org.jscience.measure.quantity.Time;
+import java.io.Serializable;
 import java.util.Calendar;
-
-import javax.measure.quantity.Duration;
-import javax.measure.unit.BaseUnit;
-import javax.measure.unit.Unit;
-
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
 
 /**
- * A class representing a way to compute time.
+ * Represents time using a decimal system (10h/100m/100s per day).
+ * Primarily based on the French Revolutionary Time system.
+ * <p>
+ * One decimal second is exactly 0.864 standard seconds.
+ * One decimal hour is exactly 2.4 standard hours.
+ * </p>
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.2
+ * @since 1.0
+ * @see <a href="http://en.wikipedia.org/wiki/Decimal_time">Decimal Time (Wikipedia)</a>
  */
+@Persistent
+public class DecimalTime extends org.jscience.history.time.Time {
 
-//  http://en.wikipedia.org/wiki/Clock
-//http://en.wikipedia.org/wiki/10-hour_clock
-//Decimal to Standard
+    private static final long serialVersionUID = 1L;
 
-// One decimal second is 86,400/100,000 = 0.864 standard seconds.
-// One decimal minute is 1,440/1,000 = 1.44 standard minutes, or 1 standard minute and 26.4 standard seconds.
-// One decimal hour is 24/10 = 2.4 standard hours, or 2 standard hours and 24 standard minutes.
-//One hundredth of a day is 14 standard minutes 24 standard seconds, or approximately 15 minutes.
-
-// Standard to Decimal
-
-// One standard second = 1.15740 decimal seconds
-// One standard minute = 69.44 decimal seconds (or .69 decimal minutes)
-// One standard hour = 4,166.67 decimal seconds (or 41 decimal minutes and 67 decimal seconds)
-public class DecimalTime extends Time {
-    /** DOCUMENT ME! */
     public static final int HOURS_PER_DAY = 10;
-
-    /** DOCUMENT ME! */
     public static final int MINUTES_PER_HOUR = 100;
-
-    /** DOCUMENT ME! */
     public static final int SECONDS_PER_MINUTE = 100;
-
-    /** DOCUMENT ME! */
     public static final int MILLISECONDS_PER_SECOND = 1000;
 
-    /** The base unit for decimal seconds, which is 0.864 SI seconds. */
-    public static final BaseUnit<Duration> DECIMAL_SECOND = new BaseUnit<Duration>(
-            "s");
+    /** The base unit for decimal seconds (0.864 SI seconds). */
+    public static final Unit<Time> DECIMAL_SECOND = new StandardUnit<>("ds", "decimal second", Dimension.TIME);
 
-    /**
-     * A unit of duration equal to <code>1/1000 s</code> (standard name
-     * <code>ms</code>).
-     */
-    public static final Unit<Duration> DECIMAL_MILLISECOND = DECIMAL_SECOND.divide(MILLISECONDS_PER_SECOND);
+    /** Unit for one decimal millisecond. */
+    public static final Unit<Time> DECIMAL_MILLISECOND = DECIMAL_SECOND.divide(MILLISECONDS_PER_SECOND);
 
-    /**
-     * A unit of duration equal to <code>100 s</code> (standard name
-     * <code>min</code>).
-     */
-    public static final Unit<Duration> DECIMAL_MINUTE = DECIMAL_SECOND.times(SECONDS_PER_MINUTE);
+    /** Unit for one decimal minute (100 decimal seconds). */
+    public static final Unit<Time> DECIMAL_MINUTE = DECIMAL_SECOND.multiply(SECONDS_PER_MINUTE);
 
-    /**
-     * A unit of duration equal to <code>100 {@link
-     * #DECIMAL_MINUTE}</code> (standard name <code>h</code>).
-     */
-    public static final Unit<Duration> DECIMAL_HOUR = DECIMAL_MINUTE.times(MINUTES_PER_HOUR);
+    /** Unit for one decimal hour (100 decimal minutes). */
+    public static final Unit<Time> DECIMAL_HOUR = DECIMAL_MINUTE.multiply(MINUTES_PER_HOUR);
 
-    /**
-     * A unit of duration equal to <code>10 {@link
-     * #DECIMAL_HOUR}</code> (standard name <code>d</code>).
-     */
-    public static final Unit<Duration> DECIMAL_DAY = DECIMAL_HOUR.times(HOURS_PER_DAY);
+    /** Unit for one decimal day (10 decimal hours). */
+    public static final Unit<Time> DECIMAL_DAY = DECIMAL_HOUR.multiply(HOURS_PER_DAY);
 
-    /** DOCUMENT ME! */
-    public final static Unit<Duration> DAYS_HOURS_MINUTES_SECONDS_MILLIS = DECIMAL_DAY.compound(DECIMAL_HOUR)
-                                                                                   .compound(DECIMAL_MINUTE)
-                                                                                   .compound(DECIMAL_SECOND)
-                                                                                   .compound(DECIMAL_MILLISECOND);
+    private static final long MILLIS_PER_DAY = (long) HOURS_PER_DAY * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND;
+    private static final long MILLIS_PER_HOUR = (long) MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND;
+    private static final long MILLIS_PER_MINUTE = (long) SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND;
 
-    /** DOCUMENT ME! */
-    private static final long MILLISECONDS_PER_DAY = 10 * 100 * 100 * 1000L;
-
-    /** DOCUMENT ME! */
-    private static final long MILLISECONDS_PER_HOUR = 100 * 100 * 1000L;
-
-    /** DOCUMENT ME! */
-    private static final long MILLISECONDS_PER_MINUTE = 100 * 1000L;
-
-    /** DOCUMENT ME! */
+    @Attribute
     private int millis;
 
-    /** DOCUMENT ME! */
+    @Attribute
     private int seconds;
 
-    /** DOCUMENT ME! */
+    @Attribute
     private int minutes;
 
-    /** DOCUMENT ME! */
+    @Attribute
     private int hours;
 
-    /** DOCUMENT ME! */
+    @Attribute
     private int days;
 
-    //we could also offer constructor using Measure<Duration>
-/**
-          * Creates a new DecimalTime object.
-          *
-           */
-
-    //get sure it is positive
-    public DecimalTime(double days, double hours, double minutes,
-        double seconds, double millis) {
-        if ((days >= 0) && (hours >= 0) && (minutes >= 0) && (seconds >= 0) &&
-                (millis >= 0)) {
-            double time = (days * MILLISECONDS_PER_DAY) +
-                (hours * MILLISECONDS_PER_HOUR) +
-                (minutes * MILLISECONDS_PER_MINUTE) +
-                (seconds * MILLISECONDS_PER_SECOND) + millis;
-            this.millis = (int) (time % MILLISECONDS_PER_SECOND);
-            time /= MILLISECONDS_PER_SECOND;
-            this.seconds = (int) (time % SECONDS_PER_MINUTE);
-            time /= SECONDS_PER_MINUTE;
-            this.minutes = (int) (time % MINUTES_PER_HOUR);
-            time /= MINUTES_PER_HOUR;
-            this.hours = (int) (time % HOURS_PER_DAY);
-            this.days = (int) (time / HOURS_PER_DAY);
-        } else {
-            throw new IllegalArgumentException(
-                "Days, hours, minutes, seconds and millis must be greater or equal to zero.");
+    /**
+     * Creates DecimalTime from components.
+     * 
+     * @param days days
+     * @param hours decimal hours (0-9)
+     * @param minutes decimal minutes (0-99)
+     * @param seconds decimal seconds (0-99)
+     * @param millis decimal milliseconds (0-999)
+     * @throws IllegalArgumentException if any value is negative
+     */
+    public DecimalTime(double days, double hours, double minutes, double seconds, double millis) {
+        if (days < 0 || hours < 0 || minutes < 0 || seconds < 0 || millis < 0) {
+            throw new IllegalArgumentException("Time components cannot be negative");
         }
+        double total = (days * MILLIS_PER_DAY) + (hours * MILLIS_PER_HOUR) +
+                       (minutes * MILLIS_PER_MINUTE) + (seconds * MILLISECONDS_PER_SECOND) + millis;
+        initFromMillis(total);
     }
 
-    //in milliseconds
-/**
-          * Creates a new DecimalTime object.
-          *
-          * @param millis DOCUMENT ME!
-          */
-
-    //get sure it is positive
+    /**
+     * Creates DecimalTime from total decimal milliseconds.
+     * 
+     * @param millis total milliseconds
+     * @throws IllegalArgumentException if millis is negative
+     */
     public DecimalTime(double millis) {
-        if (millis >= 0) {
-            this.millis = (int) (millis % MILLISECONDS_PER_SECOND);
-            millis /= MILLISECONDS_PER_SECOND;
-            this.seconds = (int) (millis % SECONDS_PER_MINUTE);
-            millis /= SECONDS_PER_MINUTE;
-            this.minutes = (int) (millis % MINUTES_PER_HOUR);
-            millis /= MINUTES_PER_HOUR;
-            this.hours = (int) (millis % HOURS_PER_DAY);
-            this.days = (int) (millis / HOURS_PER_DAY);
-        } else {
-            throw new IllegalArgumentException(
-                "Millis must be greater or equal to zero.");
+        if (millis < 0) {
+            throw new IllegalArgumentException("Decimal milliseconds cannot be negative");
         }
+        initFromMillis(millis);
     }
 
-    //using currenttime
-/**
-          * Creates a new DecimalTime object.
-          */
+    /**
+     * Creates DecimalTime with the current moment.
+     */
     public DecimalTime() {
-        this(System.currentTimeMillis());
+        this((double) System.currentTimeMillis());
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Amount<Duration> getTime() {
-        return Amount.valueOf(millis, DAYS_HOURS_MINUTES_SECONDS_MILLIS);
+    private void initFromMillis(double total) {
+        this.millis = (int) (total % MILLISECONDS_PER_SECOND);
+        total /= MILLISECONDS_PER_SECOND;
+        this.seconds = (int) (total % SECONDS_PER_MINUTE);
+        total /= SECONDS_PER_MINUTE;
+        this.minutes = (int) (total % MINUTES_PER_HOUR);
+        total /= MINUTES_PER_HOUR;
+        this.hours = (int) (total % HOURS_PER_DAY);
+        this.days = (int) (total / HOURS_PER_DAY);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
+    public Amount<Time> getTime() {
+        long totalMillis = (long)days * MILLIS_PER_DAY + (long)hours * MILLIS_PER_HOUR + 
+                          (long)minutes * MILLIS_PER_MINUTE + (long)seconds * MILLISECONDS_PER_SECOND + millis;
+        return Amount.valueOf(totalMillis, DECIMAL_MILLISECOND);
+    }
+
+    @Override
     public int getMilliseconds() {
         return millis;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public int getSeconds() {
         return seconds;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public int getMinutes() {
         return minutes;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public int getHours() {
         return hours;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public int getDays() {
         return days;
     }
 
-    /**
-     * DOCUMENT ME!
-     */
+    @Override
     public void nextMillisecond() {
-        millis += 1;
-
-        if (millis > MILLISECONDS_PER_SECOND) {
+        millis++;
+        if (millis >= MILLISECONDS_PER_SECOND) {
             millis = 0;
-            seconds += 1;
-
-            if (seconds > SECONDS_PER_MINUTE) {
-                seconds = 0;
-                minutes += 1;
-
-                if (minutes > MINUTES_PER_HOUR) {
-                    minutes = 0;
-                    hours += 1;
-
-                    if (hours > HOURS_PER_DAY) {
-                        hours = 0;
-                        days += 1;
-                    }
-                }
-            }
+            nextSecond();
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     */
+    @Override
     public void nextSecond() {
-        seconds += 1;
-
-        if (seconds > SECONDS_PER_MINUTE) {
+        seconds++;
+        if (seconds >= SECONDS_PER_MINUTE) {
             seconds = 0;
-            minutes += 1;
-
-            if (minutes > MINUTES_PER_HOUR) {
-                minutes = 0;
-                hours += 1;
-
-                if (hours > HOURS_PER_DAY) {
-                    hours = 0;
-                    days += 1;
-                }
-            }
+            nextMinute();
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     */
+    @Override
     public void nextMinute() {
-        minutes += 1;
-
-        if (minutes > MINUTES_PER_HOUR) {
+        minutes++;
+        if (minutes >= MINUTES_PER_HOUR) {
             minutes = 0;
-            hours += 1;
-
-            if (hours > HOURS_PER_DAY) {
-                hours = 0;
-                days += 1;
-            }
+            nextHour();
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     */
+    @Override
     public void nextHour() {
-        hours += 1;
-
-        if (hours > HOURS_PER_DAY) {
+        hours++;
+        if (hours >= HOURS_PER_DAY) {
             hours = 0;
-            days += 1;
+            days++;
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     */
+    @Override
     public void nextDay() {
-        days += 1;
+        days++;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Converts to a standard Java Calendar instance.
+     * 
+     * @return calendar
      */
     public Calendar toCalendar() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(0, 0, days, hours, minutes, seconds);
-
         return calendar;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public String toString() {
-        StringBuffer value;
-
-        value = new StringBuffer();
-        value.append(days);
-        value.append(" d ");
-        value.append(hours);
-        value.append(" h ");
-        value.append(minutes);
-        value.append(" m ");
-        value.append(seconds);
-        value.append(" s ");
-        value.append(millis);
-        value.append(" ms");
-
-        return value.toString();
+        return String.format("%d d %d h %d m %d s %d ms", days, hours, minutes, seconds, millis);
     }
 }

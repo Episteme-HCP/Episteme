@@ -36,16 +36,17 @@ import java.security.SecureRandom;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class SSNGenerator implements IdGenerator {
+public class SSNGenerator implements IDGenerator {
 
     private final SecureRandom random = new SecureRandom();
 
     @Override
-    public String generate() {
+    public Identification generate() {
         int area = 100 + random.nextInt(800); // 100-899
         int group = 10 + random.nextInt(90); // 10-99
         int serial = 1000 + random.nextInt(9000); // 1000-9999
-        return String.format("%03d-%02d-%04d", area, group, serial);
+        String value = String.format("%03d-%02d-%04d", area, group, serial);
+        return new SSNIdentification(value);
     }
 
     @Override

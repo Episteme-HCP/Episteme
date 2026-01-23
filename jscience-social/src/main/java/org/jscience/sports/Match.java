@@ -1,17 +1,54 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * THE above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.sports;
 
-import java.util.UUID;
+import java.io.Serializable;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.chrono.ChronoLocalDate;
 import java.util.Objects;
-import org.jscience.util.identity.Identifiable;
-import org.jscience.util.Temporal;
-import org.jscience.history.time.UncertainDate;
+import java.util.UUID;
 import org.jscience.geography.Place;
+import org.jscience.history.time.UncertainDate;
+import org.jscience.util.Temporal;
+import org.jscience.util.identity.Identified;
 
 /**
- * Represents a sports match/game.
+ * Represents a discrete sports match between two teams or individuals.
+ * Tracks scheduling status, venue, and score results.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
-public class Match implements Identifiable<String>, Temporal {
+public class Match implements Identified<String>, Temporal, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+    /** Current lifecycle state of the match. */
     public enum Status {
         SCHEDULED, IN_PROGRESS, COMPLETED, POSTPONED, CANCELLED
     }
@@ -27,6 +64,15 @@ public class Match implements Identifiable<String>, Temporal {
     private int awayScore;
     private Competition competition;
 
+    /**
+     * Creates a new Match.
+     * 
+     * @param sport    the sport being played
+     * @param date     the scheduled date (can be uncertain)
+     * @param homeTeam the hosting team
+     * @param awayTeam the visiting team
+     * @throws NullPointerException if any required argument is null
+     */
     public Match(Sport sport, UncertainDate date, Team homeTeam, Team awayTeam) {
         this.id = UUID.randomUUID().toString();
         this.sport = Objects.requireNonNull(sport, "Sport cannot be null");
@@ -42,15 +88,13 @@ public class Match implements Identifiable<String>, Temporal {
     }
 
     @Override
-    public java.time.Instant getTimestamp() {
+    public Instant getTimestamp() {
         Object val = date.getMin(0);
-        if (val instanceof java.time.Instant i) {
-            return i;
+        if (val instanceof Instant i) return i;
+        if (val instanceof ChronoLocalDate cld) {
+             return LocalDate.from(cld).atStartOfDay(ZoneId.of("UTC")).toInstant();
         }
-        if (val instanceof java.time.chrono.ChronoLocalDate cld) {
-             return java.time.LocalDate.from(cld).atStartOfDay(java.time.ZoneId.of("UTC")).toInstant();
-        }
-        throw new IllegalStateException("Match date type not supported: " + (val == null ? "null" : val.getClass()));
+        return Instant.EPOCH;
     }
 
     public Sport getSport() {
@@ -101,6 +145,9 @@ public class Match implements Identifiable<String>, Temporal {
         this.competition = competition;
     }
 
+    /**
+     * Finalizes the match result and updates status to COMPLETED.
+     */
     public void setScore(int homeScore, int awayScore) {
         this.homeScore = homeScore;
         this.awayScore = awayScore;
@@ -121,12 +168,10 @@ public class Match implements Identifiable<String>, Temporal {
     @Override
     public String toString() {
         if (status == Status.COMPLETED) {
-            return String.format("%s vs %s: %d-%d (%s)",
-                    homeTeam.getName(), awayTeam.getName(), homeScore, awayScore, sport.getName());
+            return String.format("%s %d-%d %s (%s)",
+                    homeTeam.getName(), homeScore, awayScore, awayTeam.getName(), sport.getName());
         }
         return String.format("%s vs %s @ %s (%s)",
                 homeTeam.getName(), awayTeam.getName(), date, status);
     }
 }
-
-

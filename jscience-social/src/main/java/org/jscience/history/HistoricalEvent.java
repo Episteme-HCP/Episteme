@@ -23,40 +23,95 @@
 
 package org.jscience.history;
 
+import java.io.Serializable;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.Objects;
+import java.util.UUID;
+import org.jscience.geography.Locatable;
+import org.jscience.geography.Place;
+import org.jscience.util.Temporal;
+import org.jscience.util.identity.Identified;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
+
 /**
- * Represents a historical event with fuzzy date support.
- * <p>
+ * Represents a significant historical event with support for imprecise dating.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
-public class HistoricalEvent implements org.jscience.util.identity.Identifiable<String>,
-        org.jscience.geography.Locatable, org.jscience.util.Temporal {
+@Persistent
+public class HistoricalEvent implements Identified<String>, Locatable, Temporal, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+    /** Event categories for filtering and analysis. */
     public enum Category {
         POLITICAL, MILITARY, CULTURAL, SCIENTIFIC, ECONOMIC, RELIGIOUS, NATURAL
     }
 
+    @Id
     private final String id;
-    private final String name;
-    private final String description;
-    private final FuzzyDate startDate;
-    private final FuzzyDate endDate;
-    private final Category category;
-    private final org.jscience.geography.Place location;
 
+    /** The display name of the event. */
+    @Attribute
+    private final String name;
+
+    /** Detailed description of the event. */
+    @Attribute
+    private final String description;
+
+    /** Start date of the event (possibly fuzzy). */
+    @Relation(type = Relation.Type.ONE_TO_ONE)
+    private final FuzzyDate startDate;
+
+    /** End date of the event (defaults to startDate if instantaneous). */
+    @Relation(type = Relation.Type.ONE_TO_ONE)
+    private final FuzzyDate endDate;
+
+    /** Category for classification. */
+    @Attribute
+    private final Category category;
+
+    /** Place where the event occurred. */
+    @Relation(type = Relation.Type.MANY_TO_ONE)
+    private final Place location;
+
+    /**
+     * Complete constructor for a historical event.
+     * 
+     * @param name common name
+     * @param description detailed text
+     * @param startDate when it started
+     * @param endDate when it ended (can be null for instantaneous events)
+     * @param category the category
+     * @param location the place
+     * @throws NullPointerException if any required argument is null
+     */
     public HistoricalEvent(String name, String description, FuzzyDate startDate, FuzzyDate endDate,
-            Category category, org.jscience.geography.Place location) {
-        this.id = java.util.UUID.randomUUID().toString();
-        this.name = name;
+            Category category, Place location) {
+        this.id = UUID.randomUUID().toString();
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
         this.description = description;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.category = category;
+        this.startDate = Objects.requireNonNull(startDate, "Start date cannot be null");
+        this.endDate = endDate != null ? endDate : startDate;
+        this.category = Objects.requireNonNull(category, "Category cannot be null");
         this.location = location;
     }
 
+    /**
+     * Short constructor for simpler events.
+     * 
+     * @param name common name
+     * @param date the date of the event
+     * @param category the category
+     * @throws NullPointerException if any required argument is null
+     */
     public HistoricalEvent(String name, FuzzyDate date, Category category) {
         this(name, null, date, date, category, null);
     }
@@ -87,34 +142,27 @@ public class HistoricalEvent implements org.jscience.util.identity.Identifiable<
     }
 
     @Override
-    public org.jscience.geography.Place getPosition() {
+    public Place getPosition() {
         return location;
     }
 
     @Override
-    public java.time.Instant getTimestamp() {
-        // Approximate conversion for Temporal interface
-        if (startDate != null) {
-            // Logic to convert FuzzyDate to Instant
-            // Assuming FuzzyDate has some conversion method or we construct it manually
-            // This is a placeholder logic, strictly we should use FuzzyDate's value
-            // Since I don't see FuzzyDate content, I'll assume standard conversion logic or
-            // best effort
-            java.util.Calendar cal = java.util.Calendar.getInstance();
-            cal.set(java.util.Calendar.YEAR, startDate.getYear());
-            if (startDate.getMonth() != null)
-                cal.set(java.util.Calendar.MONTH, startDate.getMonth() - 1);
-            if (startDate.getDay() != null)
-                cal.set(java.util.Calendar.DAY_OF_MONTH, startDate.getDay());
-            if (startDate.isBce())
-                cal.set(java.util.Calendar.ERA, java.util.GregorianCalendar.BC);
-            return cal.toInstant();
+    public Instant getTimestamp() {
+        if (startDate != null && startDate.isKnown() && !startDate.isBce()) {
+            try {
+                return startDate.toLocalDate().atStartOfDay(ZoneOffset.UTC).toInstant();
+            } catch (IllegalStateException | java.time.DateTimeException e) {
+                // Fallback for imprecise modern dates
+                return Instant.MIN;
+            }
         }
-        return java.time.Instant.MIN;
+        return Instant.MIN;
     }
 
     /**
      * Returns approximate duration in years.
+     * 
+     * @return duration in years (positive integer)
      */
     public int getDurationYears() {
         if (startDate == null || endDate == null)
@@ -129,9 +177,29 @@ public class HistoricalEvent implements org.jscience.util.identity.Identifiable<
         return end - start;
     }
 
+    /**
+     * Checks if this event overlaps in time with another.
+     * 
+     * @param other the other event
+     * @return true if they overlap
+     * @throws NullPointerException if other is null
+     */
     public boolean overlaps(HistoricalEvent other) {
+        Objects.requireNonNull(other, "Other event cannot be null");
         return startDate.compareTo(other.endDate) <= 0 &&
                 endDate.compareTo(other.startDate) >= 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof HistoricalEvent that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override
@@ -144,58 +212,56 @@ public class HistoricalEvent implements org.jscience.util.identity.Identifiable<
 
     // Notable historical events with FuzzyDate
     public static final HistoricalEvent FRENCH_REVOLUTION = new HistoricalEvent(
-            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.french_rev.name", "French Revolution"),
-            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.french_rev.desc", "Political revolution in France"), 
+            "French Revolution",
+            "Political revolution in France", 
             FuzzyDate.of(1789, 7, 14),
             FuzzyDate.of(1799, 11, 9), Category.POLITICAL,
-            new org.jscience.geography.Place("France", org.jscience.geography.Place.Type.COUNTRY));
+            new Place("France", Place.Type.COUNTRY));
 
     public static final HistoricalEvent WORLD_WAR_I = new HistoricalEvent(
-            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.wwi.name", "World War I"),
-            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.wwi.desc", "Global military conflict"), 
+            "World War I",
+            "Global military conflict", 
             FuzzyDate.of(1914, 7, 28),
             FuzzyDate.of(1918, 11, 11), Category.MILITARY,
-            new org.jscience.geography.Place("Global", org.jscience.geography.Place.Type.REGION));
+            new Place("Global", Place.Type.REGION));
 
     public static final HistoricalEvent WORLD_WAR_II = new HistoricalEvent(
-            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.wwii.name", "World War II"),
-            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.wwii.desc", "Global military conflict"), 
+            "World War II",
+            "Global military conflict", 
             FuzzyDate.of(1939, 9, 1),
             FuzzyDate.of(1945, 9, 2), Category.MILITARY,
-            new org.jscience.geography.Place("Global", org.jscience.geography.Place.Type.REGION));
+            new Place("Global", Place.Type.REGION));
 
     public static final HistoricalEvent MOON_LANDING = new HistoricalEvent(
-            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.moon_landing.name", "Apollo 11 Moon Landing"),
+            "Apollo 11 Moon Landing",
             FuzzyDate.of(1969, 7, 20), Category.SCIENTIFIC);
 
     // Ancient events with BCE support
     public static final HistoricalEvent FALL_OF_ROME = new HistoricalEvent(
-            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.fall_of_rome.name", "Fall of Western Rome"),
-            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.fall_of_rome.desc", "End of the Western Roman Empire"), 
+            "Fall of Western Rome",
+            "End of the Western Roman Empire", 
             FuzzyDate.of(476, 9, 4),
             FuzzyDate.of(476, 9, 4), Category.POLITICAL,
-            new org.jscience.geography.Place("Rome", org.jscience.geography.Place.Type.CITY));
+            new Place("Rome", Place.Type.CITY));
 
     public static final HistoricalEvent BATTLE_OF_MARATHON = new HistoricalEvent(
-            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.marathon.name", "Battle of Marathon"),
-            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.marathon.desc", "Greek victory over Persian forces"), 
+            "Battle of Marathon",
+            "Greek victory over Persian forces", 
             FuzzyDate.bce(490),
             FuzzyDate.bce(490), Category.MILITARY,
-            new org.jscience.geography.Place("Marathon", org.jscience.geography.Place.Type.CITY));
+            new Place("Marathon", Place.Type.CITY));
 
     public static final HistoricalEvent FOUNDING_OF_ROME = new HistoricalEvent(
-            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.founding_rome.name", "Founding of Rome"),
-            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.founding_rome.desc", "Traditional founding date of Rome"), 
+            "Founding of Rome",
+            "Traditional founding date of Rome", 
             FuzzyDate.bce(753),
             FuzzyDate.bce(753), Category.POLITICAL,
-            new org.jscience.geography.Place("Rome", org.jscience.geography.Place.Type.CITY));
+            new Place("Rome", Place.Type.CITY));
 
     public static final HistoricalEvent GREAT_PYRAMID = new HistoricalEvent(
-            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.great_pyramid.name", "Construction of Great Pyramid"),
-            org.jscience.ui.i18n.I18n.getInstance().get("demo.historytimelinedemo.event.great_pyramid.desc", "Building of the Great Pyramid of Giza"), 
+            "Construction of Great Pyramid",
+            "Building of the Great Pyramid of Giza", 
             FuzzyDate.circaBce(2560),
             FuzzyDate.circaBce(2540), Category.CULTURAL,
-            new org.jscience.geography.Place("Giza", org.jscience.geography.Place.Type.CITY));
+            new Place("Giza", Place.Type.CITY));
 }
-
-

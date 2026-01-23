@@ -7,102 +7,101 @@ import org.jscience.sociology.Culture;
 import org.jscience.util.Named;
 
 
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Relation;
+
+import java.util.Objects;
+
 /**
- * A class representing the basic facts about an organized human group.
+ * Represents a human tribe, which is an organized human group with a distinct name and culture.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @version 1.1
  */
+@Persistent
 public class Tribe extends HumanGroup implements Named {
-    /** DOCUMENT ME! */
+    /** The name of the tribe. */
+    @Attribute
     private String name;
 
-    /** DOCUMENT ME! */
+    /** The distinct culture associated with the tribe. */
+    @Relation(type = Relation.Type.MANY_TO_ONE)
     private Culture culture;
 
-/**
-     * Creates a new Tribe object.
+    /**
+     * Initializes a new Tribe instance.
      *
-     * @param name    DOCUMENT ME!
-     * @param culture DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param name    the name of the tribe
+     * @param culture the culture of the tribe
+     * @throws NullPointerException if any argument is null
+     * @throws IllegalArgumentException if name is empty
      */
     public Tribe(String name, Culture culture) {
-        if ((name != null) && (name.length() > 0) && (culture != null)) {
-            this.name = name;
-            this.culture = culture;
-        } else {
-            throw new IllegalArgumentException(
-                "The Tribe constructor can't have null or empty arguments.");
+        if (Objects.requireNonNull(name, "Name cannot be null").isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be empty");
         }
-    }
-
-/**
-     * Creates a new Tribe object.
-     *
-     * @param name            DOCUMENT ME!
-     * @param formalTerritory DOCUMENT ME!
-     * @param culture         DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    public Tribe(String name, Place formalTerritory, Culture culture) {
-        super(formalTerritory);
-
-        if ((name != null) && (name.length() > 0) && (culture != null)) {
-            this.name = name;
-            this.culture = culture;
-        } else {
-            throw new IllegalArgumentException(
-                "The Tribe constructor can't have null or empty arguments.");
-        }
+        this.name = name;
+        this.culture = Objects.requireNonNull(culture, "Culture cannot be null");
     }
 
     /**
-     * DOCUMENT ME!
+     * Initializes a new Tribe instance with a specific territory.
      *
-     * @return DOCUMENT ME!
+     * @param name            the name of the tribe
+     * @param formalTerritory the territory assigned to or claimed by the tribe
+     * @param culture         the culture of the tribe
+     * @throws NullPointerException if any argument is null
+     * @throws IllegalArgumentException if name is empty
+     */
+    public Tribe(String name, Place formalTerritory, Culture culture) {
+        super(Objects.requireNonNull(formalTerritory, "Territory cannot be null"));
+        if (Objects.requireNonNull(name, "Name cannot be null").isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be empty");
+        }
+        this.name = name;
+        this.culture = Objects.requireNonNull(culture, "Culture cannot be null");
+    }
+
+    /**
+     * Returns the name of the tribe.
+     *
+     * @return the name
      */
     public String getName() {
         return name;
     }
 
     /**
-     * DOCUMENT ME!
+     * Updates the name of the tribe.
      *
-     * @param name DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param name the new name
+     * @throws NullPointerException if name is null
+     * @throws IllegalArgumentException if name is empty
      */
     public void setName(String name) {
-        if ((name != null) && (name.length() > 0)) {
-            this.name = name;
-        } else {
-            throw new IllegalArgumentException(
-                "The name can't be null or empty.");
+        if (Objects.requireNonNull(name, "Name cannot be null").isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be empty");
         }
+        this.name = name;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the culture associated with the tribe.
      *
-     * @return DOCUMENT ME!
+     * @return the culture
      */
     public Culture getCulture() {
         return culture;
     }
 
     /**
-     * DOCUMENT ME!
+     * Updates the tribe's culture.
      *
-     * @param culture DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param culture the new culture
+     * @throws NullPointerException if culture is null
      */
     public void setCulture(Culture culture) {
-        if ((culture != null)) {
-            this.culture = culture;
-        } else {
-            throw new IllegalArgumentException("The culture must be non null.");
-        }
+        this.culture = Objects.requireNonNull(culture, "Culture cannot be null");
     }
 }

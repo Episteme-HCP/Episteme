@@ -1,141 +1,160 @@
-package org.jscience.history.archeology;
-
-import org.jscience.geography.Boundary;
-import org.jscience.geography.Place;
-
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Set;
-
-
-/**
- * A class representing a place where archeologists have looked for
- * something, and usually found items and drawn a map.
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * @author Silvere Martin-Michiellot
- * @version 1.0
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
-//usually many peoples actually dig at a site and there also can be many different teams
-//the Site may also never be really closed or on the opposite destroyed after mapping
-//although we not not account for such information, you may need to consider these
-public class Site extends Place {
-    /** DOCUMENT ME! */
-    private Date startDate; //when archeologist first dig
+package org.jscience.history.archeology;
 
-    /** DOCUMENT ME! */
-    private String description; //main characteristics
-
-    /** DOCUMENT ME! */
-    private Set contents; //a set of items
+import java.io.Serializable;
+import java.util.*;
+import org.jscience.geography.Boundary;
+import org.jscience.geography.Place;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
-     * Creates a new Site object.
+ * Represents an archaeological excavation site where artifacts and structures are studied.
+ * Tracks the excavation start date, site description, and all discovered items.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.2
+ * @since 1.0
+ */
+@Persistent
+public class Site extends Place implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    /** The date when excavation activities first began. */
+    @Attribute
+    private final Date startDate;
+
+    /** General characteristics and historical context of the site. */
+    @Attribute
+    private String description = "";
+
+    /** The set of artifacts and historical items discovered at this site. */
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private Set<Item> items = new HashSet<>();
+
+    /**
+     * Creates a new Site.
      *
-     * @param name      DOCUMENT ME!
-     * @param startDate DOCUMENT ME!
-     * @param limits    DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param name      the identifying name of the site
+     * @param startDate the start date of excavation
+     * @param limits    geographical boundaries of the site
+     * @throws NullPointerException if any argument is null
      */
     public Site(String name, Date startDate, Boundary limits) {
         super(name, limits);
-
-        if (startDate != null) {
-            this.startDate = startDate;
-            this.description = new String();
-        } else {
-            throw new IllegalArgumentException(
-                "The Site constructor can't have null arguments (and name can't be empty).");
-        }
+        this.startDate = Objects.requireNonNull(startDate, "Start date cannot be null");
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the excavation start date.
      *
-     * @return DOCUMENT ME!
+     * @return the start date
      */
     public Date getStartDate() {
         return startDate;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the site description.
      *
-     * @return DOCUMENT ME!
+     * @return the description
      */
     public String getDescription() {
         return description;
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the site description.
      *
-     * @param description DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param description characterization string
+     * @throws NullPointerException if description is null
      */
     public void setDescription(String description) {
-        if (description != null) {
-            this.description = description;
-        } else {
-            throw new IllegalArgumentException("The description can't be null.");
-        }
+        this.description = Objects.requireNonNull(description, "Description cannot be null");
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns an unmodifiable view of the discovered items.
      *
-     * @return DOCUMENT ME!
+     * @return the set of items
      */
-    public Set getItems() {
-        return contents;
+    public Set<Item> getItems() {
+        return Collections.unmodifiableSet(items);
     }
 
     /**
-     * DOCUMENT ME!
+     * Adds an item found at this site.
      *
-     * @param item DOCUMENT ME!
+     * @param item the discovered artifact
+     * @throws NullPointerException if item is null
      */
     public void addItem(Item item) {
-        contents.add(item);
+        Objects.requireNonNull(item, "Item cannot be null");
+        items.add(item);
     }
 
     /**
-     * DOCUMENT ME!
+     * Removes an item from the site records.
      *
-     * @param item DOCUMENT ME!
+     * @param item the item to remove
      */
     public void removeItem(Item item) {
-        contents.remove(item);
+        items.remove(item);
     }
 
-    //a Set of Items
     /**
-     * DOCUMENT ME!
-     *
-     * @param contents DOCUMENT ME!
+     * Replaces the entire set of items.
+     * 
+     * @param items the new set of items
+     * @throws NullPointerException if items is null
      */
-    public void setItems(Set contents) {
-        Iterator iterator;
-        boolean valid;
+    public void setItems(Set<Item> items) {
+        this.items = new HashSet<>(Objects.requireNonNull(items, "Items set cannot be null"));
+    }
 
-        if (contents != null) {
-            iterator = contents.iterator();
-            valid = true;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Site site)) return false;
+        if (!super.equals(o)) return false;
+        return Objects.equals(startDate, site.startDate) && 
+               Objects.equals(description, site.description) && 
+               Objects.equals(items, site.items);
+    }
 
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Item;
-            }
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), startDate, description, items);
+    }
 
-            if (valid) {
-                this.contents = contents;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Set of contents should contain only Items.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Set of contents can't be null.");
-        }
+    @Override
+    public String toString() {
+        return String.format("Archaeological Site: %s (Started %s, %d items)", 
+            getName(), startDate, items.size());
     }
 }

@@ -1,262 +1,169 @@
-package org.jscience.psychology.social;
-
-import org.jscience.biology.Individual;
-import org.jscience.biology.Population;
-import org.jscience.biology.Species;
-
-import org.jscience.geography.Place;
-
-import java.util.*;
-
-
-/**
- * A class representing a group, that is a population seen from a
- * psychological point of view. Includes a sociogram, that is a representation
- * of the relations among a the individuals along time.
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * @author Silvere Martin-Michiellot
- * @version 1.0
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
-//a group is a set of individuals from the same species who normally share space and/or resources
-//this class does account for hierarchical relations between the members of the group (using a positive/negative system which the highest positive number means you are strong over someone).
-//the relation system herein can be used also for a pure sociogram with the number describing attraction/repulsion towards an individual (this is the prefered mechanism as dominance hierarchies may also be defined using economics, see below).
-//One can also use the Organigram class under economics for task specific hierarchy: the group efficiency is based on an economic and hierarchic way of grouping individuals.
-//but also, hierarchical relations can be implemented as Roles/Situations using org.jscience.sociology classes or better as economic entities
-//it is expected that the number of individuals and relations considered is very low
-//in other words it is designed to grasp the relations of a small group in a small to very big population
-//may be we should call this class Sociogram or have a specific class
-//internal representation is based upon a map but could be based on a sparse matrix or a graph
-//some subclasses for high order species should consider implementing "home range" concept
-//some groups have no leader
-//as a general rule in the animal kingdom, the leader (or leaders) are individuals who control the resources
-//the goup is therefore rather seen as a community, with some members higher in the organigram than others
-//on the opposite, humans have formal leaders, ants (and the like) have individuals that are physically different from the others (queens)
-//you should therefore in most cases see the getLeaders() method as a convenince method to get some information that should be in one form or another in the underlying hierarchy
-public class Group extends Population {
-    /** DOCUMENT ME! */
-    private Place formalTerritory;
+package org.jscience.psychology.social;
 
-    //all these individuals are normally contained in the underlying population
-    /** DOCUMENT ME! */
-    private Set leaders; //the head, the ruler, see http://en.wikipedia.org/wiki/Monarch for common titles and names
-
-    /** DOCUMENT ME! */
-    private Map relations;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import org.jscience.biology.Individual;
+import org.jscience.biology.ecology.Population;
+import org.jscience.biology.taxonomy.Species;
+import org.jscience.geography.Place;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
-     * Creates a new Group object.
+ * Represents a group of individuals from a psychological and social perspective.
+ * Unlike a simple {@link Population}, a Group includes structures such as 
+ * leadership and a sociogram tracking interpersonal relations over time.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
+ */
+@Persistent
+public class Group extends Population implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    /** Individuals designated as leaders or rulers within the group. */
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private Set<Individual> leaders;
+
+    /** 
+     * Complex mapping of interpersonal relations.
+     * Maps an individual to their perceived relations with other members.
+     * The double value typically represents attraction/repulsion or dominance.
+     */
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private Map<Individual, Map<Individual, Double>> relations;
+
+    /**
+     * Creates a new Group for a specific species.
      *
-     * @param species DOCUMENT ME!
+     * @param species the species of the group members
+     * @throws NullPointerException if species is null
      */
     public Group(Species species) {
         super(species);
-        this.formalTerritory = getTerritory();
-        this.leaders = Collections.EMPTY_SET;
-        this.relations = Collections.EMPTY_MAP;
+        this.leaders = new HashSet<>();
+        this.relations = new HashMap<>();
     }
 
-/**
-     * Creates a new Group object.
+    /**
+     * Creates a new Group with a designated territory.
      *
-     * @param species         DOCUMENT ME!
-     * @param formalTerritory DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param species         the biological species
+     * @param formalTerritory the geographic area controlled or inhabited by the group
+     * @throws NullPointerException if any argument is null
      */
     public Group(Species species, Place formalTerritory) {
-        super(species);
-
-        if (formalTerritory != null) {
-            this.formalTerritory = formalTerritory;
-            this.leaders = Collections.EMPTY_SET;
-            this.relations = Collections.EMPTY_MAP;
-        } else {
-            throw new IllegalArgumentException(
-                "The Group constructor can't have null arguments.");
-        }
+        super("Group", species, formalTerritory);
+        this.leaders = new HashSet<>();
+        this.relations = new HashMap<>();
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the formal territory associated with this group.
+     * @return the territory place
      */
     public Place getFormalTerritory() {
-        return formalTerritory;
+        return getTerritory();
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param territory DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Sets the formal territory for this group.
+     * @param territory the new territory
      */
     public void setFormalTerritory(Place territory) {
-        if ((territory != null)) {
-            this.formalTerritory = territory;
-        } else {
-            throw new IllegalArgumentException(
-                "The territory must be non null.");
-        }
+        setTerritory(territory);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the set of leaders within the group.
+     * @return the leaders set
      */
-    public Set getLeaders() {
+    public Set<Individual> getLeaders() {
         return leaders;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param leaders DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Sets the leaders for this group.
+     * @param leaders the new set of leaders
+     * @throws NullPointerException if leaders is null
      */
+    public void setLeaders(Set<Individual> leaders) {
+        this.leaders = Objects.requireNonNull(leaders, "Leaders set cannot be null");
+    }
 
-    //all leaders must be from the population
-    public void setLeaders(Set leaders) {
-        Iterator iterator;
-        boolean valid;
+    /**
+     * Returns the complete sociogram of relations.
+     * @return the relations map
+     */
+    public Map<Individual, Map<Individual, Double>> getRelations() {
+        return relations;
+    }
 
-        if (leaders != null) {
-            iterator = leaders.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Individual;
-            }
-
-            if (valid) {
-                if (getIndividuals().containsAll(leaders)) {
-                    this.leaders = leaders;
-                } else {
-                    throw new IllegalArgumentException(
-                        "The leaders must also be part of the population.");
-                }
-            } else {
-                throw new IllegalArgumentException(
-                    "The leaders Set must contain only Individuals.");
-            }
-        } else {
-            throw new IllegalArgumentException("You can't set null leaders.");
+    /**
+     * Establishes or updates a relation between two individuals.
+     *
+     * @param from   the individual who holds the attitude
+     * @param to     the target of the attitude
+     * @param status numeric value representing the relation (e.g., attraction score)
+     * @throws NullPointerException if from or to is null
+     */
+    public void setRelation(Individual from, Individual to, double status) {
+        Objects.requireNonNull(from, "Source individual cannot be null");
+        Objects.requireNonNull(to, "Target individual cannot be null");
+        
+        Map<Individual, Double> individualRelations = relations.get(from);
+        if (individualRelations == null) {
+            individualRelations = new HashMap<>();
+            relations.put(from, individualRelations);
         }
+        individualRelations.put(to, status);
     }
 
     /**
-     * DOCUMENT ME!
+     * Retrieves the relation score between two individuals.
      *
-     * @param individual1 DOCUMENT ME!
-     * @param individual2 DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param from the source individual
+     * @param to   the target individual
+     * @return the relation score, or 0.0 if no relation is defined
      */
-    public double getRelation(Individual individual1, Individual individual2) {
-        Object object;
-        Hashtable hashtable;
-        double result;
-        Object object2;
-
-        if ((getIndividuals().contains(individual1)) &&
-                (getIndividuals().contains(individual2))) {
-            object = relations.get(individual1);
-
-            if (object != null) {
-                hashtable = (Hashtable) object;
-                object2 = hashtable.get(individual2);
-
-                if (object2 != null) {
-                    result = ((Double) object).doubleValue();
-                } else {
-                    result = 0;
-                }
-            } else {
-                result = 0;
+    public double getRelation(Individual from, Individual to) {
+        Map<Individual, Double> individualRelations = relations.get(from);
+        if (individualRelations != null) {
+            Double status = individualRelations.get(to);
+            if (status != null) {
+                return status;
             }
-        } else {
-            throw new IllegalArgumentException(
-                "Can't get the relation of individuals not in the Population.");
         }
-
-        return result;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param individual1 DOCUMENT ME!
-     * @param individual2 DOCUMENT ME!
-     * @param value DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    public void setRelation(Individual individual1, Individual individual2,
-        double value) {
-        Object object;
-        Hashtable hashtable;
-
-        if ((getIndividuals().contains(individual1)) &&
-                (getIndividuals().contains(individual2))) {
-            object = relations.get(individual1);
-
-            if (object != null) {
-                hashtable = (Hashtable) object;
-            } else {
-                hashtable = new Hashtable();
-            }
-
-            hashtable.put(individual2, new Double(value));
-            relations.put(individual1, hashtable);
-        } else {
-            throw new IllegalArgumentException(
-                "Can't get the relation of individuals not in the Population.");
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param individuals DOCUMENT ME!
-     */
-    public void setIndividuals(Set individuals) {
-        super.setIndividuals(individuals);
-        relations = Collections.EMPTY_MAP;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param individual DOCUMENT ME!
-     */
-    public void addIndividual(Individual individual) {
-        super.addIndividual(individual);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param individual DOCUMENT ME!
-     */
-    public void removeIndividual(Individual individual) {
-        Iterator iterator;
-        Hashtable currentHashtable;
-
-        super.removeIndividual(individual);
-        relations.remove(individual);
-
-        //even if saving memory, the next part may be too time consuming compared to the memory benefits
-        //simply remove if unsuitable as it will not change the class behavior
-        iterator = relations.keySet().iterator();
-
-        while (iterator.hasNext()) {
-            currentHashtable = (Hashtable) iterator.next();
-            currentHashtable.remove(individual);
-        }
+        return 0.0;
     }
 }

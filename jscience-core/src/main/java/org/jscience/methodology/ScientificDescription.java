@@ -24,7 +24,7 @@
 package org.jscience.methodology;
 
 import org.jscience.util.Named;
-import org.jscience.util.identity.Identifiable;
+import org.jscience.util.identity.Identified;
 import java.time.Instant;
 
 import java.util.Set;
@@ -38,7 +38,7 @@ public record ScientificDescription(
     Set<String> authors,
     Instant date,
     String contents
-) implements Named, Identifiable<String> {
+) implements Named, Identified<String> {
     
     @Override public String getId() { return id; }
     @Override public String getName() { return name; }

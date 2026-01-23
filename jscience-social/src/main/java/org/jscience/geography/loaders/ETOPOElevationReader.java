@@ -60,6 +60,11 @@ public class ETOPOElevationReader extends AbstractResourceReader<Double> {
     }
 
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"ETOPO1", "ETOPO2022"};
+    }
+
+    @Override
     protected Double loadFromSource(String coordinates) throws Exception {
         // coordinates: "lat,lon"
         String[] parts = coordinates.split(",");

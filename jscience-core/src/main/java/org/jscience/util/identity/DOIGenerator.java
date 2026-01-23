@@ -36,7 +36,7 @@ import java.time.Year;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class DOIGenerator implements IdGenerator {
+public class DOIGenerator implements IDGenerator {
 
     private final SecureRandom random = new SecureRandom();
     private final String prefix;
@@ -58,10 +58,11 @@ public class DOIGenerator implements IdGenerator {
     }
 
     @Override
-    public String generate() {
+    public Identification generate() {
         int year = Year.now().getValue();
         int suffix = random.nextInt(1000000);
-        return String.format("%s/jscience.%d.%06d", prefix, year, suffix);
+        String value = String.format("%s/jscience.%d.%06d", prefix, year, suffix);
+        return new DOIIdentification(value);
     }
 
     @Override

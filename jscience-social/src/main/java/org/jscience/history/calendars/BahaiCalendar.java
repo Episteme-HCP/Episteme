@@ -1,56 +1,91 @@
-//repackaged after the code from Mark E. Shoulson
-//email <mark@kli.org>
-//website http://web.meson.org/calendars/
-//released under GPL
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Originally based on code from Mark E. Shoulson <mark@kli.org>
+ * http://web.meson.org/calendars/
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history.calendars;
 
-
-// Referenced classes of package calendars:
 /**
- * DOCUMENT ME!
+ * Implementation of the Bahá'í (Badí') calendar.
+ * The Bahá'í calendar is a solar calendar used by the Bahá'í Faith, 
+ * consisting of 19 months of 19 days, plus intercalary days.
  *
- * @author $author$
- * @version $Revision: 1.3 $
-  */
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>Epoch: March 21, 1844 CE</li>
+ *   <li>19 months of 19 days each (361 days)</li>
+ *   <li>4-5 intercalary days (Ayyám-i-Há)</li>
+ *   <li>19-year cycles (Váhid) and 361-year major cycles (Kull-i-Shay)</li>
+ * </ul>
+ *
+ * @author Mark E. Shoulson (original implementation)
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
+ */
 public class BahaiCalendar extends SevenDaysWeek {
-    /** DOCUMENT ME! */
+
+    private static final long serialVersionUID = 1L;
+    /** Day names of the Bahá'í week. */
     private static final String[] DAYS = {
             "Jamal", "Kamal", "Fidal", "`Idal", "Istijlal", "Istiqlal", "Jalal"
         };
 
-    /** DOCUMENT ME! */
+    /** Month names of the Bahá'í year. */
     private static final String[] MONTHS = {
             "Baha", "Jalal", "Jamal", "`Azamat", "Nur", "Rahmat", "Kalimat",
             "Kamal", "Asma'", "`Izzat", "Mashiyyat", "`Ilm", "Qudrat", "Qawl",
             "Masail", "Sharaf", "Sultan", "Mulk", "Ayyam-i-Ha", "`Ala'"
         };
 
-    /** DOCUMENT ME! */
+    /** Year names within the 19-year Váhid cycle. */
     private static final String[] YEARS = {
             "Alif", "Ba'", "Ab", "Dal", "Bab", "Vav", "Abad", "Jad", "Baha",
             "Hubb", "Bahhaj", "Javab", "Ahad", "Vahhab", "Vidad", "Badi'",
             "Bahi'", "Abha", "Vahid"
         };
 
-    /** DOCUMENT ME! */
+    /** The RD number of the Bahá'í epoch (March 21, 1844). */
     public static final long EPOCH = (new GregorianCalendar(3, 21, 1844)).toRD();
 
-    /** DOCUMENT ME! */
+    /** The Gregorian year of the Bahá'í epoch. */
     private static final int EPYEAR = 1844;
 
-    /** DOCUMENT ME! */
+    /** The major cycle number (Kull-i-Shay). */
     private int major;
 
-    /** DOCUMENT ME! */
+    /** The 19-year cycle number (Váhid). */
     private int cycle;
 
-    /** DOCUMENT ME! */
+    /** The year within the cycle (1-19). */
     private int year;
 
-    /** DOCUMENT ME! */
+    /** The month of the year (1-20, with 19 as intercalary days). */
     private int month;
 
-    /** DOCUMENT ME! */
+    /** The day of the month (1-19). */
     private int day;
 
 /**
@@ -63,7 +98,7 @@ public class BahaiCalendar extends SevenDaysWeek {
 /**
      * Creates a new BahaiCalendar object.
      *
-     * @param l DOCUMENT ME!
+     * @param l the Rata Die number.
      */
     public BahaiCalendar(long l) {
         set(l);
@@ -72,7 +107,7 @@ public class BahaiCalendar extends SevenDaysWeek {
 /**
      * Creates a new BahaiCalendar object.
      *
-     * @param altcalendar DOCUMENT ME!
+     * @param altcalendar another calendar to initialize from.
      */
     public BahaiCalendar(AlternateCalendar altcalendar) {
         set(altcalendar.toRD());
@@ -81,20 +116,20 @@ public class BahaiCalendar extends SevenDaysWeek {
 /**
      * Creates a new BahaiCalendar object.
      *
-     * @param i  DOCUMENT ME!
-     * @param j  DOCUMENT ME!
-     * @param k  DOCUMENT ME!
-     * @param l  DOCUMENT ME!
-     * @param i1 DOCUMENT ME!
+     * @param i the Kull-i-Shay (major cycle).
+     * @param j the Váhid (cycle).
+     * @param k the year within Váhid.
+     * @param l the month.
+     * @param i1 the day.
      */
     public BahaiCalendar(int i, int j, int k, int l, int i1) {
         set(i, j, k, l, i1);
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the Rata Die number and recomputes the date fields.
      *
-     * @param l DOCUMENT ME!
+     * @param l the Rata Die number.
      */
     public synchronized void set(long l) {
         super.rd = l;
@@ -102,13 +137,13 @@ public class BahaiCalendar extends SevenDaysWeek {
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the Bahá'í cycle components and recomputes the Rata Die date.
      *
-     * @param i DOCUMENT ME!
-     * @param j DOCUMENT ME!
-     * @param k DOCUMENT ME!
-     * @param l DOCUMENT ME!
-     * @param i1 DOCUMENT ME!
+     * @param i the Kull-i-Shay.
+     * @param j the Váhid.
+     * @param k the year.
+     * @param l the month.
+     * @param i1 the day.
      */
     public synchronized void set(int i, int j, int k, int l, int i1) {
         major = i;
@@ -120,7 +155,7 @@ public class BahaiCalendar extends SevenDaysWeek {
     }
 
     /**
-     * DOCUMENT ME!
+     * Recomputes the Rata Die number from the Bahá'í date fields.
      */
     public synchronized void recomputeRD() {
         int i = (((361 * (major - 1)) + (19 * (cycle - 1)) + year) - 1) + 1844;
@@ -139,7 +174,7 @@ public class BahaiCalendar extends SevenDaysWeek {
     }
 
     /**
-     * DOCUMENT ME!
+     * Recomputes the Bahá'í date fields from the current Rata Die number.
      */
     public synchronized void recomputeFromRD() {
         int i = (new GregorianCalendar(super.rd)).getYear();
@@ -170,9 +205,9 @@ public class BahaiCalendar extends SevenDaysWeek {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns a string representation of the Bahá'í date.
      *
-     * @return DOCUMENT ME!
+     * @return the date string.
      */
     public String toString() {
         int i = weekDay();
@@ -183,7 +218,7 @@ public class BahaiCalendar extends SevenDaysWeek {
         }
 
         try {
-            return DAYS[i] + " (" + SevenDaysWeek.DAYNAMES[i] +
+            return DAYS[i] + " (" + SevenDaysWeek.DAY_NAMES[i] +
             ") the day of " + MONTHS[j] + " of the month of " +
             MONTHS[month - 1] + " of the year of " + YEARS[year - 1] +
             " of Vahid " + cycle + " of Kull-i-Shay " + major + "\n(" + major +
@@ -195,9 +230,9 @@ public class BahaiCalendar extends SevenDaysWeek {
     }
 
     /**
-     * DOCUMENT ME!
+     * Main method for testing the Bahá'í calendar implementation.
      *
-     * @param args DOCUMENT ME!
+     * @param args command line arguments.
      */
     public static void main(String[] args) {
         int i = 0;

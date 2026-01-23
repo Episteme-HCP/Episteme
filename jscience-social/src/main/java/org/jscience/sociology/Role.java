@@ -1,143 +1,156 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.sociology;
 
+import java.io.Serializable;
+import java.util.Objects;
 import org.jscience.biology.Individual;
-
 import org.jscience.util.Named;
-
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
- * A class representing the current behavior/relation a Person has with its
- * environment. Usually in pairs, for example client (student, customer,
- * patient...) and server (teacher, waiter, doctor...) or triplets client,
- * server and supervisor (administrator, manager...). There is sometimes
- * another role which is not part of the process itself: the observer
- * (narrator, passive audience...). Several other roles may be considered
- * although you should try to fit them in the above categories when possible:
- * mediator, slave... Think for example about all the roles of the individual
- * that are in a theater: producer, director, actors, technicians, public...
- * You may want not to assign the default roles but reproduce a more complex
- * environment although you may not apply some models on them.
+ * Represents a social role assumed by an individual within a specific situation.
+ * Roles define expected behaviors and relations (e.g., Client/Server, Supervisor, Observer).
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
-// a role defines some tasks, activities and behaviors, current and expected
+@Persistent
+public class Role implements Named, Serializable {
 
-//even in the street there are policemen: humans have roles everywhere in there life, for example at home there are parents and children, friends and neighbors.
-public class Role extends Object implements Named {
-    /** DOCUMENT ME! */
-    public final static int CLIENT = 1; //mutually exclusive
+    private static final long serialVersionUID = 1L;
 
-    /** DOCUMENT ME! */
+    @Id
+    private Identification identification;
+
+    /** Primary role of receiving a service (e.g., student, customer, patient). */
+    public final static int CLIENT = 1;
+
+    /** Primary role of providing a service (e.g., teacher, waiter, doctor). */
     public final static int SERVER = 2;
 
-    /** DOCUMENT ME! */
+    /** Role of monitoring or managing others (e.g., administrator, manager). */
     public final static int SUPERVISOR = 4;
 
-    /** DOCUMENT ME! */
+    /** Role of passive observation (e.g., narrator, audience). */
     public final static int OBSERVER = 8;
 
-    /** DOCUMENT ME! */
-    private Individual individual; //the individual callback
+    @Relation(type = Relation.Type.MANY_TO_ONE)
+    private Individual individual;
 
-    /** DOCUMENT ME! */
-    private String name; //the given name for this kind of role
+    @Attribute
+    private String name;
 
-    /** DOCUMENT ME! */
-    private Situation situation; //the situation callback
+    @Relation(type = Relation.Type.MANY_TO_ONE)
+    private Situation situation;
 
-    /** DOCUMENT ME! */
-    private int kind; //the archetypal role
+    @Attribute
+    private int kind;
 
-/**
-     * Creates a new Role object.
+    /**
+     * Creates a new Role for an individual within a specific situation.
      *
-     * @param individual DOCUMENT ME!
-     * @param name       DOCUMENT ME!
-     * @param situation  DOCUMENT ME!
-     * @param kind       DOCUMENT ME!
+     * @param individual the individual taking on the role
+     * @param name       the identifying name of the role
+     * @param situation  the context for the role
+     * @param kind       the categorical classification of the role
+     * @throws NullPointerException if any argument is null
      */
-    public Role(Individual individual, String name, Situation situation,
-        int kind) {
-        if ((individual != null) && (name != null) && (name.length() > 0) &&
-                (situation != null)) {
-            this.individual = individual;
-            individual.addRole(this);
-            this.name = name;
-            this.situation = situation;
-            this.kind = kind;
-        } else {
-            throw new IllegalArgumentException(
-                "The Role constructor cannot have null or empty arguments.");
+    public Role(Individual individual, String name, Situation situation, int kind) {
+        this.individual = Objects.requireNonNull(individual, "Individual cannot be null");
+        this.name = Objects.requireNonNull(name, "Role name cannot be null");
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("Role name cannot be empty");
         }
-    }
-
-/**
-     * Creates a new Role object.
-     *
-     * @param name DOCUMENT ME!
-     * @param kind DOCUMENT ME!
-     */
-    public Role(String name, int kind) {
-        if ((name != null) && (name.length() > 0)) {
-            this.individual = null;
-            this.name = name;
-            this.situation = null;
-            this.kind = kind;
-        } else {
-            throw new IllegalArgumentException(
-                "The Role constructor cannot have null or empty name.");
-        }
+        this.situation = Objects.requireNonNull(situation, "Situation cannot be null");
+        this.kind = kind;
+        this.identification = new SimpleIdentification(individual.getId() + ":" + name);
+        this.individual.addRole(this);
     }
 
     /**
-     * DOCUMENT ME!
+     * Creates a standalone Role template.
      *
-     * @return DOCUMENT ME!
+     * @param name the identifying name of the role
+     * @param kind the categorical classification
+     * @throws NullPointerException if name is null
+     */
+    public Role(String name, int kind) {
+        this.name = Objects.requireNonNull(name, "Role name cannot be null");
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("Role name cannot be empty");
+        }
+        this.kind = kind;
+        this.identification = new SimpleIdentification("Template:" + name);
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Returns the individual associated with this role.
+     * @return the individual
      */
     public Individual getIndividual() {
         return individual;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the situation context for this role.
+     * @return the situation
      */
     public Situation getSituation() {
         return situation;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param situation DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    protected void setSituation(Situation situation) {
-        if (situation != null) {
-            this.situation = situation;
-        } else {
-            throw new IllegalArgumentException("Situation can't be null.");
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the archetypal kind of this role.
+     * @return the kind constant
      */
     public int getKind() {
         return kind;
+    }
+
+    /**
+     * Returns the persistent identification for this role instance.
+     * @return the identification
+     */
+    public Identification getIdentification() {
+        return identification;
+    }
+
+    @Override
+    public String toString() {
+        return name + " (" + (individual != null ? individual.getName() : "None") + ")";
     }
 }

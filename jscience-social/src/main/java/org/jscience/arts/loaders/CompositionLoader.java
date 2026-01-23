@@ -1,4 +1,4 @@
-﻿package org.jscience.arts.loaders;
+package org.jscience.arts.loaders;
 
 import org.jscience.arts.music.Composition;
 import org.jscience.io.ResourceReader;

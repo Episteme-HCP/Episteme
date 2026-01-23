@@ -43,13 +43,13 @@ public class Object extends java.lang.Object {
      */
     public boolean equals(java.lang.Object o) {
         if ((o != null) &&
-                (o instanceof org.jscience.philosophy.storytelling.Object)) {
+                (o instanceof org.jscience.philosophy.storytelling.StoryObject)) {
             return this.getObject().equals(((Object) o).getObject());
         } else {
             return false;
         }
     }
 
-    //public boolean isActIncluded(org.jscience.philosophy.storytelling.Object object);
+    //public boolean isActIncluded(org.jscience.philosophy.storytelling.StoryObject object);
     //for example driving contains the act of using the car key
 }

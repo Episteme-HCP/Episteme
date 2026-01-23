@@ -4,10 +4,10 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.jscience.apps.framework.FeaturedAppBase;
-import org.jscience.ui.viewers.natural.ScientificProcessViewer;
+import org.jscience.ui.viewers.shared.scientific.ScientificProcessViewer;
 import org.jscience.ui.viewers.shared.SpatialFluxViewer;
 import org.jscience.biology.loaders.BiologicalResourceReader;
-import org.jscience.natural.biology.ProteinFolding;
+import org.jscience.biology.ProteinFolding;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

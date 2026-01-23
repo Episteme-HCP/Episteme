@@ -1,99 +1,103 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.politics;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import org.jscience.biology.Individual;
-
 import org.jscience.geography.Place;
-
 import org.jscience.psychology.social.Group;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Set;
-
-
 /**
- * A class representing a primitive settlement. This is to be used mostly
- * for Tribes (human groups), or primate groups, or also Ants groups (in which
- * case this class is the colony).
+ * Represents a localized, often primitive or community-level settlement (Chiefdom, Colony, Tribe site).
+ * Settlement is used to model smaller human or social groups (including primate or social insect colonies) 
+ * that lack complex modern state infrastructure.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
-// perhaps should be called chiefdom
-//or extend Community and implement Named, Positioned
-public class Settlement extends Place {
-    /** DOCUMENT ME! */
-    private Group group;
+public class Settlement extends Place implements Serializable {
 
-    /** DOCUMENT ME! */
-    private Set leaders; //the current leader
+    private static final long serialVersionUID = 1L;
 
-/**
-     * Creates a new Settlement object.
+    private final Group group;
+    private final Set<Individual> leaders = new HashSet<>();
+
+    /**
+     * Initializes a new Settlement.
      *
-     * @param name  DOCUMENT ME!
-     * @param group DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param name  the name of the settlement
+     * @param group the primary social group occupying the settlement
+     * @throws NullPointerException if any argument is null
      */
     public Settlement(String name, Group group) {
-        super(name, group.getFormalTerritory().getBoundary());
-
-        if (group != null) {
-            this.group = group;
-            this.leaders = Collections.EMPTY_SET;
-        } else {
-            throw new IllegalArgumentException(
-                "The Settlement constructor doesn't allow null.");
-        }
+        super(Objects.requireNonNull(name, "Name cannot be null"), 
+              Objects.requireNonNull(group, "Group cannot be null").getFormalTerritory().getBoundary());
+        this.group = group;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the social group associated with this settlement.
+     * @return the group
      */
     public Group getGroup() {
         return group;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns an unmodifiable set of the settlement's leaders (e.g., chiefs, experts).
+     * @return leaders set
      */
-    public Set getLeaders() {
-        return leaders;
+    public Set<Individual> getLeaders() {
+        return Collections.unmodifiableSet(leaders);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param leaders DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Adds an individual to the leadership of the settlement.
+     * @param leader the individual to add
      */
-
-    //a good policy is to set the leaders to getGovernement().getOrganigram().getWorkers()
-    public void setLeaders(Set leaders) {
-        Iterator iterator;
-        boolean valid;
-
-        if (leaders != null) {
-            iterator = leaders.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Individual;
-            }
-
-            if (valid) {
-                this.leaders = leaders;
-            } else {
-                throw new IllegalArgumentException(
-                    "The leaders Set must contain only Individuals.");
-            }
-        } else {
-            throw new IllegalArgumentException("You can't set null leaders.");
+    public void addLeader(Individual leader) {
+        if (leader != null) {
+            leaders.add(leader);
         }
+    }
+
+    /**
+     * Removes an individual from leadership.
+     * @param leader the individual to remove
+     */
+    public void removeLeader(Individual leader) {
+        leaders.remove(leader);
+    }
+
+    @Override
+    public String toString() {
+        return getName() + " [" + group.getName() + " settlement]";
     }
 }

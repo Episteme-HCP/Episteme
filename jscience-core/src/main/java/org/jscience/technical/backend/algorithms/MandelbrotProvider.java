@@ -24,7 +24,6 @@
 package org.jscience.technical.backend.algorithms;
 
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.technical.backend.AlgorithmProvider;
 
 /**
  * Provider interface for Mandelbrot set generation.
@@ -35,7 +34,7 @@ import org.jscience.technical.backend.AlgorithmProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface MandelbrotProvider extends AlgorithmProvider {
+public interface MandelbrotProvider {
 
     /**
      * Computes Mandelbrot set iterations using primitive doubles.

@@ -37,6 +37,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.jscience.util.Named;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
  * A molecule: collection of atoms connected by bonds.
@@ -45,14 +51,21 @@ import org.jscience.util.Named;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@Persistent
 public class Molecule implements Named {
 
+    @Id
+    private Identification identification;
+    @Attribute
     private final String name;
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private final List<Atom> atoms;
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private final List<Bond> bonds;
     private final Map<Atom, List<Bond>> atomBonds;
 
     public Molecule(String name) {
+        this.identification = new SimpleIdentification("MOL-" + name + "-" + System.nanoTime());
         this.name = name;
         this.atoms = new ArrayList<>();
         this.bonds = new ArrayList<>();

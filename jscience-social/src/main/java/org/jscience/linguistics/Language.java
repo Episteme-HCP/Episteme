@@ -25,49 +25,35 @@ import javax.sound.sampled.Clip;
 //'Metalinguistics:' Ability to discuss language itself. 
 //'Productivity:' A finite number of units can be used to create an infinite number of utterances. 
 public class Language extends Object implements Named {
-    /** DOCUMENT ME! */
-    private String name;
+    private final String isoCode;
+    private final String name;
+    private final Set<Grapheme> graphemes = new HashSet<>();
+    private final Set<Phoneme> phonemes = new HashSet<>();
 
-    /** DOCUMENT ME! */
-    private Set graphemes;
-
-    /** DOCUMENT ME! */
-    private Set phonemes;
-
-/**
-     * Creates a new Language object.
-     *
-     * @param name DOCUMENT ME!
-     */
-    public Language(String name) {
-        if ((name != null) && (name.length() > 0)) {
-            this.name = name;
-            graphemes = new HashSet();
-            phonemes = new HashSet();
-        } else {
-            throw new IllegalArgumentException(
-                "The Language constructor arguments can't be null or empty.");
+    public Language(String isoCode, String name) {
+        if (isoCode == null || name == null) {
+            throw new IllegalArgumentException("Language code and name cannot be null");
         }
+        this.isoCode = isoCode.toLowerCase();
+        this.name = name;
     }
 
-/**
-     * Creates a new Language object.
-     *
-     * @param name      DOCUMENT ME!
-     * @param graphemes DOCUMENT ME!
-     */
-    public Language(String name, String graphemes) {
-        this(name);
-        addGraphemes(graphemes);
+    @Deprecated
+    public Language(String name) {
+        this("und", name); // "und" for undetermined
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    public Language(String isoCode, String name, String alphabet) {
+        this(isoCode, name);
+        addGraphemes(alphabet);
+    }
+
     public String getName() {
         return name;
+    }
+
+    public String getIsoCode() {
+        return isoCode;
     }
 
     /**
@@ -106,13 +92,8 @@ public class Language extends Object implements Named {
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Set getGraphemes() {
-        return graphemes;
+    public Set<Grapheme> getGraphemes() {
+        return Collections.unmodifiableSet(graphemes);
     }
 
     /**
@@ -150,12 +131,12 @@ public class Language extends Object implements Named {
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Set getPhonemes() {
-        return phonemes;
+    public Set<Phoneme> getPhonemes() {
+        return Collections.unmodifiableSet(phonemes);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s (%s)", name, isoCode);
     }
 }

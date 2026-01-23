@@ -23,20 +23,20 @@
 
 package org.jscience.sociology;
 
+import java.time.LocalDate;
 import org.jscience.util.identity.IdGenerator;
 import org.jscience.util.identity.SSNGenerator;
 import org.jscience.util.identity.UUIDGenerator;
 
-import java.time.LocalDate;
-
 /**
- * Factory for creating Person instances with auto-generated IDs.
+ * Factory for creating {@link Person} instances with auto-generated unique identifiers.
  * <p>
- * Uses pluggable ID generators to create unique identifiers for persons.
+ * Provides support for different ID generation strategies (UUID, SSN) via pluggable {@link IdGenerator}.
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
 public class PersonFactory {
@@ -60,7 +60,13 @@ public class PersonFactory {
     }
 
     /**
-     * Creates a person with auto-generated ID.
+     * Creates a person with specific attributes and an auto-generated ID.
+     *
+     * @param name        the person's name
+     * @param gender      the person's gender
+     * @param birthDate   the person's birth date
+     * @param nationality the person's nationality
+     * @return a new Person instance
      */
     public Person create(String name, Person.Gender gender, LocalDate birthDate, String nationality) {
         String id = idGenerator.generate();
@@ -68,32 +74,37 @@ public class PersonFactory {
     }
 
     /**
-     * Creates a person with minimal information.
+     * Creates a person with minimal information (name only).
+     * Defaults other fields to unspecified/null.
+     *
+     * @param name the person's name
+     * @return a new Person instance
      */
     public Person create(String name) {
         return create(name, Person.Gender.UNSPECIFIED, null, null);
     }
 
     /**
-     * Creates a factory that generates SSN-style IDs.
+     * Creates a factory instance configured to generate SSN-style IDs.
+     * @return a new PersonFactory
      */
     public static PersonFactory withSSN() {
         return new PersonFactory(new SSNGenerator());
     }
 
     /**
-     * Creates a factory that generates UUID IDs.
+     * Creates a factory instance configured to generate UUIDs.
+     * @return a new PersonFactory
      */
     public static PersonFactory withUUID() {
         return new PersonFactory(new UUIDGenerator());
     }
 
     /**
-     * Returns the ID format used by this factory.
+     * Returns the description of the ID format used by this factory.
+     * @return the format description
      */
     public String getIdFormat() {
         return idGenerator.getFormat();
     }
 }
-
-

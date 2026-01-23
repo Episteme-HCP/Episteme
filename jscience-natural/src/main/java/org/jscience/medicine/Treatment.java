@@ -4,7 +4,7 @@ import org.jscience.economics.Organization;
 import org.jscience.economics.money.Money;
 import org.jscience.geography.Place;
 import org.jscience.measure.Amount;
-import org.jscience.measure.Identification;
+import org.jscience.util.identity.Identification;
 
 import java.util.Date;
 
@@ -24,7 +24,7 @@ import java.util.Date;
 //we should also take into account many fields and constants from the NCD
 //also see http://en.wikipedia.org/wiki/International_Nonproprietary_Name and
 //http://en.wikipedia.org/wiki/Anatomical_Therapeutic_Chemical_Classification_System
-public class Treatment extends org.jscience.economics.resources.Object {
+public class Treatment extends org.jscience.economics.resources.PhysicalObject {
     /**
      * DOCUMENT ME!
      */

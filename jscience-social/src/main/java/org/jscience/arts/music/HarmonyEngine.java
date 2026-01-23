@@ -1,4 +1,4 @@
-﻿package org.jscience.arts.music;
+package org.jscience.arts.music;
 
 import org.jscience.measure.Quantity;
 import org.jscience.measure.quantity.Frequency;

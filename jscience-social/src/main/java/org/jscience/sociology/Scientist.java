@@ -23,18 +23,27 @@
 
 package org.jscience.sociology;
 
+import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 
 /**
- * Represents a scientist or researcher.
+ * Represents a scientist or researcher, tracking their career, field of study, and achievements.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
-public class Scientist {
+public class Scientist implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+    /** Primary scientific disciplines. */
     public enum Field {
         PHYSICS, CHEMISTRY, BIOLOGY, MATHEMATICS, ASTRONOMY,
         MEDICINE, COMPUTER_SCIENCE, ENGINEERING, GEOLOGY,
@@ -51,13 +60,24 @@ public class Scientist {
     private final List<String> awards = new ArrayList<>();
     private boolean nobelLaureate;
 
+    /**
+     * Creates a scientist with the given name.
+     * @param name full name
+     */
     public Scientist(String name) {
         this.name = name;
     }
 
+    /**
+     * Creates a scientist with name and primary field.
+     * @param name name
+     * @param primaryField main area of research
+     */
     public Scientist(String name, Field primaryField) {
         this(name);
-        this.fields.add(primaryField);
+        if (primaryField != null) {
+            this.fields.add(primaryField);
+        }
     }
 
     // Getters
@@ -119,17 +139,27 @@ public class Scientist {
     }
 
     public void addField(Field field) {
-        fields.add(field);
+        if (field != null) {
+            fields.add(field);
+        }
     }
 
     public void addPublication(String pub) {
-        publications.add(pub);
+        if (pub != null) {
+            publications.add(pub);
+        }
     }
 
     public void addAward(String award) {
-        awards.add(award);
+        if (award != null) {
+            awards.add(award);
+        }
     }
 
+    /**
+     * Checks if the scientist is currently alive (based on death date not being set).
+     * @return true if alive
+     */
     public boolean isAlive() {
         return deathDate == null;
     }
@@ -173,5 +203,3 @@ public class Scientist {
         return s;
     }
 }
-
-

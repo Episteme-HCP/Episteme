@@ -83,6 +83,11 @@ public class OpenMathWriter implements Serializer<Object>, org.jscience.io.Resou
     }
 
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"2.0"};
+    }
+
+    @Override
     public void write(Object object, OutputStream output) throws IOException {
         XMLOutputFactory factory = XMLOutputFactory.newInstance();
         try {

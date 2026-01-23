@@ -1,370 +1,274 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history.time;
 
 import org.jscience.measure.Amount;
-
+import org.jscience.measure.Unit;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Time;
+import java.io.Serializable;
 import java.util.Calendar;
-
-import javax.measure.quantity.Duration;
-import javax.measure.unit.BaseUnit;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
-
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
 
 /**
- * A class representing a way to compute time.
+ * Standard representation of time using the Gregorian/Modern system (24h/60m/60s).
+ * Provides conversion utilities between chronological components and standardized units of duration.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.2
+ * @since 1.0
  */
+@Persistent
+public class ModernTime extends org.jscience.history.time.Time {
 
-//  http://en.wikipedia.org/wiki/Clock
-public class ModernTime extends Time {
-    /** DOCUMENT ME! */
+    private static final long serialVersionUID = 1L;
+
     public static final int HOURS_PER_DAY = 24;
-
-    /** DOCUMENT ME! */
     public static final int MINUTES_PER_HOUR = 60;
-
-    /** DOCUMENT ME! */
     public static final int SECONDS_PER_MINUTE = 60;
-
-    /** DOCUMENT ME! */
     public static final int MILLISECONDS_PER_SECOND = 1000;
 
-    /**
-     * A unit of duration equal to <code>1/1000 s</code> (standard name
-     * <code>ms</code>).
-     */
-    public static final Unit<Duration> MODERN_MILLISECOND = SI.SECOND.divide(MILLISECONDS_PER_SECOND);
+    /** Unit for one millisecond. */
+    public static final Unit<Time> MODERN_MILLISECOND = Units.MILLISECOND;
 
-    /**
-     * The base unit for duration quantities (<code>s</code>). It is
-     * defined as the duration of 9,192,631,770 cycles of radiation
-     * corresponding to the transition between two hyperfine levels of the
-     * ground state of cesium (1967 Standard).
-     */
-    public static final BaseUnit<Duration> MODERN_SECOND = SI.SECOND;
+    /** Standard unit for duration (second). */
+    public static final Unit<Time> MODERN_SECOND = Units.SECOND;
 
-    /**
-     * A unit of duration equal to <code>60 s</code> (standard name
-     * <code>min</code>).
-     */
-    public static final Unit<Duration> MODERN_MINUTE = SI.SECOND.times(SECONDS_PER_MINUTE);
+    /** Unit for one minute. */
+    public static final Unit<Time> MODERN_MINUTE = Units.MINUTE;
 
-    /**
-     * A unit of duration equal to <code>60 {@link
-     * #MODERN_MINUTE}</code> (standard name <code>h</code>).
-     */
-    public static final Unit<Duration> MODERN_HOUR = MODERN_MINUTE.times(MINUTES_PER_HOUR);
+    /** Unit for one hour. */
+    public static final Unit<Time> MODERN_HOUR = Units.HOUR;
 
-    /**
-     * A unit of duration equal to <code>24 {@link #MODERN_HOUR}</code>
-     * (standard name <code>d</code>).
-     */
-    public static final Unit<Duration> MODERN_DAY = MODERN_HOUR.times(HOURS_PER_DAY);
+    /** Unit for one 24-hour day. */
+    public static final Unit<Time> MODERN_DAY = Units.DAY;
 
-    /** DOCUMENT ME! */
-    public final static Unit<Duration> DAYS_HOURS_MINUTES_SECONDS_MILLIS = MODERN_DAY.compound(MODERN_HOUR)
-                                                                                  .compound(MODERN_MINUTE)
-                                                                                  .compound(MODERN_SECOND)
-                                                                                  .compound(MODERN_MILLISECOND);
+    private static final long MILLIS_PER_DAY = 24L * 60L * 60L * 1000L;
+    private static final long MILLIS_PER_HOUR = 60L * 60L * 1000L;
+    private static final long MILLIS_PER_MINUTE = 60L * 1000L;
 
-    /** DOCUMENT ME! */
-    private static final long MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000L;
-
-    /** DOCUMENT ME! */
-    private static final long MILLISECONDS_PER_HOUR = 60 * 60 * 1000L;
-
-    /** DOCUMENT ME! */
-    private static final long MILLISECONDS_PER_MINUTE = 60 * 1000L;
-
-    /** DOCUMENT ME! */
+    @Attribute
     private int millis;
 
-    /** DOCUMENT ME! */
+    @Attribute
     private int seconds;
 
-    /** DOCUMENT ME! */
+    @Attribute
     private int minutes;
 
-    /** DOCUMENT ME! */
+    @Attribute
     private int hours;
 
-    /** DOCUMENT ME! */
+    @Attribute
     private int days;
 
-    /** DOCUMENT ME! */
-    private boolean is24;
+    @Attribute
+    private boolean is24 = true;
 
-    //we could also offer constructor using Measure<Duration>
-/**
-     * Creates a new ModernTime object.
-     *
-      */
-
-    //get sure it is positive
-    public ModernTime(double days, double hours, double minutes,
-        double seconds, double millis) {
-        if ((days >= 0) && (hours >= 0) && (minutes >= 0) && (seconds >= 0) &&
-                (millis >= 0)) {
-            double time = (days * MILLISECONDS_PER_DAY) +
-                (hours * MILLISECONDS_PER_HOUR) +
-                (minutes * MILLISECONDS_PER_MINUTE) +
-                (seconds * MILLISECONDS_PER_SECOND) + millis;
-            this.millis = (int) (time % MILLISECONDS_PER_SECOND);
-            time /= MILLISECONDS_PER_SECOND;
-            this.seconds = (int) (time % SECONDS_PER_MINUTE);
-            time /= SECONDS_PER_MINUTE;
-            this.minutes = (int) (time % MINUTES_PER_HOUR);
-            time /= MINUTES_PER_HOUR;
-            this.hours = (int) (time % HOURS_PER_DAY);
-            this.days = (int) (time / HOURS_PER_DAY);
-            is24 = true;
-        } else {
-            throw new IllegalArgumentException(
-                "Days, hours, minutes, seconds and millis must be greater or equal to zero.");
-        }
-    }
-
-    //in milliseconds
-/**
-     * Creates a new ModernTime object.
-     *
-     * @param millis DOCUMENT ME!
+    /**
+     * Creates ModernTime from full components.
+     * 
+     * @param days count of days
+     * @param hours hours (0-23)
+     * @param minutes minutes (0-59)
+     * @param seconds seconds (0-59)
+     * @param millis milliseconds (0-999)
+     * @throws IllegalArgumentException if any value is negative
      */
-
-    //get sure it is positive
-    public ModernTime(double millis) {
-        if (millis >= 0) {
-            this.millis = (int) (millis % MILLISECONDS_PER_SECOND);
-            millis /= MILLISECONDS_PER_SECOND;
-            this.seconds = (int) (millis % SECONDS_PER_MINUTE);
-            millis /= SECONDS_PER_MINUTE;
-            this.minutes = (int) (millis % MINUTES_PER_HOUR);
-            millis /= MINUTES_PER_HOUR;
-            this.hours = (int) (millis % HOURS_PER_DAY);
-            this.days = (int) (millis / HOURS_PER_DAY);
-            is24 = true;
-        } else {
-            throw new IllegalArgumentException(
-                "Millis must be greater or equal to zero.");
+    public ModernTime(double days, double hours, double minutes, double seconds, double millis) {
+        if (days < 0 || hours < 0 || minutes < 0 || seconds < 0 || millis < 0) {
+            throw new IllegalArgumentException("Time components cannot be negative");
         }
+        double totalMillis = (days * MILLIS_PER_DAY) + (hours * MILLIS_PER_HOUR) +
+                             (minutes * MILLIS_PER_MINUTE) + (seconds * MILLISECONDS_PER_SECOND) + millis;
+        initFromMillis(totalMillis);
     }
 
-    //using currenttime
-/**
-     * Creates a new ModernTime object.
+    /**
+     * Creates ModernTime from total milliseconds.
+     * 
+     * @param millis total milliseconds
+     * @throws IllegalArgumentException if millis is negative
+     */
+    public ModernTime(double millis) {
+        if (millis < 0) {
+            throw new IllegalArgumentException("Time in milliseconds cannot be negative");
+        }
+        initFromMillis(millis);
+    }
+
+    /**
+     * Creates ModernTime representing the current system moment.
      */
     public ModernTime() {
-        this(System.currentTimeMillis());
+        this((double) System.currentTimeMillis());
+    }
+
+    private void initFromMillis(double total) {
+        this.millis = (int) (total % MILLISECONDS_PER_SECOND);
+        total /= MILLISECONDS_PER_SECOND;
+        this.seconds = (int) (total % SECONDS_PER_MINUTE);
+        total /= SECONDS_PER_MINUTE;
+        this.minutes = (int) (total % MINUTES_PER_HOUR);
+        total /= MINUTES_PER_HOUR;
+        this.hours = (int) (total % HOURS_PER_DAY);
+        this.days = (int) (total / HOURS_PER_DAY);
+    }
+
+    @Override
+    public Amount<Time> getTime() {
+        long totalMillis = (long)days * MILLIS_PER_DAY + (long)hours * MILLIS_PER_HOUR + 
+                          (long)minutes * MILLIS_PER_MINUTE + (long)seconds * MILLISECONDS_PER_SECOND + millis;
+        return Amount.valueOf(totalMillis, Units.MILLISECOND);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Amount<Duration> getTime() {
-        return Amount.valueOf(millis, DAYS_HOURS_MINUTES_SECONDS_MILLIS);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Calculates the total elapsed seconds.
+     * 
+     * @return total seconds
      */
     public double getTimeInSeconds() {
-        return ((days * MILLISECONDS_PER_DAY) +
-        (hours * MILLISECONDS_PER_HOUR) + (minutes * MILLISECONDS_PER_MINUTE) +
-        (seconds * MILLISECONDS_PER_SECOND) + millis) / MILLISECONDS_PER_SECOND;
+        return ((long)days * MILLIS_PER_DAY + (long)hours * MILLIS_PER_HOUR + 
+                (long)minutes * MILLIS_PER_MINUTE + (long)seconds * MILLISECONDS_PER_SECOND + millis) / 1000.0;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public int getMilliseconds() {
         return millis;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public int getSeconds() {
         return seconds;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public int getMinutes() {
         return minutes;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public int getHours() {
         return hours;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public int getDays() {
         return days;
     }
 
-    /**
-     * DOCUMENT ME!
-     */
+    @Override
     public void nextMillisecond() {
-        millis += 1;
-
-        if (millis > MILLISECONDS_PER_SECOND) {
+        millis++;
+        if (millis >= MILLISECONDS_PER_SECOND) {
             millis = 0;
-            seconds += 1;
-
-            if (seconds > SECONDS_PER_MINUTE) {
-                seconds = 0;
-                minutes += 1;
-
-                if (minutes > MINUTES_PER_HOUR) {
-                    minutes = 0;
-                    hours += 1;
-
-                    if (hours > HOURS_PER_DAY) {
-                        hours = 0;
-                        days += 1;
-                    }
-                }
-            }
+            nextSecond();
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     */
+    @Override
     public void nextSecond() {
-        seconds += 1;
-
-        if (seconds > SECONDS_PER_MINUTE) {
+        seconds++;
+        if (seconds >= SECONDS_PER_MINUTE) {
             seconds = 0;
-            minutes += 1;
-
-            if (minutes > MINUTES_PER_HOUR) {
-                minutes = 0;
-                hours += 1;
-
-                if (hours > HOURS_PER_DAY) {
-                    hours = 0;
-                    days += 1;
-                }
-            }
+            nextMinute();
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     */
+    @Override
     public void nextMinute() {
-        minutes += 1;
-
-        if (minutes > MINUTES_PER_HOUR) {
+        minutes++;
+        if (minutes >= MINUTES_PER_HOUR) {
             minutes = 0;
-            hours += 1;
-
-            if (hours > HOURS_PER_DAY) {
-                hours = 0;
-                days += 1;
-            }
+            nextHour();
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     */
+    @Override
     public void nextHour() {
-        hours += 1;
-
-        if (hours > HOURS_PER_DAY) {
+        hours++;
+        if (hours >= HOURS_PER_DAY) {
             hours = 0;
-            days += 1;
+            days++;
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     */
+    @Override
     public void nextDay() {
-        days += 1;
+        days++;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Checks if 24-hour format is preferred for display.
+     * 
+     * @return true for 24h, false for 12h (AM/PM)
      */
     public boolean is24() {
         return is24;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param is24 DOCUMENT ME!
+     * Sets the preferred display format.
+     * 
+     * @param is24 true for 24h format
      */
     public void set24(boolean is24) {
         this.is24 = is24;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Converts to a standard Java Calendar instance.
+     * 
+     * @return calendar representation
      */
     public Calendar toCalendar() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(0, 0, days, hours, minutes, seconds);
-
         return calendar;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public String toString() {
-        StringBuffer value;
+        StringBuilder sb = new StringBuilder();
+        sb.append(days).append(" d ");
 
-        value = new StringBuffer();
-        value.append(days);
-        value.append(" d ");
+        int displayHours = hours;
+        if (!is24 && hours > 12) {
+            displayHours -= 12;
+        }
+        
+        sb.append(displayHours).append(" h ")
+          .append(minutes).append(" m ")
+          .append(seconds).append(" s ")
+          .append(millis).append(" ms");
 
-        if (!(is24) && (hours > 12)) {
-            value.append(hours - 12);
-        } else {
-            value.append(hours);
+        if (!is24) {
+            sb.append(hours >= 12 ? " PM" : " AM");
         }
 
-        value.append(" h ");
-        value.append(minutes);
-        value.append(" m ");
-        value.append(seconds);
-        value.append(" s ");
-        value.append(millis);
-        value.append(" ms");
-
-        return value.toString();
+        return sb.toString();
     }
 }

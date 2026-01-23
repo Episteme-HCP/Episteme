@@ -58,6 +58,11 @@ public class VTKWriter extends AbstractResourceWriter<double[][]> {
         return "Writes 2D data arrays to legacy VTK Structured Points ASCII format for visualization.";
     }
 
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"3.0", "4.2"};
+    }
+
     /**
      * Saves 2D data matrix to VTK format.
      */

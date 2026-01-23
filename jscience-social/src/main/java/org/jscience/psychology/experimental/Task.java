@@ -1,122 +1,118 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.psychology.experimental;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import org.jscience.util.Named;
 
-import java.util.Iterator;
-import java.util.Vector;
-
-
 /**
- * A class representing a specific task in an experiment. You actually have
- * to subclass it to provide with your actual implementation.
+ * An abstract representation of a specific task within a psychological experiment.
+ * Implementations should define the actual experimental logic in {@link #doTask()}.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
-public abstract class Task extends Object implements Named {
-    /** DOCUMENT ME! */
-    private String name;
+public abstract class Task implements Named, Serializable {
 
-    /** DOCUMENT ME! */
-    private String description;
+    private static final long serialVersionUID = 1L;
 
-    /** DOCUMENT ME! */
-    private Vector trials;
-
-    /** DOCUMENT ME! */
+    private final String name;
+    private final String description;
+    private final List<Trial> trials;
     private Subject subject;
 
-    //the trials should be a Vector of at least one element
     /**
-     * Creates a new Task object.
+     * Creates a new experimental task.
      *
-     * @param name DOCUMENT ME!
-     * @param description DOCUMENT ME!
-     * @param trials DOCUMENT ME!
+     * @param name        the identifying name of the task
+     * @param description a brief description of the task's purpose
+     * @param trials      the list of trials to be executed (must not be empty)
+     * @throws IllegalArgumentException if name, description, or trials are invalid
+     * @throws NullPointerException     if any argument is null
      */
-    public Task(String name, String description, Vector trials) {
-        Iterator iterator;
-        boolean valid;
+    protected Task(String name, String description, List<Trial> trials) {
+        Objects.requireNonNull(name, "Task name cannot be null");
+        Objects.requireNonNull(description, "Task description cannot be null");
+        Objects.requireNonNull(trials, "Trials list cannot be null");
 
-        if ((name != null) && (name.length() > 0) && (description != null) &&
-                (description.length() > 0) && (trials != null) &&
-                (trials.size() > 0)) {
-            iterator = trials.iterator();
-            valid = true;
+        if (name.isEmpty() || description.isEmpty() || trials.isEmpty()) {
+            throw new IllegalArgumentException("Arguments cannot be empty");
+        }
 
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Trial;
-            }
-
-            if (valid) {
-                this.name = name;
-                this.description = description;
-                this.trials = trials;
-            } else {
-                throw new IllegalArgumentException(
-                    "The trials Vector must contain only Trials.");
-            }
-
-            for (int i = 0; i < trials.size(); i++) {
-                ((Trial) trials.elementAt(i)).setTask(this);
-            }
-
-            this.subject = null;
-        } else {
-            throw new IllegalArgumentException(
-                "The Task constructor can't have null or empty arguments.");
+        this.name = name;
+        this.description = description;
+        this.trials = new ArrayList<>(trials);
+        
+        for (Trial trial : this.trials) {
+            trial.setTask(this);
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public String getName() {
         return name;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the description of this task.
+     * @return the task description
      */
     public String getDescription() {
         return description;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the list of trials associated with this task.
+     * @return the trials list
      */
-    public Vector getTrials() {
+    public List<Trial> getTrials() {
         return trials;
     }
 
-    //automatically set by the system when task added to a subject
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the subject performing this task, if assigned.
+     * @return the experimental subject
      */
     public Subject getSubject() {
         return subject;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param subject DOCUMENT ME!
+     * Sets the subject for this task.
+     * @param subject the subject to set
      */
     protected void setSubject(Subject subject) {
         this.subject = subject;
     }
 
-    //normally you launch here each trial one after another
     /**
-     * DOCUMENT ME!
+     * Executes the experimental task logic.
      */
     public abstract void doTask();
 }

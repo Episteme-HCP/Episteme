@@ -101,4 +101,24 @@ public interface ResourceIO<T> {
     default boolean isOutput() {
         return false;
     }
+
+    /**
+     * Returns the supported versions of the format this reader/writer handles.
+     * <p>
+     * Each implementation MUST override this method to declare which versions
+     * of the underlying format are supported. The returned array should contain
+     * version strings in the format's standard notation (e.g., "3.0", "2.1", "Level 3 Version 2").
+     * </p>
+     * <p>
+     * Examples:
+     * <ul>
+     *   <li>MathML: {"3.0", "2.0"}</li>
+     *   <li>SBML: {"Level 3 Version 2", "Level 3 Version 1", "Level 2 Version 5"}</li>
+     *   <li>PhyloXML: {"1.10", "1.00"}</li>
+     * </ul>
+     * </p>
+     *
+     * @return array of supported version strings, never null (empty array if version-agnostic)
+     */
+    String[] getSupportedVersions();
 }

@@ -35,12 +35,12 @@ import java.security.SecureRandom;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ISBNGenerator implements IdGenerator {
+public class ISBNGenerator implements IDGenerator {
 
     private final SecureRandom random = new SecureRandom();
 
     @Override
-    public String generate() {
+    public Identification generate() {
         int[] digits = new int[12];
         digits[0] = 9;
         digits[1] = 7;
@@ -57,12 +57,13 @@ public class ISBNGenerator implements IdGenerator {
         }
         int checkDigit = (10 - (sum % 10)) % 10;
 
-        return String.format("%d%d%d-%d-%d%d%d%d-%d%d%d%d-%d",
+        String value = String.format("%d%d%d-%d-%d%d%d%d-%d%d%d%d-%d",
                 digits[0], digits[1], digits[2],
                 digits[3],
                 digits[4], digits[5], digits[6], digits[7],
                 digits[8], digits[9], digits[10], digits[11],
                 checkDigit);
+        return new ISBNIdentification(value);
     }
 
     @Override

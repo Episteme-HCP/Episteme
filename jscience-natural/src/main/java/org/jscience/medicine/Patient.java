@@ -1,15 +1,18 @@
 package org.jscience.medicine;
 
 import org.jscience.biology.Individual;
-
 import org.jscience.measure.Report;
-
 import org.jscience.sociology.Role;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Relation;
 
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.Vector;
+import java.util.Objects;
 
 
 /**
@@ -21,36 +24,37 @@ import java.util.Vector;
  */
 
 //some variables are relevant only for vertebrates (but this is mostly the kind of cases a veterinary or physics has)
+@Persistent
 public class Patient extends Role {
     //http://en.wikipedia.org/wiki/Vital_signs
-    /** DOCUMENT ME! */
+    @Attribute
     private float bloodPressure; //using standard international unit Pascal
 
-    /** DOCUMENT ME! */
+    @Attribute
     private float cardiacRate; //beat per seconds, mean over short period of seconds
 
-    /** DOCUMENT ME! */
+    @Attribute
     private float temperature; //kelvin degrees
 
-    /** DOCUMENT ME! */
+    @Attribute
     private float normalTemperature; //kelvin degrees
 
-    /** DOCUMENT ME! */
+    @Attribute
     private float respiratoryRate; //beats per seconds
 
-    /** DOCUMENT ME! */
+    @Attribute
     private float painScale; //0 to 10
 
-    /** DOCUMENT ME! */
+    @Attribute
     private float bloodOxygen; //percent of normal
 
-    /** DOCUMENT ME! */
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private Set currentPathologies; //diseases, defects,etc a Set of Pathologies
 
-    /** DOCUMENT ME! */
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private Set treatments;
 
-    /** DOCUMENT ME! */
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private Vector medicalRecords; //Set of Records
 
 /**
@@ -202,195 +206,127 @@ public class Patient extends Role {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the set of current pathologies affecting the patient.
      *
-     * @return DOCUMENT ME!
+     * @return an unmodifiable set of current pathologies
      */
-    public Set getCurrentPathologies() {
-        return currentPathologies;
-    }
-
-    //all members of the Set should be pathologies
-    /**
-     * DOCUMENT ME!
-     *
-     * @param pathologies DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    public void setCurrentPathologies(Set pathologies) {
-        Iterator iterator;
-        boolean valid;
-
-        if (pathologies != null) {
-            iterator = pathologies.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Pathology;
-            }
-
-            if (valid) {
-                this.currentPathologies = pathologies;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Set of pathologies should contain only Pathologies.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Set of pathologies shouldn't be null.");
-        }
+    public Set<Pathology> getCurrentPathologies() {
+        return Collections.unmodifiableSet(currentPathologies);
     }
 
     /**
-     * DOCUMENT ME!
+     * Updates the set of current pathologies. Each element in the set must be a Pathology instance.
      *
-     * @param pathology DOCUMENT ME!
+     * @param pathologies the new set of pathologies
+     * @throws NullPointerException if the input set is null
+     */
+    public void setCurrentPathologies(Set<Pathology> pathologies) {
+        this.currentPathologies = new HashSet<>(Objects.requireNonNull(pathologies, "Pathologies set cannot be null"));
+    }
+
+    /**
+     * Adds a pathology to the patient's current condition.
+     *
+     * @param pathology the pathology to add
+     * @throws NullPointerException if the pathology is null
      */
     public void addPathology(Pathology pathology) {
-        currentPathologies.add(pathology);
+        currentPathologies.add(Objects.requireNonNull(pathology, "Pathology cannot be null"));
     }
 
     /**
-     * DOCUMENT ME!
+     * Removes a pathology from the patient's current condition.
      *
-     * @param pathology DOCUMENT ME!
+     * @param pathology the pathology to remove
      */
     public void removePathology(Pathology pathology) {
         currentPathologies.remove(pathology);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the set of medical treatments being administered.
      *
-     * @return DOCUMENT ME!
+     * @return an unmodifiable set of treatments
      */
-    public Set getTreatments() {
-        return treatments;
-    }
-
-    //all members of the Set should be treatments
-    /**
-     * DOCUMENT ME!
-     *
-     * @param treatments DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    public void setTreatments(Set treatments) {
-        Iterator iterator;
-        boolean valid;
-
-        if (treatments != null) {
-            iterator = treatments.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Treatment;
-            }
-
-            if (valid) {
-                this.treatments = treatments;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Set of treatments should contain only Treatments.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Set of treatments shouldn't be null.");
-        }
+    public Set<Treatment> getTreatments() {
+        return Collections.unmodifiableSet(treatments);
     }
 
     /**
-     * DOCUMENT ME!
+     * Updates the set of current treatments.
      *
-     * @param treatment DOCUMENT ME!
+     * @param treatments the new set of treatments
+     * @throws NullPointerException if the input set is null
+     */
+    public void setTreatments(Set<Treatment> treatments) {
+        this.treatments = new HashSet<>(Objects.requireNonNull(treatments, "Treatments set cannot be null"));
+    }
+
+    /**
+     * Records a new medical treatment for the patient.
+     *
+     * @param treatment the treatment to record
+     * @throws NullPointerException if the treatment is null
      */
     public void addTreatment(Treatment treatment) {
-        treatments.add(treatment);
+        treatments.add(Objects.requireNonNull(treatment, "Treatment cannot be null"));
     }
 
     /**
-     * DOCUMENT ME!
+     * Removes a recorded treatment.
      *
-     * @param treatment DOCUMENT ME!
+     * @param treatment the treatment to remove
      */
     public void removeTreatment(Treatment treatment) {
         treatments.remove(treatment);
     }
 
-    //returns the complete list of medical records sorted by date
     /**
-     * DOCUMENT ME!
+     * Returns the complete chronologically ordered list of medical records.
      *
-     * @return DOCUMENT ME!
+     * @return an unmodifiable view of medical records
      */
-    public Vector getMedicalRecords() {
-        return medicalRecords;
+    public List<Report> getMedicalRecords() {
+        return Collections.unmodifiableList(medicalRecords);
     }
 
     /**
-     * DOCUMENT ME!
+     * Adds a medical record to the patient's history.
      *
-     * @param medicalRecord DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param medicalRecord the report to add
+     * @throws NullPointerException if the record is null
      */
     public void addMedicalRecord(Report medicalRecord) {
-        if (medicalRecords != null) {
-            medicalRecords.add(medicalRecord);
-        } else {
-            throw new IllegalArgumentException(
-                "You can't add a null medical record.");
-        }
+        medicalRecords.add(Objects.requireNonNull(medicalRecord, "Medical record cannot be null"));
     }
 
-    //this almost should not happen
     /**
-     * DOCUMENT ME!
+     * Removes a medical record from the history.
      *
-     * @param medicalRecord DOCUMENT ME!
+     * @param medicalRecord the record to remove
      */
     public void removeMedicalRecord(Report medicalRecord) {
         medicalRecords.remove(medicalRecord);
     }
 
-    //this is very rare
     /**
-     * DOCUMENT ME!
+     * Removes the most recently added medical record.
+     *
+     * @throws IndexOutOfBoundsException if there are no records to remove
      */
     public void removeLastMedicalRecord() {
-        medicalRecords.remove(medicalRecords.size() - 1);
+        if (!medicalRecords.isEmpty()) {
+            medicalRecords.remove(medicalRecords.size() - 1);
+        }
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the complete patient record history.
      *
-     * @param medicalRecords DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param medicalRecords the new list of medical records
+     * @throws NullPointerException if the input list is null
      */
-    public void setMedicalRecords(Vector medicalRecords) {
-        Iterator iterator;
-        boolean valid;
-
-        if (medicalRecords != null) {
-            iterator = medicalRecords.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Report;
-            }
-
-            if (valid) {
-                this.medicalRecords = medicalRecords;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Vector of medical records should contain only Reports.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Vector of medical records shouldn't be null.");
-        }
+    public void setMedicalRecords(List<Report> medicalRecords) {
+        this.medicalRecords = new ArrayList<>(Objects.requireNonNull(medicalRecords, "Medical records list cannot be null"));
     }
 }

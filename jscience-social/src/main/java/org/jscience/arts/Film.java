@@ -3,7 +3,7 @@ package org.jscience.arts;
 import java.util.*;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.history.time.UncertainDate;
-import org.jscience.economics.Money;
+import org.jscience.economics.money.Money;
 
 /**
  * Represents a film/movie.

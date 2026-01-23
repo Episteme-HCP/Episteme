@@ -1,162 +1,162 @@
-package org.jscience.sociology;
-
-/**
- * A class defining some basic roles.
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * @author Silvere Martin-Michiellot
- * @version 1.0
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
-//below are personal choices, you may not agree with
-public class Roles extends Object {
-    //health
-    /** DOCUMENT ME! */
-    public final static Role PATIENT = new Role("Patient", Role.CLIENT);
+package org.jscience.sociology;
 
-    /** DOCUMENT ME! */
+import java.io.Serializable;
+
+/**
+ * A utility class defining common archetypal social roles across various contexts.
+ * These predefined roles serve as templates for creating specific role instances for individuals.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
+ */
+public final class Roles implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private Roles() {
+        // Prevent instantiation
+    }
+
+    // Health context
+    /** Individual seeking medical care. */
+    public final static Role PATIENT = new Role("Patient", Role.CLIENT);
+    /** Individual providing medical care. */
     public final static Role DOCTOR = new Role("Doctor", Role.SERVER);
 
-    //relations
-    /** DOCUMENT ME! */
+    // Relationship context
+    /** Junior individual in a family structure. */
     public final static Role CHILD = new Role("Child", Role.CLIENT);
-
-    /** DOCUMENT ME! */
+    /** Senior/caregiver individual in a family structure. */
     public final static Role PARENT = new Role("Parent", Role.SERVER);
-
-    /** DOCUMENT ME! */
+    /** Nearby resident in a social environment. */
     public final static Role NEIGHBOR = new Role("Neighbor", Role.OBSERVER);
-
-    /** DOCUMENT ME! */
+    /** Unfamiliar individual in a social context. */
     public final static Role STRANGER = new Role("Stranger", Role.OBSERVER);
-
-    /** DOCUMENT ME! */
+    /** Peer in a voluntary social bond. */
     public final static Role FRIEND = new Role("Friend", Role.SUPERVISOR);
-
-    /** DOCUMENT ME! */
+    /** Adversary in a social or physical conflict. */
     public final static Role ENEMY = new Role("Enemy", Role.OBSERVER);
 
-    //street conflicts
-    /** DOCUMENT ME! */
+    // Public safety / Conflict context
+    /** Individual harmed during a conflict. */
     public final static Role VICTIM = new Role("Victim", Role.CLIENT);
-
-    /** DOCUMENT ME! */
+    /** Individual initiating harm or law violation. */
     public final static Role FELON = new Role("Felon", Role.SERVER);
-
-    /** DOCUMENT ME! */
+    /** Individual enforcing public order. */
     public final static Role POLICEMAN = new Role("Policeman", Role.SUPERVISOR);
-
-    /** DOCUMENT ME! */
+    /** Potential perpetrator under investigation. */
     public final static Role SUSPECT = new Role("Suspect", Role.OBSERVER);
-
-    /** DOCUMENT ME! */
+    /** Individual confined following a law violation. */
     public final static Role PRISONER = new Role("Prisoner", Role.OBSERVER);
 
-    //justice
-    /** DOCUMENT ME! */
+    // Judicial context
+    /** Legal advocate for the state or plaintiff. */
     public final static Role PROSECUTOR = new Role("Prosecutor", Role.CLIENT);
-
-    /** DOCUMENT ME! */
+    /** Legal advocate for the defendant. */
     public final static Role DEFENDER = new Role("Defender", Role.CLIENT);
-
-    /** DOCUMENT ME! */
-    public final static Role JUDGE = new Role("Judge", Role.SUPERVISOR); //mediator
-
-    /** DOCUMENT ME! */
+    /** Impartial mediator in a legal conflict. */
+    public final static Role JUDGE = new Role("Judge", Role.SUPERVISOR);
+    /** Group of peers providing a collective verdict. */
     public final static Role JURY = new Role("Jury", Role.SERVER);
 
-    //school
-    /** DOCUMENT ME! */
+    // Education context
+    /** Individual receiving instruction. */
     public final static Role STUDENT = new Role("Student", Role.CLIENT);
-
-    /** DOCUMENT ME! */
+    /** Individual providing instruction. */
     public final static Role TEACHER = new Role("Teacher", Role.SERVER);
-
-    /** DOCUMENT ME! */
+    /** Individual managing an educational institution. */
     public final static Role HEADMASTER = new Role("Headmaster", Role.SUPERVISOR);
 
-    //market
-    /** DOCUMENT ME! */
+    // Market context
+    /** Individual purchasing goods or services. */
     public final static Role CONSUMER = new Role("Consumer", Role.CLIENT);
+    /** Individual selling goods or services. */
+    public final static Role SALESMAN = new Role("Salesman", Role.SERVER);
+    /** Individual managing commercial operations. */
+    public final static Role MANAGER = new Role("Manager", Role.SUPERVISOR);
 
-    /** DOCUMENT ME! */
-    public final static Role SALESMAN = new Role("Salesman", Role.SERVER); //also see worker
-
-    /** DOCUMENT ME! */
-    public final static Role MANAGER = new Role("Manager", Role.SUPERVISOR); //also see boss
-
-    //business
-    /** DOCUMENT ME! */
+    // Business/Economy context
+    /** Participant in productive labor. */
     public final static Role WORKER = new Role("Worker", Role.SERVER);
-
-    /** DOCUMENT ME! */
-    public final static Role BOSS = new Role("Boss", Role.SUPERVISOR); //supervisor, administrator, manager...
-
-    /** DOCUMENT ME! */
+    /** Decision-maker in a productive hierarchy. */
+    public final static Role BOSS = new Role("Boss", Role.SUPERVISOR);
+    /** Individual active in society but without formal employment. */
     public final static Role UNEMPLOYED = new Role("Unemployed", Role.OBSERVER);
 
-    //antique business
-    /** DOCUMENT ME! */
+    // Historical context
+    /** Individual in forced labor. */
     public final static Role SLAVE = new Role("Slave", Role.SERVER);
+    /** Individual in possession of or power over others. */
+    public final static Role MASTER = new Role("Master", Role.CLIENT);
 
-    /** DOCUMENT ME! */
-    public final static Role MASTER = new Role("Master", Role.CLIENT); //chief, king
+    // Political context
+    /** Formal or informal head of a political group. */
+    public final static Role LEADER = new Role("Leader", Role.SUPERVISOR);
+    /** Individual adhering to a leader's direction. */
+    public final static Role FOLLOWER = new Role("Follower", Role.SERVER);
+    /** The general citizenry or collective mass. */
+    public final static Role PEOPLE = new Role("People", Role.CLIENT);
 
-    //politics
-    /** DOCUMENT ME! */
-    public final static Role LEADER = new Role("Leader", Role.SUPERVISOR); //active, sadist
-
-    /** DOCUMENT ME! */
-    public final static Role FOLLOWER = new Role("Follow", Role.SERVER); //passive, masochist
-
-    /** DOCUMENT ME! */
-    public final static Role PEOPLE = new Role("People", Role.CLIENT); //passive, masochist
-
-    //faith
-    /** DOCUMENT ME! */
+    // Faith/Religious context
+    /** Adherent to a belief system. */
     public final static Role BELIEVER = new Role("Believer", Role.CLIENT);
-
-    /** DOCUMENT ME! */
+    /** Facilitator of religious rites. */
     public final static Role PRIEST = new Role("Priest", Role.SUPERVISOR);
 
-    //games
-    /** DOCUMENT ME! */
+    // Competition/Games context
+    /** Passive participant supporting a side. */
     public final static Role SUPPORTER = new Role("Supporter", Role.CLIENT);
-
-    /** DOCUMENT ME! */
+    /** Active participant in a game or sport. */
     public final static Role PLAYER = new Role("Player", Role.SERVER);
-
-    /** DOCUMENT ME! */
+    /** Impartial enforcer of game rules. */
     public final static Role REFEREE = new Role("Referee", Role.SUPERVISOR);
 
-    //show
-    /** DOCUMENT ME! */
+    // Performance context
+    /** Creative participant in an art or performance. */
     public final static Role ARTIST = new Role("Artist", Role.SERVER);
-
-    /** DOCUMENT ME! */
+    /** Group of observers for a performance. */
     public final static Role AUDIENCE = new Role("Audience", Role.CLIENT);
-
-    /** DOCUMENT ME! */
+    /** Individual providing technical support for a show. */
     public final static Role TECHNICIAN = new Role("Technician", Role.SERVER);
-
-    /** DOCUMENT ME! */
+    /** Commercial manager of a performance. */
     public final static Role PRODUCER = new Role("Producer", Role.SERVER);
-
-    /** DOCUMENT ME! */
+    /** Creative manager directing the performance. */
     public final static Role DIRECTOR = new Role("Director", Role.SUPERVISOR);
-
-    /** DOCUMENT ME! */
+    /** Individual ensuring order during a performance. */
     public final static Role SECURITY = new Role("Security", Role.SERVER);
 
-    //hunt
-    /** DOCUMENT ME! */
+    // Ecological context
+    /** Target of a hunt. */
     public final static Role PREY = new Role("Prey", Role.SERVER);
-
-    /** DOCUMENT ME! */
+    /** Initiator of a hunt. */
     public final static Role PREDATOR = new Role("Predator", Role.CLIENT);
-
-    /** DOCUMENT ME! */
+    /** Scavenger or beneficiary of a hunt outcome. */
     public final static Role OPPORTUNIST = new Role("Opportunist", Role.OBSERVER);
-
-    /** DOCUMENT ME! */
-    public final static Role HELPER = new Role("Symbiot", Role.SERVER); //helps the hunt such as dogs tracking the trail
+    /** Symbiotic participant helping another role. */
+    public final static Role HELPER = new Role("Symbiot", Role.SERVER);
 }

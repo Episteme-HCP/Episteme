@@ -1,32 +1,36 @@
 package org.jscience.psychology.social;
 
-import org.jscience.biology.human.HumanSpecies;
+import org.jscience.biology.HomoSapiens;
 
 import org.jscience.geography.Place;
 
 
+import org.jscience.util.persistence.Persistent;
+
+import java.util.Objects;
+
 /**
- * A class representing a human group.
+ * Represents a group of human individuals (Homo Sapiens).
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @version 1.1
  */
-
-//due to Java single inheritance scheme you have to subclass this class or the Family class to define a HumanFamily class.
+@Persistent
 public class HumanGroup extends Group {
 /**
      * Creates a new HumanGroup object.
      */
     public HumanGroup() {
-        super(new HumanSpecies());
+        super(HomoSapiens.SPECIES);
     }
 
-/**
-     * Creates a new HumanGroup object.
+    /**
+     * Initializes a new HumanGroup instance with a physical location.
      *
-     * @param formalTerritory DOCUMENT ME!
+     * @param formalTerritory the physical place or territory associated with this group
+     * @throws NullPointerException if formalTerritory is null
      */
     public HumanGroup(Place formalTerritory) {
-        super(new HumanSpecies(), formalTerritory);
+        super(HomoSapiens.SPECIES, Objects.requireNonNull(formalTerritory, "Territory cannot be null"));
     }
 }

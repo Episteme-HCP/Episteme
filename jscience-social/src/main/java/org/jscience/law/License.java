@@ -1,164 +1,150 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.law;
 
 import org.jscience.biology.human.Human;
-
 import org.jscience.economics.Organization;
 import org.jscience.economics.Property;
-import org.jscience.economics.Currency;
+import org.jscience.economics.money.Currency;
 import org.jscience.economics.money.Money;
-
-import org.jscience.measure.Amount;
-import org.jscience.measure.Identification;
-import org.jscience.measure.Identified;
-
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.Identified;
 import org.jscience.sociology.Person;
 
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
-import java.util.Vector;
-
 
 /**
- * A class representing a piece of paper by an authority that gives someone
- * the right to do something. This includes birth certificate, driving
- * licence, ID, diplomas...
+ * Represents an official license or certificate issued by an authority that 
+ * grants specific rights to an owner. Examples include birth certificates, 
+ * driving licenses, IDs, and professional diplomas.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.2
  */
+public class License implements Property, Identified {
 
-//there is no set method because this is meant to be a paper that you can't fill or modify
-//there is no date or place where it was established (although the authority and identification give a hint on this) but you can subclass this class
-//computer licences, for example GPL, should be found in org.jscience.sociology.License, not in org.jscience.law.Contract
-//although you can have a different idea on this
-public class License extends Object implements Property, Identified {
-    /** DOCUMENT ME! */
-    private Human owner;
+    private final Human owner;
+    private final Organization authority;
+    private final Identification identification;
+    private final List<String> rights;
 
-    /** DOCUMENT ME! */
-    private Organization authority;
-
-    /** DOCUMENT ME! */
-    private Identification identification;
-
-    /** DOCUMENT ME! */
-    private Vector rights;
-
-/**
-     * Creates a new License object.
+    /**
+     * Creates a new License object with a single initial right.
      *
-     * @param owner          DOCUMENT ME!
-     * @param authority      DOCUMENT ME!
-     * @param identification DOCUMENT ME!
-     * @param right          DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param owner the individual who owns the license
+     * @param authority the organization that issued the license
+     * @param identification the unique identification of the license document
+     * @param right the initial right granted by this license
+     * @throws IllegalArgumentException if any argument is null or empty
      */
     public License(Human owner, Organization authority,
         Identification identification, String right) {
-        Vector strings;
-
-        if ((owner != null) && (authority != null) && (identification != null) &&
-                (right != null) && (right.length() > 0)) {
-            this.owner = owner;
-            this.authority = authority;
-            this.identification = identification;
-            strings = new Vector();
-            strings.add(right);
-            this.rights = strings;
-        } else {
+        if (owner == null || authority == null || identification == null ||
+                right == null || right.isEmpty()) {
             throw new IllegalArgumentException(
-                "The Licence constructor can't have null or empty arguments.");
+                "License constructor arguments cannot be null or empty.");
         }
-    }
-
-/**
-     * Creates a new License object.
-     *
-     * @param person         DOCUMENT ME!
-     * @param authority      DOCUMENT ME!
-     * @param identification DOCUMENT ME!
-     * @param rights         DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    public License(Person person, Organization authority,
-        Identification identification, Vector rights) {
-        Iterator iterator;
-        boolean valid;
-
-        if ((person != null) && (authority != null) &&
-                (identification != null) && (rights != null) &&
-                (rights.size() > 0)) {
-            iterator = rights.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof String;
-            }
-
-            if (valid) {
-                this.owner = person;
-                this.authority = authority;
-                this.identification = identification;
-                this.rights = rights;
-            } else {
-                throw new IllegalArgumentException(
-                    "The rights Vector must contain only Strings.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Licence constructor can't have null or empty arguments.");
-        }
+        this.owner = owner;
+        this.authority = authority;
+        this.identification = identification;
+        this.rights = new ArrayList<>();
+        this.rights.add(right);
     }
 
     /**
-     * DOCUMENT ME!
+     * Creates a new License object with multiple rights.
      *
-     * @return DOCUMENT ME!
+     * @param person the person who owns the license
+     * @param authority the organization that issued the license
+     * @param identification the unique identification of the license document
+     * @param rights the list of rights granted by this license
+     * @throws IllegalArgumentException if any argument is null, empty, or contains non-String elements
      */
-    public Set getOwners() {
-        HashSet result;
+    public License(Person person, Organization authority,
+        Identification identification, List<String> rights) {
+        if (person == null || authority == null || identification == null ||
+                rights == null || rights.isEmpty()) {
+            throw new IllegalArgumentException(
+                "License constructor arguments cannot be null or empty.");
+        }
+        
+        for (Object r : rights) {
+            if (!(r instanceof String)) {
+                throw new IllegalArgumentException("The rights list must contain only String objects.");
+            }
+        }
 
-        result = new HashSet();
+        this.owner = person;
+        this.authority = authority;
+        this.identification = identification;
+        this.rights = new ArrayList<>(rights);
+    }
+
+    /**
+     * Returns the set of owners of this license. Currently, only the primary owner is returned.
+     * @return a set containing the license owner
+     */
+    @Override
+    public Set<Human> getOwners() {
+        Set<Human> result = new HashSet<>();
         result.add(owner);
-
         return result;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the authority that issued this license.
+     * @return the issuing organization
      */
     public Organization getAuthority() {
         return authority;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public Identification getIdentification() {
         return identification;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the list of rights granted by this license.
+     * @return a list of rights as strings
      */
-    public Vector getRights() {
-        return rights;
+    public List<String> getRights() {
+        return new ArrayList<>(rights);
     }
 
-    //unless otherwise stated (by a subclass) the actual value is 0
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the economic value of this license. Unless overridden by a subclass, 
+     * the default value is 0 USD.
+     * @return the value of the license
      */
-    public Amount<Money> getValue() {
-        return Amount.valueOf(0, Currency.USD);
+    @Override
+    public Quantity<Money> getValue() {
+        return Quantities.create(0, Currency.USD);
     }
 }

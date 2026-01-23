@@ -25,10 +25,10 @@ package org.jscience.util.identity;
 
 import java.util.UUID;
 
-public class UUIDGenerator implements IdGenerator {
+public class UUIDGenerator implements IDGenerator {
     @Override
-    public String generate() {
-        return UUID.randomUUID().toString();
+    public Identification generate() {
+        return new UUIDIdentification(UUID.randomUUID().toString());
     }
 
     @Override

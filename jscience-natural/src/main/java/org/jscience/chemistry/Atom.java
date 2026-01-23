@@ -27,6 +27,10 @@ import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.physics.classical.mechanics.Particle;
 
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
+
 import org.jscience.measure.Quantity;
 import org.jscience.measure.quantity.ElectricCharge;
 import org.jscience.measure.quantity.Length;
@@ -42,11 +46,16 @@ import org.jscience.measure.Units;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@Persistent
 public class Atom extends Particle {
 
+    @Attribute
     private final Element element;
+    @Attribute
     private Isotope isotope;
+    @Attribute
     private Quantity<ElectricCharge> formalCharge;
+    @Attribute
     private Vector<Real> force;
 
     public Atom(Element element, Vector<Real> position) {

@@ -6,7 +6,7 @@
 package org.jscience.mathematics.strategy;
 
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.data.UniversalDataModel;
+import org.jscience.util.UniversalDataModel;
 import java.util.*;
 
 /**

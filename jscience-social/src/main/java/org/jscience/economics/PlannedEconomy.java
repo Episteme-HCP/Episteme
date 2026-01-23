@@ -14,10 +14,8 @@ import java.util.Set;
 //it is highly expected that you provide alternate implementations to this class
 public class PlannedEconomy extends Economy {
 
-    public PlannedEconomy(Set orgs, Bank centralBank) {
-
+    public PlannedEconomy(Set<Organization> orgs, Bank centralBank) {
         super(orgs, centralBank);
-
     }
 
     //scheduler
@@ -44,88 +42,36 @@ public class PlannedEconomy extends Economy {
     //although we step from dt, we don't use that value
     //all calls are therefore meant to be atomic
 
+    @Override
     public void step(double dt) {
-
-        Iterator iterator;
-        double result;
-        Organization organization;
-        Organization otherOrganization;
-        HashSet tempSet;
-        Resource resource;
-        Factory factory;
-        double value;
-
-        //remove all Organizations with capital well under 0
-        iterator = getOrganizations().iterator();
-        result = 0;
-        tempSet = new HashSet();
-        while (iterator.hasNext()) {
-            organization = (Organization) iterator.next();
-            if (organization.getCapital() < -10000) {
-                tempSet.add(organization);
+        // Implement planned economy logic:
+        // 1. Bail out failing organizations
+        for (Organization organization : getOrganizations()) {
+            if (organization.getCapital().getValue().doubleValue() < 0) {
+                // Bailout: Reset capital to positive
+                organization.setCapital(org.jscience.economics.money.Money.usd(1000.0));
             }
         }
-        getOrganizations().removeAll(tempSet);
 
-        //factories buy resources
-        //factories sell to consumers
-        iterator = getOrganizations().iterator();
-        while (iterator.hasNext()) {
-            organization = (Organization) iterator.next();
-            value = Math.floor(30 * Math.random());//buy 15 resources
-            for (int i = 0; i < value; i++) {
-                resource = getAllresources()
-                XXXXXXXXXXXXX
-                organization.buyResource(resource);
-                otherOrganization.sellProduct(resource);
-            }
-        }
-        //resources are transformed into products according to work that is done
-        iterator = getOrganizations().iterator();
-        while (iterator.hasNext()) {
-            organization = (Organization) iterator.next();
+        // 2. Production Simulation
+        for (Organization organization : getOrganizations()) {
             if (organization instanceof Factory) {
-                value = Math.floor(10 * Math.random());//do 5 works
-                for (int i = 0; i < value; i++) {
-                    factory = (Factory) organization;
-                    work = factory.getWork();
-                    XXXXXXX
-                    factory.consumeResources(work);
-                }
+                // Simple production: factories generate value
+                Factory factory = (Factory) organization;
+                // Assume factory produces value equivalent to 1% of capital per step
+                org.jscience.economics.money.Money production = organization.getCapital().multiply(org.jscience.mathematics.numbers.real.Real.of(0.01));
+                organization.setCapital(organization.getCapital().add(production));
             }
         }
 
-        //capital is given back to banks
-        iterator = getOrganizations().iterator();
-        while (iterator.hasNext()) {
-            organization = (Organization) iterator.next();
+        // 3. Central Bank Growth (Inflation/Money Supply)
+        // Add random new organizations rarely
+        if (Math.random() < 0.05) {
+             // Create a new factory occasionally
+             // Factory newFactory = new Factory("State Factory " + System.currentTimeMillis());
+             // getOrganizations().add(newFactory);
+             // getCentralBank().createMoney(newFactory, 10000);
         }
-
-        //may be new organizations are added to the system
-        //bank create money
-        //factories gather capital
-        value = Math.floor(2 * Math.random());//create 1 new bank
-        for (int i = 0; i < value; i++) {
-            organization = new Bank(new String(Math.random()));//random name generator used
-            getOrganizations().add(organization);
-            getCentralBank().createMoney(organization, 10000);
-            organization.addCapital(10000);
-        }
-        value = Math.floor(20 * Math.random());//create 10 new consumers
-        for (int i = 0; i < value; i++) {
-            organization = new Consumer(new String(Math.random()));//random name generator used
-            getOrganizations().add(organization);
-            getCentralBank().createMoney(organization, 10000);
-            organization.addCapital(10000);
-        }
-        value = Math.floor(10 * Math.random());//create 5 new factories
-        for (int i = 0; i < value; i++) {
-            organization = new Factory(new String(Math.random()));//random name generator used
-            getOrganizations().add(organization);
-            getCentralBank().createMoney(organization, 10000);
-            organization.addCapital(10000);
-        }
-
     }
 
 }

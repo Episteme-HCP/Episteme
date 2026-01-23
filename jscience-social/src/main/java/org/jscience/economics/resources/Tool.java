@@ -1,135 +1,97 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.economics.resources;
 
+import java.time.Instant;
 import org.jscience.economics.Community;
 import org.jscience.economics.PotentialResource;
 import org.jscience.economics.Resource;
 import org.jscience.economics.money.Money;
-
 import org.jscience.geography.Place;
-
-import org.jscience.measure.Amount;
-import org.jscience.measure.Identification;
-
-import java.util.Date;
-
+import org.jscience.measure.Quantity;
+import org.jscience.util.identity.Identification;
 
 /**
- * A class representing a tool.
+ * Represents a tool used to build or repair other objects.
+ * Tools are distinct from final consumption goods (like food) but similar to machines.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
+public abstract class Tool extends PhysicalObject {
 
-//an object used to build up or fix some other object
-//many objects can be seen as tools when used for an unsual purpose
-//but they are not really tools as their use is "final": a tin is to be eaten, a chair to sit on
-//in a virtual world you will probably prefer to build up ready to use tools
-//for example you will not design a hammer but a wireless automatic nailer (that contains nails) and can be applied directly on Objets
-//you will therefore never have to locate nails first, put nails under hammer and then nail, but directly nail.
-public abstract class Tool extends org.jscience.economics.resources.Object {
-    /** DOCUMENT ME! */
-    private String purpose; //the human readable purpose of this tool, for example: a hammer nails
+    private static final long serialVersionUID = 1L;
 
-    /** DOCUMENT ME! */
-    private PotentialResource[] targets; //the target classes of Things the Tool is meant to be applied on
+    private String purpose;
+    private PotentialResource[] targets;
+    private int acts;
 
-    /** DOCUMENT ME! */
-    private int acts; //the number of different actions that can be applied on this tool
-
-/**
-     * Creates a new Tool object.
-     *
-     * @param name            DOCUMENT ME!
-     * @param description     DOCUMENT ME!
-     * @param amount          DOCUMENT ME!
-     * @param producer        DOCUMENT ME!
-     * @param productionPlace DOCUMENT ME!
-     * @param productionDate  DOCUMENT ME!
-     * @param identification  DOCUMENT ME!
-     * @param value           DOCUMENT ME!
+    /**
+     * Initializes a new tool.
      */
-    public Tool(String name, String description, Amount amount,
-        Community producer, Place productionPlace, Date productionDate,
-        Identification identification, Amount<Money> value) {
-        super(name, description, amount, producer, productionPlace,
-            productionDate, identification, value);
+    public Tool(String name, String description, Quantity<?> amount,
+            Community producer, Place productionPlace, Instant productionDate,
+            Identification identification, Money value) {
+        super(name, description, amount, producer, productionPlace, productionDate, identification, value);
         this.purpose = null;
         this.targets = new PotentialResource[0];
         this.acts = 0;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-
-    //may return null
     public String getPurpose() {
         return purpose;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param purpose DOCUMENT ME!
-     */
     public void setPurpose(String purpose) {
         this.purpose = purpose;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public PotentialResource[] getTargets() {
         return targets;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param targets DOCUMENT ME!
-     */
     public void setTargets(Resource[] targets) {
-        this.targets = targets;
+        this.targets = targets; // Note: PotentialResource is likely superclass
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public int getNumActions() {
         return acts;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param acts DOCUMENT ME!
-     */
     public void setNumActions(int acts) {
         this.acts = acts;
     }
 
-    //return the corresponding uhman readable action name in english for action i
     /**
-     * DOCUMENT ME!
-     *
-     * @param i DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the human-readable name for a specific action index.
      */
     public abstract String getActionName(int i);
 
-    //launches the predefined action on the predefined objects (which classes should be in the target list) provided a target is in range
     /**
-     * DOCUMENT ME!
-     *
-     * @param i DOCUMENT ME!
-     * @param objects DOCUMENT ME!
+     * Executes the specific action on a set of target objects.
      */
     public abstract void act(int i, Object[] objects);
 }

@@ -1413,9 +1413,9 @@ public class JScienceMasterControl extends Application {
             return "category.politics";
         if (fullName.contains(".sociology."))
             return "category.sociology";
-        if (fullName.contains(".device.") || fullName.contains(".nmea"))
+        if (fullName.contains(".device."))
             return "category.device";
-        if (fullName.contains(".mathematics.") || fullName.contains(".io."))
+        if (fullName.contains(".mathematics."))
             return "category.mathematics";
         if (fullName.contains(".engineering."))
             return "category.engineering";

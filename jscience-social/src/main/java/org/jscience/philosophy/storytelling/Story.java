@@ -1,3 +1,25 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.philosophy.storytelling;
 
 import org.jscience.util.BinaryRelation;
@@ -16,6 +38,7 @@ import java.util.Set;
  * event linked to some others in a causal or timed fashion.
  *
  * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
  * @version 1.0
  */
 
@@ -31,7 +54,7 @@ import java.util.Set;
 //Link (event1, event2)
 public class Story extends java.lang.Object {
     /** DOCUMENT ME! */
-    private Set events;
+    private Set<Event> events;
 
     /** DOCUMENT ME! */
     private BinaryRelation relations;
@@ -40,7 +63,7 @@ public class Story extends java.lang.Object {
      * Creates a new Story object.
      */
     public Story() {
-        events = Collections.EMPTY_SET;
+        events = new HashSet<>();
         relations = Relations.EMPTY_BINARYRELATION;
     }
 
@@ -49,7 +72,7 @@ public class Story extends java.lang.Object {
      *
      * @return DOCUMENT ME!
      */
-    public Set getEvents() {
+    public Set<Event> getEvents() {
         return events;
     }
 
@@ -88,10 +111,10 @@ public class Story extends java.lang.Object {
 
         if ((cause != null) && (events.contains(cause)) &&
                 (consequence != null) && (events.contains(consequence))) {
-            value = new Object[2];
+            value = new java.lang.Object[2];
             value[0] = cause;
             value[1] = consequence;
-            relations.remove(new NAry(value));
+            relations.add(new NAry(value));
         } else {
             throw new IllegalArgumentException(
                 "Can't add a relation for unknown events.");
@@ -110,13 +133,13 @@ public class Story extends java.lang.Object {
 
         if ((cause != null) && (events.contains(cause)) &&
                 (consequence != null) && (events.contains(consequence))) {
-            value = new Object[2];
+            value = new java.lang.Object[2];
             value[0] = cause;
             value[1] = consequence;
             relations.remove(new NAry(value));
         } else {
             throw new IllegalArgumentException(
-                "Can't add a relation for unknown events.");
+                "Can't remove a relation for unknown events.");
         }
     }
 
@@ -128,7 +151,7 @@ public class Story extends java.lang.Object {
      *
      * @return DOCUMENT ME!
      */
-    public Set solve(Event question) {
-        return null; //TODO
+    public Set<Event> solve(Event question) {
+        return Collections.emptySet(); //TODO
     }
 }

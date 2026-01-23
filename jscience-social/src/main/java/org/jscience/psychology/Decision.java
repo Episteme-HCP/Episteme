@@ -23,48 +23,41 @@
 
 package org.jscience.psychology;
 
+import java.io.Serializable;
 import java.time.Instant;
+import java.util.Objects;
 
 /**
- * 
+ * Represents a discrete decision made by an agent (Individual or Organization).
+ * Captures the choice, the rationale behind it, and the temporal context.
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
-public class Decision {
+public record Decision(
+    String subject,
+    String choice,
+    String rationale,
+    Instant timestamp
+) implements Serializable {
 
-    private final String subject; // The agent making the decision
-    private final String choice; // The option selected
-    private final String rationale;
-    private final Instant timestamp;
+    private static final long serialVersionUID = 1L;
 
+    /**
+     * Creates a new Decision with the current timestamp.
+     * 
+     * @param subject   the agent making the decision
+     * @param choice    the selected option
+     * @param rationale the reasoning behind the choice
+     */
     public Decision(String subject, String choice, String rationale) {
-        this.subject = subject;
-        this.choice = choice;
-        this.rationale = rationale;
-        this.timestamp = Instant.now();
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public String getChoice() {
-        return choice;
-    }
-
-    public String getRationale() {
-        return rationale;
-    }
-
-    public Instant getTimestamp() {
-        return timestamp;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("[%s] %s decided to %s because %s", timestamp, subject, choice, rationale);
+        this(
+            Objects.requireNonNull(subject, "Subject cannot be null"),
+            Objects.requireNonNull(choice, "Choice cannot be null"),
+            Objects.requireNonNull(rationale, "Rationale cannot be null"),
+            Instant.now()
+        );
     }
 }
-
-

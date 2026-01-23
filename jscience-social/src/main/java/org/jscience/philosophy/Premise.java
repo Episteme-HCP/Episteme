@@ -20,26 +20,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package org.jscience.philosophy;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 /**
+ * Represents a logic premise, consisting of a statement and its assigned 
+ * truth value.
+ * 
+ * <p> Premises are used as the fundamental building blocks for arguments and 
+ *     syllogisms within a logical framework.</p>
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * @version 6.0, July 21, 2014
  */
-public class Premise {
+public class Premise implements Serializable {
+
+
+    private static final long serialVersionUID = 1L;
 
     private final String statement;
     private final boolean truthValue;
 
+    /**
+     * Creates a premise assumed to be True.
+     * @param statement the textual claim of the premise
+     */
     public Premise(String statement) {
-        this(statement, true); // Assumed true by default in arguments
+        this(statement, true);
     }
 
+    /**
+     * Creates a premise with an explicit truth value.
+     * @param statement  the textual claim
+     * @param truthValue validity of the claim
+     */
     public Premise(String statement, boolean truthValue) {
-        this.statement = statement;
+        this.statement = Objects.requireNonNull(statement, "Statement cannot be null");
         this.truthValue = truthValue;
     }
 
@@ -47,14 +66,16 @@ public class Premise {
         return statement;
     }
 
+    /**
+     * Returns the boolean truth value of this premise.
+     * @return true if the premise is considered true in the current context
+     */
     public boolean isTrue() {
         return truthValue;
     }
 
     @Override
     public String toString() {
-        return (truthValue ? "[TRUE] " : "[FALSE] ") + statement;
+        return String.format("[%s] %s", truthValue ? "TRUE" : "FALSE", statement);
     }
 }
-
-

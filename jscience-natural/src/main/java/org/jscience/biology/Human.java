@@ -25,6 +25,9 @@ package org.jscience.biology;
 
 import java.time.LocalDate;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.identity.IDGenerator;
 
 /**
  * Represents a human individual.
@@ -33,13 +36,20 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@Persistent
 public class Human extends Individual {
 
+    @Attribute
     private HomoSapiens.BloodType bloodType;
+    @Attribute
     private String ethnicity;
+    @Attribute
     private Real heightMeters;
+    @Attribute
     private Real weightKg;
+    @Attribute
     private String eyeColor;
+    @Attribute
     private String hairColor;
 
     public Human(String id, Individual.Sex sex, LocalDate birthDate) {
@@ -55,11 +65,11 @@ public class Human extends Individual {
     }
 
     public Human(Individual.Sex sex, LocalDate birthDate) {
-        this(new org.jscience.util.identity.UUIDGenerator().generate(), sex, birthDate);
+        this(new org.jscience.util.identity.UUIDGenerator().generate().getId(), sex, birthDate);
     }
 
-    public Human(org.jscience.util.identity.IdGenerator generator, Individual.Sex sex, LocalDate birthDate) {
-        this(generator.generate(), sex, birthDate);
+    public Human(IDGenerator generator, Individual.Sex sex, LocalDate birthDate) {
+        this(generator.generate().getId(), sex, birthDate);
     }
 
     // Getters

@@ -22,6 +22,21 @@
  */
 
 /**
- * - athletic activities, competitions, and records.
+ * Provides classes and interfaces for sports science, athletic performance analysis, 
+ * and competition modeling.
+ * 
+ * <p>This package includes tools for:</p>
+ * <ul>
+ *   <li>Biomechanical simulation of human movement.</li>
+ *   <li>Athlete physiology and training load monitoring (ACWR, CTL/ATL).</li>
+ *   <li>Electoral-style ranking systems (Elo, Glicko-2) and tournament scheduling.</li>
+ *   <li>Tactical analysis, including heatmaps and passing networks.</li>
+ *   <li>Metabolic energy expenditure and nutrition planning.</li>
+ * </ul>
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
 package org.jscience.sports;

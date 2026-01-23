@@ -126,6 +126,11 @@ public class WorldBankReader extends AbstractResourceReader<Country> {
     }
 
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"v2"};
+    }
+
+    @Override
     protected Country loadFromSource(String id) throws Exception {
         String url = String.format("%s/country/%s?format=json", WB_API_BASE, id);
         HttpRequest request = HttpRequest.newBuilder()

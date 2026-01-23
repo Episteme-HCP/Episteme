@@ -2,6 +2,8 @@ package org.jscience.economics;
 
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.data.UniversalDataModel;
+import org.jscience.economics.money.Money;
+import org.jscience.economics.money.Currency;
 import java.util.*;
 
 /**

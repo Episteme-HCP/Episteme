@@ -1,362 +1,273 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.politics;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import org.jscience.biology.human.Human;
-
 import org.jscience.economics.Organization;
-
 import org.jscience.geography.Place;
-
 import org.jscience.law.Code;
 import org.jscience.law.Constitution;
 import org.jscience.law.Treaty;
-
 import org.jscience.psychology.social.Tribe;
-
 import org.jscience.sociology.Culture;
-
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Set;
-
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
- * A class representing the basic facts about an organized human group.
- *
+ * Represents a sovereign nation or organized human group (modern tribe).
+ * A nation is defined by its territory, identity (Culture), and supreme law (Constitution).
+ * 
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.2
+ * @since 1.0
  */
+@Persistent
+public class Nation extends Tribe implements Serializable {
 
-//this class is to be used for tribes that keep record about themselves which normally happens with the discovery of writing
+    private static final long serialVersionUID = 1L;
 
-//should probably be renamed State: http://en.wikipedia.org/wiki/State
-
-public class Nation extends Tribe {
-    /** DOCUMENT ME! */
+    @Attribute
     private int kind;
 
-    //all these humans are normally contained in the underlying population
-    //this is not checked (as this may not be the rule in your country)
-    /** DOCUMENT ME! */
-    private Administration government; //the people that decide on the actions for the country, the leader should be at the top of the organigram
+    @Relation(type = Relation.Type.ONE_TO_ONE)
+    private Administration government; 
 
-    /** DOCUMENT ME! */
-    private Set parliment; //a Set of humans that decide of the laws
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private Set<Human> parliment; 
 
-    /** DOCUMENT ME! */
+    @Relation(type = Relation.Type.ONE_TO_ONE)
     private Constitution constitution;
 
-    /** DOCUMENT ME! */
-    private Set codes; //a Set of codes
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private Set<Code> codes; 
 
-    /** DOCUMENT ME! */
-    private Set treaties; //a Set of treaties
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private Set<Treaty> treaties; 
 
-    /** DOCUMENT ME! */
-    private Set organizations;
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private Set<Organization> organizations;
 
-/**
-     * Creates a new Tribe object.
+    /**
+     * Initializes a new Nation.
      *
-     * @param name            DOCUMENT ME!
-     * @param formalTerritory DOCUMENT ME!
-     * @param culture         DOCUMENT ME!
+     * @param name            the name of the nation
+     * @param formalTerritory the physical territory
+     * @param culture         the dominant cultural identity
+     * @throws NullPointerException if any argument is null
      */
     public Nation(String name, Place formalTerritory, Culture culture) {
-        super(name, formalTerritory, culture);
+        super(Objects.requireNonNull(name, "Name cannot be null"), 
+              Objects.requireNonNull(formalTerritory, "Territory cannot be null"), 
+              Objects.requireNonNull(culture, "Culture cannot be null"));
 
         this.kind = PoliticsConstants.UNKNOWN;
-        this.government = null;
-        this.parliment = Collections.EMPTY_SET;
-        this.constitution = null;
-        this.codes = Collections.EMPTY_SET;
-        this.treaties = Collections.EMPTY_SET;
-        this.organizations = Collections.EMPTY_SET;
+        this.parliment = new HashSet<>();
+        this.codes = new HashSet<>();
+        this.treaties = new HashSet<>();
+        this.organizations = new HashSet<>();
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the kind or classification of this nation.
+     * @return the kind constant from {@link PoliticsConstants}
      */
     public int getKind() {
         return kind;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param kind DOCUMENT ME!
+     * Sets the classification of the nation.
+     * @param kind the kind constant
      */
     public void setKind(int kind) {
         this.kind = kind;
     }
 
-    //a good policy is to set the leader to getGovernement().getOrganigram().getWorkers().toArray()[0]
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the primary government administration.
+     * @return government instance
      */
     public Administration getGovernment() {
         return government;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param government DOCUMENT ME!
+     * Sets the government administration.
+     * @param government the government
      */
     public void setGovernment(Administration government) {
         this.government = government;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns an unmodifiable set of parliament members.
+     * @return set of human representatives
      */
-    public Set getParliment() {
-        return parliment;
+    public Set<Human> getParliment() {
+        return Collections.unmodifiableSet(parliment);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param parliment DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Overwrites the parliament membership.
+     * @param parliment current set of members
      */
-    public void setParliment(Set parliment) {
-        Iterator iterator;
-        boolean valid;
-
-        if (parliment != null) {
-            iterator = parliment.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Human;
-            }
-
-            if (valid) {
-                this.parliment = parliment;
-            } else {
-                throw new IllegalArgumentException(
-                    "The parliment Set must contain only Humans.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The parliment Set can't be null.");
-        }
+    public void setParliment(Set<Human> parliment) {
+        this.parliment = new HashSet<>(Objects.requireNonNull(parliment, "Parliament cannot be null"));
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param human DOCUMENT ME!
+     * Adds an individual to the parliament.
+     * @param human the representative to add
      */
     public void addParlimentMember(Human human) {
-        parliment.add(human);
+        parliment.add(Objects.requireNonNull(human, "Member cannot be null"));
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param human DOCUMENT ME!
+     * Removes an individual from the parliament membership.
+     * @param human the representative to remove
      */
     public void removeParlimentMember(Human human) {
         parliment.remove(human);
     }
 
-    //may return null
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the nation's constitution.
+     * @return constitution document
      */
     public Constitution getConstitution() {
         return constitution;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param constitution DOCUMENT ME!
+     * Sets the nation's constitution.
+     * @param constitution the constitution
      */
     public void setConstitution(Constitution constitution) {
         this.constitution = constitution;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns an unmodifiable set of legislative codes.
+     * @return legal codes
      */
-    public Set getCodes() {
-        return codes;
+    public Set<Code> getCodes() {
+        return Collections.unmodifiableSet(codes);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param codes DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Overwrites the nation's legal codes.
+     * @param codes the set of codes
      */
-    public void setCodes(Set codes) {
-        Iterator iterator;
-        boolean valid;
-
-        if (codes != null) {
-            iterator = codes.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Code;
-            }
-
-            if (valid) {
-                this.codes = codes;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Set of Codes must contain only Codes.");
-            }
-        } else {
-            throw new IllegalArgumentException("The codes Set can't be null.");
-        }
+    public void setCodes(Set<Code> codes) {
+        this.codes = new HashSet<>(Objects.requireNonNull(codes, "Codes set cannot be null"));
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param code DOCUMENT ME!
+     * Adds a specific legal code to the nation's registry.
+     * @param code the code to add
      */
     public void addCode(Code code) {
-        codes.add(code);
+        codes.add(Objects.requireNonNull(code, "Code cannot be null"));
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param code DOCUMENT ME!
+     * Removes a legal code from the registry.
+     * @param code the code to remove
      */
     public void removeCode(Code code) {
         codes.remove(code);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns an unmodifiable set of registered international treaties.
+     * @return treaties
      */
-    public Set getTreaties() {
-        return treaties;
+    public Set<Treaty> getTreaties() {
+        return Collections.unmodifiableSet(treaties);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param treaties DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Overwrites the list of international treaties.
+     * @param treaties the set of treaties
      */
-    public void setTreaties(Set treaties) {
-        Iterator iterator;
-        boolean valid;
-
-        if (treaties != null) {
-            iterator = treaties.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Treaty;
-            }
-
-            if (valid) {
-                this.treaties = treaties;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Set of Treaties must contain only Treaties.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Set of Treaties can't be null.");
-        }
+    public void setTreaties(Set<Treaty> treaties) {
+        this.treaties = new HashSet<>(Objects.requireNonNull(treaties, "Treaties set cannot be null"));
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param treaty DOCUMENT ME!
+     * Adds a new treaty to the nation's records.
+     * @param treaty the treaty instance
      */
     public void addTreaty(Treaty treaty) {
-        treaties.add(treaty);
+        treaties.add(Objects.requireNonNull(treaty, "Treaty cannot be null"));
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param treaty DOCUMENT ME!
+     * Removes an international treaty from registration.
+     * @param treaty the treaty to remove
      */
     public void removeTreaty(Treaty treaty) {
         treaties.remove(treaty);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns an unmodifiable set of affiliated organizations.
+     * @return organizations
      */
-    public Set getOrganizations() {
-        return organizations;
+    public Set<Organization> getOrganizations() {
+        return Collections.unmodifiableSet(organizations);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param organizations DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Overwrites the set of nation-affiliated organizations.
+     * @param organizations the organization set
      */
-    public void setOrganizations(Set organizations) {
-        Iterator iterator;
-        boolean valid;
-
-        if (organizations != null) {
-            iterator = organizations.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Organization;
-            }
-
-            if (valid) {
-                this.organizations = organizations;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Set of Treaties must contain only Organizations.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Set of Organizations can't be null.");
-        }
+    public void setOrganizations(Set<Organization> organizations) {
+        this.organizations = new HashSet<>(Objects.requireNonNull(organizations, "Organizations set cannot be null"));
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param organization DOCUMENT ME!
+     * Registers a new organization under the nation's jurisdiction.
+     * @param organization the organization to add
      */
-    public void addTreaty(Organization organization) {
-        organizations.add(organization);
+    public void addOrganization(Organization organization) {
+        organizations.add(Objects.requireNonNull(organization, "Organization cannot be null"));
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param organization DOCUMENT ME!
+     * Unregisters an organization from the nation's jurisdiction.
+     * @param organization the organization to remove
      */
-    public void removeTreaty(Organization organization) {
+    public void removeOrganization(Organization organization) {
         organizations.remove(organization);
     }
 }

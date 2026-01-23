@@ -29,7 +29,7 @@ import org.jscience.ui.AbstractViewer;
 import org.jscience.ui.Parameter;
 import org.jscience.ui.RealParameter;
 import org.jscience.ui.i18n.I18n;
-import org.jscience.ui.viewers.mathematics.discrete.backend.JavaFXNetworkRenderer;
+import org.jscience.ui.viewers.mathematics.discrete.backends.JavaFXNetworkRenderer;
 
 import java.util.*;
 

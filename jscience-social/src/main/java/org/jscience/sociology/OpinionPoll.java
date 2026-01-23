@@ -29,9 +29,11 @@ import java.util.Random;
 
 /**
  * A simulated Opinion Poll "device" for gauging public sentiment.
+ * Provides methods to simulate polling a population on various topics or options.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 1.1
  * @since 1.0
  */
 public class OpinionPoll {
@@ -39,21 +41,31 @@ public class OpinionPoll {
     private final String topic;
     private final Random random;
 
+    /**
+     * Creates a new Opinion Poll on a specific topic.
+     * @param topic the subject of the poll
+     */
     public OpinionPoll(String topic) {
         this.topic = topic;
         this.random = new Random();
     }
 
     /**
-     * Conducts a poll with a specified sample size.
+     * Conducts a poll with a specified sample size and options.
+     * Simulates responses using a uniform random distribution.
      * 
      * @param sampleSize number of people polled
-     * @return Map of Option -> Percentage
+     * @param options    available choices (e.g., "Yes", "No", "Undecided")
+     * @return Map of Option -> Percentage (0.0 to 100.0)
      */
     public Map<String, Double> conductPoll(int sampleSize, String... options) {
         Map<String, Double> results = new HashMap<>();
-        if (options.length == 0)
+        if (options == null || options.length == 0) {
             return results;
+        }
+        if (sampleSize <= 0) {
+            return results;
+        }
 
         int[] counts = new int[options.length];
         for (int i = 0; i < sampleSize; i++) {
@@ -67,6 +79,10 @@ public class OpinionPoll {
         return results;
     }
 
+    /**
+     * Returns the topic of this poll.
+     * @return the topic string
+     */
     public String getTopic() {
         return topic;
     }

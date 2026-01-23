@@ -1,306 +1,266 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.law;
 
 import org.jscience.biology.Individual;
-
 import org.jscience.economics.MaterialResource;
 import org.jscience.economics.WorkSituation;
-
-import org.jscience.measure.Identification;
-import org.jscience.measure.Identified;
-
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.Identified;
 import org.jscience.politics.Administration;
 
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.Vector;
-
 
 /**
- * A class representing the act of justice in modern countries. As the real
- * process is different from country to country and may be fairly complicated
- * only the raw outline is described here. Also note that an actual justice
- * action may consist of several lawsuits.
+ * Represents the process and context of a lawsuit or trial.
+ * Since legal processes vary greatly between jurisdictions, this class provides 
+ * a generalized structure for organizing evidence, transcripts, roles, and outcomes.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.2
  */
-
-//may be we could tell this is a theatrical representation (performance) although, well, not that funny (you wouln't pay to go)
-//normally one of the judge is on top of the others although this really depends on the country
-//may be we should provide something less formal for primitive societies
 public class LawSuitSituation extends WorkSituation implements Identified {
-    /** DOCUMENT ME! */
+    
     private Identification identification;
-
-    //the facts
-    /** DOCUMENT ME! */
-    private Set evidences; //the material brought on which facts are built, a Set of Object, probably of Strings: "7, a long sharp knife."
-
-    //what will we know if we look at it after it is closed
-    /** DOCUMENT ME! */
-    private Vector transcripts; //a Vector of String
-
-    //the result
-    /** DOCUMENT ME! */
+    private Set<MaterialResource> evidences;
+    private List<String> transcripts;
     private String sentence;
 
-/**
-     * Creates a new LawSuitSituation object.
+    /**
+     * Creates a new LawSuitSituation with a specific identification.
      *
-     * @param identification DOCUMENT ME!
+     * @param identification the unique identifier for this situation
      */
     public LawSuitSituation(Identification identification) {
-        super(new String(), new String());
-        this.identification = identification;
-        evidences = Collections.EMPTY_SET;
-        transcripts = new Vector();
-        sentence = null;
-    }
-
-/**
-     * Creates a new LawSuitSituation object.
-     *
-     * @param name           DOCUMENT ME!
-     * @param comments       DOCUMENT ME!
-     * @param identification DOCUMENT ME!
-     */
-    public LawSuitSituation(String name, String comments,
-        Identification identification) {
-        super(name, comments);
-        this.identification = identification;
-        evidences = Collections.EMPTY_SET;
-        transcripts = new Vector();
-        sentence = null;
+        this(identification.getName(), identification.getComments(), identification);
     }
 
     /**
-     * DOCUMENT ME!
+     * Creates a new LawSuitSituation with specific name, comments, and identification.
      *
-     * @return DOCUMENT ME!
+     * @param name the name of the lawsuit
+     * @param comments additional comments or context
+     * @param identification the unique identification object
      */
+    public LawSuitSituation(String name, String comments, Identification identification) {
+        super(name, comments);
+        this.identification = identification;
+        this.evidences = new HashSet<>();
+        this.transcripts = new ArrayList<>();
+        this.sentence = null;
+    }
+
+    @Override
     public Identification getIdentification() {
         return identification;
     }
 
     /**
-     * DOCUMENT ME!
+     * Adds a judge to the lawsuit.
      *
-     * @param individual DOCUMENT ME!
-     * @param administration DOCUMENT ME!
+     * @param individual the individual taking the role
+     * @param administration the judicial administration
      */
     public void addJudge(Individual individual, Administration administration) {
         super.addRole(new Judge(individual, this, administration));
     }
 
     /**
-     * DOCUMENT ME!
+     * Adds a prosecutor to the lawsuit.
      *
-     * @param individual DOCUMENT ME!
-     * @param administration DOCUMENT ME!
+     * @param individual the individual taking the role
+     * @param administration the judicial administration
      */
-    public void addProsecutor(Individual individual,
-        Administration administration) {
+    public void addProsecutor(Individual individual, Administration administration) {
         super.addRole(new Prosecutor(individual, this, administration));
     }
 
     /**
-     * DOCUMENT ME!
+     * Adds a lawyer to the lawsuit.
      *
-     * @param individual DOCUMENT ME!
-     * @param administration DOCUMENT ME!
+     * @param individual the individual taking the role
+     * @param administration the judicial administration
      */
     public void addLawyer(Individual individual, Administration administration) {
         super.addRole(new Lawyer(individual, this, administration));
     }
 
     /**
-     * DOCUMENT ME!
+     * Adds a jury member to the lawsuit.
      *
-     * @param individual DOCUMENT ME!
-     * @param administration DOCUMENT ME!
+     * @param individual the individual taking the role
+     * @param administration the judicial administration
      */
-    public void addJuryMember(Individual individual,
-        Administration administration) {
-        super.addRole(new Prosecutor(individual, this, administration));
+    public void addJuryMember(Individual individual, Administration administration) {
+        super.addRole(new JuryMember(individual, this, administration));
     }
 
     /**
-     * DOCUMENT ME!
+     * Adds a plaintiff to the lawsuit.
      *
-     * @param individual DOCUMENT ME!
+     * @param individual the individual taking the role
      */
     public void addPlaintiff(Individual individual) {
         super.addRole(new Plaintiff(individual, this));
     }
 
     /**
-     * DOCUMENT ME!
+     * Adds a defendant to the lawsuit.
      *
-     * @param individual DOCUMENT ME!
+     * @param individual the individual taking the role
      */
     public void addDefendant(Individual individual) {
         super.addRole(new Defendant(individual, this));
     }
 
     /**
-     * DOCUMENT ME!
+     * Adds a witness to the lawsuit.
      *
-     * @param individual DOCUMENT ME!
+     * @param individual the individual taking the role
      */
     public void addWitness(Individual individual) {
         super.addRole(new Witness(individual, this));
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the set of evidences (material resources) associated with the case.
+     * @return a set of evidences
      */
-    public Set getEvidences() {
+    public Set<MaterialResource> getEvidences() {
         return evidences;
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the set of evidences for this case.
      *
-     * @param evidences DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param evidences a set of MaterialResource objects
+     * @throws IllegalArgumentException if the set is null or contains non-MaterialResource elements
      */
-
-    //as usually evidences re part of the crime sometimes onece for all may be we should treat them as Artwork or similar
-    public void setEvidences(Set evidences) {
-        Iterator iterator;
-        boolean valid;
-
-        if (evidences != null) {
-            iterator = evidences.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof MaterialResource;
-            }
-
-            if (valid) {
-                this.evidences = evidences;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Set of evidences should contain only MaterialResource.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Vector of evidences shouldn't be null.");
+    public void setEvidences(Set<MaterialResource> evidences) {
+        if (evidences == null) {
+            throw new IllegalArgumentException("Evidences cannot be null.");
         }
+        
+        for (Object evidence : evidences) {
+            if (!(evidence instanceof MaterialResource)) {
+                throw new IllegalArgumentException("The set of evidences must contain only MaterialResource objects.");
+            }
+        }
+        
+        this.evidences = new HashSet<>(evidences);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the list of transcripts for the proceeding.
+     * @return the list of transcript strings
      */
-    public Vector getTranscripts() {
+    public List<String> getTranscripts() {
         return transcripts;
     }
 
     /**
-     * DOCUMENT ME!
+     * Adds a new transcript to the record.
      *
-     * @param transcript DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param transcript the transcript content
+     * @throws IllegalArgumentException if transcript is null
      */
     public void addTranscript(String transcript) {
-        if (transcript != null) {
-            transcripts.add(transcript);
-        } else {
-            throw new IllegalArgumentException(
-                "You can't add a null transcript.");
+        if (transcript == null) {
+            throw new IllegalArgumentException("Cannot add a null transcript.");
         }
+        transcripts.add(transcript);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param transcript DOCUMENT ME!
+     * Removes a specific transcript from the record.
+     * @param transcript the transcript to remove
      */
     public void removeTranscript(String transcript) {
         transcripts.remove(transcript);
     }
 
     /**
-     * DOCUMENT ME!
+     * Removes the most recent transcript from the record.
      */
     public void removeLastTranscript() {
-        if (transcripts.size() > 0) {
-            transcripts.removeElementAt(transcripts.size() - 1);
+        if (!transcripts.isEmpty()) {
+            transcripts.remove(transcripts.size() - 1);
         }
     }
 
     /**
-     * DOCUMENT ME!
+     * Sets the complete list of transcripts.
      *
-     * @param transcripts DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param transcripts a list of transcript strings
+     * @throws IllegalArgumentException if the list is null or contains non-string elements
      */
-    public void setTranscripts(Vector transcripts) {
-        Iterator iterator;
-        boolean valid;
-
-        if (transcripts != null) {
-            iterator = transcripts.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof String;
-            }
-
-            if (valid) {
-                this.transcripts = transcripts;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Vector of transcripts should contain only Strings.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Vector of transcripts shouldn't be null.");
+    public void setTranscripts(List<String> transcripts) {
+        if (transcripts == null) {
+            throw new IllegalArgumentException("Transcripts list cannot be null.");
         }
+        
+        for (Object s : transcripts) {
+            if (!(s instanceof String)) {
+                throw new IllegalArgumentException("Transcripts list must contain only String objects.");
+            }
+        }
+        
+        this.transcripts = new ArrayList<>(transcripts);
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the final sentence or outcome of the lawsuit.
+     * @return the sentence string
      */
     public String getSentence() {
         return sentence;
     }
 
-    //should be set only once
     /**
-     * DOCUMENT ME!
+     * Sets the final sentence or outcome. This can only be called once if the case is not yet over.
      *
-     * @param sentence DOCUMENT ME!
+     * @param sentence the final outcome description
+     * @throws IllegalArgumentException if the sentence is empty or already set
      */
     public void setSentence(String sentence) {
-        if (!isOver()) {
-            if ((sentence != null) && (sentence.length() > 0)) {
-                this.sentence = sentence;
-            } else {
-                throw new IllegalArgumentException(
-                    "The sentence shouldn't be null or empty.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The sentence has already been set.");
+        if (isOver()) {
+            throw new IllegalArgumentException("The sentence has already been set.");
         }
+        
+        if (sentence == null || sentence.isEmpty()) {
+            throw new IllegalArgumentException("The sentence cannot be null or empty.");
+        }
+        
+        this.sentence = sentence;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Checks if the lawsuit or trial is over (i.e., a sentence has been set).
+     * @return true if the case is concluded
      */
     public boolean isOver() {
         return sentence != null;

@@ -1,126 +1,142 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package org.jscience.politics.vote;
 
-import org.jscience.biology.Individual;
-
+import org.jscience.biology.human.Human;
 import org.jscience.sociology.Role;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 
 /**
- * This class represent a person in a voting situation.
+ * Represents a person participating in a voting process.
+ * A voter manages their ballots across multiple rounds of voting.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 1.1
+ * @since 1.0
  */
 public abstract class Voter extends Role {
-    /** DOCUMENT ME! */
-    private Vector hasVotedAtRoundI;
+    
+    private final List<Boolean> hasVotedAtRoundI;
+    private final List<Ballot> ballots;
 
-    /** DOCUMENT ME! */
-    private Vector ballots;
-
-/**
-     * Creates a new Voter object.
+    /**
+     * Creates a new Voter.
      *
-     * @param individual DOCUMENT ME!
-     * @param situation  DOCUMENT ME!
+     * @param human      the individual casting votes
+     * @param situation  the context of the vote
      */
-    public Voter(Individual individual, VoteSituation situation) {
-        super(individual, "Voter", situation, Role.CLIENT);
-        hasVotedAtRoundI = new Vector();
-        ballots = new Vector();
+    public Voter(Human human, VoteSituation situation) {
+        super(human, "Voter", situation, Role.CLIENT);
+        this.hasVotedAtRoundI = new ArrayList<>();
+        this.ballots = new ArrayList<>();
     }
 
-    //i must be between 1 and currentRoundForVoter()
     /**
-     * DOCUMENT ME!
+     * Retrieves the ballot cast at a specific round.
      *
-     * @param i DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param i the round number (1-indexed)
+     * @return the cast ballot
+     * @throws IndexOutOfBoundsException if round is invalid
      */
     public Ballot getBallotForRoundI(int i) {
-        return (Ballot) ballots.get(i - 1);
+        return ballots.get(i - 1);
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the list of all ballots cast by this voter.
      *
-     * @return DOCUMENT ME!
+     * @return the list of ballots
      */
-    public Vector getBallots() {
+    public List<Ballot> getBallots() {
         return ballots;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the total number of ballots cast.
      *
-     * @return DOCUMENT ME!
+     * @return number of ballots
      */
     public int getNumBallots() {
         return ballots.size();
     }
 
-    //you must call setBallotForCurrentRound() before this method
     /**
-     * DOCUMENT ME!
+     * Retrieves the most recent ballot.
      *
-     * @return DOCUMENT ME!
+     * @return the current ballot
+     * @throws IndexOutOfBoundsException if no ballots exist
      */
     public Ballot getCurrentBallot() {
-        return (Ballot) ballots.get(ballots.size() - 1);
+        return ballots.get(ballots.size() - 1);
     }
 
     /**
-     * DOCUMENT ME!
+     * Prepares a ballot for the current round.
      *
-     * @param ballot DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @param ballot the ballot to use
+     * @throws NullPointerException if ballot is null
      */
     public void setBallotForCurrentRound(Ballot ballot) {
-        if (ballot != null) {
-            ballots.add(ballot);
-            hasVotedAtRoundI.add(new Boolean(false));
-        } else {
-            throw new IllegalArgumentException("You can't add a null Ballot.");
-        }
+        this.ballots.add(Objects.requireNonNull(ballot, "Ballot cannot be null."));
+        this.hasVotedAtRoundI.add(false);
     }
 
-    //i must be between 1 and currentRoundForVoter()
     /**
-     * DOCUMENT ME!
+     * Checks if the voter has cast their vote in a specific round.
      *
-     * @param i DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param i the round number (1-indexed)
+     * @return true if they voted
      */
     public boolean hasVotedAtRoundI(int i) {
-        return ((Boolean) hasVotedAtRoundI.get(i - 1)).booleanValue();
+        return hasVotedAtRoundI.get(i - 1);
     }
 
-    //returns 0 if no ballot has been put in the system
     /**
-     * DOCUMENT ME!
+     * Returns the current round number according to this voter's activity.
      *
-     * @return DOCUMENT ME!
+     * @return current round count
      */
     public int getCurrentRoundForVoter() {
         return ballots.size();
     }
 
-    //actually increase round by one and fill a ballot
     /**
-     * DOCUMENT ME!
+     * Simulates the act of casting the vote for the current round.
      */
     protected void vote() {
-        hasVotedAtRoundI.set(hasVotedAtRoundI.size() - 1, new Boolean(true));
+        if (!hasVotedAtRoundI.isEmpty()) {
+            hasVotedAtRoundI.set(hasVotedAtRoundI.size() - 1, true);
+        }
     }
 
-    //using the getBallotForRoundI(currentRoundForVoter())
     /**
-     * DOCUMENT ME!
+     * Abstract method to be implemented by specific voter types to make their choices on the ballot.
      */
     public abstract void select();
 }
+

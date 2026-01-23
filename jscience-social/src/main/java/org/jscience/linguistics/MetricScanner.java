@@ -1,4 +1,4 @@
-﻿package org.jscience.linguistics;
+package org.jscience.linguistics;
 
 import java.util.*;
 import java.util.regex.*;
