@@ -23,51 +23,83 @@
 
 package org.jscience.psychology;
 
-import org.jscience.util.Named;
+import java.io.Serializable;
+import java.util.Objects;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.util.Named;
 
 /**
- * Represents a personality trait (e.g., Openness, Conscientiousness).
- * Martin-Michiellot
+ * Represents a quantified psychological personality trait or behavioral 
+ * tendency (e.g., the 'Big Five' traits: Openness, Conscientiousness, 
+ * Extraversion, Agreeableness, and Neuroticism). 
+ * 
+ * <p>Trait values are normalized on a continuous scale from 0.0 to 1.0.</p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 2.0
  * @since 1.0
  */
-public class Trait implements Named {
+public class Trait implements Named, Serializable {
+
+    private static final long serialVersionUID = 2L;
 
     private final String name;
     private final String description;
     private Real value;
 
+    /**
+     * Initializes a personality trait with a specific value.
+     * 
+     * @param name common name of the trait
+     * @param value normalized magnitude from 0.0 to 1.0
+     * @throws IllegalArgumentException if value is out of range
+     */
     public Trait(String name, Real value) {
         this(name, null, value);
     }
 
+    /**
+     * Initializes a personality trait with a description and value.
+     * 
+     * @param name common name of the trait
+     * @param description qualitative summary of what the trait measures
+     * @param value normalized magnitude from 0.0 to 1.0
+     * @throws IllegalArgumentException if value is out of range or null
+     */
     public Trait(String name, String description, Real value) {
-        if (value.doubleValue() < 0.0 || value.doubleValue() > 1.0) {
-            throw new IllegalArgumentException("Trait value must be between 0.0 and 1.0");
-        }
-        this.name = name;
+        this.name = Objects.requireNonNull(name, "Trait name cannot be null");
         this.description = description;
-        this.value = value;
+        this.value = Objects.requireNonNull(value, "Trait value cannot be null");
+        
+        if (value.doubleValue() < 0.0 || value.doubleValue() > 1.0) {
+            throw new IllegalArgumentException("Trait value must be a normalized Real between 0.0 and 1.0");
+        }
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    /** @return textual description of the trait, or null if not provided */
     public String getDescription() {
         return description;
     }
 
+    /** @return normalized intensity value (0.0 to 1.0) */
     public Real getValue() {
         return value;
     }
 
+    /**
+     * Updates the intensity of the trait.
+     * @param value new normalized value
+     * @throws IllegalArgumentException if value is out of range
+     */
     public void setValue(Real value) {
-        if (value.doubleValue() < 0.0 || value.doubleValue() > 1.0) {
-            throw new IllegalArgumentException("Trait value must be between 0.0 and 1.0");
+        if (value == null || value.doubleValue() < 0.0 || value.doubleValue() > 1.0) {
+            throw new IllegalArgumentException("Trait value must be a normalized Real between 0.0 and 1.0");
         }
         this.value = value;
     }
@@ -77,5 +109,3 @@ public class Trait implements Named {
         return String.format(java.util.Locale.US, "%s: %.2f", name, value.doubleValue());
     }
 }
-
-

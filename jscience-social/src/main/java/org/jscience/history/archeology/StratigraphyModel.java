@@ -24,10 +24,7 @@
 package org.jscience.history.archeology;
 
 import org.jscience.mathematics.numbers.real.Real;
-import java.io.Serializable;
 import java.util.*;
-import org.jscience.util.persistence.Attribute;
-import org.jscience.util.persistence.Persistent;
 
 /**
  * Models archaeological stratigraphy and topological relationships between strata.
@@ -52,24 +49,6 @@ public final class StratigraphyModel {
     }
 
     /**
-     * A distinct layer or unit of context in a stratigraphic sequence.
-     */
-    @Persistent
-    public record Stratum(
-        @Attribute String id,
-        @Attribute String description,
-        @Attribute double depthMeters,
-        @Attribute Map<String, Relationship> relations
-    ) implements Serializable {
-        private static final long serialVersionUID = 1L;
-
-        public Stratum {
-            Objects.requireNonNull(id, "Stratum ID cannot be null");
-            relations = relations != null ? Map.copyOf(relations) : Map.of();
-        }
-    }
-
-    /**
      * Verifies if a list of strata and their declared relationships are logically symmetric and consistent.
      * 
      * @param sequence list of stratigraphic units
@@ -80,11 +59,11 @@ public final class StratigraphyModel {
         Objects.requireNonNull(sequence, "Stratigraphy sequence cannot be null");
         Map<String, Stratum> idMap = new HashMap<>();
         for (Stratum s : sequence) {
-            idMap.put(s.id(), s);
+            idMap.put(s.getId(), s);
         }
 
         for (Stratum s : sequence) {
-            for (Map.Entry<String, Relationship> rel : s.relations().entrySet()) {
+            for (Map.Entry<String, Relationship> rel : s.getRelations().entrySet()) {
                 Relationship type = rel.getValue();
                 String targetId = rel.getKey();
                 Stratum target = idMap.get(targetId);
@@ -92,9 +71,9 @@ public final class StratigraphyModel {
                 if (target == null) continue;
 
                 // Validate Law of Superposition symmetry
-                if (type == Relationship.ABOVE && target.relations().get(s.id()) != Relationship.BELOW) return false;
-                if (type == Relationship.BELOW && target.relations().get(s.id()) != Relationship.ABOVE) return false;
-                if (type == Relationship.EQUAL && target.relations().get(s.id()) != Relationship.EQUAL) return false;
+                if (type == Relationship.ABOVE && target.getRelations().get(s.getId()) != Relationship.BELOW) return false;
+                if (type == Relationship.BELOW && target.getRelations().get(s.getId()) != Relationship.ABOVE) return false;
+                if (type == Relationship.EQUAL && target.getRelations().get(s.getId()) != Relationship.EQUAL) return false;
             }
         }
         return true;

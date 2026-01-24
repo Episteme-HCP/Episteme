@@ -1,46 +1,132 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.arts;
 
-import java.util.*;
-import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.history.time.UncertainDate;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import org.jscience.economics.money.Money;
+import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.util.Named;
+import org.jscience.util.Temporal;
+import org.jscience.util.identity.Identified;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
 
 /**
- * Represents a film/movie.
+ * Represents a film or motion picture within the cinematic arts.
+ * Tracks production details, casting, genre classification, and commercial performance.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
-public class Film {
+@Persistent
+public class Film implements Identified<String>, Named, Temporal<TemporalCoordinate>, Serializable {
 
+    private static final long serialVersionUID = 2L;
+
+    /**
+     * Cinematic genres.
+     */
     public enum Genre {
         ACTION, COMEDY, DRAMA, HORROR, SCIENCE_FICTION, FANTASY,
         THRILLER, ROMANCE, DOCUMENTARY, ANIMATION, MUSICAL, WESTERN
     }
 
+    /**
+     * Film ratings (MPAA based).
+     */
     public enum Rating {
         G, PG, PG_13, R, NC_17, UNRATED
     }
 
+    @Id
+    private final String id;
+    @Attribute
     private final String title;
+    @Attribute
     private String director;
-    private UncertainDate releaseDate;
+    @Attribute
+    private TemporalCoordinate releaseDate;
+    @Attribute
     private int durationMinutes;
+    @Attribute
     private Genre genre;
+    @Attribute
     private Rating rating;
+    @Attribute
     private String studio;
+    @Attribute
     private final List<String> cast = new ArrayList<>();
+    @Attribute
     private Money boxOffice;
+    @Attribute
     private Real imdbRating;
 
+    /**
+     * Creates a new Film with a title.
+     * @param title the movie title
+     */
     public Film(String title) {
+        this.id = UUID.randomUUID().toString();
         this.title = Objects.requireNonNull(title, "Title cannot be null");
     }
 
-    public Film(String title, String director, UncertainDate releaseDate) {
+    /**
+     * Creates a new Film with production details.
+     * @param title the movie title
+     * @param director the name of the director
+     * @param releaseDate the official release date
+     */
+    public Film(String title, String director, TemporalCoordinate releaseDate) {
         this(title);
         this.director = director;
         this.releaseDate = releaseDate;
     }
 
-    // Getters
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public String getName() {
+        return title;
+    }
+
+    @Override
+    public TemporalCoordinate getWhen() {
+        return releaseDate;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -49,7 +135,7 @@ public class Film {
         return director;
     }
 
-    public UncertainDate getReleaseDate() {
+    public TemporalCoordinate getReleaseDate() {
         return releaseDate;
     }
 
@@ -81,7 +167,6 @@ public class Film {
         return Collections.unmodifiableList(cast);
     }
 
-    // Setters
     public void setDirector(String director) {
         this.director = director;
     }
@@ -92,7 +177,7 @@ public class Film {
         }
     }
 
-    public void setReleaseDate(UncertainDate date) {
+    public void setReleaseDate(TemporalCoordinate date) {
         this.releaseDate = date;
     }
 
@@ -137,5 +222,3 @@ public class Film {
         return String.format("%s (%s) dir. %s", title, releaseDate != null ? releaseDate.toString() : "Unknown", director);
     }
 }
-
-

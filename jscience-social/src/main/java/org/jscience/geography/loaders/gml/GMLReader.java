@@ -23,8 +23,7 @@
 
 package org.jscience.geography.loaders.gml;
 
-import org.jscience.geography.Boundary;
-import org.jscience.geography.Coordinate;
+import org.jscience.earth.coordinates.GeodeticCoordinate;
 import org.jscience.geography.Place;
 import org.jscience.earth.loaders.gml.*;
 import org.jscience.io.AbstractResourceReader;
@@ -44,41 +43,42 @@ import java.util.Map;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
+ * @version 3.0
  * @since 1.0
  */
 public class GMLReader extends AbstractResourceReader<List<Place>> {
 
-    private final org.jscience.earth.loaders.gml.GMLReader coreReader;
+    private final GMLParser parser;
 
     public GMLReader() {
-        this.coreReader = new org.jscience.earth.loaders.gml.GMLReader();
+        this.parser = new GMLParser();
     }
 
     @Override
     public String getCategory() {
-        return "Geography";
+        return org.jscience.ui.i18n.I18n.getInstance().get("category.geography", "Geography");
     }
 
     @Override
     public String getName() {
-        return "GML Place Reader";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.gml.name", "GML Reader");
     }
 
     @Override
     public String getDescription() {
-        return "Reads geographical places from GML format.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.gml.desc", "Geography Markup Language (GML) reader");
     }
 
     @Override
     public String getLongDescription() {
-        return "Converts OGC GML features into JScience Place objects, preserving names, " +
-               "geometries, and attributes.";
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.gml.longdesc",
+            "Reads geographic features from GML (Geography Markup Language) files. " +
+            "Supports Points, LineStrings, and Polygons with associated properties.");
     }
 
     @Override
     public String getResourcePath() {
-        return null;
+        return "/";
     }
 
     @Override
@@ -87,103 +87,106 @@ public class GMLReader extends AbstractResourceReader<List<Place>> {
         return (Class<List<Place>>) (Class<?>) List.class;
     }
 
-    @Override
-    public String[] getSupportedVersions() {
-        return coreReader.getSupportedVersions();
-    }
-
-    @Override
-    protected List<Place> loadFromSource(String resourceId) throws Exception {
-        File file = new File(resourceId);
-        if (file.exists()) {
-            return read(file);
-        }
-        try (InputStream is = getClass().getResourceAsStream(resourceId)) {
-            if (is != null) {
-                return read(is);
-            }
-        }
-        return new ArrayList<>();
-    }
-
     /**
-     * Reads a list of places from a GML input stream.
+     * Reads places from a GML file.
      *
-     * @param input the input stream
-     * @return list of parsed places
-     * @throws GMLException if parsing fails
+     * @param file the GML file
+     * @return list of Place objects
+     * @throws Exception on parse error
      */
-    public List<Place> read(InputStream input) throws Exception {
-        GMLDocument doc = coreReader.read(input);
-        return convertToPlaces(doc);
-    }
-
-    /**
-     * Reads a list of places from a GML file.
-     *
-     * @param file the file
-     * @return list of parsed places
-     * @throws GMLException if parsing fails
-     */
+    @Override
     public List<Place> read(File file) throws Exception {
-        GMLDocument doc = coreReader.read(file);
-        return convertToPlaces(doc);
+        GMLDocument doc = parser.parse(file);
+        return convertDocument(doc);
     }
 
-    private List<Place> convertToPlaces(GMLDocument doc) {
-        List<Place> places = new ArrayList<>();
+    /**
+     * Reads places from an input stream.
+     *
+     * @param is the input stream
+     * @return list of Place objects
+     * @throws Exception on parse error
+     */
+    @Override
+    public List<Place> read(InputStream is) throws Exception {
+        GMLDocument doc = parser.parse(is);
+        return convertDocument(doc);
+    }
+
+    private List<Place> convertDocument(GMLDocument doc) {
+        List<Place> results = new ArrayList<>();
+        
         for (GMLFeature feature : doc.getFeatures()) {
             Place place = convertFeature(feature);
             if (place != null) {
-                places.add(place);
+                results.add(place);
             }
         }
-        return places;
+        
+        return results;
     }
 
     private Place convertFeature(GMLFeature feature) {
-        String name = feature.getProperty("name");
-        if (name == null) name = feature.getProperty("label");
-        if (name == null) name = "Feature " + feature.getId();
-
-        Boundary boundary = convertGeometry(feature.getGeometry());
+        String name = extractName(feature);
+        GeodeticCoordinate center = extractCenter(feature.getGeometry());
         
-        // Determine type from type name or properties
-        Place.Type type = Place.Type.OTHER;
-        String typeName = feature.getTypeName().toLowerCase();
-        if (typeName.contains("city")) type = Place.Type.CITY;
-        else if (typeName.contains("country")) type = Place.Type.COUNTRY;
-        else if (typeName.contains("region")) type = Place.Type.REGION;
+        Place place = new Place(name, center, Place.Type.OTHER);
         
-        return new Place(name, boundary, type);
+        // Copy properties
+        Map<String, String> props = feature.getProperties();
+        if (props.containsKey("type")) {
+            try {
+                place.setType(Place.Type.valueOf(props.get("type").toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                // Keep default type
+            }
+        }
+        if (props.containsKey("region")) {
+            place.setRegion(props.get("region"));
+        }
+        
+        return place;
     }
 
-    private Boundary convertGeometry(GMLGeometry geom) {
+    private String extractName(GMLFeature feature) {
+        Map<String, String> props = feature.getProperties();
+        // Try common name properties
+        for (String key : new String[]{"name", "NAME", "gml:name", "title", "TITLE"}) {
+            if (props.containsKey(key)) {
+                return props.get(key);
+            }
+        }
+        return feature.getId() != null ? feature.getId() : "Unknown";
+    }
+
+    private GeodeticCoordinate extractCenter(GMLGeometry geom) {
         if (geom == null) return null;
 
         if (geom instanceof GMLPoint) {
             GMLPoint p = (GMLPoint) geom;
-            return Boundary.point(p.getY(), p.getX());
+            double h = p.getZ() != null ? p.getZ() : 0.0;
+            return new GeodeticCoordinate(p.getY(), p.getX(), h);
         } else if (geom instanceof GMLPolygon) {
             GMLPolygon poly = (GMLPolygon) geom;
-            List<double[]> points = poly.getExteriorRing();
-            Coordinate[] coords = new Coordinate[points.size()];
-            for (int i = 0; i < points.size(); i++) {
-                double[] p = points.get(i);
-                coords[i] = new Coordinate(p[1], p[0], p.length > 2 ? p[2] : 0);
-            }
-            return new Boundary(coords);
+            return computeCentroid(poly.getExteriorRing());
         } else if (geom instanceof GMLLineString) {
             GMLLineString line = (GMLLineString) geom;
-            List<double[]> points = line.getPoints();
-            Coordinate[] coords = new Coordinate[points.size()];
-            for (int i = 0; i < points.size(); i++) {
-                double[] p = points.get(i);
-                coords[i] = new Coordinate(p[1], p[0], p.length > 2 ? p[2] : 0);
-            }
-            return new Boundary(coords);
+            return computeCentroid(line.getPoints());
         }
         
         return null;
+    }
+
+    private GeodeticCoordinate computeCentroid(List<double[]> points) {
+        if (points == null || points.isEmpty()) return null;
+        
+        double sumLat = 0, sumLon = 0, sumH = 0;
+        for (double[] p : points) {
+            sumLon += p[0];
+            sumLat += p[1];
+            if (p.length > 2) sumH += p[2];
+        }
+        int n = points.size();
+        return new GeodeticCoordinate(sumLat / n, sumLon / n, sumH / n);
     }
 }

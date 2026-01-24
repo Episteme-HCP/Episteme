@@ -1,25 +1,55 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.architecture.loaders;
 
-import org.jscience.io.ResourceReader;
+import org.jscience.io.AbstractResourceReader;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Objects;
+import java.io.InputStream;
 
 /**
  * Loader for acoustic material absorption coefficients.
+ * Modernized to extend {@link AbstractResourceReader}.
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
-public class AcousticEnvironmentLoader implements ResourceReader<Map<String, double[]>> {
+public class AcousticEnvironmentLoader extends AbstractResourceReader<Map<String, double[]>> {
 
     private final String source;
 
     public AcousticEnvironmentLoader(String source) {
-        this.source = source;
+        this.source = Objects.requireNonNull(source);
     }
 
     /**
      * Absorption coefficients at standard frequencies: 125, 250, 500, 1000, 2000, 4000 Hz.
      */
     @Override
-    public Map<String, double[]> load(String resourceId) throws Exception {
+    protected Map<String, double[]> loadFromSource(String resourceId) throws Exception {
         Map<String, double[]> materials = new HashMap<>();
         
         // Standard absorption coefficients (from ISO 354 / ASTM C423)
@@ -44,10 +74,9 @@ public class AcousticEnvironmentLoader implements ResourceReader<Map<String, dou
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Class<Map<String, double[]>> getResourceType() {
-        @SuppressWarnings("unchecked")
-        Class<Map<String, double[]>> type = (Class<Map<String, double[]>>) (Class<?>) Map.class;
-        return type;
+        return (Class<Map<String, double[]>>) (Class<?>) Map.class;
     }
 
     @Override
@@ -68,5 +97,10 @@ public class AcousticEnvironmentLoader implements ResourceReader<Map<String, dou
     @Override
     public String getCategory() {
         return "Architecture / Acoustics";
+    }
+
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[]{"ISO 354:2003", "ASTM C423-17"};
     }
 }

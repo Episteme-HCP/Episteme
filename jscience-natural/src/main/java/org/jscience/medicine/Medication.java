@@ -23,16 +23,26 @@
 
 package org.jscience.medicine;
 
+import org.jscience.util.Named;
+import org.jscience.util.identity.Identified;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+
+import java.io.Serializable;
 import java.util.*;
 
 /**
- * Represents a medication/drug.
+ * Represents a medication or drug with clinical and pharmaceutical details.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Medication {
+@Persistent
+public class Medication implements Identified<String>, Named, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public enum Form {
         TABLET, CAPSULE, LIQUID, INJECTION, TOPICAL, INHALANT,
@@ -44,30 +54,56 @@ public class Medication {
         INHALATION, RECTAL, SUBLINGUAL, TRANSDERMAL, OPHTHALMIC
     }
 
+    @Id
+    private final String id;
+
+    @Attribute
     private final String name;
+
+    @Attribute
     private String genericName;
+
+    @Attribute
     private String brandName;
+
+    @Attribute
     private Form form;
+
+    @Attribute
     private Route route;
+
+    @Attribute
     private String dosage;
+
+    @Attribute
     private String frequency;
+
+    @Attribute
     private final List<String> activeIngredients = new ArrayList<>();
+
+    @Attribute
     private final List<String> sideEffects = new ArrayList<>();
+
+    @Attribute
     private final List<String> contraindications = new ArrayList<>();
+
+    @Attribute
     private boolean prescriptionRequired;
-    private String atcCode; // Anatomical Therapeutic Chemical code
+
+    @Attribute
+    private String atcCode;
 
     public Medication(String name) {
-        this.name = name;
+        this.id = UUID.randomUUID().toString();
+        this.name = Objects.requireNonNull(name);
     }
 
-    public Medication(String name, Form form, Route route) {
-        this(name);
-        this.form = form;
-        this.route = route;
+    @Override
+    public String getId() {
+        return id;
     }
 
-    // Getters
+    @Override
     public String getName() {
         return name;
     }
@@ -76,115 +112,102 @@ public class Medication {
         return genericName;
     }
 
+    public void setGenericName(String genericName) {
+        this.genericName = genericName;
+    }
+
     public String getBrandName() {
         return brandName;
+    }
+
+    public void setBrandName(String brandName) {
+        this.brandName = brandName;
     }
 
     public Form getForm() {
         return form;
     }
 
-    public Route getRoute() {
-        return route;
-    }
-
-    public String getDosage() {
-        return dosage;
-    }
-
-    public String getFrequency() {
-        return frequency;
-    }
-
-    public String getAtcCode() {
-        return atcCode;
-    }
-
-    public boolean isPrescriptionRequired() {
-        return prescriptionRequired;
-    }
-
-    public List<String> getActiveIngredients() {
-        return Collections.unmodifiableList(activeIngredients);
-    }
-
-    public List<String> getSideEffects() {
-        return Collections.unmodifiableList(sideEffects);
-    }
-
-    public List<String> getContraindications() {
-        return Collections.unmodifiableList(contraindications);
-    }
-
-    // Setters
-    public void setGenericName(String name) {
-        this.genericName = name;
-    }
-
-    public void setBrandName(String name) {
-        this.brandName = name;
-    }
-
     public void setForm(Form form) {
         this.form = form;
+    }
+
+    public Route getRoute() {
+        return route;
     }
 
     public void setRoute(Route route) {
         this.route = route;
     }
 
+    public String getDosage() {
+        return dosage;
+    }
+
     public void setDosage(String dosage) {
         this.dosage = dosage;
+    }
+
+    public String getFrequency() {
+        return frequency;
     }
 
     public void setFrequency(String frequency) {
         this.frequency = frequency;
     }
 
-    public void setAtcCode(String code) {
-        this.atcCode = code;
-    }
-
-    public void setPrescriptionRequired(boolean required) {
-        this.prescriptionRequired = required;
+    public List<String> getActiveIngredients() {
+        return Collections.unmodifiableList(activeIngredients);
     }
 
     public void addActiveIngredient(String ingredient) {
         activeIngredients.add(ingredient);
     }
 
+    public List<String> getSideEffects() {
+        return Collections.unmodifiableList(sideEffects);
+    }
+
     public void addSideEffect(String effect) {
         sideEffects.add(effect);
+    }
+
+    public List<String> getContraindications() {
+        return Collections.unmodifiableList(contraindications);
     }
 
     public void addContraindication(String contraindication) {
         contraindications.add(contraindication);
     }
 
+    public boolean isPrescriptionRequired() {
+        return prescriptionRequired;
+    }
+
+    public void setPrescriptionRequired(boolean prescriptionRequired) {
+        this.prescriptionRequired = prescriptionRequired;
+    }
+
+    public String getAtcCode() {
+        return atcCode;
+    }
+
+    public void setAtcCode(String atcCode) {
+        this.atcCode = atcCode;
+    }
+
     @Override
     public String toString() {
-        return String.format("%s (%s, %s) - %s", name, form, route, dosage);
+        return String.format("%s (%s, %s)", name, form, route);
     }
 
-    // Common medications
+    // Factory methods
     public static Medication aspirin() {
-        Medication m = new Medication("Aspirin", Form.TABLET, Route.ORAL);
+        Medication m = new Medication("Aspirin");
+        m.setForm(Form.TABLET);
+        m.setRoute(Route.ORAL);
         m.setGenericName("Acetylsalicylic acid");
         m.setDosage("325mg");
-        m.addActiveIngredient("Acetylsalicylic acid");
-        m.addSideEffect("Stomach upset");
-        m.addContraindication("Bleeding disorders");
-        return m;
-    }
-
-    public static Medication ibuprofen() {
-        Medication m = new Medication("Ibuprofen", Form.TABLET, Route.ORAL);
-        m.setDosage("200-400mg");
-        m.addActiveIngredient("Ibuprofen");
-        m.addSideEffect("Stomach upset");
-        m.addSideEffect("Dizziness");
         return m;
     }
 }
-
-

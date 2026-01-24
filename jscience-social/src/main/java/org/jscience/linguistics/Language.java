@@ -1,53 +1,84 @@
-package org.jscience.linguistics;
-
-import org.jscience.util.Named;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.sound.sampled.Clip;
-
-
-/**
- * The Language class provides a placeholder for a language.
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * @author Silvere Martin-Michiellot
- * @version 1.0
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
-//http://en.wikipedia.org/wiki/Animal_language
-//These are the properties of human language that are argued to separate it from animal communication:
-//'Arbitrariness:' There is no relationship between a sound or sign and its meaning. 
-//'Cultural transmission:' Language is passed from one language user to the next, consciously or unconsciously. 
-//'Discreteness:' Language is composed of discrete units that are used in combination to create meaning. 
-//'Displacement:' Languages can be used to communicate ideas about things that are not in the immediate vicinity either spatially or temporally. 
-//'Duality:' Language works on two levels at once, a surface level and a semantic (meaningful) level. 
-//'Metalinguistics:' Ability to discuss language itself. 
-//'Productivity:' A finite number of units can be used to create an infinite number of utterances. 
-public class Language extends Object implements Named {
+package org.jscience.linguistics;
+
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import org.jscience.util.Named;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
+
+/**
+ * Represents a human language as a systematic linguistic entity.
+ * It tracks grammatical properties, writing systems (graphemes), and 
+ * phonetic inventories (phonemes).
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
+ */
+@Persistent
+public class Language implements Named, Serializable {
+
+    private static final long serialVersionUID = 2L;
+
+    @Id
     private final String isoCode;
+
+    @Attribute
     private final String name;
+
+    @Attribute
+    private String nativeName;
+
+    @Attribute
+    private String scriptName;
+
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private final Set<Grapheme> graphemes = new HashSet<>();
+
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private final Set<Phoneme> phonemes = new HashSet<>();
 
+    /**
+     * Creates a new Language instance.
+     * 
+     * @param isoCode the standard ISO 639 code (e.g., "en", "fra")
+     * @param name common English name of the language
+     */
     public Language(String isoCode, String name) {
-        if (isoCode == null || name == null) {
-            throw new IllegalArgumentException("Language code and name cannot be null");
-        }
-        this.isoCode = isoCode.toLowerCase();
-        this.name = name;
+        this.isoCode = Objects.requireNonNull(isoCode, "ISO code cannot be null").toLowerCase();
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
     }
 
-    @Deprecated
-    public Language(String name) {
-        this("und", name); // "und" for undetermined
-    }
-
-    public Language(String isoCode, String name, String alphabet) {
-        this(isoCode, name);
-        addGraphemes(alphabet);
-    }
-
+    @Override
     public String getName() {
         return name;
     }
@@ -56,39 +87,39 @@ public class Language extends Object implements Named {
         return isoCode;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param grapheme DOCUMENT ME!
-     */
-    protected void addGrapheme(Grapheme grapheme) {
-        graphemes.add(grapheme);
+    public String getNativeName() {
+        return nativeName;
+    }
+
+    public void setNativeName(String nativeName) {
+        this.nativeName = nativeName;
+    }
+
+    public String getScriptName() {
+        return scriptName;
+    }
+
+    public void setScriptName(String scriptName) {
+        this.scriptName = scriptName;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param character DOCUMENT ME!
+     * Registers a single character in this language's grapheme inventory.
+     * @param character textual character
      */
     public void addGrapheme(char character) {
         graphemes.add(new Grapheme(this, character));
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param characters DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * Batch adds multiple characters as graphemes.
+     * @param characters string containing all characters to add
      */
     public void addGraphemes(String characters) {
-        if ((characters != null) && (characters.length() > 0)) {
-            for (int i = 0; i < characters.length(); i++) {
-                graphemes.add(new Grapheme(this, characters.charAt(i)));
+        if (characters != null) {
+            for (char c : characters.toCharArray()) {
+                addGrapheme(c);
             }
-        } else {
-            throw new IllegalArgumentException(
-                "characters can't be null or empty.");
         }
     }
 
@@ -97,37 +128,12 @@ public class Language extends Object implements Named {
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param phoneme DOCUMENT ME!
+     * Associates a phoneme with this language's inventory.
+     * @param phoneme the phoneme to add
      */
-    protected void addPhoneme(Phoneme phoneme) {
-        phonemes.add(phoneme);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param clip DOCUMENT ME!
-     */
-    public void addPhoneme(Clip clip) {
-        phonemes.add(new Phoneme(this, clip));
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param clips DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    public void addPhonemes(Clip[] clips) {
-        if ((clips != null) && (clips.length > 0)) {
-            for (int i = 0; i < clips.length; i++) {
-                phonemes.add(new Phoneme(this, clips[i]));
-            }
-        } else {
-            throw new IllegalArgumentException("clips can't be null or empty.");
+    public void addPhoneme(Phoneme phoneme) {
+        if (phoneme != null && phoneme.getLanguage().equals(this)) {
+            phonemes.add(phoneme);
         }
     }
 
@@ -136,7 +142,19 @@ public class Language extends Object implements Named {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Language language)) return false;
+        return Objects.equals(isoCode, language.isoCode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isoCode);
+    }
+
+    @Override
     public String toString() {
-        return String.format("%s (%s)", name, isoCode);
+        return String.format("%s [%s]", name, isoCode);
     }
 }

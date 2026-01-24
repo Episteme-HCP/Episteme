@@ -13,7 +13,7 @@ import java.io.Serializable;
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  */
-public abstract class Identification implements Identified<String>, Serializable {
+public abstract class Identification implements Identified<Identification>, Serializable {
     
     private final String value;
 
@@ -22,8 +22,8 @@ public abstract class Identification implements Identified<String>, Serializable
     }
 
     @Override
-    public String getId() {
-        return value;
+    public Identification getId() {
+        return this;
     }
 
     @Override

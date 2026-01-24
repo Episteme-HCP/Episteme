@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 /**
- * Provides the {@link org.jscience.economics.money} module.
+ * Provides classes for monetary and financial operations.
+ * <p>
+ * This package contains:
+ * <ul>
+ *   <li>{@link org.jscience.economics.money.Money} - Quantity representing monetary amounts</li>
+ *   <li>{@link org.jscience.economics.money.Currency} - Currency unit based on ISO 4217</li>
+ *   <li>{@link org.jscience.economics.money.Currencies} - Registry of world currencies</li>
+ *   <li>{@link org.jscience.economics.money.Account} - Bank account with balance tracking</li>
+ *   <li>{@link org.jscience.economics.money.Transaction} - Financial transaction records</li>
+ *   <li>{@link org.jscience.economics.money.Quote} - Market price quotes for securities</li>
+ *   <li>{@link org.jscience.economics.money.Share} - Corporate stock shares</li>
+ *   <li>{@link org.jscience.economics.money.Wallet} - Multi-currency money container</li>
+ *   <li>{@link org.jscience.economics.money.MoneyUtils} - Financial calculation utilities</li>
+ * </ul>
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 package org.jscience.economics.money;

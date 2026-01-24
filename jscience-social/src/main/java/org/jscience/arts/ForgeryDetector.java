@@ -1,18 +1,50 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.arts;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.jscience.mathematics.numbers.real.Real;
 
-import java.util.*;
-
 /**
- * Statistical analysis for art forgery detection.
+ * Provides statistical analysis tools for art forgery detection.
+ * It analyzes brushstroke patterns and compares them against known 
+ * artist statistical fingerprints using z-score analysis.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
 public final class ForgeryDetector {
 
     private ForgeryDetector() {}
 
     /**
-     * Represents a brushstroke signature profile.
+     * Represents a mathematical signature of brushstroke characteristics.
      */
     public record BrushstrokeProfile(
         double avgLength,
@@ -21,23 +53,30 @@ public final class ForgeryDetector {
         double directionVariance,
         double curveFrequency,
         int strokeCount
-    ) {}
+    ) implements Serializable {
+        private static final long serialVersionUID = 2L;
+    }
 
     /**
-     * Represents an artist's known statistical fingerprint.
+     * Represents the unique statistical fingerprint of a specific artist's 
+     * brushstroke technique.
      */
     public record ArtistFingerprint(
         String artistName,
         BrushstrokeProfile meanProfile,
         double[] stdDeviations, // For each profile parameter
         int sampleSize
-    ) {}
+    ) implements Serializable {
+        private static final long serialVersionUID = 2L;
+    }
 
     /**
-     * Calculates a brushstroke profile from stroke measurements.
+     * Calculates a summary brushstroke profile from raw stroke measurements.
+     * 
+     * @param strokes raw measurements: {length, width, pressure, direction, curvature}
+     * @return a consolidated BrushstrokeProfile
      */
     public static BrushstrokeProfile calculateProfile(List<double[]> strokes) {
-        // strokes: each double[] = {length, width, pressure, direction, curvature}
         if (strokes.isEmpty()) {
             return new BrushstrokeProfile(0, 0, 0, 0, 0, 0);
         }
@@ -59,8 +98,12 @@ public final class ForgeryDetector {
     }
 
     /**
-     * Compares a sample artwork against an artist's fingerprint.
-     * Returns a confidence score (0-1) that the artwork is authentic.
+     * Computes an authenticity confidence score (0 to 1) for a sample work 
+     * against a known artist fingerprint.
+     * 
+     * @param sample the profile of the work being examined
+     * @param fingerprint the verified fingerprint of the artist
+     * @return confidence score as a Real number
      */
     public static Real authenticityScore(BrushstrokeProfile sample, ArtistFingerprint fingerprint) {
         BrushstrokeProfile ref = fingerprint.meanProfile();
@@ -83,7 +126,12 @@ public final class ForgeryDetector {
     }
 
     /**
-     * Flags potential forgery indicators.
+     * Identifies specific metrics that deviate significantly from an artist's 
+     * typical technique (e.g., "hesitation marks").
+     * 
+     * @param sample the profile of the work being examined
+     * @param fingerprint the verified fingerprint of the artist
+     * @return list of detected anomalies
      */
     public static List<String> detectAnomalies(BrushstrokeProfile sample, ArtistFingerprint fingerprint) {
         List<String> anomalies = new ArrayList<>();

@@ -23,28 +23,42 @@
 
 package org.jscience.architecture.traffic;
 
+import java.io.Serializable;
+import java.util.List;
 import org.jscience.geography.Coordinate;
 import org.jscience.geography.GeoPath;
 
-import java.util.List;
-
 /**
- * 
+ * Represents a physical roadway segment within a traffic network. It extends 
+ * {@link GeoPath} to provide geographical geometry and adds operational 
+ * parameters like speed limits and lane counts for micro-simulation.
+ *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 2.0
  * @since 1.0
  */
-public class Road extends GeoPath {
+public class Road extends GeoPath implements Serializable {
+
+    private static final long serialVersionUID = 2L;
 
     private final String name;
-    private double speedLimit; // in km/h or m/s? Let's use m/s internally.
+    private double speedLimit; // Operational speed limit in meters per second (m/s)
     private int lanes;
 
+    /**
+     * Initializes a new road segment.
+     * 
+     * @param name common name for the road or segment ID
+     * @param coordinates list of geographic coordinates defining the road path
+     * @param speedLimit maximum allowed speed in meters per second (m/s)
+     * @param lanes number of directional traffic lanes
+     */
     public Road(String name, List<Coordinate> coordinates, double speedLimit, int lanes) {
         super(coordinates);
         this.name = name;
         this.speedLimit = speedLimit;
-        this.lanes = lanes;
+        this.lanes = Math.max(1, lanes);
     }
 
     public String getName() {
@@ -55,6 +69,10 @@ public class Road extends GeoPath {
         return speedLimit;
     }
 
+    /**
+     * Updates the operational speed limit.
+     * @param speedLimit new limit in meters per second
+     */
     public void setSpeedLimit(double speedLimit) {
         this.speedLimit = speedLimit;
     }
@@ -63,5 +81,3 @@ public class Road extends GeoPath {
         return lanes;
     }
 }
-
-

@@ -23,7 +23,9 @@
 
 package org.jscience.history;
 
-import org.jscience.history.time.UncertainDate;
+import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.history.temporal.FuzzyTemporalInterval;
+import java.time.ZoneOffset;
 import java.io.Serializable;
 import java.util.*;
 import org.jscience.util.persistence.Attribute;
@@ -60,8 +62,8 @@ public final class BorderEvolution {
         @Attribute String name,
         @Attribute String sovereignEntity,
         @Attribute List<double[]> boundaryPoints,
-        @Relation(type = Relation.Type.ONE_TO_ONE) UncertainDate startDate,
-        @Relation(type = Relation.Type.ONE_TO_ONE) UncertainDate endDate,
+        @Relation(type = Relation.Type.ONE_TO_ONE) TemporalCoordinate startDate,
+        @Relation(type = Relation.Type.ONE_TO_ONE) TemporalCoordinate endDate,
         @Attribute String notes
     ) implements Serializable {
         private static final long serialVersionUID = 1L;
@@ -84,7 +86,7 @@ public final class BorderEvolution {
      */
     @Persistent
     public record BorderChange(
-        @Relation(type = Relation.Type.ONE_TO_ONE) UncertainDate date,
+        @Relation(type = Relation.Type.ONE_TO_ONE) TemporalCoordinate date,
         @Attribute String description,
         @Relation(type = Relation.Type.MANY_TO_ONE) Territory beforeTerritory,
         @Relation(type = Relation.Type.MANY_TO_ONE) Territory afterTerritory,
@@ -137,7 +139,7 @@ public final class BorderEvolution {
      * @return unmodifiable list of active territories
      * @throws NullPointerException if date is null
      */
-    public static List<Territory> getTerritoriesAtDate(UncertainDate date) {
+    public static List<Territory> getTerritoriesAtDate(TemporalCoordinate date) {
         Objects.requireNonNull(date, "Date cannot be null");
         synchronized (TERRITORY_DATABASE) {
             return TERRITORY_DATABASE.stream()
@@ -156,7 +158,7 @@ public final class BorderEvolution {
      * @throws NullPointerException if date is null
      */
     public static Optional<String> getSovereignAt(double latitude, double longitude, 
-            UncertainDate date) {
+            TemporalCoordinate date) {
         Objects.requireNonNull(date, "Date cannot be null");
         for (Territory t : getTerritoriesAtDate(date)) {
             if (isPointInTerritory(latitude, longitude, t)) {
@@ -196,7 +198,7 @@ public final class BorderEvolution {
      * @return approximate area in km²
      * @throws NullPointerException if entityName or date is null
      */
-    public static double calculateTerritorialExtent(String entityName, UncertainDate date) {
+    public static double calculateTerritorialExtent(String entityName, TemporalCoordinate date) {
         Objects.requireNonNull(entityName, "Entity name cannot be null");
         Objects.requireNonNull(date, "Date cannot be null");
         String finalName = entityName.trim();
@@ -244,43 +246,43 @@ public final class BorderEvolution {
     public static void loadSampleData() {
         // Treaty of Verdun (843) - Division of Carolingian Empire
         addBorderChange(new BorderChange(
-            UncertainDate.certain(843, 8, 1),
+            FuzzyTemporalInterval.of(843, 8, 1),
             "Treaty of Verdun - Carolingian Empire divided",
             new Territory("Carolingian Empire", "Carolingian Dynasty",
                 List.of(new double[]{48.8, 2.3}),
-                UncertainDate.circa(800), UncertainDate.certain(843, 8, 1), ""),
+                FuzzyTemporalInterval.circa(800), FuzzyTemporalInterval.of(843, 8, 1), ""),
             new Territory("West Francia", "Charles the Bald",
                 List.of(new double[]{48.8, 2.3}),
-                UncertainDate.certain(843, 8, 1), UncertainDate.circa(987), "Became France"),
+                FuzzyTemporalInterval.of(843, 8, 1), FuzzyTemporalInterval.circa(987), "Became France"),
             ChangeType.PARTITION
         ));
         
         // Norman Conquest (1066)
         addBorderChange(new BorderChange(
-            UncertainDate.certain(1066, 10, 14),
+            FuzzyTemporalInterval.of(1066, 10, 14),
             "Norman Conquest of England",
             new Territory("Anglo-Saxon England", "House of Wessex",
                 List.of(new double[]{51.5, -0.1}),
-                UncertainDate.circa(927), UncertainDate.certain(1066, 10, 14), ""),
+                FuzzyTemporalInterval.circa(927), FuzzyTemporalInterval.of(1066, 10, 14), ""),
             new Territory("Norman England", "House of Normandy",
                 List.of(new double[]{51.5, -0.1}),
-                UncertainDate.certain(1066, 12, 25), UncertainDate.circa(1154), ""),
+                FuzzyTemporalInterval.of(1066, 12, 25), FuzzyTemporalInterval.circa(1154), ""),
             ChangeType.CONQUEST
         ));
         
         // Treaty of Westphalia (1648)
         addBorderChange(new BorderChange(
-            UncertainDate.certain(1648, 10, 24),
+            FuzzyTemporalInterval.of(1648, 10, 24),
             "Peace of Westphalia - End of Thirty Years' War",
             null,
             new Territory("Swiss Confederation", "Swiss Cantons",
                 List.of(new double[]{46.9, 7.4}),
-                UncertainDate.certain(1648, 10, 24), null, "Independence recognized"),
+                FuzzyTemporalInterval.of(1648, 10, 24), null, "Independence recognized"),
             ChangeType.INDEPENDENCE
         ));
     }
 
-    private static boolean isActiveAt(Territory t, UncertainDate date) {
+    private static boolean isActiveAt(Territory t, TemporalCoordinate date) {
         if (t.startDate() != null && date.compareTo(t.startDate()) < 0) return false;
         if (t.endDate() != null && date.compareTo(t.endDate()) > 0) return false;
         return true;
@@ -312,8 +314,7 @@ public final class BorderEvolution {
         return (maxLat - minLat) * (maxLon - minLon) * 111.0 * 111.0;
     }
 
-    private static int getYear(UncertainDate date) {
-        var earliest = date.getEarliestPossible();
-        return earliest != null ? earliest.getYear() : 0;
+    private static int getYear(TemporalCoordinate date) {
+        return date.toInstant().atZone(ZoneOffset.UTC).getYear();
     }
 }

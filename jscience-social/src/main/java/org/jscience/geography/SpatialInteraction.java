@@ -1,9 +1,39 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.geography;
 
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Length;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * Models spatial interaction and migration flows.
+ * Utility for modeling spatial interaction, migration flows, and urban gravitation.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public final class SpatialInteraction {
 
@@ -11,51 +41,31 @@ public final class SpatialInteraction {
 
     /**
      * Gravity Model for interactions between two locations.
-     * I = G * (Pi * Pj) / dij^beta
+     * I = (P1 * P2) / dist^beta
      * 
-     * @param p1 Population of location 1
-     * @param p2 Population of location 2
-     * @param distance Distance between locations
-     * @param beta Friction of distance (typically 1.0 to 2.0)
+     * @param p1 population of start location
+     * @param p2 population of end location
+     * @param distance distance between them
+     * @param beta friction coefficient (distance decay)
+     * @return interaction intensity
      */
-    public static Real interactionIntensity(double p1, double p2, double distance, double beta) {
-        if (distance <= 0) return Real.ZERO;
-        double intensity = (p1 * p2) / Math.pow(distance, beta);
-        return Real.of(intensity);
+    public static Real calculateGravityIntensity(double p1, double p2, Quantity<Length> distance, double beta) {
+        double d = distance.to(Units.KILOMETER).getValue();
+        if (d <= 0) return Real.ZERO;
+        return Real.of((p1 * p2) / Math.pow(d, beta));
     }
 
     /**
-     * Migration Pull Force (Lee's Model factors).
+     * Reilly's Law of Retail Gravitation: breaking point between two market areas.
+     * 
+     * @param distance distance between centroids
+     * @param p1 population of center 1
+     * @param p2 population of center 2
+     * @return breaking point distance from center 1
      */
-    public static Real migrationForce(double wageDiff, double distance, double unemploymentRate) {
-        // Force is proportional to wage benefit, inversely to distance and risk
-        double force = (wageDiff / distance) * (1.0 - unemploymentRate);
-        return Real.of(force);
-    }
-
-    /**
-     * Calculate Reilly's Law of Retail Gravitation (Breaking Point).
-     * D12 = d / (1 + sqrt(P2/P1))
-     * Point from city 1 where trade is split.
-     */
-    public static Real retailBreakingPoint(double d, double p1, double p2) {
-        return Real.of(d / (1 + Math.sqrt(p2 / p1)));
-    }
-
-    /**
-     * Huff Model for probability of choosing a destination.
-     * Pj = (Sj / d_ij^b) / sum(Sk / d_ik^b)
-     */
-    public static double[] huffModelProbs(double[] sizes, double[] distances, double beta) {
-        double[] utilities = new double[sizes.length];
-        double sum = 0;
-        for (int i = 0; i < sizes.length; i++) {
-            utilities[i] = sizes[i] / Math.pow(distances[i], beta);
-            sum += utilities[i];
-        }
-        for (int i = 0; i < sizes.length; i++) {
-            utilities[i] /= sum;
-        }
-        return utilities;
+    public static Quantity<Length> calculateBreakingPoint(Quantity<Length> distance, double p1, double p2) {
+        double d = distance.to(Units.METER).getValue();
+        double bp = d / (1 + Math.sqrt(p2 / p1));
+        return org.jscience.measure.Quantities.create(bp, Units.METER);
     }
 }

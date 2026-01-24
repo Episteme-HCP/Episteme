@@ -1,169 +1,173 @@
-package org.jscience.linguistics;
-
-/**
- * The Morpheme class corresponds to a sub unit of a word (prefix, suffix,
- * etc.).
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * @author Silvere Martin-Michiellot
- * @version 1.0
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
-//morphemes can be built out of graphemes or phonemes
-//as we are here in a computer system, phonemes also have a grapheme counterpart, which is why we use graphemes only
-//yet with a bit of imagination we could design/enhance this class to provide morpheme or phoneme support
-public class Morpheme extends Object {
-    /** DOCUMENT ME! */
-    private Phoneme[] phonemes;
+package org.jscience.linguistics;
 
-    /** DOCUMENT ME! */
-    private Grapheme[] graphemes;
-
-    /** DOCUMENT ME! */
-    private boolean isGrapheme;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
-     * Creates a new Lexeme object.
-     *
-     * @param language DOCUMENT ME!
-     * @param string   DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    public Morpheme(Language language, String string) {
-        if ((language != null) && (string != null) && (string.length() > 0)) {
-            phonemes = new Phoneme[0];
-            graphemes = new Grapheme[string.length()];
-            isGrapheme = true;
+ * Represents a morpheme—the smallest irreducible unit of meaning or 
+ * grammatical function within a language. Morphemes are the building 
+ * blocks of words.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
+ */
+@Persistent
+public class Morpheme implements Serializable {
 
-            for (int i = 0; i < string.length(); i++) {
-                graphemes[i] = new Grapheme(language, string.charAt(i));
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Morpheme constructor arguments can't be null and string can't be empty.");
-        }
+    private static final long serialVersionUID = 2L;
+
+    /**
+     * Functional and structural classification of morphemes.
+     */
+    public enum Type {
+        /** Can stand alone as a word (e.g., 'cat'). */
+        FREE, 
+        /** Must be attached to another morpheme (e.g., '-ing'). */
+        BOUND, 
+        /** Bound morpheme at the start of a word. */
+        PREFIX, 
+        /** Bound morpheme at the end of a word. */
+        SUFFIX, 
+        /** Bound morpheme inserted within a root. */
+        INFIX, 
+        /** The core semantic part of a word. */
+        ROOT, 
+        /** Classification unknown. */
+        UNKNOWN
     }
 
-/**
-     * Creates a new Lexeme object.
-     *
-     * @param graphemes DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
+    @Relation(type = Relation.Type.MANY_TO_ONE)
+    private final Language language;
+
+    @Attribute
+    private final List<Grapheme> graphemes = new ArrayList<>();
+
+    @Attribute
+    private final List<Phoneme> phonemes = new ArrayList<>();
+
+    @Attribute
+    private Type type = Type.UNKNOWN;
+
+    @Attribute
+    private String meaning;
+
+    /**
+     * Constructs a morpheme from a raw string.
+     * 
+     * @param language the language of the morpheme
+     * @param text the orthographic representation
      */
-    public Morpheme(Grapheme[] graphemes) {
-        boolean valid;
-        int i;
-
-        if ((graphemes != null) && (graphemes.length > 0)) {
-            i = 1;
-            valid = true;
-
-            while ((valid) && (i < graphemes.length)) {
-                valid = (graphemes[i].getLanguage() == graphemes[0].getLanguage());
+    public Morpheme(Language language, String text) {
+        this.language = Objects.requireNonNull(language, "Language cannot be null");
+        if (text != null) {
+            for (char c : text.toCharArray()) {
+                graphemes.add(new Grapheme(language, c));
             }
-
-            if (valid) {
-                phonemes = new Phoneme[0];
-                this.graphemes = graphemes;
-                isGrapheme = true;
-            } else {
-                throw new IllegalArgumentException(
-                    "The graphemes must all be of the same Language.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Lexeme constructor arguments can't be null and graphemes can't be empty.");
-        }
-    }
-
-/**
-     * Creates a new Morpheme object.
-     *
-     * @param phonemes DOCUMENT ME!
-     */
-    public Morpheme(Phoneme[] phonemes) {
-        boolean valid;
-        int i;
-
-        if ((phonemes != null) && (phonemes.length > 0)) {
-            i = 1;
-            valid = true;
-
-            while ((valid) && (i < phonemes.length)) {
-                valid = (phonemes[i].getLanguage() == phonemes[0].getLanguage());
-            }
-
-            if (valid) {
-                phonemes = new Phoneme[0];
-                this.phonemes = phonemes;
-                graphemes = new Grapheme[0];
-                isGrapheme = false;
-            } else {
-                throw new IllegalArgumentException(
-                    "The phonemes must all be of the same Language.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Morpheme constructor arguments can't be null and phonemes can't be empty.");
         }
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Constructs a morpheme from explicit phonetic and orthographic units.
+     * 
+     * @param language the language
+     * @param graphemes list of constituent graphemes
+     * @param phonemes list of constituent phonemes
      */
+    public Morpheme(Language language, List<Grapheme> graphemes, List<Phoneme> phonemes) {
+        this.language = Objects.requireNonNull(language, "Language cannot be null");
+        if (graphemes != null) this.graphemes.addAll(graphemes);
+        if (phonemes != null) this.phonemes.addAll(phonemes);
+    }
+
     public Language getLanguage() {
-        return graphemes[0].getLanguage();
+        return language;
+    }
+
+    /** @return unmodifiable list of internal graphemes */
+    public List<Grapheme> getGraphemes() {
+        return Collections.unmodifiableList(graphemes);
+    }
+
+    /** @return unmodifiable list of internal phonemes */
+    public List<Phoneme> getPhonemes() {
+        return Collections.unmodifiableList(phonemes);
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type != null ? type : Type.UNKNOWN;
+    }
+
+    /** @return the semantic meaning or definition of the morpheme */
+    public String getMeaning() {
+        return meaning;
+    }
+
+    public void setMeaning(String meaning) {
+        this.meaning = meaning;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Grapheme[] getGraphemes() {
-        return graphemes;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Phoneme[] getPhonemes() {
-        return phonemes;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public boolean isGraphemeBased() {
-        return isGrapheme;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @return the concatenated string of the morphemes's graphemes
      */
     public String getString() {
-        int i;
-        StringBuffer result;
-
-        result = new StringBuffer();
-
-        if (isGrapheme) {
-            for (i = 0; i < graphemes.length; i++) {
-                result.append(graphemes[i].getCharacter());
-            }
-        } else {
-            for (i = 0; i < phonemes.length; i++) {
-                result.append(phonemes[i].getCharacter());
-            }
+        if (!graphemes.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (Grapheme g : graphemes) sb.append(g.getCharacter());
+            return sb.toString();
         }
+        return "[Phonetic Morpheme]";
+    }
 
-        return result.toString();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Morpheme morpheme)) return false;
+        return Objects.equals(language, morpheme.language) && 
+               Objects.equals(getString(), morpheme.getString());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(language, getString());
+    }
+
+    @Override
+    public String toString() {
+        return getString();
     }
 }

@@ -32,6 +32,8 @@ import java.util.UUID;
 import org.jscience.geography.Place;
 import org.jscience.util.Named;
 import org.jscience.util.identity.Identified;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
@@ -47,7 +49,7 @@ import org.jscience.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Society implements org.jscience.geography.Locatable, Identified<String>, Named, Serializable {
+public class Society implements org.jscience.geography.Locatable, Identified<Identification>, Named, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -60,7 +62,7 @@ public class Society implements org.jscience.geography.Locatable, Identified<Str
     }
 
     @Id
-    private final String id;
+    private final Identification id;
     
     @Attribute
     private final String name;
@@ -91,7 +93,7 @@ public class Society implements org.jscience.geography.Locatable, Identified<Str
      * @throws IllegalArgumentException if name is empty
      */
     public Society(String name) {
-        this.id = UUID.randomUUID().toString();
+        this.id = new SimpleIdentification(UUID.randomUUID().toString());
         this.name = Objects.requireNonNull(name, "Name cannot be null").trim();
         if (this.name.isEmpty()) {
             throw new IllegalArgumentException("Name cannot be empty");
@@ -109,7 +111,7 @@ public class Society implements org.jscience.geography.Locatable, Identified<Str
     }
 
     @Override
-    public String getId() {
+    public Identification getId() {
         return id;
     }
 

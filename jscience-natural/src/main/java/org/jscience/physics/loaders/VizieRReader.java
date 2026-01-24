@@ -31,19 +31,24 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 /**
  * VizieR astronomical catalog loader.
+ * <p>
+ * This reader retrieves data from the VizieR Service (CDS, Strasbourg) 
+ * in VOTable format and parses it into structured records.
+ * </p>
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
+ * @version 2.0 (Enhanced with VOTable support)
  */
-public class VizieRReader extends AbstractResourceReader<Map<String, String>> {
+public class VizieRReader extends AbstractResourceReader<List<Map<String, String>>> {
 
     private static final String API_URL = org.jscience.JScience.getProperty("data.vizier.api.url", "https://vizier.cds.unistra.fr/viz-bin/votable");
 
@@ -62,7 +67,7 @@ public class VizieRReader extends AbstractResourceReader<Map<String, String>> {
 
     @Override
     public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.vizierreader.longdesc", "Queries VizieR astronomical catalogs by object name or coordinates (conesearch).");
+        return org.jscience.ui.i18n.I18n.getInstance().get("reader.vizierreader.longdesc", "Queries VizieR astronomical catalogs by object name or coordinates (conesearch). Parsed using VOTable standard.");
     }
 
     @Override
@@ -72,26 +77,30 @@ public class VizieRReader extends AbstractResourceReader<Map<String, String>> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Class<Map<String, String>> getResourceType() {
-        return (Class<Map<String, String>>) (Class<?>) Map.class;
+    public Class<List<Map<String, String>>> getResourceType() {
+        return (Class<List<Map<String, String>>>) (Class<?>) List.class;
     }
 
     @Override
-    protected Map<String, String> loadFromSource(String id) throws Exception {
+    protected List<Map<String, String>> loadFromSource(String id) throws Exception {
         return queryByObject(id, HIPPARCOS);
     }
 
     @Override
-    protected MiniCatalog<Map<String, String>> getMiniCatalog() {
+    protected MiniCatalog<List<Map<String, String>>> getMiniCatalog() {
         return new MiniCatalog<>() {
             @Override
-            public List<Map<String, String>> getAll() {
-                return List.of(Map.of());
+            public List<List<Map<String, String>>> getAll() {
+                return List.of();
             }
 
             @Override
-            public Optional<Map<String, String>> findByName(String name) {
-                return Optional.of(Map.of());
+            public Optional<List<Map<String, String>>> findByName(String name) {
+                try {
+                    return Optional.of(queryByObject(name, HIPPARCOS));
+                } catch (Exception e) {
+                    return Optional.empty();
+                }
             }
 
             @Override
@@ -104,37 +113,18 @@ public class VizieRReader extends AbstractResourceReader<Map<String, String>> {
     /**
      * Queries a VizieR catalog by object name.
      */
-    public static Map<String, String> queryByObject(String objectName, String catalog) {
+    public static List<Map<String, String>> queryByObject(String objectName, String catalog) {
         try {
             String urlStr = API_URL + "?-source=" + catalog
                     + "&-c=" + java.net.URLEncoder.encode(objectName, "UTF-8")
                     + "&-out.max=10";
-            URL url = java.net.URI.create(urlStr).toURL();
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setConnectTimeout(10000);
-            conn.setReadTimeout(10000);
-
-            if (conn.getResponseCode() != 200) {
-                return null;
-            }
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line).append("\n");
-            }
-            reader.close();
-
-            Map<String, String> result = new LinkedHashMap<>();
-            result.put("object", objectName);
-            result.put("catalog", catalog);
-            result.put("raw_votable", response.toString());
-
-            return result;
+            
+            String rawXml = fetchRaw(urlStr);
+            if (rawXml == null) return new ArrayList<>();
+            
+            return VOTableBridge.parse(rawXml);
         } catch (Exception e) {
-            return null;
+            return new ArrayList<>();
         }
     }
 
@@ -157,58 +147,61 @@ public class VizieRReader extends AbstractResourceReader<Map<String, String>> {
     /**
      * Queries stars within radius of coordinates.
      */
-    public static Map<String, String> queryByCoordinates(double ra, double dec, double radiusArcmin, String catalog) {
+    public static List<Map<String, String>> queryByCoordinates(double ra, double dec, double radiusArcmin, String catalog) {
         try {
             String urlStr = API_URL + "?-source=" + catalog
                     + "&-c=" + ra + "+" + dec
                     + "&-c.rm=" + radiusArcmin
                     + "&-out.max=50";
-            URL url = java.net.URI.create(urlStr).toURL();
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setConnectTimeout(10000);
-            conn.setReadTimeout(10000);
+            
+            String rawXml = fetchRaw(urlStr);
+            if (rawXml == null) return new ArrayList<>();
+            
+            return VOTableBridge.parse(rawXml);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
 
-            if (conn.getResponseCode() != 200) {
-                return null;
-            }
+    private static String fetchRaw(String urlStr) throws Exception {
+        URL url = java.net.URI.create(urlStr).toURL();
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        conn.setConnectTimeout(15000);
+        conn.setReadTimeout(15000);
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        if (conn.getResponseCode() != 200) {
+            return null;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
             StringBuilder response = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
                 response.append(line).append("\n");
             }
-            reader.close();
-
-            Map<String, String> result = new LinkedHashMap<>();
-            result.put("ra", String.valueOf(ra));
-            result.put("dec", String.valueOf(dec));
-            result.put("radius_arcmin", String.valueOf(radiusArcmin));
-            result.put("catalog", catalog);
-            result.put("raw_votable", response.toString());
-
-            return result;
-        } catch (Exception e) {
-            return null;
+            return response.toString();
         }
     }
-
 
     /**
      * Queries stars within radius of coordinates (Real precision).
      */
-    public static Map<String, String> queryByCoordinates(Real ra, Real dec, double radiusArcmin, String catalog) {
+    public static List<Map<String, String>> queryByCoordinates(Real ra, Real dec, double radiusArcmin, String catalog) {
         return queryByCoordinates(ra.doubleValue(), dec.doubleValue(), radiusArcmin, catalog);
     }
     
     /**
      * Queries stars within radius of coordinates (Real precision).
      */
-    public static Map<String, String> queryByCoordinates(Real ra, Real dec, Real radiusArcmin, String catalog) {
+    public static List<Map<String, String>> queryByCoordinates(Real ra, Real dec, Real radiusArcmin, String catalog) {
         return queryByCoordinates(ra.doubleValue(), dec.doubleValue(), radiusArcmin.doubleValue(), catalog);
+    }
+
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"VOTable 1.4", "VOTable 1.3", "VOTable 1.2"};
     }
 
     @Override public String getName() { return org.jscience.ui.i18n.I18n.getInstance().get("reader.vizierreader.name", "VizieR Reader"); }
 }
-

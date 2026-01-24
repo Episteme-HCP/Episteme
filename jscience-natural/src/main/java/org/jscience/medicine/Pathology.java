@@ -1,158 +1,144 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.medicine;
 
 import org.jscience.util.Commented;
 import org.jscience.util.Named;
+import org.jscience.util.identity.Identified;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
+import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
-
+import java.util.UUID;
 
 /**
- * The Pathology class provides a common ancestor class for all possible
- * medicine related troubles.
+ * Common ancestor for all medicine-related troubles (diseases, allergies, etc.).
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
+@Persistent
+public class Pathology implements Identified<String>, Named, Commented, Serializable {
 
-//pathologies exist even if there are no patient to be ill, this is why we haven't put any Patient callback
-//disease, allergy, bone break, psychological...
-public class Pathology extends Object implements Named, Commented {
-    /** DOCUMENT ME! */
-    private String name; //the scientific name
+    private static final long serialVersionUID = 2L;
 
-    /** DOCUMENT ME! */
-    private String cause; //how the Pathology appeared
+    @Id
+    private final String id;
 
-    /** DOCUMENT ME! */
-    private String comments; //how the Pathology evolves, etc
+    @Attribute
+    private final String name;
 
-    /** DOCUMENT ME! */
-    private Set treatments;
+    @Attribute
+    private String cause;
 
-/**
-     * Creates a new Pathology object.
+    @Attribute
+    private String comments;
+
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private final Set<Treatment> treatments = new HashSet<>();
+
+    /**
+     * Creates a new Pathology with a specific name.
      *
-     * @param name DOCUMENT ME!
+     * @param name the scientific name
+     * @throws NullPointerException if name is null
+     * @throws IllegalArgumentException if name is empty
      */
     public Pathology(String name) {
-        if ((name != null) && (name.length() > 0)) {
-            this.name = name;
-            this.cause = null;
-            this.comments = null;
-            this.treatments = new HashSet();
-        } else {
-            throw new IllegalArgumentException(
-                "The Pathology constructor can't have null or empty arguments.");
+        this.id = UUID.randomUUID().toString();
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        if (name.isBlank()) {
+            throw new IllegalArgumentException("Name cannot be blank");
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
     public String getName() {
         return name;
     }
 
-    //may return null
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public String getCause() {
         return cause;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param cause DOCUMENT ME!
-     */
     public void setCause(String cause) {
         this.cause = cause;
     }
 
-    //may return null
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public String getComments() {
         return comments;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param comments DOCUMENT ME!
-     */
+    @Override
     public void setComments(String comments) {
         this.comments = comments;
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the set of treatments associated with this pathology.
      *
-     * @return DOCUMENT ME!
+     * @return an unmodifiable set of treatments
      */
-    public Set getTreatments() {
-        return treatments;
+    public Set<Treatment> getTreatments() {
+        return Collections.unmodifiableSet(treatments);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param treatments DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-
-    //we don't call Treatment.setPathology(this) for every member of the Set although this should normally be consistent
-    //all members of the Set should be treatments
-    public void setTreatments(Set treatments) {
-        Iterator iterator;
-        boolean valid;
-
-        if (treatments != null) {
-            iterator = treatments.iterator();
-            valid = true;
-
-            while (iterator.hasNext() && valid) {
-                valid = iterator.next() instanceof Treatment;
-            }
-
-            if (valid) {
-                this.treatments = treatments;
-            } else {
-                throw new IllegalArgumentException(
-                    "The Set of treatments should contain only Treatments.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "The Set of treatments shouldn't be null.");
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param treatment DOCUMENT ME!
-     */
     public void addTreatment(Treatment treatment) {
-        treatments.add(treatment);
+        treatments.add(Objects.requireNonNull(treatment));
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param treatment DOCUMENT ME!
-     */
     public void removeTreatment(Treatment treatment) {
         treatments.remove(treatment);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Pathology that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

@@ -24,41 +24,38 @@
 package org.jscience.physics.loaders.thermoml;
 
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.Quantity;
+
+import java.io.Serializable;
 
 /**
  * Represents a thermodynamic property value from ThermoML data.
  * <p>
- * Contains the property name, numerical value, uncertainty, and associated
- * measurement conditions (temperature, pressure, composition, etc.).
+ * This class bridges the raw ThermoML XML data with the JScience Units and Quantities
+ * ontology, providing type-safe physical magnitudes and uncertainties.
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
+ * @version 2.0 (Modernized)
  */
-public class ThermoMLPropertyValue {
+public class ThermoMLPropertyValue implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String propertyName;
-    private Real value;
-    private Real uncertainty;
-    private String unitString;
-    private Real temperature;
-    private Real pressure;
+    private Quantity<?> magnitude;
+    private Quantity<?> uncertainty;
+    
+    // Conditions
+    private Quantity<?> temperature;
+    private Quantity<?> pressure;
     private Real moleFraction;
+    
     private int compoundIndex;
 
-    /**
-     * Creates a new property value.
-     */
     public ThermoMLPropertyValue() {
-    }
-
-    /**
-     * Creates a property value with name and value.
-     */
-    public ThermoMLPropertyValue(String propertyName, Real value) {
-        this.propertyName = propertyName;
-        this.value = value;
     }
 
     public String getPropertyName() {
@@ -69,43 +66,35 @@ public class ThermoMLPropertyValue {
         this.propertyName = propertyName;
     }
 
-    public Real getValue() {
-        return value;
+    public Quantity<?> getMagnitude() {
+        return magnitude;
     }
 
-    public void setValue(Real value) {
-        this.value = value;
+    public void setMagnitude(Quantity<?> magnitude) {
+        this.magnitude = magnitude;
     }
 
-    public Real getUncertainty() {
+    public Quantity<?> getUncertainty() {
         return uncertainty;
     }
 
-    public void setUncertainty(Real uncertainty) {
+    public void setUncertainty(Quantity<?> uncertainty) {
         this.uncertainty = uncertainty;
     }
 
-    public String getUnitString() {
-        return unitString;
-    }
-
-    public void setUnitString(String unitString) {
-        this.unitString = unitString;
-    }
-
-    public Real getTemperature() {
+    public Quantity<?> getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(Real temperature) {
+    public void setTemperature(Quantity<?> temperature) {
         this.temperature = temperature;
     }
 
-    public Real getPressure() {
+    public Quantity<?> getPressure() {
         return pressure;
     }
 
-    public void setPressure(Real pressure) {
+    public void setPressure(Quantity<?> pressure) {
         this.pressure = pressure;
     }
 
@@ -125,41 +114,22 @@ public class ThermoMLPropertyValue {
         this.compoundIndex = compoundIndex;
     }
 
-    /**
-     * Returns the value as a double for use in calculations.
-     */
-    public double getDoubleValue() {
-        return value != null ? value.doubleValue() : Double.NaN;
-    }
-
-    /**
-     * Returns the relative uncertainty as a fraction.
-     */
-    public Real getRelativeUncertainty() {
-        if (value == null || uncertainty == null || value.isZero()) {
-            return null;
-        }
-        return uncertainty.divide(value.abs());
-    }
-
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("ThermoMLPropertyValue{");
-        sb.append("property='").append(propertyName).append('\'');
-        sb.append(", value=").append(value);
+        StringBuilder sb = new StringBuilder();
+        sb.append(propertyName).append(": ").append(magnitude);
         if (uncertainty != null) {
-            sb.append(" ± ").append(uncertainty);
+            sb.append(" ± ").append(uncertainty.getValue());
         }
-        if (unitString != null) {
-            sb.append(' ').append(unitString);
+        if (temperature != null || pressure != null) {
+            sb.append(" [");
+            if (temperature != null) sb.append("T=").append(temperature);
+            if (pressure != null) {
+                if (temperature != null) sb.append(", ");
+                sb.append("P=").append(pressure);
+            }
+            sb.append("]");
         }
-        if (temperature != null) {
-            sb.append(", T=").append(temperature).append(" K");
-        }
-        if (pressure != null) {
-            sb.append(", P=").append(pressure).append(" Pa");
-        }
-        sb.append('}');
         return sb.toString();
     }
 }

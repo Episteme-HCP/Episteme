@@ -23,6 +23,7 @@
 
 package org.jscience.linguistics.loaders;
 
+import org.jscience.io.AbstractResourceReader;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
@@ -33,55 +34,64 @@ import java.util.*;
 
 /**
  * Loader for Word2Vec models (text format).
- * Supports loading word embeddings into a searchable map of scientific vectors.
+ * Modernized to extend {@link AbstractResourceReader} for standardized embedding loading.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public final class Word2VecLoader {
+public class Word2VecLoader extends AbstractResourceReader<Map<String, Vector<Real>>> {
 
-    private Word2VecLoader() {}
+    /**
+     * Default constructor.
+     */
+    public Word2VecLoader() {
+    }
+
+    @Override
+    protected Map<String, Vector<Real>> loadFromSource(String path) throws Exception {
+        return loadTextModel(new File(path));
+    }
+
+    @Override
+    protected Map<String, Vector<Real>> loadFromInputStream(InputStream is, String id) throws Exception {
+        return loadFromReader(new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8)));
+    }
 
     /**
      * Loads a Word2Vec model in text format.
-     * The first line contains the number of words and dimensions.
-     * Subsequent lines contain a word followed by its vector components.
-     *
-     * @param file The Word2Vec text file.
-     * @return A map of words to their embedding vectors.
-     * @throws IOException If an error occurs during reading.
      */
     public static Map<String, Vector<Real>> loadTextModel(File file) throws IOException {
-        Map<String, Vector<Real>> model = new HashMap<>();
-        
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
-            String header = reader.readLine();
-            if (header == null) throw new IOException("Empty file");
-            
-            String[] parts = header.trim().split("\\s+");
-            if (parts.length < 2) throw new IOException("Invalid Word2Vec header: " + header);
-            
-            int numWords = Integer.parseInt(parts[0]);
-            int dimensions = Integer.parseInt(parts[1]);
-            
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] values = line.trim().split("\\s+");
-                if (values.length < dimensions + 1) continue;
-                
-                String word = values[0];
-                Real[] components = new Real[dimensions];
-                for (int i = 0; i < dimensions; i++) {
-                    components[i] = Real.of(Double.parseDouble(values[i + 1]));
-                }
-                
-                model.put(word, DenseVector.of(components));
-                
-                if (model.size() >= numWords) break;
-            }
+            return loadFromReader(reader);
         }
+    }
+
+    private static Map<String, Vector<Real>> loadFromReader(BufferedReader reader) throws IOException {
+        Map<String, Vector<Real>> model = new HashMap<>();
+        String header = reader.readLine();
+        if (header == null) throw new IOException("Empty file");
         
+        String[] parts = header.trim().split("\\s+");
+        if (parts.length < 2) throw new IOException("Invalid Word2Vec header: " + header);
+        
+        int numWords = Integer.parseInt(parts[0]);
+        int dimensions = Integer.parseInt(parts[1]);
+        
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] values = line.trim().split("\\s+");
+            if (values.length < dimensions + 1) continue;
+            
+            String word = values[0];
+            Real[] components = new Real[dimensions];
+            for (int i = 0; i < dimensions; i++) {
+                components[i] = Real.of(Double.parseDouble(values[i + 1]));
+            }
+            
+            model.put(word, DenseVector.of(components));
+            if (model.size() >= numWords) break;
+        }
         return model;
     }
 
@@ -95,5 +105,37 @@ public final class Word2VecLoader {
         
         if (norm1 == 0 || norm2 == 0) return 0.0;
         return dotProduct / (norm1 * norm2);
+    }
+
+    @Override
+    public Class<Map<String, Vector<Real>>> getResourceType() {
+        @SuppressWarnings("unchecked")
+        Class<Map<String, Vector<Real>>> type = (Class<Map<String, Vector<Real>>>) (Class<?>) Map.class;
+        return type;
+    }
+
+    @Override
+    public String getName() {
+        return "Word2Vec Embeddings Loader";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Loads word embedding vectors from Word2Vec text format models.";
+    }
+
+    @Override
+    public String getCategory() {
+        return "Linguistics / Machine Learning";
+    }
+
+    @Override
+    public String getResourcePath() {
+        return "embeddings/word2vec";
+    }
+
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[]{"Text Format V1"};
     }
 }

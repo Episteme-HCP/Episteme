@@ -39,7 +39,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public final class ENUCoordinate implements Serializable {
+public final class ENUCoordinate implements EarthCoordinate, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -59,6 +59,15 @@ public final class ENUCoordinate implements Serializable {
     public Quantity<Length> getNorth() { return Quantities.create(north.doubleValue(), Units.METER); }
     public Quantity<Length> getUp() { return Quantities.create(up.doubleValue(), Units.METER); }
     public GeodeticCoordinate getReferencePoint() { return referencePoint; }
+
+    @Override
+    public String getCoordinateSystem() { return "ENU"; }
+
+    @Override
+    public ReferenceEllipsoid getEllipsoid() { return referencePoint.getEllipsoid(); }
+
+    @Override
+    public GeodeticCoordinate toGeodetic() { return toECEF().toGeodetic(); }
 
     /**
      * Converts ECEF to ENU relative to a reference point.

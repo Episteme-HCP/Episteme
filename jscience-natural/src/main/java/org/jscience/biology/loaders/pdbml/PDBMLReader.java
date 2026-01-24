@@ -88,9 +88,7 @@ public class PDBMLReader extends AbstractResourceReader<PDBMLStructure> {
      */
     public PDBMLStructure read(InputStream input) throws PDBMLException {
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
+            DocumentBuilder builder = org.jscience.io.SecureXMLFactory.createSecureDocumentBuilder();
             Document doc = builder.parse(input);
             return parseDocument(doc);
         } catch (Exception e) {

@@ -1,58 +1,44 @@
 package org.jscience.linguistics;
 
+import java.io.Serializable;
+import java.util.Objects;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
+
 /**
- * The Communication class provides support for communication, which is
- * what the language ultimatly stands for.
+ * Represents a single act of verbal communication between locutors.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 2.0
  */
+@Persistent
+public class VerbalCommunication implements Serializable {
 
-//exchange of information between locutors
-//all the receivers are believed to be part of the ChatSituation
-//this class is mainly targetted at verbal situation where people emit short phrases rather than complete texts (theater like)
-public class VerbalCommunication extends Object {
-    /** DOCUMENT ME! */
-    private Locutor locutor; //emiter
+    private static final long serialVersionUID = 2L;
 
-    /** DOCUMENT ME! */
-    private Phrase message;
+    @Relation(type = Relation.Type.MANY_TO_ONE)
+    private final Locutor speaker;
 
-/**
-     * Creates a new VerbalCommunication object.
-     *
-     * @param locutor DOCUMENT ME!
-     * @param message DOCUMENT ME!
-     */
-    public VerbalCommunication(Locutor locutor, Phrase message) {
-        if ((locutor != null) && (message != null)) {
-            this.locutor = locutor;
-            this.message = message;
-        } else {
-            throw new IllegalArgumentException(
-                "The Communication constructor doesn't accept null arguments.");
-        }
+    @Attribute
+    private final Phrase message;
+
+    public VerbalCommunication(Locutor speaker, Phrase message) {
+        this.speaker = Objects.requireNonNull(speaker, "Speaker cannot be null");
+        this.message = Objects.requireNonNull(message, "Message cannot be null");
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Locutor getLocutor() {
-        return locutor;
+    public Locutor getSpeaker() {
+        return speaker;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public Phrase getMessage() {
         return message;
     }
 
-    //public Language getLanguage() {
-    //we would have to test all the contents of the phrase are in the same language
-    //}
+    @Override
+    public String toString() {
+        return String.format("%s: \"%s\"", speaker.getIndividual().getName(), message);
+    }
 }

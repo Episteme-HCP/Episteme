@@ -32,6 +32,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.jscience.io.AbstractResourceReader;
@@ -48,6 +49,7 @@ import org.jscience.ui.i18n.I18n;
  */
 public class OpenWeatherReader extends AbstractResourceReader<WeatherInfo> {
 
+    private static final Logger LOGGER = Logger.getLogger(OpenWeatherReader.class.getName());
     private static final String API_URL = org.jscience.io.Configuration.get("api.openweathermap.base");
     private static final String SAMPLES_PATH = "/org/jscience/earth/loaders/weather_samples.json";
     private String apiKey;
@@ -209,69 +211,44 @@ public class OpenWeatherReader extends AbstractResourceReader<WeatherInfo> {
     }
 
     private WeatherInfo parseWeatherJson(String json) {
-        WeatherInfo.Builder builder = new WeatherInfo.Builder();
+        try {
+            JsonNode root = mapper.readTree(json);
+            WeatherInfo.Builder builder = new WeatherInfo.Builder();
 
-        // Temperature (Celsius with metric units)
-        String temp = extractJsonValue(json, "temp");
-        if (temp != null)
-            builder.temperatureCelsius(Double.parseDouble(temp));
+            // City name
+            builder.location(root.path("name").asText("Unknown"));
 
-        // Feels like
-        String feelsLike = extractJsonValue(json, "feels_like");
-        if (feelsLike != null)
-            builder.feelsLikeCelsius(Double.parseDouble(feelsLike));
-
-        // Pressure (hPa)
-        String pressure = extractJsonValue(json, "pressure");
-        if (pressure != null)
-            builder.pressureHPa(Double.parseDouble(pressure));
-
-        // Humidity (%)
-        String humidity = extractJsonValue(json, "humidity");
-        if (humidity != null)
-            builder.humidityPercent(Double.parseDouble(humidity));
-
-        // Wind speed (m/s)
-        String windSpeed = extractJsonValue(json, "speed");
-        if (windSpeed != null)
-            builder.windSpeedMps(Double.parseDouble(windSpeed));
-
-        // Cloud cover (%)
-        String clouds = extractJsonValue(json, "all");
-        if (clouds != null)
-            builder.cloudPercent(Double.parseDouble(clouds));
-
-        // Weather description
-        String desc = extractJsonValue(json, "description");
-        if (desc != null)
-            builder.description(desc);
-
-        // City name
-        String name = extractJsonValue(json, "name");
-        if (name != null)
-            builder.location(name);
-
-        return builder.build();
-    }
-
-    private String extractJsonValue(String json, String key) {
-        int idx = json.indexOf("\"" + key + "\":");
-        if (idx == -1)
-            return null;
-        int start = idx + key.length() + 3;
-        if (start >= json.length())
-            return null;
-
-        if (json.charAt(start) == '"') {
-            int end = json.indexOf("\"", start + 1);
-            return json.substring(start + 1, end);
-        } else {
-            int end = start;
-            while (end < json.length() &&
-                    (Character.isDigit(json.charAt(end)) || json.charAt(end) == '.' || json.charAt(end) == '-')) {
-                end++;
+            // Main observations
+            JsonNode main = root.get("main");
+            if (main != null) {
+                builder.temperatureCelsius(main.path("temp").asDouble(0.0));
+                builder.feelsLikeCelsius(main.path("feels_like").asDouble(0.0));
+                builder.pressureHPa(main.path("pressure").asDouble(1013.25));
+                builder.humidityPercent(main.path("humidity").asDouble(0.0));
             }
-            return json.substring(start, end);
+
+            // Wind
+            JsonNode wind = root.get("wind");
+            if (wind != null) {
+                builder.windSpeedMps(wind.path("speed").asDouble(0.0));
+            }
+
+            // Clouds
+            JsonNode clouds = root.get("clouds");
+            if (clouds != null) {
+                builder.cloudPercent(clouds.path("all").asDouble(0.0));
+            }
+
+            // Description
+            JsonNode weather = root.get("weather");
+            if (weather != null && weather.isArray() && weather.size() > 0) {
+                builder.description(weather.get(0).path("description").asText(""));
+            }
+
+            return builder.build();
+        } catch (Exception e) {
+            LOGGER.severe("Failed to parse weather JSON: " + e.getMessage());
+            return null;
         }
     }
 }

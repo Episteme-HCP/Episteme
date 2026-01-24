@@ -1,25 +1,60 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.arts;
 
-import java.time.Instant;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
-import org.jscience.geography.Place;
 import org.jscience.economics.money.Money;
+import org.jscience.geography.Place;
+import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.util.Named;
+import org.jscience.util.Temporal;
 import org.jscience.util.identity.Identified;
-import org.jscience.util.persistence.Persistent;
-import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
 /**
- * A class representing a piece of art (Artwork).
- * Integrates history (Instant), geography (Place), economics (Money), and scientific analysis.
+ * Represents a piece of art (Artwork), integrating historical, geographical, 
+ * economic, and scientific dimensions. This class serves as the central model 
+ * for artworks, tracking their production, authorship, valuation, and 
+ * conservation history.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
 @Persistent
-public class Artwork implements Identified<String> {
+public class Artwork implements Identified<String>, Named, Temporal<TemporalCoordinate>, Serializable {
+
+    private static final long serialVersionUID = 2L;
 
     @Id
     private final String id;
@@ -28,7 +63,7 @@ public class Artwork implements Identified<String> {
     @Attribute
     private final String description;
     @Attribute
-    private final Instant productionDate;
+    private final TemporalCoordinate productionDate;
     @Relation(type = Relation.Type.MANY_TO_ONE)
     private final Place productionPlace;
     @Attribute
@@ -44,7 +79,16 @@ public class Artwork implements Identified<String> {
     @Relation(type = Relation.Type.ONE_TO_MANY)
     private final Set<Restoration> restorations;
 
-    public Artwork(String name, String description, Instant productionDate, Place productionPlace, ArtForm category) {
+    /**
+     * Creates a new Artwork.
+     * 
+     * @param name common name of the work
+     * @param description detailed description
+     * @param productionDate estimated or precise date of creation
+     * @param productionPlace location where the work was created
+     * @param category the form of art (e.g., PAINTING, SCULPTURE)
+     */
+    public Artwork(String name, String description, TemporalCoordinate productionDate, Place productionPlace, ArtForm category) {
         this.id = UUID.randomUUID().toString();
         this.name = Objects.requireNonNull(name, "Name cannot be null");
         this.description = description;
@@ -61,15 +105,21 @@ public class Artwork implements Identified<String> {
         return id;
     }
 
+    @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public TemporalCoordinate getWhen() {
+        return productionDate;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public Instant getProductionDate() {
+    public TemporalCoordinate getProductionDate() {
         return productionDate;
     }
 

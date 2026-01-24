@@ -1,45 +1,104 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.linguistics;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import org.jscience.geography.Place;
-import org.jscience.mathematics.numbers.real.Real;
-import java.util.*;
 import org.jscience.geography.coordinates.Coordinates;
 import org.jscience.geography.coordinates.LatLong;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * Dialect mapping and isogloss analysis.
+ * Analytical tool for dialect mapping and isogloss analysis. It facilitates 
+ * the study of spatial linguistic variation by mapping features to geographical 
+ * locations and drawing boundaries between dialect regions.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
 public final class DialectMapper {
 
     private DialectMapper() {}
 
+    /**
+     * Represents a specific linguistic variable (phonological, lexical, etc.).
+     */
     public record LinguisticFeature(
         String name,
-        String category,  // phonological, lexical, morphological, syntactic
+        String category,  // e.g., "phonological", "lexical"
         String description
-    ) {}
+    ) implements Serializable {
+        private static final long serialVersionUID = 2L;
+    }
 
+    /**
+     * Data point from a linguistic survey at a specific geographical location.
+     */
     public record DialectDataPoint(
         Place location,
         List<LinguisticFeature> features,
         String dialectName,
         int respondentCount
-    ) {}
+    ) implements Serializable {
+        private static final long serialVersionUID = 2L;
+    }
 
+    /**
+     * Represents a line on a map marking the geographical boundary of a 
+     * linguistic feature.
+     */
     public record Isogloss(
         String name,
         LinguisticFeature dividingFeature,
-        List<double[]> boundaryPoints,  // latitude, longitude pairs
+        List<double[]> boundaryPoints,  // [latitude, longitude] pairs
         String description
-    ) {}
+    ) implements Serializable {
+        private static final long serialVersionUID = 2L;
+    }
 
     /**
-     * Creates an isogloss from dialect data.
+     * Generates an isogloss boundary based on a collection of survey data points 
+     * for a specific linguistic feature.
+     * 
+     * @param data list of survey points
+     * @param feature the feature to map
+     * @param name name for the generated isogloss
+     * @return an Isogloss representing the boundary for the feature
      */
     public static Isogloss createIsogloss(List<DialectDataPoint> data, 
             LinguisticFeature feature, String name) {
         
-        // Find the boundary between areas with/without the feature
         List<DialectDataPoint> withFeature = new ArrayList<>();
         List<DialectDataPoint> withoutFeature = new ArrayList<>();
         
@@ -51,9 +110,7 @@ public final class DialectMapper {
             }
         }
         
-        // Calculate approximate boundary (simplified: midpoints between closest pairs)
         List<double[]> boundary = new ArrayList<>();
-        
         for (DialectDataPoint with : withFeature) {
             DialectDataPoint closest = findClosest(with, withoutFeature);
             if (closest != null) {
@@ -68,7 +125,12 @@ public final class DialectMapper {
     }
 
     /**
-     * Calculates linguistic distance between two dialects.
+     * Calculates the linguistic distance (using Jaccard similarity inverse) 
+     * between two survey points.
+     * 
+     * @param a first survey point
+     * @param b second survey point
+     * @return distance metric (0.0 to 1.0) as a Real
      */
     public static Real linguisticDistance(DialectDataPoint a, DialectDataPoint b) {
         Set<LinguisticFeature> featuresA = new HashSet<>(a.features());
@@ -80,7 +142,6 @@ public final class DialectMapper {
         Set<LinguisticFeature> intersection = new HashSet<>(featuresA);
         intersection.retainAll(featuresB);
         
-        // Jaccard distance = 1 - (intersection / union)
         double jaccard = union.isEmpty() ? 0 : 
             1.0 - (double) intersection.size() / union.size();
         
@@ -88,15 +149,17 @@ public final class DialectMapper {
     }
 
     /**
-     * Clusters dialects based on feature similarity.
+     * Groups dialect points into clusters based on shared linguistic features 
+     * using an iterative similarity-based algorithm.
+     * 
+     * @param data survey points to cluster
+     * @param numClusters target number of clusters
+     * @return map of cluster index to list of points
      */
     public static Map<Integer, List<DialectDataPoint>> clusterDialects(
             List<DialectDataPoint> data, int numClusters) {
         
-        // Simple k-means-like clustering based on linguistic distance
         Random random = new Random(42);
-        
-        // Initialize cluster centers
         List<DialectDataPoint> centers = new ArrayList<>();
         List<DialectDataPoint> shuffled = new ArrayList<>(data);
         Collections.shuffle(shuffled, random);
@@ -104,7 +167,6 @@ public final class DialectMapper {
             centers.add(shuffled.get(i));
         }
         
-        // Assign points to clusters
         Map<Integer, List<DialectDataPoint>> clusters = new HashMap<>();
         for (int i = 0; i < numClusters; i++) {
             clusters.put(i, new ArrayList<>());
@@ -121,27 +183,25 @@ public final class DialectMapper {
                     bestCluster = i;
                 }
             }
-            
             clusters.get(bestCluster).add(point);
         }
-        
         return clusters;
     }
 
     /**
-     * Generates a dialect map summary.
+     * Generates a structural summary of the dialectal map and identified isoglosses.
+     * 
+     * @param data the survey dataset
+     * @param isoglosses the identified boundaries
+     * @return a human-readable summary
      */
     public static String generateMapSummary(List<DialectDataPoint> data, List<Isogloss> isoglosses) {
         StringBuilder sb = new StringBuilder();
-        
         sb.append("=== Dialect Map Summary ===\n\n");
         sb.append(String.format("Total data points: %d\n", data.size()));
         
-        // Count distinct dialects
         Set<String> dialects = new HashSet<>();
-        for (DialectDataPoint point : data) {
-            dialects.add(point.dialectName());
-        }
+        for (DialectDataPoint point : data) dialects.add(point.dialectName());
         sb.append(String.format("Distinct dialects: %d\n\n", dialects.size()));
         
         sb.append("Isoglosses:\n");
@@ -149,13 +209,10 @@ public final class DialectMapper {
             sb.append(String.format("  - %s: %s (%d boundary points)\n",
                 iso.name(), iso.dividingFeature().name(), iso.boundaryPoints().size()));
         }
-        
         return sb.toString();
     }
 
-    /**
-     * Predefined linguistic features for common dialectal variations.
-     */
+    // Predefined features
     public static final LinguisticFeature RHOTICITY = 
         new LinguisticFeature("Rhoticity", "phonological", "Pronunciation of post-vocalic /r/");
     public static final LinguisticFeature VOWEL_SHIFT = 
@@ -169,10 +226,8 @@ public final class DialectMapper {
 
     private static DialectDataPoint findClosest(DialectDataPoint target, List<DialectDataPoint> candidates) {
         if (candidates.isEmpty()) return null;
-        
         DialectDataPoint closest = null;
         double minDist = Double.MAX_VALUE;
-        
         for (DialectDataPoint candidate : candidates) {
             double dist = geographicDistance(target, candidate);
             if (dist < minDist) {
@@ -180,14 +235,12 @@ public final class DialectMapper {
                 closest = candidate;
             }
         }
-        
         return closest;
     }
 
     private static double geographicDistance(DialectDataPoint a, DialectDataPoint b) {
         double lat1 = getLatitude(a), lon1 = getLongitude(a);
         double lat2 = getLatitude(b), lon2 = getLongitude(b);
-        
         double dLat = lat2 - lat1;
         double dLon = lon2 - lon1;
         return Math.sqrt(dLat * dLat + dLon * dLon);

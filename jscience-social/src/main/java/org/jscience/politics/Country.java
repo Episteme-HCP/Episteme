@@ -25,12 +25,9 @@ package org.jscience.politics;
 
 import java.awt.Image;
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import org.jscience.economics.money.Currency;
-import org.jscience.geography.Place;
+import org.jscience.geography.Region;
 import org.jscience.util.Named;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
@@ -38,24 +35,30 @@ import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a sovereign state, kingdom, empire, or modern nation-state.
+ * <p>
  * A country aggregates territorial information, cultural identity (Nation), 
  * and administrative structures (Army, Police, Justice).
+ * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
+ * @version 2.1 (Modernized with ISO support)
  */
 @Persistent
-public class Country extends Place implements Named, Serializable {
+public class Country extends Region implements Named, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Attribute
-    private final String name;
+    // --- Common Static Constants ---
+    public static final Country FRANCE = new Country("France", "FR", "FRA", 250, "Paris", "Europe", 67000000L, 643801.0);
+    public static final Country USA = new Country("United States", "US", "USA", 840, "Washington, D.C.", "North America", 331000000L, 9833517.0);
+    public static final Country CHINA = new Country("China", "CN", "CHN", 156, "Beijing", "Asia", 1411000000L, 9596960.0);
+    public static final Country GERMANY = new Country("Germany", "DE", "DEU", 276, "Berlin", "Europe", 83000000L, 357022.0);
+    public static final Country JAPAN = new Country("Japan", "JP", "JPN", 392, "Tokyo", "Asia", 125000000L, 377975.0);
 
     @Relation(type = Relation.Type.MANY_TO_ONE)
-    private final Nation nation;
+    private Nation nation;
 
     @Relation(type = Relation.Type.ONE_TO_ONE)
     private Administration army;
@@ -68,193 +71,150 @@ public class Country extends Place implements Named, Serializable {
 
     @Attribute
     private Currency currency;
-
+    
     @Attribute
-    private double gdp = -1.0;
-
-    @Attribute
-    private double gnp = -1.0;
+    private String currencyCode;
 
     @Attribute
     private transient Image flag;
 
-    @Relation(type = Relation.Type.MANY_TO_ONE)
-    private City capital;
+    @Attribute
+    private String governmentType;
+
+    @Attribute
+    private Integer independenceYear;
+
+    @Attribute
+    private Double lifeExpectancy;
+
+    @Attribute
+    private Double populationGrowthRate;
+
+    @Attribute
+    private Double stability; // Index from 0.0 to 1.0
+
+    @Attribute
+    private Double militarySpending; // Usually in billions of USD or % of GDP
+
+    @Attribute
+    private String continent;
+    
+    @Attribute
+    private String alpha3;
+
+    private final Set<String> majorIndustries = new HashSet<>();
+    private final Set<String> naturalResources = new HashSet<>();
+    private final Set<String> borderCountries = new HashSet<>();
 
     @Relation(type = Relation.Type.ONE_TO_MANY)
     private final Set<City> cities = new HashSet<>();
 
     @Relation(type = Relation.Type.ONE_TO_MANY)
-    private final Set<Region> regions = new HashSet<>();
+    private final Set<Region> subRegions = new HashSet<>();
 
     /**
-     * Initializes a new Country instance.
-     *
-     * @param name    the name of the country
-     * @param nation  the cultural nation or group identity
-     * @param capital the capital city
-     * @throws NullPointerException if any argument is null
+     * Modern constructor.
      */
     public Country(String name, Nation nation, City capital) {
-        super(Objects.requireNonNull(name, "Name cannot be null"), 
-              Objects.requireNonNull(nation, "Nation cannot be null").getFormalTerritory().getBoundary());
-        this.name = name;
+        super(name, Region.RegionType.COUNTRY);
         this.nation = nation;
-        this.capital = Objects.requireNonNull(capital, "Capital cannot be null");
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public Nation getNation() {
-        return nation;
-    }
-
-    public Administration getArmy() {
-        return army;
+        if (capital != null) setCapital(capital.getName());
     }
 
     /**
-     * Sets the national army.
-     * @param army the administration
-     * @throws IllegalArgumentException if the administration belongs to another country
+     * Legacy/Factbook constructor.
      */
-    public void setArmy(Administration army) {
-        if (army != null && !Objects.equals(army.getPosition(), this)) {
-            throw new IllegalArgumentException("Army must be positioned within this country.");
-        }
-        this.army = army;
-    }
-
-    public Administration getPolice() {
-        return police;
+    public Country(String name, String code) {
+        super(name, Region.RegionType.COUNTRY);
+        setCode(code);
     }
 
     /**
-     * Sets the national police.
-     * @param police the administration
-     * @throws IllegalArgumentException if the administration belongs to another country
+     * Rich Factbook constructor.
      */
-    public void setPolice(Administration police) {
-        if (police != null && !Objects.equals(police.getPosition(), this)) {
-            throw new IllegalArgumentException("Police must be positioned within this country.");
-        }
-        this.police = police;
+    public Country(String name, String iso2, String iso3, int numeric, String capital, String continent, long pop, double area) {
+        super(name, Region.RegionType.COUNTRY);
+        setCode(iso2);
+        setAlpha3(iso3);
+        setCapital(capital);
+        setContinent(continent);
+        setPopulation(pop);
+        setAreaSqKm(area);
     }
 
-    public Administration getJustice() {
-        return justice;
-    }
+    public Nation getNation() { return nation; }
+    public void setNation(Nation nation) { this.nation = nation; }
 
-    /**
-     * Sets the national justice system.
-     * @param justice the administration
-     * @throws IllegalArgumentException if the administration belongs to another country
-     */
-    public void setJustice(Administration justice) {
-        if (justice != null && !Objects.equals(justice.getPosition(), this)) {
-            throw new IllegalArgumentException("Justice must be positioned within this country.");
-        }
-        this.justice = justice;
-    }
+    public Administration getArmy() { return army; }
+    public void setArmy(Administration army) { this.army = army; }
 
-    public Currency getCurrency() {
-        return currency;
-    }
+    public Administration getPolice() { return police; }
+    public void setPolice(Administration police) { this.police = police; }
 
-    public void setCurrency(Currency currency) {
-        this.currency = currency;
-    }
+    public Administration getJustice() { return justice; }
+    public void setJustice(Administration justice) { this.justice = justice; }
 
-    public double getGDP() {
-        return gdp;
-    }
+    public Currency getCurrency() { return currency; }
+    public void setCurrency(Currency currency) { this.currency = currency; }
 
-    public void setGDP(double gdp) {
-        this.gdp = gdp;
-    }
+    public String getCurrencyCode() { return currencyCode; }
+    public void setCurrencyCode(String code) { this.currencyCode = code; }
 
-    public double getGNP() {
-        return gnp;
-    }
+    public Image getFlag() { return flag; }
+    public void setFlag(Image flag) { this.flag = flag; }
 
-    public void setGNP(double gnp) {
-        this.gnp = gnp;
-    }
+    public String getGovernmentType() { return governmentType; }
+    public void setGovernmentType(String type) { this.governmentType = type; }
 
-    public Image getFlag() {
-        return flag;
-    }
+    public Integer getIndependenceYear() { return independenceYear; }
+    public void setIndependenceYear(Integer year) { this.independenceYear = year; }
 
-    public void setFlag(Image flag) {
-        this.flag = flag;
-    }
+    public Double getLifeExpectancy() { return lifeExpectancy; }
+    public void setLifeExpectancy(Double life) { this.lifeExpectancy = life; }
 
-    public City getCapital() {
-        return capital;
-    }
+    public Double getPopulationGrowthRate() { return populationGrowthRate; }
+    public void setPopulationGrowthRate(Double rate) { this.populationGrowthRate = rate; }
 
-    /**
-     * Sets the capital city.
-     * @param capital the city, must be within this country's cities
-     * @throws IllegalArgumentException if capital is null or from another country
-     */
-    public void setCapital(City capital) {
-        if (capital == null) {
-            throw new IllegalArgumentException("Capital cannot be null.");
-        }
-        if (!cities.contains(capital)) {
-            throw new IllegalArgumentException("The capital city must belong to this country.");
-        }
-        this.capital = capital;
-    }
+    public Double getStability() { return stability; }
+    public void setStability(Double stability) { this.stability = stability; }
 
-    public void addCity(City city) {
-        if (city != null) {
-            cities.add(city);
-        }
-    }
+    public Double getMilitarySpending() { return militarySpending; }
+    public void setMilitarySpending(Double spending) { this.militarySpending = spending; }
 
-    public void removeCity(City city) {
-        cities.remove(city);
-    }
+    public String getContinent() { return continent; }
+    public void setContinent(String continent) { this.continent = continent; }
 
-    public Set<City> getCities() {
-        return Collections.unmodifiableSet(cities);
-    }
+    public String getAlpha2() { return getCode(); }
+    public void setAlpha2(String code) { setCode(code); }
+    
+    public String getAlpha3() { return alpha3; }
+    public void setAlpha3(String code) { this.alpha3 = code; }
 
-    public void addRegion(Region region) {
-        if (region != null) {
-            regions.add(region);
-        }
-    }
+    public Set<String> getMajorIndustries() { return majorIndustries; }
+    public Set<String> getNaturalResources() { return naturalResources; }
+    public Set<String> getBorderCountries() { return borderCountries; }
 
-    public void removeRegion(Region region) {
-        regions.remove(region);
-    }
+    public void addCity(City city) { if (city != null) cities.add(city); }
+    public Set<City> getCities() { return Collections.unmodifiableSet(cities); }
 
-    public Set<Region> getRegions() {
-        return Collections.unmodifiableSet(regions);
-    }
+    public void addSubRegion(Region region) { if (region != null) subRegions.add(region); }
+    public Set<Region> getSubRegions() { return Collections.unmodifiableSet(subRegions); }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Country)) return false;
+        if (!(o instanceof Country country)) return false;
         if (!super.equals(o)) return false;
-        Country country = (Country) o;
-        return Objects.equals(name, country.name);
+        return Objects.equals(getCode(), country.getCode()) || Objects.equals(alpha3, country.alpha3);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), name);
+        return Objects.hash(super.hashCode(), getCode(), alpha3);
     }
 
     @Override
     public String toString() {
-        return name + " (Nation: " + nation.getName() + ")";
+        return getName() + " [" + getCode() + "]";
     }
 }

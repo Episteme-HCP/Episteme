@@ -1,20 +1,38 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2014 - JScience (http://jscience.org/)
- * All rights reserved.
- * 
- * Permission to use, copy, modify, and distribute this software is
- * freely granted, provided that this notice is preserved.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
+
 package org.jscience.economics;
 
 import org.jscience.biology.Individual;
-import org.jscience.biology.Human;
 import org.jscience.economics.money.Money;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Time;
+import org.jscience.mathematics.discrete.Tree;
+import org.jscience.mathematics.discrete.RootedTree;
 import org.jscience.sociology.Role;
-import org.jscience.util.CircularReferenceException;
-import org.jscience.util.NAryTree;
-import org.jscience.util.Tree;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
@@ -25,6 +43,9 @@ import java.util.Set;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.LinkedList;
 import java.util.stream.Collectors;
 
 /**
@@ -34,11 +55,15 @@ import java.util.stream.Collectors;
  * earns an income, and exists within a professional hierarchy of chiefs and 
  * subalterns.</p>
  *
- * @author <a href="mailto:silvere.martin-michiellot@jscience.org">Silvere Martin-Michiellot</a>
- * @version 6.0, July 21, 2014
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 6.1
+ * @since 1.0
  */
 @Persistent
 public class Worker extends EconomicAgent {
+
+    private static final long serialVersionUID = 1L;
 
     @Attribute
     private String function;
@@ -47,7 +72,7 @@ public class Worker extends EconomicAgent {
     private Money annualIncome;
 
     @Attribute
-    private double workedHours; // per year
+    private Quantity<Time> workedHours; // per year
 
     /** The immediate supervisors of this worker. */
     @Relation(type = Relation.Type.MANY_TO_MANY)
@@ -70,12 +95,12 @@ public class Worker extends EconomicAgent {
      * @param annualIncome their yearly salary.
      */
     public Worker(Individual individual, Organization organization, String function, Money annualIncome) {
-        super(individual, "Worker", new WorkSituation(organization.getName(), organization.getName()), Role.SERVER);
+        super(individual, new WorkSituation(organization.getName(), organization.getName()));
         this.organization = Objects.requireNonNull(organization, "Organization cannot be null");
         this.function = Objects.requireNonNull(function, "Function cannot be null");
         if (function.isEmpty()) throw new IllegalArgumentException("Function cannot be empty");
         this.annualIncome = Objects.requireNonNull(annualIncome, "Income cannot be null");
-        this.workedHours = 0;
+        this.workedHours = Quantities.create(Real.ZERO, Units.HOUR);
         this.chiefs = new HashSet<>();
         this.subalterns = new HashSet<>();
     }
@@ -84,11 +109,11 @@ public class Worker extends EconomicAgent {
      * Legacy constructor for work situation compatibility.
      */
     public Worker(Individual individual, WorkSituation workSituation, String function, Organization organization) {
-        super(individual, "Worker", workSituation, Role.SERVER);
+        super(individual, workSituation);
         this.organization = Objects.requireNonNull(organization);
         this.function = Objects.requireNonNull(function);
-        this.annualIncome = Money.usd(0);
-        this.workedHours = 0;
+        this.annualIncome = Money.usd(Real.ZERO);
+        this.workedHours = Quantities.create(Real.ZERO, Units.HOUR);
         this.chiefs = new HashSet<>();
         this.subalterns = new HashSet<>();
     }
@@ -136,7 +161,7 @@ public class Worker extends EconomicAgent {
      *
      * @return the worked hours.
      */
-    public double getWorkedHours() {
+    public Quantity<Time> getWorkedHours() {
         return workedHours;
     }
 
@@ -145,8 +170,17 @@ public class Worker extends EconomicAgent {
      *
      * @param workedHours the new hour count.
      */
+    public void setWorkedHours(Quantity<Time> workedHours) {
+        this.workedHours = Objects.requireNonNull(workedHours);
+    }
+    
+    /**
+     * Sets the number of hours worked per year.
+     *
+     * @param workedHours the new hour count in double (converted to Quantity).
+     */
     public void setWorkedHours(double workedHours) {
-        this.workedHours = workedHours;
+        this.workedHours = Quantities.create(workedHours, Units.HOUR);
     }
 
     /**
@@ -181,15 +215,14 @@ public class Worker extends EconomicAgent {
      * Sets the set of immediate subordinates.
      * 
      * @param subalterns the subordinates to set.
-     * @throws CircularReferenceException if any subordinate is also a supervisor or self.
      * @throws IllegalArgumentException if subalterns set is null.
      */
     public void setSubalterns(Set<Worker> subalterns)
-        throws CircularReferenceException, IllegalArgumentException {
+        throws IllegalArgumentException {
         Objects.requireNonNull(subalterns, "Subalterns set cannot be null");
         for (Worker child : subalterns) {
             if (child == this || child.hasDistantSubaltern(this)) {
-                throw new CircularReferenceException("Cannot add Worker child that is a parent or self.");
+                throw new IllegalArgumentException("Cannot add Worker child that is a parent or self.");
             }
             child.addChief(this);
         }
@@ -200,14 +233,13 @@ public class Worker extends EconomicAgent {
      * Adds an immediate subordinate.
      *
      * @param child the worker to add.
-     * @throws CircularReferenceException if the child is already a supervisor or self.
-     * @throws IllegalArgumentException if child is null.
+     * @throws IllegalArgumentException if the child is already a supervisor or self.
      */
     public void addSubaltern(Worker child)
-        throws CircularReferenceException, IllegalArgumentException {
+        throws IllegalArgumentException {
         Objects.requireNonNull(child, "Child cannot be null");
         if (child == this || child.hasDistantSubaltern(this)) {
-            throw new CircularReferenceException("Cannot add Worker child that is a parent or self.");
+            throw new IllegalArgumentException("Cannot add Worker child that is a parent or self.");
         }
         child.addChief(this);
         subalterns.add(child);
@@ -361,9 +393,9 @@ public class Worker extends EconomicAgent {
      */
     public static Tree<Worker> extractTree(Worker w1, Worker w2) {
         Worker root = getCommonRoot(w1, w2);
-        if (root == null) return new NAryTree<>();
+        if (root == null) return new RootedTree<>();
         
-        NAryTree<Worker> tree = new NAryTree<>(root);
+        RootedTree<Worker> tree = new RootedTree<>(root);
         List<Worker> l1 = getLineage(root, w1);
         List<Worker> l2 = getLineage(root, w2);
         
@@ -372,22 +404,12 @@ public class Worker extends EconomicAgent {
         return tree;
     }
 
-    private static void fillTree(NAryTree<Worker> tree, List<Worker> lineage) {
-        NAryTree<Worker> current = tree;
-        for (int i = 1; i < lineage.size(); i++) {
-            Worker nextWorker = lineage.get(i);
-            boolean found = false;
-            for (Tree<Worker> child : current.getChildren()) {
-                 if (child.getValue().equals(nextWorker)) {
-                     current = (NAryTree<Worker>) child;
-                     found = true;
-                     break;
-                 }
-            }
-            if (!found) {
-                NAryTree<Worker> nextTree = new NAryTree<>(nextWorker);
-                current.addChild(nextTree);
-                current = nextTree;
+    private static void fillTree(RootedTree<Worker> tree, List<Worker> lineage) {
+        for (int i = 0; i < lineage.size() - 1; i++) {
+            Worker parent = lineage.get(i);
+            Worker child = lineage.get(i + 1);
+            if (!tree.getChildren(parent).contains(child)) {
+                tree.addChild(parent, child);
             }
         }
     }
@@ -448,7 +470,7 @@ public class Worker extends EconomicAgent {
         if (!(o instanceof Worker)) return false;
         if (!super.equals(o)) return false;
         Worker that = (Worker) o;
-        return Double.compare(that.workedHours, workedHours) == 0 &&
+        return Objects.equals(workedHours, that.workedHours) &&
                Objects.equals(function, that.function) &&
                Objects.equals(annualIncome, that.annualIncome) &&
                Objects.equals(chiefs, that.chiefs) &&

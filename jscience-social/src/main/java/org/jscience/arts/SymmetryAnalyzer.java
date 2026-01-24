@@ -1,34 +1,83 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.arts;
 
+import java.io.Serializable;
+import java.util.List;
 import org.jscience.mathematics.numbers.real.Real;
-import java.util.*;
 
 /**
- * Analyzes symmetry and repetitive patterns in visual compositions.
+ * Analytical engine for detecting and measuring symmetry and repetitive patterns 
+ * in visual compositions. It supports several types of symmetry including 
+ * bilateral, rotational, translational, and point symmetry.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
 public final class SymmetryAnalyzer {
 
     private SymmetryAnalyzer() {}
 
+    /**
+     * Geometric symmetry types.
+     */
     public enum SymmetryType {
-        BILATERAL,      // Mirror symmetry
-        ROTATIONAL,     // N-fold rotation
-        TRANSLATIONAL,  // Repeating pattern
-        POINT,          // Central symmetry
-        GLIDE,          // Translation + reflection
+        /** Mirror symmetry. */
+        BILATERAL,
+        /** N-fold rotational symmetry. */
+        ROTATIONAL,
+        /** Repeating pattern. */
+        TRANSLATIONAL,
+        /** Central/inversion symmetry. */
+        POINT,
+        /** Combined translation and reflection. */
+        GLIDE,
+        /** No significant symmetry detected. */
         NONE
     }
 
+    /**
+     * Result of a symmetry detection analysis.
+     */
     public record SymmetryResult(
         SymmetryType type,
         double confidence,    // 0-1
         double[] axis,        // [x1, y1, x2, y2] for bilateral
         int foldOrder,        // n for n-fold rotational
         double[] center       // [x, y] for point/rotational
-    ) {}
+    ) implements Serializable {
+        private static final long serialVersionUID = 2L;
+    }
 
     /**
-     * Detects bilateral (mirror) symmetry in a point cloud.
+     * Detects bilateral (mirror) symmetry in a point cloud using centroid-based 
+     * axis testing.
+     * 
+     * @param points list of [x, y] coordinates representing visual features
+     * @return a SymmetryResult containing the best matching axis and confidence
      */
     public static SymmetryResult detectBilateralSymmetry(List<double[]> points) {
         if (points.size() < 4) {
@@ -70,7 +119,11 @@ public final class SymmetryAnalyzer {
     }
 
     /**
-     * Detects rotational symmetry.
+     * Detects rotational symmetry by searching for the best N-fold rotation score 
+     * around the shape's centroid.
+     * 
+     * @param points list of [x, y] coordinates
+     * @return a SymmetryResult specifying the best fold order
      */
     public static SymmetryResult detectRotationalSymmetry(List<double[]> points) {
         double[] centroid = calculateCentroid(points);
@@ -94,7 +147,13 @@ public final class SymmetryAnalyzer {
     }
 
     /**
-     * Detects repeating patterns (translational symmetry).
+     * Detects translational (repeating) symmetry by scanning for a period 
+     * vector that maps points onto each other.
+     * 
+     * @param points list of [x, y] coordinates
+     * @param minPeriod minimum expected repeat distance
+     * @param maxPeriod maximum expected repeat distance
+     * @return a SymmetryResult containing the translation vector
      */
     public static SymmetryResult detectTranslationalSymmetry(List<double[]> points,
             double minPeriod, double maxPeriod) {
@@ -133,7 +192,11 @@ public final class SymmetryAnalyzer {
     }
 
     /**
-     * Calculates the symmetry quotient of a shape (0-1).
+     * Calculates a combined symmetry quotient (0-1) representing the 
+     * overall geometric regularity of the composition.
+     * 
+     * @param points list of [x, y] coordinates
+     * @return symmetry quotient as a Real
      */
     public static Real symmetryQuotient(List<double[]> points) {
         SymmetryResult bilateral = detectBilateralSymmetry(points);
@@ -155,7 +218,6 @@ public final class SymmetryAnalyzer {
     private static double testAxisSymmetry(List<double[]> points, double[] center, double angle) {
         int matches = 0;
         double tolerance = 10.0;
-        
         for (double[] p : points) {
             double[] reflected = reflectPoint(p, center, angle);
             for (double[] q : points) {
@@ -165,7 +227,6 @@ public final class SymmetryAnalyzer {
                 }
             }
         }
-        
         return (double) matches / points.size();
     }
 
@@ -173,7 +234,6 @@ public final class SymmetryAnalyzer {
         double angle = 2 * Math.PI / n;
         int matches = 0;
         double tolerance = 10.0;
-        
         for (double[] p : points) {
             double[] rotated = rotatePoint(p, center, angle);
             for (double[] q : points) {
@@ -183,14 +243,12 @@ public final class SymmetryAnalyzer {
                 }
             }
         }
-        
         return (double) matches / points.size();
     }
 
     private static double testTranslation(List<double[]> points, double dx, double dy) {
         int matches = 0;
         double tolerance = 10.0;
-        
         for (double[] p : points) {
             double[] translated = new double[] {p[0] + dx, p[1] + dy};
             for (double[] q : points) {
@@ -200,17 +258,14 @@ public final class SymmetryAnalyzer {
                 }
             }
         }
-        
         return (double) matches / points.size();
     }
 
     private static double[] reflectPoint(double[] p, double[] center, double angle) {
         double dx = p[0] - center[0];
         double dy = p[1] - center[1];
-        
         double cos2 = Math.cos(2 * angle);
         double sin2 = Math.sin(2 * angle);
-        
         return new double[] {
             center[0] + dx * cos2 + dy * sin2,
             center[1] + dx * sin2 - dy * cos2
@@ -220,10 +275,8 @@ public final class SymmetryAnalyzer {
     private static double[] rotatePoint(double[] p, double[] center, double angle) {
         double dx = p[0] - center[0];
         double dy = p[1] - center[1];
-        
         double cos = Math.cos(angle);
         double sin = Math.sin(angle);
-        
         return new double[] {
             center[0] + dx * cos - dy * sin,
             center[1] + dx * sin + dy * cos

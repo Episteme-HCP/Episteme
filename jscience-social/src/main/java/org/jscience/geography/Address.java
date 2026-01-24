@@ -1,249 +1,214 @@
-package org.jscience.geography;
-
-import org.jscience.politics.Country;
-
-import org.jscience.util.Named;
-import org.jscience.util.Positioned;
-
-
-/**
- * A class representing all the informations needed to reach a place.
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
- * @author Silvere Martin-Michiellot
- * @version 1.0
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
-//this is the basic information
-//in fact it happens that many more specific fields may be required (all highly place dependant)
-//http://kropla.com/dialcode.htm for international phone country codes
-public class Address extends Object implements Named, Positioned {
-    /** DOCUMENT ME! */
-    private String fullName; //for example the
+package org.jscience.geography;
 
-    /** DOCUMENT ME! */
+import org.jscience.earth.coordinates.EarthCoordinate;
+import org.jscience.politics.Country;
+import org.jscience.util.Named;
+import org.jscience.util.Positioned;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+/**
+ * Represents a mailing or physical address for a location.
+ * Links to a {@link Place} for precise geographical coordinates.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+@Persistent
+public class Address implements Named, Positioned<EarthCoordinate>, Serializable {
+
+    private static final long serialVersionUID = 2L;
+
+    @Attribute
+    private String recipientName;
+
+    @Attribute
     private String company;
 
-    /** DOCUMENT ME! */
-    private String address1; //building...
+    @Attribute
+    private String streetLine1; // House number, street
 
-    /** DOCUMENT ME! */
-    private String address2; //street...
+    @Attribute
+    private String streetLine2; // Suite, Apartment, Floor
 
-    /** DOCUMENT ME! */
+    @Attribute
     private String city;
 
-    /** DOCUMENT ME! */
-    private String state;
+    @Attribute
+    private String stateProvince;
 
-    /** DOCUMENT ME! */
-    private String zipCode;
+    @Attribute
+    private String postalCode;
 
-    /** DOCUMENT ME! */
+    @Relation(type = Relation.Type.MANY_TO_ONE)
     private Country country;
 
-    /** DOCUMENT ME! */
+    @Attribute
     private String phoneNumber;
 
-    /** DOCUMENT ME! */
+    @Relation(type = Relation.Type.MANY_TO_ONE)
     private Place place;
 
-    //you have to build up a new object should any field in the constructor change
-    /**
-     * Creates a new Address object.
-     *
-     * @param fullName DOCUMENT ME!
-     * @param address DOCUMENT ME!
-     * @param city DOCUMENT ME!
-     * @param zipCode DOCUMENT ME!
-     * @param country DOCUMENT ME!
-     */
-    public Address(String fullName, String address, String city,
-        String zipCode, Country country) {
-        this(fullName, null, address, null, city, null, zipCode, country);
+    public Address() {
     }
 
-/**
-     * Creates a new Address object.
-     *
-     * @param fullName DOCUMENT ME!
-     * @param address1 DOCUMENT ME!
-     * @param address2 DOCUMENT ME!
-     * @param city     DOCUMENT ME!
-     * @param zipCode  DOCUMENT ME!
-     * @param country  DOCUMENT ME!
-     */
-    public Address(String fullName, String address1, String address2,
-        String city, String zipCode, Country country) {
-        this(fullName, null, address1, address2, city, null, zipCode, country);
-    }
-
-/**
-     * Creates a new Address object.
-     *
-     * @param fullName DOCUMENT ME!
-     * @param address1 DOCUMENT ME!
-     * @param address2 DOCUMENT ME!
-     * @param city     DOCUMENT ME!
-     * @param state    DOCUMENT ME!
-     * @param zipCode  DOCUMENT ME!
-     * @param country  DOCUMENT ME!
-     */
-    public Address(String fullName, String address1, String address2,
-        String city, String state, String zipCode, Country country) {
-        this(fullName, null, address1, address2, city, state, zipCode, country);
-    }
-
-/**
-     * Creates a new Address object.
-     *
-     * @param fullName DOCUMENT ME!
-     * @param company  DOCUMENT ME!
-     * @param address1 DOCUMENT ME!
-     * @param address2 DOCUMENT ME!
-     * @param city     DOCUMENT ME!
-     * @param state    DOCUMENT ME!
-     * @param zipCode  DOCUMENT ME!
-     * @param country  DOCUMENT ME!
-     */
-    public Address(String fullName, String company, String address1,
-        String address2, String city, String state, String zipCode,
-        Country country) {
-        this.fullName = fullName;
-        this.company = company;
-        this.address1 = address1;
-        this.address2 = address2;
+    public Address(String recipientName, String street, String city, String postalCode, Country country) {
+        this.recipientName = recipientName;
+        this.streetLine1 = street;
         this.city = city;
-        this.state = state;
-        this.zipCode = zipCode;
+        this.postalCode = postalCode;
         this.country = country;
     }
 
-    //may return null
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    @Override
     public String getName() {
-        return fullName;
+        return recipientName;
     }
 
-    //may return null
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    public void setName(String name) {
+        this.recipientName = name;
+    }
+
+    public String getRecipientName() {
+        return recipientName;
+    }
+
+    public void setRecipientName(String recipientName) {
+        this.recipientName = recipientName;
+    }
+
     public String getCompany() {
         return company;
     }
 
-    //may return null
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public String getAddress1() {
-        return address1;
+    public void setCompany(String company) {
+        this.company = company;
     }
 
-    //may return null
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public String getAddress2() {
-        return address2;
+    public String getStreetLine1() {
+        return streetLine1;
     }
 
-    //may return null
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    public void setStreetLine1(String streetLine1) {
+        this.streetLine1 = streetLine1;
+    }
+
+    public String getStreetLine2() {
+        return streetLine2;
+    }
+
+    public void setStreetLine2(String streetLine2) {
+        this.streetLine2 = streetLine2;
+    }
+
     public String getCity() {
         return city;
     }
 
-    //may return null
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public String getState() {
-        return state;
+    public void setCity(String city) {
+        this.city = city;
     }
 
-    //may return null
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public String getZipCode() {
-        return zipCode;
+    public String getStateProvince() {
+        return stateProvince;
     }
 
-    //may return null
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    public void setStateProvince(String stateProvince) {
+        this.stateProvince = stateProvince;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
     public Country getCountry() {
         return country;
     }
 
-    //may return null
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public String getCountryName() {
-        return country.getName();
+    public void setCountry(Country country) {
+        this.country = country;
     }
 
-    //may return null
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param phone DOCUMENT ME!
-     */
-    public void setPhoneNumber(String phone) {
-        this.phoneNumber = phone;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
-    //may return null
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Place getPosition() {
+    public Place getPlace() {
         return place;
     }
 
-    //usually set as a callback to a place
-    /**
-     * DOCUMENT ME!
-     *
-     * @param place DOCUMENT ME!
-     */
-    public void setPosition(Place place) {
+    public void setPlace(Place place) {
         this.place = place;
+    }
+
+    @Override
+    public EarthCoordinate getPosition() {
+        return place != null ? place.getPosition() : null;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if (recipientName != null) sb.append(recipientName).append("\n");
+        if (company != null) sb.append(company).append("\n");
+        if (streetLine1 != null) sb.append(streetLine1).append("\n");
+        if (streetLine2 != null) sb.append(streetLine2).append("\n");
+        if (city != null) sb.append(city);
+        if (stateProvince != null) sb.append(", ").append(stateProvince);
+        if (postalCode != null) sb.append(" ").append(postalCode);
+        if (country != null) sb.append("\n").append(country.getName());
+        return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Address other)) return false;
+        return Objects.equals(recipientName, other.recipientName) &&
+               Objects.equals(streetLine1, other.streetLine1) &&
+               Objects.equals(city, other.city) &&
+               Objects.equals(postalCode, other.postalCode) &&
+               Objects.equals(country, other.country);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(recipientName, streetLine1, city, postalCode, country);
     }
 }

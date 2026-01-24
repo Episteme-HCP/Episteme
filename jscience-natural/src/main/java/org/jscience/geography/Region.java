@@ -23,139 +23,127 @@
 
 package org.jscience.geography;
 
-import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.economics.money.Money;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Area;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+
+import java.util.Objects;
 
 /**
- * Represents geographic/geopolitical region.
+ * Represents a geographical or geopolitical region (Country, State, City, etc.).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Region {
+@Persistent
+public class Region extends Place {
 
-    public enum Type {
+    private static final long serialVersionUID = 1L;
+
+    public enum SubType {
         CONTINENT, SUBCONTINENT, COUNTRY, STATE, PROVINCE,
-        COUNTY, CITY, DISTRICT, TIMEZONE, CLIMATE_ZONE
+        COUNTY, CITY, DISTRICT, MUNICIPALITY, VILLAGE,
+        TIMEZONE, CLIMATE_ZONE, ECONOMIC_ZONE, OTHER
     }
 
-    private final String name;
-    private Type type;
-    private String parentRegion;
-    private Real areaSqKm;
+    @Attribute
+    private SubType subType = SubType.OTHER;
+
+    @Attribute
+    private String parentRegionId;
+
+    @Attribute
+    private Quantity<Area> area;
+
+    @Attribute
     private long population;
-    private Coordinate center;
+
+    @Attribute
     private String capital;
-    // New Data Loader Fields
-    private String code; // ISO Code
-    private org.jscience.economics.Money gdp;
 
-    public Region(String name, Type type) {
-        this.name = name;
-        this.type = type;
-        this.areaSqKm = Real.ZERO;
+    @Attribute
+    private String isoCode;
+
+    @Attribute
+    private Quantity<Money> gdp;
+
+    public Region(String name, SubType subType) {
+        super(name, Type.REGION);
+        this.subType = Objects.requireNonNull(subType);
+        this.area = Quantities.create(0.0, Units.SQUARE_METER);
     }
 
-    // Getters
-    public String getName() {
-        return name;
+    public SubType getSubType() {
+        return subType;
     }
 
-    public Type getType() {
-        return type;
+    public void setSubType(SubType subType) {
+        this.subType = subType;
     }
 
-    public String getParentRegion() {
-        return parentRegion;
+    public String getParentRegionId() {
+        return parentRegionId;
     }
 
-    public Real getAreaSqKm() {
-        return areaSqKm;
+    public void setParentRegionId(String parentRegionId) {
+        this.parentRegionId = parentRegionId;
+    }
+
+    public Quantity<Area> getArea() {
+        return area;
+    }
+
+    public void setArea(Quantity<Area> area) {
+        this.area = area;
     }
 
     public long getPopulation() {
         return population;
     }
 
-    public Coordinate getCenter() {
-        return center;
+    public void setPopulation(long population) {
+        this.population = population;
     }
 
     public String getCapital() {
         return capital;
     }
 
-    public String getCode() {
-        return code;
-    }
-
-    public org.jscience.economics.Money getGdp() {
-        return gdp;
-    }
-
-    // Setters
-    public void setType(Type type) {
-        this.type = type;
-    }
-
-    public void setParentRegion(String parent) {
-        this.parentRegion = parent;
-    }
-
-    public void setAreaSqKm(Real area) {
-        this.areaSqKm = area;
-    }
-
-    public void setAreaSqKm(double area) {
-        this.areaSqKm = Real.of(area);
-    }
-
-    public void setPopulation(long pop) {
-        this.population = pop;
-    }
-
-    public void setCenter(Coordinate center) {
-        this.center = center;
-    }
-
     public void setCapital(String capital) {
         this.capital = capital;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public String getIsoCode() {
+        return isoCode;
     }
 
-    public void setGdp(org.jscience.economics.Money gdp) {
+    public void setIsoCode(String isoCode) {
+        this.isoCode = isoCode;
+    }
+
+    public Quantity<Money> getGdp() {
+        return gdp;
+    }
+
+    public void setGdp(Quantity<Money> gdp) {
         this.gdp = gdp;
     }
 
-    /** Population density (people per sq km) */
-    public Real getPopulationDensity() {
-        return areaSqKm.isZero() ? Real.ZERO : Real.of(population).divide(areaSqKm);
+    /**
+     * Calculates population density (people per sq km).
+     */
+    public double getPopulationDensity() {
+        double areaKm2 = area.to(Units.KILOMETER.pow(2)).getValue();
+        return areaKm2 > 0 ? population / areaKm2 : 0;
     }
 
     @Override
     public String toString() {
-        return String.format("%s (%s): %.0f kmÃ‚Â², pop %d", name, type, areaSqKm.doubleValue(), population);
-    }
-
-    // Factory methods for major regions
-    public static Region europe() {
-        Region r = new Region("Europe", Type.CONTINENT);
-        r.setAreaSqKm(10_180_000);
-        r.setPopulation(750_000_000);
-        return r;
-    }
-
-    public static Region california() {
-        Region r = new Region("California", Type.STATE);
-        r.setParentRegion("United States");
-        r.setAreaSqKm(423_970);
-        r.setPopulation(39_000_000);
-        r.setCapital("Sacramento");
-        return r;
+        return String.format("%s (%s), Area: %s, Pop: %d", getName(), subType, area, population);
     }
 }
-
-

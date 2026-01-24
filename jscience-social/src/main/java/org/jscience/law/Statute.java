@@ -23,20 +23,39 @@
 
 package org.jscience.law;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
 /**
- * Represents a legal statute or law.
+ * Represents a legal statute, law, or regulation.
+ * <p>
+ * A statute is a formal written enactment of a legislative authority.
+ * This class provides a structured representation including hierarchical elements like articles.
+ * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
+ * @version 2.0 (Modernized)
  */
-public class Statute {
+public class Statute implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Types of legal acts.
+     */
     public enum Type {
         CONSTITUTION, FEDERAL_LAW, STATE_LAW, REGULATION, ORDINANCE,
-        TREATY, DIRECTIVE, DECREE
+        TREATY, DIRECTIVE, DECREE, ACT
     }
 
+    /**
+     * Life cycle status of a legal act.
+     */
     public enum Status {
         PROPOSED, ENACTED, AMENDED, REPEALED
     }
@@ -46,40 +65,35 @@ public class Statute {
     private final Type type;
     private final String jurisdiction;
     private final int yearEnacted;
-    private final Status status;
+    private Status status;
+    
+    /** The hierarchical components (articles/clauses) of the statute. */
+    private final List<Article> articles = new ArrayList<>();
 
     public Statute(String code, String title, Type type, String jurisdiction,
             int yearEnacted, Status status) {
-        this.code = code;
-        this.title = title;
+        this.code = Objects.requireNonNull(code);
+        this.title = Objects.requireNonNull(title);
         this.type = type;
         this.jurisdiction = jurisdiction;
         this.yearEnacted = yearEnacted;
         this.status = status;
     }
 
-    public String getCode() {
-        return code;
+    public String getCode() { return code; }
+    public String getTitle() { return title; }
+    public Type getType() { return type; }
+    public String getJurisdiction() { return jurisdiction; }
+    public int getYearEnacted() { return yearEnacted; }
+    public Status getStatus() { return status; }
+    public void setStatus(Status status) { this.status = status; }
+
+    public List<Article> getArticles() {
+        return Collections.unmodifiableList(articles);
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public String getJurisdiction() {
-        return jurisdiction;
-    }
-
-    public int getYearEnacted() {
-        return yearEnacted;
-    }
-
-    public Status getStatus() {
-        return status;
+    public void addArticle(Article article) {
+        this.articles.add(Objects.requireNonNull(article));
     }
 
     public boolean isActive() {
@@ -88,8 +102,6 @@ public class Statute {
 
     @Override
     public String toString() {
-        return String.format("%s: %s (%s, %d) - %s", code, title, type, yearEnacted, status);
+        return String.format("[%s] %s (%s, %d) - %s", code, title, type, yearEnacted, status);
     }
 }
-
-

@@ -1,22 +1,53 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.linguistics;
 
+import java.util.List;
 import org.jscience.mathematics.numbers.real.Real;
-import java.util.*;
 
 /**
- * Models the evolution and divergence of languages (Glottochronology).
+ * Analytical engine for modeling language evolution, divergence, and 
+ * glottochronology. It provides mathematical models for estimating divergence 
+ * times based on cognate retention in Swadesh lists.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
 public final class LanguageEvolution {
 
     private LanguageEvolution() {}
 
     /**
-     * Estimates time since divergence using Swadesh list retention.
-     * t = log(c) / (2 * log(r))
+     * Estimates the time since two languages diverged from a common ancestor 
+     * using Swadesh list retention rates.
+     * Formula: t = log(c) / (2 * log(r))
      * 
-     * @param c Fraction of shared cognates (0-1)
-     * @param r Retention rate (typically 0.81-0.86 per millennium)
-     * @return Time in millennia
+     * @param c fraction of shared cognates (0.0 to 1.0)
+     * @param r retention rate per millennium (typically 0.81 to 0.86)
+     * @return time since divergence in millennia
      */
     public static Real divergenceTimeMillennia(double c, double r) {
         if (c <= 0 || r <= 0 || r >= 1) return Real.ZERO;
@@ -24,7 +55,12 @@ public final class LanguageEvolution {
     }
 
     /**
-     * Calculates shared cognates from word lists.
+     * Calculates the fraction of shared cognates between two lists of words 
+     * representing the same concepts (Swadesh lists).
+     * 
+     * @param list1 first word list
+     * @param list2 second word list
+     * @return fraction (0.0 to 1.0)
      */
     public static double calculateCognateFraction(List<String> list1, List<String> list2) {
         int shared = 0;
@@ -40,12 +76,21 @@ public final class LanguageEvolution {
     }
 
     /**
-     * Simplified cognate check using Levenshtein distance.
+     * Determines if two words are likely cognates using normalized 
+     * Levenshtein distance.
+     * 
+     * @param word1 first word
+     * @param word2 second word
+     * @return true if similarity exceeds the cognate threshold (default 0.6)
      */
-    private static boolean isCognate(String word1, String word2) {
+    public static boolean isCognate(String word1, String word2) {
+        if (word1 == null || word2 == null) return false;
         int dist = editDistance(word1.toLowerCase(), word2.toLowerCase());
-        double similarity = 1 - (double) dist / Math.max(word1.length(), word2.length());
-        return similarity > 0.6; // Threshold for cognate status
+        int maxLen = Math.max(word1.length(), word2.length());
+        if (maxLen == 0) return true;
+        
+        double similarity = 1.0 - (double) dist / maxLen;
+        return similarity > 0.6; // Empirical threshold for cognates
     }
 
     private static int editDistance(String s1, String s2) {
@@ -63,10 +108,14 @@ public final class LanguageEvolution {
     }
 
     /**
-     * Projects future semantic drift probability.
-     * S(t) = exp(-kt)
+     * Projects the probability of semantic retention over a given time period.
+     * Formula: S(t) = exp(-kt)
+     * 
+     * @param kDrift semantic drift coefficient
+     * @param years time span in years
+     * @return retention probability (0.0 to 1.0)
      */
-    public static Real semanticRetention(double k_drift, int years) {
-        return Real.of(Math.exp(-k_drift * years / 1000.0));
+    public static Real semanticRetention(double kDrift, int years) {
+        return Real.of(Math.exp(-kDrift * years / 1000.0));
     }
 }

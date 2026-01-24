@@ -90,9 +90,7 @@ public class BioPAXReader extends AbstractResourceReader<BioPAXModel> {
      */
     public BioPAXModel read(InputStream input) throws BioPAXException {
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
+            DocumentBuilder builder = org.jscience.io.SecureXMLFactory.createSecureDocumentBuilder();
             Document doc = builder.parse(input);
             return parseDocument(doc);
         } catch (Exception e) {

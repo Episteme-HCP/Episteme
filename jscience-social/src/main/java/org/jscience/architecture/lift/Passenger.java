@@ -1,14 +1,57 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.architecture.lift;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
- * Represents a passenger in an elevator system.
+ * Represents an individual agent utilizing a vertical transportation system. 
+ * Tracks waiting time, transit time, and movement through various logical 
+ * states of a trip.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
-public class Passenger {
+public class Passenger implements Serializable {
 
+    private static final long serialVersionUID = 2L;
+
+    /** Movement states of the passenger agent. */
     public enum State {
-        WAITING, GETTING_IN, TRAVELLING, GETTING_OUT, FINISHED
+        /** Passenger is queued at the source floor. */
+        WAITING, 
+        /** In the process of boarding a cab. */
+        GETTING_IN, 
+        /** Currently inside a cab in motion. */
+        TRAVELLING, 
+        /** In the process of exiting a cab at destination. */
+        GETTING_OUT, 
+        /** Trip completed. */
+        FINISHED
     }
 
     private final String id;
@@ -19,6 +62,13 @@ public class Passenger {
     private int travelTicks;
     private Elevator currentElevator;
 
+    /**
+     * Initializes a new passenger with a specific travel intent.
+     * 
+     * @param sourceFloor the index of the floor where the passenger starts
+     * @param destinationFloor the index of the target floor
+     * @throws IllegalArgumentException if source and destination are identical
+     */
     public Passenger(int sourceFloor, int destinationFloor) {
         if (sourceFloor == destinationFloor) {
             throw new IllegalArgumentException("Source and destination floors must be different");
@@ -47,10 +97,12 @@ public class Passenger {
         return state;
     }
 
+    /** @return the number of simulation ticks spent waiting outside a cab */
     public int getWaitTicks() {
         return waitTicks;
     }
 
+    /** @return the number of simulation ticks spent inside a cab */
     public int getTravelTicks() {
         return travelTicks;
     }
@@ -59,6 +111,9 @@ public class Passenger {
         this.state = state;
     }
 
+    /**
+     * Advances the passenger's internal timers based on current state.
+     */
     public void tick() {
         if (state == State.WAITING) {
             waitTicks++;
@@ -77,6 +132,7 @@ public class Passenger {
 
     @Override
     public String toString() {
-        return String.format("Passenger[%s: %d -> %d, %s]", id.substring(0, 8), sourceFloor, destinationFloor, state);
+        return String.format("Passenger[%s: %d -> %d, %s]", 
+            id.substring(0, Math.min(id.length(), 8)), sourceFloor, destinationFloor, state);
     }
 }

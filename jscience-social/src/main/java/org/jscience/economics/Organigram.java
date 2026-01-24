@@ -23,89 +23,112 @@
 
 package org.jscience.economics;
 
-import org.jscience.util.NAryTree;
+import org.jscience.mathematics.discrete.RootedTree;
 import org.jscience.util.Named;
+import org.jscience.util.Commented;
+import org.jscience.util.Temporal;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.Identified;
+import org.jscience.util.identity.SimpleIdentification;
 
 /**
  * Represents a formal organizational structure (organigram).
  * This defines the intended hierarchy and grouping of workers within an organization.
- * It is structured as an N-Ary tree of organizational units.
+ * Uses the graph-based RootedTree for hierarchical representation.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 @Persistent
-public class Organigram extends NAryTree<String> implements Named {
+public class Organigram implements Named, Identified<Identification>, Commented, Temporal {
 
-    /** Workers associated with this specific level of the organigram. */
+    @Id
+    private Identification identification;
+
+    @Attribute
+    private String name;
+
+    @Attribute
+    private String comments;
+
+    @Attribute
+    private Instant timestamp;
+
+    /** The actual hierarchical structure of organizational unit names. */
+    private RootedTree<String> structure;
+
+    /** Mapping of organizational unit names to workers. */
     @Relation(type = Relation.Type.ONE_TO_MANY)
     private Set<Worker> workers;
 
     /**
-     * Creates a new Organigram level.
+     * Creates a new Organigram.
      *
-     * @param name the name of this organizational unit
+     * @param name the name of the organization or the root unit
      * @throws NullPointerException if name is null
      * @throws IllegalArgumentException if name is empty
      */
     public Organigram(String name) {
-        super(Objects.requireNonNull(name, "Name cannot be null"));
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
         if (name.isEmpty()) {
             throw new IllegalArgumentException("Name cannot be empty");
         }
+        this.identification = new SimpleIdentification("Organigram:" + name);
+        this.timestamp = Instant.now();
+        this.structure = new RootedTree<>(name);
         this.workers = new HashSet<>();
     }
 
     /**
-     * Creates a new Organigram level with an initial set of workers.
-     *
-     * @param name    the name of this organizational unit
-     * @param workers the initial workers
-     * @throws NullPointerException if name or workers is null
-     * @throws IllegalArgumentException if name is empty
-     */
-    public Organigram(String name, Set<Worker> workers) {
-        super(Objects.requireNonNull(name, "Name cannot be null"));
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("Name cannot be empty");
-        }
-        this.workers = new HashSet<>(Objects.requireNonNull(workers, "Workers set cannot be null"));
-    }
-
-    /**
-     * Returns the name of this organizational unit.
+     * Returns the name of this organigram.
      *
      * @return the name
      */
     @Override
     public String getName() {
-        return getContents();
+        return name;
     }
 
     /**
-     * Sets the name of this organizational unit.
+     * Sets the name of this organigram.
      *
      * @param name the new name
-     * @throws NullPointerException if name is null
-     * @throws IllegalArgumentException if name is empty
      */
     public void setName(String name) {
-        Objects.requireNonNull(name, "Name cannot be null");
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("Name cannot be empty");
-        }
-        setContents(name);
+        this.name = Objects.requireNonNull(name);
+    }
+
+    @Override
+    public Identification getId() {
+        return identification;
+    }
+
+    @Override
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
+    @Override
+    public Instant getTimestamp() {
+        return timestamp;
     }
 
     /**
-     * Returns an unmodifiable view of the workers at this level.
+     * Returns the workers associated with this organigram.
      *
      * @return the workers
      */
@@ -114,48 +137,29 @@ public class Organigram extends NAryTree<String> implements Named {
     }
 
     /**
-     * Adds a worker to this level.
+     * Adds a worker to the organigram.
      *
      * @param worker the worker to add
-     * @throws NullPointerException if worker is null
      */
     public void addWorker(Worker worker) {
-        workers.add(Objects.requireNonNull(worker, "Worker cannot be null"));
+        workers.add(Objects.requireNonNull(worker));
     }
 
     /**
-     * Removes a worker from this level.
+     * Returns the hierarchical structure.
      *
-     * @param worker the worker to remove
+     * @return the rooted tree of unit names
      */
-    public void removeWorker(Worker worker) {
-        workers.remove(worker);
+    public RootedTree<String> getStructure() {
+        return structure;
     }
 
     /**
-     * Sets the set of workers for this level.
+     * Returns all workers in the hierarchy.
      *
-     * @param workers the new set of workers
-     * @throws NullPointerException if workers is null
-     */
-    public void setWorkers(Set<Worker> workers) {
-        this.workers = new HashSet<>(Objects.requireNonNull(workers, "Workers set cannot be null"));
-    }
-
-    /**
-     * Returns all workers in this organigram level and all its sub-levels.
-     *
-     * @return a set of all workers in the hierarchy
+     * @return a set of all workers
      */
     public Set<Worker> getAllWorkers() {
-        Set<Worker> result = new HashSet<>(workers);
-
-        for (NAryTree<String> child : getChildren()) {
-            if (child instanceof Organigram organigram) {
-                result.addAll(organigram.getAllWorkers());
-            }
-        }
-
-        return result;
+        return workers; // Currently all workers are in this set
     }
 }

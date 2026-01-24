@@ -1,111 +1,74 @@
 package org.jscience.linguistics;
 
-import org.jscience.biology.Individual;
-
-import org.jscience.sociology.Situation;
-
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-import java.util.Vector;
-
+import java.util.stream.Collectors;
+import org.jscience.biology.Individual;
+import org.jscience.sociology.Situation;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
- * A class representing the interaction of people communicating.
+ * Represents the interaction of participants communicating.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 2.0
  */
-public class ChatSituation extends Situation {
-    /** DOCUMENT ME! */
-    private Vector communications;
+@Persistent
+public class ChatSituation extends Situation implements Serializable {
 
-/**
-     * Creates a new ChatSituation object.
-     *
-     * @param name     DOCUMENT ME!
-     * @param comments DOCUMENT ME!
-     */
-    public ChatSituation(String name, String comments) {
-        super(name, comments);
-        communications = new Vector();
+    private static final long serialVersionUID = 2L;
+
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private final List<VerbalCommunication> communications = new ArrayList<>();
+
+    public ChatSituation(String name, String description) {
+        super(name, description);
     }
 
-    //locutors are automatically added if not already by calling addVerbalCommunication()
-    /**
-     * DOCUMENT ME!
-     *
-     * @param individual DOCUMENT ME!
-     */
     public void addLocutor(Individual individual) {
-        super.addRole(new Locutor(individual, this));
+        if (getLocutor(individual) == null) {
+            super.addRole(new Locutor(individual, this));
+        }
     }
 
-    //locutors are automatically added if not already by calling addVerbalCommunication()
-    /**
-     * DOCUMENT ME!
-     *
-     * @param locutor DOCUMENT ME!
-     */
     public void addLocutor(Locutor locutor) {
         super.addRole(locutor);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Set getLocutors() {
-        Iterator iterator;
-        Object value;
-        Set result;
-
-        iterator = getRoles().iterator();
-        result = Collections.EMPTY_SET;
-
-        while (iterator.hasNext()) {
-            value = iterator.next();
-
-            if (value instanceof Locutor) {
-                result.add(value);
-            }
-        }
-
-        return result;
+    public Set<Locutor> getLocutors() {
+        return getRoles().stream()
+                .filter(Locutor.class::isInstance)
+                .map(Locutor.class::cast)
+                .collect(Collectors.toUnmodifiableSet());
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Vector getVerbalCommunications() {
-        return communications;
+    private Locutor getLocutor(Individual individual) {
+        return getLocutors().stream()
+                .filter(l -> l.getIndividual().equals(individual))
+                .findFirst()
+                .orElse(null);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param communication DOCUMENT ME!
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
+    public List<VerbalCommunication> getVerbalCommunications() {
+        return Collections.unmodifiableList(communications);
+    }
+
     public void addVerbalCommunication(VerbalCommunication communication) {
-        if (communication != null) {
-            if (getLocutors().contains(communication.getLocutor())) {
-                communications.add(communication);
-
-                //may be we should store the people who heard the communication
-                //but this would mean we would have to track people as they come and as they leave
-                //(we would then also remove the requirement for the locutor to be part of the roles, or would we ?)
-            } else {
-                addLocutor(communication.getLocutor());
-                communications.add(communication);
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "You can't add a null VerbalCommunication.");
+        Objects.requireNonNull(communication, "Communication cannot be null");
+        if (!getLocutors().contains(communication.getSpeaker())) {
+            addLocutor(communication.getSpeaker());
         }
+        communications.add(communication);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("ChatSituation: %s (%d communications)", getName(), communications.size());
     }
 }

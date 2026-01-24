@@ -128,9 +128,7 @@ public class PhyloXMLReader extends AbstractResourceReader<PhyloXMLDocument> {
      */
     public PhyloXMLDocument read(InputStream input) throws PhyloXMLException {
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
+            DocumentBuilder builder = org.jscience.io.SecureXMLFactory.createSecureDocumentBuilder();
             Document doc = builder.parse(input);
             return parseDocument(doc);
         } catch (Exception e) {

@@ -41,7 +41,7 @@ import org.jscience.measure.quantity.Length;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public final class AERCoordinate implements Serializable {
+public final class AERCoordinate implements EarthCoordinate, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -61,6 +61,18 @@ public final class AERCoordinate implements Serializable {
     public Quantity<Angle> getElevation() { return Quantities.create(elevation, Units.DEGREE_ANGLE); }
     public Quantity<Length> getRange() { return Quantities.create(slantRange, Units.METER); }
     public GeodeticCoordinate getObserver() { return observer; }
+
+    @Override
+    public String getCoordinateSystem() { return "AER"; }
+
+    @Override
+    public ReferenceEllipsoid getEllipsoid() { return observer.getEllipsoid(); }
+
+    @Override
+    public GeodeticCoordinate toGeodetic() { return toENU().toGeodetic(); }
+
+    @Override
+    public ECEFCoordinate toECEF() { return toENU().toECEF(); }
 
     /**
      * Converts ENU coordinates to AER.

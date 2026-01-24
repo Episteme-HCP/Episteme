@@ -23,32 +23,47 @@
 
 package org.jscience.geography;
 
+import org.jscience.earth.coordinates.GeodeticCoordinate;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Length;
+import org.jscience.util.Named;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.jscience.measure.Quantity;
-import org.jscience.measure.Units;
-import org.jscience.measure.quantity.Length;
+import java.util.Objects;
 
 /**
- * Represents a sequence of geographic coordinates forming a path or route.
+ * Represents a sequence of geodetic coordinates forming a path, route, or boundary.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GeoPath {
+@Persistent
+public class GeoPath implements Named, Serializable {
 
-    private final List<Coordinate> coordinates = new ArrayList<>();
+    private static final long serialVersionUID = 1L;
+
+    @Attribute
     private String name;
+
+    @Attribute
+    private final List<GeodeticCoordinate> points = new ArrayList<>();
 
     public GeoPath() {
     }
 
-    public GeoPath(List<Coordinate> coordinates) {
-        this.coordinates.addAll(coordinates);
+    public GeoPath(String name) {
+        this.name = name;
     }
 
+    @Override
     public String getName() {
         return name;
     }
@@ -57,61 +72,55 @@ public class GeoPath {
         this.name = name;
     }
 
-    public void addPoint(Coordinate coord) {
-        coordinates.add(coord);
+    public void addPoint(GeodeticCoordinate point) {
+        points.add(Objects.requireNonNull(point));
     }
 
-    public List<Coordinate> getCoordinates() {
-        return Collections.unmodifiableList(coordinates);
+    public List<GeodeticCoordinate> getPoints() {
+        return Collections.unmodifiableList(points);
     }
 
     public int size() {
-        return coordinates.size();
+        return points.size();
     }
 
-    public Coordinate getStart() {
-        return coordinates.isEmpty() ? null : coordinates.get(0);
+    public GeodeticCoordinate getStart() {
+        return points.isEmpty() ? null : points.get(0);
     }
 
-    public Coordinate getEnd() {
-        return coordinates.isEmpty() ? null : coordinates.get(coordinates.size() - 1);
-    }
-
-    /**
-     * Checks if the path is closed (start and end are at the same location).
-     */
-    public boolean isClosed() {
-        if (coordinates.size() < 2)
-            return false;
-        Coordinate start = getStart();
-        Coordinate end = getEnd();
-        double latDiff = Math.abs(start.getLatitudeDegrees().doubleValue() - end.getLatitudeDegrees().doubleValue());
-        double lonDiff = Math.abs(start.getLongitudeDegrees().doubleValue() - end.getLongitudeDegrees().doubleValue());
-        return latDiff < 1e-9 && lonDiff < 1e-9;
+    public GeodeticCoordinate getEnd() {
+        return points.isEmpty() ? null : points.get(points.size() - 1);
     }
 
     /**
-     * Calculates the total length of the path.
+     * Calculates the total length of the path by summing segment distances.
      * 
-     * @return total length as a Length quantity
+     * @return total length quantity
      */
     public Quantity<Length> getLength() {
-        double lengthMeters = 0.0;
-        for (int i = 0; i < coordinates.size() - 1; i++) {
-            lengthMeters += coordinates.get(i).distanceTo(coordinates.get(i + 1))
-                    .to(Units.METER).getValue().doubleValue();
+        double totalMeters = 0.0;
+        for (int i = 0; i < points.size() - 1; i++) {
+            Quantity<Length> dist = points.get(i).distanceTo(points.get(i + 1));
+            if (dist != null) {
+                totalMeters += dist.to(Units.METER).getValue();
+            }
         }
-        return org.jscience.measure.Quantities.create(lengthMeters, Units.METER);
+        return Quantities.create(totalMeters, Units.METER);
     }
 
     /**
      * Returns a reversed copy of this path.
      */
     public GeoPath reverse() {
-        List<Coordinate> reversed = new ArrayList<>(coordinates);
-        Collections.reverse(reversed);
-        return new GeoPath(reversed);
+        GeoPath reversed = new GeoPath(name != null ? name + " (reversed)" : null);
+        List<GeodeticCoordinate> revPoints = new ArrayList<>(points);
+        Collections.reverse(revPoints);
+        reversed.points.addAll(revPoints);
+        return reversed;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Path: %s (%d points, %s)", name, points.size(), getLength());
     }
 }
-
-

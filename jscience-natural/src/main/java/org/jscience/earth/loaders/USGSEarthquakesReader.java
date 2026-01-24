@@ -23,102 +23,149 @@
 
 package org.jscience.earth.loaders;
 
-import org.jscience.io.cache.ResourceCache;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jscience.earth.seismology.Earthquake;
+import org.jscience.io.AbstractResourceReader;
+import org.jscience.io.Configuration;
 import org.jscience.ui.i18n.I18n;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
- * Connector to USGS Earthquake Hazards Program API.
+ * Modern connector to USGS Earthquake Hazards Program API.
  * <p>
- * <b>What it does</b>: Provides real-time and historical earthquake data.
- * </p>
- *
- * <p>
- * <b>Data Source</b>: USGS (https://earthquake.usgs.gov/fdsnws/event/1/)
- * </p>
- * <p>
- * <b>License</b>: Public Domain (US Government work).
- * </p>
- *
- * <p>
- * <b>Usage example</b>:
+ * This reader retrieves seismic event data from USGS in GeoJSON format
+ * and converts it into structured {@link Earthquake} domain objects.
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
+ * @version 2.0 (Integrated into ResourceReader system)
  */
-public class USGSEarthquakesReader {
+public class USGSEarthquakesReader extends AbstractResourceReader<List<Earthquake>> {
 
-    private static final String API_BASE = org.jscience.io.Configuration.get("api.usgs.earthquakes.base",
+    private static final Logger LOGGER = Logger.getLogger(USGSEarthquakesReader.class.getName());
+    private static final String API_BASE = Configuration.get("api.usgs.earthquakes.base",
             "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary");
 
-    public static String getCategory() {
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    public USGSEarthquakesReader() {
+    }
+
+    @Override
+    public String getCategory() {
         return I18n.getInstance().get("reader.usgsearthquakes.category", "Earth");
     }
 
-    public static String getDescription() {
-        return I18n.getInstance().get("reader.usgsearthquakes.description", "USGS Earthquakes API Reader.");
+    @Override
+    public String getName() {
+        return I18n.getInstance().get("reader.usgsearthquakes.name", "USGS Earthquakes Reader");
+    }
+
+    @Override
+    public String getDescription() {
+        return I18n.getInstance().get("reader.usgsearthquakes.desc", "Reads seismic events from the US Geological Survey API.");
+    }
+
+    @Override
+    public String getLongDescription() {
+        return I18n.getInstance().get("reader.usgsearthquakes.longdesc", 
+                "Provides access to USGS Global Earthquake feeds, including significant monthly summaries and near real-time data.");
+    }
+
+    @Override
+    public String getResourcePath() {
+        return API_BASE;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<List<Earthquake>> getResourceType() {
+        return (Class<List<Earthquake>>) (Class<?>) List.class;
+    }
+
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"GeoJSON 1.0"};
     }
 
     /**
-     * Gets significant earthquakes from the past 30 days.
+     * Loads earthquake data from a specific feed.
      * 
-     * @return GeoJSON response
+     * @param feedName feed name (e.g., "significant_month", "all_day")
+     * @return List of parsed Earthquake objects
      */
-    public static String getSignificantMonth() {
-        String cacheKey = "usgs_significant_month";
-        // Short cache duration logic could be implemented here, but for now we use
-        // standard cache
-        // In a real app, we might want to force refresh for real-time data
+    @Override
+    protected List<Earthquake> loadFromSource(String feedName) throws Exception {
+        String urlStr = API_BASE + "/" + feedName + ".geojson";
+        String rawJson = fetchUrl(urlStr);
+        return parseGeoJson(rawJson);
+    }
 
-        try {
-            String urlStr = API_BASE + "/significant_month.geojson";
-            String data = fetchUrl(urlStr);
-            ResourceCache.global().put(cacheKey, data);
-            return data;
-        } catch (Exception e) {
-            throw new RuntimeException("USGS API request failed", e);
+    private List<Earthquake> parseGeoJson(String json) throws Exception {
+        List<Earthquake> earthquakes = new ArrayList<>();
+        JsonNode root = mapper.readTree(json);
+        JsonNode features = root.path("features");
+
+        if (features.isArray()) {
+            for (JsonNode feature : features) {
+                JsonNode props = feature.path("properties");
+                JsonNode geom = feature.path("geometry");
+                JsonNode coords = geom.path("coordinates");
+
+                if (coords.isArray() && coords.size() >= 3) {
+                    double lon = coords.get(0).asDouble();
+                    double lat = coords.get(1).asDouble();
+                    double depth = coords.get(2).asDouble();
+                    double mag = props.path("mag").asDouble();
+
+                    earthquakes.add(new Earthquake(lat, lon, mag, depth));
+                }
+            }
+        }
+        return earthquakes;
+    }
+
+    private String fetchUrl(String urlStr) throws Exception {
+        URL url = URI.create(urlStr).toURL();
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        conn.setConnectTimeout(8000);
+        conn.setReadTimeout(8000);
+
+        if (conn.getResponseCode() != 200) {
+            throw new RuntimeException("USGS API returned HTTP " + conn.getResponseCode());
+        }
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line).append("\n");
+            }
+            return response.toString();
         }
     }
 
     /**
-     * Placeholder for future mapping to Geology domain objects.
+     * Legacy method preserved for compatibility, now using the modernized backend.
      */
-    public static <T> T map(String json, Class<T> target) {
-        System.err.println(
-                "WARNING: Domain mapping for " + target.getSimpleName() + " is not yet implemented. Returning null.");
-        return null;
-    }
-
-    private static String fetchUrl(String urlStr) {
+    public List<Earthquake> getSignificantMonth() {
         try {
-            URL url = URI.create(urlStr).toURL();
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-
-            if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("HTTP error code : " + conn.getResponseCode());
-            }
-
-            BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-            StringBuilder output = new StringBuilder();
-            String line;
-            while ((line = br.readLine()) != null) {
-                output.append(line);
-            }
-            conn.disconnect();
-            return output.toString();
-
+            return load("significant_month");
         } catch (Exception e) {
-            throw new RuntimeException("Failed to fetch from USGS", e);
+            LOGGER.severe("Failed to load significant earthquakes: " + e.getMessage());
+            return new ArrayList<>();
         }
-    }
-
-    private USGSEarthquakesReader() {
     }
 }

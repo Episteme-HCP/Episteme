@@ -38,7 +38,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public final class LambertConformalConicCoordinate implements Serializable {
+public final class LambertConformalConicCoordinate implements EarthCoordinate, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -75,6 +75,48 @@ public final class LambertConformalConicCoordinate implements Serializable {
 
     public Quantity<Length> getEasting() { return Quantities.create(easting.doubleValue(), Units.METER); }
     public Quantity<Length> getNorthing() { return Quantities.create(northing.doubleValue(), Units.METER); }
+    public LCCParams getParameters() { return params; }
+
+    @Override
+    public String getCoordinateSystem() { return "LCC"; }
+
+    @Override
+    public ReferenceEllipsoid getEllipsoid() { return params.ellipsoid; }
+
+    @Override
+    public GeodeticCoordinate toGeodetic() {
+        // Inverse LCC projection (simplified)
+        double a = params.ellipsoid.getSemiMajorAxis().to(Units.METER).getValue().doubleValue();
+        double e2 = params.ellipsoid.getEccentricitySquared().doubleValue();
+        double e = Math.sqrt(e2);
+        
+        double m1 = Math.cos(params.lat1) / Math.sqrt(1 - e2 * Math.pow(Math.sin(params.lat1), 2));
+        double t1 = Math.tan(Math.PI/4 - params.lat1/2) / Math.pow((1 - e*Math.sin(params.lat1)) / (1 + e*Math.sin(params.lat1)), e/2);
+        double t2 = Math.tan(Math.PI/4 - params.lat2/2) / Math.pow((1 - e*Math.sin(params.lat2)) / (1 + e*Math.sin(params.lat2)), e/2);
+        double t0 = Math.tan(Math.PI/4 - params.lat0/2) / Math.pow((1 - e*Math.sin(params.lat0)) / (1 + e*Math.sin(params.lat0)), e/2);
+        double m2 = Math.cos(params.lat2) / Math.sqrt(1 - e2 * Math.pow(Math.sin(params.lat2), 2));
+        double n = Math.log(m1 / m2) / Math.log(t1 / t2);
+        double F = m1 / (n * Math.pow(t1, n));
+        double rho0 = a * F * Math.pow(t0, n);
+        
+        double dx = easting.doubleValue() - params.falseEasting;
+        double dy = rho0 - northing.doubleValue() + params.falseNorthing;
+        double rho = Math.signum(n) * Math.sqrt(dx*dx + dy*dy);
+        double t = Math.pow(rho / (a * F), 1.0 / n);
+        double theta = Math.atan2(dx, dy);
+        
+        // Iterative phi calculation
+        double phi = Math.PI/2 - 2*Math.atan(t);
+        for (int i = 0; i < 5; i++) {
+            phi = Math.PI/2 - 2*Math.atan(t * Math.pow((1 - e*Math.sin(phi)) / (1 + e*Math.sin(phi)), e/2));
+        }
+        double lambda = params.lon0 + theta / n;
+        
+        return new GeodeticCoordinate(Math.toDegrees(phi), Math.toDegrees(lambda), 0.0);
+    }
+
+    @Override
+    public ECEFCoordinate toECEF() { return toGeodetic().toECEF(); }
 
     /**
      * Converts Geodetic to LCC.

@@ -170,4 +170,9 @@ public class ICD10Reader extends org.jscience.io.AbstractResourceReader<Disease>
     public String getLongDescription() {
         return org.jscience.ui.i18n.I18n.getInstance().get("reader.icd10reader.longdesc", "Retrieves disease classification and details from the ICD-10/ICD-11 API.");
     }
+
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"ICD-10", "ICD-11"};
+    }
 }

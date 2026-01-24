@@ -1,37 +1,11 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * THE above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.sports;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.chrono.ChronoLocalDate;
 import java.util.Objects;
 import java.util.UUID;
 import org.jscience.geography.Place;
-import org.jscience.history.time.UncertainDate;
+import org.jscience.history.temporal.TemporalCoordinate;
 import org.jscience.util.Temporal;
 import org.jscience.util.identity.Identified;
 
@@ -41,10 +15,10 @@ import org.jscience.util.identity.Identified;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
-public class Match implements Identified<String>, Temporal, Serializable {
+public class Match implements Identified<String>, Temporal<TemporalCoordinate>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -55,7 +29,7 @@ public class Match implements Identified<String>, Temporal, Serializable {
 
     private final String id;
     private final Sport sport;
-    private final UncertainDate date;
+    private final TemporalCoordinate date;
     private final Team homeTeam;
     private final Team awayTeam;
     private Place venue;
@@ -68,12 +42,12 @@ public class Match implements Identified<String>, Temporal, Serializable {
      * Creates a new Match.
      * 
      * @param sport    the sport being played
-     * @param date     the scheduled date (can be uncertain)
+     * @param date     the scheduled date
      * @param homeTeam the hosting team
      * @param awayTeam the visiting team
      * @throws NullPointerException if any required argument is null
      */
-    public Match(Sport sport, UncertainDate date, Team homeTeam, Team awayTeam) {
+    public Match(Sport sport, TemporalCoordinate date, Team homeTeam, Team awayTeam) {
         this.id = UUID.randomUUID().toString();
         this.sport = Objects.requireNonNull(sport, "Sport cannot be null");
         this.date = Objects.requireNonNull(date, "Date cannot be null");
@@ -88,20 +62,19 @@ public class Match implements Identified<String>, Temporal, Serializable {
     }
 
     @Override
+    public TemporalCoordinate getWhen() {
+        return date;
+    }
+
     public Instant getTimestamp() {
-        Object val = date.getMin(0);
-        if (val instanceof Instant i) return i;
-        if (val instanceof ChronoLocalDate cld) {
-             return LocalDate.from(cld).atStartOfDay(ZoneId.of("UTC")).toInstant();
-        }
-        return Instant.EPOCH;
+        return date.toInstant();
     }
 
     public Sport getSport() {
         return sport;
     }
 
-    public UncertainDate getDate() {
+    public TemporalCoordinate getDate() {
         return date;
     }
 

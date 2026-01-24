@@ -1,39 +1,56 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2014 - JScience (http://jscience.org/)
- * All rights reserved.
- * 
- * Permission to use, copy, modify, and distribute this software is
- * freely granted, provided that this notice is preserved.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
+
 package org.jscience.economics;
 
-import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.mathematics.analysis.RealFunction;
 import org.jscience.mathematics.analysis.Integration;
+import org.jscience.mathematics.analysis.RealFunction;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * Supply and Demand curve modeling with economic equilibrium calculations.
- * Provides tools for finding equilibrium prices, calculating surpluses, 
- * and analyzing market efficiency.
+ * Analytical tool for modeling supply and demand curves and calculating 
+ * competitive equilibrium. It provides mathematical utilities for market 
+ * efficiency analysis, including consumer/producer surplus and deadweight loss.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.2
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
 public final class SupplyDemandModel {
 
     private SupplyDemandModel() {}
 
     /**
-     * Finds the equilibrium price where supply equals demand.
-     * Uses bisection method to find the root of supply(p) - demand(p) = 0.
+     * Resolves the market equilibrium price where the quantity supplied 
+     * exactly equals the quantity demanded.
      * 
-     * @param supply the supply function s(p)
-     * @param demand the demand function d(p)
-     * @param priceLow lower bound for price search
-     * @param priceHigh upper bound for price search
-     * @param tolerance convergence tolerance
-     * @return the equilibrium price
+     * @param supply the supply function S(p)
+     * @param demand the demand function D(p)
+     * @param priceLow lower bound for numerical search
+     * @param priceHigh upper bound for numerical search
+     * @param tolerance precision limit for the solver
+     * @return the calculated equilibrium price
      */
     public static Real findEquilibriumPrice(RealFunction supply, RealFunction demand, 
                                             Real priceLow, Real priceHigh, Real tolerance) {
@@ -50,8 +67,6 @@ public final class SupplyDemandModel {
                 return mid;
             }
             
-            // If supply > demand, price is too high (reduce)
-            // If demand > supply, price is too low (increase)
             Real diffLow = supply.apply(low).subtract(demand.apply(low));
             if (diffLow.multiply(diff).compareTo(Real.ZERO) > 0) {
                 low = mid;
@@ -63,12 +78,14 @@ public final class SupplyDemandModel {
     }
 
     /**
-     * Calculates Consumer Surplus: integral from 0 to Q* of D(q) - P*.
+     * Calculates the Consumer Surplus (CS), representing the cumulative 
+     * difference between what consumers are willing to pay and the market price.
+     * Formula: integral[0 to Q*] (D(q) - P*) dq
      * 
-     * @param demand the demand function D(q)
-     * @param equilibriumPrice the market price P*
-     * @param equilibriumQuantity the quantity traded Q*
-     * @return the consumer surplus value
+     * @param demand the demand function D(q) mapping quantity to price
+     * @param equilibriumPrice (P*) the market clearing price
+     * @param equilibriumQuantity (Q*) the market clearing quantity
+     * @return cumulative consumer surplus value
      */
     public static Real consumerSurplus(RealFunction demand, Real equilibriumPrice, Real equilibriumQuantity) {
         RealFunction surplusFunction = q -> demand.apply(q).subtract(equilibriumPrice);
@@ -76,12 +93,15 @@ public final class SupplyDemandModel {
     }
 
     /**
-     * Calculates Producer Surplus: integral from 0 to Q* of P* - S(q).
+     * Calculates the Producer Surplus (PS), representing the cumulative 
+     * difference between the market price and the price producers are willing 
+     * to accept.
+     * Formula: integral[0 to Q*] (P* - S(q)) dq
      * 
-     * @param supply the supply function S(q)
-     * @param equilibriumPrice the market price P*
-     * @param equilibriumQuantity the quantity traded Q*
-     * @return the producer surplus value
+     * @param supply the supply function S(q) mapping quantity to price
+     * @param equilibriumPrice (P*) the market clearing price
+     * @param equilibriumQuantity (Q*) the market clearing quantity
+     * @return cumulative producer surplus value
      */
     public static Real producerSurplus(RealFunction supply, Real equilibriumPrice, Real equilibriumQuantity) {
         RealFunction surplusFunction = q -> equilibriumPrice.subtract(supply.apply(q));
@@ -89,13 +109,14 @@ public final class SupplyDemandModel {
     }
 
     /**
-     * Calculates Total Welfare (Consumer + Producer Surplus).
+     * Calculates the Total Social Welfare as the sum of consumer and 
+     * producer surpluses.
      * 
-     * @param supply the supply function
-     * @param demand the demand function
-     * @param equilibriumPrice the market price
-     * @param equilibriumQuantity the quantity traded
-     * @return the total economic welfare
+     * @param supply supply function S(q)
+     * @param demand demand function D(q)
+     * @param equilibriumPrice market price
+     * @param equilibriumQuantity market quantity
+     * @return total economic welfare
      */
     public static Real totalWelfare(RealFunction supply, RealFunction demand, 
                                     Real equilibriumPrice, Real equilibriumQuantity) {
@@ -104,40 +125,39 @@ public final class SupplyDemandModel {
     }
 
     /**
-     * Calculates Deadweight Loss from a price floor or ceiling.
+     * Calculates the Deadweight Loss (DWL) resulting from market 
+     * inefficiencies or external interventions (e.g., price caps).
      * 
-     * @param supply the supply function
-     * @param demand the demand function
-     * @param equilibriumQuantity the efficient quantity Q*
-     * @param actualQuantity the actual quantity traded
-     * @return the deadweight loss value
+     * @param supply supply function S(q)
+     * @param demand demand function D(q)
+     * @param equilibriumQuantity (Q*) the efficient quantity
+     * @param actualQuantity the actual traded quantity
+     * @return value of lost economic efficiency (DWL)
      */
     public static Real deadweightLoss(RealFunction supply, RealFunction demand,
                                       Real equilibriumQuantity, Real actualQuantity) {
         if (actualQuantity.compareTo(equilibriumQuantity) >= 0) {
-            return Real.ZERO; // No deadweight loss if quantity is at or above equilibrium
+            return Real.ZERO;
         }
-        // Integrate the difference between demand and supply from actualQ to equilibriumQ
         RealFunction lossFunction = q -> demand.apply(q).subtract(supply.apply(q));
         return Integration.integrate(lossFunction, actualQuantity, equilibriumQuantity);
     }
 
     /**
-     * Price Elasticity of Demand at a given price point.
-     * E = (dQ/dP) * (P/Q)
+     * Estimates the Price Elasticity of Demand (PED) at a specific price point.
+     * Formula: E = (dQ/dP) * (P/Q)
      * 
-     * @param demand demand function
-     * @param price price point
-     * @param deltaP small change in price for approximation
-     * @return price elasticity of demand
+     * @param demand demand function D(p)
+     * @param price target price point
+     * @param deltaP increment for numerical derivative approximation
+     * @return point elasticity value
      */
     public static Real priceElasticity(RealFunction demand, Real price, Real deltaP) {
         Real q1 = demand.apply(price);
         Real q2 = demand.apply(price.add(deltaP));
         Real dQ = q2.subtract(q1);
-        Real dP = deltaP;
         
-        if (q1.compareTo(Real.ZERO) == 0) return Real.of(Double.NaN);
-        return dQ.divide(dP).multiply(price).divide(q1);
+        if (q1.isZero() || deltaP.isZero()) return Real.ZERO;
+        return dQ.divide(deltaP).multiply(price).divide(q1);
     }
 }

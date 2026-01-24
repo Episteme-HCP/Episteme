@@ -29,6 +29,7 @@ import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Angle;
 import org.jscience.measure.quantity.Length;
 import org.jscience.mathematics.numbers.real.Real;
+import java.io.Serializable;
 
 /**
  * Represents a coordinate in the American Polyconic projection.
@@ -39,7 +40,9 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class PolyconicCoordinate {
+public class PolyconicCoordinate implements EarthCoordinate, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final Real easting;
     private final Real northing;
@@ -59,6 +62,18 @@ public class PolyconicCoordinate {
         this.ellipsoid = ellipsoid;
         this.parameters = params;
     }
+
+    public Quantity<Length> getEasting() { return Quantities.create(easting.doubleValue(), Units.METER); }
+    public Quantity<Length> getNorthing() { return Quantities.create(northing.doubleValue(), Units.METER); }
+
+    @Override
+    public String getCoordinateSystem() { return "Polyconic"; }
+
+    @Override
+    public ReferenceEllipsoid getEllipsoid() { return ellipsoid; }
+
+    @Override
+    public ECEFCoordinate toECEF() { return toGeodetic().toECEF(); }
 
     public static PolyconicCoordinate fromGeodetic(GeodeticCoordinate geodetic, PolyconicParameters params) {
         ReferenceEllipsoid el = geodetic.getEllipsoid();
@@ -126,8 +141,7 @@ public class PolyconicCoordinate {
             double N = a / Math.sqrt(1 - e2 * Math.pow(Math.sin(phi), 2));
             double cotPhi = 1.0 / Math.tan(phi);
             
-            double f = (y + M0 - M) * (M + N * cotPhi * (1 - Math.cos((x/ (N * cotPhi)))) ) / something; 
-            // Simplified iteration for now
+            // Simplified iteration
             phi = phi + (y + M0 - M) / a; 
         }
 

@@ -140,12 +140,7 @@ public class FactbookReader extends AbstractResourceReader<List<Country>> {
         List<Country> countries = new ArrayList<>();
 
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            factory.setIgnoringComments(true);
-            factory.setIgnoringElementContentWhitespace(true);
-
-            DocumentBuilder builder = factory.newDocumentBuilder();
+            DocumentBuilder builder = org.jscience.io.SecureXMLFactory.createSecureDocumentBuilder();
             Document doc = builder.parse(input);
             doc.getDocumentElement().normalize();
 

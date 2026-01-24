@@ -1,30 +1,73 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.linguistics;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.jscience.mathematics.numbers.real.Real;
-import java.util.*;
 
 /**
- * Sentiment analysis for text polarity detection.
+ * Analytical tool for sentiment analysis and emotional polarity detection in text. 
+ * It identifies positive, negative, and neutral tones using a lexicon-based 
+ * approach with support for negations and intensifiers.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
 public final class SentimentAnalyzer {
 
     private SentimentAnalyzer() {}
 
+    /**
+     * Qualitative classification of text sentiment.
+     */
     public enum Sentiment {
         VERY_POSITIVE, POSITIVE, NEUTRAL, NEGATIVE, VERY_NEGATIVE
     }
 
+    /**
+     * Result of a sentiment analysis operation.
+     */
     public record SentimentResult(
         Sentiment sentiment,
-        double score,       // -1 to 1
-        double confidence,  // 0 to 1
+        double score,       // Polarity score from -1.0 to 1.0
+        double confidence,  // Confidence level from 0.0 to 1.0
         Map<String, Double> wordScores
-    ) {}
+    ) implements Serializable {
+        private static final long serialVersionUID = 2L;
+    }
 
-    // Simplified sentiment lexicon
+    // Lexicon of sentiment-bearing words
     private static final Map<String, Double> LEXICON = new HashMap<>();
     static {
-        // Positive words
+        // Positive
         LEXICON.put("excellent", 0.9); LEXICON.put("amazing", 0.85);
         LEXICON.put("wonderful", 0.8); LEXICON.put("fantastic", 0.85);
         LEXICON.put("great", 0.7); LEXICON.put("good", 0.5);
@@ -34,7 +77,7 @@ public final class SentimentAnalyzer {
         LEXICON.put("brilliant", 0.8); LEXICON.put("awesome", 0.75);
         LEXICON.put("pleased", 0.6); LEXICON.put("delighted", 0.75);
         
-        // Negative words
+        // Negative
         LEXICON.put("terrible", -0.9); LEXICON.put("awful", -0.85);
         LEXICON.put("horrible", -0.85); LEXICON.put("bad", -0.5);
         LEXICON.put("poor", -0.4); LEXICON.put("hate", -0.8);
@@ -43,12 +86,6 @@ public final class SentimentAnalyzer {
         LEXICON.put("frustrated", -0.6); LEXICON.put("angry", -0.7);
         LEXICON.put("annoyed", -0.5); LEXICON.put("boring", -0.4);
         LEXICON.put("dreadful", -0.8); LEXICON.put("disgusting", -0.85);
-        
-        // Intensifiers
-        LEXICON.put("very", 0.0); LEXICON.put("really", 0.0);
-        LEXICON.put("extremely", 0.0); LEXICON.put("absolutely", 0.0);
-        
-        // Negators (handled separately)
     }
 
     private static final Set<String> NEGATORS = Set.of(
@@ -63,9 +100,16 @@ public final class SentimentAnalyzer {
     );
 
     /**
-     * Analyzes sentiment of text.
+     * Performs sentiment analysis on a raw text string.
+     * 
+     * @param text the input text to analyze
+     * @return a SentimentResult containing the polarity score and classification
      */
     public static SentimentResult analyze(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            return new SentimentResult(Sentiment.NEUTRAL, 0, 0, Collections.emptyMap());
+        }
+        
         String[] words = text.toLowerCase().split("\\s+");
         Map<String, Double> wordScores = new HashMap<>();
         
@@ -74,83 +118,73 @@ public final class SentimentAnalyzer {
         boolean negate = false;
         double intensifier = 1.0;
         
-        for (int i = 0; i < words.length; i++) {
-            String word = words[i].replaceAll("[^a-z']", "");
+        for (String word : words) {
+            String cleaned = word.replaceAll("[^a-z']", "");
+            if (cleaned.isEmpty()) continue;
             
-            // Check for negation
-            if (NEGATORS.contains(word)) {
+            if (NEGATORS.contains(cleaned)) {
                 negate = true;
                 continue;
             }
-            
-            // Check for intensifier
-            if (INTENSIFIERS.contains(word)) {
+            if (INTENSIFIERS.contains(cleaned)) {
                 intensifier = 1.5;
                 continue;
             }
             
-            // Score the word
-            if (LEXICON.containsKey(word)) {
-                double score = LEXICON.get(word) * intensifier;
-                if (negate) {
-                    score = -score * 0.5; // Negation partially inverses
-                }
+            if (LEXICON.containsKey(cleaned)) {
+                double score = LEXICON.get(cleaned) * intensifier;
+                if (negate) score = -score * 0.5;
                 
-                wordScores.put(word, score);
+                wordScores.put(cleaned, score);
                 totalScore += score;
                 scoredWords++;
             }
             
-            // Reset modifiers after scored word
             negate = false;
             intensifier = 1.0;
         }
         
-        // Calculate final score
         double avgScore = scoredWords > 0 ? totalScore / scoredWords : 0;
         double normalizedScore = Math.max(-1, Math.min(1, avgScore));
+        double confidence = Math.min(1.0, (double) scoredWords / Math.max(1, words.length) * 5);
         
-        // Calculate confidence based on coverage
-        double coverage = (double) scoredWords / words.length;
-        double confidence = Math.min(1.0, coverage * 2);
-        
-        Sentiment sentiment = classifySentiment(normalizedScore);
-        
-        return new SentimentResult(sentiment, normalizedScore, confidence, wordScores);
+        return new SentimentResult(classifySentiment(normalizedScore), normalizedScore, confidence, wordScores);
     }
 
     /**
-     * Analyzes sentiment with aspect extraction.
+     * Performs aspect-based sentiment analysis by targeting specific keywords.
+     * 
+     * @param text full text input
+     * @param aspects list of keywords (aspects) to analyze separately
+     * @return map of aspects to their corresponding SentimentResult
      */
     public static Map<String, SentimentResult> analyzeWithAspects(String text, List<String> aspects) {
         Map<String, SentimentResult> results = new HashMap<>();
+        if (text == null || aspects == null) return results;
         
-        // Split into sentences
         String[] sentences = text.split("[.!?]+");
-        
         for (String aspect : aspects) {
             StringBuilder relevantText = new StringBuilder();
-            
             for (String sentence : sentences) {
                 if (sentence.toLowerCase().contains(aspect.toLowerCase())) {
                     relevantText.append(sentence).append(" ");
                 }
             }
-            
             if (relevantText.length() > 0) {
                 results.put(aspect, analyze(relevantText.toString()));
             } else {
-                results.put(aspect, new SentimentResult(
-                    Sentiment.NEUTRAL, 0, 0, Collections.emptyMap()
-                ));
+                results.put(aspect, new SentimentResult(Sentiment.NEUTRAL, 0, 0, Collections.emptyMap()));
             }
         }
-        
         return results;
     }
 
     /**
-     * Compares sentiment between two texts.
+     * Calculates the numerical sentiment difference between two texts.
+     * 
+     * @param text1 first text
+     * @param text2 second text
+     * @return the difference in sentiment score (text1 - text2)
      */
     public static Real sentimentDifference(String text1, String text2) {
         double score1 = analyze(text1).score();

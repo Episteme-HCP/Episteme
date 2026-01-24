@@ -1,6 +1,6 @@
 package org.jscience.arts;
 
-import org.jscience.history.time.UncertainDate;
+import org.jscience.history.temporal.TemporalCoordinate;
 import org.jscience.geography.Place;
 import java.util.*;
 
@@ -17,7 +17,7 @@ public final class ProvenanceTracker {
     }
 
     public record ProvenanceEvent(
-        UncertainDate date,
+        TemporalCoordinate date,
         String fromOwner,
         String toOwner,
         TransferType type,

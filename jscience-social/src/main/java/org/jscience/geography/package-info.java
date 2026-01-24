@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 /**
- * Provides the {@link org.jscience.geography} module.
+ * Provides classes for social geography, human settlements, and mapping.
+ * <p>
+ * This package extends the core geography module with human-centric features:
+ * <ul>
+ *   <li>{@link org.jscience.geography.Address} - Physical locations and mailing addresses</li>
+ *   <li>{@link org.jscience.geography.OwnedPlace} - Real estate and property modeling</li>
+ *   <li>{@link org.jscience.geography.Home} - Residential locations and occupants</li>
+ *   <li>{@link org.jscience.geography.BusinessPlace} - Offices and industrial sites</li>
+ *   <li>{@link org.jscience.geography.Map} - 2D geographical maps with layers and places</li>
+ *   <li>{@link org.jscience.geography.Path} - Movement tracks and routes</li>
+ *   <li>{@link org.jscience.geography.CoordinateBridge} - Bridge to scientific geodesy</li>
+ *   <li>{@link org.jscience.geography.TerrainAnalyzer} - GIS-like terrain analysis</li>
+ * </ul>
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
 package org.jscience.geography;

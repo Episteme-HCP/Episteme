@@ -1,104 +1,211 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.geography;
 
+import org.jscience.earth.coordinates.EarthCoordinate;
+import org.jscience.earth.coordinates.GeodeticCoordinate;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Length;
 import org.jscience.util.Named;
 import org.jscience.util.Positioned;
 import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.Identified;
 import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 
+import java.io.Serializable;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
- * A class representing a geographical spot, namely a feature. It is meant
- * to be used primarily to define places like human settlements, that is
- * places with a name.
+ * Base class for all geographical features and named locations.
+ * Uses geodetic coordinates for absolute positioning on Earth.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @version 3.1
+ * @since 1.0
  */
 @Persistent
-public class Place extends Object implements Named, Positioned {
+public class Place implements Identified<String>, Named, Positioned<EarthCoordinate>, Serializable {
 
-    /**
-     * Geographical type of the place.
-     */
+    private static final long serialVersionUID = 3L;
+
     public enum Type {
         COUNTRY, REGION, PROVINCE, STATE, COUNTY, CITY, TOWN, VILLAGE, 
-        BUILDING, ADDRESS, NATURAL_FEATURE, CELESTIAL_BODY, GLOBAL, OTHER
+        BUILDING, ADDRESS, NATURAL_FEATURE, CELESTIAL_BODY, GLOBAL, 
+        CONTINENT, OCEAN, SEA, RIVER, LAKE, MOUNTAIN, PARK, UNKNOWN, OTHER
+    }
+
+    public enum Precision {
+        EXACT, APPROXIMATE, CITY_LEVEL, REGION_LEVEL, COUNTRY_LEVEL, CONTINENT_LEVEL, GLOBAL_LEVEL, UNKNOWN
     }
 
     @Id
-    private Identification identification;
+    private final String id;
     
-    /** DOCUMENT ME! */
     @Attribute
     private String name;
 
-    /** DOCUMENT ME! */
     @Attribute
-    private Boundary boundary;
+    private GeodeticCoordinate center;
 
-    /** DOCUMENT ME! */
     @Attribute
     private Type type;
 
-    /**
-     * Creates a new Place object with a name and boundary.
-     *
-     * @param name     the name of the place.
-     * @param boundary the geographical boundary.
-     */
-    public Place(String name, Boundary boundary) {
-        this(name, boundary, Type.OTHER);
+    @Attribute
+    private String historicalName;
+
+    @Attribute
+    private Precision precision = Precision.UNKNOWN;
+
+    @Attribute
+    private Quantity<Length> uncertaintyRadius;
+
+    @Attribute
+    private String region;
+
+    public Place(String name) {
+        this(name, Type.UNKNOWN);
     }
 
-    /**
-     * Creates a new Place object with name, boundary and type.
-     */
-    public Place(String name, Boundary boundary, Type type) {
-        if ((name != null) && (name.length() > 0)) {
-            this.identification = new SimpleIdentification(name + ":" + System.nanoTime());
-            this.name = name;
-            this.boundary = boundary;
-            this.type = type != null ? type : Type.OTHER;
-        } else {
-            throw new IllegalArgumentException(
-                "The Place constructor can't have null or empty name.");
-        }
-    }
-
-    /**
-     * Creates a new Place object with a name and type (null boundary).
-     */
     public Place(String name, Type type) {
-        this(name, null, type);
+        this.id = UUID.randomUUID().toString();
+        this.name = Objects.requireNonNull(name);
+        this.type = type != null ? type : Type.UNKNOWN;
+        this.uncertaintyRadius = Quantities.create(0.0, Units.METER);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+    public Place(String name, GeodeticCoordinate center, Type type) {
+        this(name, type);
+        this.center = center;
+    }
+
+    @Override
     public String getName() {
         return name;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public Boundary getBoundary() {
-        return boundary;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the center coordinate of this place.
      */
-    public Object getPosition() {
-        return boundary != null ? boundary.getPosition() : null;
+    public GeodeticCoordinate getCenter() {
+        return center;
+    }
+
+    public void setCenter(GeodeticCoordinate center) {
+        this.center = center;
+    }
+
+    @Override
+    public EarthCoordinate getPosition() {
+        return center;
+    }
+
+    public String getHistoricalName() {
+        return historicalName;
+    }
+
+    public void setHistoricalName(String historicalName) {
+        this.historicalName = historicalName;
+    }
+
+    public Precision getPrecision() {
+        return precision;
+    }
+
+    public void setPrecision(Precision precision) {
+        this.precision = precision;
+    }
+
+    public Quantity<Length> getUncertaintyRadius() {
+        return uncertaintyRadius;
+    }
+
+    public void setUncertaintyRadius(Quantity<Length> radius) {
+        this.uncertaintyRadius = radius;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
+    /**
+     * Calculates spherical distance to another place.
+     */
+    public Quantity<Length> distanceTo(Place other) {
+        if (center == null || other.center == null) return null;
+        return center.distanceTo(other.center);
+    }
+
+    @Override
+    public String toString() {
+        return center != null ? String.format("%s (%s) [%s]", name, type, center) : String.format("%s (%s)", name, type);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Place other)) return false;
+        return id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    // Factory methods
+    public static Place of(String name, double lat, double lon, Type type) {
+        return new Place(name, new GeodeticCoordinate(lat, lon), type);
+    }
+
+    public static Place greenwich() {
+        return of("Greenwich Observatory", 51.4772, 0.0, Type.BUILDING);
     }
 }

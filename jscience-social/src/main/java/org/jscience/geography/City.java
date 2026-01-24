@@ -24,58 +24,59 @@
 package org.jscience.geography;
 
 import org.jscience.politics.Country;
-import org.jscience.util.identity.Identified;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
- * Represents a city or settlement.
+ * Represents a city or urban settlement.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class City extends Place implements Identified<String> {
+@Persistent
+public class City extends Region {
 
-    private final String id; // Typically name or code
-    private final Country exactCountry; // Renamed to avoid name clash with Place.getCountry()
-    private final String zipCode;
-    private final int estimatedPopulation; // Renamed to avoid name clash with Place.getPopulation()
+    private static final long serialVersionUID = 1L;
 
-    public City(String name, Country country, String zipCode, int population) {
-        super(name, Type.CITY); // Fixed constructor call
-        this.id = name;
-        this.exactCountry = country;
-        this.zipCode = zipCode;
-        this.estimatedPopulation = population;
+    @Relation(type = Relation.Type.MANY_TO_ONE)
+    private Country country;
 
-        // Also set the string representation in the parent Place
+    @Attribute
+    private String defaultPostalCode;
+
+    public City(String name, Country country) {
+        super(name, SubType.CITY);
+        this.country = country;
         if (country != null) {
-            super.setCountry(country.getName());
+            this.setRegion(country.getName());
         }
     }
 
-    @Override
-    public String getId() {
-        return id;
+    public City(String name, Country country, long population) {
+        this(name, country);
+        this.setPopulation(population);
     }
 
-    public Country getExactCountry() {
-        return exactCountry;
+    public Country getCountry() {
+        return country;
     }
 
-    public String getZipCode() {
-        return zipCode;
+    public void setCountry(Country country) {
+        this.country = country;
     }
 
-    // Override generic getPopulation if necessary, or just use
-    // getEstimatedPopulation
-    public int getEstimatedPopulation() {
-        return estimatedPopulation;
+    public String getDefaultPostalCode() {
+        return defaultPostalCode;
+    }
+
+    public void setDefaultPostalCode(String postalCode) {
+        this.defaultPostalCode = postalCode;
     }
 
     @Override
     public String toString() {
-        return String.format("%s, %s", getName(), exactCountry != null ? exactCountry.getName() : "Unknown Country");
+        return String.format("%s, %s (Pop: %d)", getName(), country != null ? country.getName() : "Unknown", getPopulation());
     }
 }
-
-

@@ -29,6 +29,7 @@ import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Angle;
 import org.jscience.measure.quantity.Length;
 import org.jscience.mathematics.numbers.real.Real;
+import java.io.Serializable;
 
 /**
  * Represents a coordinate in the Cassini-Soldner projection.
@@ -39,7 +40,9 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CassiniSoldnerCoordinate {
+public class CassiniSoldnerCoordinate implements EarthCoordinate, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final Real easting;
     private final Real northing;
@@ -59,6 +62,18 @@ public class CassiniSoldnerCoordinate {
         this.ellipsoid = ellipsoid;
         this.parameters = params;
     }
+
+    public Quantity<Length> getEasting() { return Quantities.create(easting.doubleValue(), Units.METER); }
+    public Quantity<Length> getNorthing() { return Quantities.create(northing.doubleValue(), Units.METER); }
+
+    @Override
+    public String getCoordinateSystem() { return "Cassini-Soldner"; }
+
+    @Override
+    public ReferenceEllipsoid getEllipsoid() { return ellipsoid; }
+
+    @Override
+    public ECEFCoordinate toECEF() { return toGeodetic().toECEF(); }
 
     public static CassiniSoldnerCoordinate fromGeodetic(GeodeticCoordinate geodetic, CassiniParameters params) {
         ReferenceEllipsoid el = geodetic.getEllipsoid();

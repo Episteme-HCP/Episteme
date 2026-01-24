@@ -90,11 +90,30 @@ public final class AstronomyConstants {
     public static final Real GALACTIC_LON_NCP = (Real) GALACTIC_LON_NCP_QTY.getValue();
 
     // =========================================================================
-    // Time
+    // Time and Years
     // =========================================================================
     
     public static final Quantity<Time> DAY_DURATION = Quantities.create(Real.of(86400.0), Units.SECOND);
     public static final Real DAY_SECONDS = (Real) DAY_DURATION.getValue();
+
+    /** Sideral day (rotation of Earth relative to fixed stars). */
+    public static final Quantity<Time> SIDEREAL_DAY = Quantities.create(Real.of(86164.0905), Units.SECOND);
+
+    /** Sidereal year (orbital period relative to fixed stars). */
+    public static final Quantity<Time> SIDEREAL_YEAR = Quantities.create(Real.of(365.256363004), Units.DAY);
+
+    /** Tropical year (period between successive vernal equinoxes). */
+    public static final Quantity<Time> TROPICAL_YEAR = Quantities.create(Real.of(365.242190402), Units.DAY);
+
+    /** Standard Julian year (exactly 365.25 days). */
+    public static final Quantity<Time> JULIAN_YEAR = Quantities.create(Real.of(365.25), Units.DAY);
+
+    /** Gaussian Gravitational Constant in AU^(3/2) * Day^-1 * SolarMass^(-1/2). */
+    public static final Real GAUSSIAN_GRAVITATIONAL_CONSTANT = Real.of("0.01720209895");
+
+    /** Gaussian year (period of ideal particle in circular orbit). */
+    public static final Quantity<Time> GAUSSIAN_YEAR = Quantities.create(
+            org.jscience.mathematics.MathConstants.TWO_PI.divide(GAUSSIAN_GRAVITATIONAL_CONSTANT), Units.DAY);
 
     // Julian epochs are dimensionless days or dates? Usually just distinct formatting. 
     // Keeping Real for Julian Dates as they are often treated as scalar timeline points.

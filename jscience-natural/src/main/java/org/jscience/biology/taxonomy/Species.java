@@ -23,11 +23,16 @@
 
 package org.jscience.biology.taxonomy;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Collections;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.jscience.util.identity.Identified;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.Named;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
@@ -46,7 +51,7 @@ import org.jscience.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Species implements Identified<String>, Named {
+public class Species implements Identified<Identification>, Named {
 
     /**
      * IUCN Red List conservation status.
@@ -83,6 +88,11 @@ public class Species implements Identified<String>, Named {
     private Species ancestor;
     @Attribute
     private ConservationStatus conservationStatus;
+    
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private final Set<Organ> organs = new HashSet<>();
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private final Set<Tissue> tissues = new HashSet<>();
 
     // Taxonomic ranks
     @Attribute
@@ -107,8 +117,8 @@ public class Species implements Identified<String>, Named {
     }
 
     @Override
-    public String getId() {
-        return scientificName;
+    public Identification getId() {
+        return new SimpleIdentification(scientificName);
     }
 
     @Override
@@ -206,6 +216,22 @@ public class Species implements Identified<String>, Named {
         return attributes.get(key);
     }
 
+    public void addOrgan(Organ organ) {
+        organs.add(Objects.requireNonNull(organ));
+    }
+
+    public Set<Organ> getOrgans() {
+        return Collections.unmodifiableSet(organs);
+    }
+
+    public void addTissue(Tissue tissue) {
+        tissues.add(Objects.requireNonNull(tissue));
+    }
+
+    public Set<Tissue> getTissues() {
+        return Collections.unmodifiableSet(tissues);
+    }
+
     /**
      * Returns full taxonomic lineage string.
      */
@@ -261,6 +287,9 @@ public class Species implements Identified<String>, Named {
     public int hashCode() {
         return Objects.hash(scientificName);
     }
+
+    /** Predefined species for humans. */
+    public static final Species HUMAN = new Species("Human", "Homo sapiens");
 }
 
 

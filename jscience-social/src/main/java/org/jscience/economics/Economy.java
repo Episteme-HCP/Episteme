@@ -28,33 +28,38 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
-import org.jscience.economics.money.Currency;
 import org.jscience.economics.money.Money;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantity;
 
 /**
- * Higher-level model for a macro or micro economy.
- * Manages the flow of resources between organizations and the role of the central bank.
+ * Functional abstraction for an economic system, encompassing organizations, 
+ * central banking, and macro-financial indicators. It provides the framework 
+ * for simulating resource flows and systemic events within a specific 
+ * economic situation.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 2.0
  * @since 1.0
  */
 public abstract class Economy implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
-    private Set<Organization> organizations;
-    private Bank centralBank;
+    private final Set<Organization> organizations;
+    private final Bank centralBank;
     private Money cachedGdp;
     private Real inflationRate = Real.ZERO;
     private Real unemploymentRate = Real.ZERO;
 
     /**
-     * Initializes an economy with a central bank.
+     * Initializes a new Economy with its constituent organizations and a 
+     * mandatory central bank.
+     * 
+     * @param orgs the initial set of productive organizations
+     * @param centralBank the system's central bank
+     * @throws NullPointerException if centralBank or orgs is null
      */
     public Economy(Set<Organization> orgs, Bank centralBank) {
         this.centralBank = Objects.requireNonNull(centralBank, "Central bank cannot be null");
@@ -66,10 +71,14 @@ public abstract class Economy implements Serializable {
         return Collections.unmodifiableSet(organizations);
     }
 
-    public Bank getCentralBank() { return centralBank; }
+    public Bank getCentralBank() {
+        return centralBank;
+    }
 
     public void addOrganization(Organization org) {
-        if (org != null && org != centralBank) organizations.add(org);
+        if (org != null && org != centralBank) {
+            organizations.add(org);
+        }
     }
 
     public void removeOrganization(Organization org) {
@@ -77,14 +86,19 @@ public abstract class Economy implements Serializable {
     }
 
     /** 
-     * Scans the economy for the total quantity of a specific resource.
+     * Aggregates the total quantity of a specific resource across all 
+     * organizations in the current economy.
+     * 
+     * @param resource the prototype of the resource to count
+     * @return the total quantity unit of that resource, or null if not found
      */
+    @SuppressWarnings("unchecked")
     public Quantity<?> getNumberOfUnits(Resource resource) {
         if (resource == null) return null;
         Quantity<?> total = null;
         for (Organization org : organizations) {
             for (Resource r : org.getResources()) {
-                if (r.getName().equals(resource.getName())) {
+                if (r.getName().equalsIgnoreCase(resource.getName())) {
                     total = (total == null) ? r.getAmount() : (Quantity) total.add(r.getAmount());
                 }
             }
@@ -92,7 +106,12 @@ public abstract class Economy implements Serializable {
         return total;
     }
 
-    /** Calculates the sum of capital of all organizations in the economy. */
+    /** 
+     * Calculates the gross value of all organizations in the economy 
+     * based on their localized liquid capital.
+     * 
+     * @return total aggregated value in Money units
+     */
     public Money getValue() {
         Money total = Money.usd(Real.ZERO);
         for (Organization org : organizations) {
@@ -101,19 +120,40 @@ public abstract class Economy implements Serializable {
         return total;
     }
 
+    /**
+     * Advances the economic simulation by an incremental time step.
+     * To be implemented by specific economic models (e.g., FreeMarket, Planned).
+     * 
+     * @param dt the time delta in simulation units
+     */
     public abstract void step(double dt);
 
     // --- Macro Indicators ---
 
+    /**
+     * @return the current Gross Domestic Product (GDP)
+     */
     public Money getGdp() {
         return cachedGdp != null ? cachedGdp : getValue();
     }
 
-    public void setGdp(Money gdp) { this.cachedGdp = gdp; }
+    public void setGdp(Money gdp) {
+        this.cachedGdp = gdp;
+    }
 
-    public Real getInflationRate() { return inflationRate; }
-    public void setInflationRate(Real rate) { this.inflationRate = rate; }
+    public Real getInflationRate() {
+        return inflationRate;
+    }
 
-    public Real getUnemploymentRate() { return unemploymentRate; }
-    public void setUnemploymentRate(Real rate) { this.unemploymentRate = rate; }
+    public void setInflationRate(Real rate) {
+        this.inflationRate = (rate != null) ? rate : Real.ZERO;
+    }
+
+    public Real getUnemploymentRate() {
+        return unemploymentRate;
+    }
+
+    public void setUnemploymentRate(Real rate) {
+        this.unemploymentRate = (rate != null) ? rate : Real.ZERO;
+    }
 }

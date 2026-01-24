@@ -90,9 +90,7 @@ public class GMLReader extends AbstractResourceReader<GMLDocument> {
      */
     public GMLDocument read(InputStream input) throws GMLException {
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
+            DocumentBuilder builder = org.jscience.io.SecureXMLFactory.createSecureDocumentBuilder();
             Document doc = builder.parse(input);
             return parseDocument(doc);
         } catch (Exception e) {

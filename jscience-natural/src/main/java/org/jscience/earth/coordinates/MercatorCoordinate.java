@@ -38,7 +38,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public final class MercatorCoordinate implements Serializable {
+public final class MercatorCoordinate implements EarthCoordinate, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -54,6 +54,30 @@ public final class MercatorCoordinate implements Serializable {
 
     public Quantity<Length> getX() { return Quantities.create(x.doubleValue(), Units.METER); }
     public Quantity<Length> getY() { return Quantities.create(y.doubleValue(), Units.METER); }
+    public boolean isWebMercator() { return webMercator; }
+
+    @Override
+    public String getCoordinateSystem() { return webMercator ? "EPSG:3857" : "EPSG:3395"; }
+
+    @Override
+    public ReferenceEllipsoid getEllipsoid() { return ReferenceEllipsoid.WGS84; }
+
+    @Override
+    public GeodeticCoordinate toGeodetic() {
+        double a = ReferenceEllipsoid.WGS84.getSemiMajorAxis().to(Units.METER).getValue().doubleValue();
+        double lon = x.doubleValue() / a;
+        double lat;
+        if (webMercator) {
+            lat = 2 * Math.atan(Math.exp(y.doubleValue() / a)) - Math.PI / 2;
+        } else {
+            // Simplified inverse for ellipsoidal (iterative would be more accurate)
+            lat = 2 * Math.atan(Math.exp(y.doubleValue() / a)) - Math.PI / 2;
+        }
+        return new GeodeticCoordinate(Math.toDegrees(lat), Math.toDegrees(lon), 0.0);
+    }
+
+    @Override
+    public ECEFCoordinate toECEF() { return toGeodetic().toECEF(); }
 
     /**
      * Converts Geodetic to Mercator.

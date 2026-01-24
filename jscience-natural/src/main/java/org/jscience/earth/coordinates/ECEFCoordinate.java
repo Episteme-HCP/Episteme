@@ -41,7 +41,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public final class ECEFCoordinate implements Serializable {
+public final class ECEFCoordinate implements EarthCoordinate, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -69,12 +69,30 @@ public final class ECEFCoordinate implements Serializable {
     public Real getYReal() { return y; }
     public Real getZReal() { return z; }
 
+    @Override
     public ReferenceEllipsoid getEllipsoid() { return ellipsoid; }
+
+    @Override
+    public String getCoordinateSystem() { return "ECEF"; }
+
+    @Override
+    public ECEFCoordinate toECEF() { return this; }
+
+    /**
+     * Calculates distance to another ECEF coordinate.
+     */
+    public Quantity<Length> distanceTo(ECEFCoordinate other) {
+        double dx = x.doubleValue() - other.x.doubleValue();
+        double dy = y.doubleValue() - other.y.doubleValue();
+        double dz = z.doubleValue() - other.z.doubleValue();
+        return Quantities.create(Math.sqrt(dx*dx + dy*dy + dz*dz), Units.METER);
+    }
 
     /**
      * Converts ECEF to Geodetic coordinates using Heikkinen's closed-form algorithm.
      * Higher precision than iterative methods.
      */
+    @Override
     public GeodeticCoordinate toGeodetic() {
         double a = ellipsoid.getSemiMajorAxis().to(Units.METER).getValue().doubleValue();
         double b = ellipsoid.getSemiMinorAxis().to(Units.METER).getValue().doubleValue();

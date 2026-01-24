@@ -21,6 +21,10 @@
  * SOFTWARE.
  */
 
+/**
+ * Provides models and simulation engines for urban traffic flow analysis. 
+ * This package includes microscopic car-following models (IDM) and 
+ * lane-changing logic (MOBIL), supporting architectural and urban planning 
+ * for transportation infrastructure.
+ */
 package org.jscience.architecture.traffic;
-
-

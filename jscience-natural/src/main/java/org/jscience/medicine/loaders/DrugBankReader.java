@@ -185,4 +185,9 @@ public class DrugBankReader implements org.jscience.io.ResourceReader<Medication
     public String getLongDescription() {
         return org.jscience.ui.i18n.I18n.getInstance().get("reader.drugbankreader.longdesc", "Fetches medication data including details, dosage, and active ingredients from DrugBank.");
     }
+
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"v1.0"};
+    }
 }

@@ -51,7 +51,7 @@ import org.jscience.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Person extends Individual implements org.jscience.geography.Locatable, Serializable {
+public class Person extends Human implements org.jscience.geography.Locatable, Serializable {
 
     private static final long serialVersionUID = 1L;
 

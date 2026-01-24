@@ -24,10 +24,14 @@
 package org.jscience.sociology;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 import org.jscience.biology.Individual;
+import org.jscience.util.Commented;
 import org.jscience.util.Named;
+import org.jscience.util.Temporal;
 import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.Identified;
 import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
@@ -40,11 +44,11 @@ import org.jscience.util.persistence.Relation;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
 @Persistent
-public class Role implements Named, Serializable {
+public class Role implements Named, Identified<Identification>, Commented, Temporal<Instant>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -73,6 +77,12 @@ public class Role implements Named, Serializable {
     private Situation situation;
 
     @Attribute
+    private String comments;
+
+    @Attribute
+    private Instant timestamp;
+
+    @Attribute
     private int kind;
 
     /**
@@ -93,6 +103,7 @@ public class Role implements Named, Serializable {
         this.situation = Objects.requireNonNull(situation, "Situation cannot be null");
         this.kind = kind;
         this.identification = new SimpleIdentification(individual.getId() + ":" + name);
+        this.timestamp = Instant.now();
         this.individual.addRole(this);
     }
 
@@ -110,6 +121,7 @@ public class Role implements Named, Serializable {
         }
         this.kind = kind;
         this.identification = new SimpleIdentification("Template:" + name);
+        this.timestamp = Instant.now();
     }
 
     @Override
@@ -141,12 +153,41 @@ public class Role implements Named, Serializable {
         return kind;
     }
 
-    /**
-     * Returns the persistent identification for this role instance.
-     * @return the identification
-     */
-    public Identification getIdentification() {
+    @Override
+    public Identification getId() {
         return identification;
+    }
+
+    @Override
+    public String getComments() {
+        return comments;
+    }
+
+    /**
+     * Sets the comments for this role.
+     * @param comments the comments to set
+     */
+    @Override
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
+    @Override
+    public Instant getWhen() {
+        return timestamp;
+    }
+
+    @Deprecated
+    public Instant getTimestamp() {
+        return timestamp;
+    }
+
+    /**
+     * Sets the timestamp for this role.
+     * @param timestamp the timestamp to set
+     */
+    public void setTimestamp(Instant timestamp) {
+        this.timestamp = timestamp;
     }
 
     @Override

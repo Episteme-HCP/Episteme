@@ -38,7 +38,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public final class UTMCoordinate implements Serializable {
+public final class UTMCoordinate implements EarthCoordinate, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -64,12 +64,21 @@ public final class UTMCoordinate implements Serializable {
     public char getZoneLetter() { return zoneLetter; }
     public Quantity<Length> getEasting() { return Quantities.create(easting.doubleValue(), Units.METER); }
     public Quantity<Length> getNorthing() { return Quantities.create(northing.doubleValue(), Units.METER); }
+    
+    @Override
     public ReferenceEllipsoid getEllipsoid() { return ellipsoid; }
+
+    @Override
+    public String getCoordinateSystem() { return "UTM Zone " + zoneNumber + zoneLetter; }
+
+    @Override
+    public ECEFCoordinate toECEF() { return toGeodetic().toECEF(); }
 
     /**
      * Converts this UTM coordinate to Geodetic (Lat/Lon).
      * Implementation based on USGS Bulletin 1532.
      */
+    @Override
     public GeodeticCoordinate toGeodetic() {
         double x = easting.doubleValue() - 500000.0; // remove 500km false easting
         double y = northing.doubleValue();

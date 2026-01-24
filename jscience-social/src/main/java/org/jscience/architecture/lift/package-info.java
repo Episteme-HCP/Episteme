@@ -21,6 +21,10 @@
  * SOFTWARE.
  */
 
+/**
+ * Provides mathematical models and discrete simulations for vertical 
+ * transportation systems (elevators/lifts). This package enables the study 
+ * of building traffic handling capacity and the optimization of dispatching 
+ * algorithms for high-rise architectural design.
+ */
 package org.jscience.architecture.lift;
-
-

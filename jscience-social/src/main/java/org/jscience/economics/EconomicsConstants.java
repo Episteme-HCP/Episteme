@@ -20,110 +20,71 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.economics;
 
 /**
- * A class representing some useful constants for economics.
+ * Constants and enumerations for economics and management.
+ * <p>
+ * Provides classifications for industry sectors, economic processes,
+ * organizational departments, and management levels.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.2
+ * @version 2.0
+ * @since 1.0
  */
 public final class EconomicsConstants {
 
-    /** 
-     * Default constructor (private).
+    private EconomicsConstants() {}
+
+    /**
+     * Economic industry sectors (Three-sector model + extensions).
      */
-    private EconomicsConstants() {
-        // Prevents instantiation.
+    public enum IndustrySector {
+        PRIMARY,   // Raw material extraction (farming, mining)
+        SECONDARY, // Manufacturing and processing
+        TERTIARY,  // Services
+        QUATERNARY,// Information, IT, research
+        QUINARY    // High-level decision making, non-profits
     }
 
-    //could put the standard currencies here although they are in the money subpackage
-    /** Constant for unknown or undefined value. */
-    public final static int UNKNOWN = 0;
+    /**
+     * Stages in the economic value chain.
+     */
+    public enum EconomicProcess {
+        PRODUCTION, TRANSFORMATION, DISTRIBUTION, CONSUMPTION, RECYCLING
+    }
 
-    /** Primary industry focused on raw material extraction. */
-    public final static int PRIMARY_INDUSTRY = 1;
+    /**
+     * Broad industry categories.
+     */
+    public enum IndustryCategory {
+        TRANSPORT, HYGIENE, ALIMENTATION, HABITAT, TECHNOLOGY, 
+        ENERGY, SOCIETY, FINANCE, EDUCATION, HEALTHCARE, OTHER
+    }
 
-    /** Secondary industry focused on manufacturing and processing. */
-    public final static int SECONDARY_INDUSTRY = 2;
+    /**
+     * Standard organizational departments.
+     */
+    public enum Department {
+        HUMAN_RESOURCES, SALES, MARKETING, ACCOUNTING, FINANCE, 
+        RESEARCH_AND_DEVELOPMENT, PRODUCTION, LOGISTICS, DISTRIBUTION, 
+        PROCUREMENT, LEGAL, INFRASTRUCTURE, INFORMATION_TECHNOLOGY, 
+        CUSTOMER_SERVICE, QUALITY_ASSURANCE
+    }
 
-    /** Tertiary industry focused on services. */
-    public final static int TERTIARY_INDUSTRY = 4;
+    /**
+     * Management levels or roles.
+     */
+    public enum ManagementLevel {
+        OPERATIONAL, SUPERVISORY, MIDDLE_MANAGEMENT, STRATEGIC, EXECUTIVE, BOARD
+    }
 
-    /** Quaternary industry focused on information and technology. */
-    public final static int QUATERNARY_INDUSTRY = 8;
-
-    /** Process involving raw extraction and primary production. */
-    public final static int PRODUCTION_PROCESS = 1;
-
-    /** Process involving factory production and transformation. */
-    public final static int TRANSFORMATION_PROCESS = 2;
-
-    /** Process involving logistics and distribution. */
-    public final static int DISTRIBUTION_PROCESS = 4;
-
-    /** Process involving consumption by the end user. */
-    public final static int CONSUMPTION_PROCESS = 8;
-
-    /** Industry sector for transport. */
-    public final static int TRANSPORT = 1;
-
-    /** Industry sector for hygiene. */
-    public final static int HYGIENE = 2;
-
-    /** Industry sector for food and alimentation. */
-    public final static int ALIMENTATION = 4;
-
-    /** Industry sector for housing and habitat. */
-    public final static int HABITAT = 8;
-
-    /** Industry sector for technology. */
-    public final static int TECHNOLOGY = 16;
-
-    /** Industry sector for energy. */
-    public final static int ENERGY = 32;
-
-    /** Industry sector for societal services. */
-    public final static int SOCIETY = 64;
-
-    /** Department for human resource management. */
-    public final static int HUMAN_RESOURCES = 1;
-
-    /** Department for sales activities. */
-    public final static int SALES = 2;
-
-    /** Department for marketing and communication. */
-    public final static int MARKETING = 4;
-
-    /** Department for accounting and financial tracking. */
-    public final static int ACCOUNTING = 8;
-
-    /** Department for research and development. */
-    public final static int RESEARCH = 16;
-
-    /** Department for production operations. */
-    public final static int PRODUCTION = 32;
-
-    /** Department for distribution and shipping. */
-    public final static int DISTRIBUTION = 64;
-
-    /** Department for procurement and storage. */
-    public final static int BUYING_CENTRE = 128;
-
-    /** Management level for supervision and board oversight. */
-    public final static int SUPERVISORY = 256;
-
-    /** Department for financing and capital management. */
-    public final static int FINANCING = 512;
-
-    /** Department for legal and administrative compliance. */
-    public final static int LEGAL = 1024;
-
-    /** Department for infrastructure maintenance and security. */
-    public final static int INFRASTRUCTURE = 2048;
-
-    /** Department for information systems and IT. */
-    public final static int INFORMATION = 4096;
-
+    /**
+     * Market structures.
+     */
+    public enum MarketStructure {
+        PERFECT_COMPETITION, MONOPOLISTIC_COMPETITION, OLIGOPOLY, MONOPOLY, MONOPSONY
+    }
 }

@@ -23,58 +23,51 @@
 
 package org.jscience.geography;
 
-import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Length;
+import org.jscience.measure.quantity.Temperature;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+
+import java.io.Serializable;
 
 /**
- * Represents a simplified KÃƒÂ¶ppen climate classification.
+ * Represents a simplified Köppen climate classification and associated metrics.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ClimateZone {
+@Persistent
+public record ClimateZone(
+        @Attribute Type type,
+        @Attribute Quantity<Temperature> averageTemp,
+        @Attribute Quantity<Length> annualRainfall) implements Serializable {
 
     public enum Type {
         TROPICAL, ARID, TEMPERATE, CONTINENTAL, POLAR
     }
 
-    private final Type type;
-    private final Real averageTempCelsius;
-    private final Real annualRainfallMm;
-
-    public ClimateZone(Type type, Real avgTemp, Real rainfall) {
-        this.type = type;
-        this.averageTempCelsius = avgTemp;
-        this.annualRainfallMm = rainfall;
-    }
-
-    public ClimateZone(Type type, double avgTemp, double rainfall) {
-        this(type, Real.of(avgTemp), Real.of(rainfall));
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public Real getAverageTemp() {
-        return averageTempCelsius;
-    }
-
-    public Real getAnnualRainfall() {
-        return annualRainfallMm;
-    }
-
+    /**
+     * Checks if the climate supports permanent human settlement.
+     */
     public boolean isHabitable() {
-        if (type == Type.POLAR)
-            return false;
-        if (type == Type.ARID && annualRainfallMm.doubleValue() < 50)
-            return false;
+        if (type == Type.POLAR) return false;
+        if (type == Type.ARID && annualRainfall.to(Units.MILLIMETER).getValue() < 100) return false;
         return true;
     }
 
+    /**
+     * Checks if the climate supports outdoor agriculture.
+     */
     public boolean supportsAgriculture() {
-        return annualRainfallMm.doubleValue() > 300 && averageTempCelsius.doubleValue() > 10;
+        return annualRainfall.to(Units.MILLIMETER).getValue() > 400 && 
+               averageTemp.to(Units.CELSIUS).getValue() > 12;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s Climate (Avg. Temp: %s, Rainfall: %s)", type, averageTemp, annualRainfall);
     }
 }
-
-

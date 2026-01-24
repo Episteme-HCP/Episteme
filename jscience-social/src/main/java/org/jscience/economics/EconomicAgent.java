@@ -32,26 +32,28 @@ import org.jscience.economics.money.Wallet;
 import org.jscience.sociology.Role;
 
 /**
- * Represents an individual or entity participating in market activities.
- * Manages resource belongings and a financial wallet.
+ * Represents an autonomous actor in an economic system, which can be an 
+ * individual, a household, or a firm. Economic agents are defined by their 
+ * ability to own resources, accumulate capital in a wallet, and interact 
+ * within markets.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.2
+ * @version 2.0
  * @since 1.0
  */
 public class EconomicAgent extends Role implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     private Set<Resource> belongings;
     private Wallet wallet;
 
     /**
-     * Creates a new EconomicAgent.
+     * Initializes a standard economic agent associated with an individual.
      * 
-     * @param individual the underlying biological or social individual
-     * @param situation  the economic context
+     * @param individual the biological or social entity acting as the agent
+     * @param situation the economic environment/context of action
      */
     public EconomicAgent(Individual individual, EconomicSituation situation) {
         super(individual, "Economic Agent", situation, Role.CLIENT);
@@ -59,6 +61,9 @@ public class EconomicAgent extends Role implements Serializable {
         this.wallet = new Wallet();
     }
 
+    /**
+     * Protected constructor for specialized sub-types of agents (e.g., Banks, Factories).
+     */
     protected EconomicAgent(Individual individual, String name,
             EconomicSituation situation, int kind) {
         super(individual, name, situation, kind);
@@ -66,32 +71,55 @@ public class EconomicAgent extends Role implements Serializable {
         this.wallet = new Wallet();
     }
 
-    /** Returns unmodifiable set of resources owned by this agent. */
+    /**
+     * Returns the set of resources currently owned by this agent.
+     * @return unmodifiable set of owned resources
+     */
     public Set<Resource> getBelongings() {
         return Collections.unmodifiableSet(belongings);
     }
 
+    /**
+     * Transfers ownership of a resource to this agent.
+     * @param belonging the resource to acquire
+     */
     public void addBelonging(Resource belonging) {
         if (belonging != null) {
             belongings.add(belonging);
         }
     }
 
+    /**
+     * Relinquishes ownership of a resource.
+     * @param belonging the resource to remove
+     */
     public void removeBelonging(Resource belonging) {
         belongings.remove(belonging);
     }
 
+    /**
+     * @return the agent's financial wallet containing currency holdings
+     */
     public Wallet getWallet() {
         return wallet;
     }
 
+    /**
+     * Replaces the agent's wallet.
+     * @param wallet the new wallet instance
+     */
     public void setWallet(Wallet wallet) {
         if (wallet != null) {
             this.wallet = wallet;
         }
     }
 
-    /** Aggregates the agent's identity and geographical position into a social community. */
+    /**
+     * Aggregates the agent's identity into a localized social community 
+     * based on their current geographic position.
+     * 
+     * @return a community containing this agent
+     */
     public Community getCommunity() {
         Set<Individual> set = new HashSet<>();
         set.add(getIndividual());

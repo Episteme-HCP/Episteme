@@ -26,52 +26,57 @@ package org.jscience.medicine;
 import org.jscience.device.Sensor;
 
 /**
- * Interface for vital signs monitoring devices.
+ * Interface for vital signs monitoring devices (e.g., bedside monitors).
  * <p>
- * Provides access to real-time vital signs data including heart rate,
- * blood pressure, oxygen saturation, respiration rate, and temperature.
+ * Provides streamable access to real-time vital signs data and associated waveforms.
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
+ * @see VitalSigns
  */
 public interface VitalSignsMonitor extends Sensor<VitalSigns> {
 
     /**
      * Gets the current vital signs readings.
+     * Shortcut for {@code readValue()}.
      *
      * @return current vital signs
      */
-    VitalSigns getVitalSigns();
+    default VitalSigns getVitalSigns() {
+        try {
+            return readValue();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     /**
-     * Gets the ECG waveform data for display.
+     * Gets the ECG (Electrocardiogram) waveform data.
      *
      * @return array of ECG amplitude values
      */
     double[] getECGWaveform();
 
     /**
-     * Gets the plethysmograph (SpO2) waveform data.
+     * Gets the SpO2 (Plethysmograph) waveform data.
      *
-     * @return array of plethysmograph amplitude values
+     * @return array of pleth amplitude values
      */
     double[] getPlethWaveform();
 
     /**
-     * Gets the number of channels available.
+     * Gets the sample rate for waveforms.
      *
-     * @return channel count
-     */
-    int getChannelCount();
-
-    /**
-     * Gets the sample rate in Hz.
-     *
-     * @return samples per second
+     * @return samples per second in Hz
      */
     double getSampleRate();
+    
+    /**
+     * Checks if the monitor is currently alarming.
+     * 
+     * @return true if an alert condition is active
+     */
+    boolean isAlarming();
 }
-
-

@@ -22,6 +22,9 @@
  */
 
 /**
- * - buildings, structures, and architectural styles.
+ * Provides mathematical and analytical models for architectural engineering, 
+ * building physics, and urban history. This package includes structural load 
+ * analysis, thermal simulation, solar path tracking, and historical 
+ * construction catalogues.
  */
 package org.jscience.architecture;

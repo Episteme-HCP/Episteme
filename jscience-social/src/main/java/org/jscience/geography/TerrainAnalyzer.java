@@ -1,105 +1,101 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.geography;
 
-import java.util.*;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.Length;
+
+import java.util.Arrays;
 
 /**
- * Analyzes terrain from Digital Elevation Models (DEM).
+ * Utility class for terrain analysis using Digital Elevation Models (DEM).
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
 public final class TerrainAnalyzer {
 
     private TerrainAnalyzer() {}
 
-    public record TerrainPoint(
-        double x, double y,
-        double elevation,
-        double slope,           // degrees
-        double aspect,          // degrees from north
-        double curvature
-    ) {}
-
-    public record WatershedResult(
-        int[][] basinIds,
-        Map<Integer, Double> basinAreas,
-        Map<Integer, double[]> pourPoints,  // Outlet points
-        List<int[][]> streamNetwork
-    ) {}
-
     /**
-     * Calculates slope from elevation grid.
-     * @param dem Digital Elevation Model (elevation values)
-     * @param cellSize Cell size in same units as elevation
-     * @return Slope in degrees for each cell
+     * Calculates slope grid from elevation grid using Horn's method.
+     * 
+     * @param dem Digital Elevation Model (2D elevation array)
+     * @param cellSize width/height of a grid cell
+     * @return grid of slope values in degrees
      */
-    public static double[][] calculateSlope(double[][] dem, double cellSize) {
+    public static double[][] calculateSlope(double[][] dem, Quantity<Length> cellSize) {
         int rows = dem.length;
         int cols = dem[0].length;
         double[][] slope = new double[rows][cols];
+        double size = cellSize.to(Units.METER).getValue();
         
         for (int i = 1; i < rows - 1; i++) {
             for (int j = 1; j < cols - 1; j++) {
-                // 3x3 neighborhood gradient (Horn's method)
                 double dzdx = ((dem[i-1][j+1] + 2*dem[i][j+1] + dem[i+1][j+1]) -
-                              (dem[i-1][j-1] + 2*dem[i][j-1] + dem[i+1][j-1])) / (8 * cellSize);
+                              (dem[i-1][j-1] + 2*dem[i][j-1] + dem[i+1][j-1])) / (8 * size);
                 double dzdy = ((dem[i+1][j-1] + 2*dem[i+1][j] + dem[i+1][j+1]) -
-                              (dem[i-1][j-1] + 2*dem[i-1][j] + dem[i-1][j+1])) / (8 * cellSize);
+                              (dem[i-1][j-1] + 2*dem[i-1][j] + dem[i-1][j+1])) / (8 * size);
                 
-                double slopeRad = Math.atan(Math.sqrt(dzdx*dzdx + dzdy*dzdy));
-                slope[i][j] = Math.toDegrees(slopeRad);
+                slope[i][j] = Math.toDegrees(Math.atan(Math.sqrt(dzdx*dzdx + dzdy*dzdy)));
             }
         }
-        
         return slope;
     }
 
     /**
-     * Calculates aspect (direction of slope).
-     * @return Aspect in degrees from north (0-360)
+     * Calculates aspect (slope direction) grid.
+     * 
+     * @param dem elevation grid
+     * @param cellSize cell dimension
+     * @return aspect in degrees (0-360) from North
      */
-    public static double[][] calculateAspect(double[][] dem, double cellSize) {
+    public static double[][] calculateAspect(double[][] dem, Quantity<Length> cellSize) {
         int rows = dem.length;
         int cols = dem[0].length;
         double[][] aspect = new double[rows][cols];
+        double size = cellSize.to(Units.METER).getValue();
         
         for (int i = 1; i < rows - 1; i++) {
             for (int j = 1; j < cols - 1; j++) {
                 double dzdx = ((dem[i-1][j+1] + 2*dem[i][j+1] + dem[i+1][j+1]) -
-                              (dem[i-1][j-1] + 2*dem[i][j-1] + dem[i+1][j-1])) / (8 * cellSize);
+                              (dem[i-1][j-1] + 2*dem[i][j-1] + dem[i+1][j-1])) / (8 * size);
                 double dzdy = ((dem[i+1][j-1] + 2*dem[i+1][j] + dem[i+1][j+1]) -
-                              (dem[i-1][j-1] + 2*dem[i-1][j] + dem[i-1][j+1])) / (8 * cellSize);
+                              (dem[i-1][j-1] + 2*dem[i-1][j] + dem[i-1][j+1])) / (8 * size);
                 
                 double asp = Math.toDegrees(Math.atan2(dzdy, -dzdx));
                 if (asp < 0) asp += 360;
                 aspect[i][j] = asp;
             }
         }
-        
         return aspect;
     }
-
+    
     /**
-     * Calculates profile curvature.
-     */
-    public static double[][] calculateCurvature(double[][] dem, double cellSize) {
-        int rows = dem.length;
-        int cols = dem[0].length;
-        double[][] curvature = new double[rows][cols];
-        
-        for (int i = 1; i < rows - 1; i++) {
-            for (int j = 1; j < cols - 1; j++) {
-                // Second derivatives
-                double d2zdx2 = (dem[i][j+1] - 2*dem[i][j] + dem[i][j-1]) / (cellSize * cellSize);
-                double d2zdy2 = (dem[i+1][j] - 2*dem[i][j] + dem[i-1][j]) / (cellSize * cellSize);
-                
-                curvature[i][j] = -100 * (d2zdx2 + d2zdy2);  // Scaled
-            }
-        }
-        
-        return curvature;
-    }
-
-    /**
-     * Calculates flow direction using D8 algorithm.
-     * Returns direction code: 1=E, 2=SE, 4=S, 8=SW, 16=W, 32=NW, 64=N, 128=NE
+     * Simplified flow direction (D8 algorithm).
      */
     public static int[][] calculateFlowDirection(double[][] dem) {
         int rows = dem.length;
@@ -109,136 +105,21 @@ public final class TerrainAnalyzer {
         int[] di = {0, 1, 1, 1, 0, -1, -1, -1};
         int[] dj = {1, 1, 0, -1, -1, -1, 0, 1};
         int[] codes = {1, 2, 4, 8, 16, 32, 64, 128};
-        double[] dist = {1, Math.sqrt(2), 1, Math.sqrt(2), 1, Math.sqrt(2), 1, Math.sqrt(2)};
         
         for (int i = 1; i < rows - 1; i++) {
             for (int j = 1; j < cols - 1; j++) {
                 double maxDrop = 0;
                 int maxDir = 0;
-                
                 for (int d = 0; d < 8; d++) {
-                    double drop = (dem[i][j] - dem[i + di[d]][j + dj[d]]) / dist[d];
+                    double drop = dem[i][j] - dem[i + di[d]][j + dj[d]];
                     if (drop > maxDrop) {
                         maxDrop = drop;
                         maxDir = codes[d];
                     }
                 }
-                
                 flowDir[i][j] = maxDir;
             }
         }
-        
         return flowDir;
-    }
-
-    /**
-     * Calculates flow accumulation.
-     */
-    public static int[][] calculateFlowAccumulation(int[][] flowDir) {
-        int rows = flowDir.length;
-        int cols = flowDir[0].length;
-        int[][] accumulation = new int[rows][cols];
-        
-        // Initialize all cells to 1 (count themselves)
-        for (int i = 0; i < rows; i++) {
-            Arrays.fill(accumulation[i], 1);
-        }
-        
-        // Direction lookup
-        int[] di = {0, 1, 1, 1, 0, -1, -1, -1};
-        int[] dj = {1, 1, 0, -1, -1, -1, 0, 1};
-        int[] codes = {1, 2, 4, 8, 16, 32, 64, 128};
-        
-        // Multiple passes to propagate flow
-        for (int pass = 0; pass < rows + cols; pass++) {
-            for (int i = 1; i < rows - 1; i++) {
-                for (int j = 1; j < cols - 1; j++) {
-                    // Find cells that flow into this one
-                    for (int d = 0; d < 8; d++) {
-                        int ni = i - di[d];
-                        int nj = j - dj[d];
-                        if (ni >= 0 && ni < rows && nj >= 0 && nj < cols) {
-                            if (flowDir[ni][nj] == codes[(d + 4) % 8]) {
-                                accumulation[i][j] = Math.max(accumulation[i][j],
-                                    accumulation[ni][nj] + 1);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-        return accumulation;
-    }
-
-    /**
-     * Extracts stream network from flow accumulation.
-     */
-    public static boolean[][] extractStreams(int[][] accumulation, int threshold) {
-        int rows = accumulation.length;
-        int cols = accumulation[0].length;
-        boolean[][] streams = new boolean[rows][cols];
-        
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                streams[i][j] = accumulation[i][j] >= threshold;
-            }
-        }
-        
-        return streams;
-    }
-
-    /**
-     * Calculates viewshed from a point.
-     */
-    public static boolean[][] calculateViewshed(double[][] dem, int observerRow, int observerCol,
-            double observerHeight) {
-        
-        int rows = dem.length;
-        int cols = dem[0].length;
-        boolean[][] visible = new boolean[rows][cols];
-        double observerElev = dem[observerRow][observerCol] + observerHeight;
-        
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                if (i == observerRow && j == observerCol) {
-                    visible[i][j] = true;
-                    continue;
-                }
-                
-                visible[i][j] = isVisible(dem, observerRow, observerCol, observerElev, i, j);
-            }
-        }
-        
-        return visible;
-    }
-
-    private static boolean isVisible(double[][] dem, int r1, int c1, double elev1, int r2, int c2) {
-        double dx = c2 - c1;
-        double dy = r2 - r1;
-        double distance = Math.sqrt(dx * dx + dy * dy);
-        
-        if (distance < 1) return true;
-        
-        double targetElev = dem[r2][c2];
-        double targetAngle = Math.atan2(targetElev - elev1, distance);
-        
-        // Check intermediate points
-        int steps = (int) Math.ceil(distance);
-        for (int s = 1; s < steps; s++) {
-            double fraction = (double) s / steps;
-            int checkR = (int) Math.round(r1 + dy * fraction);
-            int checkC = (int) Math.round(c1 + dx * fraction);
-            
-            if (checkR >= 0 && checkR < dem.length && checkC >= 0 && checkC < dem[0].length) {
-                double checkDist = distance * fraction;
-                double checkElev = dem[checkR][checkC];
-                double checkAngle = Math.atan2(checkElev - elev1, checkDist);
-                
-                if (checkAngle > targetAngle) return false;
-            }
-        }
-        
-        return true;
     }
 }

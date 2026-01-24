@@ -46,7 +46,10 @@ import org.jscience.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Population implements Named, Positioned {
+public class Population implements Identified<String>, Named, Positioned<org.jscience.geography.Place> {
+
+    @org.jscience.util.persistence.Id
+    private final String id;
 
     @Attribute
     private final String name;
@@ -58,6 +61,7 @@ public class Population implements Named, Positioned {
     private org.jscience.geography.Place territory;
 
     public Population(String name, Species species, org.jscience.geography.Place territory) {
+        this.id = java.util.UUID.randomUUID().toString();
         this.name = name;
         this.species = species;
         this.territory = territory;
@@ -65,6 +69,11 @@ public class Population implements Named, Positioned {
 
     public Population(Species species) {
         this("Unnamed Population", species, null);
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 
     @Override

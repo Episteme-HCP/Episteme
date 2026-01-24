@@ -1,61 +1,61 @@
 package org.jscience.linguistics;
 
-import java.util.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
- * Etymology graph for tracking word derivations across languages.
+ * Graph structure for tracking word derivations and linguistic ancestry across languages.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 2.0
  */
-public final class EtymologyGraph {
+@Persistent
+public final class EtymologyGraph implements Serializable {
 
-    private EtymologyGraph() {}
+    private static final long serialVersionUID = 2L;
 
-    public record Etymology(
-        String word,
-        String language,
-        String meaning,
-        int approximateYear
-    ) {}
+    public record EtymologyNode(String word, Language language, String meaning) implements Serializable {}
 
-    public record Derivation(
-        Etymology source,
-        Etymology target,
-        String derivationType,  // "borrowing", "inheritance", "calque", "compound"
-        String notes
-    ) {}
+    public record Derivation(EtymologyNode source, EtymologyNode target, String type) implements Serializable {}
 
-    private static final Map<String, List<Derivation>> DERIVATION_MAP = new HashMap<>();
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private final Map<String, List<Derivation>> derivationMap = new HashMap<>();
 
-    /**
-     * Adds a derivation to the graph.
-     */
-    public static void addDerivation(Derivation derivation) {
-        DERIVATION_MAP
-            .computeIfAbsent(derivation.target().word().toLowerCase(), k -> new ArrayList<>())
-            .add(derivation);
+    public EtymologyGraph() {}
+
+    public void addDerivation(EtymologyNode source, EtymologyNode target, String type) {
+        Objects.requireNonNull(source, "Source cannot be null");
+        Objects.requireNonNull(target, "Target cannot be null");
+        Derivation d = new Derivation(source, target, type);
+        derivationMap.computeIfAbsent(target.word().toLowerCase(), k -> new ArrayList<>()).add(d);
     }
 
-    /**
-     * Traces the etymology of a word back to its roots.
-     */
-    public static List<Etymology> traceEtymology(String word, String language) {
-        List<Etymology> path = new ArrayList<>();
+    public List<EtymologyNode> traceEtymology(String word, Language language) {
+        List<EtymologyNode> path = new ArrayList<>();
         traceRecursive(word.toLowerCase(), language, path, new HashSet<>());
         return path;
     }
 
-    private static void traceRecursive(String word, String language, 
-            List<Etymology> path, Set<String> visited) {
-        
-        String key = word + "_" + language;
+    private void traceRecursive(String word, Language language, List<EtymologyNode> path, Set<String> visited) {
+        String key = word + "_" + language.getIsoCode();
         if (visited.contains(key)) return;
         visited.add(key);
         
-        List<Derivation> derivations = DERIVATION_MAP.get(word);
+        List<Derivation> derivations = derivationMap.get(word);
         if (derivations == null) return;
         
         for (Derivation d : derivations) {
-            if (d.target().language().equalsIgnoreCase(language) ||
-                d.target().word().equalsIgnoreCase(word)) {
+            if (d.target().language().equals(language)) {
                 path.add(d.target());
                 path.add(d.source());
                 traceRecursive(d.source().word(), d.source().language(), path, visited);
@@ -63,93 +63,20 @@ public final class EtymologyGraph {
         }
     }
 
-    /**
-     * Finds cognates (words with common ancestry) across languages.
-     */
-    public static List<Etymology> findCognates(String word, String sourceLanguage) {
-        List<Etymology> cognates = new ArrayList<>();
+    public List<EtymologyNode> findCognates(String word, Language language) {
+        List<EtymologyNode> path = traceEtymology(word, language);
+        if (path.isEmpty()) return Collections.emptyList();
         
-        // Find the root
-        List<Etymology> path = traceEtymology(word, sourceLanguage);
-        if (path.isEmpty()) return cognates;
+        EtymologyNode root = path.get(path.size() - 1);
+        List<EtymologyNode> cognates = new ArrayList<>();
         
-        Etymology root = path.get(path.size() - 1);
-        
-        // Find all words derived from the same root
-        for (List<Derivation> derivations : DERIVATION_MAP.values()) {
+        for (List<Derivation> derivations : derivationMap.values()) {
             for (Derivation d : derivations) {
-                if (d.source().word().equals(root.word()) &&
-                    d.source().language().equals(root.language())) {
+                if (d.source().equals(root)) {
                     cognates.add(d.target());
                 }
             }
         }
-        
         return cognates;
-    }
-
-    /**
-     * Pre-built Indo-European roots database (sample).
-     */
-    public static void loadSampleData() {
-        // Example: "father" derivatives
-        Etymology piePhter = new Etymology("*ph₂tḗr", "Proto-Indo-European", "father", -4000);
-        Etymology latinPater = new Etymology("pater", "Latin", "father", -500);
-        Etymology greekPater = new Etymology("πατήρ", "Ancient Greek", "father", -800);
-        Etymology englishFather = new Etymology("father", "English", "father", 1000);
-        Etymology frenchPere = new Etymology("père", "French", "father", 1200);
-        Etymology germanVater = new Etymology("Vater", "German", "father", 800);
-        Etymology spanishPadre = new Etymology("padre", "Spanish", "father", 1300);
-        
-        addDerivation(new Derivation(piePhter, latinPater, "inheritance", "Regular sound change"));
-        addDerivation(new Derivation(piePhter, greekPater, "inheritance", ""));
-        addDerivation(new Derivation(piePhter, englishFather, "inheritance", "Via Proto-Germanic"));
-        addDerivation(new Derivation(latinPater, frenchPere, "inheritance", "Vulgar Latin"));
-        addDerivation(new Derivation(piePhter, germanVater, "inheritance", "Grimm's Law"));
-        addDerivation(new Derivation(latinPater, spanishPadre, "inheritance", ""));
-        
-        // Example: "water" derivatives
-        Etymology pieWodr = new Etymology("*wódr̥", "Proto-Indo-European", "water", -4000);
-        Etymology latinAqua = new Etymology("aqua", "Latin", "water", -500);
-        Etymology englishWater = new Etymology("water", "English", "water", 1000);
-        Etymology germanWasser = new Etymology("Wasser", "German", "water", 800);
-        Etymology russianVoda = new Etymology("вода", "Russian", "water", 1000);
-        
-        addDerivation(new Derivation(pieWodr, englishWater, "inheritance", ""));
-        addDerivation(new Derivation(pieWodr, germanWasser, "inheritance", ""));
-        addDerivation(new Derivation(pieWodr, russianVoda, "inheritance", ""));
-        
-        // Example: borrowed words
-        Etymology arabicAlgorithm = new Etymology("الخوارزمي", "Arabic", "al-Khwarizmi", 800);
-        Etymology latinAlgorismus = new Etymology("algorismus", "Medieval Latin", "algorithm", 1200);
-        Etymology englishAlgorithm = new Etymology("algorithm", "English", "algorithm", 1600);
-        
-        addDerivation(new Derivation(arabicAlgorithm, latinAlgorismus, "borrowing", "From mathematician's name"));
-        addDerivation(new Derivation(latinAlgorismus, englishAlgorithm, "borrowing", "Via Medieval Latin"));
-    }
-
-    /**
-     * Gets statistics about the etymology database.
-     */
-    public static Map<String, Integer> getStatistics() {
-        Map<String, Integer> stats = new HashMap<>();
-        
-        int totalWords = DERIVATION_MAP.size();
-        int totalDerivations = DERIVATION_MAP.values().stream()
-            .mapToInt(List::size).sum();
-        
-        Map<String, Integer> languageCount = new HashMap<>();
-        for (List<Derivation> derivations : DERIVATION_MAP.values()) {
-            for (Derivation d : derivations) {
-                languageCount.merge(d.source().language(), 1, Integer::sum);
-                languageCount.merge(d.target().language(), 1, Integer::sum);
-            }
-        }
-        
-        stats.put("Total Words", totalWords);
-        stats.put("Total Derivations", totalDerivations);
-        stats.put("Languages Covered", languageCount.size());
-        
-        return stats;
     }
 }

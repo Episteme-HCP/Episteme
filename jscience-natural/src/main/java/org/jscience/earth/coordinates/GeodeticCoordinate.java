@@ -42,7 +42,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GeodeticCoordinate {
+public class GeodeticCoordinate implements EarthCoordinate {
 
     private final Quantity<Angle> latitude;
     private final Quantity<Angle> longitude;
@@ -62,6 +62,13 @@ public class GeodeticCoordinate {
                 Quantities.create(lonDeg, Units.DEGREE_ANGLE),
                 Quantities.create(hMeters, Units.METER),
                 ReferenceEllipsoid.WGS84);
+    }
+
+    /**
+     * Creates a coordinate from latitude and longitude in degrees (height = 0).
+     */
+    public GeodeticCoordinate(double latDeg, double lonDeg) {
+        this(latDeg, lonDeg, 0.0);
     }
 
     public Quantity<Angle> getLatitude() {
@@ -122,6 +129,16 @@ public class GeodeticCoordinate {
         double z = (N * (1.0 - e2) + h) * sinPhi;
 
         return new ECEFCoordinate(Real.of(x), Real.of(y), Real.of(z), ellipsoid);
+    }
+
+    @Override
+    public String getCoordinateSystem() {
+        return ellipsoid.getName();
+    }
+
+    @Override
+    public GeodeticCoordinate toGeodetic() {
+        return this;
     }
 
     @Override

@@ -25,85 +25,37 @@ package org.jscience.bibliography.loaders;
 
 import org.jscience.io.cache.ResourceCache;
 import org.jscience.io.AbstractResourceReader;
+import org.jscience.util.SimpleJson;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
- * Connector to CrossRef API for DOI resolution and citation metadata.
+ * Modernized connector to CrossRef API for DOI resolution and citation metadata.
  * <p>
- * <b>What it does</b>: Resolves DOIs to get publication metadata including
- * title, authors, journal, year, and citation information.
- * </p>
- *
- * <p>
- * <b>Data Source</b>: CrossRef REST API (https://api.crossref.org)
- * </p>
- * <p>
- * <b>License</b>: Public API, free for non-commercial use.
+ * Uses {@link org.jscience.util.SimpleJson} for robust metadata extraction.
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
+ * @version 2.0 (Modernized)
  */
-
-
 public class CrossRefReader extends AbstractResourceReader<CitationInfo> {
 
-    @Override
-    protected CitationInfo loadFromSource(String resourceId) throws Exception {
-        // resourceId should be DOI
-        return resolve(resourceId);
-    }
+    private static final String API_BASE = "https://api.crossref.org/works/";
 
     @Override
-    public String getName() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.crossref.name", "CrossRef Connector");
+    protected CitationInfo loadFromSource(String doi) throws Exception {
+        return resolve(doi);
     }
 
-    @Override
-    public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.bibliography", "Bibliography");
-    }
-
-    @Override
-    public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.crossref.desc", "Resolves DOIs to get publication metadata.");
-    }
-
-    @Override
-    public String getLongDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.crossref.longdesc", "Connects to CrossRef API to resolve DOIs and retrieve detailed bibliography citation including authors, journal, and year.");
-    }
-
-    @Override
-    public String getResourcePath() {
-        return API_BASE;
-    }
-
-    @Override
-    public Class<CitationInfo> getResourceType() {
-        return CitationInfo.class;
-    }
-
-    @Override
-    public String[] getSupportedVersions() {
-        return new String[] {"v1"};
-    }
-
-    private static final String API_BASE = org.jscience.io.Configuration.get(
-            "api.crossref.base", "https://api.crossref.org/works/");
-
-    /**
-     * Resolves a DOI to get citation metadata.
-     * 
-     * @param doi DOI string (e.g., "10.1038/nature12373")
-     * @return CitationInfo with metadata, or null if not found
-     */
     public static CitationInfo resolve(String doi) {
         String cacheKey = "crossref_" + doi;
         Optional<String> cached = ResourceCache.global().get(cacheKey);
@@ -113,10 +65,9 @@ public class CrossRefReader extends AbstractResourceReader<CitationInfo> {
             json = cached.get();
         } else {
             try {
-                json = fetchDoi(doi);
+                json = fetchUrl(API_BASE + doi);
                 ResourceCache.global().put(cacheKey, json);
             } catch (Exception e) {
-                System.err.println("WARNING: Failed to resolve DOI '" + doi + "': " + e.getMessage());
                 return null;
             }
         }
@@ -124,188 +75,82 @@ public class CrossRefReader extends AbstractResourceReader<CitationInfo> {
         return parseCitationJson(json, doi);
     }
 
-    /**
-     * Searches for publications by title.
-     * 
-     * @param title publication title or keywords
-     * @return JSON search results
-     */
-    public static String searchByTitle(String title) {
-        try {
-            String urlStr = API_BASE.replace("/works/", "/works?query.title=") +
-                    java.net.URLEncoder.encode(title, "UTF-8") + "&rows=10";
-            return fetchUrl(urlStr);
-        } catch (Exception e) {
-            throw new RuntimeException("CrossRef search failed", e);
+    private static String fetchUrl(String urlStr) throws Exception {
+        URL url = URI.create(urlStr).toURL();
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("User-Agent", "JScience/2.0 (mailto:admin@jscience.org)");
+
+        if (conn.getResponseCode() != 200) {
+            throw new RuntimeException("HTTP error: " + conn.getResponseCode());
         }
-    }
 
-    private static String fetchDoi(String doi) {
-        String urlStr = API_BASE + doi;
-        return fetchUrl(urlStr);
-    }
-
-    private static String fetchUrl(String urlStr) {
-        try {
-            URL url = URI.create(urlStr).toURL();
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("User-Agent", "JScience/2.0 (mailto:silvere.martin@gmail.com)");
-
-            if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("HTTP error: " + conn.getResponseCode());
-            }
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
             StringBuilder output = new StringBuilder();
             String line;
-            while ((line = br.readLine()) != null) {
-                output.append(line);
-            }
-            conn.disconnect();
+            while ((line = br.readLine()) != null) output.append(line);
             return output.toString();
-
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to fetch from CrossRef", e);
+        } finally {
+            conn.disconnect();
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static CitationInfo parseCitationJson(String json, String doi) {
-        CitationInfo.Builder builder = new CitationInfo.Builder().doi(doi);
+        try {
+            Map<String, Object> root = (Map<String, Object>) SimpleJson.parse(json);
+            Map<String, Object> message = (Map<String, Object>) root.get("message");
+            if (message == null) return null;
 
-        // Extract title
-        String title = extractJsonArray(json, "title");
-        if (title != null)
-            builder.title(title);
+            CitationInfo.Builder builder = new CitationInfo.Builder().doi(doi);
 
-        // Extract container-title (journal)
-        String journal = extractJsonArray(json, "container-title");
-        if (journal != null)
-            builder.journal(journal);
+            // Title
+            List<Object> titles = (List<Object>) message.get("title");
+            if (titles != null && !titles.isEmpty()) builder.title(titles.get(0).toString());
 
-        // Extract year from published-print or published-online
-        String year = extractYear(json);
-        if (year != null)
-            builder.year(Integer.parseInt(year));
+            // Journal
+            List<Object> journals = (List<Object>) message.get("container-title");
+            if (journals != null && !journals.isEmpty()) builder.journal(journals.get(0).toString());
 
-        // Extract authors
-        String authors = extractAuthors(json);
-        if (authors != null)
-            builder.authors(authors);
-
-        // Extract volume
-        String volume = extractJsonValue(json, "volume");
-        if (volume != null)
-            builder.volume(volume);
-
-        // Extract pages
-        String pages = extractJsonValue(json, "page");
-        if (pages != null)
-            builder.pages(pages);
-
-        return builder.build();
-    }
-
-    private static String extractJsonArray(String json, String key) {
-        int idx = json.indexOf("\"" + key + "\":[");
-        if (idx == -1)
-            return null;
-        int start = json.indexOf("[", idx) + 1;
-        int end = json.indexOf("]", start);
-        if (start <= 0 || end <= start)
-            return null;
-        String content = json.substring(start, end).trim();
-        if (content.startsWith("\"")) {
-            content = content.substring(1);
-            int endQuote = content.indexOf("\"");
-            if (endQuote > 0)
-                content = content.substring(0, endQuote);
-        }
-        return content;
-    }
-
-    private static String extractJsonValue(String json, String key) {
-        int idx = json.indexOf("\"" + key + "\":");
-        if (idx == -1)
-            return null;
-        int start = idx + key.length() + 3;
-        if (json.charAt(start) == '"') {
-            int end = json.indexOf("\"", start + 1);
-            return json.substring(start + 1, end);
-        } else {
-            int end = start;
-            while (end < json.length() && (Character.isDigit(json.charAt(end)) || json.charAt(end) == '.')) {
-                end++;
-            }
-            return json.substring(start, end);
-        }
-    }
-
-    private static String extractYear(String json) {
-        // Try published-print first, then published-online
-        int idx = json.indexOf("\"published\":");
-        if (idx == -1)
-            idx = json.indexOf("\"published-print\":");
-        if (idx == -1)
-            idx = json.indexOf("\"published-online\":");
-        if (idx == -1)
-            return null;
-
-        // Find date-parts array
-        int dpIdx = json.indexOf("\"date-parts\":", idx);
-        if (dpIdx == -1 || dpIdx > idx + 200)
-            return null;
-        int numStart = json.indexOf("[[", dpIdx);
-        if (numStart == -1)
-            return null;
-        numStart += 2;
-        int numEnd = numStart;
-        while (numEnd < json.length() && Character.isDigit(json.charAt(numEnd))) {
-            numEnd++;
-        }
-        return json.substring(numStart, numEnd);
-    }
-
-    private static String extractAuthors(String json) {
-        int idx = json.indexOf("\"author\":[");
-        if (idx == -1)
-            return null;
-
-        StringBuilder authors = new StringBuilder();
-        int pos = idx;
-        int count = 0;
-
-        while (count < 5) { // Limit to 5 authors
-            int famIdx = json.indexOf("\"family\":\"", pos);
-            if (famIdx == -1 || famIdx > idx + 2000)
-                break;
-
-            int famEnd = json.indexOf("\"", famIdx + 10);
-            String family = json.substring(famIdx + 10, famEnd);
-
-            int givIdx = json.indexOf("\"given\":\"", famIdx);
-            String given = "";
-            if (givIdx != -1 && givIdx < famIdx + 100) {
-                int givEnd = json.indexOf("\"", givIdx + 9);
-                given = json.substring(givIdx + 9, givEnd);
+            // Year
+            Map<String, Object> published = (Map<String, Object>) message.get("published-print");
+            if (published == null) published = (Map<String, Object>) message.get("published-online");
+            if (published != null) {
+                List<Object> parts = (List<Object>) published.get("date-parts");
+                if (parts != null && !parts.isEmpty()) {
+                    List<Object> yearPart = (List<Object>) parts.get(0);
+                    if (!yearPart.isEmpty()) builder.year(((Number) yearPart.get(0)).intValue());
+                }
             }
 
-            if (authors.length() > 0)
-                authors.append(", ");
-            authors.append(family);
-            if (!given.isEmpty()) {
-                authors.append(", ").append(given.charAt(0)).append(".");
+            // Authors
+            List<Map<String, Object>> authors = (List<Map<String, Object>>) message.get("author");
+            if (authors != null) {
+                StringBuilder authorStr = new StringBuilder();
+                for (int i = 0; i < Math.min(authors.size(), 5); i++) {
+                    Map<String, Object> a = authors.get(i);
+                    if (authorStr.length() > 0) authorStr.append(", ");
+                    authorStr.append(a.get("family"));
+                    Object given = a.get("given");
+                    if (given != null) authorStr.append(", ").append(given.toString().charAt(0)).append(".");
+                }
+                if (authors.size() > 5) authorStr.append(" et al.");
+                builder.authors(authorStr.toString());
             }
 
-            pos = famEnd;
-            count++;
+            builder.volume((String) message.get("volume"));
+            builder.pages((String) message.get("page"));
+
+            return builder.build();
+        } catch (Exception e) {
+            return null;
         }
-
-        if (count >= 5)
-            authors.append(" et al.");
-        return authors.toString();
     }
 
-    public CrossRefReader() {
-    }
+    @Override public String getName() { return "CrossRef Connector"; }
+    @Override public String getCategory() { return "Bibliography"; }
+    @Override public String getDescription() { return "Resolves DOIs to get publication metadata."; }
+    @Override public Class<CitationInfo> getResourceType() { return CitationInfo.class; }
+    @Override public String getResourcePath() { return API_BASE; }
+    @Override public String[] getSupportedVersions() { return new String[]{"v1"}; }
 }

@@ -87,9 +87,7 @@ public class NeuroMLReader extends AbstractResourceReader<NeuroMLDocument> {
      */
     public NeuroMLDocument read(InputStream input) throws NeuroMLException {
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
+            DocumentBuilder builder = org.jscience.io.SecureXMLFactory.createSecureDocumentBuilder();
             Document doc = builder.parse(input);
             return parseDocument(doc);
         } catch (Exception e) {

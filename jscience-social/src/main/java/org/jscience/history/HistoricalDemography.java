@@ -23,7 +23,8 @@
 
 package org.jscience.history;
 
-import org.jscience.history.time.UncertainDate;
+import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.history.temporal.FuzzyTemporalInterval;
 import org.jscience.mathematics.numbers.real.Real;
 import java.io.Serializable;
 import java.util.List;
@@ -59,7 +60,7 @@ public final class HistoricalDemography {
     @Persistent
     public record DemographicSnapshot(
         @Relation(type = Relation.Type.ONE_TO_ONE)
-        UncertainDate date,
+        TemporalCoordinate date,
         @Attribute
         long population,
         @Attribute
@@ -146,11 +147,11 @@ public final class HistoricalDemography {
      */
     public static List<DemographicSnapshot> globalHistory() {
         return List.of(
-            new DemographicSnapshot(UncertainDate.circa(-10000), 5_000_000L, 0.0001, "Global", 0.1),
-            new DemographicSnapshot(UncertainDate.circa(-1000), 50_000_000L, 0.001, "Global", 0.3),
-            new DemographicSnapshot(UncertainDate.circa(1), 200_000_000L, 0.001, "Global", 0.5),
-            new DemographicSnapshot(UncertainDate.certain(1500, 1, 1), 450_000_000L, 0.002, "Global", 0.7),
-            new DemographicSnapshot(UncertainDate.certain(1800, 1, 1), 1_000_000_000L, 0.005, "Global", 0.9)
+            new DemographicSnapshot(FuzzyTemporalInterval.circa(-10000), 5_000_000L, 0.0001, "Global", 0.1),
+            new DemographicSnapshot(FuzzyTemporalInterval.circa(-1000), 50_000_000L, 0.001, "Global", 0.3),
+            new DemographicSnapshot(FuzzyTemporalInterval.circa(1), 200_000_000L, 0.001, "Global", 0.5),
+            new DemographicSnapshot(FuzzyTemporalInterval.of(1500, 1, 1), 450_000_000L, 0.002, "Global", 0.7),
+            new DemographicSnapshot(FuzzyTemporalInterval.of(1800, 1, 1), 1_000_000_000L, 0.005, "Global", 0.9)
         );
     }
 }

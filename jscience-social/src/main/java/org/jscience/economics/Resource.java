@@ -1,10 +1,7 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2014 - JScience (http://jscience.org/)
+ * Copyright (C) 2014-2026 - JScience (http://jscience.org/)
  * All rights reserved.
- * 
- * Permission to use, copy, modify, and distribute this software is
- * freely granted, provided that this notice is preserved.
  */
 package org.jscience.economics;
 
@@ -14,11 +11,13 @@ import org.jscience.measure.Quantity;
 import org.jscience.util.Positioned;
 import org.jscience.util.Temporal;
 import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.Identified;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
@@ -26,27 +25,16 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * A class representing the stuff that is extracted from the soil (coal,
- * fruits...), a final product or human labor. A product is usually a resource
- * for another factory/consumer.
- * 
- * <p>Resources can be people, equipment, facilities, funding, or anything else 
- * capable of definition (usually other than labour) required for the completion 
- * of a project activity. The lack of a resource will therefore be a constraint 
- * on the completion of the project activity.</p>
- * 
- * <p>Resources may be storable or non storable. Storable resources remain 
- * available unless depleted by usage, and may be replenished by project tasks 
- * which produce them. Non-storable resources must be renewed for each time 
- * period, even if not utilised in previous time periods.</p>
+ * A class representing a physical or virtual resource with ownership, position, and temporal attributes.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.2
+ * @version 1.3
+ * @since 1.0
  */
 @Persistent
-public class Resource extends PotentialResource implements Positioned<Place>, Temporal {
+public class Resource extends PotentialResource implements Identified<Identification>, Positioned<Place>, Temporal<Instant>, Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     @Id
     private Identification identification;
@@ -99,8 +87,16 @@ public class Resource extends PotentialResource implements Positioned<Place>, Te
         this.productionDate = Objects.requireNonNull(productionDate, "Production date cannot be null");
         
         this.place = productionPlace;
-        // Use getIndividuals() which returns a Collection/Set of Individuals
         this.owners = new HashSet<>(producer.getIndividuals());
+    }
+
+    @Override
+    public Identification getId() {
+        return identification;
+    }
+
+    public void setId(Identification identification) {
+        this.identification = identification;
     }
 
     public Community getProducer() {
@@ -141,11 +137,12 @@ public class Resource extends PotentialResource implements Positioned<Place>, Te
         this.place = Objects.requireNonNull(place, "Place cannot be null");
     }
 
-    /**
-     * Returns the production timestamp.
-     * @return the production instant
-     */
     @Override
+    public Instant getWhen() {
+        return productionDate;
+    }
+
+    @Deprecated
     public Instant getTimestamp() {
         return productionDate;
     }
@@ -160,15 +157,11 @@ public class Resource extends PotentialResource implements Positioned<Place>, Te
         if (!(o instanceof Resource)) return false;
         if (!super.equals(o)) return false;
         Resource resource = (Resource) o;
-        return Objects.equals(producer, resource.producer) &&
-                Objects.equals(owners, resource.owners) &&
-                Objects.equals(productionPlace, resource.productionPlace) &&
-                Objects.equals(place, resource.place) &&
-                Objects.equals(productionDate, resource.productionDate);
+        return Objects.equals(identification, resource.identification);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), producer, owners, productionPlace, place, productionDate);
+        return Objects.hash(super.hashCode(), identification);
     }
 }

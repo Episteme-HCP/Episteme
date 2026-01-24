@@ -28,6 +28,7 @@ import java.time.Instant;
 import java.time.chrono.ChronoLocalDate;
 import java.util.Objects;
 import java.util.Optional;
+import org.jscience.history.temporal.TemporalInterval;
 
 /**
  * Algebraic operations and helper types for historical chronologies.
@@ -45,25 +46,25 @@ public final class ChronologyAlgebras {
     }
 
     /**
-     * Represents the result of an intersection operation between two uncertain dates.
+     * Represents the result of an intersection operation between two temporal intervals.
      * 
      * @param intersection the resulting overlapping interval, or null if none
      * @param overlaps     true if the intervals overlap
      */
-    public record DateOverlap(UncertainDate intersection, boolean overlaps) implements Serializable {
+    public record DateOverlap(TemporalInterval intersection, boolean overlaps) implements Serializable {
         private static final long serialVersionUID = 1L;
     }
 
     /**
-     * Calculates the intersection (overlap) of two uncertain dates.
+     * Calculates the intersection (overlap) of two temporal intervals.
      * 
-     * @param d1 the first uncertain date
-     * @param d2 the second uncertain date
+     * @param d1 the first interval
+     * @param d2 the second interval
      * @return a {@link DateOverlap} detailing the result
      * @throws NullPointerException if d1 or d2 is null
      */
-    public static DateOverlap calculateIntersection(UncertainDate d1, UncertainDate d2) {
-        Optional<UncertainDate> result = ChronologicalOperator.intersection(d1, d2);
+    public static DateOverlap calculateIntersection(TemporalInterval d1, TemporalInterval d2) {
+        Optional<TemporalInterval> result = ChronologicalOperator.intersection(d1, d2);
         return new DateOverlap(result.orElse(null), result.isPresent());
     }
 

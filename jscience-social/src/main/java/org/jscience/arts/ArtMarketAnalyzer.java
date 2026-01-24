@@ -1,29 +1,73 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.arts;
 
+import java.io.Serializable;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.jscience.history.temporal.TemporalCoordinate;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.history.time.UncertainDate;
-import java.util.*;
 
 /**
- * Models and analyzes art market auction prices.
+ * Models and analyzes art market activity, specifically focusing on auction prices,
+ * artist performance metrics, and price prediction.
+ * It uses historical auction data to generate artist profiles and calculate 
+ * market indices.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
 public final class ArtMarketAnalyzer {
 
     private ArtMarketAnalyzer() {}
 
+    /**
+     * Represents a single auction sale record.
+     */
     public record AuctionRecord(
         String artworkTitle,
         String artist,
         int creationYear,
         String medium,
         String auctionHouse,
-        UncertainDate saleDate,
+        TemporalCoordinate saleDate,
         Real hammerPrice,
         Real estimateLow,
         Real estimateHigh,
         String currency
-    ) {}
+    ) implements Serializable {
+        private static final long serialVersionUID = 2L;
+    }
 
+    /**
+     * Statistical profile of an artist's performance in the auction market.
+     */
     public record ArtistMarketProfile(
         String artistName,
         Real averagePrice,
@@ -32,26 +76,39 @@ public final class ArtMarketAnalyzer {
         int totalSales,
         Real auctionAppearanceFrequency,
         int peakYear
-    ) {}
+    ) implements Serializable {
+        private static final long serialVersionUID = 2L;
+    }
 
+    /**
+     * Result of a price prediction analysis for a specific artwork.
+     */
     public record PricePrediction(
         Real estimatedPrice,
         Real confidenceLow,
         Real confidenceHigh,
         List<String> priceFactors
-    ) {}
+    ) implements Serializable {
+        private static final long serialVersionUID = 2L;
+    }
 
     private static final List<AuctionRecord> AUCTION_DATABASE = new ArrayList<>();
 
     /**
-     * Records an auction sale.
+     * Records a new auction sale in the internal database.
+     * 
+     * @param record the auction record to add
      */
     public static void addAuctionRecord(AuctionRecord record) {
         AUCTION_DATABASE.add(record);
     }
 
     /**
-     * Generates an artist's market profile.
+     * Generates a market performance profile for a specific artist based on 
+     * recorded sales.
+     * 
+     * @param artistName the name of the artist to analyze
+     * @return an ArtistMarketProfile containing statistical metrics
      */
     public static ArtistMarketProfile analyzeArtist(String artistName) {
         List<AuctionRecord> artistSales = AUCTION_DATABASE.stream()
@@ -75,7 +132,7 @@ public final class ArtMarketAnalyzer {
         double variance = prices.stream()
             .mapToDouble(p -> Math.pow(p - avg, 2))
             .average().orElse(0);
-        double volatility = Math.sqrt(variance) / avg;
+        double volatility = avg != 0 ? Math.sqrt(variance) / avg : 0;
         
         // Find peak sales year
         Map<Integer, Integer> salesByYear = new HashMap<>();
@@ -100,7 +157,14 @@ public final class ArtMarketAnalyzer {
     }
 
     /**
-     * Predicts auction price for a work.
+     * Predicts the potential auction price for an artwork based on artist performance, 
+     * medium, age, and physical size.
+     * 
+     * @param artist the name of the artist
+     * @param creationYear the year the work was created
+     * @param medium the materials used (e.g., "oil", "watercolor")
+     * @param sizeSqCm the surface area in square centimeters
+     * @return a PricePrediction containing estimated value and confidence range
      */
     public static PricePrediction predictPrice(String artist, int creationYear,
             String medium, double sizeSqCm) {
@@ -153,12 +217,15 @@ public final class ArtMarketAnalyzer {
     }
 
     /**
-     * Calculates market indices for art categories.
+     * Calculates market indices by comparing average prices over time.
+     * 
+     * @param baseYear the starting year for the index (value 100)
+     * @param currentYear the year to evaluate
+     * @return a map of market indices (e.g., "Overall Art Index")
      */
     public static Map<String, Real> calculateMarketIndices(int baseYear, int currentYear) {
         Map<String, Real> indices = new HashMap<>();
         
-        // Calculate index by comparing average prices
         Map<Integer, Double> pricesByYear = new HashMap<>();
         for (AuctionRecord r : AUCTION_DATABASE) {
             int year = getYear(r.saleDate());
@@ -175,7 +242,13 @@ public final class ArtMarketAnalyzer {
     }
 
     /**
-     * Finds comparable sales.
+     * Finds previous auction sales that are comparable to a given work.
+     * 
+     * @param artist the name of the artist
+     * @param year the creation year (within a 10-year range)
+     * @param medium the medium used
+     * @param maxResults maximum number of records to return
+     * @return a list of comparable AuctionRecords sorted by price
      */
     public static List<AuctionRecord> findComparables(String artist, int year, 
             String medium, int maxResults) {
@@ -189,8 +262,7 @@ public final class ArtMarketAnalyzer {
             .toList();
     }
 
-    private static int getYear(UncertainDate date) {
-        var earliest = date != null ? date.getEarliestPossible() : null;
-        return earliest != null ? earliest.getYear() : 2000;
+    private static int getYear(TemporalCoordinate date) {
+        return date != null ? date.toInstant().atZone(ZoneOffset.UTC).getYear() : 2000;
     }
 }

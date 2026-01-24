@@ -23,15 +23,37 @@
 
 package org.jscience.architecture;
 
-import org.jscience.history.time.UncertainDate;
-import org.jscience.geography.Place;
+import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
+import org.jscience.geography.Place;
+import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.util.Named;
+import org.jscience.util.Positioned;
+import org.jscience.util.Temporal;
+import org.jscience.util.identity.Identified;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
 
 /**
- * Represents a building or architectural structure.
+ * Represents a building or architectural structure, integrating historical, 
+ * geographical, and stylistic dimensions. This model tracks construction dates, 
+ * architectural styles, and physical signatures like height.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
-public class Building {
+@Persistent
+public class Building implements Identified<String>, Named, Positioned<Place>, Temporal<TemporalCoordinate>, Serializable {
 
+    private static final long serialVersionUID = 2L;
+
+    /**
+     * Major architectural styles and movements.
+     */
     public enum Style {
         CLASSICAL, GOTHIC, RENAISSANCE, BAROQUE, NEOCLASSICAL,
         ART_NOUVEAU, ART_DECO, MODERNIST, POSTMODERN, CONTEMPORARY,
@@ -39,22 +61,46 @@ public class Building {
         ISLAMIC, VERNACULAR
     }
 
+    /**
+     * Functional types of buildings.
+     */
     public enum Type {
         RESIDENTIAL, COMMERCIAL, INDUSTRIAL, RELIGIOUS, EDUCATIONAL,
         GOVERNMENT, CULTURAL, HEALTHCARE, RECREATIONAL, INFRASTRUCTURE,
         MILITARY, MIXED_USE
     }
 
+    @Id
+    private final String id;
+    @Attribute
     private final String name;
+    @Attribute
     private final Style style;
+    @Attribute
     private final Type type;
-    private final UncertainDate buildDate;
+    @Attribute
+    private final TemporalCoordinate buildDate;
+    @Attribute
     private final String architect;
+    @Attribute
     private final Place location;
+    @Attribute
     private final double heightMeters;
 
-    public Building(String name, Style style, Type type, UncertainDate buildDate,
+    /**
+     * Creates a new Building record.
+     * 
+     * @param name common name of the building
+     * @param style architectural style classification
+     * @param type functional type classification
+     * @param buildDate date of construction/completion
+     * @param architect name of the lead architect or firm
+     * @param location geographical location
+     * @param heightMeters height in meters
+     */
+    public Building(String name, Style style, Type type, TemporalCoordinate buildDate,
             String architect, Place location, double heightMeters) {
+        this.id = UUID.randomUUID().toString();
         this.name = Objects.requireNonNull(name, "Name cannot be null");
         this.style = style;
         this.type = type;
@@ -64,8 +110,24 @@ public class Building {
         this.heightMeters = heightMeters;
     }
 
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Place getPosition() {
+        return location;
+    }
+
+    @Override
+    public TemporalCoordinate getWhen() {
+        return buildDate;
     }
 
     public Style getStyle() {
@@ -76,7 +138,7 @@ public class Building {
         return type;
     }
 
-    public UncertainDate getBuildDate() {
+    public TemporalCoordinate getBuildDate() {
         return buildDate;
     }
 
@@ -98,5 +160,3 @@ public class Building {
                 name, style, buildDate, architect, (location != null ? location.getName() : "Unknown"), heightMeters);
     }
 }
-
-

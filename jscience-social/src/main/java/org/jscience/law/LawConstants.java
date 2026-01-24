@@ -20,69 +20,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.jscience.law;
 
 /**
- * Defines constants representing different domains of law and legal systems.
+ * Constants and enumerations for legal sciences and jurisprudence.
+ * <p>
+ * Provides classifications for legal fields and world legal systems.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.2
+ * @version 2.0
+ * @since 1.0
  */
 public final class LawConstants {
 
-    private LawConstants() {
-        // Utility class
+    private LawConstants() {}
+
+    /**
+     * Major fields of law.
+     */
+    public enum LawField {
+        CIVIL, MILITARY, BUSINESS, LABOR, FAMILY, PENAL, 
+        GOVERNMENT, ADMINISTRATIVE, ELECTION, HEALTH, 
+        FINANCIAL, COMMERCIAL, INSURANCE, TAXATION, 
+        INTERNATIONAL, ENVIRONMENTAL, CONSTITUTIONAL, UNKNOWN
     }
 
-    /** Unknown or undefined legal domain. */
-    public final static int UNKNOWN = 0;
-
-    /** Civil law domain. */
-    public final static int CIVIL = 1;
-
-    /** Military law domain. */
-    public final static int MILITARY = 2;
-
-    /** Business and corporate law domain. */
-    public final static int BUSINESS = 4;
-
-    /** Labor and employment law domain. */
-    public final static int LABOR = 8;
-
-    /** Family and matrimonial law domain. */
-    public final static int FAMILY = 16;
-
-    /** Penal or criminal law domain. */
-    public final static int PENAL = 32;
-
-    /** Government and administrative law domain. */
-    public final static int GOVERNMENT = 64;
-
-    /** Vehicle and traffic law domain. */
-    public final static int VEHICLES = 128;
-
-    /** Election and voting law domain. */
-    public final static int ELECTION = 256;
-
-    /** Health and medical law domain. */
-    public final static int HEALTH = 512;
-
-    /** Institutional law domain. */
-    public final static int INSTITUTIONS = 1024;
-
-    /** Education and school law domain. */
-    public final static int EDUCATION = 2048;
-
-    /** Financial and banking law domain. */
-    public final static int FINANCIAL = 4096;
-
-    /** Commercial and trade law domain. */
-    public final static int COMMERCIAL = 8192;
-
-    /** Insurance law domain. */
-    public final static int INSURANCE = 16384;
-
-    /** Taxation and fiscal law domain. */
-    public final static int TAXATION = 32768;
+    /**
+     * Major legal systems of the world.
+     */
+    public enum LegalSystem {
+        CIVIL_LAW, COMMON_LAW, RELIGIOUS_LAW, PLURALISTIC_LAW, CUSTOMARY_LAW
+    }
 }

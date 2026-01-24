@@ -1,9 +1,39 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.arts;
 
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
- * Color science utilities for Delta E calculations and color space conversions.
+ * Advanced color science utility class for color space transformations, 
+ * perceptual difference calculations (Delta E), and color harmony generation.
+ * This class provides high-precision implementations of CIE colorimetry standards.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
 public final class ColorScience {
 
@@ -18,6 +48,11 @@ public final class ColorScience {
 
     /**
      * Converts sRGB (0-255) to CIE Lab color space.
+     * 
+     * @param r red component (0-255)
+     * @param g green component (0-255)
+     * @param b blue component (0-255)
+     * @return array containing {L, a, b} components
      */
     public static double[] rgbToLab(int r, int g, int b) {
         double[] xyz = rgbToXyz(r, g, b);
@@ -26,6 +61,11 @@ public final class ColorScience {
 
     /**
      * Converts sRGB to CIE XYZ.
+     * 
+     * @param r red component (0-255)
+     * @param g green component (0-255)
+     * @param b blue component (0-255)
+     * @return array containing {X, Y, Z} components
      */
     public static double[] rgbToXyz(int r, int g, int b) {
         double[] rgb = new double[3];
@@ -42,6 +82,11 @@ public final class ColorScience {
 
     /**
      * Converts CIE XYZ to CIE Lab (D65 illuminant).
+     * 
+     * @param x X component
+     * @param y Y component
+     * @param z Z component
+     * @return array containing {L, a, b} components
      */
     public static double[] xyzToLab(double x, double y, double z) {
         // D65 reference white
@@ -59,7 +104,11 @@ public final class ColorScience {
     }
 
     /**
-     * Calculates Delta E (CIE76) - Euclidean distance in Lab space.
+     * Calculates Delta E (CIE76) - Euclidean distance in CIELAB space.
+     * 
+     * @param lab1 first color in Lab space
+     * @param lab2 second color in Lab space
+     * @return the color difference as a Real value
      */
     public static Real deltaE76(double[] lab1, double[] lab2) {
         double dL = lab1[0] - lab2[0];
@@ -69,7 +118,13 @@ public final class ColorScience {
     }
 
     /**
-     * Calculates Delta E (CIE2000) - more perceptually uniform.
+     * Calculates Delta E (CIE2000) - modern standard for perceptual uniformity.
+     * This formula is significantly more complex than CIE76 but much closer 
+     * to human perception.
+     * 
+     * @param lab1 first color in Lab space
+     * @param lab2 second color in Lab space
+     * @return the perceived color difference as a Real value
      */
     public static Real deltaE2000(double[] lab1, double[] lab2) {
         double L1 = lab1[0], a1 = lab1[1], b1 = lab1[2];
@@ -119,14 +174,24 @@ public final class ColorScience {
     }
 
     /**
-     * Generates complementary color.
+     * Generates the complementary color (opposite on the color wheel).
+     * 
+     * @param r red component
+     * @param g green component
+     * @param b blue component
+     * @return array containing {R, G, B} of the complementary color
      */
     public static int[] complementary(int r, int g, int b) {
         return new int[]{255 - r, 255 - g, 255 - b};
     }
 
     /**
-     * Generates triadic colors (120° apart on color wheel).
+     * Generates triadic colors (three colors spaced 120° apart on the color wheel).
+     * 
+     * @param r red component
+     * @param g green component
+     * @param b blue component
+     * @return array of two RGB arrays representing the other two colors in the triad
      */
     public static int[][] triadic(int r, int g, int b) {
         double[] hsv = rgbToHsv(r, g, b);

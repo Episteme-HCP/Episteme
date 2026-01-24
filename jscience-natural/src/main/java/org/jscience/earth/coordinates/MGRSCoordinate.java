@@ -33,7 +33,7 @@ import java.io.Serializable;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public final class MGRSCoordinate implements Serializable {
+public final class MGRSCoordinate implements EarthCoordinate, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -56,6 +56,55 @@ public final class MGRSCoordinate implements Serializable {
     public int getEasting() { return easting; }
     public int getNorthing() { return northing; }
     public int getPrecision() { return precision; }
+
+    @Override
+    public String getCoordinateSystem() { return "MGRS"; }
+
+    @Override
+    public ReferenceEllipsoid getEllipsoid() { return ReferenceEllipsoid.WGS84; }
+
+    @Override
+    public GeodeticCoordinate toGeodetic() {
+        // Convert MGRS back to UTM first
+        UTMCoordinate utm = toUTM();
+        return utm.toGeodetic();
+    }
+
+    @Override
+    public ECEFCoordinate toECEF() {
+        return toGeodetic().toECEF();
+    }
+
+    /**
+     * Converts MGRS back to UTM.
+     */
+    public UTMCoordinate toUTM() {
+        int zoneNumber = Integer.parseInt(zone.substring(0, zone.length() - 1));
+        char zoneLetter = zone.charAt(zone.length() - 1);
+        
+        // Decode grid square back to 100km squares
+        int col = getColFromGridSquare(zoneNumber);
+        int row = getRowFromGridSquare(zoneNumber);
+        
+        double utmEasting = col * 100000.0 + easting;
+        double utmNorthing = row * 100000.0 + northing;
+        
+        return new UTMCoordinate(zoneNumber, zoneLetter, utmEasting, utmNorthing);
+    }
+
+    private int getColFromGridSquare(int zone) {
+        String cols135 = "ABCDEFGH";
+        String cols246 = "JKLMNPQR";
+        String cols = (zone % 3 == 1) ? cols135 : (zone % 3 == 2 ? cols246 : "STUVWXYZ");
+        return cols.indexOf(gridSquare.charAt(0)) + 1;
+    }
+
+    private int getRowFromGridSquare(int zone) {
+        String rowsOdd = "ABCDEFGHJKLMNPQRSTUV";
+        String rowsEven = "FGHJKLMNPQRSTUVABCDE";
+        String rows = (zone % 2 == 0) ? rowsEven : rowsOdd;
+        return rows.indexOf(gridSquare.charAt(1));
+    }
 
     /**
      * Converts UTM to MGRS.

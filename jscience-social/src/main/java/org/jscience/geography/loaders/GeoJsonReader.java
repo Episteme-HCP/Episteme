@@ -25,7 +25,7 @@ package org.jscience.geography.loaders;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jscience.geography.Coordinate;
+import org.jscience.earth.coordinates.GeodeticCoordinate;
 import org.jscience.geography.Region;
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
@@ -186,9 +186,9 @@ public class GeoJSONReader extends AbstractResourceReader<List<Region>> {
             double lon = coordinates.get(0).asDouble();
             double lat = coordinates.get(1).asDouble();
             double alt = (coordinates.size() > 2) ? coordinates.get(2).asDouble() : 0.0;
-            region.setCenter(new Coordinate(lat, lon, alt));
+            region.setCenter(new GeodeticCoordinate(lat, lon, alt));
         } else if ("Polygon".equals(geometryType) || "MultiPolygon".equals(geometryType)) {
-            Coordinate centroid = computeCentroid(coordinates, geometryType);
+            GeodeticCoordinate centroid = computeCentroid(coordinates, geometryType);
             if (centroid != null) {
                 region.setCenter(centroid);
             }
@@ -200,7 +200,7 @@ public class GeoJSONReader extends AbstractResourceReader<List<Region>> {
     /**
      * Computes approximate centroid of a polygon.
      */
-    private Coordinate computeCentroid(JsonNode coordinates, String type) {
+    private GeodeticCoordinate computeCentroid(JsonNode coordinates, String type) {
         try {
             JsonNode ring;
             if ("MultiPolygon".equals(type)) {
@@ -235,7 +235,7 @@ public class GeoJSONReader extends AbstractResourceReader<List<Region>> {
             }
 
             if (count > 0) {
-                return new Coordinate(sumLat / count, sumLon / count, sumAlt / count);
+                return new GeodeticCoordinate(sumLat / count, sumLon / count, sumAlt / count);
             }
         } catch (Exception e) {
             // Ignore and return null
@@ -260,13 +260,13 @@ public class GeoJSONReader extends AbstractResourceReader<List<Region>> {
         return coords;
     }
 
-    private void extractCoordinates(JsonNode node, List<Coordinate> coords) {
+    private void extractCoordinates(JsonNode node, List<GeodeticCoordinate> coords) {
         if (node.isArray()) {
             if (node.size() >= 2 && node.get(0).isNumber() && node.get(1).isNumber()) {
                 double lon = node.get(0).asDouble();
                 double lat = node.get(1).asDouble();
                 double alt = (node.size() > 2) ? node.get(2).asDouble() : 0.0;
-                coords.add(new Coordinate(lat, lon, alt));
+                coords.add(new GeodeticCoordinate(lat, lon, alt));
             } else {
                 for (JsonNode child : node) {
                     extractCoordinates(child, coords);

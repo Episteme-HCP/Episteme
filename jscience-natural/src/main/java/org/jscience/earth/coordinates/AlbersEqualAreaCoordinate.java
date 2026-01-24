@@ -29,6 +29,7 @@ import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Angle;
 import org.jscience.measure.quantity.Length;
 import org.jscience.mathematics.numbers.real.Real;
+import java.io.Serializable;
 
 /**
  * Represents a coordinate in the Albers Equal-Area Conic projection.
@@ -38,7 +39,9 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class AlbersEqualAreaCoordinate {
+public class AlbersEqualAreaCoordinate implements EarthCoordinate, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final Real easting;
     private final Real northing;
@@ -109,6 +112,16 @@ public class AlbersEqualAreaCoordinate {
                 - (1 / (2 * e)) * Math.log((1 - e * sinPhi) / (1 + e * sinPhi)));
     }
 
+    @Override
+    public String getCoordinateSystem() { return "Albers"; }
+
+    @Override
+    public ReferenceEllipsoid getEllipsoid() { return ellipsoid; }
+
+    @Override
+    public ECEFCoordinate toECEF() { return toGeodetic().toECEF(); }
+
+    @Override
     public GeodeticCoordinate toGeodetic() {
         double a = ellipsoid.getSemiMajorAxis().getValue().doubleValue();
         double e2 = ellipsoid.getEccentricitySquared().doubleValue();

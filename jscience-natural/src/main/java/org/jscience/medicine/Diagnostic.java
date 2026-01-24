@@ -23,34 +23,61 @@
 
 package org.jscience.medicine;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import org.jscience.util.Named;
+import org.jscience.util.identity.Identified;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+
+import java.io.Serializable;
+import java.util.*;
 
 /**
- * Represents a medical diagnostic.
+ * Represents a medical diagnostic result or finding.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Diagnostic {
+@Persistent
+public class Diagnostic implements Identified<String>, Named, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    private final String id;
+
+    @Attribute
     private final String name;
+
+    @Attribute
     private String description;
-    private String icd10Code; // International Classification of Diseases
+
+    @Attribute
+    private String icdCode; // Often ICD-10 or ICD-11
+
+    @Attribute
     private final List<String> symptoms = new ArrayList<>();
+
+    @Attribute
     private final List<String> recommendedTests = new ArrayList<>();
 
     public Diagnostic(String name) {
-        this.name = name;
+        this.id = UUID.randomUUID().toString();
+        this.name = Objects.requireNonNull(name);
     }
 
-    public Diagnostic(String name, String icd10Code) {
-        this.name = name;
-        this.icd10Code = icd10Code;
+    public Diagnostic(String name, String icdCode) {
+        this(name);
+        this.icdCode = icdCode;
     }
 
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
     public String getName() {
         return name;
     }
@@ -63,32 +90,32 @@ public class Diagnostic {
         this.description = description;
     }
 
-    public String getIcd10Code() {
-        return icd10Code;
+    public String getIcdCode() {
+        return icdCode;
     }
 
-    public void setIcd10Code(String icd10Code) {
-        this.icd10Code = icd10Code;
-    }
-
-    public void addSymptom(String symptom) {
-        this.symptoms.add(symptom);
+    public void setIcdCode(String icdCode) {
+        this.icdCode = icdCode;
     }
 
     public List<String> getSymptoms() {
         return Collections.unmodifiableList(symptoms);
     }
 
-    public void addRecommendedTest(String test) {
-        this.recommendedTests.add(test);
+    public void addSymptom(String symptom) {
+        this.symptoms.add(symptom);
     }
 
     public List<String> getRecommendedTests() {
         return Collections.unmodifiableList(recommendedTests);
     }
 
+    public void addRecommendedTest(String test) {
+        this.recommendedTests.add(test);
+    }
+
     @Override
     public String toString() {
-        return name + (icd10Code != null ? " (" + icd10Code + ")" : "");
+        return icdCode != null ? String.format("%s (%s)", name, icdCode) : name;
     }
 }

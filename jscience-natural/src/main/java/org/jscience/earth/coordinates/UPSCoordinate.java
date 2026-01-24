@@ -38,7 +38,7 @@ import org.jscience.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public final class UPSCoordinate implements Serializable {
+public final class UPSCoordinate implements EarthCoordinate, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -57,6 +57,28 @@ public final class UPSCoordinate implements Serializable {
     public char getHemisphere() { return hemisphere; }
     public Quantity<Length> getEasting() { return Quantities.create(easting.doubleValue(), Units.METER); }
     public Quantity<Length> getNorthing() { return Quantities.create(northing.doubleValue(), Units.METER); }
+    
+    @Override
+    public ReferenceEllipsoid getEllipsoid() { return ellipsoid; }
+
+    @Override
+    public String getCoordinateSystem() { return "UPS-" + hemisphere; }
+
+    @Override
+    public GeodeticCoordinate toGeodetic() {
+        // Inverse UPS formula (simplified)
+        double x = easting.doubleValue() - 2000000.0;
+        double y = northing.doubleValue() - 2000000.0;
+        double lon = Math.atan2(x, (hemisphere == 'N') ? -y : y);
+        // More complex latitude calculation would be needed for full precision
+        return new GeodeticCoordinate(
+            Quantities.create((hemisphere == 'N') ? 90.0 : -90.0, Units.DEGREE_ANGLE),
+            Quantities.create(Math.toDegrees(lon), Units.DEGREE_ANGLE),
+            Quantities.create(0, Units.METER), ellipsoid);
+    }
+
+    @Override
+    public ECEFCoordinate toECEF() { return toGeodetic().toECEF(); }
 
     /**
      * Converts Geodetic to UPS.

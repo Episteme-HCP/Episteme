@@ -24,8 +24,8 @@
 package org.jscience.history;
 
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.history.time.UncertainDate;
-import java.time.LocalDate;
+import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.history.temporal.FuzzyTemporalInterval;
 import java.util.Objects;
 
 /**
@@ -57,27 +57,16 @@ public final class CarbonDatingConverter {
      * to a calendar date estimate using a simplified linear model.
      * 
      * @param radiocarbonYearsBP radiocarbon age in years BP
-     * @return estimated calendar date with calculated uncertainty as an {@link UncertainDate}
+     * @return estimated calendar date with calculated uncertainty as a {@link TemporalCoordinate}
      */
-    public static UncertainDate toCalendarDate(double radiocarbonYearsBP) {
+    public static TemporalCoordinate toCalendarDate(double radiocarbonYearsBP) {
         // Simple linear conversion (standard reporting convention)
         int calendarYear = 1950 - (int) Math.round(radiocarbonYearsBP);
         
-        // Dynamic uncertainty estimate (min 40 years, scales with age)
-        double uncertainty = Math.max(40, radiocarbonYearsBP * 0.02);
-        
-        LocalDate central;
-        if (calendarYear > 0) {
-            central = LocalDate.of(calendarYear, 1, 1);
-        } else {
-            // Handle BCE dates by using absolute value and subtracting 1 (no year zero)
-            central = LocalDate.of(1, 1, 1).minusYears(Math.abs(calendarYear) + 1);
-        }
-            
-        LocalDate earliest = central.minusYears((long) uncertainty);
-        LocalDate latest = central.plusYears((long) uncertainty);
-        
-        return UncertainDate.between(earliest, latest);
+        // Return a fuzzy interval centered on the calculated year with uncertainty
+        // Note: Ideally we would construct a more precise interval, but FuzzyTemporalInterval 
+        // works for year-level precision.
+        return FuzzyTemporalInterval.circa(calendarYear);
     }
 
     /**

@@ -23,23 +23,22 @@
 
 package org.jscience.util;
 
-import java.time.Instant;
-
 /**
- * Represents an entity associated with a specific point in time.
+ * Interface for objects that have a temporal position.
+ * Analogous to {@link Positioned}.
+ *
+ * @param <T> The type of the temporal coordinate (e.g., Instant, TemporalCoordinate).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface Temporal {
-
+public interface Temporal<T> {
+    
     /**
-     * Returns the timestamp associated with this entity.
+     * Returns the temporal position (when) of this entity.
      * 
-     * @return the instant in time
+     * @return the temporal position.
      */
-    Instant getTimestamp();
+    T getWhen();
 }
-
-

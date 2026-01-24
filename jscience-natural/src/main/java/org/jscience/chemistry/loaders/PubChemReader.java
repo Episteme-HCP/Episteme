@@ -1,202 +1,225 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.chemistry.loaders;
 
-import java.io.*;
-import java.net.http.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jscience.chemistry.Compound;
+import org.jscience.io.AbstractResourceReader;
+import org.jscience.io.Configuration;
+import org.jscience.ui.i18n.I18n;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
 import java.net.URI;
-import java.util.*;
-import com.fasterxml.jackson.databind.*;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.CompletableFuture;
 
 /**
- * Loader for PubChem chemical compound database.
+ * Modernized loader for the PubChem chemical compound database.
  * <p>
- * Fetches compound information from NCBI PubChem REST API.
+ * Fetches compound information from the NCBI PubChem PUG REST API.
+ * Uses the JScience ResourceReader framework for consistent data access.
  * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
+ * @version 2.0 (Integrated into ResourceReader)
  */
-public class PubChemReader {
+public class PubChemReader extends AbstractResourceReader<Compound> {
 
-    private static final String BASE_URL;
+    private static final Logger LOG = LoggerFactory.getLogger(PubChemReader.class);
+    private static final String DEFAULT_BASE_URL = "https://pubchem.ncbi.nlm.nih.gov/rest/pug";
+    private final String baseUrl;
 
-    static {
-        Properties props = new Properties();
-        try (InputStream is = PubChemReader.class.getResourceAsStream("/jscience.properties")) {
-            if (is != null)
-                props.load(is);
-        } catch (Exception e) {
-            /* ignore */ }
-        BASE_URL = props.getProperty("api.pubchem.base", "https://pubchem.ncbi.nlm.nih.gov/rest/pug");
-    }
-
-    private final HttpClient client = HttpClient.newHttpClient();
+    private final HttpClient client;
     private final ObjectMapper mapper = new ObjectMapper();
 
+    public PubChemReader() {
+        this(Configuration.get("api.pubchem.base", DEFAULT_BASE_URL));
+    }
+
+    public PubChemReader(String baseUrl) {
+        this.baseUrl = baseUrl;
+        this.client = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_2)
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+    }
+
+    @Override
     public String getCategory() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("category.chemistry", "Chemistry");
+        return I18n.getInstance().get("category.chemistry", "Chemistry");
     }
 
+    @Override
+    public String getName() {
+        return I18n.getInstance().get("reader.pubchem.name", "PubChem Reader");
+    }
+
+    @Override
     public String getDescription() {
-        return org.jscience.ui.i18n.I18n.getInstance().get("reader.pubchem.desc", "PubChem Chemical Compound Reader.");
+        return I18n.getInstance().get("reader.pubchem.desc", "Electronic database of chemical molecules.");
     }
 
-    /**
-     * Represents a chemical compound from PubChem.
-     */
-    public static class CompoundEntry {
-        public final long cid;
-        public final String iupacName;
-        public final String molecularFormula;
-        public final double molecularWeight;
-        public final String canonicalSmiles;
-        public final String inchi;
-        public final String inchiKey;
+    @Override
+    public String getLongDescription() {
+        return I18n.getInstance().get("reader.pubchem.longdesc", 
+            "Official reader for NCBI PubChem, providing access to millions of compound properties, structures, and bioactivities.");
+    }
 
-        public CompoundEntry(long cid, String iupacName, String molecularFormula,
-                double molecularWeight, String canonicalSmiles, String inchi, String inchiKey) {
-            this.cid = cid;
-            this.iupacName = iupacName;
-            this.molecularFormula = molecularFormula;
-            this.molecularWeight = molecularWeight;
-            this.canonicalSmiles = canonicalSmiles;
-            this.inchi = inchi;
-            this.inchiKey = inchiKey;
-        }
+    @Override
+    public String getResourcePath() {
+        return baseUrl;
+    }
 
-        @Override
-        public String toString() {
-            return String.format("%s (CID:%d) - %s, MW=%.2f",
-                    iupacName, cid, molecularFormula, molecularWeight);
+    @Override
+    public Class<Compound> getResourceType() {
+        return Compound.class;
+    }
+
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"PUG REST v1.0"};
+    }
+
+    @Override
+    protected Compound loadFromSource(String resourceId) throws Exception {
+        // resourceId can be a CID (numeric string) or a SMILES
+        if (resourceId.matches("\\d+")) {
+            return fetchByCid(Long.parseLong(resourceId)).join();
+        } else if (resourceId.contains("=") || resourceId.contains("(") || resourceId.length() > 5) {
+            // Very basic heuristic for SMILES
+            return fetchBySmiles(resourceId).join();
         }
+        
+        // Try search by name as a last resort
+        List<Long> cids = searchByName(resourceId).join();
+        if (!cids.isEmpty()) {
+            return fetchByCid(cids.get(0)).join();
+        }
+        
+        return null;
     }
 
     /**
      * Fetches compound by PubChem CID.
-     *
-     * @param cid the PubChem compound ID
-     * @return the compound entry, or empty if not found
      */
-    public Optional<CompoundEntry> fetchByCid(long cid) {
-        try {
-            String url = BASE_URL + "/compound/cid/" + cid + "/property/" +
-                    "IUPACName,MolecularFormula,MolecularWeight,CanonicalSMILES,InChI,InChIKey/JSON";
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200) {
-                JsonNode root = mapper.readTree(response.body());
-                JsonNode props = root.path("PropertyTable").path("Properties");
-                if (props.isArray() && props.size() > 0) {
-                    return parseCompound(props.get(0));
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("PubChem fetch failed: " + e.getMessage());
-        }
-        return Optional.empty();
+    public CompletableFuture<Compound> fetchByCid(long cid) {
+        String url = baseUrl + "/compound/cid/" + cid + "/property/" +
+                "IUPACName,MolecularFormula,MolecularWeight,CanonicalSMILES,InChI,InChIKey/JSON";
+        
+        return executeRequest(url)
+                .thenApply(response -> {
+                    try {
+                        JsonNode root = mapper.readTree(response);
+                        JsonNode props = root.path("PropertyTable").path("Properties");
+                        if (props.isArray() && props.size() > 0) {
+                            return parseCompound(props.get(0));
+                        }
+                    } catch (Exception e) {
+                        LOG.error("Failed to parse PubChem response for CID {}", cid, e);
+                    }
+                    return null;
+                });
     }
 
     /**
-     * Searches compounds by name.
-     *
-     * @param name the compound name
-     * @return list of matching CIDs
+     * Searches compounds by name, returning a list of CIDs.
      */
-    public List<Long> searchByName(String name) {
-        List<Long> cids = new ArrayList<>();
+    public CompletableFuture<List<Long>> searchByName(String name) {
         try {
-            String url = BASE_URL + "/compound/name/" +
+            String url = baseUrl + "/compound/name/" +
                     java.net.URLEncoder.encode(name, "UTF-8") + "/cids/JSON";
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200) {
-                JsonNode root = mapper.readTree(response.body());
-                JsonNode cidList = root.path("IdentifierList").path("CID");
-                if (cidList.isArray()) {
-                    for (JsonNode cid : cidList) {
-                        cids.add(cid.asLong());
-                    }
-                }
-            }
+            
+            return executeRequest(url)
+                    .thenApply(response -> {
+                        List<Long> cids = new ArrayList<>();
+                        try {
+                            JsonNode root = mapper.readTree(response);
+                            JsonNode cidList = root.path("IdentifierList").path("CID");
+                            if (cidList.isArray()) {
+                                for (JsonNode cid : cidList) {
+                                    cids.add(cid.asLong());
+                                }
+                            }
+                        } catch (Exception e) {
+                            LOG.error("Failed to parse search results for {}", name, e);
+                        }
+                        return cids;
+                    });
         } catch (Exception e) {
-            System.err.println("PubChem search failed: " + e.getMessage());
+            return CompletableFuture.failedFuture(e);
         }
-        return cids;
     }
 
     /**
      * Fetches compound by SMILES string.
      */
-    public Optional<CompoundEntry> fetchBySmiles(String smiles) {
+    public CompletableFuture<Compound> fetchBySmiles(String smiles) {
         try {
-            String url = BASE_URL + "/compound/smiles/" +
+            String url = baseUrl + "/compound/smiles/" +
                     java.net.URLEncoder.encode(smiles, "UTF-8") + "/property/" +
                     "IUPACName,MolecularFormula,MolecularWeight,CanonicalSMILES,InChI,InChIKey/JSON";
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200) {
-                JsonNode root = mapper.readTree(response.body());
-                JsonNode props = root.path("PropertyTable").path("Properties");
-                if (props.isArray() && props.size() > 0) {
-                    return parseCompound(props.get(0));
-                }
-            }
+            
+            return executeRequest(url)
+                    .thenApply(response -> {
+                        try {
+                            JsonNode root = mapper.readTree(response);
+                            JsonNode props = root.path("PropertyTable").path("Properties");
+                            if (props.isArray() && props.size() > 0) {
+                                return parseCompound(props.get(0));
+                            }
+                        } catch (Exception e) {
+                            LOG.error("Failed to parse SMILES response", e);
+                        }
+                        return null;
+                    });
         } catch (Exception e) {
-            System.err.println("PubChem SMILES fetch failed: " + e.getMessage());
+            return CompletableFuture.failedFuture(e);
         }
-        return Optional.empty();
     }
 
-    /**
-     * Gets 2D structure image URL for a compound.
-     */
-    public String getStructureImageUrl(long cid) {
-        return BASE_URL + "/compound/cid/" + cid + "/PNG";
+    private CompletableFuture<String> executeRequest(String url) {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("User-Agent", "JScience/2.0")
+                .timeout(Duration.ofSeconds(20))
+                .GET()
+                .build();
+
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(response -> {
+                    if (response.statusCode() != 200) {
+                        LOG.warn("PubChem API error: HTTP {} for {}", response.statusCode(), url);
+                        return "{}";
+                    }
+                    return response.body();
+                });
     }
 
-    private Optional<CompoundEntry> parseCompound(JsonNode node) {
-        return Optional.of(new CompoundEntry(
+    private Compound parseCompound(JsonNode node) {
+        return new Compound(
                 node.path("CID").asLong(),
                 node.path("IUPACName").asText(null),
                 node.path("MolecularFormula").asText(null),
                 node.path("MolecularWeight").asDouble(0),
                 node.path("CanonicalSMILES").asText(null),
                 node.path("InChI").asText(null),
-                node.path("InChIKey").asText(null)));
+                node.path("InChIKey").asText(null));
+    }
+
+    /**
+     * Gets 2D structure image URL for a compound.
+     */
+    public String getStructureImageUrl(long cid) {
+        return baseUrl + "/compound/cid/" + cid + "/PNG";
     }
 }

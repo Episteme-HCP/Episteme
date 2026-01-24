@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 /**
- * Provides the {@link org.jscience.linguistics} module.
+ * Provides mathematical and computational models for natural language 
+ * processing, linguistic analysis, and glottochronology. This package 
+ * structures human language into constituent units (phonemes, morphemes, words) 
+ * and provides analytical tools for sentiment, readability, and evolutionary 
+ * divergence.
+ *
+ * <p>Key components include:</p>
+ * <ul>
+ *   <li>{@link org.jscience.linguistics.Language} - Structural definition of a language</li>
+ *   <li>{@link org.jscience.linguistics.SentimentAnalyzer} - Polarity and emotional detection</li>
+ *   <li>{@link org.jscience.linguistics.ReadabilityIndex} - Text complexity evaluation</li>
+ *   <li>{@link org.jscience.linguistics.LanguageEvolution} - Divergence time estimations</li>
+ *   <li>{@link org.jscience.linguistics.DialectMapper} - Spatial linguistic variation</li>
+ * </ul>
  */
 package org.jscience.linguistics;

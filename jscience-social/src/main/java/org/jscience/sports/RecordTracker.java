@@ -27,7 +27,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.jscience.history.time.UncertainDate;
+import org.jscience.history.temporal.TemporalCoordinate;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
@@ -51,7 +51,7 @@ public final class RecordTracker {
         String unit,
         String athlete,
         String nationality,
-        UncertainDate date,
+        TemporalCoordinate date,
         String venue,
         boolean isHigherBetter
     ) implements Serializable {}

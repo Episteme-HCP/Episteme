@@ -1,31 +1,83 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.architecture;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import org.jscience.mathematics.numbers.real.Real;
-import java.util.*;
 
 /**
- * Calculates solar path and building insolation.
+ * Analytical tool for calculating the solar path, sun position, and solar 
+ * insulation on building surfaces. It supports architectural site analysis, 
+ * shading evaluation, and renewable energy planning.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
 public final class SolarPathAnalyzer {
 
     private SolarPathAnalyzer() {}
 
+    /**
+     * Represents the position of the sun in the sky at a specific moment.
+     */
     public record SolarPosition(
         double altitude,    // degrees above horizon
         double azimuth,     // degrees from north (clockwise)
         double julianDay,
         double hourAngle
-    ) {}
+    ) implements Serializable {
+        private static final long serialVersionUID = 2L;
+    }
 
+    /**
+     * Results of a 24-hour solar insulation simulation.
+     */
     public record InsolationResult(
         double dailyTotal,           // kWh/m²
         double[] hourlyValues,       // W/m² for each hour
         double peakHour,
         double peakValue
-    ) {}
+    ) implements Serializable {
+        private static final long serialVersionUID = 2L;
+    }
 
     /**
-     * Calculates sun position for given location and time.
+     * Calculates the sun position (altitude and azimuth) for a given location, 
+     * date, and time.
+     * 
+     * @param latitude degrees (-90 to 90)
+     * @param longitude degrees (-180 to 180)
+     * @param year calendar year
+     * @param month month (1-12)
+     * @param day day of month
+     * @param hour hour of day (0.0 to 24.0)
+     * @param timezone UTC offset
+     * @return SolarPosition record
      */
     public static SolarPosition calculateSunPosition(double latitude, double longitude,
             int year, int month, int day, double hour, double timezone) {
@@ -38,10 +90,10 @@ public final class SolarPathAnalyzer {
         
         // Solar declination (simplified)
         int dayOfYear = dayOfYear(year, month, day);
-        double declination = 23.45 * Math.sin(Math.toRadians(360.0 / 365 * (dayOfYear - 81)));
+        double declination = 23.45 * Math.sin(Math.toRadians(360.0 / 365.25 * (dayOfYear - 81)));
         
         // Hour angle
-        double solarTime = hour + (longitude / 15.0) - timezone;  // Approximate
+        double solarTime = hour + (longitude / 15.0) - timezone;
         double hourAngle = 15 * (solarTime - 12);
         
         // Convert to radians
@@ -52,11 +104,11 @@ public final class SolarPathAnalyzer {
         // Altitude
         double sinAlt = Math.sin(latRad) * Math.sin(decRad) + 
                         Math.cos(latRad) * Math.cos(decRad) * Math.cos(haRad);
-        double altitude = Math.toDegrees(Math.asin(sinAlt));
+        double altitude = Math.toDegrees(Math.asin(Math.max(-1, Math.min(1, sinAlt))));
         
         // Azimuth
         double cosAz = (Math.sin(decRad) - Math.sin(latRad) * sinAlt) / 
-                       (Math.cos(latRad) * Math.cos(Math.asin(sinAlt)));
+                       (Math.cos(latRad) * Math.cos(Math.asin(Math.max(-1, Math.min(1, sinAlt)))));
         double azimuth = Math.toDegrees(Math.acos(Math.max(-1, Math.min(1, cosAz))));
         
         if (hourAngle > 0) azimuth = 360 - azimuth;
@@ -65,7 +117,14 @@ public final class SolarPathAnalyzer {
     }
 
     /**
-     * Calculates daily insolation on a surface.
+     * Simulates daily solar insulation on a surface of specific tilt and orientation.
+     * 
+     * @param latitude location latitude
+     * @param month simulation month
+     * @param day simulation day
+     * @param surfaceTilt angle from horizontal (0 to 90)
+     * @param surfaceAzimuth compass direction (0=North, 180=South)
+     * @return InsolationResult over 24 hours
      */
     public static InsolationResult calculateDailyInsolation(double latitude, 
             int month, int day, double surfaceTilt, double surfaceAzimuth) {
@@ -80,7 +139,8 @@ public final class SolarPathAnalyzer {
             
             if (pos.altitude() > 0) {
                 // Direct normal irradiance (simplified clear sky model)
-                double airmass = 1 / Math.sin(Math.toRadians(pos.altitude()));
+                double sinAlt = Math.sin(Math.toRadians(pos.altitude()));
+                double airmass = sinAlt > 0 ? 1.0 / sinAlt : 0;
                 double dni = 1361 * Math.pow(0.7, Math.pow(airmass, 0.678));
                 
                 // Angle of incidence on tilted surface
@@ -89,13 +149,13 @@ public final class SolarPathAnalyzer {
                 if (incidenceAngle < 90) {
                     double irradiance = dni * Math.cos(Math.toRadians(incidenceAngle));
                     
-                    // Add diffuse component (simplified)
-                    double diffuseHorizontal = 0.1 * 1361 * Math.sin(Math.toRadians(pos.altitude()));
+                    // Add diffuse component (simplified isotropic model)
+                    double diffuseHorizontal = 0.1 * 1361 * sinAlt;
                     double viewFactor = (1 + Math.cos(Math.toRadians(surfaceTilt))) / 2;
                     irradiance += diffuseHorizontal * viewFactor;
                     
                     hourly[hour] = Math.max(0, irradiance);
-                    total += irradiance / 1000; // Convert to kWh/m²
+                    total += irradiance / 1000; // kWh/m2
                     
                     if (irradiance > peakValue) {
                         peakValue = irradiance;
@@ -109,45 +169,49 @@ public final class SolarPathAnalyzer {
     }
 
     /**
-     * Determines optimal tilt angle for solar panels.
+     * Determines the optimal year-round tilt angle for solar collectors.
+     * 
+     * @param latitude site latitude
+     * @return recommended tilt angle as a Real
      */
     public static Real optimalTiltAngle(double latitude) {
-        // Rule of thumb: tilt = latitude for year-round, latitude-15 for summer, latitude+15 for winter
         return Real.of(Math.abs(latitude));
     }
 
     /**
-     * Calculates shading from nearby obstructions.
+     * Calculates a shading factor (0 to 1) based on an external obstruction.
+     * 
+     * @param sun current position of the sun
+     * @param obstructionHeight height of the object
+     * @param obstructionDistance distance to the object
+     * @param obstructionAzimuth direction to the object
+     * @return shading multiplier (0.0 = full shade, 1.0 = clear)
      */
     public static double shadingFactor(SolarPosition sun, double obstructionHeight,
             double obstructionDistance, double obstructionAzimuth) {
         
-        // Calculate angle to top of obstruction
+        if (obstructionDistance <= 0) return 0.0;
         double obstructionAngle = Math.toDegrees(Math.atan(obstructionHeight / obstructionDistance));
-        
-        // Check if sun is behind obstruction
         double azimuthDiff = Math.abs(sun.azimuth() - obstructionAzimuth);
         if (azimuthDiff > 180) azimuthDiff = 360 - azimuthDiff;
         
-        // If sun is lower than obstruction and in same direction, shaded
         if (azimuthDiff < 30 && sun.altitude() < obstructionAngle) {
-            return 0.0; // Fully shaded
+            return 0.0;
         }
-        
         if (azimuthDiff < 45 && sun.altitude() < obstructionAngle * 1.2) {
-            return 0.5; // Partially shaded
+            return 0.5;
         }
-        
-        return 1.0; // Not shaded
+        return 1.0;
     }
 
     /**
-     * Generates sun path diagram data for a location.
+     * Generates Sun Path diagram data points for various seasons.
+     * 
+     * @param latitude site latitude
+     * @return list of paths (lists of SolarPosition) for solstices and equinoxes
      */
     public static List<List<SolarPosition>> generateSunPathDiagram(double latitude) {
         List<List<SolarPosition>> paths = new ArrayList<>();
-        
-        // Generate for solstices and equinoxes
         int[][] dates = {{3, 21}, {6, 21}, {9, 21}, {12, 21}};
         
         for (int[] date : dates) {
@@ -160,13 +224,11 @@ public final class SolarPathAnalyzer {
             }
             paths.add(dayPath);
         }
-        
         return paths;
     }
 
     private static double calculateIncidenceAngle(SolarPosition sun, double surfaceTilt, 
             double surfaceAzimuth) {
-        
         double sAlt = Math.toRadians(sun.altitude());
         double sAz = Math.toRadians(sun.azimuth());
         double tilt = Math.toRadians(surfaceTilt);
@@ -183,7 +245,6 @@ public final class SolarPathAnalyzer {
         if (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) {
             daysInMonth[1] = 29;
         }
-        
         int doy = day;
         for (int i = 0; i < month - 1; i++) {
             doy += daysInMonth[i];

@@ -25,7 +25,7 @@ package org.jscience.history.archeology;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.jscience.history.time.UncertainDate;
+import org.jscience.history.temporal.TemporalCoordinate;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
@@ -52,7 +52,7 @@ public class Artifact implements Serializable {
 
     /** Estimated age determined through dating methods (e.g., C-14). */
     @Relation(type = Relation.Type.ONE_TO_ONE)
-    private final UncertainDate dating;
+    private final TemporalCoordinate dating;
 
     /**
      * Creates a new Artifact.
@@ -62,7 +62,7 @@ public class Artifact implements Serializable {
      * @param dating estimated age range
      * @throws NullPointerException if any argument is null
      */
-    public Artifact(String name, String description, UncertainDate dating) {
+    public Artifact(String name, String description, TemporalCoordinate dating) {
         this.name = Objects.requireNonNull(name, "Artifact name cannot be null");
         this.description = Objects.requireNonNull(description, "Description cannot be null");
         this.dating = Objects.requireNonNull(dating, "Dating cannot be null");
@@ -91,7 +91,7 @@ public class Artifact implements Serializable {
      *
      * @return the dating (uncertain)
      */
-    public UncertainDate getDating() {
+    public TemporalCoordinate getDating() {
         return dating;
     }
 

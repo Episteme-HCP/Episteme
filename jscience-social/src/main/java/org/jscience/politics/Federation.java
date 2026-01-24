@@ -29,21 +29,30 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import org.jscience.util.Named;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a group of countries cooperating within a formal union or federation.
+ * <p>
  * Countries in a federation may or may not share common geography.
+ * Examples include the European Union, United Nations, or a Federal State.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
+@Persistent
 public class Federation implements Named, Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @Id
     private String name;
+
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private final Set<Country> countries = new HashSet<>();
 
     /**
@@ -51,7 +60,7 @@ public class Federation implements Named, Serializable {
      *
      * @param name      the name of the federation
      * @param countries set of member countries
-     * @throws NullPointerException if name or countries is null
+     * @throws NullPointerException if name is null
      * @throws IllegalArgumentException if name is empty
      */
     public Federation(String name, Set<Country> countries) {
@@ -105,5 +114,18 @@ public class Federation implements Named, Serializable {
     @Override
     public String toString() {
         return name + " [" + countries.size() + " member countries]";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Federation)) return false;
+        Federation other = (Federation) obj;
+        return Objects.equals(name, other.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }

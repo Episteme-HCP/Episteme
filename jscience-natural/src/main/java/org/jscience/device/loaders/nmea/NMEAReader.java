@@ -139,5 +139,10 @@ public class NMEAReader extends AbstractResourceReader<List<NMEAMessage>> {
         if (scanner != null)
             scanner.close();
     }
+
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"0183 v2.0", "0183 v3.0", "0183 v4.0"};
+    }
 }
 

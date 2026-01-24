@@ -1,210 +1,214 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.economics.money;
 
 import org.jscience.economics.Organization;
-
-import org.jscience.measure.Amount;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.Identified;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
-import java.util.Date;
-
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.Objects;
 
 /**
- * A class representing a receipt for the person who pays or a bill for the
- * person who provides the goods or services.
+ * Represents a receipt for a completed transaction.
+ * <p>
+ * A receipt is an immutable record of an exchange of money or shares
+ * between a seller and buyer.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
+@Persistent
+public final class Receipt implements Identified<String>, Serializable {
 
-//this is the same class as transaction except it is provided to get sure you don't reuse the same transaction twice
-//final modifier used to secure the access
-public final class Receipt extends Object implements Identified {
-    /** DOCUMENT ME! */
-    private Organization seller;
+    private static final long serialVersionUID = 1L;
 
-    /** DOCUMENT ME! */
-    private Organization buyer;
+    @Relation(type = Relation.Type.MANY_TO_ONE)
+    private final Organization seller;
 
-    /** DOCUMENT ME! */
-    private Date date;
+    @Relation(type = Relation.Type.MANY_TO_ONE)
+    private final Organization buyer;
 
-    /** DOCUMENT ME! */
-    private Identification identification;
+    @Attribute
+    private final Instant date;
 
-    /** DOCUMENT ME! */
-    private String description;
+    @Id
+    private final Identification identification;
 
-    /** DOCUMENT ME! */
-    private Amount<Money> amount;
+    @Attribute
+    private final String description;
 
-    /** DOCUMENT ME! */
-    private Share share;
+    @Attribute
+    private final Money amount;
 
-    /** DOCUMENT ME! */
-    private int quantity;
+    @Relation(type = Relation.Type.MANY_TO_ONE)
+    private final Share share;
 
-    //money is transfered from the buyer to the seller
+    @Attribute
+    private final int quantity;
+
     /**
-     * Creates a new Receipt object.
+     * Creates a receipt for a money transaction.
      *
-     * @param seller DOCUMENT ME!
-     * @param buyer DOCUMENT ME!
-     * @param date DOCUMENT ME!
-     * @param identification DOCUMENT ME!
-     * @param description DOCUMENT ME!
-     * @param money DOCUMENT ME!
+     * @param seller         the selling organization
+     * @param buyer          the buying organization
+     * @param date           the transaction date
+     * @param identification unique receipt ID
+     * @param description    transaction description
+     * @param amount         the monetary amount
      */
-    public Receipt(Organization seller, Organization buyer, Date date,
-        Identification identification, String description, Amount<Money> money) {
-        if ((seller != null) && (buyer != null) && (date != null) &&
-                (identification != null) && (description != null) &&
-                (description.length() > 0) && (money != null)) {
-            this.seller = seller;
-            this.buyer = buyer;
-            this.date = date;
-            this.identification = identification;
-            this.description = description;
-            this.amount = amount;
-            this.share = null;
-            this.quantity = 0;
-        } else {
-            throw new IllegalArgumentException(
-                "Receipt doesn't accept null arguments and description can't be empty.");
-        }
-    }
-
-    //money is transfered from the buyer to the seller
-    /**
-     * Creates a new Receipt object.
-     *
-     * @param seller DOCUMENT ME!
-     * @param buyer DOCUMENT ME!
-     * @param date DOCUMENT ME!
-     * @param identification DOCUMENT ME!
-     * @param description DOCUMENT ME!
-     * @param share DOCUMENT ME!
-     * @param quantity DOCUMENT ME!
-     */
-    public Receipt(Organization seller, Organization buyer, Date date,
-        Identification identification, String description, Share share,
-        int quantity) {
-        if ((seller != null) && (buyer != null) && (date != null) &&
-                (identification != null) && (description != null) &&
-                (description.length() > 0) && (share != null)) {
-            if (quantity > 0) {
-                this.seller = seller;
-                this.buyer = buyer;
-                this.date = date;
-                this.identification = identification;
-                this.description = description;
-                this.amount = Amount.valueOf(0, Currency.USD);
-                this.share = share;
-                this.quantity = quantity;
-            } else {
-                throw new IllegalArgumentException(
-                    "The quantity must be positive.");
-            }
-        } else {
-            throw new IllegalArgumentException(
-                "Receipt doesn't accept null arguments and description can't be empty.");
-        }
+    public Receipt(Organization seller, Organization buyer, Instant date,
+                   Identification identification, String description, Money amount) {
+        this.seller = Objects.requireNonNull(seller, "Seller cannot be null");
+        this.buyer = Objects.requireNonNull(buyer, "Buyer cannot be null");
+        this.date = Objects.requireNonNull(date, "Date cannot be null");
+        this.identification = Objects.requireNonNull(identification, "ID cannot be null");
+        this.description = requireNonEmpty(description, "Description");
+        this.amount = Objects.requireNonNull(amount, "Amount cannot be null");
+        this.share = null;
+        this.quantity = 0;
     }
 
     /**
-     * DOCUMENT ME!
+     * Creates a receipt for a share transaction.
      *
-     * @return DOCUMENT ME!
+     * @param seller         the selling organization
+     * @param buyer          the buying organization
+     * @param date           the transaction date
+     * @param identification unique receipt ID
+     * @param description    transaction description
+     * @param share          the share being traded
+     * @param quantity       number of shares
      */
-    public final Organization getSeller() {
+    public Receipt(Organization seller, Organization buyer, Instant date,
+                   Identification identification, String description, 
+                   Share share, int quantity) {
+        this.seller = Objects.requireNonNull(seller, "Seller cannot be null");
+        this.buyer = Objects.requireNonNull(buyer, "Buyer cannot be null");
+        this.date = Objects.requireNonNull(date, "Date cannot be null");
+        this.identification = Objects.requireNonNull(identification, "ID cannot be null");
+        this.description = requireNonEmpty(description, "Description");
+        this.share = Objects.requireNonNull(share, "Share cannot be null");
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be positive");
+        }
+        this.quantity = quantity;
+        this.amount = Money.valueOf(Real.ZERO, Currency.USD);
+    }
+
+    private static String requireNonEmpty(String value, String name) {
+        if (value == null || value.isEmpty()) {
+            throw new IllegalArgumentException(name + " cannot be null or empty");
+        }
+        return value;
+    }
+
+    @Override
+    public String getId() {
+        return identification.getId();
+    }
+
+    // Getters
+
+    public Organization getSeller() {
         return seller;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public final Organization getBuyer() {
+    public Organization getBuyer() {
         return buyer;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public final Date getDate() {
+    public Instant getDate() {
         return date;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public final Identification getIdentification() {
+    @Override
+    public Identification getIdentification() {
         return identification;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public final String getDescription() {
+    public String getDescription() {
         return description;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public final Amount<Money> getAmount() {
+    public Money getAmount() {
         return amount;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public final Share getShare() {
+    public Share getShare() {
         return share;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public final int getQuantity() {
+    public int getQuantity() {
         return quantity;
     }
 
-    //otherwise you traded shares
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns true if this is a money transaction (not shares).
+     * @return true for money transaction
      */
     public boolean isMoneyTransaction() {
-        return quantity == 0;
+        return share == null;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns true if this is a share transaction.
+     * @return true for share transaction
      */
-    public final Receipt getReceipt() {
+    public boolean isShareTransaction() {
+        return share != null;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Receipt)) return false;
+        Receipt other = (Receipt) obj;
+        return Objects.equals(identification, other.identification);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(identification);
+    }
+
+    @Override
+    public String toString() {
         if (isMoneyTransaction()) {
-            return new Receipt(seller, buyer, date, identification,
-                description, amount);
+            return String.format("Receipt %s: %s -> %s, %s, %s",
+                identification, seller.getName(), buyer.getName(), amount, date);
         } else {
-            return new Receipt(seller, buyer, date, identification,
-                description, share, quantity);
+            return String.format("Receipt %s: %s -> %s, %d x %s, %s",
+                identification, seller.getName(), buyer.getName(), 
+                quantity, share.getSymbol(), date);
         }
     }
 }

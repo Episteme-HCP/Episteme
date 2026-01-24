@@ -42,7 +42,9 @@ import java.util.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class RootedTree<V> implements Tree<V> {
+public class RootedTree<V> implements Tree<V>, java.io.Serializable {
+
+    private static final long serialVersionUID = 1L;
     // Aggressive touch for IDE re-indexing
 
     private V root;

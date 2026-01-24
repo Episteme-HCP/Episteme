@@ -23,17 +23,13 @@
 
 package org.jscience.geography;
 
-import org.jscience.measure.Quantity;
+import org.jscience.earth.coordinates.GeodeticCoordinate;
+import org.jscience.mathematics.geometry.Vector2D;
+
 import org.jscience.measure.Units;
-import org.jscience.measure.quantity.Length;
-import org.jscience.mathematics.linearalgebra.Vector;
-import org.jscience.mathematics.linearalgebra.vectors.DenseVector;
-import org.jscience.mathematics.numbers.real.Real;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * Handles Geographic Information System (GIS) profiles and projections.
+ * Handles Geographic Information System (GIS) projections and spatial offsets.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -52,52 +48,34 @@ public class GISProfile {
     }
 
     /**
-     * Projects a 3D coordinate (lat/lon) to a 2D map coordinate (x/y).
+     * Projects a geodetic coordinate to a 2D plane coordinate system.
      * 
-     * @return Vector with [x, y] map coordinates (in radians)
+     * @param coord the earth coordinate
+     * @return 2D vector [x, y] in projected space
      */
-    public Vector<Real> project(Coordinate coord) {
-        double latRad = Math.toRadians(coord.getLatitudeDegrees().doubleValue());
-        double lonRad = Math.toRadians(coord.getLongitudeDegrees().doubleValue());
+    public Vector2D project(GeodeticCoordinate coord) {
+        double latRad = coord.getLatitude().to(Units.RADIAN).getValue().doubleValue();
+        double lonRad = coord.getLongitude().to(Units.RADIAN).getValue().doubleValue();
 
-        List<Real> coords = new ArrayList<>();
-
+        double x, y;
         switch (projection) {
             case MERCATOR:
-                double x = lonRad;
-                double y = Math.log(Math.tan(Math.PI / 4 + latRad / 2));
-                coords.add(Real.of(x));
-                coords.add(Real.of(y));
+                x = lonRad;
+                y = Math.log(Math.tan(Math.PI / 4 + latRad / 2));
                 break;
             case ORTHOGRAPHIC:
-                // Orthographic projection (simplified)
                 x = Math.cos(latRad) * Math.sin(lonRad);
-                y = Math.cos(latRad) * Math.cos(lonRad);
-                coords.add(Real.of(x));
-                coords.add(Real.of(y));
+                y = Math.sin(latRad);
                 break;
             default:
-                // Equirectangular (default)
-                coords.add(Real.of(lonRad));
-                coords.add(Real.of(latRad));
+                // Equirectangular
+                x = lonRad;
+                y = latRad;
         }
-        return new DenseVector<>(coords, Real.ZERO);
-
+        return new Vector2D(x, y);
     }
 
-    /**
-     * @return distance as a Length quantity
-     */
-
-    public static Quantity<Length> calculateDistance(Coordinate c1, Coordinate c2) {
-        return c1.distanceTo(c2);
-    }
-
-    /**
-     * Calculates great-circle distance in meters.
-     */
-    public static double calculateDistanceMeters(Coordinate c1, Coordinate c2) {
-        return c1.distanceTo(c2).to(Units.METER).getValue().doubleValue();
+    public Projection getProjection() {
+        return projection;
     }
 }
-

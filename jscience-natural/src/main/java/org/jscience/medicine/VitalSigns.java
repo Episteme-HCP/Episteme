@@ -21,34 +21,49 @@
  * SOFTWARE.
  */
 
-package org.jscience.medicine;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Units;
+import org.jscience.measure.quantity.*;
 
 /**
  * Immutable record representing a snapshot of vital signs.
+ * Uses the JScience measure system for physical accuracy.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 public record VitalSigns(
-        int heartRate,
-        int systolic,
-        int diastolic,
-        int spO2,
-        int respirationRate,
-        double temperature) {
+        Quantity<Frequency> heartRate,
+        Quantity<Pressure> systolic,
+        Quantity<Pressure> diastolic,
+        Quantity<Dimensionless> spO2,
+        Quantity<Frequency> respirationRate,
+        Quantity<Temperature> temperature) {
+
     /**
      * Returns blood pressure as a formatted string "systolic/diastolic".
      */
     public String bloodPressureString() {
-        return systolic + "/" + diastolic;
+        return String.format("%d/%d %s", 
+            Math.round(systolic.to(Units.MILLIMETRE_OF_MERCURY).getValue()),
+            Math.round(diastolic.to(Units.MILLIMETRE_OF_MERCURY).getValue()),
+            Units.MILLIMETRE_OF_MERCURY.getSymbol());
     }
 
     /**
      * Returns temperature formatted to one decimal place.
      */
     public String temperatureString() {
-        return String.format("%.1f", temperature);
+        return String.format("%.1f %s", 
+            temperature.to(Units.CELSIUS).getValue(),
+            Units.CELSIUS.getSymbol());
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Heart Rate: %s, BP: %s, SpO2: %s, Temp: %s",
+                heartRate, bloodPressureString(), spO2, temperatureString());
     }
 }
 

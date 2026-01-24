@@ -1,25 +1,67 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.arts;
 
-import java.util.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Analyzes iconographic symbols in artworks for art history research.
+ * Analytical tool for identifying and interpreting iconographic symbols 
+ * in artworks. It supports art historical research by mapping visual elements 
+ * to their symbolic meanings, historical periods, and thematic categories.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
 public final class IconographyAnalyzer {
 
     private IconographyAnalyzer() {}
 
+    /**
+     * Thematic categories for iconographic symbols.
+     */
     public enum SymbolCategory {
         RELIGIOUS, MYTHOLOGICAL, HERALDIC, ALLEGORICAL, NATURAL, POLITICAL
     }
 
+    /**
+     * Represents a single iconographic symbol and its historical context.
+     */
     public record IconographicSymbol(
         String name,
         SymbolCategory category,
         String meaning,
         int startYear,
         int endYear
-    ) {}
+    ) implements Serializable {
+        private static final long serialVersionUID = 2L;
+    }
 
     private static final List<IconographicSymbol> SYMBOL_DATABASE = List.of(
         // Religious
@@ -52,7 +94,11 @@ public final class IconographyAnalyzer {
     );
 
     /**
-     * Identifies symbols present in a list of detected elements.
+     * Checks a list of detected visual elements against the database to 
+     * identify known symbols.
+     * 
+     * @param detectedElements names of visual elements found in the artwork
+     * @return list of identified iconographic symbols
      */
     public static List<IconographicSymbol> identifySymbols(List<String> detectedElements) {
         List<IconographicSymbol> found = new ArrayList<>();
@@ -68,7 +114,11 @@ public final class IconographyAnalyzer {
     }
 
     /**
-     * Calculates symbol frequency in a collection.
+     * Calculates the frequency of symbols within a collection of artworks.
+     * 
+     * @param artworkSymbolLists a list where each entry is a list of detected 
+     *                           element names for one artwork
+     * @return a frequency map of identified symbols
      */
     public static Map<IconographicSymbol, Integer> calculateFrequency(
             List<List<String>> artworkSymbolLists) {
@@ -82,22 +132,27 @@ public final class IconographyAnalyzer {
     }
 
     /**
-     * Suggests period based on identified symbols.
+     * Suggests a probable historical period based on the identified symbols.
+     * 
+     * @param symbols list of identified symbols
+     * @return a string describing the suggested period
      */
     public static String suggestPeriod(List<IconographicSymbol> symbols) {
         if (symbols.isEmpty()) return "Unknown";
-        
         int avgStart = (int) symbols.stream().mapToInt(IconographicSymbol::startYear).average().orElse(0);
         if (avgStart < 0) return "Classical Antiquity";
         if (avgStart < 500) return "Late Antiquity / Early Christian";
         if (avgStart < 1400) return "Medieval";
-        if (avgStart < 1600) return "Renaissance";
+        if (avgStart < 1400) return "Renaissance";
         if (avgStart < 1800) return "Baroque / Early Modern";
         return "Modern";
     }
 
     /**
-     * Finds symbols by category.
+     * Retrieves all symbols belonging to a specific category.
+     * 
+     * @param category the category to filter by
+     * @return list of symbols in that category
      */
     public static List<IconographicSymbol> getSymbolsByCategory(SymbolCategory category) {
         return SYMBOL_DATABASE.stream()

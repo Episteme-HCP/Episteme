@@ -23,93 +23,67 @@
 
 package org.jscience.psychology;
 
-import java.io.Serializable;
-
 /**
- * Common constants used across psychological and behavioral models.
- * Includes definitions for emotions, needs, personality traits, and sleep states.
+ * Constants and enumerations for psychology and behavioral sciences.
+ * <p>
+ * Provides classifications for emotions, Maslow's hierarchy of needs, 
+ * personality models (Big Five, Myers-Briggs/Keirsey), and sleep stages.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
+ * @version 2.0
  * @since 1.0
  */
-public final class PsychologyConstants implements Serializable {
+public final class PsychologyConstants {
 
-    private static final long serialVersionUID = 1L;
+    private PsychologyConstants() {}
 
-    private PsychologyConstants() {
-        // Prevent instantiation
+    /**
+     * Primary and secondary emotions.
+     */
+    public enum Emotion {
+        ANGER, RAGE, SORROW, SADNESS, JOY, HAPPINESS, DISGUST, 
+        ACCEPTANCE, ANTICIPATION, SURPRISE, FEAR, TERROR, 
+        BOREDOM, ENVY, GUILT, HATE, HOPE, JEALOUSY, LOVE, 
+        REGRET, REMORSE, SHAME, NONE, UNKNOWN
     }
 
-    /** Unspecified or unknown state. */
-    public final static int UNKNOWN = 0;
+    /**
+     * Maslow's Hierarchy of Needs.
+     */
+    public enum NeedLevel {
+        PHYSIOLOGICAL, // Warmth, shelter, food
+        SECURITY,      // Protection from danger
+        SOCIAL,        // Love, friendship
+        ESTEEM,        // Self-respect, personal worth (Ego)
+        SELF_ACTUALIZATION // Full potential
+    }
 
-    // Primary Emotions
-    /** State of emotional neutralness. */
-    public final static int NONE = 1;
-    /** Strong feeling of annoyance, displeasure, or hostility. */
-    public final static int ANGER = 2;
-    /** Feeling of deep distress caused by loss or disappointment. */
-    public final static int SORROW = 3;
-    /** Feeling of great pleasure and happiness. */
-    public final static int JOY = 4;
-    /** Feeling of revulsion or strong disapproval. */
-    public final static int DISGUST = 5;
-    /** Consent to receive or undertake something. */
-    public final static int ACCEPTANCE = 6;
-    /** Expectation or prediction of future events. */
-    public final static int ANTICIPATION = 7;
-    /** Reaction to an unexpected event. */
-    public final static int SURPRISE = 8;
-    /** Unpleasant emotion caused by a threat of danger. */
-    public final static int FEAR = 9;
+    /**
+     * The Big Five personality traits (Five Factor Model).
+     */
+    public enum BigFiveTrait {
+        OPENNESS, CONSCIENTIOUSNESS, EXTRAVERSION, AGREEABLENESS, NEUROTICISM
+    }
 
-    // Maslow's Hierarchy of Needs
-    /** Basic survival needs (food, water, shelter). */
-    public final static int PHYSIOLOGICAL_NEEDS = 1;
-    /** Stability and protection from physical or emotional harm. */
-    public final static int SECURITY_NEEDS = 2;
-    /** Belonging, love, and social connection. */
-    public final static int SOCIAL_NEEDS = 4;
-    /** Achievement, recognition, and self-respect. */
-    public final static int EGO_NEEDS = 8;
-    /** Personal growth and reaching full potential. */
-    public final static int SELF_NEEDS = 16;
+    /**
+     * Myers-Briggs/Keirsey personality dimensions.
+     */
+    public enum PersonalityDimension {
+        EXTRAVERSION_VS_INTROVERSION,
+        SENSING_VS_INTUITION,
+        THINKING_VS_FEELING,
+        JUDGING_VS_PERCEIVING
+    }
 
-    // BIG FIVE Personality Traits (Five Factor Model)
-    /** Tendency to be outgoing, energetic, and talkative. */
-    public final static int PERSONALITY_EXTROVERSION = 1;
-    /** Tendency to experience negative emotions (emotional stability). */
-    public final static int PERSONALITY_NEUROTICISM = 2;
-    /** Tendency to be compassionate and cooperative. */
-    public final static int PERSONALITY_AGREEABLENESS = 4;
-    /** Tendency to be organized, dependable, and disciplined. */
-    public final static int PERSONALITY_CONSCIENTIOUSNESS = 8;
-    /** Tendency to be curious and open to new experiences. */
-    public final static int PERSONALITY_OPENNESS = 16;
-
-    // Jungian/MBTI Personality Dimensions
-    /** Extraversion vs. Introversion. */
-    public final static int PERSONALITY_EXTRAVERSION_INTROVERSION = 1;
-    /** Intuition vs. Sensing. */
-    public final static int PERSONALITY_INTUITION_SENSING = 2;
-    /** Thinking vs. Feeling. */
-    public final static int PERSONALITY_THINKING_FEELING = 4;
-    /** Perceiving vs. Judging. */
-    public final static int PERSONALITY_PERCEIVEING_JUDGING = 8;
-
-    // Sleep Stages
-    /** Fully conscious and alert state. */
-    public final static int AWAKE = 1;
-    /** Non-Rapid Eye Movement Stage 1 (Light sleep). */
-    public final static int NREM1 = 2;
-    /** Non-Rapid Eye Movement Stage 2 (Onset of sleep). */
-    public final static int NREM2 = 3;
-    /** Non-Rapid Eye Movement Stage 3 (Deep sleep). */
-    public final static int NREM3 = 4;
-    /** Non-Rapid Eye Movement Stage 4 (Very deep sleep). */
-    public final static int NREM4 = 5;
-    /** Rapid Eye Movement (Dreaming sleep). */
-    public final static int REM = 6;
+    /**
+     * Stages of sleep.
+     */
+    public enum SleepStage {
+        AWAKE, 
+        NREM1, // Light sleep
+        NREM2, // Sleep spindles
+        NREM3, // Deep sleep (Slow wave)
+        REM    // Rapid Eye Movement
+    }
 }

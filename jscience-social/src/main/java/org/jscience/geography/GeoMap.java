@@ -23,59 +23,98 @@
 
 package org.jscience.geography;
 
+import org.jscience.earth.coordinates.GeodeticCoordinate;
+import org.jscience.util.Named;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
+
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
- * Represents a 2D map of a geographical area.
+ * Represents a logical map of a geographical area, containing places and paths.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GeoMap {
+@Persistent
+public class GeoMap implements Named, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+    @Attribute
     private String name;
-    private double widthDegrees;
-    private double heightDegrees;
-    private Coordinate topLeftCoordinate;
 
-    private final Set<Place> places;
-    private final Set<GeoPath> paths;
+    @Attribute
+    private GeodeticCoordinate topLeft;
+
+    @Attribute
+    private GeodeticCoordinate bottomRight;
+
+    @Attribute
     private String description;
 
-    /**
-     * Creates a map with the specified top-left coordinate and dimensions.
-     * 
-     * @param name              map name
-     * @param topLeftCoordinate top-left corner coordinate
-     * @param widthDegrees      width in degrees
-     * @param heightDegrees     height in degrees
-     */
-    public GeoMap(String name, Coordinate topLeftCoordinate, double widthDegrees, double heightDegrees) {
-        this.name = name;
-        this.topLeftCoordinate = topLeftCoordinate;
-        this.widthDegrees = widthDegrees;
-        this.heightDegrees = heightDegrees;
-        this.places = new HashSet<>();
-        this.paths = new HashSet<>();
+import java.awt.Image;
+import java.util.ArrayList;
+import java.util.List;
+
+// ...
+
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private final List<Image> layers = new ArrayList<>();
+
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private final Set<Place> places = new HashSet<>();
+
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private final Set<GeoPath> paths = new HashSet<>();
+
+    public GeoMap(String name) {
+        this.name = Objects.requireNonNull(name);
     }
 
+    public GeoMap(String name, GeodeticCoordinate topLeft, GeodeticCoordinate bottomRight) {
+        this(name);
+        this.topLeft = topLeft;
+        this.bottomRight = bottomRight;
+    }
+
+    @Override
     public String getName() {
         return name;
     }
 
-    public Coordinate getTopLeftCoordinate() {
-        return topLeftCoordinate;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public double getWidthDegrees() {
-        return widthDegrees;
+    public GeodeticCoordinate getTopLeft() {
+        return topLeft;
     }
 
-    public double getHeightDegrees() {
-        return heightDegrees;
+    public void setTopLeft(GeodeticCoordinate topLeft) {
+        this.topLeft = topLeft;
+    }
+
+    public GeodeticCoordinate getBottomRight() {
+        return bottomRight;
+    }
+
+    public void setBottomRight(GeodeticCoordinate bottomRight) {
+        this.bottomRight = bottomRight;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Set<Place> getPlaces() {
@@ -83,7 +122,7 @@ public class GeoMap {
     }
 
     public void addPlace(Place place) {
-        places.add(place);
+        places.add(Objects.requireNonNull(place));
     }
 
     public void removePlace(Place place) {
@@ -95,30 +134,15 @@ public class GeoMap {
     }
 
     public void addPath(GeoPath path) {
-        paths.add(path);
+        paths.add(Objects.requireNonNull(path));
     }
 
-    public String getDescription() {
-        return description;
+    public void removePath(GeoPath path) {
+        paths.remove(path);
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-     * Calculates the bottom-right coordinate of this map.
-     */
-    public Coordinate getBottomRightCoordinate() {
-        double topLat = topLeftCoordinate.getLatitudeDegrees().doubleValue();
-        double topLon = topLeftCoordinate.getLongitudeDegrees().doubleValue();
-
-        // Height goes down (south), width goes right (east)
-        double bottomLat = topLat - heightDegrees;
-        double rightLon = topLon + widthDegrees;
-
-        return new Coordinate(bottomLat, rightLon);
+    @Override
+    public String toString() {
+        return String.format("Map: %s (%d places, %d paths)", name, places.size(), paths.size());
     }
 }
-
-

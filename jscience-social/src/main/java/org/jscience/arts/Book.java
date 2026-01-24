@@ -1,33 +1,100 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.arts;
 
-import org.jscience.history.time.UncertainDate;
-import java.util.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.util.Named;
+import org.jscience.util.Temporal;
+import org.jscience.util.identity.Identified;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
 
 /**
- * Represents a book or publication.
+ * Represents a book or publication within the literary arts.
+ * Captures bibliographic data according to standard library metadata formats.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
-public class Book {
+@Persistent
+public class Book implements Identified<String>, Named, Temporal<TemporalCoordinate>, Serializable {
 
+    private static final long serialVersionUID = 2L;
+
+    /**
+     * Litery and publication genres.
+     */
     public enum Genre {
         FICTION, NON_FICTION, SCIENCE, HISTORY, BIOGRAPHY,
         FANTASY, MYSTERY, ROMANCE, HORROR, SCIENCE_FICTION,
         POETRY, DRAMA, PHILOSOPHY, RELIGION, REFERENCE
     }
 
+    @Id
+    private final String id;
+    @Attribute
     private final String title;
+    @Attribute
     private final List<String> authors = new ArrayList<>();
+    @Attribute
     private String isbn;
+    @Attribute
     private String publisher;
-    private UncertainDate publicationDate;
+    @Attribute
+    private TemporalCoordinate publicationDate;
+    @Attribute
     private int pages;
+    @Attribute
     private Genre genre;
+    @Attribute
     private String language;
+    @Attribute
     private String synopsis;
 
+    /**
+     * Creates a new Book with just a title.
+     * @param title the title of the book
+     */
     public Book(String title) {
+        this.id = UUID.randomUUID().toString();
         this.title = Objects.requireNonNull(title, "Title cannot be null");
     }
 
+    /**
+     * Creates a new Book with title and author.
+     * @param title the title
+     * @param author the author
+     */
     public Book(String title, String author) {
         this(title);
         if (author != null) {
@@ -35,7 +102,33 @@ public class Book {
         }
     }
 
-    // Getters
+    /**
+     * Creates a new Book with basic bibliographic info.
+     * @param title the title
+     * @param isbn the ISBN
+     * @param publicationDate the date of publication
+     */
+    public Book(String title, String isbn, TemporalCoordinate publicationDate) {
+        this(title);
+        this.isbn = isbn;
+        this.publicationDate = publicationDate;
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public String getName() {
+        return title;
+    }
+
+    @Override
+    public TemporalCoordinate getWhen() {
+        return publicationDate;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -52,7 +145,7 @@ public class Book {
         return publisher;
     }
 
-    public UncertainDate getPublicationDate() {
+    public TemporalCoordinate getPublicationDate() {
         return publicationDate;
     }
 
@@ -72,7 +165,6 @@ public class Book {
         return synopsis;
     }
 
-    // Setters
     public void setIsbn(String isbn) {
         this.isbn = isbn;
     }
@@ -81,7 +173,7 @@ public class Book {
         this.publisher = publisher;
     }
 
-    public void setPublicationDate(UncertainDate date) {
+    public void setPublicationDate(TemporalCoordinate date) {
         this.publicationDate = date;
     }
 
@@ -114,7 +206,8 @@ public class Book {
     }
 
     /**
-     * Returns formatted citation.
+     * Returns a formatted academic citation in a simplified APA/MLA style.
+     * @return citation string
      */
     public String getCitation() {
         String authorStr = authors.isEmpty() ? "Unknown Author" : String.join(", ", authors);
@@ -127,5 +220,3 @@ public class Book {
         return String.format("\"%s\" by %s", title, authors.isEmpty() ? "Unknown Author" : String.join(", ", authors));
     }
 }
-
-

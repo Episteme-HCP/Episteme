@@ -1,14 +1,52 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.architecture;
 
-import java.util.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 /**
- * Simulates urban evolution through historical periods with dynamic architectural style transitions.
+ * Historical simulation engine that models the architectural and demographic 
+ * evolution of a city over centuries. It tracks transitions between 
+ * architectural styles, building construction cycles, and urban prosperity.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
  */
 public final class UrbanEvolutionEngine {
 
     private UrbanEvolutionEngine() {}
 
+    /**
+     * Defined historical periods for urban categorization.
+     */
     public enum HistoricalPeriod {
         EARLY_MEDIEVAL(500, 1000, "Haut Moyen-Âge"),
         HIGH_MEDIEVAL(1000, 1250, "Moyen-Âge Central"),
@@ -39,6 +77,9 @@ public final class UrbanEvolutionEngine {
         }
     }
 
+    /**
+     * Major architectural styles and their defining characteristics.
+     */
     public enum ArchitecturalStyle {
         CAROLINGIAN(500, 1000, "Carolingien", List.of("Stone basilicas", "Westwork", "Round arches")),
         ROMANESQUE(1000, 1200, "Roman", List.of("Thick walls", "Semi-circular arches", "Barrel vaults", "Towers")),
@@ -67,20 +108,31 @@ public final class UrbanEvolutionEngine {
         public String getFrenchName() { return frenchName; }
     }
 
+    /**
+     * Functional classes for building simulation.
+     */
     public enum BuildingType {
         CATHEDRAL, CHURCH, MONASTERY, CASTLE, PALACE, TOWN_HALL,
         GUILD_HALL, MARKET_HALL, HOSPITAL, UNIVERSITY, HOUSE, WORKSHOP, WAREHOUSE
     }
 
+    /**
+     * Represents a single notable building within the city.
+     */
     public record Building(
         String name,
         BuildingType type,
         ArchitecturalStyle style,
         int constructionYear,
         int demolitionYear,  // -1 if still standing
-        double importance    // 0-1, affects city character
-    ) {}
+        double importance    // 0 to 1
+    ) implements Serializable {
+        private static final long serialVersionUID = 2L;
+    }
 
+    /**
+     * Snapshots the complete state of a city at a specific moment in history.
+     */
     public record CityState(
         String name,
         int year,
@@ -88,13 +140,36 @@ public final class UrbanEvolutionEngine {
         HistoricalPeriod period,
         Map<ArchitecturalStyle, Double> styleDistribution,
         List<Building> notableBuildings,
-        double prosperity,  // 0-1
-        double religiousInfluence,  // 0-1
-        double commercialActivity  // 0-1
-    ) {}
+        double prosperity,  // 0 to 1
+        double religiousInfluence,  // 0 to 1
+        double commercialActivity  // 0 to 1
+    ) implements Serializable {
+        private static final long serialVersionUID = 2L;
+    }
 
     /**
-     * Simulates urban evolution over a time period.
+     * Controls the simulation dynamics.
+     */
+    public record CityParameters(
+        double growthRate,           // annual population growth
+        double buildingTurnover,     // rate of replacement
+        double conservatism,         // resistance to new styles (0-1)
+        boolean isBishopSeat,
+        boolean hasUniversity,
+        boolean isTradeHub
+    ) implements Serializable {
+        private static final long serialVersionUID = 2L;
+    }
+
+    /**
+     * Simulates the evolution of a city over a defined time span.
+     * 
+     * @param cityName name of the city
+     * @param startYear beginning of simulation
+     * @param endYear end of simulation
+     * @param intervalYears time step in years
+     * @param params simulation parameters
+     * @return timeline of CityState snapshots
      */
     public static List<CityState> simulateEvolution(String cityName, int startYear, int endYear, 
             int intervalYears, CityParameters params) {
@@ -107,29 +182,16 @@ public final class UrbanEvolutionEngine {
             current = evolveCity(current, year, params);
             timeline.add(current);
         }
-        
         return timeline;
     }
 
-    /**
-     * City simulation parameters.
-     */
-    public record CityParameters(
-        double growthRate,           // Annual population growth
-        double buildingTurnover,     // Rate of replacement
-        double conservatism,         // Resistance to new styles (0-1)
-        boolean isBishopSeat,
-        boolean hasUniversity,
-        boolean isTradeHub
-    ) {}
-
     private static CityState initializeCity(String name, int year, CityParameters params) {
         HistoricalPeriod period = HistoricalPeriod.forYear(year);
-        
         Map<ArchitecturalStyle, Double> styles = new HashMap<>();
+        int activeCount = getActiveStylesCount(year);
         for (ArchitecturalStyle style : ArchitecturalStyle.values()) {
             if (style.isActiveIn(year)) {
-                styles.put(style, 1.0 / getActiveStylesCount(year));
+                styles.put(style, 1.0 / activeCount);
             }
         }
         
@@ -141,45 +203,22 @@ public final class UrbanEvolutionEngine {
         }
         
         return new CityState(
-            name, year,
-            5000,  // Base population
-            period,
-            styles,
-            buildings,
-            0.5,
-            params.isBishopSeat() ? 0.8 : 0.5,
-            params.isTradeHub() ? 0.8 : 0.5
+            name, year, 5000, period, styles, buildings, 
+            0.5, params.isBishopSeat() ? 0.8 : 0.5, params.isTradeHub() ? 0.8 : 0.5
         );
     }
 
     private static CityState evolveCity(CityState previous, int newYear, CityParameters params) {
         HistoricalPeriod period = HistoricalPeriod.forYear(newYear);
         int yearsDelta = newYear - previous.year();
-        
-        // Population growth
-        int newPopulation = (int)(previous.population() * 
-            Math.pow(1 + params.growthRate(), yearsDelta));
-        
-        // Update style distribution
-        Map<ArchitecturalStyle, Double> newStyles = updateStyleDistribution(
-            previous.styleDistribution(), newYear, params);
-        
-        // Add new notable buildings based on prosperity and period
-        List<Building> buildings = new ArrayList<>(previous.notableBuildings());
-        buildings = updateBuildings(buildings, newYear, period, params, newStyles);
-        
-        // Update prosperity based on events
+        int newPopulation = (int)(previous.population() * Math.pow(1 + params.growthRate(), yearsDelta));
+        Map<ArchitecturalStyle, Double> newStyles = updateStyleDistribution(previous.styleDistribution(), newYear, params);
+        List<Building> buildings = updateBuildings(previous.notableBuildings(), newYear, period, params, newStyles);
         double prosperity = calculateProsperity(previous, newYear, params);
         
         return new CityState(
-            previous.name(),
-            newYear,
-            newPopulation,
-            period,
-            newStyles,
-            buildings,
-            prosperity,
-            previous.religiousInfluence() + (params.isBishopSeat() ? 0.01 : -0.005),
+            previous.name(), newYear, newPopulation, period, newStyles, buildings, 
+            prosperity, previous.religiousInfluence() + (params.isBishopSeat() ? 0.01 : -0.005), 
             previous.commercialActivity() + (params.isTradeHub() ? 0.01 : 0)
         );
     }
@@ -189,39 +228,26 @@ public final class UrbanEvolutionEngine {
         
         Map<ArchitecturalStyle, Double> updated = new HashMap<>();
         double total = 0;
-        
         for (ArchitecturalStyle style : ArchitecturalStyle.values()) {
             double weight = 0;
-            
             if (style.isActiveIn(year)) {
-                // New buildings use current styles
                 double currentShare = current.getOrDefault(style, 0.0);
-                
-                // Style popularity peaks in the middle of its period
                 double stylePeak = (style.startYear + style.endYear) / 2.0;
-                double distanceFromPeak = Math.abs(year - stylePeak) / 
-                    ((style.endYear - style.startYear) / 2.0);
+                double span = (style.endYear - style.startYear) / 2.0;
+                double distanceFromPeak = span > 0 ? Math.abs(year - stylePeak) / span : 0;
                 double peakFactor = Math.max(0.1, 1 - distanceFromPeak);
-                
-                // Old buildings persist (conservatism)
-                weight = currentShare * params.conservatism() + 
-                        (1 - params.conservatism()) * peakFactor * 0.3;
+                weight = currentShare * params.conservatism() + (1 - params.conservatism()) * peakFactor * 0.3;
             } else {
-                // Style no longer built but old buildings remain
-                weight = current.getOrDefault(style, 0.0) * 0.95; // Slow decay
+                weight = current.getOrDefault(style, 0.0) * 0.95;
             }
-            
             if (weight > 0.001) {
                 updated.put(style, weight);
                 total += weight;
             }
         }
-        
-        // Normalize
         for (ArchitecturalStyle style : updated.keySet()) {
             updated.put(style, updated.get(style) / total);
         }
-        
         return updated;
     }
 
@@ -230,46 +256,30 @@ public final class UrbanEvolutionEngine {
             Map<ArchitecturalStyle, Double> styleDistribution) {
         
         List<Building> updated = new ArrayList<>();
-        
-        // Age existing buildings
         for (Building b : current) {
             if (b.demolitionYear() == -1 || b.demolitionYear() > year) {
                 updated.add(b);
             }
         }
         
-        // Add new buildings based on period
-        Random random = new Random(year);
+        Random random = new Random((long) year * 73);
         ArchitecturalStyle dominantStyle = getDominantStyle(styleDistribution);
         
         if (period == HistoricalPeriod.HIGH_MEDIEVAL && random.nextDouble() < 0.3) {
-            updated.add(new Building(
-                "Église Saint-" + generateSaintName(random),
-                BuildingType.CHURCH, dominantStyle, year, -1, 0.5
-            ));
+            updated.add(new Building("Église Saint-" + generateSaintName(random), BuildingType.CHURCH, dominantStyle, year, -1, 0.5));
         }
-        
         if (period == HistoricalPeriod.RENAISSANCE && params.hasUniversity() && random.nextDouble() < 0.2) {
-            updated.add(new Building(
-                "Collège de " + generateCollegeName(random),
-                BuildingType.UNIVERSITY, ArchitecturalStyle.RENAISSANCE, year, -1, 0.7
-            ));
+            updated.add(new Building("Collège de " + generateCollegeName(random), BuildingType.UNIVERSITY, ArchitecturalStyle.RENAISSANCE, year, -1, 0.7));
         }
-        
         return updated;
     }
 
     private static double calculateProsperity(CityState previous, int year, CityParameters params) {
         double base = previous.prosperity();
-        
-        // Trade hubs prosper
         if (params.isTradeHub()) base += 0.02;
-        
-        // Random events (plagues, wars, prosperity)
-        Random random = new Random(year * 31);
-        if (random.nextDouble() < 0.05) base -= 0.2; // Crisis
-        if (random.nextDouble() < 0.1) base += 0.1;  // Boom
-        
+        Random random = new Random((long) year * 31);
+        if (random.nextDouble() < 0.05) base -= 0.2; 
+        if (random.nextDouble() < 0.1) base += 0.1;
         return Math.max(0.1, Math.min(1.0, base));
     }
 
@@ -307,31 +317,26 @@ public final class UrbanEvolutionEngine {
     }
 
     /**
-     * Generates a textual description of city evolution.
+     * Generates a structural summary of city evolution over the simulated timeline.
+     * 
+     * @param timeline the simulated evolution history
+     * @return a multi-line human-readable summary
      */
     public static String describeEvolution(List<CityState> timeline) {
         StringBuilder sb = new StringBuilder();
-        
         for (CityState state : timeline) {
-            sb.append(String.format("\n=== %s en %d (%s) ===\n", 
-                state.name(), state.year(), state.period().getFrenchName()));
+            sb.append(String.format("\n=== %s en %d (%s) ===\n", state.name(), state.year(), state.period().getFrenchName()));
             sb.append(String.format("Population: %d habitants\n", state.population()));
             sb.append("Styles architecturaux dominants:\n");
-            
             state.styleDistribution().entrySet().stream()
                 .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
                 .limit(3)
-                .forEach(e -> sb.append(String.format("  - %s: %.1f%%\n", 
-                    e.getKey().getFrenchName(), e.getValue() * 100)));
-            
+                .forEach(e -> sb.append(String.format("  - %s: %.1f%%\n", e.getKey().getFrenchName(), e.getValue() * 100)));
             if (!state.notableBuildings().isEmpty()) {
                 sb.append("Bâtiments notables:\n");
-                state.notableBuildings().forEach(b -> 
-                    sb.append(String.format("  - %s (%s, %d)\n", 
-                        b.name(), b.style().getFrenchName(), b.constructionYear())));
+                state.notableBuildings().forEach(b -> sb.append(String.format("  - %s (%s, %d)\n", b.name(), b.style().getFrenchName(), b.constructionYear())));
             }
         }
-        
         return sb.toString();
     }
 }

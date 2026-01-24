@@ -135,104 +135,16 @@ public final class PeriodicTable {
         }
     }
 
-    public static List<Element> getElements() {
-        ensureLoaded();
-        synchronized (table) {
-            return new java.util.ArrayList<>(table.values());
-        }
-    }
-
-    private static void ensureLoaded() {
-        if (!loaded) {
-            synchronized (table) {
-                if (!loaded) {
-                    loadElements();
-                    loaded = true;
-                }
-            }
-        }
-    }
-
     @SuppressWarnings("unchecked")
     private static void loadElements() {
         try {
-            InputStream is = PeriodicTable.class.getResourceAsStream("elements.json");
-            if (is == null) {
-                System.err.println("elements.json not found in classpath for org.jscience.chemistry");
-                return;
+            List<Element> elements = org.jscience.chemistry.loaders.PeriodicTableReader.loadFromResource("elements.json");
+            for (Element e : elements) {
+                registerElement(e);
             }
-
-            String jsonText = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            Object result = SimpleJson.parse(jsonText);
-
-            if (result instanceof Map) {
-                Map<String, Object> root = (Map<String, Object>) result;
-                List<Object> elementsArray = (List<Object>) root.get("elements");
-
-                if (elementsArray != null) {
-                    for (Object obj : elementsArray) {
-                        parseAndRegister((Map<String, Object>) obj);
-                    }
-                }
-            }
-            is.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private static void parseAndRegister(Map<String, Object> node) {
-        String name = (String) node.getOrDefault("name", "");
-        String symbol = (String) node.getOrDefault("symbol", "");
-        if (name.isEmpty() || symbol.isEmpty())
-            return;
-
-        String category = (String) node.getOrDefault("category", "");
-
-        Element elem;
-        // Mapping category to Element subclasses
-        if (category.contains("alkali metal"))
-            elem = new AlkaliMetal(name, symbol);
-        else if (category.contains("alkaline earth"))
-            elem = new AlkaliEarthMetal(name, symbol);
-        else if (category.contains("halogen"))
-            elem = new Halogen(name, symbol);
-        else if (category.contains("noble gas"))
-            elem = new NobleGas(name, symbol);
-        else if (category.contains("transition metal"))
-            elem = new TransitionMetal(name, symbol);
-        else if (category.contains("lanthanide") || category.contains("actinide"))
-            elem = new RareEarthMetal(name, symbol);
-        else if (category.contains("metal"))
-            elem = new Metal(name, symbol); // Fallback for other metals
-        else if (category.contains("nonmetal"))
-            elem = new NonMetal(name, symbol);
-        else
-            elem = new Element(name, symbol); // Default
-
-        if (node.containsKey("atomicNumber"))
-            elem.setAtomicNumber(((Number) node.get("atomicNumber")).intValue());
-        if (node.containsKey("atomicMass")) {
-            double massVal = ((Number) node.get("atomicMass")).doubleValue();
-            elem.setMassNumber((int) Math.round(massVal));
-            elem.setAtomicMass(Quantities.create(massVal, UNIFIED_ATOMIC_MASS));
-        }
-
-        Object densityObj = node.get("density");
-        if (densityObj instanceof Number)
-            elem.setDensity(Quantities.create(((Number) densityObj).doubleValue(), G_PER_CM3));
-
-        Object meltObj = node.get("melt");
-        if (meltObj instanceof Number)
-            elem.setMeltingPoint(Quantities.create(((Number) meltObj).doubleValue(), KELVIN));
-
-        Object boilObj = node.get("boil");
-        if (boilObj instanceof Number)
-            elem.setBoilingPoint(Quantities.create(((Number) boilObj).doubleValue(), KELVIN));
-
-        // Register
-        table.put(name.toLowerCase(), elem);
-        symbolToName.put(symbol, name);
     }
 }
 

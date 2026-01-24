@@ -23,39 +23,59 @@
 
 package org.jscience.arts;
 
+import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.*;
-import org.jscience.util.identity.Identified;
-import org.jscience.util.persistence.Persistent;
-import org.jscience.util.persistence.Id;
-import org.jscience.util.persistence.Attribute;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+import org.jscience.biology.Individual;
+import org.jscience.biology.taxonomy.Species;
+import org.jscience.economics.Organization;
+import org.jscience.economics.Worker;
+import org.jscience.economics.money.Money;
+import org.jscience.geography.Place;
+import org.jscience.history.temporal.FuzzyTimePoint;
+import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
 
 /**
- * Represents an artist (painter, sculptor, musician, etc.).
+ * Represents an artist (painter, sculptor, musician, etc.) as a specialized social role.
+ * This class captures the artist's biographical data, media of expertise,
+ * nationality, and belonging to artistic movements.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
+ * @version 2.0
  * @since 1.0
  */
 @Persistent
-public class Artist implements Identified<String> {
+public class Artist extends Worker implements Serializable {
 
+    private static final long serialVersionUID = 2L;
+
+    /**
+     * Categories of artistic media.
+     */
     public enum Medium {
         PAINTING, SCULPTURE, MUSIC, DANCE, THEATER, FILM,
         PHOTOGRAPHY, ARCHITECTURE, LITERATURE, DIGITAL
     }
 
-    @Id
-    private final String name;
     @Attribute
     private final Set<Medium> media = EnumSet.noneOf(Medium.class);
     @Attribute
     private String nationality;
     @Attribute
-    private LocalDate birthDate;
+    private TemporalCoordinate birthDate;
     @Attribute
-    private LocalDate deathDate;
+    private TemporalCoordinate deathDate;
     @Attribute
     private String movement; // e.g., "Impressionism", "Baroque"
     @Attribute
@@ -63,24 +83,25 @@ public class Artist implements Identified<String> {
     @Attribute
     private String biography;
 
-    public Artist(String name) {
-        this.name = Objects.requireNonNull(name, "Name cannot be null");
-        if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
+    /**
+     * Creates a new Artist role.
+     * 
+     * @param individual the individual playing the role
+     * @param organization the organization the artist belongs to (can be self-employed)
+     * @param function the specific function description (e.g., "Painter")
+     */
+    public Artist(Individual individual, Organization organization, String function) {
+        super(individual, organization, function, Money.usd(Real.ZERO));
     }
 
-    public Artist(String name, Medium primaryMedium) {
-        this(name);
-        this.media.add(primaryMedium);
-    }
-
-    // Getters
-    @Override
-    public String getId() {
-        return name;
-    }
-
-    public String getName() {
-        return name;
+    /**
+     * Creates a new Artist role with "Artist" as the default function.
+     * 
+     * @param individual the individual playing the role
+     * @param organization the organization the artist belongs to
+     */
+    public Artist(Individual individual, Organization organization) {
+        this(individual, organization, "Artist");
     }
 
     public Set<Medium> getMedia() {
@@ -91,45 +112,44 @@ public class Artist implements Identified<String> {
         return nationality;
     }
 
-    public LocalDate getBirthDate() {
+    public void setNationality(String nationality) {
+        this.nationality = nationality;
+    }
+
+    public TemporalCoordinate getBirthDate() {
         return birthDate;
     }
 
-    public LocalDate getDeathDate() {
+    public void setBirthDate(TemporalCoordinate date) {
+        this.birthDate = date;
+    }
+
+    public TemporalCoordinate getDeathDate() {
         return deathDate;
+    }
+
+    public void setDeathDate(TemporalCoordinate date) {
+        this.deathDate = date;
     }
 
     public String getMovement() {
         return movement;
     }
 
-    public String getBiography() {
-        return biography;
-    }
-
-    public List<String> getNotableWorks() {
-        return Collections.unmodifiableList(notableWorks);
-    }
-
-    // Setters
-    public void setNationality(String nationality) {
-        this.nationality = nationality;
-    }
-
-    public void setBirthDate(LocalDate date) {
-        this.birthDate = date;
-    }
-
-    public void setDeathDate(LocalDate date) {
-        this.deathDate = date;
-    }
-
     public void setMovement(String movement) {
         this.movement = movement;
     }
 
+    public String getBiography() {
+        return biography;
+    }
+
     public void setBiography(String bio) {
         this.biography = bio;
+    }
+
+    public List<String> getNotableWorks() {
+        return Collections.unmodifiableList(notableWorks);
     }
 
     public void addMedium(Medium medium) {
@@ -140,38 +160,61 @@ public class Artist implements Identified<String> {
         notableWorks.add(work);
     }
 
+    /**
+     * Checks if the artist is currently alive (deathDate is null).
+     * @return true if alive
+     */
     public boolean isAlive() {
         return deathDate == null;
     }
 
     @Override
     public String toString() {
-        return String.format("%s (%s, %s)", name, media, nationality);
+        return String.format("%s (%s, %s)", getName(), media, nationality);
     }
 
-    // Famous artists
+    /**
+     * Factory method for Leonardo da Vinci.
+     * @return Leonardo da Vinci artist profile
+     */
     public static Artist leonardoDaVinci() {
-        Artist a = new Artist("Leonardo da Vinci", Medium.PAINTING);
+        Species human = new Species("Human", "Homo sapiens");
+        Individual leo = new Individual(UUID.randomUUID().toString(), human, Individual.Sex.MALE, LocalDate.of(1452, 4, 15));
+        leo.setTrait("name", "Leonardo da Vinci");
+        
+        Organization selfEmployed = new Organization("Independent", new Place("Florence"), Money.usd(Real.ZERO));
+        Artist a = new Artist(leo, selfEmployed, "Polymath");
+        
+        a.addMedium(Medium.PAINTING);
         a.addMedium(Medium.SCULPTURE);
         a.setNationality("Italian");
-        a.setBirthDate(LocalDate.of(1452, 4, 15));
-        a.setDeathDate(LocalDate.of(1519, 5, 2));
+        a.setBirthDate(FuzzyTimePoint.of(1452, 4, 15));
+        a.setDeathDate(FuzzyTimePoint.of(1519, 5, 2));
         a.setMovement("Renaissance");
         a.addNotableWork("Mona Lisa");
         a.addNotableWork("The Last Supper");
         return a;
     }
 
+    /**
+     * Factory method for Ludwig van Beethoven.
+     * @return Beethoven artist profile
+     */
     public static Artist beethoven() {
-        Artist a = new Artist("Ludwig van Beethoven", Medium.MUSIC);
+        Species human = new Species("Human", "Homo sapiens");
+        Individual ludwig = new Individual(UUID.randomUUID().toString(), human, Individual.Sex.MALE, LocalDate.of(1770, 12, 17));
+        ludwig.setTrait("name", "Ludwig van Beethoven");
+        
+        Organization selfEmployed = new Organization("Independent", new Place("Vienna"), Money.usd(Real.ZERO));
+        Artist a = new Artist(ludwig, selfEmployed, "Composer");
+        
+        a.addMedium(Medium.MUSIC);
         a.setNationality("German");
-        a.setBirthDate(LocalDate.of(1770, 12, 17));
-        a.setDeathDate(LocalDate.of(1827, 3, 26));
+        a.setBirthDate(FuzzyTimePoint.of(1770, 12, 17));
+        a.setDeathDate(FuzzyTimePoint.of(1827, 3, 26));
         a.setMovement("Romanticism");
         a.addNotableWork("Symphony No. 9");
         a.addNotableWork("Moonlight Sonata");
         return a;
     }
 }
-
-

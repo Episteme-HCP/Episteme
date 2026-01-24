@@ -34,10 +34,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Queue;
+import java.util.LinkedList;
 import org.jscience.biology.taxonomy.Species;
+import org.jscience.medicine.Pathology;
+import org.jscience.psychology.social.Biography;
+import org.jscience.psychology.Behavior;
 import org.jscience.geography.Place;
 import org.jscience.util.Named;
 import org.jscience.util.identity.Identified;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
@@ -57,7 +64,7 @@ import org.jscience.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Individual implements Identified<String>, Named, Serializable {
+public class Individual implements Identified<Identification>, Named, Positioned<Place>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -77,7 +84,7 @@ public class Individual implements Identified<String>, Named, Serializable {
     }
 
     @Id
-    private final String id;
+    private final Identification id;
     
     @Attribute
     private final Species species;
@@ -94,19 +101,32 @@ public class Individual implements Identified<String>, Named, Serializable {
     @Attribute
     private LifeStage lifeStage;
     
-    @Relation(type = Relation.Type.MANY_TO_MANY)
-    private final List<Individual> parents = new ArrayList<>();
-    
-    @Relation(type = Relation.Type.MANY_TO_MANY)
-    private final List<Individual> offspring = new ArrayList<>();
-    
-    private final Map<String, Object> traits = new HashMap<>();
+    @Attribute
+    private ReproductionMode reproductionMode;
     
     @Attribute
-    private ReproductionMode reproductionMode = ReproductionMode.SEXUAL;
-
     private Place place;
+    
+    @Attribute
     private Place territory;
+    
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private final Set<Individual> parents = new HashSet<>();
+    
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private final Set<Individual> children = new HashSet<>();
+    
+    @Relation(type = Relation.Type.ONE_TO_MANY)
+    private final Set<Pathology> pathologies = new HashSet<>();
+    
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private final Set<Behavior> availableBehaviors = new HashSet<>();
+    
+    @Attribute
+    private Biography biography;
+    
+    @Attribute
+    private final Map<String, Object> traits = new HashMap<>();
 
     /**
      * Creates a new individual organism.
@@ -114,15 +134,22 @@ public class Individual implements Identified<String>, Named, Serializable {
      * @param id        unique identifier
      * @param species   biological species
      * @param sex       organism sex
-     * @param birthDate birth or creation date
+     * @param birthDate birth or creation date (can be null for historical/unknown cases)
      * @throws NullPointerException if id or species is null
      */
-    public Individual(String id, Species species, Sex sex, LocalDate birthDate) {
+    public Individual(Identification id, Species species, Sex sex, LocalDate birthDate) {
         this.id = Objects.requireNonNull(id, "ID cannot be null");
         this.species = Objects.requireNonNull(species, "Species cannot be null");
         this.sex = sex != null ? sex : Sex.UNKNOWN;
-        this.birthDate = birthDate != null ? birthDate : LocalDate.now();
+        this.birthDate = birthDate;
         this.lifeStage = LifeStage.JUVENILE;
+    }
+
+    /**
+     * Helper constructor for String IDs (creates SimpleIdentification).
+     */
+    public Individual(String id, Species species, Sex sex, LocalDate birthDate) {
+        this(new SimpleIdentification(id), species, sex, birthDate);
     }
 
     /**
@@ -132,18 +159,110 @@ public class Individual implements Identified<String>, Named, Serializable {
      * @param species biological species
      * @param sex     organism sex
      */
+    public Individual(Identification id, Species species, Sex sex) {
+        this(id, species, sex, null);
+    }
+
+    /**
+     * Helper constructor for String IDs.
+     */
     public Individual(String id, Species species, Sex sex) {
-        this(id, species, sex, LocalDate.now());
+        this(new SimpleIdentification(id), species, sex, null);
     }
 
     @Override
-    public String getId() {
+    public Identification getId() {
         return id;
     }
 
     @Override
     public String getName() {
         return (String) traits.getOrDefault("name", id);
+    }
+
+    /**
+     * Finds all descendants of this individual.
+     * 
+     * @return a set of descendants
+     */
+    public Set<Individual> getDescendants() {
+        Set<Individual> descendants = new HashSet<>();
+        collectDescendants(this, descendants);
+        descendants.remove(this);
+        return descendants;
+    }
+
+    private void collectDescendants(Individual current, Set<Individual> visited) {
+        if (current == null || !visited.add(current)) return;
+        for (Individual child : current.getChildren()) {
+            collectDescendants(child, visited);
+        }
+    }
+
+    /**
+     * Finds all ancestors of this individual.
+     * 
+     * @return a set of ancestors
+     */
+    public Set<Individual> getAncestors() {
+        Set<Individual> ancestors = new HashSet<>();
+        collectAncestors(this, ancestors);
+        ancestors.remove(this);
+        return ancestors;
+    }
+
+    private void collectAncestors(Individual current, Set<Individual> visited) {
+        if (current == null || !visited.add(current)) return;
+        for (Individual parent : current.getParents()) {
+            collectAncestors(parent, visited);
+        }
+    }
+
+    /**
+     * Checks if this individual is a descendant of another.
+     */
+    public boolean isDescendantOf(Individual suspectedAncestor) {
+        return getAncestors().contains(suspectedAncestor);
+    }
+
+    /**
+     * Checks if this individual is an ancestor of another.
+     */
+    public boolean isAncestorOf(Individual suspectedDescendant) {
+        return getDescendants().contains(suspectedDescendant);
+    }
+
+    /**
+     * Calculates the genealogical distance between two individuals.
+     * 
+     * @return distance in generations (1 for parent-child, 2 for grandparents/siblings), or -1 if no relation
+     */
+    public int getGenealogicalDistance(Individual other) {
+        if (this.equals(other)) return 0;
+        
+        Map<Individual, Integer> distances = new HashMap<>();
+        Queue<Individual> queue = new LinkedList<>();
+        
+        queue.add(this);
+        distances.put(this, 0);
+        
+        while (!queue.isEmpty()) {
+            Individual current = queue.poll();
+            int currentDist = distances.get(current);
+            
+            List<Individual> neighbors = new ArrayList<>();
+            neighbors.addAll(current.getParents());
+            neighbors.addAll(current.getChildren());
+            
+            for (Individual neighbor : neighbors) {
+                if (!distances.containsKey(neighbor)) {
+                    distances.put(neighbor, currentDist + 1);
+                    if (neighbor.equals(other)) return currentDist + 1;
+                    queue.add(neighbor);
+                }
+            }
+        }
+        return -1;
     }
 
     /**
@@ -251,40 +370,101 @@ public class Individual implements Identified<String>, Named, Serializable {
     }
 
     /**
-     * Returns an unmodifiable list of parents.
-     * @return list of parents
+     * Returns an unmodifiable set of parents.
+     * @return set of parents
      */
-    public List<Individual> getParents() {
-        return Collections.unmodifiableList(parents);
+    public Set<Individual> getParents() {
+        return Collections.unmodifiableSet(parents);
     }
 
     /**
-     * Adds a parent to this individual.
+     * Adds a parent to this individual and adds this as its child (double link).
      * @param parent the parent to add
      */
     public void addParent(Individual parent) {
         if (parent != null && !parents.contains(parent)) {
             parents.add(parent);
+            parent.addChild(this);
         }
     }
 
     /**
-     * Returns an unmodifiable list of offspring.
-     * @return list of children
+     * Returns an unmodifiable set of children.
+     * @return set of children
      */
-    public List<Individual> getOffspring() {
-        return Collections.unmodifiableList(offspring);
+    public Set<Individual> getChildren() {
+        return Collections.unmodifiableSet(children);
     }
 
     /**
-     * Adds an offspring to this individual and sets this as its parent.
-     * @param child the offspring to add
+     * Adds a child to this individual and sets this as its parent (double link).
+     * @param child the child to add
      */
-    public void addOffspring(Individual child) {
-        if (child != null && !offspring.contains(child)) {
-            offspring.add(child);
+    public void addChild(Individual child) {
+        if (child != null && !children.contains(child)) {
+            children.add(child);
             child.addParent(this);
         }
+    }
+
+    /**
+     * Adds a pathology (disease, allergy, etc.) to the individual's history.
+     * @param pathology the pathology to add
+     */
+    public void addPathology(Pathology pathology) {
+        if (pathology != null) {
+            pathologies.add(pathology);
+        }
+    }
+
+    /**
+     * Returns the set of pathologies.
+     * @return set of pathologies
+     */
+    public Set<Pathology> getPathologies() {
+        return Collections.unmodifiableSet(pathologies);
+    }
+
+    /**
+     * Returns the structured biography.
+     * @return the structured biography object
+     */
+    public Biography getStructuredBiography() {
+        return biography;
+    }
+
+    /**
+     * Sets the structured biography.
+     * @param biography the biography to set
+     */
+    public void setStructuredBiography(Biography biography) {
+        this.biography = biography;
+    }
+
+    /**
+     * Registers a behavior that this individual is capable of exhibiting.
+     * @param behavior behavior to add
+     */
+    public void addAvailableBehavior(Behavior behavior) {
+        if (behavior != null) {
+            availableBehaviors.add(behavior);
+        }
+    }
+
+    /**
+     * Returns an unmodifiable set of behaviors available to this individual.
+     * @return set of behaviors
+     */
+    public Set<Behavior> getAvailableBehaviors() {
+        return Collections.unmodifiableSet(availableBehaviors);
+    }
+
+    /**
+     * Removes a behavior from the individual's available set.
+     * @param behavior behavior to remove
+     */
+    public void removeAvailableBehavior(Behavior behavior) {
+        availableBehaviors.remove(behavior);
     }
 
     /**
@@ -330,7 +510,7 @@ public class Individual implements Identified<String>, Named, Serializable {
     public List<Individual> getSiblings() {
         Set<Individual> siblings = new HashSet<>();
         for (Individual parent : parents) {
-            for (Individual sibling : parent.offspring) {
+            for (Individual sibling : parent.children) {
                 if (!sibling.equals(this)) {
                     siblings.add(sibling);
                 }
@@ -348,7 +528,7 @@ public class Individual implements Identified<String>, Named, Serializable {
         Individual clone = new Individual(newId, species, sex, LocalDate.now());
         clone.reproductionMode = ReproductionMode.ASEXUAL;
         clone.addParent(this);
-        this.offspring.add(clone);
+        this.children.add(clone);
         clone.traits.putAll(this.traits);
         return clone;
     }

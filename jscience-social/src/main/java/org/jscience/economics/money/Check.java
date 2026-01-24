@@ -1,121 +1,176 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.economics.money;
 
 import org.jscience.economics.Organization;
-
-import org.jscience.measure.Amount;
+import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.Identified;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
-import java.util.Date;
-
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.Objects;
 
 /**
- * A class representing a paper form of payment from one person to another.
+ * Represents a paper check as a form of payment.
+ * <p>
+ * A check is a written order directing a bank to pay money from the
+ * emitter's account to the receiver.
  *
  * @author Silvere Martin-Michiellot
- * @version 1.0
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
+@Persistent
+public final class Check implements Identified<String>, Serializable {
 
-//this class does not tell if the check was actually paid or not
-//look at accounts transactions or receipts
+    private static final long serialVersionUID = 1L;
 
-//perhaps we should extend Amount<Money> or something
-public final class Check implements Identified {
-    /** DOCUMENT ME! */
-    private Identification identification; //unique for each check
+    @Id
+    private final Identification identification;
 
-    /** DOCUMENT ME! */
-    private Account emitter;
+    @Relation(type = Relation.Type.MANY_TO_ONE)
+    private final Account emitter;
 
-    /** DOCUMENT ME! */
-    private Organization receiver;
+    @Relation(type = Relation.Type.MANY_TO_ONE)
+    private final Organization receiver;
 
-    /** DOCUMENT ME! */
-    private Date emission;
+    @Attribute
+    private final Instant emission;
 
-    /** DOCUMENT ME! */
-    private Amount<Money> value;
+    @Attribute
+    private final Money value;
 
-    //we don't store the place where the check was made because it is not really a trusted value
     /**
-     * Creates a new Check object.
+     * Creates a new Check.
      *
-     * @param identification DOCUMENT ME!
-     * @param emitter DOCUMENT ME!
-     * @param receiver DOCUMENT ME!
-     * @param emission DOCUMENT ME!
-     * @param value DOCUMENT ME!
-     * @param currency DOCUMENT ME!
+     * @param identification unique check number
+     * @param emitter        the account issuing the check
+     * @param receiver       the organization receiving payment
+     * @param emission       the date/time of issue
+     * @param value          the check amount
+     * @throws NullPointerException if any argument is null
      */
     public Check(Identification identification, Account emitter,
-        Organization receiver, Date emission, double value, Currency currency) {
-        if ((identification != null) && (emitter != null) &&
-                (receiver != null) && (emission != null)) {
-            this.identification = identification;
-            this.emitter = emitter;
-            this.receiver = receiver;
-            this.emission = emission;
-            this.value = Amount.valueOf(value, currency);
-        } else {
-            throw new IllegalArgumentException(
-                "Check doesn't accept null arguments.");
-        }
+                 Organization receiver, Instant emission, Money value) {
+        this.identification = Objects.requireNonNull(identification, "Identification cannot be null");
+        this.emitter = Objects.requireNonNull(emitter, "Emitter cannot be null");
+        this.receiver = Objects.requireNonNull(receiver, "Receiver cannot be null");
+        this.emission = Objects.requireNonNull(emission, "Emission date cannot be null");
+        this.value = Objects.requireNonNull(value, "Value cannot be null");
     }
 
     /**
-     * DOCUMENT ME!
+     * Creates a new Check from amount and currency.
      *
-     * @return DOCUMENT ME!
+     * @param identification unique check number
+     * @param emitter        the account issuing the check
+     * @param receiver       the organization receiving payment
+     * @param emission       the date/time of issue
+     * @param amount         the numeric amount
+     * @param currency       the currency
      */
-    public final Identification getIdentification() {
+    public Check(Identification identification, Account emitter,
+                 Organization receiver, Instant emission, double amount, Currency currency) {
+        this(identification, emitter, receiver, emission, 
+             Money.valueOf(Real.of(amount), currency));
+    }
+
+    @Override
+    public String getId() {
+        return identification.getId();
+    }
+
+    /**
+     * Returns the check identification.
+     * @return the identification
+     */
+    @Override
+    public Identification getIdentification() {
         return identification;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the emitter account.
+     * @return the emitter
      */
-    public final Account getEmitter() {
+    public Account getEmitter() {
         return emitter;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the receiver organization.
+     * @return the receiver
      */
-    public final Organization getReceiver() {
+    public Organization getReceiver() {
         return receiver;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the emission date/time.
+     * @return the emission instant
      */
-    public final Date getEmission() {
+    public Instant getEmission() {
         return emission;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the check value.
+     * @return the amount
      */
-    public final Amount<Money> getAmount() {
+    public Money getValue() {
         return value;
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns the currency of this check.
+     * @return the currency
      */
-    public final String toString() {
-        return "Check " + identification + " emitted by " +
-        emitter.getIdentification().toString() + " to " + receiver.getName() +
-        " on " + emission + " is worth " + getAmount() + " " +
-        getAmount().getUnit().toString();
+    public Currency getCurrency() {
+        return value.getCurrency();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Check)) return false;
+        Check other = (Check) obj;
+        return Objects.equals(identification, other.identification);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(identification);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Check %s from %s to %s: %s on %s",
+            identification, emitter.getName(), receiver.getName(), value, emission);
     }
 }

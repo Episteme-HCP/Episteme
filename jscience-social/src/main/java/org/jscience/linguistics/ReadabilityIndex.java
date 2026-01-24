@@ -1,23 +1,63 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.linguistics;
 
+import java.io.Serializable;
 
 /**
- * Calculates text readability indices.
+ * Utility tool for calculating various text readability indices. 
+ * Supports standard linguistic formulas including Flesch, Gunning Fog, SMOG, 
+ * Coleman-Liau, and the Automated Readability Index (ARI).
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @version 2.0
+ * @since 1.0
+ * @see <a href="https://en.wikipedia.org/wiki/Readability">Readability (Wikipedia)</a>
  */
 public final class ReadabilityIndex {
 
     private ReadabilityIndex() {}
 
+    /**
+     * Encapsulates the evaluation of a readability calculation.
+     */
     public record ReadabilityResult(
         double score,
         String indexName,
         String gradeLevel,
         String interpretation
-    ) {}
+    ) implements Serializable {
+        private static final long serialVersionUID = 2L;
+    }
 
     /**
-     * Flesch Reading Ease score.
-     * 206.835 - 1.015 × (words/sentences) - 84.6 × (syllables/words)
+     * Calculates the Flesch Reading Ease score.
+     * Formula: 206.835 - 1.015 * (words/sentences) - 84.6 * (syllables/words)
+     * 
+     * @param text the input text to analyze
+     * @return ReadabilityResult (higher score = easier to read)
      */
     public static ReadabilityResult fleschReadingEase(String text) {
         TextStats stats = analyzeText(text);
@@ -35,8 +75,11 @@ public final class ReadabilityIndex {
     }
 
     /**
-     * Flesch-Kincaid Grade Level.
-     * 0.39 × (words/sentences) + 11.8 × (syllables/words) - 15.59
+     * Calculates the Flesch-Kincaid Grade Level.
+     * Formula: 0.39 * (words/sentences) + 11.8 * (syllables/words) - 15.59
+     * 
+     * @param text input text
+     * @return ReadabilityResult representing the school grade level
      */
     public static ReadabilityResult fleschKincaidGradeLevel(String text) {
         TextStats stats = analyzeText(text);
@@ -56,8 +99,11 @@ public final class ReadabilityIndex {
     }
 
     /**
-     * Gunning Fog Index.
-     * 0.4 × ((words/sentences) + 100 × (complex words/words))
+     * Calculates the Gunning Fog Index.
+     * Formula: 0.4 * ((words/sentences) + 100 * (complex words/words))
+     * 
+     * @param text input text
+     * @return ReadabilityResult
      */
     public static ReadabilityResult gunningFogIndex(String text) {
         TextStats stats = analyzeText(text);
@@ -76,8 +122,11 @@ public final class ReadabilityIndex {
     }
 
     /**
-     * SMOG (Simple Measure of Gobbledygook) Index.
-     * 1.043 × sqrt(30 × polysyllables/sentences) + 3.1291
+     * Calculates the SMOG (Simple Measure of Gobbledygook) Index.
+     * Formula: 1.043 * sqrt(30 * polysyllables/sentences) + 3.1291
+     * 
+     * @param text input text
+     * @return ReadabilityResult
      */
     public static ReadabilityResult smogIndex(String text) {
         TextStats stats = analyzeText(text);
@@ -92,26 +141,29 @@ public final class ReadabilityIndex {
     }
 
     /**
-     * Coleman-Liau Index.
-     * 0.0588 × L - 0.296 × S - 15.8
-     * where L = avg letters per 100 words, S = avg sentences per 100 words
+     * Calculates the Coleman-Liau Index based on character and sentence counts.
+     * Formula: 0.0588 * L - 0.296 * S - 15.8
+     * 
+     * @param text input text
+     * @return ReadabilityResult
      */
     public static ReadabilityResult colemanLiauIndex(String text) {
         TextStats stats = analyzeText(text);
+        if (stats.words == 0) return new ReadabilityResult(0, "Coleman-Liau", "0", "N/A");
         
         double L = (double) stats.letters / stats.words * 100;
         double S = (double) stats.sentences / stats.words * 100;
         
         double cli = (0.0588 * L) - (0.296 * S) - 15.8;
-        
-        String gradeLevel = String.format("Grade %.1f", cli);
-        
-        return new ReadabilityResult(cli, "Coleman-Liau Index", gradeLevel, "US grade level");
+        return new ReadabilityResult(cli, "Coleman-Liau Index", String.format("Grade %.1f", cli), "US grade level");
     }
 
     /**
-     * Automated Readability Index (ARI).
-     * 4.71 × (characters/words) + 0.5 × (words/sentences) - 21.43
+     * Calculates the Automated Readability Index (ARI).
+     * Formula: 4.71 * (characters/words) + 0.5 * (words/sentences) - 21.43
+     * 
+     * @param text input text
+     * @return ReadabilityResult
      */
     public static ReadabilityResult automatedReadabilityIndex(String text) {
         TextStats stats = analyzeText(text);
@@ -120,10 +172,7 @@ public final class ReadabilityIndex {
         double wordsPerSentence = (double) stats.words / Math.max(1, stats.sentences);
         
         double ari = (4.71 * charsPerWord) + (0.5 * wordsPerSentence) - 21.43;
-        
-        String gradeLevel = String.format("Grade %.1f", ari);
-        
-        return new ReadabilityResult(ari, "Automated Readability Index", gradeLevel, "US grade level");
+        return new ReadabilityResult(ari, "Automated Readability Index", String.format("Grade %.1f", ari), "US grade level");
     }
 
     private record TextStats(
@@ -132,6 +181,10 @@ public final class ReadabilityIndex {
     ) {}
 
     private static TextStats analyzeText(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            return new TextStats(0, 0, 0, 0, 0, 0);
+        }
+        
         String[] sentences = text.split("[.!?]+");
         String[] words = text.toLowerCase().split("\\s+");
         
@@ -139,9 +192,13 @@ public final class ReadabilityIndex {
         int complexWords = 0;
         int polysyllables = 0;
         int letters = 0;
+        int wordCount = 0;
         
         for (String word : words) {
             String cleaned = word.replaceAll("[^a-z]", "");
+            if (cleaned.isEmpty()) continue;
+            
+            wordCount++;
             letters += cleaned.length();
             
             int syllables = countSyllables(cleaned);
@@ -153,14 +210,13 @@ public final class ReadabilityIndex {
             }
         }
         
-        return new TextStats(words.length, sentences.length, totalSyllables, 
+        return new TextStats(wordCount, sentences.length, totalSyllables, 
                            letters, complexWords, polysyllables);
     }
 
     private static int countSyllables(String word) {
-        if (word.isEmpty()) return 0;
+        if (word == null || word.isEmpty()) return 0;
         
-        // Simple English syllable counting heuristic
         word = word.toLowerCase().replaceAll("[^a-z]", "");
         if (word.isEmpty()) return 0;
         
@@ -176,7 +232,6 @@ public final class ReadabilityIndex {
             lastWasVowel = isVowel;
         }
         
-        // Adjust for silent e
         if (word.endsWith("e") && count > 1) {
             count--;
         }

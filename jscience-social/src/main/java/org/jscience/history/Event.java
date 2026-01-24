@@ -1,233 +1,111 @@
-/*
- * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.jscience.history;
 
-import org.jscience.history.time.UncertainDate;
 import java.io.Serializable;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.Objects;
+import java.util.UUID;
+import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.util.Named;
 import org.jscience.util.Temporal;
+import org.jscience.util.identity.Identified;
 import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
 /**
- * A class representing a historical event.
- * Uses {@link UncertainDate} to handle potential fuzziness in dating.
+ * Represents a significant historical or scientific event.
+ * Base class focusing on the temporal aspect of an event.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
- * @since 1.0
+ * @since 2.0
  */
 @Persistent
-public class Event implements Comparable<Event>, Temporal, Serializable {
+public class Event implements Identified<String>, Named, Temporal<TemporalCoordinate>, Comparable<Event>, Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
-    /** The date of the event, possibly uncertain. */
-    @Relation(type = Relation.Type.ONE_TO_ONE)
-    private final UncertainDate date;
+    public enum Category {
+        POLITICAL, MILITARY, CULTURAL, SCIENTIFIC, ECONOMIC, RELIGIOUS, NATURAL, OTHER
+    }
 
-    /** A description of what happened. */
+    @Id
+    protected final String id;
+
     @Attribute
-    private final String happening;
+    protected final String name;
 
-    /**
-     * Creates a new Event object for a specific date (UTC).
-     * 
-     * @param date the date of the event
-     * @param happening description of the event
-     * @throws NullPointerException if date or happening is null
-     */
-    public Event(LocalDate date, String happening) {
-        this(new UncertainDate(Objects.requireNonNull(date, "Date cannot be null")), happening);
-    }
-    
-    /**
-     * Creates a new Event object for a specific instant (Point in time).
-     * 
-     * @param exact the exact instant of the event
-     * @param happening description of the event
-     * @throws NullPointerException if exact or happening is null
-     */
-    public Event(Instant exact, String happening) {
-        this(new UncertainDate(Objects.requireNonNull(exact, "Exact instant cannot be null")), happening);
+    @Attribute
+    protected final String description;
+
+    @Relation(type = Relation.Type.ONE_TO_ONE)
+    protected final TemporalCoordinate when;
+
+    @Attribute
+    protected final Category category;
+
+    public Event(String name, String description, TemporalCoordinate when, Category category) {
+        this.id = UUID.randomUUID().toString();
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        this.description = description;
+        this.when = Objects.requireNonNull(when, "Time coordinate cannot be null");
+        this.category = category != null ? category : Category.OTHER;
     }
 
-    /**
-     * Creates a new Event object with a duration or uncertain range.
-     * 
-     * @param start the start of the interval
-     * @param end the end of the interval (defaults to start if null)
-     * @param happening description of the event
-     * @throws NullPointerException if start or happening is null
-     */
-    public Event(Instant start, Instant end, String happening) {
-        this(new UncertainDate(Objects.requireNonNull(start, "Start instant cannot be null"), 
-                end != null ? end : start), happening);
-    }
-    
-    /**
-     * Creates a new Event with an UncertainDate.
-     * 
-     * @param date the uncertain date
-     * @param happening description of the event
-     * @throws NullPointerException if date or happening is null
-     */
-    public Event(UncertainDate date, String happening) {
-        this.date = Objects.requireNonNull(date, "UncertainDate cannot be null");
-        this.happening = Objects.requireNonNull(happening, "Happening description cannot be null");
-    }
-
-    /**
-     * Returns the date of the event.
-     *
-     * @return the date
-     */
-    public UncertainDate getDate() {
-        return date;
-    }
-    
-    /**
-     * Returns the start instant of the event.
-     *
-     * @return the start instant
-     */
-    public Instant getStart() {
-        var start = date.getEarliestOfMidPoints();
-        if (start != null) return start;
-        
-        var min = date.getEarliestPossible();
-        if (min != null) return min;
-        
-        // Fallback to LocalDate if Instant is not available
-        var ld = (LocalDate) date.getMin(0);
-        return ld.atStartOfDay(ZoneOffset.UTC).toInstant();
-    }
-
-    /**
-     * Returns the end instant of the event.
-     *
-     * @return the end instant
-     */
-    public Instant getEnd() {
-        var end = date.getLatestOfMidPoints();
-        if (end != null) return end;
-        
-        var max = date.getLatestPossible();
-        if (max != null) return max;
-        
-        // Fallback to LocalDate if Instant is not available
-        var ld = (LocalDate) date.getMax(0);
-        return ld.atStartOfDay(ZoneOffset.UTC).toInstant();
+    public Event(String name, TemporalCoordinate when) {
+        this(name, null, when, Category.OTHER);
     }
 
     @Override
-    public Instant getTimestamp() {
-        return getStart();
+    public String getId() {
+        return id;
     }
 
-    /**
-     * Returns the description of the event.
-     *
-     * @return description
-     */
-    public String getHappening() {
-        return happening;
+    @Override
+    public String getName() {
+        return name;
     }
 
-    /**
-     * Checks if this event happens strictly before another event.
-     *
-     * @param event the other event
-     * @return true if this happens before event
-     * @throws NullPointerException if event is null
-     */
-    public boolean happensBefore(Event event) {
-        Objects.requireNonNull(event, "Other event cannot be null");
-        return this.date.getMax(0).isBefore(event.date.getMin(0));
+    public String getDescription() {
+        return description;
     }
 
-    /**
-     * Checks if this event happens strictly after another event.
-     *
-     * @param event the other event
-     * @return true if this happens after event
-     * @throws NullPointerException if event is null
-     */
-    public boolean happensAfter(Event event) {
-        Objects.requireNonNull(event, "Other event cannot be null");
-        return this.date.getMin(0).isAfter(event.date.getMax(0));
+    @Override
+    public TemporalCoordinate getWhen() {
+        return when;
     }
-    
-    /**
-     * Checks if this event's date range overlaps with another event's.
-     *
-     * @param event the other event
-     * @return true if they overlap
-     * @throws NullPointerException if event is null
-     */
-    public boolean overlaps(Event event) {
-        Objects.requireNonNull(event, "Other event cannot be null");
-        return this.date.overlaps(event.date);
+
+    public Category getCategory() {
+        return category;
     }
-    
-    /**
-     * Checks if this event's date range contains another event's.
-     *
-     * @param event the other event
-     * @return true if this contains event
-     * @throws NullPointerException if event is null
-     */
-    public boolean contains(Event event) {
-        Objects.requireNonNull(event, "Other event cannot be null");
-        return this.date.contains(event.date);
+
+    public boolean happensBefore(Event other) {
+        return this.when.toInstant().isBefore(other.when.toInstant());
+    }
+
+    public boolean happensAfter(Event other) {
+        return this.when.toInstant().isAfter(other.when.toInstant());
     }
 
     @Override
     public int compareTo(Event o) {
-        return this.date.getMin(0).compareTo(o.date.getMin(0));
-    }
-    
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Event other)) return false;
-        return Objects.equals(date, other.date) && 
-               Objects.equals(happening, other.happening);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(date, happening);
+        return this.when.compareTo(o.when);
     }
 
     @Override
     public String toString() {
-        return date.toString() + ": " + happening;
+        return String.format("%s (%s): %s", name, when, category);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Event other)) return false;
+        return Objects.equals(id, other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

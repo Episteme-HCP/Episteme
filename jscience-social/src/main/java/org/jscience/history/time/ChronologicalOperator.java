@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Optional;
+import org.jscience.history.temporal.TemporalInterval;
 
 /**
  * Provides chronological operations on uncertain dates.
@@ -45,125 +46,131 @@ public final class ChronologicalOperator {
     }
 
     /**
-     * Calculates the intersection of two uncertain date ranges.
+     * Calculates the intersection of two temporal intervals.
      * Returns the period where both ranges overlap, or empty if they are disjoint.
      *
-     * @param a the first uncertain date
-     * @param b the second uncertain date
+     * @param a the first interval
+     * @param b the second interval
      * @return optional intersection interval
      * @throws NullPointerException if a or b is null
      */
-    public static Optional<UncertainDate> intersection(UncertainDate a, UncertainDate b) {
-        Objects.requireNonNull(a, "UncertainDate 'a' cannot be null");
-        Objects.requireNonNull(b, "UncertainDate 'b' cannot be null");
+    public static Optional<TemporalInterval> intersection(TemporalInterval a, TemporalInterval b) {
+        Objects.requireNonNull(a, "Interval 'a' cannot be null");
+        Objects.requireNonNull(b, "Interval 'b' cannot be null");
         
-        LocalDate startA = a.getEarliestPossible();
-        LocalDate endA = a.getLatestPossible();
-        LocalDate startB = b.getEarliestPossible();
-        LocalDate endB = b.getLatestPossible();
-        
-        LocalDate intersectionStart = startA.isAfter(startB) ? startA : startB;
-        LocalDate intersectionEnd = endA.isBefore(endB) ? endA : endB;
-        
-        if (intersectionStart.isAfter(intersectionEnd)) {
+        if (!a.overlaps(b)) {
             return Optional.empty();
         }
         
-        return Optional.of(UncertainDate.between(intersectionStart, intersectionEnd));
+        java.time.Instant start = a.getStart().isAfter(b.getStart()) ? a.getStart() : b.getStart();
+        java.time.Instant end = a.getEnd().isBefore(b.getEnd()) ? a.getEnd() : b.getEnd();
+        
+        return Optional.of(new TemporalInterval(start, end));
     }
 
     /**
-     * Calculates the union of two uncertain date ranges.
+     * Calculates the union of two temporal intervals.
      * Returns the smallest range that encompassing both (the bounding interval).
      *
-     * @param a the first uncertain date
-     * @param b the second uncertain date
+     * @param a the first interval
+     * @param b the second interval
      * @return the union interval
      * @throws NullPointerException if a or b is null
      */
-    public static UncertainDate union(UncertainDate a, UncertainDate b) {
-        Objects.requireNonNull(a, "UncertainDate 'a' cannot be null");
-        Objects.requireNonNull(b, "UncertainDate 'b' cannot be null");
+    public static TemporalInterval union(TemporalInterval a, TemporalInterval b) {
+        Objects.requireNonNull(a, "Interval 'a' cannot be null");
+        Objects.requireNonNull(b, "Interval 'b' cannot be null");
         
-        LocalDate startA = a.getEarliestPossible();
-        LocalDate endA = a.getLatestPossible();
-        LocalDate startB = b.getEarliestPossible();
-        LocalDate endB = b.getLatestPossible();
+        java.time.Instant start = a.getStart().isBefore(b.getStart()) ? a.getStart() : b.getStart();
+        java.time.Instant end = a.getEnd().isAfter(b.getEnd()) ? a.getEnd() : b.getEnd();
         
-        LocalDate unionStart = startA.isBefore(startB) ? startA : startB;
-        LocalDate unionEnd = endA.isAfter(endB) ? endA : endB;
-        
-        return UncertainDate.between(unionStart, unionEnd);
+        return new TemporalInterval(start, end);
     }
 
     /**
      * Checks if two events or periods were potentially contemporaneous.
-     * Two events are contemporaneous if their uncertain date ranges overlap.
+     * Two events are contemporaneous if their time intervals overlap.
      *
-     * @param a the first uncertain date
-     * @param b the second uncertain date
+     * @param a the first interval
+     * @param b the second interval
      * @return true if they overlap
      * @throws NullPointerException if a or b is null
      */
-    public static boolean areContemporaneous(UncertainDate a, UncertainDate b) {
-        return intersection(a, b).isPresent();
+    public static boolean areContemporaneous(TemporalInterval a, TemporalInterval b) {
+        Objects.requireNonNull(a);
+        Objects.requireNonNull(b);
+        return a.overlaps(b);
     }
 
     /**
-     * Calculates the minimum possible duration (in days) between two events.
+     * Calculates the minimum possible duration (in milliseconds) between two events.
      * Returns 0 if they could potentially overlap or occur in any order relative to each other 
      * within their uncertainty.
      *
-     * @param earlier the presumed earlier uncertain date
-     * @param later   the presumed later uncertain date
-     * @return minimum gap in days
+     * @param earlier the presumed earlier interval
+     * @param later   the presumed later interval
+     * @return minimum gap in milliseconds
      * @throws NullPointerException if earlier or later is null
      */
-    public static long minimumGapDays(UncertainDate earlier, UncertainDate later) {
-        Objects.requireNonNull(earlier, "Earlier date cannot be null");
-        Objects.requireNonNull(later, "Later date cannot be null");
+    public static long minimumGapMillis(TemporalInterval earlier, TemporalInterval later) {
+        Objects.requireNonNull(earlier, "Earlier interval cannot be null");
+        Objects.requireNonNull(later, "Later interval cannot be null");
         
         if (areContemporaneous(earlier, later)) {
             return 0;
         }
         
-        LocalDate endEarlier = earlier.getLatestPossible();
-        LocalDate startLater = later.getEarliestPossible();
+        // Gap is between end of earlier and start of later
+        // If earlier is actually after later, we might need to handle that, but assuming param names roughly hold intent or we verify relative order.
+        // Actually, logic: distance( [A_s, A_e], [B_s, B_e] )
+        // If A_e < B_s, gap is B_s - A_e.
+        // If B_e < A_s, gap is A_s - B_e.
         
-        long gap = ChronoUnit.DAYS.between(endEarlier, startLater);
-        return Math.max(0, gap);
+        if (earlier.getEnd().isBefore(later.getStart())) {
+            return java.time.Duration.between(earlier.getEnd(), later.getStart()).toMillis();
+        } else if (later.getEnd().isBefore(earlier.getStart())) {
+            return java.time.Duration.between(later.getEnd(), earlier.getStart()).toMillis();
+        }
+        
+        return 0; 
     }
 
     /**
-     * Calculates the maximum possible duration (in days) between two events.
+     * Calculates the maximum possible duration (in milliseconds) between two events.
+     * Defined as distance between earliest start and latest end minus lengths? 
+     * Usually distance between A and B max is (Latest point of B - Earliest point of A) if A is before B.
      *
-     * @param earlier the presumed earlier uncertain date
-     * @param later   the presumed later uncertain date
-     * @return maximum gap in days
-     * @throws NullPointerException if earlier or later is null
+     * @param earliest possible start of first event
+     * @param latest   possible end of second event
+     * @return maximum gap in milliseconds
+     * @throws NullPointerException if earliest or latest is null
      */
-    public static long maximumGapDays(UncertainDate earlier, UncertainDate later) {
-        Objects.requireNonNull(earlier, "Earlier date cannot be null");
-        Objects.requireNonNull(later, "Later date cannot be null");
+    public static long maximumGapMillis(TemporalInterval earliest, TemporalInterval latest) {
+        Objects.requireNonNull(earliest, "First interval cannot be null");
+        Objects.requireNonNull(latest, "Second interval cannot be null");
         
-        LocalDate startEarlier = earlier.getEarliestPossible();
-        LocalDate endLater = later.getLatestPossible();
+        // Assuming we want max distance between the two disjoint sets of points.
+        // Usually max(abs(a - b)) for a in A, b in B.
+        // This is max( |A.start - B.end|, |A.end - B.start| )
         
-        return ChronoUnit.DAYS.between(startEarlier, endLater);
+        long d1 = Math.abs(java.time.Duration.between(earliest.getStart(), latest.getEnd()).toMillis());
+        long d2 = Math.abs(java.time.Duration.between(earliest.getEnd(), latest.getStart()).toMillis());
+        
+        return Math.max(d1, d2);
     }
 
     /**
-     * Returns the potential duration range (minimum and maximum days) between two events.
+     * Returns the potential duration range (minimum and maximum milliseconds) between two events.
      *
-     * @param from start event uncertain date
-     * @param to   end event uncertain date
-     * @return array where [0] is min days and [1] is max days
+     * @param from start event interval
+     * @param to   end event interval
+     * @return array where [0] is min millis and [1] is max millis
      * @throws NullPointerException if from or to is null
      */
-    public static long[] durationRange(UncertainDate from, UncertainDate to) {
+    public static long[] durationRange(TemporalInterval from, TemporalInterval to) {
         return new long[]{
-            minimumGapDays(from, to),
-            maximumGapDays(from, to)
+            minimumGapMillis(from, to),
+            maximumGapMillis(from, to)
         };
     }
 }
