@@ -26,6 +26,7 @@ package org.jscience.mathematics.linearalgebra.matrices;
 import org.jscience.mathematics.linearalgebra.Matrix;
 import org.jscience.mathematics.linearalgebra.matrices.storage.*;
 import org.jscience.mathematics.structures.rings.Field;
+import org.jscience.mathematics.structures.rings.Ring;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -67,15 +68,15 @@ public final class MatrixFactory {
      * @param field the field of elements
      * @return a new Identity Matrix instance
      */
-    public static <E> Matrix<E> identity(int size, Field<E> field) {
+    public static <E> Matrix<E> identity(int size, Ring<E> ring) {
         @SuppressWarnings("unchecked")
         E[] diag = (E[]) new Object[size];
-        E one = field.one();
+        E one = ring.one();
         for (int i = 0; i < size; i++) {
             diag[i] = one;
         }
-        DiagonalMatrixStorage<E> storage = new DiagonalMatrixStorage<>(diag, field);
-        return new GenericMatrix<>(storage, getProvider(field), field);
+        DiagonalMatrixStorage<E> storage = new DiagonalMatrixStorage<E>(diag, ring);
+        return new GenericMatrix<E>(storage, getProvider(ring), ring);
     }
 
     /**
@@ -108,8 +109,8 @@ public final class MatrixFactory {
      * @param field the field of elements
      * @return a new Matrix instance
      */
-    public static <E> Matrix<E> create(E[][] data, Field<E> field) {
-        return create(data, field, Storage.AUTO);
+    public static <E> Matrix<E> create(E[][] data, Ring<E> ring) {
+        return create(data, ring, Storage.AUTO);
     }
 
     /**
@@ -120,7 +121,7 @@ public final class MatrixFactory {
      * @param storageType the desired storage layout
      * @return a new Matrix instance
      */
-    public static <E> Matrix<E> create(E[][] data, Field<E> field, Storage storageType) {
+    public static <E> Matrix<E> create(E[][] data, Ring<E> ring, Storage storageType) {
         int rows = data.length;
         int cols = rows > 0 ? data[0].length : 0;
 
@@ -129,7 +130,7 @@ public final class MatrixFactory {
                 // Simple heuristic: check density
                 int nonZero = 0;
                 int total = rows * cols;
-                E zero = field.zero();
+                E zero = ring.zero();
                 for (E[] row : data) {
                     for (E val : row) {
                         if (!val.equals(zero))
@@ -138,9 +139,9 @@ public final class MatrixFactory {
                 }
                 // If density < 0.2, use Sparse
                 if ((double) nonZero / total < 0.2) {
-                    return create(data, field, Storage.SPARSE);
+                    return create(data, ring, Storage.SPARSE);
                 } else {
-                    return create(data, field, Storage.DENSE);
+                    return create(data, ring, Storage.DENSE);
                 }
 
             case DENSE:
@@ -180,12 +181,12 @@ public final class MatrixFactory {
                         lRow.add(val);
                     listData.add(lRow);
                 }
-                return new DenseMatrix<>(listData, field);
+                return new DenseMatrix<E>(listData, ring);
 
             case SPARSE:
                 // Use SparseMatrix
-                SparseMatrix<E> sm = new SparseMatrix<E>(rows, cols, field);
-                E z = field.zero();
+                SparseMatrix<E> sm = new SparseMatrix<E>(rows, cols, ring);
+                E z = ring.zero();
                 for (int i = 0; i < rows; i++) {
                     for (int j = 0; j < cols; j++) {
                         if (!data[i][j].equals(z)) {
@@ -205,7 +206,7 @@ public final class MatrixFactory {
                 // boolean upper = true;
                 // For simplicity, let's just create a generic matrix with Triangular Storage
                 // But we need to populate it.
-                TriangularMatrixStorage<E> triStorage = new TriangularMatrixStorage<>(rows, true, field.zero());
+                TriangularMatrixStorage<E> triStorage = new TriangularMatrixStorage<>(rows, true, ring.zero());
                 // Try to fill. If data in lower part is non-zero, this will fail if we enforce
                 // it.
                 // Let's iterate and set.
@@ -215,13 +216,13 @@ public final class MatrixFactory {
                     }
                 }
                 // Use Registry
-                return new GenericMatrix<>(triStorage, getProvider(field),
-                        field);
+                return new GenericMatrix<E>(triStorage, getProvider(ring),
+                        ring);
 
             case TRIDIAGONAL:
                 if (rows != cols)
                     throw new IllegalArgumentException("Tridiagonal matrices must be square");
-                TridiagonalMatrixStorage<E> tridStorage = new TridiagonalMatrixStorage<>(rows, field.zero());
+                TridiagonalMatrixStorage<E> tridStorage = new TridiagonalMatrixStorage<>(rows, ring.zero());
                 for (int i = 0; i < rows; i++) {
                     if (i < cols)
                         tridStorage.set(i, i, data[i][i]);
@@ -230,8 +231,8 @@ public final class MatrixFactory {
                     if (i - 1 >= 0)
                         tridStorage.set(i, i - 1, data[i][i - 1]);
                 }
-                return new GenericMatrix<>(tridStorage, getProvider(field),
-                        field);
+                return new GenericMatrix<E>(tridStorage, getProvider(ring),
+                        ring);
 
             case DIAGONAL:
                 if (rows != cols)
@@ -240,9 +241,9 @@ public final class MatrixFactory {
                 E[] diag = (E[]) new Object[rows];
                 for (int i = 0; i < rows; i++)
                     diag[i] = data[i][i];
-                DiagonalMatrixStorage<E> diagStorage = new DiagonalMatrixStorage<>(diag, field);
-                return new GenericMatrix<>(diagStorage, getProvider(field),
-                        field);
+                DiagonalMatrixStorage<E> diagStorage = new DiagonalMatrixStorage<E>(diag, ring);
+                return new GenericMatrix<E>(diagStorage, getProvider(ring),
+                        ring);
 
             case SYMMETRIC:
                 if (rows != cols)
@@ -255,9 +256,9 @@ public final class MatrixFactory {
                         lRow.add(val);
                     symData.add(lRow);
                 }
-                SymmetricMatrixStorage<E> symStorage = new SymmetricMatrixStorage<>(symData, field);
-                return new GenericMatrix<>(symStorage, getProvider(field),
-                        field);
+                SymmetricMatrixStorage<E> symStorage = new SymmetricMatrixStorage<E>(symData, ring);
+                return new GenericMatrix<E>(symStorage, getProvider(ring),
+                        ring);
 
             case BANDED:
                 // Need generic way to deduce bandwidth?
@@ -279,12 +280,12 @@ public final class MatrixFactory {
      * @return a new Matrix instance
      */
     private static <E> org.jscience.mathematics.linearalgebra.backends.LinearAlgebraProvider<E> getProvider(
-            Field<E> field) {
+            Ring<E> ring) {
         // Simple implementation picking the default/first available provider
         // Ideally we would query Registry for a provider compatible with 'field'
         // But for now we just use the default provider from Registry or create one
         // Note: CPUDenseLinearAlgebraProvider needs field
-        return new org.jscience.mathematics.linearalgebra.backends.CPUDenseLinearAlgebraProvider<>(field);
+        return new org.jscience.mathematics.linearalgebra.backends.CPUDenseLinearAlgebraProvider<>(ring);
     }
 
     /**
@@ -295,8 +296,8 @@ public final class MatrixFactory {
      * @param field the field of elements
      * @return a new Matrix instance
      */
-    public static <E> Matrix<E> create(List<List<E>> data, Field<E> field) {
-        return create(data, field, Storage.AUTO);
+    public static <E> Matrix<E> create(List<List<E>> data, Ring<E> ring) {
+        return create(data, ring, Storage.AUTO);
     }
 
     /**
@@ -307,7 +308,7 @@ public final class MatrixFactory {
      * @param storageType the desired storage layout
      * @return a new Matrix instance
      */
-    public static <E> Matrix<E> create(List<List<E>> data, Field<E> field, Storage storageType) {
+    public static <E> Matrix<E> create(List<List<E>> data, Ring<E> ring, Storage storageType) {
         int rows = data.size();
         int cols = rows > 0 ? data.get(0).size() : 0;
 
@@ -316,7 +317,7 @@ public final class MatrixFactory {
                 // Simple heuristic: check density
                 int nonZero = 0;
                 int total = rows * cols;
-                E zero = field.zero();
+                E zero = ring.zero();
                 for (List<E> row : data) {
                     for (E val : row) {
                         if (!val.equals(zero))
@@ -325,9 +326,9 @@ public final class MatrixFactory {
                 }
                 // If density < 0.2, use Sparse
                 if (total > 0 && (double) nonZero / total < 0.2) {
-                    return create(data, field, Storage.SPARSE);
+                    return create(data, ring, Storage.SPARSE);
                 } else {
-                    return create(data, field, Storage.DENSE);
+                    return create(data, ring, Storage.DENSE);
                 }
 
             case DENSE:
@@ -353,11 +354,11 @@ public final class MatrixFactory {
                     Matrix<E> m = (Matrix<E>) RealDoubleMatrix.of(flatData, rows, cols);
                     return m;
                 }
-                return new DenseMatrix<>(data, field);
+                return new DenseMatrix<E>(data, ring);
 
             case SPARSE:
-                SparseMatrix<E> sm = new SparseMatrix<E>(rows, cols, field);
-                E zeroVal = field.zero();
+                SparseMatrix<E> sm = new SparseMatrix<E>(rows, cols, ring);
+                E zeroVal = ring.zero();
                 for (int i = 0; i < rows; i++) {
                     List<E> row = data.get(i);
                     for (int j = 0; j < cols; j++) {
@@ -370,27 +371,27 @@ public final class MatrixFactory {
                 return sm;
 
             case SYMMETRIC:
-                SymmetricMatrixStorage<E> symStorage = new SymmetricMatrixStorage<>(data, field);
-                return new GenericMatrix<>(symStorage, getProvider(field),
-                        field);
+                SymmetricMatrixStorage<E> symStorage = new SymmetricMatrixStorage<E>(data, ring);
+                return new GenericMatrix<E>(symStorage, getProvider(ring),
+                        ring);
 
             case TRIANGULAR:
                 if (rows != cols)
                     throw new IllegalArgumentException("Triangular matrices must be square");
-                TriangularMatrixStorage<E> triStorage = new TriangularMatrixStorage<>(rows, true, field.zero());
+                TriangularMatrixStorage<E> triStorage = new TriangularMatrixStorage<>(rows, true, ring.zero());
                 for (int i = 0; i < rows; i++) {
                     List<E> row = data.get(i);
                     for (int j = i; j < cols; j++) {
                         triStorage.set(i, j, row.get(j));
                     }
                 }
-                return new GenericMatrix<>(triStorage, getProvider(field),
-                        field);
+                return new GenericMatrix<E>(triStorage, getProvider(ring),
+                        ring);
 
             case TRIDIAGONAL:
                 if (rows != cols)
                     throw new IllegalArgumentException("Tridiagonal matrices must be square");
-                TridiagonalMatrixStorage<E> tridStorage = new TridiagonalMatrixStorage<>(rows, field.zero());
+                TridiagonalMatrixStorage<E> tridStorage = new TridiagonalMatrixStorage<>(rows, ring.zero());
                 for (int i = 0; i < rows; i++) {
                     List<E> row = data.get(i);
                     if (i < cols)
@@ -400,8 +401,8 @@ public final class MatrixFactory {
                     if (i - 1 >= 0)
                         tridStorage.set(i, i - 1, row.get(i - 1));
                 }
-                return new GenericMatrix<>(tridStorage, getProvider(field),
-                        field);
+                return new GenericMatrix<E>(tridStorage, getProvider(ring),
+                        ring);
 
             case DIAGONAL:
                 if (rows != cols)
@@ -411,9 +412,9 @@ public final class MatrixFactory {
                 E[] diag = (E[]) new Object[rows]; // Unchecked cast
                 for (int i = 0; i < rows; i++)
                     diag[i] = data.get(i).get(i);
-                DiagonalMatrixStorage<E> diagStorage = new DiagonalMatrixStorage<>(diag, field);
-                return new GenericMatrix<>(diagStorage, getProvider(field),
-                        field);
+                DiagonalMatrixStorage<E> diagStorage = new DiagonalMatrixStorage<E>(diag, ring);
+                return new GenericMatrix<E>(diagStorage, getProvider(ring),
+                        ring);
 
             case BANDED:
                 throw new UnsupportedOperationException(
@@ -428,7 +429,7 @@ public final class MatrixFactory {
     /**
      * Determines and creates the optimal Dense storage for the given data.
      */
-    public static <E> MatrixStorage<E> createDenseStorage(E[][] data, Field<E> field) {
+    public static <E> MatrixStorage<E> createDenseStorage(E[][] data, Ring<E> ring) {
         int rows = data.length;
         int cols = rows > 0 ? data[0].length : 0;
 
@@ -452,7 +453,7 @@ public final class MatrixFactory {
         }
 
         // Generic Dense
-        DenseMatrixStorage<E> storage = new DenseMatrixStorage<E>(rows, cols, field.zero());
+        DenseMatrixStorage<E> storage = new DenseMatrixStorage<E>(rows, cols, ring.zero());
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 storage.set(i, j, data[i][j]);
@@ -461,7 +462,7 @@ public final class MatrixFactory {
         return storage;
     }
 
-    public static <E> MatrixStorage<E> createDenseStorage(List<List<E>> data, Field<E> field) {
+    public static <E> MatrixStorage<E> createDenseStorage(List<List<E>> data, Ring<E> ring) {
         int rows = data.size();
         int cols = rows > 0 ? data.get(0).size() : 0;
 
@@ -485,7 +486,7 @@ public final class MatrixFactory {
             return res;
         }
 
-        DenseMatrixStorage<E> storage = new DenseMatrixStorage<E>(rows, cols, field.zero());
+        DenseMatrixStorage<E> storage = new DenseMatrixStorage<E>(rows, cols, ring.zero());
         for (int i = 0; i < rows; i++) {
             List<E> row = data.get(i);
             for (int j = 0; j < cols; j++) {
@@ -498,11 +499,11 @@ public final class MatrixFactory {
     /**
      * Determines and creates the optimal Sparse storage for the given data.
      */
-    public static <E> MatrixStorage<E> createSparseStorage(E[][] data, Field<E> field) {
+    public static <E> MatrixStorage<E> createSparseStorage(E[][] data, Ring<E> ring) {
         int rows = data.length;
         int cols = rows > 0 ? data[0].length : 0;
-        SparseMatrixStorage<E> storage = new SparseMatrixStorage<>(rows, cols, field.zero());
-        E zero = field.zero();
+        SparseMatrixStorage<E> storage = new SparseMatrixStorage<>(rows, cols, ring.zero());
+        E zero = ring.zero();
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 if (!data[i][j].equals(zero)) {
@@ -513,11 +514,11 @@ public final class MatrixFactory {
         return storage;
     }
 
-    public static <E> MatrixStorage<E> createSparseStorage(List<List<E>> data, Field<E> field) {
+    public static <E> MatrixStorage<E> createSparseStorage(List<List<E>> data, Ring<E> ring) {
         int rows = data.size();
         int cols = rows > 0 ? data.get(0).size() : 0;
-        SparseMatrixStorage<E> storage = new SparseMatrixStorage<E>(rows, cols, field.zero());
-        E zero = field.zero();
+        SparseMatrixStorage<E> storage = new SparseMatrixStorage<E>(rows, cols, ring.zero());
+        E zero = ring.zero();
         for (int i = 0; i < rows; i++) {
             List<E> row = data.get(i);
             for (int j = 0; j < cols; j++) {
@@ -531,20 +532,20 @@ public final class MatrixFactory {
     }
 
     public static <E> org.jscience.mathematics.linearalgebra.backends.LinearAlgebraProvider<E> getStandardProvider(
-            Field<E> field) {
-        return getProvider(field);
+            Ring<E> ring) {
+        return getProvider(ring);
     }
 
     /**
      * Determines and creates the optimal storage (Dense or Sparse) based on data
      * density.
      */
-    public static <E> MatrixStorage<E> createAutomaticStorage(E[][] data, Field<E> field) {
+    public static <E> MatrixStorage<E> createAutomaticStorage(E[][] data, Ring<E> ring) {
         int rows = data.length;
         int cols = rows > 0 ? data[0].length : 0;
         int nonZero = 0;
         int total = rows * cols;
-        E zero = field.zero();
+        E zero = ring.zero();
         for (E[] row : data) {
             for (E val : row) {
                 if (!val.equals(zero))
@@ -552,18 +553,18 @@ public final class MatrixFactory {
             }
         }
         if (total > 0 && (double) nonZero / total < 0.2) {
-            return createSparseStorage(data, field);
+            return createSparseStorage(data, ring);
         } else {
-            return createDenseStorage(data, field);
+            return createDenseStorage(data, ring);
         }
     }
 
-    public static <E> MatrixStorage<E> createAutomaticStorage(List<List<E>> data, Field<E> field) {
+    public static <E> MatrixStorage<E> createAutomaticStorage(List<List<E>> data, Ring<E> ring) {
         int rows = data.size();
         int cols = rows > 0 ? data.get(0).size() : 0;
         int nonZero = 0;
         int total = rows * cols;
-        E zero = field.zero();
+        E zero = ring.zero();
         for (List<E> row : data) {
             for (E val : row) {
                 if (!val.equals(zero))
@@ -571,9 +572,9 @@ public final class MatrixFactory {
             }
         }
         if (total > 0 && (double) nonZero / total < 0.2) {
-            return createSparseStorage(data, field);
+            return createSparseStorage(data, ring);
         } else {
-            return createDenseStorage(data, field);
+            return createDenseStorage(data, ring);
         }
     }
 }

@@ -1,12 +1,15 @@
-package org.jscience.ml.mathml.beans;
+package org.jscience.mathematics.loaders.mathml.beans;
 
-import org.jscience.io.mathml.MathMLExpression;
-import org.jscience.io.mathml.MathMLParser;
+import org.jscience.mathematics.loaders.mathml.MathMLExpression;
+import org.jscience.mathematics.loaders.mathml.MathMLParser;
 
 import org.jscience.mathematics.linearalgebra.Matrix;
+import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.numbers.complex.Complex;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.numbers.integers.Integer;
+import org.jscience.mathematics.linearalgebra.matrices.RealDoubleMatrix;
+import org.jscience.mathematics.linearalgebra.vectors.RealDoubleVector;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,47 +20,37 @@ import java.beans.PropertyChangeSupport;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-
 /**
- * DOCUMENT ME!
+ * MathBean for JScience 6.0.
  *
- * @author $author$
- * @version $Revision: 1.3 $
+ * @author Silvere Martin-Michiellot
+ * @version 1.4
  */
-public final class MathBean extends Object implements java.io.Serializable,
-    VariableListener, ActionListener {
-    /** DOCUMENT ME! */
+public final class MathBean implements java.io.Serializable, VariableListener, ActionListener {
+    
     private PropertyChangeSupport changes = new PropertyChangeSupport(this);
 
-    /** DOCUMENT ME! */
     private MathMLExpression expr;
 
-    /** DOCUMENT ME! */
     private String mathml = "";
 
-    /** DOCUMENT ME! */
-    private Hashtable variables = new Hashtable();
+    private Hashtable<Object, Object> variables = new Hashtable<>();
 
-    /** DOCUMENT ME! */
-    private Object result = Real.Constants.NaN;
+    private Object result = Real.NaN;
 
-/**
-     * Creates a new MathBean object.
-     */
     public MathBean() {
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param uri DOCUMENT ME!
-     */
     public synchronized void setMathML(String uri) {
         try {
             MathMLParser parser = new MathMLParser();
             parser.parse(uri);
-            expr = (MathMLExpression) (parser.translateToJScienceObjects()[0]);
+            Object obj = parser.translateToJScienceObjects()[0];
+            if (obj instanceof MathMLExpression) {
+                expr = (MathMLExpression) obj;
+            }
         } catch (Exception e) {
+            // Log or handle exception
         }
 
         String oldUri = mathml;
@@ -65,216 +58,99 @@ public final class MathBean extends Object implements java.io.Serializable,
         changes.firePropertyChange("mathml", oldUri, uri);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public synchronized String getMathML() {
         return mathml;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public synchronized double getResultAs0DArray() {
-        if (result instanceof Real) {
+        if (result instanceof Number) {
+            return ((Number) result).doubleValue();
+        } else if (result instanceof Real) {
             return ((Real) result).doubleValue();
         } else if (result instanceof Integer) {
             return ((Integer) result).doubleValue();
         } else {
-            return Real.NaN;
+            return Double.NaN;
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public synchronized double[] getResultAs1DArray() {
         if (result instanceof Complex) {
-            double[] array = {
+            return new double[] {
                     ((Complex) result).real(), ((Complex) result).imaginary()
                 };
-
+        } else if (result instanceof RealDoubleVector) {
+            return ((RealDoubleVector) result).toDoubleArray();
+        } else if (result instanceof Vector) {
+            Vector<?> v = (Vector<?>) result;
+            double[] array = new double[v.dimension()];
+            for (int i = 0; i < v.dimension(); i++) {
+                Object element = v.get(i);
+                if (element instanceof Number) array[i] = ((Number) element).doubleValue();
+                else if (element instanceof Real) array[i] = ((Real) element).doubleValue();
+                else if (element instanceof Integer) array[i] = ((Integer) element).doubleValue();
+            }
             return array;
-        } else if (result instanceof AbstractRealVector) {
-            return getRealArray((Real[]) ((AbstractRealVector) result).toArray());
-        } else if (result instanceof AbstractIntegerVector) {
-            return getRealArray((Integer[]) ((AbstractIntegerVector) result).toArray());
         } else {
             return null;
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public synchronized double[][] getResultAs2DArray() {
-        if (result instanceof AbstractComplexVector) {
-            double[][] array = new double[2][];
-            array[0] = getRealArray((Real[]) ((AbstractComplexVector) result).real()
-                                                  .toArray());
-            array[1] = getRealArray((Real[]) ((AbstractComplexVector) result).imaginary()
-                                                  .toArray());
-
+        if (result instanceof RealDoubleMatrix) {
+            return ((RealDoubleMatrix) result).to2DDoubleArray();
+        } else if (result instanceof Matrix) {
+            Matrix<?> m = (Matrix<?>) result;
+            double[][] array = new double[m.rows()][m.cols()];
+            for (int i = 0; i < m.rows(); i++) {
+                for (int j = 0; j < m.cols(); j++) {
+                    Object element = m.get(i, j);
+                    if (element instanceof Number) array[i][j] = ((Number) element).doubleValue();
+                    else if (element instanceof Real) array[i][j] = ((Real) element).doubleValue();
+                    else if (element instanceof Integer) array[i][j] = ((Integer) element).doubleValue();
+                }
+            }
             return array;
-        } else if (result instanceof RealMatrix) {
-            return getRealRealArray((Real[][]) ((RealMatrix) result).toArray());
-        } else if (result instanceof IntegerMatrix) {
-            return getRealRealArray((Integer[][]) ((IntegerMatrix) result).toArray());
         } else {
             return null;
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public synchronized double[][][] getResultAs3DArray() {
-        if (result instanceof ComplexMatrix) {
-            double[][][] array = new double[2][][];
-            array[0] = getRealRealArray((Real[][]) ((ComplexMatrix) result).real()
-                                                          .toArray());
-            array[1] = getRealRealArray((Real[][]) ((ComplexMatrix) result).imaginary()
-                                                          .toArray());
-
-            return array;
-        } else {
-            return null;
-        }
+        // Current implementation does not support 3D arrays directly from Matrix/Vector
+        return null;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param doubles DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    private double[] getRealArray(Real[] doubles) {
-        double[] result;
-        result = new double[doubles.length];
-
-        for (int i = 0; i < doubles.length; i++) {
-            result[i] = doubles[i].doubleValue();
-        }
-
-        return result;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param doubles DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    private double[] getRealArray(Integer[] doubles) {
-        double[] result;
-        result = new double[doubles.length];
-
-        for (int i = 0; i < doubles.length; i++) {
-            result[i] = doubles[i].doubleValue();
-        }
-
-        return result;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param doubles DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    private double[][] getRealRealArray(Real[][] doubles) {
-        double[][] result;
-        result = new double[doubles.length][doubles[0].length];
-
-        for (int i = 0; i < doubles.length; i++) {
-            for (int j = 0; i < doubles[0].length; j++) {
-                result[i][j] = doubles[i][j].doubleValue();
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param doubles DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    private double[][] getRealRealArray(Integer[][] doubles) {
-        double[][] result;
-        result = new double[doubles.length][doubles[0].length];
-
-        for (int i = 0; i < doubles.length; i++) {
-            for (int j = 0; i < doubles[0].length; j++) {
-                result[i][j] = doubles[i][j].doubleValue();
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param evt DOCUMENT ME!
-     */
+    @Override
     public void variableChanged(VariableEvent evt) {
         variables.put(evt.getVariable(), evt.getValue());
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param evt DOCUMENT ME!
-     */
+    @Override
     public void actionPerformed(ActionEvent evt) {
+        if (expr == null) return;
+        
         MathMLExpression evalExp = expr;
-        Enumeration vars = variables.keys();
+        Enumeration<Object> vars = variables.keys();
 
         while (vars.hasMoreElements()) {
             Object var = vars.nextElement();
-            evalExp = evalExp.substitute(var.toString(), variables.get(var));
+            Object value = variables.get(var);
+            evalExp = evalExp.substitute(var.toString(), value);
         }
 
         result = evalExp.evaluate();
-        changes.firePropertyChange("resultAs0DArray", null,
-            Real.of(getResultAs0DArray()));
+        changes.firePropertyChange("resultAs0DArray", null, getResultAs0DArray());
         changes.firePropertyChange("resultAs1DArray", null, getResultAs1DArray());
         changes.firePropertyChange("resultAs2DArray", null, getResultAs2DArray());
         changes.firePropertyChange("resultAs3DArray", null, getResultAs3DArray());
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param l DOCUMENT ME!
-     */
     public synchronized void addPropertyChangeListener(PropertyChangeListener l) {
         changes.addPropertyChangeListener(l);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param l DOCUMENT ME!
-     */
-    public synchronized void removePropertyChangeListener(
-        PropertyChangeListener l) {
+    public synchronized void removePropertyChangeListener(PropertyChangeListener l) {
         changes.removePropertyChangeListener(l);
     }
 }

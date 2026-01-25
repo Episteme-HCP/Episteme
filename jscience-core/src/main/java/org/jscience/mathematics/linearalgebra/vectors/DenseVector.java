@@ -25,8 +25,7 @@ package org.jscience.mathematics.linearalgebra.vectors;
 
 import org.jscience.ComputeContext;
 import org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
-import org.jscience.mathematics.structures.rings.Field;
-
+import org.jscience.mathematics.structures.rings.Ring;
 import java.util.List;
 
 import java.util.ArrayList;
@@ -44,14 +43,14 @@ public class DenseVector<E> extends GenericVector<E> {
     /**
      * Creates a DenseVector with automatic storage optimization.
      */
-    public DenseVector(List<E> elements, Field<E> field) {
-        this(VectorFactory.createDenseStorage(elements, field), field);
+    public DenseVector(List<E> elements, Ring<E> ring) {
+        this(VectorFactory.createDenseStorage(elements, ring), ring);
     }
 
     // Internal constructor using storage directly
     protected DenseVector(org.jscience.mathematics.linearalgebra.vectors.storage.VectorStorage<E> storage,
-            Field<E> field) {
-        super(storage, ComputeContext.current().getDenseLinearAlgebraProvider(field), field);
+            Ring<E> ring) {
+        super(storage, ComputeContext.current().getDenseLinearAlgebraProvider(ring), ring);
         // explicit validation
         if (storage instanceof org.jscience.mathematics.linearalgebra.vectors.storage.SparseVectorStorage) {
             throw new IllegalArgumentException("Cannot create DenseVector with Sparse storage");
@@ -60,17 +59,17 @@ public class DenseVector<E> extends GenericVector<E> {
 
     // Removed manual createStorage methods in favor of VectorFactory
 
-    public static <E> DenseVector<E> of(List<E> elements, Field<E> field) {
-        return new DenseVector<>(elements, field);
+    public static <E> DenseVector<E> of(List<E> elements, Ring<E> ring) {
+        return new DenseVector<>(elements, ring);
     }
 
-    public static <E> DenseVector<E> zeros(int dimension, Field<E> field) {
+    public static <E> DenseVector<E> zeros(int dimension, Ring<E> ring) {
         List<E> elements = new ArrayList<>(dimension);
-        E zero = field.zero();
+        E zero = ring.zero();
         for (int i = 0; i < dimension; i++) {
             elements.add(zero);
         }
-        return new DenseVector<>(elements, field);
+        return new DenseVector<>(elements, ring);
     }
 
     public static DenseVector<org.jscience.mathematics.numbers.complex.Complex> valueOf(

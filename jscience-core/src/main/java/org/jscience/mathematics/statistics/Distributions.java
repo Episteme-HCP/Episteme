@@ -228,6 +228,18 @@ public class Distributions {
     }
 
     /**
+     * Sample mean for double array.
+     */
+    public static double mean(double[] data) {
+        if (data.length == 0)
+            return Double.NaN;
+        double sum = 0;
+        for (double d : data)
+            sum += d;
+        return sum / data.length;
+    }
+
+    /**
      * Sample variance (unbiased).
      */
     public static Real variance(Real[] data) {
@@ -243,10 +255,32 @@ public class Distributions {
     }
 
     /**
+     * Sample variance for double array.
+     */
+    public static double variance(double[] data) {
+        if (data.length <= 1)
+            return 0;
+        double m = mean(data);
+        double sumSq = 0;
+        for (double d : data) {
+            double diff = d - m;
+            sumSq += diff * diff;
+        }
+        return sumSq / (data.length - 1);
+    }
+
+    /**
      * Sample standard deviation.
      */
     public static Real stdDev(Real[] data) {
         return variance(data).sqrt();
+    }
+
+    /**
+     * Sample standard deviation for double array.
+     */
+    public static double stdDev(double[] data) {
+        return Math.sqrt(variance(data));
     }
 
     /**
@@ -267,6 +301,23 @@ public class Distributions {
     }
 
     /**
+     * Covariance for double arrays.
+     */
+    public static double covariance(double[] x, double[] y) {
+        if (x.length != y.length)
+            throw new IllegalArgumentException("Arrays must have same length");
+        if (x.length <= 1)
+            return 0;
+        double mx = mean(x);
+        double my = mean(y);
+        double sum = 0;
+        for (int i = 0; i < x.length; i++) {
+            sum += (x[i] - mx) * (y[i] - my);
+        }
+        return sum / (x.length - 1);
+    }
+
+    /**
      * Pearson correlation coefficient.
      */
     public static Real correlation(Real[] x, Real[] y) {
@@ -276,6 +327,18 @@ public class Distributions {
         if (sx.isZero() || sy.isZero())
             return Real.NaN;
         return cov.divide(sx.multiply(sy));
+    }
+
+    /**
+     * Pearson correlation coefficient for double arrays.
+     */
+    public static double correlation(double[] x, double[] y) {
+        double cov = covariance(x, y);
+        double sx = stdDev(x);
+        double sy = stdDev(y);
+        if (sx == 0 || sy == 0)
+            return Double.NaN;
+        return cov / (sx * sy);
     }
 }
 

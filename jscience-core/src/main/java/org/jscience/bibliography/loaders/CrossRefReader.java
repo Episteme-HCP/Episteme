@@ -150,6 +150,7 @@ public class CrossRefReader extends AbstractResourceReader<CitationInfo> {
     @Override public String getName() { return "CrossRef Connector"; }
     @Override public String getCategory() { return "Bibliography"; }
     @Override public String getDescription() { return "Resolves DOIs to get publication metadata."; }
+    @Override public String getLongDescription() { return "Interfaces with CrossRef API to retrieve detailed citation metadata for a DOI."; }
     @Override public Class<CitationInfo> getResourceType() { return CitationInfo.class; }
     @Override public String getResourcePath() { return API_BASE; }
     @Override public String[] getSupportedVersions() { return new String[]{"v1"}; }

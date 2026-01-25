@@ -114,15 +114,20 @@ public class Vector3D extends DenseVector<Real> implements
     }
 
     public Vector3D normalize() {
-        Real n = this.normValue();
+        Real n = this.magnitude();
         if (n.equals(Real.ZERO)) {
             return new Vector3D(0, 0, 0);
         }
         return this.divide(n);
     }
 
-    public Real normValue() {
+    public Real magnitude() {
         return x().multiply(x()).add(y().multiply(y())).add(z().multiply(z())).sqrt();
+    }
+
+    @Override
+    public Real norm() {
+        return magnitude();
     }
 
     public Vector3D multiply(Real scalar) {

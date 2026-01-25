@@ -23,7 +23,7 @@
 
 package org.jscience.mathematics.linearalgebra.matrices.storage;
 
-import org.jscience.mathematics.structures.rings.Field;
+import org.jscience.mathematics.structures.rings.Ring;
 import java.util.List;
 
 /**
@@ -41,12 +41,12 @@ public class SymmetricMatrixStorage<E> implements MatrixStorage<E> {
 
     private final E[] upperTriangle;
     private final int size;
-    private final Field<E> field;
+    private final Ring<E> ring;
 
     @SuppressWarnings("unchecked")
-    public SymmetricMatrixStorage(List<List<E>> data, Field<E> field) {
+    public SymmetricMatrixStorage(List<List<E>> data, Ring<E> ring) {
         this.size = data.size();
-        this.field = field;
+        this.ring = ring;
 
         // Calculate size: n*(n+1)/2 elements in upper triangle
         int storageSize = (size * (size + 1)) / 2;
@@ -104,7 +104,7 @@ public class SymmetricMatrixStorage<E> implements MatrixStorage<E> {
         System.arraycopy(upperTriangle, 0, copy, 0, upperTriangle.length);
 
         // Reconstruct from copy
-        SymmetricMatrixStorage<E> cloned = new SymmetricMatrixStorage<>(null, field);
+        SymmetricMatrixStorage<E> cloned = new SymmetricMatrixStorage<>(null, ring);
         System.arraycopy(copy, 0, cloned.upperTriangle, 0, copy.length);
         return cloned;
     }
@@ -114,8 +114,8 @@ public class SymmetricMatrixStorage<E> implements MatrixStorage<E> {
      * Creates an empty storage that will be populated by the clone method.
      */
     @SuppressWarnings({ "unchecked", "unused" })
-    private SymmetricMatrixStorage(Object dummy, Field<E> field) {
-        this.field = field;
+    private SymmetricMatrixStorage(Object dummy, Ring<E> ring) {
+        this.ring = ring;
         this.size = 0; // Will be set by caller
         this.upperTriangle = (E[]) new Object[0];
     }

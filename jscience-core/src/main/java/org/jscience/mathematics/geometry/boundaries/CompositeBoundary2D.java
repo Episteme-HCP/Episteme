@@ -337,7 +337,7 @@ public class CompositeBoundary2D implements Boundary2D {
         if (totalArea.isZero()) {
             cachedCentroid = inclusions.get(0).getCentroid();
         } else {
-            cachedCentroid = new Point2D(sumX.divide(totalArea), sumY.divide(totalArea));
+            cachedCentroid = Point2D.of(sumX.divide(totalArea), sumY.divide(totalArea));
         }
         return cachedCentroid;
     }

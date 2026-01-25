@@ -46,55 +46,63 @@ public class GenericVector<E> implements Vector<E> {
 
     protected final VectorStorage<E> storage;
     protected LinearAlgebraProvider<E> provider;
-    protected final Field<E> field;
+    protected final Ring<E> ring;
 
-    public GenericVector(VectorStorage<E> storage, LinearAlgebraProvider<E> provider, Field<E> field) {
+    public GenericVector(VectorStorage<E> storage, LinearAlgebraProvider<E> provider, Ring<E> ring) {
         this.storage = storage;
         this.provider = provider;
-        this.field = field;
+        this.ring = ring;
     }
 
     /**
      * Creates a GenericVector with automatic storage selection.
      */
-    public GenericVector(java.util.List<E> data, Field<E> field) {
-        this(VectorFactory.createAutomaticStorage(data, field),
-                ComputeContext.current().getDenseLinearAlgebraProvider(field),
-                field);
+    public GenericVector(java.util.List<E> data, Ring<E> ring) {
+        this(VectorFactory.createAutomaticStorage(data, ring),
+                ComputeContext.current().getDenseLinearAlgebraProvider(ring),
+                ring);
     }
 
-    public static <T> GenericVector<T> of(T[] data, Field<T> field) {
+    public static <T> GenericVector<T> of(T[] data, Ring<T> ring) {
         // Default to Dense Storage
         VectorStorage<T> storage = new DenseVectorStorage<>(data);
 
         // Select Provider based on Context
-        LinearAlgebraProvider<T> provider = ComputeContext.current().getDenseLinearAlgebraProvider(field);
+        LinearAlgebraProvider<T> provider = ComputeContext.current().getDenseLinearAlgebraProvider(ring);
 
-        return new GenericVector<>(storage, provider, field);
+        return new GenericVector<>(storage, provider, ring);
     }
 
     // ================= Conversions =================
 
     public Matrix<E> toMatrix() {
         // Convert vector to Column Matrix (n x 1)
+        int dim = storage.dimension();
+        // Fallback to Object array if we can't get class easily?
+        // Actually, we can use the first element if any.
         @SuppressWarnings("unchecked")
-        E[][] matrixData = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), storage.dimension(), 1);
-        for (int i = 0; i < storage.dimension(); i++) {
+        E zero = ring.zero();
+        Class<?> componentType = zero.getClass();
+        
+        @SuppressWarnings("unchecked")
+        E[][] matrixData = (E[][]) java.lang.reflect.Array.newInstance(componentType, dim, 1);
+        for (int i = 0; i < dim; i++) {
             @SuppressWarnings("unchecked")
-            E[] row = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), 1);
+            E[] row = (E[]) java.lang.reflect.Array.newInstance(componentType, 1);
             row[0] = storage.get(i);
             matrixData[i] = row;
         }
-        return GenericMatrix.of(matrixData, field);
+        return GenericMatrix.of(matrixData, ring);
     }
 
     public Tensor<E> toTensor() {
+        int dim = dimension();
         @SuppressWarnings("unchecked")
-        E[] data = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), dimension());
-        for (int i = 0; i < dimension(); i++) {
+        E[] data = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), dim);
+        for (int i = 0; i < dim; i++) {
             data[i] = get(i);
         }
-        return org.jscience.mathematics.linearalgebra.tensors.TensorFactory.of(data, dimension());
+        return org.jscience.mathematics.linearalgebra.tensors.TensorFactory.of(data, dim);
     }
 
     // ================= Vector<E> Implementation =================
@@ -128,9 +136,9 @@ public class GenericVector<E> implements Vector<E> {
         // or just use setters.
         DenseVectorStorage<E> newStorage = new DenseVectorStorage<>(dimension());
         for (int i = 0; i < dimension(); ++i) {
-            newStorage.set(i, field.add(storage.get(i), other.get(i)));
+            newStorage.set(i, ring.add(storage.get(i), other.get(i)));
         }
-        return new GenericVector<>(newStorage, provider, field);
+        return new GenericVector<>(newStorage, provider, ring);
     }
 
     @Override
@@ -143,10 +151,10 @@ public class GenericVector<E> implements Vector<E> {
 
         DenseVectorStorage<E> newStorage = new DenseVectorStorage<>(dimension());
         for (int i = 0; i < dimension(); ++i) {
-            E neg = field.negate(other.get(i));
-            newStorage.set(i, field.add(storage.get(i), neg));
+            E neg = ring.negate(other.get(i));
+            newStorage.set(i, ring.add(storage.get(i), neg));
         }
-        return new GenericVector<>(newStorage, provider, field);
+        return new GenericVector<>(newStorage, provider, ring);
     }
 
     @Override
@@ -160,7 +168,7 @@ public class GenericVector<E> implements Vector<E> {
 
     @Override
     public Vector<E> negate() {
-        return multiply(field.negate(field.one()));
+        return multiply(ring.negate(ring.one()));
     }
 
     @Override
@@ -168,9 +176,9 @@ public class GenericVector<E> implements Vector<E> {
         if (other instanceof GenericVector) {
             return provider.dot(this, (GenericVector<E>) other);
         }
-        E sum = field.zero();
+        E sum = ring.zero();
         for (int i = 0; i < dimension(); ++i) {
-            sum = field.add(sum, field.multiply(get(i), other.get(i)));
+            sum = ring.add(sum, ring.multiply(get(i), other.get(i)));
         }
         return sum;
     }
@@ -182,7 +190,7 @@ public class GenericVector<E> implements Vector<E> {
 
     @Override
     public Ring<E> getScalarRing() {
-        return field;
+        return ring;
     }
 
     @Override
@@ -194,8 +202,8 @@ public class GenericVector<E> implements Vector<E> {
         return storage;
     }
 
-    public Field<E> getField() {
-        return field;
+    public Ring<E> getField() {
+        return ring;
     }
 
     // --- Default implementations for Ring/Module ---

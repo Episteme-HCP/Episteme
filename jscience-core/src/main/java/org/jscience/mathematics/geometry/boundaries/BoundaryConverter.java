@@ -76,7 +76,7 @@ public final class BoundaryConverter {
         // Create a flat surface (single face for simple cases)
         List<Point3D> verts3d = new ArrayList<>();
         for (Point2D p : verts2d) {
-            verts3d.add(new Point3D(p.getX(), p.getY(), z));
+            verts3d.add(Point3D.of(p.getX(), p.getY(), z));
         }
         
         // Triangulate the polygon
@@ -113,7 +113,7 @@ public final class BoundaryConverter {
         
         List<Point3D> verts3d = new ArrayList<>();
         for (Point2D p : verts2d) {
-            verts3d.add(new Point3D(p.getX(), y, p.getY()));
+            verts3d.add(Point3D.of(p.getX(), y, p.getY()));
         }
         
         int n = verts3d.size();
@@ -149,7 +149,7 @@ public final class BoundaryConverter {
         
         List<Point3D> verts3d = new ArrayList<>();
         for (Point2D p : verts2d) {
-            verts3d.add(new Point3D(x, p.getX(), p.getY()));
+            verts3d.add(Point3D.of(x, p.getX(), p.getY()));
         }
         
         int n = verts3d.size();
@@ -188,12 +188,12 @@ public final class BoundaryConverter {
         List<Point3D> top = new ArrayList<>(n);
         
         for (Point2D p : verts2d) {
-            Point3D base = new Point3D(p.getX(), p.getY(), Real.ZERO);
+            Point3D base = Point3D.of(p.getX(), p.getY(), Real.ZERO);
             bottom.add(base);
-            top.add(new Point3D(
-                base.getX().add(direction.getX()),
-                base.getY().add(direction.getY()),
-                base.getZ().add(direction.getZ())
+            top.add(Point3D.of(
+                base.getX().add(direction.x()),
+                base.getY().add(direction.y()),
+                base.getZ().add(direction.z())
             ));
         }
 
@@ -269,10 +269,10 @@ public final class BoundaryConverter {
         
         for (Point3D p : verts3d) {
             // Project onto plane using dot product with basis vectors
-            Vector3D pv = new Vector3D(p.getX(), p.getY(), p.getZ());
+            Vector3D pv = p.toVector();
             Real x = pv.dot(u);
             Real y = pv.dot(v);
-            verts2d.add(new Point2D(x, y));
+            verts2d.add(Point2D.of(x, y));
         }
         
         return ConvexPolygon2D.fromPoints(verts2d);
@@ -280,7 +280,7 @@ public final class BoundaryConverter {
 
     private static Vector3D findPerpendicularVector(Vector3D v) {
         // Find a vector perpendicular to v
-        if (v.getX().abs().compareTo(v.getY().abs()) < 0) {
+        if (v.x().abs().compareTo(v.y().abs()) < 0) {
             return new Vector3D(Real.ONE, Real.ZERO, Real.ZERO).cross(v);
         } else {
             return new Vector3D(Real.ZERO, Real.ONE, Real.ZERO).cross(v);
@@ -296,7 +296,7 @@ public final class BoundaryConverter {
      * @return the 3D point
      */
     public static Point3D toPoint3D(Point2D point2D) {
-        return new Point3D(point2D.getX(), point2D.getY(), Real.ZERO);
+        return Point3D.of(point2D.getX(), point2D.getY(), Real.ZERO);
     }
 
     /**
@@ -307,7 +307,7 @@ public final class BoundaryConverter {
      * @return the 3D point
      */
     public static Point3D toPoint3D(Point2D point2D, Real z) {
-        return new Point3D(point2D.getX(), point2D.getY(), z);
+        return Point3D.of(point2D.getX(), point2D.getY(), z);
     }
 
     /**
@@ -317,7 +317,7 @@ public final class BoundaryConverter {
      * @return the 2D point
      */
     public static Point2D toPoint2D(Point3D point3D) {
-        return new Point2D(point3D.getX(), point3D.getY());
+        return Point2D.of(point3D.getX(), point3D.getY());
     }
 
     /**
@@ -327,7 +327,7 @@ public final class BoundaryConverter {
      * @return the 2D point (x, z)
      */
     public static Point2D toPoint2DXZ(Point3D point3D) {
-        return new Point2D(point3D.getX(), point3D.getZ());
+        return Point2D.of(point3D.getX(), point3D.getZ());
     }
 
     /**
@@ -337,7 +337,7 @@ public final class BoundaryConverter {
      * @return the 2D point (y, z)
      */
     public static Point2D toPoint2DYZ(Point3D point3D) {
-        return new Point2D(point3D.getY(), point3D.getZ());
+        return Point2D.of(point3D.getY(), point3D.getZ());
     }
 
     // ===== Fuzzy Boundary Conversion =====

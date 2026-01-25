@@ -67,6 +67,21 @@ public class DivisionExpression<T extends Ring<T>> implements Expression<T> {
     }
 
     @Override
+    public Expression<T> subtract(Expression<T> other) {
+        return new SumExpression<>(this, other.negate(), ring);
+    }
+
+    @Override
+    public Expression<T> negate() {
+        return new DivisionExpression<>(numerator.negate(), denominator, ring);
+    }
+
+    @Override
+    public Expression<T> divide(Expression<T> other) {
+        return new DivisionExpression<>(this, other, ring);
+    }
+
+    @Override
     public Expression<T> differentiate(Variable<T> variable) {
         // Quotient rule: (f/g)' = (f'g - fg') / gÃ‚Â²
         Expression<T> fPrime = numerator.differentiate(variable);

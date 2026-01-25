@@ -50,7 +50,7 @@ public class BoundingBox3D implements BoundingBox<Point3D> {
 
     public static BoundingBox3D fromPoints(List<Point3D> points) {
         if (points == null || points.isEmpty()) {
-            return new BoundingBox3D(Point3D.ORIGIN, Point3D.ORIGIN);
+            return new BoundingBox3D(Point3D.ZERO, Point3D.ZERO);
         }
 
         Real minX = points.get(0).getX(), maxX = minX;
@@ -66,7 +66,7 @@ public class BoundingBox3D implements BoundingBox<Point3D> {
             if (p.getZ().compareTo(maxZ) > 0) maxZ = p.getZ();
         }
 
-        return new BoundingBox3D(new Point3D(minX, minY, minZ), new Point3D(maxX, maxY, maxZ));
+        return new BoundingBox3D(Point3D.of(minX, minY, minZ), Point3D.of(maxX, maxY, maxZ));
     }
 
     @Override
@@ -80,7 +80,7 @@ public class BoundingBox3D implements BoundingBox<Point3D> {
     public Real getDepth() { return max.getZ().subtract(min.getZ()); }
 
     public Point3D getCenter() {
-        return new Point3D(
+        return Point3D.of(
             min.getX().add(max.getX()).divide(Real.of(2)),
             min.getY().add(max.getY()).divide(Real.of(2)),
             min.getZ().add(max.getZ()).divide(Real.of(2))
@@ -128,8 +128,8 @@ public class BoundingBox3D implements BoundingBox<Point3D> {
         Real newMaxZ = point.getZ().compareTo(max.getZ()) > 0 ? point.getZ() : max.getZ();
         
         return new BoundingBox3D(
-            new Point3D(newMinX, newMinY, newMinZ),
-            new Point3D(newMaxX, newMaxY, newMaxZ)
+            Point3D.of(newMinX, newMinY, newMinZ),
+            Point3D.of(newMaxX, newMaxY, newMaxZ)
         );
     }
 
@@ -148,8 +148,8 @@ public class BoundingBox3D implements BoundingBox<Point3D> {
         Real newMaxZ = oMax.getZ().compareTo(max.getZ()) > 0 ? oMax.getZ() : max.getZ();
         
         return new BoundingBox3D(
-            new Point3D(newMinX, newMinY, newMinZ),
-            new Point3D(newMaxX, newMaxY, newMaxZ)
+            Point3D.of(newMinX, newMinY, newMinZ),
+            Point3D.of(newMaxX, newMaxY, newMaxZ)
         );
     }
 

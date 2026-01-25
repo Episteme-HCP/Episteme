@@ -1,4 +1,4 @@
-package org.jscience.ml.mathml.beans;
+package org.jscience.mathematics.loaders.mathml.beans;
 
 import java.util.EventObject;
 

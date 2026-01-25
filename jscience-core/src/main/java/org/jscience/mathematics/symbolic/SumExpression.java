@@ -63,6 +63,21 @@ public class SumExpression<T extends Ring<T>> implements Expression<T> {
     }
 
     @Override
+    public Expression<T> subtract(Expression<T> other) {
+        return new SumExpression<>(this, other.negate(), ring);
+    }
+
+    @Override
+    public Expression<T> negate() {
+        return new SumExpression<>(left.negate(), right.negate(), ring);
+    }
+
+    @Override
+    public Expression<T> divide(Expression<T> other) {
+        return new DivisionExpression<>(this, other, ring);
+    }
+
+    @Override
     public Expression<T> differentiate(Variable<T> variable) {
         // (f + g)' = f' + g'
         return new SumExpression<>(left.differentiate(variable), right.differentiate(variable), ring);

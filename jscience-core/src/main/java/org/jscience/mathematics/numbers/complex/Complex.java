@@ -433,6 +433,14 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
     public boolean isEmpty() {
         return false;
     }
+
+    /**
+     * Returns the ring structure for complex numbers.
+     * @return this instance (as it implements Field<Complex>)
+     */
+    public org.jscience.mathematics.structures.rings.Ring<Complex> getScalarRing() {
+        return this;
+    }
 }
 
 

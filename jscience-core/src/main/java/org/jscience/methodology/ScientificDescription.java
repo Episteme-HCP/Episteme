@@ -25,6 +25,8 @@ package org.jscience.methodology;
 
 import org.jscience.util.Named;
 import org.jscience.util.identity.Identified;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
 import java.time.Instant;
 
 import java.util.Set;
@@ -33,13 +35,18 @@ import java.util.Set;
  * A formal description of a scientific entity, observation, or theory.
  */
 public record ScientificDescription(
-    String id,
+    Identification id,
     String name,
     Set<String> authors,
     Instant date,
     String contents
-) implements Named, Identified<String> {
+) implements Named, Identified<Identification> {
     
-    @Override public String getId() { return id; }
+    @Override public Identification getId() { return id; }
     @Override public String getName() { return name; }
+
+    /** Helper for String IDs */
+    public ScientificDescription(String id, String name, Set<String> authors, Instant date, String contents) {
+        this(new SimpleIdentification(id), name, authors, date, contents);
+    }
 }

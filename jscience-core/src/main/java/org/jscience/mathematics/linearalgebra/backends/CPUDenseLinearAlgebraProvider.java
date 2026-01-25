@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.jscience.mathematics.structures.rings.Field;
 
 import org.jscience.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.jscience.mathematics.linearalgebra.Matrix;
@@ -46,11 +45,11 @@ import org.jscience.mathematics.linearalgebra.vectors.GenericVector;
  */
 public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E> {
 
-    protected final Field<E> field;
+    protected final org.jscience.mathematics.structures.rings.Ring<E> ring;
     private static final int PARALLEL_THRESHOLD = 1000;
 
-    public CPUDenseLinearAlgebraProvider(Field<E> field) {
-        this.field = field;
+    public CPUDenseLinearAlgebraProvider(org.jscience.mathematics.structures.rings.Ring<E> ring) {
+        this.ring = ring;
     }
 
     /**
@@ -85,14 +84,14 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             @SuppressWarnings("unchecked")
             E[] data = (E[]) new Object[a.dimension()];
             for (int i = 0; i < a.dimension(); i++) {
-                data[i] = field.add(a.get(i), b.get(i));
+                data[i] = ring.add(a.get(i), b.get(i));
             }
             return new GenericVector<>(
-                    new org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(data), this, field);
+                    new org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(data), this, ring);
         } else {
             return IntStream.range(0, a.dimension())
                     .parallel()
-                    .mapToObj(i -> field.add(a.get(i), b.get(i)))
+                    .mapToObj(i -> ring.add(a.get(i), b.get(i)))
                     .collect(Collectors.collectingAndThen(
                             Collectors.toList(),
                             list -> {
@@ -101,7 +100,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                                 return new GenericVector<>(
                                         new org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(
                                                 arr),
-                                        this, field);
+                                        this, ring);
                             }));
         }
     }
@@ -114,18 +113,18 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (a.dimension() < PARALLEL_THRESHOLD) {
             List<E> result = new ArrayList<>(a.dimension());
             for (int i = 0; i < a.dimension(); i++) {
-                E negB = field.negate(b.get(i));
-                result.add(field.add(a.get(i), negB));
+                E negB = ring.negate(b.get(i));
+                result.add(ring.add(a.get(i), negB));
             }
             return new GenericVector<>(
                     new org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(result), this,
-                    field);
+                    ring);
         } else {
             return IntStream.range(0, a.dimension())
                     .parallel()
                     .mapToObj(i -> {
-                        E negB = field.negate(b.get(i));
-                        return field.add(a.get(i), negB);
+                        E negB = ring.negate(b.get(i));
+                        return ring.add(a.get(i), negB);
                     })
                     .collect(Collectors.collectingAndThen(
                             Collectors.toList(),
@@ -135,7 +134,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                                 return new GenericVector<>(
                                         new org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(
                                                 arr),
-                                        this, field);
+                                        this, ring);
                             }));
         }
     }
@@ -145,24 +144,22 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (vector.dimension() < PARALLEL_THRESHOLD) {
             List<E> result = new ArrayList<>(vector.dimension());
             for (int i = 0; i < vector.dimension(); i++) {
-                result.add(field.multiply(vector.get(i), scalar));
+                result.add(ring.multiply(vector.get(i), scalar));
             }
             // return new GenericVector(result.toArray(newFieldsElement[0]...), this,
             // field);
             // Handling array creation generically is hard without class token.
             // DenseVector dealt with List. GenericVector takes Array.
-            // We can create Array from List if we have type?
-            // E is generic.
-            // We can convert List to Array if we cast.
+            // We can create Array from List if we cast.
 
             @SuppressWarnings("unchecked")
             E[] arr = (E[]) result.toArray(); // Safe if result contains E
             return new GenericVector<>(
-                    new org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr), this, field);
+                    new org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr), this, ring);
         } else {
             return IntStream.range(0, vector.dimension())
                     .parallel()
-                    .mapToObj(i -> field.multiply(vector.get(i), scalar))
+                    .mapToObj(i -> ring.multiply(vector.get(i), scalar))
                     .collect(Collectors.collectingAndThen(
                             Collectors.toList(),
                             list -> {
@@ -171,7 +168,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                                 return new GenericVector<>(
                                         new org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(
                                                 arr),
-                                        this, field);
+                                        this, ring);
                             }));
         }
     }
@@ -182,17 +179,17 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             throw new IllegalArgumentException("Vector dimensions must match");
         }
         if (a.dimension() < PARALLEL_THRESHOLD) {
-            E sum = field.zero();
+            E sum = ring.zero();
             for (int i = 0; i < a.dimension(); i++) {
-                E product = field.multiply(a.get(i), b.get(i));
-                sum = field.add(sum, product);
+                E product = ring.multiply(a.get(i), b.get(i));
+                sum = ring.add(sum, product);
             }
             return sum;
         } else {
             return IntStream.range(0, a.dimension())
                     .parallel()
-                    .mapToObj(i -> field.multiply(a.get(i), b.get(i)))
-                    .reduce(field.zero(), field::add);
+                    .mapToObj(i -> ring.multiply(a.get(i), b.get(i)))
+                    .reduce(ring.zero(), ring::add);
         }
 
     }
@@ -201,7 +198,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     @SuppressWarnings("unchecked")
     public E norm(Vector<E> a) {
         E dotProduct = dot(a, a);
-        if (field instanceof org.jscience.mathematics.sets.Reals) {
+        if (ring instanceof org.jscience.mathematics.sets.Reals) {
             org.jscience.mathematics.numbers.real.Real r = (org.jscience.mathematics.numbers.real.Real) dotProduct;
             double val = r.doubleValue();
             return (E) org.jscience.mathematics.numbers.real.Real.of(Math.sqrt(val));
@@ -214,7 +211,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             org.jscience.mathematics.numbers.real.Real r = (org.jscience.mathematics.numbers.real.Real) dotProduct;
             return (E) org.jscience.mathematics.numbers.real.Real.of(Math.sqrt(r.doubleValue()));
         }
-        throw new UnsupportedOperationException("Norm not supported for field: " + field.getClass().getSimpleName());
+        throw new UnsupportedOperationException("Norm not supported for ring: " + ring.getClass().getSimpleName());
     }
 
     @Override
@@ -222,22 +219,22 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (a.rows() != b.rows() || a.cols() != b.cols()) {
             throw new IllegalArgumentException("Matrix dimensions must match");
         }
-        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), a.cols(), field.zero());
+        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), a.cols(), ring.zero());
 
         if (a.rows() * a.cols() < PARALLEL_THRESHOLD) {
             for (int i = 0; i < a.rows(); i++) {
                 for (int j = 0; j < a.cols(); j++) {
-                    storage.set(i, j, field.add(a.get(i, j), b.get(i, j)));
+                    storage.set(i, j, ring.add(a.get(i, j), b.get(i, j)));
                 }
             }
         } else {
             IntStream.range(0, a.rows()).parallel().forEach(i -> {
                 for (int j = 0; j < a.cols(); j++) {
-                    storage.set(i, j, field.add(a.get(i, j), b.get(i, j)));
+                    storage.set(i, j, ring.add(a.get(i, j), b.get(i, j)));
                 }
             });
         }
-        return new GenericMatrix<>(storage, this, field);
+        return new GenericMatrix<E>(storage, this, ring);
     }
 
     @Override
@@ -245,24 +242,24 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (a.rows() != b.rows() || a.cols() != b.cols()) {
             throw new IllegalArgumentException("Matrix dimensions must match");
         }
-        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), a.cols(), field.zero());
+        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), a.cols(), ring.zero());
 
         if (a.rows() * a.cols() < PARALLEL_THRESHOLD) {
             for (int i = 0; i < a.rows(); i++) {
                 for (int j = 0; j < a.cols(); j++) {
-                    E negB = field.negate(b.get(i, j));
-                    storage.set(i, j, field.add(a.get(i, j), negB));
+                    E negB = ring.negate(b.get(i, j));
+                    storage.set(i, j, ring.add(a.get(i, j), negB));
                 }
             }
         } else {
             IntStream.range(0, a.rows()).parallel().forEach(i -> {
                 for (int j = 0; j < a.cols(); j++) {
-                    E negB = field.negate(b.get(i, j));
-                    storage.set(i, j, field.add(a.get(i, j), negB));
+                    E negB = ring.negate(b.get(i, j));
+                    storage.set(i, j, ring.add(a.get(i, j), negB));
                 }
             });
         }
-        return new GenericMatrix<>(storage, this, field);
+        return new GenericMatrix<E>(storage, this, ring);
     }
 
     @Override
@@ -320,14 +317,14 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
 
     private Matrix<E> combineSubMatrices(Matrix<E> C11, Matrix<E> C12, Matrix<E> C21, Matrix<E> C22) {
         int n = C11.rows() * 2;
-        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(n, n, field.zero());
+        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(n, n, ring.zero());
 
         copySubMatrixToStorage(storage, C11, 0, 0);
         copySubMatrixToStorage(storage, C12, 0, n / 2);
         copySubMatrixToStorage(storage, C21, n / 2, 0);
         copySubMatrixToStorage(storage, C22, n / 2, n / 2);
 
-        return new GenericMatrix<>(storage, this, field);
+        return new GenericMatrix<E>(storage, this, ring);
     }
 
     private void copySubMatrixToStorage(DenseMatrixStorage<E> storage, Matrix<E> sub, int rowOffset, int colOffset) {
@@ -339,17 +336,17 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     private Matrix<E> standardMultiply(Matrix<E> a, Matrix<E> b) {
-        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), b.cols(), field.zero());
+        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), b.cols(), ring.zero());
         long start = System.nanoTime();
         try {
             if (a.rows() < 10) {
                 // ... serial loop ...
                 for (int i = 0; i < a.rows(); i++) {
                     for (int j = 0; j < b.cols(); j++) {
-                        E sum = field.zero();
+                        E sum = ring.zero();
                         for (int k = 0; k < a.cols(); k++) {
-                            E product = field.multiply(a.get(i, k), b.get(k, j));
-                            sum = field.add(sum, product);
+                            E product = ring.multiply(a.get(i, k), b.get(k, j));
+                            sum = ring.add(sum, product);
                         }
                         storage.set(i, j, sum);
                     }
@@ -357,10 +354,10 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             } else {
                 IntStream.range(0, a.rows()).parallel().forEach(i -> {
                     for (int j = 0; j < b.cols(); j++) {
-                        E sum = field.zero();
+                        E sum = ring.zero();
                         for (int k = 0; k < a.cols(); k++) {
-                            E product = field.multiply(a.get(i, k), b.get(k, j));
-                            sum = field.add(sum, product);
+                            E product = ring.multiply(a.get(i, k), b.get(k, j));
+                            sum = ring.add(sum, product);
                         }
                         storage.set(i, j, sum);
                     }
@@ -375,29 +372,29 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             }
             org.jscience.util.PerformanceLogger.log("CPU:GenericMultiply", context, System.nanoTime() - start);
         }
-        return new GenericMatrix<>(storage, this, field);
+        return new GenericMatrix<E>(storage, this, ring);
     }
 
     @Override
     public Matrix<E> transpose(Matrix<E> a) {
-        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.cols(), a.rows(), field.zero());
+        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.cols(), a.rows(), ring.zero());
         IntStream.range(0, a.rows()).parallel().forEach(i -> {
             for (int j = 0; j < a.cols(); j++) {
                 storage.set(j, i, a.get(i, j));
             }
         });
-        return new GenericMatrix<>(storage, this, field);
+        return new GenericMatrix<E>(storage, this, ring);
     }
 
     @Override
     public Matrix<E> scale(E scalar, Matrix<E> a) {
-        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), a.cols(), field.zero());
+        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), a.cols(), ring.zero());
         IntStream.range(0, a.rows()).parallel().forEach(i -> {
             for (int j = 0; j < a.cols(); j++) {
-                storage.set(i, j, field.multiply(a.get(i, j), scalar));
+                storage.set(i, j, ring.multiply(a.get(i, j), scalar));
             }
         });
-        return new GenericMatrix<>(storage, this, field);
+        return new GenericMatrix<E>(storage, this, ring);
     }
 
     @Override
@@ -409,24 +406,24 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (a.rows() < PARALLEL_THRESHOLD) {
             List<E> result = new ArrayList<>(a.rows());
             for (int i = 0; i < a.rows(); i++) {
-                E sum = field.zero();
+                E sum = ring.zero();
                 for (int j = 0; j < a.cols(); j++) {
-                    E product = field.multiply(a.get(i, j), b.get(j));
-                    sum = field.add(sum, product);
+                    E product = ring.multiply(a.get(i, j), b.get(j));
+                    sum = ring.add(sum, product);
                 }
                 result.add(sum);
             }
             return new GenericVector<>(
                     new org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(result), this,
-                    field);
+                    ring);
         } else {
             return IntStream.range(0, a.rows())
                     .parallel()
                     .mapToObj(i -> {
-                        E sum = field.zero();
+                        E sum = ring.zero();
                         for (int j = 0; j < a.cols(); j++) {
-                            E product = field.multiply(a.get(i, j), b.get(j));
-                            sum = field.add(sum, product);
+                            E product = ring.multiply(a.get(i, j), b.get(j));
+                            sum = ring.add(sum, product);
                         }
                         return sum;
                     })
@@ -438,13 +435,18 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                                 return new GenericVector<>(
                                         new org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(
                                                 arr),
-                                        this, field);
+                                        this, ring);
                             }));
         }
     }
 
     @Override
     public Matrix<E> inverse(Matrix<E> a) {
+        if (!(ring instanceof org.jscience.mathematics.structures.rings.Field)) {
+            throw new UnsupportedOperationException("Matrix inversion requires a Field, found: " + ring.getClass().getSimpleName());
+        }
+        org.jscience.mathematics.structures.rings.Field<E> field = (org.jscience.mathematics.structures.rings.Field<E>) ring;
+
         if (a.rows() != a.cols()) {
             throw new ArithmeticException("Matrix must be square to compute inverse");
         }
@@ -498,7 +500,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 storage.set(i, j, aug.get(i).get(n + j));
             }
         }
-        return new GenericMatrix<>(storage, this, field);
+        return new GenericMatrix<E>(storage, this, ring);
     }
 
     @Override
@@ -509,9 +511,18 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (n == 1)
             return a.get(0, 0);
         if (n == 2) {
-            return field.add(field.multiply(a.get(0, 0), a.get(1, 1)),
-                    field.negate(field.multiply(a.get(0, 1), a.get(1, 0))));
+            return ring.add(ring.multiply(a.get(0, 0), a.get(1, 1)),
+                    ring.negate(ring.multiply(a.get(0, 1), a.get(1, 0))));
         }
+
+        // Division-free determinant if not a field?
+        // Using Gauss for now, but requires Field.
+        if (!(ring instanceof org.jscience.mathematics.structures.rings.Field)) {
+            // Simplified: only allow 1x1, 2x2 determinant for general rings
+            // in LU-based approach. We could implement Bareiss algorithm here.
+            throw new UnsupportedOperationException("Determinant for N > 2 requires a Field or Bareiss implementation.");
+        }
+        org.jscience.mathematics.structures.rings.Field<E> field = (org.jscience.mathematics.structures.rings.Field<E>) ring;
 
         List<List<E>> mat = new ArrayList<>();
         for (int i = 0; i < n; i++) {
@@ -554,6 +565,11 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
 
     @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
+        if (!(ring instanceof org.jscience.mathematics.structures.rings.Field)) {
+            throw new UnsupportedOperationException("Linear system solving requires a Field, found: " + ring.getClass().getSimpleName());
+        }
+        org.jscience.mathematics.structures.rings.Field<E> field = (org.jscience.mathematics.structures.rings.Field<E>) ring;
+
         if (a.rows() != a.cols())
             throw new ArithmeticException("Must be square");
         int n = a.rows();
@@ -621,7 +637,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         E[] resArray = (E[]) res
                 .toArray();
         return new GenericVector<>(
-                new org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(resArray), this, field);
+                new org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(resArray), this, ring);
     }
 
     @Override

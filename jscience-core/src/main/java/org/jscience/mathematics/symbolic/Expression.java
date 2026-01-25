@@ -56,6 +56,52 @@ public interface Expression<T extends Ring<T>> {
     Expression<T> multiply(Expression<T> other);
 
     /**
+     * Subtracts another expression from this.
+     * 
+     * @param other the subtrahend
+     * @return the difference expression
+     */
+    Expression<T> subtract(Expression<T> other);
+
+    /**
+     * Negates this expression.
+     * 
+     * @return the negated expression
+     */
+    Expression<T> negate();
+
+    /**
+     * Divides this expression by another.
+     * 
+     * @param other the divisor
+     * @return the quotient expression
+     */
+    Expression<T> divide(Expression<T> other);
+
+    /**
+     * Raises this expression to an integer power.
+     * 
+     * @param n the exponent
+     * @return the power expression
+     */
+    default Expression<T> pow(int n) {
+        if (n == 0) return ConstantExpression.ofConstant(getRing().one(), getRing());
+        if (n == 1) return this;
+        Expression<T> result = this;
+        for (int i = 1; i < n; i++) {
+            result = result.multiply(this);
+        }
+        return result;
+    }
+
+    /**
+     * Returns the ring this expression belongs to.
+     * 
+     * @return the ring
+     */
+    Ring<T> getRing();
+
+    /**
      * Differentiates this expression with respect to the given variable.
      * 
      * @param variable the variable to differentiate by

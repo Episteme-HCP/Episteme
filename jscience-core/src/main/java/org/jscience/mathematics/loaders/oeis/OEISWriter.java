@@ -147,4 +147,9 @@ public class OEISWriter extends AbstractResourceWriter<IntegerSequence> {
             writer.println(sequence.get(Natural.of(i)));
         }
     }
+
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
+    }
 }

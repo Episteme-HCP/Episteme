@@ -93,7 +93,7 @@ public final class ConvexHull3D {
          * Returns the centroid of this face.
          */
         public Point3D getCentroid() {
-            return new Point3D(
+            return Point3D.of(
                 vertices[0].getX().add(vertices[1].getX()).add(vertices[2].getX()).divide(Real.of(3)),
                 vertices[0].getY().add(vertices[1].getY()).add(vertices[2].getY()).divide(Real.of(3)),
                 vertices[0].getZ().add(vertices[1].getZ()).add(vertices[2].getZ()).divide(Real.of(3))
@@ -189,7 +189,7 @@ public final class ConvexHull3D {
         if (faces.isEmpty()) return Real.ZERO;
 
         // Sum signed tetrahedron volumes
-        Point3D origin = Point3D.ORIGIN;
+        Point3D origin = Point3D.ZERO;
         Real sum = Real.ZERO;
 
         for (Face f : faces) {
@@ -358,7 +358,7 @@ public final class ConvexHull3D {
             sumZ = sumZ.add(p.getZ());
         }
         int n = points.size();
-        return new Point3D(
+        return Point3D.of(
             sumX.divide(Real.of(n)),
             sumY.divide(Real.of(n)),
             sumZ.divide(Real.of(n))

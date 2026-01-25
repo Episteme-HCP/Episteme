@@ -24,6 +24,8 @@
 package org.jscience.methodology;
 
 import org.jscience.util.identity.Identified;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
 import java.time.Instant;
 import java.util.List;
 
@@ -31,11 +33,16 @@ import java.util.List;
  * A formal report summarizing findings from a series of analyses or descriptions.
  */
 public record ScientificReport(
-    String id,
+    Identification id,
     String author,
     Instant date,
     List<String> contents
-) implements Identified<String> {
+) implements Identified<Identification> {
 
-    @Override public String getId() { return id; }
+    @Override public Identification getId() { return id; }
+
+    /** Helper for String IDs */
+    public ScientificReport(String id, String author, Instant date, List<String> contents) {
+        this(new SimpleIdentification(id), author, date, contents);
+    }
 }

@@ -212,8 +212,7 @@ public final class UnitConversion {
     // --- Angles ---
 
     public static double degreesToRadians(double deg) {
-        return Quantities.create(deg, Units.DEGREE_ANGLE).asType(org.jscience.measure.quantity.Dimensionless.class)
-                .to(Units.RADIAN).getValue().doubleValue();
+        return Quantities.create(deg, Units.DEGREE_ANGLE).to(Units.RADIAN).getValue().doubleValue();
     }
 
     public static double radiansToDegrees(double rad) {

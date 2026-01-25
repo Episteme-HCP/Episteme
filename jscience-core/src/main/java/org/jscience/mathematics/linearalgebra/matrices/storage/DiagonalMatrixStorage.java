@@ -23,7 +23,7 @@
 
 package org.jscience.mathematics.linearalgebra.matrices.storage;
 
-import org.jscience.mathematics.structures.rings.Field;
+import org.jscience.mathematics.structures.rings.Ring;
 
 /**
  * Diagonal matrix storage - only stores diagonal elements.
@@ -42,10 +42,10 @@ public class DiagonalMatrixStorage<E> implements MatrixStorage<E> {
     private final int size;
 
     @SuppressWarnings("unchecked")
-    public DiagonalMatrixStorage(E[] diagonal, Field<E> field) {
+    public DiagonalMatrixStorage(E[] diagonal, Ring<E> ring) {
         this.diagonal = (E[]) new Object[diagonal.length];
         System.arraycopy(diagonal, 0, this.diagonal, 0, diagonal.length);
-        this.zero = field.zero();
+        this.zero = ring.zero();
         this.size = diagonal.length;
     }
 

@@ -144,14 +144,14 @@ public class ConvexPolyhedron3D implements Boundary3D {
         Real x0 = min.getX(), y0 = min.getY(), z0 = min.getZ();
         Real x1 = max.getX(), y1 = max.getY(), z1 = max.getZ();
 
-        Point3D v000 = new Point3D(x0, y0, z0);
-        Point3D v001 = new Point3D(x0, y0, z1);
-        Point3D v010 = new Point3D(x0, y1, z0);
-        Point3D v011 = new Point3D(x0, y1, z1);
-        Point3D v100 = new Point3D(x1, y0, z0);
-        Point3D v101 = new Point3D(x1, y0, z1);
-        Point3D v110 = new Point3D(x1, y1, z0);
-        Point3D v111 = new Point3D(x1, y1, z1);
+        Point3D v000 = Point3D.of(x0, y0, z0);
+        Point3D v001 = Point3D.of(x0, y0, z1);
+        Point3D v010 = Point3D.of(x0, y1, z0);
+        Point3D v011 = Point3D.of(x0, y1, z1);
+        Point3D v100 = Point3D.of(x1, y0, z0);
+        Point3D v101 = Point3D.of(x1, y0, z1);
+        Point3D v110 = Point3D.of(x1, y1, z0);
+        Point3D v111 = Point3D.of(x1, y1, z1);
 
         // 12 triangles (2 per face)
         List<TriangularFace> faces = List.of(
@@ -193,8 +193,8 @@ public class ConvexPolyhedron3D implements Boundary3D {
         List<Point3D> top = new ArrayList<>(n);
         
         for (Point2D p : verts2d) {
-            bottom.add(new Point3D(p.getX(), p.getY(), Real.ZERO));
-            top.add(new Point3D(p.getX(), p.getY(), height));
+            bottom.add(Point3D.of(p.getX(), p.getY(), Real.ZERO));
+            top.add(Point3D.of(p.getX(), p.getY(), height));
         }
 
         List<TriangularFace> faces = new ArrayList<>();
@@ -236,7 +236,7 @@ public class ConvexPolyhedron3D implements Boundary3D {
         if (cachedVolume != null) return cachedVolume;
         
         // Sum of signed tetrahedron volumes
-        Point3D origin = Point3D.ORIGIN;
+        Point3D origin = Point3D.ZERO;
         Real sum = Real.ZERO;
         
         for (TriangularFace f : faces) {
@@ -289,7 +289,7 @@ public class ConvexPolyhedron3D implements Boundary3D {
             sumZ = sumZ.add(v.getZ());
         }
         int n = vertices.size();
-        cachedCentroid = new Point3D(
+        cachedCentroid = Point3D.of(
             sumX.divide(Real.of(n)),
             sumY.divide(Real.of(n)),
             sumZ.divide(Real.of(n))
@@ -359,7 +359,7 @@ public class ConvexPolyhedron3D implements Boundary3D {
     }
 
     private Point3D translatePoint(Point3D p, Point3D offset) {
-        return new Point3D(
+        return Point3D.of(
             p.getX().add(offset.getX()),
             p.getY().add(offset.getY()),
             p.getZ().add(offset.getZ())
@@ -382,7 +382,7 @@ public class ConvexPolyhedron3D implements Boundary3D {
     }
 
     private Point3D scalePoint(Point3D p, Point3D center, Real factor) {
-        return new Point3D(
+        return Point3D.of(
             center.getX().add(p.getX().subtract(center.getX()).multiply(factor)),
             center.getY().add(p.getY().subtract(center.getY()).multiply(factor)),
             center.getZ().add(p.getZ().subtract(center.getZ()).multiply(factor))
@@ -414,7 +414,7 @@ public class ConvexPolyhedron3D implements Boundary3D {
     public Boundary2D projectXY() {
         List<Point2D> projected = new ArrayList<>();
         for (Point3D v : vertices) {
-            projected.add(new Point2D(v.getX(), v.getY()));
+            projected.add(Point2D.of(v.getX(), v.getY()));
         }
         return ConvexPolygon2D.fromPoints(projected);
     }
@@ -423,7 +423,7 @@ public class ConvexPolyhedron3D implements Boundary3D {
     public Boundary2D projectXZ() {
         List<Point2D> projected = new ArrayList<>();
         for (Point3D v : vertices) {
-            projected.add(new Point2D(v.getX(), v.getZ()));
+            projected.add(Point2D.of(v.getX(), v.getZ()));
         }
         return ConvexPolygon2D.fromPoints(projected);
     }
@@ -432,7 +432,7 @@ public class ConvexPolyhedron3D implements Boundary3D {
     public Boundary2D projectYZ() {
         List<Point2D> projected = new ArrayList<>();
         for (Point3D v : vertices) {
-            projected.add(new Point2D(v.getY(), v.getZ()));
+            projected.add(Point2D.of(v.getY(), v.getZ()));
         }
         return ConvexPolygon2D.fromPoints(projected);
     }

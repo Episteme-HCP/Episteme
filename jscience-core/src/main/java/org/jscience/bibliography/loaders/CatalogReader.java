@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+package org.jscience.bibliography.loaders;
+
+import org.jscience.bibliography.BibliographicalNotice;
+import org.jscience.io.ResourceReader;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 /**
- * Provides the {@link org.jscience.io.mathml} module.
+ * Interface for loading bibliographical catalogs of books or articles.
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.1
  */
-package org.jscience.io.mathml;
+public interface CatalogReader extends ResourceReader<List<BibliographicalNotice>> {
+
+    /**
+     * Searches the catalog for works matching the given query string.
+     * 
+     * @param query the search query
+     * @return a list of matching notices
+     */
+    CompletableFuture<List<BibliographicalNotice>> search(String query);
+
+    /**
+     * Loads a specific notice by its identifier (e.g., ISBN, DOI).
+     * 
+     * @param id the identifier
+     * @return the notice, or null if not found
+     */
+    CompletableFuture<BibliographicalNotice> loadNotice(String id);
+}

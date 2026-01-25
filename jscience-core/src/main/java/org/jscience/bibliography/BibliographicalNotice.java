@@ -21,31 +21,54 @@
  * SOFTWARE.
  */
 
-package org.jscience.methodology;
+package org.jscience.bibliography;
 
-import org.jscience.util.Named;
-import org.jscience.util.identity.Identified;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.Identified;
 import org.jscience.util.identity.SimpleIdentification;
-import java.time.Instant;
 
 /**
- * Represents a scientific analysis linking a sample to experimental results.
+ * Represents a detailed bibliographical notice for a work (book, article, etc.).
+ * <p>
+ * This record provides a rich set of metadata according to modern library standards.
+ * </p>
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.1
  */
-public record ScientificAnalysis(
+public record BibliographicalNotice(
     Identification id,
-    String name,
-    Instant date,
-    Sample sample,
-    String result,
-    String comments
-) implements Named, Identified<Identification> {
+    String title,
+    List<String> authors,
+    String publisher,
+    String publicationYear,
+    String type, // "BOOK", "ARTICLE", "PROCEEDINGS", etc.
+    String source, // Journal name or Book series
+    String volume,
+    String issue,
+    String pages,
+    String doi,
+    String isbn,
+    String issn,
+    String abstractText,
+    List<String> keywords,
+    Map<String, String> additionalMetadata
+) implements Identified<Identification>, Serializable {
 
-    @Override public Identification getId() { return id; }
-    @Override public String getName() { return name; }
+    @Override
+    public Identification getId() {
+        return id;
+    }
 
-    /** Helper for String IDs */
-    public ScientificAnalysis(String id, String name, Instant date, Sample sample, String result, String comments) {
-        this(new SimpleIdentification(id), name, date, sample, result, comments);
+    /**
+     * Helper constructor for String IDs.
+     */
+    public BibliographicalNotice(String id, String title, List<String> authors, String publisher, String publicationYear, String type) {
+        this(new SimpleIdentification(id), title, authors, publisher, publicationYear, type, 
+             null, null, null, null, null, null, null, null, null, Map.of());
     }
 }

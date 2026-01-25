@@ -26,7 +26,7 @@ package org.jscience.mathematics.linearalgebra.matrices;
 import org.jscience.ComputeContext;
 import org.jscience.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 import org.jscience.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage;
-import org.jscience.mathematics.structures.rings.Field;
+import org.jscience.mathematics.structures.rings.Ring;
 
 import java.util.List;
 
@@ -43,34 +43,35 @@ public class SparseMatrix<E> extends GenericMatrix<E> {
     /**
      * Creates a SparseMatrix with automatic storage optimization.
      */
-    public SparseMatrix(E[][] data, Field<E> field) {
-        this(MatrixFactory.createSparseStorage(data, field), field);
+    /**
+     * Creates a SparseMatrix with automatic storage optimization.
+     */
+    public SparseMatrix(E[][] data, org.jscience.mathematics.structures.rings.Ring<E> ring) {
+        this(MatrixFactory.createSparseStorage(data, ring), ring);
     }
 
-    public SparseMatrix(List<List<E>> rows, Field<E> field) {
-        this(MatrixFactory.createSparseStorage(rows, field), field);
+    public SparseMatrix(List<List<E>> rows, org.jscience.mathematics.structures.rings.Ring<E> ring) {
+        this(MatrixFactory.createSparseStorage(rows, ring), ring);
     }
 
-    public SparseMatrix(int rows, int cols, Field<E> field) {
-        this(new SparseMatrixStorage<>(rows, cols, field.zero()), field);
+    public SparseMatrix(int rows, int cols, org.jscience.mathematics.structures.rings.Ring<E> ring) {
+        this(new SparseMatrixStorage<>(rows, cols, ring.zero()), ring);
     }
 
     // Internal constructor using storage - Made public for Providers
-    public SparseMatrix(MatrixStorage<E> storage, Field<E> field) {
-        super(storage, ComputeContext.current().getSparseLinearAlgebraProvider(field), field);
+    public SparseMatrix(MatrixStorage<E> storage, org.jscience.mathematics.structures.rings.Ring<E> ring) {
+        super(storage, ComputeContext.current().getSparseLinearAlgebraProvider(ring), ring);
         // Explicit validation
         if (storage instanceof org.jscience.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage
-                || storage instanceof org.jscience.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage) { // RealDouble
-                                                                                                                         // is
-                                                                                                                         // Dense
+                || storage instanceof org.jscience.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage) { // RealDouble is Dense
             throw new IllegalArgumentException("Cannot create SparseMatrix with Dense storage");
         }
     }
 
-    public static <E> SparseMatrix<E> fromDense(List<List<E>> rows, Field<E> field) {
+    public static <E> SparseMatrix<E> fromDense(List<List<E>> rows, org.jscience.mathematics.structures.rings.Ring<E> ring) {
         int r = rows.size();
         int c = r > 0 ? rows.get(0).size() : 0;
-        E zero = field.zero();
+        E zero = ring.zero();
         SparseMatrixStorage<E> storage = new SparseMatrixStorage<>(r, c, zero);
         for (int i = 0; i < r; i++) {
             List<E> row = rows.get(i);
@@ -81,22 +82,22 @@ public class SparseMatrix<E> extends GenericMatrix<E> {
                 }
             }
         }
-        return new SparseMatrix<>(storage, field);
+        return new SparseMatrix<>(storage, ring);
     }
 
-    public static <E> SparseMatrix<E> zeros(int rows, int cols, Field<E> field) {
-        E zero = field.zero();
-        return new SparseMatrix<>(new SparseMatrixStorage<>(rows, cols, zero), field);
+    public static <E> SparseMatrix<E> zeros(int rows, int cols, org.jscience.mathematics.structures.rings.Ring<E> ring) {
+        E zero = ring.zero();
+        return new SparseMatrix<>(new SparseMatrixStorage<>(rows, cols, zero), ring);
     }
 
-    public static <E> SparseMatrix<E> identity(int size, Field<E> field) {
-        E zero = field.zero();
+    public static <E> SparseMatrix<E> identity(int size, org.jscience.mathematics.structures.rings.Ring<E> ring) {
+        E zero = ring.zero();
         SparseMatrixStorage<E> storage = new SparseMatrixStorage<>(size, size, zero);
-        E one = field.one();
+        E one = ring.one();
         for (int i = 0; i < size; i++) {
             storage.set(i, i, one);
         }
-        return new SparseMatrix<>(storage, field);
+        return new SparseMatrix<>(storage, ring);
     }
 
     public int getNnz() {

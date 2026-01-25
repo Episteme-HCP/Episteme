@@ -25,6 +25,8 @@ package org.jscience.mathematics.symbolic;
 
 import java.util.Map;
 import org.jscience.mathematics.structures.rings.Ring;
+import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.mathematics.sets.Reals;
 
 /**
  * Represents a constant value as a symbolic expression.
@@ -39,6 +41,28 @@ import org.jscience.mathematics.structures.rings.Ring;
  * @since 1.0
  */
 public class ConstantExpression<T extends Ring<T>> implements Expression<T> {
+
+    /**
+     * Returns a constant expression for the given double value using Real numbers.
+     * 
+     * @param value the double value
+     * @return the constant expression
+     */
+    public static ConstantExpression<Real> valueOf(double value) {
+        return new ConstantExpression<>(Real.of(value), Reals.getInstance());
+    }
+
+    /**
+     * Returns a constant expression for the given value and ring.
+     * 
+     * @param <E> the type of the constant
+     * @param value the constant value
+     * @param ring  the ring structure
+     * @return the constant expression
+     */
+    public static <E extends Ring<E>> ConstantExpression<E> ofConstant(E value, Ring<E> ring) {
+        return new ConstantExpression<>(value, ring);
+    }
 
     private final T value;
     private final Ring<T> ring;
@@ -70,6 +94,33 @@ public class ConstantExpression<T extends Ring<T>> implements Expression<T> {
             return new ConstantExpression<>(ring.multiply(value, otherConst.value), ring);
         }
         return new ProductExpression<>(this, other, ring);
+    }
+
+    @Override
+    public Expression<T> subtract(Expression<T> other) {
+        if (other instanceof ConstantExpression) {
+            ConstantExpression<T> otherConst = (ConstantExpression<T>) other;
+            return new ConstantExpression<>(ring.subtract(value, otherConst.value), ring);
+        }
+        return new SumExpression<>(this, other.negate(), ring);
+    }
+
+    @Override
+    public Expression<T> negate() {
+        return new ConstantExpression<>(ring.negate(value), ring);
+    }
+
+    @Override
+    public Expression<T> divide(Expression<T> other) {
+        if (other instanceof ConstantExpression) {
+            ConstantExpression<T> otherConst = (ConstantExpression<T>) other;
+            // Division only if ring is a field
+            if (ring instanceof org.jscience.mathematics.structures.rings.Field) {
+                org.jscience.mathematics.structures.rings.Field<T> field = (org.jscience.mathematics.structures.rings.Field<T>) ring;
+                return new ConstantExpression<>(field.multiply(value, field.inverse(otherConst.value)), ring);
+            }
+        }
+        return new DivisionExpression<>(this, other, ring);
     }
 
     @Override

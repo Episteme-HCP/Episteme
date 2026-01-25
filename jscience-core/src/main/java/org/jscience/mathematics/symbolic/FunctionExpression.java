@@ -111,13 +111,32 @@ public class FunctionExpression<T extends Ring<T>> implements Expression<T> {
 
     @Override
     public Expression<T> add(Expression<T> other) {
-        throw new UnsupportedOperationException("Addition requires Ring parameter - use SumExpression directly");
+        return new SumExpression<>(this, other, getRing());
     }
 
     @Override
     public Expression<T> multiply(Expression<T> other) {
-        throw new UnsupportedOperationException(
-                "Multiplication requires Ring parameter - use ProductExpression directly");
+        return new ProductExpression<>(this, other, getRing());
+    }
+
+    @Override
+    public Expression<T> subtract(Expression<T> other) {
+        return new SumExpression<>(this, other.negate(), getRing());
+    }
+
+    @Override
+    public Expression<T> negate() {
+        return multiply(ConstantExpression.ofConstant(getRing().negate(getRing().one()), getRing()));
+    }
+
+    @Override
+    public Expression<T> divide(Expression<T> other) {
+        return new DivisionExpression<>(this, other, getRing());
+    }
+
+    @Override
+    public Ring<T> getRing() {
+        return argument.getRing();
     }
 
     @Override

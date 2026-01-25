@@ -33,7 +33,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
 import java.io.*;
 import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * OpenMath Reader for mathematical objects.
@@ -74,9 +73,6 @@ import java.util.logging.Logger;
  * @see OpenMathWriter
  */
 public class OpenMathReader extends AbstractResourceReader<Object> {
-
-    private static final Logger LOGGER = Logger.getLogger(OpenMathReader.class.getName());
-    private static final String OM_NS = "http://www.openmath.org/OpenMath";
 
     public OpenMathReader() {
     }
@@ -258,7 +254,7 @@ public class OpenMathReader extends AbstractResourceReader<Object> {
             value = Double.parseDouble(elem.getTextContent().trim());
         }
         
-        return RealDouble.valueOf(value);
+        return (RealDouble) RealDouble.of(value);
     }
 
     private String parseString(Element elem) {
@@ -303,7 +299,7 @@ public class OpenMathReader extends AbstractResourceReader<Object> {
                 if (operands.size() == 2) {
                     Real real = toReal(operands.get(0));
                     Real imag = toReal(operands.get(1));
-                    return Complex.valueOf(real, imag);
+                    return Complex.of(real, imag);
                 }
             }
             
@@ -317,7 +313,7 @@ public class OpenMathReader extends AbstractResourceReader<Object> {
         if (obj instanceof Real) {
             return (Real) obj;
         } else if (obj instanceof Number) {
-            return RealDouble.valueOf(((Number) obj).doubleValue());
+            return RealDouble.of(((Number) obj).doubleValue());
         }
         throw new IllegalArgumentException("Cannot convert to Real: " + obj);
     }

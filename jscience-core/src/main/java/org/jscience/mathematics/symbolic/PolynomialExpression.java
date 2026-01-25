@@ -43,6 +43,11 @@ public class PolynomialExpression<T extends Ring<T>> implements Expression<T> {
     private final Map<Monomial<T>, T> terms;
     private final Ring<T> ring;
 
+    @Override
+    public Ring<T> getRing() {
+        return ring;
+    }
+
     /**
      * Creates a polynomial expression.
      * 
@@ -98,6 +103,26 @@ public class PolynomialExpression<T extends Ring<T>> implements Expression<T> {
             return multiplyPoly(PolynomialExpression.ofVariable((Variable<T>) other, ring));
         }
         throw new IllegalArgumentException("Cannot multiply " + other.getClass().getSimpleName());
+    }
+
+    @Override
+    public Expression<T> subtract(Expression<T> other) {
+        if (other instanceof PolynomialExpression) {
+            return addPoly(((PolynomialExpression<T>) other).negate());
+        }
+        return add(other.negate());
+    }
+
+    @Override
+    public PolynomialExpression<T> negate() {
+        Map<Monomial<T>, T> newTerms = new HashMap<>();
+        terms.forEach((m, c) -> newTerms.put(m, ring.negate(c)));
+        return new PolynomialExpression<>(newTerms, ring);
+    }
+
+    @Override
+    public Expression<T> divide(Expression<T> other) {
+        return new DivisionExpression<>(this, other, ring);
     }
 
     private PolynomialExpression<T> multiplyPoly(PolynomialExpression<T> other) {

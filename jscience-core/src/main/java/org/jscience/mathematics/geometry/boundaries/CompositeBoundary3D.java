@@ -245,7 +245,7 @@ public class CompositeBoundary3D implements Boundary3D {
         if (totalVolume.isZero()) {
             cachedCentroid = inclusions.get(0).getCentroid();
         } else {
-            cachedCentroid = new Point3D(
+            cachedCentroid = Point3D.of(
                 sumX.divide(totalVolume),
                 sumY.divide(totalVolume),
                 sumZ.divide(totalVolume)

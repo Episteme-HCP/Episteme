@@ -168,14 +168,14 @@ public class PointBoundary<P> implements Boundary<P> {
             Point2D p = (Point2D) point;
             Point2D o = (Point2D) offset;
             @SuppressWarnings("unchecked")
-            P newPoint = (P) new Point2D(p.getX().add(o.getX()), p.getY().add(o.getY()));
+            P newPoint = (P) Point2D.of(p.getX().add(o.getX()), p.getY().add(o.getY()));
             return new PointBoundary<>(newPoint, tolerance);
         }
         if (point instanceof Point3D && offset instanceof Point3D) {
             Point3D p = (Point3D) point;
             Point3D o = (Point3D) offset;
             @SuppressWarnings("unchecked")
-            P newPoint = (P) new Point3D(
+            P newPoint = (P) Point3D.of(
                 p.getX().add(o.getX()),
                 p.getY().add(o.getY()),
                 p.getZ().add(o.getZ())
@@ -230,27 +230,27 @@ public class PointBoundary<P> implements Boundary<P> {
      * Creates a 2D point boundary.
      */
     public static PointBoundary<Point2D> of2D(Real x, Real y) {
-        return new PointBoundary<>(new Point2D(x, y));
+        return new PointBoundary<Point2D>(Point2D.of(x, y));
     }
 
     /**
      * Creates a 2D point boundary with tolerance.
      */
     public static PointBoundary<Point2D> of2D(Real x, Real y, Real tolerance) {
-        return new PointBoundary<>(new Point2D(x, y), tolerance);
+        return new PointBoundary<Point2D>(Point2D.of(x, y), tolerance);
     }
 
     /**
      * Creates a 3D point boundary.
      */
     public static PointBoundary<Point3D> of3D(Real x, Real y, Real z) {
-        return new PointBoundary<>(new Point3D(x, y, z));
+        return new PointBoundary<Point3D>(Point3D.of(x, y, z));
     }
 
     /**
      * Creates a 3D point boundary with tolerance.
      */
     public static PointBoundary<Point3D> of3D(Real x, Real y, Real z, Real tolerance) {
-        return new PointBoundary<>(new Point3D(x, y, z), tolerance);
+        return new PointBoundary<Point3D>(Point3D.of(x, y, z), tolerance);
     }
 }

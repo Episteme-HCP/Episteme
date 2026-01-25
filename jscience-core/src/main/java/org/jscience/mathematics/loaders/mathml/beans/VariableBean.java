@@ -1,150 +1,90 @@
-package org.jscience.ml.mathml.beans;
+package org.jscience.mathematics.loaders.mathml.beans;
 
-import org.jscience.mathematics.algebraic.matrices.DoubleMatrix;
-import org.jscience.mathematics.algebraic.matrices.DoubleVector;
-import org.jscience.mathematics.algebraic.numbers.Double;
+import org.jscience.mathematics.linearalgebra.vectors.RealDoubleVector;
+import org.jscience.mathematics.linearalgebra.matrices.RealDoubleMatrix;
+import org.jscience.mathematics.numbers.real.Real;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-
-import java.util.Vector;
-
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * DOCUMENT ME!
+ * VariableBean for JScience 6.0.
  *
- * @author $author$
- * @version $Revision: 1.3 $
+ * @author Silvere Martin-Michiellot
+ * @version 1.4
  */
-public final class VariableBean extends Object implements java.io.Serializable {
-    /** DOCUMENT ME! */
+public final class VariableBean implements java.io.Serializable {
+    
     private PropertyChangeSupport changes = new PropertyChangeSupport(this);
 
-    /** DOCUMENT ME! */
-    private Vector variableListeners = new Vector();
+    private List<VariableListener> variableListeners = new ArrayList<>();
 
-    /** DOCUMENT ME! */
-    private String variable = new String();
+    private String variable = "";
 
-    /** DOCUMENT ME! */
     private Object value;
 
-/**
-     * Creates a new VariableBean object.
-     */
     public VariableBean() {
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param var DOCUMENT ME!
-     */
     public synchronized void setVariable(String var) {
         String oldVar = variable;
         variable = var;
         changes.firePropertyChange("variable", oldVar, var);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public synchronized String getVariable() {
         return variable;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param x DOCUMENT ME!
-     */
     public synchronized void setValueAsNumber(double x) {
-        value = new Double(x);
-        changes.firePropertyChange("valueAsNumber", null, new Double(x));
+        value = Real.of(x);
+        changes.firePropertyChange("valueAsNumber", null, x);
         fireVariableChanged(new VariableEvent(this, variable, value));
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     public synchronized double getValueAsNumber() {
-        if (value instanceof Double) {
-            return ((Double) value).value();
+        if (value instanceof Number) {
+            return ((Number) value).doubleValue();
+        } else if (value instanceof Real) {
+            return ((Real) value).doubleValue();
         } else {
             return Double.NaN;
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param v DOCUMENT ME!
-     */
     public synchronized void setValueAsVector(double[] v) {
-        value = new DoubleVector(v);
+        value = RealDoubleVector.of(v);
         changes.firePropertyChange("valueAsVector", null, v);
         fireVariableChanged(new VariableEvent(this, variable, value));
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param m DOCUMENT ME!
-     */
     public synchronized void setValueAsMatrix(double[][] m) {
-        value = new DoubleMatrix(m);
+        value = RealDoubleMatrix.of(m);
         changes.firePropertyChange("valueAsMatrix", null, m);
         fireVariableChanged(new VariableEvent(this, variable, value));
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param l DOCUMENT ME!
-     */
     public synchronized void addPropertyChangeListener(PropertyChangeListener l) {
         changes.addPropertyChangeListener(l);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param l DOCUMENT ME!
-     */
-    public synchronized void removePropertyChangeListener(
-        PropertyChangeListener l) {
+    public synchronized void removePropertyChangeListener(PropertyChangeListener l) {
         changes.removePropertyChangeListener(l);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param l DOCUMENT ME!
-     */
     public synchronized void addVariableListener(VariableListener l) {
-        variableListeners.addElement(l);
+        variableListeners.add(l);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param l DOCUMENT ME!
-     */
     public synchronized void removeVariableListener(VariableListener l) {
-        variableListeners.removeElement(l);
+        variableListeners.remove(l);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param evt DOCUMENT ME!
-     */
     private void fireVariableChanged(VariableEvent evt) {
-        for (int i = 0; i < variableListeners.size(); i++)
-            ((VariableListener) variableListeners.elementAt(i)).variableChanged(evt);
+        for (VariableListener l : variableListeners) {
+            l.variableChanged(evt);
+        }
     }
 }

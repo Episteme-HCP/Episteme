@@ -251,7 +251,7 @@ public class ComputationalGeometry3D {
                 p.getZ().subtract(linePoint.getZ()));
         Vector3D cross = v.cross(lineDir);
         // Assuming norm() exists on Vector3D as implemented earlier
-        return cross.normValue().divide(lineDir.normValue());
+        return cross.magnitude().divide(lineDir.magnitude());
     }
 
     private static Real distanceToPlane(Point3D p, Point3D planePoint, Vector3D normal) {
@@ -259,7 +259,7 @@ public class ComputationalGeometry3D {
                 p.getX().subtract(planePoint.getX()),
                 p.getY().subtract(planePoint.getY()),
                 p.getZ().subtract(planePoint.getZ()));
-        return v.dot(normal).divide(normal.normValue());
+        return v.dot(normal).divide(normal.magnitude());
     }
 
     /**

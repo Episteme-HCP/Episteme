@@ -25,7 +25,7 @@ package org.jscience.mathematics.linearalgebra.vectors;
 
 import org.jscience.ComputeContext;
 import org.jscience.mathematics.linearalgebra.vectors.storage.SparseVectorStorage;
-import org.jscience.mathematics.structures.rings.Field;
+import org.jscience.mathematics.structures.rings.Ring;
 
 import java.util.List;
 
@@ -42,17 +42,17 @@ public class SparseVector<E> extends GenericVector<E> {
     /**
      * Creates a SparseVector with automatic storage selection.
      */
-    public SparseVector(List<E> elements, Field<E> field) {
-        this(VectorFactory.createSparseStorage(elements, field), field);
+    public SparseVector(List<E> elements, Ring<E> ring) {
+        this(VectorFactory.createSparseStorage(elements, ring), ring);
     }
 
-    public SparseVector(int dimension, Field<E> field) {
-        this(new SparseVectorStorage<>(dimension, field.zero()), field);
+    public SparseVector(int dimension, Ring<E> ring) {
+        this(new SparseVectorStorage<>(dimension, ring.zero()), ring);
     }
 
     protected SparseVector(org.jscience.mathematics.linearalgebra.vectors.storage.VectorStorage<E> storage,
-            Field<E> field) {
-        super(storage, ComputeContext.current().getSparseLinearAlgebraProvider(field), field);
+            Ring<E> ring) {
+        super(storage, ComputeContext.current().getSparseLinearAlgebraProvider(ring), ring);
         // explicit validation
         if (storage instanceof org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage
                 || storage instanceof org.jscience.mathematics.linearalgebra.vectors.storage.RealDoubleVectorStorage) {
@@ -60,12 +60,12 @@ public class SparseVector<E> extends GenericVector<E> {
         }
     }
 
-    public static <E> SparseVector<E> of(List<E> elements, Field<E> field) {
-        return new SparseVector<>(elements, field);
+    public static <E> SparseVector<E> of(List<E> elements, Ring<E> ring) {
+        return new SparseVector<>(elements, ring);
     }
 
-    public static <E> SparseVector<E> zeros(int dimension, Field<E> field) {
-        return new SparseVector<>(new SparseVectorStorage<>(dimension, field.zero()), field);
+    public static <E> SparseVector<E> zeros(int dimension, Ring<E> ring) {
+        return new SparseVector<>(new SparseVectorStorage<>(dimension, ring.zero()), ring);
     }
 
     public static SparseVector<org.jscience.mathematics.numbers.complex.Complex> valueOf(

@@ -63,6 +63,21 @@ public class ProductExpression<T extends Ring<T>> implements Expression<T> {
     }
 
     @Override
+    public Expression<T> subtract(Expression<T> other) {
+        return new SumExpression<>(this, other.negate(), ring);
+    }
+
+    @Override
+    public Expression<T> negate() {
+        return new ProductExpression<>(left.negate(), right, ring);
+    }
+
+    @Override
+    public Expression<T> divide(Expression<T> other) {
+        return new DivisionExpression<>(this, other, ring);
+    }
+
+    @Override
     public Expression<T> differentiate(Variable<T> variable) {
         // Product rule: (f * g)' = f' * g + f * g'
         Expression<T> leftDeriv = left.differentiate(variable);

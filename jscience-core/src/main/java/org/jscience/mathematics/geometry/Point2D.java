@@ -36,6 +36,8 @@ public final class Point2D implements GeometricObject<Point2D>, org.jscience.mat
     private final Real x;
     private final Real y;
 
+    public static final Point2D ZERO = new Point2D(Real.ZERO, Real.ZERO);
+
     private Point2D(Real x, Real y) {
         this.x = x;
         this.y = y;

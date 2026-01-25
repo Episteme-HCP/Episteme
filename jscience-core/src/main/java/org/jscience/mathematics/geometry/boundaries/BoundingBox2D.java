@@ -58,7 +58,7 @@ public class BoundingBox2D implements BoundingBox<Point2D> {
      * Creates a bounding box from coordinate values.
      */
     public BoundingBox2D(Real minX, Real minY, Real maxX, Real maxY) {
-        this(new Point2D(minX, minY), new Point2D(maxX, maxY));
+        this(Point2D.of(minX, minY), Point2D.of(maxX, maxY));
     }
 
     /**
@@ -69,7 +69,7 @@ public class BoundingBox2D implements BoundingBox<Point2D> {
      */
     public static BoundingBox2D fromPoints(List<Point2D> points) {
         if (points == null || points.isEmpty()) {
-            return new BoundingBox2D(Point2D.ORIGIN, Point2D.ORIGIN);
+            return new BoundingBox2D(Point2D.ZERO, Point2D.ZERO);
         }
 
         Real minX = points.get(0).getX();
@@ -84,7 +84,7 @@ public class BoundingBox2D implements BoundingBox<Point2D> {
             if (p.getY().compareTo(maxY) > 0) maxY = p.getY();
         }
 
-        return new BoundingBox2D(new Point2D(minX, minY), new Point2D(maxX, maxY));
+        return new BoundingBox2D(Point2D.of(minX, minY), Point2D.of(maxX, maxY));
     }
 
     @Override
@@ -118,7 +118,7 @@ public class BoundingBox2D implements BoundingBox<Point2D> {
      * @return center
      */
     public Point2D getCenter() {
-        return new Point2D(
+        return Point2D.of(
             min.getX().add(max.getX()).divide(Real.of(2)),
             min.getY().add(max.getY()).divide(Real.of(2))
         );
@@ -162,7 +162,7 @@ public class BoundingBox2D implements BoundingBox<Point2D> {
         Real newMaxX = point.getX().compareTo(max.getX()) > 0 ? point.getX() : max.getX();
         Real newMaxY = point.getY().compareTo(max.getY()) > 0 ? point.getY() : max.getY();
         
-        return new BoundingBox2D(new Point2D(newMinX, newMinY), new Point2D(newMaxX, newMaxY));
+        return new BoundingBox2D(Point2D.of(newMinX, newMinY), Point2D.of(newMaxX, newMaxY));
     }
 
     @Override
@@ -177,7 +177,7 @@ public class BoundingBox2D implements BoundingBox<Point2D> {
         Real newMaxX = oMax.getX().compareTo(max.getX()) > 0 ? oMax.getX() : max.getX();
         Real newMaxY = oMax.getY().compareTo(max.getY()) > 0 ? oMax.getY() : max.getY();
         
-        return new BoundingBox2D(new Point2D(newMinX, newMinY), new Point2D(newMaxX, newMaxY));
+        return new BoundingBox2D(Point2D.of(newMinX, newMinY), Point2D.of(newMaxX, newMaxY));
     }
 
     @Override

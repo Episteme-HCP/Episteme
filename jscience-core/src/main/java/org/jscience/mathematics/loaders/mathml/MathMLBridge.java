@@ -93,13 +93,33 @@ public final class MathMLBridge {
 
         // Map MathML operators to JScience Expressions
         return switch (op) {
-            case "plus" -> combine(operands, Expression::add);
-            case "times" -> combine(operands, Expression::multiply);
-            case "divide" -> (operands.size() == 2) ? operands.get(0).divide(operands.get(1)) : null;
-            case "minus" -> (operands.size() == 2) ? operands.get(0).subtract(operands.get(1)) : 
+            case "plus" -> combine(operands, (a, b) -> addAny(a, b));
+            case "times" -> combine(operands, (a, b) -> multiplyAny(a, b));
+            case "divide" -> (operands.size() == 2) ? divideAny(operands.get(0), operands.get(1)) : null;
+            case "minus" -> (operands.size() == 2) ? subtractAny(operands.get(0), operands.get(1)) : 
                             (operands.size() == 1) ? operands.get(0).negate() : null;
             default -> null;
         };
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends org.jscience.mathematics.structures.rings.Ring<T>> Expression<T> addAny(Expression<?> e1, Expression<?> e2) {
+        return ((Expression<T>)e1).add((Expression<T>)e2);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends org.jscience.mathematics.structures.rings.Ring<T>> Expression<T> multiplyAny(Expression<?> e1, Expression<?> e2) {
+        return ((Expression<T>)e1).multiply((Expression<T>)e2);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends org.jscience.mathematics.structures.rings.Ring<T>> Expression<T> divideAny(Expression<?> e1, Expression<?> e2) {
+        return ((Expression<T>)e1).divide((Expression<T>)e2);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends org.jscience.mathematics.structures.rings.Ring<T>> Expression<T> subtractAny(Expression<?> e1, Expression<?> e2) {
+        return ((Expression<T>)e1).subtract((Expression<T>)e2);
     }
 
     private static Expression<?> parseNumber(Element elem) {
@@ -111,9 +131,9 @@ public final class MathMLBridge {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private static Expression<?> combine(java.util.List<Expression<?>> exprs, 
-                                       java.util.function.BiFunction<Expression, Expression, Expression> op) {
+                                       java.util.function.BiFunction<Expression<?>, Expression<?>, Expression<?>> op) {
         if (exprs.isEmpty()) return null;
         Expression result = exprs.get(0);
         for (int i = 1; i < exprs.size(); i++) {

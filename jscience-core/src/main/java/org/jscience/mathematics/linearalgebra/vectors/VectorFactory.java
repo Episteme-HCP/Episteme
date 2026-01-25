@@ -25,7 +25,7 @@ package org.jscience.mathematics.linearalgebra.vectors;
 
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.vectors.storage.*;
-import org.jscience.mathematics.structures.rings.Field;
+import org.jscience.mathematics.structures.rings.Ring;
 import java.util.List;
 import java.util.Arrays;
 
@@ -68,7 +68,7 @@ public final class VectorFactory {
     public static <E> Vector<E> of(Class<E> elementClass, E... elements) {
         List<E> list = Arrays.asList(elements);
         if (elementClass == org.jscience.mathematics.numbers.real.Real.class) {
-            return create(list, (Field<E>) org.jscience.mathematics.numbers.real.Real.ZERO);
+            return create(list, (Ring<E>) org.jscience.mathematics.numbers.real.Real.ZERO);
         }
         throw new UnsupportedOperationException("of() only supports Real.class currently");
     }
@@ -76,54 +76,54 @@ public final class VectorFactory {
     /**
      * Creates a vector with automatic storage selection (AUTO).
      */
-    public static <E> Vector<E> create(List<E> data, Field<E> field) {
-        return create(data, field, Storage.AUTO);
+    public static <E> Vector<E> create(List<E> data, org.jscience.mathematics.structures.rings.Ring<E> ring) {
+        return create(data, ring, Storage.AUTO);
     }
 
     /**
      * Automatic storage selection based on density.
      */
-    public static <E> VectorStorage<E> createAutomaticStorage(List<E> data, Field<E> field) {
+    public static <E> VectorStorage<E> createAutomaticStorage(List<E> data, org.jscience.mathematics.structures.rings.Ring<E> ring) {
         int dim = data.size();
         int nonZero = 0;
-        E zero = field.zero();
+        E zero = ring.zero();
         for (E val : data) {
             if (!val.equals(zero))
                 nonZero++;
         }
         if (dim > 0 && (double) nonZero / dim < 0.2) {
-            return createSparseStorage(data, field);
+            return createSparseStorage(data, ring);
         } else {
-            return createDenseStorage(data, field);
+            return createDenseStorage(data, ring);
         }
     }
 
     /**
      * Creates a vector with the specified storage layout.
      */
-    public static <E> Vector<E> create(List<E> data, Field<E> field, Storage storageType) {
+    public static <E> Vector<E> create(List<E> data, org.jscience.mathematics.structures.rings.Ring<E> ring, Storage storageType) {
         int dim = data.size();
 
         switch (storageType) {
             case AUTO:
                 int nonZero = 0;
-                E zero = field.zero();
+                E zero = ring.zero();
                 for (E val : data) {
                     if (!val.equals(zero))
                         nonZero++;
                 }
                 if (dim > 0 && (double) nonZero / dim < 0.2) {
-                    return create(data, field, Storage.SPARSE);
+                    return create(data, ring, Storage.SPARSE);
                 } else {
-                    return create(data, field, Storage.DENSE);
+                    return create(data, ring, Storage.DENSE);
                 }
 
             case DENSE:
-                return DenseVector.of(data, field);
+                return org.jscience.mathematics.linearalgebra.vectors.DenseVector.of(data, ring);
 
             case SPARSE:
-                SparseVector<E> sv = new SparseVector<>(dim, field);
-                E z = field.zero();
+                SparseVector<E> sv = new SparseVector<E>(dim, ring);
+                E z = ring.zero();
                 for (int i = 0; i < dim; i++) {
                     E val = data.get(i);
                     if (!val.equals(z)) {
@@ -137,7 +137,7 @@ public final class VectorFactory {
         }
     }
 
-    public static <E> VectorStorage<E> createDenseStorage(List<E> data, Field<E> field) {
+    public static <E> VectorStorage<E> createDenseStorage(List<E> data, org.jscience.mathematics.structures.rings.Ring<E> ring) {
         int dim = data.size();
         boolean isReal = (dim > 0 && data.get(0) instanceof org.jscience.mathematics.numbers.real.Real);
 
@@ -158,10 +158,10 @@ public final class VectorFactory {
         return storage;
     }
 
-    public static <E> VectorStorage<E> createSparseStorage(List<E> data, Field<E> field) {
+    public static <E> VectorStorage<E> createSparseStorage(List<E> data, org.jscience.mathematics.structures.rings.Ring<E> ring) {
         int dim = data.size();
-        SparseVectorStorage<E> storage = new SparseVectorStorage<>(dim, field.zero());
-        E zero = field.zero();
+        SparseVectorStorage<E> storage = new SparseVectorStorage<>(dim, ring.zero());
+        E zero = ring.zero();
         for (int i = 0; i < dim; i++) {
             E val = data.get(i);
             if (!val.equals(zero)) {

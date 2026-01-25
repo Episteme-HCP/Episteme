@@ -23,4 +23,4 @@
 /**
  * Provides the {@link org.jscience.ml.mathml} module.
  */
-package org.jscience.ml.mathml;
+package org.jscience.mathematics.loaders.mathml;

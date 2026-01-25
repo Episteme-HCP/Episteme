@@ -109,7 +109,7 @@ public class ConvexPolygon2D implements Boundary2D {
             double angle = 2 * Math.PI * i / sides - Math.PI / 2;
             Real x = center.getX().add(radius.multiply(Real.of(Math.cos(angle))));
             Real y = center.getY().add(radius.multiply(Real.of(Math.sin(angle))));
-            verts.add(new Point2D(x, y));
+            verts.add(Point2D.of(x, y));
         }
         return new ConvexPolygon2D(verts);
     }
@@ -127,9 +127,9 @@ public class ConvexPolygon2D implements Boundary2D {
     public static ConvexPolygon2D rectangle(Point2D min, Point2D max) {
         return new ConvexPolygon2D(
             min,
-            new Point2D(max.getX(), min.getY()),
+            Point2D.of(max.getX(), min.getY()),
             max,
-            new Point2D(min.getX(), max.getY())
+            Point2D.of(min.getX(), max.getY())
         );
     }
 
@@ -203,7 +203,7 @@ public class ConvexPolygon2D implements Boundary2D {
             sumY = sumY.add(v.getY());
         }
         int n = vertices.size();
-        cachedCentroid = new Point2D(sumX.divide(Real.of(n)), sumY.divide(Real.of(n)));
+        cachedCentroid = Point2D.of(sumX.divide(Real.of(n)), sumY.divide(Real.of(n)));
         return cachedCentroid;
     }
 
@@ -289,7 +289,7 @@ public class ConvexPolygon2D implements Boundary2D {
     public Boundary<Point2D> translate(Point2D offset) {
         List<Point2D> newVerts = new ArrayList<>(vertices.size());
         for (Point2D v : vertices) {
-            newVerts.add(new Point2D(v.getX().add(offset.getX()), v.getY().add(offset.getY())));
+            newVerts.add(Point2D.of(v.getX().add(offset.getX()), v.getY().add(offset.getY())));
         }
         return new ConvexPolygon2D(newVerts);
     }
@@ -301,7 +301,7 @@ public class ConvexPolygon2D implements Boundary2D {
         for (Point2D v : vertices) {
             Real dx = v.getX().subtract(center.getX()).multiply(factor);
             Real dy = v.getY().subtract(center.getY()).multiply(factor);
-            newVerts.add(new Point2D(center.getX().add(dx), center.getY().add(dy)));
+            newVerts.add(Point2D.of(center.getX().add(dx), center.getY().add(dy)));
         }
         return new ConvexPolygon2D(newVerts);
     }
@@ -323,7 +323,7 @@ public class ConvexPolygon2D implements Boundary2D {
             double dy = v.getY().subtract(pivot.getY()).doubleValue();
             double newX = cos * dx - sin * dy;
             double newY = sin * dx + cos * dy;
-            newVerts.add(new Point2D(
+            newVerts.add(Point2D.of(
                 pivot.getX().add(Real.of(newX)),
                 pivot.getY().add(Real.of(newY))
             ));

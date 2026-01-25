@@ -45,8 +45,8 @@ import org.jscience.mathematics.structures.rings.Field;
  */
 public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider<E> {
 
-    public CPUSparseLinearAlgebraProvider(Field<E> field) {
-        super(field);
+    public CPUSparseLinearAlgebraProvider(org.jscience.mathematics.structures.rings.Ring<E> ring) {
+        super(ring);
     }
 
     /**
@@ -110,8 +110,8 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
                     E bVal = (E) bVals[i];
                     E existing = rowMap.get(col);
                     if (existing != null) {
-                        E sum = field.add(existing, bVal);
-                        if (!sum.equals(field.zero())) {
+                        E sum = ring.add(existing, bVal);
+                        if (!sum.equals(ring.zero())) {
                             rowMap.put(col, sum);
                         } else {
                             rowMap.remove(col);
@@ -137,8 +137,8 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
                     // Use a temporary variable to avoid map lookup race conditions?
                     // No, rowMap is unique per thread (per row).
                     if (existing != null) {
-                        E sum = field.add(existing, bVal);
-                        if (!sum.equals(field.zero())) {
+                        E sum = ring.add(existing, bVal);
+                        if (!sum.equals(ring.zero())) {
                             rowMap.put(col, sum);
                         } else {
                             rowMap.remove(col);
@@ -167,11 +167,11 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
             for (int bIdx = bRowPtrs[k]; bIdx < bRowPtrs[k + 1]; bIdx++) {
                 int j = bCols[bIdx];
                 E bVal = (E) bVals[bIdx];
-                E product = field.multiply(aVal, bVal);
+                E product = ring.multiply(aVal, bVal);
 
                 E existing = rowMap.get(j);
                 if (existing != null) {
-                    rowMap.put(j, field.add(existing, product));
+                    rowMap.put(j, ring.add(existing, product));
                 } else {
                     rowMap.put(j, product);
                 }
@@ -179,7 +179,7 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
         }
 
         // Remove zeros
-        rowMap.entrySet().removeIf(e -> e.getValue().equals(field.zero()));
+        rowMap.entrySet().removeIf(e -> e.getValue().equals(ring.zero()));
     }
 
     @Override
@@ -237,7 +237,7 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
      */
     private SparseMatrix<E> buildCSRFromMaps(List<TreeMap<Integer, E>> rowMaps, int rows, int cols) {
         // Create storage
-        E zero = field.zero();
+        E zero = ring.zero();
         org.jscience.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E> storage = new org.jscience.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(
                 rows, cols, zero);
 
@@ -248,7 +248,6 @@ public class CPUSparseLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProv
             }
         }
 
-        return new SparseMatrix<>(storage, field);
+        return new SparseMatrix<E>(storage, ring);
     }
 }
-

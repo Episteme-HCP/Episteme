@@ -66,22 +66,23 @@ public final class OpenMathBridge {
         String cd = sym.getContentDictionary();
         String name = sym.getName();
 
-        java.util.List<Expression<?>> operands = app.getOperands().stream()
-                .map(OpenMathBridge::convert)
-                .filter(java.util.Objects::nonNull)
-                .toList();
+        java.util.List<Expression<?>> operands = new java.util.ArrayList<>();
+        for (Object arg : app.getArguments()) {
+            Expression<?> e = convert(arg);
+            if (e != null) operands.add(e);
+        }
 
-        if (operands.isEmpty() && !app.getOperands().isEmpty()) return null;
+        if (operands.isEmpty() && !app.getArguments().isEmpty()) return null;
 
         // Arith1 Content Dictionary
         if ("arith1".equals(cd)) {
             return switch (name) {
-                case "plus" -> combine(operands, Expression::add);
-                case "times" -> combine(operands, Expression::multiply);
-                case "minus" -> (operands.size() == 2) ? operands.get(0).subtract(operands.get(1)) :
+                case "plus" -> combine(operands, (a, b) -> addAny(a, b));
+                case "times" -> combine(operands, (a, b) -> multiplyAny(a, b));
+                case "minus" -> (operands.size() == 2) ? subtractAny(operands.get(0), operands.get(1)) :
                                 (operands.size() == 1) ? operands.get(0).negate() : null;
-                case "divide" -> (operands.size() == 2) ? operands.get(0).divide(operands.get(1)) : null;
-                case "power" -> (operands.size() == 2) ? operands.get(0).pow(parseInteger(app.getOperands().get(1))) : null;
+                case "divide" -> (operands.size() == 2) ? divideAny(operands.get(0), operands.get(1)) : null;
+                case "power" -> (operands.size() == 2) ? powerAny(operands.get(0), parseInteger(app.getArguments().get(1))) : null;
                 default -> null;
             };
         }
@@ -89,14 +90,38 @@ public final class OpenMathBridge {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
+    private static <T extends org.jscience.mathematics.structures.rings.Ring<T>> Expression<T> addAny(Expression<?> e1, Expression<?> e2) {
+        return ((Expression<T>)e1).add((Expression<T>)e2);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends org.jscience.mathematics.structures.rings.Ring<T>> Expression<T> multiplyAny(Expression<?> e1, Expression<?> e2) {
+        return ((Expression<T>)e1).multiply((Expression<T>)e2);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends org.jscience.mathematics.structures.rings.Ring<T>> Expression<T> divideAny(Expression<?> e1, Expression<?> e2) {
+        return ((Expression<T>)e1).divide((Expression<T>)e2);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends org.jscience.mathematics.structures.rings.Ring<T>> Expression<T> subtractAny(Expression<?> e1, Expression<?> e2) {
+        return ((Expression<T>)e1).subtract((Expression<T>)e2);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends org.jscience.mathematics.structures.rings.Ring<T>> Expression<T> powerAny(Expression<?> e1, int pow) {
+        return ((Expression<T>)e1).pow(pow);
+    }
+
     private static int parseInteger(Object obj) {
         if (obj instanceof Number n) return n.intValue();
         return 1;
     }
 
-    @SuppressWarnings("unchecked")
     private static Expression<?> combine(java.util.List<Expression<?>> exprs, 
-                                       java.util.function.BiFunction<Expression, Expression, Expression> op) {
+                                       java.util.function.BiFunction<Expression<?>, Expression<?>, Expression<?>> op) {
         if (exprs.isEmpty()) return null;
         Expression result = exprs.get(0);
         for (int i = 1; i < exprs.size(); i++) {

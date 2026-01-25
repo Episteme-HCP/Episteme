@@ -172,4 +172,8 @@ public final class Vector2D extends org.jscience.mathematics.linearalgebra.vecto
     public Real normSquared() {
         return this.dot(this);
     }
+
+    public Real magnitude() {
+        return this.norm();
+    }
 }

@@ -27,6 +27,7 @@ import org.jscience.ComputeContext;
 import org.jscience.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
 import org.jscience.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 import org.jscience.mathematics.structures.rings.Field;
+import org.jscience.mathematics.structures.rings.Ring;
 
 import java.util.List;
 
@@ -43,24 +44,24 @@ public class DenseMatrix<E> extends GenericMatrix<E> {
     /**
      * Creates a DenseMatrix with automatic storage optimization.
      */
-    public DenseMatrix(E[][] data, Field<E> field) {
-        this(MatrixFactory.createDenseStorage(data, field), field);
+    public DenseMatrix(E[][] data, Ring<E> ring) {
+        this(MatrixFactory.createDenseStorage(data, ring), ring);
     }
 
     /**
      * Creates a DenseMatrix with automatic storage optimization.
      */
-    public DenseMatrix(List<List<E>> rows, Field<E> field) {
-        this(MatrixFactory.createDenseStorage(rows, field), field);
+    public DenseMatrix(List<List<E>> rows, Ring<E> ring) {
+        this(MatrixFactory.createDenseStorage(rows, ring), ring);
     }
 
-    public DenseMatrix(E[] flatData, int rows, int cols, Field<E> field) {
-        this(new DenseMatrixStorage<>(rows, cols, flatData), field);
+    public DenseMatrix(E[] flatData, int rows, int cols, Ring<E> ring) {
+        this(new DenseMatrixStorage<>(rows, cols, flatData), ring);
     }
 
     // Internal constructor
-    protected DenseMatrix(MatrixStorage<E> storage, Field<E> field) {
-        super(storage, ComputeContext.current().getDenseLinearAlgebraProvider(field), field);
+    protected DenseMatrix(MatrixStorage<E> storage, Ring<E> ring) {
+        super(storage, ComputeContext.current().getDenseLinearAlgebraProvider(ring), ring);
         // Explicit validation: Ensure storage is intended for Dense usage
         // We accept DenseMatrixStorage OR RealDoubleMatrixStorage (which is Dense
         // optimized)

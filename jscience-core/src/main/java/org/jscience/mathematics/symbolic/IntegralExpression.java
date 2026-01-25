@@ -63,6 +63,26 @@ public class IntegralExpression<T extends Ring<T>> implements Expression<T> {
     }
 
     @Override
+    public Expression<T> subtract(Expression<T> other) {
+        return new SumExpression<>(this, other.negate(), ring);
+    }
+
+    @Override
+    public Expression<T> negate() {
+        return multiply(new ConstantExpression<>(getRing().negate(getRing().one()), getRing()));
+    }
+
+    @Override
+    public Expression<T> divide(Expression<T> other) {
+        return new DivisionExpression<>(this, other, ring);
+    }
+
+    @Override
+    public Ring<T> getRing() {
+        return ring;
+    }
+
+    @Override
     public Expression<T> differentiate(Variable<T> v) {
         // Fundamental Theorem of Calculus: d/dx Ã¢Ë†Â« f(t) dt
         if (v.equals(this.variable)) {

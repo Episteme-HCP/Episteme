@@ -56,6 +56,16 @@ public class Variable<T extends Ring<T>> implements Expression<T> {
         this.ring = ring;
     }
 
+    /**
+     * Default constructor for symbolic variables (uses Real numbers by default).
+     * 
+     * @param symbol the variable symbol
+     */
+    @SuppressWarnings("unchecked")
+    public Variable(String symbol) {
+        this(symbol, (Ring<T>) org.jscience.mathematics.sets.Reals.getInstance());
+    }
+
     public String getSymbol() {
         return symbol;
     }
@@ -72,6 +82,21 @@ public class Variable<T extends Ring<T>> implements Expression<T> {
     @Override
     public Expression<T> multiply(Expression<T> other) {
         return PolynomialExpression.ofVariable(this, ring).multiply(other);
+    }
+
+    @Override
+    public Expression<T> subtract(Expression<T> other) {
+        return PolynomialExpression.ofVariable(this, ring).subtract(other);
+    }
+
+    @Override
+    public Expression<T> negate() {
+        return PolynomialExpression.ofVariable(this, ring).negate();
+    }
+
+    @Override
+    public Expression<T> divide(Expression<T> other) {
+        return new DivisionExpression<>(this, other, ring);
     }
 
     @Override

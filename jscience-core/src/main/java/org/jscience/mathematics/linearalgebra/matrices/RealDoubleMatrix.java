@@ -112,6 +112,28 @@ public class RealDoubleMatrix extends GenericMatrix<Real> {
         }
     }
 
+    /**
+     * Returns the elements of this matrix as a flattened double array.
+     */
+    public double[] toDoubleArray() {
+        return doubleStorage.toDoubleArray();
+    }
+
+    /**
+     * Returns the elements of this matrix as a 2D double array.
+     */
+    public double[][] to2DDoubleArray() {
+        int rows = rows();
+        int cols = cols();
+        double[][] res = new double[rows][cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                res[i][j] = doubleStorage.getDouble(i, j);
+            }
+        }
+        return res;
+    }
+
     // --- Optimized Operations ---
 
     @Override
