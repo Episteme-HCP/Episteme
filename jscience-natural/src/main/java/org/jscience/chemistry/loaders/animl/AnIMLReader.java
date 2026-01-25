@@ -27,17 +27,14 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 
+import jakarta.xml.bind.JAXBElement;
 import org.astm.animl.schema.core.draft._0.*;
-import org.jscience.mathematics.linearalgebra.vectors.RealDoubleVector;
 
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Analytical Information Markup Language (AnIML) Reader.
@@ -81,8 +78,6 @@ import java.util.logging.Logger;
  * @see <a href="https://www.astm.org/e2077-22.html">ASTM E2077 AnIML Standard</a>
  */
 public class AnIMLReader {
-
-    private static final Logger LOGGER = Logger.getLogger(AnIMLReader.class.getName());
     
     private static final String ANIML_PACKAGE = "org.astm.animl.schema.core.draft._0";
 
@@ -186,8 +181,8 @@ public class AnIMLReader {
         result.setName(sample.getName());
         
         // Extract container info if present
-        if (sample.getContainerId() != null) {
-            result.setContainerId(sample.getContainerId());
+        if (sample.getContainerID() != null) {
+            result.setContainerId(sample.getContainerID());
         }
         
         return result;
@@ -257,49 +252,69 @@ public class AnIMLReader {
      */
     private void extractSeriesValues(SeriesType series, AnIMLSeriesData result) {
         // Check for individual values
-        IndividualValueSetType individualValues = series.getIndividualValueSet();
-        if (individualValues != null) {
+        if (!series.getIndividualValueSet().isEmpty()) {
+            IndividualValueSetType individualValues = series.getIndividualValueSet().get(0);
             List<Double> values = new ArrayList<>();
-            for (NumericValueType numValue : individualValues.getI()) {
-                // Try to extract value - NumericValueType may be a union type
-                try {
-                    String valueStr = numValue.getValue();
-                    if (valueStr != null) {
-                        values.add(Double.parseDouble(valueStr));
+            for (JAXBElement<?> element : individualValues.getIOrLOrF()) {
+                Object val = element.getValue();
+                if (val instanceof Number) {
+                    values.add(((Number) val).doubleValue());
+                } else if (val instanceof String) {
+                    try {
+                        values.add(Double.parseDouble((String) val));
+                    } catch (NumberFormatException e) {
+                        /* ignore */
                     }
-                } catch (NumberFormatException e) {
-                    LOGGER.log(Level.FINE, "Non-numeric value in series: " + numValue.getValue());
                 }
             }
             result.setValues(toDoubleArray(values));
         }
         
         // Check for encoded values (Base64 encoded binary data)
-        EncodedValueSetType encodedValues = series.getEncodedValueSet();
-        if (encodedValues != null) {
+        if (!series.getEncodedValueSet().isEmpty()) {
+            EncodedValueSetType encodedValues = series.getEncodedValueSet().get(0);
             byte[] decoded = Base64.getDecoder().decode(encodedValues.getValue());
             result.setEncodedData(decoded);
         }
         
         // Check for auto-incremented values (start, increment, end)
-        AutoIncrementedValueSetType autoIncrementedValues = series.getAutoIncrementedValueSet();
-        if (autoIncrementedValues != null) {
-            double start = autoIncrementedValues.getStartValue().getD();
-            double increment = autoIncrementedValues.getIncrement().getD();
-            int count = result.getValues() != null ? result.getValues().length : 0;
+        if (!series.getAutoIncrementedValueSet().isEmpty()) {
+            AutoIncrementedValueSetType autoIncrementedValues = series.getAutoIncrementedValueSet().get(0);
+            Double start = extractFirstDouble(autoIncrementedValues.getStartValue());
+            Double increment = extractFirstDouble(autoIncrementedValues.getIncrement());
             
-            // Generate values if we know the count
-            if (count > 0) {
-                double[] generated = new double[count];
-                for (int i = 0; i < count; i++) {
-                    generated[i] = start + i * increment;
+            if (start != null && increment != null) {
+                int count = result.getValues() != null ? result.getValues().length : 0;
+                
+                // Generate values if we know the count
+                if (count > 0) {
+                    double[] generated = new double[count];
+                    for (int i = 0; i < count; i++) {
+                        generated[i] = start + i * increment;
+                    }
+                    result.setAutoIncrementedValues(generated);
                 }
-                result.setAutoIncrementedValues(generated);
+                
+                result.setStartValue(start);
+                result.setIncrement(increment);
             }
-            
-            result.setStartValue(start);
-            result.setIncrement(increment);
         }
+    }
+
+    private Double extractFirstDouble(UnboundedValueType valueSet) {
+        if (valueSet == null) return null;
+        for (JAXBElement<?> element : valueSet.getIOrLOrF()) {
+            Object val = element.getValue();
+            if (val instanceof Number) return ((Number) val).doubleValue();
+            if (val instanceof String) {
+                try {
+                    return Double.parseDouble((String) val);
+                } catch (NumberFormatException e) {
+                    /* continue */
+                }
+            }
+        }
+        return null;
     }
 
     /**

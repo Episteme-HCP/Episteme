@@ -89,9 +89,11 @@ public class NASAExoplanetsReader extends AbstractResourceReader<ExoplanetInfo> 
         return API_BASE;
     }
 
+    @Override public Class<ExoplanetInfo> getResourceType() { return ExoplanetInfo.class; }
+
     @Override
-    public Class<ExoplanetInfo> getResourceType() {
-        return ExoplanetInfo.class;
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
     }
 
     private static String executeQuery(String query) {

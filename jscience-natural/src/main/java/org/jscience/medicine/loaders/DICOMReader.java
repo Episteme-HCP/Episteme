@@ -23,7 +23,7 @@
 
 package org.jscience.medicine.loaders;
 
-import org.jscience.medicine.imaging.ImageModality;
+
 import org.jscience.ui.i18n.I18n;
 
 import java.awt.image.BufferedImage;
@@ -76,6 +76,11 @@ public class DICOMReader implements org.jscience.io.ResourceReader<BufferedImage
     @Override
     public String getResourcePath() {
         return "*.dcm";
+    }
+
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] {"3.0"};
     }
 
     @Override

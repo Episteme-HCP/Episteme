@@ -42,6 +42,12 @@ import java.util.List;
 public class FASTQReader extends AbstractResourceReader<List<BioSequence>> {
 
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
+    }
+
+
+    @Override
     protected List<BioSequence> loadFromSource(String resourceId) throws Exception {
         if (resourceId.startsWith("http")) {
             try (InputStream is = new java.net.URI(resourceId).toURL().openStream()) {

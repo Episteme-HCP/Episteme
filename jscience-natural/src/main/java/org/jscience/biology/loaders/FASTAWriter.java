@@ -35,6 +35,12 @@ import java.util.List;
 public class FASTAWriter extends AbstractResourceWriter<List<FASTAReader.Sequence>> {
 
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
+    }
+
+
+    @Override
     public String getResourcePath() {
         return "/";
     }

@@ -75,6 +75,11 @@ public class GBIFTaxonomyReader extends AbstractResourceReader<String> {
         return String.class;
     }
 
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
+    }
+
     private static final String API_BASE = org.jscience.io.Configuration.get("api.gbif.taxonomy.base",
             "https://api.gbif.org/v1/species");
 

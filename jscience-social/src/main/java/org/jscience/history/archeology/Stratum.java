@@ -1,6 +1,28 @@
+/*
+ * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.jscience.history.archeology;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,32 +30,23 @@ import java.util.Objects;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Length;
-import org.jscience.util.Named;
-import org.jscience.util.identity.Identified;
+import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.persistence.Attribute;
-import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 
 /**
  * A distinct layer or unit of context in a stratigraphic sequence.
+ * Extends AbstractIdentifiedEntity to support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @since 2.0
+ * @since 1.0
  */
 @Persistent
-public class Stratum implements Identified<String>, Named, Serializable {
+public class Stratum extends AbstractIdentifiedEntity {
 
-    private static final long serialVersionUID = 2L;
-
-    @Id
-    private final String id;
-
-    @Attribute
-    private final String name;
-
-    @Attribute
-    private final String description;
+    private static final long serialVersionUID = 1L;
 
     @Attribute
     private final Quantity<Length> depth;
@@ -42,24 +55,14 @@ public class Stratum implements Identified<String>, Named, Serializable {
     private final Map<String, StratigraphyModel.Relationship> relations = new HashMap<>();
 
     public Stratum(String id, String name, String description, Quantity<Length> depth) {
-        this.id = Objects.requireNonNull(id, "Stratum ID cannot be null");
-        this.name = name != null ? name : id;
-        this.description = description;
+        super(new SimpleIdentification(Objects.requireNonNull(id, "Stratum ID cannot be null")));
+        setName(name != null ? name : id);
+        setComments(description);
         this.depth = depth != null ? depth : Quantity.of(0.0, Units.METRE);
     }
 
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
     public String getDescription() {
-        return description;
+        return getComments();
     }
 
     public Quantity<Length> getDepth() {
@@ -78,16 +81,16 @@ public class Stratum implements Identified<String>, Named, Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Stratum stratum)) return false;
-        return Objects.equals(id, stratum.id);
+        return Objects.equals(getId(), stratum.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(getId());
     }
 
     @Override
     public String toString() {
-        return String.format("Stratum[%s: %s]", id, name);
+        return String.format("Stratum[%s: %s]", getId(), getName());
     }
 }

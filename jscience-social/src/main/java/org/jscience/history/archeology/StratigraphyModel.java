@@ -59,7 +59,7 @@ public final class StratigraphyModel {
         Objects.requireNonNull(sequence, "Stratigraphy sequence cannot be null");
         Map<String, Stratum> idMap = new HashMap<>();
         for (Stratum s : sequence) {
-            idMap.put(s.getId(), s);
+            idMap.put(s.getId().toString(), s);
         }
 
         for (Stratum s : sequence) {
@@ -71,9 +71,9 @@ public final class StratigraphyModel {
                 if (target == null) continue;
 
                 // Validate Law of Superposition symmetry
-                if (type == Relationship.ABOVE && target.getRelations().get(s.getId()) != Relationship.BELOW) return false;
-                if (type == Relationship.BELOW && target.getRelations().get(s.getId()) != Relationship.ABOVE) return false;
-                if (type == Relationship.EQUAL && target.getRelations().get(s.getId()) != Relationship.EQUAL) return false;
+                if (type == Relationship.ABOVE && target.getRelations().get(s.getId().toString()) != Relationship.BELOW) return false;
+                if (type == Relationship.BELOW && target.getRelations().get(s.getId().toString()) != Relationship.ABOVE) return false;
+                if (type == Relationship.EQUAL && target.getRelations().get(s.getId().toString()) != Relationship.EQUAL) return false;
             }
         }
         return true;

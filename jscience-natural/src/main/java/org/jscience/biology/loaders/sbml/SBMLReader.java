@@ -159,7 +159,7 @@ public class SBMLReader extends AbstractResourceReader<SBMLModel> {
         try {
             SBMLDocument document = org.sbml.jsbml.SBMLReader.read(file);
             return convertDocument(document);
-        } catch (XMLStreamException e) {
+        } catch (XMLStreamException | java.io.IOException e) {
             throw new SBMLException("Failed to parse SBML file: " + file, e);
         }
     }

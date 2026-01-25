@@ -66,9 +66,9 @@ public final class DatumTransformation {
      * Performs a 7-parameter Helmert transformation on ECEF coordinates.
      */
     public static ECEFCoordinate transform(ECEFCoordinate ecef, HelmertParameters p) {
-        double X = ecef.getX().doubleValue();
-        double Y = ecef.getY().doubleValue();
-        double Z = ecef.getZ().doubleValue();
+        double X = ecef.getX().getValue().doubleValue();
+        double Y = ecef.getY().getValue().doubleValue();
+        double Z = ecef.getZ().getValue().doubleValue();
 
         // Convert rotations from arc-seconds to radians
         double rx = Math.toRadians(p.rx / 3600.0);

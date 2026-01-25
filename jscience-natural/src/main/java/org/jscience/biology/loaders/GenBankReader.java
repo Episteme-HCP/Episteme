@@ -49,10 +49,36 @@ import java.util.Optional;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GenBank {
+public class GenBankReader extends org.jscience.io.AbstractResourceReader<String> {
 
     private static final String EFETCH_BASE = org.jscience.io.Configuration.get(
             "api.ncbi.efetch", "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi");
+
+    @Override
+    protected String loadFromSource(String accession) throws Exception {
+        // Default to fetching GenBank record
+        return getGenBankRecord(accession);
+    }
+    
+    @Override
+    public String getName() { return "GenBank Reader"; }
+    @Override
+    public String getDescription() { return "Fetches DNA/Protein sequences from NCBI GenBank"; }
+    @Override
+    public String getLongDescription() { 
+        return "Connects to NCBI Entrez E-utilities to retrieve sequence data in GenBank or FASTA formats."; 
+    }
+    @Override
+    public String getCategory() { return "Biology"; }
+    @Override
+    public String[] getSupportedVersions() { return new String[] { "1.0" }; }
+
+    @Override
+    public String getResourcePath() {
+        return EFETCH_BASE;
+    }
+    @Override
+    public Class<String> getResourceType() { return String.class; }
 
     /**
      * Fetches sequence in FASTA format.
@@ -98,7 +124,7 @@ public class GenBank {
 
     private static String fetch(String accession, String format, String database) {
         String cacheKey = "genbank_" + database + "_" + accession + "_" + format;
-        Optional<String> cached = ResourceCache.global().get(cacheKey);
+        java.util.Optional<String> cached = ResourceCache.global().get(cacheKey);
         if (cached.isPresent())
             return cached.get();
 
@@ -134,6 +160,10 @@ public class GenBank {
         }
     }
 
-    private GenBank() {
+    // Singleton instance access if needed, or just use as reader
+    private static final GenBankReader INSTANCE = new GenBankReader();
+    public static GenBankReader getInstance() { return INSTANCE; }
+    
+    public GenBankReader() { // Public constructor for service loading
     }
 }

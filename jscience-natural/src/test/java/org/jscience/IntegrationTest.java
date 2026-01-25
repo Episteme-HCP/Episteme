@@ -52,7 +52,7 @@ public class IntegrationTest {
     @Test
     public void testPopulationDynamics() {
         Species human = new Species("Homo sapiens", "Human");
-        Population pop = new Population("City", human, "Earth");
+        Population pop = new Population("City", human, null);
         Individual adam = new Individual("1", human, Individual.Sex.MALE);
         pop.addMember(adam);
 

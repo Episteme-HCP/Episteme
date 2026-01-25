@@ -50,6 +50,11 @@ public class VirusReader extends AbstractResourceReader<VirusSpecies> {
     private final Map<String, VirusSpecies> cache = new HashMap<>();
     private boolean loaded = false;
 
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
+    }
+
     public VirusReader() {
         // AbstractResourceReader has default constructor
     }

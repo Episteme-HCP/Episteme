@@ -126,6 +126,11 @@ public class SimulatedVitalSignsMonitor extends SimulatedDevice implements Vital
     }
 
     @Override
+    public boolean isAlarming() {
+        return false;
+    }
+
+    @Override
     public double getSampleRate() {
         return sampleRate;
     }

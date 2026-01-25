@@ -131,30 +131,17 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
+                    <release>17</release>
                     <excludes>
-                        <!-- Exclude files with dependencies on unimplemented modules -->
-                        <exclude>**/medicine/Doctor.java</exclude>
-                        <exclude>**/medicine/Patient.java</exclude>
-                        <exclude>**/medicine/Treatment.java</exclude>
-                        <exclude>**/medicine/MedicalSituation.java</exclude>
-                        <exclude>**/medicine/Disease.java</exclude>
-                        <exclude>**/medicine/Pathology.java</exclude>
-                        <exclude>**/medicine/loaders/**</exclude>
-                        <exclude>**/medicine/pharmacology/**</exclude>
-                        <exclude>**/biology/loaders/BiologicalResourceReader.java</exclude>
-                        <exclude>**/physics/ParticleType.java</exclude>
-                        <!-- AnIML/ThermoML readers depend on JAXB-generated classes -->
-                        <exclude>**/chemistry/loaders/animl/**</exclude>
-                        <exclude>**/physics/loaders/thermoml/**</exclude>
-                    </excludes>
+                        <!-- Medical/Consultation files remain in jscience-social -->
+                     </excludes>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
-            <!-- JAXB Plugin - disabled, AniML classes are pre-generated in target/generated-sources -->
-            <!-- Enable if regenerating from XSD is needed
+            <!-- JAXB Plugin - Enabled to process restored XSDs -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jaxb2-maven-plugin</artifactId>
@@ -169,11 +156,13 @@
                 </executions>
                 <configuration>
                     <sources>
-                        <source>src/main/resources/xsd</source>
+                        <source>src/main/resources/xsd/animl-core.xsd</source>
+                        <source>src/main/resources/xsd/animl-technique.xsd</source>
+                        <source>src/main/resources/xsd/ThermoML.xsd</source>
                     </sources>
+                    <packageName>org.astm.animl.schema.core.draft._0</packageName>
                 </configuration>
             </plugin>
-            -->
         </plugins>
     </build>
 </project>

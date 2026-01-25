@@ -33,68 +33,79 @@ import org.jscience.measure.quantity.ThermalConductivity;
 import org.jscience.measure.quantity.Energy;
 import org.jscience.mathematics.numbers.real.Real;
 
-import org.jscience.util.identity.Identified;
-import org.jscience.util.Named;
+import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
 
 /**
  * A chemical element.
- * Modernized to use JScience V5 Quantity system.
+ * Modernized to use JScience V5 Quantity system and Identification system.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Element implements Identified<String>, Named {
+@Persistent
+public class Element extends AbstractIdentifiedEntity {
+
+    private static final long serialVersionUID = 1L;
 
     public enum ElementCategory {
         ALKALI_METAL, ALKALINE_EARTH_METAL, TRANSITION_METAL, POST_TRANSITION_METAL, CHEMICALLY_UNKNOWN, METALLOID,
         NONMETAL, HALOGEN, NOBLE_GAS, LANTHANIDE, ACTINIDE, UNKNOWN
     }
 
-    private String name;
-    private String symbol;
+    @Attribute
     private int atomicNumber;
+    @Attribute
     private int massNumber;
+    @Attribute
     private Quantity<Mass> atomicMass;
+    @Attribute
     private int group;
+    @Attribute
     private int period;
+    @Attribute
     private ElementCategory category;
+    @Attribute
     private Real electronegativity;
 
     // Properties
+    @Attribute
     private Quantity<Length> covalentRadius;
+    @Attribute
     private Quantity<Length> atomicRadius;
+    @Attribute
     private Quantity<Temperature> meltingPoint;
+    @Attribute
     private Quantity<Temperature> boilingPoint;
+    @Attribute
     private Quantity<MassDensity> density;
+    @Attribute
     private Quantity<SpecificHeatCapacity> specificHeat;
+    @Attribute
     private Quantity<ThermalConductivity> thermalConductivity;
+    @Attribute
     private Quantity<Energy> ionizationEnergy;
+    @Attribute
     private Quantity<Energy> electronAffinity;
+    @Attribute
     private String standardState;
-    private String electronConfiguration; // e.g. [Ar]4s2
-    private String oxidationStates; // e.g. +4, +2
+    @Attribute
+    private String electronConfiguration;
+    @Attribute
+    private String oxidationStates;
+    @Attribute
     private int yearDiscovered;
 
     public Element(String name, String symbol) {
-        this.name = name;
-        this.symbol = symbol;
-    }
-
-    // --- Getters and Setters ---
-
-    @Override
-    public String getId() {
-        return symbol;
-    }
-
-    @Override
-    public String getName() {
-        return name;
+        super(new SimpleIdentification(symbol));
+        setName(name);
     }
 
     public String getSymbol() {
-        return symbol;
+        return getId().toString();
     }
 
     public int getAtomicNumber() {
@@ -153,8 +164,6 @@ public class Element implements Identified<String>, Named {
         this.electronegativity = electronegativity;
     }
 
-    // Legacy support for loading tools (optional but helpful if JSON loader uses
-    // double)
     public void setElectronegativity(double val) {
         this.electronegativity = Real.of(val);
     }
@@ -265,8 +274,6 @@ public class Element implements Identified<String>, Named {
 
     @Override
     public String toString() {
-        return symbol;
+        return getSymbol();
     }
 }
-
-

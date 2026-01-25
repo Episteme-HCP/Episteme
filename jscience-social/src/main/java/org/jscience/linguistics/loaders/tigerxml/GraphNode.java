@@ -24,6 +24,8 @@
 package org.jscience.linguistics.loaders.tigerxml;
 
 import org.jscience.util.identity.Identified;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.linguistics.loaders.tigerxml.tools.GeneralTools;
 
 import java.io.Serializable;
@@ -36,71 +38,36 @@ import java.util.Objects;
 /**
  * Represents a node in the syntax tree, either a terminal node or a
  * non-terminal node.
- * <p>
- * {@code GraphNode} is a generalization over {@link NT} (non-terminal) and 
- * {@link T} (terminal) nodes. It implements shared functionality such as 
- * tree traversal, path finding, and identification.
- * </p>
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
- * @version 2.0 (Modernized)
- * @see NT
- * @see T
  */
-public abstract class GraphNode implements Identified<String>, Serializable {
+public abstract class GraphNode implements Identified<Identification>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /** The unique identifier of the node. */
-    private String id;
+    private Identification id;
 
-    /** The sentence this GraphNode belongs to. */
     private Sentence sentence;
-
-    /** The immediate mother (parent) node. */
     private NT mother;
-
-    /** The label of the edge connecting to the mother node. */
     private String edge2mother;
-
-    /** Secondary mothers for non-tree (graph) structures. */
     private List<NT> secMothers;
-
-    /** Edge labels for secondary mothers. */
     private List<String> secLabels;
-
-    /** Verbosity level for diagnostics. */
     protected int verbosity = 0;
-
-    /** Positional index in the sentence list. */
     private int index;
-
-    /** Cached paths to other nodes in the tree. */
     private final Map<GraphNode, Path> node2path;
 
-    /**
-     * Creates an empty GraphNode.
-     */
     protected GraphNode() {
-        this.id = "";
+        this.id = new SimpleIdentification("");
         this.edge2mother = "";
         this.index = -1;
         this.node2path = new HashMap<>();
     }
 
-    /**
-     * Creates a GraphNode with specified properties.
-     *
-     * @param id          the node identifier.
-     * @param sentence    the parent sentence.
-     * @param mother      the mother node.
-     * @param edge2mother the edge label to mother.
-     * @param index       the position index.
-     */
     protected GraphNode(String id, Sentence sentence, NT mother, String edge2mother, int index) {
-        this.id = Objects.requireNonNull(id);
+        this.id = new SimpleIdentification(Objects.requireNonNull(id));
         this.sentence = sentence;
         this.mother = mother;
         this.edge2mother = edge2mother;
@@ -108,19 +75,18 @@ public abstract class GraphNode implements Identified<String>, Serializable {
         this.node2path = new HashMap<>();
     }
 
-    /**
-     * Checks if this node is terminal.
-     *
-     * @return {@code true} if this is a terminal (T) node.
-     */
     public abstract boolean isTerminal();
 
     @Override
-    public String getId() {
+    public Identification getId() {
         return id;
     }
 
     public void setId(String id) {
+        this.id = new SimpleIdentification(Objects.requireNonNull(id));
+    }
+    
+    public void setId(Identification id) {
         this.id = Objects.requireNonNull(id);
     }
 
@@ -152,12 +118,6 @@ public abstract class GraphNode implements Identified<String>, Serializable {
         this.edge2mother = edge2mother;
     }
 
-    /**
-     * Adds a secondary mother with an edge label.
-     *
-     * @param mother the secondary mother.
-     * @param label  the edge label.
-     */
     public void setSecMother(NT mother, String label) {
         if (secMothers == null) {
             secMothers = new ArrayList<>();
@@ -195,7 +155,7 @@ public abstract class GraphNode implements Identified<String>, Serializable {
 
     @Override
     public String toString() {
-        return id;
+        return id.toString();
     }
 
     @Override
@@ -215,23 +175,12 @@ public abstract class GraphNode implements Identified<String>, Serializable {
         return mother != null;
     }
 
-    /**
-     * Returns the textual content of this node.
-     *
-     * @return the surface text.
-     */
     public abstract String getText();
 
     public boolean isDominatedBy(String cat) {
         return getDominatingNodeByCat(cat) != null;
     }
 
-    /**
-     * Finds the nearest ancestor with the given category.
-     *
-     * @param cat the category to look for.
-     * @return the dominating NT node, or {@code null}.
-     */
     public NT getDominatingNodeByCat(String cat) {
         if (!isTerminal() && ((NT) this).getCat().equals(cat)) {
             return (NT) this;
@@ -258,11 +207,6 @@ public abstract class GraphNode implements Identified<String>, Serializable {
         return getPath(node).end_below_start;
     }
 
-    /**
-     * Returns a string representation of the tree structure.
-     *
-     * @return tree string.
-     */
     public String toTreeString() {
         StringBuilder sb = new StringBuilder();
         buildTreeString(0, sb);
@@ -279,11 +223,6 @@ public abstract class GraphNode implements Identified<String>, Serializable {
         this.verbosity = verbosity;
     }
 
-    /**
-     * Finds the leftmost terminal node in the subtree.
-     *
-     * @return the leftmost T node.
-     */
     public T getLeftmostTerminal() {
         if (isTerminal()) {
             return (T) this;

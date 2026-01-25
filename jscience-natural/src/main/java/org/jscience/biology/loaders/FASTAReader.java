@@ -79,6 +79,11 @@ public class FASTAReader extends AbstractResourceReader<List<FASTAReader.Sequenc
         return (Class<List<Sequence>>) (Class<?>) List.class;
     }
 
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
+    }
+
     public static class Sequence {
         public String header;
         public String data; // Nucleotides or Amino Acids

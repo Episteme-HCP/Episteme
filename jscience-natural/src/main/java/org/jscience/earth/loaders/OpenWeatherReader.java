@@ -154,9 +154,11 @@ public class OpenWeatherReader extends AbstractResourceReader<WeatherInfo> {
         return API_URL;
     }
 
+    @Override public Class<WeatherInfo> getResourceType() { return WeatherInfo.class; }
+
     @Override
-    public Class<WeatherInfo> getResourceType() {
-        return WeatherInfo.class;
+    public String[] getSupportedVersions() {
+        return new String[] { "2.5" };
     }
 
     /**

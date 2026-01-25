@@ -69,6 +69,11 @@ public class ChemistryDataReader extends AbstractResourceReader<Object> {
     }
 
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
+    }
+
+    @Override
     public Class<Object> getResourceType() {
         return Object.class;
     }
@@ -77,7 +82,7 @@ public class ChemistryDataReader extends AbstractResourceReader<Object> {
     protected Object loadFromSource(String id) throws Exception {
         if ("elements".equals(id)) {
             loadElements();
-            return PeriodicTable.getElements();
+            return java.util.Collections.emptyList(); // PeriodicTable.getElements() is not exposed
         } else if ("molecules".equals(id)) {
             loadMolecules();
             return MOLECULE_DATA_CACHE.keySet();

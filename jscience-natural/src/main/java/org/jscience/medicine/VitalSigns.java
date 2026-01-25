@@ -21,7 +21,10 @@
  * SOFTWARE.
  */
 
+package org.jscience.medicine;
+
 import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.*;
 
@@ -41,13 +44,23 @@ public record VitalSigns(
         Quantity<Frequency> respirationRate,
         Quantity<Temperature> temperature) {
 
+    public VitalSigns(int hr, int sys, int dia, int spo2, int rr, double temp) {
+        this(
+            Quantities.create(hr, Units.HERTZ.divide(60).asType(Frequency.class)), // BPM to Hz conversion approximate if just storing
+            Quantities.create(sys, Units.MILLIMETRE_OF_MERCURY),
+            Quantities.create(dia, Units.MILLIMETRE_OF_MERCURY),
+            Quantities.create(spo2 / 100.0, Units.ONE),
+            Quantities.create(rr, Units.HERTZ.divide(60).asType(Frequency.class)),
+            Quantities.create(temp, Units.FAHRENHEIT)); // Monitor usually uses Fahrenheit in US or Celsius. The sim uses 98.6 so Fahrenheit.
+    }
+
     /**
      * Returns blood pressure as a formatted string "systolic/diastolic".
      */
     public String bloodPressureString() {
         return String.format("%d/%d %s", 
-            Math.round(systolic.to(Units.MILLIMETRE_OF_MERCURY).getValue()),
-            Math.round(diastolic.to(Units.MILLIMETRE_OF_MERCURY).getValue()),
+            Math.round(systolic.to(Units.MILLIMETRE_OF_MERCURY).getValue().doubleValue()),
+            Math.round(diastolic.to(Units.MILLIMETRE_OF_MERCURY).getValue().doubleValue()),
             Units.MILLIMETRE_OF_MERCURY.getSymbol());
     }
 
@@ -56,7 +69,7 @@ public record VitalSigns(
      */
     public String temperatureString() {
         return String.format("%.1f %s", 
-            temperature.to(Units.CELSIUS).getValue(),
+            temperature.to(Units.CELSIUS).getValue().doubleValue(),
             Units.CELSIUS.getSymbol());
     }
 

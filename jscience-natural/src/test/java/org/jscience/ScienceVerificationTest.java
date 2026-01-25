@@ -93,16 +93,16 @@ public class ScienceVerificationTest {
     public void testEarthCoordinates() {
         System.out.println("Verifying Earth Coordinates...");
         GeodeticCoordinate coord = new GeodeticCoordinate(0, 0, 0); // Equator, Prime Meridian, Sea Level
-        Vector<Real> ecef = coord.toECEF();
+        org.jscience.earth.coordinates.ECEFCoordinate ecef = coord.toECEF();
 
         // Legacy bridge: reference ellipsoid uses legacy units.
         double a = ReferenceEllipsoid.WGS84.getSemiMajorAxis()
                 .to(org.jscience.measure.Units.METER).getValue().doubleValue();
 
         // At (0,0,0), x should be 'a', y=0, z=0
-        assertEquals(a, ecef.get(0).doubleValue(), 1.0);
-        assertEquals(0.0, ecef.get(1).doubleValue(), 1.0);
-        assertEquals(0.0, ecef.get(2).doubleValue(), 1.0);
+        assertEquals(a, ecef.getX().to(org.jscience.measure.Units.METER).getValue().doubleValue(), 1.0);
+        assertEquals(0.0, ecef.getY().to(org.jscience.measure.Units.METER).getValue().doubleValue(), 1.0);
+        assertEquals(0.0, ecef.getZ().to(org.jscience.measure.Units.METER).getValue().doubleValue(), 1.0);
         System.out.println("ECEF: " + ecef);
     }
 

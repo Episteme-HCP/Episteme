@@ -156,7 +156,8 @@ public class PhylogeneticTreeViewer extends AbstractViewer {
         String[] levels = lineage.split("; ");
         Taxon root = null, current = null;
         for (int i = 0; i < levels.length; i++) {
-            Taxon t = new Taxon("ncbi_" + i, (current == null ? "" : current.getId()), levels[i].trim(), Real.of(Math.random()), Real.of(Math.random()), Real.of(Math.random()));
+            String parentId = (current == null) ? "" : current.getId().toString();
+            Taxon t = new Taxon("ncbi_" + i, parentId, levels[i].trim(), Real.of(Math.random()), Real.of(Math.random()), Real.of(Math.random()));
             if (root == null) root = t;
             if (current != null) current.addChild(t);
             current = t;

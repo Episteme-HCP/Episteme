@@ -25,33 +25,42 @@ package org.jscience.biology;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.jscience.util.identity.Identified;
-import org.jscience.util.Named;
+
+import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a taxonomic group in a phylogenetic tree.
+ * Extends AbstractIdentifiedEntity to support dynamic traits and consistent identity.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
  */
-public class Taxon implements Identified<String>, Named {
-    private String id;
-    private String parentId;
-    private String name;
-    private List<Taxon> children = new ArrayList<>();
+public class Taxon extends AbstractIdentifiedEntity {
     
-    private Real coi;
-    private Real rna16s;
-    private Real cytb;
+    private final String parentId;
+    private final List<Taxon> children = new ArrayList<>();
+    
+    private final Real coi;
+    private final Real rna16s;
+    private final Real cytb;
     
     // Layout properties (transient)
     public transient double x, y, angle, radius;
 
     public Taxon(String id, String parentId, String name, Real coi, Real rna16s, Real cytb) {
-        this.id = id;
+        super(new SimpleIdentification(id));
+        setName(name);
         this.parentId = parentId;
-        this.name = name;
         this.coi = coi;
         this.rna16s = rna16s;
         this.cytb = cytb;
+    }
+
+    public Taxon(String id, Object parentId, String name, Real coi, Real rna16s, Real cytb) {
+        this(id, parentId != null ? parentId.toString() : "", name, coi, rna16s, cytb);
     }
 
     public void addChild(Taxon t) {
@@ -59,12 +68,6 @@ public class Taxon implements Identified<String>, Named {
     }
     
     public List<Taxon> getChildren() { return children; }
-    
-    @Override
-    public String getName() { return name; }
-    
-    @Override
-    public String getId() { return id; }
     
     public String getParentId() { return parentId; }
     public Real getCoi() { return coi; }

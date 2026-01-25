@@ -23,20 +23,17 @@
 
 package org.jscience.medicine;
 
-import org.jscience.util.Commented;
-import org.jscience.util.Named;
-import org.jscience.util.identity.Identified;
-import org.jscience.util.persistence.Attribute;
-import org.jscience.util.persistence.Id;
-import org.jscience.util.persistence.Persistent;
-import org.jscience.util.persistence.Relation;
-
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+
+import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.UUIDIdentification;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
  * Common ancestor for all medicine-related troubles (diseases, allergies, etc.).
@@ -46,99 +43,65 @@ import java.util.UUID;
  * @since 1.0
  */
 @Persistent
-public class Pathology implements Identified<String>, Named, Commented, Serializable {
+public class Pathology extends AbstractIdentifiedEntity {
 
     private static final long serialVersionUID = 2L;
 
-    @Id
-    private final String id;
-
-    @Attribute
-    private final String name;
-
-    @Attribute
-    private String cause;
-
-    @Attribute
-    private String comments;
-
     @Relation(type = Relation.Type.ONE_TO_MANY)
-    private final Set<Treatment> treatments = new HashSet<>();
+    private final Set<Medication> medications = new HashSet<>();
 
     /**
-     * Creates a new Pathology with a specific name.
+     * Creates a new Pathology with a specific name and random ID.
      *
      * @param name the scientific name
      * @throws NullPointerException if name is null
-     * @throws IllegalArgumentException if name is empty
      */
     public Pathology(String name) {
-        this.id = UUID.randomUUID().toString();
-        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        super(new UUIDIdentification(UUID.randomUUID().toString()));
+        setName(Objects.requireNonNull(name, "Name cannot be null"));
         if (name.isBlank()) {
             throw new IllegalArgumentException("Name cannot be blank");
         }
     }
 
-    @Override
-    public String getId() {
-        return id;
+    /**
+     * Internal constructor for subclasses specifying ID.
+     */
+    protected Pathology(Identification id, String name) {
+        super(id);
+        setName(name);
     }
 
-    @Override
-    public String getName() {
-        return name;
+    public String getDescription() {
+        return getComments();
+    }
+
+    public void setDescription(String description) {
+        setComments(description);
     }
 
     public String getCause() {
-        return cause;
+        return (String) getTrait("cause");
     }
 
     public void setCause(String cause) {
-        this.cause = cause;
-    }
-
-    @Override
-    public String getComments() {
-        return comments;
-    }
-
-    @Override
-    public void setComments(String comments) {
-        this.comments = comments;
+        setTrait("cause", cause);
     }
 
     /**
-     * Returns the set of treatments associated with this pathology.
+     * Returns the set of medications associated with this pathology.
      *
-     * @return an unmodifiable set of treatments
+     * @return an unmodifiable set of medications
      */
-    public Set<Treatment> getTreatments() {
-        return Collections.unmodifiableSet(treatments);
+    public Set<Medication> getMedications() {
+        return Collections.unmodifiableSet(medications);
     }
 
-    public void addTreatment(Treatment treatment) {
-        treatments.add(Objects.requireNonNull(treatment));
+    public void addMedication(Medication medication) {
+        medications.add(Objects.requireNonNull(medication));
     }
 
-    public void removeTreatment(Treatment treatment) {
-        treatments.remove(treatment);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Pathology that)) return false;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return name;
+    public void removeMedication(Medication medication) {
+        medications.remove(medication);
     }
 }

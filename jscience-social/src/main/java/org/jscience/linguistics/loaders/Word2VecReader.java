@@ -40,12 +40,12 @@ import java.util.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Word2VecLoader extends AbstractResourceReader<Map<String, Vector<Real>>> {
+public class Word2VecReader extends AbstractResourceReader<Map<String, Vector<Real>>> {
 
     /**
      * Default constructor.
      */
-    public Word2VecLoader() {
+    public Word2VecReader() {
     }
 
     @Override

@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.biology;
+package org.jscience.sociology;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -35,6 +35,9 @@ import org.jscience.util.identity.IDGenerator;
 import org.jscience.util.identity.UUIDGenerator;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.psychology.social.Biography;
+import org.jscience.biology.Individual;
+import org.jscience.biology.HomoSapiens;
 
 /**
  * Represents a human individual.
@@ -45,7 +48,7 @@ import org.jscience.util.identity.SimpleIdentification;
  * @since 1.0
  */
 @Persistent
-public class Human extends Individual implements Serializable {
+public class Human extends Individual {
 
     private static final long serialVersionUID = 4L;
 
@@ -91,9 +94,10 @@ public class Human extends Individual implements Serializable {
     private TemporalCoordinate deathWhen;
     
     @Attribute
-    private String biographicalSummary;
+    private Biography biography;
+    
     @Attribute
-    private final List<String> achievements = new ArrayList<>();
+    private final Map<String, Object> traits = new HashMap<>();
 
     /**
      * Creates a new human with a specific ID.
@@ -191,11 +195,28 @@ public class Human extends Individual implements Serializable {
     public TemporalCoordinate getDeathWhen() { return deathWhen; }
     public void setDeathWhen(TemporalCoordinate deathWhen) { this.deathWhen = deathWhen; }
 
-    public String getBiographicalSummary() { return biographicalSummary; }
-    public void setBiographicalSummary(String summary) { this.biographicalSummary = summary; }
+    public String getBiographicalSummary() { 
+        return biography != null ? (String)biography.getTrait("summary") : (String)traits.get("biographicalSummary"); 
+    }
+    public void setBiographicalSummary(String summary) { 
+        if (biography != null) biography.setTrait("summary", summary);
+        else traits.put("biographicalSummary", summary);
+    }
 
-    public List<String> getAchievements() { return Collections.unmodifiableList(achievements); }
-    public void addAchievement(String achievement) { achievements.add(Objects.requireNonNull(achievement)); }
+    @SuppressWarnings("unchecked")
+    public List<String> getAchievements() { 
+        return (List<String>) traits.getOrDefault("achievements", new ArrayList<String>()); 
+    }
+    
+    @SuppressWarnings("unchecked")
+    public void addAchievement(String achievement) { 
+        List<String> list = (List<String>) traits.get("achievements");
+        if (list == null) {
+            list = new ArrayList<>();
+            traits.put("achievements", list);
+        }
+        list.add(Objects.requireNonNull(achievement)); 
+    }
 
     /** BMI calculation */
     public Real getBMI() {

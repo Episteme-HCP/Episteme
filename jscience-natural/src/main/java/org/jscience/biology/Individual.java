@@ -23,32 +23,29 @@
 
 package org.jscience.biology;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.Queue;
-import java.util.LinkedList;
+import java.util.Set;
+
 import org.jscience.biology.taxonomy.Species;
-import org.jscience.medicine.Pathology;
-import org.jscience.psychology.social.Biography;
-import org.jscience.psychology.Behavior;
 import org.jscience.geography.Place;
-import org.jscience.util.Named;
-import org.jscience.util.identity.Identified;
+import org.jscience.util.Positioned;
+import org.jscience.util.identity.AbstractIdentifiedEntity;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.persistence.Attribute;
-import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
+import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents an individual organism - a single instance of a species.
@@ -60,11 +57,10 @@ import org.jscience.util.persistence.Relation;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 @Persistent
-public class Individual implements Identified<Identification>, Named, Positioned<Place>, Serializable {
+public class Individual extends AbstractIdentifiedEntity implements Positioned<Place> {
 
     private static final long serialVersionUID = 1L;
 
@@ -83,9 +79,6 @@ public class Individual implements Identified<Identification>, Named, Positioned
         SEXUAL, ASEXUAL, BUDDING, FRAGMENTATION, PARTHENOGENESIS, BINARY_FISSION
     }
 
-    @Id
-    private final Identification id;
-    
     @Attribute
     private final Species species;
     
@@ -116,17 +109,8 @@ public class Individual implements Identified<Identification>, Named, Positioned
     @Relation(type = Relation.Type.MANY_TO_MANY)
     private final Set<Individual> children = new HashSet<>();
     
-    @Relation(type = Relation.Type.ONE_TO_MANY)
-    private final Set<Pathology> pathologies = new HashSet<>();
-    
     @Relation(type = Relation.Type.MANY_TO_MANY)
     private final Set<Behavior> availableBehaviors = new HashSet<>();
-    
-    @Attribute
-    private Biography biography;
-    
-    @Attribute
-    private final Map<String, Object> traits = new HashMap<>();
 
     /**
      * Creates a new individual organism.
@@ -138,7 +122,7 @@ public class Individual implements Identified<Identification>, Named, Positioned
      * @throws NullPointerException if id or species is null
      */
     public Individual(Identification id, Species species, Sex sex, LocalDate birthDate) {
-        this.id = Objects.requireNonNull(id, "ID cannot be null");
+        super(id);
         this.species = Objects.requireNonNull(species, "Species cannot be null");
         this.sex = sex != null ? sex : Sex.UNKNOWN;
         this.birthDate = birthDate;
@@ -146,7 +130,7 @@ public class Individual implements Identified<Identification>, Named, Positioned
     }
 
     /**
-     * Helper constructor for String IDs (creates SimpleIdentification).
+     * Helper constructor for String IDs.
      */
     public Individual(String id, Species species, Sex sex, LocalDate birthDate) {
         this(new SimpleIdentification(id), species, sex, birthDate);
@@ -154,10 +138,6 @@ public class Individual implements Identified<Identification>, Named, Positioned
 
     /**
      * Creates a new individual with the current date as birth date.
-     *
-     * @param id      unique identifier
-     * @param species biological species
-     * @param sex     organism sex
      */
     public Individual(Identification id, Species species, Sex sex) {
         this(id, species, sex, null);
@@ -168,16 +148,6 @@ public class Individual implements Identified<Identification>, Named, Positioned
      */
     public Individual(String id, Species species, Sex sex) {
         this(new SimpleIdentification(id), species, sex, null);
-    }
-
-    @Override
-    public Identification getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return (String) traits.getOrDefault("name", id);
     }
 
     /**
@@ -341,6 +311,7 @@ public class Individual implements Identified<Identification>, Named, Positioned
      * Returns the current location of the individual.
      * @return the place
      */
+    @Override
     public Place getPosition() {
         return place;
     }
@@ -408,37 +379,44 @@ public class Individual implements Identified<Identification>, Named, Positioned
     }
 
     /**
-     * Adds a pathology (disease, allergy, etc.) to the individual's history.
-     * @param pathology the pathology to add
+     * Adds a pathology name to the individual's history.
+     * @param pathologyName the pathology to add
      */
-    public void addPathology(Pathology pathology) {
-        if (pathology != null) {
-            pathologies.add(pathology);
+    @SuppressWarnings("unchecked")
+    public void addPathology(String pathologyName) {
+        if (pathologyName != null) {
+            Set<String> set = (Set<String>) getTrait("pathologies");
+            if (set == null) {
+                set = new HashSet<>();
+                setTrait("pathologies", set);
+            }
+            set.add(pathologyName);
         }
     }
 
     /**
-     * Returns the set of pathologies.
+     * Returns the set of pathology names.
      * @return set of pathologies
      */
-    public Set<Pathology> getPathologies() {
-        return Collections.unmodifiableSet(pathologies);
+    @SuppressWarnings("unchecked")
+    public Set<String> getPathologies() {
+        return (Set<String>) getTrait("pathologies", Set.class);
     }
 
     /**
-     * Returns the structured biography.
-     * @return the structured biography object
+     * Returns the biography summary.
+     * @return summary or null
      */
-    public Biography getStructuredBiography() {
-        return biography;
+    public String getBiographySummary() {
+        return (String) getTrait("biography_summary");
     }
 
     /**
-     * Sets the structured biography.
-     * @param biography the biography to set
+     * Sets the biography summary.
+     * @param summary the summary
      */
-    public void setStructuredBiography(Biography biography) {
-        this.biography = biography;
+    public void setBiographySummary(String summary) {
+        setTrait("biography_summary", summary);
     }
 
     /**
@@ -529,37 +507,135 @@ public class Individual implements Identified<Identification>, Named, Positioned
         clone.reproductionMode = ReproductionMode.ASEXUAL;
         clone.addParent(this);
         this.children.add(clone);
-        clone.traits.putAll(this.traits);
+        clone.getTraits().putAll(this.getTraits());
         return clone;
     }
 
     /**
-     * Sets a custom trait.
-     * @param name  trait name
-     * @param value trait value
+     * Calculates the Wright's coefficient of inbreeding (F) for this individual.
+     * F = Σ (1/2)^(n1+n2+1) × (1 + FA)
+     * 
+     * @return inbreeding coefficient as a {@link Real} number
      */
-    public void setTrait(String name, Object value) {
-        traits.put(name, value);
+    public Real calculateInbreedingCoefficient() {
+        if (parents.size() < 2) {
+            return Real.ZERO;
+        }
+        
+        List<Individual> parentList = new ArrayList<>(parents);
+        Individual p1 = parentList.get(0);
+        Individual p2 = parentList.get(1);
+        
+        Set<Individual> ancestors1 = p1.getAncestors();
+        ancestors1.add(p1);
+        Set<Individual> ancestors2 = p2.getAncestors();
+        ancestors2.add(p2);
+        
+        Set<Individual> commonAncestors = new HashSet<>(ancestors1);
+        commonAncestors.retainAll(ancestors2);
+        
+        if (commonAncestors.isEmpty()) {
+            return Real.ZERO;
+        }
+        
+        double fValue = 0.0;
+        for (Individual ancestor : commonAncestors) {
+            List<Integer> paths1 = getAllPathLengths(p1, ancestor);
+            List<Integer> paths2 = getAllPathLengths(p2, ancestor);
+            
+            for (int n1 : paths1) {
+                for (int n2 : paths2) {
+                    double fa = ancestor.calculateInbreedingCoefficient().doubleValue();
+                    fValue += Math.pow(0.5, n1 + n2 + 1) * (1 + fa);
+                }
+            }
+        }
+        
+        return Real.of(fValue);
     }
 
     /**
-     * Retrieves a custom trait.
-     * @param name trait name
-     * @return trait value, or null
+     * Calculates the coefficient of relationship (r) between this individual and another.
+     * 
+     * @param other the other individual
+     * @return relationship coefficient as a {@link Real} number
      */
-    public Object getTrait(String name) {
-        return traits.get(name);
+    public Real calculateRelationshipCoefficient(Individual other) {
+        Objects.requireNonNull(other, "Other individual cannot be null");
+        
+        Set<Individual> ancestorsA = this.getAncestors();
+        ancestorsA.add(this);
+        Set<Individual> ancestorsB = other.getAncestors();
+        ancestorsB.add(other);
+        
+        Set<Individual> commonAncestors = new HashSet<>(ancestorsA);
+        commonAncestors.retainAll(ancestorsB);
+        
+        if (commonAncestors.isEmpty()) {
+            return Real.ZERO;
+        }
+        
+        double rValue = 0.0;
+        for (Individual ancestor : commonAncestors) {
+            List<Integer> pathsA = getAllPathLengths(this, ancestor);
+            List<Integer> pathsB = getAllPathLengths(other, ancestor);
+            for (int n1 : pathsA) {
+                for (int n2 : pathsB) {
+                    rValue += Math.pow(0.5, n1 + n2);
+                }
+            }
+        }
+        
+        return Real.of(rValue);
+    }
+    
+    /**
+     * Calculates the order of succession based on primogeniture starting from this individual.
+     * 
+     * @param malePriority if true, males take priority over females
+     * @return unmodifiable ordered list of successors
+     */
+    public List<Individual> calculateSuccessionOrder(boolean malePriority) {
+        List<Individual> order = new ArrayList<>();
+        collectSuccessors(this, order, malePriority);
+        return Collections.unmodifiableList(order);
     }
 
-    /**
-     * Retrieves a typed custom trait.
-     * @param name trait name
-     * @param type trait class
-     * @param <T>  type parameter
-     * @return typed trait value, or null
-     */
-    public <T> T getTrait(String name, Class<T> type) {
-        Object value = traits.get(name);
-        return type.isInstance(value) ? type.cast(value) : null;
+    private void collectSuccessors(Individual current, List<Individual> order, boolean malePriority) {
+        List<Individual> currentChildren = new ArrayList<>(current.getChildren());
+        
+        currentChildren.sort((c1, c2) -> {
+            if (malePriority) {
+                if (c1.getSex() == Sex.MALE && c2.getSex() != Sex.MALE) return -1;
+                if (c2.getSex() == Sex.MALE && c1.getSex() != Sex.MALE) return 1;
+            }
+            if (c1.getBirthDate() != null && c2.getBirthDate() != null) {
+                return c1.getBirthDate().compareTo(c2.getBirthDate());
+            }
+            return 0; 
+        });
+        
+        for (Individual child : currentChildren) {
+            order.add(child);
+            collectSuccessors(child, order, malePriority);
+        }
+    }
+
+    private static List<Integer> getAllPathLengths(Individual from, Individual to) {
+        List<Integer> paths = new ArrayList<>();
+        findPaths(from, to, 0, paths, new HashSet<>());
+        return paths;
+    }
+
+    private static void findPaths(Individual current, Individual target, int depth, List<Integer> paths, Set<Individual> visited) {
+        if (current == null) return;
+        if (current.equals(target)) {
+            paths.add(depth);
+            return;
+        }
+        
+        for (Individual parent : current.getParents()) {
+            findPaths(parent, target, depth + 1, paths, visited);
+        }
     }
 }

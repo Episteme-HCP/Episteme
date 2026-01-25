@@ -40,7 +40,7 @@ public class NaturalPojoTests {
         PojoTester.testPojo(DNA.class);
         PojoTester.testPojo(RNA.class);
         PojoTester.testPojo(Base.class);
-        PojoTester.testPojo(Human.class);
+        // Human moved to social module
         PojoTester.testPojo(Individual.class);
         PojoTester.testPojo(Virus.class);
         PojoTester.testPojo(VirusSpecies.class);

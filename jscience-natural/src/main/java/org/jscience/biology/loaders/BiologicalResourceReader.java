@@ -1,6 +1,6 @@
 package org.jscience.biology.loaders;
 
-import org.jscience.natural.biology.ProteinFolding;
+import org.jscience.biology.ProteinFolding;
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
 import org.jscience.io.BasicMiniCatalog;
@@ -18,6 +18,11 @@ public final class BiologicalResourceReader extends AbstractResourceReader<Prote
     @Override public String getLongDescription() { return "Support for PDB and FASTA formats with integrated simulation samples."; }
     @Override public String getResourcePath() { return "data/biology"; }
     @Override public Class<ProteinFolding> getResourceType() { return ProteinFolding.class; }
+    
+    @Override 
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
+    }
 
     @Override
     protected ProteinFolding loadFromSource(String id) throws Exception {

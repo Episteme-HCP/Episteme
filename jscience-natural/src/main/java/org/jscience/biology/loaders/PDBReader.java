@@ -54,6 +54,9 @@ public class PDBReader extends AbstractResourceReader<Protein> {
     }
 
     @Override
+    public String[] getSupportedVersions() { return new String[] { "1.0" }; }
+
+    @Override
     public String getResourcePath() {
         return "https://files.rcsb.org/download/";
     }

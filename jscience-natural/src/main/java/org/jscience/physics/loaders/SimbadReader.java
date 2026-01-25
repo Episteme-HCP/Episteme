@@ -60,6 +60,11 @@ public class SIMBADReader extends AbstractResourceReader<SIMBADReader.Astronomic
     }
 
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
+    }
+
+    @Override
     public String getCategory() {
         return org.jscience.ui.i18n.I18n.getInstance().get("category.astronomy", "Astronomy");
     }

@@ -74,6 +74,13 @@ public interface VitalSignsMonitor extends Sensor<VitalSigns> {
     double getSampleRate();
     
     /**
+     * Gets the number of data channels provided by this monitor.
+     *
+     * @return channel count
+     */
+    int getChannelCount();
+
+    /**
      * Checks if the monitor is currently alarming.
      * 
      * @return true if an alert condition is active

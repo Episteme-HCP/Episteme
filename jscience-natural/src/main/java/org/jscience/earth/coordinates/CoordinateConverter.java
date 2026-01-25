@@ -94,15 +94,15 @@ public final class CoordinateConverter {
     /**
      * Converts a geodetic point to Lambert Conformal Conic.
      */
-    public static LambertConformalConicCoordinate toLambert(GeodeticCoordinate geodetic, LambertConformalConicCoordinate.LCCParameters params) {
+    public static LambertConformalConicCoordinate toLambert(GeodeticCoordinate geodetic, LambertConformalConicCoordinate.LCCParams params) {
         return LambertConformalConicCoordinate.fromGeodetic(geodetic, params);
     }
 
     /**
      * Converts a geodetic point to Mercator.
      */
-    public static MercatorCoordinate toMercator(GeodeticCoordinate geodetic, MercatorCoordinate.MercatorType type) {
-        return MercatorCoordinate.fromGeodetic(geodetic, type);
+    public static MercatorCoordinate toMercator(GeodeticCoordinate geodetic, boolean webMercator) {
+        return MercatorCoordinate.fromGeodetic(geodetic, webMercator);
     }
 
     /**

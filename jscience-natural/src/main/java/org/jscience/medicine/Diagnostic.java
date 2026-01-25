@@ -23,14 +23,16 @@
 
 package org.jscience.medicine;
 
-import org.jscience.util.Named;
-import org.jscience.util.identity.Identified;
-import org.jscience.util.persistence.Attribute;
-import org.jscience.util.persistence.Id;
-import org.jscience.util.persistence.Persistent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
-import java.io.Serializable;
-import java.util.*;
+import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.UUIDIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
 
 /**
  * Represents a medical diagnostic result or finding.
@@ -40,18 +42,9 @@ import java.util.*;
  * @since 1.0
  */
 @Persistent
-public class Diagnostic implements Identified<String>, Named, Serializable {
+public class Diagnostic extends AbstractIdentifiedEntity {
 
     private static final long serialVersionUID = 1L;
-
-    @Id
-    private final String id;
-
-    @Attribute
-    private final String name;
-
-    @Attribute
-    private String description;
 
     @Attribute
     private String icdCode; // Often ICD-10 or ICD-11
@@ -63,8 +56,8 @@ public class Diagnostic implements Identified<String>, Named, Serializable {
     private final List<String> recommendedTests = new ArrayList<>();
 
     public Diagnostic(String name) {
-        this.id = UUID.randomUUID().toString();
-        this.name = Objects.requireNonNull(name);
+        super(new UUIDIdentification(UUID.randomUUID().toString()));
+        setName(Objects.requireNonNull(name));
     }
 
     public Diagnostic(String name, String icdCode) {
@@ -72,22 +65,12 @@ public class Diagnostic implements Identified<String>, Named, Serializable {
         this.icdCode = icdCode;
     }
 
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
     public String getDescription() {
-        return description;
+        return getComments();
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        setComments(description);
     }
 
     public String getIcdCode() {
@@ -116,6 +99,6 @@ public class Diagnostic implements Identified<String>, Named, Serializable {
 
     @Override
     public String toString() {
-        return icdCode != null ? String.format("%s (%s)", name, icdCode) : name;
+        return icdCode != null ? String.format("%s (%s)", getName(), icdCode) : getName();
     }
 }

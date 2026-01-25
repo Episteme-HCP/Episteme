@@ -26,6 +26,7 @@ package org.jscience.earth.coordinates;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.jscience.measure.Units;
+import org.jscience.mathematics.numbers.real.Real;
 
 public class CoordinateTest {
 
@@ -83,6 +84,8 @@ public class CoordinateTest {
         assertTrue(enu.getEast().getValue().doubleValue() > 0);
         assertTrue(enu.getNorth().getValue().doubleValue() > 0);
         assertTrue(enu.getUp().getValue().doubleValue() > 0);
+    }
+
     @Test
     public void testAlbersUSA() {
         // Washington DC
@@ -132,11 +135,13 @@ public class CoordinateTest {
     public void testHistoricalEllipsoids() {
         ReferenceEllipsoid bessel = HistoricalGeodeticModels.getBessel1841();
         assertNotNull(bessel);
-        assertEquals(6377397.155, bessel.getSemiMajorAxis().getValue().doubleValue(), 1e-3);
+        assertEquals(6377397.155, bessel.getSemiMajorAxis().to(Units.METER).getValue().doubleValue(), 1e-3);
         
         ReferenceEllipsoid clarke = HistoricalGeodeticModels.getClarke1866();
         assertNotNull(clarke);
-        assertEquals(6378206.4, clarke.getSemiMajorAxis().getValue().doubleValue(), 1e-3);
+        assertEquals(6378206.4, clarke.getSemiMajorAxis().to(Units.METER).getValue().doubleValue(), 1e-3);
+    }
+
     @Test
     public void testDatumTransformation() {
         // Test Helmert transformation (e.g. WGS84 to ED50 approx)
@@ -146,8 +151,8 @@ public class CoordinateTest {
         ECEFCoordinate ed50 = DatumTransformation.transform(wgs84, params);
         
         // Basic check for translation
-        assertEquals(4000000.0 - 87, ed50.getX().doubleValue(), 1.0);
-        assertEquals(500000.0 - 98, ed50.getY().doubleValue(), 1.0);
-        assertEquals(4900000.0 - 121, ed50.getZ().doubleValue(), 1.0);
+        assertEquals(4000000.0 - 87, ed50.getX().to(Units.METER).getValue().doubleValue(), 1.0);
+        assertEquals(500000.0 - 98, ed50.getY().to(Units.METER).getValue().doubleValue(), 1.0);
+        assertEquals(4900000.0 - 121, ed50.getZ().to(Units.METER).getValue().doubleValue(), 1.0);
     }
 }

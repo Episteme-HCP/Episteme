@@ -14,6 +14,7 @@
     <module>jscience-core</module>
     <module>jscience-natural</module>
     <module>jscience-social</module>
+    <!--
     <module>jscience-benchmarks</module>
     <module>jscience-featured-apps</module>
     <module>jscience-jni</module>
@@ -21,6 +22,7 @@
     <module>jscience-worker</module>
     <module>jscience-client</module>
     <module>jscience-database</module>
+    -->
   </modules>
   <licenses>
     <license>

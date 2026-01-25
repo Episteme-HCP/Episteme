@@ -44,6 +44,11 @@ public class UniProtReader extends AbstractResourceReader<Map<String, String>> {
     private static final String SEARCH_URL = "https://rest.uniprot.org/uniprotkb/search?query=";
 
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
+    }
+
+    @Override
     protected Map<String, String> loadFromSource(String resourceId) throws Exception {
         // resourceId should be accession or query
         Map<String, String> res = fetchByAccession(resourceId);

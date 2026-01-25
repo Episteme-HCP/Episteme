@@ -30,7 +30,7 @@ package org.jscience.util.identity;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public interface Identified<T> {
+public interface Identified<T extends Identification> {
 
     /**
      * Returns the unique identifier of this entity.

@@ -59,6 +59,11 @@ public class ObjMeshReader extends AbstractResourceReader<Group> {
     }
 
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
+    }
+
+    @Override
     public Class<Group> getResourceType() {
         return Group.class;
     }

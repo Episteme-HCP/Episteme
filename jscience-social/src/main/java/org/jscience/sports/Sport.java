@@ -23,23 +23,22 @@
 
 package org.jscience.sports;
 
-import java.io.Serializable;
 import java.util.Objects;
-import org.jscience.util.identity.Identified;
+import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.SimpleIdentification;
 
 /**
  * Represents a specific sport or athletic discipline.
+ * Extends AbstractIdentifiedEntity to support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
-public class Sport implements Identified<String>, Serializable {
+public class Sport extends AbstractIdentifiedEntity {
 
     private static final long serialVersionUID = 1L;
 
-    private final String name;
     private final boolean teamSport;
     private final Category category;
 
@@ -52,18 +51,10 @@ public class Sport implements Identified<String>, Serializable {
      * @throws NullPointerException if name is null
      */
     public Sport(String name, boolean teamSport, Category category) {
-        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        super(new SimpleIdentification(name));
+        setName(name);
         this.teamSport = teamSport;
         this.category = category;
-    }
-
-    @Override
-    public String getId() {
-        return name;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public boolean isTeamSport() {
@@ -76,18 +67,18 @@ public class Sport implements Identified<String>, Serializable {
 
     @Override
     public String toString() {
-        return name;
+        return getName();
     }
     
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Sport sport)) return false;
-        return teamSport == sport.teamSport && Objects.equals(name, sport.name);
+        return teamSport == sport.teamSport && Objects.equals(getName(), sport.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, teamSport);
+        return Objects.hash(getName(), teamSport);
     }
 }

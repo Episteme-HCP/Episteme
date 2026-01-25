@@ -50,6 +50,7 @@ public class SocialPojoTests {
     @Test
     public void testSociologyPojos() {
         PojoTester.testPojo(Person.class);
+        PojoTester.testPojo(Human.class);
         PojoTester.testPojo(Group.class);
         PojoTester.testPojo(Family.class);
         PojoTester.testPojo(School.class);

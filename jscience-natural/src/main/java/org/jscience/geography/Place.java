@@ -29,16 +29,12 @@ import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Length;
-import org.jscience.util.Named;
 import org.jscience.util.Positioned;
-import org.jscience.util.identity.Identification;
-import org.jscience.util.identity.Identified;
-import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.UUIDIdentification;
 import org.jscience.util.persistence.Attribute;
-import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 
-import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -48,11 +44,10 @@ import java.util.UUID;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 3.1
  * @since 1.0
  */
 @Persistent
-public class Place implements Identified<String>, Named, Positioned<EarthCoordinate>, Serializable {
+public class Place extends AbstractIdentifiedEntity implements Positioned<EarthCoordinate> {
 
     private static final long serialVersionUID = 3L;
 
@@ -65,12 +60,6 @@ public class Place implements Identified<String>, Named, Positioned<EarthCoordin
     public enum Precision {
         EXACT, APPROXIMATE, CITY_LEVEL, REGION_LEVEL, COUNTRY_LEVEL, CONTINENT_LEVEL, GLOBAL_LEVEL, UNKNOWN
     }
-
-    @Id
-    private final String id;
-    
-    @Attribute
-    private String name;
 
     @Attribute
     private GeodeticCoordinate center;
@@ -95,8 +84,8 @@ public class Place implements Identified<String>, Named, Positioned<EarthCoordin
     }
 
     public Place(String name, Type type) {
-        this.id = UUID.randomUUID().toString();
-        this.name = Objects.requireNonNull(name);
+        super(new UUIDIdentification(UUID.randomUUID().toString()));
+        setName(Objects.requireNonNull(name));
         this.type = type != null ? type : Type.UNKNOWN;
         this.uncertaintyRadius = Quantities.create(0.0, Units.METER);
     }
@@ -104,19 +93,6 @@ public class Place implements Identified<String>, Named, Positioned<EarthCoordin
     public Place(String name, GeodeticCoordinate center, Type type) {
         this(name, type);
         this.center = center;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public Type getType() {
@@ -185,19 +161,7 @@ public class Place implements Identified<String>, Named, Positioned<EarthCoordin
 
     @Override
     public String toString() {
-        return center != null ? String.format("%s (%s) [%s]", name, type, center) : String.format("%s (%s)", name, type);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Place other)) return false;
-        return id.equals(other.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
+        return center != null ? String.format("%s (%s) [%s]", getName(), type, center) : String.format("%s (%s)", getName(), type);
     }
 
     // Factory methods

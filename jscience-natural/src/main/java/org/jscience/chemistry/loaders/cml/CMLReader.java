@@ -70,7 +70,7 @@ public class CMLReader extends AbstractResourceReader<AbstractCMLDocument> {
      * Creates a new CML reader with the default document factory.
      */
     public CMLReader() {
-        this.documentFactory = DocumentFactoryImpl.newDefaultInstance();
+        this.documentFactory = DocumentFactoryImpl.newInstance();
     }
 
     /**

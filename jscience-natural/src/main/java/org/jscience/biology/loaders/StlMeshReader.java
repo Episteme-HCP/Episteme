@@ -69,6 +69,11 @@ public class StlMeshReader extends AbstractResourceReader<MeshView> {
     }
 
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
+    }
+
+    @Override
     public Class<MeshView> getResourceType() {
         return MeshView.class;
     }

@@ -58,6 +58,12 @@ import java.util.Optional;
  * @since 1.0
  */
 public class FbxMeshReader extends AbstractResourceReader<Group> {
+    
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "FBX 2013", "FBX 2014" };
+    }
+
 
     @Override
     public String getResourcePath() {

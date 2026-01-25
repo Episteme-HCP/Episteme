@@ -68,7 +68,10 @@ public class BioPAXReader extends AbstractResourceReader<BioPAXModel> {
     @Override public String getDescription() { return "Reads biological pathways from BioPAX format"; }
     @Override public String getLongDescription() { return "BioPAX is the standard format for biological pathway exchange including metabolic and signaling networks."; }
     @Override public String getCategory() { return "Biology"; }
-    @Override public String[] getSupportedVersions() { return new String[] {"Level 3", "Level 2"}; }
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "Level 3" };
+    }
 
     @Override
     protected BioPAXModel loadFromSource(String resourceId) throws Exception {

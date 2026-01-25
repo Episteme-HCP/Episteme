@@ -25,11 +25,13 @@ package org.jscience.biology.ecology;
 
 import java.util.*;
 import java.util.function.Predicate;
+
 import org.jscience.biology.Individual;
 import org.jscience.biology.taxonomy.Species;
-
-import org.jscience.util.Named;
+import org.jscience.geography.Place;
 import org.jscience.util.Positioned;
+import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.UUIDIdentification;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
@@ -46,24 +48,23 @@ import org.jscience.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Population implements Identified<String>, Named, Positioned<org.jscience.geography.Place> {
+public class Population extends AbstractIdentifiedEntity implements Positioned<Place> {
 
-    @org.jscience.util.persistence.Id
-    private final String id;
+    private static final long serialVersionUID = 1L;
 
-    @Attribute
-    private final String name;
     @Attribute
     private final Species species;
+    
     @Relation(type = Relation.Type.ONE_TO_MANY)
     private final List<Individual> members = new ArrayList<>();
+    
     @Attribute
-    private org.jscience.geography.Place territory;
+    private Place territory;
 
-    public Population(String name, Species species, org.jscience.geography.Place territory) {
-        this.id = java.util.UUID.randomUUID().toString();
-        this.name = name;
-        this.species = species;
+    public Population(String name, Species species, Place territory) {
+        super(new UUIDIdentification(UUID.randomUUID().toString()));
+        setName(name);
+        this.species = Objects.requireNonNull(species, "Species cannot be null");
         this.territory = territory;
     }
 
@@ -71,30 +72,20 @@ public class Population implements Identified<String>, Named, Positioned<org.jsc
         this("Unnamed Population", species, null);
     }
 
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
     public Species getSpecies() {
         return species;
     }
 
-    public org.jscience.geography.Place getTerritory() {
+    public Place getTerritory() {
         return territory;
     }
 
-    public void setTerritory(org.jscience.geography.Place territory) {
+    public void setTerritory(Place territory) {
         this.territory = territory;
     }
 
     @Override
-    public org.jscience.geography.Place getPosition() {
+    public Place getPosition() {
         return territory;
     }
 
@@ -206,7 +197,7 @@ public class Population implements Identified<String>, Named, Positioned<org.jsc
     public double getAverageFecundity() {
         return members.stream()
                 .filter(i -> i.getLifeStage() == Individual.LifeStage.ADULT)
-                .mapToInt(i -> i.getOffspring().size())
+                .mapToInt(i -> i.getChildren().size())
                 .average()
                 .orElse(0);
     }
@@ -220,8 +211,6 @@ public class Population implements Identified<String>, Named, Positioned<org.jsc
     @Override
     public String toString() {
         return String.format("Population '%s' of %s at %s: %d members (%d alive)",
-                name, species.getScientificName(), getLocation(), size(), countAlive());
+                getName(), species.getScientificName(), getLocation(), size(), countAlive());
     }
 }
-
-

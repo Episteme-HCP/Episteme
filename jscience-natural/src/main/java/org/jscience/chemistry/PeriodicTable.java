@@ -135,6 +135,17 @@ public final class PeriodicTable {
         }
     }
 
+    public static void ensureLoaded() {
+        if (!loaded) {
+            synchronized (PeriodicTable.class) {
+                if (!loaded) {
+                    loadElements();
+                    loaded = true;
+                }
+            }
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private static void loadElements() {
         try {

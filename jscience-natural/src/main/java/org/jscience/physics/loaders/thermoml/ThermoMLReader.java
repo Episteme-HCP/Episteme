@@ -24,7 +24,6 @@
 package org.jscience.physics.loaders.thermoml;
 
 import org.jscience.io.AbstractResourceReader;
-import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.w3c.dom.Document;
@@ -32,10 +31,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.InputStream;
-import java.util.logging.Logger;
 
 /**
  * Modernized ThermoML Reader for the IUPAC/NIST thermodynamic property data.
@@ -50,8 +47,6 @@ import java.util.logging.Logger;
  * @version 2.0 (Modernized)
  */
 public class ThermoMLReader extends AbstractResourceReader<ThermoMLDataReport> {
-
-    private static final Logger LOGGER = Logger.getLogger(ThermoMLReader.class.getName());
 
     @Override
     protected ThermoMLDataReport loadFromSource(String path) throws Exception {
@@ -163,6 +158,7 @@ public class ThermoMLReader extends AbstractResourceReader<ThermoMLDataReport> {
 
     @Override public String getName() { return "ThermoML Reader"; }
     @Override public String getDescription() { return "IUPAC/NIST Thermodynamic property reader"; }
+    @Override public String getLongDescription() { return "Parses IUPAC/NIST ThermoML files to extract high-accuracy thermodynamic data for chemical compounds."; }
     @Override public String getCategory() { return "Physics / Chemistry"; }
     @Override public Class<ThermoMLDataReport> getResourceType() { return ThermoMLDataReport.class; }
     @Override public String getResourcePath() { return "thermoml"; }

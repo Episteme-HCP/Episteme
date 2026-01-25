@@ -70,6 +70,11 @@ public class HorizonsEphemerisReader extends AbstractResourceReader<List<Horizon
     }
 
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public Class<List<HorizonsEphemerisReader.EphemerisPoint>> getResourceType() {
         return (Class<List<HorizonsEphemerisReader.EphemerisPoint>>) (Class<?>) List.class;

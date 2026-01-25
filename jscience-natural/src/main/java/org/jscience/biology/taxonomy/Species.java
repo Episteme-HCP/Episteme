@@ -23,35 +23,31 @@
 
 package org.jscience.biology.taxonomy;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.HashSet;
-import java.util.Collections;
-import java.util.Map;
-import java.util.HashMap;
 
-import org.jscience.util.identity.Identified;
-import org.jscience.util.identity.Identification;
+import org.jscience.biology.Organ;
+import org.jscience.biology.Tissue;
+import org.jscience.util.identity.AbstractIdentifiedEntity;
 import org.jscience.util.identity.SimpleIdentification;
-import org.jscience.util.Named;
 import org.jscience.util.persistence.Attribute;
-import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a biological species with full taxonomic classification.
- * <p>
- * Uses Linnaean taxonomy with the standard ranks:
- * Kingdom Ã¢â€ â€™ Phylum Ã¢â€ â€™ Class Ã¢â€ â€™ Order Ã¢â€ â€™ Family Ã¢â€ â€™ Genus Ã¢â€ â€™ Species
- * </p>
+ * Uses the trait system for flexible attribute management.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 @Persistent
-public class Species implements Identified<Identification>, Named {
+public class Species extends AbstractIdentifiedEntity {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * IUCN Red List conservation status.
@@ -78,19 +74,15 @@ public class Species implements Identified<Identification>, Named {
         }
     }
 
-    @Attribute
-    private final String commonName;
-    @Id
-    private final String scientificName;
-    @Attribute
-    private final Map<String, String> attributes = new HashMap<>();
     @Relation(type = Relation.Type.MANY_TO_ONE)
     private Species ancestor;
+
     @Attribute
     private ConservationStatus conservationStatus;
     
     @Relation(type = Relation.Type.ONE_TO_MANY)
     private final Set<Organ> organs = new HashSet<>();
+    
     @Relation(type = Relation.Type.ONE_TO_MANY)
     private final Set<Tissue> tissues = new HashSet<>();
 
@@ -111,109 +103,98 @@ public class Species implements Identified<Identification>, Named {
     private String specificEpithet;
 
     public Species(String commonName, String scientificName) {
-        this.commonName = Objects.requireNonNull(commonName, "Common name cannot be null");
-        this.scientificName = Objects.requireNonNull(scientificName, "Scientific name cannot be null");
+        super(new SimpleIdentification(scientificName));
+        setName(Objects.requireNonNull(commonName, "Common name cannot be null"));
         this.conservationStatus = ConservationStatus.NOT_EVALUATED;
     }
 
-    @Override
-    public Identification getId() {
-        return new SimpleIdentification(scientificName);
-    }
-
-    @Override
-    public String getName() {
-        return commonName != null ? commonName : scientificName;
-    }
-
-    // ========== Getters ==========
     public String getCommonName() {
-        return commonName;
+        return getName();
     }
 
     public String getScientificName() {
-        return scientificName;
+        return getId().toString();
     }
 
     public Species getAncestor() {
         return ancestor;
     }
 
-    public ConservationStatus getConservationStatus() {
-        return conservationStatus;
-    }
-
-    public String getKingdom() {
-        return kingdom;
-    }
-
-    public String getPhylum() {
-        return phylum;
-    }
-
-    public String getTaxonomicClass() {
-        return taxonomicClass;
-    }
-
-    public String getOrder() {
-        return order;
-    }
-
-    public String getFamily() {
-        return family;
-    }
-
-    public String getGenus() {
-        return genus;
-    }
-
-    public String getSpecificEpithet() {
-        return specificEpithet;
-    }
-
-    // ========== Setters ==========
     public void setAncestor(Species ancestor) {
         this.ancestor = ancestor;
+    }
+
+    public ConservationStatus getConservationStatus() {
+        return conservationStatus;
     }
 
     public void setConservationStatus(ConservationStatus status) {
         this.conservationStatus = status;
     }
 
+    public String getKingdom() {
+        return kingdom;
+    }
+
     public void setKingdom(String kingdom) {
         this.kingdom = kingdom;
+    }
+
+    public String getPhylum() {
+        return phylum;
     }
 
     public void setPhylum(String phylum) {
         this.phylum = phylum;
     }
 
+    public String getTaxonomicClass() {
+        return taxonomicClass;
+    }
+
     public void setTaxonomicClass(String taxonomicClass) {
         this.taxonomicClass = taxonomicClass;
+    }
+
+    public String getOrder() {
+        return order;
     }
 
     public void setOrder(String order) {
         this.order = order;
     }
 
+    public String getFamily() {
+        return family;
+    }
+
     public void setFamily(String family) {
         this.family = family;
+    }
+
+    public String getGenus() {
+        return genus;
     }
 
     public void setGenus(String genus) {
         this.genus = genus;
     }
 
+    public String getSpecificEpithet() {
+        return specificEpithet;
+    }
+
     public void setSpecificEpithet(String specificEpithet) {
         this.specificEpithet = specificEpithet;
     }
 
-    public void addAttribute(String key, String value) {
-        attributes.put(key, value);
+    public void addAttribute(String name, String value) {
+        setTrait(name, value);
     }
 
-    public String getAttribute(String key) {
-        return attributes.get(key);
+    public String getAttribute(String name) {
+        Object val = getTrait(name);
+        return val != null ? val.toString() : null;
     }
 
     public void addOrgan(Organ organ) {
@@ -271,25 +252,9 @@ public class Species implements Identified<Identification>, Named {
 
     @Override
     public String toString() {
-        return scientificName + " (" + commonName + ") [" + conservationStatus.getCode() + "]";
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof Species other))
-            return false;
-        return scientificName.equals(other.scientificName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(scientificName);
+        return getScientificName() + " (" + getCommonName() + ") [" + conservationStatus.getCode() + "]";
     }
 
     /** Predefined species for humans. */
     public static final Species HUMAN = new Species("Human", "Homo sapiens");
 }
-
-

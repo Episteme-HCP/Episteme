@@ -37,6 +37,9 @@ import java.util.Locale;
 public class PDBWriter extends AbstractResourceWriter<Protein> {
 
     @Override
+    public String[] getSupportedVersions() { return new String[] { "1.0" }; }
+
+    @Override
     public String getResourcePath() {
         // Should ideally be configurable or output directory
         return "https://files.rcsb.org/download/";

@@ -78,6 +78,11 @@ public class ITISReader extends AbstractResourceReader<List<Taxon>> {
     }
 
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public Class<List<Taxon>> getResourceType() {
         return (Class<List<Taxon>>) (Class<?>) List.class;

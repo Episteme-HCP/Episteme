@@ -24,6 +24,8 @@
 package org.jscience.physics.astronomy;
 
 import org.jscience.util.identity.Identified;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.Named;
 import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.numbers.real.Real;
@@ -47,7 +49,7 @@ import org.jscience.measure.Units;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class CelestialBody extends Particle implements Identified<String>, Named {
+public class CelestialBody extends Particle implements Identified<Identification>, Named {
 
     private String name;
     private Quantity<Length> radius;
@@ -70,8 +72,8 @@ public class CelestialBody extends Particle implements Identified<String>, Named
     }
 
     @Override
-    public String getId() {
-        return name.toLowerCase().replace(" ", "-");
+    public Identification getId() {
+        return new SimpleIdentification(name.toLowerCase().replace(" ", "-"));
     }
 
     public void setName(String name) {
@@ -134,7 +136,7 @@ public class CelestialBody extends Particle implements Identified<String>, Named
     }
 
     /**
-     * Surface gravity: g = GM/rÃ‚Â²
+     * Surface gravity: g = GM/r²
      */
     public Quantity<Acceleration> getSurfaceGravity() {
         Real m = Real.of(getMass().to(Units.KILOGRAM).getValue().doubleValue());
@@ -157,5 +159,3 @@ public class CelestialBody extends Particle implements Identified<String>, Named
         return String.format("%s (m=%s)", name, getMass());
     }
 }
-
-

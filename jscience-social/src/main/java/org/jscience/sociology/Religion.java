@@ -23,28 +23,25 @@
 
 package org.jscience.sociology;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import org.jscience.util.Named;
-import org.jscience.util.identity.Identified;
+import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.persistence.Attribute;
-import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 
 /**
  * Represents a religion, faith tradition, or spiritual system.
- * Encapsulates core metadata such as type, follower count, holy texts, and beliefs.
+ * Extends AbstractIdentifiedEntity to support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 @Persistent
-public class Religion implements Identified<String>, Named, Serializable {
+public class Religion extends AbstractIdentifiedEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -56,9 +53,6 @@ public class Religion implements Identified<String>, Named, Serializable {
         ANIMISTIC, SHAMANISTIC, PHILOSOPHICAL
     }
 
-    @Id
-    private final String name;
-    
     @Attribute
     private Type type;
     
@@ -94,10 +88,11 @@ public class Religion implements Identified<String>, Named, Serializable {
      * @throws IllegalArgumentException if name is empty
      */
     public Religion(String name) {
-        this.name = Objects.requireNonNull(name, "Name cannot be null").trim();
-        if (this.name.isEmpty()) {
+        super(new SimpleIdentification(Objects.requireNonNull(name, "Name cannot be null").trim()));
+        if (getId().toString().isEmpty()) {
             throw new IllegalArgumentException("Name cannot be empty");
         }
+        setName(getId().toString());
     }
 
     /**
@@ -108,16 +103,6 @@ public class Religion implements Identified<String>, Named, Serializable {
     public Religion(String name, Type type) {
         this(name);
         this.type = type;
-    }
-
-    @Override
-    public String getId() {
-        return name;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     /**
@@ -136,130 +121,66 @@ public class Religion implements Identified<String>, Named, Serializable {
         this.type = type;
     }
 
-    /**
-     * Returns the approximate number of global followers.
-     * @return follower count
-     */
     public long getFollowers() {
         return followers;
     }
 
-    /**
-     * Sets the global follower count.
-     * @param followers count
-     */
     public void setFollowers(long followers) {
         this.followers = followers;
     }
 
-    /**
-     * Returns the historical founder's name.
-     * @return founder string, or null
-     */
     public String getFounder() {
         return founder;
     }
 
-    /**
-     * Sets the historical founder.
-     * @param founder founder name
-     */
     public void setFounder(String founder) {
         this.founder = founder;
     }
 
-    /**
-     * Returns the year the religion was founded.
-     * @return year (BCE is negative)
-     */
     public int getFoundedYear() {
         return foundedYear;
     }
 
-    /**
-     * Sets the founding year.
-     * @param foundedYear year
-     */
     public void setFoundedYear(int foundedYear) {
         this.foundedYear = foundedYear;
     }
 
-    /**
-     * Returns the geographic region of origin.
-     * @return region string
-     */
     public String getOriginRegion() {
         return originRegion;
     }
 
-    /**
-     * Sets the region of origin.
-     * @param originRegion region string
-     */
     public void setOriginRegion(String originRegion) {
         this.originRegion = originRegion;
     }
 
-    /**
-     * Returns the primary holy text title.
-     * @return holy text name
-     */
     public String getHolyText() {
         return holyText;
     }
 
-    /**
-     * Sets the primary holy text.
-     * @param holyText text name
-     */
     public void setHolyText(String holyText) {
         this.holyText = holyText;
     }
 
-    /**
-     * Adds a belief or core tenet.
-     * @param belief belief string
-     */
     public void addBelief(String belief) {
         if (belief != null) beliefs.add(belief);
     }
 
-    /**
-     * Returns an unmodifiable list of core beliefs.
-     * @return beliefs list
-     */
     public List<String> getBeliefs() {
         return Collections.unmodifiableList(beliefs);
     }
 
-    /**
-     * Adds a religious practice or ritual.
-     * @param practice practice string
-     */
     public void addPractice(String practice) {
         if (practice != null) practices.add(practice);
     }
 
-    /**
-     * Returns an unmodifiable list of practices.
-     * @return practices list
-     */
     public List<String> getPractices() {
         return Collections.unmodifiableList(practices);
     }
 
-    /**
-     * Adds a religious holiday or celebration.
-     * @param holiday holiday name
-     */
     public void addHoliday(String holiday) {
         if (holiday != null) holidays.add(holiday);
     }
 
-    /**
-     * Returns an unmodifiable list of holidays.
-     * @return holidays list
-     */
     public List<String> getHolidays() {
         return Collections.unmodifiableList(holidays);
     }
@@ -269,16 +190,16 @@ public class Religion implements Identified<String>, Named, Serializable {
         if (this == o) return true;
         if (!(o instanceof Religion)) return false;
         Religion religion = (Religion) o;
-        return Objects.equals(name, religion.name);
+        return Objects.equals(getName(), religion.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(getName());
     }
 
     @Override
     public String toString() {
-        return name + " (" + type + ")";
+        return getName() + " (" + type + ")";
     }
 }

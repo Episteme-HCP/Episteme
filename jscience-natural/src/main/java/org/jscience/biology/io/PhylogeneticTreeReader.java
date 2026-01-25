@@ -117,4 +117,9 @@ public class PhylogeneticTreeReader extends AbstractResourceReader<Taxon> {
 
     @Override public String getResourcePath() { return "/data/phylogeny/"; }
     @Override public Class<Taxon> getResourceType() { return Taxon.class; }
+
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
+    }
 }

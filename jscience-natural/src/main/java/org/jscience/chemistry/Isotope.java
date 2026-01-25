@@ -30,6 +30,8 @@ import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 
 import org.jscience.util.identity.Identified;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.Named;
 
 /**
@@ -39,7 +41,7 @@ import org.jscience.util.Named;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Isotope implements Identified<String>, Named {
+public class Isotope implements Identified<Identification>, Named {
 
     private final Element element;
     private final int neutronCount;
@@ -86,8 +88,8 @@ public class Isotope implements Identified<String>, Named {
     }
 
     @Override
-    public String getId() {
-        return element.getSymbol() + "-" + getMassNumber();
+    public Identification getId() {
+        return new SimpleIdentification(element.getSymbol() + "-" + getMassNumber());
     }
 
     public Quantity<Time> getHalfLife() {
@@ -99,5 +101,3 @@ public class Isotope implements Identified<String>, Named {
         return element.getSymbol() + "-" + getMassNumber();
     }
 }
-
-

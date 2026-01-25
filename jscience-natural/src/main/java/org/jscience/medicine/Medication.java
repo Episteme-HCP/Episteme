@@ -23,24 +23,28 @@
 
 package org.jscience.medicine;
 
-import org.jscience.util.Named;
-import org.jscience.util.identity.Identified;
-import org.jscience.util.persistence.Attribute;
-import org.jscience.util.persistence.Id;
-import org.jscience.util.persistence.Persistent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
-import java.io.Serializable;
-import java.util.*;
+import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.UUIDIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a medication or drug with clinical and pharmaceutical details.
+ * Features a dynamic trait system for additional properties.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 @Persistent
-public class Medication implements Identified<String>, Named, Serializable {
+public class Medication extends AbstractIdentifiedEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -54,11 +58,8 @@ public class Medication implements Identified<String>, Named, Serializable {
         INHALATION, RECTAL, SUBLINGUAL, TRANSDERMAL, OPHTHALMIC
     }
 
-    @Id
-    private final String id;
-
-    @Attribute
-    private final String name;
+    @Relation(type = Relation.Type.MANY_TO_ONE)
+    private Pathology pathology;
 
     @Attribute
     private String genericName;
@@ -94,18 +95,16 @@ public class Medication implements Identified<String>, Named, Serializable {
     private String atcCode;
 
     public Medication(String name) {
-        this.id = UUID.randomUUID().toString();
-        this.name = Objects.requireNonNull(name);
+        super(new UUIDIdentification(UUID.randomUUID().toString()));
+        setName(Objects.requireNonNull(name));
     }
 
-    @Override
-    public String getId() {
-        return id;
+    public Pathology getPathology() {
+        return pathology;
     }
 
-    @Override
-    public String getName() {
-        return name;
+    public void setPathology(Pathology pathology) {
+        this.pathology = pathology;
     }
 
     public String getGenericName() {
@@ -198,7 +197,7 @@ public class Medication implements Identified<String>, Named, Serializable {
 
     @Override
     public String toString() {
-        return String.format("%s (%s, %s)", name, form, route);
+        return String.format("%s (%s, %s)", getName(), form, route);
     }
 
     // Factory methods

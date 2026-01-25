@@ -64,18 +64,10 @@ public class GeodeticCalculator {
                 double b = ellipsoid.getSemiMinorAxis().to(Units.METER).getValue().doubleValue();
                 double f = ellipsoid.getFlattening().doubleValue();
 
-                double phi1 = start.getLatitude().asType(org.jscience.measure.quantity.Dimensionless.class)
-                                .to(Units.RADIAN)
-                                .getValue().doubleValue();
-                double lambda1 = start.getLongitude().asType(org.jscience.measure.quantity.Dimensionless.class)
-                                .to(Units.RADIAN)
-                                .getValue().doubleValue();
-                double phi2 = end.getLatitude().asType(org.jscience.measure.quantity.Dimensionless.class)
-                                .to(Units.RADIAN)
-                                .getValue().doubleValue();
-                double lambda2 = end.getLongitude().asType(org.jscience.measure.quantity.Dimensionless.class)
-                                .to(Units.RADIAN)
-                                .getValue().doubleValue();
+                double phi1 = start.getLatitude().to(Units.RADIAN).getValue().doubleValue();
+                double lambda1 = start.getLongitude().to(Units.RADIAN).getValue().doubleValue();
+                double phi2 = end.getLatitude().to(Units.RADIAN).getValue().doubleValue();
+                double lambda2 = end.getLongitude().to(Units.RADIAN).getValue().doubleValue();
 
                 double U1 = Math.atan((1 - f) * Math.tan(phi1));
                 double U2 = Math.atan((1 - f) * Math.tan(phi2));

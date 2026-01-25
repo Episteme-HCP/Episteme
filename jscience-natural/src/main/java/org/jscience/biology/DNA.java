@@ -28,7 +28,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import org.jscience.util.identity.Identified;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.Named;
 
 /**
@@ -38,7 +41,7 @@ import org.jscience.util.Named;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class DNA implements Serializable, Cloneable, Identified<String>, Named {
+public class DNA implements Serializable, Cloneable, Identified<Identification>, Named {
 
     private final List<Base> bases;
 
@@ -56,7 +59,7 @@ public class DNA implements Serializable, Cloneable, Identified<String>, Named {
     /**
      * Parses a DNA string (e.g. "ATCG").
      * 
-     * @param sequence
+     * @param sequence the string representation
      */
     public DNA(String sequence) {
         this.bases = new ArrayList<>();
@@ -121,8 +124,8 @@ public class DNA implements Serializable, Cloneable, Identified<String>, Named {
     }
 
     @Override
-    public String getId() {
-        return toString();
+    public Identification getId() {
+        return new SimpleIdentification(toString());
     }
 
     @Override
@@ -130,5 +133,3 @@ public class DNA implements Serializable, Cloneable, Identified<String>, Named {
         return "DNA Strand (" + getLength() + " bases)";
     }
 }
-
-

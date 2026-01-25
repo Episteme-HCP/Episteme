@@ -74,6 +74,11 @@ public class NCBITaxonomyReader extends org.jscience.io.AbstractResourceReader<o
     }
     
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
+    }
+    
+    @Override
     protected org.jscience.biology.taxonomy.Species loadFromSource(String resourceId) throws Exception {
         try {
             long id = Long.parseLong(resourceId);

@@ -55,15 +55,13 @@ public class FASTABioSequenceReader extends AbstractResourceReader<List<BioSeque
         }
     }
 
-    @Override
-    public String getResourcePath() {
-        return "/";
-    }
+    @Override public String getResourcePath() { return null; }
+    
+    @Override public Class<List<BioSequence>> getResourceType() { return (Class) java.util.List.class; }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Class<List<BioSequence>> getResourceType() {
-        return (Class<List<BioSequence>>) (Class<?>) List.class;
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
     }
 
     /**

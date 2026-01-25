@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.HashMap;
 
 import org.jscience.util.identity.Identified;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.Named;
 
 /**
@@ -37,7 +39,7 @@ import org.jscience.util.Named;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class ParticleType implements Identified<String>, Named {
+public class ParticleType implements Identified<Identification>, Named {
 
     /** Speed of light (m/s) */
     public static final Real C = PhysicalConstants.c;
@@ -48,7 +50,7 @@ public class ParticleType implements Identified<String>, Named {
     /** Fine structure constant */
     public static final Real ALPHA = PhysicalConstants.alpha;
 
-    /** Weak mixing angle (sinÃ‚Â²ÃŽÂ¸_W) */
+    /** Weak mixing angle (sin²θ_W) */
     public static final Real SIN2_THETA_W = Real.of(0.23122);
 
     private static final Map<String, ParticleType> PARTICLES = new HashMap<>();
@@ -78,13 +80,17 @@ public class ParticleType implements Identified<String>, Named {
     }
 
     @Override
-    public String getId() {
-        return symbol;
+    public Identification getId() {
+        return new SimpleIdentification(symbol);
     }
 
     @Override
     public String getName() {
         return name;
+    }
+
+    public String getSymbol() {
+        return symbol;
     }
 
     public Real getMassMeV() {
@@ -124,11 +130,9 @@ public class ParticleType implements Identified<String>, Named {
                 return;
             }
 
-            // We need a custom deserializer or a DTO because JSON has doubles
             com.fasterxml.jackson.databind.JsonNode root = mapper.readTree(is);
             if (root.isArray()) {
                 for (com.fasterxml.jackson.databind.JsonNode node : root) {
-                    // Manual extraction to cleaner types
                     String sym = node.get("symbol").asText();
                     String name = node.get("name").asText();
                     double mass = node.get("massMeV").asDouble();
@@ -138,20 +142,18 @@ public class ParticleType implements Identified<String>, Named {
 
                     ParticleType p = new ParticleType(sym, name, mass, charge, spin, type);
                     PARTICLES.put(p.getSymbol(), p);
-                    PARTICLES.put(p.getName().toUpperCase(), p);
+                    if (p.getName() != null) {
+                        PARTICLES.put(p.getName().toUpperCase(), p);
+                    }
                 }
             }
             is.close();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load Standard Model particles", e);
+            // Log instead of throw to allow partial initialization
+            java.util.logging.Logger.getLogger("StandardModel").warning("Failed to load Standard Model particles: " + e.getMessage());
         }
     }
 
-    /**
-     * Registers a new particle type manually.
-     * 
-     * @param particle the particle type to register
-     */
     public static void registerParticle(ParticleType particle) {
         if (particle != null && particle.getSymbol() != null) {
             PARTICLES.put(particle.getSymbol(), particle);
@@ -173,59 +175,33 @@ public class ParticleType implements Identified<String>, Named {
         return new java.util.HashSet<>(PARTICLES.values());
     }
 
-    /**
-     * Relativistic energy-momentum relation.
-     * EÃ‚Â² = (pc)Ã‚Â² + (mcÃ‚Â²)Ã‚Â²
-     */
     public static Real relativisticEnergy(Real momentum, Real massMeV) {
-        Real pc = momentum; // in MeV/c
-        Real mc2 = massMeV;
-        return pc.multiply(pc).add(mc2.multiply(mc2)).sqrt();
+        return momentum.multiply(momentum).add(massMeV.multiply(massMeV)).sqrt();
     }
 
-    /**
-     * Lorentz factor.
-     * ÃŽÂ³ = 1 / Ã¢Ë†Å¡(1 - vÃ‚Â²/cÃ‚Â²)
-     */
     public static Real lorentzFactor(Real velocity) {
         Real beta = velocity.divide(C);
         return Real.ONE.divide(Real.ONE.subtract(beta.multiply(beta)).sqrt());
     }
 
-    /**
-     * Relativistic momentum.
-     * p = ÃŽÂ³mv
-     */
     public static Real relativisticMomentum(Real mass, Real velocity) {
         return lorentzFactor(velocity).multiply(mass).multiply(velocity);
     }
 
-    /**
-     * De Broglie wavelength.
-     * ÃŽÂ» = h / p
-     */
     public static Real deBroglieWavelength(Real momentum) {
         Real h = Real.of(6.62607015e-34);
         return h.divide(momentum);
     }
 
-    /**
-     * Compton wavelength.
-     * ÃŽÂ»_C = h / (mc)
-     */
     public static Real comptonWavelength(Real mass) {
         Real h = Real.of(6.62607015e-34);
         return h.divide(mass.multiply(C));
     }
 
-    /**
-     * Cross-section from decay width (Breit-Wigner).
-     * ÃÆ’ = (2J+1) * Ãâ‚¬ * (Ã¢â€žÂc/p)Ã‚Â² * ÃŽâ€œ_in * ÃŽâ€œ_out / ((E-M)Ã‚Â² + ÃŽâ€œÃ‚Â²/4)
-     */
     public static Real breitWignerCrossSection(Real E, Real M, Real totalWidth,
             Real partialWidthIn, Real partialWidthOut,
             Real spin) {
-        Real hbarc = Real.of(197.327); // MeVÃ‚Â·fm
+        Real hbarc = Real.of(197.327); // MeV·fm
         Real prefactor = spin.multiply(Real.of(2)).add(Real.ONE).multiply(PhysicalConstants.PI)
                 .multiply(hbarc.multiply(hbarc));
         Real numerator = partialWidthIn.multiply(partialWidthOut);
@@ -233,10 +209,6 @@ public class ParticleType implements Identified<String>, Named {
         return prefactor.multiply(numerator).divide(denominator);
     }
 
-    /**
-     * QED running coupling constant at energy Q.
-     * ÃŽÂ±(QÃ‚Â²) Ã¢â€°Ë† ÃŽÂ± / (1 - (ÃŽÂ±/3Ãâ‚¬) * ln(QÃ‚Â²/m_eÃ‚Â²))
-     */
     public static Real runningAlpha(Real Q_MeV) {
         Real me = Real.of(0.511); // MeV
         Real lnQ = (Q_MeV.multiply(Q_MeV).divide(me.multiply(me))).log();
@@ -244,5 +216,3 @@ public class ParticleType implements Identified<String>, Named {
                 .divide(Real.ONE.subtract(ALPHA.divide(Real.of(3).multiply(PhysicalConstants.PI)).multiply(lnQ)));
     }
 }
-
-

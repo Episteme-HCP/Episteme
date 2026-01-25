@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package org.jscience.history;
+package org.jscience.biology;
 
 import org.jscience.mathematics.numbers.real.Real;
 import java.io.Serializable;

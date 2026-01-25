@@ -31,6 +31,11 @@ public class StarReader extends AbstractResourceReader<List<StarReader.Star>> {
     }
 
     @Override
+    public String[] getSupportedVersions() {
+        return new String[] { "1.0" };
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public Class<List<Star>> getResourceType() {
         return (Class<List<Star>>) (Class<?>) List.class;

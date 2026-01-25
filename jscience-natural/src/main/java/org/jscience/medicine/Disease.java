@@ -23,7 +23,7 @@
 
 package org.jscience.medicine;
 
-import org.jscience.biology.Species;
+import org.jscience.biology.taxonomy.Species;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
@@ -68,8 +68,19 @@ public class Disease extends Pathology {
     @Attribute
     private String microorganismId; // ID or name of the biological agent
 
+    @Attribute
+    private String icdCode;
+
     public Disease(String name) {
         super(name);
+    }
+
+    public String getIcdCode() {
+        return icdCode;
+    }
+
+    public void setIcdCode(String icdCode) {
+        this.icdCode = icdCode;
     }
 
     public Transmission getTransmission() {
