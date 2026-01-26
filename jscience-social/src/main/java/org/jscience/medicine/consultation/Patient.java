@@ -6,6 +6,8 @@ import org.jscience.sociology.Role;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Relation;
+import org.jscience.medicine.Pathology;
+import org.jscience.medicine.Treatment;
 
 import java.util.Collections;
 import java.util.ArrayList;
@@ -49,13 +51,13 @@ public class Patient extends Role {
     private float bloodOxygen; //percent of normal
 
     @Relation(type = Relation.Type.ONE_TO_MANY)
-    private Set currentPathologies; //diseases, defects,etc a Set of Pathologies
+    private Set<Pathology> currentPathologies; //diseases, defects,etc a Set of Pathologies
 
     @Relation(type = Relation.Type.ONE_TO_MANY)
-    private Set treatments;
+    private Set<Treatment> treatments;
 
     @Relation(type = Relation.Type.ONE_TO_MANY)
-    private Vector medicalRecords; //Set of Records
+    private List<Report> medicalRecords; //List of Records
 
 /**
      * Creates a new Patient object.
@@ -72,9 +74,9 @@ public class Patient extends Role {
         this.respiratoryRate = 0;
         this.painScale = 0;
         this.bloodOxygen = 0;
-        this.currentPathologies = Collections.EMPTY_SET;
-        this.treatments = Collections.EMPTY_SET;
-        this.medicalRecords = new Vector();
+        this.currentPathologies = Collections.emptySet();
+        this.treatments = Collections.emptySet();
+        this.medicalRecords = new ArrayList<>();
     }
 
     /**

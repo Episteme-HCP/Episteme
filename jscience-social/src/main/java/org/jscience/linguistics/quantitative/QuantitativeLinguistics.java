@@ -23,10 +23,7 @@
 
 package org.jscience.linguistics.quantitative;
 
-import org.jscience.mathematics.numbers.real.Real;
 import java.util.Map;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Implements fundamental laws of quantitative linguistics.

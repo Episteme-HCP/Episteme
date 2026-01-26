@@ -23,14 +23,11 @@
 
 package org.jscience.arts;
 
-import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import org.jscience.biology.Individual;
@@ -38,9 +35,9 @@ import org.jscience.biology.taxonomy.Species;
 import org.jscience.economics.Organization;
 import org.jscience.economics.Worker;
 import org.jscience.economics.money.Money;
-import org.jscience.geography.Place;
-import org.jscience.history.temporal.FuzzyTimePoint;
-import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.earth.Place;
+import org.jscience.history.time.FuzzyTimePoint;
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
@@ -56,7 +53,7 @@ import org.jscience.util.persistence.Persistent;
  * @since 1.0
  */
 @Persistent
-public class Artist extends Worker implements Serializable {
+public class Artist extends Worker {
 
     private static final long serialVersionUID = 2L;
 
@@ -73,9 +70,9 @@ public class Artist extends Worker implements Serializable {
     @Attribute
     private String nationality;
     @Attribute
-    private TemporalCoordinate birthDate;
+    private TimeCoordinate birthDate;
     @Attribute
-    private TemporalCoordinate deathDate;
+    private TimeCoordinate deathDate;
     @Attribute
     private String movement; // e.g., "Impressionism", "Baroque"
     @Attribute
@@ -116,19 +113,19 @@ public class Artist extends Worker implements Serializable {
         this.nationality = nationality;
     }
 
-    public TemporalCoordinate getBirthDate() {
+    public TimeCoordinate getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(TemporalCoordinate date) {
+    public void setBirthDate(TimeCoordinate date) {
         this.birthDate = date;
     }
 
-    public TemporalCoordinate getDeathDate() {
+    public TimeCoordinate getDeathDate() {
         return deathDate;
     }
 
-    public void setDeathDate(TemporalCoordinate date) {
+    public void setDeathDate(TimeCoordinate date) {
         this.deathDate = date;
     }
 

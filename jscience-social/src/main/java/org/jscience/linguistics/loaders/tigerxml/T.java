@@ -29,7 +29,6 @@ import org.w3c.dom.Element;
 import java.io.FileWriter;
 import java.io.IOException;
 
-
 /**
  * Represents a terminal node in a syntax tree.
  *
@@ -41,6 +40,9 @@ import java.io.IOException;
  * @see GraphNode
  */
 public class T extends GraphNode {
+
+    private static final long serialVersionUID = 1L;
+
     /** DOCUMENT ME! */
     private String pos;
 
@@ -57,12 +59,6 @@ public class T extends GraphNode {
     private int position;
 
     /**
-     * The higher this value the more process and debug information
-     * will written to stderr.
-     */
-    private int verbosity = 0;
-
-/**
      * Creates a new T object.
      */
     public T() {
@@ -70,43 +66,54 @@ public class T extends GraphNode {
         init();
     }
 
-/**
+    /**
      * Creates a new T object.
      *
-     * @param tElement DOCUMENT ME!
-     * @param sent     DOCUMENT ME!
-     * @param pos      DOCUMENT ME!
+     * @param tElement The DOM element
+     * @param sent     The parent sentence
+     * @param posIndex The position index in the sentence
      */
-    public T(Element tElement, Sentence sent, int pos) {
+    public T(Element tElement, Sentence sent, int posIndex) {
         super();
         init();
-        TBuilder.buildT(this, sent, tElement, pos);
-    } // T()
-
-/**
-     * Creates a new T object.
-     *
-     * @param tElement  DOCUMENT ME!
-     * @param sent      DOCUMENT ME!
-     * @param pos       DOCUMENT ME!
-     * @param verbosity DOCUMENT ME!
-     */
-    public T(Element tElement, Sentence sent, int pos, int verbosity) {
-        super();
-        this.verbosity = verbosity;
-        TBuilder.buildT(this, sent, tElement, pos);
-    } // T()
+        TBuilder.buildT(this, sent, tElement, posIndex);
+    }
 
     /**
-     * DOCUMENT ME!
+     * Creates a new T object with verbosity.
      */
+    public T(Element tElement, Sentence sent, int posIndex, int verbosity) {
+        super();
+        init();
+        this.verbosity = verbosity;
+        TBuilder.buildT(this, sent, tElement, posIndex);
+    }
+
     private void init() {
-        this.setTerminal(true);
         this.pos = "";
         this.morph = "";
         this.word = "";
         this.lemma = "";
         this.position = -1;
+    }
+
+    @Override
+    public boolean isTerminal() {
+        return true;
+    }
+
+    @Override
+    public String getText() {
+        return word;
+    }
+
+    @Override
+    protected void buildTreeString(int depth, StringBuilder sb) {
+        for (int i = 0; i < depth; i++) {
+            sb.append("|   ");
+        }
+        sb.append("|--").append(getEdge2Mother()).append("--");
+        sb.append("\"").append(word).append("\" <").append(getId()).append(", ").append(pos).append(">\n");
     }
 
     /**
@@ -188,6 +195,7 @@ public class T extends GraphNode {
      */
     public void setPosition(int position) {
         this.position = position;
+        setIndex(position);
     }
 
     /**
@@ -225,5 +233,5 @@ public class T extends GraphNode {
             System.err.println("Error occurred while writing: " + e.toString());
             e.printStackTrace();
         }
-    } // method print2Xml
-} // class
+    }
+}

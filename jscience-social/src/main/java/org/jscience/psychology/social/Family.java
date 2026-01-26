@@ -24,7 +24,7 @@
 package org.jscience.psychology.social;
 
 import org.jscience.biology.taxonomy.Species;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 
 /**
  * Represents a nuclear or extended family group.

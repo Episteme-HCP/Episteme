@@ -1,0 +1,42 @@
+package org.jscience.history.time;
+
+import java.time.Instant;
+import org.jscience.util.Temporal;
+
+/**
+ * Interface for a temporal coordinate, representing a position in time.
+ * Analogous to {@link org.jscience.earth.coordinates.EarthCoordinate}.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 2.0
+ */
+public interface TimeCoordinate extends Temporal<TimeCoordinate>, Comparable<TimeCoordinate> {
+
+    /**
+     * Returns the exact instant this coordinate represents.
+     * If the coordinate is fuzzy or an interval, this returns a representative point.
+     * 
+     * @return the instant
+     */
+    Instant toInstant();
+
+    /**
+     * Returns the precision of this coordinate.
+     * 
+     * @return the precision level
+     */
+    Precision getPrecision();
+
+    /**
+     * Returns whether this coordinate represents a range or has uncertainty.
+     * 
+     * @return true if fuzzy or interval-based
+     */
+    boolean isFuzzy();
+
+    @Override
+    default TimeCoordinate getWhen() {
+        return this;
+    }
+}

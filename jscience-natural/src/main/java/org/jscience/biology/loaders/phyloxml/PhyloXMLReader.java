@@ -26,10 +26,8 @@ package org.jscience.biology.loaders.phyloxml;
 import org.jscience.io.AbstractResourceReader;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
 import java.io.*;
-import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -60,7 +58,6 @@ public class PhyloXMLReader extends AbstractResourceReader<PhyloXMLDocument> {
 
     private static final Logger LOGGER = Logger.getLogger(PhyloXMLReader.class.getName());
     
-    private static final String NS_PHYLOXML = "http://www.phyloxml.org";
     
     public PhyloXMLReader() {
     }

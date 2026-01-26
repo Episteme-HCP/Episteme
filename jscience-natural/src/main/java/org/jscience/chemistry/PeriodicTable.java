@@ -23,25 +23,10 @@
 
 package org.jscience.chemistry;
 
-import org.jscience.chemistry.elements.*;
-import org.jscience.measure.Units;
-
-import org.jscience.measure.quantity.MassDensity;
-import org.jscience.measure.quantity.Mass;
-import org.jscience.measure.quantity.Temperature;
-
-import org.jscience.measure.Quantity;
-import org.jscience.measure.Unit;
-import org.jscience.util.SimpleJson;
-
-import java.io.InputStream;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
-import java.nio.charset.StandardCharsets;
-
-import org.jscience.measure.Quantities;
 
 /**
  * This class provides access to the elements of the periodic table.
@@ -55,15 +40,6 @@ import org.jscience.measure.Quantities;
  */
 public final class PeriodicTable {
 
-    // Custom Units derived for XML/JSON data
-    private static final Unit<Temperature> KELVIN = Units.KELVIN;
-
-    // 1 u Ã¢â€°Ë† 1.66053906660e-27 kg
-    private static final Unit<Mass> UNIFIED_ATOMIC_MASS = Units.KILOGRAM.multiply(1.66053906660e-27);
-
-    // Note: Creating composite units directly using operations on base units
-    private static final Unit<MassDensity> G_PER_CM3 = Units.GRAM.divide(Units.CENTIMETER.pow(3))
-            .asType(MassDensity.class);
 
     private static final Map<String, Element> table = new HashMap<>();
     private static final Map<String, String> symbolToName = new HashMap<>();
@@ -146,7 +122,6 @@ public final class PeriodicTable {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private static void loadElements() {
         try {
             List<Element> elements = org.jscience.chemistry.loaders.PeriodicTableReader.loadFromResource("elements.json");

@@ -109,8 +109,10 @@ public class CopticCalendar extends JulianCalendar {
      * Recomputes the Rata Die number from the current month, day, and year.
      */
     protected synchronized void recomputeRD() {
-        super.rd = (EPOCH - 1L) + (long) (365 * (super.year - 1)) +
-            AlternateCalendar.fldiv(super.year, 4L) +
+            @SuppressWarnings("deprecation")
+            long q = AlternateCalendar.fldiv(super.year, 4L);
+            super.rd = (EPOCH - 1L) + (long) (365 * (super.year - 1)) +
+            q +
             (long) (30 * (super.month - 1)) + (long) super.day;
     }
 
@@ -118,9 +120,9 @@ public class CopticCalendar extends JulianCalendar {
      * Recomputes the month, day, and year from the current Rata Die number.
      */
     protected synchronized void recomputeFromRD() {
-        super.year = (int) AlternateCalendar.fldiv((4L * (super.rd - EPOCH)) +
+        super.year = (int) AlternateCalendar.floorDiv((4L * (super.rd - EPOCH)) +
                 1463L, 1461L);
-        super.month = (int) AlternateCalendar.fldiv(super.rd -
+        super.month = (int) AlternateCalendar.floorDiv(super.rd -
                 (new CopticCalendar(1, 1, super.year)).toRD(), 30L) + 1;
         super.day = (int) ((super.rd + 1L) -
             (new CopticCalendar(super.month, 1, super.year)).toRD());

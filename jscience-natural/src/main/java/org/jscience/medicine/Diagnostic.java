@@ -25,26 +25,37 @@ package org.jscience.medicine;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.UUIDIdentification;
 import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 
 /**
  * Represents a medical diagnostic result or finding.
+ * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 @Persistent
-public class Diagnostic extends AbstractIdentifiedEntity {
+public class Diagnostic implements ComprehensiveIdentification {
 
     private static final long serialVersionUID = 1L;
+
+    @Id
+    protected final Identification id;
+
+    @Attribute
+    protected final Map<String, Object> traits = new HashMap<>();
 
     @Attribute
     private String icdCode; // Often ICD-10 or ICD-11
@@ -56,13 +67,23 @@ public class Diagnostic extends AbstractIdentifiedEntity {
     private final List<String> recommendedTests = new ArrayList<>();
 
     public Diagnostic(String name) {
-        super(new UUIDIdentification(UUID.randomUUID().toString()));
+        this.id = new UUIDIdentification(UUID.randomUUID().toString());
         setName(Objects.requireNonNull(name));
     }
 
     public Diagnostic(String name, String icdCode) {
         this(name);
         this.icdCode = icdCode;
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     public String getDescription() {
@@ -95,6 +116,18 @@ public class Diagnostic extends AbstractIdentifiedEntity {
 
     public void addRecommendedTest(String test) {
         this.recommendedTests.add(test);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Diagnostic diagnostic)) return false;
+        return Objects.equals(id, diagnostic.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override

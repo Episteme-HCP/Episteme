@@ -123,7 +123,7 @@ public final class OpenMathBridge {
     private static Expression<?> combine(java.util.List<Expression<?>> exprs, 
                                        java.util.function.BiFunction<Expression<?>, Expression<?>, Expression<?>> op) {
         if (exprs.isEmpty()) return null;
-        Expression result = exprs.get(0);
+        Expression<?> result = exprs.get(0);
         for (int i = 1; i < exprs.size(); i++) {
             result = op.apply(result, exprs.get(i));
         }

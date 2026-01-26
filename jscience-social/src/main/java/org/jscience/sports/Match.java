@@ -24,40 +24,71 @@
 package org.jscience.sports;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import org.jscience.geography.Place;
-import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.earth.Place;
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.util.Temporal;
-import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.UUIDIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a discrete sports match between two teams or individuals.
  * Tracks scheduling status, venue, and score results.
- * Extends AbstractIdentifiedEntity to support dynamic traits and consistent identity.
+ * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Match extends AbstractIdentifiedEntity implements Temporal<TemporalCoordinate> {
+@Persistent
+public class Match implements ComprehensiveIdentification, Temporal<TimeCoordinate> {
 
     private static final long serialVersionUID = 1L;
+
+    @Id
+    protected final Identification id;
+
+    @Attribute
+    protected final Map<String, Object> traits = new HashMap<>();
 
     /** Current lifecycle state of the match. */
     public enum Status {
         SCHEDULED, IN_PROGRESS, COMPLETED, POSTPONED, CANCELLED
     }
 
+    @Relation(type = Relation.Type.MANY_TO_ONE)
     private final Sport sport;
-    private final TemporalCoordinate date;
+
+    @Relation(type = Relation.Type.ONE_TO_ONE)
+    private final TimeCoordinate date;
+
+    @Relation(type = Relation.Type.MANY_TO_ONE)
     private final Team homeTeam;
+
+    @Relation(type = Relation.Type.MANY_TO_ONE)
     private final Team awayTeam;
+
+    @Relation(type = Relation.Type.MANY_TO_ONE)
     private Place venue;
+
+    @Attribute
     private Status status;
+
+    @Attribute
     private int homeScore;
+
+    @Attribute
     private int awayScore;
+
+    @Relation(type = Relation.Type.MANY_TO_ONE)
     private Competition competition;
 
     /**
@@ -69,8 +100,8 @@ public class Match extends AbstractIdentifiedEntity implements Temporal<Temporal
      * @param awayTeam the visiting team
      * @throws NullPointerException if any required argument is null
      */
-    public Match(Sport sport, TemporalCoordinate date, Team homeTeam, Team awayTeam) {
-        super(new UUIDIdentification(UUID.randomUUID().toString()));
+    public Match(Sport sport, TimeCoordinate date, Team homeTeam, Team awayTeam) {
+        this.id = new UUIDIdentification(UUID.randomUUID().toString());
         this.sport = Objects.requireNonNull(sport, "Sport cannot be null");
         this.date = Objects.requireNonNull(date, "Date cannot be null");
         this.homeTeam = Objects.requireNonNull(homeTeam, "Home team cannot be null");
@@ -80,7 +111,17 @@ public class Match extends AbstractIdentifiedEntity implements Temporal<Temporal
     }
 
     @Override
-    public TemporalCoordinate getWhen() {
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
+    }
+
+    @Override
+    public TimeCoordinate getWhen() {
         return date;
     }
 
@@ -92,7 +133,7 @@ public class Match extends AbstractIdentifiedEntity implements Temporal<Temporal
         return sport;
     }
 
-    public TemporalCoordinate getDate() {
+    public TimeCoordinate getDate() {
         return date;
     }
 
@@ -164,5 +205,17 @@ public class Match extends AbstractIdentifiedEntity implements Temporal<Temporal
         }
         return String.format("%s vs %s @ %s (%s)",
                 homeTeam.getName(), awayTeam.getName(), date, status);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Match match)) return false;
+        return Objects.equals(id, match.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

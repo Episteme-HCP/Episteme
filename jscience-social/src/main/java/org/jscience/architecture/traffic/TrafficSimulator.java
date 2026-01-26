@@ -142,7 +142,7 @@ public class TrafficSimulator implements Serializable {
      * 
      * @param dt the time delta for progress
      */
-    @SuppressWarnings("unchecked")
+
     public void update(Quantity<Time> dt) {
         if (dt == null) return;
         double dtVal = dt.to(Units.SECOND).getValue().doubleValue();
@@ -181,7 +181,7 @@ public class TrafficSimulator implements Serializable {
         }
     }
 
-    @SuppressWarnings("unchecked")
+
     private Quantity<Acceleration> calculateIDM(Car car, Car leader) {
         double vRatio = car.velocity.divide(desiredVelocity).getValue().doubleValue();
         double term1 = Math.pow(vRatio, delta);

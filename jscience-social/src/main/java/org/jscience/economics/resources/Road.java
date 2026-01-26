@@ -23,11 +23,10 @@
 
 package org.jscience.economics.resources;
 
-import com.sun.j3d.utils.behaviors.interpolators.KBRotPosScaleSplinePathInterpolator;
 import java.time.Instant;
 import org.jscience.economics.Community;
 import org.jscience.economics.money.Money;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.measure.Quantity;
 import org.jscience.util.identity.Identification;
 
@@ -44,8 +43,6 @@ public class Road extends Artifact {
 
     private static final long serialVersionUID = 1L;
 
-    private transient KBRotPosScaleSplinePathInterpolator path; // Transient as J3D objects are likely not Serializable
-
     /**
      * Initializes a new road.
      */
@@ -55,11 +52,4 @@ public class Road extends Artifact {
         super(name, description, amount, producer, productionPlace, productionDate, identification, value);
     }
 
-    public KBRotPosScaleSplinePathInterpolator getPath() {
-        return path;
-    }
-
-    public void setPath(KBRotPosScaleSplinePathInterpolator path) {
-        this.path = path;
-    }
 }

@@ -2,7 +2,7 @@ package org.jscience.linguistics;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -72,7 +72,7 @@ public final class LanguageDetector {
                 if (LANGUAGE_TRIGRAMS.get(iso).contains(trigram)) trigramScore++;
             }
             double normalized = trigrams.isEmpty() ? 0 : trigramScore / trigrams.size();
-            scores.merge(lang, normalized, Double::sum);
+            scores.merge(lang, normalized, (a, b) -> a + b);
         }
         
         double total = scores.values().stream().mapToDouble(Double::doubleValue).sum();

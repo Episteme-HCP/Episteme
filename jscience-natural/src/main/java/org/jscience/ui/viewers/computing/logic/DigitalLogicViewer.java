@@ -46,8 +46,6 @@ public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
 
     private final LogicCircuit circuit = new LogicCircuit();
     private LogicCircuit.Component selectedComponent = null;
-    private LogicCircuit.Connection selectedConnection = null;
-    private LogicCircuit.Port dragSource = null;
 
     private double dragOffsetX, dragOffsetY;
     private boolean simulationMode = true; 
@@ -62,7 +60,7 @@ public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
 
     private void setupParameters() {
         parameters.add(new BooleanParameter("logic.mode", I18n.getInstance().get("viewer.digitallogicviewer.mode.simulation", "Simulation Mode"), simulationMode, v -> {
-            simulationMode = v; selectedComponent = null; selectedConnection = null; if (simulationMode) circuit.simulate(); draw();
+            simulationMode = v; selectedComponent = null; if (simulationMode) circuit.simulate(); draw();
         }));
         
         List<String> gates = List.of("INPUT", "OUTPUT", "AND", "OR", "NOT", "NAND");

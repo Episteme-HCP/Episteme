@@ -23,14 +23,15 @@
 
 package org.jscience.politics;
 
-import java.io.Serializable;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import org.jscience.biology.Individual;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.psychology.social.Group;
+import org.jscience.util.persistence.Persistent;
 
 /**
  * Represents a localized, often primitive or community-level settlement (Chiefdom, Colony, Tribe site).
@@ -42,7 +43,8 @@ import org.jscience.psychology.social.Group;
  * @version 1.1
  * @since 1.0
  */
-public class Settlement extends Place implements Serializable {
+@Persistent
+public class Settlement extends Place {
 
     private static final long serialVersionUID = 1L;
 
@@ -57,9 +59,8 @@ public class Settlement extends Place implements Serializable {
      * @throws NullPointerException if any argument is null
      */
     public Settlement(String name, Group group) {
-        super(Objects.requireNonNull(name, "Name cannot be null"), 
-              Objects.requireNonNull(group, "Group cannot be null").getFormalTerritory().getBoundary());
-        this.group = group;
+        super(Objects.requireNonNull(name, "Name cannot be null"), Place.Type.VILLAGE);
+        this.group = Objects.requireNonNull(group, "Group cannot be null");
     }
 
     /**

@@ -27,7 +27,6 @@ import org.jscience.io.AbstractResourceReader;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Objects;
-import java.io.InputStream;
 
 /**
  * Loader for acoustic material absorption coefficients.

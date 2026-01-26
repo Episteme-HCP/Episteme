@@ -50,6 +50,7 @@ public class Activity implements Named, Commented, Serializable {
     private String goal;
     private List<Activity> subActivities;
     private Set<Behavior> behaviors;
+    private final java.util.Map<String, Object> traits = new java.util.HashMap<>();
 
     /**
      * Creates a new Activity with the specified name.
@@ -83,6 +84,11 @@ public class Activity implements Named, Commented, Serializable {
     @Override
     public void setComments(String comments) {
         this.comments = Objects.requireNonNull(comments, "You can't set a null comment.");
+    }
+
+    @Override
+    public java.util.Map<String, Object> getTraits() {
+        return traits;
     }
 
     /**

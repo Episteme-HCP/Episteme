@@ -24,28 +24,39 @@
 package org.jscience.medicine;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.ComprehensiveIdentification;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.UUIDIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
 /**
  * Common ancestor for all medicine-related troubles (diseases, allergies, etc.).
+ * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 @Persistent
-public class Pathology extends AbstractIdentifiedEntity {
+public class Pathology implements ComprehensiveIdentification {
 
     private static final long serialVersionUID = 2L;
+
+    @Id
+    protected final Identification id;
+
+    @Attribute
+    protected final Map<String, Object> traits = new HashMap<>();
 
     @Relation(type = Relation.Type.ONE_TO_MANY)
     private final Set<Medication> medications = new HashSet<>();
@@ -57,7 +68,7 @@ public class Pathology extends AbstractIdentifiedEntity {
      * @throws NullPointerException if name is null
      */
     public Pathology(String name) {
-        super(new UUIDIdentification(UUID.randomUUID().toString()));
+        this.id = new UUIDIdentification(UUID.randomUUID().toString());
         setName(Objects.requireNonNull(name, "Name cannot be null"));
         if (name.isBlank()) {
             throw new IllegalArgumentException("Name cannot be blank");
@@ -68,8 +79,18 @@ public class Pathology extends AbstractIdentifiedEntity {
      * Internal constructor for subclasses specifying ID.
      */
     protected Pathology(Identification id, String name) {
-        super(id);
+        this.id = Objects.requireNonNull(id, "ID cannot be null");
         setName(name);
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     public String getDescription() {
@@ -103,5 +124,22 @@ public class Pathology extends AbstractIdentifiedEntity {
 
     public void removeMedication(Medication medication) {
         medications.remove(medication);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Pathology pathology)) return false;
+        return Objects.equals(id, pathology.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 }

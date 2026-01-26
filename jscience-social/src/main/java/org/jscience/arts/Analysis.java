@@ -23,7 +23,7 @@
 
 package org.jscience.arts;
 
-import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.history.time.TimeCoordinate;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -43,7 +43,7 @@ public class Analysis implements Serializable {
 
     private final String methodName;
     private final String performer; // Lab or Organization Name
-    private final TemporalCoordinate date;
+    private final TimeCoordinate date;
     private final String result;
     private String comments;
 
@@ -55,7 +55,7 @@ public class Analysis implements Serializable {
      * @param date the date when the analysis was conducted
      * @param result the categorical or numerical result of the examination
      */
-    public Analysis(String methodName, String performer, TemporalCoordinate date, String result) {
+    public Analysis(String methodName, String performer, TimeCoordinate date, String result) {
         this.methodName = Objects.requireNonNull(methodName, "Method name cannot be null");
         this.performer = Objects.requireNonNull(performer, "Performer cannot be null");
         this.date = Objects.requireNonNull(date, "Date cannot be null");
@@ -70,7 +70,7 @@ public class Analysis implements Serializable {
         return performer;
     }
 
-    public TemporalCoordinate getDate() {
+    public TimeCoordinate getDate() {
         return date;
     }
 

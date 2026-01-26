@@ -1,7 +1,7 @@
 package org.jscience.arts;
 
-import org.jscience.history.temporal.TemporalCoordinate;
-import org.jscience.geography.Place;
+import org.jscience.history.time.TimeCoordinate;
+import org.jscience.earth.Place;
 import java.util.Objects;
 
 /**
@@ -22,14 +22,14 @@ public class Picture extends Artwork {
     private double widthCm;
     private double heightCm;
 
-    public Picture(String name, String description, TemporalCoordinate productionDate, 
+    public Picture(String name, String description, TimeCoordinate productionDate, 
                    Place productionPlace, ArtForm category, Medium medium, Support support) {
         super(name, description, productionDate, productionPlace, category);
         this.medium = Objects.requireNonNull(medium, "Medium cannot be null");
         this.support = Objects.requireNonNull(support, "Support cannot be null");
     }
 
-    public Picture(String name, TemporalCoordinate productionDate, Medium medium) {
+    public Picture(String name, TimeCoordinate productionDate, Medium medium) {
         this(name, "", productionDate, null, ArtForm.PAINTING, medium, Support.CANVAS);
     }
 

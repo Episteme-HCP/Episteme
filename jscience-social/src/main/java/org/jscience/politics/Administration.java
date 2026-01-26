@@ -23,16 +23,16 @@
 
 package org.jscience.politics;
 
-import java.io.Serializable;
+
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
-import org.jscience.biology.Human;
+
 import org.jscience.economics.Organization;
 import org.jscience.economics.money.Account;
 import org.jscience.geography.BusinessPlace;
 import org.jscience.util.identity.Identification;
-import org.jscience.util.identity.StringIdentificationFactory;
+import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
@@ -46,7 +46,7 @@ import org.jscience.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Administration extends Organization implements Serializable {
+public class Administration extends Organization {
 
     private static final long serialVersionUID = 1L;
 
@@ -64,12 +64,8 @@ public class Administration extends Organization implements Serializable {
      */
     public Administration(String name, Country country, BusinessPlace place, Set<Account> accounts) {
         super(Objects.requireNonNull(name, "Name cannot be null"),
-            new StringIdentificationFactory().generateIdentification(name),
-            Objects.requireNonNull(country, "Country cannot be null")
-                .getNation().getIndividuals().stream()
-                .filter(Human.class::isInstance)
-                .map(Human.class::cast)
-                .collect(Collectors.toSet()), 
+            new SimpleIdentification(name),
+            Collections.emptySet(), 
             place, accounts);
         this.country = country;
     }
@@ -88,11 +84,7 @@ public class Administration extends Organization implements Serializable {
         Country country, BusinessPlace place, Set<Account> accounts) {
         super(Objects.requireNonNull(name, "Name cannot be null"), 
             Objects.requireNonNull(identification, "Identification cannot be null"), 
-            Objects.requireNonNull(country, "Country cannot be null")
-                .getNation().getIndividuals().stream()
-                .filter(Human.class::isInstance)
-                .map(Human.class::cast)
-                .collect(Collectors.toSet()),
+            Collections.emptySet(),
             place, accounts);
         this.country = country;
     }

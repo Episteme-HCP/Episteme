@@ -24,7 +24,7 @@ import org.jscience.linguistics.loaders.tigerxml.GraphNode;
 import org.jscience.linguistics.loaders.tigerxml.NT;
 import org.jscience.linguistics.loaders.tigerxml.T;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,19 +36,13 @@ import java.util.regex.Pattern;
  * @version 1.84 $Id: Lemma.java,v 1.3 2007-10-23 18:21:43 virtualcall Exp $
  */
 class Lemma {
-    /** DOCUMENT ME! */
-    private String lemma_name;
+    /** The canonical form/name of the lemma. */
+    private final String lemma_name;
 
-    /** DOCUMENT ME! */
-    private ArrayList word_forms;
+    /** Pattern for matching various word forms. */
+    private final Pattern pattern;
 
-    /** DOCUMENT ME! */
-    private Pattern pattern;
-
-    /** DOCUMENT ME! */
-    private Matcher matcher;
-
-/**
+    /**
      * Creates a new lemma instance.
      *
      * @param new_lemma_name  the name of the lemma
@@ -57,14 +51,12 @@ class Lemma {
      * @see java.util.regex.Pattern
      */
     protected Lemma(String new_lemma_name, String word_form_regex) {
-        lemma_name = new_lemma_name;
-        pattern = Pattern.compile(word_form_regex, Pattern.CASE_INSENSITIVE);
+        this.lemma_name = new_lemma_name;
+        this.pattern = Pattern.compile(word_form_regex, Pattern.CASE_INSENSITIVE);
     }
 
     /**
-     * Returns the name of the lemma
-     *
-     * @return DOCUMENT ME!
+     * Returns the name of the lemma.
      */
     protected String getName() {
         return lemma_name;
@@ -72,44 +64,29 @@ class Lemma {
 
     /**
      * Returns true if the word form matches one of the word forms of
-     * this lemma
-     *
-     * @param word_form DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * this lemma.
      */
     protected boolean hasWordForm(String word_form) {
-        matcher = pattern.matcher(word_form);
-
-        return (matcher.matches());
+        if (word_form == null) return false;
+        Matcher matcher = pattern.matcher(word_form);
+        return matcher.matches();
     }
 
     /**
-     * Returns true if this lemma occurs on the surface of the input
-     * node
-     *
-     * @param node DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Returns true if this lemma occurs on the surface of the input node.
      */
     protected boolean occursOnSurface(GraphNode node) {
+        if (node == null) return false;
         if (node.isTerminal()) {
-            String word = ((T) node).getWord();
-
-            return this.hasWordForm(word);
+            return this.hasWordForm(((T) node).getWord());
         } else {
-            ArrayList terminals = ((NT) node).getTerminals();
-
-            for (int i = 0; i < terminals.size(); i++) {
-                T next_terminal = (T) terminals.get(i);
-                String next_word = next_terminal.getWord();
-
-                if (this.hasWordForm(next_word)) {
+            List<T> terminals = ((NT) node).getTerminals();
+            for (T next_terminal : terminals) {
+                if (this.hasWordForm(next_terminal.getWord())) {
                     return true;
                 }
-            } // for i
-
+            }
             return false;
         }
-    } // method matches
+    }
 }

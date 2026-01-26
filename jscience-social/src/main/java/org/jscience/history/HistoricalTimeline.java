@@ -1,6 +1,6 @@
 package org.jscience.history;
 
-import java.io.Serializable;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -17,12 +17,20 @@ import org.jscience.util.persistence.Persistent;
  * @since 1.0
  */
 @Persistent
-public class HistoricalTimeline extends Timeline<HistoricalEvent> implements Serializable {
+public class HistoricalTimeline extends Timeline<HistoricalEvent> {
 
     private static final long serialVersionUID = 2L;
 
     public HistoricalTimeline(String name) {
         super(name);
+    }
+
+    /**
+     * Returns a standard timeline of major world history events.
+     * @return world history timeline
+     */
+    public static HistoricalTimeline worldHistory() {
+        return HistoryConstants.WORLD_HISTORY;
     }
 
     @Override

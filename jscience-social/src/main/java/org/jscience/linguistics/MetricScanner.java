@@ -1,7 +1,7 @@
 package org.jscience.linguistics;
 
 import java.util.*;
-import java.util.regex.*;
+
 
 /**
  * Poetry metric analysis (prosody).

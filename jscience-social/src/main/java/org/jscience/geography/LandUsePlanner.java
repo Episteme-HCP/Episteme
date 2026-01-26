@@ -49,7 +49,7 @@ public final class LandUsePlanner {
      * @return list of recommended zones
      */
     public static List<LandZone> suggestDefaultAllocation(Quantity<Area> totalArea) {
-        double areaVal = totalArea.to(Units.SQUARE_METER).getValue();
+        double areaVal = totalArea.to(Units.SQUARE_METER).getValue().doubleValue();
         
         return List.of(
             new LandZone("RESIDENTIAL", org.jscience.measure.Quantities.create(areaVal * 0.6, Units.SQUARE_METER), 0.7),

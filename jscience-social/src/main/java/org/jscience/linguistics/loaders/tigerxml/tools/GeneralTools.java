@@ -27,260 +27,119 @@ import org.jscience.linguistics.loaders.tigerxml.T;
 import java.util.*;
 
 /**
- * Provides methods that might generally be useful when utilizing
- * the org.jscience.ml.tigerxml. This class is for static use.
+ * Provides methods that might generally be useful when utilizing TigerXML.
  *
  * @author <a href="mailto:oeze@coli.uni-sb.de">Oezguer Demir</a>
  * @author <a href="mailto:hajokeffer@coli.uni-sb.de">Hajo Keffer</a>
  * @version 1.84
- *          $Id: GeneralTools.java,v 1.2 2007-10-21 17:47:09 virtualcall Exp $
  */
-
 public class GeneralTools {
 
     /**
      * Returns the minimum of three integer values.
      */
     protected static int minimum(int a, int b, int c) {
-        int min;
-        min = a;
-        if (b < min) {
-            min = b;
-        }
-        if (c < min) {
-            min = c;
-        }
-        return min;
+        return Math.min(a, Math.min(b, c));
     }
 
     /**
      * This static method accepts a list of <code>GraphNodes</code> and sorts it
      * according to linear precedence.
-     * <p/>
-     * In order to get a sorted copy of an <code>ArrayList<code> of Terminals
-     * use {@link #sortTerminals(ArrayListunsortedTerminals)}
      *
-     * @param unsortedNodes The <code>GraphNode ArrayList</code> to be sorted.
+     * @param unsortedNodes The <code>List</code> of nodes to be sorted.
+     * @return sorted list
      */
-    public static final ArrayList sortNodes(ArrayList unsortedNodes) {
-        // Copy the input list
-        ArrayList sortedNodes = (ArrayList) unsortedNodes.clone();
-        // insert sorting is used because it is
-        // assumed that the list is already
-        // partially ordered
-        for (int sorted = -1; sorted < (sortedNodes.size() - 1); sorted++) {
-            int current_pos = sorted + 1;
-            GraphNode current_item = (GraphNode) sortedNodes.get(current_pos);
-            for (int i = 0; i <= sorted; i++) {
-                GraphNode item_i = (GraphNode) sortedNodes.get(i);
-                if (current_item.before(item_i)) {
-                    //insert current item at i and remove
-                    //it from it previous position
-                    sortedNodes.remove(current_pos);
-                    sortedNodes.add(i, current_item);
-                    break;
-                }
-            } // for i
-        } // for sorted
+    public static <N extends GraphNode> List<N> sortNodes(List<N> unsortedNodes) {
+        if (unsortedNodes == null) return null;
+        List<N> sortedNodes = new ArrayList<>(unsortedNodes);
+        
+        // Use standard Collections.sort with custom comparator using before()
+        sortedNodes.sort((n1, n2) -> {
+            if (n1.before(n2)) return -1;
+            if (n2.before(n1)) return 1;
+            return 0;
+        });
+        
         return sortedNodes;
-    } // method sortNodes
+    }
 
     /**
-     * Sorts a given list of Terminals according to linear precedence. Applies
-     * Insertion Sort by using the position in the sentence as the sort key.
-     * Returns a sorted <code>ArrayList</code> without touching the original
-     * <code>ArrayList</code>.
-     *
-     * @param unsortedTerminals The ArrayList of terminal nodes to be sorted
-     * @return sortedTerminals The sorted version of unsortedTerminals
+     * Sorts a given list of Terminals according to linear precedence.
      */
-    public static final ArrayList sortTerminals(ArrayList unsortedTerminals) {
-        // Make sure that the ArrayList contains nothing but terminals
-        T protoT = new T();
-        for (int i = 0; i < unsortedTerminals.size(); i++) {
-            if (unsortedTerminals.get(i).getClass() != protoT.getClass()) {
-                System.err.println("org.jscience.ml.tigerxml.tools.GeneralTools.sortTerminals"
-                        + "(ArrayList):");
-                System.err.println("\tError: "
-                        + "Applicable to ArrayLists of T objects only.");
-                System.err.println("\tArgument: " + unsortedTerminals);
-                break;
-            }
-        }
-        // Create an empty ArrayList of length this.terminals.size()
-        ArrayList sortedTerminals = new ArrayList(unsortedTerminals.size());
-        // Copy the list to a temp list, sorting it
-        for (int i = 0; i < unsortedTerminals.size(); i++) {
-            T terminal2Insert = (T) unsortedTerminals.get(i);
-            boolean inserted = false;
-            for (int j = 0; j < sortedTerminals.size() - 1; j++) {
-                T currentTerminal = (T) sortedTerminals.get(j);
-                T nextTerminal = (T) sortedTerminals.get(j + 1);
-                if (terminal2Insert.getPosition() < currentTerminal.getPosition()) {
-                    sortedTerminals.add(j, terminal2Insert);
-                    inserted = true;
-                    break;
-                } // if
-                if ((terminal2Insert.getPosition() > currentTerminal.getPosition())
-                        && terminal2Insert.getPosition() < nextTerminal.getPosition()) {
-                    sortedTerminals.add(j + 1, terminal2Insert);
-                    inserted = true;
-                    break;
-                } // if
-            } // for j
-            if (inserted == false) {
-                sortedTerminals.add(terminal2Insert);
-                inserted = true;
-            }
-        } // for i
+    public static List<T> sortTerminals(List<T> unsortedTerminals) {
+        if (unsortedTerminals == null) return null;
+        List<T> sortedTerminals = new ArrayList<>(unsortedTerminals);
+        
+        sortedTerminals.sort(Comparator.comparingInt(T::getPosition));
+        
         return sortedTerminals;
-    } // sortBySentenceOrder()
+    }
 
     /**
-     * Compute the Minumum Edit Distance between two <code>ArrayLists</code>.
-     * The returned integer is the number of operations
-     * (substitution, deletion or insertion) necessary to transform one list to
-     * the other. Note that the objects in the <code>ArrayLists</code> are
-     * treated as identical if and only if they refer to the same object
-     * (<code>listA.get(i)==listB.get(j)</code> has the value <code>true</code>).
-     * <p/>
-     * The Minimum Edit Distance has been used as a measure for similarity
-     * between strings. For a detailed description of the algorithm see:
-     * <p/>
-     * Robert A. Wagner and Michael J. Fischer. 1974.<br>
-     * The string-to-string correction problem.<br>
-     * Journal of the ACM, 21(1):168 173.<br>
-     *
-     * @param listA The first <code>ArrayList</code>.
-     * @param listB The second <code>ArrayList</code>.
-     * @return The minimum number of operations to transform <code>listA</code>
-     *         to <code>listB</code>.
+     * Compute the Minimum Edit Distance between two Lists.
      */
-    public static final int minEditDistance(ArrayList listA, ArrayList listB) {
-        int d[][]; // matrix
-        int n; // length of listA
-        int m; // length of listB
-        int i; // iterates through listA
-        int j; // iterates through listB
-        Object a_i; // ith object of listA
-        Object b_j; // jth object of listB
-        int cost; // cost
-        // Step 1
-        n = listA.size();
-        m = listB.size();
-        if (n == 0) {
-            return m;
-        }
-        if (m == 0) {
-            return n;
-        }
-        d = new int[n + 1][m + 1];
-        // Step 2
-        for (i = 0; i <= n; i++) {
-            d[i][0] = i;
-        }
-        for (j = 0; j <= m; j++) {
-            d[0][j] = j;
-        }
-        // Step 3
-        for (i = 1; i <= n; i++) {
-            a_i = (Object) listA.get(i - 1);
-            // Step 4
-            for (j = 1; j <= m; j++) {
-                b_j = (Object) listB.get(j - 1);
-                // Step 5
-                if (a_i.equals(b_j)) {
-                    cost = 0;
-                } else {
-                    cost = 1;
-                }
-                // Step 6
-                d[i][j] = minimum(d[i - 1][j] + 1, d[i][j - 1] + 1,
-                        d[i - 1][j - 1] + cost);
+    public static int minEditDistance(List<?> listA, List<?> listB) {
+        int n = listA.size();
+        int m = listB.size();
+        if (n == 0) return m;
+        if (m == 0) return n;
+        
+        int[][] d = new int[n + 1][m + 1];
+        
+        for (int i = 0; i <= n; i++) d[i][0] = i;
+        for (int j = 0; j <= m; j++) d[0][j] = j;
+        
+        for (int i = 1; i <= n; i++) {
+            Object a_i = listA.get(i - 1);
+            for (int j = 1; j <= m; j++) {
+                Object b_j = listB.get(j - 1);
+                int cost = a_i.equals(b_j) ? 0 : 1;
+                d[i][j] = minimum(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
             }
         }
-        // Step 7
         return d[n][m];
     }
 
     /**
      * Converts a time value given in ms into minutes and seconds.
-     *
-     * @param time A numerical value (long) representing milliseconds.
-     * @return A string like this: "15m30.110s"
      */
     public static String timeConvert(long time) {
-        double rest;
-        double t = (double) time;
-        long hours = (long) t / 3600000;
-        rest = t - hours * 3600000;
-        long minutes = (long) rest / 60000;
-        rest = rest - minutes * 60000;
-        double seconds = rest / 1000;
+        long hours = time / 3600000;
+        long minutes = (time % 3600000) / 60000;
+        double seconds = (time % 60000) / 1000.0;
         if (hours != 0) {
             return hours + "h" + minutes + "m" + seconds + "s";
         }
         return minutes + "m" + seconds + "s";
-    } // timeConvert()
+    }
 
     /**
      * Generate and return a string with current date and time.
-     *
-     * @return A <code>String</code> containing the current date and time.
      */
-    public static final String getTimeStamp() {
-        GregorianCalendar cal = new GregorianCalendar();
-        String[] weekDays = {
-                "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-        String time = new String(weekDays[cal.get(Calendar.DAY_OF_WEEK) - 1] + " "
-                + cal.get(Calendar.YEAR) + "/"
-                + (cal.get(Calendar.MONTH) + 1) + "/"
-                + cal.get(Calendar.DATE) + " "
-                + cal.get(Calendar.HOUR_OF_DAY) + ":"
-                + cal.get(Calendar.MINUTE) + ":"
-                + cal.get(Calendar.SECOND) + " (+"
-                + cal.get(Calendar.MILLISECOND) + " ms) "
-                + cal.getTimeZone().getDisplayName());
-        return time;
-    } // getTimeStamp()
+    public static String getTimeStamp() {
+        return new Date().toString();
+    }
 
     /**
-     * Converts a <code>Map</code> to a <code>String</code>. Maps can be
-     * AbstractMap, Attributes, HashMap, Hashtable, IdentityHashMap,
-     * RenderingHints, TreeMap or WeakHashMap
-     *
-     * @param map The Map to be printed.
-     * @return The String representing the given Map.
+     * Converts a Map to a String.
      */
-    public static String map2String(Map map) {
+    public static String map2String(Map<?, ?> map) {
         return map2String(map, "");
-    } // map2String()
+    }
 
     /**
-     * Converts a <code>Map</code> to a <code>String</code>. Maps can be
-     * AbstractMap, Attributes, HashMap, Hashtable, IdentityHashMap,
-     * RenderingHints, TreeMap or WeakHashMap. Use <code>prefix</code>
-     * to add a String in front of each line.
-     *
-     * @param map    The Map to be printed.
-     * @param prefix A String preceding each line.
-     * @return The String representing the given Map.
+     * Converts a Map to a String with prefix.
      */
-    public static String map2String(Map map, String prefix) {
-        Iterator iterator = map.keySet().iterator();
-        StringBuffer sb = new StringBuffer();
-        while (iterator.hasNext()) {
-            String key = "";
-            String value = "";
-            key = iterator.next().toString();
-            value = map.get(key).toString();
-            sb.append(prefix);
-            sb.append(key);
-            sb.append(": ");
-            sb.append(value);
-            sb.append("\n"); //todo: use the OS-dependent line-sep.
-        } // while
+    public static String map2String(Map<?, ?> map, String prefix) {
+        if (map == null) return "null";
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            sb.append(prefix)
+              .append(entry.getKey())
+              .append(": ")
+              .append(entry.getValue())
+              .append(System.lineSeparator());
+        }
         return sb.toString();
-    } // map2String()
-
-} // class
+    }
+}

@@ -37,12 +37,13 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.jscience.biology.taxonomy.Species;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.util.Positioned;
-import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.ComprehensiveIdentification;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 import org.jscience.mathematics.numbers.real.Real;
@@ -54,15 +55,22 @@ import org.jscience.mathematics.numbers.real.Real;
  * a base class that can be extended for specific organisms (e.g., Human).
  * Supports multiple reproduction modes including sexual and asexual.
  * </p>
+ * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 @Persistent
-public class Individual extends AbstractIdentifiedEntity implements Positioned<Place> {
+public class Individual implements ComprehensiveIdentification, Positioned<Place> {
 
     private static final long serialVersionUID = 1L;
+
+    @Id
+    protected final Identification id;
+
+    @Attribute
+    protected final Map<String, Object> traits = new HashMap<>();
 
     /** Biological sex of the individual. */
     public enum Sex {
@@ -122,7 +130,7 @@ public class Individual extends AbstractIdentifiedEntity implements Positioned<P
      * @throws NullPointerException if id or species is null
      */
     public Individual(Identification id, Species species, Sex sex, LocalDate birthDate) {
-        super(id);
+        this.id = Objects.requireNonNull(id, "ID cannot be null");
         this.species = Objects.requireNonNull(species, "Species cannot be null");
         this.sex = sex != null ? sex : Sex.UNKNOWN;
         this.birthDate = birthDate;
@@ -148,6 +156,16 @@ public class Individual extends AbstractIdentifiedEntity implements Positioned<P
      */
     public Individual(String id, Species species, Sex sex) {
         this(new SimpleIdentification(id), species, sex, null);
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     /**
@@ -338,6 +356,18 @@ public class Individual extends AbstractIdentifiedEntity implements Positioned<P
      */
     public void setTerritory(Place territory) {
         this.territory = territory;
+    }
+
+    @SuppressWarnings("unchecked")
+    public void addRole(Object role) {
+        if (role != null) {
+            java.util.List<Object> roles = (java.util.List<Object>) getTrait("social_roles");
+            if (roles == null) {
+                roles = new java.util.ArrayList<>();
+                setTrait("social_roles", roles);
+            }
+            roles.add(role);
+        }
     }
 
     /**
@@ -637,5 +667,22 @@ public class Individual extends AbstractIdentifiedEntity implements Positioned<P
         for (Individual parent : current.getParents()) {
             findPaths(parent, target, depth + 1, paths, visited);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Individual individual)) return false;
+        return Objects.equals(id, individual.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s of %s", getName(), species.getScientificName());
     }
 }

@@ -25,7 +25,6 @@ package org.jscience.earth.coordinates;
 
 import org.jscience.util.Positioned;
 import org.jscience.measure.Quantity;
-import org.jscience.measure.quantity.Angle;
 import org.jscience.measure.quantity.Length;
 
 /**

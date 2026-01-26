@@ -51,7 +51,6 @@ public class TBuilder {
             System.err.println("org.jscience.ml.tigerxml.core.TBuilder: Building and adding T "
                     + tElement.getAttribute("id"));
         }
-        t.setTerminal(true);
         t.setPosition(pos);
         ((GraphNode) t).setVerbosity(sent.getVerbosity());
         if (tElement.hasAttribute("id")) {

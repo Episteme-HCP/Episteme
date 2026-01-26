@@ -25,7 +25,6 @@ package org.jscience.mathematics.linearalgebra.matrices;
 
 import org.jscience.mathematics.linearalgebra.Matrix;
 import org.jscience.mathematics.linearalgebra.matrices.storage.*;
-import org.jscience.mathematics.structures.rings.Field;
 import org.jscience.mathematics.structures.rings.Ring;
 import java.util.List;
 import java.util.ArrayList;

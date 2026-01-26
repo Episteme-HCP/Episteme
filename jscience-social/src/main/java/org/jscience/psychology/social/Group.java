@@ -23,16 +23,17 @@
 
 package org.jscience.psychology.social;
 
-import java.io.Serializable;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.jscience.biology.Individual;
+import org.jscience.util.identity.Identification;
 import org.jscience.biology.ecology.Population;
 import org.jscience.biology.taxonomy.Species;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
@@ -47,7 +48,7 @@ import org.jscience.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Group extends Population implements Serializable {
+public class Group extends Population {
 
     private static final long serialVersionUID = 1L;
 
@@ -83,7 +84,11 @@ public class Group extends Population implements Serializable {
      * @throws NullPointerException if any argument is null
      */
     public Group(Species species, Place formalTerritory) {
-        super("Group", species, formalTerritory);
+        this(null, species, formalTerritory);
+    }
+
+    public Group(Identification id, Species species, Place formalTerritory) {
+        super(id, "Group", species, formalTerritory);
         this.leaders = new HashSet<>();
         this.relations = new HashMap<>();
     }

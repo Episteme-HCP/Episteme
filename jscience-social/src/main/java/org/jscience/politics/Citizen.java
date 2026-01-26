@@ -3,7 +3,7 @@ package org.jscience.politics;
 import org.jscience.biology.Individual;
 
 import org.jscience.util.identity.Identification;
-import org.jscience.util.identity.StringIdentificationFactory;
+import org.jscience.util.identity.SimpleIdentification;
 
 import org.jscience.sociology.Role;
 
@@ -46,7 +46,7 @@ public class Citizen extends Role {
               Objects.requireNonNull(situation, "Situation cannot be null"), 
               Role.CLIENT);
         this.nationalities = new HashSet<>();
-        this.identification = new StringIdentificationFactory().generateIdentification("Unset");
+        this.identification = new SimpleIdentification("Unset");
     }
 
     /**

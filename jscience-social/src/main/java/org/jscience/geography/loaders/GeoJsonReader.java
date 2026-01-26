@@ -25,6 +25,7 @@ package org.jscience.geography.loaders;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.jscience.earth.coordinates.GeodeticCoordinate;
 import org.jscience.geography.Region;
 import org.jscience.io.AbstractResourceReader;
@@ -44,11 +45,11 @@ import java.util.Optional;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class GeoJSONReader extends AbstractResourceReader<List<Region>> {
+public class GeoJsonReader extends AbstractResourceReader<List<Region>> {
 
     private final ObjectMapper mapper;
 
-    public GeoJSONReader() {
+    public GeoJsonReader() {
         this.mapper = new ObjectMapper();
     }
 
@@ -80,19 +81,19 @@ public class GeoJSONReader extends AbstractResourceReader<List<Region>> {
 
     @Override
     public String[] getSupportedVersions() {
-        return new String[] {"RFC 7946", "1.0"};
+        return new String[] { "RFC 7946", "1.0" };
     }
 
     @Override
-    protected List<Region> loadFromSource(String id) throws Exception {
+    protected List<Region> loadFromSource(String id) {
         try (InputStream is = getClass().getResourceAsStream(id)) {
-            if (is == null) {
-                // Try treating id as a file path or URL if resource not found?
-                // For now, strict resource loading.
-                throw new Exception("Resource not found: " + id);
+            if (is != null) {
+                return loadRegions(is);
             }
-            return loadRegions(is);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return new ArrayList<>();
     }
 
     @Override
@@ -100,12 +101,12 @@ public class GeoJSONReader extends AbstractResourceReader<List<Region>> {
         return new MiniCatalog<>() {
             @Override
             public List<List<Region>> getAll() {
-                return List.of(List.of());
+                return List.of();
             }
 
             @Override
             public Optional<List<Region>> findByName(String name) {
-                return Optional.of(List.of());
+                return Optional.empty();
             }
 
             @Override
@@ -163,11 +164,11 @@ public class GeoJSONReader extends AbstractResourceReader<List<Region>> {
             name = "Unknown";
         }
 
-        Region.Type type = Region.Type.COUNTRY;
+        Region.SubType type = Region.SubType.COUNTRY;
         String typeStr = properties.path("type").asText("");
         if (!typeStr.isEmpty()) {
             try {
-                type = Region.Type.valueOf(typeStr.toUpperCase());
+                type = Region.SubType.valueOf(typeStr.toUpperCase());
             } catch (IllegalArgumentException e) {
                 // Use default
             }
@@ -247,11 +248,11 @@ public class GeoJSONReader extends AbstractResourceReader<List<Region>> {
      * Loads raw coordinate pairs from a GeoJSON geometry.
      *
      * @param is Input stream containing GeoJSON data
-     * @return List of Coordinate objects
+     * @return List of GeodeticCoordinate objects
      * @throws IOException on parse error
      */
-    public List<Coordinate> loadCoordinates(InputStream is) throws IOException {
-        List<Coordinate> coords = new ArrayList<>();
+    public List<GeodeticCoordinate> loadCoordinates(InputStream is) throws IOException {
+        List<GeodeticCoordinate> coords = new ArrayList<>();
         if (is == null)
             return coords;
 

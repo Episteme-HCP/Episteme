@@ -23,14 +23,14 @@
 
 package org.jscience.politics;
 
-import java.io.Serializable;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import org.jscience.biology.human.Human;
+import org.jscience.sociology.Human;
 import org.jscience.economics.Organization;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.law.Code;
 import org.jscience.law.Constitution;
 import org.jscience.law.Treaty;
@@ -50,7 +50,7 @@ import org.jscience.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Nation extends Tribe implements Serializable {
+public class Nation extends Tribe {
 
     private static final long serialVersionUID = 1L;
 

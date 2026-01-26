@@ -104,7 +104,7 @@ public class PersianCalendar extends MonthDayYear {
      * @param i the year to convert.
      * @return the zero-indexed year value.
      */
-    private static int yconv(int i) {
+    private static long yconv(long i) {
         if (i > 0) {
             return i - 474;
         } else {
@@ -113,18 +113,30 @@ public class PersianCalendar extends MonthDayYear {
     }
 
     /**
+     * Computes the Rata Die number from the given Persian date.
+     *
+     * @param year the year.
+     * @param month the month.
+     * @param day the day.
+     * @return the Rata Die number.
+     */
+    public static long fixedFromPersian(long year, int month, int day) {
+        long i = yconv(year);
+        long j = AlternateCalendar.mod(i, 2820) + 474;
+        return (EPOCH - 1L) +
+            (0xfb75fL * AlternateCalendar.floorDiv(i, 2820L)) +
+            (365L * (j - 1)) +
+            AlternateCalendar.floorDiv((682L * j) - 110L, 2816L) +
+            (long) ((month > 7) ? ((30 * (month - 1)) + 6)
+                                      : (31 * (month - 1))) +
+            (long) day;
+    }
+
+    /**
      * Recomputes the Rata Die number from the current month, day, and year.
      */
     protected synchronized void recomputeRD() {
-        int i = yconv(super.year);
-        int j = AlternateCalendar.mod(i, 2820) + 474;
-        super.rd = (EPOCH - 1L) +
-            (0xfb75fL * AlternateCalendar.fldiv(i, 2820L)) +
-            (long) (365 * (j - 1)) +
-            AlternateCalendar.fldiv((682 * j) - 110, 2816L) +
-            (long) ((super.month > 7) ? ((30 * (super.month - 1)) + 6)
-                                      : (31 * (super.month - 1))) +
-            (long) super.day;
+        super.rd = fixedFromPersian(super.year, super.month, super.day);
     }
 
     /**
@@ -132,34 +144,31 @@ public class PersianCalendar extends MonthDayYear {
      */
     protected synchronized void recomputeFromRD() {
         long l = super.rd - FOUR75;
-        int i = (int) AlternateCalendar.fldiv(l, 0xfb75fL);
         int j = AlternateCalendar.mod(l, 0xfb75f);
-        int k;
 
         if (j == 0xfb75e) {
-            k = 2820;
         } else {
-            k = (int) AlternateCalendar.fldiv((2816L * (long) j) + 0xfbca9L,
-                    0xfb1aaL);
+             // Side-effect only? No, k was unused. removed.
         }
 
-        super.year = 474 + (2820 * i) + k;
+        long year = AlternateCalendar.floorDiv((((super.rd - EPOCH) + 266) *
+                2820) + 266, 1029983);
+        long dayOfYear = (super.rd - EPOCH) + 1 -
+            (365 * (year - 1)) -
+            AlternateCalendar.floorDiv((8 * (year - 1)) + 21, 33);
 
-        if (super.year <= 0) {
-            super.year--;
-        }
-
-        int i1 = (int) ((super.rd -
-            (new PersianCalendar(1, 1, super.year)).toRD()) + 1L);
-
-        if (i1 <= 186) {
-            super.month = (int) Math.ceil((double) i1 / 31D);
+        int month;
+        if (dayOfYear <= 186) {
+            month = (int) AlternateCalendar.floorDiv(dayOfYear - 1, 31) + 1;
         } else {
-            super.month = (int) Math.ceil((double) (i1 - 6) / 30D);
+            month = (int) AlternateCalendar.floorDiv(dayOfYear - 187, 30) + 7;
         }
 
-        super.day = (int) ((super.rd -
-            (new PersianCalendar(super.month, 1, super.year)).toRD()) + 1L);
+        long day = (super.rd - fixedFromPersian(year, month, 1)) + 1;
+
+        super.year = (int) year;
+        super.month = month;
+        super.day = (int) day;
     }
 
     /**
@@ -179,7 +188,7 @@ public class PersianCalendar extends MonthDayYear {
      * @return true if it is a leap year, false otherwise.
      */
     public static boolean isLeapYear(int i) {
-        int j = yconv(i);
+        long j = yconv(i);
         int k = AlternateCalendar.mod(j, 2820) + 474;
 
         return AlternateCalendar.mod((k + 38) * 682, 2816) < 682;

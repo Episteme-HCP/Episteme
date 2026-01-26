@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import org.jscience.mathematics.geometry.boundaries.Boundary;
 
 /**
  * A boundary that changes over time.
@@ -53,9 +54,9 @@ public class TimedBoundary implements Serializable {
         private static final long serialVersionUID = 1L;
         
         private final Instant timestamp;
-        private final Boundary boundary;
+        private final Boundary<?> boundary;
 
-        public BoundaryState(Instant timestamp, Boundary boundary) {
+        public BoundaryState(Instant timestamp, Boundary<?> boundary) {
             this.timestamp = Objects.requireNonNull(timestamp);
             this.boundary = Objects.requireNonNull(boundary);
         }
@@ -64,7 +65,7 @@ public class TimedBoundary implements Serializable {
             return timestamp;
         }
 
-        public Boundary getBoundary() {
+        public Boundary<?> getBoundary() {
             return boundary;
         }
 
@@ -86,7 +87,7 @@ public class TimedBoundary implements Serializable {
      * @param name    the name of the boundary
      * @param initial the initial boundary state
      */
-    public TimedBoundary(String name, Boundary initial) {
+    public TimedBoundary(String name, Boundary<?> initial) {
         this.name = Objects.requireNonNull(name);
         this.states = new ArrayList<>();
         this.states.add(new BoundaryState(Instant.EPOCH, initial));
@@ -110,7 +111,7 @@ public class TimedBoundary implements Serializable {
      * @param timestamp when this boundary becomes active
      * @param boundary  the boundary at this time
      */
-    public void addState(Instant timestamp, Boundary boundary) {
+    public void addState(Instant timestamp, Boundary<?> boundary) {
         states.add(new BoundaryState(timestamp, boundary));
         Collections.sort(states);
     }
@@ -121,8 +122,8 @@ public class TimedBoundary implements Serializable {
      * @param time the time to query
      * @return the boundary at that time
      */
-    public Boundary getAt(Instant time) {
-        Boundary result = null;
+    public Boundary<?> getAt(Instant time) {
+        Boundary<?> result = null;
         for (BoundaryState state : states) {
             if (state.getTimestamp().compareTo(time) <= 0) {
                 result = state.getBoundary();
@@ -139,7 +140,7 @@ public class TimedBoundary implements Serializable {
      * @param epochMillis epoch milliseconds
      * @return the boundary at that time
      */
-    public Boundary getAt(long epochMillis) {
+    public Boundary<?> getAt(long epochMillis) {
         return getAt(Instant.ofEpochMilli(epochMillis));
     }
 
@@ -148,7 +149,7 @@ public class TimedBoundary implements Serializable {
      *
      * @return the most recent boundary
      */
-    public Boundary getCurrent() {
+    public Boundary<?> getCurrent() {
         return getAt(Instant.now());
     }
 

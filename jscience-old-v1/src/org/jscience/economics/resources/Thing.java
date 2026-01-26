@@ -3,7 +3,7 @@ package org.jscience.economics.resources;
 import org.jscience.economics.Community;
 import org.jscience.economics.Resource;
 
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 
 import org.jscience.measure.Amount;
 

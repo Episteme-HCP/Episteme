@@ -61,7 +61,7 @@ public final class CentralPlaceTheory {
      * Calculates the "Range" (service radius) of a good based on threshold area.
      */
     public static Quantity<Length> calculateRange(Quantity<Area> thresholdArea) {
-        double areaVal = thresholdArea.to(Units.SQUARE_METER).getValue();
+        double areaVal = thresholdArea.to(Units.SQUARE_METER).getValue().doubleValue();
         double radiusMeters = Math.sqrt(areaVal / Math.PI);
         return Quantities.create(radiusMeters, Units.METER);
     }

@@ -80,16 +80,13 @@ public class Barter implements Serializable {
      * Executes the exchange, updating both agents' belongings.
      */
     public void execute() {
-        Set<Resource> newBelongings1 = new HashSet<>(agent1.getBelongings());
-        Set<Resource> newBelongings2 = new HashSet<>(agent2.getBelongings());
-
-        newBelongings1.removeAll(resources1);
-        newBelongings1.addAll(resources2);
-
-        newBelongings2.removeAll(resources2);
-        newBelongings2.addAll(resources1);
-
-        agent1.setBelongings(newBelongings1);
-        agent2.setBelongings(newBelongings2);
+        for (Resource r : resources1) {
+            agent1.removeBelonging(r);
+            agent2.addBelonging(r);
+        }
+        for (Resource r : resources2) {
+            agent2.removeBelonging(r);
+            agent1.addBelonging(r);
+        }
     }
 }

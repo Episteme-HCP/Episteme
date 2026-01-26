@@ -20,35 +20,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package org.jscience.economics.resources;
 
 import java.time.Instant;
-import javax.media.j3d.Group;
 import org.jscience.economics.Community;
 import org.jscience.economics.MaterialResource;
 import org.jscience.economics.money.Money;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.measure.Quantity;
 import org.jscience.util.identity.Identification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
 
 /**
  * Represents a resource created by human craftsmanship (an artifact).
- * Artifacts have a specific purpose and can be represented in 3D through a J3D Group.
+ * Artifacts are the result of human craftsmanship and have a specific purpose.
+ * They can be represented in 3D through a J3D Group.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
- * @since 1.0
+ * @version 1.2
  */
+@Persistent
 public class Artifact extends MaterialResource {
 
     private static final long serialVersionUID = 1L;
 
-    /** 3D geometry representation. */
-    private Group group;
-
     /** Functional state of the artifact. */
+    @Attribute
     private boolean broken;
 
     /**
@@ -59,22 +58,6 @@ public class Artifact extends MaterialResource {
             Identification identification, Money value) {
         super(name, description, amount, producer, productionPlace, productionDate, identification, value);
         this.broken = false;
-    }
-
-    /**
-     * Returns the 3D geometry group.
-     * @return the J3D group, or null if not set
-     */
-    public Group getGroup() {
-        return group;
-    }
-
-    /**
-     * Sets the 3D geometry group.
-     * @param group the J3D group
-     */
-    public void setGroup(Group group) {
-        this.group = group;
     }
 
     /**

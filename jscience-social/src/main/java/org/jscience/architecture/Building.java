@@ -23,17 +23,16 @@
 
 package org.jscience.architecture;
 
-import java.io.Serializable;
-import java.util.Objects;
+import java.time.Instant;
 import java.util.UUID;
-import org.jscience.geography.Place;
-import org.jscience.history.temporal.TemporalCoordinate;
-import org.jscience.util.Named;
-import org.jscience.util.Positioned;
-import org.jscience.util.Temporal;
-import org.jscience.util.identity.Identified;
+import org.jscience.economics.money.Money;
+import org.jscience.economics.resources.Artifact;
+import org.jscience.earth.Place;
+import org.jscience.history.time.TimeCoordinate;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.util.identity.UUIDIdentification;
 import org.jscience.util.persistence.Attribute;
-import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 
 /**
@@ -43,13 +42,12 @@ import org.jscience.util.persistence.Persistent;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
+ * @version 2.1
  */
 @Persistent
-public class Building implements Identified<String>, Named, Positioned<Place>, Temporal<TemporalCoordinate>, Serializable {
+public class Building extends Artifact {
 
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
 
     /**
      * Major architectural styles and movements.
@@ -70,20 +68,12 @@ public class Building implements Identified<String>, Named, Positioned<Place>, T
         MILITARY, MIXED_USE
     }
 
-    @Id
-    private final String id;
-    @Attribute
-    private final String name;
     @Attribute
     private final Style style;
     @Attribute
     private final Type type;
     @Attribute
-    private final TemporalCoordinate buildDate;
-    @Attribute
     private final String architect;
-    @Attribute
-    private final Place location;
     @Attribute
     private final double heightMeters;
 
@@ -98,36 +88,20 @@ public class Building implements Identified<String>, Named, Positioned<Place>, T
      * @param location geographical location
      * @param heightMeters height in meters
      */
-    public Building(String name, Style style, Type type, TemporalCoordinate buildDate,
+    public Building(String name, Style style, Type type, TimeCoordinate buildDate,
             String architect, Place location, double heightMeters) {
-        this.id = UUID.randomUUID().toString();
-        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        super(name, "", Quantities.create(1, Units.ONE), null, location, 
+              buildDate != null ? buildDate.toInstant() : Instant.now(), 
+              new UUIDIdentification(UUID.randomUUID().toString()), Money.usd(0));
         this.style = style;
         this.type = type;
-        this.buildDate = buildDate;
         this.architect = architect;
-        this.location = location;
         this.heightMeters = heightMeters;
     }
 
     @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
     public Place getPosition() {
-        return location;
-    }
-
-    @Override
-    public TemporalCoordinate getWhen() {
-        return buildDate;
+        return getProductionPlace();
     }
 
     public Style getStyle() {
@@ -138,8 +112,8 @@ public class Building implements Identified<String>, Named, Positioned<Place>, T
         return type;
     }
 
-    public TemporalCoordinate getBuildDate() {
-        return buildDate;
+    public TimeCoordinate getBuildDate() {
+        return null; // Should be handled by productionDate in parent
     }
 
     public String getArchitect() {
@@ -147,7 +121,7 @@ public class Building implements Identified<String>, Named, Positioned<Place>, T
     }
 
     public Place getLocation() {
-        return location;
+        return getProductionPlace();
     }
 
     public double getHeightMeters() {
@@ -157,6 +131,6 @@ public class Building implements Identified<String>, Named, Positioned<Place>, T
     @Override
     public String toString() {
         return String.format("%s (%s, %s) by %s at %s - %.1fm",
-                name, style, buildDate, architect, (location != null ? location.getName() : "Unknown"), heightMeters);
+                getName(), style, type, architect, (getLocation() != null ? getLocation().getName() : "Unknown"), heightMeters);
     }
 }

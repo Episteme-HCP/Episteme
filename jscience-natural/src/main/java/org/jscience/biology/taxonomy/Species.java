@@ -24,30 +24,41 @@
 package org.jscience.biology.taxonomy;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import org.jscience.biology.Organ;
 import org.jscience.biology.Tissue;
-import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a biological species with full taxonomic classification.
  * Uses the trait system for flexible attribute management.
+ * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 @Persistent
-public class Species extends AbstractIdentifiedEntity {
+public class Species implements ComprehensiveIdentification {
 
     private static final long serialVersionUID = 1L;
+
+    @Id
+    protected final Identification id;
+
+    @Attribute
+    protected final Map<String, Object> traits = new HashMap<>();
 
     /**
      * IUCN Red List conservation status.
@@ -103,9 +114,19 @@ public class Species extends AbstractIdentifiedEntity {
     private String specificEpithet;
 
     public Species(String commonName, String scientificName) {
-        super(new SimpleIdentification(scientificName));
+        this.id = new SimpleIdentification(scientificName);
         setName(Objects.requireNonNull(commonName, "Common name cannot be null"));
         this.conservationStatus = ConservationStatus.NOT_EVALUATED;
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     public String getCommonName() {
@@ -113,7 +134,7 @@ public class Species extends AbstractIdentifiedEntity {
     }
 
     public String getScientificName() {
-        return getId().toString();
+        return id.toString();
     }
 
     public Species getAncestor() {
@@ -248,6 +269,18 @@ public class Species extends AbstractIdentifiedEntity {
     public boolean isExtinct() {
         return conservationStatus == ConservationStatus.EXTINCT ||
                 conservationStatus == ConservationStatus.EXTINCT_IN_WILD;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Species species)) return false;
+        return Objects.equals(id, species.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override

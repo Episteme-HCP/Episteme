@@ -1,6 +1,6 @@
 package org.jscience.earth.weather;
 
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 
 import org.jscience.util.Positioned;
 

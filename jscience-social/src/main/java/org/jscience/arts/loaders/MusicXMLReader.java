@@ -24,11 +24,11 @@
 package org.jscience.arts.loaders;
 
 import org.jscience.arts.music.*;
+import org.jscience.history.time.TimePoint;
 import java.io.*;
-import java.util.*;
-import javax.xml.parsers.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
-import java.time.Instant;
 
 /**
  * Advanced reader for MusicXML files.
@@ -65,7 +65,7 @@ public class MusicXMLReader extends CompositionLoader {
         String title = extractMetadata(root, "work-title", id);
         String composer = extractMetadata(root, "creator", "Unknown");
 
-        Composition composition = new Composition(title, "Composer: " + composer, Instant.now(), null);
+        Composition composition = new Composition(title, "Composer: " + composer, TimePoint.now(), null);
 
         // Map parts to tracks
         NodeList parts = root.getElementsByTagName("part");

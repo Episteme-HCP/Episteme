@@ -37,6 +37,7 @@ public class GBIFReader extends AbstractResourceReader<List<GBIFReader.GbifSpeci
         return "https://api.gbif.org/v1/";
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public Class<List<GbifSpecies>> getResourceType() { 
         return (Class) List.class; 

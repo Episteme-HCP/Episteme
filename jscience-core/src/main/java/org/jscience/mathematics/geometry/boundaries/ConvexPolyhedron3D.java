@@ -28,6 +28,7 @@ import org.jscience.mathematics.geometry.Point3D;
 import org.jscience.mathematics.geometry.Vector3D;
 import org.jscience.mathematics.numbers.real.Real;
 
+import org.jscience.mathematics.geometry.ConvexHull2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -391,25 +392,73 @@ public class ConvexPolyhedron3D implements Boundary3D {
 
     @Override
     public Boundary3D rotateX(Real angleRadians) {
-        // TODO: Implement rotation
-        throw new UnsupportedOperationException("Rotation not yet implemented");
+        return rotateAround(new Vector3D(Real.ONE, Real.ZERO, Real.ZERO), angleRadians);
     }
 
     @Override
     public Boundary3D rotateY(Real angleRadians) {
-        throw new UnsupportedOperationException("Rotation not yet implemented");
+        return rotateAround(new Vector3D(Real.ZERO, Real.ONE, Real.ZERO), angleRadians);
     }
 
     @Override
     public Boundary3D rotateZ(Real angleRadians) {
-        throw new UnsupportedOperationException("Rotation not yet implemented");
+        return rotateAround(new Vector3D(Real.ZERO, Real.ZERO, Real.ONE), angleRadians);
     }
 
     @Override
     public Boundary3D rotateAround(Vector3D axis, Real angleRadians) {
-        throw new UnsupportedOperationException("Rotation not yet implemented");
+        Vector3D k = axis.normalize();
+        double theta = angleRadians.doubleValue();
+        double cos = Math.cos(theta);
+        double sin = Math.sin(theta);
+        
+        List<TriangularFace> newFaces = new ArrayList<>();
+        Point3D center = getCentroid();
+        
+        for (TriangularFace f : faces) {
+            List<Point3D> verts = f.getVertices();
+            newFaces.add(new TriangularFace(
+                rotatePoint(verts.get(0), center, k, cos, sin),
+                rotatePoint(verts.get(1), center, k, cos, sin),
+                rotatePoint(verts.get(2), center, k, cos, sin)
+            ));
+        }
+        return new ConvexPolyhedron3D(newFaces);
     }
 
+    private Point3D rotatePoint(Point3D p, Point3D center, Vector3D k, double cos, double sin) {
+        // Translate to origin
+        Vector3D v = p.subtract(center);
+        
+        // Rodrigues' rotation formula
+        // v_rot = v * cos + (k x v) * sin + k * (k . v) * (1 - cos)
+        Vector3D kCrossV = k.cross(v);
+        Real kDotV = k.dot(v);
+        
+        double vx = v.getX();
+        double vy = v.getY();
+        double vz = v.getZ();
+        
+        double kx = k.getX();
+        double ky = k.getY();
+        double kz = k.getZ();
+        double kDotVVal = kDotV.doubleValue();
+        double kCrossVx = kCrossV.getX();
+        double kCrossVy = kCrossV.getY();
+        double kCrossVz = kCrossV.getZ();
+
+        double rx = vx * cos + kCrossVx * sin + kx * kDotVVal * (1 - cos);
+        double ry = vy * cos + kCrossVy * sin + ky * kDotVVal * (1 - cos);
+        double rz = vz * cos + kCrossVz * sin + kz * kDotVVal * (1 - cos);
+        
+        // Translate back
+        return Point3D.of(
+            center.getX().add(Real.of(rx)),
+            center.getY().add(Real.of(ry)),
+            center.getZ().add(Real.of(rz))
+        );
+    }
+    
     @Override
     public Boundary2D projectXY() {
         List<Point2D> projected = new ArrayList<>();
@@ -439,8 +488,82 @@ public class ConvexPolyhedron3D implements Boundary3D {
 
     @Override
     public Boundary2D slice(Vector3D planeNormal, Point3D pointOnPlane) {
-        // TODO: Implement plane slicing
-        throw new UnsupportedOperationException("Slicing not yet implemented");
+        Vector3D normal = planeNormal.normalize();
+        List<Point3D> intersectionPoints = new ArrayList<>();
+        
+        // Find intersection of edges with the plane
+        // An edge is defined by two vertices of a face.
+        // We iterate unique edges from faces.
+        // Simple approach: Check all pairs in faces (inefficient but safe for now)
+        
+        for (TriangularFace f : faces) {
+            List<Point3D> v = f.getVertices();
+            checkEdgeIntersection(v.get(0), v.get(1), normal, pointOnPlane, intersectionPoints);
+            checkEdgeIntersection(v.get(1), v.get(2), normal, pointOnPlane, intersectionPoints);
+            checkEdgeIntersection(v.get(2), v.get(0), normal, pointOnPlane, intersectionPoints);
+        }
+        
+        if (intersectionPoints.size() < 3) return new ConvexPolygon2D(new ArrayList<>());
+        
+        // Project 3D points to 2D
+        // Create a basis for the plane
+        // Z' = normal
+        // X' = arbitrary vector orthogonal to normal
+        // Y' = Z' cross X'
+        
+        Vector3D arbitrary = Math.abs(normal.getX()) < 0.9 ? 
+            new Vector3D(Real.ONE, Real.ZERO, Real.ZERO) : 
+            new Vector3D(Real.ZERO, Real.ONE, Real.ZERO);
+
+        Vector3D basisX = normal.cross(arbitrary).normalize();
+        Vector3D basisY = normal.cross(basisX).normalize();
+        
+        List<Point2D> projected = new ArrayList<>();
+        Point3D origin = intersectionPoints.get(0); // Use first point as local origin to keep numbers small
+        
+        for (Point3D p : intersectionPoints) {
+            Vector3D diff = p.subtract(origin);
+            projected.add(Point2D.of(diff.dot(basisX), diff.dot(basisY)));
+        }
+        
+        // ConvexHull2D to order vertices correctly
+        return ConvexHull2D.computePolygon(projected);
+    }
+
+    private void checkEdgeIntersection(Point3D a, Point3D b, Vector3D normal, Point3D p0, List<Point3D> points) {
+        Real distA = a.subtract(p0).dot(normal);
+        Real distB = b.subtract(p0).dot(normal);
+        
+        // Check if signs are different (one pos, one neg) -> intersection
+        if ((distA.compareTo(Real.ZERO) > 0) != (distB.compareTo(Real.ZERO) > 0)) {
+            Real diff = distB.subtract(distA);
+            if (!diff.isZero()) {
+                Real t = distA.negate().divide(diff);
+                double tVal = t.doubleValue();
+                
+                double abX = b.getX().doubleValue() - a.getX().doubleValue();
+                double abY = b.getY().doubleValue() - a.getY().doubleValue();
+                double abZ = b.getZ().doubleValue() - a.getZ().doubleValue();
+
+                Point3D intersection = Point3D.of(
+                    Real.of(a.getX().doubleValue() + abX * tVal),
+                    Real.of(a.getY().doubleValue() + abY * tVal),
+                    Real.of(a.getZ().doubleValue() + abZ * tVal)
+                );
+                
+                // Avoid duplicates
+                boolean duplicate = false;
+                for (Point3D existing : points) {
+                    if (existing.distanceTo(intersection).compareTo(Real.of(1e-9)) < 0) {
+                        duplicate = true;
+                        break;
+                    }
+                }
+                if (!duplicate) {
+                    points.add(intersection);
+                }
+            }
+        }
     }
 
     @Override

@@ -31,7 +31,6 @@ import org.jscience.ComputeContext;
 
 import org.jscience.mathematics.linearalgebra.Matrix;
 import org.jscience.mathematics.linearalgebra.Vector;
-import org.jscience.mathematics.structures.rings.Field;
 import org.jscience.mathematics.structures.rings.Ring;
 
 import java.util.List;

@@ -299,5 +299,14 @@ public abstract class Integer extends Number implements Ring<Integer>, Comparabl
     public Integer one() {
         return ONE;
     }
+
+    /**
+     * Returns the rational number equivalent to this integer.
+     * 
+     * @return the rational instance
+     */
+    public org.jscience.mathematics.numbers.rationals.Rational toRational() {
+        return org.jscience.mathematics.numbers.rationals.Rational.of(this, ONE);
+    }
 }
 

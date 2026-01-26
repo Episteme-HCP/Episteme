@@ -242,6 +242,41 @@ public final class Rational extends Number implements Comparable<Rational>, Fiel
     public Rational abs() {
         return (numerator.signum() < 0) ? negate() : this;
     }
+
+    public Integer floor() {
+        if (numerator.signum() >= 0) {
+            return numerator.divide(denominator);
+        } else {
+            Integer quotient = numerator.divide(denominator);
+            if (numerator.remainder(denominator).isZero()) {
+                return quotient;
+            } else {
+                return quotient.subtract(Integer.ONE);
+            }
+        }
+    }
+
+    public Integer ceil() {
+        if (numerator.signum() > 0) {
+            Integer quotient = numerator.divide(denominator);
+            if (numerator.remainder(denominator).isZero()) {
+                return quotient;
+            } else {
+                return quotient.add(Integer.ONE);
+            }
+        } else {
+            return numerator.divide(denominator);
+        }
+    }
+
+    public Rational fractionalPart() {
+        return this.subtract(Rational.of(this.floor(), Integer.ONE));
+    }
+
+    public Rational mod(Rational m) {
+        // x mod m = x - m * floor(x/m)
+        return this.subtract(m.multiply(Rational.of(this.divide(m).floor(), Integer.ONE)));
+    }
 }
 
 

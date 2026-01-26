@@ -4,7 +4,7 @@ import org.jscience.economics.Community;
 import org.jscience.economics.MaterialResource;
 import org.jscience.economics.money.Money;
 
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 
 import org.jscience.measure.Amount;
 import org.jscience.measure.Identification;

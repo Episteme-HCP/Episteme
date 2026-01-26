@@ -23,6 +23,7 @@
 
 package org.jscience.geography;
 
+import org.jscience.earth.Place;
 import org.jscience.earth.coordinates.EarthCoordinate;
 import org.jscience.politics.Country;
 import org.jscience.util.Named;
@@ -62,6 +63,9 @@ public class Address implements Named, Positioned<EarthCoordinate>, Serializable
     @Attribute
     private String city;
 
+    @Relation(type = Relation.Type.MANY_TO_ONE)
+    private org.jscience.politics.City cityObject;
+
     @Attribute
     private String stateProvince;
 
@@ -86,6 +90,12 @@ public class Address implements Named, Positioned<EarthCoordinate>, Serializable
         this.city = city;
         this.postalCode = postalCode;
         this.country = country;
+    }
+
+    /** Legacy constructor. */
+    public Address(String street, org.jscience.politics.City city, String zipCode) {
+        this("", street, city.getName(), zipCode, city.getCountry());
+        this.cityObject = city;
     }
 
     @Override

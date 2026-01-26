@@ -4,7 +4,7 @@ import org.jscience.biology.Individual;
 import org.jscience.biology.Population;
 import org.jscience.biology.Species;
 
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 
 import java.util.*;
 

@@ -9,7 +9,7 @@ import org.jscience.ui.NumericParameter;
 import org.jscience.ui.Parameter;
 import org.jscience.economics.PortfolioData;
 import org.jscience.economics.money.Money;
-import org.jscience.economics.money.Currency;
+
 
 import java.util.*;
 
@@ -24,11 +24,12 @@ public final class FinancialPortfolioViewer extends AbstractViewer {
     private final LineChart<Number, Number> performanceChart;
     private final PieChart allocationChart = new PieChart();
 
+    @SuppressWarnings("unused")
     private double refreshRate = 1.0; // Seconds
 
     public FinancialPortfolioViewer() {
         // Setup UI
-        VBox sidebar = createSidebar();
+        createSidebar();
         performanceChart = createPerformanceChart();
         setupHoldingsTable();
 

@@ -31,7 +31,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.jscience.history.HistoricalEvent;
 import org.jscience.history.HistoricalTimeline;
-import org.jscience.history.FuzzyDate;
+import org.jscience.history.time.TimeCoordinate;
+import org.jscience.history.time.FuzzyTimePoint;
+import org.jscience.history.time.Era;
 
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.ui.RealParameter;
@@ -55,7 +57,7 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
     private HistoricalTimeline timeline;
     private final Canvas canvas;
     private boolean logScale = false;
-    private Real currentYearHighlight = Real.of(2025); // Default "Now"
+    private Real currentYearHighlight = Real.of(2026); // Default "Now"
     
     // Bounds
     private Real minYear = Real.of(-10000);
@@ -103,10 +105,14 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
         }
     }
     
-    private Real getYearValue(FuzzyDate date) {
-        if (date == null || date.getYear() == null) return Real.ZERO;
+    private Real getYearValue(TimeCoordinate coordinate) {
+        if (!(coordinate instanceof FuzzyTimePoint date)) {
+            // Fallback for simple time points
+            return Real.of(coordinate.toInstant().atZone(java.time.ZoneOffset.UTC).getYear());
+        }
+        if (date.getYear() == null) return Real.ZERO;
         double val = date.getYear().doubleValue();
-        if (date.isBce()) val = -val;
+        if (date.getEra() == Era.BCE) val = -val;
         return Real.of(val);
     }
 
@@ -140,7 +146,7 @@ public class TimelineViewer extends BorderPane implements org.jscience.ui.Viewer
         // Pre-calc log parameters
         Real logMin = Real.ZERO;
         Real logMax = Real.ZERO;
-        Real present = Real.of(2025);
+        Real present = Real.of(2026);
         
         if (logScale) {
              Real oldest = minYear;

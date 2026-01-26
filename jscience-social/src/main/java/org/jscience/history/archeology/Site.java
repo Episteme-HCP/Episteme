@@ -1,13 +1,13 @@
 package org.jscience.history.archeology;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import org.jscience.geography.Boundary;
-import org.jscience.geography.Place;
-import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.mathematics.geometry.boundaries.Boundary;
+import org.jscience.earth.coordinates.EarthCoordinate;
+import org.jscience.earth.Place;
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
@@ -21,25 +21,37 @@ import org.jscience.util.persistence.Relation;
  * @since 2.0
  */
 @Persistent
-public class Site extends Place implements Serializable {
+public class Site extends Place {
 
     private static final long serialVersionUID = 2L;
 
     @Relation(type = Relation.Type.ONE_TO_ONE)
-    private final TemporalCoordinate excavationStartDate;
+    private final TimeCoordinate excavationStartDate;
 
     @Attribute
     private String description = "";
 
+    @Relation(type = Relation.Type.ONE_TO_ONE)
+    private Boundary<EarthCoordinate> limits;
+
     @Relation(type = Relation.Type.ONE_TO_MANY)
     private final Set<Item> discoveredItems = new HashSet<>();
 
-    public Site(String name, TemporalCoordinate excavationStartDate, Boundary limits) {
-        super(name, limits);
+    public Site(String name, TimeCoordinate excavationStartDate, Boundary<EarthCoordinate> limits) {
+        super(name, Type.NATURAL_FEATURE);
+        this.limits = limits;
         this.excavationStartDate = Objects.requireNonNull(excavationStartDate, "Start date cannot be null");
     }
 
-    public TemporalCoordinate getExcavationStartDate() {
+    public Boundary<EarthCoordinate> getLimits() {
+        return limits;
+    }
+
+    public void setLimits(Boundary<EarthCoordinate> limits) {
+        this.limits = limits;
+    }
+
+    public TimeCoordinate getExcavationStartDate() {
         return excavationStartDate;
     }
 

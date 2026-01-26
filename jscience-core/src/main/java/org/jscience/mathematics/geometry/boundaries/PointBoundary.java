@@ -27,7 +27,6 @@ import org.jscience.mathematics.geometry.Point2D;
 import org.jscience.mathematics.geometry.Point3D;
 import org.jscience.mathematics.numbers.real.Real;
 
-import java.util.List;
 import java.util.Objects;
 
 /**

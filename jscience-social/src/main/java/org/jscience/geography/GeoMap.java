@@ -24,6 +24,7 @@
 package org.jscience.geography;
 
 import org.jscience.earth.coordinates.GeodeticCoordinate;
+import org.jscience.earth.Place;
 import org.jscience.util.Named;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
@@ -34,6 +35,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.awt.Image;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a logical map of a geographical area, containing places and paths.
@@ -58,12 +62,6 @@ public class GeoMap implements Named, Serializable {
 
     @Attribute
     private String description;
-
-import java.awt.Image;
-import java.util.ArrayList;
-import java.util.List;
-
-// ...
 
     @Relation(type = Relation.Type.ONE_TO_MANY)
     private final List<Image> layers = new ArrayList<>();

@@ -30,7 +30,7 @@ import org.jscience.architecture.lift.LiftBuilding;
 import org.jscience.architecture.lift.Elevator;
 import org.jscience.architecture.traffic.Road;
 import org.jscience.architecture.traffic.Vehicle;
-import org.jscience.geography.Coordinate;
+import org.jscience.earth.coordinates.GeodeticCoordinate;
 import org.jscience.mathematics.numbers.real.Real;
 
 import java.util.Arrays;
@@ -58,8 +58,8 @@ public class ArchitectureRestorationTest {
 
     @Test
     public void testTrafficSimulation() {
-        Coordinate start = new Coordinate(40.7128, -74.0060); // NYC
-        Coordinate end = new Coordinate(40.7306, -73.9352);
+        GeodeticCoordinate start = new GeodeticCoordinate(40.7128, -74.0060); // NYC
+        GeodeticCoordinate end = new GeodeticCoordinate(40.7306, -73.9352);
 
         Road broadway = new Road("Broadway", Arrays.asList(start, end), 13.8, 4); // 50km/h ~= 13.8m/s
 

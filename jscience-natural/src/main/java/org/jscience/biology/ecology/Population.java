@@ -28,11 +28,13 @@ import java.util.function.Predicate;
 
 import org.jscience.biology.Individual;
 import org.jscience.biology.taxonomy.Species;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.util.Positioned;
-import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.UUIDIdentification;
 import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
@@ -42,15 +44,22 @@ import org.jscience.util.persistence.Relation;
  * Provides population-level analysis: demographics, statistics, growth
  * modeling.
  * </p>
+ * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 @Persistent
-public class Population extends AbstractIdentifiedEntity implements Positioned<Place> {
+public class Population implements ComprehensiveIdentification, Positioned<Place> {
 
     private static final long serialVersionUID = 1L;
+
+    @Id
+    protected final Identification id;
+
+    @Attribute
+    protected final Map<String, Object> traits = new HashMap<>();
 
     @Attribute
     private final Species species;
@@ -62,7 +71,11 @@ public class Population extends AbstractIdentifiedEntity implements Positioned<P
     private Place territory;
 
     public Population(String name, Species species, Place territory) {
-        super(new UUIDIdentification(UUID.randomUUID().toString()));
+        this(new UUIDIdentification(UUID.randomUUID().toString()), name, species, territory);
+    }
+
+    public Population(Identification id, String name, Species species, Place territory) {
+        this.id = Objects.requireNonNull(id, "ID cannot be null");
         setName(name);
         this.species = Objects.requireNonNull(species, "Species cannot be null");
         this.territory = territory;
@@ -70,6 +83,16 @@ public class Population extends AbstractIdentifiedEntity implements Positioned<P
 
     public Population(Species species) {
         this("Unnamed Population", species, null);
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     public Species getSpecies() {
@@ -206,6 +229,18 @@ public class Population extends AbstractIdentifiedEntity implements Positioned<P
 
     public List<Individual> filter(Predicate<Individual> predicate) {
         return members.stream().filter(predicate).toList();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Population population)) return false;
+        return Objects.equals(id, population.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override

@@ -23,12 +23,17 @@
 package org.jscience.economics;
 
 import org.jscience.measure.Quantity;
-import org.jscience.util.Named;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.UUIDIdentification;
 import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 
-import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A class representing a potential or virtual resource, such as oil in the soil 
@@ -37,18 +42,22 @@ import java.util.Objects;
  * <p>Resources can be people, equipment, facilities, funding, or anything else 
  * capable of definition (usually other than labour) required for the completion 
  * of a project activity.</p>
+ * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.2
+ * @version 1.3
  */
 @Persistent
-public class PotentialResource implements Named, Serializable {
+public class PotentialResource implements ComprehensiveIdentification {
 
     private static final long serialVersionUID = 1L;
 
+    @Id
+    protected final Identification id;
+
     @Attribute
-    private String name;
+    protected final Map<String, Object> traits = new HashMap<>();
 
     @Attribute
     private String description;
@@ -70,7 +79,15 @@ public class PotentialResource implements Named, Serializable {
      * @param amount      the quantity, not null.
      */
     public PotentialResource(String name, String description, Quantity<?> amount) {
-        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        this(new UUIDIdentification(UUID.randomUUID().toString()), name, description, amount);
+    }
+
+    /**
+     * Creates a new PotentialResource with a specific identification.
+     */
+    public PotentialResource(Identification id, String name, String description, Quantity<?> amount) {
+        this.id = Objects.requireNonNull(id, "ID cannot be null");
+        setName(Objects.requireNonNull(name, "Name cannot be null"));
         if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
         
         this.description = Objects.requireNonNull(description, "Description cannot be null");
@@ -81,12 +98,21 @@ public class PotentialResource implements Named, Serializable {
     }
 
     @Override
-    public String getName() {
-        return name;
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = Objects.requireNonNull(description);
     }
 
     public Quantity<?> getAmount() {
@@ -118,15 +144,16 @@ public class PotentialResource implements Named, Serializable {
         if (this == o) return true;
         if (!(o instanceof PotentialResource)) return false;
         PotentialResource that = (PotentialResource) o;
-        return Double.compare(that.decayTime, decayTime) == 0 &&
-                kind == that.kind &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(description, that.description) &&
-                Objects.equals(amount, that.amount);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, amount, decayTime, kind);
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 }

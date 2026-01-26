@@ -38,6 +38,7 @@ import java.util.Objects;
  * @since 1.0
  */
 @Persistent
+@SuppressWarnings("rawtypes")
 public class HumanTimeline extends Timeline {
 
     private static final long serialVersionUID = 1L;

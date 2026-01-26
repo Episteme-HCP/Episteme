@@ -139,7 +139,7 @@ public class CMLBaseImpl extends PMRElementImpl implements AbstractBase {
      * @param elementName
      * @return if no children an empty vector (not null) is returned
      */
-    public Vector getChildVector(String elementName) {
+    public Vector<Element> getChildVector(String elementName) {
         return PMRDOMUtils.getChildrenWithElementName(this, elementName);
     }
 
@@ -150,10 +150,10 @@ public class CMLBaseImpl extends PMRElementImpl implements AbstractBase {
      * @return returns a zero length list if none found
      */
     public Element[] getChildList(String elementName) {
-        Vector v = this.getChildVector(elementName);
+        Vector<Element> v = this.getChildVector(elementName);
         Element[] vv = new Element[v.size()];
         for (int i = 0; i < vv.length; i++) {
-            vv[i] = (Element) v.elementAt(i);
+            vv[i] = v.elementAt(i);
         }
         return vv;
     }
@@ -224,13 +224,11 @@ public class CMLBaseImpl extends PMRElementImpl implements AbstractBase {
     public void removeTextChildren() throws CMLException {
         NodeList children = this.getChildNodes();
         int nchild = children.getLength();
-        int ntext = 0;
         for (int j = nchild - 1; j >= 0; j--) {   // convert to double minus
             Node cc = children.item(j);
             if (cc instanceof Text) {
                 if (cc.getNodeValue().trim().equals("")) {
                     this.removeChild(cc);
-                    ntext++;
                 } else {
                     throw new CMLException("" + this.getClass() + " may not have text children");
                 }
@@ -594,11 +592,11 @@ public class CMLBaseImpl extends PMRElementImpl implements AbstractBase {
             logger.log(Level.FINE, " new Class name " + classx);
             if (classx != null) {
                 tool = null;
-                Class classz = null;
+                Class<?> classz = null;
                 try {
                     classz = Class.forName(classx);
                     if (classz != null) {
-                        tool = (BaseTool) classz.newInstance();
+                        tool = (BaseTool) classz.getDeclaredConstructor().newInstance();
                     }
                 } catch (Exception e) {
                     logger.log(Level.SEVERE, "Cannot instantiate class " + classz + "/" + e.getCause());

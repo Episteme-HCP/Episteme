@@ -132,8 +132,7 @@ public final class BallAerodynamics {
         double dragY = -dragForceMag * uvy;
         
         // Gravity
-        double gravityY = -9.81 * 0.057; // Force = m*g (mass approx 57g tennis ball)
-        // Wait, calculateDragForce returns Force. We need Acceleration = Force / Mass.
+        // Force = m*g (mass approx 57g tennis ball). We need Acceleration = Force / Mass.
         double mass = 0.057; // kg
         
         double ax = (dragX + forceX) / mass;

@@ -23,7 +23,6 @@
 
 package org.jscience.economics;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -42,7 +41,7 @@ import org.jscience.sociology.Role;
  * @version 2.0
  * @since 1.0
  */
-public class EconomicAgent extends Role implements Serializable {
+public class EconomicAgent extends Role {
 
     private static final long serialVersionUID = 2L;
 
@@ -95,6 +94,14 @@ public class EconomicAgent extends Role implements Serializable {
      */
     public void removeBelonging(Resource belonging) {
         belongings.remove(belonging);
+    }
+
+    /**
+     * Sets the resources owned by this agent.
+     * @param belongings the set of resources
+     */
+    public void setBelongings(Set<Resource> belongings) {
+        this.belongings = belongings != null ? belongings : new HashSet<>();
     }
 
     /**

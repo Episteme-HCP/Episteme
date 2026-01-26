@@ -2,7 +2,7 @@ package org.jscience.economics.loaders;
 
 import org.jscience.economics.PortfolioData;
 import org.jscience.economics.money.Money;
-import org.jscience.economics.Currency;
+import org.jscience.economics.money.Currency;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;

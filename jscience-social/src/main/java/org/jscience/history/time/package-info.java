@@ -1,6 +1,6 @@
 /*
  * JScience - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 /**
- * Provides the {@link org.jscience.history.time} module.
+ * Temporal coordinate and interval support for historical analysis.
+ * <p>
+ * This package provides unified temporal representation analogous to how
+ * {@link org.jscience.earth.coordinates} provides unified geographic coordinates.
+ * </p>
+ * <p>
+ * Key concepts:
+ * <ul>
+ *   <li>{@link org.jscience.history.temporal.TimeCoordinate} - Unified temporal position interface</li>
+ *   <li>{@link org.jscience.history.temporal.TemporalPoint} - Precise point in time</li>
+ *   <li>{@link org.jscience.history.temporal.TemporalInterval} - Time range with start and end</li>
+ *   <li>{@link org.jscience.history.temporal.FuzzyTemporalInterval} - Uncertain time range</li>
+ * </ul>
+ * </p>
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 2.0
  */
 package org.jscience.history.time;

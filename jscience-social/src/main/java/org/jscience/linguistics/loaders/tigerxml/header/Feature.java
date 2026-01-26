@@ -21,7 +21,6 @@
  */
 package org.jscience.linguistics.loaders.tigerxml.header;
 
-import java.util.Hashtable;
 
 
 /**
@@ -32,16 +31,6 @@ import java.util.Hashtable;
  */
 public class Feature implements HeaderElement {
     /** DOCUMENT ME! */
-    private String name;
-
-    /** DOCUMENT ME! */
-    private boolean domainIsNT;
-
-    /** DOCUMENT ME! */
-    private boolean domainisT;
-
-    /** DOCUMENT ME! */
-    private Hashtable values; // key: name, value: description
 
     /**
      * DOCUMENT ME!

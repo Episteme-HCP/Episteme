@@ -26,10 +26,8 @@ package org.jscience.biology.loaders.biopax;
 import org.jscience.io.AbstractResourceReader;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
 import java.io.*;
-import java.util.logging.Logger;
 
 /**
  * BioPAX Reader for biological pathways and networks.
@@ -55,7 +53,6 @@ import java.util.logging.Logger;
  */
 public class BioPAXReader extends AbstractResourceReader<BioPAXModel> {
 
-    private static final Logger LOGGER = Logger.getLogger(BioPAXReader.class.getName());
     private static final String BP_NS = "http://www.biopax.org/release/biopax-level3.owl#";
     private static final String RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 
@@ -114,7 +111,6 @@ public class BioPAXReader extends AbstractResourceReader<BioPAXModel> {
 
     private BioPAXModel parseDocument(Document doc) {
         BioPAXModel model = new BioPAXModel();
-        Element root = doc.getDocumentElement();
         
         // Parse pathways
         NodeList pathways = doc.getElementsByTagNameNS(BP_NS, "Pathway");

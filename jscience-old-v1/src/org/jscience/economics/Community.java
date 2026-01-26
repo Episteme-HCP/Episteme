@@ -2,7 +2,7 @@ package org.jscience.economics;
 
 import org.jscience.biology.Species;
 
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 
 import org.jscience.psychology.social.Group;
 

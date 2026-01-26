@@ -1,9 +1,8 @@
 package org.jscience.history;
 
-import java.io.Serializable;
+
 import java.util.List;
-import org.jscience.history.temporal.FuzzyTimePoint;
-import org.jscience.history.temporal.FuzzyTimeInterval;
+import org.jscience.history.time.FuzzyTimePoint;
 import org.jscience.util.persistence.Persistent;
 
 /**
@@ -15,7 +14,7 @@ import org.jscience.util.persistence.Persistent;
  * @since 2.0
  */
 @Persistent
-public final class GeologicalTimeScale extends Timeline implements Serializable {
+public final class GeologicalTimeScale extends Timeline<Event> {
 
     private static final long serialVersionUID = 2L;
 

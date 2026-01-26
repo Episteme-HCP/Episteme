@@ -26,7 +26,6 @@ package org.jscience.mathematics.linearalgebra.matrices;
 import org.jscience.ComputeContext;
 import org.jscience.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 import org.jscience.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage;
-import org.jscience.mathematics.structures.rings.Ring;
 
 import java.util.List;
 

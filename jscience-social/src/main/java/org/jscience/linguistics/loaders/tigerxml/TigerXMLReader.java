@@ -24,14 +24,13 @@
 package org.jscience.linguistics.loaders.tigerxml;
 
 import org.jscience.io.AbstractResourceReader;
-import org.jscience.linguistics.loaders.tigerxml.core.TigerXmlDocument;
 import org.jscience.linguistics.loaders.tigerxml.core.CorpusBuilder;
 import org.w3c.dom.Element;
 
-import java.io.InputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * Reader for TIGER-XML corpus files.
@@ -75,5 +74,42 @@ public class TigerXMLReader extends AbstractResourceReader<Corpus> {
 
     private int getVerbosity() {
         return 0; // Default
+    }
+
+    @Override
+    public String getResourcePath() {
+        return "corpora/tigerxml";
+    }
+
+    @Override
+    public Class<Corpus> getResourceType() {
+        return Corpus.class;
+    }
+
+    @Override
+    public String getName() {
+        return "TIGER-XML Reader";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Loads linguistically annotated corpora in TIGER-XML format.";
+    }
+
+    @Override
+    public String getLongDescription() {
+        return "Comprehensive reader for TIGER-XML, a format for representing graph-based syntactic annotations. " +
+               "It supports both terminal and non-terminal nodes, primary and secondary edges, and morphological " +
+               "information. Efficiently reconstructs syntax trees and provides access to serialized corpus data.";
+    }
+
+    @Override
+    public String getCategory() {
+        return "Linguistics / Corpus Engineering";
+    }
+
+    @Override
+    public String[] getSupportedVersions() {
+        return new String[]{"2.0", "1.0"};
     }
 }

@@ -21,7 +21,6 @@
  */
 package org.jscience.linguistics.loaders.tigerxml.header;
 
-import java.util.ArrayList;
 
 
 /**
@@ -32,16 +31,6 @@ import java.util.ArrayList;
  */
 public class Header {
     /** DOCUMENT ME! */
-    private Meta meta;
-
-    /** DOCUMENT ME! */
-    private ArrayList features;
-
-    /** DOCUMENT ME! */
-    private ArrayList edgeLabels;
-
-    /** DOCUMENT ME! */
-    private ArrayList secEdgeLabels;
 
     /**
      * DOCUMENT ME!

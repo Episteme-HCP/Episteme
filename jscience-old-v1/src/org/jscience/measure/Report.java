@@ -4,7 +4,7 @@ import org.jscience.biology.human.Human;
 
 import org.jscience.economics.Organization;
 
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 
 import org.jscience.sociology.Person;
 

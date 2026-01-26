@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import org.jscience.util.Named;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.identity.Identified;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
@@ -48,7 +50,7 @@ import org.jscience.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Group implements Identified<String>, Named, Serializable {
+public class Group implements Identified<Identification>, Named, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -60,7 +62,7 @@ public class Group implements Identified<String>, Named, Serializable {
     }
 
     @Id
-    private final String id;
+    private final Identification id;
     
     @Attribute
     private final String name;
@@ -86,7 +88,7 @@ public class Group implements Identified<String>, Named, Serializable {
      * @throws IllegalArgumentException if name is empty
      */
     public Group(String name, Type type) {
-        this.id = UUID.randomUUID().toString();
+        this.id = new SimpleIdentification(UUID.randomUUID().toString());
         this.name = Objects.requireNonNull(name, "Name cannot be null");
         if (name.trim().isEmpty()) {
             throw new IllegalArgumentException("Name cannot be empty");
@@ -95,7 +97,7 @@ public class Group implements Identified<String>, Named, Serializable {
     }
 
     @Override
-    public String getId() {
+    public Identification getId() {
         return id;
     }
 

@@ -23,50 +23,70 @@
 
 package org.jscience.history;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.util.Temporal;
-import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.UUIDIdentification;
 import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a significant historical or scientific event.
  * Base class focusing on the temporal aspect of an event.
- * Extends AbstractIdentifiedEntity to support dynamic traits and consistent identity.
+ * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 @Persistent
-public class Event extends AbstractIdentifiedEntity implements Temporal<TemporalCoordinate>, Comparable<Event> {
+public class Event implements ComprehensiveIdentification, Temporal<TimeCoordinate>, Comparable<Event> {
 
     private static final long serialVersionUID = 2L;
+
+    @Id
+    protected final Identification id;
+
+    @Attribute
+    protected final Map<String, Object> traits = new HashMap<>();
 
     public enum Category {
         POLITICAL, MILITARY, CULTURAL, SCIENTIFIC, ECONOMIC, RELIGIOUS, NATURAL, OTHER
     }
 
     @Relation(type = Relation.Type.ONE_TO_ONE)
-    protected final TemporalCoordinate when;
+    protected final TimeCoordinate when;
 
     @Attribute
     protected final Category category;
 
-    public Event(String name, String description, TemporalCoordinate when, Category category) {
-        super(new UUIDIdentification(UUID.randomUUID().toString()));
+    public Event(String name, String description, TimeCoordinate when, Category category) {
+        this.id = new UUIDIdentification(UUID.randomUUID().toString());
         setName(Objects.requireNonNull(name, "Name cannot be null"));
         setComments(description);
         this.when = Objects.requireNonNull(when, "Time coordinate cannot be null");
         this.category = category != null ? category : Category.OTHER;
     }
 
-    public Event(String name, TemporalCoordinate when) {
+    public Event(String name, TimeCoordinate when) {
         this(name, null, when, Category.OTHER);
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     public String getDescription() {
@@ -74,7 +94,7 @@ public class Event extends AbstractIdentifiedEntity implements Temporal<Temporal
     }
 
     @Override
-    public TemporalCoordinate getWhen() {
+    public TimeCoordinate getWhen() {
         return when;
     }
 

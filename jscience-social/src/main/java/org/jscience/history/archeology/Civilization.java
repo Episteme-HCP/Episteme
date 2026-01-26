@@ -2,8 +2,8 @@ package org.jscience.history.archeology;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.jscience.geography.Place;
-import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.earth.Place;
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.sociology.Culture;
 import org.jscience.util.Positioned;
 import org.jscience.util.persistence.Attribute;
@@ -19,7 +19,7 @@ import org.jscience.util.persistence.Relation;
  * @since 2.0
  */
 @Persistent
-public class Civilization implements Positioned, Serializable {
+public class Civilization implements Positioned<Place>, Serializable {
 
     private static final long serialVersionUID = 2L;
 
@@ -30,15 +30,15 @@ public class Civilization implements Positioned, Serializable {
     private final Place place;
 
     @Relation(type = Relation.Type.ONE_TO_ONE)
-    private final TemporalCoordinate startDate;
+    private final TimeCoordinate startDate;
 
     @Relation(type = Relation.Type.ONE_TO_ONE)
-    private TemporalCoordinate endDate;
+    private TimeCoordinate endDate;
 
     @Attribute
     private String description = "";
 
-    public Civilization(Culture culture, Place place, TemporalCoordinate startDate) {
+    public Civilization(Culture culture, Place place, TimeCoordinate startDate) {
         this.culture = Objects.requireNonNull(culture, "Culture cannot be null");
         this.place = Objects.requireNonNull(place, "Place cannot be null");
         this.startDate = Objects.requireNonNull(startDate, "Start date cannot be null");
@@ -53,15 +53,15 @@ public class Civilization implements Positioned, Serializable {
         return place;
     }
 
-    public TemporalCoordinate getStartDate() {
+    public TimeCoordinate getStartDate() {
         return startDate;
     }
 
-    public TemporalCoordinate getEndDate() {
+    public TimeCoordinate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(TemporalCoordinate endDate) {
+    public void setEndDate(TimeCoordinate endDate) {
         this.endDate = endDate;
     }
 

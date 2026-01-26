@@ -30,7 +30,6 @@ import java.util.TreeMap;
 import java.util.stream.IntStream;
 import org.jscience.mathematics.linearalgebra.Matrix;
 import org.jscience.mathematics.linearalgebra.matrices.SparseMatrix;
-import org.jscience.mathematics.structures.rings.Field;
 
 /**
  * Linear Algebra Provider for Sparse Matrices (CPU).

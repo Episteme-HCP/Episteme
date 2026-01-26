@@ -57,6 +57,7 @@ public class FASTABioSequenceReader extends AbstractResourceReader<List<BioSeque
 
     @Override public String getResourcePath() { return null; }
     
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override public Class<List<BioSequence>> getResourceType() { return (Class) java.util.List.class; }
 
     @Override

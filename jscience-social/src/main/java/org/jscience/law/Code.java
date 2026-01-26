@@ -44,6 +44,14 @@ public class Code implements Named {
     private List<Article> articles;
 
     /**
+     * Minimal constructor for the legal code.
+     * @param name the name of the code
+     */
+    public Code(String name) {
+        this(name, "General Law", new Date(), new ArrayList<>());
+    }
+
+    /**
      * Creates a new Code object.
      *
      * @param name the name of the code (e.g., "Code Civil")
@@ -121,5 +129,18 @@ public class Code implements Named {
      */
     public void removeArticle(Article article) {
         this.articles.remove(article);
+    }
+
+    /** Legacy getter for ID. */
+    public String getId() {
+        return name;
+    }
+
+    /** Retrieves an article by its numbering. */
+    public Article getArticle(String num) {
+        return articles.stream()
+                .filter(a -> a.getNumbering() != null && a.getNumbering().toString().equals(num))
+                .findFirst()
+                .orElse(null);
     }
 }

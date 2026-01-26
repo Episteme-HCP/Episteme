@@ -42,17 +42,28 @@ public class Behavior implements Commented, org.jscience.biology.Behavior, Seria
 
     private static final long serialVersionUID = 1L;
 
+    /** Nested type constants for legacy support and cleaner API. */
+    public static class Type {
+        public static final int REFLEX = 1;
+        public static final int SELF = 2;
+        public static final int SOCIAL = 3;
+        public static final int INSTINCTIVE = 4;
+    }
+
     /** Categorization for behaviors of unknown nature. */
     public final static int UNKNOWN = 0;
 
     /** Categorization for innate, involuntary reflex actions. */
-    public final static int REFLEX = 1;
+    public final static int REFLEX = Type.REFLEX;
 
     /** Categorization for individual-oriented behaviors (e.g., feeding, sleeping). */
-    public final static int SELF = 2;
+    public final static int SELF = Type.SELF;
 
     /** Categorization for interaction-oriented behaviors with other individuals. */
-    public final static int SOCIAL = 3;
+    public final static int SOCIAL = Type.SOCIAL;
+
+    /** Categorization for biological instincts. */
+    public final static int INSTINCTIVE = Type.INSTINCTIVE;
 
     // Standard biological reflex behaviors
     /** Vital reflex for gas exchange. */
@@ -200,6 +211,14 @@ public class Behavior implements Commented, org.jscience.biology.Behavior, Seria
         }
     }
 
+    /**
+     * Creates a new Behavior with name, kind, and comments.
+     */
+    public Behavior(String name, int kind, String comments) {
+        this(name, kind);
+        setComments(comments);
+    }
+
     @Override
     public void execute(Individual individual) {
         // Default implementation: specific behaviors can override this to perform actions
@@ -219,6 +238,16 @@ public class Behavior implements Commented, org.jscience.biology.Behavior, Seria
      */
     public int getKind() {
         return kind;
+    }
+
+    /** Legacy getter for kind. */
+    public int getType() {
+        return kind;
+    }
+
+    /** Legacy getter for ID. */
+    public String getId() {
+        return name;
     }
 
     /**
@@ -245,6 +274,13 @@ public class Behavior implements Commented, org.jscience.biology.Behavior, Seria
     @Override
     public void setComments(String comments) {
         this.comments = Objects.requireNonNull(comments, "You can't set a null comment.");
+    }
+
+    private java.util.Map<String, Object> traits = new java.util.HashMap<>();
+
+    @Override
+    public java.util.Map<String, Object> getTraits() {
+        return traits;
     }
 
     @Override

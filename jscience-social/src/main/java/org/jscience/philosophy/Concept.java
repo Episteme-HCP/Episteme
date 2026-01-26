@@ -45,6 +45,7 @@ public class Concept implements Named, Serializable {
     private static final long serialVersionUID = 1L;
 
     private final String name;
+    private String description;
     private final Set<Concept> relatedConcepts = new HashSet<>();
 
     /**
@@ -54,14 +55,35 @@ public class Concept implements Named, Serializable {
      * @throws IllegalArgumentException if name is null or empty
      */
     public Concept(String name) {
+        this(name, "");
+    }
+
+    /**
+     * Rich constructor with description.
+     */
+    public Concept(String name, String description) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Concept name cannot be null or empty.");
         }
         this.name = name;
+        this.description = description;
     }
 
     @Override
     public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /** Legacy getter for ID. */
+    public String getId() {
         return name;
     }
 

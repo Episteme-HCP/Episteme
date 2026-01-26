@@ -26,7 +26,6 @@ package org.jscience.earth.coordinates;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
-import org.jscience.measure.quantity.Angle;
 import org.jscience.measure.quantity.Length;
 import org.jscience.mathematics.numbers.real.Real;
 import java.io.Serializable;
@@ -138,8 +137,6 @@ public class PolyconicCoordinate implements EarthCoordinate, Serializable {
         double phi = phi0 + (y / a); // Initial guess
         for (int i = 0; i < 10; i++) {
             double M = calculateM(phi, a, e2);
-            double N = a / Math.sqrt(1 - e2 * Math.pow(Math.sin(phi), 2));
-            double cotPhi = 1.0 / Math.tan(phi);
             
             // Simplified iteration
             phi = phi + (y + M0 - M) / a; 

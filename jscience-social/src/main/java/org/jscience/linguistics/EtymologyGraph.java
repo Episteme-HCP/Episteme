@@ -1,6 +1,7 @@
 package org.jscience.linguistics;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import org.jscience.util.persistence.Attribute;
+
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 

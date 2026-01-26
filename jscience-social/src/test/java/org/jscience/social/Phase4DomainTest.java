@@ -28,10 +28,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import org.jscience.geography.*;
+import org.jscience.earth.Place;
+
 import org.jscience.sociology.*;
+
 import org.jscience.politics.*;
-import org.jscience.politics.military.*;
+
+import org.jscience.politics.military.Conflict;
+
+import org.jscience.geography.Address;
 import org.jscience.linguistics.Language;
 
 public class Phase4DomainTest {
@@ -54,7 +59,7 @@ public class Phase4DomainTest {
         western.addCelebration("New Year");
 
         assertEquals("Western", western.getName());
-        assertTrue(western.getCelebrations().contains("New Year"));
+        assertTrue(western.getCelebrations().stream().anyMatch(c -> c.getName().equals("New Year")));
     }
 
     @Test
@@ -79,7 +84,7 @@ public class Phase4DomainTest {
         Country germany = new Country("Germany", "DE");
         Place europe = new Place("Europe", Place.Type.CONTINENT);
 
-        org.jscience.politics.military.Conflict ww2 = new org.jscience.politics.military.Conflict("WW2", europe, LocalDate.of(1939, 9, 1));
+        Conflict ww2 = new Conflict("WW2", europe, LocalDate.of(1939, 9, 1));
         ww2.addBelligerent(uk);
         ww2.addBelligerent(germany);
 

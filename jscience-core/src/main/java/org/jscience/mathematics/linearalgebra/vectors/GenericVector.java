@@ -31,7 +31,6 @@ import org.jscience.mathematics.linearalgebra.Vector;
 import org.jscience.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
 import org.jscience.mathematics.linearalgebra.vectors.storage.VectorStorage;
 import org.jscience.mathematics.linearalgebra.tensors.Tensor;
-import org.jscience.mathematics.structures.rings.Field;
 import org.jscience.mathematics.structures.rings.Ring;
 
 /**
@@ -80,7 +79,6 @@ public class GenericVector<E> implements Vector<E> {
         int dim = storage.dimension();
         // Fallback to Object array if we can't get class easily?
         // Actually, we can use the first element if any.
-        @SuppressWarnings("unchecked")
         E zero = ring.zero();
         Class<?> componentType = zero.getClass();
         

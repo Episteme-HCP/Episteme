@@ -32,7 +32,7 @@ import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Time;
 import org.jscience.mathematics.discrete.Tree;
 import org.jscience.mathematics.discrete.RootedTree;
-import org.jscience.sociology.Role;
+
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
@@ -43,9 +43,7 @@ import java.util.Set;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Queue;
-import java.util.LinkedList;
+
 import java.util.stream.Collectors;
 
 /**

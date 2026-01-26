@@ -23,15 +23,17 @@
 
 package org.jscience.economics.money;
 
-import org.jscience.biology.Human;
-
+import org.jscience.economics.EconomicAgent;
 import org.jscience.economics.Organization;
 import org.jscience.economics.Property;
 import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
@@ -49,15 +51,16 @@ import java.util.Set;
  * @see <a href="https://en.wikipedia.org/wiki/Share_(finance)">Share (finance)</a>
  */
 @Persistent
-public final class Share implements Property, Serializable {
+public final class Share implements Property, ComprehensiveIdentification {
 
-    private static final long serialVersionUID = 1L;
-
-    @Relation(type = Relation.Type.MANY_TO_MANY)
-    private final Set<Human> owners;
+    @Id
+    private final Identification id;
 
     @Attribute
-    private final String symbol;
+    private final java.util.Map<String, Object> traits = new java.util.HashMap<>();
+
+    @Relation(type = Relation.Type.MANY_TO_MANY)
+    private final Set<EconomicAgent> owners;
 
     @Relation(type = Relation.Type.MANY_TO_ONE)
     private final Organization company;
@@ -76,32 +79,34 @@ public final class Share implements Property, Serializable {
      * @param company      the issuing company
      * @param currentValue the current market value
      */
-    public Share(Set<Human> owners, String symbol, Organization company, Money currentValue) {
+    public Share(Set<EconomicAgent> owners, String symbol, Organization company, Money currentValue) {
         if (owners == null || owners.isEmpty()) {
             throw new IllegalArgumentException("Owners set cannot be null or empty");
         }
-        if (symbol == null || symbol.isEmpty()) {
-            throw new IllegalArgumentException("Symbol cannot be null or empty");
-        }
-        
-        // Validate all owners are Human instances
-        for (Object owner : owners) {
-            if (!(owner instanceof Human)) {
-                throw new IllegalArgumentException("All owners must be Human instances");
-            }
-        }
+        this.id = new SimpleIdentification(symbol);
+        setName(symbol);
         
         this.owners = new HashSet<>(owners);
-        this.symbol = symbol;
         this.company = Objects.requireNonNull(company, "Company cannot be null");
         this.currentValue = Objects.requireNonNull(currentValue, "Current value cannot be null");
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public java.util.Map<String, Object> getTraits() {
+        return traits;
     }
 
     /**
      * Returns an unmodifiable view of the owners.
      * @return the owners
      */
-    public Set<Human> getOwners() {
+    @Override
+    public Set<EconomicAgent> getOwners() {
         return Collections.unmodifiableSet(owners);
     }
 
@@ -109,7 +114,7 @@ public final class Share implements Property, Serializable {
      * Adds an owner to this share.
      * @param owner the new owner
      */
-    public void addOwner(Human owner) {
+    public void addOwner(EconomicAgent owner) {
         owners.add(Objects.requireNonNull(owner, "Owner cannot be null"));
     }
 
@@ -117,7 +122,7 @@ public final class Share implements Property, Serializable {
      * Removes an owner from this share.
      * @param owner the owner to remove
      */
-    public void removeOwner(Human owner) {
+    public void removeOwner(EconomicAgent owner) {
         if (owners.size() <= 1) {
             throw new IllegalArgumentException("Cannot remove last owner");
         }
@@ -129,7 +134,7 @@ public final class Share implements Property, Serializable {
      * @return the symbol
      */
     public String getSymbol() {
-        return symbol;
+        return id.toString();
     }
 
     /**
@@ -196,19 +201,18 @@ public final class Share implements Property, Serializable {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof Share)) return false;
-        Share other = (Share) obj;
-        return Objects.equals(symbol, other.symbol) &&
+        if (!(obj instanceof Share other)) return false;
+        return Objects.equals(id, other.id) &&
                Objects.equals(company, other.company);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(symbol, company);
+        return Objects.hash(id, company);
     }
 
     @Override
     public String toString() {
-        return String.format("%s (%s): %s", symbol, company.getName(), currentValue);
+        return String.format("%s (%s): %s", getSymbol(), company.getName(), currentValue);
     }
 }

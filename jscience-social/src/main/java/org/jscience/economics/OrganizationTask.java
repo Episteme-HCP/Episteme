@@ -3,8 +3,6 @@ package org.jscience.economics;
 import org.jscience.economics.money.Currency;
 import org.jscience.economics.money.Money;
 
-import org.jscience.measure.Amount;
-
 import java.util.Set;
 
 
@@ -26,7 +24,7 @@ public class OrganizationTask extends Task {
     private double humanCost; //the number of hours of man work
 
     /** DOCUMENT ME! */
-    private Amount<Money> adjustedCost; //the adjusted cost depending on the price of the energy and the human work
+    private Money adjustedCost; //the adjusted cost depending on the price of the energy and the human work
 
     /** DOCUMENT ME! */
     private int kind;
@@ -39,10 +37,10 @@ public class OrganizationTask extends Task {
      * @param resources DOCUMENT ME!
      * @param products DOCUMENT ME!
      */
-    public OrganizationTask(String name, Set resources, Set products) {
+    public OrganizationTask(String name, Set<Resource> resources, Set<Resource> products) {
         super(name, resources, products);
         this.humanCost = 0;
-        this.adjustedCost = Amount.valueOf(0, Currency.USD);
+        this.adjustedCost = Money.valueOf(0, Currency.USD);
         this.kind = EconomicsConstants.UNKNOWN;
     }
 
@@ -70,7 +68,7 @@ public class OrganizationTask extends Task {
      *
      * @return DOCUMENT ME!
      */
-    public Amount<Money> getAdjustedCost() {
+    public Money getAdjustedCost() {
         return adjustedCost;
     }
 
@@ -80,7 +78,7 @@ public class OrganizationTask extends Task {
      *
      * @param cost DOCUMENT ME!
      */
-    public void setAdjustedCost(Amount<Money> cost) {
+    public void setAdjustedCost(Money cost) {
         if (cost != null) {
             this.adjustedCost = cost;
         } else {

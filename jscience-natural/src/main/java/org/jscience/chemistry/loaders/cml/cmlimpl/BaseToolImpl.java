@@ -23,7 +23,7 @@ public class BaseToolImpl implements BaseTool {
     protected static String CONSTRUCT = "_CONSTRUCT";
     protected static String TEST = "_TEST";
 
-    protected static Hashtable baseToolTable;
+    protected static Hashtable<String, BaseTool> baseToolTable;
 
     // the objects being edited
     protected AbstractBase abstractBase = null;
@@ -32,10 +32,10 @@ public class BaseToolImpl implements BaseTool {
 
     protected boolean debug = false;
 
-    protected Hashtable ignoreAttributeTable;
+    protected Hashtable<String, Boolean> ignoreAttributeTable;
     protected Workflow workflow;
     protected Method[] declaredPublicMethods = null;
-    protected Constructor[] declaredPublicConstructors = null;
+    protected Constructor<?>[] declaredPublicConstructors = null;
 
     /**
      * new BaseTool.
@@ -213,9 +213,9 @@ public class BaseToolImpl implements BaseTool {
     }
 
     public void mustEqualAttributes(BaseTool otherTool) throws CMLException {
-        Vector attributeVector0 = PMRDOMUtils.createVector(abstractBase.getAttributes());
+        Vector<Node> attributeVector0 = PMRDOMUtils.createVector(abstractBase.getAttributes());
         NamedNodeMap otherAttributes = otherTool.getAbstractBase().getAttributes();
-        Vector attributeVector1 = PMRDOMUtils.createVector(otherAttributes);
+        Vector<Node> attributeVector1 = PMRDOMUtils.createVector(otherAttributes);
         int n0 = attributeVector0.size();
         for (int i = 0; i < n0; i++) {
             Attr attr0 = (Attr) attributeVector0.elementAt(0);
@@ -270,7 +270,6 @@ public class BaseToolImpl implements BaseTool {
                     throw new CMLException("Text for this and other have different values: " + value0 + "/" + value1);
                 }
             } else if (child0 instanceof AbstractBase && child1 instanceof AbstractBase) {
-                BaseTool newBaseTool = new BaseToolImpl();
                 BaseTool baseTool0 = ((CMLBaseImpl) child0).getTool();
                 BaseTool baseTool1 = ((CMLBaseImpl) child1).getTool();
                 if (baseTool0 == null || baseTool1 == null) {
@@ -286,10 +285,10 @@ public class BaseToolImpl implements BaseTool {
     }
 
     private void setIgnoreAttributes(BaseTool be) {
-        Enumeration keys = ignoreAttributeTable.keys();
+        Enumeration<String> keys = ignoreAttributeTable.keys();
         while (keys.hasMoreElements()) {
-            String attName = (String) keys.nextElement();
-            if (((Boolean) ignoreAttributeTable.get(attName)).booleanValue()) {
+            String attName = keys.nextElement();
+            if (ignoreAttributeTable.get(attName)) {
                 be.setIgnoreAttribute(attName, true);
             }
         }
@@ -303,9 +302,9 @@ public class BaseToolImpl implements BaseTool {
      */
     public void setIgnoreAttribute(String name, boolean descend) {
         if (ignoreAttributeTable == null) {
-            ignoreAttributeTable = new Hashtable();
+            ignoreAttributeTable = new Hashtable<>();
         }
-        ignoreAttributeTable.put(name, new Boolean(descend));
+        ignoreAttributeTable.put(name, descend);
     }
 
     private boolean canIgnoreAttribute(String name) {
@@ -452,7 +451,7 @@ public class BaseToolImpl implements BaseTool {
      *
      * @param editorTable the table to clear
      */
-    public static void clear(Hashtable editorTable) {
+    public static void clear(Hashtable<?, ?> editorTable) {
         editorTable.clear();
     }
 
@@ -481,7 +480,7 @@ public class BaseToolImpl implements BaseTool {
         String name = packageName.substring(0, lastDot + 1) + "tools" + "." + baseName.substring(0, 1).toString().toUpperCase() + baseName.substring(1) + "Impl";
         BaseTool baseTool = null;
         try {
-            baseTool = (BaseTool) Class.forName(name).newInstance();
+            baseTool = (BaseTool) Class.forName(name).getDeclaredConstructor().newInstance();
         } catch (Exception e) {
         }
         return baseTool;
@@ -509,10 +508,8 @@ public class BaseToolImpl implements BaseTool {
     }
 
     public String formatNumber(String s) {
-        Double dbl = null;
-
         try {
-            dbl = new Double(s);
+            Double.valueOf(s);
         } catch (NumberFormatException nfe) {
             return s;
         }
@@ -525,22 +522,22 @@ public class BaseToolImpl implements BaseTool {
      *
      * @return array of constructors
      */
-    public Constructor[] getDeclaredPublicConstructors() {
+    public Constructor<?>[] getDeclaredPublicConstructors() {
         if (declaredPublicConstructors == null) {
-            Class classx = this.getClass();
-            Constructor[] declared = classx.getDeclaredConstructors();
-            HashSet set = new HashSet();
+            Class<?> classx = this.getClass();
+            Constructor<?>[] declared = classx.getDeclaredConstructors();
+            HashSet<Constructor<?>> set = new HashSet<>();
             for (int i = 0; i < declared.length; i++) {
                 set.add(declared[i]);
             }
-            Constructor[] publicc = classx.getConstructors();
-            ArrayList dcc = new ArrayList();
+            Constructor<?>[] publicc = classx.getConstructors();
+            ArrayList<Constructor<?>> dcc = new ArrayList<>();
             for (int i = 0; i < publicc.length; i++) {
                 if (set.contains(publicc[i])) {
                     dcc.add(publicc[i]);
                 }
             }
-            declaredPublicConstructors = (Constructor[]) dcc.toArray(new Constructor[0]);
+            declaredPublicConstructors = dcc.toArray(new Constructor<?>[0]);
         }
         return declaredPublicConstructors;
     }
@@ -552,20 +549,20 @@ public class BaseToolImpl implements BaseTool {
      */
     public Method[] getDeclaredPublicMethods() {
         if (declaredPublicMethods == null) {
-            Class classx = this.getClass();
+            Class<?> classx = this.getClass();
             Method[] declared = classx.getDeclaredMethods();
-            HashSet set = new HashSet();
+            HashSet<Method> set = new HashSet<>();
             for (int i = 0; i < declared.length; i++) {
                 set.add(declared[i]);
             }
             Method[] publicm = classx.getMethods();
-            ArrayList dcm = new ArrayList();
+            ArrayList<Method> dcm = new ArrayList<>();
             for (int i = 0; i < publicm.length; i++) {
                 if (set.contains(publicm[i])) {
                     dcm.add(publicm[i]);
                 }
             }
-            declaredPublicMethods = (Method[]) dcm.toArray(new Method[0]);
+            declaredPublicMethods = dcm.toArray(new Method[0]);
         }
         return declaredPublicMethods;
     }
@@ -581,14 +578,14 @@ public class BaseToolImpl implements BaseTool {
      * @param argVector arguments in order.
      * @return the constructor value
      */
-    public Object runConstructor(List argVector) {
+    public Object runConstructor(List<Object> argVector) {
         Object[] args = new Object[0];
         Object result = null;
-        Constructor theConstructor = getConstructor(argVector);
+        Constructor<?> theConstructor = getConstructor(argVector);
         if (theConstructor == null) {
             jumboLogger.info("Cannot find constructor (" + argsString(argVector) + ")");
         } else {
-            Class[] params = theConstructor.getParameterTypes();
+            Class<?>[] params = theConstructor.getParameterTypes();
             args = new Object[params.length];
             for (int i = 0; i < params.length; i++) {
                 args[i] = argVector.get(i);
@@ -614,14 +611,14 @@ public class BaseToolImpl implements BaseTool {
      * @param argVector arguments in order. First arg is instance of this
      * @return any return value (see Method.invoke for classes)
      */
-    public Object runMethod(String methodS, List argVector) {
+    public Object runMethod(String methodS, List<Object> argVector) {
         Object[] args = new Object[0];
         Object result = null;
         Method theMethod = getMethod(methodS, argVector);
         if (theMethod == null) {
             jumboLogger.info("Cannot find unique method: " + methodS);
         } else {
-            Class[] params = theMethod.getParameterTypes();
+            Class<?>[] params = theMethod.getParameterTypes();
             args = new Object[params.length];
             for (int i = 0; i < params.length; i++) {
                 args[i] = argVector.get(i + 1);
@@ -639,13 +636,13 @@ public class BaseToolImpl implements BaseTool {
         return result;
     }
 
-    protected Method getMethod(String methodS, List argVector) {
+    protected Method getMethod(String methodS, List<Object> argVector) {
         getDeclaredPublicMethods();
         Method theMethod = null;
         for (int i = 0; i < declaredPublicMethods.length; i++) {
             Method dcp = declaredPublicMethods[i];
             if (dcp.getName().equals(methodS)) {
-                Class[] argTypes = dcp.getParameterTypes();
+                Class<?>[] argTypes = dcp.getParameterTypes();
                 if (argTypes.length + 1 != argVector.size()) {
                     continue;
                 }
@@ -671,12 +668,12 @@ public class BaseToolImpl implements BaseTool {
         return theMethod;
     }
 
-    protected Constructor getConstructor(List argVector) {
+    protected Constructor<?> getConstructor(List<Object> argVector) {
         getDeclaredPublicConstructors();
-        Constructor theConstructor = null;
+        Constructor<?> theConstructor = null;
         for (int i = 0; i < declaredPublicConstructors.length; i++) {
-            Constructor dcp = declaredPublicConstructors[i];
-            Class[] argTypes = dcp.getParameterTypes();
+            Constructor<?> dcp = declaredPublicConstructors[i];
+            Class<?>[] argTypes = dcp.getParameterTypes();
             if (argTypes.length != argVector.size()) {
                 continue;
             }
@@ -696,7 +693,7 @@ public class BaseToolImpl implements BaseTool {
         return theConstructor;
     }
 
-    boolean argMatchesType(Object arg, Class argType) {
+    boolean argMatchesType(Object arg, Class<?> argType) {
         boolean result =
                 argType.isAssignableFrom(arg.getClass()) ||
                         argType.equals(void.class) && arg instanceof Void ||
@@ -738,7 +735,7 @@ public class BaseToolImpl implements BaseTool {
     protected static double[] getDoubleArgs(int start, int nargs, String[] args) {
         double xyz[] = new double[nargs];
         for (int i = 0; i < nargs; i++) {
-            xyz[i] = new Double(args[start + i]).doubleValue();
+            xyz[i] = Double.valueOf(args[start + i]).doubleValue();
         }
         return xyz;
     }
@@ -765,7 +762,7 @@ public class BaseToolImpl implements BaseTool {
     }
 
     protected void constructorsUsage() {
-        Constructor[] constructors = this.getDeclaredPublicConstructors();
+        Constructor<?>[] constructors = this.getDeclaredPublicConstructors();
         for (int i = 0; i < constructors.length; i++) {
             String constructorName = getShortClassName(this.getClass());
             String s = "";
@@ -775,7 +772,7 @@ public class BaseToolImpl implements BaseTool {
         }
     }
 
-    String argsString(Class[] classes) {
+    String argsString(Class<?>[] classes) {
         String s = "";
         for (int j = 0; j < classes.length; j++) {
             if (j > 0) {
@@ -787,7 +784,7 @@ public class BaseToolImpl implements BaseTool {
         return s;
     }
 
-    String argsString(List argVector) {
+    String argsString(List<Object> argVector) {
         String s = "";
         for (int j = 0; j < argVector.size(); j++) {
             if (j > 0) {
@@ -819,7 +816,7 @@ public class BaseToolImpl implements BaseTool {
                 continue;
             }
             String s = "";
-            Class returnx = methods[i].getReturnType();
+            Class<?> returnx = methods[i].getReturnType();
             s += " " + getShortClassName(returnx);
             s += " " + methodName + "(";
             s += argsString(methods[i].getParameterTypes());
@@ -828,7 +825,7 @@ public class BaseToolImpl implements BaseTool {
         }
     }
 
-    static String getShortClassName(Class classx) {
+    static String getShortClassName(Class<?> classx) {
         String className = classx.getName();
         int idx = -1;
         if (classx.isArray()) {
@@ -874,7 +871,7 @@ public class BaseToolImpl implements BaseTool {
         return className;
     }
 
-    static Set excludeMethodSet = new HashSet();
+    static Set<String> excludeMethodSet = new HashSet<>();
 
     static {
         excludeMethodSet.add("main");
@@ -904,7 +901,7 @@ public class BaseToolImpl implements BaseTool {
         String theClassName = theObject.getClass().getName();
         System.out.println("\n==================== " + theClassName + " =====================\n");
         String interfaceName = "";
-        Class interfaceClass = null;
+        Class<?> interfaceClass = null;
         try {
             interfaceName = convertClassToInterface(theClassName);
             interfaceClass = Class.forName(interfaceName);
@@ -921,15 +918,15 @@ public class BaseToolImpl implements BaseTool {
             }
             System.out.println("\n.................. " + dpm.getName() + " ......................");
             // classes of args
-            Class[] argTypes = dpm.getParameterTypes();
+            Class<?>[] argTypes = dpm.getParameterTypes();
             // instances of args to be invoked
             Object[] args = new Object[argTypes.length];
-            Map argTypeMap = new HashMap();
+            Map<Class<?>, Integer> argTypeMap = new HashMap<>();
 // this is instance of interface and uses first test instance so index it in map
-            argTypeMap.put(interfaceClass, new Integer(1));
+            argTypeMap.put(interfaceClass, 1);
             boolean ok = true;
             for (int j = 0; j < argTypes.length; j++) {
-                Class argType = argTypes[j];
+                Class<?> argType = argTypes[j];
                 if (argType.isArray()) {
                     System.err.println("Cannot process array arg");
                     ok = false;
@@ -937,10 +934,10 @@ public class BaseToolImpl implements BaseTool {
                 }
                 Integer argTypeCount = (Integer) argTypeMap.get(argType);
                 if (argTypeCount == null) {
-                    argTypeCount = new Integer(0);
+                    argTypeCount = Integer.valueOf(0);
                 }
                 int nargType = argTypeCount.intValue() + 1;
-                argTypeCount = new Integer(nargType);
+                argTypeCount = Integer.valueOf(nargType);
                 argTypeMap.put(argType, argTypeCount);
                 jumboLogger.fine("narg " + nargType + "/" + argType.getName());
                 if (AbstractBase.class.isAssignableFrom(argType)) {
@@ -949,7 +946,7 @@ public class BaseToolImpl implements BaseTool {
                     try {
                         className = argType.getName();
                         className = convertInterfaceToClass(className);
-                        AbstractBase ab = (AbstractBase) Class.forName(className).newInstance();
+                        AbstractBase ab = (AbstractBase) Class.forName(className).getDeclaredConstructor().newInstance();
                         baseTool = ab.getOrCreateTool();
                     } catch (Exception ee) {
                         jumboLogger.severe("Cannot create tool: " + ee);
@@ -967,9 +964,9 @@ public class BaseToolImpl implements BaseTool {
                     }
                     args[j] = instanceTool.getAbstractBase();
                 } else if (argType.equals(double.class)) {
-                    args[j] = new Double(nargType + 0.5);
+                    args[j] = Double.valueOf(nargType + 0.5);
                 } else if (argType.equals(int.class)) {
-                    args[j] = new Integer(nargType);
+                    args[j] = Integer.valueOf(nargType);
                 } else if (argType.equals(String.class)) {
                     args[j] = "s" + nargType;
                 } else {
@@ -1074,8 +1071,7 @@ public class BaseToolImpl implements BaseTool {
         } else {
             AbstractCMLDocument doc = (AbstractCMLDocument) DocumentFactoryImpl.newInstance().createDocument();
 
-            Vector argVector = new Vector();
-            boolean ok = true;
+            Vector<Object> argVector = new Vector<>();
 // parse the args, grab the method and leave the other args as object in argVector
             String methodS = parseArgs(args, argVector, doc);
 // run through the args
@@ -1118,20 +1114,17 @@ public class BaseToolImpl implements BaseTool {
         }
     }
 
-    String parseArgs(String[] args, List argVector, AbstractCMLDocument doc) {
+    String parseArgs(String[] args, List<Object> argVector, AbstractCMLDocument doc) {
         String methodS = null;
-        String constructorS = null;
         int i = 0;
         boolean ok = true;
         while (i < args.length) {
-            if (false) {
-                ;
-            } else if (args[i].equalsIgnoreCase("-float")) {
-                Double floatArg = new Double(args[++i]);
+            if (args[i].equalsIgnoreCase("-float")) {
+                Double floatArg = Double.valueOf(args[++i]);
                 i++;
                 argVector.add(floatArg);
             } else if (args[i].equalsIgnoreCase("-int")) {
-                Integer intArg = new Integer(args[++i]);
+                Integer intArg = Integer.valueOf(args[++i]);
                 i++;
                 argVector.add(intArg);
             } else if (args[i].equalsIgnoreCase("-string")) {
@@ -1155,8 +1148,8 @@ public class BaseToolImpl implements BaseTool {
                 String toolClassName = "org.xmlcml.tools." + args[i].substring(4) + "ToolImpl";
                 BaseTool tool = null;
                 try {
-                    Class toolClass = Class.forName(toolClassName);
-                    tool = (BaseTool) toolClass.newInstance();
+                    Class<?> toolClass = Class.forName(toolClassName);
+                    tool = (BaseTool) toolClass.getDeclaredConstructor().newInstance();
                 } catch (Exception e) {
                     System.out.println("Unknown args/class: " + args[i] + "/" + toolClassName);
                     ok = false;
@@ -1220,7 +1213,7 @@ public class BaseToolImpl implements BaseTool {
      * @param doc       owner document
      * @return position in args after parsing
      */
-    public int processCommandLine(String[] args, int offset, List argVector, AbstractCMLDocument doc) {
+    public int processCommandLine(String[] args, int offset, List<Object> argVector, AbstractCMLDocument doc) {
         System.out.println("No commandline processor for: " + this.getClass().getName());
         System.out.println("If required should create a subclassed processCommandLine: ");
         return offset;

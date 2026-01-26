@@ -61,7 +61,7 @@ class FactbookReaderTest {
             assertEquals("Testland", c1.getName());
             assertEquals("TST", c1.getAlpha2());
             assertEquals("Test City", c1.getCapital());
-            assertEquals(10000.0, c1.getAreaSqKm().doubleValue());
+            assertEquals(10000.0, c1.getAreaSqKm());
             assertEquals(1000000L, c1.getPopulationLong());
             assertEquals("Europe", c1.getContinent());
 

@@ -22,9 +22,9 @@
  */
 package org.jscience.law;
 
-import org.jscience.biology.BiologyConstants;
-import org.jscience.biology.human.Human;
+import org.jscience.biology.Individual;
 import org.jscience.sociology.Person;
+import org.jscience.sociology.Human;
 
 import java.awt.Color;
 import java.awt.Image;
@@ -44,7 +44,7 @@ import java.util.List;
  */
 public class Biometrics {
     
-    private int sex; // see BiologyConstants
+    private Individual.Sex sex;
     private float height; // in meters
     private float weight; // nude weight in kilograms
     private Color skinColor;
@@ -66,7 +66,7 @@ public class Biometrics {
         if (person == null) {
             throw new IllegalArgumentException("Person cannot be null.");
         }
-        this.sex = BiologyConstants.UNKNOWN;
+        this.sex = Individual.Sex.UNKNOWN;
         this.height = 0.0f;
         this.weight = 0.0f;
         this.skinColor = Color.GRAY;
@@ -83,17 +83,17 @@ public class Biometrics {
 
     /**
      * Returns the sex of the individual.
-     * @return the sex code (see BiologyConstants)
+     * @return the sex
      */
-    public int getSex() {
+    public Individual.Sex getSex() {
         return sex;
     }
 
     /**
      * Sets the sex of the individual.
-     * @param sex the sex code
+     * @param sex the sex
      */
-    public void setSex(int sex) {
+    public void setSex(Individual.Sex sex) {
         this.sex = sex;
     }
 

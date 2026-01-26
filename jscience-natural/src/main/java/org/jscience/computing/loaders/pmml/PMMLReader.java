@@ -26,10 +26,8 @@ package org.jscience.computing.loaders.pmml;
 import org.jscience.io.AbstractResourceReader;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
 import java.io.*;
-import java.util.logging.Logger;
 
 /**
  * PMML Reader for Predictive Model Markup Language.
@@ -57,8 +55,6 @@ import java.util.logging.Logger;
  */
 public class PMMLReader extends AbstractResourceReader<PMMLModel> {
 
-    private static final Logger LOGGER = Logger.getLogger(PMMLReader.class.getName());
-    private static final String PMML_NS = "http://www.dmg.org/PMML-4_4";
 
     public PMMLReader() {
     }

@@ -1,8 +1,8 @@
 package org.jscience.arts;
 
 import org.jscience.history.Event;
-import org.jscience.geography.Place;
-import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.earth.Place;
+import org.jscience.history.time.TimeCoordinate;
 // import org.jscience.sociology.Celebration; // Not yet ported
 
 /**
@@ -15,8 +15,9 @@ public class Performance extends Event {
     private final Artwork artwork;
     private final Place place;
 
-    public Performance(Artwork artwork, Place place, TemporalCoordinate date, String comments) {
-        super(date, comments); // Event constructor
+    public Performance(Artwork artwork, Place place, TimeCoordinate date, String comments) {
+        super(artwork != null ? (artwork.getName() + " Performance") : "Unnamed Performance",
+              comments, date, Category.CULTURAL); 
         if (artwork == null || place == null) {
             throw new IllegalArgumentException("Artwork and Place cannot be null.");
         }

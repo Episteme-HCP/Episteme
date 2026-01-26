@@ -33,23 +33,36 @@ import org.jscience.measure.quantity.ThermalConductivity;
 import org.jscience.measure.quantity.Energy;
 import org.jscience.mathematics.numbers.real.Real;
 
-import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * A chemical element.
  * Modernized to use JScience V5 Quantity system and Identification system.
+ * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 @Persistent
-public class Element extends AbstractIdentifiedEntity {
+public class Element implements ComprehensiveIdentification {
 
     private static final long serialVersionUID = 1L;
+
+    @Id
+    protected final Identification id;
+
+    @Attribute
+    protected final Map<String, Object> traits = new HashMap<>();
 
     public enum ElementCategory {
         ALKALI_METAL, ALKALINE_EARTH_METAL, TRANSITION_METAL, POST_TRANSITION_METAL, CHEMICALLY_UNKNOWN, METALLOID,
@@ -100,12 +113,22 @@ public class Element extends AbstractIdentifiedEntity {
     private int yearDiscovered;
 
     public Element(String name, String symbol) {
-        super(new SimpleIdentification(symbol));
+        this.id = new SimpleIdentification(symbol);
         setName(name);
     }
 
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
+    }
+
     public String getSymbol() {
-        return getId().toString();
+        return id.toString();
     }
 
     public int getAtomicNumber() {
@@ -270,6 +293,18 @@ public class Element extends AbstractIdentifiedEntity {
 
     public void setYearDiscovered(int yearDiscovered) {
         this.yearDiscovered = yearDiscovered;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Element element)) return false;
+        return Objects.equals(id, element.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override

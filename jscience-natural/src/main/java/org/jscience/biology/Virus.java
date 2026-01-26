@@ -24,23 +24,35 @@
 package org.jscience.biology;
 
 import org.jscience.biology.genetics.BioSequence;
-import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Represents a virus - an infectious agent that replicates inside living cells.
- * Extends AbstractIdentifiedEntity to support dynamic traits and consistent identity.
+ * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 @Persistent
-public class Virus extends AbstractIdentifiedEntity {
+public class Virus implements ComprehensiveIdentification {
 
     private static final long serialVersionUID = 1L;
+
+    @Id
+    protected final Identification id;
+
+    @Attribute
+    protected final Map<String, Object> traits = new HashMap<>();
 
     /**
      * Virus lifecycle stages.
@@ -85,7 +97,7 @@ public class Virus extends AbstractIdentifiedEntity {
 
     public Virus(String name, String family, GenomeType genomeType,
             Morphology morphology, BioSequence genome, double capsidDiameterNm) {
-        super(new SimpleIdentification(name.toLowerCase().replace(' ', '-')));
+        this.id = new SimpleIdentification(name.toLowerCase().replace(' ', '-'));
         setName(name);
         this.family = family;
         this.genomeType = genomeType;
@@ -93,6 +105,16 @@ public class Virus extends AbstractIdentifiedEntity {
         this.genome = genome;
         this.capsidDiameterNm = capsidDiameterNm;
         this.currentStage = Stage.DORMANT;
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     public String getFamily() {
@@ -139,6 +161,18 @@ public class Virus extends AbstractIdentifiedEntity {
 
     public boolean isRetrovirus() {
         return genomeType == GenomeType.RNA_REVERSE_TRANSCRIBING;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Virus virus)) return false;
+        return Objects.equals(id, virus.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override

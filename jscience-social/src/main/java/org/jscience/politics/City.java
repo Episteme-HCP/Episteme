@@ -23,30 +23,26 @@
 
 package org.jscience.politics;
 
-import java.io.Serializable;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import org.jscience.biology.Individual;
-import org.jscience.geography.Boundary;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
 /**
- * Represents a major human settlement or urban center.
- * A city is a geographical place with administrative boundaries, a country affiliation, 
- * and a set of leaders.
+ * Represents a city.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
  * @since 1.0
  */
 @Persistent
-public class City extends Place implements Serializable {
+public class City extends Place {
 
     private static final long serialVersionUID = 1L;
 
@@ -56,20 +52,30 @@ public class City extends Place implements Serializable {
     @Relation(type = Relation.Type.MANY_TO_ONE)
     private Country country;
 
+    @Attribute
+    private long population;
+
     @Relation(type = Relation.Type.MANY_TO_MANY)
     private final Set<Individual> leaders = new HashSet<>();
+
+    /**
+     * Legacy constructor.
+     */
+    public City(String name, Country country, String zipCode, int population) {
+        this(name, country);
+        this.zipCode = zipCode;
+        this.population = population;
+    }
 
     /**
      * Creates a new City.
      *
      * @param name     the name of the city
-     * @param boundary the administrative borders
      * @param country  the country to which the city belongs
      * @throws NullPointerException if any argument is null
      */
-    public City(String name, Boundary boundary, Country country) {
-        super(Objects.requireNonNull(name, "City name cannot be null"), 
-              Objects.requireNonNull(boundary, "Boundary cannot be null"));
+    public City(String name, Country country) {
+        super(Objects.requireNonNull(name, "City name cannot be null"), Place.Type.CITY);
         this.country = Objects.requireNonNull(country, "Country cannot be null");
         this.country.addCity(this);
     }
@@ -105,6 +111,10 @@ public class City extends Place implements Serializable {
      * @return the country
      */
     public Country getCountry() {
+        return country;
+    }
+
+    public Country getExactCountry() {
         return country;
     }
 

@@ -28,18 +28,12 @@ import org.sbml.jsbml.ext.fbc.FBCModelPlugin;
 import org.sbml.jsbml.ext.fbc.GeneProduct;
 
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 
 import org.jscience.io.AbstractResourceReader;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -300,7 +294,9 @@ public class SBMLReader extends AbstractResourceReader<SBMLModel> {
         result.setId(reaction.getId());
         result.setName(reaction.getName());
         result.setReversible(reaction.getReversible());
-        result.setFast(reaction.getFast());
+        @SuppressWarnings("deprecation")
+        boolean isFast = reaction.getFast();
+        result.setFast(isFast);
         
         // Reactants
         for (SpeciesReference ref : reaction.getListOfReactants()) {

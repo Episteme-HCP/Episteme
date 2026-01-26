@@ -43,7 +43,7 @@ import java.util.Set;
  * @author Gemini AI (Google DeepMind)
  * @version 1.2
  */
-public class LawSuitSituation extends WorkSituation implements Identified {
+public class LawSuitSituation extends WorkSituation implements Identified<Identification> {
     
     private Identification identification;
     private Set<MaterialResource> evidences;
@@ -56,7 +56,7 @@ public class LawSuitSituation extends WorkSituation implements Identified {
      * @param identification the unique identifier for this situation
      */
     public LawSuitSituation(Identification identification) {
-        this(identification.getName(), identification.getComments(), identification);
+        this(identification.toString(), null, identification);
     }
 
     /**
@@ -76,6 +76,11 @@ public class LawSuitSituation extends WorkSituation implements Identified {
 
     @Override
     public Identification getIdentification() {
+        return identification;
+    }
+
+    @Override
+    public Identification getId() {
         return identification;
     }
 

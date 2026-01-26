@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
@@ -56,7 +56,7 @@ public final class ArtMarketAnalyzer {
         int creationYear,
         String medium,
         String auctionHouse,
-        TemporalCoordinate saleDate,
+        TimeCoordinate saleDate,
         Real hammerPrice,
         Real estimateLow,
         Real estimateHigh,
@@ -138,7 +138,7 @@ public final class ArtMarketAnalyzer {
         Map<Integer, Integer> salesByYear = new HashMap<>();
         for (AuctionRecord r : artistSales) {
             int year = getYear(r.saleDate());
-            salesByYear.merge(year, 1, Integer::sum);
+            salesByYear.merge(year, 1, (a, b) -> a + b);
         }
         int peakYear = salesByYear.entrySet().stream()
             .max(Map.Entry.comparingByValue())
@@ -262,7 +262,7 @@ public final class ArtMarketAnalyzer {
             .toList();
     }
 
-    private static int getYear(TemporalCoordinate date) {
+    private static int getYear(TimeCoordinate date) {
         return date != null ? date.toInstant().atZone(ZoneOffset.UTC).getYear() : 2000;
     }
 }

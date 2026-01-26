@@ -1,6 +1,6 @@
 package org.jscience.arts;
 
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 
 import org.jscience.sociology.Celebration;
 

@@ -25,7 +25,7 @@ package org.jscience.politics;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.util.Named;
 
 /**

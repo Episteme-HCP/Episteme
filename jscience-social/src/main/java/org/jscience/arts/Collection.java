@@ -32,6 +32,8 @@ import java.util.Set;
 import java.util.UUID;
 import org.jscience.util.Named;
 import org.jscience.util.identity.Identified;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.UUIDIdentification;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
@@ -47,12 +49,12 @@ import org.jscience.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Collection implements Identified<String>, Named, Serializable {
+public class Collection implements Identified<Identification>, Named, Serializable {
 
     private static final long serialVersionUID = 2L;
 
     @Id
-    private final String id;
+    private final Identification id;
     
     @Attribute
     private String name;
@@ -65,7 +67,7 @@ public class Collection implements Identified<String>, Named, Serializable {
      * @param name common name of the collection
      */
     public Collection(String name) {
-        this.id = UUID.randomUUID().toString();
+        this.id = new UUIDIdentification(UUID.randomUUID().toString());
         this.name = Objects.requireNonNull(name, "Collection name cannot be null.");
         this.artworks = new HashSet<>();
     }
@@ -75,7 +77,7 @@ public class Collection implements Identified<String>, Named, Serializable {
     }
 
     @Override
-    public String getId() {
+    public Identification getId() {
         return id;
     }
 

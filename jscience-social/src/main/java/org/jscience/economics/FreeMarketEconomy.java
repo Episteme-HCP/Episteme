@@ -25,7 +25,6 @@ package org.jscience.economics;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.jscience.economics.money.Money;
 
 /**
  * An economic model where resource allocation is determined by supply and demand 

@@ -29,7 +29,6 @@ import org.jscience.mathematics.numbers.real.Real;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * A composite 2D boundary supporting exclaves and enclaves.

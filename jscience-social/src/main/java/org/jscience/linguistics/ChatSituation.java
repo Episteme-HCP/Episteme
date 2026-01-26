@@ -1,6 +1,6 @@
 package org.jscience.linguistics;
 
-import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +20,7 @@ import org.jscience.util.persistence.Relation;
  * @since 2.0
  */
 @Persistent
-public class ChatSituation extends Situation implements Serializable {
+public class ChatSituation extends Situation {
 
     private static final long serialVersionUID = 2L;
 

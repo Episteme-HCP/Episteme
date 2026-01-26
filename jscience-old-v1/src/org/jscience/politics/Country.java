@@ -2,7 +2,7 @@ package org.jscience.politics;
 
 import org.jscience.economics.money.Currency;
 
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 
 import org.jscience.util.Named;
 

@@ -1,7 +1,7 @@
 package org.jscience.history;
 
-import java.io.Serializable;
-import org.jscience.history.temporal.TemporalCoordinate;
+
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.util.persistence.Persistent;
 
 /**
@@ -12,15 +12,15 @@ import org.jscience.util.persistence.Persistent;
  * @since 2.0
  */
 @Persistent
-public class GeologicalEra extends Event implements Serializable {
+public class GeologicalEra extends Event {
 
     private static final long serialVersionUID = 2L;
 
-    public GeologicalEra(String name, String description, TemporalCoordinate when) {
+    public GeologicalEra(String name, String description, TimeCoordinate when) {
         super(name, description, when, Category.NATURAL);
     }
 
-    public GeologicalEra(String name, TemporalCoordinate when) {
+    public GeologicalEra(String name, TimeCoordinate when) {
         super(name, when);
     }
 }

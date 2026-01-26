@@ -27,6 +27,8 @@ import org.jscience.economics.*;
 import org.jscience.sociology.*;
 import org.jscience.geography.*;
 import org.jscience.linguistics.*;
+import org.jscience.economics.money.Money;
+import org.jscience.earth.coordinates.GeodeticCoordinate;
 import org.jscience.mathematics.numbers.real.Real;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -67,8 +69,8 @@ public class AdvancedFeaturesTest {
 
     @Test
     public void testGISProfile() {
-        Coordinate paris = new Coordinate(48.8566, 2.3522);
-        Coordinate london = new Coordinate(51.5074, -0.1278);
+        GeodeticCoordinate paris = new GeodeticCoordinate(48.8566, 2.3522);
+        GeodeticCoordinate london = new GeodeticCoordinate(51.5074, -0.1278);
 
         double distance = GISProfile.calculateDistanceMeters(paris, london);
         // Approx 344 km
@@ -82,11 +84,11 @@ public class AdvancedFeaturesTest {
 
     @Test
     public void testCorpus() {
-        Corpus corpus = new Corpus();
+        Corpus corpus = new Corpus("Test Corpus");
         corpus.addDocument("Hello world");
         corpus.addDocument("Hello Gemini");
 
-        java.util.Map<String, Integer> freq = corpus.getWordFrequency();
+        java.util.Map<String, Long> freq = corpus.getWordFrequency();
         assertEquals(2, freq.get("hello"));
         assertEquals(1, freq.get("world"));
         assertEquals(1, freq.get("gemini"));

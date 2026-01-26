@@ -23,24 +23,44 @@
 
 package org.jscience.sports;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
-import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
 
 /**
  * Represents a specific sport or athletic discipline.
- * Extends AbstractIdentifiedEntity to support dynamic traits and consistent identity.
+ * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Sport extends AbstractIdentifiedEntity {
+@Persistent
+public class Sport implements ComprehensiveIdentification {
 
     private static final long serialVersionUID = 1L;
 
+    @Id
+    protected final Identification id;
+
+    @Attribute
+    protected final Map<String, Object> traits = new HashMap<>();
+
+    @Attribute
     private final boolean teamSport;
+
+    @Attribute
     private final Category category;
+
+    public Sport(String name, boolean teamSport) {
+        this(name, teamSport, Category.OTHER);
+    }
 
     /**
      * Initializes a new Sport.
@@ -51,10 +71,20 @@ public class Sport extends AbstractIdentifiedEntity {
      * @throws NullPointerException if name is null
      */
     public Sport(String name, boolean teamSport, Category category) {
-        super(new SimpleIdentification(name));
+        this.id = new SimpleIdentification(name);
         setName(name);
         this.teamSport = teamSport;
         this.category = category;
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     public boolean isTeamSport() {
@@ -74,11 +104,11 @@ public class Sport extends AbstractIdentifiedEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Sport sport)) return false;
-        return teamSport == sport.teamSport && Objects.equals(getName(), sport.getName());
+        return Objects.equals(id, sport.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), teamSport);
+        return Objects.hash(id);
     }
 }

@@ -22,6 +22,9 @@
  */
 package org.jscience.philosophy.epistemology;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Evidence based on logical reasoning, mathematical proofs, or a priori analysis.
  *
@@ -30,6 +33,8 @@ package org.jscience.philosophy.epistemology;
  * @since 1.0
  */
 public class RationalEvidence extends Evidence {
+    private Map<String, Object> traits = new HashMap<>();
+    @Override public Map<String, Object> getTraits() { return traits; }
 
     private static final long serialVersionUID = 1L;
 

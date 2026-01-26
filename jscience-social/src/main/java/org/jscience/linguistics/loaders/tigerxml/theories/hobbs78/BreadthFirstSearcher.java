@@ -28,198 +28,112 @@ import org.jscience.linguistics.loaders.tigerxml.tools.SyncMMAX;
 import org.jscience.linguistics.loaders.tigerxml.tools.SyntaxTools;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
- * This class is a helper class for Hobbs78. A BreadthFirstSearcher
- * searches for a GraphNode that is the possible antecedent of a pronoun. It
- * searches recursively through a list of Graphnodes and through all children
- * it encounters. It does so in a breadth-first and subject-first then
- * left-to-right fashion. Parameters: my_pronoun is the pronoun whose
- * antecedent is searched my_mother is an NT that is supposed to be the mother
- * of nodes nodes are the nodes to be searched np_or_s_between if set to true
- * then there must be a np or s-like node between a node and mother for the
- * node to be returned go_below specifies whether it will be searched below np
- * or s-like nodes encountered
- *
- * @author <a href="mailto:hajokeffer@coli.uni-sb.de">Hajo Keffer</a>
- * @version 1.84 $Id: BreadthFirstSearcher.java,v 1.3 2007-10-23 18:21:43 virtualcall Exp $
+ * Helper class for Hobbs78 pronoun resolution algorithm.
+ * Searches breadth-first, subject-first, then left-to-right.
  */
 public class BreadthFirstSearcher {
-    /** DOCUMENT ME! */
-    private T pronoun;
-
-    /** DOCUMENT ME! */
-    private NT mother;
-
-    /** DOCUMENT ME! */
-    private ArrayList agenda;
-
-    /** DOCUMENT ME! */
+    private final T pronoun;
+    private final NT mother;
+    private final List<GraphNode> agenda;
     private int pointer;
+    private final boolean np_or_s_between;
+    private final boolean go_below;
 
-    /** DOCUMENT ME! */
-    private boolean np_or_s_between;
-
-    /** DOCUMENT ME! */
-    private boolean go_below;
-
-/**
+    /**
      * Creates a new BreadthFirstSearcher object.
-     *
-     * @param my_pronoun         DOCUMENT ME!
-     * @param my_mother          DOCUMENT ME!
-     * @param nodes              DOCUMENT ME!
-     * @param my_np_or_s_between DOCUMENT ME!
-     * @param my_go_below        DOCUMENT ME!
      */
-    public BreadthFirstSearcher(T my_pronoun, NT my_mother, ArrayList nodes,
+    public BreadthFirstSearcher(T my_pronoun, NT my_mother, List<GraphNode> nodes,
         boolean my_np_or_s_between, boolean my_go_below) {
         this.mother = my_mother;
-        this.agenda = new ArrayList();
+        this.agenda = new ArrayList<>();
 
-        for (int i = 0; i < nodes.size(); i++) {
-            Object next_item = nodes.get(i);
-            agenda.add(next_item);
+        if (nodes != null) {
+            this.agenda.addAll(nodes);
         }
 
-        agenda = GeneralTools.sortNodes(agenda);
+        List<GraphNode> sorted = GeneralTools.sortNodes(agenda);
+        this.agenda.clear();
+        this.agenda.addAll(sorted);
+        
         this.pointer = 0;
         this.go_below = my_go_below;
         this.np_or_s_between = my_np_or_s_between;
         this.pronoun = my_pronoun;
-    } // constructor BreadthFirstSeacher
+    }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     private GraphNode getNext() {
-        GraphNode next_node = (GraphNode) agenda.get(pointer);
+        GraphNode next_node = agenda.get(pointer);
         pointer++;
 
-        if (!(next_node.isTerminal())) {
+        if (!next_node.isTerminal()) {
             NT non_terminal = (NT) next_node;
-            boolean neither_np_nor_s = ((!(SyntaxTools.isNpLikeNode(non_terminal))) &&
-                (!(SyntaxTools.isSLikeNode(non_terminal))));
-            ArrayList daughters = non_terminal.getDaughters();
+            boolean neither_np_nor_s = !SyntaxTools.isNpLikeNode(non_terminal) &&
+                                       !SyntaxTools.isSLikeNode(non_terminal);
+            
+            List<GraphNode> daughters = new ArrayList<>(non_terminal.getDaughters());
             daughters = GeneralTools.sortNodes(daughters);
             orderSubjectFirst(daughters);
 
-            if ((go_below) || (neither_np_nor_s)) {
-                for (int i = 0; i < daughters.size(); i++) {
-                    Object next_daughter = daughters.get(i);
-                    agenda.add(next_daughter);
-                } // for i
-            } // if
-        } // if
+            if (go_below || neither_np_nor_s) {
+                agenda.addAll(daughters);
+            }
+        }
 
         return next_node;
-    } // method getNext
+    }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     private boolean hasNext() {
         return pointer < agenda.size();
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param list DOCUMENT ME!
-     */
-    private static void orderSubjectFirst(ArrayList list) {
+    private static void orderSubjectFirst(List<GraphNode> list) {
         for (int i = 0; i < list.size(); i++) {
-            GraphNode next_node = (GraphNode) list.get(i);
+            GraphNode next_node = list.get(i);
             String edge = next_node.getEdge2Mother();
 
-            if (edge.equals("SB")) {
+            if ("SB".equals(edge)) {
                 list.remove(i);
                 list.add(0, next_node);
             }
-        } // for i
-    } // method orderSubjectFirst
+        }
+    }
 
-    /**
-     * Returns the GraphNode which is likely to be the antecedent
-     * according to the setting of the BreadthFirstSearcher object, null if no
-     * such node could be found
-     *
-     * @return The GraphNode which is likely to be the antecedent or null.
-     */
     public GraphNode searchAntecedent() {
-        GraphNode return_value = null;
-        boolean cont = this.hasNext();
-
-        while (cont) {
-            GraphNode next = this.getNext();
+        while (hasNext()) {
+            GraphNode next = getNext();
 
             if (SyncMMAX.isMarkable(next)) {
-                boolean match = IndexFeatures.indexFeaturesMatch(next,
-                        this.pronoun);
-
-                if (match) {
+                if (IndexFeatures.indexFeaturesMatch(next, pronoun)) {
                     boolean between_ok = true;
-
-                    if (this.np_or_s_between) {
-                        between_ok = npOrSLikeBetween(next, this.mother);
+                    if (np_or_s_between) {
+                        between_ok = npOrSLikeBetween(next, mother);
                     }
-
                     if (between_ok) {
-                        return_value = next;
-                    } // if between_ok
-                } // if match
-            } // if is Markable
-
-            if ((!(this.hasNext())) || (!(return_value == null))) {
-                cont = false;
+                        return next;
+                    }
+                }
             }
-        } //while
+        }
+        return null;
+    }
 
-        return return_value;
-    } // method SearchAntecedent
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param lower DOCUMENT ME!
-     * @param higher DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
     private static boolean npOrSLikeBetween(GraphNode lower, NT higher) {
-        NT mother = lower.getMother();
-        boolean return_value = false;
-        boolean cont;
-        cont = true;
+        if (lower == null || higher == null) return false;
+        NT currentMother = lower.getMother();
 
-        while (cont) {
-            if (mother == null) {
-                System.err.println(
-                    "org.jscience.ml.tigerxml.theories.hobbs78.BreadthFirstSearcher: " +
-                    "WARNING: didn't meet higher node when calling NpOrSLikeBetween" +
-                    " for Sentence(s) " + lower.getSentence() + " and " +
-                    higher.getSentence());
-                cont = false;
-            } else if (mother.equals(higher)) {
-                cont = false;
-            } else if (org.jscience.ml.tigerxml.tools.SyntaxTools.isNpLikeNode(
-                        mother) ||
-                    org.jscience.ml.tigerxml.tools.SyntaxTools.isSLikeNode(
-                        mother)) {
-                cont = false;
-                return_value = true;
+        while (currentMother != null) {
+            if (currentMother.equals(higher)) {
+                return false;
             }
-
-            if (cont) {
-                mother = mother.getMother();
+            if (SyntaxTools.isNpLikeNode(currentMother) || SyntaxTools.isSLikeNode(currentMother)) {
+                return true;
             }
-        } // while
-
-        return return_value;
-    } // npOrSLikeBetween
-} // class BreadthFirstSearcher
+            currentMother = currentMother.getMother();
+        }
+        return false;
+    }
+}

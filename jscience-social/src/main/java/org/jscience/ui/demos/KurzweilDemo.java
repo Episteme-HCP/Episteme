@@ -34,7 +34,7 @@ import javafx.scene.text.Font;
 import org.jscience.ui.AbstractDemo;
 import org.jscience.history.HistoricalTimeline;
 import org.jscience.history.HistoricalEvent;
-import org.jscience.history.FuzzyDate;
+import org.jscience.history.time.FuzzyTimePoint;
 import org.jscience.ui.viewers.history.TimelineViewer;
 import org.jscience.ui.i18n.I18n;
 
@@ -120,11 +120,11 @@ public class KurzweilDemo extends AbstractDemo {
         // Create Timeline Data
         HistoricalTimeline timeline = new HistoricalTimeline("Kurzweil History");
         for (Milestone m : MILESTONES) {
-            FuzzyDate date;
+            FuzzyTimePoint date;
             if (m.year < 0) {
-                date = FuzzyDate.bce(-m.year);
+                date = FuzzyTimePoint.bce(-m.year);
             } else {
-                date = FuzzyDate.of(m.year);
+                date = FuzzyTimePoint.of(m.year);
             }
             // Category? Default to SCIENTIFIC
             // NOTE: Key is passed as label, TimelineViewer should translate it if it's a key.

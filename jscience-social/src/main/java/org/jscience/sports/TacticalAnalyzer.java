@@ -93,7 +93,7 @@ public final class TacticalAnalyzer {
         for (Pass pass : passes) {
             if (pass.successful()) {
                 network.computeIfAbsent(pass.fromPlayer(), k -> new HashMap<>())
-                    .merge(pass.toPlayer(), 1, Integer::sum);
+                    .merge(pass.toPlayer(), 1, (a, b) -> a + b);
             }
         }
         return network;

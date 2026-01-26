@@ -124,7 +124,7 @@ public class GenBankReader extends org.jscience.io.AbstractResourceReader<String
 
     private static String fetch(String accession, String format, String database) {
         String cacheKey = "genbank_" + database + "_" + accession + "_" + format;
-        java.util.Optional<String> cached = ResourceCache.global().get(cacheKey);
+        Optional<String> cached = ResourceCache.global().get(cacheKey);
         if (cached.isPresent())
             return cached.get();
 

@@ -23,9 +23,9 @@
 
 package org.jscience.politics;
 
-import java.io.Serializable;
+
 import java.util.Set;
-import org.jscience.biology.Human;
+import org.jscience.economics.EconomicAgent;
 import org.jscience.economics.Organization;
 import org.jscience.economics.money.Account;
 import org.jscience.geography.BusinessPlace;
@@ -40,7 +40,7 @@ import org.jscience.util.identity.Identification;
  * @version 1.1
  * @since 1.0
  */
-public class PoliticalParty extends Organization implements Serializable {
+public class PoliticalParty extends Organization {
 
     private static final long serialVersionUID = 1L;
 
@@ -54,7 +54,7 @@ public class PoliticalParty extends Organization implements Serializable {
      * @param accounts       financial accounts for party funding
      */
     public PoliticalParty(String name, Identification identification,
-        Set<Human> owners, BusinessPlace place, Set<Account> accounts) {
+        Set<EconomicAgent> owners, BusinessPlace place, Set<Account> accounts) {
         super(name, identification, owners, place, accounts);
     }
 

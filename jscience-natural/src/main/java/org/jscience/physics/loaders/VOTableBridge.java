@@ -25,7 +25,6 @@ package org.jscience.physics.loaders;
 
 import org.w3c.dom.*;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;

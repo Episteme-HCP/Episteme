@@ -39,7 +39,7 @@ import org.jscience.util.persistence.Persistent;
  * @since 1.0
  */
 @Persistent
-public class HeightMap extends Map {
+public class HeightMap extends GeoMap {
 
     private static final long serialVersionUID = 1L;
 
@@ -47,7 +47,7 @@ public class HeightMap extends Map {
     private Matrix<Real> elevations;
 
     public HeightMap(String name, GeodeticCoordinate topLeft, Quantity<Length> width, Quantity<Length> height) {
-        super(name, topLeft, width, height);
+        super(name, topLeft, null); // bottomRight unknown or need calculation, passing null is safe if optional
     }
 
     public Matrix<Real> getElevations() {
@@ -62,7 +62,7 @@ public class HeightMap extends Map {
     public String toString() {
         return String.format("HeightMap: %s (%dx%d data points)", 
             getName(), 
-            elevations != null ? elevations.getRows() : 0, 
-            elevations != null ? elevations.getColumns() : 0);
+            elevations != null ? elevations.rows() : 0, 
+            elevations != null ? elevations.cols() : 0);
     }
 }

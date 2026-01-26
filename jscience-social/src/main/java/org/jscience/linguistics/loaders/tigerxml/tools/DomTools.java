@@ -90,13 +90,6 @@ public class DomTools {
         int TEXT_TYPE = 3;
         int CDATA_TYPE = 4;
         int ENTITYREF_TYPE = 5;
-        int ENTITY_TYPE = 6;
-        int PROCINSTR_TYPE = 7;
-        int COMMENT_TYPE = 8;
-        int DOCUMENT_TYPE = 9;
-        int DOCTYPE_TYPE = 10;
-        int DOCFRAG_TYPE = 11;
-        int NOTATION_TYPE = 12;
 
         String name = node.getNodeName();
         int type = node.getNodeType();

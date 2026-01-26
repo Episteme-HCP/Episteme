@@ -7,8 +7,8 @@ import org.jscience.biology.human.Human;
 import org.jscience.economics.Organization;
 import org.jscience.economics.money.Currency;
 
-import org.jscience.geography.Place;
-import org.jscience.geography.Places;
+import org.jscience.earth.Place;
+import org.jscience.earth.Places;
 
 import org.jscience.measure.Amount;
 import org.jscience.measure.Analysis;

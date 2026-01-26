@@ -9,7 +9,7 @@
 package org.jscience.economics.resources;
 
 import org.jscience.economics.Community;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.measure.Quantity;
 
 import java.time.Instant;

@@ -23,20 +23,17 @@
 
 package org.jscience.economics.money;
 
-import org.jscience.biology.Human;
-
 import org.jscience.economics.Bank;
+import org.jscience.economics.EconomicAgent;
 import org.jscience.economics.Property;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.util.Named;
+import org.jscience.util.identity.ComprehensiveIdentification;
 import org.jscience.util.identity.Identification;
-import org.jscience.util.identity.Identified;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,7 +52,7 @@ import java.util.Set;
  * @since 1.0
  */
 @Persistent
-public class Account implements Property, Named, Identified<String>, Serializable {
+public class Account implements Property, ComprehensiveIdentification {
 
     private static final long serialVersionUID = 1L;
 
@@ -63,13 +60,13 @@ public class Account implements Property, Named, Identified<String>, Serializabl
     private final Bank bank;
 
     @Relation(type = Relation.Type.MANY_TO_MANY)
-    private Set<Human> owners;
+    private Set<EconomicAgent> owners;
     
     @Id
-    private final Identification identification;
+    private final Identification id;
     
     @Attribute
-    private final String name;
+    private final Map<String, Object> traits = new HashMap<>();
     
     @Attribute
     private Money amount;
@@ -78,8 +75,13 @@ public class Account implements Property, Named, Identified<String>, Serializabl
     private Map<Share, Integer> shares;
 
     @Override
-    public String getId() {
-        return identification != null ? identification.getId() : name;
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     /**
@@ -101,7 +103,7 @@ public class Account implements Property, Named, Identified<String>, Serializabl
      * @param name           the account name
      * @param amount         initial balance
      */
-    public Account(Bank bank, Set<Human> owners, Identification identification,
+    public Account(Bank bank, Set<EconomicAgent> owners, Identification identification,
                    String name, Money amount) {
         this(bank, owners, identification, name, amount, new HashMap<>());
     }
@@ -116,11 +118,11 @@ public class Account implements Property, Named, Identified<String>, Serializabl
      * @param amount         initial balance
      * @param shares         initial share holdings
      */
-    public Account(Bank bank, Set<Human> owners, Identification identification,
+    public Account(Bank bank, Set<EconomicAgent> owners, Identification id,
                    String name, Money amount, Map<Share, Integer> shares) {
         this.bank = bank;
-        this.identification = identification;
-        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        this.id = id != null ? id : new org.jscience.util.identity.SimpleIdentification(name);
+        setName(Objects.requireNonNull(name, "Name cannot be null"));
         if (name.isEmpty()) throw new IllegalArgumentException("Account name cannot be empty");
         this.amount = Objects.requireNonNull(amount, "Amount cannot be null");
         
@@ -140,7 +142,8 @@ public class Account implements Property, Named, Identified<String>, Serializabl
      * Returns an unmodifiable set of account owners.
      * @return the owners
      */
-    public Set<Human> getOwners() {
+    @Override
+    public Set<EconomicAgent> getOwners() {
         return Collections.unmodifiableSet(owners);
     }
 
@@ -148,7 +151,7 @@ public class Account implements Property, Named, Identified<String>, Serializabl
      * Adds an owner to the account.
      * @param owner the owner to add
      */
-    public void addOwner(Human owner) {
+    public void addOwner(EconomicAgent owner) {
         owners.add(Objects.requireNonNull(owner, "Owner cannot be null"));
     }
 
@@ -157,7 +160,7 @@ public class Account implements Property, Named, Identified<String>, Serializabl
      * @param owner the owner to remove
      * @throws IllegalArgumentException if trying to remove the last owner
      */
-    public void removeOwner(Human owner) {
+    public void removeOwner(EconomicAgent owner) {
         if (owners.size() <= 1) {
             throw new IllegalArgumentException("Cannot remove last owner");
         }
@@ -168,20 +171,16 @@ public class Account implements Property, Named, Identified<String>, Serializabl
      * Replaces all owners.
      * @param owners the new set of owners
      */
-    public void setOwners(Set<Human> owners) {
+    public void setOwners(Set<EconomicAgent> owners) {
         this.owners = new HashSet<>(Objects.requireNonNull(owners, "Owners set cannot be null"));
         if (this.owners.isEmpty()) throw new IllegalArgumentException("Owners set cannot be empty");
     }
 
-    @Override
     public Identification getIdentification() {
-        return identification;
+        return id;
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
+    // getName() and setName() are provided by ComprehensiveIdentification default methods
 
     /**
      * Returns the current account balance.
@@ -239,7 +238,7 @@ public class Account implements Property, Named, Identified<String>, Serializabl
     public void addShare(Share share, int quantity) {
         Objects.requireNonNull(share, "Share cannot be null");
         if (quantity <= 0) throw new IllegalArgumentException("Quantity must be positive");
-        shares.merge(share, quantity, Integer::sum);
+        shares.merge(share, quantity, (v1, v2) -> v1 + v2);
     }
 
     /**
@@ -273,20 +272,18 @@ public class Account implements Property, Named, Identified<String>, Serializabl
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof Account)) return false;
-        Account other = (Account) obj;
-        return Objects.equals(identification, other.identification) &&
-               Objects.equals(name, other.name);
+        if (!(obj instanceof Account other)) return false;
+        return Objects.equals(id, other.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(identification, name);
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
         return String.format("Account[%s, balance=%s, shares=%d types]", 
-            name, amount, shares.size());
+            getName(), amount, shares.size());
     }
 }

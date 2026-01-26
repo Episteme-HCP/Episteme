@@ -25,14 +25,13 @@ package org.jscience.economics.money;
 
 import org.jscience.economics.Organization;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.util.identity.ComprehensiveIdentification;
 import org.jscience.util.identity.Identification;
-import org.jscience.util.identity.Identified;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 
@@ -47,7 +46,7 @@ import java.util.Objects;
  * @since 1.0
  */
 @Persistent
-public final class Transaction implements Identified<String>, Serializable {
+public final class Transaction implements ComprehensiveIdentification {
 
     private static final long serialVersionUID = 1L;
 
@@ -68,10 +67,10 @@ public final class Transaction implements Identified<String>, Serializable {
     private final Instant date;
 
     @Id
-    private final Identification identification;
+    private final Identification id;
 
     @Attribute
-    private final String description;
+    private final java.util.Map<String, Object> traits = new java.util.HashMap<>();
 
     @Attribute
     private final Money amount;
@@ -96,12 +95,12 @@ public final class Transaction implements Identified<String>, Serializable {
      * @param amount         the monetary amount
      */
     public Transaction(Organization seller, Organization buyer, Instant date,
-                       Identification identification, String description, Money amount) {
+                       Identification id, String description, Money amount) {
         this.seller = Objects.requireNonNull(seller, "Seller cannot be null");
         this.buyer = Objects.requireNonNull(buyer, "Buyer cannot be null");
         this.date = Objects.requireNonNull(date, "Date cannot be null");
-        this.identification = Objects.requireNonNull(identification, "ID cannot be null");
-        this.description = requireNonEmpty(description, "Description");
+        this.id = Objects.requireNonNull(id, "ID cannot be null");
+        setName(requireNonEmpty(description, "Description"));
         this.amount = Objects.requireNonNull(amount, "Amount cannot be null");
         this.share = null;
         this.quantity = 0;
@@ -120,13 +119,13 @@ public final class Transaction implements Identified<String>, Serializable {
      * @param quantity       number of shares
      */
     public Transaction(Organization seller, Organization buyer, Instant date,
-                       Identification identification, String description, 
+                       Identification id, String description, 
                        Share share, int quantity) {
         this.seller = Objects.requireNonNull(seller, "Seller cannot be null");
         this.buyer = Objects.requireNonNull(buyer, "Buyer cannot be null");
         this.date = Objects.requireNonNull(date, "Date cannot be null");
-        this.identification = Objects.requireNonNull(identification, "ID cannot be null");
-        this.description = requireNonEmpty(description, "Description");
+        this.id = Objects.requireNonNull(id, "ID cannot be null");
+        setName(requireNonEmpty(description, "Description"));
         this.share = Objects.requireNonNull(share, "Share cannot be null");
         if (quantity <= 0) {
             throw new IllegalArgumentException("Quantity must be positive");
@@ -144,8 +143,13 @@ public final class Transaction implements Identified<String>, Serializable {
     }
 
     @Override
-    public String getId() {
-        return identification.getId();
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public java.util.Map<String, Object> getTraits() {
+        return traits;
     }
 
     // Getters
@@ -162,13 +166,12 @@ public final class Transaction implements Identified<String>, Serializable {
         return date;
     }
 
-    @Override
     public Identification getIdentification() {
-        return identification;
+        return id;
     }
 
     public String getDescription() {
-        return description;
+        return getName();
     }
 
     public Money getAmount() {
@@ -242,33 +245,32 @@ public final class Transaction implements Identified<String>, Serializable {
      */
     public Receipt getReceipt() {
         if (isMoneyTransaction()) {
-            return new Receipt(seller, buyer, date, identification, description, amount);
+            return new Receipt(seller, buyer, date, id, getName(), amount);
         } else {
-            return new Receipt(seller, buyer, date, identification, description, share, quantity);
+            return new Receipt(seller, buyer, date, id, getName(), share, quantity);
         }
     }
 
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof Transaction)) return false;
-        Transaction other = (Transaction) obj;
-        return Objects.equals(identification, other.identification);
+        if (!(obj instanceof Transaction other)) return false;
+        return Objects.equals(id, other.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(identification);
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
         if (isMoneyTransaction()) {
             return String.format("Transaction %s [%s]: %s -> %s, %s",
-                identification, status, seller.getName(), buyer.getName(), amount);
+                id, status, seller.getName(), buyer.getName(), amount);
         } else {
             return String.format("Transaction %s [%s]: %s -> %s, %d x %s",
-                identification, status, seller.getName(), buyer.getName(), 
+                id, status, seller.getName(), buyer.getName(), 
                 quantity, share.getSymbol());
         }
     }

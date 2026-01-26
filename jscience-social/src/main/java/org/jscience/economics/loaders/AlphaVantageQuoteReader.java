@@ -37,7 +37,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * Modern stock quote reader using Alpha Vantage API.
@@ -174,7 +174,7 @@ public class AlphaVantageQuoteReader extends AbstractResourceReader<Quote> {
         String changePercent = globalQuote.path("10. change percent").asText("0%");
 
         Quote quote = new Quote(sym, sym, "Alpha Vantage");
-        quote.setQuotation(volume, Money.usd(price), new Date());
+        quote.update(volume, Money.usd(price), Instant.now());
         quote.setOpenPrice(Money.usd(open));
         quote.setHighPrice(Money.usd(high));
         quote.setLowPrice(Money.usd(low));

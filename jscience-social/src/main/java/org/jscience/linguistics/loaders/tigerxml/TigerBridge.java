@@ -23,15 +23,13 @@
 
 package org.jscience.linguistics.loaders.tigerxml;
 
-import org.jscience.linguistics.*;
+import org.jscience.linguistics.Language;
 import org.jscience.linguistics.Phrase;
 import org.jscience.linguistics.Sentence;
 import org.jscience.linguistics.Word;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 /**
  * Bridge between TigerXML data structures and the JScience Linguistics ontology.
@@ -54,25 +52,30 @@ public final class TigerBridge {
      */
     public static Sentence convert(org.jscience.linguistics.loaders.tigerxml.Sentence tigerSent, Language language) {
         Sentence result = new Sentence();
-        result.setRawText(tigerSent.getText());
+        result.setText(tigerSent.getText());
         
         // Map top-level non-terminals to Phrases
-        // Usually, the sentence root is an NT with cat="S" or similar.
-        for (org.jscience.linguistics.loaders.tigerxml.NT nt : tigerSent.getNTs()) {
-            // Is it a direct child of the root?
-            // In TigerXML, root has no mother.
-            if (!nt.hasMother()) {
-                result.addPhrase(convertNT(nt, language));
+        // Use raw ArrayList but cast carefully or use generic-safe methods
+        List<?> nts = tigerSent.getNTs();
+        for (Object obj : nts) {
+            if (obj instanceof org.jscience.linguistics.loaders.tigerxml.NT nt) {
+                if (!nt.hasMother()) {
+                    result.addPhrase(convertNT(nt, language));
+                }
             }
         }
         
         // If there are orphaned terminals (not covered by NTs), add them as a phrase
         List<org.jscience.linguistics.loaders.tigerxml.T> orphaned = new ArrayList<>();
-        for (org.jscience.linguistics.loaders.tigerxml.T t : tigerSent.getTs()) {
-            if (!t.hasMother()) {
-                orphaned.add(t);
+        List<?> ts = tigerSent.getTs();
+        for (Object obj : ts) {
+            if (obj instanceof org.jscience.linguistics.loaders.tigerxml.T t) {
+                if (!t.hasMother()) {
+                    orphaned.add(t);
+                }
             }
         }
+        
         if (!orphaned.isEmpty()) {
             Phrase p = new Phrase();
             for (org.jscience.linguistics.loaders.tigerxml.T t : orphaned) {
@@ -104,9 +107,26 @@ public final class TigerBridge {
      */
     public static Word convertT(org.jscience.linguistics.loaders.tigerxml.T t, Language language) {
         Word word = new Word(language, t.getWord());
-        word.setPartOfSpeech(t.getPos());
-        // Morphological info can be stored in word attributes if desired.
+        word.setPartOfSpeech(mapPosToEnum(t.getPos()));
+        word.setLemma(t.getLemma());
         return word;
+    }
+
+    private static Word.PartOfSpeech mapPosToEnum(String pos) {
+        if (pos == null) return Word.PartOfSpeech.UNKNOWN;
+        // Mapping STTS (Stuttgart-Tübingen-Tagset) often used in TigerXML
+        return switch (pos.toUpperCase()) {
+            case "NN", "NE" -> Word.PartOfSpeech.NOUN;
+            case "VVFIN", "VVIMP", "VVINF", "VVIZU", "VVPP", "VAFIN", "VAIMP", "VAINF", "VAPP", "VMFIN", "VMINF", "VMPP" -> Word.PartOfSpeech.VERB;
+            case "ADJA", "ADJD" -> Word.PartOfSpeech.ADJECTIVE;
+            case "ADV", "PAV" -> Word.PartOfSpeech.ADVERB;
+            case "PPER", "PDS", "PDAT", "PIS", "PIAT", "PIDAT", "PPOSS", "PPOSAT", "PRELS", "PRELAT", "PRF", "PWS", "PWAT", "PWAV" -> Word.PartOfSpeech.PRONOUN;
+            case "APPR", "APPRART", "APPO", "APZR" -> Word.PartOfSpeech.PREPOSITION;
+            case "KON", "KOUI", "KOUS", "KOKAS" -> Word.PartOfSpeech.CONJUNCTION;
+            case "ITJ" -> Word.PartOfSpeech.INTERJECTION;
+            case "ART" -> Word.PartOfSpeech.ARTICLE;
+            default -> Word.PartOfSpeech.UNKNOWN;
+        };
     }
 
     private static Phrase.Type mapCatToType(String cat) {

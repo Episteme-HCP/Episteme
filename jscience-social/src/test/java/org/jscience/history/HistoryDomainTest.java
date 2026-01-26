@@ -28,15 +28,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.Optional;
+import org.jscience.history.time.FuzzyTimePoint;
 
 public class HistoryDomainTest {
 
     @Test
     public void testTimeline() {
         HistoricalTimeline timeline = new HistoricalTimeline("World History");
-        timeline.addEvent(HistoricalEvent.FRENCH_REVOLUTION);
-        timeline.addEvent(HistoricalEvent.WORLD_WAR_I);
-        timeline.addEvent(HistoricalEvent.MOON_LANDING);
+        timeline.addEvent(HistoryConstants.FRENCH_REVOLUTION);
+        timeline.addEvent(HistoryConstants.WORLD_WAR_I);
+        timeline.addEvent(HistoryConstants.MOON_LANDING);
 
         assertEquals(3, timeline.getEvents().size());
 
@@ -54,8 +55,8 @@ public class HistoryDomainTest {
         HistoricalTimeline timeline = HistoricalTimeline.worldHistory();
         // 1900 to 1950
         List<HistoricalEvent> events = timeline.getEventsBetween(
-                FuzzyDate.of(1900, 1, 1),
-                FuzzyDate.of(1950, 12, 31));
+                FuzzyTimePoint.of(1900, 1, 1),
+                FuzzyTimePoint.of(1950, 12, 31));
 
         // Should include WWI and WWII
         assertTrue(events.stream().anyMatch(e -> e.getName().equals("World War I")));

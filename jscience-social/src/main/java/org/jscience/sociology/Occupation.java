@@ -42,7 +42,7 @@ import org.jscience.util.persistence.Persistent;
  * @since 1.0
  */
 @Persistent
-public final class Occupation implements ExtensibleEnum<Occupation>, Serializable {
+public final class Occupation implements ExtensibleEnum<Occupation>, org.jscience.util.Named, Serializable {
 
     private static final long serialVersionUID = 1L;
 

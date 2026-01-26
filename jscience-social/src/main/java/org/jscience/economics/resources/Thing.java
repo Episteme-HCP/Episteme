@@ -23,12 +23,11 @@
 
 package org.jscience.economics.resources;
 
-import java.io.Serializable;
+
 import java.time.Instant;
-import javax.media.j3d.Group;
 import org.jscience.economics.Community;
 import org.jscience.economics.Resource;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.measure.Quantity;
 
 /**
@@ -40,12 +39,9 @@ import org.jscience.measure.Quantity;
  * @version 1.1
  * @since 1.0
  */
-public class Thing extends Resource implements Serializable {
+public class Thing extends Resource {
 
     private static final long serialVersionUID = 1L;
-
-    /** 3D geometry representation. */
-    private Group group;
 
     /**
      * Initializes a new physical thing.
@@ -55,19 +51,4 @@ public class Thing extends Resource implements Serializable {
         super(name, description, amount, producer, productionPlace, productionDate);
     }
 
-    /**
-     * Returns the 3D geometry group.
-     * @return the J3D group, or null if not set
-     */
-    public Group getGroup() {
-        return group;
-    }
-
-    /**
-     * Sets the 3D geometry group.
-     * @param group the J3D group
-     */
-    public void setGroup(Group group) {
-        this.group = group;
-    }
 }

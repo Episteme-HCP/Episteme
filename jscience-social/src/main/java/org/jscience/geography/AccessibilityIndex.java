@@ -23,11 +23,11 @@
 
 package org.jscience.geography;
 
+import org.jscience.earth.Place;
 import org.jscience.earth.coordinates.GeodeticCoordinate;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Length;
-import org.jscience.measure.quantity.Time;
 
 import java.time.Duration;
 import java.util.*;
@@ -75,7 +75,7 @@ public final class AccessibilityIndex {
             Quantity<Length> dist = location.distanceTo(facility.getCenter());
             if (dist == null) continue;
 
-            double timeMinutes = dist.to(Units.KILOMETER).getValue() / 30.0 * 60.0; // Assume 30km/h avg
+            double timeMinutes = dist.to(Units.KILOMETER).getValue().doubleValue() / 30.0 * 60.0; // Assume 30km/h avg
             Duration duration = Duration.ofMinutes((long)timeMinutes);
             
             String type = facility.getType().name();

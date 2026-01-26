@@ -23,14 +23,14 @@
 
 package org.jscience.economics;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import org.jscience.biology.Individual;
+import org.jscience.util.identity.Identification;
 import org.jscience.biology.taxonomy.Species;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.psychology.social.Group;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
@@ -45,7 +45,7 @@ import org.jscience.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Community extends Group implements TaskProcessor, Serializable {
+public class Community extends Group implements TaskProcessor {
 
     private static final long serialVersionUID = 1L;
 
@@ -59,7 +59,11 @@ public class Community extends Group implements TaskProcessor, Serializable {
      * @param place   location
      */
     public Community(Species species, Place place) {
-        super(species, place);
+        this(null, species, place);
+    }
+
+    public Community(Identification id, Species species, Place place) {
+        super(id, species, place);
         this.resources = new HashSet<>();
     }
 

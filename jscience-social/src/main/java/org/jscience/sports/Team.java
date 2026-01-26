@@ -29,23 +29,43 @@ import java.util.List;
 import java.util.Objects;
 import org.jscience.economics.money.Money;
 import org.jscience.sociology.Person;
-import org.jscience.util.identity.AbstractIdentifiedEntity;
+import java.util.HashMap;
+import java.util.Map;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
+
+import org.jscience.util.persistence.Relation;
 
 /**
  * Represents an organized sports team within a specific discipline.
- * Extends AbstractIdentifiedEntity to support dynamic traits and consistent identity.
+ * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Team extends AbstractIdentifiedEntity {
+@Persistent
+public class Team implements ComprehensiveIdentification {
 
     private static final long serialVersionUID = 1L;
 
+    @Id
+    protected final Identification id;
+
+    @Attribute
+    protected final Map<String, Object> traits = new HashMap<>();
+
+    @Relation(type = Relation.Type.MANY_TO_ONE)
     private final Sport sport;
+
+    @Relation(type = Relation.Type.ONE_TO_MANY)
     private final List<Person> members = new ArrayList<>();
+
+    @Attribute
     private Money budget;
 
     /**
@@ -56,9 +76,19 @@ public class Team extends AbstractIdentifiedEntity {
      * @throws NullPointerException if any argument is null
      */
     public Team(String name, Sport sport) {
-        super(new SimpleIdentification(name));
+        this.id = new SimpleIdentification(name);
         setName(name);
         this.sport = Objects.requireNonNull(sport, "Sport cannot be null");
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     public Sport getSport() {
@@ -97,11 +127,11 @@ public class Team extends AbstractIdentifiedEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Team team)) return false;
-        return Objects.equals(getName(), team.getName()) && Objects.equals(sport, team.sport);
+        return Objects.equals(id, team.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), sport);
+        return Objects.hash(id);
     }
 }

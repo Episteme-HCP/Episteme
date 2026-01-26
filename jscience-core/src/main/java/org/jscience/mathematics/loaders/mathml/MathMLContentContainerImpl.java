@@ -141,8 +141,6 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
      */
     public MathMLBvarElement setBoundVariable(MathMLBvarElement newBvar,
         int index) throws DOMException {
-        final int bvarsLength = getBoundVariablesGetLength();
-
         return (MathMLBvarElement) replaceChild(newBvar,
             getBoundVariablesItem(index - 1));
     }
@@ -159,8 +157,6 @@ public class MathMLContentContainerImpl extends MathMLElementImpl
      */
     public MathMLBvarElement insertBoundVariable(MathMLBvarElement newBvar,
         int index) throws DOMException {
-        final int bvarsLength = getBoundVariablesGetLength();
-
         if (index == 0) {
             return (MathMLBvarElement) appendChild(newBvar);
         } else {

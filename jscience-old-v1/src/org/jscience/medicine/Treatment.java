@@ -2,7 +2,7 @@ package org.jscience.medicine;
 
 import org.jscience.economics.Organization;
 import org.jscience.economics.money.Money;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.measure.Amount;
 import org.jscience.measure.Identification;
 

@@ -256,8 +256,45 @@ public class ConvexPolygon2D implements Boundary2D {
                 if (this.contains(v)) return true;
             }
         }
-        // TODO: Edge intersection check for more robust detection
+        // Check if any edge intersects any edge of the other polygon
+        if (other instanceof Boundary2D) {
+            List<Point2D> otherVerts = ((Boundary2D) other).getVertices();
+            int n = vertices.size();
+            int m = otherVerts.size();
+            
+            for (int i = 0; i < n; i++) {
+                Point2D a1 = vertices.get(i);
+                Point2D a2 = vertices.get((i + 1) % n);
+                
+                for (int j = 0; j < m; j++) {
+                    Point2D b1 = otherVerts.get(j);
+                    Point2D b2 = otherVerts.get((j + 1) % m);
+                    
+                    if (segmentsIntersect(a1, a2, b1, b2)) {
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
+    }
+
+    private boolean segmentsIntersect(Point2D a, Point2D b, Point2D c, Point2D d) {
+        // Simple bounding box reject
+        if (Math.max(a.getX().doubleValue(), b.getX().doubleValue()) < Math.min(c.getX().doubleValue(), d.getX().doubleValue()) ||
+            Math.min(a.getX().doubleValue(), b.getX().doubleValue()) > Math.max(c.getX().doubleValue(), d.getX().doubleValue()) ||
+            Math.max(a.getY().doubleValue(), b.getY().doubleValue()) < Math.min(c.getY().doubleValue(), d.getY().doubleValue()) ||
+            Math.min(a.getY().doubleValue(), b.getY().doubleValue()) > Math.max(c.getY().doubleValue(), d.getY().doubleValue())) {
+            return false;
+        }
+        
+        Real cp1 = crossProduct(a, b, c);
+        Real cp2 = crossProduct(a, b, d);
+        Real cp3 = crossProduct(c, d, a);
+        Real cp4 = crossProduct(c, d, b);
+        
+        return ((cp1.compareTo(Real.ZERO) > 0) != (cp2.compareTo(Real.ZERO) > 0)) &&
+               ((cp3.compareTo(Real.ZERO) > 0) != (cp4.compareTo(Real.ZERO) > 0));
     }
 
     @Override
@@ -276,8 +313,67 @@ public class ConvexPolygon2D implements Boundary2D {
         // Sutherland-Hodgman for convex-convex intersection
         // Simplified: return null if no intersection
         if (!this.intersects(other)) return null;
-        // TODO: Implement proper polygon clipping
-        return this;
+        if (other instanceof ConvexPolygon2D) {
+            return sutherlandHodgmanClip(this.vertices, ((ConvexPolygon2D) other).vertices);
+        }
+        // Fallback for non-polygon boundaries (e.g. circles) or complex ones
+        // If not implemented, returning null or intersection of bbox is common, but
+        // for now we enforce type check.
+        return null;
+    }
+
+    private Boundary<Point2D> sutherlandHodgmanClip(List<Point2D> subject, List<Point2D> clipper) {
+        List<Point2D> output = new ArrayList<>(subject);
+        
+        int m = clipper.size();
+        for (int i = 0; i < m; i++) {
+            Point2D clipEdgeStart = clipper.get(i);
+            Point2D clipEdgeEnd = clipper.get((i + 1) % m);
+            
+            List<Point2D> input = new ArrayList<>(output);
+            output.clear();
+            
+            if (input.isEmpty()) break;
+            
+            Point2D S = input.get(input.size() - 1);
+            
+            for (Point2D E : input) {
+                // Check if E is inside the clip edge (to the left/on line)
+                boolean E_inside = crossProduct(clipEdgeStart, clipEdgeEnd, E).compareTo(Real.ZERO) >= 0;
+                boolean S_inside = crossProduct(clipEdgeStart, clipEdgeEnd, S).compareTo(Real.ZERO) >= 0;
+                
+                if (E_inside) {
+                    if (!S_inside) {
+                        output.add(computeIntersection(clipEdgeStart, clipEdgeEnd, S, E));
+                    }
+                    output.add(E);
+                } else if (S_inside) {
+                    output.add(computeIntersection(clipEdgeStart, clipEdgeEnd, S, E));
+                }
+                S = E;
+            }
+        }
+        
+        if (output.size() < 3) return new ConvexPolygon2D(new ArrayList<>()); // Empty
+        return new ConvexPolygon2D(output);
+    }
+
+    private Point2D computeIntersection(Point2D a, Point2D b, Point2D c, Point2D d) {
+        // Line AB intersection Line CD
+        // Using determinants
+        Real det = b.getX().subtract(a.getX()).multiply(d.getY().subtract(c.getY()))
+                   .subtract(b.getY().subtract(a.getY()).multiply(d.getX().subtract(c.getX())));
+                   
+        if (det.abs().compareTo(Real.of(1e-10)) < 0) return c; // Parallel/Collinear
+        
+        Real t = (c.getX().subtract(a.getX()).multiply(d.getY().subtract(c.getY()))
+                  .subtract(c.getY().subtract(a.getY()).multiply(d.getX().subtract(c.getX()))))
+                  .divide(det);
+                  
+        return Point2D.of(
+            a.getX().add(t.multiply(b.getX().subtract(a.getX()))),
+            a.getY().add(t.multiply(b.getY().subtract(a.getY())))
+        );
     }
 
     @Override

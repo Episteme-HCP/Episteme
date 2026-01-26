@@ -56,13 +56,8 @@ public class SentenceBuilder {
         sentence.setId(sElement.getAttribute("id"));
         sentence.setVerbosity(corpus.getVerbosity());
         // Process the sentence graph
-        String rootNodeID;
         Element graph = DomTools.getElement(sElement, "graph");
-        if (graph.hasAttribute("root")) {
-            rootNodeID = graph.getAttribute("root");
-        } // if root
-        else {
-            rootNodeID = null;
+        if (!graph.hasAttribute("root")) {
             if (sentence.getVerbosity() >= 2) {
                 System.err.println("org.jscience.ml.tigerxml.Sentence: No root specified for "
                         + "Sentence "
@@ -82,8 +77,8 @@ public class SentenceBuilder {
             // node with the same id
             // if so, add virtual node info to this
             // terminal
-            if (sentence.hasVNode(my_term.getId())) {
-                VNode v_node = sentence.getVNode(my_term.getId());
+            if (sentence.hasVNode(my_term.getId().toString())) {
+                VNode v_node = sentence.getVNode(my_term.getId().toString());
                 v_node.addInfo(my_term);
             } // if
         } // for i
@@ -100,8 +95,8 @@ public class SentenceBuilder {
             // node with the same id
             // if so, add virtual node info to this
             // non-terminal
-            if (sentence.hasVNode(my_non_term.getId())) {
-                VNode v_node = sentence.getVNode(my_non_term.getId());
+            if (sentence.hasVNode(my_non_term.getId().toString())) {
+                VNode v_node = sentence.getVNode(my_non_term.getId().toString());
                 v_node.addInfo(my_non_term);
             }
         } // for n

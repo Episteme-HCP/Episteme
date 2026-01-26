@@ -23,7 +23,7 @@
 
 package org.jscience.politics;
 
-import java.io.Serializable;
+
 import java.util.Objects;
 import org.jscience.biology.Individual;
 import org.jscience.sociology.Role;
@@ -38,7 +38,7 @@ import org.jscience.sociology.Situation;
  * @version 1.1
  * @since 1.0
  */
-public class CivilSituation extends Situation implements Serializable {
+public class CivilSituation extends Situation {
 
     private static final long serialVersionUID = 1L;
 

@@ -26,10 +26,8 @@ package org.jscience.biology.loaders.neuroml;
 import org.jscience.io.AbstractResourceReader;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
 import java.io.*;
-import java.util.logging.Logger;
 
 /**
  * NeuroML Reader for computational neuroscience models.
@@ -54,7 +52,6 @@ import java.util.logging.Logger;
  */
 public class NeuroMLReader extends AbstractResourceReader<NeuroMLDocument> {
 
-    private static final Logger LOGGER = Logger.getLogger(NeuroMLReader.class.getName());
 
     public NeuroMLReader() {
     }

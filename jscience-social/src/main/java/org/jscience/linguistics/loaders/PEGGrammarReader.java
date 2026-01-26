@@ -52,7 +52,8 @@ public class PEGGrammarReader extends AbstractResourceReader<Grammar> {
     @Override
     protected Grammar loadFromSource(String id) throws Exception {
         // Source is a file path in ID for this implementation
-        String content = Files.readString(Paths.get(id), StandardCharsets.UTF_8);
+        // Source is a file path in ID for this implementation
+        Files.readString(Paths.get(id), StandardCharsets.UTF_8);
         Grammar grammar = new Grammar(language, "PEG Grammar [" + id + "]");
         grammar.setDescription("PEG Grammar loaded from " + id);
         // PEG parsing logic would go here
@@ -61,7 +62,7 @@ public class PEGGrammarReader extends AbstractResourceReader<Grammar> {
 
     @Override
     protected Grammar loadFromInputStream(InputStream is, String id) throws Exception {
-        String content = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
+        new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
                 .lines().collect(Collectors.joining("\n"));
         Grammar grammar = new Grammar(language, id);
         grammar.setDescription("PEG Grammar loaded from stream: " + id);

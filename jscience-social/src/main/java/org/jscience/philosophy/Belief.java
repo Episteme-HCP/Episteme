@@ -27,6 +27,9 @@ import java.io.Serializable;
 import java.util.Objects;
 import org.jscience.util.Commented;
 import org.jscience.util.Named;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Collections;
 
 /**
  * Represents a fundamental conviction or tenet within a philosophical system.
@@ -45,6 +48,7 @@ public class Belief implements Named, Commented, Serializable {
 
     private final String name;
     private final String comments;
+    private final Set<Concept> relatedConcepts = new HashSet<>();
 
     /**
      * Creates a new Belief.
@@ -71,6 +75,14 @@ public class Belief implements Named, Commented, Serializable {
         return comments;
     }
 
+    public void addRelatedConcept(Concept concept) {
+        if (concept != null) relatedConcepts.add(concept);
+    }
+
+    public Set<Concept> getRelatedConcepts() {
+        return Collections.unmodifiableSet(relatedConcepts);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -82,6 +94,13 @@ public class Belief implements Named, Commented, Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(name);
+    }
+
+    private java.util.Map<String, Object> traits = new java.util.HashMap<>();
+
+    @Override
+    public java.util.Map<String, Object> getTraits() {
+        return traits;
     }
 
     @Override

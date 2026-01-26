@@ -66,19 +66,23 @@ public class Sentence
     /**
      * The non-terminal nodes of this sentence
      */
-    private ArrayList nts;
+    private ArrayList<NT> nts;
     /**
      * The terminal nodes of this sentence
      */
-    private ArrayList ts;
+    private ArrayList<T> ts;
     /**
      * The String representation of this sentence: the text
      */
     private String text;
     /**
+     * The raw String representation of this sentence
+     */
+    private String rawText;
+    /**
      * The terminals in sentence order (linear precedence)
      */
-    private ArrayList terminals;
+    private ArrayList<T> terminals;
     /**
      * The virtual root node - this node is imaginary and the only node that
      * holds all other nodes.
@@ -95,7 +99,7 @@ public class Sentence
     /**
      * A hash storing possible virtual node with their ids.
      */
-    private HashMap id2vnode;
+    private HashMap<String, VNode> id2vnode;
     /**
      * The higher this value the more process and debug information will
      * written to stderr.
@@ -136,14 +140,14 @@ public class Sentence
     } // Sentence()
 
     private void init() {
-        this.nts = new ArrayList();
-        this.ts = new ArrayList();
+        this.nts = new ArrayList<>();
+        this.ts = new ArrayList<>();
         this.id = "";
         this.index = -1;
-        this.id2vnode = new HashMap();
+        this.id2vnode = new HashMap<>();
         this.hashCode = 0;
         this.text = "";
-        this.terminals = new ArrayList();
+        this.terminals = new ArrayList<>();
         this.vroot = null;
         this.root = null;
     }
@@ -246,9 +250,9 @@ public class Sentence
      * @return A String representing the span (e.g. "s1_1..s1_14")
      */
     public String getSpan() {
-        T firstT = (T) ts.get(0);
-        T lastT = (T) ts.get(ts.size() - 1);
-        return new String(firstT.getId() + ".." + lastT.getId());
+        T firstT = ts.get(0);
+        T lastT = ts.get(ts.size() - 1);
+        return new String(firstT.getId().toString() + ".." + lastT.getId().toString());
     }
 
     /**
@@ -275,7 +279,7 @@ public class Sentence
         if (nts.size() == 0) {
             return null;
         }
-        return (NT) nts.get(i);
+        return nts.get(i);
     }
 
     /**
@@ -290,13 +294,13 @@ public class Sentence
      */
     public NT getNT(String id) {
         for (int i = 0; i < this.nts.size(); i++) {
-            NT currentNT = (NT) this.nts.get(i);
-            if (currentNT.getId().equalsIgnoreCase(id)) {
+            NT currentNT = this.nts.get(i);
+            if (currentNT.getId().toString().equalsIgnoreCase(id)) {
                 return currentNT;
             } // if
         } // for i
         // maybe it is the VROOT?
-        if (this.getVROOT().getId().equalsIgnoreCase(id)) {
+        if (this.getVROOT().getId().toString().equalsIgnoreCase(id)) {
             return this.getVROOT();
         }
         return null;
@@ -314,8 +318,8 @@ public class Sentence
      */
     public T getT(String id) {
         for (int i = 0; i < this.ts.size(); i++) {
-            T currentT = (T) this.ts.get(i);
-            if (currentT.getId().equalsIgnoreCase(id)) {
+            T currentT = this.ts.get(i);
+            if (currentT.getId().toString().equalsIgnoreCase(id)) {
                 return currentT;
             } // if
         } // for i
@@ -358,8 +362,8 @@ public class Sentence
      *
      * @return All graph nodes contained in this <code>Sentence</code>.
      */
-    public ArrayList getAllGraphNodes() {
-        ArrayList allGraphNodes = new ArrayList();
+    public ArrayList<GraphNode> getAllGraphNodes() {
+        ArrayList<GraphNode> allGraphNodes = new ArrayList<>();
         allGraphNodes.addAll(this.nts);
         allGraphNodes.addAll(this.ts);
         return allGraphNodes;
@@ -379,11 +383,11 @@ public class Sentence
         return this.getT(id);
     }
 
-    public ArrayList getNTs() {
+    public ArrayList<NT> getNTs() {
         return this.nts;
     }
 
-    public ArrayList getTs() {
+    public ArrayList<T> getTs() {
         return this.ts;
     }
 
@@ -408,7 +412,7 @@ public class Sentence
         // Strategy: start from the end, look for the first NT node in the list of
         // NT nodes that has the mother 'null'
         for (int i = this.nts.size() - 1; i >= 0; i--) {
-            NT n = (NT) this.nts.get(i);
+            NT n = this.nts.get(i);
             if (n.getMother() == null) {
                 this.root = n;
                 return n;
@@ -430,12 +434,12 @@ public class Sentence
     public NT getVROOT() {
         // if already generated, return the VROOT
         if (this.vroot != null) {
-            return (NT) this.vroot;
+            return this.vroot;
         }
         // else create the VROOT
         else {
             this.vroot = new VRoot(this);
-            return (NT) this.vroot;
+            return this.vroot;
         } // else
     } // getVROOT()
 
@@ -463,18 +467,29 @@ public class Sentence
     }
 
     public T getT(int i) {
-        return (T) ts.get(i);
+        return ts.get(i);
     }
 
     public void addT(T newt) {
         ts.add(newt);
     }
 
+    /**
+     * Sets the text of the sentence.
+     * @param text the text
+     */
+    public void setText(String text) {
+        this.text = text;
+    }
+
     public String getText() {
-        if (this.text == null) {
+        if (this.text == null || this.text.isEmpty()) {
+            if (this.rawText != null && !this.rawText.isEmpty()) {
+                return this.rawText;
+            }
             StringBuffer textBuffer = new StringBuffer();
             for (int i = 0; i < this.ts.size(); i++) {
-                textBuffer.append(((T) this.ts.get(i)).getWord());
+                textBuffer.append((this.ts.get(i)).getWord());
                 textBuffer.append(" ");
             } // for i
             this.text = textBuffer.toString();
@@ -483,13 +498,21 @@ public class Sentence
     }
 
     /**
+     * Sets the raw textual representation of the sentence.
+     */
+    public void setRawText(String rawText) {
+        this.rawText = rawText;
+        this.text = rawText;
+    }
+
+    /**
      * Returns all terminal daughters. The returned terminals are
      * in the order of the sentence (linear precedence).
      */
-    public ArrayList getTerminals() {
+    public ArrayList<T> getTerminals() {
         // If not already generated, generate the terminal nodes list
         if (this.terminals == null) {
-            this.terminals = this.getRootNT().getTerminals();
+            this.terminals = new ArrayList<>(this.getRootNT().getTerminals());
         } // if
         return this.terminals;
     } // getTerminals()
@@ -562,26 +585,26 @@ public class Sentence
      */
     public GraphNode getById(String pass_id) {
         for (int i = 0; i < ts.size(); i++) {
-            T tmpT = (T) ts.get(i);
-            if (tmpT.getId().equalsIgnoreCase(pass_id)) {
+            T tmpT = ts.get(i);
+            if (tmpT.getId().toString().equalsIgnoreCase(pass_id)) {
                 return (GraphNode) tmpT;
             }
         } // for i
         for (int i = 0; i < nts.size(); i++) {
-            NT tmpNT = (NT) nts.get(i);
-            if (tmpNT.getId().equalsIgnoreCase(pass_id)) {
+            NT tmpNT = nts.get(i);
+            if (tmpNT.getId().toString().equalsIgnoreCase(pass_id)) {
                 return (GraphNode) tmpNT;
             }
         } // for i
         // maybe it is the VROOT?
-        if (this.getVROOT().getId().equalsIgnoreCase(pass_id)) {
+        if (this.getVROOT().getId().toString().equalsIgnoreCase(pass_id)) {
             return this.getVROOT();
         }
         return null;
     } // getById()
 
     public void addVNode(VNode v_node) {
-        id2vnode.put(v_node.getId(), v_node);
+        id2vnode.put(v_node.getId().toString(), v_node);
     }
 
     public boolean hasVNode(String v_node_id) {
@@ -589,7 +612,7 @@ public class Sentence
     }
 
     public VNode getVNode(String v_node_id) {
-        return ((VNode) id2vnode.get(v_node_id));
+        return id2vnode.get(v_node_id);
     }
 
     protected void print2Xml(FileWriter out_xml) {
@@ -602,11 +625,11 @@ public class Sentence
             // look for an root id
             NT root_nt = this.getRootNT();
             if (root_nt != null) {
-                root_id = root_nt.getId();
+                root_id = root_nt.getId().toString();
             } else {
                 if (this.getTCount() > 0) {
                     T first_t = this.getT(0);
-                    root_id = first_t.getId();
+                    root_id = first_t.getId().toString();
                 }
             }
             out_xml.write("<graph ");

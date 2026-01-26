@@ -26,12 +26,12 @@ package org.jscience.economics;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.sociology.Person;
 
 import java.time.LocalDate;
 import org.jscience.economics.money.Money;
-import org.jscience.economics.money.Currency;
+
 
 public class EconomicsRestorationTest {
 

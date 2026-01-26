@@ -23,18 +23,21 @@
 
 package org.jscience.chemistry.loaders.animl;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
-
-import jakarta.xml.bind.JAXBElement;
-import org.astm.animl.schema.core.draft._0.*;
-
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * Analytical Information Markup Language (AnIML) Reader.
@@ -53,23 +56,8 @@ import java.util.List;
  * </ul>
  * </p>
  * <p>
- * <b>Example Usage:</b>
- * <pre>{@code
- * AnIMLReader reader = new AnIMLReader();
- * AnIMLDocument doc = reader.read(new FileInputStream("spectrum.animl"));
- * 
- * for (AnIMLSample sample : doc.getSamples()) {
- *     System.out.println("Sample: " + sample.getName());
- * }
- * 
- * for (AnIMLExperimentStep step : doc.getExperimentSteps()) {
- *     for (AnIMLSeriesData series : step.getSeriesData()) {
- *         double[] xData = series.getXValues();
- *         double[] yData = series.getYValues();
- *         // Process spectral/chromatographic data
- *     }
- * }
- * }</pre>
+ * This implementation uses standard DOM parsing to remove dependencies on
+ * external schemas (org.astm).
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -79,30 +67,10 @@ import java.util.List;
  */
 public class AnIMLReader {
     
-    private static final String ANIML_PACKAGE = "org.astm.animl.schema.core.draft._0";
-
-    private JAXBContext jaxbContext;
-    private boolean initialized = false;
-
     /**
      * Creates a new AnIMLReader.
      */
     public AnIMLReader() {
-    }
-
-    /**
-     * Initializes the JAXB context for AnIML parsing.
-     */
-    private void initializeContext() throws AnIMLException {
-        if (initialized) {
-            return;
-        }
-        try {
-            jaxbContext = JAXBContext.newInstance(ANIML_PACKAGE);
-            initialized = true;
-        } catch (JAXBException e) {
-            throw new AnIMLException("Failed to initialize JAXB context for AnIML", e);
-        }
     }
 
     /**
@@ -113,13 +81,13 @@ public class AnIMLReader {
      * @throws AnIMLException if parsing fails
      */
     public AnIMLDocument read(InputStream input) throws AnIMLException {
-        initializeContext();
-        
         try {
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            Object root = unmarshaller.unmarshal(input);
-            return convertToDocument(root);
-        } catch (JAXBException e) {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.parse(input);
+            return convertToDocument(doc.getDocumentElement());
+        } catch (ParserConfigurationException | SAXException | IOException e) {
             throw new AnIMLException("Failed to parse AnIML data", e);
         }
     }
@@ -132,40 +100,32 @@ public class AnIMLReader {
      * @throws AnIMLException if parsing fails
      */
     public AnIMLDocument read(File file) throws AnIMLException {
-        initializeContext();
-        
-        try {
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            Object root = unmarshaller.unmarshal(file);
-            return convertToDocument(root);
-        } catch (JAXBException e) {
-            throw new AnIMLException("Failed to parse AnIML data from file: " + file, e);
+        try (InputStream is = new FileInputStream(file)) {
+            return read(is);
+        } catch (IOException e) {
+            throw new AnIMLException("Failed to read AnIML file: " + file, e);
         }
     }
 
     /**
-     * Converts JAXB-generated AnIML objects to JScience domain objects.
+     * Converts DOM-parsed AnIML objects to JScience domain objects.
      */
-    private AnIMLDocument convertToDocument(Object jaxbRoot) throws AnIMLException {
+    private AnIMLDocument convertToDocument(Element root) throws AnIMLException {
         AnIMLDocument doc = new AnIMLDocument();
         
-        if (jaxbRoot instanceof AnIMLType) {
-            AnIMLType animl = (AnIMLType) jaxbRoot;
-            
-            // Convert samples
-            SampleSetType sampleSet = animl.getSampleSet();
-            if (sampleSet != null) {
-                for (SampleType sample : sampleSet.getSample()) {
-                    doc.addSample(convertSample(sample));
-                }
+        // Convert samples
+        Element sampleSet = getChild(root, "SampleSet");
+        if (sampleSet != null) {
+            for (Element sample : getChildren(sampleSet, "Sample")) {
+                doc.addSample(convertSample(sample));
             }
-            
-            // Convert experiment steps
-            ExperimentStepSetType experimentSteps = animl.getExperimentStepSet();
-            if (experimentSteps != null) {
-                for (ExperimentStepType step : experimentSteps.getExperimentStep()) {
-                    doc.addExperimentStep(convertExperimentStep(step));
-                }
+        }
+        
+        // Convert experiment steps
+        Element experimentSteps = getChild(root, "ExperimentStepSet");
+        if (experimentSteps != null) {
+            for (Element step : getChildren(experimentSteps, "ExperimentStep")) {
+                doc.addExperimentStep(convertExperimentStep(step));
             }
         }
         
@@ -173,41 +133,42 @@ public class AnIMLReader {
     }
 
     /**
-     * Converts a JAXB sample to an AnIMLSample.
+     * Converts a DOM sample element to an AnIMLSample.
      */
-    private AnIMLSample convertSample(SampleType sample) {
+    private AnIMLSample convertSample(Element sample) {
         AnIMLSample result = new AnIMLSample();
-        result.setId(sample.getSampleID());
-        result.setName(sample.getName());
+        result.setId(getAttribute(sample, "sampleID"));
+        result.setName(getAttribute(sample, "name"));
         
         // Extract container info if present
-        if (sample.getContainerID() != null) {
-            result.setContainerId(sample.getContainerID());
+        String containerID = getAttribute(sample, "containerID");
+        if (containerID != null) {
+            result.setContainerId(containerID);
         }
         
         return result;
     }
 
     /**
-     * Converts a JAXB experiment step to an AnIMLExperimentStep.
+     * Converts a DOM experiment step element to an AnIMLExperimentStep.
      */
-    private AnIMLExperimentStep convertExperimentStep(ExperimentStepType step) {
+    private AnIMLExperimentStep convertExperimentStep(Element step) {
         AnIMLExperimentStep result = new AnIMLExperimentStep();
-        result.setId(step.getExperimentStepID());
-        result.setName(step.getName());
+        result.setId(getAttribute(step, "experimentStepID"));
+        result.setName(getAttribute(step, "name"));
         
         // Convert technique info
-        TechniqueType technique = step.getTechnique();
+        Element technique = getChild(step, "Technique");
         if (technique != null) {
-            result.setTechniqueName(technique.getName());
-            result.setTechniqueUri(technique.getUri());
+            result.setTechniqueName(getAttribute(technique, "name"));
+            result.setTechniqueUri(getAttribute(technique, "uri"));
         }
         
         // Convert results containing series data
-        for (ResultType resultType : step.getResult()) {
-            SeriesSetType seriesSet = resultType.getSeriesSet();
+        for (Element resultElement : getChildren(step, "Result")) {
+            Element seriesSet = getChild(resultElement, "SeriesSet");
             if (seriesSet != null) {
-                for (SeriesType series : seriesSet.getSeries()) {
+                for (Element series : getChildren(seriesSet, "Series")) {
                     result.addSeriesData(convertSeries(series));
                 }
             }
@@ -217,28 +178,20 @@ public class AnIMLReader {
     }
 
     /**
-     * Converts a JAXB series to AnIMLSeriesData.
+     * Converts a DOM series element to AnIMLSeriesData.
      */
-    private AnIMLSeriesData convertSeries(SeriesType series) {
+    private AnIMLSeriesData convertSeries(Element series) {
         AnIMLSeriesData result = new AnIMLSeriesData();
-        result.setName(series.getName());
-        result.setSeriesId(series.getSeriesID());
-        
-        // Extract series type (dependent/independent)
-        if (series.getDependency() != null) {
-            result.setDependency(series.getDependency().value());
-        }
-        
-        // Extract plot scale type
-        if (series.getPlotScale() != null) {
-            result.setPlotScale(series.getPlotScale().value());
-        }
+        result.setName(getAttribute(series, "name"));
+        result.setSeriesId(getAttribute(series, "seriesID"));
+        result.setDependency(getAttribute(series, "dependency"));
+        result.setPlotScale(getAttribute(series, "plotScale"));
         
         // Extract unit if present
-        UnitType unit = series.getUnit();
+        Element unit = getChild(series, "Unit");
         if (unit != null) {
-            result.setUnitLabel(unit.getLabel());
-            result.setUnitQuantity(unit.getQuantity());
+            result.setUnitLabel(getAttribute(unit, "label"));
+            result.setUnitQuantity(getAttribute(unit, "quantity"));
         }
         
         // Extract data values
@@ -248,22 +201,24 @@ public class AnIMLReader {
     }
 
     /**
-     * Extracts numerical values from a series.
+     * Extracts numerical values from a series element.
      */
-    private void extractSeriesValues(SeriesType series, AnIMLSeriesData result) {
+    private void extractSeriesValues(Element series, AnIMLSeriesData result) {
         // Check for individual values
-        if (!series.getIndividualValueSet().isEmpty()) {
-            IndividualValueSetType individualValues = series.getIndividualValueSet().get(0);
+        Element individualValues = getChild(series, "IndividualValueSet");
+        if (individualValues != null) {
             List<Double> values = new ArrayList<>();
-            for (JAXBElement<?> element : individualValues.getIOrLOrF()) {
-                Object val = element.getValue();
-                if (val instanceof Number) {
-                    values.add(((Number) val).doubleValue());
-                } else if (val instanceof String) {
+            NodeList children = individualValues.getChildNodes();
+            for (int i = 0; i < children.getLength(); i++) {
+                Node node = children.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
                     try {
-                        values.add(Double.parseDouble((String) val));
+                        String text = node.getTextContent().trim();
+                        if (!text.isEmpty()) {
+                            values.add(Double.parseDouble(text));
+                        }
                     } catch (NumberFormatException e) {
-                        /* ignore */
+                        /* ignore non-numeric content */
                     }
                 }
             }
@@ -271,17 +226,24 @@ public class AnIMLReader {
         }
         
         // Check for encoded values (Base64 encoded binary data)
-        if (!series.getEncodedValueSet().isEmpty()) {
-            EncodedValueSetType encodedValues = series.getEncodedValueSet().get(0);
-            byte[] decoded = Base64.getDecoder().decode(encodedValues.getValue());
-            result.setEncodedData(decoded);
+        Element encodedValues = getChild(series, "EncodedValueSet");
+        if (encodedValues != null) {
+            String content = encodedValues.getTextContent().trim();
+            if (!content.isEmpty()) {
+                try {
+                    byte[] decoded = Base64.getDecoder().decode(content);
+                    result.setEncodedData(decoded);
+                } catch (IllegalArgumentException e) {
+                    /* ignore invalid base64 */
+                }
+            }
         }
         
         // Check for auto-incremented values (start, increment, end)
-        if (!series.getAutoIncrementedValueSet().isEmpty()) {
-            AutoIncrementedValueSetType autoIncrementedValues = series.getAutoIncrementedValueSet().get(0);
-            Double start = extractFirstDouble(autoIncrementedValues.getStartValue());
-            Double increment = extractFirstDouble(autoIncrementedValues.getIncrement());
+        Element autoIncrementedValues = getChild(series, "AutoIncrementedValueSet");
+        if (autoIncrementedValues != null) {
+            Double start = extractFirstDouble(getChild(autoIncrementedValues, "StartValue"));
+            Double increment = extractFirstDouble(getChild(autoIncrementedValues, "Increment"));
             
             if (start != null && increment != null) {
                 int count = result.getValues() != null ? result.getValues().length : 0;
@@ -301,18 +263,15 @@ public class AnIMLReader {
         }
     }
 
-    private Double extractFirstDouble(UnboundedValueType valueSet) {
-        if (valueSet == null) return null;
-        for (JAXBElement<?> element : valueSet.getIOrLOrF()) {
-            Object val = element.getValue();
-            if (val instanceof Number) return ((Number) val).doubleValue();
-            if (val instanceof String) {
-                try {
-                    return Double.parseDouble((String) val);
-                } catch (NumberFormatException e) {
-                    /* continue */
-                }
+    private Double extractFirstDouble(Element parent) {
+        if (parent == null) return null;
+        try {
+            String text = parent.getTextContent().trim();
+            if (!text.isEmpty()) {
+                return Double.parseDouble(text);
             }
+        } catch (NumberFormatException e) {
+            /* continue */
         }
         return null;
     }
@@ -326,5 +285,45 @@ public class AnIMLReader {
             array[i] = list.get(i);
         }
         return array;
+    }
+
+    // Helper methods for DOM navigation
+
+    private Element getChild(Element parent, String localName) {
+        NodeList nl = parent.getChildNodes();
+        for (int i = 0; i < nl.getLength(); i++) {
+            Node n = nl.item(i);
+            if (n.getNodeType() == Node.ELEMENT_NODE) {
+                String nodeName = n.getLocalName();
+                if (nodeName == null) nodeName = n.getNodeName();
+                if (localName.equals(nodeName)) {
+                    return (Element) n;
+                }
+            }
+        }
+        return null;
+    }
+
+    private List<Element> getChildren(Element parent, String localName) {
+        List<Element> list = new ArrayList<>();
+        NodeList nl = parent.getChildNodes();
+        for (int i = 0; i < nl.getLength(); i++) {
+            Node n = nl.item(i);
+            if (n.getNodeType() == Node.ELEMENT_NODE) {
+                String nodeName = n.getLocalName();
+                if (nodeName == null) nodeName = n.getNodeName();
+                if (localName.equals(nodeName)) {
+                    list.add((Element) n);
+                }
+            }
+        }
+        return list;
+    }
+
+    private String getAttribute(Element e, String name) {
+        if (e.hasAttribute(name)) {
+            return e.getAttribute(name);
+        }
+        return null;
     }
 }

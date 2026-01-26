@@ -23,11 +23,7 @@
 
 package org.jscience.ui.viewers.geography.backends;
 
-import org.jscience.ui.viewers.geography.backends.JavaFXMapBackendProvider;
-import org.jscience.ui.viewers.geography.backends.GeoToolsBackendProvider;
-import org.jscience.ui.viewers.geography.backends.OpenMapBackendProvider;
-import org.jscience.ui.viewers.geography.backends.UnfoldingMapBackendProvider;
-import org.jscience.ui.viewers.geography.backends.GoogleGeoChartBackendProvider;
+
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

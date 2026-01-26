@@ -1,7 +1,5 @@
 package org.jscience.economics;
 
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -57,7 +55,6 @@ public class PlannedEconomy extends Economy {
         for (Organization organization : getOrganizations()) {
             if (organization instanceof Factory) {
                 // Simple production: factories generate value
-                Factory factory = (Factory) organization;
                 // Assume factory produces value equivalent to 1% of capital per step
                 org.jscience.economics.money.Money production = organization.getCapital().multiply(org.jscience.mathematics.numbers.real.Real.of(0.01));
                 organization.setCapital(organization.getCapital().add(production));

@@ -25,8 +25,11 @@ package org.jscience.law;
 import org.jscience.util.Commented;
 import org.jscience.util.Named;
 import org.jscience.util.Numbering;
+import org.jscience.util.SimpleNumbering;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A class representing a specific element or clause of a law, code, or constitution.
@@ -41,8 +44,16 @@ public class Article implements Named, Commented {
     private String name; // rarely used
     private Numbering numbering;
     private String contents;
-    private String comments; // clarification or interpretative notes
     private Date date; // date of adoption, publication, or application
+    
+    private final Map<String, Object> traits = new HashMap<>();
+
+    /**
+     * Minimal constructor for legacy support.
+     */
+    public Article(String name, String contents) {
+        this(name, new SimpleNumbering(name), contents, "", new Date());
+    }
 
     /**
      * Creates a new Article object with numbering and contents.
@@ -86,7 +97,7 @@ public class Article implements Named, Commented {
         this.name = name;
         this.numbering = numbering;
         this.contents = contents;
-        this.comments = comments;
+        setComments(comments);
         this.date = date;
     }
 
@@ -116,19 +127,15 @@ public class Article implements Named, Commented {
     }
 
     /**
-     * Returns interpretative comments related to the article.
-     * @return the comments
-     */
-    @Override
-    public String getComments() {
-        return comments;
-    }
-
-    /**
      * Returns the date associated with this article.
      * @return the date
      */
     public Date getDate() {
         return date;
+    }
+    
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 }

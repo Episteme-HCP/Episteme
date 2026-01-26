@@ -49,6 +49,8 @@ public class Language implements Named, Serializable {
 
     private static final long serialVersionUID = 2L;
 
+    public static final Language ENGLISH = new Language("en", "English");
+
     @Id
     private final String isoCode;
 
@@ -84,6 +86,14 @@ public class Language implements Named, Serializable {
     }
 
     public String getIsoCode() {
+        return isoCode;
+    }
+
+    public String getCode() {
+        return isoCode;
+    }
+
+    public String getId() {
         return isoCode;
     }
 

@@ -126,4 +126,9 @@ public class Flag implements Named, Commented, Serializable {
     public String toString() {
         return String.format("Flag: %s (Ratio: %.2f, Symbols: %s)", name, aspectRatio, symbols);
     }
+
+    @Override
+    public java.util.Map<String, Object> getTraits() {
+        return java.util.Collections.emptyMap();
+    }
 }

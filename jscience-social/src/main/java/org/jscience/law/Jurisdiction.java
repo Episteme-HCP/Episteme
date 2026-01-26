@@ -23,7 +23,7 @@
 
 package org.jscience.law;
 
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 
 import java.util.Collections;
 import java.util.HashSet;

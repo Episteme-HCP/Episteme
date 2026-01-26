@@ -23,15 +23,16 @@
 
 package org.jscience.politics;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import org.jscience.biology.Individual;
+
 import org.jscience.sociology.Situation;
 import org.jscience.util.Temporal;
+import org.jscience.util.persistence.Persistent;
 
 /**
  * Represents a political election event, aggregating votes for candidates.
@@ -42,7 +43,8 @@ import org.jscience.util.Temporal;
  * @version 1.2
  * @since 1.0
  */
-public class Election extends Situation implements Temporal, Serializable {
+@Persistent
+public class Election extends Situation implements Temporal<org.jscience.history.time.TimeCoordinate> {
 
     private static final long serialVersionUID = 1L;
 
@@ -63,9 +65,17 @@ public class Election extends Situation implements Temporal, Serializable {
         this.date = Objects.requireNonNull(date, "Date cannot be null");
     }
 
-    @Override
+    /**
+     * Returns the timestamp of the election.
+     * @return the instant
+     */
     public java.time.Instant getTimestamp() {
         return java.time.Instant.from(date.atStartOfDay(java.time.ZoneId.of("UTC")));
+    }
+
+    @Override
+    public org.jscience.history.time.TimeCoordinate getWhen() {
+        return org.jscience.history.time.TimePoint.of(getTimestamp());
     }
 
     /**
@@ -100,7 +110,7 @@ public class Election extends Situation implements Temporal, Serializable {
      */
     public void addVote(String candidateName, int count) {
         if (candidateName != null) {
-            results.merge(candidateName, count, Integer::sum);
+            results.merge(candidateName, count, (a, b) -> a + b);
         }
     }
 

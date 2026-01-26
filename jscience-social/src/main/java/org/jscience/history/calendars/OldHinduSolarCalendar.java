@@ -12,45 +12,26 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * All rights reserved.
  */
 
 package org.jscience.history.calendars;
 
-import org.jscience.mathematics.algebraic.numbers.Rational;
-
+import org.jscience.mathematics.numbers.rationals.Rational;
 import java.util.Enumeration;
 
 /**
  * Implementation of the Old Hindu Solar calendar (Surya Siddhanta).
- * This is the traditional Hindu solar calendar based on the Surya Siddhanta
- * astronomical treatise, with solar months based on solar longitude.
- *
- * <p>Key features:</p>
- * <ul>
- *   <li>Epoch: February 18, 3102 BCE (Julian) - Kali Yuga</li>
- *   <li>Uses sidereal year (star-to-star) length</li>
- *   <li>12 solar months of varying length</li>
- * </ul>
  *
  * @author Mark E. Shoulson (original implementation)
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
+ * @version 2.1
  * @since 1.0
  */
 public class OldHinduSolarCalendar extends MonthDayYear {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
     /** The RD (Rata Die) number for the Old Hindu Solar calendar epoch (Kali Yuga). */
     protected static final long EPOCH = (new JulianCalendar(2, 18, -3102)).toRD();
 
@@ -58,8 +39,7 @@ public class OldHinduSolarCalendar extends MonthDayYear {
     protected static final Rational SIDEREALYEAR;
 
     /** The Jovian period (cycle of Jupiter) in days. */
-    protected static final Rational JOVIANPERIOD = new Rational(0x5e0d1c3cL,
-            0x58ec0L);
+    protected static final Rational JOVIANPERIOD = Rational.of(0x5e0d1c3cL, 0x58ec0L);
 
     /** The length of a solar month in days. */
     protected static final Rational SOLARMONTH;
@@ -71,113 +51,62 @@ public class OldHinduSolarCalendar extends MonthDayYear {
         };
 
     static {
-        SIDEREALYEAR = new Rational(0x5e0d1c3cL, 0x41eb00L);
-        SOLARMONTH = SIDEREALYEAR.divide(new Rational(12L));
+        SIDEREALYEAR = Rational.of(0x5e0d1c3cL, 0x41eb00L);
+        SOLARMONTH = SIDEREALYEAR.divide(Rational.of(12L));
     }
 
-/**
-     * Creates a new OldHinduSolarCalendar object.
-     *
-     * @param l the Rata Die number to set.
-     */
     public OldHinduSolarCalendar(long l) {
         set(l);
     }
 
-/**
-     * Creates a new OldHinduSolarCalendar object.
-     *
-     * @param altcalendar another calendar to initialize from.
-     */
     public OldHinduSolarCalendar(AlternateCalendar altcalendar) {
         this(altcalendar.toRD());
     }
 
-/**
-     * Creates a new OldHinduSolarCalendar object.
-     */
     public OldHinduSolarCalendar() {
     }
 
-/**
-     * Creates a new OldHinduSolarCalendar object.
-     *
-     * @param i the month (1-12).
-     * @param j the day.
-     * @param k the year.
-     */
     public OldHinduSolarCalendar(int i, int j, int k) {
         set(i, j, k);
     }
 
-    /**
-     * Returns the number of days elapsed since the epoch.
-     *
-     * @return the day count.
-     */
     public long dayCount() {
         return toRD() - EPOCH;
     }
 
-    /**
-     * Returns the year in the 60-year Jovian cycle.
-     *
-     * @return the Jovian year (1-60).
-     */
     public int jovianYear() {
-        Rational rational = new Rational((int) dayCount(), 1L);
-        int i = (int) rational.divide(JOVIANPERIOD.divide(new Rational(12L)))
-                              .floor();
+        Rational rational = Rational.of(dayCount());
+        int i = rational.divide(JOVIANPERIOD.divide(Rational.of(12L))).floor().intValue();
         i = AlternateCalendar.mod(i, 60);
-
         return ++i;
     }
 
-    /**
-     * Recomputes the Rata Die number from the current month, day, and year.
-     */
     protected synchronized void recomputeRD() {
-        Rational rational = new Rational(EPOCH);
-        rational = rational.add(SIDEREALYEAR.multiply(new Rational(super.year)));
-        rational = rational.add(SOLARMONTH.multiply(
-                    new Rational(super.month - 1)));
-        rational = rational.add(new Rational(super.day));
-        rational = rational.subtract(new Rational(1L, 4L));
-        super.rd = rational.floor();
+        Rational rational = Rational.of(EPOCH);
+        rational = rational.add(SIDEREALYEAR.multiply(Rational.of(super.year)));
+        rational = rational.add(SOLARMONTH.multiply(Rational.of(super.month - 1)));
+        rational = rational.add(Rational.of(super.day));
+        rational = rational.subtract(Rational.of(1L, 4L));
+        super.rd = rational.floor().longValue();
     }
 
-    /**
-     * Recomputes the month, day, and year from the current Rata Die number.
-     */
     protected synchronized void recomputeFromRD() {
-        Rational rational = new Rational(1L, 4L);
-        rational = rational.add(new Rational(dayCount()));
+        Rational rational = Rational.of(1L, 4L);
+        rational = rational.add(Rational.of(dayCount()));
 
         Rational rational1 = rational.divide(SIDEREALYEAR);
-        super.year = (int) rational1.floor();
+        super.year = rational1.floor().intValue();
 
         Rational rational2 = rational.divide(SOLARMONTH);
-        super.month = AlternateCalendar.mod(rational2.floor(), 12) + 1;
-        super.day = (int) rational.mod(SOLARMONTH).floor() + 1;
+        super.month = AlternateCalendar.mod(rational2.floor().longValue(), 12) + 1;
+        super.day = rational.mod(SOLARMONTH).floor().intValue() + 1;
     }
 
-    /**
-     * Sets the Rata Die number and recomputes the date.
-     *
-     * @param l the Rata Die number.
-     */
     public synchronized void set(long l) {
         super.rd = l;
         recomputeFromRD();
     }
 
-    /**
-     * Sets the month, day, and year and recomputes the Rata Die number.
-     *
-     * @param i the month.
-     * @param j the day.
-     * @param k the year.
-     */
     public synchronized void set(int i, int j, int k) {
         super.month = i;
         super.day = j;
@@ -185,38 +114,18 @@ public class OldHinduSolarCalendar extends MonthDayYear {
         recomputeRD();
     }
 
-    /**
-     * Returns the name of the current month.
-     *
-     * @return the month name string.
-     */
     protected String monthName() {
         return MONTHS[super.month - 1];
     }
 
-    /**
-     * Returns the suffix for Old Hindu years (" K.Y.").
-     *
-     * @return the year suffix.
-     */
     protected String getSuffix() {
         return " K.Y.";
     }
 
-    /**
-     * Returns an enumeration of all Hindu solar month names.
-     *
-     * @return enumeration of month names.
-     */
-    public Enumeration getMonths() {
+    public Enumeration<String> getMonths() {
         return new ArrayEnumeration<>(MONTHS);
     }
 
-    /**
-     * Main method for testing the Old Hindu Solar calendar implementation.
-     *
-     * @param args command line arguments (year, month, day).
-     */
     public static void main(String[] args) {
         int i;
         int j;
@@ -242,7 +151,6 @@ public class OldHinduSolarCalendar extends MonthDayYear {
         System.out.println(oldhindusolar.toRD());
         System.out.println("\n" + SOLARMONTH.toString() + "\n" +
             SIDEREALYEAR.toString() + "\n" +
-            (new Rational(oldhindusolar.dayCount())).divide(SOLARMONTH)
-             .toString());
+            Rational.of(oldhindusolar.dayCount()).divide(SOLARMONTH).toString());
     }
 }

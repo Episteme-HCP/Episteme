@@ -24,14 +24,16 @@
 package org.jscience.sociology;
 
 import java.time.LocalDate;
-import org.jscience.util.identity.IdGenerator;
+import org.jscience.util.identity.IDGenerator;
 import org.jscience.util.identity.SSNGenerator;
 import org.jscience.util.identity.UUIDGenerator;
+import org.jscience.util.identity.Identification;
+import org.jscience.biology.Individual;
 
 /**
  * Factory for creating {@link Person} instances with auto-generated unique identifiers.
  * <p>
- * Provides support for different ID generation strategies (UUID, SSN) via pluggable {@link IdGenerator}.
+ * Provides support for different ID generation strategies (UUID, SSN) via pluggable {@link IDGenerator}.
  * </p>
  *
  * @author Silvere Martin-Michiellot
@@ -41,7 +43,7 @@ import org.jscience.util.identity.UUIDGenerator;
  */
 public class PersonFactory {
 
-    private final IdGenerator idGenerator;
+    private final IDGenerator idGenerator;
 
     /**
      * Creates a factory with the default UUID generator.
@@ -55,7 +57,7 @@ public class PersonFactory {
      *
      * @param idGenerator the generator to use for person IDs
      */
-    public PersonFactory(IdGenerator idGenerator) {
+    public PersonFactory(IDGenerator idGenerator) {
         this.idGenerator = idGenerator;
     }
 
@@ -69,8 +71,9 @@ public class PersonFactory {
      * @return a new Person instance
      */
     public Person create(String name, Person.Gender gender, LocalDate birthDate, String nationality) {
-        String id = idGenerator.generate();
-        return new Person(id, name, gender, birthDate, nationality);
+        Identification id = idGenerator.generate();
+        Individual.Sex sex = (gender != null) ? gender.toSex() : Individual.Sex.UNKNOWN;
+        return new Person(id, name, sex, birthDate, nationality);
     }
 
     /**
@@ -98,13 +101,5 @@ public class PersonFactory {
      */
     public static PersonFactory withUUID() {
         return new PersonFactory(new UUIDGenerator());
-    }
-
-    /**
-     * Returns the description of the ID format used by this factory.
-     * @return the format description
-     */
-    public String getIdFormat() {
-        return idGenerator.getFormat();
     }
 }

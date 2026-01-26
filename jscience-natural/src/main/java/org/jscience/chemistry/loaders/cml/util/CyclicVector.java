@@ -13,12 +13,12 @@ import java.util.Vector;
  * vector and its contents can be changed but Enumerations will be
  * invalidated.
  */
-public class CyclicVector extends Vector {
+public class CyclicVector extends Vector<Object> {
 /**
      * create with an empty vector
      */
     public CyclicVector() {
-        this(new Vector());
+        this(new Vector<>());
     }
 
 /**
@@ -26,8 +26,8 @@ public class CyclicVector extends Vector {
      *
      * @param vector DOCUMENT ME!
      */
-    public CyclicVector(Vector vector) {
-        for (Enumeration e = vector.elements(); e.hasMoreElements();) {
+    public CyclicVector(Vector<?> vector) {
+        for (Enumeration<?> e = vector.elements(); e.hasMoreElements();) {
             this.addElement(e.nextElement());
         }
     }
@@ -42,7 +42,7 @@ public class CyclicVector extends Vector {
      *
      * @throws IllegalArgumentException DOCUMENT ME!
      */
-    public Enumeration elements(Object startObject)
+    public Enumeration<Object> elements(Object startObject)
         throws IllegalArgumentException {
         int index = this.indexOf(startObject);
 
@@ -63,7 +63,7 @@ public class CyclicVector extends Vector {
      *
      * @throws IllegalArgumentException DOCUMENT ME!
      */
-    public Enumeration elements(int startIndex) throws IllegalArgumentException {
+    public Enumeration<Object> elements(int startIndex) throws IllegalArgumentException {
         return new CyclicVectorEnumeration(this, startIndex);
     }
 
@@ -88,7 +88,7 @@ public class CyclicVector extends Vector {
             cyclicVector.addElement("" + i);
 
             try {
-                for (Enumeration e = cyclicVector.elements("" + start);
+                for (Enumeration<Object> e = cyclicVector.elements("" + start);
                         e.hasMoreElements();) {
                     System.out.println("obj>" + e.nextElement());
                 }
@@ -104,7 +104,7 @@ public class CyclicVector extends Vector {
             cyclicVector.removeElementAt(0);
 
             try {
-                for (Enumeration e = cyclicVector.elements("" + start);
+                for (Enumeration<Object> e = cyclicVector.elements("" + start);
                         e.hasMoreElements();) {
                     System.out.println("obj>" + e.nextElement());
                 }
@@ -124,9 +124,9 @@ public class CyclicVector extends Vector {
  * @author $author$
  * @version $Revision: 1.3 $
  */
-class CyclicVectorEnumeration implements Enumeration {
+class CyclicVectorEnumeration implements Enumeration<Object> {
     /** DOCUMENT ME! */
-    Vector vector;
+    Vector<Object> vector;
 
     /** DOCUMENT ME! */
     int startIndex;
@@ -144,7 +144,7 @@ class CyclicVectorEnumeration implements Enumeration {
      * @param startIndex DOCUMENT ME!
      * @throws IllegalArgumentException DOCUMENT ME!
      */
-    public CyclicVectorEnumeration(Vector vector, int startIndex)
+    public CyclicVectorEnumeration(Vector<Object> vector, int startIndex)
         throws IllegalArgumentException {
         this.vector = vector;
 

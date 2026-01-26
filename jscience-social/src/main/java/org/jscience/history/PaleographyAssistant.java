@@ -170,7 +170,7 @@ public final class PaleographyAssistant {
                 if (featureName.contains(finalObserved) || finalObserved.contains(featureName)) {
                     matchedFeatures.add(feature.name());
                     for (ScriptType script : feature.associatedScripts()) {
-                        scriptScores.merge(script, 1, Integer::sum);
+                        scriptScores.merge(script, 1, (a, b) -> a + b);
                     }
                 }
             }

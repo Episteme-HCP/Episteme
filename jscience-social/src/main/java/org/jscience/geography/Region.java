@@ -23,6 +23,7 @@
 
 package org.jscience.geography;
 
+import org.jscience.earth.Place;
 import org.jscience.economics.money.Money;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
@@ -102,6 +103,14 @@ public class Region extends Place {
         this.area = area;
     }
 
+    /**
+     * Sets the area in square kilometers.
+     * @param areaSqKm the area in km^2
+     */
+    public void setAreaSqKm(double areaSqKm) {
+        this.area = Quantities.create(areaSqKm * 1_000_000.0, Units.SQUARE_METER);
+    }
+
     public long getPopulation() {
         return population;
     }
@@ -134,11 +143,21 @@ public class Region extends Place {
         this.gdp = gdp;
     }
 
+    /** Legacy getter for area in sq km. */
+    public double getAreaSqKm() {
+        return area != null ? area.to(Units.SQUARE_METER).getValue().doubleValue() / 1_000_000.0 : 0.0;
+    }
+
+    /** Legacy getter for population. */
+    public long getPopulationLong() {
+        return population;
+    }
+
     /**
      * Calculates population density (people per sq km).
      */
     public double getPopulationDensity() {
-        double areaKm2 = area.to(Units.KILOMETER.pow(2)).getValue();
+        double areaKm2 = area.to(Units.SQUARE_METER).getValue().doubleValue() / 1_000_000.0;
         return areaKm2 > 0 ? population / areaKm2 : 0;
     }
 

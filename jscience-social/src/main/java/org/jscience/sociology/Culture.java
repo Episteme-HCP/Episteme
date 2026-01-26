@@ -81,6 +81,8 @@ public class Culture implements Named, Commented, Serializable {
     @Attribute
     private String comments;
 
+    private final java.util.Map<String, Object> traits = new java.util.HashMap<>();
+
     /**
      * Creates a new Culture with specified traits.
      *
@@ -106,6 +108,11 @@ public class Culture implements Named, Commented, Serializable {
         this.technologicalLevel = technologicalLevel;
         this.maritalType = maritalType;
         this.identification = new SimpleIdentification(name + ":" + System.currentTimeMillis());
+    }
+
+    /** Legacy constructor. */
+    public Culture(String name, Language language) {
+        this(name, language, 0, new HashSet<>(), new HashSet<>(), new HashSet<>(), 0, "");
     }
 
     @Override
@@ -145,6 +152,19 @@ public class Culture implements Named, Commented, Serializable {
         return Collections.unmodifiableSet(celebrations);
     }
 
+    /** Legacy method to add celebration by name. */
+    public void addCelebration(String name) {
+        if (name != null) {
+            celebrations.add(new Celebration(name));
+        }
+    }
+
+    public void addCelebration(Celebration celebration) {
+        if (celebration != null) {
+            celebrations.add(celebration);
+        }
+    }
+
     /**
      * Returns an unmodifiable set of rituals.
      * @return the rituals
@@ -169,6 +189,11 @@ public class Culture implements Named, Commented, Serializable {
     @Override
     public void setComments(String comments) {
         this.comments = Objects.requireNonNull(comments, "Comments cannot be null");
+    }
+
+    @Override
+    public java.util.Map<String, Object> getTraits() {
+        return traits;
     }
 
     /**

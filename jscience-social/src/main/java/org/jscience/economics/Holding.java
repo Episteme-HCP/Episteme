@@ -23,12 +23,10 @@
 
 package org.jscience.economics;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import org.jscience.biology.Human;
 import org.jscience.economics.money.Account;
 import org.jscience.geography.BusinessPlace;
 import org.jscience.util.identity.Identification;
@@ -42,7 +40,7 @@ import org.jscience.util.identity.Identification;
  * @version 1.1
  * @since 1.0
  */
-public class Holding extends Organization implements Serializable {
+public class Holding extends Organization {
 
     private static final long serialVersionUID = 1L;
 
@@ -53,7 +51,7 @@ public class Holding extends Organization implements Serializable {
      * 
      * @param organizations the fleet of companies initially held
      */
-    public Holding(String name, Identification id, Set<Human> owners,
+    public Holding(String name, Identification id, Set<EconomicAgent> owners,
             BusinessPlace place, Set<Account> accounts, Set<Organization> organizations) {
         super(name, id, owners, place, accounts);
         this.organizations = new HashSet<>(Objects.requireNonNull(organizations, "Controlled organizations cannot be null"));

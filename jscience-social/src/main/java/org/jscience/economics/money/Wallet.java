@@ -160,7 +160,6 @@ public final class Wallet implements Serializable {
      * @return true if successful
      */
     public boolean withdraw(double amount, Currency currency) {
-        Money toWithdraw = Money.valueOf(amount, currency);
         Money available = getBalance(currency);
         
         if (available.getValue().doubleValue() >= amount) {

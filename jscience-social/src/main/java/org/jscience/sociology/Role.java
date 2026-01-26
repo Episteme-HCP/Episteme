@@ -79,6 +79,8 @@ public class Role implements Named, Identified<Identification>, Commented, Tempo
     @Attribute
     private String comments;
 
+    private final java.util.Map<String, Object> traits = new java.util.HashMap<>();
+
     @Attribute
     private Instant timestamp;
 
@@ -170,6 +172,11 @@ public class Role implements Named, Identified<Identification>, Commented, Tempo
     @Override
     public void setComments(String comments) {
         this.comments = comments;
+    }
+
+    @Override
+    public java.util.Map<String, Object> getTraits() {
+        return traits;
     }
 
     @Override

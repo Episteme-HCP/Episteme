@@ -1,6 +1,6 @@
 package org.jscience.psychology.social;
 
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 
 import org.jscience.sociology.Culture;
 

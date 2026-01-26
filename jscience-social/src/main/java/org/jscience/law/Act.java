@@ -22,13 +22,15 @@
  */
 package org.jscience.law;
 
-import org.jscience.biology.human.Human;
+import org.jscience.sociology.Human;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.Identified;
 import org.jscience.util.Commented;
 
 import java.util.Date;
 import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A class representing a legal act or certificate (contract, deed, etc.) 
@@ -40,7 +42,7 @@ import java.util.Set;
  * @version 1.2
  */
 // no relation with an act in a play, see Jsci.arts.theater.Act.
-public class Act implements Identified, Commented {
+public class Act implements Identified<Identification>, Commented {
     
     /** Indicates a birth certificate. */
     public final static String BIRTH = "Birth";
@@ -71,7 +73,8 @@ public class Act implements Identified, Commented {
     private Date date;
     private String object; // "you ... have the right to ... under these circumstances..."
     private Set<Human> subjects; // the people in the act
-    private String comments;
+    
+    private final Map<String, Object> traits = new HashMap<>();
 
     /**
      * Creates a new Act object.
@@ -104,15 +107,19 @@ public class Act implements Identified, Commented {
         this.date = date;
         this.object = object;
         this.subjects = subjects;
-        this.comments = comments;
+        setComments(comments);
     }
 
     /**
      * Returns the identification of this act.
      * @return the identification
      */
-    @Override
     public Identification getIdentification() {
+        return identification;
+    }
+
+    @Override
+    public Identification getId() {
         return identification;
     }
 
@@ -148,12 +155,8 @@ public class Act implements Identified, Commented {
         return subjects;
     }
 
-    /**
-     * Returns any comments associated with the act.
-     * @return the comments
-     */
     @Override
-    public String getComments() {
-        return comments;
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 }

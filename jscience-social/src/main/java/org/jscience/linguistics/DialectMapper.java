@@ -32,9 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import org.jscience.geography.Place;
-import org.jscience.geography.coordinates.Coordinates;
-import org.jscience.geography.coordinates.LatLong;
+import org.jscience.earth.Place;
+
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
@@ -247,16 +246,12 @@ public final class DialectMapper {
     }
 
     private static double getLatitude(DialectDataPoint point) {
-        if (point.location() == null || point.location().getCoordinates() == null) return 0;
-        Coordinates c = point.location().getCoordinates();
-        if (c instanceof LatLong ll) return ll.getLatitude();
-        return c.getDimension() > 0 ? c.get(0) : 0;
+        if (point.location() == null || point.location().getCenter() == null) return 0;
+        return point.location().getCenter().getLatitude().to(org.jscience.measure.Units.DEGREE_ANGLE).getValue().doubleValue();
     }
 
     private static double getLongitude(DialectDataPoint point) {
-        if (point.location() == null || point.location().getCoordinates() == null) return 0;
-        Coordinates c = point.location().getCoordinates();
-        if (c instanceof LatLong ll) return ll.getLongitude();
-        return c.getDimension() > 1 ? c.get(1) : 0;
+        if (point.location() == null || point.location().getCenter() == null) return 0;
+        return point.location().getCenter().getLongitude().to(org.jscience.measure.Units.DEGREE_ANGLE).getValue().doubleValue();
     }
 }

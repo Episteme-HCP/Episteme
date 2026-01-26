@@ -28,7 +28,6 @@ import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.quantity.Volume;
-import org.jscience.measure.quantity.AmountOfSubstance;
 import org.jscience.physics.PhysicalConstants;
 
 /**

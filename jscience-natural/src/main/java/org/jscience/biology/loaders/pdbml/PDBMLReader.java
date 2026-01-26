@@ -26,10 +26,8 @@ package org.jscience.biology.loaders.pdbml;
 import org.jscience.io.AbstractResourceReader;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
 import java.io.*;
-import java.util.logging.Logger;
 
 /**
  * PDBML Reader for Protein Data Bank macromolecular structures.
@@ -55,7 +53,6 @@ import java.util.logging.Logger;
  */
 public class PDBMLReader extends AbstractResourceReader<PDBMLStructure> {
 
-    private static final Logger LOGGER = Logger.getLogger(PDBMLReader.class.getName());
 
     public PDBMLReader() {
     }
@@ -109,7 +106,6 @@ public class PDBMLReader extends AbstractResourceReader<PDBMLStructure> {
 
     private PDBMLStructure parseDocument(Document doc) {
         PDBMLStructure structure = new PDBMLStructure();
-        Element root = doc.getDocumentElement();
         
         // Parse entry information
         parseEntryInfo(doc, structure);

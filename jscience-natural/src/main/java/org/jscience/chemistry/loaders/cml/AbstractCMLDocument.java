@@ -48,7 +48,7 @@ public interface AbstractCMLDocument extends PMRDocument, CMLNode {
      *
      * @return Vector of elements (empty if none)
      */
-    Vector getElementVector(String name);
+    Vector<Element> getElementVector(String name);
 
     /**
      * gets all element of given type (included nested children)

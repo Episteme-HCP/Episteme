@@ -26,17 +26,17 @@
 
 package org.jscience.history.calendars;
 
-import org.jscience.mathematics.algebraic.numbers.ExactRational;
+import org.jscience.mathematics.numbers.rationals.Rational;
 
 /**
  * Modified Hindu Solar calendar using arbitrary-precision arithmetic.
- * This version uses ExactRational for precise calculations without
+ * This version uses Rational for precise calculations without
  * floating-point errors.
  *
  * @author Mark E. Shoulson (original implementation)
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
+ * @version 2.1
  * @since 1.0
  */
 public class ModifiedHinduSolarBRCalendar extends OldHinduSolarCalendar {
@@ -48,72 +48,41 @@ public class ModifiedHinduSolarBRCalendar extends OldHinduSolarCalendar {
     /** Delegate for Hindu astronomical calculations. */
     protected static ModifiedHinduBRCalendar mh;
 
-/**
-     * Creates a new ModifiedHinduSolarBRCalendar object.
-     *
-     * @param l Rata Die number.
-     */
     public ModifiedHinduSolarBRCalendar(long l) {
         super(l);
     }
 
-/**
-     * Creates a new ModifiedHinduSolarBRCalendar object.
-     *
-     * @param altcalendar another calendar to initialize from.
-     */
     public ModifiedHinduSolarBRCalendar(AlternateCalendar altcalendar) {
         this(altcalendar.toRD());
     }
 
-/**
-     * Creates a new ModifiedHinduSolarBRCalendar object.
-     */
     public ModifiedHinduSolarBRCalendar() {
     }
 
-/**
-     * Creates a new ModifiedHinduSolarBRCalendar object.
-     *
-     * @param i the month.
-     * @param j the day.
-     * @param k the year.
-     */
     public ModifiedHinduSolarBRCalendar(int i, int j, int k) {
         set(i, j, k);
     }
 
-    /**
-     * Recomputes the Hindu solar date components from the current Rata Die number.
-     */
     public synchronized void recomputeFromRD() {
-        ExactRational bigrational = new ExactRational(dayCount());
-        ExactRational bigrational1 = ModifiedHinduBRCalendar.sunrise(bigrational);
+        Rational bigrational = Rational.of(dayCount());
+        Rational bigrational1 = ModifiedHinduBRCalendar.sunrise(bigrational);
         super.month = ModifiedHinduBRCalendar.zodiac(bigrational1);
         super.year = ModifiedHinduBRCalendar.calYear(bigrational1) - 3179;
 
-        ExactRational bigrational2;
+        Rational bigrational2;
 
-        for (bigrational2 = bigrational.subtract(new ExactRational(3L))
-                                       .subtract(new ExactRational(
-                        ModifiedHinduBRCalendar.solarLongitude(bigrational1)
-                                               .mod(new ExactRational(1800L))
-                                               .divide(new ExactRational(60L))
-                                               .floor()));
-                ModifiedHinduBRCalendar.zodiac(ModifiedHinduBRCalendar.sunrise(
-                        bigrational2)) != super.month;
-                bigrational2 = bigrational2.add(new ExactRational(1L)))
+        for (bigrational2 = bigrational.subtract(Rational.of(3L))
+                                       .subtract(ModifiedHinduBRCalendar.solarLongitude(bigrational1)
+                                                .mod(Rational.of(1800L))
+                                                .divide(Rational.of(60L))
+                                                .floor().toRational());
+                ModifiedHinduBRCalendar.zodiac(ModifiedHinduBRCalendar.sunrise(bigrational2)) != super.month;
+                bigrational2 = bigrational2.add(Rational.ONE))
             ;
 
         super.day = bigrational.subtract(bigrational2).intValue() + 1;
     }
 
-    /**
-     * Checks if this date precedes another Hindu solar date.
-     *
-     * @param modhindusolarbr the other date.
-     * @return true if this date is before the other.
-     */
     public boolean precedes(ModifiedHinduSolarBRCalendar modhindusolarbr) {
         return (super.year < ((MonthDayYear) (modhindusolarbr)).year) ||
         ((super.year == ((MonthDayYear) (modhindusolarbr)).year) &&
@@ -122,30 +91,22 @@ public class ModifiedHinduSolarBRCalendar extends OldHinduSolarCalendar {
         (super.day < ((MonthDayYear) (modhindusolarbr)).day))));
     }
 
-    /**
-     * Recomputes the Rata Die number from the current Hindu solar date components.
-     *
-     * @throws InconsistentDateException if the date is invalid.
-     */
     public synchronized void recomputeRD() {
-        ExactRational bigrational = new ExactRational(super.month - 1, 12L);
-        bigrational = bigrational.add(new ExactRational(super.year + 3179))
+        Rational bigrational = Rational.of(super.month - 1, 12L);
+        bigrational = bigrational.add(Rational.of(super.year + 3179))
                                  .multiply(ModifiedHinduBRCalendar.SIDEREALYEAR);
 
         long l = bigrational.floor().longValue();
         l += ((OldHinduSolarCalendar.EPOCH + (long) super.day) - 9L);
 
         ModifiedHinduSolarBRCalendar modhindusolarbr = new ModifiedHinduSolarBRCalendar(l);
-        System.err.println("tmp: " + modhindusolarbr);
 
         if ((((MonthDayYear) (modhindusolarbr)).month == super.month) &&
                 (((MonthDayYear) (modhindusolarbr)).year == super.year)) {
             l += (super.day - ((MonthDayYear) (modhindusolarbr)).day - 1);
         }
 
-        for (; modhindusolarbr.precedes(this);
-                System.err.println("tmp: " + modhindusolarbr + " => (" +
-                    modhindusolarbr.toRD() + ")"))
+        for (; modhindusolarbr.precedes(this); )
             modhindusolarbr = new ModifiedHinduSolarBRCalendar(++l);
 
         super.rd = l;
@@ -154,25 +115,13 @@ public class ModifiedHinduSolarBRCalendar extends OldHinduSolarCalendar {
                 (((MonthDayYear) (modhindusolarbr)).month != super.month) ||
                 (((MonthDayYear) (modhindusolarbr)).year != super.year)) {
             throw new InconsistentDateException("Illegal Hindu Solar Date");
-        } else {
-            return;
         }
     }
 
-    /**
-     * Returns the era suffix for this calendar.
-     *
-     * @return the suffix string.
-     */
     protected String getSuffix() {
         return " S.E.";
     }
 
-    /**
-     * Main method for testing Hindu solar calendar calculations.
-     *
-     * @param args command line arguments.
-     */
     public static void main(String[] args) {
         int i;
         int j;

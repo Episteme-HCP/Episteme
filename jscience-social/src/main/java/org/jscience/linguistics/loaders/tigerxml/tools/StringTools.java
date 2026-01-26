@@ -111,8 +111,8 @@ public class StringTools {
      *         <code>String</code> object for each character (<code>char</code>) of
      *         the argument <code>str</code>.
      */
-    public final static ArrayList string2ArrayList(String str) {
-        ArrayList arrayList = new ArrayList();
+    public final static ArrayList<String> string2ArrayList(String str) {
+        ArrayList<String> arrayList = new ArrayList<>();
         for (int i = 0; i < str.length(); i++) {
             StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append(str.charAt(i));

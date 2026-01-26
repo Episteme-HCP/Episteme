@@ -143,6 +143,15 @@ public class Sentence implements Serializable {
     }
 
     /**
+     * Sets the raw text of the sentence and detects its purpose.
+     * @param text the raw text
+     */
+    public void setText(String text) {
+        this.rawText = text;
+        detectPurpose(text);
+    }
+
+    /**
      * Estimates word count from raw text or constituent phrases.
      * @return count of words
      */

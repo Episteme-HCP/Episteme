@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import org.jscience.util.Named;
-import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;

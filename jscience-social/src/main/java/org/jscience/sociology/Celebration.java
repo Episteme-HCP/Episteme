@@ -23,12 +23,12 @@
 
 package org.jscience.sociology;
 
-import java.io.Serializable;
+
 import java.util.Date;
 import java.util.Objects;
 import org.jscience.economics.WorkSituation;
-import org.jscience.geography.Place;
-import org.jscience.util.Positioned;
+import org.jscience.earth.Place;
+
 
 /**
  * Represents a cultural or religious celebration (feast, rite of passage, festival).
@@ -39,7 +39,7 @@ import org.jscience.util.Positioned;
  * @version 1.1
  * @since 1.0
  */
-public class Celebration extends WorkSituation implements Positioned<Place>, Serializable {
+public class Celebration extends WorkSituation {
 
     private static final long serialVersionUID = 1L;
 
@@ -107,6 +107,11 @@ public class Celebration extends WorkSituation implements Positioned<Place>, Ser
         super(name, comments);
         this.kind = kind;
         this.date = Objects.requireNonNull(date, "Celebration date cannot be null");
+    }
+
+    /** Legacy constructor. */
+    public Celebration(String name) {
+        this(name, "", OTHER, new Date());
     }
 
     @Override

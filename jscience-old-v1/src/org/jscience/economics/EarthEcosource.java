@@ -3,7 +3,7 @@ package org.jscience.economics;
 import org.jscience.biology.Species;
 import org.jscience.biology.human.HumanSpecies;
 
-import org.jscience.geography.Places;
+import org.jscience.earth.Places;
 
 import org.jscience.measure.Amount;
 

@@ -29,22 +29,6 @@ package org.jscience.linguistics.loaders.tigerxml.header;
  */
 public class Meta implements HeaderElement {
     /** DOCUMENT ME! */
-    private String name;
-
-    /** DOCUMENT ME! */
-    private String author;
-
-    /** DOCUMENT ME! */
-    private String date;
-
-    /** DOCUMENT ME! */
-    private String description;
-
-    /** DOCUMENT ME! */
-    private String format;
-
-    /** DOCUMENT ME! */
-    private String history;
 
     /**
      * DOCUMENT ME!

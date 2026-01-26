@@ -22,24 +22,22 @@
  */
 package org.jscience.economics;
 
-import org.jscience.biology.Human;
-import org.jscience.biology.taxonomy.HomoSapiens;
+import org.jscience.biology.HomoSapiens;
 import org.jscience.economics.money.Account;
 import org.jscience.economics.money.Money;
 import org.jscience.geography.BusinessPlace;
 import org.jscience.util.identity.Identification;
-import org.jscience.util.identity.Identified;
 import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.identity.UUIDIdentification;
 import org.jscience.util.persistence.Attribute;
-import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Represents a formal social and economic entity, such as a company, 
@@ -51,18 +49,15 @@ import java.util.Set;
  *
  * @author <a href="mailto:silvere.martin-michiellot@jscience.org">Silvere Martin-Michiellot</a>
  * @author Gemini AI (Google DeepMind)
- * @version 6.0, July 21, 2014
+ * @version 6.1
  */
 @Persistent
-public class Organization extends Community implements Property, Identified<String>, Serializable {
+public class Organization extends Community implements Property {
 
     private static final long serialVersionUID = 1L;
 
     @Attribute
     private String name;
-    
-    @Id
-    private Identification identification;
     
     /** The estimated total value of the organization. */
     @Attribute
@@ -92,11 +87,6 @@ public class Organization extends Community implements Property, Identified<Stri
     @Relation(type = Relation.Type.MANY_TO_MANY)
     private Set<Organization> clients;
 
-    @Override
-    public String getId() {
-        return identification != null ? identification.getId() : name;
-    }
-
     /**
      * Creates a new organization.
      *
@@ -108,17 +98,16 @@ public class Organization extends Community implements Property, Identified<Stri
      */
     public Organization(String name, Identification identification, Set<EconomicAgent> owners,
                         BusinessPlace place, Set<Account> accounts) {
-        super(HomoSapiens.SPECIES, place);
+        super(identification, HomoSapiens.SPECIES, place);
         this.name = Objects.requireNonNull(name, "Name cannot be null");
         if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
         
-        this.identification = Objects.requireNonNull(identification, "Identification cannot be null");
         this.owners = Objects.requireNonNull(owners, "Owners set cannot be null");
         this.accounts = Objects.requireNonNull(accounts, "Accounts set cannot be null");
         if (accounts.isEmpty()) throw new IllegalArgumentException("Accounts cannot be empty");
 
         this.value = Money.usd(0);
-        this.organigram = new Organigram(name, new HashSet<>());
+        this.organigram = new Organigram(name);
         this.capital = Money.usd(0);
         this.providers = new HashSet<>();
         this.clients = new HashSet<>();
@@ -127,20 +116,18 @@ public class Organization extends Community implements Property, Identified<Stri
     /**
      * Convenience constructor for modern API.
      */
-    public Organization(String name, org.jscience.geography.Place place, Money initialCapital) {
-        super(HomoSapiens.SPECIES, place);
-        this.name = Objects.requireNonNull(name, "Name cannot be null");
-        if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
-
-        this.identification = new SimpleIdentification(name);
-        this.value = Money.usd(0);
-        this.owners = new HashSet<>();
-        this.accounts = new HashSet<>();
-        this.accounts.add(new Account(null, owners, identification, "Main Account", initialCapital));
-        this.organigram = new Organigram(name, new HashSet<>());
+    public Organization(String name, org.jscience.earth.Place place, Money initialCapital) {
+        this(name, new UUIDIdentification(UUID.randomUUID().toString()), new HashSet<>(), 
+             place instanceof BusinessPlace ? (BusinessPlace) place : null, new HashSet<>());
+        
         this.capital = initialCapital;
-        this.providers = new HashSet<>();
-        this.clients = new HashSet<>();
+        Identification mainAccountId = new SimpleIdentification(name + "-MainAccount");
+        this.accounts.add(new Account(null, owners, mainAccountId, "Main Account", initialCapital));
+    }
+
+    public Organization(String name, EconomicAgent owner) {
+        this(name, null, Money.usd(0));
+        addOwner(owner);
     }
 
     public String getName() {
@@ -155,11 +142,11 @@ public class Organization extends Community implements Property, Identified<Stri
     }
 
     public Identification getIdentification() {
-        return identification;
+        return getId();
     }
 
     public void setIdentification(Identification identification) {
-        this.identification = Objects.requireNonNull(identification, "Identification cannot be null");
+        throw new UnsupportedOperationException("Identification is final and managed by identity system");
     }
 
     public Money getValue() {
@@ -288,6 +275,4 @@ public class Organization extends Community implements Property, Identified<Stri
     public Set<Worker> getWorkers() {
         return organigram != null ? organigram.getAllWorkers() : Collections.emptySet();
     }
-
-    //perhaps we should also provide a setter/getter for country in which this organization is built
 }

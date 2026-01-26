@@ -30,7 +30,7 @@ import org.jscience.economics.loaders.FinancialMarketReader;
 import org.jscience.economics.money.Money;
 import org.jscience.economics.money.Currency;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.history.TimePoint;
+import org.jscience.history.time.TimePoint;
 
 import java.util.ArrayList;
 import java.util.List;

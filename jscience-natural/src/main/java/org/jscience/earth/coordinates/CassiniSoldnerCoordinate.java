@@ -26,7 +26,6 @@ package org.jscience.earth.coordinates;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
-import org.jscience.measure.quantity.Angle;
 import org.jscience.measure.quantity.Length;
 import org.jscience.mathematics.numbers.real.Real;
 import java.io.Serializable;

@@ -5,7 +5,7 @@ import com.sun.j3d.utils.behaviors.interpolators.KBRotPosScaleSplinePathInterpol
 import org.jscience.economics.Community;
 import org.jscience.economics.money.Money;
 
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 
 import org.jscience.measure.Amount;
 import org.jscience.measure.Identification;

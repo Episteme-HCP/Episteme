@@ -1,6 +1,6 @@
 package org.jscience.linguistics;
 
-import org.jscience.computing.graph.graphs.DirectedMultigraph;
+
 
 
 /**
@@ -10,7 +10,7 @@ import org.jscience.computing.graph.graphs.DirectedMultigraph;
  * @author Silvere Martin-Michiellot
  * @version 1.0
  */
-public class SemanticNetwork extends DirectedMultigraph {
+public class SemanticNetwork {
     //A semantic network is often used as a form of knowledge representation. It is a directed graph consisting of vertices which represent concepts and edges which represent semantic relations between the concepts.
     //Semantic networks are a common type of machine-readable dictionary.
     //Important semantic relations:

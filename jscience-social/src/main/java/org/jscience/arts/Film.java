@@ -23,20 +23,13 @@
 
 package org.jscience.arts;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 import org.jscience.economics.money.Money;
-import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.util.Named;
-import org.jscience.util.Temporal;
-import org.jscience.util.identity.Identified;
 import org.jscience.util.persistence.Attribute;
-import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 
 /**
@@ -45,13 +38,12 @@ import org.jscience.util.persistence.Persistent;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
+ * @version 2.1
  */
 @Persistent
-public class Film implements Identified<String>, Named, Temporal<TemporalCoordinate>, Serializable {
+public class Film extends Artwork {
 
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
 
     /**
      * Cinematic genres.
@@ -68,14 +60,8 @@ public class Film implements Identified<String>, Named, Temporal<TemporalCoordin
         G, PG, PG_13, R, NC_17, UNRATED
     }
 
-    @Id
-    private final String id;
-    @Attribute
-    private final String title;
     @Attribute
     private String director;
-    @Attribute
-    private TemporalCoordinate releaseDate;
     @Attribute
     private int durationMinutes;
     @Attribute
@@ -96,8 +82,7 @@ public class Film implements Identified<String>, Named, Temporal<TemporalCoordin
      * @param title the movie title
      */
     public Film(String title) {
-        this.id = UUID.randomUUID().toString();
-        this.title = Objects.requireNonNull(title, "Title cannot be null");
+        super(title, "", null, null, ArtForm.CINEMA);
     }
 
     /**
@@ -106,37 +91,17 @@ public class Film implements Identified<String>, Named, Temporal<TemporalCoordin
      * @param director the name of the director
      * @param releaseDate the official release date
      */
-    public Film(String title, String director, TemporalCoordinate releaseDate) {
-        this(title);
+    public Film(String title, String director, TimeCoordinate releaseDate) {
+        super(title, "", releaseDate, null, ArtForm.CINEMA);
         this.director = director;
-        this.releaseDate = releaseDate;
-    }
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return title;
-    }
-
-    @Override
-    public TemporalCoordinate getWhen() {
-        return releaseDate;
     }
 
     public String getTitle() {
-        return title;
+        return getName();
     }
 
     public String getDirector() {
         return director;
-    }
-
-    public TemporalCoordinate getReleaseDate() {
-        return releaseDate;
     }
 
     public int getDurationMinutes() {
@@ -164,7 +129,7 @@ public class Film implements Identified<String>, Named, Temporal<TemporalCoordin
     }
 
     public List<String> getCast() {
-        return Collections.unmodifiableList(cast);
+        return Collections.unmodifiableSet(new java.util.HashSet<>(cast)).stream().toList(); // simplified
     }
 
     public void setDirector(String director) {
@@ -175,10 +140,6 @@ public class Film implements Identified<String>, Named, Temporal<TemporalCoordin
         if (artist != null) {
             this.director = artist.getName();
         }
-    }
-
-    public void setReleaseDate(TemporalCoordinate date) {
-        this.releaseDate = date;
     }
 
     public void setDurationMinutes(int duration) {
@@ -219,6 +180,6 @@ public class Film implements Identified<String>, Named, Temporal<TemporalCoordin
 
     @Override
     public String toString() {
-        return String.format("%s (%s) dir. %s", title, releaseDate != null ? releaseDate.toString() : "Unknown", director);
+        return String.format("%s (%s) dir. %s", getTitle(), getProductionDate() != null ? getProductionDate().toString() : "Unknown", director);
     }
 }

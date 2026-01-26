@@ -50,7 +50,7 @@ public final class SpatialInteraction {
      * @return interaction intensity
      */
     public static Real calculateGravityIntensity(double p1, double p2, Quantity<Length> distance, double beta) {
-        double d = distance.to(Units.KILOMETER).getValue();
+        double d = distance.to(Units.KILOMETER).getValue().doubleValue();
         if (d <= 0) return Real.ZERO;
         return Real.of((p1 * p2) / Math.pow(d, beta));
     }
@@ -64,7 +64,7 @@ public final class SpatialInteraction {
      * @return breaking point distance from center 1
      */
     public static Quantity<Length> calculateBreakingPoint(Quantity<Length> distance, double p1, double p2) {
-        double d = distance.to(Units.METER).getValue();
+        double d = distance.to(Units.METER).getValue().doubleValue();
         double bp = d / (1 + Math.sqrt(p2 / p1));
         return org.jscience.measure.Quantities.create(bp, Units.METER);
     }

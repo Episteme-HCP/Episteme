@@ -1,10 +1,10 @@
 package org.jscience.psychology.social;
 
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 
 import org.jscience.sociology.Culture;
 
-import org.jscience.util.Named;
+
 
 
 import org.jscience.util.persistence.Persistent;
@@ -20,7 +20,7 @@ import java.util.Objects;
  * @version 1.1
  */
 @Persistent
-public class Tribe extends HumanGroup implements Named {
+public class Tribe extends HumanGroup {
     /** The name of the tribe. */
     @Attribute
     private String name;

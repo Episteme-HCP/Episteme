@@ -1,7 +1,7 @@
 package org.jscience.biology;
 
 import org.jscience.geography.Boundary;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 
 import org.jscience.util.Positioned;
 

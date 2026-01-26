@@ -24,7 +24,7 @@ package org.jscience.philosophy.storytelling;
 
 import org.jscience.biology.Individual;
 
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 
 import java.util.Date;
 

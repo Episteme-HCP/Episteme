@@ -51,7 +51,7 @@ public class BNFGrammarReader extends AbstractResourceReader<Grammar> {
 
     @Override
     protected Grammar loadFromSource(String id) throws Exception {
-        String content = Files.readString(Paths.get(id), StandardCharsets.UTF_8);
+        Files.readString(Paths.get(id), StandardCharsets.UTF_8);
         Grammar grammar = new Grammar(language, "BNF Grammar [" + id + "]");
         grammar.setDescription("BNF Grammar loaded from " + id);
         // BNF parsing logic would go here
@@ -60,7 +60,7 @@ public class BNFGrammarReader extends AbstractResourceReader<Grammar> {
 
     @Override
     protected Grammar loadFromInputStream(InputStream is, String id) throws Exception {
-        String content = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
+        new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
                 .lines().collect(Collectors.joining("\n"));
         Grammar grammar = new Grammar(language, id);
         grammar.setDescription("BNF Grammar loaded from stream: " + id);

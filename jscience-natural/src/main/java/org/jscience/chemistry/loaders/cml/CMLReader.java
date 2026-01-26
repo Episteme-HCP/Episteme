@@ -28,7 +28,6 @@ import org.jscience.chemistry.loaders.cml.cmlimpl.DocumentFactoryImpl;
 import org.xml.sax.InputSource;
 
 import java.io.*;
-import java.util.logging.Logger;
 
 /**
  * Chemical Markup Language (CML) Reader.
@@ -63,7 +62,6 @@ import java.util.logging.Logger;
  */
 public class CMLReader extends AbstractResourceReader<AbstractCMLDocument> {
 
-    private static final Logger LOGGER = Logger.getLogger(CMLReader.class.getName());
     private CMLDocumentFactory documentFactory;
 
     /**

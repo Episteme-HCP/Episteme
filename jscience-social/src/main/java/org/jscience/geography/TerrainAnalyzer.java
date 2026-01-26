@@ -27,7 +27,6 @@ import org.jscience.measure.Quantity;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Length;
 
-import java.util.Arrays;
 
 /**
  * Utility class for terrain analysis using Digital Elevation Models (DEM).
@@ -51,7 +50,7 @@ public final class TerrainAnalyzer {
         int rows = dem.length;
         int cols = dem[0].length;
         double[][] slope = new double[rows][cols];
-        double size = cellSize.to(Units.METER).getValue();
+        double size = cellSize.to(Units.METER).getValue().doubleValue();
         
         for (int i = 1; i < rows - 1; i++) {
             for (int j = 1; j < cols - 1; j++) {
@@ -77,7 +76,7 @@ public final class TerrainAnalyzer {
         int rows = dem.length;
         int cols = dem[0].length;
         double[][] aspect = new double[rows][cols];
-        double size = cellSize.to(Units.METER).getValue();
+        double size = cellSize.to(Units.METER).getValue().doubleValue();
         
         for (int i = 1; i < rows - 1; i++) {
             for (int j = 1; j < cols - 1; j++) {

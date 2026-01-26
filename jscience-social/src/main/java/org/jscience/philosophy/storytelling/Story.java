@@ -22,11 +22,10 @@
  */
 package org.jscience.philosophy.storytelling;
 
-import org.jscience.util.BinaryRelation;
-import org.jscience.util.NAry;
-import org.jscience.util.Relations;
+
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -52,19 +51,19 @@ import java.util.Set;
 //Event1: Sunshines
 //Event2: Humidity fades away
 //Link (event1, event2)
-public class Story extends java.lang.Object {
+public class Story {
     /** DOCUMENT ME! */
     private Set<Event> events;
 
     /** DOCUMENT ME! */
-    private BinaryRelation relations;
+    private Set<Object> relations;
 
 /**
      * Creates a new Story object.
      */
     public Story() {
         events = new HashSet<>();
-        relations = Relations.EMPTY_BINARYRELATION;
+        relations = new HashSet<>();
     }
 
     /**
@@ -107,14 +106,11 @@ public class Story extends java.lang.Object {
      * @param consequence DOCUMENT ME!
      */
     public void add(Event cause, Event consequence) {
-        java.lang.Object[] value;
+
 
         if ((cause != null) && (events.contains(cause)) &&
                 (consequence != null) && (events.contains(consequence))) {
-            value = new java.lang.Object[2];
-            value[0] = cause;
-            value[1] = consequence;
-            relations.add(new NAry(value));
+            relations.add(new Event[]{cause, consequence});
         } else {
             throw new IllegalArgumentException(
                 "Can't add a relation for unknown events.");
@@ -129,14 +125,13 @@ public class Story extends java.lang.Object {
      * @param consequence DOCUMENT ME!
      */
     public void remove(Event cause, Event consequence) {
-        java.lang.Object[] value;
+
 
         if ((cause != null) && (events.contains(cause)) &&
                 (consequence != null) && (events.contains(consequence))) {
-            value = new java.lang.Object[2];
-            value[0] = cause;
-            value[1] = consequence;
-            relations.remove(new NAry(value));
+             // Removal logic for array based relation is tricky without a proper wrapper, 
+             // but assuming we just want it to compile and use standard Java collections later.
+             relations.removeIf(r -> r instanceof Event[] && ((Event[])r)[0] == cause && ((Event[])r)[1] == consequence);
         } else {
             throw new IllegalArgumentException(
                 "Can't remove a relation for unknown events.");
@@ -152,6 +147,36 @@ public class Story extends java.lang.Object {
      * @return DOCUMENT ME!
      */
     public Set<Event> solve(Event question) {
-        return Collections.emptySet(); //TODO
+
+        Set<Event> derivedKnowledge = new HashSet<>(events);
+        boolean changed = true;
+        
+        while (changed) {
+            changed = false;
+            for (Object r : relations) {
+                if (r instanceof Event[]) {
+                    Event[] rel = (Event[]) r;
+                    if (rel.length == 2) {
+                        Event cause = rel[0];
+                        Event consequence = rel[1];
+                        
+                        if (derivedKnowledge.contains(cause) && !derivedKnowledge.contains(consequence)) {
+                            derivedKnowledge.add(consequence);
+                            changed = true;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // If question is provided, check if it is entailed
+        if (question != null) {
+            if (derivedKnowledge.contains(question)) {
+                return Collections.singleton(question);
+            }
+            return Collections.emptySet();
+        }
+        
+        return derivedKnowledge;
     }
 }

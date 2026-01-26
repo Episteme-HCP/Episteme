@@ -23,6 +23,7 @@
 
 package org.jscience.geography;
 
+import org.jscience.earth.Place;
 import org.jscience.economics.EconomicAgent;
 import org.jscience.economics.Organization;
 import org.jscience.util.persistence.Persistent;
@@ -52,7 +53,7 @@ public class BusinessPlace extends OwnedPlace {
     public BusinessPlace(String name, Address address, Set<EconomicAgent> owners) {
         super(name, owners);
         this.address = Objects.requireNonNull(address, "Address cannot be null");
-        this.setType(Type.BUILDING);
+        this.setType(Place.Type.BUILDING);
         this.address.setPlace(this);
     }
 
@@ -78,7 +79,7 @@ public class BusinessPlace extends OwnedPlace {
     @Override
     public String toString() {
         return String.format("%s (%s) [%s]", 
-            getName(), address.getCity(), 
+            getName(), address != null ? address.getCity() : "Unknown", 
             organization != null ? organization.getName() : "Vacant");
     }
 }

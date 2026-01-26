@@ -24,8 +24,8 @@
 package org.jscience.history;
 
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.history.temporal.TemporalCoordinate;
-import org.jscience.history.temporal.FuzzyTemporalInterval;
+import org.jscience.history.time.TimeCoordinate;
+import org.jscience.history.time.FuzzyTimePoint;
 import java.util.Objects;
 
 /**
@@ -57,16 +57,16 @@ public final class CarbonDatingConverter {
      * to a calendar date estimate using a simplified linear model.
      * 
      * @param radiocarbonYearsBP radiocarbon age in years BP
-     * @return estimated calendar date with calculated uncertainty as a {@link TemporalCoordinate}
+     * @return estimated calendar date with calculated uncertainty as a {@link TimeCoordinate}
      */
-    public static TemporalCoordinate toCalendarDate(double radiocarbonYearsBP) {
+    public static TimeCoordinate toCalendarDate(double radiocarbonYearsBP) {
         // Simple linear conversion (standard reporting convention)
         int calendarYear = 1950 - (int) Math.round(radiocarbonYearsBP);
         
         // Return a fuzzy interval centered on the calculated year with uncertainty
         // Note: Ideally we would construct a more precise interval, but FuzzyTemporalInterval 
         // works for year-level precision.
-        return FuzzyTemporalInterval.circa(calendarYear);
+        return FuzzyTimePoint.circa(calendarYear);
     }
 
     /**

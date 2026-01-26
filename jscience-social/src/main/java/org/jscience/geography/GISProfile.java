@@ -25,7 +25,6 @@ package org.jscience.geography;
 
 import org.jscience.earth.coordinates.GeodeticCoordinate;
 import org.jscience.mathematics.geometry.Vector2D;
-
 import org.jscience.measure.Units;
 
 /**
@@ -77,5 +76,26 @@ public class GISProfile {
 
     public Projection getProjection() {
         return projection;
+    }
+
+    /**
+     * Calculates the approximate distance in meters between two geodetic coordinates 
+     * using the Haversine formula (spherical earth approximation).
+     */
+    public static double calculateDistanceMeters(GeodeticCoordinate c1, GeodeticCoordinate c2) {
+        double lat1 = c1.getLatitude().to(Units.RADIAN).getValue().doubleValue();
+        double lon1 = c1.getLongitude().to(Units.RADIAN).getValue().doubleValue();
+        double lat2 = c2.getLatitude().to(Units.RADIAN).getValue().doubleValue();
+        double lon2 = c2.getLongitude().to(Units.RADIAN).getValue().doubleValue();
+
+        double dLat = lat2 - lat1;
+        double dLon = lon2 - lon1;
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                   Math.cos(lat1) * Math.cos(lat2) *
+                   Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return 6371000.0 * c; // Earth radius in meters
     }
 }

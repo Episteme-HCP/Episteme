@@ -712,10 +712,12 @@ public class PMRDocumentImpl extends PMRNodeImpl implements PMRDocument {
             pmrDocBuilder = (PMRDocumentBuilder) pmrDocBuilderFactory.newDocumentBuilder();
         } catch (ParserConfigurationException pce) {
         }
-        PMRDocument pmrDoc = (PMRDocument) pmrDocBuilder.parse(new File(inFile));
-        StringWriter w = new StringWriter();
-        //PMRDOMUtils.outputEventStream(pmrDoc, w, PMRDOMUtils.PRETTY, 0);
-        System.out.println(w.toString());
+        if (pmrDocBuilder != null) {
+            pmrDocBuilder.parse(new File(inFile));
+            StringWriter w = new StringWriter();
+            //PMRDOMUtils.outputEventStream(pmrDoc, w, PMRDOMUtils.PRETTY, 0);
+            System.out.println(w.toString());
+        }
     }
 
     public static void test() throws Exception {
@@ -725,7 +727,8 @@ public class PMRDocumentImpl extends PMRNodeImpl implements PMRDocument {
             pmrDocBuilder = (PMRDocumentBuilder) pmrDocBuilderFactory.newDocumentBuilder();
         } catch (ParserConfigurationException pce) {
         }
-        PMRDocument pmrDoc = (PMRDocument) pmrDocBuilder.newDocument();
+        if (pmrDocBuilder != null) {
+            PMRDocument pmrDoc = (PMRDocument) pmrDocBuilder.newDocument();
         Element a = pmrDoc.createElement("aElem");
         pmrDoc.appendChild(a);
         Element b = pmrDoc.createElement("b");
@@ -760,6 +763,7 @@ public class PMRDocumentImpl extends PMRNodeImpl implements PMRDocument {
                 System.out.println("Att " + att);
                 System.out.println("Att " + att.getNodeName() + "=" + att.getNodeValue());
             }
+        }
         }
         System.out.println("=================================");
         StringWriter w = new StringWriter();
@@ -813,8 +817,7 @@ public class PMRDocumentImpl extends PMRNodeImpl implements PMRDocument {
 
     PMRNodeImpl createAndAddPMRNode(PMRNodeImpl parent, Node child, int level) {
         PMRNodeImpl newNode = null;
-        if (false) {
-        } else if (child == null) {
+        if (child == null) {
             System.err.println("Null child");
         } else if (child instanceof Element) {
             newNode = new PMRElementImpl((Element) child, this);

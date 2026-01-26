@@ -28,10 +28,10 @@ import org.jscience.measure.Quantity;
 import org.jscience.measure.Quantities;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Time;
-import org.jscience.physics.astronomy.AstronomyConstants;
 
-import org.jscience.history.temporal.FuzzyTimePoint;
-import org.jscience.history.temporal.FuzzyTimeInterval;
+
+import org.jscience.history.time.FuzzyTimePoint;
+import org.jscience.history.time.FuzzyTimeInterval;
 
 /**
  * Constants and reference points for historical and cosmological timelines.
@@ -50,6 +50,9 @@ public final class HistoryConstants {
 
     /** Unix Epoch (January 1, 1970). Reference time point 0. */
     public static final Real UNIX_EPOCH = Real.ZERO;
+
+    /** Number of seconds in a standard Julian year. */
+    public static final double JULIAN_YEAR_SECONDS = 31557600.0;
 
     /** Estimated age of the Universe (v2024 estimate: ~13.787 billion years). */
     public static final Quantity<Time> UNIVERSE_AGE = Quantities.create(Real.of("13.787e9"), Units.YEAR);

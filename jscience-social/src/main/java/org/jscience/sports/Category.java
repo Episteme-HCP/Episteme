@@ -37,6 +37,8 @@ public record Category(String name, String description) implements Serializable 
 
     private static final long serialVersionUID = 1L;
 
+    public static final Category OTHER = new Category("Other", "Unclassified sport category");
+
     public Category {
         Objects.requireNonNull(name, "Name cannot be null");
         Objects.requireNonNull(description, "Description cannot be null");

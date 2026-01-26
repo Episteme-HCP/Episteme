@@ -299,13 +299,10 @@ public class MechanicsDemo extends AbstractSimulationDemo {
         // Getters and Setters
         public double getPosition() { return position; }
         public void setPosition(double position) { this.position = position; }
-        public double getVelocity() { return velocity; }
         public void setVelocity(double velocity) { this.velocity = velocity; }
         public double getMass() { return mass; }
         public void setMass(double mass) { this.mass = mass; }
-        public double getSpringConstant() { return springConstant; }
         public void setSpringConstant(double k) { this.springConstant = k; }
-        public double getDamping() { return damping; }
         public void setDamping(double c) { this.damping = c; }
     
         /**

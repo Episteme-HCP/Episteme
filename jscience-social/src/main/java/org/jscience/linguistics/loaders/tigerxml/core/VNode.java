@@ -48,10 +48,9 @@ public class VNode implements Serializable {
     private String edge;
 
     /** DOCUMENT ME! */
-    private ArrayList secDaughters;
-
+    private ArrayList<GraphNode> secDaughters;
     /** DOCUMENT ME! */
-    private ArrayList secEdges;
+    private ArrayList<String> secEdges;
 
     /** DOCUMENT ME! */
     private int verbosity = 0;
@@ -65,8 +64,8 @@ public class VNode implements Serializable {
         id = new_id;
         mother = null;
         edge = null;
-        secDaughters = new ArrayList();
-        secEdges = new ArrayList();
+        secDaughters = new ArrayList<>();
+        secEdges = new ArrayList<>();
     }
 
 /**
@@ -79,8 +78,8 @@ public class VNode implements Serializable {
         id = new_id;
         mother = null;
         edge = null;
-        secDaughters = new ArrayList();
-        secEdges = new ArrayList();
+        secDaughters = new ArrayList<>();
+        secEdges = new ArrayList<>();
         this.verbosity = verbosity;
     }
 
@@ -148,8 +147,8 @@ public class VNode implements Serializable {
                 }
             } else {
                 NT nt_node = (NT) node;
-                GraphNode next_s_daughter = (GraphNode) secDaughters.get(i);
-                String next_s_edge = (String) secEdges.get(i);
+                GraphNode next_s_daughter = secDaughters.get(i);
+                String next_s_edge = secEdges.get(i);
                 nt_node.addSecDaughter(next_s_daughter);
                 next_s_daughter.setSecMother(nt_node, next_s_edge);
             }

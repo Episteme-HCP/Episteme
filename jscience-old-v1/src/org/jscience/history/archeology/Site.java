@@ -1,7 +1,7 @@
 package org.jscience.history.archeology;
 
 import org.jscience.geography.Boundary;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 
 import java.util.Date;
 import java.util.Iterator;

@@ -103,7 +103,7 @@ public final class FireEscapeAnalyzer {
             if (c.connectedExits().isEmpty()) continue;
             int occupantsPerExit = c.occupancy() / c.connectedExits().size();
             for (String exitId : c.connectedExits()) {
-                exitLoads.merge(exitId, occupantsPerExit, Integer::sum);
+                exitLoads.merge(exitId, occupantsPerExit, (a, b) -> Integer.sum(a, b));
             }
         }
         

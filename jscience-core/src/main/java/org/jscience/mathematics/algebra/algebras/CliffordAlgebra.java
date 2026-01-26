@@ -50,7 +50,6 @@ public class CliffordAlgebra<E> implements Ring<CliffordAlgebra.Multivector<E>> 
 
     private final Field<E> scalarField;
     private final int dimension;
-    @SuppressWarnings("unused")
     private final E[] metric; // Reserved for full orthogonal basis product implementation
 
     public CliffordAlgebra(Field<E> scalarField, int dimension, E[] metric) {

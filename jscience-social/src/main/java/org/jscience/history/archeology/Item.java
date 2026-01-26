@@ -1,6 +1,5 @@
 package org.jscience.history.archeology;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,14 +10,13 @@ import java.util.Set;
 import org.jscience.arts.Analysis;
 import org.jscience.arts.Restoration;
 import org.jscience.bibliography.Citation;
-import org.jscience.biology.Human;
+import org.jscience.sociology.Human;
 import org.jscience.economics.Organization;
 import org.jscience.economics.money.Money;
 import org.jscience.economics.resources.PhysicalObject;
-import org.jscience.geography.Place;
-import org.jscience.geography.Places;
-import org.jscience.history.temporal.TemporalCoordinate;
-import org.jscience.measure.Quantity;
+import org.jscience.earth.Place;
+import org.jscience.earth.Places;
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.methodology.ScientificDescription;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.persistence.Attribute;
@@ -34,7 +32,7 @@ import org.jscience.util.persistence.Relation;
  * @since 2.0
  */
 @Persistent
-public class Item extends PhysicalObject implements Serializable {
+public class Item extends PhysicalObject {
 
     private static final long serialVersionUID = 2L;
 
@@ -50,6 +48,10 @@ public class Item extends PhysicalObject implements Serializable {
     @Relation(type = Relation.Type.MANY_TO_ONE)
     private Civilization civilization;
 
+    /** Estimated age determined through dating methods (e.g., C-14). */
+    @Relation(type = Relation.Type.ONE_TO_ONE)
+    private TimeCoordinate dating;
+
     @Relation(type = Relation.Type.ONE_TO_MANY)
     private final List<ScientificDescription> extraDescriptions = new ArrayList<>();
 
@@ -63,11 +65,12 @@ public class Item extends PhysicalObject implements Serializable {
     private final List<Restoration> restorations = new ArrayList<>();
 
     public Item(String name, String description, Organization organization,
-                TemporalCoordinate primaryDate, Identification identification, Set<Human> discoverers,
+                TimeCoordinate dating, Identification identification, Set<Human> discoverers,
                 Instant discoveryDate, Place originalPosition) {
-        super(name, description, Quantity.ONE, organization, Places.EARTH,
-            primaryDate, identification, Money.usd(0));
+        super(name, description, org.jscience.measure.Quantities.create(1, org.jscience.measure.Units.ONE), organization, Places.EARTH,
+            dating != null ? dating.toInstant() : Instant.now(), identification, Money.usd(0));
 
+        this.dating = Objects.requireNonNull(dating, "Dating cannot be null");
         this.discoverers = new HashSet<>(Objects.requireNonNull(discoverers, "Discoverers cannot be null"));
         if (this.discoverers.isEmpty()) {
             throw new IllegalArgumentException("Discoverers cannot be empty");
@@ -75,6 +78,23 @@ public class Item extends PhysicalObject implements Serializable {
         
         this.discoveryDate = Objects.requireNonNull(discoveryDate, "Discovery date cannot be null");
         this.originalPosition = Objects.requireNonNull(originalPosition, "Original position cannot be null");
+    }
+
+    /**
+     * Returns the estimated dating of the artifact.
+     *
+     * @return the dating
+     */
+    public TimeCoordinate getDating() {
+        return dating;
+    }
+
+    /**
+     * Sets the estimated dating of the artifact.
+     * @param dating the new dating
+     */
+    public void setDating(TimeCoordinate dating) {
+        this.dating = Objects.requireNonNull(dating, "Dating cannot be null");
     }
 
     public Set<Human> getDiscoverers() {

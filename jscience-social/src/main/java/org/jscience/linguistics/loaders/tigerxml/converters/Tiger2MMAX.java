@@ -86,8 +86,8 @@ public class Tiger2MMAX {
      * @param args The command line arguments as received from the OS
      * @return fileNames The files to be processed.
      */
-    private static ArrayList parseCmdLineArgs(String[] args) {
-        ArrayList fileNames = new ArrayList();
+    private static ArrayList<String> parseCmdLineArgs(String[] args) {
+        ArrayList<String> fileNames = new ArrayList<>();
         /* Check if enough cmd line args are given, exit if not */
         if (args.length == 0) {
             System.err.println("Usage: java Tiger2MMAX XMLfilename[s] -o [outputPath]\n" +
@@ -771,7 +771,7 @@ public class Tiger2MMAX {
                     if (w.equals("&")) {
                         w = "&amp;";
                     }
-                    outXML.write("  <word id=\"" + tmpT.getId() + "\">"
+                    outXML.write("  <word id=\"" + tmpT.getId().toString() + "\">"
                             + w + "</word>\n");
                 } // for j
             } // for i
@@ -807,7 +807,7 @@ public class Tiger2MMAX {
 
             for (int i = 0; i < corp.getSentenceCount(); i++) {
                 Sentence tmpSent = corp.getSentence(i);
-                outXML.write("  <sentence id=\"" + tmpSent.getId() + "\""
+                outXML.write("  <sentence id=\"" + tmpSent.getId().toString() + "\""
                         + " span=\"" + tmpSent.getSpan() + "\"/>\n");
             } // for i
 
@@ -847,7 +847,7 @@ public class Tiger2MMAX {
                     T t = tmpSent.getT(j);
                     outXML.write("  <markable "
                             + "id=\"synmark_" + calcNumID(t) + "\" "
-                            + "span=\"" + t.getId() + "\" "
+                            + "span=\"" + t.getId().toString() + "\" "
                             + "class=\"t\" "
                             + "pos=\"" + t.getPos() + "\" "
                             + "morph=\"" + t.getMorph() + "\" "
@@ -903,13 +903,13 @@ public class Tiger2MMAX {
             int runningID = 0;
 
             /* Check all GraphNodes, write all markables (filtered) */
-            ArrayList allGraphNodes = corp.getAllGraphNodes();
+            java.util.List<GraphNode> allGraphNodes = corp.getAllGraphNodes();
             for (int i = 0; i < allGraphNodes.size(); i++) {
                 String span;
                 GraphNode gn = (GraphNode) allGraphNodes.get(i);
                 if (SyncMMAX.isMarkable(gn)) {
                     if (gn.isTerminal()) {
-                        span = ((T) gn).getId();
+                        span = ((T) gn).getId().toString();
                     } else {
                         span = ((NT) gn).getSpan();
                     }
@@ -950,13 +950,13 @@ public class Tiger2MMAX {
             int runningID = 0;
 
             /* Check all GraphNodes, write all markables (filtered) */
-            ArrayList allGraphNodes = corp.getAllGraphNodes();
+            java.util.List<GraphNode> allGraphNodes = corp.getAllGraphNodes();
             for (int i = 0; i < allGraphNodes.size(); i++) {
                 String span;
                 GraphNode gn = (GraphNode) allGraphNodes.get(i);
                 if (SyncMMAX.isMarkable(gn)) {
                     if (gn.isTerminal()) {
-                        span = ((T) gn).getId();
+                        span = ((T) gn).getId().toString();
                     } else {
                         span = ((NT) gn).getSpan();
                     }
@@ -993,13 +993,13 @@ public class Tiger2MMAX {
             int runningID = 0;
 
             /* Check all GraphNodes, write all markables (filtered) */
-            ArrayList allGraphNodes = corp.getAllGraphNodes();
+            java.util.List<GraphNode> allGraphNodes = corp.getAllGraphNodes();
             for (int i = 0; i < allGraphNodes.size(); i++) {
                 String span;
                 GraphNode gn = (GraphNode) allGraphNodes.get(i);
                 if (SyncMMAX.isMarkable(gn)) {
                     if (gn.isTerminal()) {
-                        span = ((T) gn).getId();
+                        span = ((T) gn).getId().toString();
                     } else {
                         span = ((NT) gn).getSpan();
                     }
@@ -1083,7 +1083,7 @@ public class Tiger2MMAX {
     public static void main(String[] args) {
 
         /* Run the main loop (for all files in args) */
-        ArrayList allFilePaths = parseCmdLineArgs(args);
+        ArrayList<String> allFilePaths = parseCmdLineArgs(args);
         System.err.println("This is org.jscience.ml.tigerxml.converters.Tiger2MMAX.");
         for (int i = 0; i < allFilePaths.size(); i++) {
 

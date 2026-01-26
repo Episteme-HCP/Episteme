@@ -24,34 +24,58 @@
 package org.jscience.biology;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.SimpleIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
 import org.jscience.mathematics.numbers.real.Real;
 
 /**
  * Represents a taxonomic group in a phylogenetic tree.
- * Extends AbstractIdentifiedEntity to support dynamic traits and consistent identity.
+ * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Taxon extends AbstractIdentifiedEntity {
+@Persistent
+public class Taxon implements ComprehensiveIdentification {
     
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    protected final Identification id;
+
+    @Attribute
+    protected final Map<String, Object> traits = new HashMap<>();
+
+    @Attribute
     private final String parentId;
+    
+    @Attribute
     private final List<Taxon> children = new ArrayList<>();
     
+    @Attribute
     private final Real coi;
+    
+    @Attribute
     private final Real rna16s;
+    
+    @Attribute
     private final Real cytb;
     
     // Layout properties (transient)
     public transient double x, y, angle, radius;
 
     public Taxon(String id, String parentId, String name, Real coi, Real rna16s, Real cytb) {
-        super(new SimpleIdentification(id));
+        this.id = new SimpleIdentification(id);
         setName(name);
         this.parentId = parentId;
         this.coi = coi;
@@ -61,6 +85,16 @@ public class Taxon extends AbstractIdentifiedEntity {
 
     public Taxon(String id, Object parentId, String name, Real coi, Real rna16s, Real cytb) {
         this(id, parentId != null ? parentId.toString() : "", name, coi, rna16s, cytb);
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     public void addChild(Taxon t) {
@@ -73,4 +107,21 @@ public class Taxon extends AbstractIdentifiedEntity {
     public Real getCoi() { return coi; }
     public Real getRna16s() { return rna16s; }
     public Real getCytb() { return cytb; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Taxon taxon)) return false;
+        return Objects.equals(id, taxon.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

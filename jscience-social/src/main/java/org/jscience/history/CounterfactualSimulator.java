@@ -23,8 +23,8 @@
 
 package org.jscience.history;
 
-import org.jscience.history.temporal.TemporalCoordinate;
-import org.jscience.history.temporal.FuzzyTemporalInterval;
+import org.jscience.history.time.TimeCoordinate;
+import org.jscience.history.time.FuzzyTimePoint;
 import org.jscience.mathematics.numbers.real.Real;
 import java.io.Serializable;
 import java.util.*;
@@ -61,7 +61,7 @@ public final class CounterfactualSimulator {
     public record ContingencyEvent(
         @Attribute String id,
         @Attribute String name,
-        @Relation(type = Relation.Type.ONE_TO_ONE) TemporalCoordinate date,
+        @Relation(type = Relation.Type.ONE_TO_ONE) TimeCoordinate date,
         @Attribute String category,
         @Attribute double importance,
         @Attribute List<String> consequences
@@ -259,25 +259,25 @@ public final class CounterfactualSimulator {
      */
     public static void loadSampleData() {
         addEvent(new ContingencyEvent("roman_republic", "Founding of Roman Republic",
-            FuzzyTemporalInterval.circa(-509), "Political", 0.9, Arrays.asList("punic_wars", "roman_empire")));
+            FuzzyTimePoint.circaBce(509), "Political", 0.9, Arrays.asList("punic_wars", "roman_empire")));
         
         addEvent(new ContingencyEvent("punic_wars", "Punic Wars",
-            FuzzyTemporalInterval.circa(-264), "War", 0.85, Collections.singletonList("roman_empire")));
+            FuzzyTimePoint.circaBce(264), "War", 0.85, Collections.singletonList("roman_empire")));
         
         addEvent(new ContingencyEvent("roman_empire", "Roman Empire established",
-            FuzzyTemporalInterval.circa(-27), "Political", 0.95, Arrays.asList("christianity_rise", "fall_of_rome")));
+            FuzzyTimePoint.circaBce(27), "Political", 0.95, Arrays.asList("christianity_rise", "fall_of_rome")));
         
         addEvent(new ContingencyEvent("christianity_rise", "Rise of Christianity",
-            FuzzyTemporalInterval.circa(30), "Religious", 0.95, Arrays.asList("constantine", "medieval_church")));
+            FuzzyTimePoint.circa(30), "Religious", 0.95, Arrays.asList("constantine", "medieval_church")));
         
         addEvent(new ContingencyEvent("fall_of_rome", "Fall of Western Roman Empire",
-            FuzzyTemporalInterval.of(476, 9, 4), "Political", 0.9, Collections.singletonList("medieval_period")));
+            FuzzyTimePoint.of(476, 9, 4), "Political", 0.9, Collections.singletonList("medieval_period")));
         
         addEvent(new ContingencyEvent("printing_press", "Gutenberg Printing Press",
-            FuzzyTemporalInterval.circa(1440), "Technology", 0.9, Arrays.asList("reformation", "scientific_rev")));
+            FuzzyTimePoint.circa(1440), "Technology", 0.9, Arrays.asList("reformation", "scientific_rev")));
         
         addEvent(new ContingencyEvent("reformation", "Protestant Reformation",
-            FuzzyTemporalInterval.of(1517, 10, 31), "Religious", 0.85, Collections.singletonList("30_years_war")));
+            FuzzyTimePoint.of(1517, 10, 31), "Religious", 0.85, Collections.singletonList("30_years_war")));
     }
 
     private static void cascadeEffects(String eventId, Set<String> affected) {

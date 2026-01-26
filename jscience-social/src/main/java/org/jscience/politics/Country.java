@@ -24,11 +24,11 @@
 package org.jscience.politics;
 
 import java.awt.Image;
-import java.io.Serializable;
+
 import java.util.*;
 import org.jscience.economics.money.Currency;
 import org.jscience.geography.Region;
-import org.jscience.util.Named;
+
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
@@ -46,7 +46,7 @@ import org.jscience.util.persistence.Relation;
  * @version 2.1 (Modernized with ISO support)
  */
 @Persistent
-public class Country extends Region implements Named, Serializable {
+public class Country extends Region {
 
     private static final long serialVersionUID = 1L;
 
@@ -116,7 +116,7 @@ public class Country extends Region implements Named, Serializable {
      * Modern constructor.
      */
     public Country(String name, Nation nation, City capital) {
-        super(name, Region.RegionType.COUNTRY);
+        super(name, Region.SubType.COUNTRY);
         this.nation = nation;
         if (capital != null) setCapital(capital.getName());
     }
@@ -125,16 +125,16 @@ public class Country extends Region implements Named, Serializable {
      * Legacy/Factbook constructor.
      */
     public Country(String name, String code) {
-        super(name, Region.RegionType.COUNTRY);
-        setCode(code);
+        super(name, Region.SubType.COUNTRY);
+        setIsoCode(code);
     }
 
     /**
      * Rich Factbook constructor.
      */
     public Country(String name, String iso2, String iso3, int numeric, String capital, String continent, long pop, double area) {
-        super(name, Region.RegionType.COUNTRY);
-        setCode(iso2);
+        super(name, Region.SubType.COUNTRY);
+        setIsoCode(iso2);
         setAlpha3(iso3);
         setCapital(capital);
         setContinent(continent);
@@ -184,8 +184,8 @@ public class Country extends Region implements Named, Serializable {
     public String getContinent() { return continent; }
     public void setContinent(String continent) { this.continent = continent; }
 
-    public String getAlpha2() { return getCode(); }
-    public void setAlpha2(String code) { setCode(code); }
+    public String getAlpha2() { return getIsoCode(); }
+    public void setAlpha2(String code) { setIsoCode(code); }
     
     public String getAlpha3() { return alpha3; }
     public void setAlpha3(String code) { this.alpha3 = code; }
@@ -205,16 +205,16 @@ public class Country extends Region implements Named, Serializable {
         if (this == o) return true;
         if (!(o instanceof Country country)) return false;
         if (!super.equals(o)) return false;
-        return Objects.equals(getCode(), country.getCode()) || Objects.equals(alpha3, country.alpha3);
+        return Objects.equals(getIsoCode(), country.getIsoCode()) || Objects.equals(alpha3, country.alpha3);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getCode(), alpha3);
+        return Objects.hash(super.hashCode(), getIsoCode(), alpha3);
     }
 
     @Override
     public String toString() {
-        return getName() + " [" + getCode() + "]";
+        return getName() + " [" + getIsoCode() + "]";
     }
 }

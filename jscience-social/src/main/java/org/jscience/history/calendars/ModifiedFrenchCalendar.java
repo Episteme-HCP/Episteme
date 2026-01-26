@@ -144,9 +144,9 @@ public class ModifiedFrenchCalendar extends MonthDayYear {
     protected synchronized void recomputeRD() {
         int i = super.year - 1;
         super.rd = ((((EPOCH - 1L) + (long) (365 * i) +
-            AlternateCalendar.fldiv(i, 4L)) - AlternateCalendar.fldiv(i, 100L)) +
-            AlternateCalendar.fldiv(i, 400L)) -
-            AlternateCalendar.fldiv(i, 4000L);
+            AlternateCalendar.floorDiv(i, 4L)) - AlternateCalendar.floorDiv(i, 100L)) +
+            AlternateCalendar.floorDiv(i, 400L)) -
+            AlternateCalendar.floorDiv(i, 4000L);
         super.rd += ((30 * (super.month - 1)) + super.day);
     }
 
@@ -167,8 +167,10 @@ public class ModifiedFrenchCalendar extends MonthDayYear {
         }
 
         modfrench.set(1, 1, super.year);
-        super.month = (int) AlternateCalendar.fldiv(super.rd -
-                modfrench.toRD(), 30L) + 1;
+        @SuppressWarnings("deprecation")
+        long m = AlternateCalendar.fldiv(super.rd -
+                modfrench.toRD(), 30L);
+        super.month = (int)m + 1;
         modfrench.set(super.month, 1, super.year);
         super.day = (int) ((super.rd - modfrench.toRD()) + 1L);
     }

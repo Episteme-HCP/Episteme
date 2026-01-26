@@ -63,7 +63,6 @@ public class TelescopeViewer extends AbstractDeviceViewer<Telescope> {
     // Parameters
     private double targetRA = 12.0;
     private double targetDec = 45.0;
-    private String selectedPreset = "None";
     
     private final List<Parameter<?>> parameters = new ArrayList<>();
 
@@ -85,7 +84,6 @@ public class TelescopeViewer extends AbstractDeviceViewer<Telescope> {
         
         List<String> presets = List.of("None", "Polaris", "Vega", "Betelgeuse", "Sirius");
         parameters.add(new ChoiceParameter("telescope.preset", I18n.getInstance().get("telescope.target", "Preset Target"), presets, "None", v -> {
-            selectedPreset = v;
             switch(v) {
                 case "Polaris" -> { targetRA = 2.53; targetDec = 89.26; }
                 case "Vega" -> { targetRA = 18.62; targetDec = 38.78; }

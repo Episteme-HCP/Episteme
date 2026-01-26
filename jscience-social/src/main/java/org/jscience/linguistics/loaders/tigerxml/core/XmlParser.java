@@ -22,6 +22,8 @@
 
 package org.jscience.linguistics.loaders.tigerxml.core;
 
+import java.io.File;
+
 import org.jscience.linguistics.loaders.tigerxml.tools.GeneralTools;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -32,9 +34,6 @@ import org.xml.sax.SAXParseException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 
 /**
  * Provides static XML parsing functionality.
@@ -51,7 +50,6 @@ public class XmlParser {
      * If this flag is set, the document will be parsed building a DOM tree,
      * if unset, the document will be parsed using SAX.
      */
-    private boolean dom = true;
 
     /**
      * The name of the XML file to be parsed
@@ -61,8 +59,6 @@ public class XmlParser {
     /**
      * The first line in the XML corpus file. Ex: '<?xml version="1.0" ...'
      */
-    private final String xmlDeclaration =
-            "<?xml version=\"1.0\" standalone=\"yes\">";
 
     /**
      * The higher this value the more process and debug information will
@@ -111,8 +107,6 @@ public class XmlParser {
             // But after hours of browsing the Java XML
             // documentation, I still see no other
             // possibility of getting the XML prolog.
-            BufferedReader in = new BufferedReader(new FileReader(this.xmlFileName));
-            ////FOOxmlProlog = in.readLine();
         } catch (java.io.IOException ex) {
             ex.printStackTrace();
             System.err.println("org.jscience.ml.tigerxml.core.XmlParser: Could not open "
@@ -142,6 +136,7 @@ public class XmlParser {
         } catch (ParserConfigurationException pce) {
             pce.printStackTrace();
         }
+        if (doc == null) return null;
         NodeList currentNodeList =
                 doc.getElementsByTagName("corpus"); //corpus element list
         Element rootElement =
@@ -202,18 +197,5 @@ public class XmlParser {
         this.verbosity = verbosity;
     }
 
-    public void useDOM() {
-        this.dom = true;
-        if (this.verbosity > 2) {
-            System.err.println("org.jscience.ml.tigerxml.core.XmlParser: Parser set to 'DOM'");
-        }
-    }
-
-    public void useSAX() {
-        this.dom = false;
-        if (this.verbosity > 2) {
-            System.err.println("org.jscience.ml.tigerxml.core.XmlParser: Parser set to 'SAX'");
-        }
-    }
 
 } // class

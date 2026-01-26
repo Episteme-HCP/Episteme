@@ -284,7 +284,7 @@ public final class TradeRouteMapper {
         synchronized (ROUTES) {
             for (TradeRoute route : ROUTES) {
                 for (TradingPost post : route.waypoints()) {
-                    correlations.merge(post.name(), 1, Integer::sum);
+                    correlations.merge(post.name(), 1, (a, b) -> a + b);
                 }
             }
         }

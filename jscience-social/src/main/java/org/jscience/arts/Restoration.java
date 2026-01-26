@@ -25,7 +25,7 @@ package org.jscience.arts;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.history.time.TimeCoordinate;
 
 /**
  * Represents a restoration event or conservation treatment performed on an artwork.
@@ -43,7 +43,7 @@ public class Restoration implements Serializable {
 
     private final String processName;
     private final String restorer; // Individual or Organization name
-    private final TemporalCoordinate date;
+    private final TimeCoordinate date;
     private final String outcome;
     private String comments;
 
@@ -55,7 +55,7 @@ public class Restoration implements Serializable {
      * @param date the date when the restoration was completed
      * @param outcome the state of the artwork after the treatment
      */
-    public Restoration(String processName, String restorer, TemporalCoordinate date, String outcome) {
+    public Restoration(String processName, String restorer, TimeCoordinate date, String outcome) {
         this.processName = Objects.requireNonNull(processName, "Process name cannot be null");
         this.restorer = Objects.requireNonNull(restorer, "Restorer cannot be null");
         this.date = Objects.requireNonNull(date, "Date cannot be null");
@@ -70,7 +70,7 @@ public class Restoration implements Serializable {
         return restorer;
     }
 
-    public TemporalCoordinate getDate() {
+    public TimeCoordinate getDate() {
         return date;
     }
 

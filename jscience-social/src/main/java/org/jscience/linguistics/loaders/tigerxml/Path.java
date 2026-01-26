@@ -32,7 +32,7 @@ import java.util.ArrayList;
  */
 public class Path {
     /** DOCUMENT ME! */
-    protected ArrayList steps;
+    protected ArrayList<Step> steps;
 
     /** DOCUMENT ME! */
     private int cursor;
@@ -55,7 +55,7 @@ public class Path {
      * @param node DOCUMENT ME!
      */
     private Path(GraphNode node) {
-        steps = new ArrayList();
+        steps = new ArrayList<>();
 
         Step step = new Step(node, Step.UNDEF, this.verbosity);
         steps.add(step);
@@ -71,7 +71,7 @@ public class Path {
      */
     private Path(GraphNode node, int verbosity) {
         this.verbosity = verbosity;
-        steps = new ArrayList();
+        steps = new ArrayList<>();
 
         Step step = new Step(node, Step.UNDEF, this.verbosity);
         steps.add(step);
@@ -86,7 +86,7 @@ public class Path {
      */
     public String toString() {
         Step first_step = this.getFirstStep();
-        StringBuffer string_buffer = new StringBuffer((first_step.getNode()).getId());
+        StringBuffer string_buffer = new StringBuffer(first_step.getNode().getId().toString());
 
         while (this.hasNext()) {
             string_buffer.append("-");
@@ -108,7 +108,6 @@ public class Path {
      *         used by Daniel Gildea.
      */
     public String toGildeaStyleString() {
-        Step first_step = this.getFirstStep();
         StringBuffer string_buffer = new StringBuffer();
         String cat = "";
 
@@ -351,11 +350,6 @@ public class Path {
      * @param node DOCUMENT ME!
      * @param dir DOCUMENT ME!
      */
-    private void prefixNode(GraphNode node, String dir) {
-        Step first = this.getFirstStep();
-        first.setDirection(dir);
-        (this.steps).add(0, (new Step(node, Step.UNDEF, this.verbosity)));
-    }
 
     /**
      * Inverts this path by reversing the order of the nodes and
@@ -365,12 +359,12 @@ public class Path {
         int to_swap = (steps.size() - 1);
 
         for (int i = 0; i < steps.size(); i++) {
-            Step current = (Step) steps.get(i);
+            Step current = steps.get(i);
             current.invertDirection();
 
             if (i < to_swap) {
                 GraphNode tmp = current.getNode();
-                Step swap = (Step) steps.get(to_swap);
+                Step swap = steps.get(to_swap);
                 current.setNode(swap.getNode());
                 swap.setNode(tmp);
             }
@@ -387,7 +381,7 @@ public class Path {
     private Step getPrevStep() {
         cursor--;
 
-        return (Step) steps.get(cursor);
+        return steps.get(cursor);
     }
 
     /**
@@ -419,7 +413,7 @@ public class Path {
     private Step getNextStep() {
         cursor++;
 
-        return (Step) steps.get(cursor);
+        return steps.get(cursor);
     }
 
     /**
@@ -451,7 +445,7 @@ public class Path {
     private Step getFirstStep() {
         cursor = 0;
 
-        return (Step) steps.get(cursor);
+        return steps.get(cursor);
     }
 
     /**
@@ -460,7 +454,7 @@ public class Path {
      * @return The first <tt>GraphNode</tt> in this <tt>Path</tt>.
      */
     public GraphNode getFirst() {
-        return ((Step) steps.get(0)).getNode();
+        return steps.get(0).getNode();
     }
 
     /**
@@ -480,7 +474,7 @@ public class Path {
      * @return The last <tt>GraphNode</tt> in this <tt>Path</tt>.
      */
     public GraphNode getLast() {
-        return ((Step) steps.get(steps.size() - 1)).getNode();
+        return steps.get(steps.size() - 1).getNode();
     }
 
     /**

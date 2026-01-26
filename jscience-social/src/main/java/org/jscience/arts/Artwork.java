@@ -23,20 +23,23 @@
 
 package org.jscience.arts;
 
-import java.io.Serializable;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import org.jscience.economics.Community;
 import org.jscience.economics.money.Money;
-import org.jscience.geography.Place;
-import org.jscience.history.temporal.TemporalCoordinate;
-import org.jscience.util.Named;
-import org.jscience.util.Temporal;
-import org.jscience.util.identity.Identified;
+import org.jscience.economics.resources.Artifact;
+import org.jscience.earth.Place;
+import org.jscience.history.time.TimeCoordinate;
+import org.jscience.measure.Quantity;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.UUIDIdentification;
 import org.jscience.util.persistence.Attribute;
-import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
@@ -48,31 +51,18 @@ import org.jscience.util.persistence.Relation;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
+ * @version 2.1
  */
 @Persistent
-public class Artwork implements Identified<String>, Named, Temporal<TemporalCoordinate>, Serializable {
+public class Artwork extends Artifact {
 
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
 
-    @Id
-    private final String id;
-    @Attribute
-    private final String name;
-    @Attribute
-    private final String description;
-    @Attribute
-    private final TemporalCoordinate productionDate;
-    @Relation(type = Relation.Type.MANY_TO_ONE)
-    private final Place productionPlace;
     @Attribute
     private final ArtForm category;
 
     @Attribute
     private final Set<String> authors; // Names of authors/artists
-    @Relation(type = Relation.Type.MANY_TO_ONE)
-    private Money estimatedValue;
     
     @Relation(type = Relation.Type.ONE_TO_MANY)
     private final Set<Analysis> analyses;
@@ -88,43 +78,23 @@ public class Artwork implements Identified<String>, Named, Temporal<TemporalCoor
      * @param productionPlace location where the work was created
      * @param category the form of art (e.g., PAINTING, SCULPTURE)
      */
-    public Artwork(String name, String description, TemporalCoordinate productionDate, Place productionPlace, ArtForm category) {
-        this.id = UUID.randomUUID().toString();
-        this.name = Objects.requireNonNull(name, "Name cannot be null");
-        this.description = description;
-        this.productionDate = productionDate;
-        this.productionPlace = productionPlace;
+    public Artwork(String name, String description, TimeCoordinate productionDate, Place productionPlace, ArtForm category) {
+        this(name, description, Quantities.create(1, Units.ONE), null, productionPlace, 
+             productionDate != null ? productionDate.toInstant() : Instant.now(),
+             new UUIDIdentification(UUID.randomUUID().toString()), Money.usd(0), category);
+    }
+
+    /**
+     * Full constructor for Artwork as a resource.
+     */
+    public Artwork(String name, String description, Quantity<?> amount,
+            Community producer, Place productionPlace, Instant productionDate,
+            Identification identification, Money value, ArtForm category) {
+        super(name, description, amount, producer, productionPlace, productionDate, identification, value);
         this.category = Objects.requireNonNull(category, "Category cannot be null");
         this.authors = new HashSet<>();
         this.analyses = new HashSet<>();
         this.restorations = new HashSet<>();
-    }
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public TemporalCoordinate getWhen() {
-        return productionDate;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public TemporalCoordinate getProductionDate() {
-        return productionDate;
-    }
-
-    public Place getProductionPlace() {
-        return productionPlace;
     }
 
     public ArtForm getCategory() {
@@ -145,14 +115,6 @@ public class Artwork implements Identified<String>, Named, Temporal<TemporalCoor
         if (artist != null) {
             authors.add(artist.getName());
         }
-    }
-
-    public Money getEstimatedValue() {
-        return estimatedValue;
-    }
-
-    public void setEstimatedValue(Money estimatedValue) {
-        this.estimatedValue = estimatedValue;
     }
 
     public Set<Analysis> getAnalyses() {
@@ -177,20 +139,20 @@ public class Artwork implements Identified<String>, Named, Temporal<TemporalCoor
 
     @Override
     public String toString() {
-        return String.format("%s (%s)", name, category);
+        return String.format("%s (%s)", getName(), category);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Artwork artwork)) return false;
+        if (!super.equals(o)) return false;
         return category == artwork.category && 
-               Objects.equals(name, artwork.name) && 
-               Objects.equals(productionDate, artwork.productionDate);
+               Objects.equals(getName(), artwork.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, productionDate, category);
+        return Objects.hash(super.hashCode(), category);
     }
 }

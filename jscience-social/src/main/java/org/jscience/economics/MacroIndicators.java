@@ -23,7 +23,7 @@
 
 package org.jscience.economics;
 
-import java.util.ArrayList;
+
 import java.util.List;
 import org.jscience.mathematics.numbers.real.Real;
 

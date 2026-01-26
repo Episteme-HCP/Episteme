@@ -100,8 +100,10 @@ public class EthiopicCalendar extends CopticCalendar {
      * Recomputes the Rata Die number from the current month, day, and year.
      */
     protected synchronized void recomputeRD() {
+        @SuppressWarnings("deprecation")
+        long q = AlternateCalendar.fldiv(super.year, 4L);
         super.rd = (EPOCH - 1L) + (long) (365 * (super.year - 1)) +
-            AlternateCalendar.fldiv(super.year, 4L) +
+            q +
             (long) (30 * (super.month - 1)) + (long) super.day;
     }
 
@@ -109,10 +111,13 @@ public class EthiopicCalendar extends CopticCalendar {
      * Recomputes the month, day, and year from the current Rata Die number.
      */
     protected synchronized void recomputeFromRD() {
-        super.year = (int) AlternateCalendar.fldiv((4L * (super.rd - EPOCH)) +
-                1463L, 1461L);
-        super.month = (int) AlternateCalendar.fldiv(super.rd -
-                (new EthiopicCalendar(1, 1, super.year)).toRD(), 30L) + 1;
+        @SuppressWarnings("deprecation")
+        long y = AlternateCalendar.fldiv((4L * (super.rd - EPOCH)) + 1463L, 1461L);
+        super.year = (int)y;
+        @SuppressWarnings("deprecation")
+        long m = AlternateCalendar.fldiv(super.rd -
+                (new EthiopicCalendar(1, 1, super.year)).toRD(), 30L);
+        super.month = (int)m + 1;
         super.day = (int) ((super.rd + 1L) -
             (new EthiopicCalendar(super.month, 1, super.year)).toRD());
     }

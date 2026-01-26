@@ -201,7 +201,7 @@ public class PMRNodeImpl implements Node {
             throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, "appendChild: refChildDelegate Parent != delegateNode");
         }
 // delegate action
-        Node node = delegateNode.insertBefore(newChildDelegateNode, refChildDelegateNode);
+        delegateNode.insertBefore(newChildDelegateNode, refChildDelegateNode);
 // parent
         ((PMRNodeImpl) newChild).parentNode = this;
 
@@ -257,7 +257,7 @@ public class PMRNodeImpl implements Node {
         }
 
 // delegate
-        Node node = delegateNode.replaceChild(newChildDelegateNode, oldChildDelegateNode);
+        delegateNode.replaceChild(newChildDelegateNode, oldChildDelegateNode);
 // parents
         ((PMRNodeImpl) newChild).parentNode = this;
         ((PMRNodeImpl) oldChild).parentNode = null;
@@ -297,7 +297,7 @@ public class PMRNodeImpl implements Node {
         }
 
 // delegate action
-        Node node = delegateNode.removeChild(oldChildDelegateNode);
+        delegateNode.removeChild(oldChildDelegateNode);
 // parent
         ((PMRNodeImpl) oldChild).parentNode = null;
 // childNodes
@@ -344,7 +344,7 @@ public class PMRNodeImpl implements Node {
             }
         } else {
 // delegate
-            Node node = delegateNode.appendChild(newChildDelegateNode);
+            delegateNode.appendChild(newChildDelegateNode);
 // parent
             ((PMRNodeImpl) newChild).parentNode = this;
 // childNodes
@@ -401,21 +401,23 @@ public class PMRNodeImpl implements Node {
             System.err.println("NYI: clone does not support this class");
         }
 
-        Node newDelegateNode = delegateNode.cloneNode(false);
-        newNode.setDelegateNode(newDelegateNode);
+        if (newNode != null) {
+            Node newDelegateNode = delegateNode.cloneNode(false);
+            newNode.setDelegateNode(newDelegateNode);
 
-        if (!(this instanceof Document)) {
-            newNode.setOwnerDocument((PMRDocument) this.getOwnerDocument());
-        }
+            if (!(this instanceof Document)) {
+                newNode.setOwnerDocument((PMRDocument) this.getOwnerDocument());
+            }
 
-        if (deep == true) {
-            NodeList childNodes = this.getChildNodes();
-            for (int i = 0; i < childNodes.getLength(); i++) {
-                Node newChild = childNodes.item(i).cloneNode(true);
-                newNode.appendChild(newChild);
+            if (deep == true) {
+                NodeList childNodes = this.getChildNodes();
+                for (int i = 0; i < childNodes.getLength(); i++) {
+                    Node newChild = childNodes.item(i).cloneNode(true);
+                    newNode.appendChild(newChild);
 
-                Node childDelegate = ((PMRNodeImpl) newChild).getDelegateNode();
-                newDelegateNode.appendChild(childDelegate);
+                    Node childDelegate = ((PMRNodeImpl) newChild).getDelegateNode();
+                    newDelegateNode.appendChild(childDelegate);
+                }
             }
         }
 

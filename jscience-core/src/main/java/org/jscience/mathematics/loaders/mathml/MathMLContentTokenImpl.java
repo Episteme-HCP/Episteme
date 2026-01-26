@@ -98,8 +98,6 @@ public class MathMLContentTokenImpl extends MathMLElementImpl
      * @return DOCUMENT ME!
      */
     public Node setArgument(Node newArgument, int index) {
-        final int argsLength = getArgumentsGetLength();
-
         return replaceChild(newArgument, getArgumentsItem(index - 1));
     }
 
@@ -112,8 +110,6 @@ public class MathMLContentTokenImpl extends MathMLElementImpl
      * @return DOCUMENT ME!
      */
     public Node insertArgument(Node newArgument, int index) {
-        final int argsLength = getArgumentsGetLength();
-
         return insertBefore(newArgument, getArgumentsItem(index - 1));
     }
 

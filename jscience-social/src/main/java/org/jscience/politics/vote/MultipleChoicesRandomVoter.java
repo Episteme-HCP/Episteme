@@ -22,7 +22,7 @@
  */
 package org.jscience.politics.vote;
 
-import org.jscience.biology.human.Human;
+import org.jscience.sociology.Human;
 
 import java.util.ArrayList;
 import java.util.Collections;

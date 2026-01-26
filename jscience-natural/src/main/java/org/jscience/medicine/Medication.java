@@ -25,28 +25,38 @@ package org.jscience.medicine;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.UUIDIdentification;
 import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
 /**
  * Represents a medication or drug with clinical and pharmaceutical details.
- * Features a dynamic trait system for additional properties.
+ * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 @Persistent
-public class Medication extends AbstractIdentifiedEntity {
+public class Medication implements ComprehensiveIdentification {
 
     private static final long serialVersionUID = 1L;
+
+    @Id
+    protected final Identification id;
+
+    @Attribute
+    protected final Map<String, Object> traits = new HashMap<>();
 
     public enum Form {
         TABLET, CAPSULE, LIQUID, INJECTION, TOPICAL, INHALANT,
@@ -95,8 +105,18 @@ public class Medication extends AbstractIdentifiedEntity {
     private String atcCode;
 
     public Medication(String name) {
-        super(new UUIDIdentification(UUID.randomUUID().toString()));
+        this.id = new UUIDIdentification(UUID.randomUUID().toString());
         setName(Objects.requireNonNull(name));
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     public Pathology getPathology() {
@@ -193,6 +213,18 @@ public class Medication extends AbstractIdentifiedEntity {
 
     public void setAtcCode(String atcCode) {
         this.atcCode = atcCode;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Medication medication)) return false;
+        return Objects.equals(id, medication.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override

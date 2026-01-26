@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import org.jscience.history.temporal.FuzzyTemporalInterval;
-import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.history.time.FuzzyTimePoint;
+import org.jscience.history.time.TimeCoordinate;
 
 /**
  * Models ancestral sports and provides a catalog of historical physical activities.
@@ -48,7 +48,7 @@ public final class HistoricalSports {
     public record HistoricalSport(
         String name,
         String modernDescendant,
-        TemporalCoordinate originPeriod,
+        TimeCoordinate originPeriod,
         String region,
         List<String> rules,
         Map<String, String> equipment,
@@ -59,28 +59,28 @@ public final class HistoricalSports {
     public static final List<HistoricalSport> CATALOG = List.of(
         new HistoricalSport(
             "Soule", "Rugby/Football", 
-            FuzzyTemporalInterval.circa(1147), "France/England",
+            FuzzyTimePoint.circa(1147), "France/England",
             List.of("Two teams", "Ball must reach opponent's goal", "Few restrictions on contact"),
             Map.of("Ball", "Leather stuffed with hay", "Field", "Village to village"),
             "Goals scored"
         ),
         new HistoricalSport(
             "Cuju", "Football",
-            FuzzyTemporalInterval.circa(-206), "China",
+            FuzzyTimePoint.circa(-206), "China",
             List.of("Ball through goal opening", "No hands", "Teams of 12-16"),
             Map.of("Ball", "Leather with feathers", "Goal", "Silk net on bamboo poles"),
             "Goals scored"
         ),
         new HistoricalSport(
             "Pankration", "MMA",
-            FuzzyTemporalInterval.circa(-648), "Greece",
+            FuzzyTimePoint.circa(-648), "Greece",
             List.of("No biting", "No eye gouging", "Submission or knockout wins"),
             Map.of("Arena", "Sand pit", "Protection", "None"),
             "Victories in tournament"
         ),
         new HistoricalSport(
             "Ullamaliztli", "Basketball",
-            FuzzyTemporalInterval.circa(-1400), "Mesoamerica",
+            FuzzyTimePoint.circa(-1400), "Mesoamerica",
             List.of("Ball through stone ring", "Cannot use hands/feet", "Hip/elbow only"),
             Map.of("Ball", "Solid rubber 4kg", "Ring", "Stone at 9m height"),
             "Ring passes"

@@ -24,16 +24,10 @@
 package org.jscience.mathematics.loaders.mathml;
 
 import java.util.Arrays;
-import org.jscience.mathematics.structures.sets.FiniteSet;
 import org.jscience.mathematics.util.MathUtils;
 import org.jscience.mathematics.linearalgebra.Matrix;
-import org.jscience.mathematics.structures.rings.Field;
-import org.jscience.mathematics.structures.rings.Ring;
-import org.jscience.mathematics.linearalgebra.matrices.*;
-import org.jscience.mathematics.linearalgebra.vectors.*;
 import org.jscience.mathematics.numbers.complex.Complex;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.mathematics.structures.groups.GroupElement;
 import org.jscience.mathematics.structures.rings.RingElement;
 import org.jscience.mathematics.structures.rings.FieldElement;
 
@@ -238,7 +232,7 @@ public final class MathMLExpression {
         return value;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private Object binaryEvaluate() {
         Object value = getArgument(0);
         if (value instanceof MathMLExpression) {
@@ -273,7 +267,7 @@ public final class MathMLExpression {
         return value;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private Object nAryEvaluate() {
         Object value = getArgument(0);
         if (value instanceof MathMLExpression) {
@@ -305,26 +299,26 @@ public final class MathMLExpression {
                 return ans;
             }
         } else if (operation.equals("min")) {
-            Comparable ans = (Comparable) value;
+            Comparable<Object> ans = (Comparable<Object>) value;
             for (int i = 1; i < length(); i++) {
                 Object next = getArgument(i);
                 if (next instanceof MathMLExpression) {
                     next = ((MathMLExpression) next).evaluate();
                 }
                 if (ans.compareTo(next) > 0) {
-                    ans = (Comparable) next;
+                    ans = (Comparable<Object>) next;
                 }
             }
             return ans;
         } else if (operation.equals("max")) {
-            Comparable ans = (Comparable) value;
+            Comparable<Object> ans = (Comparable<Object>) value;
             for (int i = 1; i < length(); i++) {
                 Object next = getArgument(i);
                 if (next instanceof MathMLExpression) {
                     next = ((MathMLExpression) next).evaluate();
                 }
                 if (ans.compareTo(next) < 0) {
-                    ans = (Comparable) next;
+                    ans = (Comparable<Object>) next;
                 }
             }
             return ans;

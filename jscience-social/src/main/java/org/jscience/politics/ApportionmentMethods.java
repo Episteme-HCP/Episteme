@@ -78,7 +78,7 @@ public final class ApportionmentMethods {
             }
             
             if (winner != null) {
-                seats.merge(winner, 1, Integer::sum);
+                seats.merge(winner, 1, (a, b) -> a + b);
             }
         }
         
@@ -111,7 +111,7 @@ public final class ApportionmentMethods {
             }
             
             if (winner != null) {
-                seats.merge(winner, 1, Integer::sum);
+                seats.merge(winner, 1, (a, b) -> a + b);
             }
         }
         
@@ -148,7 +148,7 @@ public final class ApportionmentMethods {
             Double.compare(remainders.get(b.name()), remainders.get(a.name())));
         
         for (int i = 0; i < totalSeats - seatsAssigned && i < sortedByRemainder.size(); i++) {
-            seats.merge(sortedByRemainder.get(i).name(), 1, Integer::sum);
+            seats.merge(sortedByRemainder.get(i).name(), 1, (a, b) -> a + b);
         }
         
         double gallagher = calculateGallagher(parties, seats, totalSeats);
@@ -189,7 +189,7 @@ public final class ApportionmentMethods {
             }
             
             if (winner != null) {
-                seats.merge(winner, 1, Integer::sum);
+                seats.merge(winner, 1, (a, b) -> a + b);
             }
         }
         

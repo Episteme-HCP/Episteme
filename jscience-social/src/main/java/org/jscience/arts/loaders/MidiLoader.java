@@ -30,7 +30,6 @@ import org.jscience.arts.music.Track;
 import javax.sound.midi.*;
 import java.io.File;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -84,7 +83,7 @@ public class MidiLoader extends CompositionLoader {
 
     @Override
     protected Composition loadFromInputStream(InputStream is, String id) throws Exception {
-        Sequence sequence = MidiSystem.getSequence(is);
+        MidiSystem.getSequence(is); // Validate valid MIDI stream
         // Similar logic to loadFromSource
         Composition composition = new Composition(id, "Imported MIDI Stream", null, null);
         // ... (DRY: could refactor common logic)

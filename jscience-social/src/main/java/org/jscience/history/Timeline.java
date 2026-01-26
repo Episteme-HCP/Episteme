@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
@@ -56,7 +56,7 @@ public class Timeline<E extends Event> implements Serializable {
                 .toList();
     }
 
-    public List<E> getEventsBetween(TemporalCoordinate start, TemporalCoordinate end) {
+    public List<E> getEventsBetween(TimeCoordinate start, TimeCoordinate end) {
         return events.stream()
                 .filter(e -> e.getWhen().compareTo(start) >= 0 &&
                         e.getWhen().compareTo(end) <= 0)

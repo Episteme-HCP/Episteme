@@ -49,6 +49,7 @@ public enum ArtForm {
     
     /** Poetry and Literature (5th Art). */
     POETRY(5),
+    LITERATURE(5),
     
     /** Performing Arts and Dance (6th Art). */
     DANCE(6),

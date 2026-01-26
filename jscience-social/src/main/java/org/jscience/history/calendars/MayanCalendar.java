@@ -196,10 +196,10 @@ public class MayanCalendar extends AlternateCalendar {
         long l1 = AlternateCalendar.mod(l, 7200);
         long l2 = AlternateCalendar.mod(l1, 360);
 
-        return AlternateCalendar.fldiv(longcount, 0x23280L) + "." +
-        AlternateCalendar.fldiv(l, 7200L) + "." +
-        AlternateCalendar.fldiv(l1, 360L) + "." +
-        AlternateCalendar.fldiv(l2, 20L) + "." + AlternateCalendar.mod(l2, 20);
+        return AlternateCalendar.floorDiv(longcount, 0x23280L) + "." +
+        AlternateCalendar.floorDiv(l, 7200L) + "." +
+        AlternateCalendar.floorDiv(l1, 360L) + "." +
+        AlternateCalendar.floorDiv(l2, 20L) + "." + AlternateCalendar.mod(l2, 20);
     }
 
     /**

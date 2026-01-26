@@ -87,7 +87,6 @@ public final class UTMCoordinate implements EarthCoordinate, Serializable {
         }
 
         double a = ellipsoid.getSemiMajorAxis().to(Units.METER).getValue().doubleValue();
-        double f = ellipsoid.getFlattening().doubleValue();
         double k0 = 0.9996; // UTM scale factor
         
         double e2 = ellipsoid.getEccentricitySquared().doubleValue();

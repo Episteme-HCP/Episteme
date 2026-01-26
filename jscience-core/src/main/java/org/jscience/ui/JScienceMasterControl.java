@@ -1263,6 +1263,7 @@ public class JScienceMasterControl extends Application {
      * Creates the Molecular Viewing category using SPI discovery.
      */
 
+    @SuppressWarnings("rawtypes")
     private Tab createLoadersTab(I18n i18n) {
         VBox content = new VBox(20);
         content.setPadding(new Insets(20));

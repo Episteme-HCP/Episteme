@@ -139,7 +139,7 @@ public class ISOCalendar extends GregorianCalendar {
         }
 
         year = iso.getYear();
-        week = (int) AlternateCalendar.fldiv(super.rd - iso.toRD(), 7L) + 1;
+        week = (int) AlternateCalendar.floorDiv(super.rd - iso.toRD(), 7L) + 1;
         day = (int) AlternateCalendar.amod(super.rd, 7L);
     }
 

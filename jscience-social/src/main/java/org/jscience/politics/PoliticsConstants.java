@@ -38,6 +38,9 @@ public final class PoliticsConstants {
 
     private PoliticsConstants() {}
 
+    /** Unknown or unclassified value. */
+    public static final int UNKNOWN = 0;
+
     /**
      * Development status of a nation.
      */

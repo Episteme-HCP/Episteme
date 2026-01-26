@@ -29,15 +29,15 @@ public class MathMLDocumentImpl extends DocumentImpl implements MathMLDocument {
     private static final String DOCTYPE_SYSTEM = "http://www.w3.org/TR/MathML2/dtd/mathml2.dtd";
 
     /** DOCUMENT ME! */
-    private static final Hashtable _elementTypesMathML;
+    private static final Hashtable<String, Class<?>> _elementTypesMathML;
 
     /** DOCUMENT ME! */
-    private static final Class[] _elemClassSigMathML = new Class[] {
+    private static final Class<?>[] _elemClassSigMathML = new Class<?>[] {
             MathMLDocumentImpl.class, String.class
         };
 
     static {
-        _elementTypesMathML = new Hashtable(160);
+        _elementTypesMathML = new Hashtable<>(160);
         _elementTypesMathML.put("math", MathMLMathElementImpl.class);
         _elementTypesMathML.put("annotation", MathMLAnnotationElementImpl.class);
         _elementTypesMathML.put("xml-annotation",
@@ -310,8 +310,8 @@ public class MathMLDocumentImpl extends DocumentImpl implements MathMLDocument {
         throws DOMException {
         if (MathMLElementImpl.mathmlURI.equals(namespaceURI)) {
             String localName;
-            Class elemClass;
-            Constructor cnst;
+            Class<?> elemClass;
+            Constructor<?> cnst;
 
             int index = qualifiedName.indexOf(':');
 
@@ -321,7 +321,7 @@ public class MathMLDocumentImpl extends DocumentImpl implements MathMLDocument {
                 localName = qualifiedName.substring(index + 1);
             }
 
-            elemClass = (Class) _elementTypesMathML.get(localName);
+            elemClass = (Class<?>) _elementTypesMathML.get(localName);
 
             if (elemClass != null) {
                 try {

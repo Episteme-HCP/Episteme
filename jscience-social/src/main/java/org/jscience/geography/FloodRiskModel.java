@@ -48,8 +48,8 @@ public final class FloodRiskModel {
      * @return risk factor as Real
      */
     public static Real estimateRisk(Quantity<Length> elevation, Quantity<Length> rainfallRate, double soilSaturation) {
-        double elevM = elevation.to(Units.METER).getValue();
-        double rainM = rainfallRate.to(Units.METER).getValue();
+        double elevM = elevation.to(Units.METER).getValue().doubleValue();
+        double rainM = rainfallRate.to(Units.METER).getValue().doubleValue();
         
         // Simplified physical model: Risk increases with rain and saturation, decreases with elevation
         double risk = (rainM * 1000 * soilSaturation) / (elevM + 1.0);

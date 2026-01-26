@@ -23,6 +23,7 @@
 
 package org.jscience.geography;
 
+
 import org.jscience.biology.Individual;
 import org.jscience.economics.EconomicAgent;
 import org.jscience.util.persistence.Persistent;

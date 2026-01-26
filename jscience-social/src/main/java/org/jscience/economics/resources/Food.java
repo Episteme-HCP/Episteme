@@ -10,7 +10,7 @@ package org.jscience.economics.resources;
 
 import java.time.Instant;
 import org.jscience.measure.Quantity;
-import javax.measure.quantity.Energy;
+import org.jscience.measure.quantity.Energy;
 
 /**
  * An interface representing a substance that can be eaten or drunk to provide nutritional support.

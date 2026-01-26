@@ -27,7 +27,7 @@ package org.jscience.util;
  * Interface for objects that have a temporal position.
  * Analogous to {@link Positioned}.
  *
- * @param <T> The type of the temporal coordinate (e.g., Instant, TemporalCoordinate).
+ * @param <T> The type of the temporal coordinate (e.g., Instant, TimeCoordinate).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)

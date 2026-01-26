@@ -23,9 +23,8 @@
 
 package org.jscience.architecture.traffic;
 
-import java.io.Serializable;
 import java.util.List;
-import org.jscience.geography.Coordinate;
+import org.jscience.earth.coordinates.GeodeticCoordinate;
 import org.jscience.geography.GeoPath;
 
 /**
@@ -38,7 +37,7 @@ import org.jscience.geography.GeoPath;
  * @version 2.0
  * @since 1.0
  */
-public class Road extends GeoPath implements Serializable {
+public class Road extends GeoPath {
 
     private static final long serialVersionUID = 2L;
 
@@ -54,8 +53,13 @@ public class Road extends GeoPath implements Serializable {
      * @param speedLimit maximum allowed speed in meters per second (m/s)
      * @param lanes number of directional traffic lanes
      */
-    public Road(String name, List<Coordinate> coordinates, double speedLimit, int lanes) {
-        super(coordinates);
+    public Road(String name, List<GeodeticCoordinate> coordinates, double speedLimit, int lanes) {
+        super(name);
+        if (coordinates != null) {
+            for (GeodeticCoordinate coord : coordinates) {
+                this.addPoint(coord);
+            }
+        }
         this.name = name;
         this.speedLimit = speedLimit;
         this.lanes = Math.max(1, lanes);

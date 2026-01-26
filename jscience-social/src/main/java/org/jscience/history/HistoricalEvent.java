@@ -1,10 +1,8 @@
 package org.jscience.history;
 
-import java.io.Serializable;
 import java.util.Objects;
-import org.jscience.geography.Place;
-import org.jscience.history.temporal.TemporalCoordinate;
-import org.jscience.util.Positioned;
+import org.jscience.earth.Place;
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
@@ -16,32 +14,32 @@ import org.jscience.util.persistence.Relation;
  * @since 2.0
  */
 @Persistent
-public class HistoricalEvent extends Event implements Positioned, Serializable {
+public class HistoricalEvent extends Event implements org.jscience.util.Positioned<Place> {
 
     private static final long serialVersionUID = 4L;
 
     @Relation(type = Relation.Type.ONE_TO_ONE)
-    private final TemporalCoordinate endDate;
+    private final TimeCoordinate endDate;
 
     @Relation(type = Relation.Type.MANY_TO_ONE)
     private final Place location;
 
-    public HistoricalEvent(String name, String description, TemporalCoordinate startDate, TemporalCoordinate endDate,
+    public HistoricalEvent(String name, String description, TimeCoordinate startDate, TimeCoordinate endDate,
             Event.Category category, Place location) {
         super(name, description, startDate, category);
         this.endDate = endDate != null ? endDate : startDate;
         this.location = location;
     }
 
-    public HistoricalEvent(String name, TemporalCoordinate date, Event.Category category) {
+    public HistoricalEvent(String name, TimeCoordinate date, Event.Category category) {
         this(name, null, date, date, category, null);
     }
 
-    public TemporalCoordinate getStartDate() {
+    public TimeCoordinate getStartDate() {
         return when;
     }
 
-    public TemporalCoordinate getEndDate() {
+    public TimeCoordinate getEndDate() {
         return endDate;
     }
 
@@ -59,8 +57,8 @@ public class HistoricalEvent extends Event implements Positioned, Serializable {
     @Override
     public String toString() {
         if (when.equals(endDate)) {
-            return String.format("%s (%s) - %s", name, when, category);
+            return String.format("%s (%s) - %s", getName(), when, category);
         }
-        return String.format("%s (%s to %s) - %s", name, when, endDate, category);
+        return String.format("%s (%s to %s) - %s", getName(), when, endDate, category);
     }
 }

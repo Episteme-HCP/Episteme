@@ -183,6 +183,7 @@ public class VotingSystem {
             default:
                 throw new UnsupportedOperationException("Voting method not supported with aggregated counts: " + method);
         }
+        return winners;
     }
 
     private static List<String> formatAllocation(Map<String, Long> votes, java.util.function.Function<Map.Entry<String, Long>, Double> seatCalc) {
@@ -328,7 +329,7 @@ public class VotingSystem {
     private static Map<String, Long> aggregateFirstPreferences(List<List<String>> ballots) {
         Map<String, Long> counts = new HashMap<>();
         for (List<String> b : ballots) {
-            if (!b.isEmpty()) counts.merge(b.get(0), 1L, Long::sum);
+            if (!b.isEmpty()) counts.merge(b.get(0), 1L, (a, bVal) -> a + bVal);
         }
         return counts;
     }

@@ -29,6 +29,12 @@ import org.jscience.util.identity.Identified;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import org.jscience.sociology.Person;
+import org.jscience.util.identity.SimpleIdentification;
 
 /**
  * A class representing a legal contract or agreement between two organizations or parties.
@@ -41,13 +47,23 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @version 1.2
  */
-public class Contract implements Identified {
+public class Contract implements Identified<Identification> {
     
     private Organization firstParty;
     private Organization secondParty;
     private Identification identification;
     private Date date; // when signed by both parties
     private List<String> contents; // clauses or terms
+    private Set<Person> parties = new HashSet<>();
+
+    /**
+     * Minimal constructor for legacy support.
+     */
+    public Contract(String title, LocalDate date) {
+        this.identification = new SimpleIdentification(title);
+        this.date = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        this.contents = new ArrayList<>();
+    }
 
     /**
      * Creates a new Contract object.
@@ -94,8 +110,12 @@ public class Contract implements Identified {
      * Returns the identification of this contract.
      * @return the identification, or null
      */
-    @Override
     public Identification getIdentification() {
+        return identification;
+    }
+
+    @Override
+    public Identification getId() {
         return identification;
     }
 
@@ -113,5 +133,21 @@ public class Contract implements Identified {
      */
     public List<String> getContents() {
         return contents;
+    }
+
+    public void addParty(Person person) {
+        if (person != null) parties.add(person);
+    }
+
+    public Set<Person> getParties() {
+        return parties;
+    }
+
+    public void addClause(String clause) {
+        if (clause != null) contents.add(clause);
+    }
+
+    public boolean isValid() {
+        return !parties.isEmpty() && !contents.isEmpty();
     }
 }

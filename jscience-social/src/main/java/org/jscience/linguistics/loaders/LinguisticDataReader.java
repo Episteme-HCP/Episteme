@@ -24,13 +24,11 @@
 package org.jscience.linguistics.loaders;
 
 import org.jscience.io.AbstractResourceReader;
-import org.jscience.linguistics.Language;
 import java.io.*;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -119,9 +117,10 @@ public class LinguisticDataReader extends AbstractResourceReader<Map<String, Str
         return Collections.emptyMap();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Class<Map<String, String>> getResourceType() {
-        return (Class) Map.class;
+        return (Class<Map<String, String>>) (Class<?>) Map.class;
     }
 
     @Override
@@ -132,6 +131,11 @@ public class LinguisticDataReader extends AbstractResourceReader<Map<String, Str
     @Override
     public String getDescription() {
         return "Reads country codes and language metadata with external synchronization.";
+    }
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
     }
 
     @Override

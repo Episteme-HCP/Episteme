@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.util.Named;
 import org.jscience.util.identity.Identified;
 import org.jscience.util.identity.Identification;
@@ -38,6 +38,7 @@ import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
+import org.jscience.util.Commented;
 
 /**
  * Represents a society, defined by its type, culture, institutions, and geographic location.
@@ -49,7 +50,7 @@ import org.jscience.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Society implements org.jscience.geography.Locatable, Identified<Identification>, Named, Serializable {
+public class Society implements org.jscience.util.Positioned<Place>, Identified<Identification>, Named, Commented, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -78,6 +79,8 @@ public class Society implements org.jscience.geography.Locatable, Identified<Ide
     
     @Attribute
     private String governmentType;
+    
+    private final java.util.Map<String, Object> traits = new java.util.HashMap<>();
     
     @Relation(type = Relation.Type.ONE_TO_MANY)
     private final List<Group> institutions = new ArrayList<>();
@@ -182,6 +185,11 @@ public class Society implements org.jscience.geography.Locatable, Identified<Ide
      */
     public void setGovernmentType(String governmentType) {
         this.governmentType = governmentType;
+    }
+
+    @Override
+    public java.util.Map<String, Object> getTraits() {
+        return traits;
     }
 
     /**

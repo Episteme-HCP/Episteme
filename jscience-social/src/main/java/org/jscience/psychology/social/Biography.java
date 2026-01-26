@@ -45,6 +45,7 @@ public class Biography implements Commented, Serializable {
 
     private final Map<String, HumanTimeline> timelines;
     private String comments;
+    private final Map<String, Object> traits = new HashMap<>();
 
     /**
      * Creates a new Biography with default categorical timelines initialized.
@@ -98,5 +99,10 @@ public class Biography implements Commented, Serializable {
     @Override
     public void setComments(String comments) {
         this.comments = Objects.requireNonNull(comments, "Comments cannot be null");
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 }

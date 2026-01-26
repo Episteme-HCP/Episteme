@@ -13,7 +13,7 @@ import javax.swing.*;
  */
 public class ValueBox extends JPanel {
     /** DOCUMENT ME! */
-    JComboBox comboBox;
+    JComboBox<String> comboBox;
 
     /** DOCUMENT ME! */
     String[] values;
@@ -28,7 +28,7 @@ public class ValueBox extends JPanel {
         this.values = values;
         this.setLayout(new BorderLayout());
         this.add(new JLabel(prompt), BorderLayout.WEST);
-        comboBox = new JComboBox();
+        comboBox = new JComboBox<>();
 
         this.add(comboBox, BorderLayout.CENTER);
 

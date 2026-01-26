@@ -44,8 +44,11 @@ import org.jscience.util.persistence.Persistent;
  * @version 1.1
  * @since 1.0
  */
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
+
 @Persistent
-public class School implements Identified<String>, Serializable {
+public class School implements Identified<Identification>, org.jscience.util.Named, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -61,7 +64,7 @@ public class School implements Identified<String>, Serializable {
     }
 
     @Id
-    private final String id;
+    private final Identification id;
     @Attribute
     private final String name;
     @Attribute
@@ -90,7 +93,7 @@ public class School implements Identified<String>, Serializable {
      * @throws IllegalArgumentException if name is empty
      */
     public School(String name, Type type) {
-        this.id = UUID.randomUUID().toString();
+        this.id = new SimpleIdentification(UUID.randomUUID().toString());
         this.name = Objects.requireNonNull(name, "Name cannot be null");
         if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
         this.type = Objects.requireNonNull(type, "Type cannot be null");
@@ -98,9 +101,11 @@ public class School implements Identified<String>, Serializable {
 
     // Getters
     @Override
-    public String getId() {
+    public Identification getId() {
         return id;
     }
+
+    @Override
 
     public String getName() {
         return name;

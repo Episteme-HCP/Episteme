@@ -31,7 +31,7 @@ public class PMRDOMUtils {
             return;
         }
         NodeList childNodes = element.getChildNodes();
-        Vector deleteVector = new Vector();
+        Vector<Node> deleteVector = new Vector<>();
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node child = childNodes.item(i);
             if (child instanceof Element) {
@@ -44,8 +44,8 @@ public class PMRDOMUtils {
             }
         }
 // delete nodes
-        for (Enumeration e = deleteVector.elements(); e.hasMoreElements();) {
-            element.removeChild((Node) e.nextElement());
+        for (Enumeration<Node> e = deleteVector.elements(); e.hasMoreElements();) {
+            element.removeChild(e.nextElement());
         }
     }
 
@@ -86,15 +86,15 @@ public class PMRDOMUtils {
      * @param element Description of the Parameter
      * @return Description of the Return Value
      */
-    public static Enumeration depthFirstEnumeration(Element element) {
-        Vector outputVector = new Vector();
+    public static Enumeration<Node> depthFirstEnumeration(Element element) {
+        Vector<Node> outputVector = new Vector<>();
         if (element.hasChildNodes()) {
             NodeList nodeList = element.getChildNodes();
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node childNode = nodeList.item(i);
                 outputVector.addElement(childNode);
                 if (childNode instanceof Element) {
-                    Enumeration e = PMRDOMUtils.depthFirstEnumeration((Element) childNode);
+                    Enumeration<Node> e = PMRDOMUtils.depthFirstEnumeration((Element) childNode);
                     while (e.hasMoreElements()) {
                         outputVector.addElement(e.nextElement());
                     }
@@ -110,8 +110,8 @@ public class PMRDOMUtils {
      * @param element Description of the Parameter
      * @return The childElements value
      */
-    public static Vector getChildElements(Element element) {
-        Vector vector = new Vector();
+    public static Vector<Element> getChildElements(Element element) {
+        Vector<Element> vector = new Vector<>();
         if (element == null) {
             return vector;
         }
@@ -119,7 +119,7 @@ public class PMRDOMUtils {
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
             if (child instanceof Element) {
-                vector.addElement(child);
+                vector.addElement((Element) child);
             }
         }
         return vector;
@@ -134,9 +134,9 @@ public class PMRDOMUtils {
      * @return The childElement value
      */
     public static Element getChildElement(Element element, int index) {
-        Vector vector = getChildElements(element);
+        Vector<Element> vector = getChildElements(element);
         return (vector.size() == 0 || index >= vector.size()) ? null :
-                (Element) vector.elementAt(index);
+                vector.elementAt(index);
     }
 
     /**
@@ -146,15 +146,15 @@ public class PMRDOMUtils {
      * @param element Description of the Parameter
      * @return Element the ancestor (null = none)
      */
-    public static Vector getAncestors(Element element) {
+    public static Vector<Element> getAncestors(Element element) {
         Node parent = element;
-        Vector vector = new Vector();
+        Vector<Element> vector = new Vector<>();
         while (true) {
             parent = parent.getParentNode();
             if (parent == null || !(parent instanceof Element)) {
                 return vector;
             }
-            vector.addElement(parent);
+            vector.addElement((Element) parent);
         }
     }
 
@@ -193,11 +193,11 @@ public class PMRDOMUtils {
      * @param nodes NodeList to copy
      * @return the equiavlent vector
      */
-    public static Vector createVector(NodeList nodes) {
+    public static Vector<Node> createVector(NodeList nodes) {
         int n = nodes.getLength();
-        Vector v = new Vector(n);
+        Vector<Node> v = new Vector<>(n);
         for (int i = 0; i < n; i++) {
-            v.setElementAt(nodes.item(i), i);
+            v.addElement(nodes.item(i));
         }
         return v;
     }
@@ -211,9 +211,9 @@ public class PMRDOMUtils {
      * @param nodeMap NodeMap to copy
      * @return the equiavlent vector
      */
-    public static Vector createVector(NamedNodeMap nodeMap) {
+    public static Vector<Node> createVector(NamedNodeMap nodeMap) {
         int n = nodeMap.getLength();
-        Vector v = new Vector();
+        Vector<Node> v = new Vector<>();
         for (int i = 0; i < n; i++) {
             v.addElement(nodeMap.item(i));
         }
@@ -321,19 +321,19 @@ public class PMRDOMUtils {
      * @param name    Description of the Parameter
      * @return Vector the vector of children (empty if none)
      */
-    public static Vector getChildrenWithElementName(Element element, String name) {
+    public static Vector<Element> getChildrenWithElementName(Element element, String name) {
         if (element == null || name == null || !element.hasChildNodes()) {
             return null;
         }
         NodeList childNodes = element.getChildNodes();
-        Vector vector = new Vector();
+        Vector<Element> vector = new Vector<>();
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node child = childNodes.item(i);
             if (!(child instanceof Element)) {
                 continue;
             }
             if (((Element) child).getTagName().equals(name)) {
-                vector.addElement(child);
+                vector.addElement((Element) child);
             }
         }
         return vector;
@@ -351,9 +351,9 @@ public class PMRDOMUtils {
      * @return Element the first child or null
      */
     public static Element getFirstChildWithElementName(Element element, String name) {
-        Vector childVector = PMRDOMUtils.getChildrenWithElementName(element, name);
+        Vector<Element> childVector = PMRDOMUtils.getChildrenWithElementName(element, name);
         return (childVector == null || childVector.size() == 0) ? null :
-                (Element) childVector.elementAt(0);
+                childVector.elementAt(0);
     }
 
     /**
@@ -532,10 +532,7 @@ public class PMRDOMUtils {
             w.write(CMLUtils.escape(s));
         } else if (node instanceof DocumentType) {
         } else {
-            String s = node.getNodeValue();
-            w.write("<!--Output event Stream: untreated node" + node.getClass() + "-->");
         }
-
         return ((level == 0) ? w.toString() : null);
     }
 
@@ -663,10 +660,7 @@ public class PMRDOMUtils {
         if (type == PMRDOMUtils.PRETTY) {
             w.write(CMLUtils.spaces(nspace));
         }
-        if (false) {
-        } else {
-            outputStartTag0(w, element, level, ">");
-        }
+        outputStartTag0(w, element, level, ">");
         if ((type == PMRDOMUtils.PRETTY) && isPrettyCR(element, type)) {
             w.write("\n");
         }
@@ -719,10 +713,7 @@ public class PMRDOMUtils {
         if (type == PMRDOMUtils.PRETTY) {
             w.write(CMLUtils.spaces(nspace));
         }
-        if (false) {
-        } else {
-            outputStartTag0(w, element, level, "/>");
-        }
+        outputStartTag0(w, element, level, "/>");
         if ((type == PMRDOMUtils.PRETTY) && isPrettyCR(element, type)) {
             w.write("\n");
         }
@@ -780,11 +771,7 @@ public class PMRDOMUtils {
      * @param level   Description of the Parameter
      * @throws IOException Description of the Exception
      */
-    public static void outputChildContent(Element element, Writer w, int type, int level
-                                          /*
-                                          *  , String prefix, String namespace
-                                          */) throws IOException {
-        int count = 0;
+    public static void outputChildContent(Element element, Writer w, int type, int level) throws IOException {
         NodeList childs = element.getChildNodes();
         for (int i = 0; i < childs.getLength(); i++) {
             PMRDOMUtils.outputEventStream(childs.item(i), w, type, level + 1
@@ -809,10 +796,7 @@ public class PMRDOMUtils {
         if ((type == PMRDOMUtils.PRETTY) && isPrettyCR(element, type)) {
             w.write(CMLUtils.spaces(nspace));
         }
-        if (false) {
-        } else {
-            w.write("</" + element.getTagName() + ">");
-        }
+        w.write("</" + element.getTagName() + ">");
         if (type == PMRDOMUtils.PRETTY) {
             w.write("\n");
         }
@@ -920,14 +904,14 @@ public class PMRDOMUtils {
      * @param p           the <code>Picker</code>  used to match the elements
      * @return a List of the matching elements, or null if none matched.
      */
-    public static List pickElements(Element rootElement, final Picker p) {
+    public static List<Node> pickElements(Element rootElement, final Picker p) {
         NodeList childNodes = rootElement.getChildNodes();
         int i = childNodes.getLength();
 
         if (i > 0) {
-            LinkedList nodesToConsider = new LinkedList();
+            LinkedList<Node> nodesToConsider = new LinkedList<>();
             Node node = null;
-            ArrayList chosenNodes = new ArrayList();
+            ArrayList<Node> chosenNodes = new ArrayList<>();
 
             --i;
             for (; i >= 0; --i) {
@@ -969,7 +953,7 @@ public class PMRDOMUtils {
      * @return an array of the matching Attributes, or null if none matched.
      */
     public static Attr[] copyAttributes(Element e, final Picker p) {
-        ArrayList l = new ArrayList();
+        ArrayList<Attr> l = new ArrayList<>();
 
         NamedNodeMap nnm = e.getAttributes();
         if (nnm != null) {
@@ -1000,7 +984,7 @@ public class PMRDOMUtils {
      * @throws DOMException propagated from the call to remove the Attribute node from the Element.
      */
     public static Attr[] cutAttributes(Element e, final Picker p) throws DOMException {
-        ArrayList l = new ArrayList();
+        ArrayList<Attr> l = new ArrayList<>();
 
         NamedNodeMap nnm = e.getAttributes();
         if (nnm != null) {

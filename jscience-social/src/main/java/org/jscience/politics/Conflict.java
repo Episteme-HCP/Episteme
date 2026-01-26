@@ -27,11 +27,12 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import org.jscience.biology.Population;
-import org.jscience.geography.Locatable;
-import org.jscience.geography.Place;
+import org.jscience.sociology.Group;
+import org.jscience.util.Positioned;
+import org.jscience.earth.Place;
 import org.jscience.util.Commented;
 import org.jscience.util.Named;
 import org.jscience.util.Temporal;
@@ -45,12 +46,12 @@ import org.jscience.util.Temporal;
  * @version 1.1
  * @since 1.0
  */
-public class Conflict implements Named, Commented, Locatable, Temporal, Serializable {
+public class Conflict implements Named, Commented, Positioned<Place>, Temporal<Instant>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private String name;
-    private final Set<Population> groups = new HashSet<>();
+    private final Set<Group> groups = new HashSet<>();
     private Place place;
     private final Instant startingDate;
     private Instant endDate;
@@ -60,13 +61,13 @@ public class Conflict implements Named, Commented, Locatable, Temporal, Serializ
      * Creates a new Conflict.
      *
      * @param name         the name of the conflict
-     * @param involvedGroups populations participating in the conflict
+     * @param involvedGroups groups participating in the conflict
      * @param place        the primary location of the conflict
      * @param startingDate the timestamp when the conflict began
      * @throws NullPointerException if any mandatory argument is null
      * @throws IllegalArgumentException if name is empty or no groups are involved
      */
-    public Conflict(String name, Set<Population> involvedGroups, Place place, Instant startingDate) {
+    public Conflict(String name, Set<Group> involvedGroups, Place place, Instant startingDate) {
         this.name = Objects.requireNonNull(name, "Name cannot be null");
         if (name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty");
         
@@ -93,10 +94,10 @@ public class Conflict implements Named, Commented, Locatable, Temporal, Serializ
     }
 
     /**
-     * Returns an unmodifiable set of participating populations.
+     * Returns an unmodifiable set of participating groups.
      * @return the involved groups
      */
-    public Set<Population> getGroups() {
+    public Set<Group> getGroups() {
         return Collections.unmodifiableSet(groups);
     }
 
@@ -121,8 +122,12 @@ public class Conflict implements Named, Commented, Locatable, Temporal, Serializ
         this.place = Objects.requireNonNull(place, "Place cannot be null");
     }
 
-    @Override
     public Instant getTimestamp() {
+        return startingDate;
+    }
+
+    @Override
+    public Instant getWhen() {
         return startingDate;
     }
 
@@ -158,6 +163,11 @@ public class Conflict implements Named, Commented, Locatable, Temporal, Serializ
     @Override
     public void setComments(String comments) {
         this.comments = Objects.requireNonNull(comments, "Comments cannot be null");
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return Collections.emptyMap();
     }
 
     @Override

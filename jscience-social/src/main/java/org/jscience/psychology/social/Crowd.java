@@ -23,7 +23,7 @@
 
 package org.jscience.psychology.social;
 
-import java.io.Serializable;
+
 import java.util.Objects;
 import org.jscience.biology.ecology.Population;
 import org.jscience.biology.taxonomy.Species;
@@ -37,7 +37,7 @@ import org.jscience.biology.taxonomy.Species;
  * @version 1.1
  * @since 1.0
  */
-public class Crowd extends Population implements Serializable {
+public class Crowd extends Population {
 
     private static final long serialVersionUID = 1L;
 

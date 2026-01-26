@@ -71,7 +71,6 @@ public class BahaiCalendar extends SevenDaysWeek {
     public static final long EPOCH = (new GregorianCalendar(3, 21, 1844)).toRD();
 
     /** The Gregorian year of the Bahá'í epoch. */
-    private static final int EPYEAR = 1844;
 
     /** The major cycle number (Kull-i-Shay). */
     private int major;
@@ -185,8 +184,8 @@ public class BahaiCalendar extends SevenDaysWeek {
             j--;
         }
 
-        major = (int) AlternateCalendar.fldiv(j, 361L) + 1;
-        cycle = (int) AlternateCalendar.fldiv(AlternateCalendar.mod(j, 361), 19L) +
+        major = (int) Math.floorDiv(j, 361L) + 1;
+        cycle = (int) Math.floorDiv(AlternateCalendar.mod(j, 361), 19L) +
             1;
         year = AlternateCalendar.mod(j, 19) + 1;
 
@@ -197,7 +196,7 @@ public class BahaiCalendar extends SevenDaysWeek {
         if (super.rd >= bahai.toRD()) {
             month = 20;
         } else {
-            month = (int) AlternateCalendar.fldiv(l, 19L) + 1;
+            month = (int) AlternateCalendar.floorDiv(l, 19L) + 1;
         }
 
         day = (int) ((super.rd + 1L) -

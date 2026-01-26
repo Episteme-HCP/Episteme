@@ -1,0 +1,69 @@
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for org.jscience:jscience-natural:jar:1.0.0-SNAPSHOT
+[WARNING] 'dependencies.dependency.systemPath' for com.github.studygameengines:java-fbx-loader:jar should not point at files within the project directory, ${project.basedir}/../launchers/lib/java-fbx-loader-v1.0.jar will be unresolvable by dependent projects @ line 90, column 25
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] 
+[INFO] --------------------< org.jscience:jscience-social >--------------------
+[INFO] Building JScience Social 1.0.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[WARNING] The POM for org.jscience:jscience-natural:jar:1.0.0-SNAPSHOT is invalid, transitive dependencies (if any) will not be available, enable debug logging for more details
+[INFO] 
+[INFO] --- jacoco:0.8.12:prepare-agent (prepare-agent) @ jscience-social ---
+[INFO] argLine set to -javaagent:C:\\Users\\silve\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.12\\org.jacoco.agent-0.8.12-runtime.jar=destfile=C:\\Silvere\\Encours\\Developpement\\JScience\\jscience-social\\target\\jacoco.exec,includes=org/jscience/**,excludes=com/sun/**:sun/**:jdk/**:java/**
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ jscience-social ---
+[INFO] Copying 13 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ jscience-social ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 679 source files with javac [debug release 21] to target\classes
+[INFO] /C:/Silvere/Encours/Developpement/JScience/jscience-social/src/main/java/org/jscience/history/calendars/ModifiedFrenchCalendar.java: Some input files use or override a deprecated API.
+[INFO] /C:/Silvere/Encours/Developpement/JScience/jscience-social/src/main/java/org/jscience/history/calendars/ModifiedFrenchCalendar.java: Recompile with -Xlint:deprecation for details.
+[INFO] /C:/Silvere/Encours/Developpement/JScience/jscience-social/src/main/java/org/jscience/linguistics/loaders/tigerxml/Path.java: Some input files use unchecked or unsafe operations.
+[INFO] /C:/Silvere/Encours/Developpement/JScience/jscience-social/src/main/java/org/jscience/linguistics/loaders/tigerxml/Path.java: Recompile with -Xlint:unchecked for details.
+[INFO] -------------------------------------------------------------
+[WARNING] COMPILATION WARNING : 
+[INFO] -------------------------------------------------------------
+[WARNING] using incubating module(s): jdk.incubator.vector
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-social/src/main/java/org/jscience/linguistics/loaders/tigerxml/Sentence.java:[274,16] deprecated item is not annotated with @Deprecated
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-social/src/main/java/org/jscience/linguistics/loaders/tigerxml/Sentence.java:[465,16] deprecated item is not annotated with @Deprecated
+[WARNING] /C:/Silvere/Encours/Developpement/JScience/jscience-social/src/main/java/org/jscience/arts/ArtsConstants.java:[8,14] deprecated item is not annotated with @Deprecated
+[INFO] 4 warnings 
+[INFO] -------------------------------------------------------------
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-social/src/main/java/org/jscience/law/Article.java:[28,25] cannot find symbol
+  symbol:   class SimpleNumbering
+  location: package org.jscience.util
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-social/src/main/java/org/jscience/law/Article.java:[55,24] cannot find symbol
+  symbol:   class SimpleNumbering
+  location: class org.jscience.law.Article
+[INFO] 2 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  29.209 s
+[INFO] Finished at: 2026-01-25T23:17:12+01:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project jscience-social: Compilation failure: Compilation failure: 
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-social/src/main/java/org/jscience/law/Article.java:[28,25] cannot find symbol
+[ERROR]   symbol:   class SimpleNumbering
+[ERROR]   location: package org.jscience.util
+[ERROR] /C:/Silvere/Encours/Developpement/JScience/jscience-social/src/main/java/org/jscience/law/Article.java:[55,24] cannot find symbol
+[ERROR]   symbol:   class SimpleNumbering
+[ERROR]   location: class org.jscience.law.Article
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

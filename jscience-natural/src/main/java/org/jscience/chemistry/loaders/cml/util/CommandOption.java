@@ -28,7 +28,7 @@ public class CommandOption {
     String name;
 
     /** DOCUMENT ME! */
-    Class classx;
+    Class<?> classx;
 
     /** DOCUMENT ME! */
     CommandOptionValue[] optionValue;
@@ -48,7 +48,7 @@ public class CommandOption {
      * @param value       DOCUMENT ME!
      * @param desc        DOCUMENT ME!
      */
-    public CommandOption(String name, Class classx,
+    public CommandOption(String name, Class<?> classx,
         CommandOptionValue[] optionValue, Object value, String desc) {
         this.name = name.toUpperCase();
         this.classx = classx;
@@ -93,7 +93,7 @@ public class CommandOption {
      *
      * @return DOCUMENT ME!
      */
-    public Class getClassx() {
+    public Class<?> getClassx() {
         return this.classx;
     }
 
@@ -195,7 +195,7 @@ public class CommandOption {
                 value = args[count++];
 
                 if (classx.equals(Double.class)) {
-                    value = new Double((String) value);
+                    value = Double.valueOf((String) value);
                     System.out.println("ZZ " + ((Double) value).doubleValue());
                 }
             }

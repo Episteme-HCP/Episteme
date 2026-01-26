@@ -27,6 +27,7 @@ import javax.swing.*;
 import java.awt.*;
 import org.jscience.sociology.survey.Question;
 import org.jscience.sociology.survey.Survey;
+import org.jscience.sociology.survey.ChoiceQuestion;
 
 /**
  * A Swing-based viewer for rendering a Survey.
@@ -88,19 +89,25 @@ public class SurveyViewer extends JPanel {
                 break;
             case MULTIPLE_CHOICE:
                 ButtonGroup bg = new ButtonGroup();
-                for (String opt : q.getOptions()) {
-                    JRadioButton rb = new JRadioButton(opt);
-                    bg.add(rb);
-                    panel.add(rb);
+                if (q instanceof ChoiceQuestion cq) {
+                    for (String opt : cq.getOptions()) {
+                        JRadioButton rb = new JRadioButton(opt);
+                        bg.add(rb);
+                        panel.add(rb);
+                    }
                 }
                 break;
             case CHECKBOXES:
-                for (String opt : q.getOptions()) {
-                    panel.add(new JCheckBox(opt));
+                if (q instanceof ChoiceQuestion cq) {
+                    for (String opt : cq.getOptions()) {
+                        panel.add(new JCheckBox(opt));
+                    }
                 }
                 break;
             case DROPDOWN:
-                panel.add(new JComboBox<>(q.getOptions().toArray(new String[0])));
+                if (q instanceof ChoiceQuestion cq) {
+                    panel.add(new JComboBox<>(cq.getOptions().toArray(new String[0])));
+                }
                 break;
             default:
                 panel.add(new JLabel("[Unsupported Types: " + q.getType() + "]"));

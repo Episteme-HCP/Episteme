@@ -31,7 +31,6 @@ import org.w3c.dom.Element;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -124,7 +123,7 @@ public class NT extends GraphNode {
             if (terms == null || terms.isEmpty()) return "";
             
             String rawSpan = terms.stream()
-                .map(T::getId)
+                .map(t -> t.getId().toString())
                 .collect(Collectors.joining(","));
             span = SyncMMAX.condenseSpan(rawSpan);
         }

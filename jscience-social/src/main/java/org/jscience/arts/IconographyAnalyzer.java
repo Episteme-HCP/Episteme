@@ -125,7 +125,7 @@ public final class IconographyAnalyzer {
         Map<IconographicSymbol, Integer> frequency = new HashMap<>();
         for (List<String> symbols : artworkSymbolLists) {
             for (IconographicSymbol identified : identifySymbols(symbols)) {
-                frequency.merge(identified, 1, Integer::sum);
+                frequency.merge(identified, 1, (a, b) -> Integer.sum(a, b));
             }
         }
         return frequency;

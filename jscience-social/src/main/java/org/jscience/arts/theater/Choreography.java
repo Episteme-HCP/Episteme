@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.time.Instant;
-import org.jscience.geography.Place;
+import org.jscience.history.time.TimeCoordinate;
+import org.jscience.earth.Place;
 
 /**
  * Represents the choreography for a show.
@@ -16,7 +16,7 @@ public class Choreography extends Artwork {
 
     private final List<String> steps;
 
-    public Choreography(String name, String description, Instant productionDate, 
+    public Choreography(String name, String description, TimeCoordinate productionDate, 
                         Place productionPlace, List<String> steps) {
         super(name, description, productionDate, productionPlace, ArtForm.DANCE);
         this.steps = new ArrayList<>(Objects.requireNonNull(steps, "Steps cannot be null"));

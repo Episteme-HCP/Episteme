@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalLong;
-import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.history.time.TimeCoordinate;
 
 /**
  * Analyzes historical events to detect patterns, causal relationships, and clusters.
@@ -25,7 +25,7 @@ public final class HistoricalEventCorrelator {
     public record CorrelatableEvent(
         String name,
         String category,
-        TemporalCoordinate date,
+        TimeCoordinate date,
         String location,
         Map<String, Object> attributes
     ) implements Serializable {
@@ -131,11 +131,11 @@ public final class HistoricalEventCorrelator {
     public static Map<String, Integer> eventFrequencyByCategory(List<CorrelatableEvent> events) {
         Objects.requireNonNull(events, "Events list cannot be null");
         Map<String, Integer> frequency = new HashMap<>();
-        for (CorrelatableEvent e : events) frequency.merge(e.category(), 1, Integer::sum);
+        for (CorrelatableEvent e : events) frequency.merge(e.category(), 1, (a, b) -> a + b);
         return Collections.unmodifiableMap(frequency);
     }
 
-    private static OptionalLong calculateLag(TemporalCoordinate earlier, TemporalCoordinate later) {
+    private static OptionalLong calculateLag(TimeCoordinate earlier, TimeCoordinate later) {
         if (earlier == null || later == null) return OptionalLong.empty();
         Instant e = earlier.toInstant();
         Instant l = later.toInstant();

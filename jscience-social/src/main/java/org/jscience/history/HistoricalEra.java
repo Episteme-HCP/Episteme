@@ -1,11 +1,11 @@
 package org.jscience.history;
 
-import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
@@ -18,7 +18,7 @@ import org.jscience.util.persistence.Relation;
  * @since 2.0
  */
 @Persistent
-public class HistoricalEra extends Event implements Serializable {
+public class HistoricalEra extends Event {
 
     private static final long serialVersionUID = 3L;
 
@@ -28,11 +28,11 @@ public class HistoricalEra extends Event implements Serializable {
     @Relation(type = Relation.Type.ONE_TO_MANY)
     private final List<HistoricalEvent> keyEvents = new ArrayList<>();
 
-    public HistoricalEra(String name, String description, TemporalCoordinate when) {
+    public HistoricalEra(String name, String description, TimeCoordinate when) {
         super(name, description, when, Category.CULTURAL);
     }
 
-    public HistoricalEra(String name, TemporalCoordinate when) {
+    public HistoricalEra(String name, TimeCoordinate when) {
         this(name, null, when);
     }
 

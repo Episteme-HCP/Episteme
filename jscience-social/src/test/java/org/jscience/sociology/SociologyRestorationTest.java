@@ -56,7 +56,7 @@ public class SociologyRestorationTest {
 
         // Verify Linkage
         assertEquals(dinnerParty, hostRole.getSituation());
-        assertEquals(alice, hostRole.getPerson());
+        assertEquals(alice, hostRole.getIndividual());
 
         // Test Ritual
         Ritual wedding = new Ritual("Wedding", "A marriage ceremony");

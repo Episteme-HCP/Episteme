@@ -23,8 +23,8 @@
 
 package org.jscience.history;
 
-import org.jscience.geography.Place;
-import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.earth.Place;
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.util.Positioned;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
@@ -45,12 +45,12 @@ public class PositionedEvent extends Event implements Positioned<Place> {
     @Relation(type = Relation.Type.MANY_TO_ONE)
     private final Place position;
 
-    public PositionedEvent(String name, String description, TemporalCoordinate when, Place position, Category category) {
+    public PositionedEvent(String name, String description, TimeCoordinate when, Place position, Category category) {
         super(name, description, when, category);
         this.position = position;
     }
 
-    public PositionedEvent(String name, TemporalCoordinate when, Place position) {
+    public PositionedEvent(String name, TimeCoordinate when, Place position) {
         this(name, null, when, position, Category.OTHER);
     }
 
@@ -65,6 +65,6 @@ public class PositionedEvent extends Event implements Positioned<Place> {
 
     @Override
     public String toString() {
-        return String.format("%s (%s) at %s: %s", name, when, position, category);
+        return String.format("%s (%s) at %s: %s", getName(), when, position, category);
     }
 }

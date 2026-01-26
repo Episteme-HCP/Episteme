@@ -25,10 +25,8 @@ package org.jscience.mathematics.loaders.mathml;
 
 import org.jscience.mathematics.symbolic.*;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.mathml.MathMLDocument;
-import org.w3c.dom.mathml.MathMLElement;
 
 /**
  * Bridge between MathML DOM and JScience Symbolic Expressions.
@@ -131,7 +129,7 @@ public final class MathMLBridge {
         }
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({ "rawtypes" })
     private static Expression<?> combine(java.util.List<Expression<?>> exprs, 
                                        java.util.function.BiFunction<Expression<?>, Expression<?>, Expression<?>> op) {
         if (exprs.isEmpty()) return null;

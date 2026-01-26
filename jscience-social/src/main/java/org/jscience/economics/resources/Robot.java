@@ -27,7 +27,7 @@ import java.time.Instant;
 import org.jscience.economics.Community;
 import org.jscience.economics.TaskProcessor;
 import org.jscience.economics.money.Money;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.measure.Quantity;
 import org.jscience.util.identity.Identification;
 

@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.jscience.util.Named;
 
 /**
  * Represents a protein structure composed of polypeptide chains.
@@ -39,7 +38,7 @@ import org.jscience.util.Named;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class Protein extends Molecule implements Named {
+public class Protein extends Molecule {
 
     private final String pdbId;
     private final List<Chain> chains = new ArrayList<>();

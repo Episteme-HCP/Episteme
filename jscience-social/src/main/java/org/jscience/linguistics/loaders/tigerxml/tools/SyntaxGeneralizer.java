@@ -26,7 +26,8 @@ import org.jscience.linguistics.loaders.tigerxml.T;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,22 +45,22 @@ public class SyntaxGeneralizer {
     /**
      * DOCUMENT ME!
      */
-    private final String OTHER = "OTHER";
+    private static final String OTHER = "OTHER";
 
     /**
      * DOCUMENT ME!
      */
-    private HashMap my_type2gen_type;
+    private final Map<String, String> my_type2gen_type;
 
     /**
      * DOCUMENT ME!
      */
-    private HashMap my_label2gen_label;
+    private final Map<String, String> my_label2gen_label;
 
     /**
      * DOCUMENT ME!
      */
-    private HashMap my_tag2gen_tag;
+    private final Map<String, String> my_tag2gen_tag;
 
     /**
      * DOCUMENT ME!
@@ -74,36 +75,9 @@ public class SyntaxGeneralizer {
 /**
      * Creates a SyntaxGeneralizer object with user-definned
      * generalization settings.
-     * Each SyntaxGeneralizer is initialized with three
-     * HashMaps. The HashMaps map strings that are used to
-     * create
-     * regular expressions into strings that represent general
-     * linguisticallly relevant categories.
-     * The hash maps are used to group together concepts of
-     * Tiger syntax and thereby abstract away from
-     * their distinctions. <p>
-     * The first hash maps Tiger phrase type designators
-     * (like &quot;S&quot;, &quot;CS&quot;, &quot;CVP&quot; and so forth)
-     * into general phrase type labels. For example you
-     * might find it useful to group together the two Tiger
-     * phrase type tags &quot;S&quot; and &quot;CS&quot; into
-     * a single general phrase type tag called &quot;S&quot;. Then
-     * your first hash should contain the mapping from
-     * &quot;^(S|CS)$&quot; to &quot;S&quot;. <p>
-     * The second hash maps Tiger edge labels
-     * (like &quot;SB&quot;, &quot;HD&quot;, and &quot;MO&quot;)
-     * into general edge labels. <p>
-     * The third hash maps Tiger part of speech tags
-     * (like &quot;NN&quot;, &quot;NE&quot;, and &quot;VVFIN&quot;
-     * into general POS tags. <p>
-     * Types, labels or tags that are not taken into
-     * account by the hash maps will automatically
-     * mapped onto a tag  &quot;OTHER&quot;.
-     *
-     * @see java.util.regex.Pattern
      */
-    public SyntaxGeneralizer(HashMap type2gen_type, HashMap label2gen_label,
-        HashMap tag2gen_tag) {
+    public SyntaxGeneralizer(Map<String, String> type2gen_type, Map<String, String> label2gen_label,
+        Map<String, String> tag2gen_tag) {
         my_type2gen_type = type2gen_type;
         my_tag2gen_tag = tag2gen_tag;
         my_label2gen_label = label2gen_label;
@@ -112,67 +86,35 @@ public class SyntaxGeneralizer {
 /**
      * Creates a SyntaxGeneralizer object with predefinned
      * generalization settings.
-     * As for phrase type,
-     * &quot;NP&quot;, &quot;CNP&quot;,
-     * &quot;NM&quot;, and &quot;PN&quot; are mapped onto &quot;NP&quot;;
-     * &quot;PP&quot;, and &quot;CPP&quot; are mapped onto &quot;PP&quot;;
-     * &quot;AVP&quot;, &quot;AA&quot;, and &quot;CAVP&quot; are mapped onto &quot;AVP&quot;;
-     * &quot;AP&quot;, &quot;MTA&quot;, and &quot;CAP&quot; are mapped onto &quot;AP&quot;;
-     * &quot;CVP&quot;, and &quot;VP&quot; are mapped onto &quot;VP&quot;;
-     * &quot;S&quot;, &quot;CS&quot;, and &quot;DL&quot; are mapped onto &quot;S&quot;.
-     * <p/>
-     * As for edge label,
-     * &quot;NN&quot;, &quot;NE&quot;, &quot;NNE&quot;, &quot;PNC&quot;, &quot;PRF&quot;, &quot;PDS&quot;, &quot;PIS&quot;, &quot;PPER&quot;, &quot;PPOS&quot;, &quot;PRELS&quot;, and &quot;PWS&quot; are mapped onto &quot;NP&quot;;
-     * &quot;PROAV&quot;, and &quot;PWAV&quot; are mapped onto &quot;PP&quot;
-     * &quot;ADJA&quot;, &quot;PDAT&quot;, &quot;PIAT&quot;, &quot;PPOSAT&quot;, &quot;PRELAT&quot;, &quot;PWAT&quot;, and &quot;PRELS&quot; are mapped onto &quot;AP&quot;;
-     * &quot;ADJD&quot;, and &quot;ADV&quot; are mapped onto &quot;AVP&quot;;
-     * <p/>
-     * As for POS tag,
-     * &quot;EP&quot;, &quot;SB&quot;, and &quot;SP&quot; are mapped onto &quot;SB&quot;;
-     * &quot;DA&quot; is mapped onto &quot;DA&quot;;
-     * &quot;OA&quot;, and &quot;OA2&quot; are mapped onto &quot;OA&quot;;
-     * &quot;OG&quot; is mapped onto &quot;OG&quot;;
-     * &quot;OP&quot; is mapped onto &quot;OP&quot;;
-     * &quot;NK&quot; is mapped onto &quot;NK&quot;;
-     * &quot;HD&quot; is mapped onto &quot;HD&quot;;
-     * &quot;PD&quot;, &quot;CVC&quot;, &quot;MO&quot;, &quot;SBP&quot;, &quot;AMS&quot;, and &quot;CC&quot; is mapped onto &quot;MO&quot;;
-     * &quot;GR&quot;, &quot;GL&quot;, &quot;AG&quot;, &quot;PG&quot;, and &quot;MNR&quot; are mapped onto &quot;MNR&quot;;
-     * &quot;RC&quot; is mapped onto &quot;RC&quot;;
-     * &quot;OC&quot;, &quot;RE&quot;, &quot;RS&quot;, and &quot;DH&quot; are mapped onto &quot;OC&quot;;
-     * &quot;DA&quot; is mapped onto &quot;DA&quot;.
      */
     public SyntaxGeneralizer() {
-        HashMap type2gen_type = new HashMap();
-        type2gen_type.put("^(NP|CNP|NM|PN)$", "NP");
-        type2gen_type.put("^(PP|CPP)$", "PP");
-        type2gen_type.put("^(AVP|AA|CAVP)$", "AVP");
-        type2gen_type.put("^(AP|MTA|CAP)$", "AP");
-        type2gen_type.put("^(CVP|VP)$", "VP");
-        type2gen_type.put("^(S|CS|DL)$", "S");
-        my_type2gen_type = type2gen_type;
+        my_type2gen_type = new HashMap<>();
+        my_type2gen_type.put("^(NP|CNP|NM|PN)$", "NP");
+        my_type2gen_type.put("^(PP|CPP)$", "PP");
+        my_type2gen_type.put("^(AVP|AA|CAVP)$", "AVP");
+        my_type2gen_type.put("^(AP|MTA|CAP)$", "AP");
+        my_type2gen_type.put("^(CVP|VP)$", "VP");
+        my_type2gen_type.put("^(S|CS|DL)$", "S");
 
-        HashMap tag2gen_tag = new HashMap();
-        tag2gen_tag.put("^(NN|NE|NNE|PNC|PRF|PDS|PIS|PPER|PPOS|PRELS|PWS)$",
-            "NP");
-        tag2gen_tag.put("^(PROAV|PWAV)$", "PP");
-        tag2gen_tag.put("^(ADJA|PDAT|PIAT|PPOSAT|PRELAT|PWAT|PRELS)$", "AP");
-        tag2gen_tag.put("^(ADJD|ADV)$", "AVP");
-        my_tag2gen_tag = tag2gen_tag;
+        my_tag2gen_tag = new HashMap<>();
+        my_tag2gen_tag.put("^(NN|NE|NNE|PNC|PRF|PDS|PIS|PPER|PPOS|PRELS|PWS)$", "NP");
+        my_tag2gen_tag.put("^(PROAV|PWAV)$", "PP");
+        my_tag2gen_tag.put("^(ADJA|PDAT|PIAT|PPOSAT|PRELAT|PWAT|PRELS)$", "AP");
+        my_tag2gen_tag.put("^(ADJD|ADV)$", "AVP");
 
-        HashMap label2gen_label = new HashMap();
-        label2gen_label.put("^(EP|SB|SP)$", "SB");
-        label2gen_label.put("^DA$", "DA");
-        label2gen_label.put("^(OA|OA2)$", "OA");
-        label2gen_label.put("^OG$", "OG");
-        label2gen_label.put("^OP$", "OP");
-        label2gen_label.put("^NK$", "NK");
-        label2gen_label.put("^HD$", "HD");
-        label2gen_label.put("^(PD|CVC|MO|SBP|AMS|CC)$", "MO");
-        label2gen_label.put("^(GR|GL|AG|PG|MNR)$", "MNR");
-        label2gen_label.put("^RC$", "RC");
-        label2gen_label.put("^(OC|RE|RS|DH)$", "OC");
-        label2gen_label.put("^DA$", "DA");
-        my_label2gen_label = label2gen_label;
+        my_label2gen_label = new HashMap<>();
+        my_label2gen_label.put("^(EP|SB|SP)$", "SB");
+        my_label2gen_label.put("^DA$", "DA");
+        my_label2gen_label.put("^(OA|OA2)$", "OA");
+        my_label2gen_label.put("^OG$", "OG");
+        my_label2gen_label.put("^OP$", "OP");
+        my_label2gen_label.put("^NK$", "NK");
+        my_label2gen_label.put("^HD$", "HD");
+        my_label2gen_label.put("^(PD|CVC|MO|SBP|AMS|CC)$", "MO");
+        my_label2gen_label.put("^(GR|GL|AG|PG|MNR)$", "MNR");
+        my_label2gen_label.put("^RC$", "RC");
+        my_label2gen_label.put("^(OC|RE|RS|DH)$", "OC");
+        my_label2gen_label.put("^DA$", "DA");
     }
 
     /**
@@ -183,15 +125,12 @@ public class SyntaxGeneralizer {
      * @return DOCUMENT ME!
      */
     protected String getGeneralType(String type) {
-        Iterator iterator = (my_type2gen_type.keySet()).iterator();
-
-        while (iterator.hasNext()) {
-            String regex = (String) iterator.next();
+        for (String regex : my_type2gen_type.keySet()) {
             pattern = Pattern.compile(regex);
             matcher = pattern.matcher(type);
 
             if (matcher.matches()) {
-                return (String) my_type2gen_type.get(regex);
+                return my_type2gen_type.get(regex);
             }
         }
 
@@ -206,15 +145,12 @@ public class SyntaxGeneralizer {
      * @return DOCUMENT ME!
      */
     protected String getGeneralTag(String tag) {
-        Iterator iterator = (my_tag2gen_tag.keySet()).iterator();
-
-        while (iterator.hasNext()) {
-            String regex = (String) iterator.next();
+        for (String regex : my_tag2gen_tag.keySet()) {
             pattern = Pattern.compile(regex);
             matcher = pattern.matcher(tag);
 
             if (matcher.matches()) {
-                return (String) my_tag2gen_tag.get(regex);
+                return my_tag2gen_tag.get(regex);
             }
         }
 
@@ -229,15 +165,12 @@ public class SyntaxGeneralizer {
      * @return DOCUMENT ME!
      */
     protected String getGeneralLabel(String label) {
-        Iterator iterator = (my_label2gen_label.keySet()).iterator();
-
-        while (iterator.hasNext()) {
-            String regex = (String) iterator.next();
+        for (String regex : my_label2gen_label.keySet()) {
             pattern = Pattern.compile(regex);
             matcher = pattern.matcher(label);
 
             if (matcher.matches()) {
-                return (String) my_label2gen_label.get(regex);
+                return my_label2gen_label.get(regex);
             }
         }
 
@@ -269,51 +202,37 @@ public class SyntaxGeneralizer {
     }
 
     /**
-     * Returns an ArrayList of the daughter nodes with a given general
+     * Returns a List of the daughter nodes with a given general
      * edge label. The list is ordered left to right according to word order.
-     *
-     * @param node DOCUMENT ME!
-     * @param gen_label DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
      */
-    public ArrayList getDaughtersByGeneralLabel(NT node, String gen_label) {
-        ArrayList return_daughters = new ArrayList();
-        ArrayList daughters = node.getDaughters();
+    public List<GraphNode> getDaughtersByGeneralLabel(NT node, String gen_label) {
+        List<GraphNode> return_daughters = new ArrayList<>();
+        List<GraphNode> daughters = node.getDaughters();
 
-        for (int i = 0; i < daughters.size(); i++) {
-            GraphNode next_node = (GraphNode) daughters.get(i);
-
+        for (GraphNode next_node : daughters) {
             if (this.isCaseOf(next_node.getEdge2Mother(), gen_label)) {
                 return_daughters.add(next_node);
             }
-        } // for i
+        }
 
         return GeneralTools.sortNodes(return_daughters);
     }
 
     /**
-     * Returns an ArrayList of the descendant nodes with a given
+     * Returns a List of the descendant nodes with a given
      * general edge label. The descendants are ordered breadth first then left
      * to right.
-     *
-     * @param node DOCUMENT ME!
-     * @param gen_label DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
      */
-    public ArrayList getDescendantsByGeneralLabel(NT node, String gen_label) {
-        ArrayList return_daughters = new ArrayList(this.getDaughtersByGeneralLabel(
-                    node, gen_label));
-        ArrayList agenda = new ArrayList(node.getDaughters());
+    public List<GraphNode> getDescendantsByGeneralLabel(NT node, String gen_label) {
+        List<GraphNode> return_daughters = new ArrayList<>(this.getDaughtersByGeneralLabel(node, gen_label));
+        List<GraphNode> agenda = new ArrayList<>(node.getDaughters());
 
         while (!(agenda.isEmpty())) {
-            GraphNode next_node = (GraphNode) agenda.remove(0);
+            GraphNode next_node = agenda.remove(0);
 
             if (!(next_node.isTerminal())) {
                 NT nt = (NT) next_node;
-                return_daughters.addAll(this.getDaughtersByGeneralLabel(nt,
-                        gen_label));
+                return_daughters.addAll(this.getDaughtersByGeneralLabel(nt, gen_label));
                 agenda.addAll(nt.getDaughters());
             }
         }
@@ -324,11 +243,6 @@ public class SyntaxGeneralizer {
     /**
      * Returns true if there is a dominating node that has the general
      * category &quot;cat&quot;
-     *
-     * @param node DOCUMENT ME!
-     * @param gen_cat DOCUMENT ME!
-     *
-     * @return A truth value indicating whether there is a dominating cat node.
      */
     public boolean isDominatedBy(GraphNode node, String gen_cat) {
         return (getDominatingNode(node, gen_cat) != null);
@@ -338,11 +252,6 @@ public class SyntaxGeneralizer {
      * Returns the nearest dominating node that has the general
      * category gen_cat, and is not identical with the input node itself. The
      * method returns null if there is no such node.
-     *
-     * @param node DOCUMENT ME!
-     * @param gen_cat DOCUMENT ME!
-     *
-     * @return The nearest node with &quot;cat&quot; that dominates this node.
      */
     public NT getDominatingNode(GraphNode node, String gen_cat) {
         if (!(node.hasMother())) {
@@ -388,9 +297,7 @@ public class SyntaxGeneralizer {
      * @return DOCUMENT ME!
      */
     public String getPhraseType(NT node) {
-        String string = this.getGeneralType(node.getCat());
-
-        return string;
+        return this.getGeneralType(node.getCat());
     }
 
     /**

@@ -189,7 +189,7 @@ public interface BaseTool {
      * @param argVector arguments in order. First arg is instance of this
      * @return any return value (see Method.invoke for classes)
      */
-    Object runMethod(String methodS, List argVector);
+    Object runMethod(String methodS, List<Object> argVector);
 
     /**
      * get all public methods belonging just to this class.
@@ -209,7 +209,7 @@ public interface BaseTool {
      * @param doc       owner document
      * @return position in args after parsing
      */
-    int processCommandLine(String[] args, int offset, List argVector, AbstractCMLDocument doc);
+    int processCommandLine(String[] args, int offset, List<Object> argVector, AbstractCMLDocument doc);
 
     /**
      * a standard instance for testing.

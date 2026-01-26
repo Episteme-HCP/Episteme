@@ -37,6 +37,10 @@ public class EdgeLabel implements HeaderElement {
     /** DOCUMENT ME! */
     private boolean secondary;
 
+    public String getName() { return name; }
+    public String getDescription() { return description; }
+    public boolean isSecondary() { return secondary; }
+
     /**
      * DOCUMENT ME!
      *

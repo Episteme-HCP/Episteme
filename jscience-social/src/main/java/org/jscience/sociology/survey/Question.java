@@ -23,33 +23,62 @@
 
 package org.jscience.sociology.survey;
 
-import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.UUIDIdentification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
+import org.jscience.util.persistence.Persistent;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
  * Base class for all survey questions.
- * Extends AbstractIdentifiedEntity to support dynamic traits and consistent identity.
+ * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public abstract class Question extends AbstractIdentifiedEntity {
+@Persistent
+public abstract class Question implements ComprehensiveIdentification {
     
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    protected final Identification id;
+
+    @Attribute
+    protected final Map<String, Object> traits = new HashMap<>();
+
     public enum Type {
-        TEXT, MULTIPLE_CHOICE, CHECKBOXES, DROPDOWN, LINEAR_SCALE, DATE
+        TEXT, PARAGRAPH, MULTIPLE_CHOICE, CHECKBOXES, DROPDOWN, LINEAR_SCALE, DATE
     }
 
+    @Attribute
     private final Type type;
+
+    @Attribute
     private boolean required;
 
     public Question(String text, Type type) {
-        super(new UUIDIdentification(UUID.randomUUID().toString()));
+        this.id = new UUIDIdentification(UUID.randomUUID().toString());
         setName(text);
         this.type = type;
         this.required = false;
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     public String getText() {
@@ -70,5 +99,22 @@ public abstract class Question extends AbstractIdentifiedEntity {
 
     public void setRequired(boolean required) {
         this.required = required;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Question question)) return false;
+        return Objects.equals(id, question.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 }

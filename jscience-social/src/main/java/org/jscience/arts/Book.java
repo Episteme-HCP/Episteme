@@ -23,18 +23,8 @@
 
 package org.jscience.arts;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import org.jscience.history.temporal.TemporalCoordinate;
-import org.jscience.util.Named;
-import org.jscience.util.Temporal;
-import org.jscience.util.identity.Identified;
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.util.persistence.Attribute;
-import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 
 /**
@@ -43,13 +33,12 @@ import org.jscience.util.persistence.Persistent;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
+ * @version 2.1
  */
 @Persistent
-public class Book implements Identified<String>, Named, Temporal<TemporalCoordinate>, Serializable {
+public class Book extends Artwork {
 
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
 
     /**
      * Litery and publication genres.
@@ -60,18 +49,10 @@ public class Book implements Identified<String>, Named, Temporal<TemporalCoordin
         POETRY, DRAMA, PHILOSOPHY, RELIGION, REFERENCE
     }
 
-    @Id
-    private final String id;
-    @Attribute
-    private final String title;
-    @Attribute
-    private final List<String> authors = new ArrayList<>();
     @Attribute
     private String isbn;
     @Attribute
     private String publisher;
-    @Attribute
-    private TemporalCoordinate publicationDate;
     @Attribute
     private int pages;
     @Attribute
@@ -86,8 +67,7 @@ public class Book implements Identified<String>, Named, Temporal<TemporalCoordin
      * @param title the title of the book
      */
     public Book(String title) {
-        this.id = UUID.randomUUID().toString();
-        this.title = Objects.requireNonNull(title, "Title cannot be null");
+        super(title, "", null, null, ArtForm.LITERATURE);
     }
 
     /**
@@ -98,7 +78,7 @@ public class Book implements Identified<String>, Named, Temporal<TemporalCoordin
     public Book(String title, String author) {
         this(title);
         if (author != null) {
-            this.authors.add(author);
+            addAuthor(author);
         }
     }
 
@@ -108,33 +88,13 @@ public class Book implements Identified<String>, Named, Temporal<TemporalCoordin
      * @param isbn the ISBN
      * @param publicationDate the date of publication
      */
-    public Book(String title, String isbn, TemporalCoordinate publicationDate) {
-        this(title);
+    public Book(String title, String isbn, TimeCoordinate publicationDate) {
+        super(title, "", publicationDate, null, ArtForm.LITERATURE);
         this.isbn = isbn;
-        this.publicationDate = publicationDate;
-    }
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return title;
-    }
-
-    @Override
-    public TemporalCoordinate getWhen() {
-        return publicationDate;
     }
 
     public String getTitle() {
-        return title;
-    }
-
-    public List<String> getAuthors() {
-        return Collections.unmodifiableList(authors);
+        return getName();
     }
 
     public String getIsbn() {
@@ -143,10 +103,6 @@ public class Book implements Identified<String>, Named, Temporal<TemporalCoordin
 
     public String getPublisher() {
         return publisher;
-    }
-
-    public TemporalCoordinate getPublicationDate() {
-        return publicationDate;
     }
 
     public int getPages() {
@@ -173,10 +129,6 @@ public class Book implements Identified<String>, Named, Temporal<TemporalCoordin
         this.publisher = publisher;
     }
 
-    public void setPublicationDate(TemporalCoordinate date) {
-        this.publicationDate = date;
-    }
-
     public void setPages(int pages) {
         this.pages = pages;
     }
@@ -193,30 +145,18 @@ public class Book implements Identified<String>, Named, Temporal<TemporalCoordin
         this.synopsis = synopsis;
     }
 
-    public void addAuthor(String author) {
-        if (author != null) {
-            authors.add(author);
-        }
-    }
-
-    public void addAuthor(Artist artist) {
-        if (artist != null) {
-            authors.add(artist.getName());
-        }
-    }
-
     /**
      * Returns a formatted academic citation in a simplified APA/MLA style.
      * @return citation string
      */
     public String getCitation() {
-        String authorStr = authors.isEmpty() ? "Unknown Author" : String.join(", ", authors);
-        String yearStr = publicationDate != null ? publicationDate.toString() : "n.d.";
-        return String.format("%s (%s). %s. %s.", authorStr, yearStr, title, publisher != null ? publisher : "n.p.");
+        String authorStr = getAuthors().isEmpty() ? "Unknown Author" : String.join(", ", getAuthors());
+        String yearStr = getProductionDate() != null ? getProductionDate().toString() : "n.d.";
+        return String.format("%s (%s). %s. %s.", authorStr, yearStr, getTitle(), publisher != null ? publisher : "n.p.");
     }
 
     @Override
     public String toString() {
-        return String.format("\"%s\" by %s", title, authors.isEmpty() ? "Unknown Author" : String.join(", ", authors));
+        return String.format("\"%s\" by %s", getTitle(), getAuthors().isEmpty() ? "Unknown Author" : String.join(", ", getAuthors()));
     }
 }

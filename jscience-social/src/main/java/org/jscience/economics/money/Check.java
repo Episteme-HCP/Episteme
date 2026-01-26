@@ -25,14 +25,13 @@ package org.jscience.economics.money;
 
 import org.jscience.economics.Organization;
 import org.jscience.mathematics.numbers.real.Real;
+import org.jscience.util.identity.ComprehensiveIdentification;
 import org.jscience.util.identity.Identification;
-import org.jscience.util.identity.Identified;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 
@@ -47,12 +46,15 @@ import java.util.Objects;
  * @since 1.0
  */
 @Persistent
-public final class Check implements Identified<String>, Serializable {
+public final class Check implements ComprehensiveIdentification {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    private final Identification identification;
+    private final Identification id;
+
+    @Attribute
+    private final java.util.Map<String, Object> traits = new java.util.HashMap<>();
 
     @Relation(type = Relation.Type.MANY_TO_ONE)
     private final Account emitter;
@@ -76,13 +78,14 @@ public final class Check implements Identified<String>, Serializable {
      * @param value          the check amount
      * @throws NullPointerException if any argument is null
      */
-    public Check(Identification identification, Account emitter,
+    public Check(Identification id, Account emitter,
                  Organization receiver, Instant emission, Money value) {
-        this.identification = Objects.requireNonNull(identification, "Identification cannot be null");
+        this.id = Objects.requireNonNull(id, "Identification cannot be null");
         this.emitter = Objects.requireNonNull(emitter, "Emitter cannot be null");
         this.receiver = Objects.requireNonNull(receiver, "Receiver cannot be null");
         this.emission = Objects.requireNonNull(emission, "Emission date cannot be null");
         this.value = Objects.requireNonNull(value, "Value cannot be null");
+        setName("Check " + id);
     }
 
     /**
@@ -102,17 +105,21 @@ public final class Check implements Identified<String>, Serializable {
     }
 
     @Override
-    public String getId() {
-        return identification.getId();
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public java.util.Map<String, Object> getTraits() {
+        return traits;
     }
 
     /**
      * Returns the check identification.
      * @return the identification
      */
-    @Override
     public Identification getIdentification() {
-        return identification;
+        return id;
     }
 
     /**
@@ -158,19 +165,18 @@ public final class Check implements Identified<String>, Serializable {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof Check)) return false;
-        Check other = (Check) obj;
-        return Objects.equals(identification, other.identification);
+        if (!(obj instanceof Check other)) return false;
+        return Objects.equals(id, other.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(identification);
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
         return String.format("Check %s from %s to %s: %s on %s",
-            identification, emitter.getName(), receiver.getName(), value, emission);
+            id, emitter.getName(), receiver.getName(), value, emission);
     }
 }

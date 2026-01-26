@@ -31,6 +31,11 @@ import org.jscience.politics.*;
 import org.jscience.arts.*;
 import org.jscience.arts.music.*;
 import org.jscience.arts.culinary.*;
+import org.jscience.economics.money.Money;
+import org.jscience.economics.money.Currency;
+import org.jscience.earth.Place;
+import org.jscience.mathematics.geometry.boundaries.Boundary;
+import org.jscience.sociology.Organization;
 
 public class SocialPojoTests {
 
@@ -54,7 +59,7 @@ public class SocialPojoTests {
         PojoTester.testPojo(Group.class);
         PojoTester.testPojo(Family.class);
         PojoTester.testPojo(School.class);
-        PojoTester.testPojo(org.jscience.sociology.Organization.class);
+        PojoTester.testPojo(Organization.class);
         PojoTester.testPojo(Religion.class);
         PojoTester.testPojo(Culture.class);
     }

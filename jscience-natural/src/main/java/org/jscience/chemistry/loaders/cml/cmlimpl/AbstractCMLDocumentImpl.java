@@ -9,7 +9,6 @@ import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 
 import java.io.*;
-import java.util.Hashtable;
 import java.util.Vector;
 
 /**
@@ -58,7 +57,6 @@ public class AbstractCMLDocumentImpl extends PMRDocumentImpl
         super(doc);
     }
 
-    static Hashtable tagTable = new Hashtable();
 
     public static AbstractBase transferOwnerDocument(AbstractCMLDocument doc, AbstractBase elem) {
         /**- PMR
@@ -189,14 +187,14 @@ public class AbstractCMLDocumentImpl extends PMRDocumentImpl
      * @param elementName Description of the Parameter
      * @return the Elements (empty list if none)
      */
-    public Vector getElementVector(String elementName) {
+    public Vector<Element> getElementVector(String elementName) {
         NodeList nodes = this.getElementsByTagName(elementName);
         if (nodes.getLength() == 0) {
             return null;
         }
-        Vector elementVector = new Vector();
+        Vector<Element> elementVector = new Vector<>();
         for (int i = 0; i < nodes.getLength(); i++) {
-            elementVector.addElement(nodes.item(i));
+            elementVector.addElement((Element) nodes.item(i));
         }
         return elementVector;
     }
@@ -308,9 +306,7 @@ public class AbstractCMLDocumentImpl extends PMRDocumentImpl
         try {
 
             while (i < args.length) {
-                if (false) {
-                    ;
-                } else if (args[i].equals("-IN")) {
+                if (args[i].equals("-IN")) {
                     i++;
                     inFile = args[i++];
                 } else if (args[i].equals("-OUT")) {

@@ -357,7 +357,6 @@ public final class Units {
         public static final Unit<Energy> ELECTRON_VOLT = (Unit<Energy>) JOULE.multiply(1.602176634e-19);
 
         /** Degree: 1Ã‚Â° = Ãâ‚¬/180 rad */
-        @SuppressWarnings("unchecked")
         public static final Unit<Angle> DEGREE_ANGLE = ((StandardUnit<Angle>) RADIAN).multiply(Math.PI / 180.0);
 
         /** Minute (angle): 1' = 1Ã‚Â°/60 */

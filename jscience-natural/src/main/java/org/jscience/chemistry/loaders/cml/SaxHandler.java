@@ -32,7 +32,7 @@ public interface SaxHandler extends ContentHandler, DTDHandler, EntityResolver,
      *
      * @return DOCUMENT ME!
      */
-    public Vector getErrorVector();
+    public Vector<String> getErrorVector();
 
     /**
      * DOCUMENT ME!

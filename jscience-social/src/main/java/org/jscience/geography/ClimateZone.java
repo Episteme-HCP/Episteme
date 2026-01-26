@@ -45,6 +45,13 @@ public record ClimateZone(
         @Attribute Quantity<Temperature> averageTemp,
         @Attribute Quantity<Length> annualRainfall) implements Serializable {
 
+    /** Legacy constructor for simple values. */
+    public ClimateZone(Type type, org.jscience.mathematics.numbers.real.Real averageTemp, org.jscience.mathematics.numbers.real.Real annualRainfall) {
+        this(type, 
+             org.jscience.measure.Quantities.create(averageTemp, org.jscience.measure.Units.CELSIUS),
+             org.jscience.measure.Quantities.create(annualRainfall, org.jscience.measure.Units.MILLIMETER));
+    }
+
     public enum Type {
         TROPICAL, ARID, TEMPERATE, CONTINENTAL, POLAR
     }
@@ -54,7 +61,7 @@ public record ClimateZone(
      */
     public boolean isHabitable() {
         if (type == Type.POLAR) return false;
-        if (type == Type.ARID && annualRainfall.to(Units.MILLIMETER).getValue() < 100) return false;
+        if (type == Type.ARID && annualRainfall.to(Units.MILLIMETER).getValue().doubleValue() < 100) return false;
         return true;
     }
 
@@ -62,8 +69,8 @@ public record ClimateZone(
      * Checks if the climate supports outdoor agriculture.
      */
     public boolean supportsAgriculture() {
-        return annualRainfall.to(Units.MILLIMETER).getValue() > 400 && 
-               averageTemp.to(Units.CELSIUS).getValue() > 12;
+        return annualRainfall.to(Units.MILLIMETER).getValue().doubleValue() > 400 && 
+               averageTemp.to(Units.CELSIUS).getValue().doubleValue() > 12;
     }
 
     @Override

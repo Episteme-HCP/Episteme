@@ -24,7 +24,7 @@
 package org.jscience.economics.loaders;
 
 import org.jscience.economics.money.Money;
-import org.jscience.history.TimePoint;
+import org.jscience.history.time.TimePoint;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.ui.i18n.I18n;
 import org.jscience.io.AbstractResourceReader;

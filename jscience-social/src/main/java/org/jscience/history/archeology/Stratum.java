@@ -24,29 +24,38 @@
 package org.jscience.history.archeology;
 
 import java.util.Collections;
+import org.jscience.measure.Quantities;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import org.jscience.measure.Quantity;
 import org.jscience.measure.Units;
 import org.jscience.measure.quantity.Length;
-import org.jscience.util.identity.AbstractIdentifiedEntity;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 
 /**
  * A distinct layer or unit of context in a stratigraphic sequence.
- * Extends AbstractIdentifiedEntity to support dynamic traits and consistent identity.
+ * Implements ComprehensiveIdentification to support dynamic traits and consistent identity.
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
 @Persistent
-public class Stratum extends AbstractIdentifiedEntity {
+public class Stratum implements ComprehensiveIdentification {
 
     private static final long serialVersionUID = 1L;
+
+    @Id
+    protected final Identification id;
+
+    @Attribute
+    protected final Map<String, Object> traits = new HashMap<>();
 
     @Attribute
     private final Quantity<Length> depth;
@@ -55,10 +64,20 @@ public class Stratum extends AbstractIdentifiedEntity {
     private final Map<String, StratigraphyModel.Relationship> relations = new HashMap<>();
 
     public Stratum(String id, String name, String description, Quantity<Length> depth) {
-        super(new SimpleIdentification(Objects.requireNonNull(id, "Stratum ID cannot be null")));
+        this.id = new SimpleIdentification(Objects.requireNonNull(id, "Stratum ID cannot be null"));
         setName(name != null ? name : id);
         setComments(description);
-        this.depth = depth != null ? depth : Quantity.of(0.0, Units.METRE);
+        this.depth = depth != null ? depth : Quantities.create(0.0, Units.METER);
+    }
+
+    @Override
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     public String getDescription() {
@@ -81,16 +100,16 @@ public class Stratum extends AbstractIdentifiedEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Stratum stratum)) return false;
-        return Objects.equals(getId(), stratum.getId());
+        return Objects.equals(id, stratum.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId());
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
-        return String.format("Stratum[%s: %s]", getId(), getName());
+        return String.format("Stratum[%s: %s]", id, getName());
     }
 }

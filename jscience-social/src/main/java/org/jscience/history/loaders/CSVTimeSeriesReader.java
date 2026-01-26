@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
-import org.jscience.history.temporal.TimePoint;
+import org.jscience.history.time.TimePoint;
 import org.jscience.io.AbstractResourceReader;
 import org.jscience.io.MiniCatalog;
 import org.jscience.mathematics.numbers.real.Real;

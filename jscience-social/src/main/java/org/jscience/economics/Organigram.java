@@ -50,7 +50,7 @@ import org.jscience.util.identity.SimpleIdentification;
  * @since 1.0
  */
 @Persistent
-public class Organigram implements Named, Identified<Identification>, Commented, Temporal {
+public class Organigram implements Named, Identified<Identification>, Commented, Temporal<Instant> {
 
     @Id
     private Identification identification;
@@ -63,6 +63,9 @@ public class Organigram implements Named, Identified<Identification>, Commented,
 
     @Attribute
     private Instant timestamp;
+
+    /** The internal map for traits. */
+    private final java.util.Map<String, Object> traits = new java.util.HashMap<>();
 
     /** The actual hierarchical structure of organizational unit names. */
     private RootedTree<String> structure;
@@ -123,8 +126,21 @@ public class Organigram implements Named, Identified<Identification>, Commented,
     }
 
     @Override
+    public Instant getWhen() {
+        return timestamp;
+    }
+
+    /**
+     * Legacy getter.
+     * @return the timestamp
+     */
     public Instant getTimestamp() {
         return timestamp;
+    }
+
+    @Override
+    public java.util.Map<String, Object> getTraits() {
+        return traits;
     }
 
     /**

@@ -24,7 +24,7 @@ public class SaxHandlerImpl extends org.xml.sax.helpers.DefaultHandler
     AbstractCMLDocument doc;
 
     /** DOCUMENT ME! */
-    Stack stack;
+    Stack<Node> stack;
 
     // the node which determines the data type; always mirrors the input
     /** DOCUMENT ME! */
@@ -33,7 +33,7 @@ public class SaxHandlerImpl extends org.xml.sax.helpers.DefaultHandler
     // the Node to add new elements to; mirrors the output data structure
     //    Node currentParent = null;
     /** DOCUMENT ME! */
-    Vector errorVector;
+    Vector<String> errorVector;
 
     /** DOCUMENT ME! */
     boolean debug = false;
@@ -55,9 +55,9 @@ public class SaxHandlerImpl extends org.xml.sax.helpers.DefaultHandler
      */
     public SaxHandlerImpl(AbstractCMLDocument d, boolean debug) {
         this.doc = d;
-        stack = new Stack();
+        stack = new Stack<>();
         stack.push(doc);
-        errorVector = new Vector();
+        errorVector = new Vector<>();
         this.debug = debug;
         debug("Sax debugging on");
 
@@ -115,7 +115,7 @@ public class SaxHandlerImpl extends org.xml.sax.helpers.DefaultHandler
      *
      * @return DOCUMENT ME!
      */
-    public Vector getErrorVector() {
+    public Vector<String> getErrorVector() {
         return errorVector;
     }
 
@@ -133,7 +133,7 @@ public class SaxHandlerImpl extends org.xml.sax.helpers.DefaultHandler
      *
      * @return DOCUMENT ME!
      */
-    Stack getStack() {
+    Stack<Node> getStack() {
         return stack;
     }
 
@@ -242,7 +242,7 @@ public class SaxHandlerImpl extends org.xml.sax.helpers.DefaultHandler
         }
 
         // this is called for all elements
-        currentNode = (Node) stack.pop();
+        currentNode = stack.pop();
     }
 
     /**

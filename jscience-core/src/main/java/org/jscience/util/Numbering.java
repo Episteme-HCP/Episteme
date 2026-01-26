@@ -25,7 +25,6 @@ package org.jscience.util;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**

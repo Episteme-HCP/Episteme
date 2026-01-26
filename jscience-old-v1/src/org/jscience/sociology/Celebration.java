@@ -5,7 +5,7 @@ import org.jscience.biology.Individual;
 import org.jscience.economics.Organization;
 import org.jscience.economics.WorkSituation;
 
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 
 import org.jscience.util.Positioned;
 

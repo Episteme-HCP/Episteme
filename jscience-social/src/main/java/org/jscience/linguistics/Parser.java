@@ -1,6 +1,6 @@
 package org.jscience.linguistics;
 
-import org.jscience.util.Tree;
+import javax.swing.tree.TreeModel;
 
 
 /**
@@ -21,5 +21,5 @@ public interface Parser {
      *
      * @return DOCUMENT ME!
      */
-    public Tree parse(Grammar grammar, String string);
+    public TreeModel parse(Grammar grammar, String string);
 }

@@ -23,11 +23,11 @@
 
 package org.jscience.sociology;
 
-import java.io.Serializable;
+
 import java.time.LocalDate;
 import java.util.*;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.util.temporal.TemporalCoordinate;
+import org.jscience.history.time.TimeCoordinate;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
@@ -89,9 +89,9 @@ public class Human extends Individual {
     private String nationality;
     
     @Relation(type = Relation.Type.ONE_TO_ONE)
-    private TemporalCoordinate birthWhen;
+    private TimeCoordinate birthWhen;
     @Relation(type = Relation.Type.ONE_TO_ONE)
-    private TemporalCoordinate deathWhen;
+    private TimeCoordinate deathWhen;
     
     @Attribute
     private Biography biography;
@@ -189,11 +189,11 @@ public class Human extends Individual {
     public String getNationality() { return nationality; }
     public void setNationality(String nationality) { this.nationality = nationality; }
 
-    public TemporalCoordinate getBirthWhen() { return birthWhen; }
-    public void setBirthWhen(TemporalCoordinate birthWhen) { this.birthWhen = birthWhen; }
+    public TimeCoordinate getBirthWhen() { return birthWhen; }
+    public void setBirthWhen(TimeCoordinate birthWhen) { this.birthWhen = birthWhen; }
 
-    public TemporalCoordinate getDeathWhen() { return deathWhen; }
-    public void setDeathWhen(TemporalCoordinate deathWhen) { this.deathWhen = deathWhen; }
+    public TimeCoordinate getDeathWhen() { return deathWhen; }
+    public void setDeathWhen(TimeCoordinate deathWhen) { this.deathWhen = deathWhen; }
 
     public String getBiographicalSummary() { 
         return biography != null ? (String)biography.getTrait("summary") : (String)traits.get("biographicalSummary"); 

@@ -26,10 +26,8 @@ package org.jscience.earth.loaders.gml;
 import org.jscience.io.AbstractResourceReader;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
 import java.io.*;
-import java.util.logging.Logger;
 
 /**
  * GML Reader for Geography Markup Language data.
@@ -55,7 +53,6 @@ import java.util.logging.Logger;
  */
 public class GMLReader extends AbstractResourceReader<GMLDocument> {
 
-    private static final Logger LOGGER = Logger.getLogger(GMLReader.class.getName());
     private static final String GML_NS = "http://www.opengis.net/gml/3.2";
     private static final String GML_NS_OLD = "http://www.opengis.net/gml";
 

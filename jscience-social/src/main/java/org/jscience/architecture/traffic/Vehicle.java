@@ -23,14 +23,17 @@
 
 package org.jscience.architecture.traffic;
 
-import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
-import org.jscience.geography.Coordinate;
+import org.jscience.earth.coordinates.GeodeticCoordinate;
+import org.jscience.economics.money.Money;
+import org.jscience.economics.resources.Machine;
+import org.jscience.earth.Place;
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.util.Named;
-import org.jscience.util.Positioned;
-import org.jscience.util.identity.Identified;
-import org.jscience.util.persistence.Id;
+import org.jscience.measure.Quantities;
+import org.jscience.measure.Units;
+import org.jscience.util.identity.UUIDIdentification;
+import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
 
 /**
@@ -40,19 +43,18 @@ import org.jscience.util.persistence.Persistent;
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 2.0
- * @since 1.0
+ * @version 2.1
  */
 @Persistent
-public class Vehicle implements Identified<String>, Named, Positioned<Coordinate>, Serializable {
+public class Vehicle extends Machine {
 
     private static final long serialVersionUID = 2L;
 
-    @Id
-    private final String id;
-    private final String name;
-    private Coordinate position;
+    @Attribute
+    private GeodeticCoordinate geodeticPosition;
+    @Attribute
     private Real speed; // Speed in meters per second (m/s)
+    @Attribute
     private Road currentRoad;
 
     /**
@@ -61,29 +63,41 @@ public class Vehicle implements Identified<String>, Named, Positioned<Coordinate
      * @param name descriptive label for the vehicle (e.g., "Car-A1")
      */
     public Vehicle(String name) {
-        this.id = UUID.randomUUID().toString();
-        this.name = name != null ? name : "Vehicle";
+        super(name, "", Quantities.create(1, Units.ONE), null, null, Instant.now(), 
+              new UUIDIdentification(UUID.randomUUID().toString()), Money.usd(0));
         this.speed = Real.ZERO;
     }
 
     @Override
-    public String getId() {
-        return id;
+    public Place getPosition() {
+        return super.getPosition();
+    }
+
+    public GeodeticCoordinate getGeodeticPosition() {
+        return geodeticPosition;
+    }
+
+    public void setPosition(GeodeticCoordinate position) {
+        this.geodeticPosition = position;
+        Place p = getPosition();
+        if (p == null) {
+            p = new Place(getName(), position, Place.Type.OTHER);
+            super.setPosition(p);
+        } else {
+            p.setCenter(position);
+        }
     }
 
     @Override
-    public String getName() {
-        return name;
+    public String getActionName(int i) {
+        return "Move";
     }
 
     @Override
-    public Coordinate getPosition() {
-        return position;
-    }
-
-    @Override
-    public void setPosition(Coordinate position) {
-        this.position = position;
+    public void act(int i, Object[] objects) {
+        if (i == 0 && objects.length > 0 && objects[0] instanceof Number) {
+            move(((Number) objects[0]).doubleValue());
+        }
     }
 
     /** @return current velocity in meters per second */
@@ -114,8 +128,8 @@ public class Vehicle implements Identified<String>, Named, Positioned<Coordinate
      */
     public void enterRoad(Road road) {
         this.currentRoad = road;
-        if (road != null && !road.getCoordinates().isEmpty()) {
-            this.position = road.getStart();
+        if (road != null && !road.getPoints().isEmpty()) {
+            this.setPosition(road.getStart());
         }
     }
 
@@ -128,7 +142,6 @@ public class Vehicle implements Identified<String>, Named, Positioned<Coordinate
     public void move(double seconds) {
         if (currentRoad != null && speed.doubleValue() > 0 && seconds > 0) {
             // Integration logic for path progression to be implemented 
-            // based on GeoPath segment analysis.
         }
     }
 }

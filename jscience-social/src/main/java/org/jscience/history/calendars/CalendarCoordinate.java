@@ -5,8 +5,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Objects;
-import org.jscience.history.temporal.Precision;
-import org.jscience.history.temporal.TemporalCoordinate;
+import org.jscience.history.time.Precision;
+import org.jscience.history.time.TimeCoordinate;
 
 /**
  * A temporal coordinate based on an {@link AlternateCalendar} system.
@@ -16,7 +16,7 @@ import org.jscience.history.temporal.TemporalCoordinate;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-public final class CalendarCoordinate implements TemporalCoordinate, Serializable {
+public final class CalendarCoordinate implements TimeCoordinate, Serializable {
 
     private static final long serialVersionUID = 2L;
 
@@ -71,7 +71,7 @@ public final class CalendarCoordinate implements TemporalCoordinate, Serializabl
     }
 
     @Override
-    public int compareTo(TemporalCoordinate o) {
+    public int compareTo(TimeCoordinate o) {
         return this.toInstant().compareTo(o.toInstant());
     }
 

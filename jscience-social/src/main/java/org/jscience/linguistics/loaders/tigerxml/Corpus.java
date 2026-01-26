@@ -201,7 +201,7 @@ public class Corpus implements Serializable {
                 }
             }
             for (T t : s.getTs()) {
-                List<String> currentSpan = List.of(t.getId());
+                List<String> currentSpan = List.of(t.getId().toString());
                 int med = GeneralTools.minEditDistance(new ArrayList<>(currentSpan), new ArrayList<>(argSpanList));
                 if (med < minMed) {
                     minMed = med;
@@ -215,12 +215,14 @@ public class Corpus implements Serializable {
     public List<NT> getAllNTs() {
         return sentences.stream()
                 .flatMap(s -> s.getNTs().stream())
+                .map(nt -> (NT)nt)
                 .collect(Collectors.toList());
     }
 
     public List<T> getAllTs() {
         return sentences.stream()
                 .flatMap(s -> s.getTs().stream())
+                .map(t -> (T)t)
                 .collect(Collectors.toList());
     }
 

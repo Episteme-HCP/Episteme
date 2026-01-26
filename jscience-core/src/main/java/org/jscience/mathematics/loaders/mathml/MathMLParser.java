@@ -28,7 +28,6 @@ import org.jscience.mathematics.numbers.complex.Complex;
 import org.jscience.mathematics.numbers.real.Real;
 import org.jscience.mathematics.numbers.integers.Integer;
 import org.jscience.mathematics.structures.sets.DiscreteSet;
-import org.jscience.mathematics.sets.Integers;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

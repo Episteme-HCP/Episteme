@@ -23,10 +23,11 @@
 
 package org.jscience.geography;
 
+import org.jscience.earth.Place;
 import org.jscience.economics.EconomicAgent;
 import org.jscience.economics.Property;
 import org.jscience.economics.money.Money;
-import org.jscience.economics.money.Currency;
+
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
@@ -55,12 +56,12 @@ public class OwnedPlace extends Place implements Property {
     private Money value;
 
     public OwnedPlace(String name, Set<EconomicAgent> initialOwners) {
-        super(name, Type.OTHER);
+        super(name, Place.Type.OTHER);
         if (initialOwners == null || initialOwners.isEmpty()) {
             throw new IllegalArgumentException("Property must have at least one owner");
         }
         this.owners.addAll(initialOwners);
-        this.value = Money.valueOf(0.0, Currency.USD);
+        this.value = Money.usd(0);
     }
 
     public OwnedPlace(String name, EconomicAgent singleOwner) {

@@ -41,7 +41,7 @@ public class NaturalLanguageAnalyzer {
     private static final Map<String, NaturalLanguageAnalyzer> INSTANCES = new ConcurrentHashMap<>();
 
     private final Language language;
-    private final Map<String, WordAnalysis> dictionary = new ConcurrentHashMap<>();
+
 
     protected NaturalLanguageAnalyzer(Language language) {
         this.language = language;

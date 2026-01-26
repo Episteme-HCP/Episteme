@@ -23,13 +23,9 @@
 
 package org.jscience.util.identity;
 
-import org.jscience.util.Commented;
-import org.jscience.util.Named;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
-
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -42,7 +38,7 @@ import java.util.Objects;
  * @since 1.1
  */
 @Persistent
-public abstract class AbstractIdentifiedEntity implements Identified<Identification>, Named, Commented, Serializable {
+public abstract class AbstractIdentifiedEntity implements ComprehensiveIdentification {
 
     private static final long serialVersionUID = 1L;
 

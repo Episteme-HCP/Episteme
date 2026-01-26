@@ -24,16 +24,18 @@
 package org.jscience.economics.money;
 
 import org.jscience.mathematics.numbers.real.Real;
-import org.jscience.measure.Dimension;
+
 import org.jscience.measure.StandardUnit;
 import org.jscience.measure.Unit;
 import org.jscience.measure.UnitConverter;
-import org.jscience.util.identity.Identified;
+import org.jscience.util.identity.ComprehensiveIdentification;
+import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Id;
 import org.jscience.util.persistence.Persistent;
 
-import java.io.Serializable;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -52,10 +54,16 @@ import java.util.Objects;
  * @see <a href="https://www.iso.org/iso-4217-currency-codes.html">ISO 4217</a>
  */
 @Persistent
-public class Currency extends StandardUnit<Money> implements Identified<String>, Serializable {
+public class Currency extends StandardUnit<Money> implements ComprehensiveIdentification {
 
     private static final long serialVersionUID = 1L;
 
+
+    @Id
+    private final Identification id;
+
+    @Attribute
+    private final Map<String, Object> traits = new HashMap<>();
 
     /**
      * Holds the Reference currency.
@@ -142,12 +150,6 @@ public class Currency extends StandardUnit<Money> implements Identified<String>,
         TO_REFERENCE.put(USD.getCode(), Real.ONE);
     }
 
-    @Id
-    private final String code;
-
-    @Attribute
-    private final String name;
-
     @Attribute
     private final String symbol;
 
@@ -164,8 +166,8 @@ public class Currency extends StandardUnit<Money> implements Identified<String>,
      */
     public Currency(String name, String code, String symbol, int fractionalDigits) {
         super(code, code, Money.DIMENSION);
-        this.name = Objects.requireNonNull(name, "Name cannot be null");
-        this.code = Objects.requireNonNull(code, "Code cannot be null");
+        this.id = new SimpleIdentification(code);
+        setName(Objects.requireNonNull(name, "Name cannot be null"));
         this.symbol = symbol != null ? symbol : code;
         this.fractionalDigits = fractionalDigits;
         
@@ -215,7 +217,7 @@ public class Currency extends StandardUnit<Money> implements Identified<String>,
      * @return the ISO-4217 code.
      */
     public String getCode() {
-        return code;
+        return getId().toString();
     }
 
     /**
@@ -234,8 +236,13 @@ public class Currency extends StandardUnit<Money> implements Identified<String>,
     }
 
     @Override
-    public String getId() {
-        return code;
+    public Identification getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getTraits() {
+        return traits;
     }
 
     /**
@@ -269,7 +276,7 @@ public class Currency extends StandardUnit<Money> implements Identified<String>,
      */
     public Real getExchangeRate() {
         Real rate = TO_REFERENCE.get(this.getCode());
-        if (rate == null) throw new IllegalStateException("Exchange rate not set for " + code);
+        if (rate == null) throw new IllegalStateException("Exchange rate not set for " + getCode());
         return rate;
     }
 
@@ -291,13 +298,12 @@ public class Currency extends StandardUnit<Money> implements Identified<String>,
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof Currency)) return false;
-        Currency that = (Currency) obj;
-        return this.code.equals(that.code);
+        if (!(obj instanceof Currency that)) return false;
+        return Objects.equals(this.id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return code.hashCode();
+        return Objects.hashCode(id);
     }
 }

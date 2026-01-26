@@ -79,7 +79,7 @@ public class DocumentFactoryImpl implements CMLDocumentFactory {
 
         try {
             doc = (AbstractCMLDocument) Class.forName(documentClassName)
-                                             .newInstance();
+                                             .getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             System.err.println("Cannot create: " + documentClassName + " (" +
                 e + ")");
@@ -239,10 +239,12 @@ public class DocumentFactoryImpl implements CMLDocumentFactory {
         handler.setIgnoreWhite(true);
 
         try {
-            parser.parse(is, handler);
+            if (parser != null) {
+                parser.parse(is, handler);
+            }
 
             if (handler.hasErrors()) {
-                Vector v = handler.getErrorVector();
+                Vector<String> v = handler.getErrorVector();
 
                 for (int i = 0; i < v.size(); i++) {
                     System.err.println("ParseError: " + v.elementAt(i));
@@ -291,16 +293,16 @@ public class DocumentFactoryImpl implements CMLDocumentFactory {
         handler.setIgnoreWhite(true);
 
         try {
-            parser.parse(is, handler);
+            if (parser != null) {
+                parser.parse(is, handler);
+            }
 
             if (handler.hasErrors()) {
-                Vector v = handler.getErrorVector();
+                Vector<String> v = handler.getErrorVector();
 
                 for (int i = 0; i < v.size(); i++) {
                     System.err.println("ParseError: " + v.elementAt(i));
                 }
-
-                //                throw new org.jscience.chemistry.loaders.cml.CMLException("CMLHandler had errors");
             }
         } catch (Exception e) {
             e.printStackTrace();

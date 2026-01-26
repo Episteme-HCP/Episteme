@@ -26,7 +26,7 @@ package org.jscience.linguistics.loaders.tigerxml;
 import org.jscience.util.identity.Identified;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.SimpleIdentification;
-import org.jscience.linguistics.loaders.tigerxml.tools.GeneralTools;
+
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -176,6 +176,49 @@ public abstract class GraphNode implements Identified<Identification>, Serializa
     }
 
     public abstract String getText();
+
+    /**
+     * Returns all descendants (recursive) that have the given edge label to their mother.
+     * @param label the search label
+     * @return list of matching graph nodes
+     */
+    public List<GraphNode> getDescendantsByLabel(String label) {
+        List<GraphNode> results = new ArrayList<>();
+        collectDescendantsByLabel(this, label, results);
+        return results;
+    }
+
+    private void collectDescendantsByLabel(GraphNode current, String label, List<GraphNode> results) {
+        if (!current.isTerminal()) {
+            NT nt = (NT) current;
+            for (GraphNode d : nt.getDaughters()) {
+                if (d.getEdge2Mother().equals(label)) {
+                    results.add(d);
+                }
+                collectDescendantsByLabel(d, label, results);
+            }
+        }
+    }
+
+    /**
+     * Checks if this node occurs before another node in the sentence.
+     */
+    public boolean before(GraphNode other) {
+        if (other == null || this.sentence != other.sentence) return false;
+        if (this.index != -1 && other.index != -1) return this.index < other.index;
+        // Fallback for nodes without indices: check leftmost terminals
+        T myMost = getLeftmostTerminal();
+        T otherMost = other.getLeftmostTerminal();
+        if (myMost != null && otherMost != null) return myMost.getPosition() < otherMost.getPosition();
+        return false;
+    }
+
+    /**
+     * Checks if this node occurs after another node in the sentence.
+     */
+    public boolean after(GraphNode other) {
+        return other != null && other.before(this);
+    }
 
     public boolean isDominatedBy(String cat) {
         return getDominatingNodeByCat(cat) != null;

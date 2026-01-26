@@ -151,9 +151,9 @@ public final class AuctionSimulator {
         Real start = bidders.stream().map(Bidder::maxWillingness).max(Real::compareTo).orElse(Real.ZERO).multiply(Real.of(0.1));
         
         for (int i = 0; i < simulations; i++) {
-            totals.merge("English", englishAuction(bidders, start, Real.of(1)).sellerRevenue().doubleValue(), Double::sum);
-            totals.merge("FirstPrice", firstPriceSealedBid(bidders).sellerRevenue().doubleValue(), Double::sum);
-            totals.merge("Vickrey", vickreyAuction(bidders).sellerRevenue().doubleValue(), Double::sum);
+            totals.merge("English", englishAuction(bidders, start, Real.of(1)).sellerRevenue().doubleValue(), (a, b) -> Double.sum(a, b));
+            totals.merge("FirstPrice", firstPriceSealedBid(bidders).sellerRevenue().doubleValue(), (a, b) -> Double.sum(a, b));
+            totals.merge("Vickrey", vickreyAuction(bidders).sellerRevenue().doubleValue(), (a, b) -> Double.sum(a, b));
         }
         
         Map<String, Real> averages = new HashMap<>();

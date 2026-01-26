@@ -26,10 +26,8 @@ import org.jscience.linguistics.loaders.tigerxml.NT;
 import org.jscience.linguistics.loaders.tigerxml.Sentence;
 import org.jscience.linguistics.loaders.tigerxml.tools.GeneralTools;
 
-import java.io.Serializable;
 
-import java.util.ArrayList;
-
+import java.util.List;
 
 /**
  * Represents the virtual root node in a syntax tree. This is a restricted
@@ -43,7 +41,7 @@ import java.util.ArrayList;
  * @see GraphNode
  * @see NT
  */
-public class VRoot extends NT implements Serializable {
+public class VRoot extends NT {
 /**
      * Creates an empty VRoot setting all member variables to <code>null<code>
      * or empty.
@@ -55,8 +53,6 @@ public class VRoot extends NT implements Serializable {
         this.setEdge2Mother("");
 
         this.setCat("VROOT");
-
-        this.setTerminal(false);
     }
 
 /**
@@ -71,13 +67,12 @@ public class VRoot extends NT implements Serializable {
         this.setCat("VROOT");
         this.setId(sent.getId() + "_" + "VROOT");
         this.setSentence(sent);
-        this.setTerminal(false);
 
         // link all nodes without a mother to this (virtual root) node
-        ArrayList allNodes = GeneralTools.sortNodes(sent.getAllGraphNodes());
+        List<GraphNode> allNodes = GeneralTools.sortNodes(sent.getAllGraphNodes());
 
         for (int i = 0; i < allNodes.size(); i++) {
-            GraphNode currentNode = (GraphNode) allNodes.get(i);
+            GraphNode currentNode = allNodes.get(i);
 
             if (!currentNode.hasMother()) {
                 /////FOOcurrentNode.printNodeErr();

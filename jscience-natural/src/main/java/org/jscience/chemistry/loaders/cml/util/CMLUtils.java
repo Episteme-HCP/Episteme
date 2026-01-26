@@ -1,6 +1,6 @@
 package org.jscience.chemistry.loaders.cml.util;
 
-import java.applet.Applet;
+
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,6 +17,7 @@ import java.util.zip.ZipFile;
  * @author (C) P. Murray-Rust, 1998
  * @author 20 August 2003
  */
+
 public class CMLUtils {
 
     /**
@@ -362,24 +363,7 @@ public class CMLUtils {
      *@param  deleteDirectory  Description of the Parameter
      *@return Description of the Return Value
      */
-    /*
-    *  public static String prompt(String prompt) {
-    *  System.out.print(prompt+": ");
-    *  System.out.flush();
-    *  StringBuffer s = new StringBuffer();
-    *  try {
-    *  while (true) {
-    *  int c = System.in.read();
-    *  if (c == '\n') break;
-    *  char cc = (char) c;
-    *  s.append(cc);
-    *  }
-    *  } catch (Exception e) {
-    *  System.err.println("CMLUtils.prompt error: " + e);
-    *  }
-    *  return s.toString();
-    *  }
-    */
+
     /**
      * delete a file If directory==true then file will be recursively deleted
      *
@@ -606,14 +590,13 @@ public class CMLUtils {
         if (urlString == null) {
             return;
         }
-        InputStream is = new URL(CMLUtils.makeAbsoluteURL(urlString)).openStream();
+        InputStream is = java.net.URI.create(CMLUtils.makeAbsoluteURL(urlString)).toURL().openStream();
         Properties sysProps = System.getProperties();
-        Properties props = new Properties(sysProps);
         sysProps.load(is);
         System.setProperties(sysProps);
     }
 
-    static Hashtable classTable = new Hashtable();
+    static Hashtable<String, Class<?>> classTable = new Hashtable<>();
 
     /**
      * gets a new instance of a class from a hashtable because normal methods
@@ -627,12 +610,12 @@ public class CMLUtils {
         if (className == null) {
             return null;
         }
-        Class theClass = (Class) classTable.get(className);
+        Class<?> theClass = classTable.get(className);
         if (theClass == null) {
             theClass = Class.forName(className);
             classTable.put(className, theClass);
         }
-        return theClass.newInstance();
+        return theClass.getDeclaredConstructor().newInstance();
     }
 
     /**
@@ -756,13 +739,13 @@ public class CMLUtils {
      *         null
      * @throws Exception Description of the Exception
      */
-    public static Vector getCommaSeparatedStrings(String s) throws Exception {
+    public static Vector<String> getCommaSeparatedStrings(String s) throws Exception {
         if (s == null) {
             return null;
         }
         String s0 = s;
         s = s.trim();
-        Vector v = new Vector();
+        Vector<String> v = new Vector<>();
         while (!s.equals("")) {
             if (s.startsWith(CMLUtils.QUOT)) {
                 String temp = "";
@@ -831,7 +814,7 @@ public class CMLUtils {
      * @return Description of the Return Value
      * @throws Exception Description of the Exception
      */
-    public static String createCommaSeparatedStrings(Vector v) throws Exception {
+    public static String createCommaSeparatedStrings(Vector<?> v) throws Exception {
         if (v == null) {
             return null;
         }
@@ -859,8 +842,8 @@ public class CMLUtils {
      * @param delim Description of the Parameter
      * @return Description of the Return Value
      */
-    public static Vector alternativeStringTokenizer(String s, char delim) {
-        Vector vector = new Vector();
+    public static Vector<String> alternativeStringTokenizer(String s, char delim) {
+        Vector<String> vector = new Vector<>();
         while (true) {
             int idx = s.indexOf(delim);
             if (idx == -1) {
@@ -883,10 +866,10 @@ public class CMLUtils {
      * @param s Description of the Parameter
      * @return Vector of strings (size = 0 if s is whitespace);
      */
-    public static Vector parseWhitespaceQuotedFields(String s) {
+    public static Vector<String> parseWhitespaceQuotedFields(String s) {
         String delim = CMLUtils.QUOT + CMLUtils.APOS + CMLUtils.WHITESPACE;
         StringTokenizer st = new StringTokenizer(s, delim, true);
-        Vector vector = new Vector();
+        Vector<String> vector = new Vector<>();
         while (st.hasMoreTokens()) {
             String element = null;
             String token = st.nextToken(delim);
@@ -1074,42 +1057,7 @@ public class CMLUtils {
         e.printStackTrace(System.err);
     }
 
-    /**
-     *  get a long from a Date
-     */
-    /*
-    *  --
-    *  public static long longFromDate(Date d) {
-    *  if (d == null) return -1;
-    *  return Date.UTC(
-    *  d.getYear(),
-    *  d.getMonth(),
-    *  d.getDate(),
-    *  d.getHours(),
-    *  d.getMinutes(),
-    *  d.getSeconds()
-    *  );
-    *  }
-    *  --
-    */
-    /**
-     * create from a date; if hrs, sec are negative, they are ignored
-     */
-    /*
-    *  --
-    *  public static Date month, int day, int hrs, int min, int sec) {
-    *  Date date = null;
-    *  if (hrs < 0) {
-    *  date = new Date(year, month, day);
-    *  } else if (sec < 0) {
-    *  date = new Date(year, month, day, hrs, min);
-    *  } else {
-    *  date = new Date(year, month, day, hrs, min, sec);
-    *  }
-    *  return date;
-    *  }
-    *  --
-    */
+
     static String FS = System.getProperty("file.separator");
 
     /**
@@ -1138,7 +1086,7 @@ public class CMLUtils {
         }
         if (!fileName.endsWith(FS)) {
             f = new File(fileName);
-            boolean created = f.createNewFile();
+            f.createNewFile();
         }
 //		} catch (IOException e) {
 //			System.out.println("Failed to create: "+fileName+"("+e+")");
@@ -1629,9 +1577,9 @@ public class CMLUtils {
      * @param format Description of the Parameter
      * @return Description of the Return Value
      */
-    public static Vector convertFormat(Vector vector, String format) {
+    public static Vector<String> convertFormat(Vector<String> vector, String format) {
         String currentLine = "";
-        Vector newVector = new Vector();
+        Vector<String> newVector = new Vector<>();
         for (int i = 0; i < vector.size(); i++) {
             String line = (String) vector.elementAt(i);
             if (format.equals(FORMAT_EQUALS)) {
@@ -2007,28 +1955,7 @@ public class CMLUtils {
                 s.indexOf("mods=4") != -1);
     }
 
-    static Hashtable appletTable = new Hashtable();
 
-    /**
-     * record that an object is an applet rather than an application
-     * call from applet's init() method
-     *
-     * @param applet Description of the Parameter
-     */
-    public static void registerApplet(Applet applet) {
-        appletTable.put(applet, applet);
-    }
-
-    /**
-     * retrive that an object is an applet rather than an application
-     * must have been registered above
-     *
-     * @param applet Description of the Parameter
-     * @return The registeredApplet value
-     */
-    public static boolean isRegisteredApplet(Applet applet) {
-        return (appletTable.get(applet) != null);
-    }
 
     /**
      * truncate filename suffix to make a directory name (without
@@ -2071,8 +1998,8 @@ public class CMLUtils {
 // is url alreday a valid URL?
         boolean ok = true;
         try {
-            URL u = new URL(url);
-        } catch (MalformedURLException mue) {
+            java.net.URI.create(url).toURL();
+        } catch (Exception mue) {
             ok = false;
 // DOS filenames (for example C:\foo) gives problems
             String mueString = mue.toString().trim();
@@ -2083,7 +2010,7 @@ public class CMLUtils {
                 if (mueString.length() == 1) {
                     url = "file:/" + url;
 // throws MalformedURL if wrong
-                    URL u = new URL(url);
+                    java.net.URI.create(url).toURL();
                     ok = true;
                 }
             }
@@ -2098,32 +2025,18 @@ public class CMLUtils {
         if (file.charAt(0) != '/') {
             file = "/" + file;
         }
-        baseURL = new URL("file", null, file);
+        baseURL = java.net.URI.create("file://" + file).toURL();
 
-        String newUrl = new URL(baseURL, url).toString();
+        String newUrl;
+        try {
+            newUrl = baseURL.toURI().resolve(url).toURL().toString();
+        } catch (java.net.URISyntaxException e) {
+            throw new MalformedURLException(e.getMessage());
+        }
         return newUrl;
     }
 
-    /**
-     * If a URL is relative, make it absolute against either the current
-     * directory (application) or codebase (applet)
-     *
-     * @param applet Description of the Parameter
-     * @param url    Description of the Parameter
-     * @return Description of the Return
-     *         Value
-     * @throws java.net.MalformedURLException Description of the Exception
-     */
-    public static String makeAbsoluteURL(Applet applet, String url)
-            throws java.net.MalformedURLException {
-        URL baseURL;
-        if (!CMLUtils.isRegisteredApplet(applet)) {
-            return CMLUtils.makeAbsoluteURL(url);
-        }
-        baseURL = applet.getCodeBase();
-        System.out.println("CodeBase:" + baseURL);
-        return new URL(baseURL, url).toString();
-    }
+
 
     /**
      * get an OutputStream from a file or URL. Required (I think) because
@@ -2163,7 +2076,8 @@ public class CMLUtils {
             throw new IOException("Null zip file name");
         }
         ZipFile zipFile = new ZipFile(fileName);
-        Enumeration zipEntries = zipFile.entries();
+        try {
+        Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
         while (zipEntries.hasMoreElements()) {
             ZipEntry zipEntry = (ZipEntry) zipEntries.nextElement();
 //			ZipEntry zipEntry = zipFile.getEntry(entryName);
@@ -2177,11 +2091,19 @@ public class CMLUtils {
                 System.out.println(">" + line);
             }
         }
+        } finally {
+            try {
+                zipFile.close();
+            } catch (IOException e) {
+                // Ignore close error
+            }
+        }
     }
 
 
+
     // cache the formats
-    static Hashtable formTable = new Hashtable();
+    static Hashtable<String, DecimalFormat> formTable = new Hashtable<>();
 
     /**
      * this is a mess
@@ -2307,12 +2229,12 @@ public class CMLUtils {
      * @param table Description of the Parameter
      * @return Description of the Return Value
      */
-    public static Hashtable invert(Hashtable table) {
+    public static Hashtable<Object, Object> invert(Hashtable<Object, Object> table) {
         if (table == null) {
             return null;
         }
-        Hashtable newTable = new Hashtable();
-        for (Enumeration e = table.keys(); e.hasMoreElements();) {
+        Hashtable<Object, Object> newTable = new Hashtable<>();
+        for (Enumeration<Object> e = table.keys(); e.hasMoreElements();) {
             Object key = e.nextElement();
             Object value = table.get(key);
             newTable.put(value, key);
@@ -2328,12 +2250,12 @@ public class CMLUtils {
      * @param b Description of the Parameter
      * @return Hashtable contains only common entries. null if none
      */
-    public static Hashtable andTables(Hashtable a, Hashtable b) {
+    public static Hashtable<Object, Object> andTables(Hashtable<Object, Object> a, Hashtable<Object, Object> b) {
         if (a == null || b == null) {
             return null;
         }
-        Hashtable c = null;
-        Enumeration e = a.keys();
+        Hashtable<Object, Object> c = null;
+        Enumeration<Object> e = a.keys();
         while (e.hasMoreElements()) {
             Object keya = e.nextElement();
             Object valb = b.get(keya);
@@ -2345,7 +2267,7 @@ public class CMLUtils {
                 continue;
             }
             if (c == null) {
-                c = new Hashtable();
+                c = new Hashtable<>();
             }
             c.put(keya, vala);
         }
@@ -2361,12 +2283,12 @@ public class CMLUtils {
      * @param b Description of the Parameter
      * @return Hashtable contains all entries. null if none
      */
-    public static Hashtable orTables(Hashtable a, Hashtable b) {
+    public static Hashtable<Object, Object> orTables(Hashtable<Object, Object> a, Hashtable<Object, Object> b) {
         if (a == null || b == null) {
             return null;
         }
-        Hashtable c = new Hashtable();
-        Enumeration e = b.keys();
+        Hashtable<Object, Object> c = new Hashtable<>();
+        Enumeration<Object> e = b.keys();
         while (e.hasMoreElements()) {
             Object keyb = e.nextElement();
             Object valb = b.get(keyb);
@@ -2390,12 +2312,12 @@ public class CMLUtils {
      * @param b Description of the Parameter
      * @return Hashtable contains no common entries.
      */
-    public static Hashtable xorTables(Hashtable a, Hashtable b) {
+    public static Hashtable<Object, Object> xorTables(Hashtable<?, ?> a, Hashtable<?, ?> b) {
         if (a == null || b == null) {
             return null;
         }
-        Hashtable c = new Hashtable();
-        Enumeration e = a.keys();
+        Hashtable<Object, Object> c = new Hashtable<>();
+        Enumeration<?> e = a.keys();
         while (e.hasMoreElements()) {
             Object keya = e.nextElement();
             if (b.get(keya) != null) {
@@ -2420,9 +2342,9 @@ public class CMLUtils {
      * @param v Description of the Parameter
      * @return Vector containing duplicate values. If none, returns null
      */
-    public static Vector getRepeatedValues(Vector v) {
-        Vector repeatedVector = new Vector();
-        Hashtable table = new Hashtable();
+    public static Vector<Object> getRepeatedValues(Vector<?> v) {
+        Vector<Object> repeatedVector = new Vector<>();
+        Hashtable<Object, String> table = new Hashtable<>();
         for (int i = 0; i < v.size(); i++) {
             Object obj = v.elementAt(i);
             if (table.get(obj) != null) {
@@ -2440,8 +2362,8 @@ public class CMLUtils {
      * @param b Description of the Parameter
      * @return Description of the Return Value
      */
-    public static Vector andVectors(Vector a, Vector b) {
-        Vector c = null;
+    public static Vector<Object> andVectors(Vector<?> a, Vector<?> b) {
+        Vector<Object> c = null;
         if (a == null || b == null) {
             return null;
         }
@@ -2450,7 +2372,7 @@ public class CMLUtils {
             Object obj = a.elementAt(i);
             if (b.contains(obj)) {
                 if (c == null) {
-                    c = new Vector();
+                    c = new Vector<>();
                 }
                 c.addElement(obj);
             }
@@ -2464,7 +2386,7 @@ public class CMLUtils {
      * @param v The feature to be added to the EnumerationToVector attribute
      * @param e The feature to be added to the EnumerationToVector attribute
      */
-    public static void addEnumerationToVector(Vector v, Enumeration e) {
+    public static void addEnumerationToVector(Vector<Object> v, Enumeration<?> e) {
         if (v == null) {
             return;
         }
@@ -2512,7 +2434,7 @@ public class CMLUtils {
      *
      * @param v Description of the Parameter
      */
-    public static void sortVector(Vector v) {
+    public static void sortVector(Vector<Object> v) {
         Object[] objs = new Object[v.size()];
 
         for (int i = 0; i < v.size(); i++) {
@@ -2532,8 +2454,8 @@ public class CMLUtils {
      * @param v2 Description of the Parameter
      * @return Description of the Return Value
      */
-    public static Vector and(Vector v1, Vector v2) {
-        Vector v = new Vector();
+    public static Vector<Object> and(Vector<Object> v1, Vector<Object> v2) {
+        Vector<Object> v = new Vector<>();
         for (int i = 0; i < v1.size(); i++) {
             Object o1 = v1.elementAt(i);
             for (int j = 0; j < v2.size(); j++) {
@@ -2554,8 +2476,8 @@ public class CMLUtils {
      * @param v2 Description of the Parameter
      * @return Description of the Return Value
      */
-    public static Vector not(Vector v1, Vector v2) {
-        Vector v = new Vector();
+    public static Vector<Object> not(Vector<Object> v1, Vector<Object> v2) {
+        Vector<Object> v = new Vector<>();
         for (int i = 0; i < v1.size(); i++) {
             Object o1 = v1.elementAt(i);
             boolean found = false;
@@ -2567,7 +2489,7 @@ public class CMLUtils {
                 }
             }
             if (!found) {
-                v.addElement(v1);
+                v.addElement(o1);
             }
         }
         return v;
@@ -2581,12 +2503,12 @@ public class CMLUtils {
      * @param v2 Description of the Parameter
      * @return Description of the Return Value
      */
-    public static Vector or(Vector v1, Vector v2) {
-        Vector v = new Vector();
+    public static Vector<Object> or(Vector<Object> v1, Vector<Object> v2) {
+        Vector<Object> v = new Vector<>();
         for (int i = 0; i < v1.size(); i++) {
             v.addElement(v1.elementAt(i));
         }
-        Vector vv = not(v2, v);
+        Vector<Object> vv = not(v2, v);
         for (int i = 0; i < vv.size(); i++) {
             v.addElement(vv.elementAt(i));
         }
@@ -2601,12 +2523,12 @@ public class CMLUtils {
      * @param h2 Description of the Parameter
      * @return Description of the Return Value
      */
-    public static Hashtable and(Hashtable h1, Hashtable h2) {
-        Hashtable h = new Hashtable();
-        for (Enumeration k1 = h1.keys(); k1.hasMoreElements();) {
+    public static Hashtable<Object, Object> and(Hashtable<Object, Object> h1, Hashtable<Object, Object> h2) {
+        Hashtable<Object, Object> h = new Hashtable<>();
+        for (Enumeration<Object> k1 = h1.keys(); k1.hasMoreElements();) {
             Object k = k1.nextElement();
             Object o1 = h1.get(k);
-            for (Enumeration e2 = h2.elements(); e2.hasMoreElements();) {
+            for (Enumeration<Object> e2 = h2.elements(); e2.hasMoreElements();) {
                 Object o2 = e2.nextElement();
                 if (o1.equals(o2)) {
                     h.put(k, o1);
@@ -2624,13 +2546,13 @@ public class CMLUtils {
      * @param h2 Description of the Parameter
      * @return Description of the Return Value
      */
-    public static Hashtable not(Hashtable h1, Hashtable h2) {
-        Hashtable h = new Hashtable();
-        for (Enumeration k1 = h1.keys(); k1.hasMoreElements();) {
+    public static Hashtable<Object, Object> not(Hashtable<Object, Object> h1, Hashtable<Object, Object> h2) {
+        Hashtable<Object, Object> h = new Hashtable<>();
+        for (Enumeration<Object> k1 = h1.keys(); k1.hasMoreElements();) {
             Object k = k1.nextElement();
             Object o1 = h1.get(k);
             boolean found = false;
-            for (Enumeration e2 = h2.elements(); e2.hasMoreElements();) {
+            for (Enumeration<Object> e2 = h2.elements(); e2.hasMoreElements();) {
                 Object o2 = e2.nextElement();
                 if (o1.equals(o2)) {
                     found = true;
@@ -2652,14 +2574,14 @@ public class CMLUtils {
      * @param h2 Description of the Parameter
      * @return Description of the Return Value
      */
-    public static Hashtable or(Hashtable h1, Hashtable h2) {
-        Hashtable h = new Hashtable();
-        for (Enumeration k1 = h1.keys(); k1.hasMoreElements();) {
+    public static Hashtable<Object, Object> or(Hashtable<Object, Object> h1, Hashtable<Object, Object> h2) {
+        Hashtable<Object, Object> h = new Hashtable<>();
+        for (Enumeration<Object> k1 = h1.keys(); k1.hasMoreElements();) {
             Object k = k1.nextElement();
             Object o1 = h1.get(k);
             h.put(k, o1);
         }
-        for (Enumeration k2 = h2.keys(); k2.hasMoreElements();) {
+        for (Enumeration<Object> k2 = h2.keys(); k2.hasMoreElements();) {
             Object k = k2.nextElement();
             Object o2 = h2.get(k);
             if (h1.contains(o2)) {
@@ -2681,7 +2603,7 @@ public class CMLUtils {
      */
     public static double sin(String fString) {
         try {
-            return Math.sin(new Double(fString).doubleValue());
+            return Math.sin(Double.parseDouble(fString));
         } catch (NumberFormatException e) {
             return Double.NaN;
         }
@@ -2695,7 +2617,7 @@ public class CMLUtils {
      */
     public static double cos(String fString) {
         try {
-            return Math.cos(new Double(fString).doubleValue());
+            return Math.cos(Double.parseDouble(fString));
         } catch (NumberFormatException e) {
             return Double.NaN;
         }
@@ -2709,7 +2631,7 @@ public class CMLUtils {
      */
     public static double log(String fString) {
         try {
-            return Math.log(new Double(fString).doubleValue());
+            return Math.log(Double.parseDouble(fString));
         } catch (NumberFormatException e) {
             return Double.NaN;
         }
@@ -2782,9 +2704,9 @@ public class CMLUtils {
                 System.out.println(">" + outputInteger(3, -1234) + "<");
             }
             if (args[0].equalsIgnoreCase("vector")) {
-                Vector a = new Vector();
+                Vector<String> a = new Vector<>();
                 String[] as = {"A", "B", "C"};
-                Vector b = new Vector();
+                Vector<String> b = new Vector<>();
                 String[] bs = {"D", "C", "Q", "B"};
                 for (int i = 0; i < as.length; i++) {
                     a.addElement(as[i]);
@@ -2796,7 +2718,7 @@ public class CMLUtils {
             }
             if (args[0].equalsIgnoreCase("properties")) {
                 CMLUtils.addToSystemProperties(args[1]);
-                Enumeration properties = System.getProperties().propertyNames();
+                Enumeration<?> properties = System.getProperties().propertyNames();
                 while (properties.hasMoreElements()) {
                     Object p = properties.nextElement();
                     System.out.println("Property: " + p + "=" + System.getProperties().get(p));
@@ -2824,7 +2746,7 @@ public class CMLUtils {
             }
             if (args[0].equalsIgnoreCase("DUMP")) {
                 String urlString = CMLUtils.makeAbsoluteURL(args[1]);
-                System.out.println(CMLUtils.dump(new URL(urlString)));
+                System.out.println(CMLUtils.dump(java.net.URI.create(urlString).toURL()));
             }
             if (args[0].equalsIgnoreCase("EQUALS") && args.length >= 2) {
                 System.out.println(substituteEquals(args[1]));

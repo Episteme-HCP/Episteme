@@ -29,7 +29,6 @@ import org.jscience.physics.classical.mechanics.Particle;
 
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
-import org.jscience.util.persistence.Relation;
 
 import org.jscience.measure.Quantity;
 import org.jscience.measure.quantity.ElectricCharge;

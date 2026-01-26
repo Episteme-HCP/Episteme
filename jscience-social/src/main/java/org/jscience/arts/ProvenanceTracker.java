@@ -1,7 +1,7 @@
 package org.jscience.arts;
 
-import org.jscience.history.temporal.TemporalCoordinate;
-import org.jscience.geography.Place;
+import org.jscience.history.time.TimeCoordinate;
+import org.jscience.earth.Place;
 import java.util.*;
 
 /**
@@ -17,7 +17,7 @@ public final class ProvenanceTracker {
     }
 
     public record ProvenanceEvent(
-        TemporalCoordinate date,
+        TimeCoordinate date,
         String fromOwner,
         String toOwner,
         TransferType type,
@@ -29,11 +29,10 @@ public final class ProvenanceTracker {
      * Complete provenance record for an artwork.
      */
     public static class ProvenanceRecord {
-        private final Artwork artwork;
         private final List<ProvenanceEvent> history = new ArrayList<>();
 
         public ProvenanceRecord(Artwork artwork) {
-            this.artwork = Objects.requireNonNull(artwork);
+            Objects.requireNonNull(artwork);
         }
 
         public void addEvent(ProvenanceEvent event) {

@@ -23,7 +23,7 @@
 
 package org.jscience.sociology;
 
-import java.io.Serializable;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,10 +32,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import org.jscience.biology.HomoSapiens;
+
 import org.jscience.biology.Individual;
 import org.jscience.economics.money.Money;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.util.persistence.Attribute;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
@@ -51,7 +51,7 @@ import org.jscience.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Person extends Human implements org.jscience.geography.Locatable, Serializable {
+public class Person extends Human {
 
     private static final long serialVersionUID = 1L;
 
@@ -92,10 +92,10 @@ public class Person extends Human implements org.jscience.geography.Locatable, S
     private final String nationality;
     
     @Attribute
-    private final List<String> roles = new ArrayList<>();
+    private final List<String> socialRoles = new ArrayList<>();
     
     @Relation(type = Relation.Type.ONE_TO_MANY)
-    private final List<Role> structuralRoles = new ArrayList<>();
+    private final List<org.jscience.sociology.Role> structuralRoles = new ArrayList<>();
     
     @Relation(type = Relation.Type.MANY_TO_MANY)
     private final Set<Person> spouses = new HashSet<>();
@@ -115,13 +115,20 @@ public class Person extends Human implements org.jscience.geography.Locatable, S
      * @param birthDate   date of birth
      * @param nationality country of citizenship
      */
-    public Person(String id, String name, Individual.Sex sex, LocalDate birthDate, String nationality) {
-        super(id, HomoSapiens.SPECIES, sex, birthDate);
+    public Person(org.jscience.util.identity.Identification id, String name, Individual.Sex sex, LocalDate birthDate, String nationality) {
+        super(id, sex, birthDate);
         setTrait("name", name);
         this.nationality = (nationality != null) ? nationality : "Unknown";
         this.wealth = Money.usd(0);
     }
 
+    public Person(String id, String name, Individual.Sex sex, LocalDate birthDate, String nationality) {
+        super(new org.jscience.util.identity.SimpleIdentification(id), sex, birthDate);
+        setTrait("name", name);
+        this.nationality = (nationality != null) ? nationality : "Unknown";
+        this.wealth = Money.usd(0);
+    }
+    
     /**
      * Creates a new person using social Gender instead of biological Sex.
      */
@@ -164,8 +171,8 @@ public class Person extends Human implements org.jscience.geography.Locatable, S
      * Returns an unmodifiable list of roles assigned to this person.
      * @return roles list
      */
-    public List<String> getRoles() {
-        return Collections.unmodifiableList(roles);
+    public List<String> getSocialRoles() {
+        return Collections.unmodifiableList(socialRoles);
     }
 
     /**
@@ -246,9 +253,9 @@ public class Person extends Human implements org.jscience.geography.Locatable, S
      * @param role the role to add
      * @return this person instance for chaining
      */
-    public Person addRole(String role) {
+    public Person addSocialRole(String role) {
         if (role != null) {
-            roles.add(role);
+            socialRoles.add(role);
         }
         return this;
     }
@@ -257,7 +264,7 @@ public class Person extends Human implements org.jscience.geography.Locatable, S
      * Registers a structural sociological role.
      * @param role the structural role
      */
-    public void addStructuralRole(Role role) {
+    public void addStructuralRole(org.jscience.sociology.Role role) {
         if (role != null && !structuralRoles.contains(role)) {
             structuralRoles.add(role);
         }
@@ -267,7 +274,7 @@ public class Person extends Human implements org.jscience.geography.Locatable, S
      * Removes a structural sociological role.
      * @param role the role to remove
      */
-    public void removeStructuralRole(Role role) {
+    public void removeStructuralRole(org.jscience.sociology.Role role) {
         structuralRoles.remove(role);
     }
 
@@ -275,7 +282,7 @@ public class Person extends Human implements org.jscience.geography.Locatable, S
      * Returns an unmodifiable list of structural roles.
      * @return structural roles list
      */
-    public List<Role> getStructuralRoles() {
+    public List<org.jscience.sociology.Role> getStructuralRoles() {
         return Collections.unmodifiableList(structuralRoles);
     }
 

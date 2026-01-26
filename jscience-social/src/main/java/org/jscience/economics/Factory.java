@@ -23,16 +23,14 @@
 
 package org.jscience.economics;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
-import org.jscience.biology.Human;
 import org.jscience.economics.money.Account;
 import org.jscience.economics.money.Money;
 import org.jscience.geography.BusinessPlace;
 import org.jscience.util.identity.Identification;
+import org.jscience.util.identity.SimpleIdentification;
 import org.jscience.util.persistence.Persistent;
 import org.jscience.util.persistence.Relation;
 
@@ -46,7 +44,7 @@ import org.jscience.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Factory extends Organization implements Serializable {
+public class Factory extends Organization {
 
     private static final long serialVersionUID = 1L;
 
@@ -59,7 +57,7 @@ public class Factory extends Organization implements Serializable {
     /**
      * Standard constructor for industrial organizations.
      */
-    public Factory(String name, Identification id, Set<Human> owners,
+    public Factory(String name, Identification id, Set<EconomicAgent> owners,
             BusinessPlace place, Set<Account> accounts) {
         super(name, id, owners, place, accounts);
         this.productionResources = new HashSet<>();
@@ -69,7 +67,7 @@ public class Factory extends Organization implements Serializable {
     /**
      * Minimal constructor for modern simulation.
      */
-    public Factory(String name, org.jscience.geography.Place place, Money capital) {
+    public Factory(String name, org.jscience.earth.Place place, Money capital) {
         super(name, place, capital);
         this.productionResources = new HashSet<>();
         this.productionProducts = new HashSet<>();
@@ -102,8 +100,39 @@ public class Factory extends Organization implements Serializable {
         
         var qty = org.jscience.measure.Quantities.create(amount, org.jscience.measure.Units.ONE);
         MaterialResource res = new MaterialResource(name, name, qty, this, 
-                new Identification(name + "_" + System.nanoTime()), cost);
+                new SimpleIdentification(name + "_" + System.nanoTime()), cost);
         addResource(res);
         return res;
+    }
+
+    /**
+     * Adds a worker to the organization.
+     */
+    public void addWorker(Worker worker) {
+        if (getOrganigram() != null) {
+            getOrganigram().addWorker(worker);
+        }
+    }
+
+    /**
+     * Adds a type of product this factory is capable of manufacturing.
+     */
+    public void addProductionType(String typeName) {
+        addProductionProduct(new PotentialResource(typeName, typeName, 
+            org.jscience.measure.Quantities.create(0, org.jscience.measure.Units.ONE)));
+    }
+
+    /**
+     * Checks if this factory is configured to produce a specific product type.
+     */
+    public boolean canProduce(String typeName) {
+        return getProductionProducts().stream().anyMatch(p -> p.getName().equals(typeName));
+    }
+
+    /**
+     * Returns the set of resources currently held by the factory.
+     */
+    public Set<Resource> getInventory() {
+        return getResources();
     }
 }

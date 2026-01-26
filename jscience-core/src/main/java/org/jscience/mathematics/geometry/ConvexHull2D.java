@@ -226,20 +226,38 @@ public final class ConvexHull2D {
         List<Point2D> hull = compute(points);
         if (hull.size() < 2) return Real.ZERO;
         
-        // Simplified: brute force for now (O(n^2))
-        // TODO: Implement rotating calipers for O(n)
-        Real maxDist = Real.ZERO;
+        // Rotating Calipers Algorithm (O(n))
+        Real maxDistSq = Real.ZERO;
         int n = hull.size();
-        
+        if (n <= 1) return Real.ZERO;
+        if (n == 2) return hull.get(0).distanceTo(hull.get(1));
+
+        int k = 1;
+        // Avoid infinite loop if all points are same or errors
         for (int i = 0; i < n; i++) {
-            for (int j = i + 1; j < n; j++) {
-                Real dist = hull.get(i).distanceTo(hull.get(j));
-                if (dist.compareTo(maxDist) > 0) {
-                    maxDist = dist;
-                }
+            Point2D p_i = hull.get(i);
+            Point2D p_next = hull.get((i + 1) % n);
+            
+            // Advance k while area of triangle (p_i, p_next, p_{k+1}) > area (p_i, p_next, p_k)
+            // Using cross product for area comparison
+            while (triangleArea2(p_i, p_next, hull.get((k + 1) % n))
+                      .compareTo(triangleArea2(p_i, p_next, hull.get(k))) > 0) {
+                k = (k + 1) % n;
             }
+            
+            // Distance p_i to p_k
+            Real d1 = p_i.distanceTo(hull.get(k));
+            if (d1.compareTo(maxDistSq) > 0) maxDistSq = d1;
+            
+            // Distance p_next to p_k
+            Real d2 = p_next.distanceTo(hull.get(k));
+            if (d2.compareTo(maxDistSq) > 0) maxDistSq = d2;
         }
-        return maxDist;
+        return maxDistSq;
+    }
+
+    private static Real triangleArea2(Point2D a, Point2D b, Point2D c) {
+        return crossProduct(a, b, c).abs();
     }
 
     /**

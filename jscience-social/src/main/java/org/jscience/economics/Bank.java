@@ -23,7 +23,6 @@
 
 package org.jscience.economics;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
@@ -48,7 +47,7 @@ import org.jscience.util.persistence.Relation;
  * @since 1.0
  */
 @Persistent
-public class Bank extends Organization implements ChangeSource, Serializable {
+public class Bank extends Organization implements ChangeSource {
 
     private static final long serialVersionUID = 1L;
 
@@ -64,7 +63,7 @@ public class Bank extends Organization implements ChangeSource, Serializable {
      * @param place          physical headquarters
      * @param accounts       initial capital accounts
      */
-    public Bank(String name, Identification identification, Set<Human> owners,
+    public Bank(String name, Identification identification, Set<EconomicAgent> owners,
             BusinessPlace place, Set<Account> accounts) {
         super(name, identification, owners, place, accounts);
         this.clientAccounts = new HashSet<>();
@@ -73,8 +72,13 @@ public class Bank extends Organization implements ChangeSource, Serializable {
     /**
      * Minimal constructor for the modern API.
      */
-    public Bank(String name, org.jscience.geography.Place place, Money initialCapital) {
+    public Bank(String name, org.jscience.earth.Place place, Money initialCapital) {
         super(name, place, initialCapital);
+        this.clientAccounts = new HashSet<>();
+    }
+
+    public Bank(String name) {
+        super(name, null, Money.usd(0));
         this.clientAccounts = new HashSet<>();
     }
 

@@ -22,16 +22,12 @@
  */
 package org.jscience.law;
 
-import org.jscience.biology.human.Human;
+import org.jscience.economics.EconomicAgent;
 import org.jscience.economics.Organization;
 import org.jscience.economics.Property;
-import org.jscience.economics.money.Currency;
 import org.jscience.economics.money.Money;
-import org.jscience.measure.Quantity;
-import org.jscience.measure.Quantities;
 import org.jscience.util.identity.Identification;
 import org.jscience.util.identity.Identified;
-import org.jscience.sociology.Person;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -47,9 +43,9 @@ import java.util.Set;
  * @author Gemini AI (Google DeepMind)
  * @version 1.2
  */
-public class License implements Property, Identified {
+public class License implements Property, Identified<Identification> {
 
-    private final Human owner;
+    private final EconomicAgent owner;
     private final Organization authority;
     private final Identification identification;
     private final List<String> rights;
@@ -57,13 +53,13 @@ public class License implements Property, Identified {
     /**
      * Creates a new License object with a single initial right.
      *
-     * @param owner the individual who owns the license
+     * @param owner the agent who owns the license
      * @param authority the organization that issued the license
      * @param identification the unique identification of the license document
      * @param right the initial right granted by this license
      * @throws IllegalArgumentException if any argument is null or empty
      */
-    public License(Human owner, Organization authority,
+    public License(EconomicAgent owner, Organization authority,
         Identification identification, String right) {
         if (owner == null || authority == null || identification == null ||
                 right == null || right.isEmpty()) {
@@ -80,15 +76,15 @@ public class License implements Property, Identified {
     /**
      * Creates a new License object with multiple rights.
      *
-     * @param person the person who owns the license
+     * @param owner the agent who owns the license
      * @param authority the organization that issued the license
      * @param identification the unique identification of the license document
      * @param rights the list of rights granted by this license
      * @throws IllegalArgumentException if any argument is null, empty, or contains non-String elements
      */
-    public License(Person person, Organization authority,
+    public License(EconomicAgent owner, Organization authority,
         Identification identification, List<String> rights) {
-        if (person == null || authority == null || identification == null ||
+        if (owner == null || authority == null || identification == null ||
                 rights == null || rights.isEmpty()) {
             throw new IllegalArgumentException(
                 "License constructor arguments cannot be null or empty.");
@@ -100,7 +96,7 @@ public class License implements Property, Identified {
             }
         }
 
-        this.owner = person;
+        this.owner = owner;
         this.authority = authority;
         this.identification = identification;
         this.rights = new ArrayList<>(rights);
@@ -111,8 +107,8 @@ public class License implements Property, Identified {
      * @return a set containing the license owner
      */
     @Override
-    public Set<Human> getOwners() {
-        Set<Human> result = new HashSet<>();
+    public Set<EconomicAgent> getOwners() {
+        Set<EconomicAgent> result = new HashSet<>();
         result.add(owner);
         return result;
     }
@@ -125,8 +121,12 @@ public class License implements Property, Identified {
         return authority;
     }
 
-    @Override
     public Identification getIdentification() {
+        return identification;
+    }
+
+    @Override
+    public Identification getId() {
         return identification;
     }
 
@@ -144,7 +144,7 @@ public class License implements Property, Identified {
      * @return the value of the license
      */
     @Override
-    public Quantity<Money> getValue() {
-        return Quantities.create(0, Currency.USD);
+    public Money getValue() {
+        return Money.usd(0);
     }
 }

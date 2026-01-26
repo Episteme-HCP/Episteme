@@ -25,7 +25,7 @@ package org.jscience.economics.loaders;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jscience.io.AbstractResourceReader;
-import org.jscience.io.Configuration;
+
 import org.jscience.ui.i18n.I18n;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +61,7 @@ public class ExchangeRateReader extends AbstractResourceReader<Double> {
     
     // Free APIs for exchange rates
     private static final String FRANKFURTER_API = "https://api.frankfurter.app/latest";
-    private static final String ECB_API = "https://data-api.ecb.europa.eu/service/data/EXR";
+
     private static final String EXCHANGE_RATE_API = "https://api.exchangerate-api.com/v4/latest";
 
     public enum Source {

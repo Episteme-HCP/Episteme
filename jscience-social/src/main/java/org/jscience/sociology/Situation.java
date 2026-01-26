@@ -29,7 +29,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import org.jscience.biology.Individual;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.util.Commented;
 import org.jscience.util.Named;
 import org.jscience.util.Positioned;
@@ -62,6 +62,8 @@ public class Situation implements Named, Commented, Positioned<Place>, Serializa
 
     @Attribute
     private String comments;
+
+    private final java.util.Map<String, Object> traits = new java.util.HashMap<>();
 
     @Relation(type = Relation.Type.ONE_TO_MANY)
     private Set<Role> roles;
@@ -102,11 +104,15 @@ public class Situation implements Named, Commented, Positioned<Place>, Serializa
     }
 
     @Override
+    public java.util.Map<String, Object> getTraits() {
+        return traits;
+    }
+
+    @Override
     public Place getPosition() {
         return place;
     }
 
-    @Override
     public void setPosition(Place place) {
         this.place = place;
     }
@@ -132,6 +138,14 @@ public class Situation implements Named, Commented, Positioned<Place>, Serializa
         Role role = new Role(individual, roleName, this, kind);
         roles.add(role);
         return role;
+    }
+
+    /**
+     * Directly adds a role to this situation.
+     * @param role the role to add
+     */
+    public void addRole(Role role) {
+        roles.add(Objects.requireNonNull(role, "Role cannot be null"));
     }
 
     /**

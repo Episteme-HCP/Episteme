@@ -83,31 +83,35 @@ public class CommandOptions {
      */
     protected CommandOption[] getOptions() {
         if (option == null) {
-            Class thisClass = this.getClass();
+            Class<?> thisClass = this.getClass();
 
             if (thisClass.equals(CommandOptions.class)) {
                 option = extendOptions();
             } else {
-                Class superx = thisClass.getSuperclass();
+                Class<?> superx = thisClass.getSuperclass();
                 CommandOptions superClass = null;
 
                 try {
-                    superClass = (CommandOptions) superx.newInstance();
+                    superClass = (CommandOptions) superx.getDeclaredConstructor().newInstance();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                CommandOption[] superOption = superClass.extendOptions();
-                CommandOption[] thisOption = this.extendOptions();
-                option = new CommandOption[superOption.length +
-                    thisOption.length];
-
-                for (int i = 0; i < superOption.length; i++) {
-                    option[i] = superOption[i];
-                }
-
-                for (int i = 0; i < thisOption.length; i++) {
-                    option[i + superOption.length] = thisOption[i];
+                if (superClass != null) {
+                    CommandOption[] superOption = superClass.extendOptions();
+                    CommandOption[] thisOption = this.extendOptions();
+                    option = new CommandOption[superOption.length +
+                        thisOption.length];
+    
+                    for (int i = 0; i < superOption.length; i++) {
+                        option[i] = superOption[i];
+                    }
+    
+                    for (int i = 0; i < thisOption.length; i++) {
+                        option[i + superOption.length] = thisOption[i];
+                    }
+                } else {
+                    option = this.extendOptions();
                 }
             }
         }
@@ -152,10 +156,10 @@ public class CommandOptions {
             // scan through args
             int j = getOptionIndex(argx);
 
-            if (j == commandOptionManager.UNKNOWN) {
+            if (j == CommandOptionManager.UNKNOWN) {
                 System.err.println("unknown arg: " + argx);
                 argCount++;
-            } else if (j == commandOptionManager.AMBIGUOUS) {
+            } else if (j == CommandOptionManager.AMBIGUOUS) {
                 System.err.println("ambiguous arg: " + argx);
 
                 for (int i = 0; i < option.length; i++) {
@@ -196,12 +200,12 @@ public class CommandOptions {
      * @return DOCUMENT ME!
      */
     int getOptionIndex(String arg) {
-        int found = commandOptionManager.UNKNOWN;
+        int found = CommandOptionManager.UNKNOWN;
 
         for (int i = 0; i < option.length; i++) {
             if (option[i].getName().startsWith(arg.toUpperCase())) {
-                if (found != commandOptionManager.UNKNOWN) {
-                    found = commandOptionManager.AMBIGUOUS;
+                if (found != CommandOptionManager.UNKNOWN) {
+                    found = CommandOptionManager.AMBIGUOUS;
 
                     break;
                 }

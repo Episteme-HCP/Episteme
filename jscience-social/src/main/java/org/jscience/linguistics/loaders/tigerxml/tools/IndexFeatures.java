@@ -22,10 +22,9 @@ package org.jscience.linguistics.loaders.tigerxml.tools;
 
 import org.jscience.linguistics.loaders.tigerxml.GraphNode;
 import org.jscience.linguistics.loaders.tigerxml.NT;
-import org.jscience.linguistics.loaders.tigerxml.Sentence;
 import org.jscience.linguistics.loaders.tigerxml.T;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 /**
@@ -40,8 +39,7 @@ public class IndexFeatures {
     private String person;
     private String gender;
     private String number;
-    // the priority of the person number and gender
-    // information
+    // the priority of the person number and gender information
     private int person_priority;
     private int gender_priority;
     private int number_priority;
@@ -73,88 +71,71 @@ public class IndexFeatures {
         this.number_priority = 0;
         this.gender_priority = 0;
         this.conflict = false;
+        
         if (node.isTerminal()) {
             T terminal = (T) node;
             String morph = terminal.getMorph();
             morph2Features(morph, OTHER);
         } else {
             // complex nodes
-            Sentence sent = node.getSentence();
             NT non_terminal = (NT) node;
-            ArrayList daughters =
-                    non_terminal.getDaughters();
-            // get feature information from NK or from HD
-            // nodes
-            for (int i = 0; i < daughters.size(); i++) {
-                GraphNode next_node =
-                        (GraphNode) daughters.get(i);
+            List<GraphNode> daughters = non_terminal.getDaughters();
+            
+            // get feature information from NK or from HD nodes
+            for (GraphNode next_node : daughters) {
                 String edge = next_node.getEdge2Mother();
-                if ((edge.equals("NK")) ||
-                        (edge.equals("HD"))) {
+                if (edge.equals("NK") || edge.equals("HD")) {
                     if (next_node.isTerminal()) {
                         T terminal = (T) next_node;
                         String morph = terminal.getMorph();
                         // if it is a determiner its features
                         // will be recorded separately in order
                         // to resolve possible conflicts
-                        if ((terminal.getPos()).equals(ART)) {
+                        if (terminal.getPos().equals(ART)) {
                             morph2Features(morph, ART);
-                        } else if ((terminal.getPos()).equals(NE)) {
+                        } else if (terminal.getPos().equals(NE)) {
                             morph2Features(morph, NE);
                         } else {
                             morph2Features(morph, OTHER);
                         }
                     }
                 }
-            } // for i
+            }
             // set CNPs to plural
-            if ((non_terminal.getCat()).equals("CNP")) {
+            if (non_terminal.getCat().equals("CNP")) {
                 this.number = "Pl";
             }
         } // not a terminal
+        
         // default person = 3 for markables
-        if ((SyncMMAX.isMarkable(node)) &&
-                (isUndefined(person))) {
+        if (SyncMMAX.isMarkable(node) && isUndefined(person)) {
             person = "3";
         }
-        if ((this.conflict) && (this.verbosity > 0)) {
-            System.err.println
-                    ("org.jscience.ml.tigerxml.tools.IndexFeatures: "
-                            + "WARNING: Couldn't resolve feature conflict"
-                            + " at node " +
-                            (this.my_node).getId());
+        
+        if (this.conflict && this.verbosity > 0) {
+            System.err.println("IndexFeatures: WARNING: Couldn't resolve feature conflict at node " + this.my_node.getId());
         }
     }
 
-    private void morph2Features
-            (String morph, String pos_tag) {
+    private void morph2Features(String morph, String pos_tag) {
+        if (morph == null || morph.isEmpty()) return;
+        
         int my_priority = 0;
         // determiners get the highest priority
-        // i.e. their feature information is the most
-        // valuable
-        // proper names get the lowest priority
         if (pos_tag.equals(ART)) {
             my_priority = 3;
-        }
-        if (pos_tag.equals(OTHER)) {
+        } else if (pos_tag.equals(OTHER)) {
             my_priority = 2;
-        }
-        if (pos_tag.equals(NE)) {
+        } else if (pos_tag.equals(NE)) {
             my_priority = 1;
         }
-        StringTokenizer tokenizer =
-                new StringTokenizer(morph, ".", false);
+        
+        StringTokenizer tokenizer = new StringTokenizer(morph, ".", false);
         while (tokenizer.hasMoreTokens()) {
             String feature = tokenizer.nextToken();
             if (isPersonFeature(feature)) {
                 if (isDefined(person)) {
-                    // possible conflict
-                    if (!(person.equals(feature))) {
-                        // higher priority info resolves
-                        // conflict
-                        // equal priority info means conflict
-                        // lower priority info won't be
-                        // considered at all
+                    if (!person.equals(feature)) {
                         if (my_priority > person_priority) {
                             this.person = feature;
                             person_priority = my_priority;
@@ -163,21 +144,15 @@ public class IndexFeatures {
                             conflict = true;
                         }
                     }
-                } else { // feature is undefined
+                } else {
                     this.person = feature;
                     this.person_priority = my_priority;
                     this.conflict = false;
                 }
-            } // is person feature
+            }
             if (isNumberFeature(feature)) {
                 if (isDefined(number)) {
-                    // possible conflict
-                    if (!(number.equals(feature))) {
-                        // higher priority info resolves
-                        // conflict
-                        // equal priority info means conflict
-                        // lower priority info won't be
-                        // considered at all
+                    if (!number.equals(feature)) {
                         if (my_priority > number_priority) {
                             this.number = feature;
                             number_priority = my_priority;
@@ -186,21 +161,15 @@ public class IndexFeatures {
                             conflict = true;
                         }
                     }
-                } else { // feature is undefined
+                } else {
                     this.number = feature;
                     number_priority = my_priority;
                     conflict = false;
                 }
-            } // is number feature
+            }
             if (isGenderFeature(feature)) {
                 if (isDefined(gender)) {
-                    // possible conflict
-                    if (!(gender.equals(feature))) {
-                        // higher priority info resolves
-                        // conflict
-                        // equal priority info means conflict
-                        // lower priority info won't be
-                        // considered at all
+                    if (!gender.equals(feature)) {
                         if (my_priority > gender_priority) {
                             this.gender = feature;
                             gender_priority = my_priority;
@@ -209,156 +178,68 @@ public class IndexFeatures {
                             conflict = true;
                         }
                     }
-                } else { // feature is undefined
+                } else {
                     this.gender = feature;
                     gender_priority = my_priority;
                     conflict = false;
                 }
-            } // is gender feature
-        } // while loop
-    } // method morph2features
+            }
+        }
+    }
 
     private static boolean isUndefined(String feature) {
-        return feature.equals(UNDEFINED);
+        return feature == null || feature.equals(UNDEFINED);
     }
 
     private static boolean isDefined(String feature) {
-        return (!(isUndefined(feature)));
+        return !isUndefined(feature);
     }
 
-    private static boolean isPersonFeature
-            (String feature) {
-        return ((feature.equals("1")) ||
-                (feature.equals("2")) ||
-                (feature.equals("3")));
+    private static boolean isPersonFeature(String feature) {
+        return feature.equals("1") || feature.equals("2") || feature.equals("3");
     }
 
-    public boolean isFirstPerson() {
-        return (this.person).equals("1");
+    public boolean isFirstPerson() { return "1".equals(this.person); }
+    public boolean isSecondPerson() { return "2".equals(this.person); }
+    public boolean isThirdPerson() { return "3".equals(this.person); }
+    public boolean hasUndefinedPerson() { return isUndefined(this.person); }
+
+    private static boolean isGenderFeature(String feature) {
+        return feature.equals("Fem") || feature.equals("Masc") || feature.equals("Neut");
     }
 
-    public boolean isSecondPerson() {
-        return (this.person).equals("2");
+    public boolean isFeminine() { return "Fem".equals(this.gender); }
+    public boolean isMasculine() { return "Masc".equals(this.gender); }
+    public boolean isNeuter() { return "Neut".equals(this.gender); }
+    public boolean hasUndefinedGender() { return isUndefined(this.gender); }
+
+    private static boolean isNumberFeature(String feature) {
+        return feature.equals("Sg") || feature.equals("Pl");
     }
 
-    public boolean isThirdPerson() {
-        return (this.person).equals("3");
-    }
+    public boolean isSingular() { return "Sg".equals(this.number); }
+    public boolean isPlural() { return "Pl".equals(this.number); }
+    public boolean hasUndefinedNumber() { return isUndefined(this.number); }
 
-    public boolean hasUndefinedPerson() {
-        return (this.person).equals(UNDEFINED);
-    }
-
-    private static boolean isGenderFeature
-            (String feature) {
-        return ((feature.equals("Fem")) ||
-                (feature.equals("Masc")) ||
-                (feature.equals("Neut")));
-    }
-
-    public boolean isFeminine() {
-        return (this.gender).equals("Fem");
-    }
-
-    public boolean isMasculine() {
-        return (this.gender).equals("Masc");
-    }
-
-    public boolean isNeuter() {
-        return (this.gender).equals("Neut");
-    }
-
-    public boolean hasUndefinedGender() {
-        return (this.gender).equals(UNDEFINED);
-    }
-
-    private static boolean isNumberFeature
-            (String feature) {
-        return ((feature.equals("Sg")) ||
-                (feature.equals("Pl")));
-    }
-
-    public boolean isSingular() {
-        return (this.number).equals("Sg");
-    }
-
-    public boolean isPlural() {
-        return (this.number).equals("Pl");
-    }
-
-    public boolean hasUndefinedNumber() {
-        return (this.number).equals(UNDEFINED);
-    }
-
-    public String getGender() {
-        return this.gender;
-    }
-
-    public String getNumber() {
-        return this.number;
-    }
-
-    public String getPerson() {
-        return this.person;
-    }
-
-    private static boolean match(String feature1,
-                                 String feature2) {
-        return feature1.equals(feature2);
-    }
+    public String getGender() { return this.gender; }
+    public String getNumber() { return this.number; }
+    public String getPerson() { return this.person; }
 
     /**
-     * This static method returns true if the two GraphNodes
-     * agree in their index features and are therefore
-     * candidates for the coreference relation
-     * <p/>
-     * Examples: "sie" and "die Frau",
-     * "sie" und "die Kinder" and so forth.
-     *
-     * @param node1     The first node to be matched against the index features.
-     * @param node2     The second node to be matched against the index features.
-     * @param verbosity The level of verbosity.
-     * @return True if the given GraphNodes agree in their index features.
+     * returns true if the two GraphNodes agree in their index features.
      */
-    public static final boolean indexFeaturesMatch(GraphNode node1,
-                                                   GraphNode node2,
-                                                   int verbosity) {
-        boolean match = true;
+    public static boolean indexFeaturesMatch(GraphNode node1, GraphNode node2, int verbosity) {
         IndexFeatures feat1 = new IndexFeatures(node1, verbosity);
         IndexFeatures feat2 = new IndexFeatures(node2, verbosity);
-        String gender1 = feat1.getGender();
-        String person1 = feat1.getPerson();
-        String number1 = feat1.getNumber();
-        String gender2 = feat2.getGender();
-        String person2 = feat2.getPerson();
-        String number2 = feat2.getNumber();
-        if (match) {
-            match = match(gender1, gender2);
-        }
-        if (match) {
-            match = match(number1, number2);
-        }
-        if (match) {
-            match = match(person1, person2);
-        }
-        return match;
+        
+        boolean genderMatch = isUndefined(feat1.getGender()) || isUndefined(feat2.getGender()) || feat1.getGender().equals(feat2.getGender());
+        boolean numberMatch = isUndefined(feat1.getNumber()) || isUndefined(feat2.getNumber()) || feat1.getNumber().equals(feat2.getNumber());
+        boolean personMatch = isUndefined(feat1.getPerson()) || isUndefined(feat2.getPerson()) || feat1.getPerson().equals(feat2.getPerson());
+        
+        return genderMatch && numberMatch && personMatch;
     }
 
-    /**
-     * This static method returns true if the two GraphNodes
-     * agree in their index features and are therefore
-     * candidates for the coreference relation
-     * <p/>
-     * Examples: "sie" and "die Frau",
-     * "sie" und "die Kinder" and so forth.
-     *
-     * @param node1 The first node to be matched against the index features.
-     * @param node2 The second node to be matched against the index features.
-     * @return True if the given GraphNodes agree in their index features.
-     */
-    public static final boolean indexFeaturesMatch(GraphNode node1,
-                                                   GraphNode node2) {
+    public static boolean indexFeaturesMatch(GraphNode node1, GraphNode node2) {
         return indexFeaturesMatch(node1, node2, 0);
     }
-
-} // class IndexFeatures
+}

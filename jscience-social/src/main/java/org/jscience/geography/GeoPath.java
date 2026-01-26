@@ -102,7 +102,7 @@ public class GeoPath implements Named, Serializable {
         for (int i = 0; i < points.size() - 1; i++) {
             Quantity<Length> dist = points.get(i).distanceTo(points.get(i + 1));
             if (dist != null) {
-                totalMeters += dist.to(Units.METER).getValue();
+                totalMeters += dist.to(Units.METER).getValue().doubleValue();
             }
         }
         return Quantities.create(totalMeters, Units.METER);

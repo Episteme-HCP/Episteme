@@ -23,11 +23,11 @@
 
 package org.jscience.economics;
 
-import java.io.Serializable;
+
 import java.time.Instant;
 import java.util.Objects;
 import org.jscience.economics.money.Money;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.measure.Quantity;
 
 /**
@@ -38,7 +38,7 @@ import org.jscience.measure.Quantity;
  * @version 1.1
  * @since 1.0
  */
-public class HumanResource extends Resource implements Property, Serializable {
+public class HumanResource extends Resource implements Property {
 
     private static final long serialVersionUID = 1L;
 

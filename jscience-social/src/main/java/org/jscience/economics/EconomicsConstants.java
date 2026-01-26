@@ -35,6 +35,9 @@ package org.jscience.economics;
  * @since 1.0
  */
 public final class EconomicsConstants {
+    
+    /** Common identifier for unknown categories or processes. */
+    public static final int UNKNOWN = -1;
 
     private EconomicsConstants() {}
 

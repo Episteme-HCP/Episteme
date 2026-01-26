@@ -23,7 +23,7 @@
 
 package org.jscience.sociology;
 
-import java.io.Serializable;
+
 import org.jscience.biology.Individual;
 import org.jscience.economics.Organization;
 
@@ -35,7 +35,7 @@ import org.jscience.economics.Organization;
  * @version 1.1
  * @since 1.0
  */
-public class MasterOfCeremony extends Role implements Serializable {
+public class MasterOfCeremony extends Role {
 
     private static final long serialVersionUID = 1L;
 

@@ -2,7 +2,7 @@ package org.jscience.linguistics;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Objects;
+
 import java.util.Set;
 import org.jscience.biology.Individual;
 import org.jscience.sociology.Role;

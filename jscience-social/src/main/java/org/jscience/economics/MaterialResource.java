@@ -20,30 +20,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package org.jscience.economics;
 
-import java.io.Serializable;
+
 import java.time.Instant;
 import java.util.Objects;
 import org.jscience.economics.money.Money;
-import org.jscience.geography.Place;
+import org.jscience.earth.Place;
 import org.jscience.measure.Quantity;
 import org.jscience.util.identity.Identification;
+import org.jscience.util.persistence.Attribute;
+import org.jscience.util.persistence.Persistent;
 
 /**
  * Represents a physical or tangible resource with a unique identification (serial number).
  *
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
- * @version 1.1
- * @since 1.0
+ * @version 1.2
  */
-public class MaterialResource extends Resource implements Property, Serializable {
+@Persistent
+public class MaterialResource extends Resource implements Property {
 
     private static final long serialVersionUID = 1L;
 
-    private Identification identification;
+    @Attribute
     private Money value;
 
     /**
@@ -60,12 +61,10 @@ public class MaterialResource extends Resource implements Property, Serializable
     public MaterialResource(String name, String description, Quantity<?> amount,
             Community producer, Place productionPlace, Instant productionDate,
             Identification id, Money value) {
-        super(name, description, amount, producer, productionPlace, productionDate);
-        this.identification = Objects.requireNonNull(id, "Identification cannot be null");
+        super(id, name, description, amount, producer, productionPlace, productionDate);
         this.value = Objects.requireNonNull(value, "Value cannot be null");
     }
 
-    public Identification getIdentification() { return identification; }
     public Money getValue() { return value; }
 
     public void setValue(Money value) {
@@ -76,12 +75,11 @@ public class MaterialResource extends Resource implements Property, Serializable
     public boolean equals(Object o) {
         if (!super.equals(o)) return false;
         if (!(o instanceof MaterialResource that)) return false;
-        return Objects.equals(identification, that.identification) && 
-               Objects.equals(value, that.value);
+        return Objects.equals(value, that.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), identification, value);
+        return Objects.hash(super.hashCode(), value);
     }
 }

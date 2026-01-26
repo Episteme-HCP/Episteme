@@ -48,10 +48,10 @@ public class PsychologyDomainTest {
     public void testDecisionRecording() {
         Decision d = new Decision("Agent 007", "Attack", "Threat detected");
 
-        assertEquals("Agent 007", d.getSubject());
-        assertEquals("Attack", d.getChoice());
-        assertEquals("Threat detected", d.getRationale());
-        assertNotNull(d.getTimestamp());
+        assertEquals("Agent 007", d.subject());
+        assertEquals("Attack", d.choice());
+        assertEquals("Threat detected", d.rationale());
+        assertNotNull(d.timestamp());
 
         assertTrue(d.toString().contains("decided to Attack"));
     }

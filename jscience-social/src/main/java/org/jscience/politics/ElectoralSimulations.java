@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -108,7 +107,6 @@ public final class ElectoralSimulations {
         for (List<String> b : ballots) candidates.addAll(b);
 
         List<String> candidateList = new ArrayList<>(candidates);
-        int n = candidateList.size();
 
         for (String c1 : candidateList) {
             boolean isCondorcetWinner = true;
@@ -163,7 +161,7 @@ public final class ElectoralSimulations {
                 String candidate = b.get(i);
                 if (candidates.contains(candidate)) {
                     int p = n - 1 - i;
-                    points.merge(candidate, Math.max(0, p), Integer::sum);
+                    points.merge(candidate, Math.max(0, p), (x, y) -> x + y);
                 }
             }
         }
@@ -356,7 +354,7 @@ public final class ElectoralSimulations {
         Map<String, Integer> counts = new HashMap<>();
         for (List<String> voterApprovals : approvals) {
             for (String candidate : voterApprovals) {
-                counts.merge(candidate, 1, Integer::sum);
+                counts.merge(candidate, 1, (a, b) -> a + b);
             }
         }
 
@@ -382,8 +380,8 @@ public final class ElectoralSimulations {
 
         for (Map<String, Integer> voterScores : scores) {
             for (Map.Entry<String, Integer> entry : voterScores.entrySet()) {
-                totalScores.merge(entry.getKey(), entry.getValue(), Integer::sum);
-                voteCounts.merge(entry.getKey(), 1, Integer::sum);
+                totalScores.merge(entry.getKey(), entry.getValue(), (a, b) -> a + b);
+                voteCounts.merge(entry.getKey(), 1, (a, b) -> a + b);
             }
         }
 
@@ -415,7 +413,7 @@ public final class ElectoralSimulations {
         Map<String, Integer> totalScores = new HashMap<>();
         for (Map<String, Integer> voterScores : scores) {
             for (Map.Entry<String, Integer> entry : voterScores.entrySet()) {
-                totalScores.merge(entry.getKey(), entry.getValue(), Integer::sum);
+                totalScores.merge(entry.getKey(), entry.getValue(), (a, b) -> a + b);
             }
         }
 
@@ -480,7 +478,7 @@ public final class ElectoralSimulations {
             }
 
             if (winner != null) {
-                allocation.merge(winner, 1, Integer::sum);
+                allocation.merge(winner, 1, (a, b) -> a + b);
             }
         }
 
@@ -521,7 +519,7 @@ public final class ElectoralSimulations {
             }
 
             if (winner != null) {
-                allocation.merge(winner, 1, Integer::sum);
+                allocation.merge(winner, 1, (a, b) -> a + b);
             }
         }
 
@@ -563,7 +561,7 @@ public final class ElectoralSimulations {
             }
 
             if (winner != null) {
-                allocation.merge(winner, 1, Integer::sum);
+                allocation.merge(winner, 1, (a, b) -> a + b);
             }
         }
 
@@ -616,7 +614,7 @@ public final class ElectoralSimulations {
             }
 
             if (winner != null) {
-                allocation.merge(winner, 1, Integer::sum);
+                allocation.merge(winner, 1, (a, b) -> a + b);
             }
         }
 
@@ -657,7 +655,7 @@ public final class ElectoralSimulations {
 
         for (int i = 0; i < remainingSeats && i < sortedRemainders.size(); i++) {
             String party = sortedRemainders.get(i).getKey();
-            allocation.merge(party, 1, Integer::sum);
+            allocation.merge(party, 1, (a, b) -> a + b);
         }
 
         return allocation;
@@ -695,7 +693,7 @@ public final class ElectoralSimulations {
 
         for (int i = 0; i < remainingSeats && i < sortedRemainders.size(); i++) {
             String party = sortedRemainders.get(i).getKey();
-            allocation.merge(party, 1, Integer::sum);
+            allocation.merge(party, 1, (a, b) -> a + b);
         }
 
         return allocation;
@@ -717,7 +715,7 @@ public final class ElectoralSimulations {
         Map<String, Integer> firstRoundCounts = new HashMap<>();
         for (List<String> ballot : ballots) {
             if (!ballot.isEmpty()) {
-                firstRoundCounts.merge(ballot.get(0), 1, Integer::sum);
+                firstRoundCounts.merge(ballot.get(0), 1, (a, b) -> a + b);
             }
         }
 
@@ -827,7 +825,7 @@ public final class ElectoralSimulations {
             String leastFavorite = ballot.get(ballot.size() - 1);
             for (String c : candidateSet) {
                 if (!c.equals(leastFavorite)) {
-                    counts.merge(c, 1, Integer::sum);
+                    counts.merge(c, 1, (a, b) -> a + b);
                 }
             }
         }
@@ -860,7 +858,7 @@ public final class ElectoralSimulations {
         for (int rank = 0; rank < maxRank; rank++) {
             for (List<String> ballot : ballots) {
                 if (rank < ballot.size()) {
-                    accumulatedVotes.merge(ballot.get(rank), 1, Integer::sum);
+                    accumulatedVotes.merge(ballot.get(rank), 1, (a, b) -> a + b);
                 }
             }
 
@@ -918,8 +916,8 @@ public final class ElectoralSimulations {
                         last = c;
                     }
                 }
-                if (first != null) firstPref.merge(first, 1, Integer::sum);
-                if (last != null) lastPref.merge(last, 1, Integer::sum);
+                if (first != null) firstPref.merge(first, 1, (a, v) -> a + v);
+                if (last != null) lastPref.merge(last, 1, (a, v) -> a + v);
             }
 
             // Check for absolute majority of first preferences

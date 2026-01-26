@@ -89,10 +89,17 @@ public class Word2VecReader extends AbstractResourceReader<Map<String, Vector<Re
                 components[i] = Real.of(Double.parseDouble(values[i + 1]));
             }
             
-            model.put(word, DenseVector.of(components));
+            model.put(word, DenseVector.of(Arrays.asList(components), Real.ZERO));
             if (model.size() >= numWords) break;
         }
         return model;
+    }
+
+    @Override
+    public String getLongDescription() {
+        return "Advanced word embedding loader supporting standard Word2Vec text format. " +
+               "It reads word-vector pairs, parses header metadata for validation, and provides " +
+               "cosine similarity utilities for semantic analysis.";
     }
 
     /**
