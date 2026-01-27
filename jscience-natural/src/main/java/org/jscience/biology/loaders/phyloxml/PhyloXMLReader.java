@@ -24,10 +24,13 @@
 package org.jscience.biology.loaders.phyloxml;
 
 import org.jscience.io.AbstractResourceReader;
+import org.jscience.biology.evolution.PhylogeneticTree;
+import org.jscience.biology.taxonomy.Species;
 
 import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.*;
 import java.io.*;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
